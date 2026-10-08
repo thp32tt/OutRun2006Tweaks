@@ -18,6 +18,9 @@ def verify(source):
        ("caps positive default", "TIMECAPS caps{ 1, 1 };" in fps),
        ("QPC counter checked", "if (!QueryPerformanceFrequency(&qpf) || qpf.QuadPart <= 0)" in fps),
        ("timer optional", "Timer = CreateWaitableTimerExW(" in fps),
+       ("render wait checks arming failure", "if (!SetWaitableTimerEx(Timer, &due, 0, NULL, NULL, NULL, 0))" in fps),
+       ("render wait is bounded", "WaitForSingleObject(Timer, waitBudgetMs) != WAIT_OBJECT_0" in fps),
+       ("timer wait has finite QPC slice", "std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)" in fps),
        ("file loader lock failure refuses hook install",
         "if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))" in source["src/hooks_bugfixes.cpp"] and
         "FixFileLoadRace: unable to initialize request-list lock" in source["src/hooks_bugfixes.cpp"])
@@ -39,7 +42,10 @@ def negatives(src):
       ("src/hooks_framerate.cpp","auto timeGetDevCaps = winmm"),
       ("src/hooks_framerate.cpp","TIMECAPS caps{ 1, 1 };"),
       ("src/hooks_framerate.cpp","if (!QueryPerformanceFrequency(&qpf) || qpf.QuadPart <= 0)"),
-      ("src/hooks_bugfixes.cpp","if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))")]
+      ("src/hooks_bugfixes.cpp","if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))"),
+      ("src/hooks_framerate.cpp","if (!SetWaitableTimerEx(Timer, &due, 0, NULL, NULL, NULL, 0))"),
+      ("src/hooks_framerate.cpp","WaitForSingleObject(Timer, waitBudgetMs) != WAIT_OBJECT_0"),
+      ("src/hooks_framerate.cpp","std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)")]
     for path,token in cases:
        copy=dict(src)
        copy[path]=src[path].replace(token,"__FAIL_CROSS_SOURCE_GUARD__",1)
@@ -55,4 +61,4 @@ if __name__=="__main__":
         n=verify(s)
         m=negatives(s) if "--self-test" in sys.argv[1:] else 0
     except ValueError as e:sys.exit("Win32 cross-domain contract FAIL: "+str(e))
-    print(f"Win32 cross-domain contracts PASS: {n}, mutation-negative={m}/10, runtime UNTESTED")
+    print(f"Win32 cross-domain contracts PASS: {n}, mutation-negative={m}/13, runtime UNTESTED")

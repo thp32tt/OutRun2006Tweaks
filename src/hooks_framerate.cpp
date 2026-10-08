@@ -74,8 +74,22 @@ public:
 
 				LARGE_INTEGER due;
 				due.QuadPart = -(sleepTicks > maxTicks ? maxTicks : sleepTicks);
-				SetWaitableTimerEx(Timer, &due, 0, NULL, NULL, NULL, 0);
-				WaitForSingleObject(Timer, INFINITE);
+				// A timer handle can exist yet fail arming (or the wait can
+				// fail). INFINITE here would freeze the rendering thread forever.
+				// Bound the wait to the requested slice with a small scheduler
+				// tolerance; recover via the final QPC spin on failure.
+				if (!SetWaitableTimerEx(Timer, &due, 0, NULL, NULL, NULL, 0))
+				{
+					QueryPerformanceCounter(&qpc);
+					break;
+				}
+				const DWORD waitBudgetMs = static_cast<DWORD>(
+					std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000));
+				if (WaitForSingleObject(Timer, waitBudgetMs) != WAIT_OBJECT_0)
+				{
+					QueryPerformanceCounter(&qpc);
+					break;
+				}
 				QueryPerformanceCounter(&qpc);
 			}
 		}
