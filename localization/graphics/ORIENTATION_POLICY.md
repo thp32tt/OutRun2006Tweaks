@@ -157,6 +157,26 @@ Effective 2026-09-28:
 - Canonical audit record: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
 
 
+## Production extension: plate-only + composition-only protection (2026-10-08)
+
+The mandatory production **10-stage** and retained original **eight ordered**
+checks are specified in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md`.
+They apply per sprite and do **not** change the RAW orientation rules below.
+
+- Review exact-source **SOURCE vs CLEAN** with Korean hidden. An English
+  outline/glow ghost, donor patch, alpha edge or rectangular erasure trace
+  invalidates the plate, regardless of later text coverage.
+- Composite only transparent Hangul glyph/effect alpha onto approved CLEAN.
+  Review **CLEAN vs FINAL** independently and reject any visible foreign box,
+  patch intrusion or rectangular composite seam. Ordinary editing selection
+  boxes are allowed if they leave no unintended pixels.
+- Review persisted decoded DDS at RAW/readable native and practical/mip sizes.
+  Source-size bbox, 1px protected overlap, per-sprite transform and no
+  source residue continue to be absolute gates.
+- Record the five distinct plate/composition failure codes defined by the
+  quality pipeline. A/B must not claim producer PASS for an identified visual
+  defect or hand that failed candidate to C as a success.
+
 ## Recovery quality pipeline: clean plate before lettering
 
 This section imports image-quality techniques without importing later controller/automation machinery. It applies to newly produced or materially reworked localized graphics.
