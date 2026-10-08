@@ -190,6 +190,11 @@ namespace SumoUISpriteReplay
 		uint32_t kind;
 		SPRARGS args;
 		SPRARGS2 args2;
+		OutRunVR::GameSemantic::RenderScope vrScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		OutRunVR::GameSemantic::ProducerToken vrProducer =
+			OutRunVR::GameSemantic::ProducerToken::None;
+		OutRunVR::GameSemantic::ProjectedMarkerInfo vrProjectedMarker{};
 		// Source SpriteNodes are unlinked after each rendered frame. A copied
 		// SPRARGS2::child_B4 (mask chain) must never point back into a reused
 		// game sprite ring on the next no-tick replay.
@@ -198,11 +203,6 @@ namespace SumoUISpriteReplay
 		std::array<const SPRARGS2*, MaxMaskChildren> maskSourceAddresses{};
 		unsigned maskCount = 0;
 		bool replayable = true;
-		OutRunVR::GameSemantic::RenderScope vrScope =
-			OutRunVR::GameSemantic::RenderScope::None;
-		OutRunVR::GameSemantic::ProducerToken vrProducer =
-			OutRunVR::GameSemantic::ProducerToken::None;
-		OutRunVR::GameSemantic::ProjectedMarkerInfo vrProjectedMarker{};
 	};
 
 	static Entry Captured[Game::SpriteNodeMax];
