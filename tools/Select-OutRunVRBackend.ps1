@@ -220,6 +220,17 @@ if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it b
 Seal-PendingSessionLogs
 
 Copy-Required "dinput8.dll"
+# SOURCE_SHA.txt describes the selected payload, not the DLL that Windows
+# actually loads. A stale root dinput8.dll must never pass silently.
+$selectedGameDll = Join-Path $src "dinput8.dll"
+$rootGameDll = Join-Path $root "dinput8.dll"
+Assert-X86Pe $selectedGameDll "Selected game dinput8.dll"
+Assert-X86Pe $rootGameDll "Installed game dinput8.dll"
+$selectedGameDllSha256 = Get-Sha256Lower $selectedGameDll
+$installedGameDllSha256 = Get-Sha256Lower $rootGameDll
+if ($installedGameDllSha256 -ne $selectedGameDllSha256) {
+    throw "Game DLL identity mismatch after selection: expected $selectedGameDllSha256, installed $installedGameDllSha256"
+}
 
 if ($Backend -eq "2d") {
     Remove-RootVerified "d3d9.dll"
@@ -328,6 +339,8 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "gameDllSha256=$installedGameDllSha256"
+    "selectedGameDllSha256=$selectedGameDllSha256"
     "provider=$backendProvider"
     "dxvkD3D9Sha256=$dxvkD3D9Sha256"
     "multiviewPatcherSha256=$multiviewPatcherSha256"
