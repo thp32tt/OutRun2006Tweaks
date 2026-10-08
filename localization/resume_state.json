@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C273 q175 754F0599 exact A153 5b37fdaf... is REWORK_REQUIRED: preserve clean/bbox/source-left/RAW but reduce broad black extrusion/outline and rebuild thinner rounded/segmented techno Hangul family. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
+    "C273 q161 55B57CDE exact A157 66a89385... is HOLD_STRICT_RECHECK: visual contact/RAW is favorable but current invocation was not pixels-first and lacks complete lossless per-region evidence. Preserve bytes; future C1 must inspect exact pixels before producer verdict and generate complete region evidence, then separate C3. RUNTIME_VALIDATION=UNTESTED.",
     "C272 q219 D263B3F1 exact A181R candidate 41cf4c15... is REWORK_REQUIRED: remove arbitrary 0.80 English-width targeting and rebuild rounded/segmented silver-techno Hangul with open counters while preserving A113 clean plate, exact bbox/margins, OutRun2 artwork and RAW mirror-Y. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + NEW actual-game retest. IGR-025 also remains HOLD for unresolved screenshot(163) labels. RUNTIME_VALIDATION=UNTESTED.",
     "C271 q59 7CE1CFC5 remains REWORK_REQUIRED for source-style/hierarchy/effect fidelity; do not re-review until producer bytes materially change. RUNTIME_VALIDATION=UNTESTED.",
     "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
@@ -10790,6 +10792,21 @@
     "candidate_changed": false,
     "report": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_Q154_CONTROLLER_QA.json",
     "pre_commit_refresh_head": "6a13a898821b5eb0ad77496fd814802dfb34dcce",
+    "runtime_validation": "UNTESTED"
+  },
+  "c273_c1_q161_q175_evidence": {
+    "run": "20261008-C273-C1-Q161-Q175-EVIDENCE",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "q161": {
+      "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+      "status": "HOLD_STRICT_RECHECK"
+    },
+    "q175": {
+      "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+      "status": "REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_EXTRUSION_WEIGHT"
+    },
+    "report": "localization/graphics/role_C/20261008-C273-C1-Q161-Q175-EVIDENCE/C273_BATCH_REPORT.json",
     "runtime_validation": "UNTESTED"
   }
 }
