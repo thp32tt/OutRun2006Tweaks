@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A189-Q217-SOURCE-GOLD-ITALIC",
+  "queue_index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_elements": 2
+  },
+  "mapping_provenance": "A113 exact readable/component mapping fixed the two D103 route-map sign ROIs. A189 uses the B190/B191 convex-red-hull clean reconstruction method independently on D103 source pixels.",
+  "same_family_reference": "C288 user-returned native English START/GOAL cream-gold italic badge family",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "start",
+      "source": "START",
+      "ko": "출발",
+      "roi": [
+        788,
+        495,
+        910,
+        545
+      ],
+      "source_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "banner_bbox": [
+        800,
+        507,
+        890,
+        534
+      ],
+      "source_text_pixels": 1215,
+      "banner_pixels": 2021,
+      "component_meta": [
+        [
+          518,
+          [
+            15,
+            14,
+            86,
+            37
+          ]
+        ],
+        [
+          117,
+          [
+            36,
+            21,
+            48,
+            37
+          ]
+        ],
+        [
+          464,
+          [
+            46,
+            21,
+            85,
+            37
+          ]
+        ],
+        [
+          116,
+          [
+            84,
+            21,
+            96,
+            37
+          ]
+        ]
+      ],
+      "clean_region_bbox": [
+        801,
+        508,
+        889,
+        533
+      ],
+      "clean_region_pixels": 1986,
+      "red_hull_vertices": [
+        [
+          811,
+          507
+        ],
+        [
+          889,
+          507
+        ],
+        [
+          889,
+          509
+        ],
+        [
+          887,
+          516
+        ],
+        [
+          884,
+          525
+        ],
+        [
+          881,
+          532
+        ],
+        [
+          880,
+          533
+        ],
+        [
+          800,
+          533
+        ],
+        [
+          803,
+          525
+        ],
+        [
+          808,
+          512
+        ],
+        [
+          810,
+          508
+        ]
+      ],
+      "korean": "출발",
+      "font": "NanumSquareRound Bold",
+      "font_family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+      "font_size": 17,
+      "tracking_px": 4,
+      "readable_shear": 0.28,
+      "bevel": "three-tone source-cream-gold face/white upper lip/orange lower inset",
+      "extrusion": "warm source-orange offset 1x2px",
+      "horizontal_scaling": 1.0,
+      "source_base_rgb": [
+        244,
+        225,
+        180
+      ],
+      "source_depth_rgb": [
+        234,
+        131,
+        95
+      ],
+      "localized_bbox": [
+        824,
+        510,
+        863,
+        531
+      ],
+      "source_width": 81,
+      "source_height": 23,
+      "localized_width": 39,
+      "localized_height": 21,
+      "delta_left": 21,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "ko": "골",
+      "roi": [
+        1325,
+        755,
+        1445,
+        810
+      ],
+      "source_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "banner_bbox": [
+        1339,
+        770,
+        1429,
+        797
+      ],
+      "source_text_pixels": 1510,
+      "banner_pixels": 2181,
+      "component_meta": [
+        [
+          1510,
+          [
+            18,
+            16,
+            95,
+            40
+          ]
+        ]
+      ],
+      "clean_region_bbox": [
+        1340,
+        771,
+        1428,
+        796
+      ],
+      "clean_region_pixels": 2038,
+      "red_hull_vertices": [
+        [
+          1349,
+          770
+        ],
+        [
+          1428,
+          770
+        ],
+        [
+          1428,
+          782
+        ],
+        [
+          1418,
+          796
+        ],
+        [
+          1339,
+          796
+        ],
+        [
+          1339,
+          793
+        ],
+        [
+          1341,
+          787
+        ],
+        [
+          1345,
+          777
+        ],
+        [
+          1348,
+          771
+        ]
+      ],
+      "korean": "골",
+      "font": "NanumSquareRound Bold",
+      "font_family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+      "font_size": 20,
+      "tracking_px": 4,
+      "readable_shear": 0.28,
+      "bevel": "three-tone source-cream-gold face/white upper lip/orange lower inset",
+      "extrusion": "warm source-orange offset 1x2px",
+      "horizontal_scaling": 1.0,
+      "source_base_rgb": [
+        255,
+        233,
+        173
+      ],
+      "source_depth_rgb": [
+        247,
+        118,
+        84
+      ],
+      "localized_bbox": [
+        1371,
+        772,
+        1392,
+        794
+      ],
+      "source_width": 77,
+      "source_height": 24,
+      "localized_width": 21,
+      "localized_height": 22,
+      "delta_left": 28,
+      "delta_right": 28,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_source_residue": 0,
+    "clean_non_red": 0,
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "final_source_residue_exact": 5,
+    "final_source_residue_color": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "A189_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_touched": false
+}

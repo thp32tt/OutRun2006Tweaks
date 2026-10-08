@@ -1,0 +1,11 @@
+{
+  "run": "20261008-A189-Q217-SOURCE-GOLD-ITALIC",
+  "index": 217,
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "bbox_size_positive_margin": "2/2 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "residue": 0,
+  "status": "A189_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_D1039D6F_REPORT.json"
+}
