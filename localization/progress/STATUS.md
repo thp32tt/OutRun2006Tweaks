@@ -3097,3 +3097,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 22:52 KST — C307 C1 q139 C3 fallback
 - `TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL)`. Prior C226 PASS 2048×1024 RGBA source and candidate SHA independently verified; 14 new SOURCE/CLEAN/FINAL lossless PNG native/BGW/zoom/75/50/RAW. Outside changes 0, source original bbox positive margins 2/2, source family readable. Current-policy C3 `HOLD_STRICT_RECHECK`: independent blind calibration/full family/per-region evidence incomplete, historical C226 retained; no new DDS/C3 approval/user/game PASS, `RUNTIME_VALIDATION=UNTESTED`. localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json
+
+### 2026-10-08 22:59 KST — C307 C2 EVEN q230 lossless/whole-atlas HOLD
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`. 22 new source/CLEAN/final native+75+50/RAW/zoom lossless PNG and full-atlas CLEAN/FINAL pixel gate outside q230 two help bboxes 0/0/0. Exact DDS preserved. Independent blind calibration/source-family/semantic anchors/full approval outstanding: `C3_STRICT_AUDIT=HOLD_STRICT_RECHECK`, current APPROVALS/export blocked, DDS 0, `RUNTIME_VALIDATION=UNTESTED`. Controller `localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json`.

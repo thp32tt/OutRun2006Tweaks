@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 22:52 KST",
+  "updated_at_kst": "2026-10-08 22:59 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8007,5 +8007,26 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json"
+  },
+  "c307_c2_q230_plate_composite": {
+    "task_id": "OUTRUN-KOR-C307-C2-Q230-PLATE-COMPOSITE-20261008-2250",
+    "updated_at_kst": "2026-10-08 22:59 KST",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 230,
+    "triage": "EVIDENCE_ONLY_HOLD",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "authored_clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+    "new_lossless_png": 22,
+    "atlas_outside_RGBA": 0,
+    "atlas_outside_alpha": 0,
+    "atlas_outside_visible": 0,
+    "new_dds": 0,
+    "C3": "HOLD_STRICT_RECHECK",
+    "APPROVED": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
+    "machine": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_PLATE_COMPOSITE_NATIVE_MACHINE.json"
   }
 }

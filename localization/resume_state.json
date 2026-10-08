@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C307 C2 EVEN q230 E95DA5: 22 new exact-SHA lossless SOURCE/CLEAN/FINAL, BLACK/GRAY/WHITE native/75/50, RAW and 200%; complete clean/final atlas outside 2 help regions RGBA/alpha/visible 0/0/0. Calibrated blind source-family weight/counter-space/slant/full-inventory review missing; C3 HOLD and no approval; no DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
     "C307 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) C3_STRICT_AUDIT fallback (fresh odd C done/none actionable). Reverified exact 313DB8CB source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and unchanged A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; 14 independent lossless SOURCE/CLEAN/FINAL native black/gray/white 2x/75/50/RAW views. 2/2 source bbox positive margin, outside source/clean/candidate 0, alpha-outside0, header/RAW matched; no definite visual source residue, wrong slant or glyph loss observed. Historical C226 C PASS retained, C3 HOLD_STRICT_RECHECK lacking qualified blind calibration and full current-policy family/anchor/approval evidence. No new DDS/approval/user/actual-game; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json.",
     "B273 B EVEN q098 42E618FD rejected source-white-face/BC3 trials: B272 trial SHA 71d5683b... 23854 pixels erased navy outline; B273 trial SHA 7f9bc391... 1321 microhole pixels/320 BC3 blocks exact alpha/header/outside0 but native/practical 100/50 shows dark glyph-face streaks, controller VISUAL FAIL. Both trial DDS only under role_B, neither promoted. Existing B269 SHA 1d63cd9b... remains byte-identical production candidate and C300 REWORK_REQUIRED. Next use source-derived native white face + navy keyline and qualified CLEAN, not more same-method BC3 fill; fresh C2/C3/user/game blocked. B273_CONTROLLER_VISUAL_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C306 C2 EVEN q154: 30 SHA-bound lossless PNG proof source/authored CLEAN/current DDS, 3 gray menu regions × BLACK/GRAY/WHITE × 100/75/50 plus RAW. Still HOLD_STRICT_RECHECK until first-look calibrated C + source-family counter/weight/semantic anchors + whole-atlas/mips/source separation; no DDS rerender, no C3/approval, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json",
@@ -6778,7 +6779,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 22:52 KST",
+  "updated_at_kst": "2026-10-08 22:59 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12052,5 +12053,26 @@
     "current_policy_approval": false,
     "qa": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c307_c2_q230_plate_composite": {
+    "task_id": "OUTRUN-KOR-C307-C2-Q230-PLATE-COMPOSITE-20261008-2250",
+    "updated_at_kst": "2026-10-08 22:59 KST",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 230,
+    "triage": "EVIDENCE_ONLY_HOLD",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "authored_clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+    "new_lossless_png": 22,
+    "atlas_outside_RGBA": 0,
+    "atlas_outside_alpha": 0,
+    "atlas_outside_visible": 0,
+    "new_dds": 0,
+    "C3": "HOLD_STRICT_RECHECK",
+    "APPROVED": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
+    "machine": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_PLATE_COMPOSITE_NATIVE_MACHINE.json"
   }
 }
