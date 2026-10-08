@@ -78,11 +78,14 @@ for path in (
     'tools/analyze_outrun_exe.py',
     'tools/verify_vr_visual_composition_p0.py',
     'tools/verify_vr_hud_exact_callsite_contract.py',
+    'tools/verify_vr_projected_marker_anchor.py',
 ):
     if hud_inspector_workflow.count(path) < 2:
         raise SystemExit(
             f'P0 visual composition drift: HUD Inspector must watch {path!r} on push and PR'
         )
+require("'tools/verify_vr_projected_marker_anchor.py'",
+        dx9ex_active_workflow, 'DX9Ex Active watches projected marker verifier')
 require('python tools/verify_vr_visual_composition_p0.py',
         hud_inspector_workflow, 'HUD Inspector executes the P0 contract')
 require("'.github/workflows/outrun-exe-hud-inspector.yml'",
