@@ -11393,7 +11393,7 @@ VSOutput main(VSInput input)
                              ID3D11RenderTargetView* target,
                              const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
             return outrun::vr::dx11::
-                execute_fixed_function_nonindexed_direct_draw_probe(
+                prepare_fixed_function_nonindexed_direct_draw_probe(
                     context, target, nonIndexedRenderTargetBoundDraw,
                     nonIndexedDirectDrawReady, nonIndexedGeometryReady,
                     packet, D3DPT_TRIANGLESTRIP, 2u, 1u);
@@ -11421,7 +11421,12 @@ VSOutput main(VSInput input)
         require(
             r156Probe(d3d.context, outputColorSurface.render_target_view(),
                       nonIndexedDirectDispatch),
-            "R156 real native Draw issues against matching offscreen WARP state");
+            "R156 validates native Draw prerequisites on matching WARP state");
+        // The protected native backend never calls Draw*: issue this only
+        // inside the isolated WARP regression probe after live preflight.
+        d3d.context->Draw(
+            nonIndexedDirectDispatch.elementCount,
+            nonIndexedDirectDispatch.startVertexLocation);
         d3d.context->End(r156Stats);
         d3d.context->Flush();
         D3D11_QUERY_DATA_PIPELINE_STATISTICS r156Counters{};

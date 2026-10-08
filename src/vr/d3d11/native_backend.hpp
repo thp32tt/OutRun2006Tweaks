@@ -4359,12 +4359,13 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     INT baseVertexLocation,
     std::uint64_t snapshotToken) noexcept;
 
-// R156: a diagnostic-only bridge from a sealed nonindexed direct dispatch
-// to an actual offscreen D3D11 Draw. It is not wired to the game's draw hook,
-// the native activation selector, or the OpenXR submission path.
+// R156: diagnostic preflight for a sealed offscreen nonindexed Draw in the
+// dedicated WARP test harness. Gameplay/native draw activation remains dormant.
+// This function never calls Draw; only tools/dx11_constant_buffer_probe.cpp
+// issues the separately reviewed offscreen WARP test Draw.
 // Caller must supply an explicit expected probe RTV; the bridge rechecks live
 // immediate-context OM/IA/VS/PS state and refuses indexed or stale dispatches.
-[[nodiscard]] bool execute_fixed_function_nonindexed_direct_draw_probe(
+[[nodiscard]] bool prepare_fixed_function_nonindexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,

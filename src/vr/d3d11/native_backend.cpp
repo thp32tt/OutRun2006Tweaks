@@ -14444,10 +14444,10 @@ bool validate_fixed_function_direct_draw_dispatch_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
-// R156: WARP/offscreen proof-only native Draw bridge; no gameplay caller.
-// Unlike dormant scalar dispatch checks, this issues a real D3D11 Draw after
-// checking the current device/context and the live OM/IA/VS/PS attachments.
-bool execute_fixed_function_nonindexed_direct_draw_probe(
+// R156: offscreen WARP-only native Draw preflight; no gameplay draw dispatch.
+// The actual D3D11 Draw resides exclusively in tools/dx11_constant_buffer_probe.cpp.
+// This rechecks current device/context and live OM/IA/VS/PS attachments.
+bool prepare_fixed_function_nonindexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
@@ -14497,7 +14497,7 @@ bool execute_fixed_function_nonindexed_direct_draw_probe(
         liveTopology != dispatch.topology)
         return false;
 
-    context->Draw(dispatch.elementCount, dispatch.startVertexLocation);
+    // No native Draw* dispatch in production: preserve the activation boundary.
     return true;
 }
 
