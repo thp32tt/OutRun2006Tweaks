@@ -4023,19 +4023,21 @@ namespace OutRunVRStereo
                         if (!R30GetRecentRawWvpForQueueSprite(original))
                             return false;
                     }
-                    else if (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D &&
-                             R30GetRecentRawWvpForQueueSprite(original))
+                    else if (screenKind ==
+                        R30ScreenSpaceKind::ProjectedWorldMarker2D)
                     {
-                        // The original game c64 is still valid for this exact
-                        // node beyond the old 12-draw window. This avoids
-                        // applying head/eye offsets twice on later rank
-                        // digit siblings. The usual <=12 window and existing
-                        // original fallback remain unchanged for rival.
+                        // The same vehicle anchor cannot be reprojected using
+                        // a live head-injected GPU c64 after its original
+                        // upload expires. Either prove the raw same-shader
+                        // game c64, or let the outer renderer reject this
+                        // candidate; never apply the headset transform twice.
+                        if (!R30GetRecentRawWvpForQueueSprite(original))
+                            return false;
                     }
                     else
                     {
-                        // Unchanged exact WORLD_BILLBOARD, rival and world
-                        // paths: no risky projection or per-eye rewrites.
+                        // True WorldBillboard / rival retains its established
+                        // verified-world ownership and safe fallback path.
                         if (FAILED(device->GetVertexShaderConstantF(
                                 OutRunWvpRegister, original,
                                 OutRunWvpRegisterCount)))
