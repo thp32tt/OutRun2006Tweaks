@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B259-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "previous_C285_rejected_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "policy_version": "visual-evidence-v1-20261008",
+  "candidate_is_materially_changed": true,
+  "qa_source": "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_BF229CF4_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_SOURCE_CLEAN_B253_NEW_NATIVE6X.png",
+    "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_SOURCE_READABLE.png",
+    "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_FINAL_READABLE.png",
+    "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_FINAL_RAW.png",
+    "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_PRACTICAL_50.png"
+  ],
+  "material_repair": "C285 B258 style FAIL: grow native text face START 51x18->57x19 / GOAL 29x18->35x18, source-rightward shear +7->+10 px, add directional lower/right bevel to luminous cream glyph; retain exact BC3 source text effect box and guarded full-block only placement.",
+  "machine_qa": {
+    "result": "PASS",
+    "native_dds": "2048x2048 DXT5_BC3 RAW mirror_y",
+    "header_128": "EXACT",
+    "source_effect_regions": 2,
+    "changed_rgba_outside_english_source_effect_regions": 0,
+    "changed_alpha_outside": 0,
+    "changed_previous_candidate_rgba_outside": 0,
+    "bright_core_recall_start": 1,
+    "bright_core_recall_goal": 1,
+    "worst_decoded_bright_core_scanline_start": 1,
+    "worst_decoded_bright_core_scanline_goal": 1
+  },
+  "ordered_generation_gates": [
+    {
+      "step": "English removal and clean plate",
+      "result": "MACHINE_PASS_SOURCE_DERIVED_B253_CLEAN",
+      "limitation": "C must verify real authored plate and no hidden old glyph under the new face"
+    },
+    {
+      "step": "Readable slant direction",
+      "result": "MATERIAL_IMPROVEMENT",
+      "observation": "Top-right 10px shear, visibly stronger than B258; English per-glyph top-minus-bottom anchor not independently measured, HOLD exact style"
+    },
+    {
+      "step": "Native scale",
+      "result": "MACHINE_PASS",
+      "observation": "START bbox [826,497,889,516] within English [815,495,899,517]; GOAL [1361,766,1400,784] within [1343,764,1417,787]"
+    },
+    {
+      "step": "Weight, outline, shadow",
+      "result": "MATERIAL_IMPROVEMENT_HOLD",
+      "observation": "Gold lower/right bevel against cream luminous face added in persisted BC3. Remaining English-source metallic volume equivalence NOT proven"
+    },
+    {
+      "step": "Glyph integrity",
+      "result": "MACHINE_PASS",
+      "observation": "Persisted core retention 100% both; no obvious fragmented white stroke in viewed 6x comparison"
+    },
+    {
+      "step": "Protected artwork",
+      "result": "MACHINE_PASS",
+      "observation": "0 changed original RGBA/alpha pixels outside two original English effect regions, preserves scene, signs/rims outside exact scope"
+    },
+    {
+      "step": "RAW and FLIP-Y",
+      "result": "MACHINE_PASS_PENDING_NATIVE_C",
+      "observation": "Source and candidate header exact, correct RAW mirror-y decode, C to review high zoom native RAW"
+    },
+    {
+      "step": "Immediate readability",
+      "result": "CONTROLLER_OBSERVED_NATIVE6X_BUT_PENDING_INDEPENDENT",
+      "observation": "출발/골 distinguishable at native 6x; user game practical scale and source-family matching not yet certified"
+    }
+  ],
+  "producer_visual_first_hand": "Source, CLEAN, prior B257, and persisted B259 native6x contact reviewed. 10px rightward shear and warm lower bevel visible; C285 critique of flat cream was materially addressed but stylistic fidelity still uncertain. No independent approval or runtime evidence.",
+  "result": "HOLD_STRICT_RECHECK_FRESH_C2_SOURCE_FAMILY",
+  "source_glyph_slant_anchors": "UNMEASURED_NOT_INVENTED",
+  "calibration": "PRODUCER_SELF_QA_NOT_C_CALIBRATION",
+  "C2": "PENDING_NEW_EXACT_SHA_INDEPENDENT",
+  "C3": "BLOCKED",
+  "approval": "NOT_CREATED",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_ACTIONS_CPU_DUE_GPT_LOCAL_RAW_GITHUB_DNS_UNAVAILABLE",
+  "worker_run": 37738486621,
+  "first_failed_attempt": 37738250394,
+  "first_failure": "Protected partial BC3 block intrusion; aborted without replacing DDS",
+  "cleanup": "GITHUB_HOSTED_EPHEMERAL_RUNNER_AUTOCLEAN; NO_N100_USED",
+  "forbidden_domains_touched": []
+}
