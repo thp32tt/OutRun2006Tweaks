@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY",
+  "queue_index": 35,
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds"
+  },
+  "prior_candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "new_candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "dds": {
+    "size": [
+      4096,
+      4096
+    ],
+    "pixel_mode": "RGBA",
+    "mip_count": 1,
+    "header128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "source_family": "Italic Total Rank white face + native deep-navy outline; enlarged native Hangul, positively centered inside original glyph box",
+  "clean_plate_provenance": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CLEAN_PLATE.png",
+  "rows": [
+    {
+      "id": "pink",
+      "source_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "edit_bbox": [
+        594,
+        342,
+        1128,
+        444
+      ],
+      "old_bbox": [
+        745,
+        361,
+        977,
+        425
+      ],
+      "source_removed_pixels": 32656,
+      "font_pt": 66,
+      "tracking": 17,
+      "readable_slant_top_minus_bottom_px": 13,
+      "new_bbox": [
+        697,
+        358,
+        1024,
+        428
+      ],
+      "old_width": 232,
+      "new_width": 327,
+      "gain_px": 95,
+      "margins": [
+        88,
+        89,
+        1,
+        1
+      ],
+      "width_ceiling": 504,
+      "height_ceiling": 72
+    },
+    {
+      "id": "green",
+      "source_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "edit_bbox": [
+        2266,
+        363,
+        2785,
+        448
+      ],
+      "old_bbox": [
+        2412,
+        375,
+        2639,
+        437
+      ],
+      "source_removed_pixels": 35931,
+      "font_pt": 66,
+      "tracking": 17,
+      "readable_slant_top_minus_bottom_px": 13,
+      "new_bbox": [
+        2362,
+        371,
+        2689,
+        441
+      ],
+      "old_width": 227,
+      "new_width": 327,
+      "gain_px": 100,
+      "margins": [
+        89,
+        89,
+        1,
+        1
+      ],
+      "width_ceiling": 505,
+      "height_ceiling": 72
+    }
+  ],
+  "machine_qa": {
+    "plate_only_source_removed_per_row": [
+      32656,
+      35931
+    ],
+    "changed_outside_declared_english_effect_scope": 0,
+    "alpha_changed_outside_declared_english_effect_scope": 0,
+    "clean_to_final_changes_outside_korean_effect_mask": 0,
+    "protected_changed_pixels": 0,
+    "source_script_byte_residue": 0,
+    "localized_overlap": 0,
+    "persisted_dds_roundtrip": "PASS",
+    "native_no_upscale": true,
+    "src_vs_evidence_png": "BYTE_EXACT",
+    "previous_vs_evidence_png": "BYTE_EXACT"
+  },
+  "static_visual_status": "PENDING_CONTROLLER_IMAGE_QA",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_production_approval_from_worker": true
+}

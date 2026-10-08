@@ -1,0 +1,29 @@
+{
+  "run": "20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY",
+  "queue_index": 35,
+  "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "previous_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "widths": [
+    327,
+    327
+  ],
+  "machine": {
+    "plate_only_source_removed_per_row": [
+      32656,
+      35931
+    ],
+    "changed_outside_declared_english_effect_scope": 0,
+    "alpha_changed_outside_declared_english_effect_scope": 0,
+    "clean_to_final_changes_outside_korean_effect_mask": 0,
+    "protected_changed_pixels": 0,
+    "source_script_byte_residue": 0,
+    "localized_overlap": 0,
+    "persisted_dds_roundtrip": "PASS",
+    "native_no_upscale": true,
+    "src_vs_evidence_png": "BYTE_EXACT",
+    "previous_vs_evidence_png": "BYTE_EXACT"
+  },
+  "worker_status": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "report": "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_WORKER_REPORT.json",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
