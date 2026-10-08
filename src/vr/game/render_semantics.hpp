@@ -260,10 +260,11 @@ namespace OutRunVR::GameSemantic
         if (!node || scope == RenderScope::None)
             return;
 
+        // Publish serial and tag atomically with respect to queue cutoff.
+        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
         const std::uint64_t serial =
             SpriteNodeSemanticNextSerial.fetch_add(
                 1, std::memory_order_acq_rel);
-        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
         for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
         {
             if (SpriteNodeSemanticTags[i].node == node)
@@ -390,9 +391,13 @@ namespace OutRunVR::GameSemantic
         if (SpriteQueueDepth++ == 0)
         {
             SpriteQueuePreviousScope = CurrentScope;
-            const std::uint64_t next =
-                SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
-            SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+            // Serial publication and queue snapshot must share a mutex.
+            {
+                std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+                const std::uint64_t next =
+                    SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
+                SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+            }
             // Runtime ea7c322d proved queue->SCREEN_HUD is too strong, while
             // runtime 9554272a proved queue->NONE leaves 2D content duplicated
             // at identical D3D screen coordinates, which does not converge under
@@ -414,9 +419,13 @@ namespace OutRunVR::GameSemantic
         {
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
-            const std::uint64_t next =
-                SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
-            SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+            // Serial publication and queue snapshot must share a mutex.
+            {
+                std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+                const std::uint64_t next =
+                    SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
+                SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+            }
         }
         CurrentSpriteQueueNode = node;
         CurrentQueueProjectedMarker = {};

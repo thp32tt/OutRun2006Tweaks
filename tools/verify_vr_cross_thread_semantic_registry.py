@@ -132,4 +132,45 @@ for marker in (
     if marker not in s:
         fail(f"render-thread queue cursor state changed unexpectedly: {marker}")
 
+# Exact producer publication/cutoff must be linearized, not merely guarded
+# by different sections of the same function. The original producer reserved a
+# serial before locking, and both renderer cutoffs read nextSerial unlocked.
+def require_epoch_order(source):
+    specs = (
+        ("RegisterSpriteNodeScope", "inline void RegisterSpriteNodeScope(", "SpriteNodeSemanticNextSerial.fetch_add("),
+        ("BeginSpriteQueueRender", "inline void BeginSpriteQueueRender() noexcept", "SpriteNodeSemanticNextSerial.load("),
+        ("SelectSpriteQueueNode", "inline void SelectSpriteQueueNode(", "SpriteNodeSemanticNextSerial.load("),
+    )
+    for name, marker, operation in specs:
+        body_text = function_body(source, marker)
+        lock_pos = body_text.find("std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);")
+        serial_pos = body_text.find(operation)
+        if lock_pos < 0 or serial_pos < 0 or lock_pos > serial_pos:
+            raise ValueError(f"{name}: epoch not published/snapshotted under mutex")
+    return len(specs)
+
+try:
+    checked = require_epoch_order(s)
+except ValueError as exc:
+    fail(str(exc))
+mutations = 0
+for mark in (
+    "inline void RegisterSpriteNodeScope(",
+    "inline void BeginSpriteQueueRender() noexcept",
+    "inline void SelectSpriteQueueNode(",
+):
+    pos=s.find(mark)
+    target_lock="std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);"
+    index=s.find(target_lock,pos)
+    if index<0:fail("exact epoch mutation could not locate lock: "+mark)
+    mutated=s[:index]+"/* deleted critical section */"+s[index+len(target_lock):]
+    try:
+        require_epoch_order(mutated)
+    except ValueError:
+        mutations+=1
+    else:
+        fail("uncaught epoch race mutation: "+mark)
+if mutations!=3:fail("epoch negatives must be 3/3")
+print(f"VR semantic tag epoch ordering PASS: {checked} sources, {mutations}/3 lock faults detected")
+
 print("VR cross-thread semantic registry contract PASS")
