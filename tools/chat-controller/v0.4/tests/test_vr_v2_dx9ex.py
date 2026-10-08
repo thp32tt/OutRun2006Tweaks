@@ -1,7 +1,9 @@
 """Regression coverage for the isolated VR Controller v2 DX11/DXVK/DX9Ex queue."""
 import ast
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ''.join(p.read_text() for p in sorted((ROOT / 'src-vr-v2').glob('controller.py.part*')))
@@ -14,6 +16,23 @@ def load_queue_target():
     ns = {'CONTROLLER_MODE': 'conversion'}
     exec(compile(module, '<queue-target>', 'exec'), ns)
     return ns['queue_target_for_slot']
+
+
+
+def load_liveness_helpers():
+    tree = ast.parse(SOURCE)
+    names = {'rollover_has_confirmed_ui_failure', 'hold_unconfirmed_chat'}
+    fns = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in names]
+    assert {node.name for node in fns} == names
+    module = ast.Module(body=fns, type_ignores=[])
+    ns = {
+        'datetime': datetime,
+        'TZ': timezone.utc,
+        'save_queue_state': Mock(),
+        'write_runtime': Mock(),
+    }
+    exec(compile(module, '<liveness-guard>', 'exec'), ns)
+    return ns
 
 
 class VRV2DX9ExTests(unittest.TestCase):
@@ -108,6 +127,60 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('terminal"] = "STALE_DROPPED"', SOURCE)
         self.assertIn('completed_tasks_in_chat', SOURCE)
         self.assertIn('CHAT_ROTATE_COMPLETED_TASKS', SOURCE)
+
+    def test_rollover_requires_confirmed_ui_failure(self):
+        policy = load_liveness_helpers()['rollover_has_confirmed_ui_failure']
+        for reason in (
+            'No assistant response was detected before grace period',
+            'Chat response stabilized but there is no [AUTO:TASK_ID] commit',
+            'Active conversion lane chat URL is missing or outside project',
+            '60 minutes have passed',
+            'Failed to observe GitHub changes',
+        ):
+            with self.subTest(reason=reason):
+                self.assertFalse(policy(reason))
+        self.assertTrue(policy('ChatGPT reported that conversation reached its length limit.'))
+        self.assertTrue(policy('Retry persisted after one recovery attempt'))
+        self.assertFalse(policy(''))
+
+    def test_uncertain_chat_retains_task_and_does_not_fake_progress(self):
+        ns = load_liveness_helpers()
+        active = {'task_id': 'CONVERSION-DX11-00454', 'phase': 'WAIT_CHAT',
+                  'attempt': 1, 'chat_rollovers': 0}
+        queue = {'active_by_lane': {'A': active}}
+        hold = ns['hold_unconfirmed_chat']
+        hold(queue, active, 'No reply detected')
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+        self.assertEqual(active['attempt'], 1)
+        self.assertEqual(active['chat_rollovers'], 0)
+        self.assertEqual(active['chat_liveness'], 'STALE_UNCONFIRMED')
+        self.assertIn('liveness_first_uncertain_at', active)
+        ns['save_queue_state'].assert_called_once_with(queue)
+        ns['write_runtime'].assert_called_once()
+        stamp = active['liveness_first_uncertain_at']
+        hold(queue, active, 'No reply detected')
+        self.assertEqual(active['liveness_first_uncertain_at'], stamp)
+        ns['save_queue_state'].assert_called_once_with(queue)
+        hold(queue, active, 'Stable interim text, no commit')
+        self.assertEqual(ns['save_queue_state'].call_count, 2)
+        self.assertEqual(active['attempt'], 1)
+
+    def test_serial_and_parallel_chat_grace_fail_closed(self):
+        tree = ast.parse(SOURCE)
+        for fn_name in ('queue_cycle', 'conversion_process_lane'):
+            node = next(n for n in tree.body
+                        if isinstance(n, ast.AsyncFunctionDef) and n.name == fn_name)
+            body = ast.get_source_segment(SOURCE, node)
+            with self.subTest(function=fn_name):
+                self.assertGreaterEqual(body.count('hold_unconfirmed_chat('), 2)
+                self.assertIn('QUEUE_RESULT_GRACE_SECONDS', body)
+                self.assertNotIn('No assistant response was detected before', body)
+                self.assertNotIn('Chat response stabilized but no durable commit', body)
+        rollover = next(n for n in tree.body
+                        if isinstance(n, ast.AsyncFunctionDef) and n.name == 'queue_rollover_chat')
+        body = ast.get_source_segment(SOURCE, rollover)
+        self.assertIn('if not rollover_has_confirmed_ui_failure(reason):', body)
+        self.assertIn('status="conversation_rollover_held"', body)
 
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
