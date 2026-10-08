@@ -104,7 +104,7 @@ for name,en,ko,(l,t,r,b) in specs:
    ymin=max(28,28+v["y"][0])
    ymax=min(ref.height-1,28+v["y"][1])
    if ymax<=ymin:continue
-   d.line((offset+mid,ymin,offset+mid,ymax),fill=(0,245,245,150),width=1)
+   d.line((offset+mid,ymin,offset+mid,ymax),fill=(0,245,245),width=1)
  ref.save(O/(name+"_NATIVE_SOURCE_FINAL_MARKED.png"))
  # Practical 50% proof matching exact full width without truncating Korean suffixes.
  ref.resize((ref.width//2,ref.height//2),Image.Resampling.LANCZOS).save(O/(name+"_PRACTICAL50_MARKED.png"))
