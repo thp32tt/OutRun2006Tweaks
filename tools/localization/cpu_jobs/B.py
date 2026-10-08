@@ -34,7 +34,7 @@ assert sha(cleanfile.read_bytes())==clean_sha
 clean=np.asarray(Image.open(cleanfile).convert("RGBA"),dtype=np.uint8)
 mask=np.asarray(Image.open(maskfile).convert("L"),dtype=np.uint8)
 assert source.shape==current.shape==clean.shape==(128,2048,4) and mask.shape==(128,2048)
-srcbbox=[434,9,1671,120];editbbox=[564,12,1540,116] # exact native English bounds, nonprotected
+srcbbox=[431,6,1674,123];visible_source_bbox=[434,9,1671,120];editbbox=[564,12,1540,116] # exact native English bounds, nonprotected
 y,x=np.ogrid[:height,:width]
 srcmask=(x>=srcbbox[0])&(x<srcbbox[2])&(y>=srcbbox[1])&(y<srcbbox[3])
 editmask=(x>=editbbox[0])&(x<editbbox[2])&(y>=editbbox[1])&(y<editbbox[3])
@@ -158,7 +158,7 @@ newpos=native[:,:,3]>16
 ys,xs=np.nonzero(newpos)
 if not len(xs):raise RuntimeError("empty trial")
 nbbox=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-if not(nbbox[0]>=srcbbox[0] and nbbox[1]>=srcbbox[1] and nbbox[2]<=srcbbox[2] and nbbox[3]<=srcbbox[3]):
+if not(nbbox[0]>=visible_source_bbox[0] and nbbox[1]>=visible_source_bbox[1] and nbbox[2]<=visible_source_bbox[2] and nbbox[3]<=visible_source_bbox[3]):
     raise RuntimeError(("source extent escape",nbbox))
 old_white=int(np.count_nonzero((current[:,:,0]>230)&(current[:,:,1]>230)&(current[:,:,2]>230)&(current[:,:,3]>175)&srcmask))
 new_white=int(np.count_nonzero((native[:,:,0]>230)&(native[:,:,1]>230)&(native[:,:,2]>230)&(native[:,:,3]>175)&srcmask))
@@ -184,6 +184,6 @@ for direction in ("READABLE","RAW"):
             left=0
             for z in chunks:panel.paste(z,(left,0));left+=z.width+4
             panel.save(run/f"B280_{direction}_{back}_{scale}_EN_CLEAN_B279_TRIAL.png",optimize=True)
-report={"run":"B280","index":98,"asset":"42E618FD_512x32.dds","source_sha256":source_sha,"clean_png_sha256":clean_sha,"previous_sha256":old_sha,"trial_sha256":sha(trial),"method":"NATIVE_NEW_BC3_ALPHA_RGB_PER_BLOCK_WHITE_INK_7PX_NAVY_KEYLINE_GAUSSIAN_HALO","method_not_same_as_B279":True,"source_family":{"white_rgb":white.tolist(),"navy_rgb":navy.tolist(),"english_white_support":int(sface.sum()),"english_navy_support":int(snavy.sum()),"source_navy_alpha_gt140":source_navy,"render_vertical_glyph_scale":0.76,"navy_outline_radius":7,"navy_diffuse_sigma":3.1},"format":"BC3_DXT5","native":[width,height],"mips":mips,"raw_orientation":"mirror_y","machine":{"blocks_reencoded":touched,"alpha_only_cleanup_blocks":alpha_touched,"changed_rgba_pixels":int(delta.sum()),"outside_exact_english_source":outside_src,"original_alpha_residue_in_clean":0,"decoded_bbox":nbbox,"source_bbox":srcbbox,"previous_white_count":old_white,"trial_white_count":new_white,"trial_navy_count":new_navy,"white_navy_ratio":round(new_white/max(new_navy,1),3),"dds_header_exact":True,"roundtrip_persisted_dds":True},"visual_producer":"PENDING_PIXELS_FIRST_SOURCE_CLEAN_B279_TRIAL_NATIVE_AND_50","candidate_promoted":False,"independent_C2":"NOT_RUN","C3":"NOT_RUN","USER":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_HOSTED_CANONICAL_PUBLIC_SOURCE_DNS_DEPENDENCY_NO_GPT_LOCAL_NETWORK","forbidden_domains_touched":[]}
+report={"run":"B280","index":98,"asset":"42E618FD_512x32.dds","source_sha256":source_sha,"clean_png_sha256":clean_sha,"previous_sha256":old_sha,"trial_sha256":sha(trial),"method":"NATIVE_NEW_BC3_ALPHA_RGB_PER_BLOCK_WHITE_INK_7PX_NAVY_KEYLINE_GAUSSIAN_HALO","method_not_same_as_B279":True,"source_family":{"white_rgb":white.tolist(),"navy_rgb":navy.tolist(),"english_white_support":int(sface.sum()),"english_navy_support":int(snavy.sum()),"source_navy_alpha_gt140":source_navy,"render_vertical_glyph_scale":0.76,"navy_outline_radius":7,"navy_diffuse_sigma":3.1},"format":"BC3_DXT5","native":[width,height],"mips":mips,"raw_orientation":"mirror_y","machine":{"blocks_reencoded":touched,"alpha_only_cleanup_blocks":alpha_touched,"changed_rgba_pixels":int(delta.sum()),"outside_exact_english_source":outside_src,"original_alpha_residue_in_clean":0,"decoded_bbox":nbbox,"source_effect_rgba_scope":srcbbox,"source_visible_alpha_bbox":visible_source_bbox,"previous_white_count":old_white,"trial_white_count":new_white,"trial_navy_count":new_navy,"white_navy_ratio":round(new_white/max(new_navy,1),3),"dds_header_exact":True,"roundtrip_persisted_dds":True},"visual_producer":"PENDING_PIXELS_FIRST_SOURCE_CLEAN_B279_TRIAL_NATIVE_AND_50","candidate_promoted":False,"independent_C2":"NOT_RUN","C3":"NOT_RUN","USER":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_HOSTED_CANONICAL_PUBLIC_SOURCE_DNS_DEPENDENCY_NO_GPT_LOCAL_NETWORK","forbidden_domains_touched":[]}
 (run/"B280_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"trial":sha(trial),"changed":int(delta.sum()),"white":new_white,"navy":new_navy,"bbox":nbbox},ensure_ascii=False))
