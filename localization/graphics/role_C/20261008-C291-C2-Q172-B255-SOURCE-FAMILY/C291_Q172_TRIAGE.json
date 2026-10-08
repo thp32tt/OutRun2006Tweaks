@@ -1,0 +1,19 @@
+{
+  "queue_file": "localization/graphics/asset_queue.csv",
+  "escalation_file": "localization/graphics/REWORK_ESCALATIONS.json",
+  "counts": {
+    "EVIDENCE_ONLY_HOLD": 1
+  },
+  "assets": [
+    {
+      "index": 172,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "current_status": "c282_hold_strict_recheck_b255_native_recovery_confirmed_evidence_pending",
+      "next_action": "EVIDENCE_ONLY_HOLD",
+      "repeated_root_causes": [],
+      "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "note": "No state transition or game QA is inferred by this read-only diagnosis."
+}
