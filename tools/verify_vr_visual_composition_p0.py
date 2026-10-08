@@ -758,9 +758,11 @@ def check_original_queue_wvp(source):
                   'R30GetRecentRawWvpForQueueSprite(original)',
                   'GetVertexShaderConstantF(',
                   'R30BuildEyeAffine(stereo, eyeScale, eyeOffset)')
-    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D\s*&&\s*'
-                     r'R30GetRecentRawWvpForQueueSprite\(original\)\)', build):
-        raise SystemExit('P0 exact projected marker long-batch raw game WVP fallback lost')
+    if not re.search(r'else if\s*\(screenKind ==\s*'
+                     r'R30ScreenSpaceKind::ProjectedWorldMarker2D\)\s*\{'
+                     r'[^{}]*if\s*\(!R30GetRecentRawWvpForQueueSprite\(original\)\)'
+                     r'\s*return false;', build, re.S):
+        raise SystemExit('P0 projected rank must reject head-injected live c64 after raw WVP expiry')
     if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\s*\)', build):
         raise SystemExit('P0 screen overlay lacks original WVP recovery')
     if not re.search(r'!R30GetRecentRawWvpForQueueSprite\(original\)\)\s*return false;', build):
