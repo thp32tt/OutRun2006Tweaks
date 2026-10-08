@@ -1,0 +1,50 @@
+{
+  "run": "B273",
+  "role": "B",
+  "queue_index": 98,
+  "run_key": "OUTRUN-KOR-B273-Q098-MORPHOLOGICAL-PINHOLE-20261008",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "unchanged_deployable_candidate_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "rejected_trial_sha256": "7f9bc391eb254534caba405beba40026dba9ef1f31df81b0c24139ce1d3c7ae2",
+  "source_style": "White solid italic fill, broad continuous dark-navy keyline, right-lean source typography",
+  "technical_qa": {
+    "workflow_run_id": 37786104893,
+    "workflow_conclusion": "success",
+    "mask_consistent": true,
+    "bc3_blocks_modified": 320,
+    "white_face_pixels_recovered": 1321,
+    "unsupported_gray_pinholes": 43,
+    "changed_rgba_pixels": 1321,
+    "changed_rgba_outside_source_bbox": 0,
+    "changed_rgba_outside_target_bbox": 0,
+    "alpha_exact": true,
+    "header_exact": true,
+    "persisted_dds_roundtrip_exact": true
+  },
+  "visual_evidence": [
+    "READABLE_SOURCE_PREVIOUS_REPAIRED_100.png",
+    "READABLE_SOURCE_PREVIOUS_REPAIRED_50.png",
+    "RAW_SOURCE_PREVIOUS_REPAIRED_100.png",
+    "RAW_SOURCE_PREVIOUS_REPAIRED_50.png"
+  ],
+  "producer_visual": "FAIL",
+  "visual_findings": [
+    "SOURCE vs TRIAL 100%: Hangul face still contains extensive horizontal navy/black banding and disconnected bright face strokes; English source has smooth solid white face.",
+    "Practical 50%: q098 current and B273 trial remain visibly striped/dotted relative to source; original outline substantially preserved after limiting edits, but remaining glyph integrity failure is not acceptable.",
+    "B273 micro-gap-only repair is insufficient to correct source-family face construction; further BC3 index microfill alone cannot be claimed a producer PASS."
+  ],
+  "reason_codes": [
+    "BROKEN_GLYPH_FACE_STRIPES",
+    "SOURCE_FAMILY_WHITE_FACE_MISMATCH"
+  ],
+  "disposition": "REWORK_REQUIRED_NO_PROMOTION",
+  "next_required_method": "Reconstruct Hangul white glyph face and source-derived navy keyline together from exact English family plus independently validated CLEAN_PLATE at native 2048x128, then BC3 encode and verify actual persisted DDS, RAW/FLIPY, 100/75/50, eight ordered visual gates and independent C2/C3.",
+  "c": "NOT_RUN",
+  "c3": "NOT_RUN",
+  "user_review": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_WORKER_AND_CONTROLLER_VISUAL",
+  "n100_heavy_compute": false,
+  "cleanup": "GitHub runner ephemeral; no N100 scratch/worktree created",
+  "prohibited_domains_touched": []
+}
