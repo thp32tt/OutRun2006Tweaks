@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C320-C1-Q227-A198R-ALPHA-PROOF-20261009-0420",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD",
+  "queue_index": 227,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "prior_c_rejection_candidate_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+  "superseded_trial_sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+  "source_worker_json": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_WORKER_REPORT.json",
+  "producer_qa": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
+  "triage": {
+    "action": "FRESH_C_REVIEW",
+    "execution": "Original GitHub tools/localization/rework_triage.py copied SHA cad348c3995a27624615b8e3023a05101c34f063 and run against current queue+REWORK_ESCALATIONS.json on N100 as low-cost fallback",
+    "queue_blob_sha": "ba38c3dd79f196427a39265453ea229528b74fa7"
+  },
+  "independent_observation": "Native uncomposited RGBA evidence appears to show English glyphs in CLEAN or English+Korean in FINAL if a viewer ignores alpha. Pixel alpha independently inspected and opaque-composited: all source letters removed in CLEAN, and final only Korean is visible. The apparently black English remnants have alpha=0 and therefore are NOT a true double-draw visual defect. Do not assign SOURCE_RESIDUE_UNDER_KOREAN to transparent RGB. Three new SHA-pinned lossless opaque BGW panels generated. Exact source/candidate labels of PNG still rely on producer source and saved-DDS provenance; independently decoding the 2048x2048 current DDS again not performed.",
+  "independent_visual": {
+    "pixels_before_producer_verdict": false,
+    "sampled_regions": 3,
+    "region_total": 16,
+    "readable_native": "Source vs clean vs candidate on white/gray/black; source family gray and flat-red; no background plate discontinuity visible for sampled three native regions after alpha composite.",
+    "raw": "Producer current RAW source/final review JPG inspected; mirrored orientation respected, no specific mismatch proved. This JPG is secondary, not current new lossless full-atlas RAW proof.",
+    "practical": "Prior producer source-clean-final TRIPLE_50/75/100 JPG inspected for sampled and additional rows; not independent full 16-region native BGW and 100/75/50 proof.",
+    "protected": "Producer reports protected changed=0, not independently recalculated from current DDS in this run",
+    "slant": "Gray/red source upright; candidate seems upright for sampled three. Per-segment measured anchor/top-minus-bottom not independently verified.",
+    "source_family": "The A198R improves previous underheight PROFESSIONAL 51 to 72 vs English75; width ratio 165/672 (~24.6%) arises from 2 Korean syllables and is a source-hierarchy risk for user review, not by itself a failure or justification for distortion."
+  },
+  "region_samples": [
+    {
+      "id": "professional",
+      "english": "PROFESSIONAL",
+      "korean": "프로",
+      "proof": {
+        "path": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_professional_SOURCE_CLEAN_FINAL_BGW_NATIVE.png",
+        "git_blob_sha": "913eaa894b62222bf2053b2d6effd3ff574b40ba",
+        "sha256": "68b5df91625f5785c6727ad865a6ed3b811586a3a83f659b8201d2f952010f48"
+      },
+      "alpha_nonzero_source": 26827,
+      "alpha_nonzero_clean": 0,
+      "alpha_nonzero_final": 6007,
+      "bbox_source_crop": [
+        3,
+        5,
+        675,
+        80
+      ],
+      "bbox_final_crop": [
+        5,
+        6,
+        170,
+        78
+      ],
+      "results": {
+        "clean_plate": {
+          "decision": "SAMPLE_PASS",
+          "observation": "CLEAN alpha nonzero pixels 0; stale RGB only fully transparent. Opaque BGW presents clean background."
+        },
+        "composite_only": {
+          "decision": "SAMPLE_PASS",
+          "observation": "Korean-only final visible after independent alpha compositing, no English ghost in this region."
+        },
+        "style": {
+          "decision": "HOLD",
+          "observation": "Source effect hue/scale preserved to first look; independent family calibration and complete 16-region audit not completed."
+        },
+        "orientation": {
+          "decision": "HOLD",
+          "observation": "RAW overview previously inspected but region-native RAW still missing for current independent check."
+        }
+      }
+    },
+    {
+      "id": "alpine",
+      "english": "ALPINE",
+      "korean": "알파인",
+      "proof": {
+        "path": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_alpine_SOURCE_CLEAN_FINAL_BGW_NATIVE.png",
+        "git_blob_sha": "5f91348759092241a2af9a01637425da24d988af",
+        "sha256": "eaa4229fdfc7ddeca13563b1a12855203094451281865137250486d857368113"
+      },
+      "alpha_nonzero_source": 14475,
+      "alpha_nonzero_clean": 0,
+      "alpha_nonzero_final": 6907,
+      "bbox_source_crop": [
+        2,
+        5,
+        346,
+        81
+      ],
+      "bbox_final_crop": [
+        4,
+        6,
+        205,
+        79
+      ],
+      "results": {
+        "clean_plate": {
+          "decision": "SAMPLE_PASS",
+          "observation": "CLEAN alpha nonzero pixels 0; stale RGB only fully transparent. Opaque BGW presents clean background."
+        },
+        "composite_only": {
+          "decision": "SAMPLE_PASS",
+          "observation": "Korean-only final visible after independent alpha compositing, no English ghost in this region."
+        },
+        "style": {
+          "decision": "HOLD",
+          "observation": "Source effect hue/scale preserved to first look; independent family calibration and complete 16-region audit not completed."
+        },
+        "orientation": {
+          "decision": "HOLD",
+          "observation": "RAW overview previously inspected but region-native RAW still missing for current independent check."
+        }
+      }
+    },
+    {
+      "id": "flagman1",
+      "english": "FLAGMAN 1",
+      "korean": "플래그맨 1",
+      "proof": {
+        "path": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_flagman1_SOURCE_CLEAN_FINAL_BGW_NATIVE.png",
+        "git_blob_sha": "17147f239b2041a00d37d74631d00b31e97bf0f1",
+        "sha256": "292de8dd1f22c4f8fb97ac819adc52313ff38eba42df23252b86c265bbc6b029"
+      },
+      "alpha_nonzero_source": 72996,
+      "alpha_nonzero_clean": 0,
+      "alpha_nonzero_final": 42213,
+      "bbox_source_crop": [
+        5,
+        5,
+        960,
+        156
+      ],
+      "bbox_final_crop": [
+        7,
+        6,
+        702,
+        154
+      ],
+      "results": {
+        "clean_plate": {
+          "decision": "SAMPLE_PASS",
+          "observation": "CLEAN alpha nonzero pixels 0; stale RGB only fully transparent. Opaque BGW presents clean background."
+        },
+        "composite_only": {
+          "decision": "SAMPLE_PASS",
+          "observation": "Korean-only final visible after independent alpha compositing, no English ghost in this region."
+        },
+        "style": {
+          "decision": "HOLD",
+          "observation": "Source effect hue/scale preserved to first look; independent family calibration and complete 16-region audit not completed."
+        },
+        "orientation": {
+          "decision": "HOLD",
+          "observation": "RAW overview previously inspected but region-native RAW still missing for current independent check."
+        }
+      }
+    }
+  ],
+  "current_proof_limitations": [
+    "Only 3/16 regions independently sampled on lossless native BGW, not 16/16",
+    "Producer JPEG previews are not equivalent to current lossless C/C3 per-region RAW and 75/50 evidence",
+    "Current candidate DDS 2048x2048 binary SHA and decoded bytes taken from producer report, not independently rehashed/redecoded in this C execution",
+    "No independent blind calibration or source-conditioned per-region glyph anchors; C PASS would violate evidence gate"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "not_rework": "Do not rerender candidate merely because transparent RGB looks like source remnants. No confirmed visible glyph double-draw in three verified regions.",
+  "next_action": "Complete C1 blind calibration and 16/16 lossless persisted DDS region SOURCE/CLEAN/FINAL RGBA-BGW native/75/50/RAW and source-family per glyph anchors; check candidate against source/protected masks; choose independent C verdict, then separate C3 before approval/JPG. Preserve exact candidate bytes until actual visual defect proven.",
+  "APPROVAL": false,
+  "C3": "BLOCKED_PENDING_FRESH_C1",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_lossless_proof_png": 3,
+  "backend": "GitHub connector exact PNG fetch + N100 MCP small (<100KB) alpha inspection/composite fallback because ChatGPT sandbox cannot fetch external GitHub binaries; no N100 heavy DDS processing. Post-task cleanup of isolated N100 temp directory after remote verification."
+}
