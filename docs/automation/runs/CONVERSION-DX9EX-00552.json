@@ -61,7 +61,7 @@
     "hud_inspector": "SUCCESS",
     "canonical_exe_hud_analysis": "SUCCESS",
     "domain_isolation": "SUCCESS",
-    "supplemental_full_source": "IN_PROGRESS_AT_C6"
+    "supplemental_full_source": "SUCCESS"
   },
   "exact_sha_validation": {
     "material_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
@@ -70,7 +70,9 @@
     "hud_run_id": 37742743880,
     "hud_result": "success",
     "domain_run_id": 37742743748,
-    "domain_result": "success"
+    "domain_result": "success",
+    "full_source_impact_run_id": 37742743754,
+    "full_source_impact_result": "success"
   },
   "package_artifact": {
     "id": 11534597778,
@@ -84,6 +86,8 @@
   },
   "runtime_note": "UNTESTED: no Quest3/VDXR gameplay check, no claim of HUD visual correctness or backend promotion.",
   "parallel_policy": "A/DX11 Native active independently; C/DX9Ex active stabilization; B/DXVK frozen; no DXVK changes.",
-  "score_status": "PENDING_AI2_SCOREBOARD_SINGLE_AWARD_AFTER_C6",
-  "next_action": "Do not rerun 00552, resume a new independent P0 source implementation while Quest3 runtime-only acceptance remains NEED_HMD_TEST. Protect original scene/white HUD and world stereo baselines."
+  "score_status": "RECORDED_AI2_ONCE_RUN_KEY_CONVERSION-DX9EX-00552-E001_1221_PLUS_1_EQUALS_1222",
+  "next_action": "Do not rerun 00552, resume a new independent P0 source implementation while Quest3 runtime-only acceptance remains NEED_HMD_TEST. Protect original scene/white HUD and world stereo baselines.",
+  "scoreboard_commit": "f6808fe4a48d2f50c744a421d8e30fb6644009b4",
+  "score_calculation": "1221 + 1 = 1222; no retry/rollover re-award"
 }
