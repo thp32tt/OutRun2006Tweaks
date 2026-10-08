@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED (2026-10-08):** The user no longer wants 1000/5000 repeated static passes of unchanged HUD code. Both dedicated repetitive GitHub Actions workflows are discontinued. Do **not** run this contract or recreate the loop. Use one exact-SHA targeted check via the existing HUD Inspector / DX9Ex Active CI when material code changes. Old results remain historical, not runtime proof.
+
 # DX9Ex HUD 1000-cycle review contract
 
 A deterministic source/semantic/canonical EXE mutation audit, **not 1000 separate human visual reviews**.
