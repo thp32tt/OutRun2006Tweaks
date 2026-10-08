@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "dimensions": [
+    4096,
+    1024
+  ],
+  "dds_header_128_source_current_exact": true,
+  "dds_header_128_prior_current_exact": true,
+  "raw_to_flip_y_mapping": "np.ndarray[::-1] before cropping; RAW crop y=(1024-readable_y1,1024-readable_y0)",
+  "exact_sha256": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "current": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "prior_b225": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288"
+  },
+  "original_to_current_changed_rgba_outside_eight_source_bboxes": 0,
+  "original_to_current_changed_alpha_outside_eight_source_bboxes": 0,
+  "prior_b225_to_current_changed_rgba_outside_three_gray_source_bboxes": 0,
+  "prior_b225_to_current_changed_alpha_outside_three_gray_source_bboxes": 0,
+  "prior_b225_to_current_changed_rgba_inside_gray": 29377,
+  "red_and_other_protected_bytes_unchanged_since_b225": true,
+  "regions": [
+    {
+      "id": "create_new_license_red",
+      "original_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "candidate_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "source_alpha_nonzero": 142103,
+      "candidate_alpha_nonzero": 101090,
+      "native_lossless_source_png": "01_create_new_license_red_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "01_create_new_license_red_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "select_license_red",
+      "original_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "candidate_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "source_alpha_nonzero": 105320,
+      "candidate_alpha_nonzero": 72921,
+      "native_lossless_source_png": "02_select_license_red_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "02_select_license_red_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "single_player_red",
+      "original_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "candidate_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "source_alpha_nonzero": 98927,
+      "candidate_alpha_nonzero": 77318,
+      "native_lossless_source_png": "03_single_player_red_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "03_single_player_red_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "default_license_red",
+      "original_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "candidate_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "source_alpha_nonzero": 115127,
+      "candidate_alpha_nonzero": 71820,
+      "native_lossless_source_png": "04_default_license_red_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "04_default_license_red_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "multiplayer_red",
+      "original_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "candidate_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "source_alpha_nonzero": 90633,
+      "candidate_alpha_nonzero": 73103,
+      "native_lossless_source_png": "05_multiplayer_red_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "05_multiplayer_red_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "single_player_gray",
+      "original_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "candidate_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "source_alpha_nonzero": 19100,
+      "candidate_alpha_nonzero": 13360,
+      "native_lossless_source_png": "06_single_player_gray_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "06_single_player_gray_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "showroom_gray",
+      "original_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "candidate_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "source_alpha_nonzero": 15231,
+      "candidate_alpha_nonzero": 6628,
+      "native_lossless_source_png": "07_showroom_gray_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "07_showroom_gray_CURRENT_FLIPY.png"
+    },
+    {
+      "id": "multiplayer_gray",
+      "original_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "candidate_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "bbox_containment": true,
+      "margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "source_alpha_nonzero": 17402,
+      "candidate_alpha_nonzero": 12757,
+      "native_lossless_source_png": "08_multiplayer_gray_SOURCE_FLIPY.png",
+      "native_lossless_current_png": "08_multiplayer_gray_CURRENT_FLIPY.png"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "C": "HOLD_EVIDENCE_GATE",
+  "C3": "BLOCKED",
+  "QA_LIMITATIONS": "No verified clean-plate artifact, per-mip background views, blind calibration or separate eight-check C/C3 stage records. This report cannot approve/export the DDS.",
+  "all8_source_bbox_containment": true
+}
