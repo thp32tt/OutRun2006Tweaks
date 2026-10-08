@@ -76,7 +76,7 @@ class VRV2DX9ExTests(unittest.TestCase):
 
     def test_dx9ex_active_visual_stabilization_policy(self):
         prompt = (ROOT / 'conversion_dx9ex.md').read_text()
-        for marker in ('동시', '흰색 HUD', '+TIME', 'lens flare', 'NEED_HMD_TEST', '1000/5000회', '포크된 원본'):
+        for marker in ('동시', '흰색 HUD', '+TIME', 'lens flare', 'NEED_HMD_TEST', '1000/5000회', '원본 포크의'):
             self.assertIn(marker, prompt)
         self.assertIn('실기', prompt)
 
