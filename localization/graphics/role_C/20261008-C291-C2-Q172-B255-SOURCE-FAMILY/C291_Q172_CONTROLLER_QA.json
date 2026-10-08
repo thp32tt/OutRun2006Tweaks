@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "run": "C291",
+  "run_key": "OUTRUN-KOR-C291-C2-Q172-B255-SOURCE-GOLD-FAMILY-20261008-1620",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "previous_review": "C282 HOLD_STRICT_RECHECK",
+  "prior_review_superseded_only_for_current_source_family_assessment": true,
+  "provenance": {
+    "source": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+    "authored_clean": "localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/CLEAN.png",
+    "machine_report": "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_NATIVE_MACHINE.json",
+    "read_only_triage": "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_TRIAGE.json"
+  },
+  "machine_findings": {
+    "dimension": "1024x1024 RGBA32/mip1",
+    "source_candidate_header_equal": true,
+    "src_png_exact_matches_persisted_decode": true,
+    "final_png_exact_matches_persisted_decode": true,
+    "rgba_outside_two_source_regions": 0,
+    "alpha_outside_two_source_regions": 0,
+    "clean_rgba_outside_source_regions": 0,
+    "clean_alpha_outside_source_regions": 0,
+    "candidate_minus_clean_region_bbox_not_glyph_only": true,
+    "original_vs_current_bright_face_pixel_counts_descriptive": [
+      {
+        "region": "start",
+        "source": 269,
+        "current": 33,
+        "warning": "Different glyph count/areas. Descriptive only, not universal visual threshold."
+      },
+      {
+        "region": "goal",
+        "source": 270,
+        "current": 24,
+        "warning": "Different glyph count/areas. Descriptive only, not universal visual threshold."
+      }
+    ]
+  },
+  "reviewer": "ChatGPT C2 controller; single reviewer",
+  "pixels_before_producer_verdict": false,
+  "calibration": "NOT_PERFORMED; historical producer/reviewer notes consulted before this invocation. No compliant visual-evidence-v1 PASS asserted.",
+  "new_independent_visual_observations": [
+    {
+      "id": "start",
+      "label": "START → 출발",
+      "decision": "REWORK_REQUIRED",
+      "detail": "Exact persisted B255 source-vs-clean-vs-final 6x native/50%: source has elongated, connected/slanted cream-white surface with strong orange/gold inset and darker 3D edge. Korean is substantially narrower and reads as flatter, upright-looking regular block strokes even though right-lean adjustment is present. Source-style volume, face gradient and hierarchy not recreated.",
+      "evidence": [
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/start_GRAY_CONTACT_6X.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/start_PRACTICAL_50.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/start_BLACK_CONTACT_NATIVE.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/start_WHITE_CONTACT_NATIVE.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/start_CURRENT_RAW.png"
+      ]
+    },
+    {
+      "id": "goal",
+      "label": "GOAL → 골",
+      "decision": "REWORK_REQUIRED",
+      "detail": "Persisted B255 current image contains pale horizontal rectangular stripes rather than source continuous slanted, beveled cream-orange letterfaces. Original right-italic depth/metallic gradient is absent or too weak; source-relative face contrast and title hierarchy are poorer at 50%. No protected-image intrusion is asserted; source-relative font effect is the observable failure.",
+      "evidence": [
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/goal_GRAY_CONTACT_6X.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/goal_PRACTICAL_50.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/goal_BLACK_CONTACT_NATIVE.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/goal_WHITE_CONTACT_NATIVE.png",
+        "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/goal_CURRENT_RAW.png"
+      ]
+    }
+  ],
+  "comparison_to_C282": "C282 confirmed material slant repair over B251 without definitive new rejection and explicitly left source-family fidelity in HOLD. C291 independently checked canonical original/verified B255 CLEAN/exact persisted current bytes, then classified source bevel/glow/stroke model mismatch as a visible source-style FAIL. No unchanged candidate was regenerated or reapproved.",
+  "decision": "REWORK_REQUIRED",
+  "defects": [
+    "SOURCE_CREME_GOLD_BEVEL_DEPTH_MISMATCH",
+    "FLAT_HORIZONTAL_KOREAN_FACE",
+    "WEAK_SOURCE_RELATIVE_TITLE_HIERARCHY"
+  ],
+  "rework_request": "B must first measure original native letterface/color/gradient/right-lean glyph anchors, then create a substantially different source-family graphic reconstruction for both START/GOAL. Keep verified B255 clean/protected badge and original exact glyph-effect bbox ceilings; keep RAW mirror-Y, exact DDS header, all artwork outside source effect bboxes, no English residue/overlap, and full native/50/75 plus calibrated independent C then separate C3. Do not merely tweak same shear or font size.",
+  "new_dds_generated": false,
+  "approval_created": false,
+  "C3": "BLOCKED_PENDING_MATERIAL_B_REWORK_AND_FRESH_C2",
+  "pre_ingame": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "actions": {
+    "failed_first": 37743137187,
+    "failed_second": 37743601657,
+    "successful_third": 37743938208,
+    "failures": "Worker evidence script triage variable shadowing followed by left-over alias; both failed before evidence publication; corrected script and third run succeeded. No retries scored separately."
+  },
+  "execution_backend": "GitHub hosted CPU worker 37743938208; ChatGPT local DNS to raw GitHub verified unavailable; N100 unused",
+  "cleanup": "GitHub Actions disposable runner workspace, no GPT local/N100 task scratch created",
+  "forbidden_domains_touched": []
+}

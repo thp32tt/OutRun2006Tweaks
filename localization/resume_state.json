@@ -6748,7 +6748,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T16:13:00+09:00",
+  "updated_at_kst": "2026-10-08T16:34:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11451,5 +11451,26 @@
     "machine_report": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_CONTROLLER_QA.json",
     "backend": "GitHub connector + N100 MCP isolated small DDS decode fallback (GPT local DNS failure)"
+  },
+  "c291_c2_q172_b255_source_gold_style_fail": {
+    "run": "C291",
+    "run_key": "OUTRUN-KOR-C291-C2-Q172-B255-SOURCE-GOLD-FAMILY-20261008-1620",
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+    "result": "REWORK_REQUIRED",
+    "reason": "SOURCE_BEVELED_GOLD_ITALIC_FAMILY_MISMATCH",
+    "source_final_outside_rgba": 0,
+    "source_final_outside_alpha": 0,
+    "authored_clean_outside": 0,
+    "worker": 37743938208,
+    "QA": "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_CONTROLLER_QA.json",
+    "new_DDS": false,
+    "pre_ingame": "BLOCKED",
+    "c3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
