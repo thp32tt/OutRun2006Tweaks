@@ -1,0 +1,252 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B261-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "prior_rejected_candidate_sha256": "0036a943265c0244ec9c9e53e6d9e55e205c08b0d59699275f02631d82b5a903",
+  "candidate_sha256": "d900d347b0e6882b9e9be072fc25bb92f9a21ca533745cc8ee584702938b8e9d",
+  "format": "DXT5_BC3",
+  "size": [
+    2048,
+    2048
+  ],
+  "header_exact": true,
+  "raw_orientation": "mirror_y",
+  "construction": "B261_METHOD_CHANGE: source English P85/P48/P20 per-region cream/gold palette sampling + signed-distance 1px bevel Hangul surface + BC3 per-block endpoint adaptation; explicitly replaces B259 flat categorical cream/shear retry",
+  "font_coverage_probed": "출발골",
+  "native_masks": [
+    {
+      "id": "start",
+      "english": "START",
+      "korean": "출발",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "size": [
+        56,
+        18
+      ],
+      "right_lean_px": 8,
+      "source_family": {
+        "source_face_pixel_count": 1036,
+        "english_warm_face_rgb_p85": [
+          255,
+          247,
+          229
+        ],
+        "english_warm_face_rgb_p48": [
+          238,
+          201,
+          167
+        ],
+        "english_warm_face_rgb_p20": [
+          230,
+          150,
+          112
+        ],
+        "proxy_rightward_top_centroid_shift_px": 1.0,
+        "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+      },
+      "localized_bbox": [
+        827,
+        497,
+        888,
+        515
+      ],
+      "margins": [
+        12,
+        2,
+        11,
+        2
+      ],
+      "native_core_pixels": 492,
+      "native_keyline_pixels": 400
+    },
+    {
+      "id": "goal",
+      "english": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "size": [
+        33,
+        18
+      ],
+      "right_lean_px": 8,
+      "source_family": {
+        "source_face_pixel_count": 911,
+        "english_warm_face_rgb_p85": [
+          255,
+          251,
+          214
+        ],
+        "english_warm_face_rgb_p48": [
+          255,
+          231,
+          181
+        ],
+        "english_warm_face_rgb_p20": [
+          249,
+          172,
+          137
+        ],
+        "proxy_rightward_top_centroid_shift_px": 1.0,
+        "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+      },
+      "localized_bbox": [
+        1362,
+        766,
+        1399,
+        784
+      ],
+      "margins": [
+        19,
+        2,
+        18,
+        3
+      ],
+      "native_core_pixels": 288,
+      "native_keyline_pixels": 234
+    }
+  ],
+  "source_family_profile": [
+    {
+      "id": "start",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "source_face_pixel_count": 1036,
+      "english_warm_face_rgb_p85": [
+        255,
+        247,
+        229
+      ],
+      "english_warm_face_rgb_p48": [
+        238,
+        201,
+        167
+      ],
+      "english_warm_face_rgb_p20": [
+        230,
+        150,
+        112
+      ],
+      "proxy_rightward_top_centroid_shift_px": 1.0,
+      "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+    },
+    {
+      "id": "goal",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "source_face_pixel_count": 911,
+      "english_warm_face_rgb_p85": [
+        255,
+        251,
+        214
+      ],
+      "english_warm_face_rgb_p48": [
+        255,
+        231,
+        181
+      ],
+      "english_warm_face_rgb_p20": [
+        249,
+        172,
+        137
+      ],
+      "proxy_rightward_top_centroid_shift_px": 1.0,
+      "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+    }
+  ],
+  "convergence_triage": "METHOD_CHANGE_REQUIRED",
+  "prior_rejections": [
+    "C285",
+    "C289"
+  ],
+  "B260_first_draft_visual_reject": "SOURCE_PROFILE_METHOD_RETAINED_BUT_SPARSE_BEVEL_FIX_REQUIRES_NEW_NATIVE_DDS_QA",
+  "full_blocks_reencoded": 190,
+  "partial_blocks_protected_indices": 84,
+  "changed_bc3_blocks": 97,
+  "blocks_with_new_hangul": 116,
+  "source_vs_candidate_changed_inside": 3110,
+  "source_vs_candidate_changed_outside": 0,
+  "source_vs_candidate_alpha_outside": 0,
+  "source_vs_candidate_introduced_visible_outside": 0,
+  "previous_vs_candidate_changed_outside": 0,
+  "post_encode_native_face_integrity": [
+    {
+      "id": "start",
+      "core_pixels": 492,
+      "bright_core_retention": 1.0,
+      "worst_native_scanline": 1.0,
+      "row_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "goal",
+      "core_pixels": 288,
+      "bright_core_retention": 1.0,
+      "worst_native_scanline": 1.0,
+      "row_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_DIRECT_PERSISTED_DDS_REVIEW",
+  "independent_C2": "REQUIRED_NEW_SHA",
+  "C3": "BLOCKED_PENDING_C2",
+  "PRE_INGAME": "BLOCKED_PENDING_EVIDENCE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_HOSTED_CPU_DUE_TO_GPT_LOCAL_GITHUB_RAW_DNS_UNAVAILABLE",
+  "forbidden_domains_touched": []
+}

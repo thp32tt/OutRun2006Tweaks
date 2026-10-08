@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "method": "native English warm-face percentile source sampling + signed-distance Hangul surface",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "prior_rejected_sha256": "0036a943265c0244ec9c9e53e6d9e55e205c08b0d59699275f02631d82b5a903",
+  "independent_rejections": [
+    "C285",
+    "C289"
+  ],
+  "source_family": [
+    {
+      "id": "start",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "source_face_pixel_count": 1036,
+      "english_warm_face_rgb_p85": [
+        255,
+        247,
+        229
+      ],
+      "english_warm_face_rgb_p48": [
+        238,
+        201,
+        167
+      ],
+      "english_warm_face_rgb_p20": [
+        230,
+        150,
+        112
+      ],
+      "proxy_rightward_top_centroid_shift_px": 1.0,
+      "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+    },
+    {
+      "id": "goal",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "source_face_pixel_count": 911,
+      "english_warm_face_rgb_p85": [
+        255,
+        251,
+        214
+      ],
+      "english_warm_face_rgb_p48": [
+        255,
+        231,
+        181
+      ],
+      "english_warm_face_rgb_p20": [
+        249,
+        172,
+        137
+      ],
+      "proxy_rightward_top_centroid_shift_px": 1.0,
+      "proxy_limit": "Whole-word centroid not independent per-glyph slant anchor"
+    }
+  ],
+  "limitations": [
+    "Centroid proxy is not per-glyph slant measurement",
+    "Colors estimated from visible canonical English face; BC3 palette may quantize gradients"
+  ]
+}
