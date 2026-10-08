@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-run="20261008-A192-Q119-PADDED-ITALIC-HALO"
+run="20261008-A192R-Q119-PADDED-ITALIC-HALO"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -26,13 +26,13 @@ ko="타임 어택 모드"
 # Fail closed against concurrent producer changes and the exact rejected C290 bytes.
 REJECTED_SHA="4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca"
 if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=REJECTED_SHA:
-    raise RuntimeError("C290 rejected q119 bytes have changed; abort stale A192 job")
+    raise RuntimeError("C290 rejected q119 bytes have changed; abort stale A192R job")
 triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","119","--require-safe-rerender"],capture_output=True,text=True)
-print("A192 REWORK TRIAGE "+triage.stdout,flush=True)
+print("A192R REWORK TRIAGE "+triage.stdout,flush=True)
 if triage.returncode: raise RuntimeError(("q119 rework triage blocked",triage.returncode,triage.stderr))
 
 
-srcp=Path("/tmp/A192_F6811E94.dds")
+srcp=Path("/tmp/A192R_F6811E94.dds")
 urllib.request.urlretrieve(url,srcp)
 raw=srcp.read_bytes()
 if hashlib.sha256(raw).hexdigest()!=SOURCE_SHA: raise RuntimeError("source drift")
@@ -105,7 +105,7 @@ def shear(im,k):
 # Render at native HD. Preserve the strong orange fill, navy outline and right italic lean.
 sw=x1-x0; sh=y1-y0
 chosen=None
-for fs in range(136,70,-1):
+for fs in range(93,70,-1):
     font=ImageFont.truetype(FONT,fs)
     pad=30
     canvas=Image.new("RGBA",(1600,260),(0,0,0,0))
@@ -147,7 +147,7 @@ letter_glow.alpha_composite(glyph,(HALO_PAD,HALO_PAD))
 # extended white blur be clipped against the halo drawing canvas.
 gb=letter_glow.getchannel("A").getbbox()
 if gb is None: raise RuntimeError("empty halo")
-pad_guard=3
+pad_guard=2
 if min(gb[0],gb[1],letter_glow.width-gb[2],letter_glow.height-gb[3])<pad_guard:
     raise RuntimeError(("halo touches effect canvas",gb,letter_glow.size))
 crop_box=(gb[0]-pad_guard,gb[1]-pad_guard,gb[2]+pad_guard,gb[3]+pad_guard)
@@ -168,8 +168,8 @@ if (pre_bbox[2]-pre_bbox[0])>sw or (pre_bbox[3]-pre_bbox[1])>sh: raise RuntimeEr
 
 # Encode a full desired DXT5 image with ImageMagick, then splice only block-safe data.
 desired_raw=desired.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-tmp_png=Path("/tmp/A192_desired_raw.png"); desired_raw.save(tmp_png)
-tmp_dds=Path("/tmp/A192_desired_dxt5.dds")
+tmp_png=Path("/tmp/A192R_desired_raw.png"); desired_raw.save(tmp_png)
+tmp_dds=Path("/tmp/A192R_desired_dxt5.dds")
 cmd=["convert",str(tmp_png),"-define","dds:compression=dxt5","-define","dds:mipmaps=0",str(tmp_dds)]
 subprocess.run(cmd,check=True)
 enc=tmp_dds.read_bytes()
@@ -262,10 +262,10 @@ if payload[:128]!=raw[:128]: raise RuntimeError("header drift")
 if len(payload)!=len(raw): raise RuntimeError("size drift")
 
 # Evidence
-src.save(out/"A192_SOURCE_READABLE.png"); src_raw.save(out/"A192_SOURCE_RAW.png")
-clean.save(out/"A192_CLEAN_PLATE.png"); dec.save(out/"A192_FINAL_READABLE.png"); dec_raw.save(out/"A192_FINAL_RAW.png")
-Image.fromarray((source_alpha*255).astype(np.uint8),"L").save(out/"A192_SOURCE_TEXT_MASK.png")
-Image.fromarray((pre_mask*255).astype(np.uint8),"L").save(out/"A192_TARGET_MASK.png")
+src.save(out/"A192R_SOURCE_READABLE.png"); src_raw.save(out/"A192R_SOURCE_RAW.png")
+clean.save(out/"A192R_CLEAN_PLATE.png"); dec.save(out/"A192R_FINAL_READABLE.png"); dec_raw.save(out/"A192R_FINAL_RAW.png")
+Image.fromarray((source_alpha*255).astype(np.uint8),"L").save(out/"A192R_SOURCE_TEXT_MASK.png")
+Image.fromarray((pre_mask*255).astype(np.uint8),"L").save(out/"A192R_TARGET_MASK.png")
 
 def white(im):
     z=Image.new("RGBA",im.size,(255,255,255,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -280,13 +280,13 @@ sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+8 for c in cards
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((2200,1500),Image.Resampling.LANCZOS)
-sheet.save(out/"A192_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"A192R_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 rawsheet=Image.new("RGB",(1100,700),"white")
 for i,(lab,im) in enumerate([("SOURCE RAW mirror_y",src_raw),("FINAL RAW mirror_y",dec_raw)]):
     v=white(im); v.thumbnail((1050,280),Image.Resampling.LANCZOS)
     y=i*335+30; rawsheet.paste(v,(20,y)); ImageDraw.Draw(rawsheet).text((20,y-22),lab,fill="black")
-rawsheet.save(out/"A192_RAW_COMPARE.jpg",quality=95)
+rawsheet.save(out/"A192R_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":idx,"asset":asset,
@@ -324,7 +324,7 @@ report={
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"A192_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A192R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True,
  "supersedes_rejected_c294_sha256":REJECTED_SHA,
  "source_family_lean_anchors":"PENDING_DIRECT_NATIVE_CONTROLLER_MEASUREMENT",
@@ -333,9 +333,9 @@ report={
  "previous_visual_failure":"A190 native BWG black/gray revealed a too-hard white rim rather than source diffuse halo; this reconstruction materially softens glow and revisits slant",
  "qa_gate":"Pending first-hand native SOURCE/CLEAN/FINAL, 4x/practical/RAW controller review; numeric PASS never authorizes C approval"
 }
-rp=out/"A192_F6811E94_REPORT.json"
+rp=out/"A192R_F6811E94_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A192_F6811E94.json").write_text(json.dumps({
+(wr/"A192R_F6811E94.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":idx,"asset":"F6811E94",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "original_bbox":source_bbox,"localized_bbox":db,"deltas":deltas,
