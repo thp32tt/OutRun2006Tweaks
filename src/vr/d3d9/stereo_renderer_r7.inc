@@ -269,12 +269,18 @@ namespace OutRunVRStereo
 			if (!Game::current_mode)
 				return false;
 
-			// Reuse the game's established "in-game" state definition instead of
-			// treating only STATE_GAME as gameplay. GOAL/TIMEUP/TRYAGAIN,
-			// OUTRUNMILES and the single-player pause state can keep rendering the
-			// live 3D scene. Switching those frames to theater immediately clears
-			// stereo metadata and can leave the HMD without a fresh projection
-			// source while the monitor continues normally.
+			// Keep the original GAME/GOAL/TIMEUP/pause and WARP/RESTART
+			// allowances, but never produce stereo for host mono Theater.
+			// R45 host/game presentation parity: is_in_game() includes
+			// TRYAGAIN and OUTRUNMILES, but both are mono Theater frames in
+			// CurrentPresentationMode() and the OpenXR host. A stereo SBS
+			// result buffer displayed inside one Theater quad makes the entire
+			// screen binocularly doubled. Reject those exact Theater states
+			// before the old gameplay/stage transition allowlist.
+			// GOAL/TIMEUP and the established START/WARP/RESTART policies
+			// remain unchanged.
+			if (!Game::is_vr_gameplay_presentation())
+				return false;
 			if (Game::is_in_game())
 				return true;
 
