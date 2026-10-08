@@ -90,6 +90,8 @@
   },
   "runtime_note": "Quest 3/VDXR gameplay not tested. Existing 00519 white HUD, doubled visual and vehicle marker anchor failures remain OPEN/NEED_HMD_TEST. No hardware functional claims.",
   "parallel_policy": "DX11 native A active independently, DX9Ex stabilization C active, DXVK B FROZEN. No source edits in DX11/DXVK/localization.",
-  "score_status": "PENDING_AI2_SCOREBOARD_UPDATE: award +1 once for this new material+CI production task; duplicate dispatch/retry prohibited.",
-  "next_action": "Do not rerun 00554. Continue a NEW independent DX9Ex stabilization item under a new task ID; hardware-only correctness remains NEED_HMD_TEST with RUNTIME_VALIDATION=UNTESTED."
+  "score_status": "AWARDED_AI2_ONCE_RUN_KEY_CONVERSION-DX9EX-00554-E001: prior confirmed 1223 + new source/CI achievement 1 = cumulative 1224; scoreboard commit 4e19f0fc59db2ec81eed1def3725fd9bfcebed13; no retry/rollover re-award.",
+  "next_action": "Do not rerun 00554. Continue a NEW independent DX9Ex stabilization item under a new task ID; hardware-only correctness remains NEED_HMD_TEST with RUNTIME_VALIDATION=UNTESTED.",
+  "scoreboard_commit": "4e19f0fc59db2ec81eed1def3725fd9bfcebed13",
+  "score_calculation": "1223 + 1 = 1224; already-scored TASK_ID must receive +0 in subsequent dispatch."
 }
