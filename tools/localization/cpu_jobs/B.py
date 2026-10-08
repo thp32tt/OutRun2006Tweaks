@@ -131,9 +131,9 @@ for by in (8,):
     for bx in range(580,1524,4):
         offset=128+(((height-by-4)//4)*(width//4)+(bx//4))*16
         before=bytes(raw[offset:offset+8]);prev=current[by:by+4,bx:bx+4,3]
-        changed=(prev[:3,:]!=0)
+        changed=np.any(prev[3,:]!=0)
         if not np.any(changed):continue
-        a=prev.copy();a[:3,:]=0
+        a=prev.copy();a[3,:]=0
         a0=int(a.max());a1=int(a.min())
         if a0<=a1:a0=min(255,a1+1)
         ap=palalpha(a0,a1);ii=np.argmin(np.abs(a.astype(np.int32)[:,:,None]-ap[None,None,:]),axis=2)
