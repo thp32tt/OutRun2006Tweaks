@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B260 q214: BC3 face-priority, constrained original-block Hangul correction.
+"""B261 q214: BC3 face-priority, constrained original-block Hangul correction.
 
 Do not reuse an old Korean raster. New native Noto CJK glyph mask is rendered on the
 verified source-derived B253 clean plate, then RGB565 BC3 blocks are fitted to
@@ -12,9 +12,9 @@ from io import BytesIO
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B260 GitHub-hosted CPU runner (ChatGPT local GitHub raw DNS unavailable)")
+    raise SystemExit("B261 GitHub-hosted CPU runner (ChatGPT local GitHub raw DNS unavailable)")
 root=Path.cwd()
-RUN="20261008-B260-Q214-BC3-FACE-PRIORITY"
+RUN="20261008-B261-Q214-BC3-FACE-PRIORITY"
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
 loc=root/"localization/graphics"
 path=loc/"hd_candidates"/asset
@@ -27,14 +27,14 @@ check=subprocess.run(triage_cmd,capture_output=True,text=True,check=True)
 triage=json.loads(check.stdout)
 result=triage["assets"][0]
 if result["next_action"]!="METHOD_CHANGE_REQUIRED" or "SOURCE_FAMILY_BEVEL_MISMATCH" not in result["repeated_root_causes"]:
-    raise RuntimeError(("B260 requires genuine repeated-source-style defect",result))
+    raise RuntimeError(("B261 requires genuine repeated-source-style defect",result))
 blocked=subprocess.run(triage_cmd+["--require-safe-rerender"],capture_output=True,text=True)
 if blocked.returncode!=2:
     raise RuntimeError(("blind ordinary rerender not safely blocked",blocked.returncode))
-(out/"B260_REWORK_TRIAGE.json").write_text(json.dumps(triage,ensure_ascii=False,indent=2)+"\n")
+(out/"B261_REWORK_TRIAGE.json").write_text(json.dumps(triage,ensure_ascii=False,indent=2)+"\n")
 
 SOURCE_SHA="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-PRIOR_SHA="ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30"
+PRIOR_SHA="0036a943265c0244ec9c9e53e6d9e55e205c08b0d59699275f02631d82b5a903"
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "3da79726739ac631d8e2703a65330dbb0c310770/"
 "Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds")
@@ -42,7 +42,7 @@ cleanpath=loc/"role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CLEAN_PLATE.png"
 def sha(b):return hashlib.sha256(b).hexdigest()
 old=path.read_bytes()
 if sha(old)!=PRIOR_SHA: raise RuntimeError(("q214 changed concurrently",sha(old),PRIOR_SHA))
-with tempfile.TemporaryDirectory(prefix="b260_source_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b261_source_") as tmp:
     sourcefile=Path(tmp)/"source.dds"
     urllib.request.urlretrieve(url,sourcefile)
     sourcebytes=sourcefile.read_bytes()
@@ -95,7 +95,7 @@ for item in specs:
         "proxy_limit":"Whole-word centroid not independent per-glyph slant anchor"
     }
     source_profile.append({"id":item["id"],"source_bbox":item["source_bbox"],**item["source_family"]})
-(out/"B260_SOURCE_FAMILY_PROFILE.json").write_text(json.dumps({
+(out/"B261_SOURCE_FAMILY_PROFILE.json").write_text(json.dumps({
    "schema_version":1,"method":"native English warm-face percentile source sampling + signed-distance Hangul surface",
    "source_sha256":SOURCE_SHA,"prior_rejected_sha256":PRIOR_SHA,
    "independent_rejections":["C285","C289"],"source_family":source_profile,
@@ -150,8 +150,15 @@ for r in specs:
     class_local[core]=3
     # Only the outer-most real glyph contour gets gold bevel. The center is
     # protected as a continuous, luminous face for BC3 post-encode integrity.
-    bevel=core&(dist<=1.05)
+    # B260 machine PASS / controller VISUAL FAIL: edge signed-distance
+    # classification covered ~half of the Korean face and made pink blobs.
+    # Restrict gold accent to sparse, lower/right-facing real outer AA
+    # contour; NEVER replace a continuous cream stroke with pink bevel.
+    yy,xx=np.indices(core.shape)
+    bevel=core&(dist<=1.01)&(coverage<205)&((xx+yy)%4==0)&(yy>=h//3)
     class_local[bevel]=2
+    if int(np.count_nonzero(class_local==3))<int(np.count_nonzero(core)*0.86):
+        raise RuntimeError(("source gold accent steals too much Korean face",r["id"]))
     if np.count_nonzero(class_local==3)<40:
         raise RuntimeError(("source bevel erodes inner Hangul too much",r["id"]))
     ly,lx=np.nonzero(class_local)
@@ -188,7 +195,7 @@ for r in specs:
     parr[tile==1]=[155,56,32,255]
     parr[tile==2]=[238,141,73,255]
     parr[tile==3]=[255,242,205,255]
-    Image.fromarray(parr,"RGBA").save(out/("B260_"+r["id"]+"_PREENCODE.png"))
+    Image.fromarray(parr,"RGBA").save(out/("B261_"+r["id"]+"_PREENCODE.png"))
 if np.any((glyphkind>0)&~allowed):raise RuntimeError("glyph outside original text effect boxes")
 # Compose ideal RGBA for human comparison, but QA uses actual saved BC3 decode.
 ideal=base.copy()
@@ -345,12 +352,12 @@ for r in specs:
 # within the measured original text-effect area.
 path.write_bytes(dst)
 if sha(path.read_bytes())!=sha(dst):raise RuntimeError("publish byte drift")
-src.save(out/"B260_SOURCE_READABLE.png")
-clean.save(out/"B260_CLEAN_PLATE.png")
-Image.fromarray(ideal,"RGBA").save(out/"B260_PREENCODE_READABLE.png")
-prev.save(out/"B260_PREVIOUS_READABLE.png")
-after.save(out/"B260_FINAL_READABLE.png")
-after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B260_FINAL_RAW.png")
+src.save(out/"B261_SOURCE_READABLE.png")
+clean.save(out/"B261_CLEAN_PLATE.png")
+Image.fromarray(ideal,"RGBA").save(out/"B261_PREENCODE_READABLE.png")
+prev.save(out/"B261_PREVIOUS_READABLE.png")
+after.save(out/"B261_FINAL_READABLE.png")
+after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B261_FINAL_RAW.png")
 def over_bg(im,col=(115,115,115,255)):
     canvas=Image.new("RGBA",im.size,col)
     canvas.alpha_composite(im)
@@ -361,7 +368,7 @@ def make_contact():
         x0,y0,x1,y1=r["source_bbox"]
         box=(x0-10,y0-7,x1+10,y1+7)
         tiles=[]
-        for name,im in [("SOURCE",src),("CLEAN",clean),("B257_PREVIOUS",prev),("B260_NEW",after)]:
+        for name,im in [("SOURCE",src),("CLEAN",clean),("B257_PREVIOUS",prev),("B261_NEW",after)]:
             crop=over_bg(im).crop(box)
             crop=crop.resize((crop.width*6,crop.height*6),Image.Resampling.NEAREST)
             tile=Image.new("RGB",(crop.width,crop.height+24),(35,35,35))
@@ -376,20 +383,21 @@ def make_contact():
     py=0
     for im in strips:board.paste(im,(0,py));py+=im.height+16
     return board
-make_contact().save(out/"B260_SOURCE_CLEAN_B253_NEW_NATIVE6X.png")
+make_contact().save(out/"B261_SOURCE_CLEAN_B253_NEW_NATIVE6X.png")
 for percent in (100,75,50):
     dest=over_bg(after).resize((W*percent//100,H*percent//100),Image.Resampling.LANCZOS)
-    dest.save(out/("B260_PRACTICAL_"+str(percent)+".png"))
+    dest.save(out/("B261_PRACTICAL_"+str(percent)+".png"))
 report={
   "schema_version":2,"role":"B","run":RUN,"queue_index":214,"asset":asset,
   "source_sha256":SOURCE_SHA,"prior_rejected_candidate_sha256":PRIOR_SHA,
   "candidate_sha256":sha(dst),"format":"DXT5_BC3","size":[W,H],
   "header_exact":bytes(encoded[:128])==sourcebytes[:128],"raw_orientation":"mirror_y",
-  "construction":"B260_METHOD_CHANGE: source English P85/P48/P20 per-region cream/gold palette sampling + signed-distance 1px bevel Hangul surface + BC3 per-block endpoint adaptation; explicitly replaces B259 flat categorical cream/shear retry",
+  "construction":"B261_METHOD_CHANGE: source English P85/P48/P20 per-region cream/gold palette sampling + signed-distance 1px bevel Hangul surface + BC3 per-block endpoint adaptation; explicitly replaces B259 flat categorical cream/shear retry",
   "font_coverage_probed":"출발골","native_masks":specs,
   "source_family_profile":source_profile,
   "convergence_triage":"METHOD_CHANGE_REQUIRED",
   "prior_rejections":["C285","C289"],
+  "B260_first_draft_visual_reject":"SOURCE_PROFILE_METHOD_RETAINED_BUT_SPARSE_BEVEL_FIX_REQUIRES_NEW_NATIVE_DDS_QA",
   "full_blocks_reencoded":full,"partial_blocks_protected_indices":partial,
   "changed_bc3_blocks":retouched,"blocks_with_new_hangul":face_blocks,
   "source_vs_candidate_changed_inside":int(np.count_nonzero(delta&allowed)),
@@ -405,13 +413,13 @@ report={
   "execution_backend":"GITHUB_HOSTED_CPU_DUE_TO_GPT_LOCAL_GITHUB_RAW_DNS_UNAVAILABLE",
   "forbidden_domains_touched":[]
 }
-reportpath=out/"B260_BF229CF4_REPORT.json"
+reportpath=out/"B261_BF229CF4_REPORT.json"
 reportpath.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-wr=loc/"worker_results/B260_BF229CF4.json"
+wr=loc/"worker_results/B261_BF229CF4.json"
 wr.write_text(json.dumps({
   "role":"B","run":RUN,"queue_index":214,"asset":"BF229CF4",
   "source_sha256":SOURCE_SHA,"prior_sha256":PRIOR_SHA,
   "candidate_sha256":sha(dst),"status":"MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
   "report":str(reportpath.relative_to(root)),"RUNTIME_VALIDATION":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
-print("B260_DONE",json.dumps({"sha":sha(dst),"blocks":retouched,"face":integrity,"outside":outside},ensure_ascii=False),flush=True)
+print("B261_DONE",json.dumps({"sha":sha(dst),"blocks":retouched,"face":integrity,"outside":outside},ensure_ascii=False),flush=True)
