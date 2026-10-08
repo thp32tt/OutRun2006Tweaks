@@ -266,10 +266,18 @@ class UIScaling : public Hook
 				std::fabs(a2) <= 1.0e-6f ||
 				std::fabs(out->z) <= 1.0e-6f)
 				return;
-			info.valid = true;
 			info.viewZ = out->z;
 			info.viewX = out->x * (-out->z) / a1;
 			info.viewY = out->y * (-out->z) / a2;
+			// Finite game outputs can overflow while unprojecting. Never
+			// publish a poisoned per-eye rank/rival marker anchor.
+			if (!std::isfinite(info.viewX) ||
+				!std::isfinite(info.viewY))
+			{
+				info = {};
+				return;
+			}
+			info.valid = true;
 		};
 
 		if (returnAddress == Module::exe_ptr(0xBAEE7) &&
