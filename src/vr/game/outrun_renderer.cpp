@@ -1134,8 +1134,20 @@ namespace OutRunVRRenderer
             }
         }
 
+		// A raw game c64 upload belongs to its original render frame. The
+		// shader pointer/epoch and a 128-draw window alone cannot prove that
+		// a source WVP survived a new Present pose. In particular the GOAL
+		// ScreenHud fallback must never reuse the previous frame's raw c64
+		// as if it were the current course-name/time glyph transform.
+		void InvalidateGameWvpWrite() noexcept;
+
 		void ResetFrameState()
 		{
+			// Retain shader identity and per-scene pose rules, but require a
+			// fresh successful original game c64 write in the new frame.
+			// This is independent of no-tick Sumo SpriteNode replay, whose
+			// semantic ownership is preserved by its own snapshot path.
+			InvalidateGameWvpWrite();
 			LatchedHeadInverseValid = false;
 			LatchedStereo = {};
 			LastVerifiedWvpValid = false;
