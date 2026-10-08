@@ -1,0 +1,159 @@
+{
+  "role": "B",
+  "run": "B286",
+  "queue_index": 60,
+  "regression": "IGR-044",
+  "user_in_game": "OPEN_USER_INGAME_FAIL",
+  "canonical_source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "trial_sha256": "8b93dba89b2343bf8e24f966914811fd3bb2510b4006e964a27e3640285f6015",
+  "candidate_promoted": false,
+  "source_header_exact": true,
+  "native": [
+    4096,
+    2048
+  ],
+  "format": "BGRA32_mip1",
+  "orientation": "mirror_y",
+  "triage": {
+    "index": 60,
+    "path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "current_status": "c315_c2_user_ingame_rework_required_source_face_depth",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "regions": [
+    {
+      "name": "stage",
+      "korean": "스테이지",
+      "original_bbox": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "localized_effect_bbox": [
+        466,
+        252,
+        680,
+        346
+      ],
+      "source_size": [
+        235,
+        105
+      ],
+      "localized_size": [
+        214,
+        94
+      ],
+      "source_rgb_face": [
+        245,
+        204,
+        12
+      ],
+      "source_rgb_outer": [
+        2,
+        12,
+        65
+      ],
+      "native_font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+      "style": "yellow",
+      "slant_top_right": 0.18
+    },
+    {
+      "name": "outrun_miles_white",
+      "korean": "아웃런 마일!",
+      "original_bbox": [
+        1090,
+        245,
+        1930,
+        385
+      ],
+      "localized_effect_bbox": [
+        1121,
+        249,
+        1907,
+        381
+      ],
+      "source_size": [
+        840,
+        140
+      ],
+      "localized_size": [
+        786,
+        132
+      ],
+      "source_rgb_face": [
+        255,
+        255,
+        255
+      ],
+      "source_rgb_outer": [
+        194,
+        194,
+        195
+      ],
+      "native_font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+      "style": "white",
+      "slant_top_right": 0.23
+    },
+    {
+      "name": "outrun_miles_gold",
+      "korean": "아웃런 마일:",
+      "original_bbox": [
+        2081,
+        250,
+        2860,
+        370
+      ],
+      "localized_effect_bbox": [
+        2108,
+        256,
+        2835,
+        366
+      ],
+      "source_size": [
+        779,
+        120
+      ],
+      "localized_size": [
+        727,
+        110
+      ],
+      "source_rgb_face": [
+        243,
+        219,
+        162
+      ],
+      "source_rgb_outer": [
+        0,
+        8,
+        59
+      ],
+      "native_font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+      "style": "cream",
+      "slant_top_right": 0.19
+    }
+  ],
+  "clean_plate": "TRIAL_PENDING_INDEPENDENT_VISUAL",
+  "composite_contamination": "TRIAL_PENDING_INDEPENDENT_VISUAL",
+  "outside_changed_pixels": 0,
+  "alpha_outside_changed_pixels": 0,
+  "decoded_roundtrip_exact": true,
+  "C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "producer_visual": "PENDING_CONTROLLER_NATIVES_AND_PRACTICAL",
+  "new_production_candidate_dds": 0,
+  "backend": "GITHUB_HOSTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
