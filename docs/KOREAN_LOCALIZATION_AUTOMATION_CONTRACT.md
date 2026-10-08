@@ -4,6 +4,17 @@
 
 This is the canonical contract for the A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md, localization/graphics/TRANSLATION_NAMING_POLICY.md and localization/graphics/INGAME_REWORK_BACKLOG.csv. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
+## Rework convergence selection guard — 2026-10-08
+
+Before each A/B production selection and C1/C2 evidence selection, read `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md`, refresh the Git queue, and run `python tools/localization/rework_triage.py --index N` on the selected asset. Use `--require-safe-rerender` before ordinary same-method DDS rerender attempts; a nonzero result prevents blind rerender, not genuine corrective reconstruction. Do not use this read-only triage as visual QA or approval.
+
+- `EVIDENCE_ONLY_HOLD` / `FRESH_C_REVIEW` / `VALIDATION_ONLY`: preserve the current candidate bytes, gather the missing independent evidence or actual-game retest, and do not use A/B throughput to reproduce an unchanged DDS without a newly verified pixel defect.
+- `MATERIAL_REWORK`: repair the specific confirmed visual failure against the canonical native English source and measured UI-family style.
+- `METHOD_CHANGE_REQUIRED`: repeated independently evidenced source-family rejection requires a documented new reconstruction method and source-derived font/plate/style reference before producer PASS. Do not retry the same width/stretch, slant or flat-effect method. Initial evidence: q219 in `localization/graphics/REWORK_ESCALATIONS.json`. Any new escalation must cite genuine C review decisions and cannot be inferred from a test fixture.
+- `PRESERVE_ORIGINAL`: keep the preserved original without producing a replacement DDS.
+
+Do not reopen a current approved candidate merely to migrate evidence. New pixel evidence outranks prior numeric PASS; missing approval evidence remains HOLD rather than auto-REWORK. Measure produced DDS, current-evidence approvals, P0/P1 regressions, user acceptance and actual in-game closures separately. No changes to the six-launch A/B/C1/C2 schedule, parity ownership, exact-SHA C/C3, or RUNTIME_VALIDATION semantics.
+
 ## Evidence enforcement override — 2026-10-08
 
 Read `docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md` before selection. Its evidence gate
