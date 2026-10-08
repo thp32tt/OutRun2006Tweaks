@@ -1,0 +1,32 @@
+{
+  "run": "B277",
+  "index": 98,
+  "asset": "42E618FD",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "prior_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "trial_sha256": "a027b173769a994689a5e3bf35eec9d6fedfcfde94a8b9468f08610a35dd16b1",
+  "numeric": {
+    "changed_blocks": 4569,
+    "changed_pixels": 40426,
+    "outside_source": 0,
+    "outside_target": 0,
+    "alpha_exact": true,
+    "source_clean_residue": 0,
+    "white_face_recovery": 0.9990951591011914,
+    "header_exact": true
+  },
+  "producer_visual": "FAIL",
+  "observations": [
+    "SOURCE/CLEAN/OLD/B277 native100 and 50 images: B277 repairs all horizontal dark face stripes but removes the original thick navy outline entirely, rendering a flat white Hangul silhouette.",
+    "B277 RAW BLACK75 also lacks navy keyline, while source has dark blue stroke around light italic letterface.",
+    "Source-derived RGB values correctly measured [255,255,255]/[0,12,57], but palette selection lacks the layer geometry/inner dark border. Machine numeric PASS cannot override visual failure."
+  ],
+  "source_reference": "READABLE_GRAY_100_SOURCE_CLEAN_OLD_B277.png",
+  "failure_code": "SOURCE_FAMILY_NAVY_OUTLINE_MISSING",
+  "decision": "REWORK_REQUIRED_NO_PROMOTION",
+  "future_method": "use distance-to-authored-boundary 2-3px dark ring, then native white core; preserve native alpha; inspect actual stored DDS before any promotion",
+  "candidate_promoted": false,
+  "independent_C": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_PRODUCTION_TRIAL_GPT_CONTROLLER_VISUAL"
+}
