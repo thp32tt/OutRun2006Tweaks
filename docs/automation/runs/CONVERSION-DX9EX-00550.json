@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00550",
+  "production_id": "CONVERSION-DX9EX-00550",
+  "event_id": "CONVERSION-DX9EX-00550-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "3cb68827a54ef2073ca04c6424c7bb0b9e385fa0",
+  "material_result_sha": "PENDING_MATERIAL_COMMIT",
+  "validation_bearing_result_sha": "PENDING_MATERIAL_COMMIT",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00550]",
+  "status": "MATERIAL_PREPARED_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "score_award": "PENDING_VERIFIED_COMPLETION_NO_DUPLICATES",
+  "selected_work_item": "DX9EX-P0-FAST-DDS-HEADER-DESCRIPTOR-SIZE-FAIL-CLOSED",
+  "summary": "Reject invalid surface and pixel descriptor sizes in fast DDS decoder prior to interpretation; preserve native D3DX fallback, extend exact-source contract and two mutations.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/reviews/CONVERSION_DX9EX_00550_DDS_FAST_HEADER_GUARD.md",
+    "docs/automation/runs/CONVERSION-DX9EX-00550.json"
+  ],
+  "deterministic_precommit_review": {
+    "source_order": [
+      368,
+      501,
+      629,
+      680,
+      793
+    ],
+    "added_negative_mutations": 2,
+    "source_text_assertions": "PASS",
+    "hosted_compiler": "PENDING",
+    "hmd": "UNTESTED"
+  },
+  "ci_gate_complete": false,
+  "controller_terminal": false,
+  "next_action": "Observe GitHub exact-material-SHA HUD Inspector, DX9Ex Active and Domain Isolation CI. Record immutable run/job/artifact evidence and finish C6 only when confirmed; do not repeat 1000/5000 unchanged-source audit."
+}

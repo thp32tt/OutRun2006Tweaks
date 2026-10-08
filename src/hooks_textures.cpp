@@ -195,7 +195,9 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	const DDS_FILE* header = reinterpret_cast<const DDS_FILE*>(data);
 
 	// Validate DDS header
-	if (header->magic != DDS_MAGIC)
+	if (header->magic != DDS_MAGIC ||
+		header->data.dwSize != sizeof(DDSURFACEDESC2) ||
+		header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT))
 		return E_FAIL;
 
 	// Extract texture information

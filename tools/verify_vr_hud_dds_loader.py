@@ -25,6 +25,8 @@ def verify(text):
     handle=body(text,"static void HandleTexture(")
     guards=[
         (loader,"if (dataSize < sizeof(DDS_FILE))","short header rejected"),
+        (loader,"header->data.dwSize != sizeof(DDSURFACEDESC2)","malformed fast DDS surface descriptor rejected"),
+        (loader,"header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)","malformed fast DDS pixel descriptor rejected"),
         (loader,"*ppTexture = nullptr;","released output cleared"),
         (loader,"bytes > remainingSourceBytes","mip source bounded"),
         (loader,"Width > 16384","oversized DDS rejected"),
@@ -53,6 +55,9 @@ def verify(text):
             raise ValueError(label+" not verified")
     if loader.index("if (dataSize < sizeof(DDS_FILE))") > loader.index("const DDS_FILE* header ="):
         raise ValueError("DDS header read precedes byte length")
+    if max(loader.index("header->data.dwSize != sizeof(DDSURFACEDESC2)"),
+           loader.index("header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)")) > loader.index("Width = (Width != D3DX_DEFAULT)"):
+        raise ValueError("fast DDS descriptor validation must precede dimension/format interpretation")
     if handle.index("if (validHeader && completeMipPayload && firstMipSize &&") > handle.index("memcpy(*ppSrcData, file, sizeof(DDS_FILE));"):
         raise ValueError("game DDS header was overwritten before replacement validation")
     if "const D3DFORMAT newFormat = validHeader" not in handle:
@@ -92,6 +97,8 @@ def verify(text):
 def negatives(text):
     needles=[
         "if (dataSize < sizeof(DDS_FILE))",
+        "header->data.dwSize != sizeof(DDSURFACEDESC2)",
+        "header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)",
         "bytes > remainingSourceBytes",
         "dynamicTexture && mipLevel == 0",
         "LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
@@ -130,4 +137,4 @@ if __name__=="__main__":
         count=negatives(text) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("VR HUD DDS loader gate FAIL: "+str(exc))
-    print("VR HUD DDS fast loader PASS: %d source obligations; %d/%d deliberate defects rejected; runtime UNTESTED"%(n,count,20))
+    print("VR HUD DDS fast loader PASS: %d source obligations; %d/%d deliberate defects rejected; runtime UNTESTED"%(n,count,count))

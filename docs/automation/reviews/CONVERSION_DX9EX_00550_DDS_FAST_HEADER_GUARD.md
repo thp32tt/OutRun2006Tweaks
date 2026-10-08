@@ -1,0 +1,9 @@
+# CONVERSION-DX9EX-00550 — DDS fast-decoder descriptor fail-closed guard
+
+- Event: `CONVERSION-DX9EX-00550-E003`; event type `rollover`; `ATTEMPT=1/3`, `CHAT_ROLLOVER=2` unchanged. Resume reason: `Retry persisted after one recovery attempt`.
+- GitHub source-of-truth recovered from `vr-d3d9ex-focus` starting at `3cb68827a54ef2073ca04c6424c7bb0b9e385fa0`. The 00550 run file and commit marker were absent; 00549 was previously `COMPLETE_BUILD_VERIFIED`. Do not replay the earlier job.
+- **Confirmed source gap:** `HandleTexture` validates the replacement `DDSURFACEDESC2.dwSize` and `DDPIXELFORMAT.dwSize` before modifying the game's original DDS header, but `D3DXCreateTextureFromFileInMemoryEx_Custom` checked only `DDS_MAGIC` before interpreting size/mipmap/format. Invalid descriptors could enter the optional fast path even if the downstream replacement gate rejects such files.
+- **Material correction:** reject malformed fast-loader DDS descriptor sizes before width/format parsing or GPU allocation. Keep the existing UI and scene legacy-D3DX fallback intact to retain compatibility with unsupported/custom layouts; do not claim this resolves missing textures or doubled HUD in the previously failed HMD session.
+- **Negative proof:** extend `tools/verify_vr_hud_dds_loader.py --self-test` to reject either invalid descriptor guard being removed, and assert early-check ordering. This runs once per changed material SHA via HUD Inspector, not the retired 1000/5000 loop workflows.
+- **Scope:** `src/hooks_textures.cpp` + fast-loader source contract only. No DX11/DXVK changes, no rerun of 00549, no new HMD trial. `RUNTIME_VALIDATION=UNTESTED` until a matching Quest 3/VDXR test.
+- CI acceptance: exact material SHA HUD Inspector, DX9Ex Active game/host/full-chain/package, and Domain Isolation. Any future CI failure needs exact-run evidence, not assumed success.
