@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C319-C1-Q161-A200-RETAINED-GLYPH-FACE-20261009-0350",
+  "review_at_kst": "2026-10-09 03:50 KST",
+  "role": "C",
+  "lane": "C1",
+  "temporary_shard": "ODD",
+  "index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "old_C314_candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "new_A200_candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "asset_format": "2048x2048 BC3/DXT5 mip1 mirror_y raw",
+  "before_selection": "A200 fresh producer SHA, no prior C decision on these exact new bytes. Higher priority user P0 remain open but their existing candidates were already reviewed/rejected or await B/A reconstruction; no repeat q137/060/121 C result.",
+  "triage": "REWORK_GLYPH_INTEGRITY; read-only rework_triage.py NOT_EXECUTED since local sandbox lacks GitHub network checkout and N100 repo version not verified. Selection based on authoritative current queue/new candidate and exact saved producer QA.",
+  "producer_claims_distinguished": {
+    "changed_regions": [
+      "04",
+      "06"
+    ],
+    "preserved_regions": 36,
+    "preservation": "A200 producer exact BC3 compressed block-by-block report states 261038 unrelated blocks byte-identical to C314/A157 candidate. This independent C visual decision relies on the producer preservation proof for associating archived region08/10/12 lossless PNG with current A200 bytes; the 36-region DDS equality was not recomputed separately here.",
+    "reference": "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json",
+    "prior_C314_manifest": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_38_REGION_MACHINE_AND_PNG_MANIFEST.json",
+    "prior_C314_current_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d"
+  },
+  "pixel_visual_review": {
+    "native_readable_source_clean_final": "New A200 04/06 source-clean-final, archived C314 native SOURCE/FINAL region08/10/12. Archived evidence is applicable only to regions explicitly kept byte-identical by A200.",
+    "native_100_75_50": "New A200 04/06 native and practical proof plus archived C314 native/50 for 08/10/12; archived native/50 do not constitute current independently redecoded DDS proof.",
+    "raw_flip_y": "A200 06 RAW and C314 preserved 08 RAW inspected; no new orientation reversal observed. Whole 38 atlas RAW not independently reviewed.",
+    "source_plate_and_composite": "A200 04/06 producer source-clean-final proof inspected, no new CLEAN for preserved 08/10/12 independently inspected. This is not a whole-atlas plate PASS.",
+    "full_regions_covered": 38,
+    "independently_visual_sampled": [
+      "04",
+      "06",
+      "08",
+      "10",
+      "12"
+    ],
+    "not_claiming_all_38_reviewed": true,
+    "source_tight_bbox_checked_from_producer": true,
+    "independent_bc3_encoder_roundtrip": "NOT_RERUN",
+    "source_vs_plate_exact_hash": "NO_CURRENT_ALL_REGIONS_PROOF",
+    "practical_50": "Native readable preserved 08/10/12 face speckling persists at 50%",
+    "calibration": "First-look was not blind to prior C314 and A200 descriptions; do not promote PASS without separate calibrated evidence."
+  },
+  "regions": [
+    {
+      "id": "04",
+      "source": "PISCES",
+      "candidate": "물고기자리",
+      "decision": "SAMPLED_REPAIRED_NO_PRIOR_DAMAGE_OBSERVED",
+      "bbox_source": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "bbox_current": [
+        8,
+        1866,
+        206,
+        1909
+      ],
+      "evidence": [
+        "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_04_SOURCE_CLEAN_FINAL_GRAY_100.png",
+        "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_04_SOURCE_CLEAN_FINAL_BLACK_50.png"
+      ],
+      "remarks": "New A200 images display naturally proportioned Korean face without the old conspicuous pinholes. Producer persisted current bbox and zero-core-holes cited, but independent all-mip/full-atlas approval was not performed."
+    },
+    {
+      "id": "06",
+      "source": "LEO",
+      "candidate": "사자",
+      "decision": "SAMPLED_REPAIRED_WITH_TRANSLATION_HOLD",
+      "bbox_source": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "bbox_current": [
+        8,
+        1800,
+        98,
+        1848
+      ],
+      "evidence": [
+        "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_06_SOURCE_CLEAN_FINAL_WHITE_100.png",
+        "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_06_SOURCE_FINAL_RAW.png"
+      ],
+      "remarks": "Old severely condensed 사자자리 replaced by natural-width short 사자, no former face dropout apparent in new native/RAW examples. Semantic/terminology approval for shortened Leo remains pending; this is not 38-region C PASS."
+    },
+    {
+      "id": "08",
+      "source": "CAPRICORN",
+      "candidate": "염소자리",
+      "decision": "FAIL",
+      "bbox_source": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "bbox_prior_candidate": [
+        8,
+        1736,
+        182,
+        1784
+      ],
+      "evidence": [
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_08_SOURCE_CURRENT_BGW_NATIVE.png",
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_08_SOURCE_CURRENT_PRACTICAL50.png",
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_08_SOURCE_CURRENT_RAW.png"
+      ],
+      "remarks": "Archived lossless C314 persisted candidate decoded proof shows dotted/irregular transparent-looking sub-stroke gaps in Korean fill on white/gray (also visible RAW); source English fill is continuous. Native black also shows face speckles. Not a bbox escape; a source-family glyph integrity failure."
+    },
+    {
+      "id": "10",
+      "source": "ARIES",
+      "candidate": "양자리",
+      "decision": "FAIL",
+      "bbox_source": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "bbox_prior_candidate": [
+        4,
+        1672,
+        134,
+        1720
+      ],
+      "evidence": [
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_10_SOURCE_CURRENT_BGW_NATIVE.png",
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_10_SOURCE_CURRENT_PRACTICAL50.png"
+      ],
+      "remarks": "Native white/gray source-vs-Korean glyph face displays irregular small holes and noisy interior contour in Hangul; becomes coarser at 50%. English source solid strokes do not show equivalent texture."
+    },
+    {
+      "id": "12",
+      "source": "THAILAND",
+      "candidate": "태국",
+      "decision": "FAIL",
+      "bbox_source": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "bbox_prior_candidate": [
+        1,
+        1609,
+        84,
+        1655
+      ],
+      "evidence": [
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_12_SOURCE_CURRENT_BGW_NATIVE.png",
+        "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_12_SOURCE_CURRENT_PRACTICAL50.png"
+      ],
+      "remarks": "Korean thick-stroke face exhibits conspicuous pinprick/stepped blank spots compared with filled source on gray/white; persists in 50% practical proof."
+    }
+  ],
+  "confirmed_failure_codes": [
+    "PERSISTED_GLYPH_FACE_PINHOLES_OR_SPECKLE",
+    "GLYPH_STROKE_INTEGRITY_VISUAL_FAIL",
+    "PRACTICAL_SCALE_EDGE_BREAKUP"
+  ],
+  "root_cause": "Undetermined; defects are directly visible on old SHA decoded persisted-DDS proof. Cannot uniquely assign to BC3 alpha versus color without independent per-block re-decode.",
+  "unchanged_regions_not_certified_pass": 36,
+  "decision": "REWORK_REQUIRED",
+  "queue_target": "c319_c1_a200_rework_required_preserved_36_glpyh_face",
+  "producer_handoff": "A owner, do not undo A200 repaired cells04/06. Confirm exact compressed-block identity/current DDS decode for all 36 preserved cells and independently QA whole 38 region native 100/75/50 RAW/FLIP-Y on BGW. Rebuild at least confirmed 08/10/12 from canonical source CLEAN plate/source-family profile with native glyph color/alpha and zero pinholes; do not blur/upscale or widen past English original effect bbox. Audit all other preserved cells for same face artifacts; reuse 04/06 unchanged only if still proven clean. Recheck exact saved DDS SHA, no source residue/overlap/protected damage and positive bbox. New producer SHA -> fresh independent C1, distinct C3, user JPG then game.",
+  "current_C_pass": false,
+  "C3": "BLOCKED",
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED",
+  "USER_ACCEPTANCE": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "source_or_candidate_modified": false,
+  "backend": "GitHub connector direct current/archived proof visual review in ChatGPT; N100 MCP directory/file metadata only; local shell network unavailable; no heavy N100 jobs"
+}
