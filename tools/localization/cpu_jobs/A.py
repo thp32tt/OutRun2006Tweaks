@@ -2,7 +2,7 @@
 import hashlib,json,os,struct,subprocess,urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageChops,ImageDraw,ImageFont
+from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageFilter
 from scipy import ndimage
 from scipy.spatial import ConvexHull
 
