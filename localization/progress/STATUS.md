@@ -2997,3 +2997,6 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 ### 2026-10-08 17:49 KST — B262 q172 material DDS + B263 retry in flight
 - q172 6C9B3611 B262 native 1024×1024 RGBA32 DDS 15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0 produced by GitHub Actions 37750836025; decoded header/box/protected-outside/RAW numeric PASS. Source-derived warm gold bevel, original English CLEAN contact, practical100/75/50 and RAW persisted.
 - Practical 50% GOAL `골` remains visibly horizontally stretched. Producer visual HOLD. B263 rework retry 37751579835 still pending; no C/C3/PRE_INGAME approval or game acceptance. RUNTIME_VALIDATION=UNTESTED; N100 unused.
+
+## 2026-10-08 17:46 KST — C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740
+- C1 `ODD(+UNINDEXED_SPECIAL)` q119 F6811E94: A191 exact 4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca independently rejected for native first-Hangul left white-halo vertical truncation (PNG x705 106 near-white rows, preceding x704 transparent). C3/approval/PRE_INGAME blocked; A padded white-halo and source-lean rework required. Candidate unchanged, independent full-DDS machine PASS not claimed; actual game UNTESTED. Evidence `localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_CONTROLLER_QA.json`.

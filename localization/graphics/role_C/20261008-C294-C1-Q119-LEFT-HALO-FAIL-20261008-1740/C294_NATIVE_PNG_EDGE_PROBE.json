@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "run": "C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "evidence_class": "targeted lossless readable-PNG alpha-edge probe plus exact-DDS hash/header; not an independent full decoded-DDS machine PASS",
+  "exact_files": {
+    "canonical_source_dds_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "latest_candidate_dds_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+    "source_dds_verified_against_Sonic_TV_pinned_raw": true,
+    "candidate_dds_verified_against_branch_raw": true,
+    "format": "DXT5",
+    "dimensions": [
+      2048,
+      256
+    ],
+    "mipmaps": 1
+  },
+  "png_pixel_probe": {
+    "source_native_png": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_READABLE.png",
+    "candidate_native_png": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_FINAL_READABLE.png",
+    "source_crop": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_Q119_SOURCE_LEFT_NATIVE.png",
+    "candidate_crop": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_Q119_FINAL_LEFT_NATIVE.png",
+    "crop_source_xywh": [
+      365,
+      50,
+      255,
+      158
+    ],
+    "crop_candidate_xywh": [
+      680,
+      50,
+      255,
+      158
+    ],
+    "candidate_png_column_704_near_white_alpha_positive": 0,
+    "candidate_png_column_705_near_white_alpha_positive": 106,
+    "candidate_png_column_705_contiguous_y_span": [
+      67,
+      172
+    ],
+    "white_condition": "r>=235 && g>=235 && b>=235 && alpha>0",
+    "example_candidate_rgba_at_xy_705_130": [
+      255,
+      255,
+      255,
+      13
+    ],
+    "visual_interpretation": "A sharp vertical leftmost halo fringe extending >100 rows appears in the first glyph despite source effect being rounded and text-shaped. These observations do not establish final text-core clipping pixel count."
+  },
+  "producer_numeric_reference": {
+    "path": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_F6811E94_REPORT.json",
+    "status": "PRODUCER_MACHINE_PASS_ONLY",
+    "source_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "candidate_bbox": [
+      705,
+      58,
+      1316,
+      196
+    ],
+    "delta": [
+      315,
+      316,
+      4,
+      4
+    ],
+    "outside_pixels_claimed": 0,
+    "warning": "Not independently rerun; prior machine containment cannot overrule current visual defect"
+  },
+  "independent_machine_full_pixel_gate": "NOT_DONE",
+  "result": "VISUAL_HARD_EDGE_CONFIRMED"
+}

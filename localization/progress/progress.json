@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 17:49 KST",
+  "updated_at_kst": "2026-10-08 17:46 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7564,5 +7564,18 @@
     "qa": "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/B262_POST_ENCODE_NATIVE_PRACTICAL_RAW_QA.json",
     "execution_backend": "GitHub Actions ephemeral; no N100; local DNS failure to raw Github",
     "cleanup": "GitHub ephemeral job workspace discarded; no N100 scratch"
+  },
+  "c294_c1_q119_left_halo_fail": {
+    "run_key": "OUTRUN-KOR-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 119,
+    "decision": "REWORK_REQUIRED",
+    "candidate_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+    "review": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_CONTROLLER_QA.json",
+    "producer_dds_unchanged": true,
+    "approval": false,
+    "runtime_validation": "UNTESTED"
   }
 }

@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740",
+  "run": "C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "decision": "REWORK_REQUIRED",
+  "decision_reason": "VISIBLE_RECTANGULAR_LEFT_WHITE_HALO_EDGE_AND_UNRESOLVED_SOURCE_LEAN",
+  "source": {
+    "sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "origin": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "exact_binary_download_hash_verified": true
+  },
+  "candidate": {
+    "sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+    "width": 2048,
+    "height": 256,
+    "fourcc": "DXT5",
+    "mips": 1,
+    "exact_binary_download_hash_verified": true,
+    "modified_by_C": false
+  },
+  "evidence": {
+    "native_png_edge_probe": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_NATIVE_PNG_EDGE_PROBE.json",
+    "source_crop": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_Q119_SOURCE_LEFT_NATIVE.png",
+    "candidate_crop": "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_Q119_FINAL_LEFT_NATIVE.png",
+    "source_comparison": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "native_source": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_READABLE.png",
+    "native_candidate": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_FINAL_READABLE.png",
+    "raw_comparison": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_RAW_COMPARE.jpg"
+  },
+  "selection": {
+    "fresh_head_sha": "d21a93b9e8d0145eb6c090506ac9c8ec6d031c55",
+    "triage_script": "tools/localization/rework_triage.py --index 119",
+    "triage_result": "MATERIAL_REWORK (coarse status substring; independent adjudication below)",
+    "priority": "latest q119 user/JPG visual regression repair before older pending C; odd C1 shard",
+    "prior_review": "C290 rejected old SHA af938e04... for missing white outer glow; this A191 is a new candidate SHA"
+  },
+  "calibration": {
+    "qualified": false,
+    "blind_review_completed": false,
+    "reason": "Current run consulted A191 producer notes before first-look; no qualified hidden-answer controls. No PASS or APPROVAL claimed."
+  },
+  "controller_vision": {
+    "source_view": "Original source Time Attack Mode has rounded, right-italic orange/navy lettering and a continuous soft white outer glow.",
+    "clean_plate": "A191 PNG shows transparent text removal; plate not independently full-pixel certified.",
+    "candidate_view": "Current translated '타임 어택 모드' shows glow brightness restored versus C290, but Korean first-glyph left halo appears as an abrupt straight vertical cut in the lossless candidate PNG; no comparable hard vertical left edge in original.",
+    "alpha_evidence": "At readable x704 no near-white positive alpha; at adjacent x705, near-white positive alpha runs in 106 uninterrupted rows y67..172; original effect's left side follows glyph contours.",
+    "slant": "Source is visibly right italic. Candidate Korean appears much flatter/source-family different in the same readable orientation; exact top-minus-bottom independent glyph anchoring not established. Separate style measurement is required before producer PASS.",
+    "raw": "Producer's source-vs-final mirror-Y RAW evidence inspected; no separate raw orientation failure established.",
+    "zoom": "Native 255x158 lossless crops inspected; first-glyph effect appears hard-truncated.",
+    "practical": "Not independently measured in this run; do not assert successful practical-size QA.",
+    "outcome": "Concrete halo edge defect suffices for C REWORK_REQUIRED despite previous numeric producer PASS."
+  },
+  "per_region": {
+    "id": "time_attack_mode",
+    "native_source_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "native_candidate_bbox": [
+      705,
+      58,
+      1316,
+      196
+    ],
+    "observations": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Source right-italic; candidate source-family/glyph lean measurement missing"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "Existing producer clean image reviewed; independent source-to-clean full-pixel gate not rerun"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Source smooth glowing outline becomes a cut rectangular left glow fringe on Korean"
+      },
+      "readability": {
+        "result": "HOLD",
+        "observation": "The Korean text is semantically legible, but native edge presentation is unacceptable"
+      },
+      "glyph_integrity": {
+        "result": "FAIL",
+        "observation": "First glyph outer white alpha fringe has a vertical hard cutoff x705; no direct evidence proving interior Hangul stroke clipping"
+      },
+      "protected_art": {
+        "result": "HOLD",
+        "observation": "Existing producer outside/protected zero evidence not rerun by C"
+      },
+      "placement": {
+        "result": "HOLD",
+        "observation": "Producer source-bbox numeric containment margins positive; no independent pixel approval"
+      },
+      "orientation": {
+        "result": "HOLD",
+        "observation": "RAW mirror-Y images show consistent transforms but separate decoded pixel proof not rerun"
+      }
+    }
+  },
+  "required_rework": "A must reconstruct the left glow using sufficient native-resolution padded glyph/effect raster before the final DXT5 encode, avoid rectangular clip at first Hangul syllable, retain original dark navy/orange/soft white source family and right italic; confirm source-family lean with measured glyph anchors, both SOURCE/CLEAN/FINAL and RAW, black/white/gray views, DXT5 authored mip, exact source-bbox 1px rule and protected pixels. Re-review 100/75/50; then genuinely fresh qualified C1 and separate C3. Do not repeat A190's overly hard white rim or rerender just to satisfy schema.",
+  "stages": {
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "USER_JPG": "NOT_ACCEPTED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "backend": {
+    "source_fetch": "GitHub connector",
+    "binary_sha_validation": "N100 MCP github_download fallback because ChatGPT local DNS unavailable",
+    "pixel_probe": "N100 MCP small 255x158 lossless PNG crops (not whole-atlas DDS processing)",
+    "publish": "GitHub commit"
+  },
+  "no_vr_ffb_dx11_dxvk_work": true
+}
