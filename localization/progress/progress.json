@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 00:16 KST",
+  "updated_at_kst": "2026-10-09 00:25 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8221,5 +8221,48 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_MACHINE.json",
     "qa": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json"
+  },
+  "c311_c2_q154_gray_family_rework": {
+    "at_kst": "2026-10-09 00:25 KST",
+    "run_key": "OUTRUN-KOR-C311-C2-Q154-GRAY-SOURCE-STROKE-UNDERWEIGHT-20261009-0020",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "worker_run_id": 37800584333,
+    "worker": "SUCCESS",
+    "triage_before": "EVIDENCE_ONLY_HOLD",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_lossless_png": 6,
+    "new_dds": 0,
+    "gray_regions": 3,
+    "red_regions_preserved": 5,
+    "median_source_core_radius_px": [
+      6.3246,
+      6.4031,
+      7
+    ],
+    "median_final_core_radius_px": [
+      3,
+      3,
+      4
+    ],
+    "relative_core_radius": [
+      0.4743,
+      0.4685,
+      0.5714
+    ],
+    "source_final_gray_color_equal": true,
+    "source_clean_final_outside_8_rgba": 0,
+    "source_clean_final_outside_8_alpha": 0,
+    "reason_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_GRAY_STROKE_PROFILE_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_CONTROLLER_C2_REWORK.json"
   }
 }

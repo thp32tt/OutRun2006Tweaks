@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C311 C2 EVEN q154 newly confirmed 3-gray SOURCE_FAMILY_STROKE_UNDERWEIGHT native DDS style defect: current SHA unchanged 94678124..., new 6 stroke-core lossless mapped source/final 100/200; median ridge core 6.32/6.40/7px English vs 3/3/4px Hangul, visually too weak. C REWORK_REQUIRED, B owner reconstruct three gray labels only with source-derived thick condensed-family strokes and preserved counter/correct RGB [78,96,100]; protect other five red and B60 CLEAN, source bbox ceiling/RAW, fresh C2/C3 after actual new DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_CONTROLLER_C2_REWORK.json",
     "C310 C2 EVEN new q098 B279 candidate rejected after independent exact DDS native first C: source-family thick diffuse navy outline vs candidate overly thin sharp navy and white-face dominance (source white/navy support ratio 0.413; candidate 2.018, proxy not sole cause). Prior stripe repair remains. C REWORK_REQUIRED; B needs source-conditioned face navy halo and independent clean/compound profile, not more same-method whitening. 13 new PNG, SHA pinned, atlas outside=0, runtime UNTESTED. localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json",
     "A197 q103 new DDS 9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed source original390x72 vs Korean349x64 (old196x40), source-clean source removed7439px, native right italic olive gray, changed outside/alpha/protected/English remnant/foreign box=0, saved DDS roundtrip, RAW/100/75/50 producer visual PASS; C1/C3/user/actual game pending; localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CONTROLLER_SELF_QA_FINAL.json",
     "C309 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL): current A161 q111 3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394 supersedes older C111 PASS candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633; 149294 old->new RGBA differences only within A161 four original source boxes, RGBA/alpha outside0. SOURCE/CLEAN and SOURCE/CURRENT entire 17 source region union outside0. Newly published 24 SHA-bound lossless source/clean/final images, native/BGW/zoom/50/raw. C=HOLD_STRICT_RECHECK, old C111 PASS historical only, C3 and approval blocked, no new DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_CONTROLLER_C1_HOLD.json",
@@ -6787,7 +6788,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 00:16 KST",
+  "updated_at_kst": "2026-10-09 00:25 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12236,5 +12237,48 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_MACHINE.json",
     "qa": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json"
+  },
+  "c311_c2_q154_gray_family_rework": {
+    "at_kst": "2026-10-09 00:25 KST",
+    "run_key": "OUTRUN-KOR-C311-C2-Q154-GRAY-SOURCE-STROKE-UNDERWEIGHT-20261009-0020",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "worker_run_id": 37800584333,
+    "worker": "SUCCESS",
+    "triage_before": "EVIDENCE_ONLY_HOLD",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_lossless_png": 6,
+    "new_dds": 0,
+    "gray_regions": 3,
+    "red_regions_preserved": 5,
+    "median_source_core_radius_px": [
+      6.3246,
+      6.4031,
+      7
+    ],
+    "median_final_core_radius_px": [
+      3,
+      3,
+      4
+    ],
+    "relative_core_radius": [
+      0.4743,
+      0.4685,
+      0.5714
+    ],
+    "source_final_gray_color_equal": true,
+    "source_clean_final_outside_8_rgba": 0,
+    "source_clean_final_outside_8_alpha": 0,
+    "reason_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_GRAY_STROKE_PROFILE_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_CONTROLLER_C2_REWORK.json"
   }
 }
