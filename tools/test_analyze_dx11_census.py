@@ -2439,7 +2439,7 @@ def main() -> int:
     # of these analyzer receipts promotes NativeDrawPath or a Draw* call.
     r313_handoff_line = (
         "VR DX11 R273 sourceMappingHandoff: "
-        "exact=1 snapshot=0xDEADBEEF00000001\n"
+        "exact=1 snapshot=0x6AFFAF0E35D2F69B\n"
     )
     r313_support = r311_register_mapping_support.replace(
         "VR DX11 R276 semanticTranslationPlan signature#1:",
@@ -2456,9 +2456,11 @@ def main() -> int:
         "SourceMappingHandoff"
     ]
     assert r313_evidence["producer_order_valid"] is True
-    assert r313_evidence["snapshot"] == 0xDEADBEEF00000001
+    assert r313_evidence["snapshot"] == 0x6AFFAF0E35D2F69B
+    assert r313_evidence["expected_snapshot"] == 0x6AFFAF0E35D2F69B
+    assert r313_evidence["snapshot_matches_producer"] is True
     assert r313_evidence["summary_correlation_exact"] is True
-    assert r313_evidence["identity_link_strength"] == "ORDER_AND_NONZERO_ONLY"
+    assert r313_evidence["identity_link_strength"] == "EXACT_RECONSTRUCTED_R273_SNAPSHOT"
     assert r313_evidence["diagnostic_only"] is True
     assert r313_evidence["activation_proof"] is False
     assert r313_good["NativeDrawPathActivationAllowed"] is False
@@ -2487,8 +2489,25 @@ def main() -> int:
     )
     check_r313_inexact(
         r313_support.replace(
-            "0xDEADBEEF00000001", "0x0000000000000000"
+            "0x6AFFAF0E35D2F69B", "0x0000000000000000"
         )
+    )
+    # R314: counterfeit, altered R271/R272 identity and invalid ready bit
+    # must all fail exact native R273 snapshot reconstruction.
+    check_r313_inexact(
+        r313_support.replace("0x6AFFAF0E35D2F69B", "0xDEADBEEF00000001")
+    )
+    check_r313_inexact(
+        r313_support.replace("pairHash=0x1111111111111111",
+                             "pairHash=0x1111111111111112")
+    )
+    check_r313_inexact(
+        r313_support.replace("samplerHash=0x3434343434343434",
+                             "samplerHash=0x3434343434343435")
+    )
+    check_r313_inexact(
+        r313_support.replace("exact=1 snapshot=0x6AFFAF0E35D2F69B",
+                             "exact=0 snapshot=0x6AFFAF0E35D2F69B")
     )
     # New R271 invalidates the handoff and R272; a later R276 cannot
     # consume stale evidence even when the signature ordinal is identical.

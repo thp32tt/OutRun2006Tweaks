@@ -165,6 +165,33 @@ R273_SOURCE_MAPPING_HANDOFF_RE = re.compile(
     r"VR DX11 R273 sourceMappingHandoff: exact=(?P<exact>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+def recompute_r273_handoff_snapshot(
+    source_pair: dict, mapping_plan: dict
+) -> int:
+    """Mirror native_backend.cpp R273 uint64 snapshot mixing, not a draw gate."""
+    if not source_pair["exact"] or not mapping_plan["exact"]:
+        return 0
+    mask = (1 << 64) - 1
+    token = 0xCBF29CE484222325
+    for value in (
+        source_pair["cache_key"],
+        source_pair["pair_hash"],
+        source_pair["vertex_register_hash"],
+        source_pair["pixel_register_hash"],
+        mapping_plan["constant_mapping_hash"],
+        mapping_plan["sampler_mapping_hash"],
+        mapping_plan["plan_revision_hash"],
+        mapping_plan["semantic_contract_hash"],
+        0x273,
+    ):
+        token ^= (
+            value + 0x9E3779B97F4A7C15
+            + ((token << 6) & mask) + (token >> 2)
+        ) & mask
+        token &= mask
+    return token or 1
+
+
 R276_SEMANTIC_PLAN_RE = re.compile(
     r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
@@ -2296,16 +2323,32 @@ def main() -> int:
                 and semantic_plan["exact"]
                 and semantic_plan["snapshot"] != 0
             )
+            expected_snapshot = (
+                recompute_r273_handoff_snapshot(
+                    source_semantic_pair, register_mapping_plan
+                )
+                if source_semantic_pair is not None
+                and register_mapping_plan is not None
+                else 0
+            )
+            snapshot_matches_producer = bool(
+                source_mapping_handoff["exact"]
+                and expected_snapshot != 0
+                and source_mapping_handoff["snapshot"] == expected_snapshot
+            )
             summary_correlation_exact = bool(
                 source_mapping_handoff["producer_order_valid"]
-                and source_mapping_handoff["snapshot"] != 0
+                and snapshot_matches_producer
                 and source_pair_correlated
                 and mapping_correlated
                 and semantic_plan_correlated
             )
-            # R273 emits only exact/snapshot, not the mapping hashes: order
-            # and nonzero identity are checked, not unlogged hash equality.
+            # Reconstruct R273 from logged R271/R272 fields using the
+            # native uint64 mixer; no downstream R276 hash is assumed.
             source_mapping_handoff.update({
+                "expected_snapshot": expected_snapshot,
+                "expected_snapshot_hex": f"0x{expected_snapshot:016X}",
+                "snapshot_matches_producer": snapshot_matches_producer,
                 "source_semantic_pair_correlated": source_pair_correlated,
                 "register_mapping_plan_correlated": mapping_correlated,
                 "semantic_plan_correlated": semantic_plan_correlated,
@@ -2314,7 +2357,11 @@ def main() -> int:
                     summary_correlation_exact
                     and source_mapping_handoff["exact"]
                 ),
-                "identity_link_strength": "ORDER_AND_NONZERO_ONLY",
+                "identity_link_strength": (
+                    "EXACT_RECONSTRUCTED_R273_SNAPSHOT"
+                    if snapshot_matches_producer
+                    else "MISMATCH_OR_MISSING_PRODUCER"
+                ),
                 "diagnostic_only": True,
                 "activation_proof": False,
             })

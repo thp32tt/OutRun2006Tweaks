@@ -11594,6 +11594,16 @@ def main() -> None:
 
 
     r313_programmable_source_mapping_handoff_analyzer_bridge = [
+        ("def recompute_r273_handoff_snapshot(",
+         DX11_CENSUS_ANALYZER, "R314 rebuilds R273 from exact R271/R272 identity"),
+        ("token = mix_readiness_snapshot_token(token, 0x273u)",
+         NATIVE_BACKEND_CPP, "R314 requires native R273 mixer domain tag"),
+        ('"snapshot_matches_producer": snapshot_matches_producer',
+         DX11_CENSUS_ANALYZER, "R314 rejects forged R273 snapshots"),
+        ('"EXACT_RECONSTRUCTED_R273_SNAPSHOT"',
+         DX11_CENSUS_ANALYZER, "R314 exact provenance strength classified"),
+        ('"0x6AFFAF0E35D2F69B", "0xDEADBEEF00000001"',
+         DX11_CENSUS_ANALYZER_TEST, "R314 counterfeit nonzero regression"),
         ("VR DX11 R273 sourceMappingHandoff",
          RUNTIME_CENSUS, "R313 consumes existing R273 source mapping handoff"),
         ("R273_SOURCE_MAPPING_HANDOFF_RE = re.compile(",
