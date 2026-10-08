@@ -165,6 +165,43 @@ for name, source in (('R26 early world-rebind', r26),
     require('OutRunVR::GameSemantic::EffectiveScope()', source,
             name + ' must use exact queued scope')
 
+# The two E8-sourced GOAL time helpers share a ScreenHud render policy
+# but must be distinguishable in source->queue->c64->draw telemetry. The
+# driver's original E8 edges target two different no-arg originals.
+def verify_goal_helper_source_variants(ui_source, sem_source, r30_source):
+    goal = function_body(ui_source, 'static void GoalTime_TagHelper(')
+    for token in ('helperRva == 0xBE020', 'helperRva == 0xBE150',
+                  'ProducerToken::GoalTime020',
+                  'ProducerToken::GoalTime150',
+                  'ProducerToken::GoalTimeHelper'):
+        require(token, goal, 'GOAL helper A/B provenance')
+    for variant in ('GoalTime020', 'GoalTime150'):
+        require('        ' + variant + ',', sem_source,
+                'GOAL helper token enum missing')
+        require('case ProducerToken::' + variant + ':', sem_source,
+                'GOAL helper token diagnostics missing')
+    if 'ProducerToken::GoalTime150);' in r30_source and (
+            'constexpr unsigned last' not in r30_source):
+        raise SystemExit('GOAL source range logger missing')
+    require('ProducerToken::GoalTime150', r30_source,
+            'GOAL second helper excluded from bounded GPU sink log')
+
+verify_goal_helper_source_variants(ui, sem, r30)
+for name, corrupt in (
+    ('BEA5A helper source lost', ui.replace(
+        'ProducerToken::GoalTime020', 'ProducerToken::GoalTimeHelper', 1)),
+    ('BEA5F wrongly aliased to first helper', ui.replace(
+        'ProducerToken::GoalTime150', 'ProducerToken::GoalTime020', 1)),
+):
+    if corrupt == ui:
+        raise SystemExit('GOAL source fault not injected: ' + name)
+    try:
+        verify_goal_helper_source_variants(corrupt, sem, r30)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL source alias regression escaped: ' + name)
+
 # Exactly one presentation policy must authorize both game SBS generation
 # and host projection. R45 narrowed the host Theater states, but the old R9
 # Game::is_in_game() still accepts TRYAGAIN/OUTRUNMILES; without the early
@@ -328,7 +365,7 @@ for marker in (
     '"VR P0 RESULT DRAW ROUTE: producer={} scope={} gameState={} mode={} queueEpoch={} shaderPresent={}"',
     'OutRunVR::GameSemantic::CurrentQueueProducerToken()',
     'ProducerToken::OutRunStagePrintf',
-    'ProducerToken::DispRankFirst',
+    'ProducerToken::GoalTime150',
     '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}"',
 ):
     require(marker, r30, 'result sink provenance / R62 fixedfn telemetry')
