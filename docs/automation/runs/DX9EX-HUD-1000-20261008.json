@@ -1,0 +1,331 @@
+{
+  "schema": 1,
+  "record_id": "DX9EX-HUD-1000-20261008",
+  "branch": "vr-d3d9ex-focus",
+  "validation_bearing_result_sha": "01f742749c414679cca210d6a275c55e778db3de",
+  "result_sha": "01f742749c414679cca210d6a275c55e778db3de",
+  "material_commit": "fix(vr): eliminate invalid managed DDS discard locks and corrupt texture copies [AUTO:DX9EX-HUD-DDS-FIX-20261008]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "source_audit": {
+    "cycles": 1000,
+    "families": 10,
+    "repeat_contract_checks_per_cycle": 10,
+    "rotation_variants": 5,
+    "checkpoint_interval": 30,
+    "total_checkpoints": 34,
+    "checkpoints": [
+      {
+        "from": 1,
+        "to": 30,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0030.json"
+      },
+      {
+        "from": 31,
+        "to": 60,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0060.json"
+      },
+      {
+        "from": 61,
+        "to": 90,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0090.json"
+      },
+      {
+        "from": 91,
+        "to": 120,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0120.json"
+      },
+      {
+        "from": 121,
+        "to": 150,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0150.json"
+      },
+      {
+        "from": 151,
+        "to": 180,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0180.json"
+      },
+      {
+        "from": 181,
+        "to": 210,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0210.json"
+      },
+      {
+        "from": 211,
+        "to": 240,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0240.json"
+      },
+      {
+        "from": 241,
+        "to": 270,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0270.json"
+      },
+      {
+        "from": 271,
+        "to": 300,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0300.json"
+      },
+      {
+        "from": 301,
+        "to": 330,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0330.json"
+      },
+      {
+        "from": 331,
+        "to": 360,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0360.json"
+      },
+      {
+        "from": 361,
+        "to": 390,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0390.json"
+      },
+      {
+        "from": 391,
+        "to": 420,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0420.json"
+      },
+      {
+        "from": 421,
+        "to": 450,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0450.json"
+      },
+      {
+        "from": 451,
+        "to": 480,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0480.json"
+      },
+      {
+        "from": 481,
+        "to": 510,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0510.json"
+      },
+      {
+        "from": 511,
+        "to": 540,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0540.json"
+      },
+      {
+        "from": 541,
+        "to": 570,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0570.json"
+      },
+      {
+        "from": 571,
+        "to": 600,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0600.json"
+      },
+      {
+        "from": 601,
+        "to": 630,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0630.json"
+      },
+      {
+        "from": 631,
+        "to": 660,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0660.json"
+      },
+      {
+        "from": 661,
+        "to": 690,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0690.json"
+      },
+      {
+        "from": 691,
+        "to": 720,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0720.json"
+      },
+      {
+        "from": 721,
+        "to": 750,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0750.json"
+      },
+      {
+        "from": 751,
+        "to": 780,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0780.json"
+      },
+      {
+        "from": 781,
+        "to": 810,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0810.json"
+      },
+      {
+        "from": 811,
+        "to": 840,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0840.json"
+      },
+      {
+        "from": 841,
+        "to": 870,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0870.json"
+      },
+      {
+        "from": 871,
+        "to": 900,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0900.json"
+      },
+      {
+        "from": 901,
+        "to": 930,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0930.json"
+      },
+      {
+        "from": 931,
+        "to": 960,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0960.json"
+      },
+      {
+        "from": 961,
+        "to": 990,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-0990.json"
+      },
+      {
+        "from": 991,
+        "to": 1000,
+        "verdict": "PASS",
+        "findings_new": 0,
+        "artifact_path": "checkpoint-1000.json"
+      }
+    ],
+    "source_digest": "35db8038a1da65ca9ef6e9c8a062a6ea0862cbcddf67f0c8a98988da9511e719",
+    "audit_result": "PASS",
+    "notes": "Pass means deterministic source/contract assertions and injected mutant rejections. It does not certify visible output.",
+    "artifact_id": 11519024426,
+    "artifact_digest": "sha256:8d4fd408d78ac8b77a39c1673586742a0924df1ae3d44fb8210aa3db48c97b7f",
+    "run_id": 37705935078
+  },
+  "concrete_source_repairs": [
+    "Reject DDS buffers shorter than original header before reading",
+    "Prevalidate source mip bytes before CreateTexture",
+    "Condition D3DLOCK_DISCARD on D3DUSAGE_DYNAMIC and mipLevel zero rather than MANAGED UI",
+    "Use per-row D3DLOCKED_RECT Pitch for compressed DXT rows and RGBA",
+    "Release-and-null output on LockRect/pitch/UnlockRect failure",
+    "Refuse truncated replacement DDS before touching original game header"
+  ],
+  "static_verifiers": [
+    "tools/verify_vr_hud_dds_loader.py --self-test",
+    "tools/verify_vr_hud_exact_callsite_contract.py --self-test",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "mutation_probes": {
+    "dds_loader": 8,
+    "hud_exact_callsite": 10,
+    "ten_domain_cycles": 1000
+  },
+  "exact_sha_gates": [
+    {
+      "id": 37705935247,
+      "conclusion": "success",
+      "title": "DX9Ex Active Validation"
+    },
+    {
+      "id": 37705935151,
+      "conclusion": "success",
+      "title": "OutRun EXE HUD Inspector CI"
+    },
+    {
+      "id": 37705935078,
+      "conclusion": "success",
+      "title": "DX9Ex HUD 1000 Static Review"
+    },
+    {
+      "id": 37705935117,
+      "conclusion": "success",
+      "title": "Domain Isolation Guard"
+    }
+  ],
+  "package": {
+    "artifact_id": 11520071041,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-01f742749c414679cca210d6a275c55e778db3de",
+    "digest": "sha256:6a0eca174e0cc307b746e0ebcf1d546cbc5e41e412cf77cc46e5c92a662a3856"
+  },
+  "open_evidence_risks": [
+    {
+      "key": "F1",
+      "status": "NO_CONFIRMED_BUG",
+      "text": "RankMarker_sprani uses last tail; canonical producer one-node assertion needs original binary trace before changing established behavior"
+    },
+    {
+      "key": "F2",
+      "status": "NEEDS_POLICY_RECONCILIATION",
+      "text": "ScreenOverlay2D header FOV-only text disagrees with active finite HUD placement; preserve known working behavior until source/runtime chronology reviewed"
+    },
+    {
+      "key": "F3",
+      "status": "PARTIALLY_FIXED",
+      "text": "DDS loader length/discard/pitch repaired but real replacement pixels/alpha/manifest matching and old 00519 hardware visual FAIL remain unverified"
+    }
+  ],
+  "historical_failed_runtime": "00519 2026-10-07 menu/car textures missing, HUD/rank/markers/result/F11/lens duplicated/head-following; cannot close without exact candidate HMD evidence",
+  "no_repeated_hmd_policy": "No further routine user test until all attainable static/map/asset checks are exhausted; freeze one exact candidate for a single integrated Quest3/VDXR test.",
+  "record_written_by": "assistant via authenticated GitHub"
+}
