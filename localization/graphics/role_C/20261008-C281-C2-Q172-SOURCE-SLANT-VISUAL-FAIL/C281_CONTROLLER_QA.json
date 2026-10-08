@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "original_repo": "Sonic-TV/OR2006Sprites",
+  "original_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "execution_backend": "GitHub SSOT; ChatGPT local attempted exact public raw DDS download but outbound DNS unavailable; minimal N100 MCP exact DDS download/Pillow pixel decode fallback",
+  "machine_report": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_MACHINE_QA.json",
+  "native_format": "1024x1024 DDS RGBA32 mip1; entire RAW texture mirror-Y",
+  "machine_qa": {
+    "source_candidate_sha256_verified": true,
+    "header_128_exact": true,
+    "original_vs_current_rgba_changed_outside_exact_two_source_boxes": 0,
+    "original_vs_current_alpha_changed_outside": 0,
+    "original_vs_current_rgba_changed_inside_exact_two_boxes": 3541,
+    "raw_vs_flipy_native_region_match": true,
+    "limitation": "source/current cropped alpha bboxes are full opaque badge/text boxes. These are not separate glyph-only slant anchor measurements. Do not falsely report per-glyph exact bbox/size PASS based on badge alpha."
+  },
+  "visual_first_hand": {
+    "source_current_zoom6": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png",
+    "practical_75": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_COMPARISON_75.png",
+    "practical_50": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_COMPARISON_50.png",
+    "full_atlas": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_FULL_ATLAS_SOURCE_CURRENT_50.png",
+    "raw_source_current": "01/02_SOURCE_RAW.png and 01/02_FINAL_RAW.png",
+    "finding": "English START and GOAL show obvious diagonal right-italic stroke geometry. Korean 출발 and 골 in the exact current persisted candidate look nearly upright/boxy with flatter column alignment, materially weaker right-lean than their source text family at source/candidate matched scale. This difference is visible on both native 6x no-interpolation comparison and full-atlas overview. A pixel containment PASS cannot override source-style direction/amount mismatch.",
+    "claim_scope": "Confirmed relative visual slant mismatch, not numeric measured slant angle or real-game observation."
+  },
+  "regions": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "native_readable_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "raw_bbox": [
+        55,
+        628,
+        136,
+        651
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "FAIL",
+          "observation": "Canonical English strongly diagonal right-italic vs candidate Hangul near-upright, source/source-family leaning not reproduced.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "No independently pinned CLEAN plate image for this B251 candidate.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/01_FINAL_FLIPY.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source cream/orange sharply right-italic geometric wordmark; Korean looks boxier and lacks equivalent italic displacement.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "readability": {
+          "result": "OBSERVED_LEGIBLE",
+          "observation": "출발 characters visually recognizable; readability does not cure slant mismatch.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_FULL_ATLAS_SOURCE_CURRENT_50.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_OBSERVED",
+          "observation": "Visible Hangul strokes continuous in provided 6x nearest-neighbor crop; separate glyph micro-evidence not approved.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/01_FINAL_FLIPY.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPE",
+          "observation": "Current and exact English source pixel-diff outside two original source-region rectangles 0 RGBA/alpha pixels.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_MACHINE_QA.json"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Source-derived glyph-only anchor/baseline not independently measured.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "orientation": {
+          "result": "PASS_RAW_MAPPING",
+          "observation": "Original and candidate RAW crop y=628..651 maps to readable y=373..396 under whole-texture FLIP-Y.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/01_FINAL_RAW.png"
+        }
+      }
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "native_readable_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "raw_bbox": [
+        595,
+        365,
+        672,
+        389
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "FAIL",
+          "observation": "Source GOAL strongly right italic; current 골 near upright and insufficiently tilted.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "No current exact CLEAN reference.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/02_FINAL_FLIPY.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Right diagonal golden source label replaced by much flatter upright block face.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "readability": {
+          "result": "OBSERVED_LEGIBLE",
+          "observation": "골 remains recognizable but stylistic fidelity fails.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_FULL_ATLAS_SOURCE_CURRENT_50.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_OBSERVED",
+          "observation": "No unequivocal isolated broken Hangul stroke in nearest-neighbor enlarged current region.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/02_FINAL_FLIPY.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPE",
+          "observation": "Canonical source-to-final zero change outside original START/GOAL rectangles.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_MACHINE_QA.json"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "One-character anchor relative to original is not independently measured; no width-ratio universal threshold applied.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_SOURCE_CURRENT_ZOOM6.png"
+        },
+        "orientation": {
+          "result": "PASS_RAW_MAPPING",
+          "observation": "Current RAW crop y=365..389 maps to readable 635..659; mapping matches source.",
+          "evidence": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/02_FINAL_RAW.png"
+        }
+      }
+    }
+  ],
+  "calibration": {
+    "synthetic_triage": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_CALIBRATION_DIAGNOSTIC.json",
+    "result": "5/5 diagnostic detection, NOT qualified approval calibration because control from unapproved candidate",
+    "pixels_before_producer_verdict": "NOT_ASSERTED: C277/B251 historical producer prose known from earlier workflow"
+  },
+  "new_independent_findings": "CONFIRMED_VISUAL_FAIL_SOURCE_RIGHT_ITALIC_VS_NEAR_UPRIGHT_HANGUL_IN_BOTH_LABELS",
+  "C": {
+    "result": "FAIL",
+    "decision": "REWORK_REQUIRED"
+  },
+  "C3": {
+    "result": "BLOCKED"
+  },
+  "approval_created": false,
+  "pre_ingame_export": "BLOCKED",
+  "REWORK_REQUIRED": "B producer must replace only START/GOAL Korean foreground/effect with original source-faithful visible rightward slant and cream/orange badge typography. Preserve exact 1024x1024 original sign red-plate, maps/icons, full original source region containment zero-pixel outside, positive margins, source color/counter/readability, authored mip/header/RAW mirror-Y. Reinspect native/practical 100/75/50 after persisted DDS compression. New exact-byte independent C then separate C3, user JPG and NEW actual-game retest required.",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "new_candidate_generated": false
+}

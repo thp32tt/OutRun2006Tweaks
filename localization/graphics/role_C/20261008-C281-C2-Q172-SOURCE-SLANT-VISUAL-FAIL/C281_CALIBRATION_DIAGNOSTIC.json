@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C281-C2-Q172",
+  "kind": "synthetic_visual_diagnostic_not_approval",
+  "source": "C281_BLIND_CALIBRATION.png",
+  "is_production_candidate": false,
+  "source_faithful_normal_verified": false,
+  "blind_display_prior_to_key": true,
+  "first_look_observations": {
+    "A": "excessive_weight",
+    "B": "residue",
+    "C": "opposite_slant",
+    "D": "normal",
+    "E": "clipped_stroke"
+  },
+  "revealed_labels": {
+    "A": "excessive_weight",
+    "B": "residue",
+    "C": "opposite_slant",
+    "D": "normal",
+    "E": "clipped_stroke"
+  },
+  "binary_classification": "5/5",
+  "approval_calibration": "NOT_QUALIFIED",
+  "reason": "The normal image was extracted from the visually rejected Korean candidate, not independently certified source-faithful control. This exercise can assist defect recognition but cannot satisfy visual-evidence policy's PASS calibration."
+}
