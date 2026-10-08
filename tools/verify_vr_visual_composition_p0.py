@@ -803,9 +803,12 @@ def verify_raw_queue_wvp_owner(source):
                   'GetLastRawGameWvpWrite(', 'GetCurrentShaderEpoch(')
     require('currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow', raw,
             'prevent cross-frame unbounded queue c64 reuse')
+    require('writeShader != currentShader ||', raw,
+            'raw source shader must match active GPU shader')
     builder = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
-    require_order(builder, 'queue c64 ownership before original GPU fallback',
-                  'if (!R44GetOwnedRawOverlayWvp(original))',
+    # Ignore initial kind enumeration: only test actual fallback branch order.
+    branch = builder[builder.index('if (!R44GetOwnedRawOverlayWvp(original)'):]
+    require_order(branch, 'queue c64 owner precedes live GPU fallback',
                   'R30ScreenSpaceKind::ScreenOverlay2D',
                   'R30GetRecentRawWvpForQueueSprite(original)',
                   'R30ScreenSpaceKind::ProjectedWorldMarker2D',
