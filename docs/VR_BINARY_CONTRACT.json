@@ -1527,6 +1527,34 @@
           "needle": "DispRankFirstSpraniCall = 0xB9DA6"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-P0-OUTRUN-TEXT-CLIP-BAAA0",
+      "rva": "0x000BAAA0",
+      "expectedBytes": "e8db27f7ff",
+      "purpose": "Original pinned EXE: BA9D0 shared OutRun HUD text producer calls put_clip_sprite 0x2D280; when original parent ClassifyCaller owns ScreenHud, every newly queued sibling must inherit ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "OutRunHudTextClipCallRva = 0xBAAA0"
+        }
+      ],
+      "signatureLength": 5,
+      "disassemblyWindow": 48
+    },
+    {
+      "id": "VR-EXE-P0-OUTRUN-TEXT-SPRANI-BAAEA",
+      "rva": "0x000BAAEA",
+      "expectedBytes": "e891eaf6ff",
+      "purpose": "Original pinned EXE: BA9D0 shared OutRun HUD text producer calls sprani_play_ae_auth_alpha 0x29580; user Quest3 HUD trace emitted 255 records from RVA 0xBAAEA.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "OutRunHudTextSpraniCallRva = 0xBAAEA"
+        }
+      ],
+      "signatureLength": 5,
+      "disassemblyWindow": 48
     }
   ]
 }
