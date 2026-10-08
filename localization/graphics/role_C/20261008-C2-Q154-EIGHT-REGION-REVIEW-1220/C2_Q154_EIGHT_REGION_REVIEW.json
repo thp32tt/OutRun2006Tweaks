@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C2-Q154-EIGHT-REGION-REVIEW-1220",
+  "timestamp_kst": "2026-10-08T12:20:00+09:00",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "selection_remote_head": "9f5c74bba61f76f978b41d3ddc57fe6e4f1379db",
+  "queue_blob_sha": "d7da432ea0c47aa7f18f294307a3e9e6c75eea94",
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_and_candidate_hashes_from": "previous C269/C271 persisted-DDS reports, not newly rehashed in this invocation",
+  "execution_backend": "GitHub connector / source-vs-candidate visual evidence review",
+  "scope": "eight text regions: five red source-family reference rows (older B225 exact red-family evidence), three gray current A182R lossless rows",
+  "regions": [
+    {
+      "id": "create_new_license",
+      "english": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_Q154_CONTACTS.jpg",
+      "observation": "Previous B225 lossless-to-JPG contact shows large upright red glyphs and red Hangul of comparable vertical hierarchy; no definite missing syllable or clipped stroke apparent at contact resolution. A182R producer claimed these five rows unchanged, but no NEW independent exact-current DDS hash/pixel binding was made in this invocation. No current-policy PASS.",
+      "risk": "HISTORICAL_REFERENCE_NOT_CURRENT_BYTE_CERTIFICATION",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "select_license",
+      "english": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_Q154_CONTACTS.jpg",
+      "observation": "Previous B225 lossless-to-JPG contact shows large upright red glyphs and red Hangul of comparable vertical hierarchy; no definite missing syllable or clipped stroke apparent at contact resolution. A182R producer claimed these five rows unchanged, but no NEW independent exact-current DDS hash/pixel binding was made in this invocation. No current-policy PASS.",
+      "risk": "HISTORICAL_REFERENCE_NOT_CURRENT_BYTE_CERTIFICATION",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "single_player_red",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_Q154_CONTACTS.jpg",
+      "observation": "Previous B225 lossless-to-JPG contact shows large upright red glyphs and red Hangul of comparable vertical hierarchy; no definite missing syllable or clipped stroke apparent at contact resolution. A182R producer claimed these five rows unchanged, but no NEW independent exact-current DDS hash/pixel binding was made in this invocation. No current-policy PASS.",
+      "risk": "HISTORICAL_REFERENCE_NOT_CURRENT_BYTE_CERTIFICATION",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "default_license",
+      "english": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_Q154_CONTACTS.jpg",
+      "observation": "Previous B225 lossless-to-JPG contact shows large upright red glyphs and red Hangul of comparable vertical hierarchy; no definite missing syllable or clipped stroke apparent at contact resolution. A182R producer claimed these five rows unchanged, but no NEW independent exact-current DDS hash/pixel binding was made in this invocation. No current-policy PASS.",
+      "risk": "HISTORICAL_REFERENCE_NOT_CURRENT_BYTE_CERTIFICATION",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "multiplayer_red",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_Q154_CONTACTS.jpg",
+      "observation": "Previous B225 lossless-to-JPG contact shows large upright red glyphs and red Hangul of comparable vertical hierarchy; no definite missing syllable or clipped stroke apparent at contact resolution. A182R producer claimed these five rows unchanged, but no NEW independent exact-current DDS hash/pixel binding was made in this invocation. No current-policy PASS.",
+      "risk": "HISTORICAL_REFERENCE_NOT_CURRENT_BYTE_CERTIFICATION",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "single_player_gray",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_CORRECT_FLIPY.png",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "observation": "Correctly FLIP-Y-oriented lossless source/current evidence: gray-tone upright Korean is present and legible; no definite missing glyph, reversal or crop clipping in the shown row. The current gray glyphs are shorter than stock English but source-width percentage alone is not a failure. This is not a clean-plate or native DDS rehash.",
+      "risk": "FULL_REGION_VIEWS_CLEAN_FAMILY_MIPS_NOT_YET_CERTIFIED",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "showroom_gray",
+      "english": "SHOWROOM",
+      "korean": "쇼룸",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_CORRECT_FLIPY.png",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "observation": "Correctly FLIP-Y-oriented lossless source/current evidence: gray-tone upright Korean is present and legible; no definite missing glyph, reversal or crop clipping in the shown row. The current gray glyphs are shorter than stock English but source-width percentage alone is not a failure. This is not a clean-plate or native DDS rehash.",
+      "risk": "FULL_REGION_VIEWS_CLEAN_FAMILY_MIPS_NOT_YET_CERTIFIED",
+      "result": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "multiplayer_gray",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "visible_source_and_korean_comparison": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_CORRECT_FLIPY.png",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "observation": "Correctly FLIP-Y-oriented lossless source/current evidence: gray-tone upright Korean is present and legible; no definite missing glyph, reversal or crop clipping in the shown row. The current gray glyphs are shorter than stock English but source-width percentage alone is not a failure. This is not a clean-plate or native DDS rehash.",
+      "risk": "FULL_REGION_VIEWS_CLEAN_FAMILY_MIPS_NOT_YET_CERTIFIED",
+      "result": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "visual_gate": {
+    "red_five": "REFERENCE_IMAGES_REVIEWED_HISTORICAL_B225_NOT_CERTIFIED_CURRENT",
+    "gray_three": "C271_CORRECTED_LOSSLESS_IMAGES_REVIEWED",
+    "readable_orientation": "Evidence matches readable English-to-Korean orientation for all displayed regions; five red rows lack fresh RAW/current binding.",
+    "raw_orientation": "C271 independently established RAW/FLIP-Y byte equality for gray three only, not rechecked this run",
+    "source_clean_final": "C141 clean and current full eight-region native pixel comparisons not reverified; incomplete",
+    "practical_and_zoom": "Contacts reviewed; mandatory per-region current practical 100/75/50, zoom, native and RAW evidence incomplete",
+    "calibration": "NOT_PERFORMED_IN_THIS_INVOCATION",
+    "pixels_before_producer_verdict": false,
+    "pixels_before_producer_verdict_reason": "Historical candidate/producer notes were already read before viewing images. Cannot claim blind or first-look C approval.",
+    "machine_independent_all8": "NOT_EXECUTED",
+    "C3_separate_eight_findings": "NOT_EXECUTED",
+    "approvals_q154": "NOT_CREATED"
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "status_unchanged": true,
+  "new_candidate_generated": false,
+  "new_evidence": "Eight-region image-level evidence provenance/coverage map and first-look compliance gap recorded; not a final C pass",
+  "required_next": "Fresh C2 must inspect exact current DDS SOURCE/CLEAN/FINAL pixels before producer verdict; derive all eight native RAW/FLIP-Y lossless evidence regions, complete blind known-defect calibration, machine pixel zero gates, per-region C then separately C3 observations and hash-bound records. Do not regenerate approved-looking DDS to satisfy evidence migration.",
+  "export": "BLOCKED_NO_CURRENT_POLICY_PASS",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "transient_scratch_created": false,
+  "post_task_cleanup": "No local/N100 temporary paths created; nothing to remove."
+}
