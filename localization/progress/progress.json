@@ -7808,5 +7808,28 @@
     "new_C3_pass": 0,
     "new_approval": 0,
     "runtime_validation": "UNTESTED"
+  },
+  "c304_c2_q236_all14_native": {
+    "run_key": "OUTRUN-KOR-C304-C2-Q236-COMPLETE-14-NATIVE-20261008-2125",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "new_region_inspections": 10,
+    "source_regions_total": 14,
+    "independently_inspected_native_now": 14,
+    "per_region_positive_margin": "14/14",
+    "changed_rgba_outside_source_effect_bboxes_in_row_bands": 0,
+    "changed_alpha_outside_source_effect_bboxes_in_row_bands": 0,
+    "current_C3": "HOLD_STRICT_RECHECK",
+    "remaining_approval_gates": "CLEAN plate, blind known-defect calibration, semantic glyph family/slant anchors, lossless native 100/75/50+RAW on BGW, full atlas protected; independent APPROVALS evidence",
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json",
+    "machine": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_NEW14_MACHINE.json",
+    "contact_jpg": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_SOURCE_KOREAN_14ROW_50_CONTACT.jpg"
   }
 }
