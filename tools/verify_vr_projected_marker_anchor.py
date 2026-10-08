@@ -138,8 +138,35 @@ for body, label, producer in (
 
 if "&RankMarkerProjectedInfo" not in rank13 or "&RankMarkerProjectedInfo" not in rank46:
     fail("rank marker nodes do not carry recovered rank anchor")
-if "&RivalMarkerProjectedInfo" not in rival:
-    fail("rival marker nodes do not carry recovered rival anchor")
+if "&projectedAnchor" not in rival or "RivalMarkerProjectedInfo = {};" not in rival:
+    fail("rival marker must consume one exact recovered anchor and copy it to all sibling nodes")
+rank_owner = function_body(ui, "static int __cdecl RankMarkerSub_dest(")
+for marker in (
+    "RankMarkerProjectedInfo = {};",
+    "++RankMarkerSubActiveDepth;",
+    "RankMarkerSub_hk.call<int>(arg)",
+    "--RankMarkerSubActiveDepth;",
+    "RankMarkerProjectedInfo = saved;",
+):
+    if marker not in rank_owner:
+        fail(f"rank sub_4BAD20 must own its per-vehicle view anchor: {marker}")
+if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
+    fail("original rank sub_4BAD20 hook not installed")
+if "RankMarkerSubScreenHudDepth == 0" not in calc:
+    fail("NaviPub rank HUD must not poison the next vehicle's projected anchor")
+rank_digit = function_body(ui, "static int __cdecl RankMarker_putClipSprite(")
+exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
+for label, body in (("rank 4th+ digits", rank_digit),
+                    ("menu/result HUD", exact_clip)):
+    if "TagAppendedNodes(tailsBefore," not in body:
+        fail(f"{label} must propagate semantic tags to every appended sibling")
+    if "Game::SpritePriorityCount" not in body:
+        fail(f"{label} must enumerate original sprite priority queues")
+for marker in ("const auto projectedAnchor = RivalMarkerProjectedInfo;",
+               "RivalMarkerProjectedInfo = {};",
+               "projected ? &projectedAnchor : nullptr"):
+    if marker not in rival:
+        fail(f"rival producer leaked stale anchor: {marker}")
 
 # Sumo no-tick replay allocates fresh nodes, so projected anchor metadata must
 # survive together with the already-preserved RenderScope and ProducerToken.
