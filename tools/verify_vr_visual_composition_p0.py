@@ -202,6 +202,54 @@ for name, corrupt in (
     else:
         raise SystemExit('GOAL source alias regression escaped: ' + name)
 
+# R64 used live original-or-injected c64 as a late fallback. Current R51
+# must never restore that unsafe behaviour even when a GOAL/6th glyph misses
+# its original WVP; emit bounded per-parent missing/recovered evidence instead.
+def verify_goal_c64_fallback_evidence(source):
+    fn = function_body(source,
+                       'void R30TraceGoalOriginalC64Status(')
+    for token in (
+        'Settings::VRTelemetry',
+        'QueueRenderActive()',
+        'CurrentQueueProducerToken()',
+        'GameState::STATE_GOAL',
+        'GameState::STATE_TIMEUP',
+        'GameState::STATE_LINK_TIMEUP',
+        'fetch_or(',
+        'MISSING_FALLBACK_TO_R29',
+        'RECOVERED',
+        'VR P0 GOAL RAW_C64_OWNER',
+    ):
+        require(token, fn, 'exact GOAL shader c64 failure telemetry')
+    shader = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    require('R30TraceGoalOriginalC64Status(false);', shader,
+            'missing GOAL c64 must be attributed before fail-closed')
+    require('R30TraceGoalOriginalC64Status(true);', shader,
+            'recovered GOAL c64 must be recorded per original producer')
+    require_order(shader, 'GOAL c64 fail-closed and source fingerprint',
+                  '++R30ExactHudRawWvpMiss;',
+                  'R30TraceGoalOriginalC64Status(false);',
+                  'return false;')
+    if ('SetVertexShaderConstantF(' in fn or
+            'GetVertexShaderConstantF(' in fn):
+        raise SystemExit('GOAL c64 evidence mutated live GPU constants')
+
+verify_goal_c64_fallback_evidence(r30)
+for name, corrupt in (
+    ('missing fail-closed source attribution',
+     r30.replace('R30TraceGoalOriginalC64Status(false);', '', 1)),
+    ('missing original WVP recovery attribution',
+     r30.replace('R30TraceGoalOriginalC64Status(true);', '', 1)),
+):
+    if corrupt == r30:
+        raise SystemExit('failed GOAL original-c64 injection: ' + name)
+    try:
+        verify_goal_c64_fallback_evidence(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL original-c64 defect escaped: ' + name)
+
 # Exactly one presentation policy must authorize both game SBS generation
 # and host projection. R45 narrowed the host Theater states, but the old R9
 # Game::is_in_game() still accepts TRYAGAIN/OUTRUNMILES; without the early
