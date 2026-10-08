@@ -1564,6 +1564,39 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R30ExactSceneEffectScope() noexcept
+        {
+            const auto scope = OutRunVR::GameSemantic::CurrentScope;
+            return scope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(scope);
+        }
+
+        bool R30GetExtendedRawWvpForExactSceneEffect(
+            float outConstants[16]) noexcept
+        {
+            // Never grant generic alpha/unknown draws this ownership. The
+            // original mod scopes Clr_SceneEffect and EXE+0xCABE precisely.
+            if (!outConstants || !R30ExactSceneEffectScope())
+                return false;
+            std::uint64_t writeSerial = 0;
+            std::uint64_t writeDrawSerial = 0;
+            std::uintptr_t writeShader = 0;
+            std::uint64_t writeShaderSerial = 0;
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderSerial = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    outConstants, writeSerial, writeDrawSerial,
+                    writeShader, writeShaderSerial) ||
+                !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
+                writeShader == 0 || writeShader != currentShader ||
+                writeShaderSerial == 0 ||
+                writeShaderSerial != currentShaderSerial)
+                return false;
+            const std::uint64_t currentDraw = TopLevelDrawSerial() + 1u;
+            return currentDraw > writeDrawSerial &&
+                currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow;
+        }
+
         bool R44GetOwnedRawOverlayWvp(
             float outConstants[16], std::uint64_t* drawAge = nullptr) noexcept
         {
@@ -1801,7 +1834,8 @@ namespace OutRunVRStereo
                     return R30ScreenSpaceKind::None;
 
                 float rawWvp[16]{};
-                if (!R44GetOwnedRawOverlayWvp(rawWvp))
+                if (!R44GetOwnedRawOverlayWvp(rawWvp) &&
+                    !R30GetExtendedRawWvpForExactSceneEffect(rawWvp))
                     return R30ScreenSpaceKind::None;
                 const auto matrixKind =
                     R44ClassifyOwnedOverlayMatrix(rawWvp);
@@ -3913,12 +3947,24 @@ namespace OutRunVRStereo
                         // Accept only the last original game upload with the
                         // same shader epoch and a bounded draw age. Never use
                         // a live potentially already-injected c64 for HUD.
-                        if (!R30GetExtendedRawWvpForExactHud(original))
+                        // A flat exact SceneEffect/lens also classifies as
+                        // PerspectiveHud, but is not a game text ScreenHud.
+                        // Recover the matching original matrix for *either*
+                        // exact owner, never a possibly injected live c64.
+                        if (!R30GetExtendedRawWvpForExactHud(original) &&
+                            !R30GetExtendedRawWvpForExactSceneEffect(original))
                         {
                             ++R30ExactHudRawWvpMiss;
                             return false;
                         }
                         ++R30ExactHudExtendedRawWvp;
+                    }
+                    else if (R30ExactSceneEffectScope())
+                    {
+                        // Spatial exact lens effect keeps its original game
+                        // world WVP rather than rereading injected GPU c64.
+                        if (!R30GetExtendedRawWvpForExactSceneEffect(original))
+                            return false;
                     }
                     else
                     {
