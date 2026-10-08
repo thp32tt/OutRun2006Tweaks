@@ -87,7 +87,7 @@ for y0 in range((tgt[1]//4)*4,((tgt[3]+3)//4)*4,4):
         pal=palette(end0,end1)
         whiteindex=int(np.argmin(np.sum((pal-np.array([255,255,255]))**2,axis=1)))
         if int(pal[whiteindex].min())<222:
-            # B272 incident: changing both BC1 endpoints to unconditional
+            # B271 incident: changing both BC1 endpoints to unconditional
             # white/navy erased source ink/keyline. Reconstruct only when
             # original non-core BC3 pixels retain their native palette values.
             tile=cur[y0:y0+4,x0:x0+4,:3].astype(np.int32)
@@ -162,7 +162,8 @@ if improved<10:raise RuntimeError(("white-stroke continuity did not improve",imp
 # Always verify original source-vs-candidate visible area has no new overflow
 if int(np.count_nonzero((res[:,:,3]>16)&~source_box))!=int(np.count_nonzero((cur[:,:,3]>16)&~source_box)):
     raise RuntimeError("source extent changed")
-trial=run/"42E618FD_B272_TRIAL_NOT_APPROVED.dds"\ntrial.write_bytes(new)
+trial=run/"42E618FD_B272_TRIAL_NOT_APPROVED.dds"
+trial.write_bytes(new)
 if SHA(trial.read_bytes())!=SHA(new):raise RuntimeError("persist verification failed")
 if not np.array_equal(dec(trial.read_bytes()),res):raise RuntimeError("persist roundtrip mismatch")
 # Small side-by-side independent pixel evidence with canonical source
