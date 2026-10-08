@@ -9,22 +9,54 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "ccf692cc4983ba2a469f631702d3709bfcb23995",
-  "material_result_sha": "PENDING_MATERIAL_COMMIT",
+  "material_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00547]",
-  "status": "MATERIAL_COMMITTED_AWAITING_EXACT_SHA_CI",
+  "status": "MATERIAL_COMMITTED_CI_IN_PROGRESS",
   "selected_work_item": "DX9EX-P0-UI-TEXTURE-LEGACY-D3DX-FALLBACK",
   "summary": "Restore legacy D3DX Ex trampoline on failed fast DDS UI decode (menu/car-selection texture resilience). Add deterministic source/negative-mutation contract; not a proven HMD fix.",
   "changed_paths": [
     "src/hooks_textures.cpp",
-    "tools/verify_vr_hud_dds_loader.py"
+    "tools/verify_vr_hud_dds_loader.py",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00547.json"
   ],
   "upstream_evidence": "emoose/OutRun2006Tweaks src/hooks_textures.cpp uses the identical legacy Ex trampoline/arguments in Orig_dest",
-  "deterministic_preflight": "PASS: exact wrapper behavior compared to Orig_dest; two deliberate guard/fallback corruptions fail; full Python and Windows CI pending",
+  "deterministic_preflight": "EXACT-SHA HUD Inspector static-exe-analysis success: 71 CALLs, 10/10 HUD mutations, 16 DDS source obligations, 10/10 DDS mutations, P0 visual PASS.",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "ci_gate_complete": false,
   "package_requested": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-  "next_action": "Track exact material SHA in HUD Inspector, DX9Ex Active Validation and Domain Isolation CI; fix any failures. Do not request Quest3 test until broader P0 static closure.",
-  "score_award": "PENDING_NEW_MATERIAL_VALIDATION"
+  "next_action": "Wait for exact material SHA 7768a745 HUD Inspector build and DX9Ex game/host/full-chain/package; if CI fails, inspect job logs and repair, then persist success/failure. Keep RUNTIME_VALIDATION=UNTESTED; do not package another HMD candidate.",
+  "score_award": "PENDING_NEW_MATERIAL_VALIDATION",
+  "validation_bearing_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
+  "result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
+  "material_commit_history": [
+    "fed8ae3f577644be6107c3c6bfe5b228ff7ff27d",
+    "f46e2ec42fea9bc62f02384f8ef6cb66bbe8819c",
+    "7768a745037c6453e85caf036f2001b1c8d379eb"
+  ],
+  "validation_runs": {
+    "hud_inspector": {
+      "id": 37710072983,
+      "static_job": 113093670470,
+      "static_status": "success",
+      "build_job": 113093670640,
+      "build_status": "in_progress"
+    },
+    "dx9ex_active": {
+      "id": 37710073122,
+      "policy_job": 113093671339,
+      "policy_status": "success",
+      "game_job": 113093773949,
+      "host_job": 113093773910,
+      "full_chain_job": 113093773912,
+      "build_status": "in_progress"
+    },
+    "domain_isolation": {
+      "id": 37710073156,
+      "job": 113093671247,
+      "status": "success"
+    }
+  }
 }
