@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A186R-Q219-SOURCE-HEIGHT-CHROME",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "before": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+  "after": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "status": "A186R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "report": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
