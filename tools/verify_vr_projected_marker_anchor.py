@@ -117,7 +117,7 @@ def require_finite_projected_anchor(calc_body: str) -> None:
     fx = calc_body.find("!std::isfinite(info.viewX)")
     fy = calc_body.find("!std::isfinite(info.viewY)")
     clear = calc_body.find("info = {};", fy)
-    valid = calc_body.find("info.valid = true;")
+    valid = calc_body.find("info.valid = true;", y)
     if min(x, y, fx, fy, clear, valid) < 0 or not (
         x < y < fx < fy < clear < valid
     ):
@@ -187,7 +187,9 @@ for invalid in (
 # Two distinct fault injections, not repeated audits of unchanged content.
 for bad_calc in (
     calc.replace("!std::isfinite(info.viewX)", "false", 1),
-    calc.replace("info.valid = true;", "/* premature validity */", 1),
+    calc[:calc.rfind("info.valid = true;")] +
+    "/* removed fallback validity */" +
+    calc[calc.rfind("info.valid = true;") + len("info.valid = true;"):],
 ):
     try:
         require_finite_projected_anchor(bad_calc)
