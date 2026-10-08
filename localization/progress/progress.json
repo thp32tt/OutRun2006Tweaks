@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 02:01 KST",
+  "updated_at_kst": "2026-10-09 02:11 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8476,5 +8476,23 @@
     "approval": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/C317_Q228_CONTROLLER_C2_REWORK.json"
+  },
+  "a199_p0_q121_white_italic": {
+    "at_kst": "2026-10-09 02:11 KST",
+    "task_id": "OUTRUN-KOR-A199-P0-Q121-WHITE-ITALIC-20261009-0204",
+    "index": 121,
+    "asset": "FD90AA9",
+    "new_dds_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "prior_dds_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+    "localized_headers": 3,
+    "materially_reworked_dds": 1,
+    "producer_selfqa": "PASS_WITH_CAUTION",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "APPROVAL": false,
+    "ingame_retest": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A199-P0-Q121-ORIGINAL-WHITE-ITALIC/A199_CONTROLLER_SELF_QA_FINAL.json"
   }
 }

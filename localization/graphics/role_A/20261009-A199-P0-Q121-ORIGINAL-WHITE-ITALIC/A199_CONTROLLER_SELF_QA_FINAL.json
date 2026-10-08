@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-A199-P0-Q121-WHITE-ITALIC-20261009-0204",
+  "role": "A",
+  "reviewed_at_kst": "2026-10-09 02:11 KST",
+  "priority": "P0",
+  "index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "ingame_reports": [
+    "IGR-030 screenshot181",
+    "IGR-031 screenshot182",
+    "IGR-040 screenshot192"
+  ],
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "supersedes_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "new_candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "native_dds": {
+    "width": 4096,
+    "height": 4096,
+    "mode": "RGBA",
+    "mips": 1,
+    "pitch": 16384,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "raw": "mirror_y"
+  },
+  "source_clean_provenance": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "actions": "GitHub CPU worker run 37813739749 SUCCESS; controller native and practical English/CLEAN/saved-Korean readable and RAW images visually inspected",
+  "source_derived_profile": "Native bright-white upright-body right italic 0.25 shear, single black right/down [5,5] depth, no extra gray outlines, NotoSansCJK Black, preserve original typography family",
+  "ten_stage": {
+    "exact_source": "PASS canonical English SHA pinned and DDS header size format/orientation matched",
+    "source_region_inventory": "PASS three exact q121 headers; mixed small info/logo NOT mapped and UNTOUCHED",
+    "clean_plate": "PASS verified authored transparent A176 CLEAN; source/CLEAN independently proved",
+    "plate_only": "PASS SOURCE vs CLEAN title removal; black, gray, white preview no new visible plate box",
+    "family": "PASS original bright-white heavy italic and simple black right-depth recreated, no multi outline",
+    "native": "PASS actual 4096² native rendering no bitmap upscale, fit in original source cell",
+    "transparent_glyph": "PASS no opaque or semitransparent crop background",
+    "composite_only": "PASS CLEAN to persisted FINAL differences only three declared glyph/shadow masks; 0 elsewhere",
+    "persisted": "PASS decoded actual persisted DDS roundtrip, readable/RAW 1 mip + BWG native/75/50 JPG",
+    "handoff": "Producer visual first-look done; independent C1/C3/current gate/user actual-game approval remains pending"
+  },
+  "ordered_visual": {
+    "source_removal": "PASS new titles on transparent A176 clean, original English removed at targets",
+    "source_slant": "PASS right lean matches main original; shear0.25 approximates source not precise glyph-anchor calibrated",
+    "source_relative_hierarchy": "IMPROVED BUT CAUTION: game mode old649x99→749x123 (source1000x154), car428x99→436x108 (source913x164), course430x99→462x114 (source783x151); car still narrower than source",
+    "effect_weight": "PASS source white face with single black lower-right shadow, no gray multiply outlines",
+    "glyph_integrity": "PASS native and practical examples no damaged Hangul pixels detected",
+    "protected_art": "PASS outside original 3 cells unchanged and original Dino model art untouched; logo orientation unresolved",
+    "raw_flip_y": "PASS readable source/persisted and RAW mirror-Y compared",
+    "instant_readability": "PASS all three Korean titles legible in producer review; composed game screenshot not executed"
+  },
+  "user_report_14_stops": "NOT_ALL_CLOSED: small car info/runtime overlay, Dino preserve orientation, actual composed header clipping/overlap require independent layer mapping and new user game capture",
+  "geometric": [
+    {
+      "key": "select_game_mode",
+      "old_size": [
+        649,
+        99
+      ],
+      "new_size": [
+        749,
+        123
+      ],
+      "source_limit": [
+        1000,
+        154
+      ],
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "new_bbox": [
+        291,
+        825,
+        1040,
+        948
+      ],
+      "margin": [
+        125,
+        126,
+        6,
+        25
+      ],
+      "non_touch_band": [
+        820,
+        953
+      ]
+    },
+    {
+      "key": "select_car",
+      "old_size": [
+        428,
+        99
+      ],
+      "new_size": [
+        436,
+        108
+      ],
+      "source_limit": [
+        913,
+        164
+      ],
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "new_bbox": [
+        481,
+        964,
+        917,
+        1072
+      ],
+      "margin": [
+        238,
+        239,
+        17,
+        39
+      ],
+      "non_touch_band": [
+        959,
+        1077
+      ]
+    },
+    {
+      "key": "select_course",
+      "old_size": [
+        430,
+        99
+      ],
+      "new_size": [
+        462,
+        114
+      ],
+      "source_limit": [
+        783,
+        151
+      ],
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "new_bbox": [
+        462,
+        1088,
+        924,
+        1202
+      ],
+      "margin": [
+        160,
+        161,
+        26,
+        11
+      ],
+      "non_touch_band": [
+        1083,
+        1207
+      ]
+    }
+  ],
+  "numeric": {
+    "clean_old_unrelated_diff_outside_original_bboxes": 0,
+    "clean_final_outside_original_bboxes": 0,
+    "clean_final_outside_glyph_masks": 0,
+    "alpha_outside_original_bboxes": 0,
+    "protected_unrelated_changed_pixels": 0,
+    "source_exact_residue_outside_localized_masks": 0,
+    "label_collision_pairs": 0,
+    "header128_exact": true,
+    "native_dds_roundtrip": "PASS"
+  },
+  "evidence": {
+    "source_clean": "A199_SOURCE_NATIVE.png, A199_CLEAN_NATIVE.png",
+    "persisted": "A199_FINAL_SAVED_NATIVE.png",
+    "per_region_png": "A199_{0..2}_{key}_{SOURCE|CLEAN|FINAL}_NATIVE.png",
+    "per_region_practical": "A199_{0..2}_{key}_{BLACK|GRAY|WHITE}_{100|75|50}.jpg",
+    "read_raw": [
+      "A199_READABLE_SOURCE_FINAL.jpg",
+      "A199_RAW_SOURCE_FINAL.jpg"
+    ],
+    "glyph_scope": "A199_COMPOSED_GLYPHS_SCOPE.png"
+  },
+  "review_limitations": [
+    "C316 independent C failure is for old SHA; new A199 bytes MUST receive a fresh C1 first look and distinct C3",
+    "Car header width remains 436 versus 913 English pixels; this short Korean phrase and shared-atlas row packing limit source-relative width, requires game feedback",
+    "Actual overlapping/clipped car title screen may involve runtime or info layers; static atlas alone does not close any IGR",
+    "Black boxes in provided annotated screenshots cannot be treated as native sprite rectangles absent unmarked evidence"
+  ],
+  "decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1_C3_AND_ACTUAL_INGAME",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "EVIDENCE_APPROVAL": false,
+  "USER_ACCEPTED": false,
+  "REAL_GAME_RETEST": "NOT_PERFORMED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
