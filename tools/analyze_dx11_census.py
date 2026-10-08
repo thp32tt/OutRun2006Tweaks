@@ -343,7 +343,7 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
 R317_RECEIPT_HEX_FIELDS = ['cacheKey','vertexVersionToken','pixelVersionToken','vertexBytecodeHash','pixelBytecodeHash','translatedVertexSemanticHash','translatedPixelSemanticHash','translatorRevisionHash','semanticContractHash','sourcePairSemanticHash','sourceConstantMappingHash','sourceSamplerMappingHash','sourceMappingPlanRevisionHash','sourceMappingSemanticContractHash','translationObjectSnapshotToken','sourceMappingHandoffSnapshotToken','translationPlanSnapshotToken']
 R317_RECEIPT_BOOL_FIELDS = ['vertexSemanticExact','pixelSemanticExact','constantRegisterMappingExact','samplerMappingExact']
 R317_RECEIPT_INPUT_RE = re.compile(
-    r"VR DX11 R317 receiptInputs signature#(?P<signature>\\d+): ".replace(r"\\d", r"\d")
+    r"VR DX11 R317 receiptInputs signature#(?P<signature>\d+): "
     + " ".join(
         f"{name}=0x(?P<{name}>[0-9A-Fa-f]{{1,16}})"
         for name in R317_RECEIPT_HEX_FIELDS
@@ -353,7 +353,7 @@ R317_RECEIPT_INPUT_RE = re.compile(
         f"{name}=(?P<{name}>[01])"
         for name in R317_RECEIPT_BOOL_FIELDS
     )
-    + r"(?=\\s|$)".replace(r"\\s", r"\s")
+    + r"(?=\s|$)"
 )
 
 

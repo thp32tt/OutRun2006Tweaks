@@ -2714,8 +2714,8 @@ def main() -> int:
     assert r317_snapshot != 0
     r317_prefix = (
         "VR DX11 R275 translatedSemanticReceipt signature#1: "
-        f"exact=1 objectReady=1 snapshot=0x{r317_snapshot:016X}\\n"
-    ).replace("\\\\n", "\\n")
+        f"exact=1 objectReady=1 snapshot=0x{r317_snapshot:016X}\n"
+    )
     r317_inputs_line = (
         "VR DX11 R317 receiptInputs signature#1: "
         + " ".join(
@@ -2727,11 +2727,11 @@ def main() -> int:
             f"{name}={r317_fields[name]}"
             for name in R317_RECEIPT_BOOL_FIELDS
         )
-        + "\\n"
+        + "\n"
     )
     def r317_case(snapshot_line: str, inputs_line: str) -> tuple[dict, dict]:
         report = run_case(
-            "VR DX11 R73 signature#1: primitive=4 fixedFn=0\\n"
+            "VR DX11 R73 signature#1: primitive=4 fixedFn=0\n"
             + snapshot_line + inputs_line
         )
         receipt = report["ActivationEvidence"]["ProgrammableShaderInventory"][
