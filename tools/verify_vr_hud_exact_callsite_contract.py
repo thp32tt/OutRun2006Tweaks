@@ -207,11 +207,28 @@ def check(ui, manifest):
             fail("nonconstant array entry " + name)
         if [int(x, 16) for x in addresses] != [int(x, 16) for x in values.split()]:
             fail("missing/extra/reordered CALL in " + name)
-        hook = (r"for\s*\(\s*int\s+addr\s*:\s*" + re.escape(name) +
-                r"\s*\)\s*Memory::VP::InjectHook\s*\(\s*Module::exe_ptr\(addr\)"
-                r"\s*,\s*(\w+)\s*,\s*Memory::HookType::Call\s*\)")
-        if re.findall(hook, ui, re.S) != [wrapper]:
-            fail("missing/duplicate/wrong hook target in " + name)
+        if name == "ExactScreenHudRight_ClipSpriteCalls":
+            # R64 headset-proven DispRank kind0 must use an exact 8-RVA
+            # producer+batch barrier, while the OTHER right-aligned
+            # TimeAttack/result/C2C calls still use the original common
+            # ScreenHud wrapper. This does NOT change the 71 E8 addresses.
+            # Never permit a global right-side sprite batch flush.
+            selector_hook = (
+                r"for\s*\(\s*int\s+addr\s*:\s*" + re.escape(name) +
+                r"\s*\)\s*Memory::VP::InjectHook\s*\("
+                r"\s*Module::exe_ptr\(addr\)\s*,\s*"
+                r"IsExactDispRankRightClipRva\(addr\)\s*\?\s*"
+                r"DispRankRight_putClipSprite\s*:\s*"
+                r"ExactScreenHudRight_putClipSprite\s*,\s*"
+                r"Memory::HookType::Call\s*\)")
+            if len(re.findall(selector_hook, ui, re.S)) != 1:
+                fail("R64 DispRank/right TimeAttack E8 selective hook missing")
+        else:
+            hook = (r"for\s*\(\s*int\s+addr\s*:\s*" + re.escape(name) +
+                    r"\s*\)\s*Memory::VP::InjectHook\s*\(\s*Module::exe_ptr\(addr\)"
+                    r"\s*,\s*(\w+)\s*,\s*Memory::HookType::Call\s*\)")
+            if re.findall(hook, ui, re.S) != [wrapper]:
+                fail("missing/duplicate/wrong hook target in " + name)
         for addr in addresses:
             check_call(int(addr, 16), destination)
 
@@ -337,6 +354,12 @@ def test_mutations(ui, manifest):
                                                "ProducerToken::RankMarkerClipSprite", 1))
     must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0)",
                                             "if (RankMarkerSubScreenHudDepth == 0)", 1))
+    must_fail("R64 DispRank source accidentally shares TimeAttack owner",
+              ui.replace("IsExactDispRankRightClipRva(addr)",
+                         "false", 1))
+    must_fail("R64 exact DispRank E8 hook target removed",
+              ui.replace("? DispRankRight_putClipSprite",
+                         "? ExactScreenHudRight_putClipSprite", 1))
     must_fail("right-side spacing reversed",
               ui.replace("AddSpriteSpacing(&x, false);\n\t\treturn ExactScreenHud_putClipSprite(",
                          "AddSpriteSpacing(&x, true);\n\t\treturn ExactScreenHud_putClipSprite(", 1))
