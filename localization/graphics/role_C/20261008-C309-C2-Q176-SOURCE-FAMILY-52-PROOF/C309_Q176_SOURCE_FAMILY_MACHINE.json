@@ -1,0 +1,561 @@
+{
+  "run": "C309-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "index": 176,
+  "triage": {
+    "index": 176,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "current_status": "c299_hold_strict_recheck_exact_clean_4of4_verified_pending_c3",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "policy_version": "visual-evidence-v1-20261008",
+  "execution_backend": "github-hosted only because ChatGPT local cannot reach raw.githubusercontent.com",
+  "sha256": {
+    "source": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "candidate": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "clean": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc"
+  },
+  "format": "2048x2048 RGBA32 1 mip mirrored Y exact DDS headers",
+  "header_equal": true,
+  "changed_outside_four_canonical_text_bboxes": {
+    "SOURCE_CLEAN": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "CLEAN_FINAL": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "SOURCE_FINAL": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    }
+  },
+  "rows": [
+    {
+      "id": "01_jennifer",
+      "english": "JENNIFER",
+      "korean": "제니퍼",
+      "readable_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_bbox_inside_roi": [
+        0,
+        0,
+        838,
+        158
+      ],
+      "candidate_bbox_inside_roi": [
+        3,
+        4,
+        425,
+        154
+      ],
+      "margins_LRTB": [
+        3,
+        413,
+        4,
+        4
+      ],
+      "source_alpha": 72799,
+      "clean_alpha": 0,
+      "final_alpha": 31464,
+      "source_candidate_height_ratio": 0.9494,
+      "source_candidate_width_ratio": 0.5036,
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "changed_source_clean_rgba": 72799,
+      "changed_clean_final_rgba": 31464,
+      "views": [
+        {
+          "kind": "BLACK_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "88b051d7961b6017b12a87e50ebe12424acd38978defc6e223ebe74f6b8abefc",
+          "bytes": 13706
+        },
+        {
+          "kind": "BLACK_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "07694cbeec2f36aae957a9fe036b8efa161505e5625dfbad60696abd9ae84b11",
+          "bytes": 22940
+        },
+        {
+          "kind": "BLACK_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "cbf1bd00e44b84a3393c5b3411965599055cf77ce128c6d7bf18d2d4c02e0086",
+          "bytes": 14090
+        },
+        {
+          "kind": "GRAY_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "69629fe03d56dacd67beb276aca14d2417a0731b235793f4f8c636b55dd17ab6",
+          "bytes": 14921
+        },
+        {
+          "kind": "GRAY_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "32b4d6ecc3126a9f69d1d9523aa2443bcd1e301c4883080368ab8d1df52cb344",
+          "bytes": 25050
+        },
+        {
+          "kind": "GRAY_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9becb638ceceef8322105f625c2437d7ada0d1d199db4caf3b533dd012856b9f",
+          "bytes": 15120
+        },
+        {
+          "kind": "WHITE_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "8e913c7287d86161e6e3cdb0060779258a9d20d84a22e28b008d9c6dc885247c",
+          "bytes": 15934
+        },
+        {
+          "kind": "WHITE_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9e5e59d8c65f941aa5f85a92357d81f7678f922425f0ffcd0a654796a308787a",
+          "bytes": 27347
+        },
+        {
+          "kind": "WHITE_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "01e5c4f8d6169fd212ec35502d5aeb322dd89e3dd9b816b7af9ed0b0299f7d0b",
+          "bytes": 16814
+        },
+        {
+          "kind": "RAW",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_RAW_SOURCE_FINAL.png",
+          "sha256": "e373a2444d757e6fe313ea53a47bc52c866339e56ba5dbe08a487f7b735ba326",
+          "bytes": 12427
+        },
+        {
+          "kind": "ZOOM200",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "295efe4f01678c980fa13b4ed11e347bfb4e8d701d75a5f8340a71e10c7e4f06",
+          "bytes": 21302
+        },
+        {
+          "kind": "PLATE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_PLATE_ONLY.png",
+          "sha256": "58b21a48f284fff7ecf27beaffc30c049a871861512ac4d3e2dae7364e5676d7",
+          "bytes": 9686
+        },
+        {
+          "kind": "COMPOSITE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_COMPOSITE_ONLY.png",
+          "sha256": "34ecdd6e60d2c6e6c6283a5b60fd5976d3e0d84d9e4573687f4be41a99c3e7d3",
+          "bytes": 6893
+        }
+      ]
+    },
+    {
+      "id": "02_clarissa",
+      "english": "CLARISSA",
+      "korean": "클라리사",
+      "readable_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_bbox_inside_roi": [
+        0,
+        0,
+        840,
+        160
+      ],
+      "candidate_bbox_inside_roi": [
+        8,
+        4,
+        589,
+        156
+      ],
+      "margins_LRTB": [
+        8,
+        251,
+        4,
+        4
+      ],
+      "source_alpha": 68689,
+      "clean_alpha": 0,
+      "final_alpha": 43528,
+      "source_candidate_height_ratio": 0.95,
+      "source_candidate_width_ratio": 0.6917,
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "changed_source_clean_rgba": 68689,
+      "changed_clean_final_rgba": 43528,
+      "views": [
+        {
+          "kind": "BLACK_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0bf399971e2b2ff895d5843965d29c0adf946da00502d3c29655e39cd9fb518e",
+          "bytes": 23733
+        },
+        {
+          "kind": "BLACK_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "cadf1d94f1ff5107d3ed769134104b70232ae7cdcee0041c1497c52e5af325ac",
+          "bytes": 37486
+        },
+        {
+          "kind": "BLACK_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "11d3a1295b683653f91f3a0e103978f62c6aa14641d05a08452ea6f92a52eb32",
+          "bytes": 24172
+        },
+        {
+          "kind": "GRAY_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3223ab59f8286f7b124710fd47169f558ff0bd418e63db5577e6822496b1d3f1",
+          "bytes": 26703
+        },
+        {
+          "kind": "GRAY_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5864f54931f409226f77018ecf5f4510c01b75880516505a9f81a52a07b6b0a4",
+          "bytes": 41972
+        },
+        {
+          "kind": "GRAY_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "bbac98534ba860b5e04263f69b67e36f0c66acc0fd14331e9d54ad77798b24e8",
+          "bytes": 26944
+        },
+        {
+          "kind": "WHITE_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4405b52ca1feda3f44b142b15c0c50d6b8e36d18c7cff0c137147158f08b25bd",
+          "bytes": 28781
+        },
+        {
+          "kind": "WHITE_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0f6ffe36b84e1664e31c1acb27593a455149b1369b24d5c5e3c63e1948880830",
+          "bytes": 46428
+        },
+        {
+          "kind": "WHITE_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "587d4db24060393043a16c785b2e6ac5449e8651f63b72107f9698666a070f46",
+          "bytes": 29823
+        },
+        {
+          "kind": "RAW",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_RAW_SOURCE_FINAL.png",
+          "sha256": "229ee5b7e91c517d40ba51ecfb58193fd04972dfd5365d7e0bf31848737efc12",
+          "bytes": 24126
+        },
+        {
+          "kind": "ZOOM200",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "e47193bf7c445c182dd496882b4b6c6f6f1ee222ba0ba08c358622a39bb312f1",
+          "bytes": 37129
+        },
+        {
+          "kind": "PLATE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_PLATE_ONLY.png",
+          "sha256": "006e0c7b7191e04a6cbb04cdd66fbb72f6f08be626e5b77c68c995363629a740",
+          "bytes": 20312
+        },
+        {
+          "kind": "COMPOSITE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_COMPOSITE_ONLY.png",
+          "sha256": "de6edc7959fda0a3b95ed7516360e2aa7894b72dfcc4f0db58fe99470276df00",
+          "bytes": 7690
+        }
+      ]
+    },
+    {
+      "id": "03_holly",
+      "english": "HOLLY",
+      "korean": "홀리",
+      "readable_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_bbox_inside_roi": [
+        0,
+        0,
+        533,
+        151
+      ],
+      "candidate_bbox_inside_roi": [
+        7,
+        3,
+        266,
+        148
+      ],
+      "margins_LRTB": [
+        7,
+        267,
+        3,
+        3
+      ],
+      "source_alpha": 41097,
+      "clean_alpha": 0,
+      "final_alpha": 21834,
+      "source_candidate_height_ratio": 0.9603,
+      "source_candidate_width_ratio": 0.4859,
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "changed_source_clean_rgba": 41097,
+      "changed_clean_final_rgba": 21834,
+      "views": [
+        {
+          "kind": "BLACK_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5edfc92b1d803dcff0c50e90283879329cf1da8911b589eac141926e8250d6c8",
+          "bytes": 10055
+        },
+        {
+          "kind": "BLACK_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "36dcf64c7b5dfb28327a9a8cb8ac09115571d157091b375e4ffe0aa688ede0fd",
+          "bytes": 16987
+        },
+        {
+          "kind": "BLACK_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "56188a4d3deb44bece85cac6653783fd925556869e8fa4a81906e088a59e345e",
+          "bytes": 11212
+        },
+        {
+          "kind": "GRAY_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "54f5bac1bafbd1aeb89bc9e3f84dd80510b0a0c8ba8a748bd3ef1b110bc2404c",
+          "bytes": 11245
+        },
+        {
+          "kind": "GRAY_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "641932c153a7fcbce4fce2815502e0309e6e8ce83af7029555ea383160c8a407",
+          "bytes": 18481
+        },
+        {
+          "kind": "GRAY_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "dc93b6a3133a68f5a7426b62eaee1f976c6e44d8d9d943a8f7352a7841e9ab37",
+          "bytes": 11987
+        },
+        {
+          "kind": "WHITE_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a2f685fd73f8eaf75c678922f89ad6406cbc03ed7d31f19e66eedbb1f110598c",
+          "bytes": 11672
+        },
+        {
+          "kind": "WHITE_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f5cf3d9f68bf203bd56f57eb8e0f8281724ee86bae994e6f348a98b3909f427e",
+          "bytes": 19806
+        },
+        {
+          "kind": "WHITE_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "915819e1f5f417443a16efe0047433657ac59404c8acb422307790d8d7b51bc8",
+          "bytes": 13237
+        },
+        {
+          "kind": "RAW",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_RAW_SOURCE_FINAL.png",
+          "sha256": "acc77dcc52b5887d2eccaee432d5ea67584ad4b771621827521f7eef336e8d94",
+          "bytes": 9526
+        },
+        {
+          "kind": "ZOOM200",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "e6e3d3d1f75251babf3dbce31115b5104180a025ef9f72292134a56802fc34d2",
+          "bytes": 14354
+        },
+        {
+          "kind": "PLATE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_PLATE_ONLY.png",
+          "sha256": "d195e83adb8f0c24833d367631208467ff95cb7b64281ef5e41bb80c19efb97c",
+          "bytes": 7524
+        },
+        {
+          "kind": "COMPOSITE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_COMPOSITE_ONLY.png",
+          "sha256": "14e56b07e1d02d2da26ae9880f52f5b11422b21edfc5150704598400971c2af2",
+          "bytes": 5204
+        }
+      ]
+    },
+    {
+      "id": "04_flagman4",
+      "english": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "readable_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_bbox_inside_roi": [
+        0,
+        0,
+        980,
+        155
+      ],
+      "candidate_bbox_inside_roi": [
+        7,
+        4,
+        699,
+        151
+      ],
+      "margins_LRTB": [
+        7,
+        281,
+        4,
+        4
+      ],
+      "source_alpha": 75687,
+      "clean_alpha": 0,
+      "final_alpha": 49663,
+      "source_candidate_height_ratio": 0.9484,
+      "source_candidate_width_ratio": 0.7061,
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "changed_source_clean_rgba": 75687,
+      "changed_clean_final_rgba": 49663,
+      "views": [
+        {
+          "kind": "BLACK_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "8378796a7355eaa0345fa0c3f0cda2f39a6c8493247f36c826f68054a540559e",
+          "bytes": 20427
+        },
+        {
+          "kind": "BLACK_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "72588e29fa3b8ba742ef8c8a1104c9ae6859328f0843146ad367a9118effe567",
+          "bytes": 32579
+        },
+        {
+          "kind": "BLACK_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2b3a8d130faf2512d51f43f9984f6f5352c994d896f682e03fbf5ebc2f17c9b3",
+          "bytes": 21039
+        },
+        {
+          "kind": "GRAY_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "bdb0bded6ee8f7a84a26fef9e0274d0e1bdb9e4a95347f66dc0d1149f02fb125",
+          "bytes": 22612
+        },
+        {
+          "kind": "GRAY_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "77257a17e735c19ec5b7e99e189cc6d8218b0aaf1c48c363296c1a53986699fc",
+          "bytes": 36311
+        },
+        {
+          "kind": "GRAY_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "be92e1353f57fd521c00cb81bacdce5c7fb910b02bf0f2abf9657f3f23ca3b32",
+          "bytes": 22819
+        },
+        {
+          "kind": "WHITE_100",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "aa87158be8ea6456842952ed4593de29fbbe4c6c12b999cb6d4b33aa526c5af6",
+          "bytes": 23918
+        },
+        {
+          "kind": "WHITE_75",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "87a926c2bf1b30f56ba98501a34373371388d83b89740076014d4d89b767fb48",
+          "bytes": 39931
+        },
+        {
+          "kind": "WHITE_50",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e18c2e6f9e77adbddb50feaafa35eb8e4369c03221c618cc3164a25d2380a835",
+          "bytes": 25824
+        },
+        {
+          "kind": "RAW",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_RAW_SOURCE_FINAL.png",
+          "sha256": "6769c278397df2694c6a0b808833969bb04a5d7a392aeca0aa8a22ea51f07144",
+          "bytes": 19834
+        },
+        {
+          "kind": "ZOOM200",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "575aba4b472508a58decb5cb3abc27f140d0f9e5c436fedd4411cce63b2acb59",
+          "bytes": 31378
+        },
+        {
+          "kind": "PLATE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_PLATE_ONLY.png",
+          "sha256": "36307a44e5f6be43275cfe1db1ca5ff72e3da1324a6ea2bd421d80e6470758e1",
+          "bytes": 16987
+        },
+        {
+          "kind": "COMPOSITE_ONLY",
+          "file": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_COMPOSITE_ONLY.png",
+          "sha256": "be04fbb550fea10c1449a2c70f18dba5015738237ca3beb8a3c5ad50f829b485",
+          "bytes": 6381
+        }
+      ]
+    }
+  ],
+  "lossless_png_count": 52,
+  "metrics_limit": "Width/height ratios and RGB median are whole-glyph-family proxies only; cannot establish semantic stem slant, legibility or calibrated C PASS.",
+  "C": "CONTROLLER_VISUAL_PENDING",
+  "C3": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0
+}
