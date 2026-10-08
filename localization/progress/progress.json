@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 08:52 KST",
+  "updated_at_kst": "2026-10-09 08:57 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8812,5 +8812,32 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_Q161_REPORT.json",
     "qa": "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c322_c2_q236_b302_row_visual": {
+    "time_kst": "2026-10-09 08:57 KST",
+    "run_key": "OUTRUN-KOR-C322-C2-Q236-B302-ROW-VISUAL-20261009-0857",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 236,
+    "candidate_sha256_producer": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+    "visual_50_gray_rows": 14,
+    "visual_native_100_rows": [
+      0,
+      5,
+      11
+    ],
+    "visual_raw_75_rows": [
+      0
+    ],
+    "C": "HOLD_STRICT_RECHECK",
+    "C2": "SCOPED_VISUAL_ONLY",
+    "independent_complete_native_dds_QA": false,
+    "C3": "BLOCKED",
+    "approval": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
+    "backend": "GitHub + N100 tiny image access"
   }
 }
