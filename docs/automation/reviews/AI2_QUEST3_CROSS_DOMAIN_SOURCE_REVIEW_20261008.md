@@ -34,3 +34,8 @@
 - **P0 VISUAL:** open; prior 00519 HMD FAIL remains authoritative.
 - **Quest 3 current build:** NOT TESTED; `RUNTIME_VALIDATION=UNTESTED`.
 - **New source changes:** NONE in this review. No material fix, runtime success, score double count or extra 1000/5000 pass claimed.
+
+## Additional verifier coverage gap found during follow-up
+- `tools/verify_vr_visual_composition_p0.py` (~390–446) explicitly pins the F11 RAII guard, D3D9Ex dynamic MANAGED bypass, EXE identity and the presence of `ScreenOverlay2D`, but **does not assert end-to-end source order** for the renderer's exact `ScreenHud` perspective branch versus `CurrentDrawMatchesVerifiedWorld` / `R28CanRebindVerifiedWorld`, nor does that block assert that both VS and XYZRHW generic 2D paths use the finite HUD plane.
+- Other validators do check exact producer CALLs, but that is not equivalent to testing c64 write timing, renderer exclusion precedence or per-eye visual placement. Proposed next targeted deterministic contract: pin the exact c64 producer scope -> queue-node draw semantic relationship; reject mutation which moves `CurrentDrawMatchesVerifiedWorld` exclusion ahead of validated HUD owner where ownership is demonstrable; ensure R30 active VS+XYZRHW finite-plane paths remain consistent. **Do not blindly alter exclusion precedence** without proving the lower world ownership and protected world stereo safety.
+- This additional read is documentary review only, without changes to game/render code or repeat of previously passed source validators.
