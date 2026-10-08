@@ -1,0 +1,40 @@
+{
+  "run": "B284",
+  "role": "B",
+  "q": 137,
+  "source": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "prior": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "trial": "1248721f20d2ac69afd0f8c97d407a5886d8850f4c56060f51aa93d1fa511e53",
+  "machine": {
+    "native": [
+      2048,
+      1024
+    ],
+    "format": "BGRA32 mip1",
+    "rows": 6,
+    "changed_pixels": 22760,
+    "source_outside": 0,
+    "clean_outside": 0,
+    "protected_AT_MT_changed": 0,
+    "raw_roundtrip_exact": true,
+    "source_identical_separator_pixels": 396,
+    "separator_antialias_edits_against_source": 44
+  },
+  "visual_evidence": [
+    "B284_READABLE_GRAY_50_SOURCE_CLEAN_B165_TRIAL.png",
+    "B284_READABLE_BLACK_100_SOURCE_CLEAN_B165_TRIAL.png",
+    "B284_transmission_small_SOURCE_CLEAN_B165_TRIAL_2X.png",
+    "B284_manual_large_SOURCE_CLEAN_B165_TRIAL_2X.png"
+  ],
+  "producer_visual": "FAIL_SOURCE_GRAY_SMALL_LABEL_LIGHTNESS",
+  "reason_codes": [
+    "SOURCE_FAMILY_SMALL_LABEL_COLOR_ALPHA_MISMATCH"
+  ],
+  "finding": "B284 native glyph contours, placement, protected AT/MT and CLEAN appear intact; however smaller original TRANSMISSION and MANUAL/AUTOMATIC are gray/translucent, while B284 makes them near-opaque white, creating visual hierarchy mismatch at practical 50%. Current candidate not replaced.",
+  "disposition": "REJECT_TRIAL_NO_PROMOTION",
+  "next_method": "Measure original English premultiplied RGB*alpha and apply matching per-label native glyph opacity; keep six-region scope.",
+  "C1": "NOT_RUN",
+  "C3": "BLOCKED",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
