@@ -29,12 +29,14 @@
 - **Lens centre:** five-disc flare includes at least one separately doubled central primitive; no evidence that all five belong to the same 2D HUD owner. Broad lens-to-HUD conversion forbidden. Exact CF53 projected light grouping still a historical hypothesis; not ported.
 - **HMD limitation:** this build only corrects 2D queued shader WVP ownership, which was a real source discrepancy; fixed-function 2D path and 1–5 car-rank reprojection may still fail. Do NOT report all listed optical regressions repaired until a new headset test.
 
+## C2B — new exact R70 OutRun HUD source repair from uploaded log
+- The uploaded hudtrace has 4,161 rows: 3,611 UNKNOWN classifier rows, 402 DispRank ScreenHud, 148 generic rank/recovered rival WorldBillboard; **255 unknown direct CALL rows originate from RVA 0xBAAEA**. UNKNOWN classifier is not evidence of an unknown GPU render owner.
+- Historical R70/R74 source intercepted parent 0xBA9D0 with exact child 0xBAAA0 (clip) and 0xBAAEA (sprani); current active before this run had none. Original canonical EXE Inspector proved `0xBAAA0→0x2D280`, `0xBAAEA→0x29580` in source SHA `3d0d4701` run `37801472101` and fresh exact material `d9e26e97` static job `113396088606`.
+- Code `23919be38d3237b96103d1cc7e1898951a02990a` restores BA9D0 parent identity from the original caller and two exact E8 child wrappers, publishing `ScreenHud` on **all newly appended SpriteNodes** only when the caller is historically classified ScreenHud. Uses active TagAppendedNodes API; no obsolete R74 scoped producer, no generic alpha or queue-wide HUD tagging.
+- Original-byte signatures added to manifest in `8cc35c0993dd495d544a056fb6a2c9d63ee6e238`: 108→110 contracts; new P0 parent/child and 3 negative mutation tests `d9e26e97f8969cd925c7925f5eda055802e9fe72` passed in static EXE job.
+- Existing OutRun rival working, car selector texture working. Their source paths remain protected. Rank 1–5 world anchor and five-disc flare middle dot remain independently OPEN; this does not claim runtime visual convergence.
+
 ## C3 Exact SHA Actions verification
-PENDING
-
-
-## C3 Exact SHA Actions verification
-PENDING
-
+- CURRENT material SHA `d9e26e97f8969cd925c7925f5eda055802e9fe72`. HUD Inspector static-exe-analysis `113396088606` SUCCESS, game/host/full-chain/package and domain gates require final verification; runtime HMD UNTESTED.
 ## C4 Runtime resumption
 User HMD failures stay OPEN. Any new package is SOURCE_BUILD_VERIFIED / RUNTIME_VALIDATION=UNTESTED until real test.
