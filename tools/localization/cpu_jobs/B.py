@@ -139,8 +139,11 @@ if outside or alpha_out:raise RuntimeError(("protected pixels altered",outside,a
 visible_count=0
 for e in entries:
     x0,y0,x1,y1=e["source_bbox"]
-    t=persist[y0:y1,x0:x1,3]
-    yy,xx=np.nonzero(t>16)
+    # The native source has a protected one-pixel separator at y314 across
+    # the MANUAL bbox. Measure the actual new GLYPH ONLY via CLEAN->persist
+    # pixel deltas, not all preserved alpha inside the original cell.
+    t=np.any(persist[y0:y1,x0:x1,:]!=clean[y0:y1,x0:x1,:],axis=2)
+    yy,xx=np.nonzero(t)
     if len(xx)==0:raise RuntimeError(("glyph lost on encode",e["key"]))
     e["persisted_visible_bbox"]=[int(x0+xx.min()),int(y0+yy.min()),int(x0+xx.max()+1),int(y0+yy.max()+1)]
     bounds=e["persisted_visible_bbox"]
