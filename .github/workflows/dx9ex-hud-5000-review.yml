@@ -1,0 +1,44 @@
+name: DX9Ex HUD 5000 Static Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - 'tools/audit_vr_hud_5000.py'
+      - '.github/workflows/dx9ex-hud-5000-review.yml'
+      - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_textures.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/game/render_semantics.hpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r14.cpp'
+      - 'src/overlay/hooks_overlay.cpp'
+      - 'docs/VR_BINARY_CONTRACT.json'
+      - 'tools/verify_vr_hud_dds_loader.py'
+      - 'tools/verify_vr_hud_exact_callsite_contract.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dx9ex-hud-5000-static
+  cancel-in-progress: false
+
+jobs:
+  hud-5000:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit 5000 HUD source contracts with 30-cycle durable evidence
+        run: python3 tools/audit_vr_hud_5000.py --cycles 5000 --batch 30 --output hud-audit-output-5000
+      - name: Archive every 30-cycle finding and final summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-hud-5000-static-review-${{ github.sha }}
+          path: hud-audit-output-5000/
+          if-no-files-found: error
+          retention-days: 90
