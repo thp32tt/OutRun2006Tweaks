@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C276 IGR-006/007 shared runtime-text fix is independent C static PASS on current exact hooks blob 954f0998... with Win32 Release 37645785737 and Korean Test Build 37645785906/package PASS. Do not re-review unchanged source; both rows now require only NEW actual-game screenshots/retest before closure. RUNTIME_VALIDATION=UNTESTED.",
     "C274 q59 7CE1CFC5 exact A184R 261108cd... is HOLD_STRICT_RECHECK, not REWORK: supplied visual evidence is favorable and current bytes should be preserved. Future C1 must inspect exact pixels before producer verdict, generate complete lossless per-region native/zoom/practical/RAW/black-white-gray plus independent machine evidence, then separate C3. PJR-019 remains open for user JPG + NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "q214 A183R3 exact 4ff06dbe... is visual FAIL despite static PASS: broken Hangul strokes/BC3 red striping. Do not approve/ship, material rerender needed. localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
     "C273 q175 754F0599 exact A153 5b37fdaf... is REWORK_REQUIRED: preserve clean/bbox/source-left/RAW but reduce broad black extrusion/outline and rebuild thinner rounded/segmented techno Hangul family. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
@@ -57,8 +58,6 @@
     "A98 positively classified odd index25 4AFC1BED zoom_review as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact 2048x2048 HD readable+raw evidence. Do not revisit it. With no A-owned active in-game backlog, no C-returned REWORK and no pending_artwork, next A normal queue item is odd index27 8B52FEEC zoom_review unless a higher-priority row appears.",
     "B172 IGR-010 Stage/heart-tally regression producer PASS: index60 A064FDFC Stage row natural-advance native-HD candidate 77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b. First B172 attempt was rejected for clean residue; final retry passes controller. Await independent C + NEW actual in-game retest; do not repeat unless returned REWORK.",
     "A97 consumed the four remaining pending_artwork localize_text rows 225/227/231/237. Do not repeat them unless independent C returns REWORK_REQUIRED. C should independently verify E3C455FA/E596B7AC/EBE401C8/FF514CEB next; producer runtime validation remains UNTESTED.",
-    "B171 IGR-007 speech-bubble regression is mapped to the SHA-exact, already build-validated B170 compact runtime keyline path; do not duplicate B170 source bytes. Await independent C + NEW actual in-game retest. Next B active P1 is IGR-010 STAGE_HEART_TALLY_OVERLAY exact MIXED split/material repair.",
-    "B170 IGR-006 runtime HUD compact-text repair is Win32 Release + Korean test-package PASS. Await independent C review and NEW actual in-game screenshot before closure; do not repeat B170. Next B active P1 rows: IGR-007, then IGR-010 exact mapping/material repair.",
     "B169 IGR-019 producer static/controller PASS: 97E MULTIPLAYER + 8C Online/LAN help are native-HD; independent C and NEW actual in-game retest required. Do not repeat B169 bytes unless returned REWORK.",
     "A90 P1 IGR-013 screenshot(158): exact MIXED split. 6DC89C6E 8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830 natively rerenders all 21 stage-location rows and supersedes A62 lowres18x4; E7F6E9B7 C144 top C2C title preserved; runtime ID1123 스테이지 주행 mapped/reviewed without source change. 21/21 bbox/size/margins and zero scope/protected/residue/overlap/touch; controller visual/raw PASS. Pending C + NEW game retest; not closed.",
     "A89R P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping. 97E863AD cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 natively rerenders WELCOME/SHOWROOM visible rows; B168 A9 + C171 754F + C149 E95 preserved. 2/2 bbox/size/margins and zero scope/protected gates; controller visual PASS. Pending C + NEW game retest; not closed.",
@@ -10882,5 +10881,11 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "B251 q172 6C9B3611 exact 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018 pending fresh pixels-first C2 -> separate exact-SHA C3/evidence -> PRE_INGAME/user JPG -> NEW actual-game retest. q214 remains material REWORK_REQUIRED."
+  "next_checkpoint": "B251 q172 6C9B3611 exact 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018 pending fresh pixels-first C2 -> separate exact-SHA C3/evidence -> PRE_INGAME/user JPG -> NEW actual-game retest. q214 remains material REWORK_REQUIRED.",
+  "c276_c1_igr006_007_runtime": {
+    "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
+    "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
+    "report": "localization/graphics/role_C/20261008-C276-C1-IGR006-007-RUNTIME/C276_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  }
 }
