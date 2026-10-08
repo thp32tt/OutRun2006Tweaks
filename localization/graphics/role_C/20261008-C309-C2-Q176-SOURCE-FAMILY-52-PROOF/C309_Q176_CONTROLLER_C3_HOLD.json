@@ -1,0 +1,472 @@
+{
+  "schema_version": 2,
+  "run": "C309-C2",
+  "run_key": "OUTRUN-KOR-C309-C2-Q176-SOURCE-FAMILY-PRACTICAL-20261008-2350",
+  "review_id": "C309-Q176-EVEN-SOURCE-FAMILY-20261008",
+  "date_kst": "2026-10-08 23:59 KST",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 176,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "selected_head": "94e51c9bc5ae79aa009467a4996e8d877420f8da",
+  "selection_queue_blob": "d834a7d6c66ac7d90051ef82bf3ff13c05ebad6f",
+  "execution_backend": "GitHub Actions runner (ChatGPT local container HTTPS raw.githubusercontent.com unreachable) and controller direct visual",
+  "actions_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37796372269",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "exact_sha256": {
+    "source": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "candidate": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "clean": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc"
+  },
+  "triage": {
+    "index": 176,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "current_status": "c299_hold_strict_recheck_exact_clean_4of4_verified_pending_c3",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_SOURCE_FAMILY_MACHINE.json",
+  "new_evidence": {
+    "lossless_images": 52,
+    "rows": 4,
+    "backgrounds": [
+      "BLACK",
+      "GRAY",
+      "WHITE"
+    ],
+    "display_percent": [
+      100,
+      75,
+      50
+    ],
+    "extra": [
+      "RAW_SOURCE_FINAL",
+      "ZOOM200_SOURCE_FINAL",
+      "PLATE_ONLY",
+      "COMPOSITE_ONLY"
+    ],
+    "new_dds": 0
+  },
+  "whole_atlas_source_clean_final_outside": {
+    "SOURCE_CLEAN": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "CLEAN_FINAL": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "SOURCE_FINAL": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    }
+  },
+  "per_region_review": [
+    {
+      "id": "01_jennifer",
+      "original_text": "JENNIFER",
+      "korean_text": "제니퍼",
+      "source_bbox_readable": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "original_alpha_bbox_relative": [
+        0,
+        0,
+        838,
+        158
+      ],
+      "candidate_alpha_bbox_relative": [
+        3,
+        4,
+        425,
+        154
+      ],
+      "margins_LRTB": [
+        3,
+        413,
+        4,
+        4
+      ],
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "native_height_ratio": 0.9494,
+      "native_width_ratio": 0.5036,
+      "authored_clean_alpha": 0,
+      "image_proofs": {
+        "BLACK_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_RAW_SOURCE_FINAL.png",
+        "ZOOM200": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_ZOOM200_SOURCE_FINAL.png",
+        "PLATE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_PLATE_ONLY.png",
+        "COMPOSITE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/01_jennifer_COMPOSITE_ONLY.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_TRUE_STEM_REFERENCE",
+          "observation": "Source red capitals appear upright in readable orientation and current Korean appears upright; 2D semantic per-glyph stem-anchor slope has not been independently calibrated. RAW mirror-Y example inspected, not gameplay."
+        },
+        "clean_plate": {
+          "result": "STATIC_PIXEL_AND_VISUAL_SCOPED_PASS",
+          "observation": "Exact authored B201 CLEAN inside this complete English glyph-effect bbox has zero nontransparent pixels. New PLATE_ONLY view shows no visible English residue, shadow, donor seam, or foreign rectangle."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_MEASUREMENT",
+          "observation": "Canonical source and candidate median opaque RGB both [186,0,0]; Korean glyph height is ~95% native source. English uppercase red block strokes and Korean black/sans strokes differ in contour; source-family stems, counter-space and optical weight cannot be finally certified by median or height alone."
+        },
+        "readability": {
+          "result": "STATIC_VISIBLE_PENDING_GAME",
+          "observation": "100% white triptych direct viewed for all 4; black50 (Clarissa), gray50 (Jennifer), white50 (Holly), gray75 (Flagman4) directly viewed, text legible with no definite excessive reduction. Display scale and user/in-game acceptance not observed."
+        },
+        "glyph_integrity": {
+          "result": "STATIC_NO_DEFINITE_FAIL",
+          "observation": "Native comparison of all four and inspected Jennifer/Clarissa 200% nearest images show no definite broken syllable, clipped stroke, or foreign anti-alias overpainting. Cannot certify every zoom and runtime font presentation."
+        },
+        "protected_art": {
+          "result": "MACHINE_OUTSIDE_UNION_ZERO_INSIDE_HOLD",
+          "observation": "All three pairwise comparisons SOURCE/CLEAN/FINAL show 0 RGBA, alpha and visible changes outside union of four English original effect boxes, preserving unrelated atlas artwork. No independently verified protected per-glyph object mask inside the source boxes."
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Saved candidate alpha bbox strictly within canonical English source bbox with positive margins all sides; source-relative right/left positioning is not in itself aesthetic approval."
+        },
+        "orientation": {
+          "result": "RAW_READABLE_STATIC_PASS_RUNTIME_UNTESTED",
+          "observation": "Direct RAW English and Korean crop pair viewed for representative Holly and Flagman4, same source mirroring Y; full atlas/game UV not tested."
+        }
+      }
+    },
+    {
+      "id": "02_clarissa",
+      "original_text": "CLARISSA",
+      "korean_text": "클라리사",
+      "source_bbox_readable": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "original_alpha_bbox_relative": [
+        0,
+        0,
+        840,
+        160
+      ],
+      "candidate_alpha_bbox_relative": [
+        8,
+        4,
+        589,
+        156
+      ],
+      "margins_LRTB": [
+        8,
+        251,
+        4,
+        4
+      ],
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "native_height_ratio": 0.95,
+      "native_width_ratio": 0.6917,
+      "authored_clean_alpha": 0,
+      "image_proofs": {
+        "BLACK_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_RAW_SOURCE_FINAL.png",
+        "ZOOM200": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_ZOOM200_SOURCE_FINAL.png",
+        "PLATE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_PLATE_ONLY.png",
+        "COMPOSITE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/02_clarissa_COMPOSITE_ONLY.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_TRUE_STEM_REFERENCE",
+          "observation": "Source red capitals appear upright in readable orientation and current Korean appears upright; 2D semantic per-glyph stem-anchor slope has not been independently calibrated. RAW mirror-Y example inspected, not gameplay."
+        },
+        "clean_plate": {
+          "result": "STATIC_PIXEL_AND_VISUAL_SCOPED_PASS",
+          "observation": "Exact authored B201 CLEAN inside this complete English glyph-effect bbox has zero nontransparent pixels. New PLATE_ONLY view shows no visible English residue, shadow, donor seam, or foreign rectangle."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_MEASUREMENT",
+          "observation": "Canonical source and candidate median opaque RGB both [186,0,0]; Korean glyph height is ~95% native source. English uppercase red block strokes and Korean black/sans strokes differ in contour; source-family stems, counter-space and optical weight cannot be finally certified by median or height alone."
+        },
+        "readability": {
+          "result": "STATIC_VISIBLE_PENDING_GAME",
+          "observation": "100% white triptych direct viewed for all 4; black50 (Clarissa), gray50 (Jennifer), white50 (Holly), gray75 (Flagman4) directly viewed, text legible with no definite excessive reduction. Display scale and user/in-game acceptance not observed."
+        },
+        "glyph_integrity": {
+          "result": "STATIC_NO_DEFINITE_FAIL",
+          "observation": "Native comparison of all four and inspected Jennifer/Clarissa 200% nearest images show no definite broken syllable, clipped stroke, or foreign anti-alias overpainting. Cannot certify every zoom and runtime font presentation."
+        },
+        "protected_art": {
+          "result": "MACHINE_OUTSIDE_UNION_ZERO_INSIDE_HOLD",
+          "observation": "All three pairwise comparisons SOURCE/CLEAN/FINAL show 0 RGBA, alpha and visible changes outside union of four English original effect boxes, preserving unrelated atlas artwork. No independently verified protected per-glyph object mask inside the source boxes."
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Saved candidate alpha bbox strictly within canonical English source bbox with positive margins all sides; source-relative right/left positioning is not in itself aesthetic approval."
+        },
+        "orientation": {
+          "result": "RAW_READABLE_STATIC_PASS_RUNTIME_UNTESTED",
+          "observation": "Direct RAW English and Korean crop pair viewed for representative Holly and Flagman4, same source mirroring Y; full atlas/game UV not tested."
+        }
+      }
+    },
+    {
+      "id": "03_holly",
+      "original_text": "HOLLY",
+      "korean_text": "홀리",
+      "source_bbox_readable": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "original_alpha_bbox_relative": [
+        0,
+        0,
+        533,
+        151
+      ],
+      "candidate_alpha_bbox_relative": [
+        7,
+        3,
+        266,
+        148
+      ],
+      "margins_LRTB": [
+        7,
+        267,
+        3,
+        3
+      ],
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "native_height_ratio": 0.9603,
+      "native_width_ratio": 0.4859,
+      "authored_clean_alpha": 0,
+      "image_proofs": {
+        "BLACK_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_RAW_SOURCE_FINAL.png",
+        "ZOOM200": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_ZOOM200_SOURCE_FINAL.png",
+        "PLATE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_PLATE_ONLY.png",
+        "COMPOSITE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/03_holly_COMPOSITE_ONLY.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_TRUE_STEM_REFERENCE",
+          "observation": "Source red capitals appear upright in readable orientation and current Korean appears upright; 2D semantic per-glyph stem-anchor slope has not been independently calibrated. RAW mirror-Y example inspected, not gameplay."
+        },
+        "clean_plate": {
+          "result": "STATIC_PIXEL_AND_VISUAL_SCOPED_PASS",
+          "observation": "Exact authored B201 CLEAN inside this complete English glyph-effect bbox has zero nontransparent pixels. New PLATE_ONLY view shows no visible English residue, shadow, donor seam, or foreign rectangle."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_MEASUREMENT",
+          "observation": "Canonical source and candidate median opaque RGB both [186,0,0]; Korean glyph height is ~95% native source. English uppercase red block strokes and Korean black/sans strokes differ in contour; source-family stems, counter-space and optical weight cannot be finally certified by median or height alone."
+        },
+        "readability": {
+          "result": "STATIC_VISIBLE_PENDING_GAME",
+          "observation": "100% white triptych direct viewed for all 4; black50 (Clarissa), gray50 (Jennifer), white50 (Holly), gray75 (Flagman4) directly viewed, text legible with no definite excessive reduction. Display scale and user/in-game acceptance not observed."
+        },
+        "glyph_integrity": {
+          "result": "STATIC_NO_DEFINITE_FAIL",
+          "observation": "Native comparison of all four and inspected Jennifer/Clarissa 200% nearest images show no definite broken syllable, clipped stroke, or foreign anti-alias overpainting. Cannot certify every zoom and runtime font presentation."
+        },
+        "protected_art": {
+          "result": "MACHINE_OUTSIDE_UNION_ZERO_INSIDE_HOLD",
+          "observation": "All three pairwise comparisons SOURCE/CLEAN/FINAL show 0 RGBA, alpha and visible changes outside union of four English original effect boxes, preserving unrelated atlas artwork. No independently verified protected per-glyph object mask inside the source boxes."
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Saved candidate alpha bbox strictly within canonical English source bbox with positive margins all sides; source-relative right/left positioning is not in itself aesthetic approval."
+        },
+        "orientation": {
+          "result": "RAW_READABLE_STATIC_PASS_RUNTIME_UNTESTED",
+          "observation": "Direct RAW English and Korean crop pair viewed for representative Holly and Flagman4, same source mirroring Y; full atlas/game UV not tested."
+        }
+      }
+    },
+    {
+      "id": "04_flagman4",
+      "original_text": "FLAGMAN 4",
+      "korean_text": "플래그맨 4",
+      "source_bbox_readable": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "original_alpha_bbox_relative": [
+        0,
+        0,
+        980,
+        155
+      ],
+      "candidate_alpha_bbox_relative": [
+        7,
+        4,
+        699,
+        151
+      ],
+      "margins_LRTB": [
+        7,
+        281,
+        4,
+        4
+      ],
+      "source_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "candidate_opaque_rgba_median": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "native_height_ratio": 0.9484,
+      "native_width_ratio": 0.7061,
+      "authored_clean_alpha": 0,
+      "image_proofs": {
+        "BLACK_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+        "BLACK_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_100": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_75": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "WHITE_50": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_RAW_SOURCE_FINAL.png",
+        "ZOOM200": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_ZOOM200_SOURCE_FINAL.png",
+        "PLATE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_PLATE_ONLY.png",
+        "COMPOSITE_ONLY": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/04_flagman4_COMPOSITE_ONLY.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_TRUE_STEM_REFERENCE",
+          "observation": "Source red capitals appear upright in readable orientation and current Korean appears upright; 2D semantic per-glyph stem-anchor slope has not been independently calibrated. RAW mirror-Y example inspected, not gameplay."
+        },
+        "clean_plate": {
+          "result": "STATIC_PIXEL_AND_VISUAL_SCOPED_PASS",
+          "observation": "Exact authored B201 CLEAN inside this complete English glyph-effect bbox has zero nontransparent pixels. New PLATE_ONLY view shows no visible English residue, shadow, donor seam, or foreign rectangle."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_MEASUREMENT",
+          "observation": "Canonical source and candidate median opaque RGB both [186,0,0]; Korean glyph height is ~95% native source. English uppercase red block strokes and Korean black/sans strokes differ in contour; source-family stems, counter-space and optical weight cannot be finally certified by median or height alone."
+        },
+        "readability": {
+          "result": "STATIC_VISIBLE_PENDING_GAME",
+          "observation": "100% white triptych direct viewed for all 4; black50 (Clarissa), gray50 (Jennifer), white50 (Holly), gray75 (Flagman4) directly viewed, text legible with no definite excessive reduction. Display scale and user/in-game acceptance not observed."
+        },
+        "glyph_integrity": {
+          "result": "STATIC_NO_DEFINITE_FAIL",
+          "observation": "Native comparison of all four and inspected Jennifer/Clarissa 200% nearest images show no definite broken syllable, clipped stroke, or foreign anti-alias overpainting. Cannot certify every zoom and runtime font presentation."
+        },
+        "protected_art": {
+          "result": "MACHINE_OUTSIDE_UNION_ZERO_INSIDE_HOLD",
+          "observation": "All three pairwise comparisons SOURCE/CLEAN/FINAL show 0 RGBA, alpha and visible changes outside union of four English original effect boxes, preserving unrelated atlas artwork. No independently verified protected per-glyph object mask inside the source boxes."
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Saved candidate alpha bbox strictly within canonical English source bbox with positive margins all sides; source-relative right/left positioning is not in itself aesthetic approval."
+        },
+        "orientation": {
+          "result": "RAW_READABLE_STATIC_PASS_RUNTIME_UNTESTED",
+          "observation": "Direct RAW English and Korean crop pair viewed for representative Holly and Flagman4, same source mirroring Y; full atlas/game UV not tested."
+        }
+      }
+    }
+  ],
+  "controller_visual_first_look": {
+    "actual_native_100_white_views_all_four": true,
+    "specific_practical_views": [
+      "02_clarissa_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+      "04_flagman4_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+      "01_jennifer_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+      "03_holly_WHITE_50pct_SOURCE_CLEAN_FINAL.png"
+    ],
+    "other_views_reviewed": [
+      "03_holly_RAW_SOURCE_FINAL.png",
+      "04_flagman4_RAW_SOURCE_FINAL.png",
+      "01_jennifer_ZOOM200_SOURCE_FINAL.png",
+      "02_clarissa_ZOOM200_SOURCE_FINAL.png",
+      "01_jennifer_PLATE_ONLY.png",
+      "01_jennifer_COMPOSITE_ONLY.png"
+    ],
+    "qualified_blind": false,
+    "pixels_before_producer_notes": false,
+    "reason": "Historical B201/C299 producer and C reviewer notes were consulted before this run's contact pixels; do not falsely certify blind family review."
+  },
+  "visual_summary": "No definite plate ghost/foreign rectangle/alpha artifact/clipped Hangul in reviewed contacts, shared median color source/final exact and native height 94.84–96.03%. Full atlas outside-ROI RGBA/alpha/visible zero. Width ratios vary 0.486–0.706 due shorter Korean strings and cannot alone establish scale defect or PASS. Source-family per-stem, counter-space, separately blinded calibration, detailed protection inside ROIs and actual game remain unresolved.",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3_STRICT_AUDIT": "BLOCKED_PENDING_QUALIFIED_C",
+  "current_evidence_gate_APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Perform qualified blind calibration and semantic source-anchored stem/weight/counter-space comparisons against exact source. Independently audit permitted effects and protected artwork inside four source cells; C then distinct C3 for unchanged candidate SHA. No material rerender absent proven visual defect."
+}
