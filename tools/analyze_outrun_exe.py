@@ -35,6 +35,19 @@ KNOWN_TARGETS = {
 
 PRODUCER_WINDOWS = (
     {
+        # Uploaded Quest3 hudtrace: 0xBAAEA emitted 255 source rows.
+        # Historical R70 actually intercepted both children of BA9D0.
+        # Canonical pinned binary must prove their original E8 targets first.
+        "name": "OutRun_HudText_BA9D0_exact_children",
+        "start_rva": 0x000BAA80,
+        "end_rva": 0x000BAB10,
+        "anchors": (0x000BAAA0, 0x000BAAEA),
+        "expected_direct_targets": {
+            0x000BAAA0: 0x02D280,
+            0x000BAAEA: 0x029580,
+        },
+    },
+    {
         # R59/R74 HMD position HUD: the first rank glyph uses a five-arg
         # sprani producer; eight following clip siblings have separate CALLs.
         # Verify this against pinned EXE before adding any new hook.
