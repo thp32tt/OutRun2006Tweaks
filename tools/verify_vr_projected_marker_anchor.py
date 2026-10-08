@@ -140,6 +140,33 @@ for marker in (
 
 require_finite_projected_anchor(calc)
 
+# Exact R57_06 and R62 HMD-tested ordinal capture uses the unique EXE
+# Calc3D2D return site 0xBAEE7, even when a separate sub_4BAD20 entry
+# detour is unavailable. NaviPub ScreenHud still excludes world capture.
+def require_historical_rank_capture_gate(body: str) -> None:
+    match = "if (returnAddress == Module::exe_ptr(0xBAEE7) &&"
+    if match not in body:
+        fail("R57/R62 ordinal Calc3D2D return-site capture missing")
+    section = body[body.index(match):body.index(
+        "recoverViewPoint(RankMarkerProjectedInfo, true);", body.index(match))]
+    if "RankMarkerSubScreenHudDepth == 0" not in section:
+        fail("NaviPub ScreenHud may contaminate car projected rank anchor")
+    if "RankMarkerSubActiveDepth" in section:
+        fail("R57/R62 rank capture improperly requires optional sub-entry hook")
+
+require_historical_rank_capture_gate(calc)
+bad_gate = calc.replace(
+    "RankMarkerSubScreenHudDepth == 0)",
+    "RankMarkerSubActiveDepth != 0 && RankMarkerSubScreenHudDepth == 0)", 1)
+if bad_gate == calc:
+    fail("rank capture-gate fault injection did not mutate source")
+try:
+    require_historical_rank_capture_gate(bad_gate)
+except SystemExit:
+    pass
+else:
+    fail("optional rank-sub-hook capture regression escaped verifier")
+
 # The ordinal rank producer has the actual view-space input before
 # Calc3D2D flattens its result. Accept it only with a matching original
 # game-screen projection; keep the previously HMD-confirmed rival unchanged.
