@@ -505,7 +505,8 @@ class UIScaling : public Hook
 		const int result = Game::put_clip_sprite(
 			sprite, x, y, flags, priority, color);
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
 		return result;
 	}
 	static int __cdecl OutRunHudText_sprani(
@@ -523,7 +524,8 @@ class UIScaling : public Hook
 		const int result = Game::sprani_play_ae_auth_alpha(
 			spriteId, x, y, a4, a5, alpha);
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
 		return result;
 	}
 
@@ -549,7 +551,8 @@ class UIScaling : public Hook
 		if (!OutRunStagePrintfDepth || --OutRunStagePrintfDepth != 0)
 			return;
 		TagAppendedNodes(OutRunStagePrintfBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
 		OutRunStagePrintfBefore = {};
 	}
 
@@ -579,7 +582,8 @@ class UIScaling : public Hook
 		if (!ResultProgressDepth || --ResultProgressDepth != 0)
 			return;
 		TagAppendedNodes(ResultProgressTailsBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::ResultProgress);
 		ResultProgressTailsBefore = {};
 	}
 
@@ -601,7 +605,8 @@ class UIScaling : public Hook
 			Module::exe_ptr(helperRva));
 		original();
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
@@ -715,7 +720,8 @@ class UIScaling : public Hook
 		// Keep the original first position (kind_C=1) and any animated
 		// siblings on the same finite ScreenHud plane as eight kind-0 clips.
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::DispRankFirst);
 		return result;
 	}
 
