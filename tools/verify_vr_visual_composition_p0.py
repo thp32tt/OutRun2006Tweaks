@@ -163,6 +163,61 @@ for name, source in (('R26 early world-rebind', r26),
     require('OutRunVR::GameSemantic::EffectiveScope()', source,
             name + ' must use exact queued scope')
 
+# P0 result/+TIME/GOAL provenance regression: identify the canonical
+# parent's actual queued glyph/clip node (not merely the 2C808 glyph helper).
+# All five distinct producer families must survive R84 refactor and no-tick
+# replay, or the first HMD session cannot isolate late shader WVP misses.
+def check_result_parent_provenance(ui_source, semantics_source):
+    expected_tokens = (
+        "OutRunStagePrintf", "ResultProgress",
+        "GoalTimeHelper", "OutRunHudText", "DispRankFirst")
+    for token in expected_tokens:
+        require("        " + token + ",", semantics_source,
+                "missing result/GOAL semantic enum " + token)
+        require("case ProducerToken::" + token + ":", semantics_source,
+                "missing result/GOAL token diagnostic label " + token)
+        require("ProducerToken::" + token, ui_source,
+                "result/GOAL producer has no exact registered node token")
+    functions = (
+        ("static void OutRunStagePrintfLeave(", "OutRunStagePrintf"),
+        ("static void ResultProgressLeave(", "ResultProgress"),
+        ("static void GoalTime_TagHelper(", "GoalTimeHelper"),
+        ("static int __cdecl OutRunHudText_clip(", "OutRunHudText"),
+        ("static int __cdecl OutRunHudText_sprani(", "OutRunHudText"),
+        ("static int __cdecl DispRankFirst_sprani(", "DispRankFirst"),
+    )
+    for start, token in functions:
+        body = function_body(ui_source, start)
+        require("ProducerToken::" + token, body,
+                "exact producer missing tag: " + token)
+        require("TagAppendedNodes(", body,
+                "exact producer missing sibling group tag: " + token)
+    if "vrProducer" not in framerate or (
+            "entry.vrProducer" not in framerate):
+        raise SystemExit("Sumo no-tick replay loses exact result producer")
+
+check_result_parent_provenance(ui, sem)
+for label, corrupt in (
+    ("result parent no provenance",
+     ui.replace("ProducerToken::ResultProgress);",
+                "ProducerToken::None);", 1)),
+    ("GOAL parent no provenance",
+     ui.replace("ProducerToken::GoalTimeHelper);",
+                "ProducerToken::None);", 1)),
+    ("result parent token dropped at enum",
+     sem.replace("        ResultProgress,\n", "", 1)),
+):
+    if corrupt == (sem if "enum" in label else ui):
+        raise SystemExit("failed to mutate result provenance: " + label)
+    try:
+        check_result_parent_provenance(
+            ui if "enum" in label else corrupt,
+            corrupt if "enum" in label else sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit("result provenance defect was not rejected: " + label)
+
 # R62 USER_RUNTIME_VERIFIED: ordinal 4th/5th were single and tracked
 # vehicles through head motion only when the exact D3DXSprite FVF 0x142
 # DrawIndexedPrimitive owner existed. The R84 refactor silently removed
