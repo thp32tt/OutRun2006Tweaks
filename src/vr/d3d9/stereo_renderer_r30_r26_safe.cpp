@@ -1569,18 +1569,24 @@ namespace OutRunVRStereo
             return true;
         }
 
-        // Generic queued screen sprites share the game's c64 across draw
-        // calls. Reading live GPU c64 may recover an already head-injected
-        // world WVP. Restrict this recovery to the explicit SCREEN_OVERLAY_2D
-        // semantic: no ProducerToken (diagnostic-only), no rank/rival or world
-        // classification changes. The scene owner remains authoritative.
+        // Generic queued screen sprites and explicitly projected world
+        // markers may share one game c64 for more than twelve draws. Prefer
+        // the original same-shader c64 to any live, possibly head-injected
+        // GPU register. Do not infer semantic ownership from ProducerToken;
+        // a projected world marker also requires the actual recovered
+        // Calc3D2D anchor. Verified world/non-marker routes stay untouched.
         bool R30GetRecentRawWvpForQueueSprite(
             float outConstants[16]) noexcept
         {
-            if (!outConstants ||
-                !OutRunVR::GameSemantic::QueueRenderActive() ||
-                !OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
-                    OutRunVR::GameSemantic::CurrentScope))
+            if (!outConstants || !OutRunVR::GameSemantic::QueueRenderActive())
+                return false;
+            const auto scope = OutRunVR::GameSemantic::CurrentScope;
+            const bool screenOverlay =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope);
+            const bool projectedMarker =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(scope) &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+            if (!screenOverlay && !projectedMarker)
                 return false;
             std::uint64_t writeSerial = 0;
             std::uint64_t writeDrawSerial = 0;
@@ -4007,12 +4013,18 @@ namespace OutRunVRStereo
                     else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
                     {
                         // Never apply the HUD plane to head-injected live
-                        // c64 for a queued 2D sprite. Fail closed when the
-                        // original same-shader upload cannot be proven.
-                        // Both rank and correctly placed rival world routes
-                        // retain their existing original transform owners.
+                        // c64 for an unproven queued 2D sprite.
                         if (!R30GetRecentRawWvpForQueueSprite(original))
                             return false;
+                    }
+                    else if (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                             R30GetRecentRawWvpForQueueSprite(original))
+                    {
+                        // The original game c64 is still valid for this exact
+                        // node beyond the old 12-draw window. This avoids
+                        // applying head/eye offsets twice on later rank
+                        // digit siblings. The usual <=12 window and existing
+                        // original fallback remain unchanged for rival.
                     }
                     else
                     {
