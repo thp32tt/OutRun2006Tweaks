@@ -1200,7 +1200,6 @@ def check_exact_scene_effect_raw_wvp(source):
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'else if (R30ExactSceneEffectScope())',
         'if (!R30GetExtendedRawWvpForExactSceneEffect(original))',
-        'else',
         'GetVertexShaderConstantF('
     )
     if fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 2:
