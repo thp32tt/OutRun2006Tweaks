@@ -339,6 +339,50 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+
+# R316: R275 logs exact/objectReady/snapshot only. Native R275's receipt
+# hash binds source bytecode, the translation object and R273/R276 inputs.
+# None of those object/provenance bindings is authenticated by the R275 line.
+R275_UNLOGGED_RECEIPT_BINDINGS = (
+    "cacheKey", "vertexVersionToken", "pixelVersionToken",
+    "vertexBytecodeHash", "pixelBytecodeHash",
+    "translationObjectSnapshotToken",
+    "sourceMappingHandoffSnapshotToken", "translationPlanSnapshotToken",
+    "vertexSemanticExact", "pixelSemanticExact",
+    "constantRegisterMappingExact", "samplerMappingExact",
+)
+
+
+def annotate_r275_receipt_provenance(
+    receipt: dict, plan: dict | None, handoff: dict | None
+) -> None:
+    """Keep raw R275 claims separate from independently validated provenance."""
+    exact = receipt["exact"]
+    snapshot = receipt["snapshot"]
+    shape_valid = (
+        (snapshot != 0 and receipt["object_ready"]) if exact
+        else snapshot == 0
+    )
+    producer_correlated = bool(
+        plan is not None and plan.get("summary_correlation_exact")
+        and handoff is not None and handoff.get("summary_correlation_exact")
+    )
+    receipt.update({
+        "claim_shape_consistent": shape_valid,
+        "producer_chain_correlated": producer_correlated,
+        "unlogged_receipt_bindings": list(R275_UNLOGGED_RECEIPT_BINDINGS),
+        "snapshot_independently_verified": False,
+        "provenance_status": (
+            "CONTRADICTORY_R275_TELEMETRY" if not shape_valid
+            else "UNVERIFIABLE_R275_PRODUCER_CHAIN"
+            if exact and not producer_correlated
+            else "UNVERIFIABLE_R275_UNLOGGED_BINDINGS"
+        ),
+        "diagnostic_only": True,
+        "activation_proof": False,
+    })
+
+
 R287_PRODUCTION_OBSERVATION_RE = re.compile(
     r"VR DX11 R287 productionObservation signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) ownerGeneration=(?P<ownerGeneration>\d+) "
@@ -2512,9 +2556,15 @@ def main() -> int:
         signature["target_bytecode_materialization"] = (
             target_bytecode_materializations.get(signature_key)
         )
-        signature["translated_semantic_receipt"] = (
-            translated_semantic_receipts.get(signature_key)
+        # R316: an R275 exact=1 claim alone cannot prove its hash/object tuple.
+        translated_semantic_receipt = translated_semantic_receipts.get(
+            signature_key
         )
+        if translated_semantic_receipt is not None:
+            annotate_r275_receipt_provenance(
+                translated_semantic_receipt, semantic_plan, source_mapping_handoff
+            )
+        signature["translated_semantic_receipt"] = translated_semantic_receipt
         signature["production_activation_prerequisite"] = (
             production_activation_prerequisites.get(signature_key)
         )

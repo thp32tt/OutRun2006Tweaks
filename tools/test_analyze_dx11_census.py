@@ -2612,6 +2612,92 @@ def main() -> int:
     assert r315_plan["activation_proof"] is False
     assert r315_receipt["NativeDrawPathActivationAllowed"] is False
 
+    # R316: the native composer hashes many fields absent from R275 logging.
+    # A three-field receipt claim, even if nonzero and exact=1, cannot
+    # authenticate object ownership or silently unlock programmable draws.
+    native_backend = (ROOT / "src/vr/d3d11/native_backend.cpp").read_text(
+        encoding="utf-8"
+    )
+    native_census = (ROOT / "src/vr/d3d11/runtime_census.cpp").read_text(
+        encoding="utf-8"
+    )
+    receipt_composer = native_backend.split(
+        "NativeProgrammableShaderTranslatedSemanticReceipt\n"
+        "compose_programmable_shader_translated_semantic_receipt(", 1
+    )[1].split(
+        "validate_programmable_shader_translated_semantic_receipt_snapshot(", 1
+    )[0]
+    assert "mix_readiness_snapshot_token(token, out.cacheKey)" in receipt_composer
+    assert "out.translationObjectSnapshotToken" in receipt_composer
+    assert "out.sourceMappingHandoffSnapshotToken" in receipt_composer
+    assert "out.translationPlanSnapshotToken" in receipt_composer
+    assert "0x275276u" in receipt_composer
+    assert (
+        "R275 translatedSemanticReceipt signature#{}: exact={} "
+        "objectReady={} snapshot=0x{:016X}"
+    ) in native_census
+
+    def r316_receipt_line(
+        exact: int, ready: int, snapshot: str,
+        source: str = r315_good_support,
+    ) -> tuple[dict, dict]:
+        report = run_case(
+            source
+            + "VR DX11 R275 translatedSemanticReceipt signature#1: "
+              f"exact={exact} objectReady={ready} snapshot=0x{snapshot}\n"
+            + r306_signature_tail
+        )
+        receipt = report["ActivationEvidence"]["ProgrammableShaderInventory"][
+            "Pairs"
+        ][0]["SemanticTranslationEvidence"][0]["Receipt"]
+        return report, receipt
+
+    r316_forged, r316_claim = r316_receipt_line(
+        1, 1, "DEADBEEF00000001"
+    )
+    assert r316_claim["claim_shape_consistent"] is True
+    assert r316_claim["producer_chain_correlated"] is True
+    assert r316_claim["snapshot_independently_verified"] is False
+    assert "translationObjectSnapshotToken" in (
+        r316_claim["unlogged_receipt_bindings"]
+    )
+    assert r316_claim["provenance_status"] == (
+        "UNVERIFIABLE_R275_UNLOGGED_BINDINGS"
+    )
+    assert r316_claim["activation_proof"] is False
+    assert r316_forged["NativeDrawPathActivationAllowed"] is False
+
+    for exact, ready, snapshot in (
+        (1, 1, "0000000000000000"),
+        (1, 0, "DEADBEEF00000001"),
+        (0, 0, "DEADBEEF00000001"),
+    ):
+        report, receipt = r316_receipt_line(exact, ready, snapshot)
+        assert receipt["claim_shape_consistent"] is False
+        assert receipt["provenance_status"] == "CONTRADICTORY_R275_TELEMETRY"
+        assert receipt["snapshot_independently_verified"] is False
+        assert report["NativeDrawPathActivationAllowed"] is False
+
+    # A not-ready receipt has a zero token, regardless of objectReady bit.
+    for ready in (0, 1):
+        report, receipt = r316_receipt_line(0, ready, "0000000000000000")
+        assert receipt["claim_shape_consistent"] is True
+        assert receipt["snapshot_independently_verified"] is False
+        assert report["NativeDrawPathActivationAllowed"] is False
+
+    r316_unbound, r316_claim = r316_receipt_line(
+        1, 1, "DEADBEEF00000001",
+        r315_good_support.replace(
+            "R276 semanticTranslationPlan signature#1: exact=1",
+            "R276 semanticTranslationPlan signature#1: exact=0", 1
+        ),
+    )
+    assert r316_claim["producer_chain_correlated"] is False
+    assert r316_claim["provenance_status"] == (
+        "UNVERIFIABLE_R275_PRODUCER_CHAIN"
+    )
+    assert r316_unbound["NativeDrawPathActivationAllowed"] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
