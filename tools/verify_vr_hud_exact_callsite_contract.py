@@ -100,6 +100,16 @@ def check_extra_producers(ui, contracts):
             if len(re.findall(expr, ui, re.S)) != 1:
                 fail('wrong/missing original exact result-progress ' + name)
 
+    # All four CALL-boundary hooks must fail closed as one group.
+    for token in (
+        'if (!ResultProgressEnterA || !ResultProgressLeaveA ||',
+        '!ResultProgressEnterB || !ResultProgressLeaveB)',
+        'ResultProgressEnterA = {};', 'ResultProgressLeaveA = {};',
+        'ResultProgressEnterB = {};', 'ResultProgressLeaveB = {};',
+    ):
+        if token not in ui:
+            fail('result-progress partial hook rollback missing ' + token)
+
     goal = function_body(ui, 'static void GoalTime_TagHelper(')
     ordered(goal, 'GOAL sprite parent call and all-node scope',
             'Game::SpritePriorityCount', 'Module::exe_ptr(helperRva)',
@@ -360,7 +370,10 @@ def test_mutations(ui, manifest):
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0xB9DA6)['expectedBytes'] = 'e800000000'
     must_fail('first DispRank rel32 original CALL corrupted', changed_manifest=corrupt)
     print('P0 first DispRank original CALL mutations: 2/2 failures detected')
-    print('P0 GOAL/RESULT original producer mutations: 4/4 failures detected')
+    must_fail('result-progress hook group no longer fail-closed',
+              ui.replace('ResultProgressLeaveB = {};',
+                         'ResultProgressLeaveNoop = {};', 1))
+    print('P0 GOAL/RESULT original producer mutations: 5/5 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
 
