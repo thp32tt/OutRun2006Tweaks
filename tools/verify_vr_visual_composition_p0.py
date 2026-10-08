@@ -50,6 +50,7 @@ verify_texture_cache_lifetime(textures)
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
+r7 = read('src/vr/d3d9/stereo_renderer_r7.inc')
 r26 = read('src/vr/d3d9/stereo_renderer_r26.cpp')
 r29 = read('src/vr/d3d9/stereo_renderer_r29.cpp')
 graphics = read('src/hooks_graphics.cpp')
@@ -80,6 +81,7 @@ for path in (
     'src/vr/d3d9/stereo_renderer_r26.cpp',
     'src/vr/d3d9/stereo_renderer_r29.cpp',
     'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
+    'src/vr/d3d9/stereo_renderer_r7.inc',
     'src/hooks_graphics.cpp',
     'src/overlay/hooks_overlay.cpp',
     'src/game_addrs.hpp',
@@ -162,6 +164,54 @@ for name, source in (('R26 early world-rebind', r26),
                      ('R30 HUD/XYZRHW draw', r30)):
     require('OutRunVR::GameSemantic::EffectiveScope()', source,
             name + ' must use exact queued scope')
+
+# Exactly one presentation policy must authorize both game SBS generation
+# and host projection. R45 narrowed the host Theater states, but the old R9
+# Game::is_in_game() still accepts TRYAGAIN/OUTRUNMILES; without the early
+# common predicate the Theater quad can display a raw SBS result image.
+def verify_result_theater_guard(source):
+    body = function_body(source, 'bool GameplayActive()')
+    require_order(
+        body, 'host and game result/theater stereo eligibility parity',
+        'if (!Game::is_vr_gameplay_presentation())',
+        'if (Game::is_in_game())',
+        'switch (*Game::current_mode)')
+    require('case GameState::STATE_WARP:', body,
+            'retain original WARP gameplay stereo')
+    require('case GameState::STATE_RESTART:', body,
+            'retain original RESTART gameplay stereo')
+    require('case STATE_GOAL:', game_addrs,
+            'GOAL remains host gameplay')
+    require('case STATE_TIMEUP:', game_addrs,
+            'TIMEUP remains host gameplay')
+    require('case STATE_LINK_TIMEUP:', game_addrs,
+            'LINK_TIMEUP remains host gameplay')
+    predicate = function_body(
+        game_addrs, 'inline bool is_vr_gameplay_presentation() noexcept')
+    for theater in ('STATE_TRYAGAIN', 'STATE_OUTRUNMILES'):
+        if theater in predicate:
+            raise SystemExit('result Theater state promoted to host gameplay: ' +
+                             theater)
+
+verify_result_theater_guard(r7)
+for label, corrupt in (
+    ('theater gate removed', r7.replace(
+        'if (!Game::is_vr_gameplay_presentation())',
+        'if (false)', 1)),
+    ('theater gate moved after broad in_game',
+     r7.replace(
+         'if (!Game::is_vr_gameplay_presentation())\n\t\t\t\treturn false;\n\t\t\tif (Game::is_in_game())',
+         'if (Game::is_in_game())\n\t\t\t\treturn true;\n\t\t\tif (!Game::is_vr_gameplay_presentation())', 1)),
+):
+    if corrupt == r7:
+        raise SystemExit('Theater SBS mutation did not modify source: ' +
+                         label)
+    try:
+        verify_result_theater_guard(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('Theater SBS regression mutation escaped: ' + label)
 
 # P0 result/+TIME/GOAL provenance regression: identify the canonical
 # parent's actual queued glyph/clip node (not merely the 2C808 glyph helper).
