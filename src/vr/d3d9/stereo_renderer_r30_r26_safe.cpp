@@ -1544,9 +1544,15 @@ namespace OutRunVRStereo
 
         bool R30GetExtendedRawWvpForExactHud(float outConstants[16]) noexcept
         {
+            // A queued 2D sprite may be a menu arrow, YES/NO, +TIME or rank
+            // sibling even without an exact producer tag. Both ScreenHud and
+            // queue-owned ScreenOverlay2D require ORIGINAL c64. The live GPU
+            // register is potentially already head-corrected by R23, and
+            // applying a second head inverse makes the result follow the HMD.
+            const auto scope = OutRunVR::GameSemantic::CurrentScope;
             if (!outConstants ||
-                !OutRunVR::GameSemantic::CorroboratesHud(
-                    OutRunVR::GameSemantic::CurrentScope))
+                (!OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+                 !OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope)))
                 return false;
             std::uint64_t writeSerial = 0;
             std::uint64_t writeDrawSerial = 0;
@@ -4035,6 +4041,18 @@ namespace OutRunVRStereo
                                 OutRunWvpRegisterCount)))
                             return false;
                     }
+                }
+            }
+            else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
+            {
+                // A generic queue sprite is not an unknown world draw: it
+                // must never reuse the GPU's last already-injected world c64.
+                // Require the bounded same-shader original game upload.
+                if (!R44GetOwnedRawOverlayWvp(original) &&
+                    !R30GetExtendedRawWvpForExactHud(original))
+                {
+                    ++R30ExactHudRawWvpMiss;
+                    return false;
                 }
             }
             else if (FAILED(device->GetVertexShaderConstantF(
