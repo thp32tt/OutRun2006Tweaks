@@ -72,10 +72,13 @@ for r in rows:
  name=r["key"];l,t,rr,b=boxes[name]
  tile=S[t:b,l:rr];alpha=tile[:,:,3]
  rgb=tile[:,:,:3];face=rgb[(alpha>=220)&(rgb[:,:,0]>120)&(rgb[:,:,1]<85)]
+ # Original source may have red-only face RGB with antialias represented
+ # by alpha rather than a separately authored black/dark RGB contour.
+ # Do not invent a dark border when the source contains no such pixels.
  black=rgb[(alpha>=100)&(rgb[:,:,0]<65)&(rgb[:,:,1]<70)&(rgb[:,:,2]<80)]
- assert face.shape[0]>200 and black.shape[0]>50,("missing source color profile",name,len(face),len(black))
+ assert face.shape[0]>200,("missing original red face",name,len(face))
  faceRGB=np.median(face,axis=0).round().astype(int).tolist()
- darkRGB=np.percentile(black,25,axis=0).round().astype(int).tolist()
+ darkRGB=np.percentile(black,25,axis=0).round().astype(int).tolist() if len(black)>50 else None
  # Original source alpha centroid shifts to right/left near top/bottom.
  y,x=np.where(alpha>130)
  top=x[y<=np.percentile(y,30)];bot=x[y>=np.percentile(y,70)]
@@ -103,7 +106,8 @@ for r in rows:
   tmp=Image.new("RGBA",(bbox[2]-bbox[0]+14,bbox[3]-bbox[1]+14),(0,0,0,0))
   draw=ImageDraw.Draw(tmp)
   draw.text((7-bbox[0],7-bbox[1]),ko,font=font,
-            fill=(*f["face_rgb"],255),stroke_width=3,stroke_fill=(*f["dark_rgb"],255))
+            fill=(*f["face_rgb"],255),stroke_width=(3 if f["dark_rgb"] else 0),
+            stroke_fill=(*f["dark_rgb"],255) if f["dark_rgb"] else None)
   bb=tmp.getchannel("A").getbbox()
   if bb:
    tile=tmp.crop(bb)
@@ -119,7 +123,7 @@ for r in rows:
                  "original_bbox":[l,t,rr,b],"candidate_bbox":[x,y,x+im.width,y+im.height],
                  "margins":[x-l,rr-x-im.width,y-t,b-y-im.height],
                  "face":f["face_rgb"],"edge":f["dark_rgb"],"font_size":size,
-                 "font_file":Path(fontpath).name,"rendering":"native_transparent_rgba_serif_black_source_palette_plus_3px_source_dark_contour"})
+                 "font_file":Path(fontpath).name,"rendering":"native_transparent_rgba_serif_black_source_red_face; dark_keyline_only_if_measured"})
 assert all(min(r["margins"])>=2 for r in records)
 # Serialize in the same native channel order proven by the source DDS.
 # Determine this empirically instead of assuming DDS header RGB masks.
@@ -172,7 +176,7 @@ for name,img in [("SOURCE",S),("CLEAN",C),("OLD",P),("TRIAL",D)]:
 report={"role":"B","run":"B303","queue_index":205,"work":"IGR-026+IGR-027 P0 original red heading materially rebuilt",
  "source_sha256":SOURCE,"old_sha256":oldsha,"trial_sha256":SHA(trial),
  "new_trial_dds":1,"promoted_dds":0,"dds_size":[4096,2048],"dds_mode":mode,"mips":1,"raw_orientation":"mirror_y",
- "font":"NotoSerifCJK Black native RGBA with source measured face+dark keyline",
+ "font":"NotoSerifCJK Black native RGBA; red original face and dark contour only when source RGB proves it",
  "source_family":family,"regions":records,
  "saved_dds_roundtrip":"EXACT","saved_dds_header":"EXACT","outside_two_source_bbox_rgba_changed_pixels":0,
  "outside_two_source_bbox_alpha_changed_pixels":0,"all_other_regions":"PIXEL_EXACT",
