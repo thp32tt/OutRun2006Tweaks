@@ -192,6 +192,71 @@ def recompute_r273_handoff_snapshot(
     return token or 1
 
 
+
+def _r276_hash_literal(text: str) -> int:
+    """Native R276 lambda uses the *short* FNV offset (not R273's offset)."""
+    mask = (1 << 64) - 1
+    token = 1469598103934665603
+    for byte in text.encode("ascii"):
+        token = ((token ^ byte) * 1099511628211) & mask
+    return token or 1
+
+
+def _r276_mix(*fields: int) -> int:
+    """Native mix_readiness_snapshot_token, unsigned 64-bit after each mix."""
+    mask = (1 << 64) - 1
+    token = 0xCBF29CE484222325
+    for value in fields:
+        token ^= (
+            value + 0x9E3779B97F4A7C15
+            + ((token << 6) & mask) + (token >> 2)
+        ) & mask
+        token &= mask
+    return token or 1
+
+
+def recompute_r276_semantic_plan(
+    source_pair: dict, mapping_plan: dict, handoff_snapshot: int
+) -> dict:
+    """R315 offline reconstruction of C++ R276 (diagnostic; no draw authority).
+
+    This checks emitted scalar identities only. The R268 bytecode linkage and
+    R275 object/lifetime ownership cannot be proven from the R271/R272/R273
+    scalar logs and remain separate runtime/receipt gates.
+    """
+    revision = _r276_hash_literal(
+        "R276_D3D9_SOURCE_DERIVED_SEMANTIC_TRANSLATION_PLAN_V1"
+    )
+    contract = _r276_hash_literal(
+        "R276_R271_R268_R273_TARGET_SEMANTIC_IDENTITY_V1"
+    )
+    common = (
+        source_pair["pair_hash"],
+        source_pair["link_hash"],
+        mapping_plan["constant_mapping_hash"],
+        mapping_plan["sampler_mapping_hash"],
+    )
+    target_vs = _r276_mix(
+        common[0], source_pair["vertex_register_hash"], *common[1:],
+        revision, contract, 0x5653,
+    )
+    target_ps = _r276_mix(
+        common[0], source_pair["pixel_register_hash"], *common[1:],
+        revision, contract, 0x5053,
+    )
+    snapshot = _r276_mix(
+        source_pair["cache_key"], common[0], *common[1:],
+        target_vs, target_ps, revision, contract, handoff_snapshot, 0x276,
+    )
+    return {
+        "target_vertex_semantic_hash": target_vs,
+        "target_pixel_semantic_hash": target_ps,
+        "translator_revision_hash": revision,
+        "semantic_contract_hash": contract,
+        "snapshot": snapshot,
+    }
+
+
 R276_SEMANTIC_PLAN_RE = re.compile(
     r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
@@ -2366,9 +2431,72 @@ def main() -> int:
                 "activation_proof": False,
             })
         signature["source_mapping_handoff"] = source_mapping_handoff
-        signature["semantic_translation_plan"] = (
-            semantic_translation_plans.get(signature_key)
-        )
+        # R315: R276's emitted "exact=1" bit and nonzero token cannot
+        # authenticate themselves. Independently reconstruct all R276 scalar
+        # identities from the ordered R271/R272/R273 producer chain and native
+        # revision/contract literals; preserve R275/object ownership as a
+        # separate fail-closed requirement.
+        semantic_plan = semantic_translation_plans.get(signature_key)
+        if semantic_plan is not None:
+            expected = (
+                recompute_r276_semantic_plan(
+                    source_semantic_pair,
+                    register_mapping_plan,
+                    source_mapping_handoff["expected_snapshot"],
+                )
+                if source_semantic_pair is not None
+                and register_mapping_plan is not None
+                and source_mapping_handoff is not None
+                else None
+            )
+            identities_match = bool(
+                expected is not None
+                and all(
+                    semantic_plan[key] == expected[key]
+                    for key in (
+                        "target_vertex_semantic_hash",
+                        "target_pixel_semantic_hash",
+                        "translator_revision_hash",
+                        "semantic_contract_hash",
+                        "snapshot",
+                    )
+                )
+            )
+            producer_chain_exact = bool(
+                source_mapping_handoff is not None
+                and source_mapping_handoff["fail_closed"]
+                and source_semantic_pair is not None
+                and source_semantic_pair["exact"]
+                and register_mapping_plan is not None
+                and register_mapping_plan["exact"]
+            )
+            semantic_plan.update({
+                "expected_target_vertex_semantic_hash": (
+                    expected["target_vertex_semantic_hash"] if expected else 0
+                ),
+                "expected_target_pixel_semantic_hash": (
+                    expected["target_pixel_semantic_hash"] if expected else 0
+                ),
+                "expected_translator_revision_hash": (
+                    expected["translator_revision_hash"] if expected else 0
+                ),
+                "expected_semantic_contract_hash": (
+                    expected["semantic_contract_hash"] if expected else 0
+                ),
+                "expected_snapshot": expected["snapshot"] if expected else 0,
+                "producer_chain_exact": producer_chain_exact,
+                "scalar_identity_matches_producer": identities_match,
+                "summary_correlation_exact": bool(
+                    semantic_plan["exact"] and producer_chain_exact
+                    and identities_match
+                ),
+                "diagnostic_only": True,
+                "activation_proof": False,
+            })
+            semantic_plan["fail_closed"] = (
+                semantic_plan["summary_correlation_exact"]
+            )
+        signature["semantic_translation_plan"] = semantic_plan
         signature["translation_object_prerequisite"] = (
             translation_object_prerequisites.get(signature_key)
         )
