@@ -1797,17 +1797,14 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             // A SCREEN_HUD node may still use the game's perspective sprite
-            // shader (6th/6, Position/results and menu glyph variants). The EXE
-            // queue semantic is the ownership proof; use raw game WVP only as
-            // placement data, never as a classifier.
-            if (CurrentDrawMatchesVerifiedWorld(device))
-                return R30ScreenSpaceKind::None;
-            std::uintptr_t reboundShader = 0;
-            std::uint64_t reboundSerial = 0;
-            if (R28CanRebindVerifiedWorld(
-                    device, reboundShader, reboundSerial))
-                return R30ScreenSpaceKind::None;
-
+            // shader (+TIME, checkpoint, goal/finish results, 6th/6 and glyphs).
+            // The canonical EXE producer and consumed SpriteNode semantic are
+            // stronger than a *stale* verified-world shader/c64 match left by
+            // the preceding road/car draw. This exact branch may never use the
+            // generic R28 world-rebind gate as a veto: that was forcing HUD
+            // content back down R9/R13 into identical-eye/head-locked replay.
+            // Conversely, the semanticWorld path above retains both strict
+            // world verification gates, so no unknown/world draw is promoted.
             ++R44FlatOverlayClassifications;
             return R30ScreenSpaceKind::PerspectiveHud;
         }
@@ -2486,6 +2483,13 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            // Exact executable lens draw at 0xCABE and original Clr_SceneEffect
+            // both enter the fixed-function XYZRHW path on some effects.
+            // Shader-only R44 semantic recognition must not be a prerequisite.
+            const bool exactSceneEffect =
+                semanticScope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
+                    semanticScope);
 
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
@@ -2539,6 +2543,19 @@ namespace OutRunVRStereo
                 state.worldEffect = true;
             else if (semanticHud || semanticOverlay2D)
                 state.worldEffect = false;
+            else if (exactSceneEffect)
+            {
+                // Never infer that flat lens pixels are in the game world
+                // simply because an earlier World/Scene c64 is still live.
+                // Only genuine referenced screen-depth evidence allows the
+                // original EXE-scoped effect to take the world stereo path.
+                // Otherwise render it once per eye on the same finite,
+                // head-recentered plane as the already-authored HUD, rather
+                // than silently replaying its source pixels head-locked.
+                state.worldEffect = state.rhwDepthEvidence &&
+                    !R30XyzrhwLooksLikeHudPlane(
+                        source, vertexCount, stride, state, usedMask);
+            }
             else
                 state.worldEffect = state.rhwDepthEvidence;
 
@@ -2551,7 +2568,8 @@ namespace OutRunVRStereo
                  !R30XyzrhwLooksLikeHudPlane(
                      source, vertexCount, stride, state, usedMask));
 
-            if (!state.worldEffect && !semanticHud && !semanticOverlay2D)
+            if (!state.worldEffect && !semanticHud && !semanticOverlay2D &&
+                !exactSceneEffect)
             {
                 ++R47SemanticUnknownRejected;
                 return false;
