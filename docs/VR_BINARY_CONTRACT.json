@@ -1513,6 +1513,20 @@
           "needle": "GoalTimeHelperCallB = 0xBEA5F"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-P0-DISPRANK-FIRST-KIND1-SPRANI-B9DA6",
+      "rva": "0x000B9DA6",
+      "signatureLength": 5,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e885f7f6ff",
+      "purpose": "Canonical original EXE Inspector independent CALL-window validation: first DispRank kind_C=1 sprite via 0x29530, distinct from eight subsequent kind_C=0 put_clip_sprite calls; scoped ScreenHud node ownership.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "DispRankFirstSpraniCall = 0xB9DA6"
+        }
+      ]
     }
   ]
 }
