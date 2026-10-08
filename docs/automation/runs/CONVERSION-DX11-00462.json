@@ -16,11 +16,11 @@
     "tools/dx11_constant_buffer_probe.cpp:R154"
   ],
   "selected_work_item": "DX11_R154_FIXED_FUNCTION_PIPELINE_IMMEDIATE_CONTEXT_OWNERSHIP",
-  "status": "WAITING_FOR_CI",
-  "checkpoint": "C4_COMMIT",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "material_result_sha": "4e120107e3dfd81d7be4946f7cd25a422f817115",
+  "validation_bearing_result_sha": "4e120107e3dfd81d7be4946f7cd25a422f817115",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "changed_paths": [
     "src/vr/d3d11/native_backend.cpp",
@@ -31,22 +31,42 @@
     "C0_RECOVER": "PASS: base GitHub HEAD 60806ff362c9b0ffeb2a22d95bc013ceed54e06c; 00461 terminal; 00462 absent",
     "C1_REVIEW": "PASS: deferred-context live IA/VS/PS receipt ownership gap isolated",
     "C2_IMPLEMENT": "PASS: R154 C++ source guard and WARP negative/positive probe",
-    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate",
-    "C4_COMMIT": "MATERIAL_COMMIT_PENDING_SHA",
-    "C5_PACKAGE": "NOT_REQUIRED: no native Draw activation, no runtime package requested",
-    "C6_STATE": "PENDING: exact-SHA CI and durable final result"
+    "C3_VALIDATE": "PASS: exact-SHA 4e120107e3dfd81d7be4946f7cd25a422f817115 Backend Conversion Gate 37825303807, Win32 validate 113476503170 SUCCESS, DX11 WARP smoke 113478894685 SUCCESS, artifact 11572065062 sha256:b1f15238b2b40229e5866b8dafe1c88a7ef5c1766a0bcac368424c2edde01454",
+    "C4_COMMIT": "PASS: substantive C++ and WARP probe material SHA 4e120107e3dfd81d7be4946f7cd25a422f817115 [AUTO:CONVERSION-DX11-00462]",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant IA/VS/PS observation guard, no Draw activation, no release package",
+    "C6_STATE": "PASS: run/lane exact-SHA status and Issue #14 material/validation event persisted; native Draw dormant; HMD UNTESTED"
   },
-  "static_validation": "PASS: focused source guard/test insertion scope and no Draw activation check",
-  "state_persisted": false,
-  "next_action": "Verify required exact-SHA Backend Conversion Gate and DX11 smoke, then finalize run record and lane state in a separate bookkeeping commit.",
+  "static_validation": "PASS: R154 focus source check + exact material-SHA Windows C++ validate + WARP probe deferred-negative/immediate-positive",
+  "state_persisted": true,
+  "next_action": "00462 terminal. Under a separate controller-assigned task, inspect R155 dormant NativeFixedFunctionOutputStateBinding::apply/binding_readiness same-device deferred-context RS/OM receipt guard. Quest3/VDXR hardware test needed before native Draw promotion; do not repeat R154.",
   "blockers": [
     "Quest3/VDXR in-game runtime unavailable; RUNTIME_VALIDATION=UNTESTED"
   ],
   "evidence": {
     "source_guard": "R154_IMMEDIATE_ONLY",
-    "warp_negative": "DEFERRED_REJECTED_EXPECTED",
-    "warp_positive": "IMMEDIATE_VALID_EXPECTED",
-    "ci_gate": "PENDING",
-    "runtime": "Quest3/VDXR NOT RUN"
-  }
+    "warp_negative": "PASS_DEFERRED_PIPELINE_REJECTED",
+    "warp_positive": "PASS_IMMEDIATE_PIPELINE_VALID",
+    "ci_gate": "PASS_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN",
+    "ci_head_sha": "4e120107e3dfd81d7be4946f7cd25a422f817115",
+    "backend_conversion_gate_run_id": 37825303807,
+    "validate_job_id": 113476503170,
+    "readiness_smoke_job_id": 113478894685,
+    "artifact_id": 11572065062,
+    "artifact_digest": "sha256:b1f15238b2b40229e5866b8dafe1c88a7ef5c1766a0bcac368424c2edde01454"
+  },
+  "result_sha": "4e120107e3dfd81d7be4946f7cd25a422f817115",
+  "validation_bearing_sha": "4e120107e3dfd81d7be4946f7cd25a422f817115",
+  "automation_validation_detail": "EXACT_SHA_WIN32_VALIDATE_AND_DX11_WARP_READINESS_SMOKE_SUCCESS",
+  "validation_run_id": 37825303807,
+  "validation_job_id": 113476503170,
+  "readiness_smoke_job_id": 113478894685,
+  "artifact_id": 11572065062,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4e120107e3dfd81d7be4946f7cd25a422f817115",
+  "artifact_digest": "sha256:b1f15238b2b40229e5866b8dafe1c88a7ef5c1766a0bcac368424c2edde01454",
+  "issue14_comment_id": 6066545634,
+  "validation_issue14_comment_id": 6066704988,
+  "recorded_at_utc": "2026-10-08T18:43:58Z",
+  "last_real_activity_at": "2026-10-08T18:43:58Z",
+  "last_activity_evidence": "GitHub exact 4e120107e3dfd81d7be4946f7cd25a422f817115 Gate 37825303807 SUCCESS; validate 113476503170 SUCCESS, DX11 WARP smoke 113478894685 SUCCESS, artifact 11572065062 digest sha256:b1f15238b2b40229e5866b8dafe1c88a7ef5c1766a0bcac368424c2edde01454"
 }
