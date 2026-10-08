@@ -220,7 +220,7 @@ with tempfile.TemporaryDirectory() as td:
     for z in rowsheets: sheet2.paste(z,(0,yy)); yy+=z.height+4
     sheet2.save(out/"A182R_Q154_SOURCE_B225_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
 
-    for label,raw in (("SOURCE RAW",source_raw),("B225 RAW",old_raw),("A182 RAW",rraw)):
+    for label,raw in (("SOURCE RAW",source_raw),("B225 RAW",old_raw),("A182R RAW",rraw)):
         z=flat(raw); z.thumbnail((900,260),Image.Resampling.LANCZOS)
         z.save(out/(label.replace(" ","_")+".jpg"),"JPEG",quality=94,subsampling=0)
 
@@ -259,7 +259,7 @@ with tempfile.TemporaryDirectory() as td:
       "forbidden_domains_touched":[]
     }
     rp=out/"A182R_Q154_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    (wr/"A182_Q154.json").write_text(json.dumps({
+    (wr/"A182R_Q154.json").write_text(json.dumps({
       "role":"A","run":RUN,"queue_index":154,"asset":"4D38BBB0","work_stolen_from_lane":"B",
       "before":EXPECTED,"after":after,"status":report["status"],"report":str(rp.relative_to(repo)),
       "runtime_validation":"UNTESTED"
