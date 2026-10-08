@@ -1,4 +1,4 @@
-# B252 q214: native high-contrast BC3 badge glyph rework with decoded-face gate.
+# B253 q214: native high-contrast BC3 badge glyph rework with decoded-face gate.
 #!/usr/bin/env python3
 import hashlib,json,os,struct,subprocess,urllib.request,math
 from pathlib import Path
@@ -11,7 +11,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261008-B252-Q214-BC3-GLYPH-CONTRAST"
+run="20261008-B253-Q214-BC3-COUNTER-SPACE"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -21,11 +21,11 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
 SOURCE_SHA="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-PRIOR_SHA="4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1"
+PRIOR_SHA="db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d"
 prior_bytes=candidate.read_bytes()
 if hashlib.sha256(prior_bytes).hexdigest()!=PRIOR_SHA:
     raise RuntimeError("A183 q214 prior DDS SHA drift; stop rather than overwrite")
-srcp=Path("/tmp/B252_BF229CF4.dds")
+srcp=Path("/tmp/B253_BF229CF4.dds")
 urllib.request.urlretrieve(url,srcp)
 
 def sha256_bytes(b): return hashlib.sha256(b).hexdigest()
@@ -70,7 +70,7 @@ for i in range(1,n+1):
     w=b[2]-b[0]; h=b[3]-b[1]
     if 45<=w<=300 and 12<=h<=90 and (w/max(h,1))>=1.55:
         cands.append({"area":area,"bbox":b,"mask":m})
-print("B252_RED_CANDIDATES",[(z["area"],z["bbox"],round((z["bbox"][2]-z["bbox"][0])/max(1,z["bbox"][3]-z["bbox"][1]),2)) for z in cands],flush=True)
+print("B253_RED_CANDIDATES",[(z["area"],z["bbox"],round((z["bbox"][2]-z["bbox"][0])/max(1,z["bbox"][3]-z["bbox"][1]),2)) for z in cands],flush=True)
 if len(cands)<2:
     raise RuntimeError(("fewer than two route-sign red components",[(c["area"],c["bbox"]) for c in cands]))
 # START is the upper-left sign, GOAL the lower-right sign. Keep the pair maximizing
@@ -87,7 +87,7 @@ if not pairs:
     raise RuntimeError(("cannot geometrically identify START/GOAL pair",[(c["area"],c["bbox"]) for c in cands]))
 pairs.sort(key=lambda z:z[0],reverse=True)
 _,start_comp,goal_comp=pairs[0]
-print("B252_SELECTED",start_comp["area"],start_comp["bbox"],goal_comp["area"],goal_comp["bbox"],flush=True)
+print("B253_SELECTED",start_comp["area"],start_comp["bbox"],goal_comp["area"],goal_comp["bbox"],flush=True)
 
 specs=[("start","START","출발",start_comp),("goal","GOAL","골",goal_comp)]
 rows=[]
@@ -304,54 +304,61 @@ final=clean.copy()
 target=np.zeros((H,W),bool)
 safe_target_blocks=set()
 
-# High-contrast source-family badges; reject decoded BC3 damage, not just bbox overflow.
+# Source-family counter-space repair: natural-aspect 18px Hangul, thin source-red
+# keyline, no heavy generic white extrusion. Review persisted DDS at practical scale.
+MEDIUM=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Medium"],text=True).strip()
+if not MEDIUM or not Path(MEDIUM).exists():raise RuntimeError("No Korean Medium font")
 preencode={}
 for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_masks):
-    x0,y0,x1,y1=row["source_bbox"]; sw=x1-x0; sh=y1-y0
-    font=ImageFont.truetype(FONT,26*4)
-    m=Image.new("L",(1300,360),0); draw=ImageDraw.Draw(m)
-    t=draw.textbbox((0,0),row["korean"],font=font)
-    draw.text((45-t[0],45-t[1]),row["korean"],font=font,fill=255)
-    mb=m.getbbox()
-    if not mb: raise RuntimeError(("empty Korean glyph",row["key"]))
-    size={"start":(56,18),"goal":(35,18)}[row["key"]]
-    m=m.crop(mb).resize(size,Image.Resampling.LANCZOS)
-    m=m.point(lambda x:255 if x>=90 else 0)
+    x0,y0,x1,y1=row["source_bbox"];sw=x1-x0;sh=y1-y0
+    font=ImageFont.truetype(MEDIUM,24*4)
+    m=Image.new("L",(1200,350),0);d=ImageDraw.Draw(m)
+    tb=d.textbbox((0,0),row["korean"],font=font)
+    d.text((40-tb[0],40-tb[1]),row["korean"],font=font,fill=255)
+    bb=m.getbbox()
+    if not bb:raise RuntimeError(("empty Korean glyph",row["key"]))
+    size={"start":(43,18),"goal":(23,18)}[row["key"]]
+    m=m.crop(bb).resize(size,Image.Resampling.LANCZOS)
+    m=shear(m,0.10).point(lambda v:255 if v>=130 else 0)
+    face_n=int(sum(m.histogram()[1:]))
+    face_frac=face_n/(m.width*m.height)
+    if face_frac<0.13 or face_frac>0.57:
+        raise RuntimeError(("counter-space occupancy not readable",row["key"],face_frac))
     edge=m.filter(ImageFilter.MaxFilter(3))
     w,h=m.size
     glyph=Image.new("RGBA",(w+2,h+2),(0,0,0,0))
-    glyph.paste((110,34,23,255),(1,1,w+1,h+1),edge)
-    glyph.paste((255,248,222,255),(0,0,w,h),m)
+    glyph.paste((117,40,25,255),(1,1,w+1,h+1),edge)
+    glyph.paste((255,242,211,255),(0,0,w,h),m)
     glyph=glyph.crop(glyph.getchannel("A").getbbox())
-    px=x0+(sw-glyph.width)//2; py=y0+(sh-glyph.height)//2
+    px=x0+(sw-glyph.width)//2;py=y0+(sh-glyph.height)//2
     lm=np.zeros((H,W),bool)
     ga=np.asarray(glyph.getchannel("A"))>0
     lm[py:py+glyph.height,px:px+glyph.width]=ga
     lb=bbox(lm)
     if lb is None or not (lb[0]>x0 and lb[1]>y0 and lb[2]<x1 and lb[3]<y1):
         raise RuntimeError(("glyph overflow",row["key"],lb,row["source_bbox"]))
-    if np.any(lm & ~safe_banner): raise RuntimeError(("protected sign border",row["key"]))
-    if np.any(lm & target): raise RuntimeError(("glyph overlap",row["key"]))
-    final.alpha_composite(glyph,(px,py)); target |= lm
+    if np.any(lm&~safe_banner):raise RuntimeError(("sign/art intrusion",row["key"]))
+    if np.any(lm&target):raise RuntimeError(("glyph collision",row["key"]))
+    final.alpha_composite(glyph,(px,py));target|=lm
     blocks={(int(x)//4,int(y)//4) for y,x in zip(*np.nonzero(lm))}
     safe_target_blocks |= blocks
     preencode[row["key"]]={"xy":[px,py],"image":glyph}
-    glyph.save(out/("B252_"+row["key"]+"_PREENCODE.png"))
+    glyph.save(out/("B253_"+row["key"]+"_PREENCODE.png"))
     row.update({"localized_bbox":lb,"source_width":sw,"source_height":sh,
       "localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],
       "delta_left":lb[0]-x0,"delta_right":x1-lb[2],
       "delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-      "font":"Noto Sans CJK KR Black 26px native-sampled 4x",
-      "font_size":26,"slant":"PENDING_INDEPENDENT_NATIVE_SOURCE_COMPARISON",
-      "shadow_offset":1,"fill_rgba":[255,248,222,255],
-      "shadow_rgba":[110,34,23,255],"target_bc3_blocks":len(blocks)})
+      "font":"Noto Sans CJK KR Medium 24px/4x source-family",
+      "font_size":24,"readable_shear":0.10,"face_occupancy":round(face_frac,4),
+      "shadow_offset":1,"fill_rgba":[255,242,211,255],
+      "shadow_rgba":[117,40,25,255],"target_bc3_blocks":len(blocks)})
 
 # Compress entire raw-orientation image, then splice only complete sign-interior BC3
 # blocks touched by source removal or Korean lettering. Every other compressed block
 # remains byte-identical to the canonical DDS.
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-tmp_png=Path("/tmp/B252_final_raw.png"); tmp_dds=Path("/tmp/B252_final_nv.dds")
+tmp_png=Path("/tmp/B253_final_raw.png"); tmp_dds=Path("/tmp/B253_final_nv.dds")
 raw_final.save(tmp_png)
 subprocess.run(["/usr/bin/nvcompress","-bc3","-nomips",str(tmp_png),str(tmp_dds)],check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
 tb=tmp_dds.read_bytes()
@@ -525,7 +532,7 @@ for row in rows:
       "face_recall":round(k/n,4),"bad_scanlines":bad,"scanlines":scan}
     integrity.append(item)
     if k/n<0.77 or bad:raise RuntimeError(("BC3 face is fractured; block publication",item))
-print("B252_DECODED_FACE_INTEGRITY",integrity,flush=True)
+print("B253_DECODED_FACE_INTEGRITY",integrity,flush=True)
 
 # Candidate bboxes from actual decoded-vs-clean alpha/content delta inside source bboxes.
 clean_a=np.asarray(clean.getchannel("A"))
@@ -550,14 +557,14 @@ if outside_blocks:
     raise RuntimeError(("compressed block drift",outside_blocks))
 
 # Evidence
-src.save(out/"B252_SOURCE_READABLE.png")
-clean.save(out/"B252_CLEAN_PLATE.png")
-dec.save(out/"B252_FINAL_READABLE.png")
-src_raw.save(out/"B252_SOURCE_RAW.png")
-dec_raw.save(out/"B252_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B252_SOURCE_TEXT_MASK.png")
-Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"B252_ALLOWED_BLOCK_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B252_TARGET_MASK.png")
+src.save(out/"B253_SOURCE_READABLE.png")
+clean.save(out/"B253_CLEAN_PLATE.png")
+dec.save(out/"B253_FINAL_READABLE.png")
+src_raw.save(out/"B253_SOURCE_RAW.png")
+dec_raw.save(out/"B253_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B253_SOURCE_TEXT_MASK.png")
+Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"B253_ALLOWED_BLOCK_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B253_TARGET_MASK.png")
 
 def on_bg(im,bg=(245,245,245,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -576,7 +583,7 @@ sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((1800,3200),Image.Resampling.LANCZOS)
-sheet.save(out/"B252_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"B253_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_cards=[]
 for label,im in [("SOURCE_RAW_MIRROR_Y",src_raw),("FINAL_RAW_MIRROR_Y",dec_raw)]:
@@ -588,7 +595,7 @@ rs=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in raw_cards:
     rs.paste(c,(0,yy)); yy+=c.height+8
 rs.thumbnail((1400,2200),Image.Resampling.LANCZOS)
-rs.save(out/"B252_RAW_CONTACT.jpg",quality=95)
+rs.save(out/"B253_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":2,"role":"B","run":run,
@@ -610,22 +617,22 @@ report={
    "full_reencoded_blocks":full_reencoded_blocks,"partial_constrained_blocks":partial_constrained_blocks,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "rework_trigger":"A183R3_CONTROLLER_FAIL_BROKEN_HANGUL_BC3",
+ "rework_trigger":"B252_CONTROLLER_VISUAL_FAIL_GLYPH_COUNTER_SPACES_COLLAPSED",
  "prior_candidate_sha256":PRIOR_SHA,
- "target_width_by_row":{"start":56,"goal":35},
+ "target_width_by_row":{"start":43,"goal":23},
  "exact_source_bbox_hard_gate":{"decoded_outside":outside,"alpha_outside":alpha_out,"introduced_outside":introduced,
    "previous_to_current_outside":blast_out,"previous_to_current_alpha_outside":blast_alpha},
  "execution_backend":"GITHUB_HOSTED_CPU_WORKER",
  "fresh_independent_c":"REQUIRED_C2","c3":"REQUIRED_AFTER_FRESH_C",
  "pre_ingame":"PENDING_FRESH_C_C3","runtime_validation":"UNTESTED",
  "runtime_validation":"UNTESTED",
- "status":"B252_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B253_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B252_BF229CF4_REPORT.json"
+rp=out/"B253_BF229CF4_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B252_BF229CF4.json").write_text(json.dumps({
+(wr/"B253_BF229CF4.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":214,"asset":"BF229CF4","source_sha256":SOURCE_SHA,
- "candidate_sha256":cand_sha,"report":str(rp.relative_to(repo)),"status":"B252_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+ "candidate_sha256":cand_sha,"report":str(rp.relative_to(repo)),"status":"B253_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B252_DONE",cand_sha,[(r["key"],r["banner_bbox"],r["source_bbox"],r["localized_bbox"]) for r in rows],flush=True)
+print("B253_DONE",cand_sha,[(r["key"],r["banner_bbox"],r["source_bbox"],r["localized_bbox"]) for r in rows],flush=True)
