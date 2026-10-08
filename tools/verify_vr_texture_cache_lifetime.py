@@ -34,7 +34,7 @@ def verify(s):
         ("cache ref returned", "return found->second.data;" in getter),
         ("cache miss read outside cache lock", "cacheFile(filename);" in getter),
         ("cached buffer owner retained through D3DX", "*transientOwner = std::move(owner);" in getter),
-        ("cached bytes pointer owned", "return (*transientOwner)->data();" in getter),
+        ("both cache and transient pointers are retained", getter.count("return (*transientOwner)->data();")==2),
         ("never return unowned pointer", "if (!transientOwner)" in getter and "return nullptr;" in getter),
         ("cache miss transient owner still retained", "std::make_shared<std::vector<uint8_t>>(" in getter),
         ("evict size uses current owner", "found->second.data->size()" in scope),
