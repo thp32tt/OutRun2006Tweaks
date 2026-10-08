@@ -1525,7 +1525,7 @@ namespace OutRunVRRenderer
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
-			LastGameWvpSemanticScope = OutRunVR::GameSemantic::CurrentScope;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::EffectiveScope();
 			LastGameWvpQueueNodeEpoch =
 				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
 			LastGameWvpQueueNode =
@@ -1680,7 +1680,7 @@ namespace OutRunVRRenderer
 			// renderer head injection can happen first and R30 applies a second
 			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
 			const auto semanticScope =
-				OutRunVR::GameSemantic::CurrentScope;
+				OutRunVR::GameSemantic::EffectiveScope();
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
