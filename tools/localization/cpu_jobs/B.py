@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B294 P0 q060 white banner genuine plate reconstruction: source DDS+
+"""B295 P0 q060 white banner genuine plate reconstruction: source DDS+
 pinned native source-text mask, then retain only previously rendered Korean
 glyph pixels. Trial only until direct SOURCE/CLEAN/FINAL visual acceptance.
 """
@@ -13,7 +13,7 @@ G=Path("localization/graphics")
 P=G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
 F=G/"role_B/20261009-B289-Q060-P0-WHITE-FACE-PIXEL-MATERIAL/A064FDFC_B289_TRIAL_NOT_PROMOTED.dds"
 MASK=G/"role_B/20261004-B-RECOVERY02/A064FDFC_SOURCE_TEXT_MASK.png"
-OUT=G/"role_B/20261009-B294-Q060-P0-SOURCE-CLEAN-GLYPH-PLATE";OUT.mkdir(parents=True,exist_ok=True)
+OUT=G/"role_B/20261009-B295-Q060-P0-SOURCE-CLEAN-GLYPH-PLATE";OUT.mkdir(parents=True,exist_ok=True)
 E="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
 O="457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2"
 B289="068b4f5795e85b960493efad832f9060984387c978c4936f9708133e6227fb85"
@@ -59,7 +59,12 @@ assert int(glyph.sum())>30000
 result=painted.copy()
 # Strip source-title effects only. Preserve all unrelated prior localization
 # and source art even inside the larger source cell.
-result[english_fx]=0
+# The SOURCE CLEAN proof removes the complete English effect from y238.
+# The existing candidate has an unrelated protected sprite at y238..244:
+# the FINAL must not alter even a single existing pixel outside the
+# source's B-approved bbox. CURRENT already has no English text there.
+final_english_fx=english_fx&(yy>=245)
+result[final_english_fx]=0
 retain=glyph&upper
 result[retain]=painted[retain]
 # Lower/non-target atlas stays pixel exact; no source text/opaque plate survives
@@ -68,7 +73,7 @@ assert np.array_equal(result[~upper],painted[~upper])
 plate_no_english=int(np.count_nonzero(clean[english_fx,3]));assert plate_no_english==0
 # Debug leftover English ink in FINAL allowed only where Korean glyph replaces
 # old English; no self-claimed under-glyph source ghost.
-not_korean=english_fx&(~retain)
+not_korean=final_english_fx&(~retain)
 assert int(np.count_nonzero(result[not_korean,3]))==0
 # Fail if actual original source English glyph remnants survive anywhere
 # in the upper title band, including pixels above the catalogue bbox y245.
@@ -88,7 +93,7 @@ def plate(ar,background=(74,74,74,255)):
  x.alpha_composite(Image.fromarray(ar,"RGBA"))
  return x.convert("RGB")
 L,T,R,B=(1075,236,1950,399)
-views=[("ENGLISH",src),("SOURCE_CLEAN",clean),("CURRENT",old),("B289_MATERIAL",painted),("B294_FINAL",result)]
+views=[("ENGLISH",src),("SOURCE_CLEAN",clean),("CURRENT",old),("B289_MATERIAL",painted),("B295_FINAL",result)]
 for ratio in (100,75,50):
  cs=[]
  for key,ar in views:
@@ -98,17 +103,17 @@ for ratio in (100,75,50):
  sh=Image.new("RGB",(sum(c.width for c in cs)+len(cs)*4,max(c.height for c in cs)),(74,74,74))
  cx=0
  for c in cs:sh.paste(c,(cx,0));cx+=c.width+4
- sh.save(OUT/f"B294_SOURCE_CLEAN_OLD_MATERIAL_FINAL_{ratio}pct.png")
+ sh.save(OUT/f"B295_SOURCE_CLEAN_OLD_MATERIAL_FINAL_{ratio}pct.png")
 raws=[plate(np.flipud(ar[T:B,L:R])) for _,ar in views]
 sh=Image.new("RGB",(sum(c.width for c in raws)+len(raws)*4,max(c.height for c in raws)),(74,74,74))
 cx=0
 for c in raws:sh.paste(c,(cx,0));cx+=c.width+4
-sh.save(OUT/"B294_SOURCE_CLEAN_FINAL_RAW.png")
+sh.save(OUT/"B295_SOURCE_CLEAN_FINAL_RAW.png")
 Image.fromarray(clean[T:B,L:R],"RGBA").save(OUT/"SOURCE_CLEAN_NATIVE_RGBA.png")
 Image.fromarray(english_fx[T:B,L:R].astype("uint8")*255,"L").save(OUT/"SOURCE_WHITE_REMOVAL_MASK.png")
 Image.fromarray(retain[T:B,L:R].astype("uint8")*255,"L").save(OUT/"KOREAN_GLYPH_RESTORE_MASK.png")
-outpath=OUT/"A064FDFC_B294_TRIAL_NOT_PROMOTED.dds";outpath.write_bytes(outdds)
-qa={"schema_version":2,"role":"B","run":"B294","index":60,"priority":"P0","regression":"IGR-044",
+outpath=OUT/"A064FDFC_B295_TRIAL_NOT_PROMOTED.dds";outpath.write_bytes(outdds)
+qa={"schema_version":2,"role":"B","run":"B295","index":60,"priority":"P0","regression":"IGR-044",
 "source_sha256":E,"old_sha256":O,"material_trial_sha256":B289,"new_trial_sha256":sha(outdds),
 "source_mask_sha256":M,"plate_method":"SOURCE_NATIVE_NEUTRAL_FACE_AND_APPROVED_MASK_REMOVAL_WITH_2PX_FRINGE",
 "glyph_method":"RESTORE_SOURCE_CONDITIONED_B289_KOREAN_GLYPH_PRESERVE_OTHER_CURRENT_ART",
@@ -116,6 +121,7 @@ qa={"schema_version":2,"role":"B","run":"B294","index":60,"priority":"P0","regre
 "source_clean_english_effect_removed":int(english_fx.sum()),"source_clean_english_alpha_remaining":plate_no_english,
 "native_source_effect_upper_band":[1090,238,1930,335],
 "source_effect_above_catalog_bbox_covered":True,
+"final_source_effect_mask_protected_above_bbox":True,
 "native_upper_source_alpha_remaining":residual_upper_source,
 "source_clean_untouched_protected_outside_mask":True,
 "source_clean_final_english_ghost_outside_korean":0,
@@ -126,5 +132,5 @@ qa={"schema_version":2,"role":"B","run":"B294","index":60,"priority":"P0","regre
 "APPROVAL":False,"RUNTIME_VALIDATION":"UNTESTED",
 "backend":"GITHUB_ACTIONS_NO_BINARY_SOURCE_IN_CHATGPT_LOCAL",
 "exclusions":["VR","FFB","DX11","DXVK"]}
-(OUT/"B294_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B294","sha":sha(outdds),"changed":int(ch.sum()),"retained":int(retain.sum())}))
+(OUT/"B295_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B295","sha":sha(outdds),"changed":int(ch.sum()),"retained":int(retain.sum())}))
