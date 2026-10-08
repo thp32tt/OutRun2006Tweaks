@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "q214 A183R3 exact 4ff06dbe... is visual FAIL despite static PASS: broken Hangul strokes/BC3 red striping. Do not approve/ship, material rerender needed. localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
     "C273 q175 754F0599 exact A153 5b37fdaf... is REWORK_REQUIRED: preserve clean/bbox/source-left/RAW but reduce broad black extrusion/outline and rebuild thinner rounded/segmented techno Hangul family. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
     "C273 q161 55B57CDE exact A157 66a89385... is HOLD_STRICT_RECHECK: visual contact/RAW is favorable but current invocation was not pixels-first and lacks complete lossless per-region evidence. Preserve bytes; future C1 must inspect exact pixels before producer verdict and generate complete region evidence, then separate C3. RUNTIME_VALIDATION=UNTESTED.",
     "C272 q219 D263B3F1 exact A181R candidate 41cf4c15... is REWORK_REQUIRED: remove arbitrary 0.80 English-width targeting and rebuild rounded/segmented silver-techno Hangul with open counters while preserving A113 clean plate, exact bbox/margins, OutRun2 artwork and RAW mirror-Y. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + NEW actual-game retest. IGR-025 also remains HOLD for unresolved screenshot(163) labels. RUNTIME_VALIDATION=UNTESTED.",
@@ -6743,7 +6744,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T09:05:37+09:00",
+  "updated_at_kst": "2026-10-08T11:00:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10807,6 +10808,15 @@
       "status": "REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_EXTRUSION_WEIGHT"
     },
     "report": "localization/graphics/role_C/20261008-C273-C1-Q161-Q175-EVIDENCE/C273_BATCH_REPORT.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a183r3_q214_controller_fail": {
+    "queue_index": 214,
+    "run": "20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX",
+    "candidate_sha256": "4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1",
+    "controller_visual_qa": "FAIL",
+    "status": "REWORK_REQUIRED",
+    "report": "localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }

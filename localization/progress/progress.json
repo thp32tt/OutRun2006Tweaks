@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T09:05:37+09:00",
+  "updated_at_kst": "2026-10-08T11:00:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6739,5 +6739,14 @@
     "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a183r3_q214_controller_fail": {
+    "queue_index": 214,
+    "run": "20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX",
+    "candidate_sha256": "4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1",
+    "controller_visual_qa": "FAIL",
+    "status": "REWORK_REQUIRED",
+    "report": "localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }

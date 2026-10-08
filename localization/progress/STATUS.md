@@ -2782,3 +2782,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q175 754F0599 @ 5b37fdaf...: **REWORK_REQUIRED**. Numeric 3/3 containment PASS is overridden by source-style visual FAIL: Korean family remains too square/heavy and dark extrusion/outline forms broad block bands versus the thin rounded metallic source; C3 BLOCKED.
 - No PRE_INGAME export change. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+
+
+### 2026-10-08 A183R3 q214 controller visual rejection
+- q214 BF229CF4 exact `4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1`: machine 2/2 bbox/zero decoded outside PASS, but visible Hangul glyph-stripe/broken-stroke/plate-showthrough FAIL. Rework required; C2/C3/PRE_INGAME blocked; runtime untested.
