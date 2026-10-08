@@ -14,8 +14,11 @@ on:
       - 'OutRun2006Tweaks.ini'
       - 'OutRun2006Tweaks.lods.ini'
       - 'localization/text/runtime_ko.tsv'
-      - 'localization/graphics/asset_queue.csv'
-      - 'localization/graphics/hd_candidates/**'
+      # Candidate DDS and queue edits are not export approvals. Avoid rebuilding
+      # Windows on every A/B/C evidence-only recheck or unapproved rerender.
+      # C export must refresh this manifest when exact-SHA approvals change.
+      - 'localization/graphics/role_C/APPROVALS/**'
+      - 'localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json'
   workflow_dispatch:
 
 jobs:
