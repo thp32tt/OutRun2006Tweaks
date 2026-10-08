@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 19:00 KST",
+  "updated_at_kst": "2026-10-08T19:06:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7618,5 +7618,24 @@
     "runtime_validation": "UNTESTED",
     "new_dds": 0,
     "qa": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/C297_CONTROLLER_QA.json"
+  },
+  "a193_q225_true_black_family": {
+    "role": "A",
+    "queue_index": 225,
+    "status": "PRODUCER_SELF_QA_PASS_PENDING_C1",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "new_candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "supersedes_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+    "total_regions": 9,
+    "producer_machine_pass": 9,
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "residue": 0,
+    "overlap": 0,
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CONTROLLER_SELF_QA.json"
   }
 }
