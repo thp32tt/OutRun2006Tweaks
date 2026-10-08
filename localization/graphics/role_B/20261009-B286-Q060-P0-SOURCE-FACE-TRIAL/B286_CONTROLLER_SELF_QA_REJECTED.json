@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B286",
+  "run_key": "OUTRUN-KOR-B286-Q060-IGR044-SOURCE-FACE-REJECTED-20261009",
+  "selected_according_to": "B EVEN + P0 IGR-044 owner_lane=B; rework_triage --index 60 --require-safe-rerender => MATERIAL_REWORK",
+  "queue_index": 60,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "english_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "prior_candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "new_trial_sha256": "8b93dba89b2343bf8e24f966914811fd3bb2510b4006e964a27e3640285f6015",
+  "trial_path": "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/A064FDFC_B286_TRIAL_NOT_PROMOTED.dds",
+  "source_format": "RGBA32_mip1",
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "orientation": "RAW_MIRROR_Y",
+  "github_action_run": 37823894161,
+  "github_worker_commit": "1aee64af8bee995ffe38550b98f6273f57d8d547",
+  "machine": {
+    "persisted_dds_decode_exact": true,
+    "dds_header_exact": true,
+    "changed_rgba_pixels_outside_3_original_bboxes": 0,
+    "changed_alpha_pixels_outside_3_original_bboxes": 0,
+    "source_bbox_positive_margin": "3/3",
+    "new_working_trial_dds": 1,
+    "new_production_candidate_dds": 0
+  },
+  "producer_visual": "FAIL_REJECTED",
+  "candidate_promoted": false,
+  "per_region": [
+    {
+      "region": "stage",
+      "source_bbox": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "trial_effect_bbox": [
+        466,
+        252,
+        680,
+        346
+      ],
+      "observation": "Native SOURCE/CLEAN/OLD/TRIAL comparison: source yellow/white/navy rounded italic family and strong white edge contrasted with trial large flat angular yellow characters with heavy dark outline, insufficient white rim and mismatched original shape.",
+      "result": "FAIL_SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH"
+    },
+    {
+      "region": "outrun_miles_white",
+      "source_bbox": [
+        1090,
+        245,
+        1930,
+        385
+      ],
+      "trial_effect_bbox": [
+        1121,
+        249,
+        1907,
+        381
+      ],
+      "observation": "Opaque white/gray native trial improves fill versus rejected hollow metallic old candidate, but English reference is much more condensed, slanted and softer; trial generic bulky Korean family fails source contour, italic hierarchy and edge fidelity.",
+      "result": "FAIL_SOURCE_FAMILY_CONDENSED_SLANT_MISMATCH"
+    },
+    {
+      "region": "outrun_miles_gold",
+      "source_bbox": [
+        2081,
+        250,
+        2860,
+        370
+      ],
+      "trial_effect_bbox": [
+        2108,
+        256,
+        2835,
+        366
+      ],
+      "observation": "English italic cream/gold bevel/extrusion has narrow directionally leaning letterforms; trial becomes blocky broad flat golden Hangul and cannot reproduce intended slant/volume. Native source/clean/old/trial shows visually different family.",
+      "result": "FAIL_SOURCE_FAMILY_BEVEL_CONTOUR_MISMATCH"
+    }
+  ],
+  "ordered_rework_visual": [
+    {
+      "step": 1,
+      "english_removal_clean_plate": "HOLD_NEEDS_CANONICAL_PLATE_ONLY_APPROVAL: synthetic zeroed text rectangles do not constitute source-faithful proven restoration"
+    },
+    {
+      "step": 2,
+      "source_readable_slant": "FAIL_SOURCE_CONTOUR_AND_RIGHT_LEAN_MISMATCH"
+    },
+    {
+      "step": 3,
+      "relative_size": "MACHINE_CONTAINMENT_PASS_BUT_STYLE_HIERARCHY_FAIL"
+    },
+    {
+      "step": 4,
+      "fill_weight_outline_shadow": "FAIL_STOCK_TYPEFACE_EFFECT_FIDELITY"
+    },
+    {
+      "step": 5,
+      "clipped_glyphs": "MACHINE_BBOX_POSITIVE_MARGIN_PASS"
+    },
+    {
+      "step": 6,
+      "protected_art": "OUTSIDE_THREE_SOURCE_BBOX_CHANGED_ZERO; PROTECTED_MASK_NOT_INDEPENDENTLY_VERIFIED"
+    },
+    {
+      "step": 7,
+      "raw_flipy": "DDS_ROUNDTRIP_PASS; persisted PNGs authored RAW and readable"
+    },
+    {
+      "step": 8,
+      "immediate_readability": "READABLE_BUT_VISUAL_SOURCE_STYLE_FAIL"
+    }
+  ],
+  "production_gates": {
+    "PLATE_ONLY": "HOLD_NOT_INDEPENDENTLY_QUALIFIED",
+    "COMPOSITE_CONTAMINATION": "HOLD_NOT_INDEPENDENTLY_QUALIFIED",
+    "native_persisted_view": "INSPECTED_FAIL_FAMILY",
+    "practical_75_50": "PROOF_SAVED_NOT_INDEPENDENT_PASS",
+    "C": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_ingame": "OPEN_USER_INGAME_FAIL",
+    "APPROVAL": false
+  },
+  "next_material_method": "Avoid Noto bold/shear-only/flat sampled palette. Construct source-derived source-mask-approved CLEAN and actual native per-glyph white-rim/navy/cream/bevel/soft white face contours with measured right-italic family; confirm independently before replacing the current candidate. Recheck exact 1-pixel source bounds, RAW, 100/75/50 and composited game.",
+  "defect_codes": [
+    "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+    "SOURCE_FAMILY_CONDENSED_SLANT_MISMATCH",
+    "SOURCE_FAMILY_BEVEL_CONTOUR_MISMATCH"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub-hosted full-size DDS trial; N100 MCP transport/read-only image previews only; ChatGPT controller visual comparison",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "evidence": [
+    "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/stage_SOURCE_CLEAN_OLD_TRIAL_100pct.png",
+    "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/outrun_miles_white_SOURCE_CLEAN_OLD_TRIAL_100pct.png",
+    "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/outrun_miles_gold_SOURCE_CLEAN_OLD_TRIAL_100pct.png",
+    "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/B286_MACHINE_QA.json"
+  ]
+}
