@@ -1957,9 +1957,13 @@ namespace OutRunVRStereo
                     : R30ScreenSpaceKind::None;
             }
 
-            // R50: canonical queue membership proves generic 2D ownership but
-            // not finite/world-locked HUD ownership. This class receives only
-            // the per-eye asymmetric-FOV affine.
+            // Generic queue membership is not an exact named HUD or
+            // world producer, but R51's *accepted* ScreenOverlay2D VS
+            // route also enters R30BuildScreenSpaceEyeConstants' finite,
+            // recentered common HUD plane (after original c64 proof).
+            // The fixed-function XYZRHW route independently builds that
+            // finite plane. Do not confuse this early semantic return
+            // with the final per-eye transformation or widen unknown alpha.
             if (semanticOverlay2D)
                 return R30ScreenSpaceKind::ScreenOverlay2D;
 
