@@ -15,9 +15,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00459",
   "lease_epoch": 1,
   "base_sha": "fe6981cdb715efd7a03337d03059ed8915b55868",
-  "status": "VALIDATING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_GITHUB_CI",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "native_draw_path_activation_changed": false,
   "draw_dispatch_authorized": false,
@@ -29,16 +29,42 @@
     "C0_RECOVER": "PASS: GitHub HEAD and 00458 complete; 00459 missing; ATTEMPT 1/3 rollover not retry",
     "C1_REVIEW": "PASS: programmable VS/PS pipeline immediate context is already validated; R96 fixed-function WVP b0 accepts same-device deferred recording as live binding",
     "C2_IMPLEMENT": "PASS: R151 immediate-context fail-closed upload/readiness with WARP deferred-negative/immediate-positive receipt tests",
-    "C3_VALIDATE": "PENDING: material exact-SHA hosted Backend Conversion Gate and DX11 readiness smoke",
-    "C4_COMMIT": "PENDING material Git commit",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37818980553 validate 113454809137 SUCCESS and DX11 readiness smoke 113457231086 SUCCESS; WARP R151 probe; artifact 11569006126 sha256:c72ca571b3bb8fb848f157bef93a0b33db5044a1799d79dcde84be3dfe6f92e9",
+    "C4_COMMIT": "PASS: source/probe material commit e9933da2c7e33e13f309fddbd457d3712238a534 [AUTO:CONVERSION-DX11-00459]",
     "C5_PACKAGE": "NOT_REQUIRED: dormant b0 guard and WARP test only, no Draw path activation or HMD deploy",
-    "C6_STATE": "PENDING exact-SHA CI result and durable closeout"
+    "C6_STATE": "PASS: material exact-SHA CI, artifact digest, Issue #14 ledger, dormant Draw, runtime UNTESTED and next work item persisted"
   },
-  "static_validation": "PASS: single scoped source/test invariant and negative/positive source checks before CI; no Win32 execution claimed",
+  "static_validation": "PASS: scoped invariant check plus exact-SHA Windows C++/WARP probe and DX11 readiness smoke",
   "state_persisted": true,
-  "next_action": "Inspect material SHA GitHub Actions Backend Conversion Gate validate and dx11-smoke exact result; seal C6 only on SUCCESS, otherwise repair same TASK_ID.",
+  "next_action": "00459 terminal. Under a NEW TASK_ID inspect an unaddressed DX11 native device/context/binding receipt gap after excluding protected R149/R150/R151; Quest3/VDXR exact-build HMD test still required before native Draw promotion.",
   "blockers": [
-    "Quest3/VDXR hardware validation not performed"
+    "Quest3/VDXR hardware runtime untested; no native Draw activation or promotion"
   ],
-  "last_activity_evidence": "R151 source and probe material commit preparation"
+  "last_activity_evidence": "Exact material SHA e9933da2c7e33e13f309fddbd457d3712238a534: validate 113454809137 and smoke 113457231086 SUCCESS; WARP R151 deferred negative/immediate positive; artifact 11569006126",
+  "result_sha": "e9933da2c7e33e13f309fddbd457d3712238a534",
+  "material_result_sha": "e9933da2c7e33e13f309fddbd457d3712238a534",
+  "validation_bearing_sha": "e9933da2c7e33e13f309fddbd457d3712238a534",
+  "validation_bearing_result_sha": "e9933da2c7e33e13f309fddbd457d3712238a534",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "validation_run_id": 37818980553,
+  "validation_job_id": 113454809137,
+  "readiness_smoke_job_id": 113457231086,
+  "artifact_id": 11569006126,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-e9933da2c7e33e13f309fddbd457d3712238a534",
+  "artifact_digest": "sha256:c72ca571b3bb8fb848f157bef93a0b33db5044a1799d79dcde84be3dfe6f92e9",
+  "issue14_comment_id": 6065713884,
+  "recorded_at_utc": "2026-10-08T17:55:08.160Z",
+  "last_real_activity_at": "2026-10-08T17:55:08.160Z",
+  "evidence": {
+    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
+    "ci_gate": "PASS_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN",
+    "backend_conversion_gate_run_id": 37818980553,
+    "validate_job_id": 113454809137,
+    "readiness_smoke_job_id": 113457231086,
+    "artifact_id": 11569006126,
+    "artifact_digest": "sha256:c72ca571b3bb8fb848f157bef93a0b33db5044a1799d79dcde84be3dfe6f92e9",
+    "ci_head_sha": "e9933da2c7e33e13f309fddbd457d3712238a534",
+    "warp_transform_probe": "PASS: R151 same-device deferred VS b0 recording rejected; immediate WVP binding/snapshot validated"
+  }
 }
