@@ -82,8 +82,8 @@ rgba[:,:,3]=np.clip(np.rint(target_alpha*255),0,255).astype(np.uint8)
 # Hard native source bbox guard and exact target region; keep antialias vanishing
 # beyond full 4x4 editable blocks to avoid changing protected source pixels.
 rgba[~editmask]=0
-rgba[(rgba[:,:,3]<10)]=0
-result[:,:,:]=rgba
+rgba[rgba[:,:,3]<10]=0
+result[editmask]=rgba[editmask]
 # Completely transparent plate must remain transparent; no foreign patches.
 if np.any(result[:,:,3][~srcmask]):raise RuntimeError("target escapes canonical source bbox")
 if not np.any((result[:,:,3]>16)&editmask):raise RuntimeError("no visible Korean glyph")
@@ -130,7 +130,7 @@ for by in range(8,116,4):
 for by in (8,):
     for bx in range(580,1524,4):
         offset=128+(((height-by-4)//4)*(width//4)+(bx//4))*16
-        before=bytes(raw[offset:offset+8]);prev=decode(old)[by:by+4,bx:bx+4,3]
+        before=bytes(raw[offset:offset+8]);prev=current[by:by+4,bx:bx+4,3]
         changed=(prev[:3,:]!=0)
         if not np.any(changed):continue
         a=prev.copy();a[:3,:]=0
