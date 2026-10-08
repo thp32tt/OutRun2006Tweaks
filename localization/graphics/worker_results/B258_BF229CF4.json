@@ -1,0 +1,12 @@
+{
+  "role": "B",
+  "run": "20261008-B258-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "BF229CF4",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "prior_sha256": "132ba8d5159196eb68d6635a7331fc08ed0269a1512acbf9abff2226fd9fe183",
+  "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "status": "MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_B/20261008-B258-Q214-BC3-FACE-PRIORITY/B258_BF229CF4_REPORT.json",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
