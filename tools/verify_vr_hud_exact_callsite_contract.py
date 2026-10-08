@@ -96,7 +96,7 @@ def check_extra_producers(ui, contracts):
                 r'%s\s*=\s*safetyhook::create_mid\s*\(\s*'
                 r'Module::exe_ptr\(ResultProgressCall%s%s\),\s*ResultProgress%s\);'
             )
-            expr = ''.join(expected) % (name, edge, ' + 5' if side == 'Leave' else '', side)
+            expr = ''.join(expected) % (name, edge, r'\s*\+\s*5' if side == 'Leave' else '', side)
             if len(re.findall(expr, ui, re.S)) != 1:
                 fail('wrong/missing original exact result-progress ' + name)
 
