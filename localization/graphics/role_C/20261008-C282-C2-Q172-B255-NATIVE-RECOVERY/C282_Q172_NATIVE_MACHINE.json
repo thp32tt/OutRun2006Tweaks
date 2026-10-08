@@ -1,0 +1,65 @@
+{
+  "run": "C282-C2-Q172",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "header_identical": true,
+  "native_size": [
+    1024,
+    1024
+  ],
+  "source_current_changed_RGBA_outside": 0,
+  "source_current_changed_alpha_outside": 0,
+  "source_current_changed_RGBA_inside": 3520,
+  "regions": [
+    {
+      "id": "start",
+      "readable_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "raw_bbox": [
+        55,
+        628,
+        136,
+        651
+      ],
+      "raw_flip_y_parity": true,
+      "source_cream_color_profile": {
+        "foreground_pixels": 1095,
+        "global_top_minus_bottom_median_x": 7.0
+      },
+      "current_cream_color_profile": {
+        "foreground_pixels": 814,
+        "global_top_minus_bottom_median_x": 1.0
+      },
+      "src_rgba_changed_inside": 1755
+    },
+    {
+      "id": "goal",
+      "readable_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "raw_bbox": [
+        595,
+        365,
+        672,
+        389
+      ],
+      "raw_flip_y_parity": true,
+      "source_cream_color_profile": {
+        "foreground_pixels": 1067,
+        "global_top_minus_bottom_median_x": 1.25
+      },
+      "current_cream_color_profile": {
+        "foreground_pixels": 530,
+        "global_top_minus_bottom_median_x": 5.0
+      },
+      "src_rgba_changed_inside": 1765
+    }
+  ]
+}

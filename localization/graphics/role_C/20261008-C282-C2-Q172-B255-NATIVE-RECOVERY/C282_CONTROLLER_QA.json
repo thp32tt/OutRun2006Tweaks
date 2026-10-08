@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C282-C2-Q172-B255-NATIVE-RECOVERY",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "source": {
+    "origin": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
+  },
+  "current": {
+    "producer": "B255",
+    "sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2"
+  },
+  "rejected_prior": {
+    "producer": "B251",
+    "sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018"
+  },
+  "backend": "GitHub connector is SSOT; N100 MCP for exact DDS bytes and native decode because ChatGPT local sandbox cannot resolve raw.githubusercontent.com; no GitHub Actions or VR work",
+  "machine_report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_NATIVE_MACHINE.json",
+  "comparative_delta_report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_B251_B255_DELTA.json",
+  "machine_result": {
+    "source_candidate_header_exact": true,
+    "source_current_1024x1024_RGBA32_mip1": true,
+    "source_current_RGBA_outside_two_source_boxes": 0,
+    "source_current_alpha_outside_two_source_boxes": 0,
+    "source_current_RGBA_inside": 3520,
+    "B251_B255_RGBA_inside": 1819,
+    "B251_B255_RGBA_outside": 0,
+    "RAW_FLIPY_exact_per_region": 2,
+    "protected_map_outside_boxes_byte_exact": true
+  },
+  "visual_comparison": {
+    "source_vs_current": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_SOURCE_CURRENT_NEAREST7.png",
+    "source_vs_rejected_vs_current": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_SOURCE_B251_B255_SIDE_BY_SIDE.png",
+    "full_map": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_FULL_ATLAS_50.png",
+    "practical": [
+      "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_PRACTICAL_100.png",
+      "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_PRACTICAL_75.png",
+      "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_PRACTICAL_50.png"
+    ],
+    "source_style": "Canonical START and GOAL show strong right-lean italic cream/orange lettering on red badges.",
+    "new_candidate_style": "New B255 Hangul contains visually clear right-lean top displacement on both words compared with near-upright B251; cream/orange family restored with readable glyphs. Exact source-glyph-only top/bottom anchors and independent clean plate still unverified; comparison not equivalent to final source-style PASS.",
+    "current_relative_to_prior": "Genuine repair 1,819 pixels confined to original two source boxes, not a stale recheck; no objectively definite new right-slant inversion, protected-area overflow or clipped Korean syllable in shown native/50% pixel contact."
+  },
+  "region_observations": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "readable_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "raw_bbox": [
+        55,
+        628,
+        136,
+        651
+      ],
+      "observations": {
+        "slant": {
+          "state": "VISUAL_IMPROVED_PENDING_EXACT_ANCHORS",
+          "detail": "Rightward lean is visibly introduced over B251; comparison with source confirmed correct directional impression but quantitative glyph-only anchors are not verified."
+        },
+        "clean_plate": {
+          "state": "HOLD",
+          "detail": "Exact B255 CLEAN/foreground separation not independently hash-bound."
+        },
+        "style": {
+          "state": "VISUAL_REVIEWED_NO_DEFINITE_REJECTION",
+          "detail": "Cream/orange italic treatment approximates source better than B251; no assertion of final family equivalence."
+        },
+        "readability": {
+          "state": "VISIBLE_AT_NATIVE_AND_50",
+          "detail": "출발 is recognizable at reviewed native zoom and atlas 50% overview; real game untested."
+        },
+        "glyph_integrity": {
+          "state": "NO_DEFINITE_BREAK_IN_SHOWN_VIEWS",
+          "detail": "No obvious missing syllable or clipped component in reviewed native-lossless/50% views."
+        },
+        "protected_art": {
+          "state": "MACHINE_PASS_SCOPE",
+          "detail": "Zero source-current changed RGBA/alpha outside exact two boxes; rim corner inside text box requires CLEAN evidence."
+        },
+        "placement": {
+          "state": "HOLD",
+          "detail": "Glyph-only source bbox and baseline not independently measured; do not infer from opaque badge alpha."
+        },
+        "orientation": {
+          "state": "RAW_FLIPY_EXACT",
+          "detail": "Reflected raw rectangle y=628..651 matches readable 373..396."
+        }
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/01_start_SOURCE.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/01_start_FINAL.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/01_start_SOURCE_RAW.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/01_start_FINAL_RAW.png"
+      ]
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "readable_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "raw_bbox": [
+        595,
+        365,
+        672,
+        389
+      ],
+      "observations": {
+        "slant": {
+          "state": "VISUAL_IMPROVED_PENDING_EXACT_ANCHORS",
+          "detail": "Current Korean upper face now visibly leans right compared with earlier B251 upright face; precise source top/bottom glyph-only displacement unverified."
+        },
+        "clean_plate": {
+          "state": "HOLD",
+          "detail": "Exact B255 CLEAN plate remains unbound for the current source."
+        },
+        "style": {
+          "state": "VISUAL_REVIEWED_NO_DEFINITE_REJECTION",
+          "detail": "Cream/gold and right-lean treatment resembles source more than B251; source remains wider/bolder, no arbitrary width stretch threshold."
+        },
+        "readability": {
+          "state": "VISIBLE_AT_NATIVE_AND_50",
+          "detail": "골 remains recognizable on the badge in 50% full atlas."
+        },
+        "glyph_integrity": {
+          "state": "NO_DEFINITE_BREAK_IN_SHOWN_VIEWS",
+          "detail": "No definite broken current Korean stroke in native/50% evidence."
+        },
+        "protected_art": {
+          "state": "MACHINE_PASS_SCOPE",
+          "detail": "Source-current changes outside text regions zero, area-local clean evidence missing."
+        },
+        "placement": {
+          "state": "HOLD",
+          "detail": "Exact glyph baseline/source letter slant anchors unverified."
+        },
+        "orientation": {
+          "state": "RAW_FLIPY_EXACT",
+          "detail": "Reflected raw y=365..389 matches readable y=635..659."
+        }
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/02_goal_SOURCE.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/02_goal_FINAL.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/02_goal_SOURCE_RAW.png",
+        "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/02_goal_FINAL_RAW.png"
+      ]
+    }
+  ],
+  "C": {
+    "decision": "HOLD_STRICT_RECHECK",
+    "pixels_before_producer_verdict": false,
+    "calibration": "NOT_QUALIFIED_NOT_PERFORMED_CURRENT_RUN",
+    "source_relative_slope": "UNPROVEN_GLYPH_ANCHORS",
+    "clean_plate": "MISSING_EXACT_HASH_BINDING",
+    "eight_checks": "OBSERVATIONS_RECORDED_BUT_UNRESOLVED_FIELDS_NOT_PASS",
+    "reason": "Fresh B255 materially repairs former C281 right-italic defect without new obvious visual FAIL, but the complete evidence-gate criteria are not fulfilled. No false C PASS."
+  },
+  "C3": {
+    "decision": "BLOCKED_UNTIL_QUALIFIED_C_PASS",
+    "separate_review_performed": false
+  },
+  "approval_record_created": false,
+  "export": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds_candidate_created_by_C": false,
+  "required_next": "Producer should supply exact B255 clean-plate and source-glyph-only slant anchors, preserve candidate bytes. Next independent pixels-first C2 with valid known-good calibration and explicit family/mip/black-white-gray region evidence can then decide C PASS or precise defect; follow with a separate C3 before export. Do not blindly regenerate for evidence migration.",
+  "cleanup": "PENDING_REMOTE_VERIFICATION",
+  "forbidden_domains_touched": []
+}
