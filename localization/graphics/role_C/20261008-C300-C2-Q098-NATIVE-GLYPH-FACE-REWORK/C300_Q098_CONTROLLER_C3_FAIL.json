@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "run": "C300-C2",
+  "run_key": "OUTRUN-KOR-C300-C2-Q098-NATIVE-GLYPH-FAIL-20261008-1950",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "quality_stage": "C3_STRICT_AUDIT_EARLY_HARD_FAILURE",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 98,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "selection_head": "10595a3a75b46330e004a60f66c190c597cd4b5e",
+  "source_revision": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "source_path": "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "source_blob_sha": "04af6f19533c54e84f6bca3cd29e53aa1abf98d6",
+  "source_sha256_from_C126_evidence": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "candidate_blob_sha": "24afe2d075cf43c7ddd246b4c245cde76b43f4fa",
+  "candidate_sha256_from_C126_evidence": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+  "source_candidate_native_decode": "2048x128 BC3/DXT5 mip1; both files fetched as current GitHub bytes and decoded independently by controller; 1:1 readable FLIP-Y alpha-composited source/top and candidate/bottom compared",
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "prior_C": "C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_machine_report": "localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_MACHINE_QA.json",
+  "machine_crosscheck": {
+    "changed_rgba_pixels_unconditional": 97029,
+    "changed_rgba_outside_source_bbox_unconditional": 14,
+    "unconditional_rgba_note": "Includes hidden RGB in alpha-zero pixels; do not interpret as proven visible 1px overflow without alpha-weighted recheck.",
+    "source_visible_alpha_gt16_pixels": 84642,
+    "candidate_visible_alpha_gt16_pixels": 66311,
+    "source_candidate_same_dimensions": true,
+    "visually_independent_canonical_decode": true
+  },
+  "existing_review_images": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_ROW_CONTACT_2X.jpg"
+  ],
+  "findings": {
+    "slant": {
+      "result": "NOT_APPROVED",
+      "observation": "Readable rightward shear appears broadly aligned but exact semantic glyph stem anchors were not established."
+    },
+    "clean_plate": {
+      "result": "NOT_REAPPROVED",
+      "observation": "No new native clean plate proof was independently certified in this fail-fast audit."
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Source English face has smooth continuous white interior whereas decoded Korean face exhibits repetitive blue/gray dotted horizontal perforations inside white glyphs; visual mismatch remains visible in current native FLIP-Y and existing 2x gray and white contacts."
+    },
+    "readability": {
+      "result": "FAIL_VISUAL_QUALITY",
+      "observation": "Sentence can be read but speckled glyph fill degrades practical-scale quality; numeric containment PASS insufficient."
+    },
+    "glyph_integrity": {
+      "result": "FAIL",
+      "observation": "Repeated horizontal discontinuities/striping within many Hangul white fill strokes; original source does not share this texture. Source-matched decoded rebuild required. This is a source-style/glyph-face defect; do not claim source glyph omission."
+    },
+    "protected_art": {
+      "result": "NOT_REAPPROVED",
+      "observation": "14 unqualified RGBA differences beyond original bbox require alpha-aware visible-pixel separation; prior C126 zero-allowed evidence not treated as newly verified."
+    },
+    "placement": {
+      "result": "LEGACY_NUMERIC_PASS_ONLY",
+      "observation": "Prior C126 original [431,6,1674,123] and candidate [580,11,1523,116] had positive margins; no current C3 PASS."
+    },
+    "orientation": {
+      "result": "READABLE_FLIP_Y_INSPECTED",
+      "observation": "Independently decoded RAW DDS and source/candidate flipped Y into readable screenshot; native source/candidate equal header dimensions. Real-game sprite/UV path untested."
+    }
+  },
+  "calibration": "NOT_CURRENT_QUALIFIED; this is a hard visual FAIL, not a PASS/approval attempt",
+  "C3_decision": "REWORK_REQUIRED",
+  "C_legacy_pass": "SUPERSEDED_FOR_CURRENT_C3",
+  "approval": false,
+  "export": false,
+  "user_acceptance": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "produced_dds": 0,
+  "reconstruction_required": "A/B: derive source smooth white face, navy outline, italic direction and original clean plate; remove DXT5/renderer-induced dotted glyph interiors while maintaining <= source exact bbox, protected art and native 100/75/50/RAW visual QA; then fresh independent C2 and separate C3.",
+  "evidence_caveat": "Current independent lossless decoded pixels were visually examined in the controller but a lossless crop has not yet been persisted. Legacy JPEGs are supporting comparison only, not evidence-backed APPROVALS. Do not mark C3_STRICT_PASS or approved export.",
+  "cleanup": "No persistent GPT scratch or N100 compute was created.",
+  "prohibited_domains_touched": []
+}
