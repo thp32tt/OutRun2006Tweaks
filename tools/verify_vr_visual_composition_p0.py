@@ -496,6 +496,89 @@ for label, corrupt in (
     else:
         raise SystemExit("result provenance defect was not rejected: " + label)
 
+# R64 USER_RUNTIME_VERIFIED: 6th/6 fused and HudScale respected in
+# OutRun2_VR_R64_TEXT_DISPRANK_20260927.zip, while result time/arrows failed.
+# A post-D3DXSprite::Draw Flush on *exact* projected car rank and DispRank
+# source was physically removed by R84 despite R62 GPU draw restoration.
+# Never flush generic ScreenHud, option arrows, GOAL, +TIME or F11.
+def verify_r64_exact_sprite_isolation(ui_source, sem_source):
+    for rva in ('0xB9F3A', '0xB9F5E', '0xB9F81', '0xB9FD0',
+                '0xB9FFC', '0xBA01E', '0xBA035', '0xBA052'):
+        right = function_body(ui_source,
+                              'static bool IsExactDispRankRightClipRva(')
+        require('case ' + rva + ':', right,
+                'R64 exact DispRank kind0 caller omitted')
+    wrapper = function_body(
+        ui_source, 'static int __cdecl DispRankRight_putClipSprite(')
+    for token in ('AddSpriteSpacing(&x, false);',
+                  'Game::put_clip_sprite(',
+                  'TagAppendedNodes(before,',
+                  'ProducerToken::DispRankClipSprite'):
+        require(token, wrapper,
+                'R64 DispRank kind0 source lost original dimensions/scope')
+    install = function_body(ui_source, 'bool apply() override')
+    # UIScaling is the first Hook subclass; keep exact 8 E8 routing,
+    # original unrelated time/right sprites use the old common wrapper.
+    for token in ('IsExactDispRankRightClipRva(addr)',
+                  '? DispRankRight_putClipSprite',
+                  ': ExactScreenHudRight_putClipSprite'):
+        require(token, install, 'R64 exact callsite selection')
+    draw = function_body(ui_source, 'static HRESULT __stdcall DrawDest(')
+    for token in ('QueueRenderActive()',
+                  'CurrentProjectedMarker()',
+                  'CorroboratesProjectedWorldMarker(',
+                  'CorroboratesHud(scope)',
+                  'ProducerToken::DispRankFirst',
+                  'ProducerToken::DispRankClipSprite',
+                  'vtable[10]',
+                  'reinterpret_cast<FlushFn>(vtable[10])(self)',
+                  'VR R64 D3DX ISOLATE RESTORED:'):
+        require(token, draw, 'HMD proven R64 D3DXSprite isolation')
+    require_order(draw, 'original D3DXSprite Draw before bounded Flush',
+                  'Draw_hk.stdcall<HRESULT>(',
+                  'if (FAILED(hr)',
+                  'const bool projectedRank',
+                  'const bool dispRankHud',
+                  'reinterpret_cast<FlushFn>(vtable[10])(self)')
+    if 'ProducerToken::TextGlyphPutSprite' in draw or (
+            'ProducerToken::ResultProgress' in draw) or (
+            'ProducerToken::GoalTime020' in draw):
+        raise SystemExit('R64 flush accidentally widened to result/font')
+    for token in ('        DispRankClipSprite,',
+                  'case ProducerToken::DispRankClipSprite:'):
+        require(token, sem_source,
+                'R64 DispRank kind0 category not preserved across queue')
+    starter = function_body(ui_source, 'static DWORD WINAPI InstallThread(')
+    for token in ('0x55B218', 'vtable[9]', 'vtable[10]',
+                  'safetyhook::create_inline('):
+        require(token, starter, 'R64 hooked original D3DXSprite vtable/ABI')
+
+verify_r64_exact_sprite_isolation(ui, sem)
+for label, bad in (
+    ('D3DX Draw hook removed', ui.replace(
+        'vtable[9], reinterpret_cast<void*>(&DrawDest)',
+        'vtable[8], reinterpret_cast<void*>(&DrawDest)', 1)),
+    ('D3DX Flush missing', ui.replace(
+        'reinterpret_cast<FlushFn>(vtable[10])(self)',
+        'D3D_OK', 1)),
+    ('6th kind0 exact call omitted', ui.replace(
+        'case 0xB9F3A:', 'case 0xBADDD:', 1)),
+    ('DispRank right glyph aliases arbitrary text', ui.replace(
+        'ProducerToken::DispRankClipSprite);',
+        'ProducerToken::ExactScreenHudClipSprite);', 1)),
+    ('generic menu text incorrectly flushed', ui.replace(
+        'ProducerToken::DispRankClipSprite);',
+        'ProducerToken::TextGlyphPutSprite);', 1)),
+):
+    if bad == ui:
+        raise SystemExit('R64 negative control failed to mutate: ' + label)
+    try:
+        verify_r64_exact_sprite_isolation(bad, sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('R64 6th/6 Flush regression escaped: ' + label)
+
 # R62 USER_RUNTIME_VERIFIED: ordinal 4th/5th were single and tracked
 # vehicles through head motion only when the exact D3DXSprite FVF 0x142
 # DrawIndexedPrimitive owner existed. The R84 refactor silently removed
