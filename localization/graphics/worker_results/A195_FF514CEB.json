@@ -1,0 +1,24 @@
+{
+  "run": "20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION",
+  "queue_index": 237,
+  "asset": "FF514CEB",
+  "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+  "localized_physical_rows": 9,
+  "bbox_size_positive_margin": "9/9 PASS",
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 470207,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "worker_status": "A195_WORKER_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_FF514CEB_REPORT.json"
+}
