@@ -1,0 +1,7 @@
+{
+  "role": "B",
+  "run": "20261008-B254-Q172-SOURCE-RIGHT-ITALIC",
+  "candidate_sha256": "26381bbba897a303934908a6057d5a7a04ae7e8ff16eee2cdb77780ca43a2110",
+  "status": "B254_MACHINE_PASS_PENDING_CONTROLLER",
+  "qa_path": "localization/graphics/role_B/20261008-B254-Q172-SOURCE-RIGHT-ITALIC/B254_MACHINE_QA.json"
+}
