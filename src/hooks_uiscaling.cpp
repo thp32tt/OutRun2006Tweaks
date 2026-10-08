@@ -1016,6 +1016,44 @@ class UIScaling : public Hook
 			xstnum, x, y, flags, priority, color);
 	}
 
+	// R64 exact 6th/6 kind-0 source. Unlike generic C2C/time/right
+	// clips, these eight canonical DispRank E8 edges are the only source
+	// eligible for the HMD-proven post-ID3DXSprite::Draw Flush isolate.
+	static bool IsExactDispRankRightClipRva(int rva) noexcept
+	{
+		switch (rva)
+		{
+		case 0xB9F3A: case 0xB9F5E: case 0xB9F81:
+		case 0xB9FD0: case 0xB9FFC: case 0xBA01E:
+		case 0xBA035: case 0xBA052:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	static int __cdecl DispRankRight_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		// Preserve the same upstream right-side aspect/online spacing
+		// and exact all-sibling queued HUD tagging as the retired generic
+		// right wrapper; only its source identity differs.
+		AddSpriteSpacing(&x, false);
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int p = 0; p < Game::SpritePriorityCount; ++p)
+		{
+			SpriteNode* root = Game::sprite_prio_root[p];
+			before[p] = root ? root->tail_4 : nullptr;
+		}
+		const int result = Game::put_clip_sprite(
+			xstnum, x, y, flags, priority, color);
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite);
+		return result;
+	}
+
 	static int __cdecl ExactScreenHudLeft_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags,
 		float priority, uint32_t color)
@@ -1211,7 +1249,10 @@ public:
 			DispRankFirst_sprani, Memory::HookType::Call);
 		for (int addr : ExactScreenHudRight_ClipSpriteCalls)
 			Memory::VP::InjectHook(
-				Module::exe_ptr(addr), ExactScreenHudRight_putClipSprite,
+				Module::exe_ptr(addr),
+				IsExactDispRankRightClipRva(addr)
+					? DispRankRight_putClipSprite
+					: ExactScreenHudRight_putClipSprite,
 				Memory::HookType::Call);
 		for (int addr : ExactScreenHudLeft_ClipSpriteCalls)
 			Memory::VP::InjectHook(
