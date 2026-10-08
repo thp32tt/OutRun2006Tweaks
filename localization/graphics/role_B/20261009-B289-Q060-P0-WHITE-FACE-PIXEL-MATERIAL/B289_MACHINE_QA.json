@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B289",
+  "queue_index": 60,
+  "priority": "P0",
+  "regression": "IGR-044",
+  "canonical_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "current_candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "trial_sha256": "068b4f5795e85b960493efad832f9060984387c978c4936f9708133e6227fb85",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "trial_path": "localization/graphics/role_B/20261009-B289-Q060-P0-WHITE-FACE-PIXEL-MATERIAL/A064FDFC_B289_TRIAL_NOT_PROMOTED.dds",
+  "method": "SOURCE_FAMILY_EXISTING_KOREAN_GLYPH_MATERIAL_RECOLOR_NO_NEW_FONT_NO_RERENDER",
+  "source_bbox": [
+    1090,
+    245,
+    1930,
+    385
+  ],
+  "preexisting_korean_bbox": [
+    1096,
+    256,
+    1816,
+    374
+  ],
+  "source_white_core_pixels": 52808,
+  "localized_neutral_white_core_pixels": 31089,
+  "new_material_pixels": 47702,
+  "eligible_localized_ink_pixels": 47714,
+  "pixels_outside_localized_glyph_bbox_changed": 0,
+  "whole_atlas_alpha_changes": 0,
+  "protected_non_neutral_pixels_changed": 0,
+  "header_byte_equal": true,
+  "raw_native_roundtrip": "PASS",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "codec": "RGBA32_MIP1",
+  "product_status": "TRIAL_NOT_PROMOTED",
+  "producer_visual": "REQUIRES_DIRECT_CONTROLLER_100_75_50_RAW_AND_CLEAN_GATE",
+  "PLATE_ONLY": "HOLD_CANONICAL_CLEAN_REVIEW_REQUIRED",
+  "COMPOSITE_ONLY": "MASK_AND_SOURCE_CURRENT_TRIAL_SAVED",
+  "C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "other_two_visual_fail_regions": [
+    "stage",
+    "outrun_miles_gold"
+  ],
+  "new_production_dds": 0,
+  "execution_backend": "GITHUB_ACTIONS_BINARY_SOURCE_FALLBACK_NOT_LOCAL_SANDBOX",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
