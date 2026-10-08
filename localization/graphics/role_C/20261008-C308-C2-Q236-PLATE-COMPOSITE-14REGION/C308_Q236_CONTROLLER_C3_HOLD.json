@@ -1,0 +1,1069 @@
+{
+  "schema_version": 2,
+  "run": "C308-C2",
+  "run_key": "OUTRUN-KOR-C308-C2-Q236-ALL14-PLATE-COMPOSITE-20261008-2320",
+  "review_id": "C308-C2-Q236-PLATE-COMPOSITE-NATIVE-20261008-2331",
+  "review_time_kst": "2026-10-08 23:31 KST",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "role": "C",
+  "index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selection_head": "df9c1557c5fd96c763cad55d68b5e77ba0c4e07d",
+  "backend": "GitHub Actions Ubuntu CPU worker (ChatGPT local outbound DNS unavailable) + ChatGPT direct visual independent C controller",
+  "worker_run": {
+    "id": 37792830655,
+    "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37792830655",
+    "conclusion": "success",
+    "note": "Two earlier attempts 37792145237/37792496529 failed respectively stale B217 reference SHA and worker source newline syntax; both attempts produced NO candidate/QA output, this success is the only output"
+  },
+  "provenance": {
+    "canonical_source": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "B80_authored_clean": "localization/graphics/role_B/20261005-B-PRODUCTION80/FEF_CLEAN_PLATE.png",
+    "historical_B217_scope": "B217 row/source bbox metadata only; B217 candidate SHA superseded by exact current C304 candidate",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8"
+  },
+  "triage": {
+    "index": 236,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "current_status": "c304_c2_c3_hold_all14_native_done_clean_calibration_pending",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "raw_header_exact": true,
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "new_lossless_png": 84,
+  "region_count": 14,
+  "source_clean_and_clean_final_full_atlas_outside": {
+    "source_clean_RGBA": 0,
+    "clean_final_RGBA": 0,
+    "source_final_RGBA": 0,
+    "source_clean_alpha": 0,
+    "clean_final_alpha": 0,
+    "source_final_alpha": 0
+  },
+  "region_checks": [
+    {
+      "region_index": 0,
+      "id": "stage_00",
+      "source_text": "INDUSTRIAL COMPLEX",
+      "korean_text": "인더스트리얼 컴플렉스",
+      "native_source_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "native_local_visible_bbox": [
+        364,
+        2,
+        1105,
+        85
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 27806,
+      "source_clean_rgba_inside": 50903,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 1,
+      "id": "stage_01",
+      "source_text": "WATERFALLS",
+      "korean_text": "워터폴스",
+      "native_source_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "native_local_visible_bbox": [
+        429,
+        6,
+        715,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 11228,
+      "source_clean_rgba_inside": 34348,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 2,
+      "id": "stage_02",
+      "source_text": "TULIP GARDEN",
+      "korean_text": "튤립 가든",
+      "native_source_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "native_local_visible_bbox": [
+        487,
+        5,
+        791,
+        88
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 12204,
+      "source_clean_rgba_inside": 38353,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 3,
+      "id": "stage_03",
+      "source_text": "SUNNY BEACH",
+      "korean_text": "서니 비치",
+      "native_source_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "native_local_visible_bbox": [
+        478,
+        6,
+        778,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 10195,
+      "source_clean_rgba_inside": 37623,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 4,
+      "id": "stage_04",
+      "source_text": "SNOW MOUNTAIN",
+      "korean_text": "스노 마운틴",
+      "native_source_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "native_local_visible_bbox": [
+        552,
+        6,
+        926,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 12540,
+      "source_clean_rgba_inside": 46922,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 5,
+      "id": "stage_05",
+      "source_text": "SKYSCRAPERS",
+      "korean_text": "스카이스크레이퍼스",
+      "native_source_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "native_local_visible_bbox": [
+        148,
+        6,
+        799,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 22644,
+      "source_clean_rgba_inside": 39204,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 6,
+      "id": "stage_06",
+      "source_text": "PALM BEACH",
+      "korean_text": "팜 비치",
+      "native_source_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "native_local_visible_bbox": [
+        478,
+        5,
+        704,
+        88
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 9041,
+      "source_clean_rgba_inside": 34035,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 7,
+      "id": "stage_07",
+      "source_text": "NATIONAL PARK",
+      "korean_text": "내셔널 파크",
+      "native_source_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "native_local_visible_bbox": [
+        489,
+        5,
+        863,
+        88
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 13933,
+      "source_clean_rgba_inside": 41589,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 8,
+      "id": "stage_08",
+      "source_text": "MILKY WAY",
+      "korean_text": "밀키 웨이",
+      "native_source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "native_local_visible_bbox": [
+        331,
+        3,
+        626,
+        86
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 12482,
+      "source_clean_rgba_inside": 28237,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 9,
+      "id": "stage_09",
+      "source_text": "METROPOLIS",
+      "korean_text": "메트로폴리스",
+      "native_source_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "native_local_visible_bbox": [
+        278,
+        6,
+        708,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 16883,
+      "source_clean_rgba_inside": 35325,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 10,
+      "id": "stage_10",
+      "source_text": "LOST CITY",
+      "korean_text": "로스트 시티",
+      "native_source_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "native_local_visible_bbox": [
+        160,
+        6,
+        532,
+        89
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 12113,
+      "source_clean_rgba_inside": 23310,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 11,
+      "id": "stage_11",
+      "source_text": "LEGEND",
+      "korean_text": "레전드",
+      "native_source_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "native_local_visible_bbox": [
+        209,
+        5,
+        421,
+        88
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 8496,
+      "source_clean_rgba_inside": 22506,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 12,
+      "id": "stage_12",
+      "source_text": "JUNGLE",
+      "korean_text": "정글",
+      "native_source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "native_local_visible_bbox": [
+        278,
+        5,
+        418,
+        88
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 6249,
+      "source_clean_rgba_inside": 20811,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_RAW_SOURCE_FINAL.png"
+        }
+      }
+    },
+    {
+      "region_index": 13,
+      "id": "stage_13",
+      "source_text": "IMPERIAL AVENUE",
+      "korean_text": "임페리얼 애비뉴",
+      "native_source_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "native_local_visible_bbox": [
+        486,
+        4,
+        1008,
+        87
+      ],
+      "authored_clean_remaining_alpha": 0,
+      "clean_final_rgba_inside": 21933,
+      "source_clean_rgba_inside": 49460,
+      "views": {
+        "WHITE_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "BLACK_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_NATIVE": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+        "GRAY_75": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_75_SOURCE_CLEAN_FINAL.png",
+        "GRAY_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_50_SOURCE_CLEAN_FINAL.png",
+        "RAW": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_RAW_SOURCE_FINAL.png"
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "English and Hangul readable glyphs appear upright in native white contact; per-syllable top-minus-bottom true stem-anchor measurements were not independently established.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "clean_plate": {
+          "result": "PASS_PLATE_ALPHA_AND_NATIVE_VIEW_SCOPE",
+          "observation": "Independently inspected native canonical SOURCE vs B80 authored CLEAN with Korean hidden; formerly English area transparent and uniform on inspected white panel; no definite source shadow/edge seam. Entire union source-vs-CLEAN outside pixel delta 0.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Original English is tall heavy condensed gray flat-face; current Hangul is strong dark gray source-height-class and right anchored, but font family/counter spacing and source-original vs Hangul body proportions lack a qualified independent accepted source-family reference.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_NOT_GAME",
+          "observation": "Native readable view verified for this row; 75/50 gray lossless views generated but not all individually independently reviewed at practical game-size or calibrated small-display UI.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_BREAKAGE",
+          "observation": "Direct native WHITE SOURCE/CLEAN/FINAL inspected for this row: no definite malformed Hangul syllable, broken stroke or visible clipping in displayed contact; missing full high-zoom plus blind glyph-level per-MIP check.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_VISUAL_HOLD",
+          "observation": "Full 2048x2048 source/CLEAN/final changed RGBA and alpha pixels outside union of 14 exact source glyph bboxes are each zero. Protected artwork inside target bboxes, per-row independent collision coverage and actual UV are not fully certified.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "placement": {
+          "result": "MACHINE_CONTAINMENT_PASS",
+          "observation": "Current decoded candidate alpha bbox measured inside matching native English source text effect region, no extra width/height or boundary escape; high-risk near-edge rows still require calibrated visual and game checks.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png"
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "English and persisted Korean RAW views published with matching Y-inversion; no actual in-game UV/sprite playback validation.",
+          "evidence": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_RAW_SOURCE_FINAL.png"
+        }
+      }
+    }
+  ],
+  "visual_first_look": {
+    "native_white_all14_viewed": true,
+    "black_native_example": "row10_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+    "gray_practical_examples": [
+      "row05_GRAY_75_SOURCE_CLEAN_FINAL.png",
+      "row13_GRAY_50_SOURCE_CLEAN_FINAL.png"
+    ],
+    "raw_example": "row00_RAW_SOURCE_FINAL.png",
+    "calibration_blind_completed": false,
+    "reason": "Read previous C304/B217 source/producer notes before new proof; cannot claim qualified blind pixels-before-producer verdict. All 14 native white row triptychs visually reviewed; selected practical scale and RAW viewed."
+  },
+  "C": "HOLD_STRICT_RECHECK",
+  "C3_STRICT_AUDIT": "HOLD_STRICT_RECHECK",
+  "C_PASS_NEW": false,
+  "C3_PASS_NEW": false,
+  "current_policy_evidence_APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "next_action": "Qualified blind calibration against source-family control and known defect examples; independently measure slant/counter-space/weight and text hierarchy for all 14; inspect more high-zoom and practical-scale samples and preserved art; only then distinct C3/current evidence approval. Do not rerender current unchanged candidate absent verified visual defect."
+}
