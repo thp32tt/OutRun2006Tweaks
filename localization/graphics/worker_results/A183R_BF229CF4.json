@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A183R-Q214-START-GOAL-ANTIALIAS-BC3",
+  "queue_index": 214,
+  "work_stolen_from_lane": "B",
+  "asset": "BF229CF4",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "2aab9b24a29ccc062a4d7b46f8a24ab785dcdefd895c7c95ad874e1da3dd9cfb",
+  "report": "localization/graphics/role_A/20261008-A183R-Q214-START-GOAL-ANTIALIAS-BC3/A183R_BF229CF4_REPORT.json",
+  "status": "A183R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+}
