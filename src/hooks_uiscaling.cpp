@@ -1490,11 +1490,20 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 		const auto scope = OutRunVR::GameSemantic::EffectiveScope();
 		const auto* marker =
 			OutRunVR::GameSemantic::CurrentProjectedMarker();
-		const bool projectedRank =
-			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
-				scope) && marker && marker->valid;
 		const auto source =
 			OutRunVR::GameSemantic::CurrentQueueProducerToken();
+		// Modern R84 also uses ProjectedWorldMarker2D for the rival-car
+		// icon, which was already HMD-correct and must NOT receive an
+		// unrelated new Flush. R64's old broad projected scope was
+		// primarily the car rank 1..5 owner; here prove the exact original
+		// rank E8 source to avoid widening the restored old batch policy.
+		const bool projectedRank =
+			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) && marker && marker->valid &&
+			(source ==
+				OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+				source ==
+				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
 		const bool dispRankHud =
 			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
 			(source ==
