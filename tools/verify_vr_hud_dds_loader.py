@@ -121,7 +121,7 @@ def verify(text):
         ("fast",ui_clean,fast+gated+native+failed+fallback),
         ("original allocator",orig_clean,native+failed+fallback),
     ):
-        if "const UiDdsOriginalState original(pSrcData, SrcDataSize);" not in clean:
+        if strip("const UiDdsOriginalState original(pSrcData, SrcDataSize);") not in clean:
             raise ValueError(name+" UI path must snapshot original before replacement")
         if not clean.endswith(strip(sequence)):
             raise ValueError(name+" UI path must restore exact original after native replacement failure")
