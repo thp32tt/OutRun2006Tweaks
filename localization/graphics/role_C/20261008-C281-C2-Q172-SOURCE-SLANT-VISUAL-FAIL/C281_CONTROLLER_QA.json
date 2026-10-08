@@ -170,5 +170,11 @@
   "REWORK_REQUIRED": "B producer must replace only START/GOAL Korean foreground/effect with original source-faithful visible rightward slant and cream/orange badge typography. Preserve exact 1024x1024 original sign red-plate, maps/icons, full original source region containment zero-pixel outside, positive margins, source color/counter/readability, authored mip/header/RAW mirror-Y. Reinspect native/practical 100/75/50 after persisted DDS compression. New exact-byte independent C then separate C3, user JPG and NEW actual-game retest required.",
   "RUNTIME_VALIDATION": "UNTESTED",
   "forbidden_domains_touched": [],
-  "new_candidate_generated": false
+  "new_candidate_generated": false,
+  "post_task_cleanup": {
+    "status": "COMPLETE",
+    "removed": "work/C281_C2_Q172_20261008_scratch",
+    "after_remote_publication": true,
+    "n100_free_bytes_after_cleanup": 28706738176
+  }
 }
