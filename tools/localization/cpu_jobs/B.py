@@ -149,7 +149,11 @@ for name,label,(l,t,r,b),size,slant,sty,outer in rows:
         source_rgb_face=face_rgb.tolist(),source_rgb_outer=navy.tolist(),
         native_font=fontp,style=sty,slant_top_right=slant))
 assert np.any(old!=out)
-body=np.flipud(out)[:,:,[2,1,0,3]].copy().tobytes()
+# A064FDFC is RGBA32 on disk (R=0x000000ff, G=0x0000ff00, B=0x00ff0000).
+# Unlike BGRA atlases, channel-swizzling it corrupts exact DDS bytes.
+import struct
+assert struct.unpack_from("<4I",prior,92)==(255,65280,16711680,4278190080)
+body=np.flipud(out).copy().tobytes()
 trial=prior[:128]+body
 assert len(trial)==len(prior)
 persist=dec(trial)
