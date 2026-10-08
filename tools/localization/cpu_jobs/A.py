@@ -7,12 +7,12 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
-repo=Path.cwd(); run="20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR"
+repo=Path.cwd(); run="20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
-tmp=Path("/tmp/outrun_A200"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_A201"); tmp.mkdir(parents=True,exist_ok=True)
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"; BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
 source=tmp/"55B57CDE_HD.dds"; atlasp=tmp/"55B57CDE_atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",source)
@@ -31,9 +31,9 @@ if gitblob(sb)!="0b12c672224ce05acb9470af895bbda335cc5543" or gitblob(ab)!="7000
     raise RuntimeError(("pinned drift",gitblob(sb),gitblob(ab)))
 W,H,MIPS=dds_meta(sb)
 if (W,H)!=(2048,2048): raise RuntimeError(("dimension",W,H))
-EXPECTED_BEFORE="66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d"
+EXPECTED_BEFORE="2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b"
 if not candidate.exists() or sha(candidate.read_bytes())!=EXPECTED_BEFORE:
-    raise RuntimeError(("candidate drift before A157",sha(candidate.read_bytes()) if candidate.exists() else None,EXPECTED_BEFORE))
+    raise RuntimeError(("candidate drift before A201",sha(candidate.read_bytes()) if candidate.exists() else None,EXPECTED_BEFORE))
 old_bytes=candidate.read_bytes()
 old_raw=Image.open(candidate).convert("RGBA"); old=old_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM); olda=np.asarray(old,dtype=np.uint8)
 regs={int(r["idx"]):r for r in json.loads(ab.decode("utf-8"))["regions"]}
@@ -60,7 +60,7 @@ if not FONT or not Path(FONT).exists() or "NotoSansCJK" not in Path(FONT).name:
 
 elements=[]; source_union=np.zeros((H,W),bool); allowed=np.zeros((H,W),bool)
 for idx,(english,korean) in TARGETS.items():
-    if idx not in (4,6): continue  # Repair proven C314 damaged regions ONLY; preserve 36 independent candidates
+    if idx not in (8,10,12): continue  # C319 confirmed remaining pinholes; preserve A200 04/06 and 33 untouched regions
     x,y,cw,ch=map(int,regs[idx]["rect"]); roi=sa[y:y+ch,x:x+cw]; mask=roi[:,:,3]>1
     ys,xs=np.nonzero(mask)
     if not len(xs): raise RuntimeError(("empty",idx))
@@ -74,12 +74,12 @@ for idx,(english,korean) in TARGETS.items():
                      "source_mask_pixels":int(np.count_nonzero(gm)),"source_rgba_median":list(color)})
 
 clean_arr=olda.copy(); clean_arr[allowed,:]=0; clean=Image.fromarray(clean_arr,"RGBA")
-# Preserve exactly all 36 other already-localized rows, including their native BC3 compressed bytes.
+# Preserve exactly all 35 other already-localized rows, including their native BC3 compressed bytes.
 final=clean.copy(); target_union=np.zeros((H,W),bool); layers=[]
 
 def text_alpha(text,maxw,maxh):
     # FIT BY NATURAL CJK PIXEL DIMENSIONS. Never horizontally condense Hangul.
-    # C314 failed LEO 0.5682 anisotropic scaling and PISCES compressed/BC3 pinholes.
+    # C319 failed preserved CAPRICORN/ARIES/THAILAND native glyph face BC3 pinholes.
     for fs in range(max(24,int(maxh*1.60)),18,-1):
         font=ImageFont.truetype(FONT,fs)
         d=ImageDraw.Draw(Image.new("L",(8,8),0)); bb=d.textbbox((0,0),text,font=font)
@@ -223,8 +223,8 @@ height_improved=sum(1 for e in elements if e["localized_height"]>e["prior_locali
 height_not_worse=sum(1 for e in elements if e["localized_height"]>=e["prior_localized_height"])
 left_anchor_improved=sum(1 for e in elements if e["delta_left"]<e["prior_delta_left"])
 near_source_height=sum(1 for e in elements if e["localized_height"]>=max(1,e["source_height"]-10))
-if len(elements)!=2 or sorted(e["idx"] for e in elements)!=[4,6]:
-    raise RuntimeError("not exactly two diagnosed regions")
+if len(elements)!=3 or sorted(e["idx"] for e in elements)!=[8,10,12]:
+    raise RuntimeError("not exactly three diagnosed C319 regions")
 if any(e["horizontal_scale"]!=1.0 for e in elements):
     raise RuntimeError(("Korean squish still present",elements))
 # Persisted true opaque glyph cores cannot exhibit the C314 interior alpha pinholes.
@@ -248,6 +248,7 @@ for by in range(bh):
             changed_blocks+=1
             if (bx,by) not in patch: changed_outside+=1
 if changed_outside: raise RuntimeError(("compressed outside patch",changed_outside))
+if sha(bytes(outb))==EXPECTED_BEFORE:raise RuntimeError("No changed BC3 DDS bytes")
 
 def comp(im):
     z=Image.new("RGBA",im.size,(65,65,65,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -262,8 +263,8 @@ for e in elements:
     cards.append(c)
 cw=max(c.width for c in cards); sh=sum(c.height+2 for c in cards); sheet=Image.new("RGB",(cw,sh),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+2
-sheet.save(out/"A157_55B57CDE_SOURCE_CLEAN_FINAL.jpg",quality=94)
-comp(dec_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A157_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",quality=93)
+sheet.save(out/"A201_55B57CDE_SOURCE_CLEAN_FINAL.jpg",quality=94)
+comp(dec_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A201_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",quality=93)
 
 # Native lossless per-region SOURCE / CLEAN / DECODED DDS on BWG at 100/75/50,
 # including mirrored RAW. Controls intentionally keep 36 unrelated rows untouched.
@@ -272,7 +273,7 @@ for e in elements:
     x0,y0,x1,y1=e["original_bbox"]
     rect=(max(0,x0-8),max(0,y0-8),min(W,x1+8),min(H,y1+8))
     for kind,im in (("SOURCE",src),("CLEAN",clean),("FINAL",dec)):
-        im.crop(rect).save(out/f"A200_{idx:02}_{kind}_NATIVE.png")
+        im.crop(rect).save(out/f"A201_{idx:02}_{kind}_NATIVE.png")
     for bgname,rgb in (("BLACK",(0,0,0)),("GRAY",(95,95,95)),("WHITE",(245,245,245))):
         panels=[]
         for im in (src,clean,dec):
@@ -284,15 +285,15 @@ for e in elements:
         for i,z in enumerate(panels):combined.paste(z,(i*(width+6),26))
         for pct in (100,75,50):
             view=combined if pct==100 else combined.resize((max(1,combined.width*pct//100),max(1,combined.height*pct//100)),Image.Resampling.LANCZOS)
-            view.save(out/f"A200_{idx:02}_SOURCE_CLEAN_FINAL_{bgname}_{pct}.png")
+            view.save(out/f"A201_{idx:02}_SOURCE_CLEAN_FINAL_{bgname}_{pct}.png")
     im1=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     im2=dec_raw
     rawrect=(rect[0],H-rect[3],rect[2],H-rect[1])
     rawpanels=[z.crop(rawrect) for z in (im1,im2)]
     raw=Image.new("RGBA",(rawpanels[0].width*2+6,rawpanels[0].height),(0,0,0,0))
     raw.alpha_composite(rawpanels[0]);raw.alpha_composite(rawpanels[1],(rawpanels[0].width+6,0))
-    raw.save(out/f"A200_{idx:02}_SOURCE_FINAL_RAW.png")
-# Verify exact original BC3 blocks of the other 36 rows remain byte-identical.
+    raw.save(out/f"A201_{idx:02}_SOURCE_FINAL_RAW.png")
+# Verify exact original BC3 blocks of the other 35 rows remain byte-identical.
 raw_allowed=np.flipud(allowed)
 preserved_blocks=0
 for by in range(H//4):
@@ -308,27 +309,28 @@ report={"schema_version":1,"role":"A","run":run,"index":161,"asset":asset_rel,
 "atlas_provenance":{"blob_sha1":gitblob(ab),"sha256":sha(ab),"regions":38},
 "structure":{"width":W,"height":H,"format":"DXT5","mips":MIPS,"raw_orientation":"mirror_y","header_exact":bytes(outb[:128])==sb[:128]},
 "old_candidate_sha256":EXPECTED_BEFORE,"candidate_sha256":sha(bytes(outb)),
-"targeted_regions":elements,"repaired_rows":2,"other_regions_preserved":36,"untouched_BC3_blocks":preserved_blocks,
-"translation_policy_note":"LEO -> 사자 uses semantically accurate shorter constellation label to avoid 0.5682 horizontal squish; PISCES keeps 물고기자리 with smaller natural unscaled CJK; policy exception pending independent C/user confirmation",
-"new_method":"Native unsqueezed Korean + exact source-flat gray RGB565 block face for non-pinhole color + fixed BC3 alpha endpoints from glyph only; untouched old compressed blocks outside original PISCES/LEO bboxes",
-"source_clean":"Old verified source DDS versus two cleared source-effect bboxes, no changed pixels outside for retained candidate",
-"machine_checks":{"changed_pixels_outside_two_bboxes":diff_out,"alpha_changed_outside_two_bboxes":alpha_out,
-"introduced_visible_outside_two_bboxes":intro,"source_residue_pixels":residue,
+"targeted_regions":elements,"repaired_rows":3,"other_regions_preserved":35,"untouched_BC3_blocks":preserved_blocks,
+"translation_policy_note":"CAPRICORN=염소자리, ARIES=양자리, THAILAND=태국 preserve Korean strings; A200 LEO=사자 and PISCES=물고기자리 remain byte-identical pending independent user acceptance",
+"root_cause":"C319 observed BC3 color/alpha speckle in retained region08/10/12","new_method":"Native unsqueezed Korean and exact source-flat gray RGB565 face, fixed BC3 alpha endpoints from glyph only; A200 region04/06 and 33 other regions byte-identical",
+"source_clean":"SHA-pinned English source versus three cleared source-effect bboxes, no changed pixels outside for retained candidate",
+"machine_checks":{"changed_pixels_outside_three_bboxes":diff_out,"alpha_changed_outside_three_bboxes":alpha_out,
+"introduced_visible_outside_three_bboxes":intro,"source_residue_pixels":residue,
 "decoded_alpha_extra_pixels":extra_total,"decoded_alpha_missing_pixels":missing_total,
-"decoded_bbox_exact_match":f"{bbox_exact}/2 PASS","localized_overlap_pairs":0,
+"decoded_bbox_exact_match":f"{bbox_exact}/3 PASS","localized_overlap_pairs":0,
 "changed_blocks_outside_patch":changed_outside,
 "all_unrelated_blocks_unchanged":True,
+"preserved_A200_04_06_and_other_33_blocks":True,
 "opaque_core_color_pinhole_pixels":sum(e['decoded_core_interior_pinhole_pixels'] for e in elements),
 "opaque_core_color_mismatch_pixels":sum(e['decoded_core_color_mismatch_pixels'] for e in elements)},
 "persisted_dds_roundtrip":"PASS decoded source-visible and exact output header",
 "producer_status":"MACHINE_PASS_CONTROLLER_VISUAL_PENDING","C1":"PENDING","C3":"PENDING",
 "RUNTIME_VALIDATION":"UNTESTED"}
 
-(out/"A200_Q161_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"A201_Q161_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"role":"A","run":run,"index":161,"candidate_sha256":report["candidate_sha256"],
-"repaired_regions":[4,6],"prior_candidate_sha256":EXPECTED_BEFORE,
+"repaired_regions":[8,10,12],"prior_candidate_sha256":EXPECTED_BEFORE,
 "machine_qa":report["machine_checks"],"worker_status":report["producer_status"],
 "RUNTIME_VALIDATION":"UNTESTED",
-"report":str((out/"A200_Q161_REPORT.json").relative_to(repo))}
-(wr/"A200_Q161.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
-print("A200_MACHINE_DONE",json.dumps(summary,ensure_ascii=False),flush=True)
+"report":str((out/"A201_Q161_REPORT.json").relative_to(repo))}
+(wr/"A201_Q161.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+print("A201_MACHINE_DONE",json.dumps(summary,ensure_ascii=False),flush=True)
