@@ -67,7 +67,11 @@ def run_task(args):
                       "status": "running", "created": time.time()})
     env = os.environ.copy()
     env.update({"TMPDIR": str(d), "TMP": str(d), "TEMP": str(d),
-                "OUTRUN_TASK_SCRATCH": str(d)})
+                "OUTRUN_TASK_SCRATCH": str(d),
+                "PIP_CACHE_DIR": str(d / "pip-cache"),
+                "npm_config_cache": str(d / "npm-cache"),
+                "XDG_CACHE_HOME": str(d / "xdg-cache"),
+                "MPLCONFIGDIR": str(d / "mpl-config")})
     print("SCRATCH=" + str(d), flush=True)
     try:
         result = subprocess.run(command, env=env, check=False)
