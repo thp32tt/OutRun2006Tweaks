@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C300 C2 EVEN q98 42E618FD: C3 native DXT5 vs exact English independently identifies striped/dotted Korean white face absent in smooth English source. C126 machine PASS superseded; current candidate preserved; A/B material glyph-face+outline reconstruction then fresh C2 and C3 required. Evidence localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C1 19:48 q227/q231/q237 native source-faithful typography/effect rework required before fresh independent C/C3 and user/actual-game test; do not reproduce unchanged DDS.",
     "B265 q172 2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da machine PASS but SOURCE/CLEAN/FINAL native/50%/RAW producer visual FAIL; original B263 812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a restored. Do not rerun current SDF/palette tricks; manual vector reconstruction source style needed. Fresh C2 + C3 and in-game remain blocked, RUNTIME_VALIDATION=UNTESTED.",
     "C299 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q176 independent B201 authored CLEAN SHA0fd5d518... verified against exact source 8ba40915... and current 494d42c0...: all 4 original name bboxes transparent in CLEAN, source-clean-candidate outside RGBA/alpha 0, 4/4 margin+RAW, 8 new source/clean/current native/50% reference PNG. HOLD no pixels-first C, true stem anchor/family or C3; approval/export and actual-game BLOCKED, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C299-C2-Q176-AUTHORED-CLEAN-INDEPENDENT/C299_CONTROLLER_QA.json",
@@ -11744,5 +11745,25 @@
     "dds_produced": 0,
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c300_c2_q098_native_glyph_face_fail": {
+    "run_key": "OUTRUN-KOR-C300-C2-Q098-NATIVE-GLYPH-FAIL-20261008-1950",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 98,
+    "asset": "42E618FD",
+    "status": "C3_STRICT_AUDIT_REWORK_REQUIRED",
+    "source_sha256_from_prior_proof": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "candidate_sha256_from_prior_proof": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+    "concrete_visual_defect": "Decoded 2048x128 DXT5 Korean fill contains repeated horizontal dark stipple in white glyph interior; native English source white fill smooth; independent C3 early hard FAIL overrides C126 machine PASS",
+    "report": "localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json",
+    "produced_dds": 0,
+    "C_current": "REWORK_REQUIRED",
+    "C3": "FAIL",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "execution_backend": "GitHub connector data + ChatGPT local JS native DXT5 decode; no N100 computation"
   }
 }
