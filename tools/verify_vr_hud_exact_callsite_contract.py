@@ -127,9 +127,11 @@ def check(ui, manifest):
             "ProducerToken::ExactScreenHudClipSprite" not in exact_clip):
         fail("exact clip HUD lost all-node ScreenHud tagging")
     glyph = function_body(ui, "static int __cdecl TextGlyph_putSprite(")
-    ordered(glyph, "glyph must tag node after original draw",
-            "tailBefore", "const int result = ", "if (node && node != tailBefore)",
-            "RegisterSpriteNodeScope(")
+    ordered(glyph, "stage/result Sumo_Printf glyph group tags all nodes",
+            "tailsBefore", "const int result = original(args, priority);",
+            "TagAppendedNodes(tailsBefore,")
+    if "Game::SpritePriorityCount" not in glyph:
+        fail("result +TIME glyph group lost bounded all-priority ownership")
     if ("RenderScope::ScreenHud" not in glyph or
             "ProducerToken::TextGlyphPutSprite" not in glyph):
         fail("glyph ScreenHud lost tag")
