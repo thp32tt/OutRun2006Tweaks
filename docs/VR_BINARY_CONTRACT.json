@@ -167,6 +167,10 @@
         {
           "path": "tools/analyze_outrun_exe.py",
           "needle": "0x000975EE"
+        },
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x975EE"
         }
       ]
     },
@@ -181,6 +185,10 @@
         {
           "path": "tools/analyze_outrun_exe.py",
           "needle": "0x00097727"
+        },
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x97727"
         }
       ]
     },
@@ -195,6 +203,10 @@
         {
           "path": "tools/analyze_outrun_exe.py",
           "needle": "0x000977FB"
+        },
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x977FB"
         }
       ]
     },
