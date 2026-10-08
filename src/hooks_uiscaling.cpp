@@ -98,6 +98,14 @@ class UIScaling : public Hook
 	inline static thread_local unsigned RankMarkerSubScreenHudDepth = 0;
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
+	// The original result screen emits a progress/percentage sprite through
+	// two separate calls to 0x2D200. Both had their own exact ownership in
+	// the historically validated R74 producer map (canonical EXE SHA pinned).
+	static constexpr int ResultProgressCallA = 0x97BE4;
+	static constexpr int ResultProgressCallB = 0x97DEC;
+	// The GOAL time panel also calls two sprite-producing helpers directly.
+	static constexpr int GoalTimeHelperCallA = 0xBEA5A;
+	static constexpr int GoalTimeHelperCallB = 0xBEA5F;
 
 	inline static thread_local
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
@@ -391,6 +399,60 @@ class UIScaling : public Hook
 		}
 	}
 
+
+	// R74 exact result-progress CALL boundaries: the parent 0x2D200 creates
+	// queued SpriteNodes, so lower glyph/put_clip hooks do not capture every
+	// sibling or animated percentage component. Snapshot the parent CALL,
+	// then tag only its newly appended nodes, never a global result queue.
+	inline static SafetyHookMid ResultProgressEnterA{};
+	inline static SafetyHookMid ResultProgressLeaveA{};
+	inline static SafetyHookMid ResultProgressEnterB{};
+	inline static SafetyHookMid ResultProgressLeaveB{};
+	inline static thread_local unsigned ResultProgressDepth = 0;
+	inline static thread_local
+		std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressTailsBefore{};
+	static void ResultProgressEnter(safetyhook::Context&)
+	{
+		if (ResultProgressDepth++ != 0)
+			return;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+	}
+	static void ResultProgressLeave(safetyhook::Context&)
+	{
+		if (!ResultProgressDepth || --ResultProgressDepth != 0)
+			return;
+		TagAppendedNodes(ResultProgressTailsBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		ResultProgressTailsBefore = {};
+	}
+
+	// R74 original GOAL helpers have the verified zero-argument void ABI.
+	// Preserve the original call, then tag all its newly queued siblings.
+	using GoalTimeHelperFn = void(__cdecl*)();
+	static void GoalTime_TagHelper(int helperRva)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			auto original = reinterpret_cast<GoalTimeHelperFn>(
+				Module::exe_ptr(helperRva));
+			original();
+		}
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+	}
+	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
+	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
 
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
@@ -956,6 +1018,26 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
 				Memory::HookType::Call);
+		// Original R74 exact CALL window has already been byte-fingerprinted:
+		// result 0x97BE4/0x97DEC E8 -> 0x2D200, and GOAL helpers
+		// 0xBEA5A -> 0xBE020 / 0xBEA5F -> 0xBE150.
+		// Bracket the two result calls without hooking the shared 0x2D200.
+		ResultProgressEnterA = safetyhook::create_mid(
+			Module::exe_ptr(ResultProgressCallA), ResultProgressEnter);
+		ResultProgressLeaveA = safetyhook::create_mid(
+			Module::exe_ptr(ResultProgressCallA + 5), ResultProgressLeave);
+		ResultProgressEnterB = safetyhook::create_mid(
+			Module::exe_ptr(ResultProgressCallB), ResultProgressEnter);
+		ResultProgressLeaveB = safetyhook::create_mid(
+			Module::exe_ptr(ResultProgressCallB + 5), ResultProgressLeave);
+		// The two GOAL CALLs are adjacent, so preserve the original function
+		// signatures and redirect only their individually proven E8 edges.
+		Memory::VP::InjectHook(Module::exe_ptr(GoalTimeHelperCallA),
+			GoalTime_Help020, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(GoalTimeHelperCallB),
+			GoalTime_Help150, Memory::HookType::Call);
+		spdlog::info(
+			"VR P0 GOAL/RESULT: exact result-progress and two GOAL helper producer owners restored (HMD validation pending)");
 
 		spdlog::info(
 			"VR HUD RESTORE: exact option arrows/result clips/text glyphs -> SCREEN_HUD; rank/rival markers -> PROJECTED_WORLD_MARKER_2D when Calc3D2D anchor is valid, WORLD_BILLBOARD fallback otherwise");
