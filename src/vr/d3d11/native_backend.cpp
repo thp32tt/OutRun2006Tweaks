@@ -1303,7 +1303,11 @@ bool bind_fixed_function_texture_stage_for_observation(
     const NativeFixedFunctionSamplerState& sampler,
     const NativeFixedFunctionTextureView& texture) noexcept {
 
-    if (!context || !sampler.ready() || !texture.ready() ||
+    // R152: a deferred context can record matching PS sampler/SRV state,
+    // but cannot prove the immediate draw context has those live bindings.
+    if (!context ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+        !sampler.ready() || !texture.ready() ||
         slot >= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT ||
         slot >= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT)
         return false;
@@ -1356,7 +1360,10 @@ observe_fixed_function_texture_stage_binding(
     NativeFixedFunctionTextureStageBindingReadiness out{};
     out.slot = slot;
     out.textureUploadGeneration = texture.upload_generation();
-    out.inputValid = context != nullptr;
+    // R152: recording state on a deferred context is not a live PS receipt.
+    out.inputValid =
+        context != nullptr &&
+        context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE;
     out.slotValid =
         slot < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT &&
         slot < D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT;

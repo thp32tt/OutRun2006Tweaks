@@ -1690,6 +1690,40 @@ int main()
             d3d.context, textureStageSlot, samplerOwner, textureView,
             textureStageBindingReady.snapshotToken),
         "R132 texture-stage binding issues exact sampler/SRV snapshot");
+
+    // R152: reject a same-device deferred context even when it contains
+    // matching PS sampler/SRV recordings. Preserve the immediate receipt.
+    ID3D11DeviceContext* r152DeferredContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(0, &r152DeferredContext)) &&
+        r152DeferredContext != nullptr &&
+        r152DeferredContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R152 WARP same-device deferred texture-stage prerequisite");
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            r152DeferredContext, textureStageSlot, samplerOwner, textureView),
+        "R152 deferred texture-stage live bind fails closed");
+    ID3D11SamplerState* r152RecordedSampler = samplerOwner.sampler();
+    ID3D11ShaderResourceView* r152RecordedSrv = textureView.srv();
+    r152DeferredContext->PSSetSamplers(
+        textureStageSlot, 1, &r152RecordedSampler);
+    r152DeferredContext->PSSetShaderResources(
+        textureStageSlot, 1, &r152RecordedSrv);
+    const auto r152DeferredReceipt =
+        outrun::vr::dx11::observe_fixed_function_texture_stage_binding(
+            r152DeferredContext, textureStageSlot, samplerOwner, textureView);
+    require(
+        !r152DeferredReceipt.inputValid &&
+        !r152DeferredReceipt.ready &&
+        r152DeferredReceipt.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_texture_stage_binding_snapshot(
+            r152DeferredContext, textureStageSlot, samplerOwner, textureView,
+            textureStageBindingReady.snapshotToken) &&
+        outrun::vr::dx11::validate_fixed_function_texture_stage_binding_snapshot(
+            d3d.context, textureStageSlot, samplerOwner, textureView,
+            textureStageBindingReady.snapshotToken),
+        "R152 recorded deferred PS bindings cannot forge immediate live receipt");
+    r152DeferredContext->Release();
     if (observedStageSampler)
         observedStageSampler->Release();
     if (observedStageSrv)
