@@ -128,3 +128,10 @@ Every PC-fast package records `BuildMode`, `BuildContract` and canonical `CMakeF
 
 Historical reason: the earlier broken R51 PC-fast rebuild used `OUTRUN_VR_R26_HUD_COMPARE=OFF`; the verified R51 contract and the later working driver-seat PC-fast path use `ON`. Therefore build-configuration drift, not incremental caching itself, is the primary known cause of that visual mismatch.
 
+## DX9Ex test ZIP entrypoint and batch cleanup — 2026-10-08
+
+- The DX9Ex ACTIVE ZIP has exactly ONE user-facing batch/command launcher: `OutRunVR-Slot-Selector.cmd`. The file opens `OutRunVR-Slot-Selector.ps1`, whose `CURRENT_FOCUS / CORRECTNESS` row offers `설정 + 바로 실행`. This selects D3D9Ex and launches `OR2006C2C.EXE` through `Run-OutRunVRTest.ps1`.
+- Extract the package **contents** into the folder already containing original `OR2006C2C.EXE`; bundled `outrun-vr-host.exe` is a dependent helper, **not** the launcher.
+- Do NOT ship obsolete or redundant user-facing shortcuts: `Run-OutRunVRTest.cmd`, `OutRunVR-Backend-Selector.cmd`, `Collect-OutRunVRLogs.cmd` or unused alternate `OutRunVR-Backend-Selector.ps1`. Retain functional `.ps1` scripts necessary for backend selection, launch, session collection and diagnosis.
+- The canonical Active workflow MUST verify exactly one `.cmd` and zero `.bat` anywhere within the assembled ZIP. Include `START_HERE_실행방법.txt` describing the exact launcher, one-click target and automatic log collection. Older shortcuts in a user's existing directory may persist after overlay extraction; never silently delete user files.
+- **Every future build handoff must state the exact entrypoint filename, game EXE dependency, click sequence, material source SHA and verified test-ZIP link.** A successful static/game build is not a Quest 3 HMD runtime PASS.
