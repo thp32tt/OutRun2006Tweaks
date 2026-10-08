@@ -1,0 +1,21 @@
+{
+  "queue_file": "localization/graphics/asset_queue.csv",
+  "escalation_file": "localization/graphics/REWORK_ESCALATIONS.json",
+  "counts": {
+    "METHOD_CHANGE_REQUIRED": 1
+  },
+  "assets": [
+    {
+      "index": 214,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "current_status": "c289_c2_rework_required_b259_source_bevel_redline",
+      "next_action": "METHOD_CHANGE_REQUIRED",
+      "repeated_root_causes": [
+        "SOURCE_FAMILY_BEVEL_MISMATCH"
+      ],
+      "reason": "Repeated independent C failures in one root-cause family: SOURCE_FAMILY_BEVEL_MISMATCH. Stop same-method retries; make a new source-derived family profile and construction method before creating another candidate.",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "note": "No state transition or game QA is inferred by this read-only diagnosis."
+}
