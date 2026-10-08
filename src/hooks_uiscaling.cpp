@@ -98,6 +98,9 @@ class UIScaling : public Hook
 	inline static thread_local unsigned RankMarkerSubScreenHudDepth = 0;
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
+	// Canonical EXE Inspector verified first DispRank kind-1 CALL E8->0x29530.
+	// This producer is separate from the eight following kind-0 clip sprites.
+	static constexpr int DispRankFirstSpraniCall = 0xB9DA6;
 	// The original result screen emits a progress/percentage sprite through
 	// two separate calls to 0x2D200. Both had their own exact ownership in
 	// the historically validated R74 producer map (canonical EXE SHA pinned).
@@ -544,6 +547,26 @@ class UIScaling : public Hook
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
 			projected ? &RankMarkerProjectedInfo : nullptr);
+		return result;
+	}
+
+	using DispRankFirstSpraniFn = int(__cdecl*)(uint32_t, float, float, int, int);
+	static int __cdecl DispRankFirst_sprani(
+		uint32_t spriteId, float x, float y, int a4, int a5)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+		auto original = reinterpret_cast<DispRankFirstSpraniFn>(
+			Module::exe_ptr(0x29530));
+		const int result = original(spriteId, x, y, a4, a5);
+		// Keep the original first position (kind_C=1) and any animated
+		// siblings on the same finite ScreenHud plane as eight kind-0 clips.
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
 		return result;
 	}
 
@@ -1003,6 +1026,8 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHud_putClipSprite,
 				Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(DispRankFirstSpraniCall),
+			DispRankFirst_sprani, Memory::HookType::Call);
 		for (int addr : ExactScreenHudRight_ClipSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHudRight_putClipSprite,
