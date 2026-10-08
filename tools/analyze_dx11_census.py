@@ -2284,7 +2284,7 @@ def main() -> int:
             source_pair_correlated = bool(
                 source_semantic_pair is not None
                 and source_semantic_pair["exact"]
-                and source_semantic_pair["summary_correlation_exact"]
+                and source_semantic_pair["exact_state_correlated"]
             )
             mapping_correlated = bool(
                 register_mapping_plan is not None
