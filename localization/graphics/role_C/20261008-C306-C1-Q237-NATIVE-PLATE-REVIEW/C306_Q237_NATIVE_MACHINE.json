@@ -1,0 +1,131 @@
+{
+  "orientation_index": 6,
+  "clean_outside_candidates": [
+    581303,
+    343772,
+    581303,
+    343772,
+    0,
+    239190,
+    0,
+    239190
+  ],
+  "source_clean_outside": 0,
+  "source_final_outside": 0,
+  "clean_final_outside": 0,
+  "clean_final_outside_candidate_bounds": 0,
+  "clean_alpha_in_original": 0,
+  "rows": [
+    {
+      "id": "small_create",
+      "margins": [
+        2,
+        236,
+        2,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 8496,
+      "source_localized_changed": 19264
+    },
+    {
+      "id": "small_custom",
+      "margins": [
+        2,
+        223,
+        2,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 8013,
+      "source_localized_changed": 18388
+    },
+    {
+      "id": "small_quick",
+      "margins": [
+        2,
+        226,
+        4,
+        5
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 7349,
+      "source_localized_changed": 17746
+    },
+    {
+      "id": "help_create",
+      "margins": [
+        2,
+        69,
+        5,
+        6
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 39461,
+      "source_localized_changed": 46637
+    },
+    {
+      "id": "help_custom",
+      "margins": [
+        2,
+        181,
+        10,
+        11
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 41723,
+      "source_localized_changed": 49957
+    },
+    {
+      "id": "help_quick",
+      "margins": [
+        2,
+        84,
+        2,
+        2
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 33842,
+      "source_localized_changed": 39340
+    },
+    {
+      "id": "big_create",
+      "margins": [
+        2,
+        534,
+        3,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 47159,
+      "source_localized_changed": 96467
+    },
+    {
+      "id": "big_quick",
+      "margins": [
+        2,
+        515,
+        7,
+        8
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 40786,
+      "source_localized_changed": 89895
+    },
+    {
+      "id": "big_custom",
+      "margins": [
+        2,
+        555,
+        3,
+        4
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 44084,
+      "source_localized_changed": 92537
+    }
+  ],
+  "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+  "note": "Orientation 6 aligns both RAW DDS to readable FLIP-Y and CLEAN PNG; no visual approval inferred."
+}

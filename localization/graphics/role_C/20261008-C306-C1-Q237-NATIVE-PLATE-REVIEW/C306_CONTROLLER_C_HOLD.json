@@ -1,0 +1,160 @@
+{
+  "task_id": "OUTRUN-KOR-C306-C1-Q237-NATIVE-PLATE-20261008",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "index": 237,
+  "status": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED_PENDING_QUALIFIED_C",
+  "SOURCE_SHA256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "CANDIDATE_SHA256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+  "CLEAN_SHA256": "8ca0e291e745b176f18a626c76ee54339031643ebb395e293af77804d0aa00f0",
+  "triage": "FRESH_C_REVIEW",
+  "triage_command": "python tools/localization/rework_triage.py --index 237",
+  "backend": "GitHub SSOT/ChatGPT visual; N100 MCP bounded native decode (local DNS unavailable)",
+  "machine_report": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_NATIVE_MACHINE.json",
+  "machine": {
+    "source_clean_outside": 0,
+    "source_final_outside": 0,
+    "clean_final_outside": 0,
+    "clean_final_outside_candidate_bounds": 0,
+    "clean_alpha_in_original": 0,
+    "all_nine_positive_margins": true,
+    "native_resolution": [
+      2048,
+      2048
+    ],
+    "orientation": "raw mirror-Y / readable FLIP-Y"
+  },
+  "regions": [
+    {
+      "id": "small_create",
+      "margins": [
+        2,
+        236,
+        2,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 8496,
+      "source_localized_changed": 19264,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R01_small_create_LOSSLESS.png"
+    },
+    {
+      "id": "small_custom",
+      "margins": [
+        2,
+        223,
+        2,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 8013,
+      "source_localized_changed": 18388,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R02_small_custom_LOSSLESS.png"
+    },
+    {
+      "id": "small_quick",
+      "margins": [
+        2,
+        226,
+        4,
+        5
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 7349,
+      "source_localized_changed": 17746,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R03_small_quick_LOSSLESS.png"
+    },
+    {
+      "id": "help_create",
+      "margins": [
+        2,
+        69,
+        5,
+        6
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 39461,
+      "source_localized_changed": 46637,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R04_help_create_LOSSLESS.png"
+    },
+    {
+      "id": "help_custom",
+      "margins": [
+        2,
+        181,
+        10,
+        11
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 41723,
+      "source_localized_changed": 49957,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R05_help_custom_LOSSLESS.png"
+    },
+    {
+      "id": "help_quick",
+      "margins": [
+        2,
+        84,
+        2,
+        2
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 33842,
+      "source_localized_changed": 39340,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R06_help_quick_LOSSLESS.png"
+    },
+    {
+      "id": "big_create",
+      "margins": [
+        2,
+        534,
+        3,
+        3
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 47159,
+      "source_localized_changed": 96467,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R07_big_create_LOSSLESS.png"
+    },
+    {
+      "id": "big_quick",
+      "margins": [
+        2,
+        515,
+        7,
+        8
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 40786,
+      "source_localized_changed": 89895,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R08_big_quick_LOSSLESS.png"
+    },
+    {
+      "id": "big_custom",
+      "margins": [
+        2,
+        555,
+        3,
+        4
+      ],
+      "plate_remaining_alpha": 0,
+      "changed_clean_final": 44084,
+      "source_localized_changed": 92537,
+      "lossless_png": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_Q237_R09_big_custom_LOSSLESS.png"
+    }
+  ],
+  "visual_observation": "Nine native lossless SOURCE/CLEAN/FINAL panels and previously authored SOURCE/FINAL RAW plus practical 50% reviewed; earlier displaced pink/red bevel is absent; flat red/gray native text readable and no definite plate ghost or foreign patch established. Native bbox masks must not be taken as C full visual approval. Crop margins include neighboring atlas rows but glyphs do not cross the declared localized bounds.",
+  "blind_calibration_completed": false,
+  "pixels_before_producer_verdict": false,
+  "qualified_family_reference": false,
+  "current_policy_region_bgw_and_scale_evidence_complete": false,
+  "hold_reason": "Producer notes seen before first pixel look; blind control/rejected-case calibration and full per-region family/slant/mip/protected artwork observations not qualified. Separate C3 and current-policy approval blocked.",
+  "independent_new_C_PASS": 0,
+  "new_dds": 0,
+  "approval": false,
+  "user_acceptance": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "created_at_kst": "2026-10-08 22:24 KST"
+}

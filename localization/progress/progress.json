@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 22:08 KST",
+  "updated_at_kst": "2026-10-08 22:24 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7921,5 +7921,17 @@
     "user": "NOT_APPROVED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c306_c1_q237_native_hold": {
+    "task_id": "OUTRUN-KOR-C306-C1-Q237-NATIVE-PLATE-20261008",
+    "index": 237,
+    "sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+    "lossless_png": 9,
+    "outside_pixel_differences": 0,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "approved": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_CONTROLLER_C_HOLD.json"
   }
 }

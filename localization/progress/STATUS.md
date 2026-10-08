@@ -3085,3 +3085,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 22:08 KST — A195 q237 FF514CEB native DDS replacement
 - C1 red/gray unsupported-bevel rejection addressed with source flat face. Persisted new DDS `39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2`, 9/9 original bbox+positive margins and 0 outside/protected/source-residue/overlap. SOURCE/CLEAN/FINAL, RAW/FLIP-Y, 100/75/50 controller producer visual PASS; no opaque/foreign box. Fresh independent C1 + distinct C3 + current-policy approval and actual game retest remain pending; RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json`.
+
+### 2026-10-08 22:24 KST — C306 C1 q237
+- `TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL)`; 9 independent native lossless SOURCE/CLEAN/FINAL panels. Outside-changes 0 for three stages and clean alpha0 within source regions, 9 positive margins, no new DDS. Visual flat-red prior bevel issue not reproduced. C `HOLD_STRICT_RECHECK` until qualified blind calibration/per-region family and distinct C3. PRE_INGAME/user/game not approved. `RUNTIME_VALIDATION=UNTESTED`.
