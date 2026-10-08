@@ -10,7 +10,9 @@ if os.getenv("OUTRUN_CPU_WORKER") != "github-actions" or os.getenv("OUTRUN_CPU_R
 R=Path(".")
 O=R/"localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED"
 O.mkdir(parents=True,exist_ok=True)
-TRIAGE=subprocess.run(["python","tools/localization/rework_triage.py","--index","214"],capture_output=True,text=True,check=True)
+TRIAGE=subprocess.run(["python","tools/localization/rework_triage.py","--index","214"],capture_output=True,text=True)
+if TRIAGE.returncode:
+    raise SystemExit("q214 rework triage failed: "+TRIAGE.stderr.strip())
 triage=json.loads(TRIAGE.stdout)
 assert len(triage["assets"])==1 and triage["assets"][0]["index"]==214
 (O/"C289_TRIAGE.json").write_text(json.dumps(triage,ensure_ascii=False,indent=2)+"\n")
