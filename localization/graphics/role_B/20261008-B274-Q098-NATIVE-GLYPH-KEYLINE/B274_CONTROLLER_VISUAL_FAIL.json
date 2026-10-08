@@ -1,0 +1,36 @@
+{
+  "run": "B274",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "trial_sha256": "a906b7a637eeca200bf27fc4ac5d007021024b22045c70a90af906f3ab1872e3",
+  "previous_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "method": "NEW_WHOLE_BC3_4COLOR_SOURCE_WHITE_NAVY_ATTEMPT",
+  "status": "PRODUCER_VISUAL_FAIL_REJECTED",
+  "machine": {
+    "source_clean_outside": 0,
+    "source_clean_alpha_remnants": 0,
+    "alpha_exact": true,
+    "header_exact": true,
+    "changed_outside_bbox": 0,
+    "blocks_rebuilt": 3511,
+    "changed_pixels": 50021
+  },
+  "visual_observations": [
+    "Native and 50 percent SOURCE/CLEAN/OLD/B274 shown in READABLE_GRAY_100_SOURCE_CLEAN_OLD_B274.png and READABLE_GRAY_50_SOURCE_CLEAN_OLD_B274.png.",
+    "Trial renders broad navy-filled Hangul silhouettes with scant remaining white face, unlike canonical source white solid italic with navy keyline. The 3-5px erosions eliminated substantial glyph-face strokes.",
+    "RAW_BLACK_75_SOURCE_CLEAN_OLD_B274.png corroborates incorrect colored-face hierarchy in the mirrored orientation."
+  ],
+  "defects": [
+    "SOURCE_FAMILY_WHITE_FACE_UNDERFILL",
+    "EXCESSIVE_NAVY_INTERIOR",
+    "BROKEN_GLYPH_FACE"
+  ],
+  "candidate_promoted": false,
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Recolor the full authored high-alpha face with source white while retaining original-alpha exterior navy outline; inspect persisted bytes before promotion.",
+  "backend": "GITHUB_ACTIONS_OFFLOAD_LOCAL_DNS_BLOCKED",
+  "no_VR_FFB_DX11_DXVK": true
+}
