@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C274-C1-Q059-EVIDENCE",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T11:18:00+09:00",
+  "selection_head": "85897fc6dda3fd62a78d1aa8e3fffd2c6dffa673",
+  "queue_index": 59,
+  "asset": "7CE1CFC5",
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "trigger": "PJR-019 user-JPG regression; A184R materially changed bytes after C271",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "persisted_dds_identity": {
+    "result": "PASS",
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "file_size": 1048704,
+    "sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "raw_orientation": "mirror_y",
+    "backend": "N100 MCP metadata/hash verification only"
+  },
+  "producer_machine_context": {
+    "source_bbox_by_row": {
+      "next_mission": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "race_rivals": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "drift_score": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "slipstream_score": [
+        717,
+        225,
+        1408,
+        320
+      ]
+    },
+    "candidate_bbox_by_row": {
+      "next_mission": [
+        356,
+        358,
+        944,
+        495
+      ],
+      "race_rivals": [
+        159,
+        226,
+        541,
+        299
+      ],
+      "drift_score": [
+        142,
+        58,
+        586,
+        131
+      ],
+      "slipstream_score": [
+        817,
+        236,
+        1308,
+        309
+      ]
+    },
+    "source_vs_candidate_size": {
+      "next_mission": {
+        "source": [
+          1285,
+          147
+        ],
+        "candidate": [
+          588,
+          137
+        ],
+        "width_ratio": 0.4576,
+        "height_ratio": 0.932
+      },
+      "race_rivals": {
+        "source": [
+          550,
+          82
+        ],
+        "candidate": [
+          382,
+          73
+        ],
+        "width_ratio": 0.6945,
+        "height_ratio": 0.8902
+      },
+      "drift_score": {
+        "source": [
+          490,
+          84
+        ],
+        "candidate": [
+          444,
+          73
+        ],
+        "width_ratio": 0.9061,
+        "height_ratio": 0.869
+      },
+      "slipstream_score": {
+        "source": [
+          691,
+          95
+        ],
+        "candidate": [
+          491,
+          73
+        ],
+        "width_ratio": 0.7106,
+        "height_ratio": 0.7684
+      }
+    },
+    "reported_zero_gates": "4/4 bbox/size/positive-margin; outside/alpha/introduced-visible/source-residue/protected/overlap/touch=0",
+    "note": "These zero-gate values are producer evidence bound to this SHA, not independently recomputed by C274 and therefore do not authorize PASS."
+  },
+  "evidence": {
+    "source_clean_final": {
+      "path": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg",
+      "sha256": "a142559d1293271b6a03ce703042c1388c1e4846c2a4e79b75ec26e576513c01"
+    },
+    "per_region_contact": {
+      "path": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg",
+      "sha256": "8d3134c8c164a82540afc65eaefed4236cfbcf794fb649df3924fe30cd08726f"
+    },
+    "raw_compare": {
+      "path": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg",
+      "sha256": "f1aaa2b7b9c953e419613ac733ddf2939a612d9dfff6141cf71e0cd9a63606fe"
+    },
+    "practical_100_75_50": {
+      "path": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg",
+      "sha256": "0300b2224004638a19e2eb4cdd94713bed860bac5e9d47fb1f17efbb443db972"
+    }
+  },
+  "sequencing": {
+    "pixels_before_producer_verdict": false,
+    "reason": "The live queue producer notes were exposed before exact-pixel first-look in this invocation. The evidence gate therefore forbids a current-policy PASS/approval claim."
+  },
+  "visual_review": {
+    "overall_observation": "A184R materially improves the C271-rejected source-family effects. The three small labels now show the strong white keyline/halo and navy depth; NEXT MISSION->다음 미션 restores the pale/white-to-orange/yellow face, navy depth and readable right lean. At 100/75/50 the Korean remains legible and the big title is still vertically dominant. Its width is naturally much shorter than English (588/1285), but no definite visual failure is asserted solely from width ratio because policy forbids arbitrary English-width targeting.",
+    "findings": {
+      "next_mission": {
+        "slant": {
+          "result": "PASS",
+          "observation": "Readable lean is in the same right-italic direction as the source family; no opposite-slant regression is visible.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Reviewed CLEAN band is visually free of the English lettering and does not show an obvious patch rectangle or source-script ghost.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "style": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "The orange/white/yellow graded face, white edge and navy depth are materially closer to source than B249. The Hangul family remains visually compact, but the title preserves strong vertical hierarchy and readable right lean; width ratio alone is not treated as a defect.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "readability": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Readable at native, 75% and 50%; effect weight no longer obscures the Hangul counters in the supplied practical strip.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "No broken Hangul, tofu, clipped stroke or missing syllable is visible in the reviewed contact/practical evidence.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "Cars/speed streaks and non-target graphics remain visually isolated from localized lettering.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "placement": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Centered within the source title footprint with large horizontal margins; no source/protected collision is visible.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "RAW mirror-Y comparison is consistent with the readable presentation and shows no orientation-only defect.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg"
+        }
+      },
+      "race_rivals": {
+        "slant": {
+          "result": "PASS",
+          "observation": "Readable lean is in the same right-italic direction as the source family; no opposite-slant regression is visible.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Reviewed CLEAN band is visually free of the English lettering and does not show an obvious patch rectangle or source-script ghost.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "style": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Yellow face, strong white keyline and navy depth now materially match the small-label source family.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "readability": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Legible at all supplied practical scales with open Hangul counters.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "No broken Hangul, tofu, clipped stroke or missing syllable is visible in the reviewed contact/practical evidence.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "Cars/speed streaks and non-target graphics remain visually isolated from localized lettering.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "placement": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Contained and visually separated from neighboring art.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "RAW mirror-Y comparison is consistent with the readable presentation and shows no orientation-only defect.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg"
+        }
+      },
+      "drift_score": {
+        "slant": {
+          "result": "PASS",
+          "observation": "Readable lean is in the same right-italic direction as the source family; no opposite-slant regression is visible.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Reviewed CLEAN band is visually free of the English lettering and does not show an obvious patch rectangle or source-script ghost.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "style": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Yellow/white/navy family and emphasis are close to the source row; no obvious flat generic-caption regression remains.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "readability": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Legible at all supplied practical scales.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "No broken Hangul, tofu, clipped stroke or missing syllable is visible in the reviewed contact/practical evidence.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "Cars/speed streaks and non-target graphics remain visually isolated from localized lettering.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "placement": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Contained with no visible collision.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "RAW mirror-Y comparison is consistent with the readable presentation and shows no orientation-only defect.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg"
+        }
+      },
+      "slipstream_score": {
+        "slant": {
+          "result": "PASS",
+          "observation": "Readable lean is in the same right-italic direction as the source family; no opposite-slant regression is visible.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Reviewed CLEAN band is visually free of the English lettering and does not show an obvious patch rectangle or source-script ghost.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "style": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Yellow/white/navy source-family treatment is restored and remains readable.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "readability": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Legible at all supplied practical scales.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "No broken Hangul, tofu, clipped stroke or missing syllable is visible in the reviewed contact/practical evidence.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "Cars/speed streaks and non-target graphics remain visually isolated from localized lettering.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg"
+        },
+        "placement": {
+          "result": "PASS_WITH_REVIEW_NOTE",
+          "observation": "Contained with no visible collision into the nearby car/streak artwork.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg"
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "RAW mirror-Y comparison is consistent with the readable presentation and shows no orientation-only defect.",
+          "evidence": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg"
+        }
+      }
+    }
+  },
+  "evidence_completeness": {
+    "lossless_region_source_clean_final_png": false,
+    "native_zoom_practical_raw_black_white_gray_per_region": false,
+    "independent_machine_report": false,
+    "current_policy_approval_complete": false
+  },
+  "stages": {
+    "C": {
+      "review_id": "C274-Q059-C-HOLD",
+      "reviewer": "ChatGPT AI 1",
+      "pixels_before_producer_verdict": false,
+      "result": "HOLD_STRICT_RECHECK",
+      "reason": "Visual evidence is favorable, but required pixels-first sequencing and complete lossless per-region/native/zoom/practical/RAW/black-white-gray evidence are not satisfied in this invocation."
+    },
+    "C3": {
+      "review_id": null,
+      "result": "BLOCKED_PENDING_CURRENT_POLICY_FRESH_C_PASS"
+    }
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED",
+  "candidate_changed_by_C": false,
+  "queue_integrity_issue": {
+    "observed": true,
+    "issue": "A184R queue sync left an extra closing quote at the end of q59, causing standard CSV parsers to absorb q60+ into q59 notes.",
+    "corrective_action": "Remove only the extra quote while updating q59 status/notes; no DDS bytes or unrelated queue semantics changed."
+  },
+  "pjr_019": "OPEN_PENDING_PIXELS_FIRST_FRESH_C1_C3_USER_JPG_AND_NEW_INGAME_RETEST",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
