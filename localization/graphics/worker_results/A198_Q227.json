@@ -1,0 +1,25 @@
+{
+  "run": "20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT",
+  "queue_index": 227,
+  "candidate_sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+  "prior_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+  "rows": 16,
+  "professional_before_after": [
+    51,
+    72
+  ],
+  "machine_qa": {
+    "source_clean_removed_pixels": 531382,
+    "source_clean_changed_outside_source_bboxes": 0,
+    "source_final_changed_outside_source_bboxes": 0,
+    "source_final_alpha_changed_outside": 0,
+    "clean_final_changed_outside_Korean_glyphs": 0,
+    "source_script_exact_residue_outside_final_glyphs": 0,
+    "protected_art_changed": 0,
+    "localized_overlap_pairs": 0,
+    "glyph_original_bbox_failures": 0
+  },
+  "report": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_WORKER_REPORT.json",
+  "producer_status": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
