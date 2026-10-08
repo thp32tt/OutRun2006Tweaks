@@ -1531,6 +1531,38 @@ namespace OutRunVRStereo
         };
 
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
+        // Original HUD glyphs may share the last game c64 for more than 12
+        // draws, but a different shader epoch or older-frame WVP is not proof.
+        constexpr std::uint64_t R30ExactHudRawWvpDrawWindow = 128u;
+        std::uint64_t R30ExactHudExtendedRawWvp = 0;
+        std::uint64_t R30ExactHudRawWvpMiss = 0;
+
+        bool R30GetExtendedRawWvpForExactHud(float outConstants[16]) noexcept
+        {
+            if (!outConstants ||
+                !OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::CurrentScope))
+                return false;
+            std::uint64_t writeSerial = 0;
+            std::uint64_t writeDrawSerial = 0;
+            std::uintptr_t writeShader = 0;
+            std::uint64_t writeShaderSerial = 0;
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderSerial = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    outConstants, writeSerial, writeDrawSerial,
+                    writeShader, writeShaderSerial) ||
+                !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
+                writeShader == 0 || writeShader != currentShader ||
+                writeShaderSerial == 0 ||
+                writeShaderSerial != currentShaderSerial)
+                return false;
+            const std::uint64_t currentDraw = TopLevelDrawSerial() + 1u;
+            if (currentDraw <= writeDrawSerial ||
+                currentDraw - writeDrawSerial > R30ExactHudRawWvpDrawWindow)
+                return false;
+            return true;
+        }
 
         bool R44GetOwnedRawOverlayWvp(
             float outConstants[16], std::uint64_t* drawAge = nullptr) noexcept
@@ -3871,17 +3903,32 @@ namespace OutRunVRStereo
                 // a live register that may already contain our head correction.
                 if (!R44GetOwnedRawOverlayWvp(original))
                 {
-                    // R51: an exact WORLD_BILLBOARD semantic is already stronger
-                    // than the old 12-draw R44 age heuristic. The classifier has
-                    // just excluded both current-verified and strict R28-rebind
-                    // world ownership, so the live c64 is the remaining placement
-                    // source. This fixes rank-marker groups whose raw upload was
-                    // older than R44OverlayWvpDrawWindow without widening any
-                    // untagged draw.
-                    if (FAILED(device->GetVertexShaderConstantF(
-                            OutRunWvpRegister, original,
-                            OutRunWvpRegisterCount)))
-                        return false;
+                    if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+                    {
+                        // The queued +TIME/goal/result/6th text is explicitly
+                        // ScreenHud. With a stale 12-draw owner, the *live* GPU
+                        // c64 may contain the renderer's head-injected world
+                        // WVP. Applying the HUD inverse on that again produces
+                        // eye mismatch or head-following double correction.
+                        // Accept only the last original game upload with the
+                        // same shader epoch and a bounded draw age. Never use
+                        // a live potentially already-injected c64 for HUD.
+                        if (!R30GetExtendedRawWvpForExactHud(original))
+                        {
+                            ++R30ExactHudRawWvpMiss;
+                            return false;
+                        }
+                        ++R30ExactHudExtendedRawWvp;
+                    }
+                    else
+                    {
+                        // Exact WorldBillboard and ProjectedWorldMarker2D
+                        // preserve the existing proven R51 long-batch route.
+                        if (FAILED(device->GetVertexShaderConstantF(
+                                OutRunWvpRegister, original,
+                                OutRunWvpRegisterCount)))
+                            return false;
+                    }
                 }
             }
             else if (FAILED(device->GetVertexShaderConstantF(
