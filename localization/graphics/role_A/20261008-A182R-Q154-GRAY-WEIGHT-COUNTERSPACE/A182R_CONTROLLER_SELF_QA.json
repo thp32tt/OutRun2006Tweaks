@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE",
+  "timestamp_kst": "2026-10-08T09:11:00+09:00",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "work_stolen_from_lane": "B",
+  "selection_reason": "A odd shard had no actionable material target after q59 was concurrently repaired by B249; q154 was the only remaining C268 material REWORK_REQUIRED and was work-stolen after fresh HEAD/queue refresh.",
+  "c_return": "C268_REWORK_REQUIRED_GRAY_WEIGHT_COUNTER_SPACE",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "c268_rejected_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "controller_rejected_intermediate_a182_sha256": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "machine_qa": {
+    "result": "PASS",
+    "bbox_source_size_positive_margin": "3/3 PASS",
+    "changed_pixels_outside_gray_source_bboxes": 0,
+    "alpha_changed_outside_gray_source_bboxes": 0,
+    "protected_visible_changed": 0,
+    "red_family_changed_pixels": 0,
+    "header_128_exact": true,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "density_gate": {
+    "single_player_gray": {
+      "c268": 1.3933,
+      "a182r": 0.9553,
+      "reduction_pct": 31.43
+    },
+    "showroom_gray": {
+      "c268": 1.2361,
+      "a182r": 0.8738,
+      "reduction_pct": 29.31
+    },
+    "multiplayer_gray": {
+      "c268": 1.3872,
+      "a182r": 0.9685,
+      "reduction_pct": 30.18
+    }
+  },
+  "controller_visual_qa": {
+    "result": "PASS",
+    "evidence": [
+      "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/A182R_Q154_GRAY_PRACTICAL_100_75_50.jpg",
+      "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/A182R_Q154_SOURCE_B225_CLEAN_FINAL.jpg",
+      "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/SOURCE_RAW.jpg",
+      "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/A182R_RAW.jpg",
+      "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_Q154_GRAY_PRACTICAL_100_75_50.jpg"
+    ],
+    "observations": [
+      "C268-rejected B225 gray Hangul was visibly too blocky and compressed internal counters at practical 50% scale.",
+      "The first A182 no-stroke density fix opened counters but controller precheck rejected promotion risk because its optical weight was lighter than the source family.",
+      "A182R selects native Noto Sans CJK KR Bold with zero added stroke. SINGLE PLAYER and MULTIPLAYER now sit near source text-density ratios (0.9553/0.9685); SHOWROOM is 0.8738 while remaining immediately legible at 50%.",
+      "All three gray labels keep the B225 source-left footprint, upright transform, gray color, exact source bboxes and positive margins. Counters are visibly open; no clipped/broken Hangul or overlap is observed.",
+      "C141 clean plate is reused only inside the three gray source footprints. Red-family rows, protected/Ferrari artwork and every pixel outside the three gray bboxes remain unchanged.",
+      "RAW mirror-Y evidence is structurally preserved; no orientation regression is observed."
+    ],
+    "evidence_label_note": "In the A182R generated comparison, the middle panel display caption says B225 but its byte-bound underlying image is the immediate A182 precheck candidate dd4a3719... because A182R started from that exact candidate. The separate A182 comparison contains the true B225->A182 transition. SHA-bound reports are authoritative."
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS",
+    "source_matching_slant_direction": "PASS_UPRIGHT",
+    "no_unnecessary_undersizing": "PASS_B225_FOOTPRINT_PRESERVED",
+    "source_faithful_weight_outline_shadow": "PASS_BOLD_ZERO_ADDED_STROKE_DENSITY_REBALANCED",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS_100_75_50"
+  },
+  "decision": "A182R_SELF_QA_PASS_PENDING_FRESH_C2_EXACT_SHA_C3_PRE_INGAME_USER_JPG_INGAME",
+  "fresh_independent_c": "REQUIRED_C2",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
