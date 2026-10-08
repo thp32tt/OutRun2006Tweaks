@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A190-Q119-SOURCE-WHITE-HALO",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_provenance": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+    "sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552"
+  },
+  "translation": {
+    "source": "Time Attack Mode",
+    "korean": "타임 어택 모드"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "construction": {
+    "clean_plate": "exact source glyph/effect bbox cleared to transparent; source contains no nontransparent pixels outside bbox",
+    "render": "native 2048x256 Noto Sans CJK KR Black; C290 material defect correction: source-sampled white outer luminous rim + diffuse halo behind orange/navy outline, same 0.17 right shear; height refit for 12px padding",
+    "dxt5_boundary": "full-inside 4x4 blocks use fresh DXT5 encode; partial boundary blocks retain original endpoints/color bytes/outside indices and set only inside alpha indices to an existing exact-zero palette entry; outside blocks byte-identical source",
+    "block_counts": {
+      "full_inside": 11160,
+      "partial_boundary": 347,
+      "outside_unchanged": 21261
+    }
+  },
+  "style": {
+    "font": "Noto Sans CJK KR Black",
+    "font_size": 97,
+    "fill_rgba": [
+      236,
+      128,
+      2,
+      255
+    ],
+    "outline_rgba": [
+      0,
+      9,
+      38,
+      255
+    ],
+    "outline_px": 10,
+    "shear": 0.17,
+    "white_halo_rgb": [
+      255,
+      255,
+      255
+    ],
+    "halo_pad": 12,
+    "source_bright_pixel_count": 38689
+  },
+  "elements": [
+    {
+      "source": "Time Attack Mode",
+      "korean": "타임 어택 모드",
+      "original_bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "localized_bbox": [
+        705,
+        58,
+        1317,
+        196
+      ],
+      "source_width": 1242,
+      "source_height": 146,
+      "localized_width": 612,
+      "localized_height": 138,
+      "delta_left": 315,
+      "delta_right": 315,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "clean_plate_source_residue_pixels": 0,
+    "changed_pixels_outside_original_bbox": 0,
+    "alpha_changed_outside_original_bbox": 0,
+    "source_residue_outside_korean_guard": 0,
+    "unexpected_visible_pixels_outside_korean_guard": 0,
+    "localized_overlap_pixels": 0,
+    "protected_pixels_changed": 0,
+    "dds_size_preserved": true,
+    "source_bright_count": 38689,
+    "decoded_final_bright_count": 20303,
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "candidate_sha256": "d7e1378f1adac5ba1069985583cbcba30d8bc2f9b496110e865a3dd827b55490",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A190_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "supersedes_rejected_candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+  "qa_gate": "Pending first-hand native SOURCE/CLEAN/FINAL, 4x/practical/RAW controller review; numeric PASS never authorizes C approval"
+}
