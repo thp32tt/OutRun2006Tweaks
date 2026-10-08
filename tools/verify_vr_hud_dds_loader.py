@@ -74,6 +74,25 @@ def verify(text):
     strip=lambda s: re.sub(r"\s+","",re.sub(r"//[^\n]*","",s))
     ui_clean=strip(ui)
     orig_clean=strip(orig)
+    # Both UI hooks must retry the untouched game DDS only after the
+    # selected replacement fails native decode. Fast decoding must not
+    # short-circuit a successful replacement or trigger original retry.
+    state=body(text,"struct UiDdsOriginalState")
+    state_clean=strip(state)
+    ui_clean=strip(ui)
+    orig_clean=strip(orig)
+    state_guards=[
+        "memcpy(&header, data, sizeof(DDS_FILE));",
+        "scaleKey = (CurrentXstsetIndex << 16) | textureNum;",
+        "previousScale = found->second;",
+        "return snapshotted && selectedData && selectedData != data;",
+        "memcpy(data, &header, sizeof(DDS_FILE));",
+        "sprite_scales[scaleKey] = previousScale;",
+        "sprite_scales.erase(scaleKey);",
+    ]
+    for guard in state_guards:
+        if strip(guard) not in state_clean:
+            raise ValueError("UI replacement rollback lacks "+guard)
     fast=(
         "const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom("
         "pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
@@ -83,16 +102,30 @@ def verify(text):
         "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)"
         "return fastResult;"
     )
-    legacy=(
-        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
+    native=(
+        "const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
         "pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
         "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);"
     )
-    if not ui_clean.endswith(strip(fast+gated+legacy)):
-        raise ValueError("fast UI DDS failure must route to guarded legacy Ex decoder")
-    if not orig_clean.endswith(strip(legacy)):
-        raise ValueError("legacy UI DDS fallback differs from Orig_dest trampoline")
-    return len(guards) + 2
+    failed=(
+        "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))"
+        "return nativeResult;"
+        "original.restoreOriginal();"
+    )
+    fallback=(
+        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
+        "pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
+        "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);"
+    )
+    for name,clean,sequence in (
+        ("fast",ui_clean,fast+gated+native+failed+fallback),
+        ("original allocator",orig_clean,native+failed+fallback),
+    ):
+        if "const UiDdsOriginalState original(pSrcData, SrcDataSize);" not in clean:
+            raise ValueError(name+" UI path must snapshot original before replacement")
+        if not clean.endswith(strip(sequence)):
+            raise ValueError(name+" UI path must restore exact original after native replacement failure")
+    return len(guards) + len(state_guards) + 2
 
 def negatives(text):
     needles=[
@@ -116,6 +149,12 @@ def negatives(text):
         "completeMipPayload = false;",
         "firstMipSize <= size - sizeof(DDS_FILE)",
         "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)",
+        "previousScale = found->second;",
+        "memcpy(data, &header, sizeof(DDS_FILE));",
+        "sprite_scales.erase(scaleKey);",
+        "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))",
+        "original.restoreOriginal();",
+        "pDevice, original.data, original.bytes, D3DX_DEFAULT",
         "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
     ]
     for token in needles:

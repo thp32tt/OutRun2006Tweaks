@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00551",
+  "production_id": "CONVERSION-DX9EX-00551",
+  "event_id": "CONVERSION-DX9EX-00551-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "30ff1d7baed6a9db919850e7ac2a4efafb91c117",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00551]",
+  "selected_work_item": "DX9EX-P0-UI-DDS-FAILED-REPLACEMENT-ORIGINAL-RETRY",
+  "status": "C3_EXACT_SHA_CI_PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "Snapshot original DDS and scale before replacement, restore and retry original on failed selected UI decode for fast and original allocator paths.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/reviews/CONVERSION_DX9EX_00551_UI_DDS_ORIGINAL_RETRY.md",
+    "docs/automation/runs/CONVERSION-DX9EX-00551.json"
+  ],
+  "score_award": "NOT_AWARDED_PENDING_EXACT_SHA_VALIDATION",
+  "retry_allowed": false,
+  "preexisting_hmd_failure": "CONVERSION-DX9EX-00519",
+  "preexisting_validation": "00550 material SHA 6d9041ed5abcf2275809db289cd8614c99369cda PASS, not repeated",
+  "no_hud_1000_5000_repetition": true,
+  "next_action": "Inspect exact material SHA DX9Ex Active, HUD Inspector, Domain Isolation. On PASS, close C6 once and consider distinct remaining P0 work; do not repeat same task."
+}

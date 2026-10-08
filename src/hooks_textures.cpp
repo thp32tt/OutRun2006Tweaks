@@ -1008,10 +1008,58 @@ class TextureReplacement : public Hook
 		}
 	}
 
+	// The selected UI replacement is only committed when texture creation succeeds.
+	// HandleTexture updates the original DDS header and sprite scale eagerly; on
+	// decoder failure restore both before trying the untouched original DDS.
+	struct UiDdsOriginalState
+	{
+		void* data;
+		UINT bytes;
+		DDS_FILE header{};
+		int scaleKey = 0;
+		bool snapshotted = false;
+		bool hadScale = false;
+		std::pair<float, float> previousScale{};
+
+		UiDdsOriginalState(void* originalData, UINT originalBytes)
+			: data(originalData), bytes(originalBytes)
+		{
+			if (!data || bytes < sizeof(DDS_FILE) || !Settings::UITextureReplacement)
+				return;
+			memcpy(&header, data, sizeof(DDS_FILE));
+			const int textureNum = *Module::exe_ptr<int>(0x55B25C);
+			scaleKey = (CurrentXstsetIndex << 16) | textureNum;
+			const auto found = sprite_scales.find(scaleKey);
+			if (found != sprite_scales.end())
+			{
+				hadScale = true;
+				previousScale = found->second;
+			}
+			snapshotted = true;
+		}
+
+		bool replacementSelected(const void* selectedData) const
+		{
+			return snapshotted && selectedData && selectedData != data;
+		}
+
+		void restoreOriginal() const
+		{
+			if (!snapshotted)
+				return;
+			memcpy(data, &header, sizeof(DDS_FILE));
+			if (hadScale)
+				sprite_scales[scaleKey] = previousScale;
+			else
+				sprite_scales.erase(scaleKey);
+		}
+	};
+
 	// Two versions of the func depending on Settings::UseNewTextureAllocator, to reduce branching
 	inline static SafetyHookInline D3DXCreateTextureFromFileInMemory = {};
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		const UiDdsOriginalState original(pSrcData, SrcDataSize);
 		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if (pSrcData && SrcDataSize)
 		{
@@ -1019,20 +1067,27 @@ class TextureReplacement : public Hook
 				transientTextureData);
 		}
 
-		// Call D3DXCreateTextureFromFileInMemoryEx instead of D3DXCreateTextureFromFileInMemory, so we can specify no mipmaps
-		// Should prevent D3D from trying to generate mipmaps, reducing load times of non-mipped UI textures quite a bit
-		// Fast DDS is intentionally format-limited. Preserve the legacy D3DX UI
-		// decoder on failure instead of leaving menus/car-selection blank.
-		// The Ex trampoline is the same one used by the existing Orig_dest path.
+		// Prefer the fast DDS decoder, then original D3DX on the selected DDS.
+		// If BOTH reject an optional UI replacement, retry the unmodified game
+		// DDS and revoke its premature header/scale changes.
 		const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom(
 			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);
 		if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)
 			return fastResult;
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
+			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+			return nativeResult;
+		original.restoreOriginal();
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
+			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		const UiDdsOriginalState original(pSrcData, SrcDataSize);
 		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if (pSrcData && SrcDataSize)
 		{
@@ -1040,9 +1095,15 @@ class TextureReplacement : public Hook
 				transientTextureData);
 		}
 
-		// Call D3DXCreateTextureFromFileInMemoryEx instead of D3DXCreateTextureFromFileInMemory, so we can specify no mipmaps
-		// Should prevent D3D from trying to generate mipmaps, reducing load times of non-mipped UI textures quite a bit
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
+			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+			return nativeResult;
+		original.restoreOriginal();
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
+			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 	}
 
 	//
