@@ -1,0 +1,174 @@
+{
+  "run": "C310-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 98,
+  "policy_version": "visual-evidence-v1-20261008",
+  "triage": {
+    "index": 98,
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+    "current_status": "b279_producer_self_qa_pass_pending_fresh_c2_c3",
+    "next_action": "FRESH_C_REVIEW",
+    "repeated_root_causes": [],
+    "reason": "Producer candidate exists; await independent pixels-first C",
+    "runtime_validation": "UNTESTED"
+  },
+  "sha256": {
+    "source": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "candidate": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+    "clean": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8"
+  },
+  "source_provenance": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "native": [
+    2048,
+    128
+  ],
+  "format": "DXT5 BC3 mip1 RAW mirrored-Y",
+  "header_exact": true,
+  "alpha_nonzero_clean_in_english_region": 0,
+  "original_alpha_bbox": [
+    434,
+    9,
+    1671,
+    120
+  ],
+  "new_candidate_alpha_bbox": [
+    580,
+    11,
+    1523,
+    116
+  ],
+  "bounding_box_source_ceiling_pass": true,
+  "full_atlas_comparisons": {
+    "source_clean_outside_source": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "clean_final_outside_target": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "source_final_outside_source": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    }
+  },
+  "source_white_face_pixels": 23914,
+  "candidate_white_face_pixels": 44146,
+  "source_blue_greater_red_pixels": 57960,
+  "candidate_blue_greater_red_pixels": 21877,
+  "color_metric_limitation": "white/navy thresholds are approximate BC3-decoded category counts, not source-family perceptual/style C approval",
+  "views": [
+    {
+      "mode": "READABLE",
+      "background": "BLACK",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_BLACK_100_SOURCE_CLEAN_FINAL.png",
+      "sha256": "1c06e3527df50579e1973097c7b7a74c2649813c671c2d49649c12435f524ca9",
+      "bytes": 93331
+    },
+    {
+      "mode": "READABLE",
+      "background": "BLACK",
+      "percent": 75,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_BLACK_75_SOURCE_CLEAN_FINAL.png",
+      "sha256": "ecfaa9dd9027e9940321d9340d83942a68763ca709d3e95dbfb80ce1e9542375",
+      "bytes": 124212
+    },
+    {
+      "mode": "READABLE",
+      "background": "BLACK",
+      "percent": 50,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_BLACK_50_SOURCE_CLEAN_FINAL.png",
+      "sha256": "880161a352ee2f8f0210564fb6592f1c3c42ab35585dbab7bcd9490ab810af30",
+      "bytes": 69070
+    },
+    {
+      "mode": "READABLE",
+      "background": "GRAY",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_GRAY_100_SOURCE_CLEAN_FINAL.png",
+      "sha256": "d4585cb02ffa70bd51031224674d6efea23677bcbf6ec8b38625c13f9177a4d9",
+      "bytes": 111325
+    },
+    {
+      "mode": "READABLE",
+      "background": "GRAY",
+      "percent": 75,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_GRAY_75_SOURCE_CLEAN_FINAL.png",
+      "sha256": "d3aec643c20f0433c408477c3190e35273353305cd5b9c3c5d066a1001b9aef1",
+      "bytes": 141483
+    },
+    {
+      "mode": "READABLE",
+      "background": "GRAY",
+      "percent": 50,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_GRAY_50_SOURCE_CLEAN_FINAL.png",
+      "sha256": "c2b4f6f8d18b04d1180df7d932cb10950699f4655c36dfbd9b82a06a0db27c63",
+      "bytes": 77832
+    },
+    {
+      "mode": "READABLE",
+      "background": "WHITE",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_WHITE_100_SOURCE_CLEAN_FINAL.png",
+      "sha256": "47f0fff04ab8c5f63f42454f78dd7a907efecbebd424a903b6a61a30bf62e198",
+      "bytes": 124494
+    },
+    {
+      "mode": "READABLE",
+      "background": "WHITE",
+      "percent": 75,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_WHITE_75_SOURCE_CLEAN_FINAL.png",
+      "sha256": "760028fab9f12879f531eb31fc6cf34d41992197c323728fc956241f380ea458",
+      "bytes": 156009
+    },
+    {
+      "mode": "READABLE",
+      "background": "WHITE",
+      "percent": 50,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_WHITE_50_SOURCE_CLEAN_FINAL.png",
+      "sha256": "11ae73d4a0c7aa6f04ba4b80dd81823735ef8037b4b67e914748410c46b030dc",
+      "bytes": 84834
+    },
+    {
+      "mode": "RAW",
+      "background": "GRAY",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_RAW_SOURCE_FINAL.png",
+      "sha256": "0631443c253dd1f86e72695969ef8000220f0d56576413664867bf6e60207f40",
+      "bytes": 111373
+    },
+    {
+      "mode": "ZOOM200",
+      "background": "WHITE",
+      "percent": 200,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_ZOOM200_SOURCE_FINAL.png",
+      "sha256": "af3f486f5dfcbe74f037f2e40391ce0026f87dc4dfa12130275f097da92c080f",
+      "bytes": 155338
+    },
+    {
+      "mode": "PLATE_ONLY",
+      "background": "GRAY",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_PLATE_ONLY.png",
+      "sha256": "dea2d673ef2c20c2323915b910856b5493f746b7ff3a4e4aae07061b3d267cf9",
+      "bytes": 82914
+    },
+    {
+      "mode": "COMPOSITE_ONLY",
+      "background": "GRAY",
+      "percent": 100,
+      "path": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_COMPOSITE_ONLY.png",
+      "sha256": "2a112fc8a4a6251d0ecdbb56650463821dc7e1a2e96060bc33c379aaaf9818fb",
+      "bytes": 27451
+    }
+  ],
+  "new_lossless_png": 13,
+  "C": "CONTROLLER_FIRST_LOOK_REQUIRED",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
