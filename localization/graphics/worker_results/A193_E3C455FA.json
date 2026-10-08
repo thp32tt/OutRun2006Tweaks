@@ -1,0 +1,28 @@
+{
+  "run": "20261008-A193-Q225-NATIVE-BLACK-FAMILY",
+  "queue_index": 225,
+  "asset": "E3C455FA",
+  "candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+  "supersedes_candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+  "localized_physical_rows": 9,
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 66385,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "small_row_source_rgb_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS",
+    "controller_defect_regression_guard": "ALL_6_SMALL_ROWS_CAPTURE_LEADING_SOURCE_GLYPH_AT_X960",
+    "black_font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+    "black_font_file_required": true
+  },
+  "worker_status": "A193_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_E3C455FA_REPORT.json"
+}
