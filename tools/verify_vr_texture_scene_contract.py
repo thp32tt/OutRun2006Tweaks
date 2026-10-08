@@ -27,6 +27,24 @@ def verify(src):
     scene=body(src,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest(")
     ui=body(src,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(")
     native=body(src,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(")
+    scene_orig=body(src,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(")
+    cube=body(src,"static HRESULT __stdcall D3DXCreateCubeTextureFromFileInMemoryEx_dest(")
+    snapshot=body(src,"struct SceneDdsOriginalState")
+    for label,wrapper in (("scene fast",scene),("scene native",scene_orig),("cube",cube)):
+        required=("const SceneDdsOriginalState original(pSrcData, SrcDataSize);",
+                  "original.replacementSelected(pSrcData)", "original.restoreOriginal();",
+                  "original.data, original.bytes", "if (SUCCEEDED(nativeResult)")
+        if any(token not in wrapper for token in required):
+            raise ValueError(label+" must retry original DDS after failed replacement")
+        sequence=[wrapper.find(v) for v in ("HandleTexture(&pSrcData", "const HRESULT nativeResult",
+                    "if (SUCCEEDED(nativeResult)", "original.restoreOriginal();",
+                    "original.data, original.bytes")]
+        if any(x<0 for x in sequence) or sequence!=sorted(sequence):
+            raise ValueError(label+" native failure/restore/retry ordering changed")
+    if any(x not in snapshot for x in ("memcpy(&header, data, sizeof(DDS_FILE));",
+                                      "memcpy(data, &header, sizeof(DDS_FILE));",
+                                      "selectedData != data")):
+        raise ValueError("original DDS snapshot or header rollback lost")
     demanded=[
         ("fast may not override sampler state", "SetSamplerState(" not in fast),
         ("original scene owns transient replacement data", "std::shared_ptr<std::vector<uint8_t>> transientTextureData;" in scene),
@@ -78,7 +96,21 @@ def mutations(text):
         try:verify(part)
         except ValueError:continue
         raise ValueError("missed negative test "+label)
-    return len(tokens)
+    # Three independent source-level rollback mutations.
+    for name in ("D3DXCreateTextureFromFileInMemoryEx_Custom_dest",
+                 "D3DXCreateTextureFromFileInMemoryEx_Orig_dest",
+                 "D3DXCreateCubeTextureFromFileInMemoryEx_dest"):
+        marker="static HRESULT __stdcall "+name+"("
+        start=text.find(marker)
+        if start<0:raise ValueError("missing source wrapper "+name)
+        tail=text[start:]
+        token="original.restoreOriginal();"
+        if token not in tail:raise ValueError("missing restore "+name)
+        mutated=text[:start]+tail.replace(token,"__REMOVED_SCENE_DDS_ROLLBACK__",1)
+        try:verify(mutated)
+        except ValueError:pass
+        else:raise ValueError("rollback mutation escaped verifier: "+name)
+    return len(tokens)+3
 
 if __name__=="__main__":
     src=(ROOT/"src/hooks_textures.cpp").read_text(encoding="utf-8")
