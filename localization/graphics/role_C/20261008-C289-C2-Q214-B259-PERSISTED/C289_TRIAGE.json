@@ -1,0 +1,19 @@
+{
+  "queue_file": "localization/graphics/asset_queue.csv",
+  "escalation_file": "localization/graphics/REWORK_ESCALATIONS.json",
+  "counts": {
+    "MATERIAL_REWORK": 1
+  },
+  "assets": [
+    {
+      "index": 214,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "current_status": "b259_material_rework_hold_source_bevel_pending_fresh_c2",
+      "next_action": "MATERIAL_REWORK",
+      "repeated_root_causes": [],
+      "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "note": "No state transition or game QA is inferred by this read-only diagnosis."
+}

@@ -1,0 +1,121 @@
+{
+  "run": "C289",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 214,
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "clean_plate_sha256": "b2a8fd17033efd4ff471b48e1f9289dadfab872cb92ea4bbb2fc6de14762255d",
+  "source_provenance": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "dds_format": "DXT5_BC3",
+  "readable_orientation": "FLIP_Y",
+  "raw_orientation": "MIRROR_Y",
+  "header_128_equal": true,
+  "source_vs_candidate_changed_outside_2_exact_effect_bboxes": 0,
+  "source_vs_candidate_alpha_outside_2_exact_effect_bboxes": 0,
+  "source_vs_authored_clean_changed_outside_2_exact_effect_bboxes": 394,
+  "regions": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "source_effect_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "candidate_vs_clean_effect_delta_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "clean_delta_not_a_glyph_mask": true,
+      "decoded_source_vs_candidate_changed_inside_bbox": 1591,
+      "source_alpha_pixels": 1848,
+      "candidate_alpha_pixels": 1848,
+      "raw_flipY_crop_coords": [
+        801,
+        1517,
+        913,
+        1567
+      ],
+      "evidence_native": [
+        "start_GRAY_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "start_BLACK_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "start_WHITE_SOURCE_CLEAN_FINAL_NATIVE.png"
+      ],
+      "evidence_practical": [
+        "start_GRAY_PRACTICAL_75.png",
+        "start_GRAY_PRACTICAL_50.png"
+      ],
+      "evidence_raw": [
+        "start_ENGLISH_RAW.png",
+        "start_B259_RAW.png"
+      ]
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "source_effect_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "candidate_vs_clean_effect_delta_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "clean_delta_not_a_glyph_mask": true,
+      "decoded_source_vs_candidate_changed_inside_bbox": 1520,
+      "source_alpha_pixels": 1702,
+      "candidate_alpha_pixels": 1702,
+      "raw_flipY_crop_coords": [
+        1329,
+        1247,
+        1431,
+        1298
+      ],
+      "evidence_native": [
+        "goal_GRAY_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "goal_BLACK_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "goal_WHITE_SOURCE_CLEAN_FINAL_NATIVE.png"
+      ],
+      "evidence_practical": [
+        "goal_GRAY_PRACTICAL_75.png",
+        "goal_GRAY_PRACTICAL_50.png"
+      ],
+      "evidence_raw": [
+        "goal_ENGLISH_RAW.png",
+        "goal_B259_RAW.png"
+      ]
+    }
+  ],
+  "rework_triage": {
+    "index": 214,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+    "current_status": "b259_material_rework_hold_source_bevel_pending_fresh_c2",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "triage_note": "Current queue status contains material_rework historically but new B259 exact SHA awaits independent fresh C; do not auto-rerender.",
+  "machine_result": "OUTSIDE_ZERO",
+  "glyph_only_bbox": "UNPROVEN_SOURCE_EFFECT_AND_CLEAN_DELTA_ARE_NOT_GLYPH_ONLY_MASKS",
+  "calibration": "NOT_PERFORMED_BY_SCRIPT",
+  "visual_result": "PENDING_INDEPENDENT_CONTROLLER",
+  "c3": "BLOCKED_UNTIL_C_VISUAL_AND_PER_REGION_POLICY_EVIDENCE",
+  "runtime_validation": "UNTESTED",
+  "no_candidate_modified": true
+}
