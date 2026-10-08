@@ -1,0 +1,9 @@
+{
+  "index": 98,
+  "path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "current_status": "c300_c2_c3_rework_required_striped_glyph_face",
+  "next_action": "MATERIAL_REWORK",
+  "repeated_root_causes": [],
+  "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+  "runtime_validation": "UNTESTED"
+}
