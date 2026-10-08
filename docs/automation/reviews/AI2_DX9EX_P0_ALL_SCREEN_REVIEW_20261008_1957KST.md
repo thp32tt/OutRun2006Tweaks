@@ -10,7 +10,7 @@
 
 ## 진행 체크포인트
 - [x] C0: 인증된 GitHub 현재 브랜치, 원본 리그레션 기록, 정확 SHA 4종 CI 완료 재검증.
-- [ ] C1: 사용자 기존 항목 총목록 및 증상·정확 원본 game producer 소유권 대조.
+- [x] C1: 사용자 기존 항목 총목록 및 증상·정확 원본 game producer 소유권 대조.
 - [ ] C2: SceneEffect/lens/SkyGlow/그림자, WorldBillboard/rank 1~5위, HUD/글리프/+TIME/골인, 메뉴/YES-NO/F11/texture, recenter, 프레임 페이싱 소스 정적 분기 대조.
 - [ ] C3: 새로운 소스 위험 여부를 기존 fix·negative test와 대조해 false-positive 배제. 발견 항목은 정확 수정 지점과 재현 가능한 반증 조건 기입.
 - [ ] C4: 최종 triage·필수 CI/실기 검증·인계. 별도 요청 또는 확실한 소스 버그 없이는 넓은 휴리스틱 수정 금지.
@@ -20,8 +20,29 @@
 - 원본 binary manifest: `OR2006C2C.EXE` pinned `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`, manifest 계약 103개, explicit HUD CALL 71개.
 - GitHub checkpoint: 다음 조사내용은 이 파일을 순차 업데이트해 세션 유실을 방지한다.
 
-## C1 — 원본·증상 행렬
-PENDING
+## C1 — 원본 증상 전체 비교 (ORIGINAL_SOURCE_CHECKED)
+
+| 증상 | 원본·게임 producer | 현재 소스와 잔여 증거 |
+|---|---|---|
+| HUD 백색 글씨/6th/6 | DispRank 8 CALL, TextGlyph/ScreenHud | all-node 태그, raw WVP 검증, Quest 실기 미완 |
+| +TIME·체크포인트·골인·결과 기록 | Sumo_Printf 0x975EE/0x97727/0x977FB, glyph 0x2C808/0x2C9DB, result 0x97BB7/0x97DA7 | Sumo 마스크 복사·expiry 보존, 원본 행렬 폴백, 광학 미완 |
+| 1~5위·라이벌 마커 | Calc3D2D 0x49940; rank 0xBB0FB..0xBB2D0, rival 0xBB6F5/0xBB796 | 00554 finite / 00558 clipW / all children source PASS, 실제 차량 고정 미확인 |
+| 화살표·YES/NO | 원본 put_clip_sprite, fork 12 exact option CALL + left/right | ScreenHud ownership CI PASS, 실기 미완 |
+| F11 Tweaks 패널 | ImGui XYZ+orthographic, external overlay, R30 per-eye+scissor | static PASS, 게임 중 양안 미검증 |
+| 렌즈 플레어 | Clr_SceneEffect 0xBE70 znear 0.05, flare 0xCABE->0x56D0, projection 0xCF4E->0x49940 | R30 shader/XYZRHW, original raw WVP CI PASS, 광학 미확인 |
+| SkyGlow 과노출 | upstream RestoreSkyGlow, R30 per-eye independent | prior mono disabled, current pre-HUD capture failclose, brightness 미측정 |
+| 시작 그림자 | CalcPeraShadow original 0x69EB4/0x6AC76/0x6B766 | WorldParticle 소유권 유지, 렌더/스텐실 중복 미분리 |
+| 메뉴·차량 DDS 누락 | native D3DX/fast DDS, UiDdsOriginalState restore | original bytes/header rollback and pitch-aware decoder, GPU 화소 미확인 |
+| 리센터/헤드락 | headPoseSequence, OpenXR camera, R30 HUD finite plane, queue semantics | eye별 frame/pose epoch 미측정 |
+| FPS 72/90Hz 불안정 | game tick fn43FA10, Sumo no-tick, DirectGPU/host | 00519 사용자 실기 FAIL, 현재 profiler 미측정 |
+| 보호 불변성 | R50 도로/차량 월드 스테레오·startup white recover | broad alpha/primitive shader heuristic 변경 금지 |
+
+원본 파일: https://github.com/emoose/OutRun2006Tweaks/blob/master/src/hooks_graphics.cpp ; https://github.com/emoose/OutRun2006Tweaks/blob/master/src/hooks_uiscaling.cpp ; https://github.com/emoose/OutRun2006Tweaks/blob/master/src/hooks_framerate.cpp
+
+현재 포크: src/hooks_graphics.cpp; src/hooks_uiscaling.cpp; src/hooks_framerate.cpp; src/hooks_textures.cpp; src/overlay/hooks_overlay.cpp; src/vr/game/render_semantics.hpp; src/vr/game/outrun_renderer.cpp.
+
+주의: VR_REGRESSION_KNOWLEDGE.json의 10개 incident key는 최종 광학 합격 숫자가 아님. USER_RUNTIME_FAIL 00519는 OPEN.
+
 
 ## C2 — 코드 경로 감사
 PENDING
