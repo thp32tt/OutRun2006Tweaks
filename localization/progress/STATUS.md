@@ -3205,3 +3205,6 @@ New current Korean DDS q154 SHA256 `c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a
 
 ### 2026-10-09 08:37 KST — A201 q161 BC3 face repair
 - RUN_KEY=OUTRUN-KOR-A201-Q161-C319-FACE-20261009-0830; **new candidate DDS** `8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65` 08/10/12 BC3 face pinhole/speckle removed without touching A200 04/06 or other 33 BC3 regions. 3/3 exact bbox/alpha color/roundtrip QA PASS; 0 changed outside source bboxes. Native/50/RAW A self-QA PASS only, **fresh C1 38/38 and C3** + user/game retest pending, RUNTIME_VALIDATION=UNTESTED. Evidence `localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_CONTROLLER_SELF_QA_FINAL.json`.
+
+### 2026-10-09 08:54 KST — B303 q205
+- New native source-red P0 OPTIONS/랭킹 DDS fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae replaces e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088; original bbox min5px; changed outside selected two 0; all other atlas protected bytes exact. SOURCE/CLEAN/OLD/NEW 40 lossless native/75/50 RAW producer scoped visual PASS; independent C2/C3/new game UNTESTED; IGR026/027 and mixed IGR028 OPEN. localization/graphics/role_B/20261009-B303-Q205-P0-RED-HEADING-NATIVE-FAMILY/B303_CONTROLLER_SELF_QA_FINAL.json.

@@ -1,0 +1,90 @@
+{
+  "role": "B",
+  "run": "B303",
+  "task_id": "OUTRUN-KOR-B303-Q205-P0-RED-NATIVE-HEADINGS-20261009",
+  "queue_index": 205,
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "previous_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+  "new_candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "new_dds": 1,
+  "source_reviews": [
+    "IGR-026",
+    "IGR-027"
+  ],
+  "regions": [
+    {
+      "id": "options",
+      "korean": "옵션",
+      "original_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "candidate_bbox": [
+        1596,
+        1428,
+        1850,
+        1563
+      ],
+      "margins": [
+        5,
+        466,
+        5,
+        5
+      ]
+    },
+    {
+      "id": "rankings",
+      "korean": "랭킹",
+      "original_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "candidate_bbox": [
+        38,
+        1250,
+        277,
+        1383
+      ],
+      "margins": [
+        5,
+        653,
+        5,
+        5
+      ]
+    }
+  ],
+  "method": "source-conditioned original red RGB[186,0,0] native NotoSerifCJK Black 137px with no unsupported black border, render only two source-clean alpha0 cells",
+  "machine": {
+    "outside_two_changed_rgba": 0,
+    "outside_two_changed_alpha": 0,
+    "other_atlas_pixel_exact": true,
+    "positive_margins": "2/2 >=5px",
+    "original_dims": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32 mip1",
+    "header_exact": true,
+    "stored_roundtrip": "PASS",
+    "RAW_FLIPY": "PASS"
+  },
+  "producer_visual": "PASS_SCOPED_NATIVE_75_50_BG_W_RAW_IMAGES",
+  "evidence_png": 40,
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "actual_game": "IGR026/027 OPEN_USER_INGAME_FAIL",
+  "IGR028": "MIXED_OPEN_UNCHANGED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "worker_run": 37861249931,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
