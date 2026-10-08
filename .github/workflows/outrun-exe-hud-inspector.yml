@@ -29,6 +29,7 @@ on:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/verify_vr_hud_dds_loader.py'
+      - 'tools/verify_vr_texture_scene_contract.py'
       - 'tools/verify_vr_hud_exact_callsite_contract.py'
       - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
@@ -64,6 +65,7 @@ on:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/verify_vr_hud_dds_loader.py'
+      - 'tools/verify_vr_texture_scene_contract.py'
       - 'tools/verify_vr_hud_exact_callsite_contract.py'
       - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
@@ -110,6 +112,10 @@ jobs:
       - name: Reject corrupted HUD producer mutations
         shell: pwsh
         run: python tools/verify_vr_hud_exact_callsite_contract.py --self-test
+
+      - name: Verify scene texture Ex API side effects and native fallback
+        shell: pwsh
+        run: python tools/verify_vr_texture_scene_contract.py --self-test
 
       - name: Verify fail-closed DDS fast texture upload and corruption probes
         shell: pwsh

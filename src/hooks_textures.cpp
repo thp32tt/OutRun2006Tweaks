@@ -319,24 +319,9 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		srcData += mipSize;
 	}
 
-	// Apply filtering modes (just the ones used by C2C)
-	// TODO: this likely isn't applying filtering properly, we probably need to gen mipmaps & use D3DXFilterTexture...
-
-	if (Filter != 0) {
-		if (Filter == D3DX_FILTER_NONE)
-			Filter = D3DTEXF_NONE;
-		else if (Filter == D3DX_FILTER_LINEAR)
-			Filter = D3DTEXF_LINEAR;
-		pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, Filter);
-		pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, Filter);
-	}
-	if (MipFilter != 0) {
-		if (MipFilter == D3DX_FILTER_NONE)
-			MipFilter = D3DTEXF_NONE;
-		else if (MipFilter == D3DX_FILTER_LINEAR)
-			MipFilter = D3DTEXF_LINEAR;
-		pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, MipFilter);
-	}
+	// Texture creation is not a rendering operation. Never change global
+	// sampler state here: it belongs to each actual game draw and can change
+	// menus, HUD, scene shaders and stereo passes if mutated while loading.
 
 	return S_OK;
 }
@@ -1039,7 +1024,33 @@ class TextureReplacement : public Hook
 				transientTextureData);
 		}
 
-		return D3DXCreateTextureFromFileInMemoryEx_Custom(pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels, Usage, Format, Pool, Filter, MipFilter, ppTexture);
+		// Unlike the UI-only decoder, the game's scene Ex call has richer API
+		// semantics. Fast DDS does not provide pSrcInfo/pPalette, ColorKey,
+		// explicit format/size, extra mips or filtered resampling. Route those
+		// requests to the original Ex trampoline without modifying game state.
+		const bool requiresLegacyD3DX =
+			pSrcInfo != nullptr || pPalette != nullptr || ColorKey != 0 ||
+			Format != D3DFMT_UNKNOWN ||
+			Width != D3DX_DEFAULT || Height != D3DX_DEFAULT ||
+			(MipLevels != D3DX_DEFAULT && MipLevels != 1) ||
+			Usage != 0 || Pool != D3DPOOL_MANAGED ||
+			(Filter != D3DX_FILTER_NONE && Filter != D3DX_DEFAULT) ||
+			(MipFilter != D3DX_FILTER_NONE && MipFilter != D3DX_DEFAULT);
+		if (!requiresLegacyD3DX && pDevice && pSrcData && SrcDataSize && ppTexture)
+		{
+			const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom(
+				pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels,
+				Usage, Format, Pool, Filter, MipFilter, ppTexture);
+			if (SUCCEEDED(fastResult))
+				return fastResult;
+		}
+		// A failed/unsupported fast decoder must not make world/environment
+		// textures disappear. Preserve every Ex argument on the native path;
+		// transientTextureData remains alive through both decoder attempts.
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels,
+			Usage, Format, Pool, Filter, MipFilter, ColorKey,
+			pSrcInfo, pPalette, ppTexture);
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DTEXTURE9* ppTexture)
 	{
