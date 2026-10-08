@@ -15,9 +15,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00460",
   "lease_epoch": 1,
   "base_sha": "4e391ed1292eedea3218d44f65f0a37671772af7",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_HOSTED_CI",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "native_draw_path_activation_changed": false,
   "draw_dispatch_authorized": false,
@@ -29,14 +29,14 @@
     "C0_RECOVER": "PASS: branch HEAD 4e391ed and 00459 C6; 00460 absent; rollover not retry, ATTEMPT=1/3",
     "C1_REVIEW": "PASS: texture stage allowed same-device deferred PS sampler/SRV recorded state to masquerade as live immediate state; R149-R151 unchanged",
     "C2_IMPLEMENT": "PASS: R152 immediate-only live PS sampler/SRV guard and WARP deferred-negative/immediate-positive preservation probes",
-    "C3_VALIDATE": "IN_PROGRESS: exact-SHA Backend Conversion Gate 37820902405 validate 113461376600 executing Windows Win32 build after source static checks PASS",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37820902405 validate 113461376600 SUCCESS and DX11 readiness smoke 113464382136 SUCCESS; WARP R152; artifact 11570295105 sha256:22b704fa0204cef225902694e26d3fd56573e3bc51a8d469a8ffecd330b92dac",
     "C4_COMMIT": "PASS: material source/probe commit 4bb96209f74bc235b9815d39b9e9bd456ab97bb9 [AUTO:CONVERSION-DX11-00460]",
     "C5_PACKAGE": "NOT_REQUIRED: dormant PS texture stage live-receipt guard only; no Draw activation, release or HMD deployment",
-    "C6_STATE": "PENDING final exact-SHA CI results and artifact before completion"
+    "C6_STATE": "PASS: exact material-SHA CI, artifact, Issue #14 material and validation events, dormant Draw, Quest3/VDXR runtime UNTESTED and independent next action persisted"
   },
-  "static_validation": "PASS: scoped text patch invariant and source graph/static analyzer phases in hosted validate job; C++/WARP execution pending",
-  "state_persisted": false,
-  "next_action": "Check GitHub Actions Backend Conversion Gate 37820902405 for exact material SHA 4bb962..., validate 113461376600 and dx11-smoke; on SUCCESS persist complete C0-C6 state and evidence. On failure repair same TASK_ID. Do not advance ATTEMPT for rollover.",
+  "static_validation": "PASS: exact-SHA Win32 C++ build plus native R152 WARP deferred-negative / immediate-positive regression",
+  "state_persisted": true,
+  "next_action": "00460 terminal. Next independent task should inspect R153 dynamic texture upload (Map/Unmap) deferred-vs-immediate ownership receipt; no repetition of R149-R152. Quest3/VDXR exact-build HMD proof required to authorize native Draw.",
   "blockers": [
     "Quest3/VDXR runtime untested; native Draw dormant"
   ],
@@ -44,5 +44,31 @@
   "validation_bearing_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
   "validation_run_id": 37820902405,
   "validation_job_id": 113461376600,
-  "issue14_comment_id": 6065970844
+  "issue14_comment_id": 6065970844,
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "readiness_smoke_job_id": 113464382136,
+  "artifact_id": 11570295105,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+  "artifact_digest": "sha256:22b704fa0204cef225902694e26d3fd56573e3bc51a8d469a8ffecd330b92dac",
+  "validation_bearing_result_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+  "result_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+  "implementation_commits": [
+    "4bb96209f74bc235b9815d39b9e9bd456ab97bb9"
+  ],
+  "evidence": {
+    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
+    "ci_gate": "PASS_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN",
+    "backend_conversion_gate_run_id": 37820902405,
+    "validate_job_id": 113461376600,
+    "readiness_smoke_job_id": 113464382136,
+    "artifact_id": 11570295105,
+    "artifact_digest": "sha256:22b704fa0204cef225902694e26d3fd56573e3bc51a8d469a8ffecd330b92dac",
+    "ci_head_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+    "warp_texture_stage_probe": "PASS: R152 deferred same-device PS sampler/SRV cannot forge immediate live receipt; immediate validation preserved"
+  },
+  "validation_issue14_comment_id": 6066176462,
+  "recorded_at_utc": "2026-10-08T18:12:14Z",
+  "last_real_activity_at": "2026-10-08T18:12:14Z",
+  "last_activity_evidence": "Exact material SHA 4bb96209f74bc235b9815d39b9e9bd456ab97bb9: validate 113461376600 SUCCESS and smoke 113464382136 SUCCESS; WARP R152 deferred-negative/immediate-positive; artifact 11570295105"
 }
