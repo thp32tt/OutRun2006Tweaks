@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00552",
+  "production_id": "CONVERSION-DX9EX-00552",
+  "event_id": "CONVERSION-DX9EX-00552-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "151b3d184e7d8abfe0328cb1093870bf9533adf4",
+  "material_result_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+  "validation_bearing_result_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+  "result_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00552]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": false,
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "selected_work_item": "DX9EX-P0-SCENE-CUBE-DDS-FAILED-REPLACEMENT-ORIGINAL-RETRY",
+  "summary": "Protect scene and cube DDS original headers and retry untouched game DDS after failed optional native replacement decode, preserving all native D3DX Ex arguments. Add three dedicated negative rollback injections and execute scene texture policy verifier.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_texture_scene_contract.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "commits": {
+    "verifier": "6f394bb1286abad373f90ca869bd2bcf3515b39e",
+    "policy_workflow": "beb319e027f82bc6244e63daaa9e73060046c143",
+    "material": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: fetched focus HEAD, AGENTS, queue/state, issue #13/#14, original upstream producer/texture code and recent 00550/00551 results",
+    "C1_REVIEW": "PASS: scene/cube D3DX fallback lacked UI 00551 original-header rollback",
+    "C2_IMPLEMENT": "PASS: real scene/cube native and fast failure fallback code",
+    "C3_VALIDATE": "PASS: exact-SHA GitHub Actions with one focused static contract; 3/3 injected independent rollback omissions rejected; runtime untested",
+    "C4_COMMIT": "PASS: native GitHub target branch material commit and marker",
+    "C5_PACKAGE": "PASS: exact-SHA DX9Ex Active hosted game/host package artifact; no hardware distribution/promotion",
+    "C6_RESULT": "PASS: durable task record, GitHub issue #14 production change event"
+  },
+  "static_contract": {
+    "source_exact_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+    "scene_texture_policy": "PASS_16_CONTRACTS",
+    "independent_rollback_mutations": "PASS_3_OF_3",
+    "repeat_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 37742743667,
+    "hud_inspector": 37742743880,
+    "domain_isolation": 37742743748,
+    "full_source_impact_supplemental": 37742743754
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "canonical_exe_hud_analysis": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "supplemental_full_source": "IN_PROGRESS_AT_C6"
+  },
+  "exact_sha_validation": {
+    "material_sha": "f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+    "active_run_id": 37742743667,
+    "active_result": "success",
+    "hud_run_id": 37742743880,
+    "hud_result": "success",
+    "domain_run_id": 37742743748,
+    "domain_result": "success"
+  },
+  "package_artifact": {
+    "id": 11534597778,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-f134f48ee75b82d3ca8e3b1037b4bd0c510ebdd0",
+    "size_bytes": 2750036,
+    "digest": "sha256:a890569b8ad7d41b25986dae1b2613fc408430b159b0e3ac7a1fcc99483d94e4"
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "comment_id": 6054783838
+  },
+  "runtime_note": "UNTESTED: no Quest3/VDXR gameplay check, no claim of HUD visual correctness or backend promotion.",
+  "parallel_policy": "A/DX11 Native active independently; C/DX9Ex active stabilization; B/DXVK frozen; no DXVK changes.",
+  "score_status": "PENDING_AI2_SCOREBOARD_SINGLE_AWARD_AFTER_C6",
+  "next_action": "Do not rerun 00552, resume a new independent P0 source implementation while Quest3 runtime-only acceptance remains NEED_HMD_TEST. Protect original scene/white HUD and world stereo baselines."
+}
