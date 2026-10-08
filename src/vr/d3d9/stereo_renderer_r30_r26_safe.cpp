@@ -1549,7 +1549,7 @@ namespace OutRunVRStereo
             // with independent queue and shader epoch proof.
             if (!outConstants ||
                 !OutRunVR::GameSemantic::CorroboratesHud(
-                    OutRunVR::GameSemantic::CurrentScope))
+                    OutRunVR::GameSemantic::EffectiveScope()))
                 return false;
             std::uint64_t writeSerial = 0;
             std::uint64_t writeDrawSerial = 0;
@@ -1583,7 +1583,7 @@ namespace OutRunVRStereo
         {
             if (!outConstants || !OutRunVR::GameSemantic::QueueRenderActive())
                 return false;
-            const auto scope = OutRunVR::GameSemantic::CurrentScope;
+            const auto scope = OutRunVR::GameSemantic::EffectiveScope();
             const bool screenOverlay =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope);
             const bool projectedMarker =
@@ -1612,7 +1612,7 @@ namespace OutRunVRStereo
 
         bool R30ExactSceneEffectScope() noexcept
         {
-            const auto scope = OutRunVR::GameSemantic::CurrentScope;
+            const auto scope = OutRunVR::GameSemantic::EffectiveScope();
             return scope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
                 OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(scope);
         }
@@ -1747,7 +1747,7 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticSceneEffect =
@@ -2327,7 +2327,7 @@ namespace OutRunVRStereo
             if (!device || !R30SafeStereoBase(device) ||
                 !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
                 OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 ||
-                OutRunVR::GameSemantic::CurrentScope !=
+                OutRunVR::GameSemantic::EffectiveScope() !=
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire))
                 return false;
@@ -2630,7 +2630,7 @@ namespace OutRunVRStereo
             // Positive projected-depth evidence remains sufficient for known
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -4280,7 +4280,7 @@ namespace OutRunVRStereo
             // D3D state can describe a candidate shape, but it never owns it.
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool exactSceneEffect =
                 semanticScope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
                 OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
@@ -4507,7 +4507,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
@@ -4536,7 +4536,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
@@ -4578,7 +4578,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
@@ -4608,7 +4608,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
