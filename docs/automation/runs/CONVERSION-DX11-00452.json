@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00452",
+  "production_id": "CONVERSION-DX11-00452",
+  "event_id": "CONVERSION-DX11-00452-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R314_R273_EXACT_PRODUCER_SNAPSHOT_RECONSTRUCTION",
+  "base_sha": "0e38e115b3d3e1be60b54991347d4ae370c763e5",
+  "result_sha": "d53911b2c39703b78916fb6262f2aa5aa8025532",
+  "material_result_sha": "d53911b2c39703b78916fb6262f2aa5aa8025532",
+  "validation_bearing_sha": "d53911b2c39703b78916fb6262f2aa5aa8025532",
+  "validation_bearing_result_sha": "d53911b2c39703b78916fb6262f2aa5aa8025532",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "validation_run_id": 37711938268,
+  "validation_job_id": 113099596030,
+  "readiness_smoke_job_id": 113100675404,
+  "artifact_id": 11521974244,
+  "artifact_digest": "sha256:a16918b94196deb6a3d1eeb579754595666e4ca4d1b159bf34380ed861a853db",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00452.json",
+  "implementation_commits": [
+    "b9af7c6a611c3e50f06dbc18f9bbc7bee342ae27",
+    "d53911b2c39703b78916fb6262f2aa5aa8025532"
+  ],
+  "issue14_comment_id": 6050146747,
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "state_persisted": true,
+  "summary": "R314 reconstructs native C++ R273 uint64 sourceMappingHandoff snapshot from ordered R271 source and R272 mapping producer hashes and 0x273 domain tag; stale, counterfeit nonzero and mutated identity/ready evidence fail closed. Diagnostic only; no production draw activation.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub exact branch HEAD 0e38e115, no 00452 run record; prior 00451 R313 COMPLETE. E002 rollover kept ATTEMPT=1/3.",
+    "C1_REVIEW": "PASS: inspected C++ R273 sourceMappingHandoff composer 64-bit mixing and R276 typed receipt consumer; R271/R272 logs expose complete R273 snapshot producer inputs; R313 only checked order/nonzero.",
+    "C2_IMPLEMENT": "PASS: R314 exact R273 producer snapshot recomputation and fail-closed mismatch classification; counterfeit, altered R271/R272, zero and ready-bit negative tests; source-graph contract corrected after first CI exposed stale R313 string.",
+    "C3_VALIDATE": "PASS: exact SHA d53911b Backend Conversion Gate 37711938268 completed success; validate job 113099596030 SUCCESS (source graph, census, Win32 build), DX11 readiness smoke job 113100675404 SUCCESS; artifact 11521974244 sha256:a16918b94196deb6a3d1eeb579754595666e4ca4d1b159bf34380ed861a853db. Initial SHA b9af7c6 gate 37711865809 failed outdated static guard; fixed in d53911b, no retry attempt increment.",
+    "C4_COMMIT": "PASS: substantive source/test/guard commits b9af7c6 and d53911b with exact [AUTO:CONVERSION-DX11-00452] marker. GitHub branch fast-forward, no CI skip; issue14 comment 6050146747.",
+    "C5_PACKAGE": "NOT_REQUIRED: static/census analyzer change only, no headset candidate or native draw activation; exact-SHA CI Win32 artifact retained as build proof.",
+    "C6_STATE": "PASS: persist exact material/validation SHAs, successful full C0-C6 evidence, artifact and independent next action in run JSON and branch-local state. RUNTIME_VALIDATION=UNTESTED."
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37711938268,
+    "validation_job_id": 113099596030,
+    "readiness_smoke_job_id": 113100675404,
+    "artifact_id": 11521974244,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-d53911b2c39703b78916fb6262f2aa5aa8025532",
+    "artifact_digest": "sha256:a16918b94196deb6a3d1eeb579754595666e4ca4d1b159bf34380ed861a853db",
+    "issue14_comment_id": 6050146747
+  },
+  "next_action": "Inspect R276 target semantic plan snapshot composition and R275 receipt bindings against exact producer hashes and existing emitted telemetry. Add evidence-backed independent DX11 source/tool tests only; keep native Draw/DrawIndexed fail-closed and Quest3/VDXR runtime UNTESTED."
+}
