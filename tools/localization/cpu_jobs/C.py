@@ -12,7 +12,7 @@ assert triage["next_action"]=="FRESH_C_REVIEW",triage
 queue=Path("localization/graphics/asset_queue.csv").read_text(encoding="utf-8-sig")
 assert "98,textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds,localize_text,b279_producer_self_qa_pass_pending_fresh_c2_c3" in queue
 c=Path("localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds").read_bytes()
-cleanp=Path("localization/graphics/role_B/20261008-B279-Q098-NAVY-KEYLINE-WEIGHT/B279_AUTHORED_CLEAN_PLATE.png")
+cleanp=Path("localization/graphics/role_B/20261005-B-PRODUCTION40/42E618FD_CLEAN_PLATE.png")
 cleanb=cleanp.read_bytes()
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 s=urllib.request.urlopen(url,timeout=150).read()
@@ -70,8 +70,8 @@ for kind,parts in (("PLATE_ONLY",[("ENGLISH",S),("INDEPENDENT CLEAN",C)]),("COMP
  views.append({"mode":kind,"background":"GRAY","percent":100,**pngsave(panel(parts,(105,105,105)),f"q098_{kind}.png")})
 Sface=(S[:,:,0]>235)&(S[:,:,1]>235)&(S[:,:,2]>235)&(S[:,:,3]>16)
 Fface=(F[:,:,0]>235)&(F[:,:,1]>235)&(F[:,:,2]>235)&(F[:,:,3]>16)
-Snavy=(S[:,:,2]>S[:,:,0]+20)&(S[:,:,3]>16)
-Fnavy=(F[:,:,2]>F[:,:,0]+20)&(F[:,:,3]>16)
+Snavy=(S[:,:,2].astype(np.int16)>S[:,:,0].astype(np.int16)+20)&(S[:,:,3]>16)
+Fnavy=(F[:,:,2].astype(np.int16)>F[:,:,0].astype(np.int16)+20)&(F[:,:,3]>16)
 report={"run":"C310-C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","queue_index":98,"policy_version":"visual-evidence-v1-20261008",
  "triage":triage,"sha256":expected,"source_provenance":"Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
  "native":[2048,128],"format":"DXT5 BC3 mip1 RAW mirrored-Y","header_exact":True,
