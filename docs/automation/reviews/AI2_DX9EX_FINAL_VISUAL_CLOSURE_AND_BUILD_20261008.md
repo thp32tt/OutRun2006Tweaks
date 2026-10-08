@@ -41,11 +41,12 @@
 
 ## 5. Exact CI result and package
 ### RELEASED EXACT TEST PACKAGE — authentic GitHub Actions artifact
+- **FINAL 4/4 EXACT-SHA CI SUITES SUCCESS at 2026-10-08 22:20 KST.** The four GitHub runs all show `status=completed, conclusion=success` and `head_sha=5868f8760e939e58212e9bc4fe5d15954a384f9c`. The branch HEAD may contain later documents, but no newer game material than this source. No Quest 3 runtime optical PASS claimed.
 - SOURCE_MATERIAL_SHA: `5868f8760e939e58212e9bc4fe5d15954a384f9c` (not later docs-only branch HEAD).
-- DX9Ex Active Validation https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451574: `policy` SUCCESS, `game` Win32 DLL SUCCESS, `host` x64 OpenXR SUCCESS, `package` SUCCESS; optional `full-chain-compile` still running at 22:17 KST (recheck below).
+- DX9Ex Active Validation https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451574: **SUCCESS all five**: `policy`, `game` Win32 DLL, `host` x64 OpenXR, `full-chain-compile` Win32 R33, `package`.
 - EXE HUD Inspector https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451549: static original x86 + all P0 F11 shared-state negatives SUCCESS, Win32 inspector build SUCCESS.
 - Domain Isolation https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451505: SUCCESS.
-- DX9Ex Full Source Impact https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451606: source-cross-domain SUCCESS, x64 host MSVC analyze SUCCESS; Win32 game analyzer pending at 22:17 KST.
+- DX9Ex Full Source Impact https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451606: **SUCCESS all three**: source-cross-domain, x64 OpenXR host MSVC /analyze, Win32 game MSVC /analyze.
 - **ONE DEPLOYABLE PACKAGE:** https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451574/artifacts/11553510211, artifact ID `11553510211`, name `OutRun2-VR-DX9EX-ACTIVE-5868f8760e939e58212e9bc4fe5d15954a384f9c`, size `2,752,926` bytes; uploaded digest SHA-256 `247469d6e237f00e615a9a2f1cc11082ed1a8893f9d75309daedd931051b4c3e`.
 - Package job `113330641488` downloaded exact game and host artifacts by digest, staged `dinput8.dll`, `outrun-vr-host.exe`, `SOURCE_SHA.txt`, verified each listed file and created nested `OutRun2_VR_DX9EX_ACTIVE_5868f8760e93.zip`, completed artifact upload successfully.
 - This source includes the previous full P0 GOAL/RESULT/rank/SkyGlow/XMT fixes + new F11 shared theater-state fix. **No running HMD test has been performed**, so historical issue 00519 remains open with `RUNTIME_VALIDATION=UNTESTED`.
