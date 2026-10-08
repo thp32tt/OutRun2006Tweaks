@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00548",
+  "production_id": "CONVERSION-DX9EX-00548",
+  "event_id": "CONVERSION-DX9EX-00548-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "156cc3ccb5444a032986bd3ba57fc500b1259d17",
+  "material_result_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+  "validation_bearing_result_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+  "result_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00548]",
+  "status": "VALIDATION_IN_PROGRESS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "ci_gate_complete": false,
+  "selected_work_item": "DX9EX-P0-REPLACEMENT-DDS-DESCRIPTOR-FAIL-CLOSED",
+  "priority_authority": "AGENTS.md P0 visual composition override; docs/VR_REFACTOR_STATE.json active chain COMPLETE; current docs/VR_WORK_QUEUE.json P0 UI texture priority",
+  "summary": "Before replacing the game's original DDS header and applying sprite scales, reject replacement files whose DDSURFACEDESC2/DDPIXELFORMAT descriptor sizes do not match Windows DDS layout; reject zero-width/height original header to avoid undefined HUD sprite scale division. Source-logic hardening, not HMD symptom resolution.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00548.json",
+    "docs/automation/reviews/CONVERSION_DX9EX_00548_DDS_VALIDATION.md"
+  ],
+  "deterministic_verification": {
+    "tool": "python tools/verify_vr_hud_dds_loader.py --self-test",
+    "dds_source_obligations": 20,
+    "negative_mutations": "14/14",
+    "hud_callsite_contract": "71 CALL PASS",
+    "hud_mutations": "10/10",
+    "p0_composition": "PASS",
+    "source": "GitHub HUD Inspector static-exe-analysis 113106557754 for exact SHA"
+  },
+  "ci_runs": {
+    "hud_inspector": 37714119384,
+    "dx9ex_active": 37714119420,
+    "domain_isolation": 37714119310,
+    "full_source_review": 37714119321
+  },
+  "result_identity_policy": "Only f96b661 material triggers mandatory gates. Do not poll docs checkpoint SHA; persist pinned validation_bearing_result_sha and result_sha even after bookkeeping commits.",
+  "risk": "DDS layout validation is structural source hardening; it does not establish that 00519 missing UI textures or HUD duplication is visually fixed.",
+  "next_action": "C3: wait for exact-SHA DX9Ex Active policy/host/game/full-chain/package and HUD Inspector Windows build plus Domain Isolation. On confirmed success, record job IDs/artifact digest and set automation_validation=PASS. Otherwise inspect explicit failing job only. Keep runtime UNTESTED.",
+  "score_award": "DEFERRED_UNTIL_COMPLETE_AND_NOT_DUPLICATE"
+}
