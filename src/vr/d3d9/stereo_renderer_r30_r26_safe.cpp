@@ -2427,6 +2427,11 @@ namespace OutRunVRStereo
             ++NonWorldDuplicatedDraws;
             ++R30SafeTwoEyeDraws;
             ++R30ExternalImGuiStereoDraws;
+            if (R30ExternalImGuiStereoDraws == 1)
+                spdlog::info(
+                    "VR R30 F11 IMGUI: explicit external XYZ/orthographic UI "
+                    "now uses finite recentered L/R projection + per-eye "
+                    "scissor; stock fixed-function WORLD/VIEW preserved");
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
@@ -3233,6 +3238,10 @@ namespace OutRunVRStereo
                 else
                 {
                     ++R30AmbiguousFlatWorldDraws;
+                    if (R30AmbiguousFlatWorldDraws == 1)
+                        spdlog::info(
+                            "VR R30 XYZRHW: untagged flat RHW=1 depth "
+                            "effect rendered but cannot seed host WorldStereo");
                 }
             }
             else
