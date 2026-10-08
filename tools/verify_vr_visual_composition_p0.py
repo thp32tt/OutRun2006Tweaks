@@ -384,10 +384,100 @@ require_order(
 rank_clip = function_body(ui, 'static int __cdecl RankMarker_putClipSprite(')
 require_order(
     rank_clip, 'screen-owned 4th+ rank digits must outrank projected/world tagging',
-    'if (RankMarkerSubScreenHudDepth != 0)',
+    'const bool screenHud = RankMarkerSubScreenHudDepth != 0;',
+    'const bool projected = !screenHud && RankMarkerProjectedInfo.valid;',
     'RenderScope::ScreenHud',
-    'const bool projected = RankMarkerProjectedInfo.valid'
+    'RenderScope::ProjectedWorldMarker2D',
+    'RenderScope::WorldBillboard',
+    'TagAppendedNodes(tailsBefore, scope,'
 )
+for label, body in (
+    ('4th+ multi-digit car mark', rank_clip),
+    ('menu/result clip', function_body(ui, 'static int __cdecl ExactScreenHud_putClipSprite(')),
+):
+    require('TagAppendedNodes(tailsBefore,', body,
+            label + ' must tag every emitted sprite sibling')
+    require('Game::SpritePriorityCount', body,
+            label + ' must trace every priority queue')
+rank_group = function_body(ui, 'static int __cdecl RankMarkerSub_dest(')
+require_order(
+    rank_group, 'old car anchor cannot survive across separate sub_4BAD20 invocations',
+    'RankMarkerProjectedInfo = {};',
+    '++RankMarkerSubActiveDepth;',
+    'RankMarkerSub_hk.call<int>(arg)',
+    '--RankMarkerSubActiveDepth;',
+    'RankMarkerProjectedInfo = saved;'
+)
+require('RankMarkerSub_hk = safetyhook::create_inline(',
+        ui, 'full original rank function entry now scopes each car')
+rival_producer = function_body(ui, 'static int __cdecl RivalMarker_sprani(')
+require_order(
+    rival_producer, 'rival anchor captured from BB6F5 must be consumed once at BB796',
+    'const auto projectedAnchor = RivalMarkerProjectedInfo;',
+    'RivalMarkerProjectedInfo = {};',
+    'TagAppendedNodes('
+)
+calc_producer = function_body(ui, 'static void Calc3D2D_dest(')
+require('RankMarkerSubScreenHudDepth == 0', calc_producer,
+        'NaviPub screen-HUD Calc3D2D must not overwrite world car anchor')
+
+# Four distinct deterministic regressions: do not repeat the same source
+# contract 1,000/5,000 times.
+def verify_marker_owner(source):
+    rank_body = function_body(source, 'static int __cdecl RankMarkerSub_dest(')
+    digit_body = function_body(source, 'static int __cdecl RankMarker_putClipSprite(')
+    menu_body = function_body(source, 'static int __cdecl ExactScreenHud_putClipSprite(')
+    rival_body = function_body(source, 'static int __cdecl RivalMarker_sprani(')
+    calc_body = function_body(source, 'static void Calc3D2D_dest(')
+    require('RankMarkerProjectedInfo = {};', rank_body,
+            'stale vehicle rank anchor at sub entry')
+    require('TagAppendedNodes(tailsBefore, scope,', digit_body,
+            'missing 4th+ all-node stereo semantic')
+    require('TagAppendedNodes(tailsBefore,', menu_body,
+            'missing menu all-node stereo semantic')
+    require('RivalMarkerProjectedInfo = {};', rival_body,
+            'stale rival anchor must be consumed')
+    require('RankMarkerSubScreenHudDepth == 0', calc_body,
+            'screen HUD overwrote world Calc3D2D')
+verify_marker_owner(ui)
+for label, token in (
+    ('stale rank car', 'RankMarkerProjectedInfo = {};'),
+    ('missing 4th+ digit children', 'TagAppendedNodes(tailsBefore, scope,'),
+    ('missing menu arrow children', 'TagAppendedNodes(tailsBefore,'),
+    ('stale rival car', 'RivalMarkerProjectedInfo = {};'),
+):
+    # Target each exact function, so mutation of another identical token cannot
+    # accidentally make an invalid fixture look valid.
+    targets = {
+        'stale rank car': 'static int __cdecl RankMarkerSub_dest(',
+        'missing 4th+ digit children': 'static int __cdecl RankMarker_putClipSprite(',
+        'missing menu arrow children': 'static int __cdecl ExactScreenHud_putClipSprite(',
+        'stale rival car': 'static int __cdecl RivalMarker_sprani(',
+    }
+    target = targets[label]
+    start = ui.index(target)
+    brace = ui.index('{', start)
+    depth = 0
+    stop = None
+    for j in range(brace, len(ui)):
+        if ui[j] == '{':
+            depth += 1
+        elif ui[j] == '}':
+            depth -= 1
+            if depth == 0:
+                stop = j
+                break
+    source_body = ui[brace:stop]
+    if token not in source_body:
+        raise SystemExit('P0 marker negative setup missing ' + label)
+    altered = ui[:brace] + source_body.replace(
+        token, '/* injected regression */', 1) + ui[stop:]
+    try:
+        verify_marker_owner(altered)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 marker injection not caught: ' + label)
 
 # Direct put_sprite_ex/put_sprite_ex2 producers cover the remaining exact semantic families
 # (WORLD_HEART, C2C speech/hearts, etc.) without hot-path stack walking.
