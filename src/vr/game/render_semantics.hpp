@@ -66,6 +66,11 @@ namespace OutRunVR::GameSemantic
         // 0xBEA5A vs 0xBEA5F result glyph source in HMD evidence.
         GoalTime020,
         GoalTime150,
+        // R64 HMD-confirmed 6th/6 isolate: kind-0 exact DispRank
+        // children are not generic result/time/right-aligned clip HUD.
+        // Keep their source distinct so D3DXSprite::Flush never widens
+        // to menu, result, +TIME, DDS or all ScreenHud.
+        DispRankClipSprite,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -109,6 +114,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
         case ProducerToken::GoalTime020: return "GOAL_TIME_HELPER_020";
         case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";
+        case ProducerToken::DispRankClipSprite: return "DISPRANK_KIND0_CLIP";
         default: return "NONE";
         }
     }
