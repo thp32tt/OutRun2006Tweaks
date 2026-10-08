@@ -213,6 +213,61 @@ for label, corrupt in (
     else:
         raise SystemExit('Theater SBS regression mutation escaped: ' + label)
 
+# The user's doubled timer occurs in GOAL/TIMEUP *before* the mono restart
+# screen. White/translucent material is not proof of a normal shader HUD.
+# Require bounded, read-only evidence from shader/c64, XYZRHW and R62 FVF142.
+def verify_pre_restart_hud_routes(source):
+    reporter = function_body(
+        source, 'void R30TracePreRestartHudDrawForm(')
+    for token in (
+        'Settings::VRTelemetry',
+        'Game::current_mode',
+        'GameState::STATE_GOAL',
+        'GameState::STATE_TIMEUP',
+        'GameState::STATE_LINK_TIMEUP',
+        'QueueRenderActive()',
+        'CurrentQueueProducerToken()',
+        'fetch_or(',
+        'D3DRS_ALPHABLENDENABLE',
+        'D3DRS_SRCBLEND',
+        'D3DRS_DESTBLEND',
+        'SHADER_C64_CANDIDATE',
+        'XYZRHW_CANDIDATE',
+        'D3DX_XYZ_FVF142_CANDIDATE',
+        'VR P0 PRE_RESTART_HUD_FORM',
+    ):
+        require(token, reporter, 'pre-restart time HUD route evidence')
+    for function_name, route in (
+        ('R30ScreenSpaceKind R30ClassifyScreenSpacePass(', '0u'),
+        ('bool R30ConfigureXyzrhwWorldEffect(', '1u'),
+        ('HRESULT R62TryFixedFunctionSpriteIndexed(', '2u'),
+    ):
+        body = function_body(source, function_name)
+        require('R30TracePreRestartHudDrawForm(device, ' + route + ')',
+                body, 'pre-restart HUD three-draw-route provenance')
+    # A trace cannot change ScreenHud classification or the user's GPU
+    # blending state. Read alpha without ever calling SetRenderState here.
+    if 'SetRenderState(' in reporter or 'RegisterSpriteNodeScope(' in reporter:
+        raise SystemExit('pre-restart HUD diagnosis changes game pixels')
+
+verify_pre_restart_hud_routes(r30)
+for name, corrupt in (
+    ('no shader c64 trace', r30.replace(
+        'R30TracePreRestartHudDrawForm(device, 0u);', '', 1)),
+    ('no XYZRHW trace', r30.replace(
+        'R30TracePreRestartHudDrawForm(device, 1u);', '', 1)),
+    ('no R62 fixedfn trace', r30.replace(
+        'R30TracePreRestartHudDrawForm(device, 2u);', '', 1)),
+):
+    if corrupt == r30:
+        raise SystemExit('pre-restart injection missing: ' + name)
+    try:
+        verify_pre_restart_hud_routes(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('pre-restart route loss undetected: ' + name)
+
 # P0 result/+TIME/GOAL provenance regression: identify the canonical
 # parent's actual queued glyph/clip node (not merely the 2C808 glyph helper).
 # All five distinct producer families must survive R84 refactor and no-tick
