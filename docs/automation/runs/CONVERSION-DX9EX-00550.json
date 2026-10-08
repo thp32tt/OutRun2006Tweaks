@@ -10,11 +10,11 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "3cb68827a54ef2073ca04c6424c7bb0b9e385fa0",
-  "material_result_sha": "PENDING_MATERIAL_COMMIT",
-  "validation_bearing_result_sha": "PENDING_MATERIAL_COMMIT",
+  "material_result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+  "validation_bearing_result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00550]",
-  "status": "MATERIAL_PREPARED_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "MATERIAL_COMMITTED_VALIDATING",
+  "automation_validation": "PENDING_FULL_EXACT_SHA_CI",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "score_award": "PENDING_VERIFIED_COMPLETION_NO_DUPLICATES",
@@ -41,5 +41,24 @@
   },
   "ci_gate_complete": false,
   "controller_terminal": false,
-  "next_action": "Observe GitHub exact-material-SHA HUD Inspector, DX9Ex Active and Domain Isolation CI. Record immutable run/job/artifact evidence and finish C6 only when confirmed; do not repeat 1000/5000 unchanged-source audit."
+  "next_action": "CI remains active for material 6d9041ed5abcf2275809db289cd8614c99369cda. Confirm exact-SHA DX9Ex game/host/full-chain/package, HUD inspector build and Domain Isolation jobs; then persist terminal C6 and score once. Do not rerun 00549 or retired 1000/5000 loops; RUNTIME_VALIDATION=UNTESTED.",
+  "result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+  "ci_runs": {
+    "hud_inspector": 37725768172,
+    "dx9ex_active": 37725768200,
+    "domain_isolation": 37725768242,
+    "full_source_impact": 37725768222,
+    "vr_autodev_coordination": 37725768248
+  },
+  "ci_observed": {
+    "hud_inspector_static_exe_analysis": "SUCCESS",
+    "hud_call_sites": "71/71",
+    "hud_mutations": "10/10",
+    "dds_loader_mutations": "21/21",
+    "dds_cache_mutations": "17/17",
+    "visual_composition_static": "SUCCESS",
+    "dx9ex_policy": "SUCCESS",
+    "source_cross_domain": "SUCCESS",
+    "vr_autodev_coordination": "FAIL_PREEXISTING_IMPLEMENT_NEXT_QUEUE_VALIDATOR"
+  }
 }
