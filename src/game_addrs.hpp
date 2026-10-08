@@ -306,6 +306,32 @@ namespace Game
 			(*Game::current_mode == GameState::STATE_START && *Game::game_start_progress_code == 65);
 	}
 
+	// The VR host's projection/theater classification is narrower than
+	// is_in_game(): TRYAGAIN/OUTRUNMILES and the selector belong to Theater.
+	// External F11 ImGui must use exactly the same gameplay states as
+	// CurrentPresentationMode(), or it can be tagged for stereo while the
+	// host is showing a single theater quad (and vice versa).
+	inline bool is_vr_gameplay_presentation() noexcept
+	{
+		if (!Game::current_mode)
+			return false;
+		switch (static_cast<GameState>(*Game::current_mode))
+		{
+		case STATE_START:
+		case STATE_WARP:
+		case STATE_RESTART:
+		case STATE_GAME:
+		case STATE_GIVEUP:
+		case STATE_SMPAUSEMENU:
+		case STATE_GOAL:
+		case STATE_TIMEUP:
+		case STATE_LINK_TIMEUP:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	inline const char* StageNames[] = {
 		"Palm Beach",
 		"Deep Lake", "Industrial Complex",
