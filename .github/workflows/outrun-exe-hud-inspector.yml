@@ -35,6 +35,7 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
       - 'tools/verify_vr_texture_scene_contract.py'
       - 'tools/verify_vr_texture_cache_lifetime.py'
@@ -83,6 +84,7 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
       - 'tools/verify_vr_texture_scene_contract.py'
       - 'tools/verify_vr_texture_cache_lifetime.py'
@@ -135,6 +137,10 @@ jobs:
       - name: Verify real-session rank/DLL analysis behavior
         shell: pwsh
         run: ./tools/Test-OutRunVRAnalysisContract.ps1
+
+      - name: Audit first-party source-wide result and extension-time risk
+        shell: pwsh
+        run: python tools/audit_vr_result_full_source.py
 
       - name: Asset semantic parser self-test
         shell: pwsh
