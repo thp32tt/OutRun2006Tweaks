@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "review_id": "C313-C2-Q236-SOURCE-FAMILY-THICKNESS-20261009",
+  "run_key": "OUTRUN-KOR-C313-C2-Q236-STROKE-FAMILY-VISUAL-REWORK-20261009",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selection_head": "10f2a30edf20693094d98584991c59fcdb63b1b7",
+  "prior_status": "c308_c2_c3_hold_all14_clean_composite_native84",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+  "triage_at_selection": {
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "source": "tools/localization/rework_triage.py --repo tmp/c2_q236_run --index 236; ran on latest downloaded queue/REWORK_ESCALATIONS, before decision"
+  },
+  "new_review_scope": "New targeted source-family ink solidity and on-screen typography at original native scale and 50% on three selected row labels; not a repeat of C308 plate/mask/coverage audit.",
+  "views": [
+    {
+      "region": "00",
+      "native": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_50_SOURCE_CLEAN_FINAL.png",
+      "observation": "English heavy/condensed face has markedly greater solid stroke body; current Korean family shows visibly lighter and less filled strokes. No claim about unreviewed 11 rows."
+    },
+    {
+      "region": "05",
+      "native": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_50_SOURCE_CLEAN_FINAL.png",
+      "observation": "English heavy/condensed face has markedly greater solid stroke body; current Korean family shows visibly lighter and less filled strokes. No claim about unreviewed 11 rows."
+    },
+    {
+      "region": "11",
+      "native": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_50_SOURCE_CLEAN_FINAL.png",
+      "observation": "English heavy/condensed face has markedly greater solid stroke body; current Korean family shows visibly lighter and less filled strokes. No claim about unreviewed 11 rows."
+    }
+  ],
+  "measured_samples": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_SOURCE_FAMILY_THICKNESS_SAMPLE.json",
+  "prior_exact_byte_machine": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_14REGION_NATIVE_MACHINE.json",
+  "prior_visual_report": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_CONTROLLER_C3_HOLD.json",
+  "defect_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+  "visual_decision": "REWORK_REQUIRED",
+  "decision_basis": "Controller direct native WHITE and practical 50% GRAY SOURCE/CLEAN/KOREAN images: source INDUSTRIAL COMPLEX, SKYSCRAPERS, LEGEND exhibit dense, tall, black ultra-bold condensed type family; Hangul counterparts appear visibly thinner and less solid, underrepresenting source emphasis. Script-dependent occupancy differences are supplementary and not used as a hard threshold.",
+  "machine_scope": "Historical C308 source-CLEAN/FINAL same SHA outside 14 effect bboxes RGBA/alpha zero, positive margins; numeric success does not override visible source-style mismatch.",
+  "plate_contamination": "No new plate seam or residue asserted. C308 authentic CLEAN and outside-mask zero evidence preserved; no replacement DDS produced.",
+  "calibration": {
+    "blind_completed": false,
+    "qualified": false,
+    "note": "Previous C308 and producer notes were known. Never claim blind pixels-before-producer verdict or synthetic-controls PASS."
+  },
+  "per_region_decision": [
+    {
+      "id": "stage_00",
+      "style": "FAIL_SOURCE_WEIGHT"
+    },
+    {
+      "id": "stage_05",
+      "style": "FAIL_SOURCE_WEIGHT"
+    },
+    {
+      "id": "stage_11",
+      "style": "FAIL_SOURCE_WEIGHT"
+    }
+  ],
+  "other_regions": "Unreviewed by new targeted source-weight comparison: retain prior C308 observations; atlas as a whole cannot receive C/C3 approval while three regions fail.",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED_REWORK_REQUIRED",
+  "C_PASS_NEW": false,
+  "C3_PASS_NEW": false,
+  "APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_REVIEW": "NOT_APPROVED",
+  "required_fix": "B parity owner: derive weight/counter-space from canonical native English condensed-black type family and reconstruct affected Hangul glyph masks without blanket dilation or box/shadow overlays; inspect all 14 row family consistency, preserve B80 authored clean, REVERSED protected artwork, exact source bbox 1px ceiling, source-aligned RAW mirror-Y, all decoded DDS MIPs; independently recheck SOURCE-vs-CLEAN, CLEAN-vs-FINAL, 100/75/50/RAW, C2 then separate C3 and new user/game evidence.",
+  "backend": "GitHub connector state+blob updates; lightweight N100 MCP GitHub PNG I/O and three-image threshold summary only because GPT local cannot resolve GitHub/raw host and GitHub fetch_blob rejects PNG; no heavy DDS processing on N100.",
+  "new_dds": 0,
+  "new_lossless_png": 0,
+  "qa_metric_files": 1,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "scope_exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

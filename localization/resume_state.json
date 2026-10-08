@@ -6788,7 +6788,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 00:51 KST",
+  "updated_at_kst": "2026-10-09 00:58 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12297,5 +12297,29 @@
     "C3": "PENDING",
     "approval": false,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c313_c2_q236_source_family_weight": {
+    "task_id": "OUTRUN-KOR-C313-C2-Q236-STROKE-FAMILY-VISUAL-REWORK-20261009",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 236,
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+    "previous": "C308_HOLD_STRICT_RECHECK",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "regression_rows": [
+      "stage_00",
+      "stage_05",
+      "stage_11"
+    ],
+    "reason": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+    "qa": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_CONTROLLER_C2_REWORK.json",
+    "metrics": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_SOURCE_FAMILY_THICKNESS_SAMPLE.json"
   }
 }

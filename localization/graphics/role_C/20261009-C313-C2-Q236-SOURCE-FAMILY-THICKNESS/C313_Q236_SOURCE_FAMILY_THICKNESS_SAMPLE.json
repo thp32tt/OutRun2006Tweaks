@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "role": "C2",
+  "run_key": "OUTRUN-KOR-C313-C2-Q236-STROKE-FAMILY-VISUAL-REWORK-20261009",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "index": 236,
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+  "inputs": "C308 previously SHA-bound SOURCE/CLEAN/persisted DDS lossless 3-panel native WHITE image; independently downloaded from GitHub by authenticated N100 MCP as a lightweight I/O fallback; viewed native WHITE and GRAY_50 images for rows 00/05/11.",
+  "measurement_method": "Per panel split image width into equal SOURCE,CLEAN,FINAL thirds; exclude y<25px label bar; threshold RGB mean < 140 with channel range < 50 on white; inside foreground bbox measure occupancy=selected dark glyph pixels/(bbox width*height). This is a supplementary within-image script/shape occupancy indicator, NOT a pixel containment, stem-width, per-glyph source-family or universal threshold test; Latin and Hangul glyphs differ.",
+  "scenarios": [
+    {
+      "row": "00",
+      "source_label": "INDUSTRIAL COMPLEX",
+      "korean_label": "인더스트리얼 컴플렉스",
+      "native_source_height": 84,
+      "native_korean_height": 83,
+      "source_ink_density": 0.49467,
+      "korean_ink_density": 0.37591,
+      "source_visible_width": 1103,
+      "korean_visible_width": 739,
+      "density_ratio": 0.7599,
+      "native_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_50_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "row": "05",
+      "source_label": "SKYSCRAPERS",
+      "korean_label": "스카이스크레이퍼스",
+      "native_source_height": 93,
+      "native_korean_height": 83,
+      "source_ink_density": 0.50059,
+      "korean_ink_density": 0.33906,
+      "source_visible_width": 800,
+      "korean_visible_width": 649,
+      "density_ratio": 0.6773,
+      "native_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_50_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "row": "11",
+      "source_label": "LEGEND",
+      "korean_label": "레전드",
+      "native_source_height": 93,
+      "native_korean_height": 83,
+      "source_ink_density": 0.54108,
+      "korean_ink_density": 0.39007,
+      "source_visible_width": 421,
+      "korean_visible_width": 210,
+      "density_ratio": 0.7209,
+      "native_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+      "practical_50_view": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_50_SOURCE_CLEAN_FINAL.png"
+    }
+  ],
+  "source_family_finding": "At both native 100% and 50% contacts, English has very dark, thick, tall, condensed headline faces, whereas current Hangul is visibly thinner and less solid with weaker block/body visual hierarchy across the three independently sampled atlas labels. The native ink-occupancy reductions corroborate visual impression; the cross-script occupancy ratio is NOT a standalone proof of defect.",
+  "machine_containment_reused": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_14REGION_NATIVE_MACHINE.json",
+  "limitations": "Three of 14 label rows inspected for this new targeted font-weight defect; 11 remaining rows not newly adjudicated. Native preview is generated from exact previously verified DDS bytes, but this run did not independently decode the entire current DDS again. This is not a machine-enforced current-policy PASS or new material Korean DDS.",
+  "result": "VISUAL_SOURCE_FAMILY_DEFECT_CORROBORATED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

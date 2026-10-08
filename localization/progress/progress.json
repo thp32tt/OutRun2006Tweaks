@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 00:51 KST",
+  "updated_at_kst": "2026-10-09 00:58 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8282,5 +8282,26 @@
     "approval": false,
     "qa": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CONTROLLER_C1_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c313_c2_q236_source_family_weight": {
+    "task_id": "OUTRUN-KOR-C313-C2-Q236-STROKE-FAMILY-VISUAL-REWORK-20261009",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 236,
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "new_dds": 0,
+    "new_png": 0,
+    "visual_defect": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+    "sample_rows": [
+      0,
+      5,
+      11
+    ],
+    "new_current_policy_approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_CONTROLLER_C2_REWORK.json"
   }
 }
