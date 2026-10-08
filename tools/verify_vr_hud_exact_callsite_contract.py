@@ -155,8 +155,17 @@ def check(ui, manifest):
                 "if (RankMarkerSubScreenHudDepth != 0)", "RenderScope::ScreenHud",
                 "const bool projected = RankMarkerProjectedInfo.valid",
                 "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard")
-        if "ProducerToken::" + token not in chunk or "RegisterSpriteNodeScope(" not in chunk:
+        if "ProducerToken::" + token not in chunk:
+            fail(func + " producer identity missing")
+        if token == "RankMarkerSprani":
+            if "TagAppendedNodes(tailsBefore, scope," not in chunk:
+                fail("rank sprani lost all-node exact producer tagging")
+        elif "RegisterSpriteNodeScope(" not in chunk:
             fail(func + " marker registration missing")
+    rank = function_body(ui, "static int __cdecl RankMarker_sprani(")
+    if "TagAppendedNodes(tailsBefore, scope," not in rank:
+        fail("multi-node rank producer not tagged")
+    # Both rank/rival producers share the existing guarded all-node walk.
     # Rival's actual producer uses a bounded multi-node tagging helper,
     # unlike the single-node rank wrappers. Guard this real ownership path.
     rival = function_body(ui, "static int __cdecl RivalMarker_sprani(")

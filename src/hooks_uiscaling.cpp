@@ -313,6 +313,35 @@ class UIScaling : public Hook
 
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
 	// position as floats, so the discarded fraction goes straight back on.
+	static void TagAppendedNodes(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		OutRunVR::GameSemantic::RenderScope scope,
+		OutRunVR::GameSemantic::ProducerToken producer =
+			OutRunVR::GameSemantic::ProducerToken::None,
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
+			nullptr)
+	{
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[prio])
+				continue;
+
+			SpriteNode* node = before[prio]
+				? before[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, scope, producer, projectedMarker);
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+	}
+
+
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
@@ -343,16 +372,11 @@ class UIScaling : public Hook
 		// These four exact producer callsites own the vehicle-relative rank
 		// markers. Prefer the recovered Calc3D2D anchor; retain the current
 		// strict WorldBillboard path as a fail-soft fallback if capture is absent.
-		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-		{
-			SpriteNode* root = Game::sprite_prio_root[prio];
-			SpriteNode* node = root ? root->tail_4 : nullptr;
-			if (node && node != tailsBefore[prio])
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope,
-					OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
-					marker);
-		}
+		// A sprani producer normally emits one sprite, but can queue an
+		// animated or masked sibling. Every node appended by this exact CALL
+		// belongs to the same rank marker, not just the final priority tail.
+		TagAppendedNodes(tailsBefore, scope,
+			OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani, marker);
 		return result;
 	}
 
@@ -402,33 +426,6 @@ class UIScaling : public Hook
 	}
 
 
-	static void TagAppendedNodes(
-		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
-		OutRunVR::GameSemantic::RenderScope scope,
-		OutRunVR::GameSemantic::ProducerToken producer =
-			OutRunVR::GameSemantic::ProducerToken::None,
-		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
-			nullptr)
-	{
-		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-		{
-			SpriteNode* root = Game::sprite_prio_root[prio];
-			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
-			if (!root || !tailAfter || tailAfter == before[prio])
-				continue;
-
-			SpriteNode* node = before[prio]
-				? before[prio]->next_0 : root->next_0;
-			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
-			{
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope, producer, projectedMarker);
-				if (node == tailAfter)
-					break;
-				node = node->next_0;
-			}
-		}
-	}
 
 	static int __cdecl ExactScreenHud_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags,
