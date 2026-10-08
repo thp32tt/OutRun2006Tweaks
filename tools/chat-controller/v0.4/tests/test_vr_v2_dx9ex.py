@@ -329,6 +329,66 @@ class VRV2DX9ExTests(unittest.TestCase):
         dx9.pop('checkpoint')
         self.assertTrue(verdict(dx9, active, run)[0])
 
+    def test_wait_actions_c6_binding_never_oscillates_to_bookkeeping_sha(self):
+        # Regression: 00455's canonical material Gate succeeded, but a later
+        # [AUTO:00455] C6 checkpoint has a different SHA (and may have a Gate).
+        tree = ast.parse(SOURCE)
+        fn = next(n for n in tree.body
+                  if isinstance(n, ast.FunctionDef) and n.name == 'refresh_wait_actions_task_binding')
+        ns = {
+            'datetime': datetime, 'TZ': timezone.utc, 'log': Mock(),
+            '_github_commit_list_cache': {},
+            'github_branch_head': Mock(return_value='c' * 40),
+            'github_find_task_commit': Mock(return_value={
+                'sha': 'b' * 40, 'message': 'docs: seal C6 [AUTO:CONVERSION-DX11-00455]'}),
+            'github_task_record': Mock(return_value={
+                'task_id': 'CONVERSION-DX11-00455',
+                'target_branch': 'vr-dx11-native-r71',
+                'status': 'COMPLETE', 'checkpoint': 'C6_STATE',
+                'automation_validation': 'PASS',
+                'validation_bearing_result_sha': 'a' * 40,
+            }),
+        }
+        exec(compile(ast.Module(body=[fn], type_ignores=[]), '<canonical-binding>', 'exec'), ns)
+        task = {'task_id': 'CONVERSION-DX11-00455',
+                'branch': 'vr-dx11-native-r71', 'phase': 'WAIT_ACTIONS',
+                'result_sha': 'b' * 40, 'gate_run': {'id': 111},
+                'last_gate_poll_at': '2026-10-08T00:00:00+00:00'}
+        changed = ns['refresh_wait_actions_task_binding'](task)
+        self.assertIn('->aaaaaaaa', changed)
+        self.assertEqual(task['result_sha'], 'a' * 40)
+        self.assertNotIn('gate_run', task)
+        self.assertIsNone(task['last_gate_poll_at'])
+        # Subsequent ticks must retain the canonical SHA without resetting CI.
+        task['gate_run'] = {'id': 37732432495, 'head_sha': 'a' * 40}
+        task['last_gate_poll_at'] = '2026-10-08T00:01:00+00:00'
+        self.assertIsNone(ns['refresh_wait_actions_task_binding'](task))
+        self.assertEqual(task['result_sha'], 'a' * 40)
+        self.assertEqual(task['gate_run']['id'], 37732432495)
+        self.assertEqual(task['last_gate_poll_at'], '2026-10-08T00:01:00+00:00')
+        ns['github_find_task_commit'].assert_not_called()
+
+        # An uncompleted, incorrect-branch, or invalid C6 record cannot
+        # override the normal commit discovery and cannot manufacture PASS.
+        for record_patch in (
+            {'status': 'IN_PROGRESS'},
+            {'target_branch': 'vr-dxvk-r71-disasm'},
+            {'automation_validation': 'PENDING'},
+            {'validation_bearing_result_sha': 'invalid'},
+        ):
+            record = {
+                'task_id': 'CONVERSION-DX11-00455',
+                'target_branch': 'vr-dx11-native-r71',
+                'status': 'COMPLETE', 'checkpoint': 'C6_STATE',
+                'automation_validation': 'PASS',
+                'validation_bearing_result_sha': 'a' * 40,
+                **record_patch,
+            }
+            ns['github_task_record'].return_value = record
+            fresh = dict(task, result_sha='a' * 40, gate_run={'id': 111})
+            self.assertIsNotNone(ns['refresh_wait_actions_task_binding'](fresh))
+            self.assertEqual(fresh['result_sha'], 'b' * 40)
+
     def test_conversion_success_waits_for_terminal_c6(self):
         tree = ast.parse(SOURCE)
         fn = next(n for n in tree.body
