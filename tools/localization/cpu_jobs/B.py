@@ -53,15 +53,15 @@ for y,x in zip(*np.where(band)):
  block_x=int(x)//4
  addr=128+(block_y*512+block_x)*16
  e0,e1=struct.unpack_from("<HH",data,addr+8)
- if e0<=e1:
-  no_dark+=1
-  continue
+ # BC3 always uses 4 color interpolants, even if e0<=e1; unlike BC1.
  p0,p1=rgb(e0),rgb(e1)
  palette=np.array([p0,p1,(2*p0+p1+1)//3,(p0+2*p1+1)//3],dtype=np.int16)
  # Retain the source-derived navy family, reject non-navy/white unrelated blocks.
  desired=np.array([0,12,57],dtype=np.int16)
  near=np.sum((palette-desired)**2,axis=1).argmin()
- if near not in (1,3) or np.linalg.norm(palette[near]-desired)>90:
+ # Derive the darkest available compressed navy-like channel; do not
+ # treat DXT5 as DXT1 one-bit color mode.
+ if np.sum(palette[near])>170:
   no_dark+=1;continue
  raw_row=(127-int(y))%4
  q=(raw_row*4+(int(x)%4))*2
