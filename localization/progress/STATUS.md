@@ -3141,3 +3141,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 01:20 KST — A198R q227
 - RUN_KEY=OUTRUN-KOR-A198R-Q227-COUNTER-REPAIR-20261009-0118. Material DDS `83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595`, 16/16 native Korean counter-safe rows; rejected A198 `502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69` visually overbold despite machine pass. PROFESSIONAL height51→72/75px, zero outside/ghost/artwork/overlap, persisted RAW/50% producer PASS. Fresh C1/C3/evidence user/game pending, UNTESTED. QA `localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json`.
+
+### 2026-10-09 01:27 KST — C315 C2 EVEN q060 P0 user-game-reopened source-face FAIL
+- `TEMP_BACKLOG_RELIEF=C2` / `SHARD=EVEN`: q060 exact DDS SHA-bound 18 new lossless source/current 100/75/50/RAW PNG, 3 original-vs-Korean source-family face/fill/depth visual defects. User `IGR-044` remains OPEN; `C=REWORK_REQUIRED`, C3/current approval/export blocked. New DDS=0, `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/C315_Q060_CONTROLLER_C2_REWORK.json`.

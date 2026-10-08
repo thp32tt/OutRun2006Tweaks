@@ -6789,7 +6789,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 01:19 KST",
+  "updated_at_kst": "2026-10-09 01:27 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12403,5 +12403,24 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
     "failed_trial": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_CONTROLLER_VISUAL_FAIL.json"
+  },
+  "c315_c2_q060_igr044_source_face_fail": {
+    "run_key": "OUTRUN-KOR-C315-C2-Q060-IGR044-SOURCE-FACE-REWORK-20261009",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 60,
+    "priority": "P0",
+    "ingame": "IGR-044",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+    "worker_run_id": 37808549971,
+    "new_lossless_png": 18,
+    "new_dds": 0,
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/C315_Q060_CONTROLLER_C2_REWORK.json"
   }
 }

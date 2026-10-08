@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 01:20 KST",
+  "updated_at_kst": "2026-10-09 01:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8385,5 +8385,20 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
     "failed_trial": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_CONTROLLER_VISUAL_FAIL.json"
+  },
+  "c315_c2_q060_igr044_source_face_fail": {
+    "run_key": "OUTRUN-KOR-C315-C2-Q060-IGR044-SOURCE-FACE-REWORK-20261009",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 60,
+    "P0": "IGR-044",
+    "C": "REWORK_REQUIRED",
+    "reason": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+    "C3": "BLOCKED",
+    "new_lossless_png": 18,
+    "new_dds": 0,
+    "approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/C315_Q060_CONTROLLER_C2_REWORK.json"
   }
 }
