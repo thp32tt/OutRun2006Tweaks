@@ -202,6 +202,43 @@ def rollover_has_confirmed_ui_failure(reason: str) -> bool:
     )
 
 
+def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> tuple[bool, str]:
+    """Require a GitHub C6/terminal PASS record tied to the successful exact SHA."""
+    if not isinstance(record, dict):
+        return False, "RUN_RECORD_NOT_FOUND"
+    if str(record.get("task_id") or record.get("TASK_ID") or "") != str(active.get("task_id") or ""):
+        return False, "TASK_ID_MISMATCH"
+    if str(record.get("target_branch") or "") != str(active.get("branch") or ""):
+        return False, "BRANCH_MISMATCH"
+    status = str(record.get("status") or "").upper()
+    pipeline = record.get("pipeline") if isinstance(record.get("pipeline"), dict) else {}
+    c6 = pipeline.get("C6_STATE") if isinstance(pipeline, dict) else None
+    c6_complete = (
+        bool(record.get("controller_terminal"))
+        or str(record.get("checkpoint") or "").upper() == "C6_STATE"
+        or (isinstance(c6, dict) and str(c6.get("status") or "").upper() in {"COMPLETE", "PASS"})
+    )
+    if status not in {"COMPLETE", "COMPLETE_BUILD_VERIFIED", "PASS", "DONE"} or not c6_complete:
+        return False, "C6_NOT_COMPLETE"
+    nested_validation = record.get("validation") if isinstance(record.get("validation"), dict) else {}
+    validation = str(record.get("automation_validation") or nested_validation.get("automation_validation") or "").upper()
+    if not validation.startswith("PASS"):
+        return False, "AUTOMATION_VALIDATION_NOT_PASS"
+    exact_sha = str(
+        record.get("validation_bearing_result_sha")
+        or record.get("validation_bearing_sha")
+        or record.get("material_result_sha")
+        or ""
+    ).lower()
+    if len(exact_sha) != 40 or any(c not in "0123456789abcdef" for c in exact_sha):
+        return False, "VALIDATION_SHA_UNRESOLVED"
+    if exact_sha != str(gate_run.get("head_sha") or "").lower():
+        return False, "EXACT_SHA_MISMATCH"
+    if gate_run.get("status") != "completed" or gate_run.get("conclusion") != "success":
+        return False, "EXACT_GATE_NOT_SUCCESS"
+    return True, "C6_EXACT_SHA_VERIFIED"
+
+
 def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
     """Keep the original TASK_ID owned while an unfinished chat is ambiguous."""
     if active.get("chat_liveness") != "STALE_UNCONFIRMED" or active.get("last_liveness_reason") != reason:
@@ -1689,16 +1726,46 @@ async def conversion_process_lane(
                 return
 
             if run.get("conclusion") == "success":
+                try:
+                    head = github_branch_head(active["branch"])
+                    record = github_task_record(head, active["task_id"]) if head else None
+                except Exception as exc:
+                    record = None
+                    log.warning("C6 terminal verification deferred task=%s: %r", active["task_id"], exc)
+                verified, reason = conversion_terminal_verdict(record, active, run)
+                if not verified:
+                    validated_sha = str((record or {}).get("validation_bearing_result_sha") or "")
+                    if (
+                        reason == "EXACT_SHA_MISMATCH"
+                        and len(validated_sha) == 40
+                        and all(c in "0123456789abcdefABCDEF" for c in validated_sha)
+                    ):
+                        active["result_sha"] = validated_sha.lower()
+                        active["gate_run"] = None
+                        active["last_gate_poll_at"] = None
+                        active["terminal_verification"] = "REBOUND_TO_DURABLE_VALIDATION_SHA"
+                        save_queue_state(q)
+                        return
+                    if active.get("terminal_verification") != reason:
+                        active["terminal_verification"] = reason
+                        save_queue_state(q)
+                        write_runtime(
+                            status="conversion_wait_c6",
+                            last_action=f"{active['task_id']} gate SUCCESS but task not released: {reason}",
+                            queue=q,
+                        )
+                    return
                 active["automation_validation"] = "PASS"
                 active["runtime_validation"] = "UNTESTED"
                 active["completed_at"] = now.isoformat()
+                active["terminal_verification"] = reason
                 active["terminal"] = "PASS"
                 active["phase"] = "DONE"
                 q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
                 save_queue_state(q)
                 write_runtime(
                     status="conversion_parallel_pass",
-                    last_action=f"{active['task_id']} automation PASS; other conversion lanes continue independently",
+                    last_action=f"{active['task_id']} exact-SHA Gate and durable C6 PASS; other lanes continue independently",
                     last_completed=dict(active),
                     queue=q,
                 )
