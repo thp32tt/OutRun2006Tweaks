@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "run": "C310-C2",
+  "run_key": "OUTRUN-KOR-C310-C2-Q098-B279-NATIVE-SOURCE-FAMILY-FAIL-20261009",
+  "date_kst": "2026-10-09 00:12 KST",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "role": "C",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "selected_head": "2c6bf506e4c35c8dde11625263c3011dcea983c4",
+  "selected_queue_blob": "55f8676aa7ec1c79154edd468208b6f9edd2f902",
+  "triage": {
+    "index": 98,
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+    "current_status": "b279_producer_self_qa_pass_pending_fresh_c2_c3",
+    "next_action": "FRESH_C_REVIEW",
+    "repeated_root_causes": [],
+    "reason": "Producer candidate exists; await independent pixels-first C",
+    "runtime_validation": "UNTESTED"
+  },
+  "actions_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37797838142",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "authored_clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "candidate_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "source_provenance": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "worker_machine": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_MACHINE.json",
+  "new_lossless_png": 13,
+  "format": "DXT5 BC3 mip1 RAW mirrored-Y",
+  "native": [
+    2048,
+    128
+  ],
+  "permitted_bbox": {
+    "source": [
+      434,
+      9,
+      1671,
+      120
+    ],
+    "candidate": [
+      580,
+      11,
+      1523,
+      116
+    ],
+    "inside_source": true
+  },
+  "exact_full_atlas": {
+    "source_clean_outside_source": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "clean_final_outside_target": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    },
+    "source_final_outside_source": {
+      "RGBA": 0,
+      "alpha": 0,
+      "visible": 0
+    }
+  },
+  "clean_english_alpha_residual": 0,
+  "source_white_face_pixel_count": 23914,
+  "source_navy_blue_greater_red_pixel_count": 57960,
+  "candidate_white_face_pixel_count": 44146,
+  "candidate_navy_blue_greater_red_pixel_count": 21877,
+  "white_to_navy_ratio": {
+    "source": 0.413,
+    "candidate": 2.018,
+    "interpretation": "Thresholded native BC3 opaque support is a descriptive proxy. Source/candidate scripts have different silhouette geometry; ratio alone never determines style PASS/FAIL."
+  },
+  "controller_first_look": {
+    "reviewer": "ChatGPT C2 controller",
+    "blinded_before_producer_notes": false,
+    "qualified_calibration": false,
+    "direct_views": [
+      "q098_WHITE_100_SOURCE_CLEAN_FINAL.png",
+      "q098_GRAY_50_SOURCE_CLEAN_FINAL.png",
+      "q098_BLACK_100_SOURCE_CLEAN_FINAL.png",
+      "q098_ZOOM200_SOURCE_FINAL.png",
+      "q098_RAW_SOURCE_FINAL.png",
+      "q098_PLATE_ONLY.png",
+      "q098_COMPOSITE_ONLY.png"
+    ],
+    "reason": "Producer report B279 read before new C310 exact source/current independent contact; do not claim qualified blind review."
+  },
+  "per_region": [
+    {
+      "id": "course_record_help",
+      "english": "Challenge the course record.",
+      "korean": "코스 기록에 도전하세요.",
+      "checks": {
+        "slant": {
+          "result": "PARTIAL_RIGHTWARD_LEAN_NO_OPPOSITE_OBSERVED",
+          "observation": "Source English right italic and candidate Korean also appears forward/right leaning; no independent semantic top-minus-bottom stem slope calibration."
+        },
+        "clean_plate": {
+          "result": "PASS_STATIC_NATIVE_SCOPE",
+          "observation": "B40-authored CLEAN contains zero nontransparent source text alpha and SOURCE/CLEAN changed pixels outside English source bbox 0; direct PLATE_ONLY comparison shows no definitive English lettering, donor box or seam."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_NAVY_GLOW_WEIGHT",
+          "reason_code": "SOURCE_FAMILY_NAVY_GLOW_UNDERWEIGHT_WHITE_FACE_DOMINANCE",
+          "observation": "Viewed lossless native WHITE and 200% source-vs-B279: canonical italic English has a thick diffuse navy halo/outline outside a comparatively restrained white face; B279 Korean presents large near-solid white fill with a thin sharply bounded navy edge and lacks comparable diffuse navy extrusion/glow. This is a persistent visible family/effect mismatch after B279 repair of prior stippled horizontal stripes, not an automatic PASS from native containment. Threshold pixel ratios source 0.413 vs candidate 2.018 support investigation but are not the sole verdict.",
+          "evidence": [
+            "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_WHITE_100_SOURCE_CLEAN_FINAL.png",
+            "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_ZOOM200_SOURCE_FINAL.png",
+            "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/q098_BLACK_100_SOURCE_CLEAN_FINAL.png"
+          ]
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_LEGIBLE",
+          "observation": "Korean is decipherable in native and 50% proof; native source-family/hierarchy and in-game readability not accepted."
+        },
+        "glyph_integrity": {
+          "result": "IMPROVED_NO_PRIOR_B273_HORIZONTAL_BLACK_STRIPES_OBSERVED",
+          "observation": "New persisted Korean native/zoom and GRAY50 show contiguous white Hangul face; no definitive previous B273 horizontal dark stripe recurrence, but separate small BC3 spot imperfections not independently excluded."
+        },
+        "protected_art": {
+          "result": "MACHINE_OUTSIDE_ALL_SCOPES_ZERO",
+          "observation": "Full atlas source-vs-CLEAN, CLEAN-vs-final target bbox, source-vs-final RGB(A), alpha and visible-pixel changed outside 0/0/0; positive translated-text containment; within-effect mask exact palette style remains rejected."
+        },
+        "placement": {
+          "result": "PASS_NUMERIC_BOUNDARY_ONLY",
+          "observation": "Candidate decoded bbox [580,11,1523,116] strictly within English decoded [434,9,1671,120]; 146px left/148px right and 2px top/4px bottom margins in measured alpha>16 bounds. No protected region overflow."
+        },
+        "orientation": {
+          "result": "PASS_STATIC_RAW_AND_READABLE_UNTESTED_GAME",
+          "observation": "Native source/final RAW paired inversion visually consistent with readable orientation. In-game sprite UV actual display remains UNTESTED."
+        }
+      }
+    }
+  ],
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED_REWORK_REQUIRED",
+  "current_policy_APPROVAL": false,
+  "user_JPG_accepted": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "root_cause": "White/navy UI-family effect construction lacks canonical English's diffuse heavy navy edge/glow and comparatively lighter white face; should preserve B279 repaired continuous glyph face while source-conditioning navy halo/outer depth and source palette, without repeating B272/B273 whitening or B277/B278 too-thin keyline.",
+  "next_B_action": "Rebuild from exact B40 CLEAN and pinned English, revise both white face/relative opaque surface and navy keyline/diffuse outer glow based on native source effect profile; keep B279 repaired no-stripe glyph integrity, whole-atlas zero pixel escape, positive original bbox margin; new producer plate/composite separate QA, persisted BC3 native/RAW/50% and fresh independent C2/C3. Do not falsely mark repeated unchanged DDS as repaired."
+}
