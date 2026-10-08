@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00464",
+  "production_id": "CONVERSION-DX11-00464",
+  "event_id": "CONVERSION-DX11-00464-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "a571ef2326b3f36db5a564af036ff2d864796984",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00464",
+  "lease_epoch": 1,
+  "work_key": "DX11:R156:OFFSCREEN_NATIVE_NONINDEXED_DRAW:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:execute_fixed_function_nonindexed_direct_draw_probe",
+    "src/vr/d3d11/native_backend.hpp:R156",
+    "tools/dx11_constant_buffer_probe.cpp:R156"
+  ],
+  "selected_work_item": "DX11_R156_NATIVE_NONINDEXED_DRAW_WARP_OFFSCREEN_EXECUTION",
+  "status": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "result_sha": "PENDING_COMMIT_SHA",
+  "material_result_sha": "PENDING_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "Add actual native D3D11 Draw execution bridge for sealed nonindexed offscreen probe plus WARP IA primitive-counter regression; native gameplay draw selector unchanged.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: 00463 terminal exact-SHA PASS; 00464 absent",
+    "C1_REVIEW": "PASS: direct nonindexed dispatch sealed but no D3D11 Draw invocation; choose offscreen-only executable proof",
+    "C2_IMPLEMENT": "PASS: real native Draw bridge and WARP primitive-count + fail-closed negatives",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate",
+    "C4_COMMIT": "PENDING: GitHub material commit",
+    "C5_PACKAGE": "NOT_REQUIRED: probe-only diagnostic, no user candidate",
+    "C6_STATE": "PENDING: exact-SHA CI and issue ledger"
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PENDING_CI",
+  "state_persisted": true,
+  "next_action": "Read exact material-SHA Backend Conversion Gate Win32 validation and DX11 readiness WARP smoke; correct source/test within 00464 if failing; after success update canonical run/lane/Issue14 and score once.",
+  "blockers": [
+    "Quest3/VDXR hardware runtime UNTESTED"
+  ],
+  "last_real_activity_at": "2026-10-08T23:38:00Z",
+  "last_activity_evidence": "GitHub C0 source inspection and real C++ Draw offscreen probe implementation"
+}

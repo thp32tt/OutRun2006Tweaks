@@ -14444,6 +14444,63 @@ bool validate_fixed_function_direct_draw_dispatch_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+// R156: WARP/offscreen proof-only native Draw bridge; no gameplay caller.
+// Unlike dormant scalar dispatch checks, this issues a real D3D11 Draw after
+// checking the current device/context and the live OM/IA/VS/PS attachments.
+bool execute_fixed_function_nonindexed_direct_draw_probe(
+    ID3D11DeviceContext* context,
+    ID3D11RenderTargetView* expectedProbeTarget,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    UINT startVertexLocation) noexcept {
+    if (!context || !expectedProbeTarget ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+        dispatch.indexed || !dispatch.ready || dispatch.snapshotToken == 0 ||
+        dispatch.elementCount == 0 ||
+        !validate_fixed_function_direct_draw_dispatch_snapshot(
+            boundDraw, draw, geometry, primitive, primitiveCount, false,
+            startVertexLocation, 0u, 0, dispatch.snapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device> targetDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    expectedProbeTarget->GetDevice(targetDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != targetDevice.Get())
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveTarget;
+    context->OMGetRenderTargets(1, liveTarget.ReleaseAndGetAddressOf(), nullptr);
+    if (liveTarget.Get() != expectedProbeTarget)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> liveVertexBuffer;
+    UINT liveStride = 0;
+    UINT liveOffset = 0;
+    context->IAGetVertexBuffers(
+        0, 1, liveVertexBuffer.ReleaseAndGetAddressOf(),
+        &liveStride, &liveOffset);
+    D3D11_PRIMITIVE_TOPOLOGY liveTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    context->IAGetPrimitiveTopology(&liveTopology);
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> liveVS;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
+    context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(livePS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    if (!liveVertexBuffer || !liveVS || !livePS ||
+        liveStride != boundDraw.vertexStride ||
+        liveOffset != boundDraw.vertexOffset ||
+        liveTopology != dispatch.topology)
+        return false;
+
+    context->Draw(dispatch.elementCount, dispatch.startVertexLocation);
+    return true;
+}
+
 NativeFixedFunctionFanDrawDispatchReadiness
 compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
     const NativeFixedFunctionDrawReadiness& draw,

@@ -11379,6 +11379,64 @@ VSOutput main(VSInput input)
                     nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
                     1u, 0u, 0, nonIndexedDirectDispatch.snapshotToken),
             "R147 direct nonindexed dispatch seals Draw start vertex");
+
+        // R156 issues real native Draw on WARP using the already sealed IA/VS/PS
+        // and OM target, without enabling the game's native draw selector.
+        ID3D11Query* r156Stats = nullptr;
+        D3D11_QUERY_DESC r156StatsDesc{};
+        r156StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
+        require(
+            SUCCEEDED(d3d.device->CreateQuery(&r156StatsDesc, &r156Stats)) &&
+            r156Stats != nullptr,
+            "R156 offscreen WARP pipeline statistics query prerequisite");
+        auto r156Probe = [&](ID3D11DeviceContext* context,
+                             ID3D11RenderTargetView* target,
+                             const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
+            return outrun::vr::dx11::
+                execute_fixed_function_nonindexed_direct_draw_probe(
+                    context, target, nonIndexedRenderTargetBoundDraw,
+                    nonIndexedDirectDrawReady, nonIndexedGeometryReady,
+                    packet, D3DPT_TRIANGLESTRIP, 2u, 1u);
+        };
+        require(
+            !r156Probe(d3d.context, nullptr, nonIndexedDirectDispatch),
+            "R156 refuses missing offscreen target");
+        ID3D11DeviceContext* r156Deferred = nullptr;
+        require(
+            SUCCEEDED(d3d.device->CreateDeferredContext(0, &r156Deferred)) &&
+            r156Deferred != nullptr,
+            "R156 deferred context negative prerequisite");
+        require(
+            !r156Probe(r156Deferred, outputColorSurface.render_target_view(),
+                       nonIndexedDirectDispatch),
+            "R156 deferred recording never issues native probe Draw");
+        r156Deferred->Release();
+        auto r156Forged = nonIndexedDirectDispatch;
+        r156Forged.startVertexLocation ^= 1u;
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       r156Forged),
+            "R156 refuses stale nonindexed Draw argument tuple");
+        d3d.context->Begin(r156Stats);
+        require(
+            r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                      nonIndexedDirectDispatch),
+            "R156 real native Draw issues against matching offscreen WARP state");
+        d3d.context->End(r156Stats);
+        d3d.context->Flush();
+        D3D11_QUERY_DATA_PIPELINE_STATISTICS r156Counters{};
+        HRESULT r156QueryResult = S_FALSE;
+        for (unsigned spin = 0; spin < 2048u; ++spin) {
+            r156QueryResult = d3d.context->GetData(
+                r156Stats, &r156Counters, sizeof(r156Counters), 0u);
+            if (r156QueryResult != S_FALSE)
+                break;
+        }
+        require(
+            r156QueryResult == S_OK && r156Counters.IAPrimitives == 2u,
+            "R156 WARP confirms two actual native triangle-strip primitives");
+        r156Stats->Release();
+
         require(
             !outrun::vr::dx11::
                 validate_fixed_function_direct_draw_dispatch_snapshot(

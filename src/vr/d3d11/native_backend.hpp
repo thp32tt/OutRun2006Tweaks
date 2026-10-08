@@ -4359,6 +4359,22 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     INT baseVertexLocation,
     std::uint64_t snapshotToken) noexcept;
 
+// R156: a diagnostic-only bridge from a sealed nonindexed direct dispatch
+// to an actual offscreen D3D11 Draw. It is not wired to the game's draw hook,
+// the native activation selector, or the OpenXR submission path.
+// Caller must supply an explicit expected probe RTV; the bridge rechecks live
+// immediate-context OM/IA/VS/PS state and refuses indexed or stale dispatches.
+[[nodiscard]] bool execute_fixed_function_nonindexed_direct_draw_probe(
+    ID3D11DeviceContext* context,
+    ID3D11RenderTargetView* expectedProbeTarget,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    UINT startVertexLocation) noexcept;
+
 // R149 preserves the D3D9 DrawIndexedPrimitive source-range arguments before
 // any native DrawIndexed activation. D3D11 drops MinVertexIndex/NumVertices
 // from the dispatch API, so this dormant token keeps BaseVertexIndex,
