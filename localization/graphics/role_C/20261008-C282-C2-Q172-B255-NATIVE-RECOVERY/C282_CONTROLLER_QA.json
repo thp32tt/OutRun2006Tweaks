@@ -182,6 +182,10 @@
   "RUNTIME_VALIDATION": "UNTESTED",
   "new_dds_candidate_created_by_C": false,
   "required_next": "Producer should supply exact B255 clean-plate and source-glyph-only slant anchors, preserve candidate bytes. Next independent pixels-first C2 with valid known-good calibration and explicit family/mip/black-white-gray region evidence can then decide C PASS or precise defect; follow with a separate C3 before export. Do not blindly regenerate for evidence migration.",
-  "cleanup": "PENDING_REMOTE_VERIFICATION",
-  "forbidden_domains_touched": []
+  "cleanup": "COMPLETE_ONLY_REGISTERED_TASK_SCRATCH_AFTER_REMOTE_QA_VERIFICATION",
+  "forbidden_domains_touched": [],
+  "cleaned_paths": [
+    "work/C282_C2_Q172_20261008_scratch"
+  ],
+  "n100_free_bytes_after_cleanup": 27650301952
 }
