@@ -35,5 +35,5 @@
 
 ## Status
 - Code implementation: material changes committed.
-- Canonical static/build CI: **pending verification of exact material** at time of report creation; earlier successful CI on a prior SHA cannot be transferred.
+- Canonical static/build CI: **SUCCESS ON EXACT SOURCE SHA** `f2e290417fe9e4f6f822f0009feca7410103adf7`. GitHub Actions: DX9Ex Active Validation run `37735180194` (policy/game Win32/host x64/R33 full-chain/package ALL SUCCESS); OutRun EXE HUD Inspector `37735180126` (static EXE contract and Win32 HUD build SUCCESS); DX9Ex Full Source Impact Review `37735180184` (inventory/game+host MSVC /analyze SUCCESS); Domain Isolation Guard `37735180154` SUCCESS. Artifact `11532115874` named `OutRun2-VR-DX9EX-ACTIVE-f2e290417fe9e4f6f822f0009feca7410103adf7`, sha256 `c8fbce8ef19abcdca4e6dbcde33aca7f1de44e2c6911b941006bfcdaa07e2823`. Results apply only to the code-bearing SHA; subsequent docs do not imply fresh game build.
 - Headset: **UNTESTED**.
