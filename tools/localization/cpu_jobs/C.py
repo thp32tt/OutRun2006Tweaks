@@ -9,8 +9,8 @@ base=Path(".")
 out=base/"localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY"
 out.mkdir(parents=True,exist_ok=True)
 triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","172"],capture_output=True,text=True,check=True)
-t=json.loads(triage.stdout)
-assert len(t["assets"])==1 and t["assets"][0]["index"]==172 and t["assets"][0]["next_action"]=="EVIDENCE_ONLY_HOLD", t
+triage_report=json.loads(triage.stdout)
+assert len(triage_report["assets"])==1 and triage_report["assets"][0]["index"]==172 and triage_report["assets"][0]["next_action"]=="EVIDENCE_ONLY_HOLD", t
 (out/"C291_Q172_TRIAGE.json").write_text(json.dumps(t,ensure_ascii=False,indent=2)+"\n")
 source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 with urllib.request.urlopen(source_url,timeout=120) as f: source_bytes=f.read()
@@ -90,7 +90,7 @@ rep={"schema_version":1,"run":"C291","role":"C","TEMP_BACKLOG_RELIEF":"C2","SHAR
 "producer_final_png_exact_matches_persisted_candidate_decode":raw_match_final,
 "source_to_candidate_RGBA_outside_two_boxes":rgbo,"source_to_candidate_alpha_outside_two_boxes":alphao,
 "source_to_authored_clean_RGBA_outside_two_boxes":cleano,"source_to_authored_clean_alpha_outside_two_boxes":clean_alpha_out,
-"region_notes":rows,"triage_result":t["assets"][0],"C_result":"PENDING_CONTROLLER_NEW_STYLE_INSPECTION",
+"region_notes":rows,"triage_result":triage_report["assets"][0],"C_result":"PENDING_CONTROLLER_NEW_STYLE_INSPECTION",
 "C3":"BLOCKED_PENDING_COMPLETE_C_EVIDENCE","runtime_validation":"UNTESTED"}
 (out/"C291_Q172_NATIVE_MACHINE.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
 print("C291 q172",expected_final,"SRC_PNG",raw_match_source,"FIN_PNG",raw_match_final,"outside",rgbo,alphao,"clean outside",cleano,clean_alpha_out)
