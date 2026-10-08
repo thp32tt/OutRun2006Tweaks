@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q137-B285-P0-STYLE-20261009-0322",
+  "role": "C",
+  "lane": "C1",
+  "selection": "P0 user in-game IGR-041; fresh B285 exact new bytes; odd index",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "priority": "P0",
+  "user_regression": "IGR-041 screenshot(193)(1).png",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "candidate_sha256": "1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2",
+  "prior_C234_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "native_dds": "2048x1024 BGRA32 mip1 RAW mirror_y",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "review_kind": "independent C1 readable native/practical, exact producer persisted candidate evidence images viewed directly; no game runtime executed",
+  "backend": "GitHub connected file fetch base64 and ChatGPT direct independent visual interpretation; local git access DNS unavailable; producer worker generated pinned proof",
+  "proof": {
+    "producer_machine_json": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_MACHINE_QA.json",
+    "source_clean_native": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_PLATE_ONLY_RGBA.png",
+    "region_2x": [
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_select_transmission_SOURCE_CLEAN_B165_TRIAL_2X.png",
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_transmission_small_SOURCE_CLEAN_B165_TRIAL_2X.png",
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_manual_small_SOURCE_CLEAN_B165_TRIAL_2X.png",
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_automatic_small_SOURCE_CLEAN_B165_TRIAL_2X.png",
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_manual_large_SOURCE_CLEAN_B165_TRIAL_2X.png",
+      "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_automatic_large_SOURCE_CLEAN_B165_TRIAL_2X.png"
+    ],
+    "readable_native": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_READABLE_GRAY_100_SOURCE_CLEAN_B165_TRIAL.png",
+    "readable_practical50": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_READABLE_GRAY_50_SOURCE_CLEAN_B165_TRIAL.png",
+    "readable_black_native": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_READABLE_BLACK_100_SOURCE_CLEAN_B165_TRIAL.png",
+    "readable_white_practical50": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_READABLE_WHITE_50_SOURCE_CLEAN_B165_TRIAL.png",
+    "raw_mirror": "localization/graphics/role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY/B285_RAW_GRAY_75_SOURCE_CLEAN_B165_TRIAL.png"
+  },
+  "calibration_control": "Compared q161 previous C314 rejected visibly speckled/overcondensed glyph crops against repaired A200 q161 crops; not counted as a q161 C decision. B285 did not show that same specific pinhole failure.",
+  "static_machine_corroboration": {
+    "source_region_count": 6,
+    "source_vs_clean_outside": 0,
+    "candidate_changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_at_mt_panel_diff": 0,
+    "source_line_retained_pixels": 396,
+    "source_antialias_changed_pixels": 44,
+    "source_bbox_containment": "6/6 producer PASS, not independently recomputed from raw DDS",
+    "persisted_roundtrip": "producer PASS, not independently recomputed from raw DDS",
+    "source_family_stroke_px_producer": [
+      1,
+      2,
+      3
+    ]
+  },
+  "region_checks": [
+    {
+      "region": "select_transmission",
+      "source_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "candidate_bbox": [
+        299,
+        70,
+        573,
+        127
+      ],
+      "source_wh": [
+        863,
+        63
+      ],
+      "candidate_wh": [
+        274,
+        57
+      ],
+      "result": "FAIL",
+      "reason": "Source tall condensed white title versus visibly stockier, rounder Hangul face and wider-looking strokes at native/50%; candidate spans only 31.75% of source width. Width ratio is context, not itself a prohibited pixel overflow; use source-family-conditioned typography and clean practical hierarchy without arbitrary scale."
+    },
+    {
+      "region": "transmission_small",
+      "source_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "candidate_bbox": [
+        1394,
+        99,
+        1462,
+        125
+      ],
+      "source_wh": [
+        281,
+        32
+      ],
+      "candidate_wh": [
+        68,
+        26
+      ],
+      "result": "HOLD",
+      "reason": "Small gray label legible against dark backgrounds, but exact game-scale text sharpness/source-family weight remains unqualified after the user's IGR-041 low-resolution report."
+    },
+    {
+      "region": "manual_small",
+      "source_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "candidate_bbox": [
+        122,
+        151,
+        231,
+        207
+      ],
+      "source_wh": [
+        325,
+        62
+      ],
+      "candidate_wh": [
+        109,
+        56
+      ],
+      "result": "FAIL",
+      "reason": "Gray Korean glyph silhouette is visually much bulkier/less condensed than source uppercase MANUAL at the same practical scale; needs independent stroke and spacing reference."
+    },
+    {
+      "region": "automatic_small",
+      "source_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "candidate_bbox": [
+        1039,
+        150,
+        1159,
+        213
+      ],
+      "source_wh": [
+        554,
+        69
+      ],
+      "candidate_wh": [
+        120,
+        63
+      ],
+      "result": "FAIL",
+      "reason": "Gray Korean glyph silhouette heavy versus source narrow-uppercase AUTOMATIC, especially at 50% practical preview."
+    },
+    {
+      "region": "manual_large",
+      "source_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "candidate_bbox": [
+        126,
+        238,
+        272,
+        312
+      ],
+      "source_wh": [
+        396,
+        80
+      ],
+      "candidate_wh": [
+        146,
+        74
+      ],
+      "result": "FAIL",
+      "reason": "White Korean face uses thick, rounded bold glyphs while source large MANUAL has a much narrower angular/vertical stroke impression; 3px producer dilation is not source-measured style proof."
+    },
+    {
+      "region": "automatic_large",
+      "source_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "candidate_bbox": [
+        1260,
+        236,
+        1404,
+        312
+      ],
+      "source_wh": [
+        886,
+        82
+      ],
+      "candidate_wh": [
+        144,
+        76
+      ],
+      "result": "FAIL",
+      "reason": "White Korean face visually bulky with insufficient family-specific condensed/form matching compared with source large AUTOMATIC; size containment alone cannot approve."
+    }
+  ],
+  "confirmed_visual_failure_codes": [
+    "SOURCE_FAMILY_GLYPH_WEIGHT_MISMATCH",
+    "SOURCE_FAMILY_CONDENSED_SHAPE_MISMATCH",
+    "PRACTICAL_SCALE_HIERARCHY_UNFAITHFUL"
+  ],
+  "not_observed": [
+    "No visible new black-box edge on inspected source/CLEAN/candidate contacts",
+    "No obvious leftover English under current Korean in six viewed regions",
+    "No proven AT/MT artwork intrusion",
+    "No wrong RAW orientation proven"
+  ],
+  "decision": "REWORK_REQUIRED",
+  "rationale": "Five translated regions exhibit current visual family/weight mismatch relative to the canonical native source at natural and practical 50% scale; source-bbox numeric acceptance is not visual acceptance. Small subtitle remains HOLD for genuine native/game-scale assessment. Keep user P0 open.",
+  "producer_rework": "B owns P0 q137. Rebuild source-conditioned white and gray typography with native family reference; remove arbitrary 2/3px CJK dilation unless English native stroke evidence justifies it; preserve clean plate, native source glyph bounding boxes, 0 overlap/protected changes, exact codec/orientation and high fidelity at 100/75/50. DO NOT blindly horizontally stretch to English width, do not mask defects with rectangles; compare SOURCE/CLEAN/FINAL, RAW/FLIP-Y and real AT/MT game composition. New exact DDS SHA required before fresh independent C1, separate C3, and NEW actual game screenshot for closure.",
+  "candidate_modified": false,
+  "new_dds": 0,
+  "independent_C_PASS": false,
+  "C3": "BLOCKED",
+  "PRE_INGAME_JPG_REVIEW": "EXCLUDED",
+  "CURRENT_APPROVAL": false,
+  "USER_ACCEPTANCE": false,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
