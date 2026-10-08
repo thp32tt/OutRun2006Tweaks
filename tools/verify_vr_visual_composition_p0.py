@@ -1092,4 +1092,71 @@ for label, damaged in (
         raise SystemExit('P0 SkyGlow negative case incorrectly passed: ' + label)
 
 
+# A canonical stage/+TIME/goal text queue node can outlive R44's 12-draw
+# source ownership window. The previous fallback read live c64, which may
+# already contain head injection. For exact ScreenHud only, require the
+# original pre-injection game upload with current shader epoch/bounded age.
+# Rival/world and projected car marker routes must not change.
+def check_exact_hud_raw_wvp(source):
+    raw = function_body(source, 'bool R30GetExtendedRawWvpForExactHud(')
+    for token in (
+        'CorroboratesHud(',
+        'GameSemantic::CurrentScope',
+        'GetLastRawGameWvpWrite(',
+        'GetCurrentShaderEpoch(',
+        'writeShader != currentShader',
+        'writeShaderSerial != currentShaderSerial',
+        'currentDraw <= writeDrawSerial',
+        'currentDraw - writeDrawSerial > R30ExactHudRawWvpDrawWindow',
+    ):
+        require(token, raw, 'exact HUD only raw game c64 bounded provenance')
+
+    require('constexpr std::uint64_t R30ExactHudRawWvpDrawWindow = 128u;',
+            source, 'bounded max HUD raw WVP draw reuse')
+    eye = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    require_order(
+        eye, 'exact ScreenHud fallback must not feed live already-injected c64',
+        'if (!R44GetOwnedRawOverlayWvp(original))',
+        'if (screenKind == R30ScreenSpaceKind::PerspectiveHud)',
+        'if (!R30GetExtendedRawWvpForExactHud(original))',
+        '++R30ExactHudRawWvpMiss;',
+        'return false;',
+        '++R30ExactHudExtendedRawWvp;',
+        'else',
+        'GetVertexShaderConstantF('
+    )
+    if eye.count('R30GetExtendedRawWvpForExactHud(original)') != 1:
+        raise SystemExit('P0 HUD raw WVP: exact screen call missing/duplicated')
+    for token in (
+        'R30ScreenSpaceKind::WorldBillboard',
+        'R30ScreenSpaceKind::ProjectedWorldMarker2D',
+    ):
+        require(token, eye, 'original rival marker source route unchanged')
+
+check_exact_hud_raw_wvp(r30)
+for label, corrupt in (
+    ('exact HUD tag authority lost',
+     inject_one_function_token(
+         r30, 'bool R30GetExtendedRawWvpForExactHud(',
+         '!OutRunVR::GameSemantic::CorroboratesHud(',
+         '/* no exact HUD */ false &&')),
+    ('stale original c64 age no longer bounded',
+     inject_one_function_token(
+         r30, 'bool R30GetExtendedRawWvpForExactHud(',
+         'currentDraw - writeDrawSerial > R30ExactHudRawWvpDrawWindow',
+         'currentDraw - writeDrawSerial > 1000000u')),
+    ('HUD once again reads potentially injected live c64',
+     inject_one_function_token(
+         r30, 'bool R30BuildScreenSpaceEyeConstants(',
+         'if (!R30GetExtendedRawWvpForExactHud(original))',
+         'if (FAILED(device->GetVertexShaderConstantF(')),
+):
+    try:
+        check_exact_hud_raw_wvp(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 original HUD c64 mutation survived: ' + label)
+
+
 print('P0 visual composition static contract: PASS')
