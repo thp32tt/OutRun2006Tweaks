@@ -1,0 +1,375 @@
+{
+  "run": "C318",
+  "role": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 212,
+  "user_regression": "IGR-029",
+  "mapping_status": "SUSPECTED_NOT_VERIFIED",
+  "native_size": [
+    2048,
+    2048
+  ],
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "header_match": true,
+  "raw_flip_y_crop_parity": true,
+  "changed_rgba_outside_12_bboxes": 0,
+  "changed_alpha_outside_12_bboxes": 0,
+  "region_count_existing": 12,
+  "selected_region_count": 6,
+  "selected_regions": [
+    {
+      "label": "showroom",
+      "source": "SHOWROOM",
+      "ko": "쇼룸",
+      "source_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "ko_bbox": [
+        18,
+        1154,
+        266,
+        1290
+      ],
+      "source_width": 1746,
+      "ko_width": 248,
+      "width_ratio": 0.142,
+      "height_ratio": 0.9189,
+      "margins": [
+        4,
+        1494,
+        6,
+        6
+      ]
+    },
+    {
+      "label": "coast2coast",
+      "source": "COAST 2 COAST",
+      "ko": "코스트 2 코스트",
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "ko_bbox": [
+        91,
+        966,
+        1344,
+        1120
+      ],
+      "source_width": 1760,
+      "ko_width": 1253,
+      "width_ratio": 0.7119,
+      "height_ratio": 0.9625,
+      "margins": [
+        91,
+        416,
+        2,
+        4
+      ]
+    },
+    {
+      "label": "outrun_big",
+      "source": "OUTRUN",
+      "ko": "아웃런",
+      "source_bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "ko_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "source_width": 718,
+      "ko_width": 372,
+      "width_ratio": 0.5181,
+      "height_ratio": 0.9459,
+      "margins": [
+        4,
+        342,
+        4,
+        4
+      ]
+    },
+    {
+      "label": "enter_name",
+      "source": "ENTER NAME",
+      "ko": "이름 입력",
+      "source_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "ko_bbox": [
+        4,
+        506,
+        188,
+        562
+      ],
+      "source_width": 1081,
+      "ko_width": 184,
+      "width_ratio": 0.1702,
+      "height_ratio": 0.7368,
+      "margins": [
+        4,
+        893,
+        10,
+        10
+      ]
+    },
+    {
+      "label": "professional",
+      "source": "PROFESSIONAL",
+      "ko": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "ko_bbox": [
+        522,
+        346,
+        634,
+        398
+      ],
+      "source_width": 638,
+      "ko_width": 112,
+      "width_ratio": 0.1755,
+      "height_ratio": 0.8254,
+      "margins": [
+        522,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "label": "outrun_small",
+      "source": "OUTRUN",
+      "ko": "아웃런",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "ko_bbox": [
+        1701,
+        529,
+        1833,
+        581
+      ],
+      "source_width": 211,
+      "ko_width": 132,
+      "width_ratio": 0.6256,
+      "height_ratio": 0.8254,
+      "margins": [
+        75,
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "lossless_png_count": 36,
+  "proof_sha_manifest": [
+    {
+      "name": "showroom_EN_NATIVE_RGBA.png",
+      "sha256": "fc299e6426bde065ae48e53720eb4db12c96b7eb69e41b51fadd5b1299a502cd",
+      "bytes": 16170
+    },
+    {
+      "name": "showroom_KO_NATIVE_RGBA.png",
+      "sha256": "f543224efa2c42879fb661c3f3e8a51ff90c1824b8f245703bc4c15270ba5cfc",
+      "bytes": 2553
+    },
+    {
+      "name": "showroom_EN_KO_GRAY_100pct.png",
+      "sha256": "9bd1354b0040c8415c7f2b54fec0c73274a51f67fafb8953e9665960ae8eb1e1",
+      "bytes": 24761
+    },
+    {
+      "name": "showroom_EN_KO_GRAY_75pct.png",
+      "sha256": "80029d27ab7961f0193b6aa0d8f78144d759f35d1f651ea75cdde46f66bbe338",
+      "bytes": 37635
+    },
+    {
+      "name": "showroom_EN_KO_GRAY_50pct.png",
+      "sha256": "eeef0992020d339ce3a156f463bb7087488fbc895b970f8e7727cf8ce16a3401",
+      "bytes": 26165
+    },
+    {
+      "name": "showroom_EN_KO_RAW.png",
+      "sha256": "88491b6fbc51060f01c54617a9423ae4d14e0751ddd38f81e622ce8e272ab383",
+      "bytes": 24574
+    },
+    {
+      "name": "coast2coast_EN_NATIVE_RGBA.png",
+      "sha256": "abbc2959d49d3de20c64e4c9ec284115f538c917f4d77a3a4bfca28a92088a3b",
+      "bytes": 21972
+    },
+    {
+      "name": "coast2coast_KO_NATIVE_RGBA.png",
+      "sha256": "54719ab73fdf45b4d87ef438b12e34923c3490e42e7c93ce3277eaffe96ab347",
+      "bytes": 12775
+    },
+    {
+      "name": "coast2coast_EN_KO_GRAY_100pct.png",
+      "sha256": "7c4a474fae24e65841df8f2b3a26f81866df6cde86892c7b8390d8b3ae46f4df",
+      "bytes": 42402
+    },
+    {
+      "name": "coast2coast_EN_KO_GRAY_75pct.png",
+      "sha256": "78c3c27266eacfb1940dec178e702c463ff18ef3a3c3f74894e3bb9ff0fd9547",
+      "bytes": 56090
+    },
+    {
+      "name": "coast2coast_EN_KO_GRAY_50pct.png",
+      "sha256": "9726aaaea5ccf51427654004e6b467dade555c4838eb74f953834ee5f1799c47",
+      "bytes": 37241
+    },
+    {
+      "name": "coast2coast_EN_KO_RAW.png",
+      "sha256": "52ee446c0393ee875ef9db943e6cb583330ac33c39846c38322a44d529d256c9",
+      "bytes": 41944
+    },
+    {
+      "name": "outrun_big_EN_NATIVE_RGBA.png",
+      "sha256": "0d7dd388736854cddb7f9716b65d38041d694c4701c462ccdb7710636230c391",
+      "bytes": 7745
+    },
+    {
+      "name": "outrun_big_KO_NATIVE_RGBA.png",
+      "sha256": "dc813288e258d60b0bec78975bbd41b2de1b72d10c4e1e2b70b669951e9d38e6",
+      "bytes": 2753
+    },
+    {
+      "name": "outrun_big_EN_KO_GRAY_100pct.png",
+      "sha256": "9723dd0f79e1c7187b04314f504c7a7f6a1ed17a7f414048577fc71766b7ed90",
+      "bytes": 14628
+    },
+    {
+      "name": "outrun_big_EN_KO_GRAY_75pct.png",
+      "sha256": "1effee69fbc27deddd4edd1b4da218736c10ce46dd44ced77fc99106ca9b488c",
+      "bytes": 28549
+    },
+    {
+      "name": "outrun_big_EN_KO_GRAY_50pct.png",
+      "sha256": "4d5ff707a544f1d918559802460599a9771dd9d6637dc36542ea60d3427d2f2a",
+      "bytes": 18884
+    },
+    {
+      "name": "outrun_big_EN_KO_RAW.png",
+      "sha256": "4e4c341f6af73ab5b2fc8a9c1b7aad872a1c2f98606e8a21dd1b293321b13bae",
+      "bytes": 14140
+    },
+    {
+      "name": "enter_name_EN_NATIVE_RGBA.png",
+      "sha256": "1fab6cbe81298484d109f06e8cc2b400d11cb07aa8d3d023a8a81dec9413f485",
+      "bytes": 5676
+    },
+    {
+      "name": "enter_name_KO_NATIVE_RGBA.png",
+      "sha256": "3a8fed851411bd5d0249bedb18422569ab91f67e6273cd722828c135cb7af404",
+      "bytes": 1555
+    },
+    {
+      "name": "enter_name_EN_KO_GRAY_100pct.png",
+      "sha256": "022006614733ba01fb510b89e39f3e1d3882ce618a9fac43b00323b0bf772ca6",
+      "bytes": 9459
+    },
+    {
+      "name": "enter_name_EN_KO_GRAY_75pct.png",
+      "sha256": "9cde18d0e10bf9ee0dd3ad549340a3f597f6a8c5e06457b94f0711b1675b7400",
+      "bytes": 14484
+    },
+    {
+      "name": "enter_name_EN_KO_GRAY_50pct.png",
+      "sha256": "d801b0e1bf11349813b40a7048e45722157b1366da4f7ebac94ab718f6c3acf5",
+      "bytes": 10383
+    },
+    {
+      "name": "enter_name_EN_KO_RAW.png",
+      "sha256": "a208d86c75daf441eccea306afa218e46761735ca3f02e8c77170d05c2679a0b",
+      "bytes": 9235
+    },
+    {
+      "name": "professional_EN_NATIVE_RGBA.png",
+      "sha256": "87b999ab17addceb17c44105dacadb6499ed311dd4eac010eb42d836d79cea0f",
+      "bytes": 5052
+    },
+    {
+      "name": "professional_KO_NATIVE_RGBA.png",
+      "sha256": "6546c3cd80bcf9399810bbd2132e3d4053b08e63441841b302379095bf296477",
+      "bytes": 802
+    },
+    {
+      "name": "professional_EN_KO_GRAY_100pct.png",
+      "sha256": "17211a4ef60fe48a9172f110e2836affc2bf3f4a1c0f1c77f6b35e4fb9c24566",
+      "bytes": 8079
+    },
+    {
+      "name": "professional_EN_KO_GRAY_75pct.png",
+      "sha256": "0d2a55b7ebd2bae919ac5e2dc5f8c78f6d827d653dff098b078c54f77ef53ea9",
+      "bytes": 15247
+    },
+    {
+      "name": "professional_EN_KO_GRAY_50pct.png",
+      "sha256": "ea676b0798a16d9a6313d0c44f419de339df7d10d748baaf97b13ffcfffafe81",
+      "bytes": 9886
+    },
+    {
+      "name": "professional_EN_KO_RAW.png",
+      "sha256": "1864caf17c5609a794aaff61b49dd3842ffcede41d9151e84824fbff273c58dd",
+      "bytes": 7942
+    },
+    {
+      "name": "outrun_small_EN_NATIVE_RGBA.png",
+      "sha256": "4e8a8f18e407b9fb3e7e38d1b192b8cd5f3a2a3017c81679939cfe637992975f",
+      "bytes": 2930
+    },
+    {
+      "name": "outrun_small_KO_NATIVE_RGBA.png",
+      "sha256": "4d9df378343fd425bf5da044a42f1d1e6a2af082c01e1c3aeb0c5eccb1b417e6",
+      "bytes": 1000
+    },
+    {
+      "name": "outrun_small_EN_KO_GRAY_100pct.png",
+      "sha256": "da957d0064232b5a1181dfe328adcad7ef1fff34e59a3f3cff2c05251c368aee",
+      "bytes": 5906
+    },
+    {
+      "name": "outrun_small_EN_KO_GRAY_75pct.png",
+      "sha256": "a3d618207019a5f8e2e1e9f8e86636e05fc5e78b4b5ef7790a140d9374f616ec",
+      "bytes": 10756
+    },
+    {
+      "name": "outrun_small_EN_KO_GRAY_50pct.png",
+      "sha256": "2207542de19c4b3e95ecc3cd4c4c928afd54ae186e02503cb7b916e7471f2e0c",
+      "bytes": 7240
+    },
+    {
+      "name": "outrun_small_EN_KO_RAW.png",
+      "sha256": "ae38636bf40c9ba7dbbaaa78369dde94f0936dd3e44a16d0fe59be649c18c15c",
+      "bytes": 5759
+    }
+  ],
+  "C": "EVIDENCE_ONLY_NOT_APPROVAL",
+  "C3": "BLOCKED_USER_FAIL",
+  "source_clean": "NOT_NEWLY_EXAMINED; historical C264 contact only",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0
+}
