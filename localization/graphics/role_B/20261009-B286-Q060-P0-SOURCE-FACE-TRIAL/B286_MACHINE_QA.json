@@ -14,7 +14,7 @@
     4096,
     2048
   ],
-  "format": "BGRA32_mip1",
+  "format": "RGBA32_mip1",
   "orientation": "mirror_y",
   "triage": {
     "index": 60,
@@ -143,11 +143,11 @@
   "outside_changed_pixels": 0,
   "alpha_outside_changed_pixels": 0,
   "decoded_roundtrip_exact": true,
-  "C": "NOT_RUN",
-  "C3": "NOT_RUN",
+  "C": "NOT_RUN_BLOCKED_BY_PRODUCER_FAIL",
+  "C3": "NOT_RUN_BLOCKED",
   "USER": "NOT_RUN",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "producer_visual": "PENDING_CONTROLLER_NATIVES_AND_PRACTICAL",
+  "producer_visual": "FAIL_SOURCE_FAMILY_AND_CONDENSED_SLANT",
   "new_production_candidate_dds": 0,
   "backend": "GITHUB_HOSTED",
   "excluded": [
@@ -155,5 +155,13 @@
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "source_rgb_masks": [
+    "000000ff",
+    "0000ff00",
+    "00ff0000",
+    "ff000000"
+  ],
+  "producer_qa_final": "REJECTED_NOT_PROMOTED",
+  "controller_visual_qa_path": "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/B286_CONTROLLER_SELF_QA_REJECTED.json"
 }
