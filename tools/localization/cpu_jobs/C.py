@@ -20,7 +20,7 @@ candidate=(root/"localization/graphics/hd_candidates"/asset).read_bytes()
 assert sha(source)==expected["source"] and sha(candidate)==expected["candidate"]
 assert source[:128]==candidate[:128] and len(source)==len(candidate)
 def decode(b):
- assert b[:4]==b"DDS " and b[84:88]==b"\\0"*4
+ assert b[:4]==b"DDS " and b[84:88]==bytes([0])*4
  h,w=struct.unpack_from("<II",b,12);m=struct.unpack_from("<I",b,28)[0]
  assert (w,h,m)==(2048,2048,1) and len(b)==128+w*h*4
  masks=struct.unpack_from("<IIII",b,92)
@@ -112,5 +112,5 @@ report={"schema_version":1,"task_id":"OUTRUN-KOR-C312-C1-Q103-A197-FRESH-EVIDENC
 "gate":"HOLD_STRICT_RECHECK","C3":"NOT_RUN","APPROVAL":"NOT_APPROVED","RUNTIME_VALIDATION":"UNTESTED",
 "new_dds":0,"backend":"GitHub Actions CPU worker evidence-only; no N100 heavy compute"}
 fn=out/"C312_Q103_INDEPENDENT_MACHINE_AND_EVIDENCE.json"
-fn.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n")
+fn.write_text(json.dumps(report,ensure_ascii=False,indent=2)+chr(10))
 print("C312_C1_Q103",json.dumps({"sha":expected,"bbox":metrics,"outside":counts,"new_lossless_png":len(files),"status":"HOLD_VISUAL_REQUIRED"},ensure_ascii=False),flush=True)
