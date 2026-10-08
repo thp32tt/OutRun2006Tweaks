@@ -930,7 +930,31 @@ class TextureReplacement : public Hook
 						newhead->data.dwWidth <= 16384 && newhead->data.dwHeight <= 16384;
 					const size_t firstMipSize = validDimensions && newFormat != D3DFMT_UNKNOWN
 						? D3DXGetFormatSize(newFormat, newhead->data.dwWidth, newhead->data.dwHeight) : 0;
-					if (validHeader && firstMipSize &&
+					// D3DX (scene/cube and UI fallback) may consume the full mip
+					// chain, not just level zero. Never mutate original game data or
+					// publish HUD scaling for a DDS whose later levels are truncated.
+					const UINT mipCount = (newhead->data.dwFlags & DDSD_MIPMAPCOUNT)
+						? newhead->data.dwMipMapCount : 1U;
+					bool completeMipPayload = validHeader && validDimensions &&
+						newFormat != D3DFMT_UNKNOWN && firstMipSize &&
+						mipCount >= 1 && mipCount <= 32;
+					if (completeMipPayload)
+					{
+						size_t remainingMipBytes = size - sizeof(DDS_FILE);
+						for (UINT level = 0; level < mipCount; ++level)
+						{
+							const size_t levelBytes = D3DXGetFormatSize(newFormat,
+								max(1U, newhead->data.dwWidth >> level),
+								max(1U, newhead->data.dwHeight >> level));
+							if (!levelBytes || levelBytes > remainingMipBytes)
+							{
+								completeMipPayload = false;
+								break;
+							}
+							remainingMipBytes -= levelBytes;
+						}
+					}
+					if (validHeader && completeMipPayload && firstMipSize &&
 						firstMipSize <= size - sizeof(DDS_FILE))
 					{
 						if (isUITexture)
