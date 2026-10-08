@@ -1,0 +1,110 @@
+{
+  "run": "B262",
+  "run_key": "OUTRUN-KOR-B262-Q172-SOURCE-GOLD-20261008-1730",
+  "queue_index": 172,
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "new_candidate_sha256": "15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "method": "SOURCE-SAMPLED-CONTINUOUS-CREAM-GOLD-GRADIENT_PLUS_PER_GLYPH_BEVEL",
+  "source_anchored_regions": [
+    {
+      "id": "START",
+      "korean": "출발",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "face_width": 62,
+      "face_height": 16,
+      "shear_px": 8,
+      "profile": {
+        "source_gold_pixels": 1096,
+        "source_face_top_rgb": [
+          247,
+          247,
+          206
+        ],
+        "source_face_bottom_rgb": [
+          239,
+          187,
+          148
+        ]
+      },
+      "localized_effect_bbox": [
+        62,
+        376,
+        130,
+        392
+      ],
+      "margins": [
+        7,
+        3,
+        6,
+        4
+      ]
+    },
+    {
+      "id": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "face_width": 49,
+      "face_height": 17,
+      "shear_px": 8,
+      "profile": {
+        "source_gold_pixels": 1072,
+        "source_face_top_rgb": [
+          255,
+          243,
+          222
+        ],
+        "source_face_bottom_rgb": [
+          253,
+          211,
+          148
+        ]
+      },
+      "localized_effect_bbox": [
+        608,
+        639,
+        661,
+        656
+      ],
+      "margins": [
+        13,
+        4,
+        11,
+        3
+      ]
+    }
+  ],
+  "native_size": [
+    1024,
+    1024
+  ],
+  "DDS": "RGBA32 mip1 raw mirror_y",
+  "machine": {
+    "exact_dds_header": true,
+    "roundtrip_decoded_final": "PASS",
+    "changed_rgba_outside_source_boxes": 0,
+    "alpha_outside_source_boxes": 0,
+    "bbox_size_margin": "PASS_BOTH",
+    "persisted_file": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
+  },
+  "producer_visual": "PENDING_CONTROLLER_FRESH_NATIVE_75_50_RAW_REVIEW",
+  "status": "NEW_MATERIAL_CANDIDATE_NOT_PRODUCER_PASS",
+  "C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "approval": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_ACTIONS_EPHEMERAL_CPU_WORKER",
+  "cleanup": "tempfile auto-removes; runner workspace ephemeral",
+  "protected_domains_touched": []
+}
