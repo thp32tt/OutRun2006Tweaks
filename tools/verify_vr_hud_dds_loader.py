@@ -53,7 +53,7 @@ def verify(text):
     # when the fast DDS path cannot decode a menu/car-selection texture.
     ui=body(text,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(")
     orig=body(text,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(")
-    strip=lambda s: re.sub(r"\\s+","",re.sub(r"//[^\\n]*","",s))
+    strip=lambda s: re.sub(r"\s+","",re.sub(r"//[^\n]*","",s))
     ui_clean=strip(ui)
     orig_clean=strip(orig)
     fast=(
