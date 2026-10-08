@@ -9,6 +9,7 @@
 #include <ddraw.h>
 #include <unordered_set>
 #include <array>
+#include <climits>
 #include <new>
 #include <memory>
 #include <intrin.h>
@@ -184,13 +185,18 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	DWORD MipFilter,
 	LPDIRECT3DTEXTURE9* ppTexture)
 {
-	if (!pDevice || !pData || !ppTexture)
+	// Always clear a valid output slot before any failing fast-DDS exit.
+	// Native D3DX fallback can then safely repopulate it without inheriting
+	// a stale texture pointer from an invalid/truncated source.
+	if (!ppTexture)
+		return E_POINTER;
+	*ppTexture = nullptr;
+	if (!pDevice || !pData)
 		return E_POINTER;
 
 	// Refuse truncated DDS before reading the header and touching the UI resource.
 	if (dataSize < sizeof(DDS_FILE))
 		return E_FAIL;
-	*ppTexture = nullptr;
 	const uint8_t* data = static_cast<const uint8_t*>(pData);
 	const DDS_FILE* header = reinterpret_cast<const DDS_FILE*>(data);
 
@@ -924,7 +930,10 @@ class TextureReplacement : public Hook
 				size_t size = 0;
 				const uint8_t* file = FileData.getFileData(
 					path_load, &size, &transientOwner);
-				if (file && size >= sizeof(DDS_FILE))
+				// D3DX and the original game accept a UINT byte count. Never
+				// truncate a size_t cache/transient replacement length to 32 bits.
+				if (file && size >= sizeof(DDS_FILE) &&
+					size <= static_cast<size_t>(UINT_MAX))
 				{
 					const DDS_FILE* newhead = (const DDS_FILE*)file;
 					// A malformed replacement must not overwrite the game's original

@@ -25,6 +25,9 @@ def verify(text):
     handle=body(text,"static void HandleTexture(")
     guards=[
         (loader,"if (dataSize < sizeof(DDS_FILE))","short header rejected"),
+        (loader,"if (!ppTexture)","null output slot rejected"),
+        (loader,"if (!pDevice || !pData)","null input rejected after clearing output"),
+        (handle,"size <= static_cast<size_t>(UINT_MAX)","reject UINT-truncating replacement size"),
         (loader,"header->data.dwSize != sizeof(DDSURFACEDESC2)","malformed fast DDS surface descriptor rejected"),
         (loader,"header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)","malformed fast DDS pixel descriptor rejected"),
         (loader,"*ppTexture = nullptr;","released output cleared"),
@@ -53,6 +56,11 @@ def verify(text):
     for region,needle,label in guards:
         if needle not in region:
             raise ValueError(label+" not verified")
+    if not (loader.index("if (!ppTexture)") < loader.index("*ppTexture = nullptr;") <
+            loader.index("if (!pDevice || !pData)") < loader.index("if (dataSize < sizeof(DDS_FILE))")):
+        raise ValueError("fast DDS output must be cleared before failing for invalid input or short header")
+    if handle.index("size <= static_cast<size_t>(UINT_MAX)") > handle.index("*pSrcDataSize = size;"):
+        raise ValueError("UINT overflow guard must precede replacement pointer publication")
     if loader.index("if (dataSize < sizeof(DDS_FILE))") > loader.index("const DDS_FILE* header ="):
         raise ValueError("DDS header read precedes byte length")
     if max(loader.index("header->data.dwSize != sizeof(DDSURFACEDESC2)"),
@@ -130,6 +138,9 @@ def verify(text):
 def negatives(text):
     needles=[
         "if (dataSize < sizeof(DDS_FILE))",
+        "if (!ppTexture)",
+        "if (!pDevice || !pData)",
+        "size <= static_cast<size_t>(UINT_MAX)",
         "header->data.dwSize != sizeof(DDSURFACEDESC2)",
         "header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)",
         "bytes > remainingSourceBytes",
