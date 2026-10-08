@@ -1,0 +1,45 @@
+{
+  "run": "B282",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "prior_production_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "9b35fd275427fb7287f69c0bd18185a730c59625f4189db0e15685b0c616f420",
+  "machine": {
+    "decoded_bbox": [
+      573,
+      15,
+      1531,
+      113
+    ],
+    "changed_rgba": 58665,
+    "outside_source": 0,
+    "header_exact": true,
+    "roundtrip": true,
+    "source_white_navy_ratio": 0.413,
+    "trial_white_navy_ratio": 0.484
+  },
+  "visual_first_look": {
+    "native": "Original source displays separate, slim white italic letter faces with soft navy halo; B282 trial displays enlarged heavy navy and still overfilled Korean face compared with source.",
+    "practical50": "Korean keyline and adjacent character effects appear merged, readability/source family not acceptable.",
+    "raw": "Consistent mirror-Y; still same face weight defect."
+  },
+  "reason_codes": [
+    "SOURCE_FAMILY_OVERWEIGHT_FACE",
+    "NAVY_GLOW_GLYPH_CROWDING"
+  ],
+  "producer_visual": "FAIL",
+  "promoted": false,
+  "decision": "REWORK_REQUIRED",
+  "next": "B283 preserve B279 native glyph shape without vertical resize; adjust white inner-face width plus very low-amplitude localized navy halo only, verify practical 50% and 1px source containment",
+  "independent_C": "NOT_RUN",
+  "C3": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "views": [
+    "B282_READABLE_GRAY_100_EN_CLEAN_B279_TRIAL.png",
+    "B282_READABLE_GRAY_50_EN_CLEAN_B279_TRIAL.png",
+    "B282_READABLE_WHITE_100_EN_CLEAN_B279_TRIAL.png",
+    "B282_RAW_BLACK_75_EN_CLEAN_B279_TRIAL.png"
+  ],
+  "backend": "GITHUB_ACTIONS_WITH_CHATGPT_CONTROLLER"
+}
