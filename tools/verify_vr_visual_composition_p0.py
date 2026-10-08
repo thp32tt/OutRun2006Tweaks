@@ -942,8 +942,8 @@ for label, broken_r30, broken_ui in (
     ('time-goal HUD world veto resurrected',
      inject_one_function_token(
          r30, 'R30ScreenSpaceKind R30ClassifyScreenSpacePass(',
-         '++R44FlatOverlayClassifications;',
-         'if (CurrentDrawMatchesVerifiedWorld(device)) return R30ScreenSpaceKind::None;\n            ++R44FlatOverlayClassifications;'), ui),
+         'if (semanticHud)',
+         'if (semanticHud && !CurrentDrawMatchesVerifiedWorld(device))'), ui),
     ('stage text glyph siblings untagged',
      r30, inject_one_function_token(
          ui, 'static int __cdecl TextGlyph_putSprite(',
