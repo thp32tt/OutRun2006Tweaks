@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A195 A ODD q237 FF514CEB NEW material source-flat DDS 39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2: prior C1 red-offset bevel visual FAIL repaired with no added shadow/stroke and native flat red/gray source palette; authored A94 clean independently verified 402833 removed source-alpha pixels, plate outside=0; persisted DDS 9/9 bbox positive margin and changed/protected/alpha/residue/composite outside/overlap/touch 0. Controller SOURCE/CLEAN/FINAL readable/RAW + 100/75/50 visual producer PASS, fresh independent C1+C3/current evidence approval/user JPG/actual game remain PENDING. No game run; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json.",
     "C305 C2 EVEN q154 4D38BBB0 authentic B60 authored clean (exact a4d707fa) newly inspected 8/8 including 5 red UI labels over BLACK/GRAY/WHITE with SOURCE/CLEAN/CURRENT triple contact. CLEAN source region alpha all zero, source-clean/source-current RGBA outside union zero. HOLD: font weight/counter-space/source-anchored slant + qualified blind first-look and current full native+RAW 100/75/50 protected evidence not certified. No rerender unchanged bytes or repeat plate visual. localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C305 C1 q055 18 native lossless views and exact DXT5 scope QA published; historical C224 C PASS retained but C3 strict HOLD until blind calibration, native clean/anchor/family profile, current evidence validator; user JPG and actual in-game still UNTESTED. No repeat exact q055 C3 evidence without new inputs.",
     "B270/B271 q098 42E618FD: 54 independent source/clean/final native+RAW+50% plate/composite lossless PNG produced and SHA-bound to B269 1d63cd9b...; no outside pixels. B271 1994820e... core whitening erased original navy outline despite machine PASS; controller VISUAL FAIL, rollback B269 exact SHA 1d63cd9b... (also HOLD for residual micro-perforations). Need white/navy per-pixel boundary-preserving method, fresh B producer QA then C2+C3; never promote B271, no in-game test.",
@@ -11973,5 +11974,21 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_AUTHORED_PLATE_RGB_AUDIT.json",
     "qa": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json"
+  },
+  "a195_q237_flat_source_family": {
+    "at_kst": "2026-10-08 22:08 KST",
+    "task_id": "OUTRUN-KOR-A195-Q237-FLAT-EFFECT-20261008-2200",
+    "index": 237,
+    "sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "source_clean_alpha_removed": 402833,
+    "new_materially_revised_dds": 1,
+    "producer": "SELF_QA_PASS",
+    "c1": "PENDING",
+    "c3": "PENDING",
+    "evidence_gate": "NOT_APPROVED",
+    "user": "NOT_APPROVED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json"
   }
 }

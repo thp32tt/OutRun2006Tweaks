@@ -3082,3 +3082,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 21:56 KST — C305 C2 q154
 - `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`. 8/8 exact SOURCE/CLEAN/FINAL visual PNG/JPG contrasts on black/gray/white; new five red source rows plus prior gray. Authored CLEAN all original alpha zero, outside change 0, correct readable orientation; style/qualified calibration outstanding. `C=HOLD_STRICT_RECHECK`, C3/APPROVALS/PRE_INGAME blocked, DDS 0, `RUNTIME_VALIDATION=UNTESTED`. localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json.
+
+### 2026-10-08 22:08 KST — A195 q237 FF514CEB native DDS replacement
+- C1 red/gray unsupported-bevel rejection addressed with source flat face. Persisted new DDS `39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2`, 9/9 original bbox+positive margins and 0 outside/protected/source-residue/overlap. SOURCE/CLEAN/FINAL, RAW/FLIP-Y, 100/75/50 controller producer visual PASS; no opaque/foreign box. Fresh independent C1 + distinct C3 + current-policy approval and actual game retest remain pending; RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json`.

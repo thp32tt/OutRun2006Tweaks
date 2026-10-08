@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 21:41 KST",
+  "updated_at_kst": "2026-10-08 22:08 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7905,5 +7905,21 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_AUTHORED_PLATE_RGB_AUDIT.json",
     "qa": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json"
+  },
+  "a195_q237_flat_source_family": {
+    "at_kst": "2026-10-08 22:08 KST",
+    "task_id": "OUTRUN-KOR-A195-Q237-FLAT-EFFECT-20261008-2200",
+    "index": 237,
+    "sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "source_clean_alpha_removed": 402833,
+    "new_materially_revised_dds": 1,
+    "producer": "SELF_QA_PASS",
+    "c1": "PENDING",
+    "c3": "PENDING",
+    "evidence_gate": "NOT_APPROVED",
+    "user": "NOT_APPROVED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json"
   }
 }

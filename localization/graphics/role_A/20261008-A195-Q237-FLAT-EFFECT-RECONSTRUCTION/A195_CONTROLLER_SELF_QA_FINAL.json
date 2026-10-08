@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-A195-Q237-FLAT-EFFECT-20261008-2200",
+  "role": "A",
+  "reviewed_at_kst": "2026-10-08 22:08 KST",
+  "queue_index": 237,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+  "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "previous_rejected_candidate_sha256": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3",
+  "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+  "execution_backend": "GITHUB_ACTIONS_REQUIRED_SOURCE_NOT_MATERIALIZABLE_GPT_LOCAL",
+  "workflow_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37781517255",
+  "inspected_evidence": {
+    "source_clean_final_native": "A195_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "source_vs_saved_final_readable": "A195_READABLE_SOURCE_FINAL.jpg",
+    "source_vs_saved_final_raw": "A195_RAW_SOURCE_FINAL.jpg",
+    "source_clean_lossless": "A195_SOURCE_READABLE.png|A195_CLEAN_PLATE.png|A195_SOURCE_TEXT_MASK.png",
+    "clean_final_lossless": "A195_CLEAN_PLATE.png|A195_FINAL_READABLE.png|A195_ALLOWED_BBOX_MASK.png|A195_PROTECTED_MASK.png",
+    "practical": [
+      "A195_PRACTICAL_100.jpg",
+      "A195_PRACTICAL_75.jpg",
+      "A195_PRACTICAL_50.jpg"
+    ],
+    "prefix": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/"
+  },
+  "producer_10_stage": {
+    "01_source": "PASS exact English source SHA, native 2048x2048 BGRA 1 mip RAW mirror-Y",
+    "02_masks": "PASS nine text regions, protected source alpha outside source lettering",
+    "03_plate": "PASS reused A94 independently authored clean plate without Korean",
+    "04_plate_only": "PASS source/clean native independently inspected; transparent plate flat, no source lettering ghost or foreign box in reviewed regions",
+    "05_family": "PASS source red solid face and gray flat small/help, no invented red bevel; NotoSansCJK-Black source-family approximation",
+    "06_native_glyph": "PASS native 2048 glyphs, 9/9 positive margins, no forced horizontal width",
+    "07_glyph_only": "PASS transparent Korean lettering without opaque background crop/shadow/stroke",
+    "08_composite_only": "PASS clean/final native preview, zero outside-glyph changes, no rectangular foreign box",
+    "09_persisted_dds": "PASS actual DDS roundtrip, readable+RAW source/final, 100/75/50 available, mip1",
+    "10_handoff": "PENDING independent C1 pixels-first and distinct C3; user/game NOT approved"
+  },
+  "eight_visual_checks": {
+    "english_removal_clean_plate": "PASS",
+    "slant_matches_source": "PASS original flat upright family; RAW mirrors identical",
+    "readable_native_size": "PASS with source bbox ceiling",
+    "weight_effect_source_fidelity": "PASS red plain single face and gray sans hierarchy; independent C1 still required",
+    "clipping": "PASS",
+    "protected_graphics": "PASS 0 changed protected",
+    "flip_y_and_raw": "PASS",
+    "instant_source_relative_readability": "PASS"
+  },
+  "machine_qa": {
+    "region_bbox_positive_margin": "9/9 PASS",
+    "changed_outside_original_bbox": 0,
+    "alpha_changed_outside_original_bbox": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap": 0,
+    "source_residue": 0,
+    "changed_clean_final_outside_korean_mask": 0,
+    "localized_overlap_pairs": 0,
+    "localized_one_pixel_touch_pairs": 0,
+    "persisted_dds_roundtrip": "PASS",
+    "removed_original_opaque_pixels": 402833
+  },
+  "visual_notes": "Controller inspected actual saved DDS native readable/RAW and SOURCE/CLEAN/FINAL contacts. Earlier red displaced bevel/shadow now absent; solid-red original family restored. A195 contact crop has neighboring next atlas row at padded boundary; full native image and nonoverlapping glyph masks show no cross-label collision. Flat source may still require fresh independently calibrated C family review.",
+  "producer_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_materially_revised_dds": 1,
+  "report": "localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_FF514CEB_REPORT.json"
+}
