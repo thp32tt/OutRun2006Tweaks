@@ -280,6 +280,12 @@ def verify_goal_c64_fallback_evidence(source):
             'missing GOAL c64 must be attributed before fail-closed')
     require('R30TraceGoalOriginalC64Status(true);', shader,
             'recovered GOAL c64 must be recorded per original producer')
+    # Both perspective and orthographic shader HUD owners must attribute
+    # independent fail-closed / recovered source events. A negative mutation
+    # deleting only one branch must not be masked by the other branch.
+    if (shader.count('R30TraceGoalOriginalC64Status(false);') != 2 or
+            shader.count('R30TraceGoalOriginalC64Status(true);') != 2):
+        raise SystemExit('GOAL c64 evidence must cover both HUD shader forms')
     c64_miss_branch = shader[shader.index(
         '++R30ExactHudRawWvpMiss;'):]
     require_order(c64_miss_branch,
