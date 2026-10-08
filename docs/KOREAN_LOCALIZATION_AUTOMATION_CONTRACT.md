@@ -4,6 +4,39 @@
 
 This is the canonical contract for the A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md, localization/graphics/TRANSLATION_NAMING_POLICY.md and localization/graphics/INGAME_REWORK_BACKLOG.csv. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
+## In-game regression hard stop — 2026-10-09
+
+The new user-marked actual-game review (screenshots 173–203) overrides
+all previous static C/C3 PASS verdicts on affected exact candidate bytes.
+For every report, register a row in INGAME_REWORK_BACKLOG.csv, connect the
+unambiguous queue index, and make that row REWORK_REQUIRED even if it was
+historical C3 PASS. Keep uncertain MIXED/RUNTIME_TEXT source mapping OPEN
+rather than editing arbitrary DDS. An open user report cannot be closed
+by static C, C3 or screenshot JPG; require a newer game retest containing
+the exact repaired DDS/runtime commit.
+
+The black outlines drawn on screenshots are **annotations**; only
+independently observed pixels are intrinsic background/box defects. The
+reported actual plate contamination, degraded tiny Hangul, unreadable
+glyphs, wrong lean, clipped headers, collision of Stage 2 text and rank
+HUD, duplicated/overlapping text, and bad protected-art orientation
+are hard failures regardless of zero mask-overflow metrics.
+
+Before producing related assets, calibrate native-HUD, big chrome
+header, italic main title, small showroom/help and stage/rank families
+separately. Require a clean source plate approved *before* lettering,
+transparent-only lettering, source-specific slant anchors, persisted DDS
+RAW/FLIP-Y/mips/native/75/50 checks, and a game-composed review. Never
+upscale earlier low-resolution Hangul, use an arbitrary shear/scale to
+force PASS, or let source glyph remnants hide beneath new Korean glyphs.
+User P0 (HUD, stage overlap, broken/glitched glyph) precedes P1
+(menu/title and showroom metadata) within the existing owner lanes.
+
+See docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md; preserve the
+existing six-launch scheduler, C/C3 evidence gate, and VR/FFB/DX11/DXVK
+exclusions. Preview packaging must suppress active user-failed queue
+indexes even if stale C3 metadata remains.
+
 ## Mandatory production contamination prevention — 2026-10-08
 
 Every A/B localization run MUST apply the **10-stage producer sequence** in
