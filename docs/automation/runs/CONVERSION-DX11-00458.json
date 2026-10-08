@@ -20,13 +20,13 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00458",
   "lease_epoch": 1,
   "base_sha": "55db0604c9371c712170bdc15bd57d6f089a1809",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "result_sha": "fd55e799755cd41f042675698080f8f0f48f744c",
+  "material_result_sha": "fd55e799755cd41f042675698080f8f0f48f744c",
+  "validation_bearing_result_sha": "fd55e799755cd41f042675698080f8f0f48f744c",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "checkpoint": "C3_VALIDATE",
-  "status": "WAITING_FOR_CI",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
   "summary": "Reject same-device deferred D3D11 contexts from dormant generated triangle-fan index-buffer live IA binding/readiness, including a WARP negative regression that seeds identical deferred IA state.",
   "changed_paths": [
     "src/vr/d3d11/triangle_fan_index_buffer.cpp",
@@ -34,15 +34,15 @@
   ],
   "native_draw_path_activation_changed": false,
   "draw_dispatch_authorized": false,
-  "static_validation": "PASS: one deterministic scoped source/test anchor and invariant check before material commit",
+  "static_validation": "PASS: one scoped invariant; exact-SHA Win32 Gate validates live immediate-only triangle-fan binding and WARP deferred negative control",
   "pipeline": {
     "C0_RECOVER": "PASS: authenticated branch HEAD and AGENTS, 00457 terminal CI, run directory (00458 absent), queue policy and protected regression ledger inspected; rollover ATTEMPT 1/3",
     "C1_REVIEW": "PASS: generated fan IA context currently checks matching device only, accepting same-device deferred context as live; independent R149 surface fix covers OM not IA",
     "C2_IMPLEMENT": "PASS: native C++ immediate-context-only generated fan IA bind/readiness and WARP same-device deferred negative+immediate positive control",
-    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate validate and dx11-smoke; one scoped source/test JS invariant PASS",
-    "C4_COMMIT": "PENDING: GitHub material commit with [AUTO:CONVERSION-DX11-00458]",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37817007006 validate 113448095740 SUCCESS; DX11 readiness smoke 113450741517 SUCCESS including triangle-fan WARP probe; artifact 11567802633 SHA256 sha256:41e1d135f2b179578f80c76aad19c4059a777abbcaafe8a644a29c74b92d282c",
+    "C4_COMMIT": "PASS: material source/WARP test and initial run record commit fd55e799755cd41f042675698080f8f0f48f744c [AUTO:CONVERSION-DX11-00458]",
     "C5_PACKAGE": "NOT_REQUIRED: dormant binding correctness only, no native Draw activation or HMD deploy",
-    "C6_STATE": "PENDING: exact CI receipts and Issue #14 change ledger"
+    "C6_STATE": "PASS: exact-SHA validate/smoke, protected dormant draw, Issue #14 ledger, and Quest3/VDXR HMD UNTESTED persisted"
   },
   "evidence": {
     "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
@@ -53,15 +53,31 @@
       "dormantNoDrawCall": true,
       "unchangedForeignDeviceCase": true
     },
-    "ci_gate": "PENDING_EXACT_SHA",
-    "runtime": "Quest3/VDXR NOT RUN"
+    "ci_gate": "PASS_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN",
+    "backend_conversion_gate_run_id": 37817007006,
+    "validate_job_id": 113448095740,
+    "readiness_smoke_job_id": 113450741517,
+    "artifact_id": 11567802633,
+    "artifact_digest": "sha256:41e1d135f2b179578f80c76aad19c4059a777abbcaafe8a644a29c74b92d282c",
+    "ci_head_sha": "fd55e799755cd41f042675698080f8f0f48f744c",
+    "warp_triangle_fan_probe": "PASS: same-device deferred D3D11 IA context rejected; immediate binding snapshot unchanged"
   },
-  "next_action": "After material commit, fetch exact-SHA Backend Conversion Gate validate + DX11 smoke jobs; update Issue #14 and persist canonical C6 while retaining UNTESTED.",
-  "state_persisted": false,
+  "next_action": "00458 terminal; new independent DX11 live VS/PS or VB device/context ownership item under a different TASK_ID after queue dispatch; exact-build Quest3/VDXR remains required for runtime promotion.",
+  "state_persisted": true,
   "recorded_at_utc": "2026-10-08T17:29:35.872Z",
-  "last_real_activity_at": "2026-10-08T17:29:35.873Z",
-  "last_activity_evidence": "C2 C++/WARP test patch verified against GitHub source; branch compare-and-swap material commit targeted",
+  "last_real_activity_at": "2026-10-08T17:39:10.189Z",
+  "last_activity_evidence": "Backend Conversion Gate 37817007006 validate 113448095740 and smoke 113450741517 SUCCESS with R150 WARP",
   "blockers": [
     "Quest3/VDXR runtime untested; native Draw activation remains gated"
-  ]
+  ],
+  "validation_bearing_sha": "fd55e799755cd41f042675698080f8f0f48f744c",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "validation_run_id": 37817007006,
+  "validation_job_id": 113448095740,
+  "readiness_smoke_job_id": 113450741517,
+  "artifact_id": 11567802633,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-fd55e799755cd41f042675698080f8f0f48f744c",
+  "artifact_digest": "sha256:41e1d135f2b179578f80c76aad19c4059a777abbcaafe8a644a29c74b92d282c",
+  "issue14_comment_id": 6065472907
 }
