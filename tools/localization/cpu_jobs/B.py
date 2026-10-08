@@ -1,147 +1,320 @@
 #!/usr/bin/env python3
-# B256 actual q172 native DDS repair; C281 source-right-italic C-return.
-import os,json,hashlib,struct,tempfile,urllib.request,subprocess
+"""B257 q214: BC3 face-priority, constrained original-block Hangul correction.
+
+Do not reuse an old Korean raster. New native Noto CJK glyph mask is rendered on the
+verified source-derived B253 clean plate, then RGB565 BC3 blocks are fitted to
+cream face + source red badge. Only exact original START/GOAL effect bboxes may
+change from canonical DDS. Machine quality NEVER establishes visual approval.
+"""
+import os, hashlib, json, struct, urllib.request, subprocess, tempfile
 from pathlib import Path
+from io import BytesIO
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
-if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":raise SystemExit("worker B only")
-repo=Path.cwd();run="20261008-B256-Q172-CLEAN-RIM-RESIDUE"
-out=repo/"localization/graphics/role_B"/run;out.mkdir(parents=True,exist_ok=True)
-file=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
-platefile=repo/"localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_CLEAN_PLATE.png"
-SOURCE="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-PRIOR="7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2"
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
-def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
-if sha(file)!=PRIOR:raise RuntimeError(("concurrent DDS changed",sha(file),PRIOR))
-with tempfile.TemporaryDirectory(prefix="b254_") as td:
-    src=Path(td)/"source.dds";urllib.request.urlretrieve(url,src)
-    if sha(src)!=SOURCE:raise RuntimeError("canonical source identity mismatch")
-    a=src.read_bytes();b=file.read_bytes()
-    if a[:128]!=b[:128]:raise RuntimeError("DDS header drift")
-    h,w=struct.unpack_from("<II",a,12)
-    masks=struct.unpack_from("<IIII",a,92)
-    mode="RGBA" if masks==(0xff,0xff00,0xff0000,0xff000000) else "BGRA" if masks==(0xff0000,0xff00,0xff,0xff000000) else None
-    if (w,h)!=(1024,1024) or mode is None or struct.unpack_from("<I",a,28)[0]!=1 or len(a)!=128+4*w*h:raise RuntimeError(("source format drift",w,h,mode))
-    def decode(bb):return Image.frombytes("RGBA",(w,h),bb[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    source=decode(a);previous=decode(b);legacy=Image.open(platefile).convert("RGBA")
-    if legacy.size!=(w,h):raise RuntimeError("clean-plate wrong native size")
-    specs=[{"key":"START","ko":"출발","box":[55,373,136,396],"textsize":[47,18],"shear":8},
-           {"key":"GOAL","ko":"골","box":[595,635,672,659],"textsize":[31,19],"shear":8}]
-    allowed=np.zeros((h,w),bool);clean=source.copy()
-    for q in specs:
-        x0,y0,x1,y1=q["box"];allowed[y0:y1,x0:x1]=True
-        clean.paste(legacy.crop((x0,y0,x1,y1)),(x0,y0))
-    # B255 source/CLEAN 6x showed a pale source-shaped fragment at the extreme
-    # right of the START text/effect rectangle. Reconstruct ONLY confirmed
-    # cream/orange residue pixels there from same-scanline red donors.
-    # Do not edit the protected white rim outside [55,373,136,396].
-    plane=np.asarray(clean,dtype=np.uint8).copy()
-    residue_count=0
-    for row in specs:
-        if row["key"]!="START":continue
-        x0,y0,x1,y1=row["box"]
-        for yy in range(y0+1,min(y0+8,y1)):
-            donor=plane[yy,x1-19:x1-9,:].astype(np.int16)
-            red=(donor[:,0]>140)&(donor[:,0]>donor[:,1]+55)&(donor[:,1]<110)&(donor[:,2]<145)
-            if not red.any():raise RuntimeError(("no red donor",yy))
-            fill=np.median(donor[red],axis=0).astype(np.uint8)
-            for xx in range(x1-7,x1):
-                p=plane[yy,xx].astype(np.int16)
-                pale=(p[0]>195 and p[1]>115 and p[2]>65 and p[1]>p[0]*0.5)
-                if pale:
-                    plane[yy,xx]=fill
-                    residue_count+=1
-    if residue_count<1:raise RuntimeError("B255 suspected right source residue not reproduced; stop and re-inspect")
-    clean=Image.fromarray(plane,"RGBA")
-    print("B256_START_SOURCE_RESIDUE_PIXELS_REPLACED",residue_count,flush=True)
-    sourcepixels=np.asarray(source,dtype=np.uint8)
-    if np.count_nonzero(np.any(sourcepixels!=np.asarray(clean),axis=2)&allowed)<500:raise RuntimeError("English source-removal plate invalid")
-    final=clean.copy()
-    # B254 decoded output exposed tofu glyph boxes despite machine QA; install a real
-    # Korean family and *probe* actual glyph coverage before any DDS write.
-    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    subprocess.run(["fc-cache","-f"],check=True)
-    res=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{family}","Noto Sans CJK KR:style=Bold"],text=True).strip().split("|")
-    fp,idx,fam=res[0],int(res[1] or "0"),res[2]
-    if not Path(fp).exists() or "NotoSansCJK" not in Path(fp).name or "Noto Sans CJK KR" not in fam:
-        raise RuntimeError(("Korean Noto family unresolved",fp,idx,fam))
-    glyph_probe=ImageFont.truetype(fp,108,index=idx)
-    missing=bytes(glyph_probe.getmask(chr(0x10ffff)))
-    for korean in ["출","발","골"]:
-        maskdata=bytes(glyph_probe.getmask(korean))
-        if not maskdata or not any(maskdata) or maskdata==missing:
-            raise RuntimeError(("Missing Hangul glyph / tofu fallback",korean,fp,idx))
-    print("B256_KOREAN_GLYPH_COVERAGE_OK",fp,idx,fam,flush=True)
-    for q in specs:
-        x0,y0,x1,y1=q["box"];fw,fh=q["textsize"];dx=q["shear"]
-        f=ImageFont.truetype(fp,108,index=idx)
-        mask=Image.new("L",(900,250),0);d=ImageDraw.Draw(mask)
-        bb=d.textbbox((0,0),q["ko"],font=f);d.text((40-bb[0],40-bb[1]),q["ko"],fill=255,font=f)
-        mask=mask.crop(mask.getbbox()).resize((fw,fh),Image.Resampling.LANCZOS)
-        # Source italic: top of the glyph leans right by 8px versus bottom.
-        mask=mask.transform((fw+dx,fh),Image.Transform.AFFINE,(1,dx/(fh-1),-dx,0,1,0),resample=Image.Resampling.BICUBIC)
-        mask=mask.crop(mask.getbbox())
-        edge=mask.filter(ImageFilter.MaxFilter(3))
-        glyph=Image.new("RGBA",(mask.width+2,mask.height+3),(0,0,0,0))
-        glyph.paste((188,83,40,255),(1,2),edge)
-        glyph.paste((235,145,70,255),(1,1),edge)
-        glyph.paste((255,244,199,255),(1,1),mask)
-        glyph=glyph.crop(glyph.getchannel("A").getbbox())
-        gx=x0+(x1-x0-glyph.width)//2;gy=y0+(y1-y0-glyph.height)//2
-        margins=[gx-x0,gy-y0,x1-(gx+glyph.width),y1-(gy+glyph.height)]
-        if min(margins)<1:raise RuntimeError(("bbox overflow",q["key"],margins,glyph.size))
-        final.alpha_composite(glyph,(gx,gy))
-        q.update({"local_bbox":[gx,gy,gx+glyph.width,gy+glyph.height],"margins":margins,
-                  "generated_face":list(mask.size),"source_top_vs_bottom_shift_target_px":dx})
-        mask.save(out/(q["key"]+"_PRETRANSFORM.png"))
-        glyph.save(out/(q["key"]+"_POSTTRANSFORM.png"))
-    raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    file.write_bytes(a[:128]+raw.tobytes("raw",mode));hashnow=sha(file)
-    decoded=decode(file.read_bytes())
-    if ImageChops.difference(decoded,final).getbbox():raise RuntimeError("persisted DDS decode differs")
-    delta=np.asarray(decoded,dtype=np.uint8)
-    changed=np.any(sourcepixels!=delta,axis=2)
-    outside=int(np.count_nonzero(changed&~allowed))
-    ao=int(np.count_nonzero((sourcepixels[:,:,3]!=delta[:,:,3])&~allowed))
-    if outside or ao:raise RuntimeError(("protected overflow",outside,ao))
-    def gray(im):
-        p=Image.new("RGBA",im.size,(90,90,90,255));p.alpha_composite(im);return p.convert("RGB")
-    # Native SOURCE/CLEAN/OLD/NEW, readable and RAW are required for self-QA.
-    for title,im in [("SOURCE",source),("CLEAN",clean),("PREVIOUS",previous),("FINAL",decoded),("FINAL_RAW",raw)]:
-        im.save(out/(title+".png"))
-    contact=[]
-    for q in specs:
-        x0,y0,x1,y1=q["box"];rect=(x0-5,y0-5,x1+5,y1+5);items=[]
-        for tag,im in [("ORIGINAL",source),("CLEAN",clean),("PREVIOUS",previous),("REWORK",decoded)]:
-            crop=gray(im).crop(rect);crop=crop.resize((crop.width*6,crop.height*6),Image.Resampling.NEAREST)
-            tile=Image.new("RGB",(crop.width,crop.height+23),(28,28,28));tile.paste(crop,(0,23))
-            ImageDraw.Draw(tile).text((4,4),q["key"]+" "+tag,fill="white");items.append(tile)
-        panel=Image.new("RGB",(sum(i.width for i in items),max(i.height for i in items)),(28,28,28));x=0
-        for img in items:panel.paste(img,(x,0));x+=img.width
-        contact.append(panel)
-    board=Image.new("RGB",(max(x.width for x in contact),sum(x.height for x in contact)+16),(28,28,28));y=0
-    for p in contact:board.paste(p,(0,y));y+=p.height+16
-    board.save(out/"B256_SOURCE_CLEAN_PREVIOUS_FINAL_NATIVE6X.png")
-    for scale in [1,.75,.5]:
-        pr=gray(decoded).resize((int(w*scale),int(h*scale)),Image.Resampling.LANCZOS)
-        pr.save(out/("PRACTICAL_"+str(int(scale*100))+".png"))
-    report={"role":"B","run":run,"queue_index":172,"source_sha256":SOURCE,
-            "prior_sha256":PRIOR,"candidate_sha256":hashnow,"source_url":url,
-            "execution_backend":"GITHUB_HOSTED_CPU_INPUT_NOT_MATERIALIZABLE_IN_GPT_LOCAL",
-            "format":"RGBA32","native_size":[w,h],"mips":1,"raw_orientation":"mirror_y",
-            "regions":specs,"changed_inside":int(np.count_nonzero(changed&allowed)),
-            "outside_rgba":outside,"outside_alpha":ao,
-            "header_exact":file.read_bytes()[:128]==a[:128],
-            "source_right_bright_residue_pixels_replaced":residue_count,
-            "roundtrip":"PASS",
-            "controller_visual":"PENDING_HUMAN_REVIEW",
-            "status":"B256_MACHINE_PASS_PENDING_CONTROLLER",
-            "RUNTIME_VALIDATION":"UNTESTED","forbidden_domains_touched":[]}
-    rp=out/"B256_MACHINE_QA.json";rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-    wr=repo/"localization/graphics/worker_results/B256_6C9B3611.json"
-    wr.write_text(json.dumps({"role":"B","run":run,"candidate_sha256":hashnow,
-         "status":"B256_MACHINE_PASS_PENDING_CONTROLLER",
-         "qa_path":str(rp.relative_to(repo))},ensure_ascii=False,indent=2)+"\n")
-    print("B256_DONE",json.dumps({"candidate_sha":hashnow,"regions":specs,"outside":outside},ensure_ascii=False),flush=True)
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":
+    raise SystemExit("B257 GitHub-hosted CPU runner (ChatGPT local GitHub raw DNS unavailable)")
+root=Path.cwd()
+RUN="20261008-B257-Q214-BC3-FACE-PRIORITY"
+asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
+loc=root/"localization/graphics"
+path=loc/"hd_candidates"/asset
+out=loc/"role_B"/RUN
+out.mkdir(parents=True,exist_ok=True)
+SOURCE_SHA="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
+PRIOR_SHA="2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25"
+url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
+"3da79726739ac631d8e2703a65330dbb0c310770/"
+"Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds")
+cleanpath=loc/"role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CLEAN_PLATE.png"
+def sha(b):return hashlib.sha256(b).hexdigest()
+old=path.read_bytes()
+if sha(old)!=PRIOR_SHA: raise RuntimeError(("q214 changed concurrently",sha(old),PRIOR_SHA))
+with tempfile.TemporaryDirectory(prefix="b257_source_") as tmp:
+    sourcefile=Path(tmp)/"source.dds"
+    urllib.request.urlretrieve(url,sourcefile)
+    sourcebytes=sourcefile.read_bytes()
+if sha(sourcebytes)!=SOURCE_SHA:raise RuntimeError(("source changed",sha(sourcebytes)))
+W=struct.unpack_from("<I",sourcebytes,16)[0]
+H=struct.unpack_from("<I",sourcebytes,12)[0]
+mip=struct.unpack_from("<I",sourcebytes,28)[0]
+if (W,H,mip,sourcebytes[84:88],len(sourcebytes))!=(2048,2048,1,b"DXT5",128+2048*2048):
+    raise RuntimeError(("unexpected source format",W,H,mip,sourcebytes[84:88],len(sourcebytes)))
+if old[:128]!=sourcebytes[:128]:raise RuntimeError("DDS header changed")
+def decode(buf):
+    return Image.open(BytesIO(buf)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+src=decode(sourcebytes)
+prev=decode(old)
+clean=Image.open(cleanpath).convert("RGBA")
+if clean.size!=(W,H):raise RuntimeError("clean plate wrong dimensions")
+source=np.asarray(src,dtype=np.uint8)
+base=np.asarray(clean,dtype=np.uint8)
+previous=np.asarray(prev,dtype=np.uint8)
+# Source effect bboxes measured from the canonical English HD DDS, not Korean pixels.
+specs=[
+    {"id":"start","english":"START","korean":"출발","source_bbox":[815,495,899,517],"size":[51,18],"right_lean_px":4},
+    {"id":"goal","english":"GOAL","korean":"골","source_bbox":[1343,764,1417,787],"size":[29,18],"right_lean_px":4}
+]
+allowed=np.zeros((H,W),bool)
+for r in specs:
+    x0,y0,x1,y1=r["source_bbox"]
+    allowed[y0:y1,x0:x1]=True
+# Install and probe exact KR glyph coverage before altering bytes.
+subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+subprocess.run(["fc-cache","-f"],check=True)
+f=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{family}","Noto Sans CJK KR:style=Bold"],text=True).strip().split("|")
+fontpath,fontidx,family=f[0],int(f[1] or "0"),f[2]
+if "NotoSansCJK" not in Path(fontpath).name or "Noto Sans CJK KR" not in family:
+    raise RuntimeError(("wrong glyph family",fontpath,fontidx,family))
+font=ImageFont.truetype(fontpath,4*26,index=fontidx)
+tofu=bytes(font.getmask(chr(0x10ffff)))
+for ch in "출발골":
+    bm=bytes(font.getmask(ch))
+    if bm==tofu or not bm or not any(bm):raise RuntimeError(("tofu glyph",ch))
+glyphkind=np.zeros((H,W),np.uint8)
+previews=[]
+for r in specs:
+    w,h=r["size"]
+    canvas=Image.new("L",(900,350),0)
+    painter=ImageDraw.Draw(canvas)
+    bb=painter.textbbox((0,0),r["korean"],font=font)
+    painter.text((40-bb[0],40-bb[1]),r["korean"],font=font,fill=255)
+    ink=canvas.getbbox()
+    if not ink:raise RuntimeError(("no real glyph",r["id"]))
+    mask=canvas.crop(ink).resize((w,h),Image.Resampling.LANCZOS)
+    dx=r["right_lean_px"]
+    mask=mask.transform((w+dx,h),Image.Transform.AFFINE,(1,dx/(h-1),-dx,0,1,0),
+                        resample=Image.Resampling.BICUBIC)
+    core=np.asarray(mask,dtype=np.uint8)>=128
+    # 1px red-orange keyline around opaque cream. Shadow below cannot erase counters.
+    expanded=np.asarray(mask.filter(ImageFilter.MaxFilter(3)),dtype=np.uint8)>=128
+    shadow=np.zeros_like(expanded)
+    shadow[1:]=expanded[:-1]
+    class_local=np.zeros_like(core,np.uint8)
+    class_local[shadow]=1
+    class_local[expanded]=2
+    class_local[core]=3
+    ly,lx=np.nonzero(class_local)
+    if not len(lx):raise RuntimeError(("empty raster",r["id"]))
+    xmin,xmax=int(lx.min()),int(lx.max())+1
+    ymin,ymax=int(ly.min()),int(ly.max())+1
+    tile=class_local[ymin:ymax,xmin:xmax]
+    x0,y0,x1,y1=r["source_bbox"]
+    cx=(x0+x1)//2; cy=(y0+y1)//2
+    px=cx-tile.shape[1]//2;py=cy-tile.shape[0]//2
+    bound=[px,py,px+tile.shape[1],py+tile.shape[0]]
+    margins=[px-x0,py-y0,x1-bound[2],y1-bound[3]]
+    if min(margins)<1:raise RuntimeError(("glyph touches exact source boundary",r["id"],bound,margins))
+    if np.any(glyphkind[py:bound[3],px:bound[2]]):raise RuntimeError("localized overlap")
+    glyphkind[py:bound[3],px:bound[2]]=tile
+    r["localized_bbox"]=bound
+    r["margins"]=margins
+    r["native_core_pixels"]=int(np.count_nonzero(tile==3))
+    r["native_keyline_pixels"]=int(np.count_nonzero(tile==2))
+    preview=Image.new("RGBA",(tile.shape[1],tile.shape[0]),(0,0,0,0))
+    parr=np.asarray(preview).copy()
+    parr[tile==1]=[155,56,32,255]
+    parr[tile==2]=[238,141,73,255]
+    parr[tile==3]=[255,242,205,255]
+    Image.fromarray(parr,"RGBA").save(out/("B257_"+r["id"]+"_PREENCODE.png"))
+if np.any((glyphkind>0)&~allowed):raise RuntimeError("glyph outside original text effect boxes")
+# Compose ideal RGBA for human comparison, but QA uses actual saved BC3 decode.
+ideal=base.copy()
+ideal[glyphkind==1,:3]=[157,53,34]
+ideal[glyphkind==2,:3]=[237,141,72]
+ideal[glyphkind==3,:3]=[255,243,208]
+ideal[glyphkind>0,3]=255
+# BC3 4-color palette endpoints and indices, in DDS raw coordinate space.
+def rgb565(rgb):
+    r,g,b=[int(x) for x in rgb]
+    return (round(r*31/255)<<11)|(round(g*63/255)<<5)|round(b*31/255)
+def col565(v):
+    return np.array([(v>>11&31)*255/31,(v>>5&63)*255/63,(v&31)*255/31],dtype=np.float64)
+def palette(hi,lo):
+    p0,p1=col565(hi),col565(lo)
+    return np.array([p0,p1,(2*p0+p1)/3,(p0+2*p1)/3],dtype=np.float64)
+def oldcolor(block):
+    a=int.from_bytes(block[8:10],"little")
+    b=int.from_bytes(block[10:12],"little")
+    return palette(a,b)
+def get_ci(block):
+    z=int.from_bytes(block[12:16],"little")
+    return [(z>>(2*i))&3 for i in range(16)]
+def set_ci(block,idx):
+    z=sum((int(idx[i])&3)<<(2*i) for i in range(16))
+    return block[:12]+z.to_bytes(4,"little")
+encoded=bytearray(old)
+bw=W//4;bh=H//4
+full=0;partial=0;retouched=0;face_blocks=0
+rgba_raw=np.flipud(ideal)
+kind_raw=np.flipud(glyphkind)
+allowed_raw=np.flipud(allowed)
+# Only visit source effect rectangles and their partial blocks.
+block_ids=set()
+for r in specs:
+    x0,y0,x1,y1=r["source_bbox"]
+    for y in range(y0//4,(y1+3)//4):
+        for x in range(x0//4,(x1+3)//4):
+            block_ids.add((x,bh-1-y))
+for bx,by in sorted(block_ids):
+    xx=bx*4;yy=by*4
+    m=allowed_raw[yy:yy+4,xx:xx+4]
+    if not np.any(m):continue
+    off=128+(by*bw+bx)*16
+    oldblock=bytes(encoded[off:off+16])
+    pix=rgba_raw[yy:yy+4,xx:xx+4,:3]
+    kind=kind_raw[yy:yy+4,xx:xx+4]
+    if np.all(m):
+        # Face-priority: never ask a generic compressor to interpolate tiny
+        # cream strokes against red horizontally-striped badge backing.
+        if np.any(kind):
+            face_blocks+=1
+            bgpix=pix[kind==0]
+            plate_rgb=np.median(bgpix,axis=0) if len(bgpix) else np.array([220,25,44])
+            hi=rgb565((255,245,210));lo=rgb565(plate_rgb)
+            if hi<=lo:raise RuntimeError("BC3 endpoints invalid")
+            idx=np.zeros((4,4),dtype=np.uint8)
+            idx[kind==0]=1 # original red plate
+            idx[kind==1]=3 # red-orange shadow
+            idx[kind==2]=2 # source warm orange keyline
+            idx[kind==3]=0 # full cream white face
+        else:
+            # Clean all old Korean/English from source-effect area, retain
+            # source-derived red plate variation using red-family endpoints.
+            colors=pix.reshape(-1,3).astype(np.float64)
+            lumas=(colors[:,0]*0.5+colors[:,1]*0.4+colors[:,2]*0.1)
+            hi=rgb565(colors[int(np.argmax(lumas))])
+            lo=rgb565(colors[int(np.argmin(lumas))])
+            if hi==lo:hi=min(65535,hi+1)
+            if hi<lo:hi,lo=lo,hi
+            pp=palette(hi,lo)
+            idx=np.argmin(((colors[:,None,:]-pp[None,:,:])**2).sum(axis=2),axis=1).reshape(4,4)
+        nb=oldblock[:8]+int(hi).to_bytes(2,"little")+int(lo).to_bytes(2,"little")
+        nb=set_ci(nb+b"\x00\x00\x00\x00",idx.reshape(16))
+        full+=1
+    else:
+        # Keep original BC3 endpoints + all protected texel indices *exact*.
+        # Restore partial-edge English/B253 fragments only within original bbox.
+        pp=oldcolor(oldblock)
+        idx=get_ci(oldblock)
+        for dy in range(4):
+            for dx in range(4):
+                if not m[dy,dx]:continue
+                if kind[dy,dx]:
+                    # Source bbox border with glyph is invalid: design should
+                    # leave a positive margin on every side.
+                    raise RuntimeError(("glyph enters partial boundary block",bx,by,dx,dy))
+                # Choose the nearest source-red original BC3 palette entry.
+                opts=[i for i,p in enumerate(pp) if p[0]>p[1]+34 and p[0]>p[2]+20]
+                if not opts:raise RuntimeError(("no original sign red for partial block",bx,by))
+                color=pix[dy,dx].astype(np.float64)
+                idx[dy*4+dx]=min(opts,key=lambda i:float(np.sum((pp[i]-color)**2)))
+        nb=set_ci(oldblock,idx)
+        partial+=1
+    if nb!=oldblock:retouched+=1
+    encoded[off:off+16]=nb
+if bytes(encoded[:128])!=sourcebytes[:128]:raise RuntimeError("header mismatch")
+# Validate exact saved DDS and the English source, not PNG approximation.
+dst=bytes(encoded)
+after=decode(dst)
+actual=np.asarray(after,dtype=np.uint8)
+delta=np.any(source!=actual,axis=2)
+outside=int(np.count_nonzero(delta&~allowed))
+alpha_out=int(np.count_nonzero((source[:,:,3]!=actual[:,:,3])&~allowed))
+visible_out=int(np.count_nonzero((actual[:,:,3]>8)&(source[:,:,3]<=8)&~allowed))
+if outside or alpha_out or visible_out:
+    raise RuntimeError(("protected source pixel drift",outside,alpha_out,visible_out))
+# The B253 prior may contain original colored English/scratch outside rectangles;
+# do not let production reencode unrelated full atlas blocks.
+oldout=int(np.count_nonzero(np.any(previous!=actual,axis=2)&~allowed))
+if oldout:raise RuntimeError(("altered previous protected pixels",oldout))
+integrity=[]
+for r in specs:
+    x0,y0,x1,y1=r["source_bbox"]
+    origkind=glyphkind[y0:y1,x0:x1]
+    img=actual[y0:y1,x0:x1,:3].astype(np.int16)
+    face=(origkind==3)
+    # Cream should remain visibly bright across the glyph's native scanlines.
+    good=(img[:,:,0]>=240)&(img[:,:,1]>=211)&(img[:,:,2]>=175)
+    ratio=float(np.count_nonzero(good&face))/max(1,np.count_nonzero(face))
+    row_ratios=[]
+    for row in range(face.shape[0]):
+        n=int(face[row].sum())
+        if n>=3:row_ratios.append(round(float((good[row]&face[row]).sum())/n,4))
+    minimum=min(row_ratios) if row_ratios else 0
+    integrity.append({"id":r["id"],"core_pixels":int(face.sum()),
+        "bright_core_retention":round(ratio,4),"worst_native_scanline":minimum,
+        "row_ratios":row_ratios})
+    if ratio<0.965 or minimum<0.86:
+        raise RuntimeError(("BC3 cream glyph has broken strokes",integrity[-1]))
+# Actual DDS bytes only after confirmed generation+QA, file remains changed only
+# within the measured original text-effect area.
+path.write_bytes(dst)
+if sha(path.read_bytes())!=sha(dst):raise RuntimeError("publish byte drift")
+src.save(out/"B257_SOURCE_READABLE.png")
+clean.save(out/"B257_CLEAN_PLATE.png")
+Image.fromarray(ideal,"RGBA").save(out/"B257_PREENCODE_READABLE.png")
+prev.save(out/"B257_PREVIOUS_READABLE.png")
+after.save(out/"B257_FINAL_READABLE.png")
+after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B257_FINAL_RAW.png")
+def over_bg(im,col=(115,115,115,255)):
+    canvas=Image.new("RGBA",im.size,col)
+    canvas.alpha_composite(im)
+    return canvas.convert("RGB")
+def make_contact():
+    strips=[]
+    for r in specs:
+        x0,y0,x1,y1=r["source_bbox"]
+        box=(x0-10,y0-7,x1+10,y1+7)
+        tiles=[]
+        for name,im in [("SOURCE",src),("CLEAN",clean),("B253_REJECTED",prev),("B257_NEW",after)]:
+            crop=over_bg(im).crop(box)
+            crop=crop.resize((crop.width*6,crop.height*6),Image.Resampling.NEAREST)
+            tile=Image.new("RGB",(crop.width,crop.height+24),(35,35,35))
+            tile.paste(crop,(0,24))
+            ImageDraw.Draw(tile).text((3,4),r["id"]+" "+name,fill=(255,255,255))
+            tiles.append(tile)
+        strip=Image.new("RGB",(sum(t.width for t in tiles),max(t.height for t in tiles)),(35,35,35))
+        px=0
+        for t in tiles:strip.paste(t,(px,0));px+=t.width
+        strips.append(strip)
+    board=Image.new("RGB",(max(x.width for x in strips),sum(x.height for x in strips)+16),(35,35,35))
+    py=0
+    for im in strips:board.paste(im,(0,py));py+=im.height+16
+    return board
+make_contact().save(out/"B257_SOURCE_CLEAN_B253_NEW_NATIVE6X.png")
+for percent in (100,75,50):
+    dest=over_bg(after).resize((W*percent//100,H*percent//100),Image.Resampling.LANCZOS)
+    dest.save(out/("B257_PRACTICAL_"+str(percent)+".png"))
+report={
+  "schema_version":2,"role":"B","run":RUN,"queue_index":214,"asset":asset,
+  "source_sha256":SOURCE_SHA,"prior_rejected_candidate_sha256":PRIOR_SHA,
+  "candidate_sha256":sha(dst),"format":"DXT5_BC3","size":[W,H],
+  "header_exact":bytes(encoded[:128])==sourcebytes[:128],"raw_orientation":"mirror_y",
+  "construction":"native Noto CJK KR Bold source-derived clean; categorical face-orange-red BC3 palette per 4x4 original source-effect block, partial original endpoints/indices protected",
+  "font_coverage_probed":"출발골","native_masks":specs,
+  "full_blocks_reencoded":full,"partial_blocks_protected_indices":partial,
+  "changed_bc3_blocks":retouched,"blocks_with_new_hangul":face_blocks,
+  "source_vs_candidate_changed_inside":int(np.count_nonzero(delta&allowed)),
+  "source_vs_candidate_changed_outside":outside,
+  "source_vs_candidate_alpha_outside":alpha_out,
+  "source_vs_candidate_introduced_visible_outside":visible_out,
+  "previous_vs_candidate_changed_outside":oldout,
+  "post_encode_native_face_integrity":integrity,
+  "machine_status":"PASS",
+  "controller_visual_qa":"PENDING_CONTROLLER_DIRECT_PERSISTED_DDS_REVIEW",
+  "independent_C2":"REQUIRED_NEW_SHA","C3":"BLOCKED_PENDING_C2",
+  "PRE_INGAME":"BLOCKED_PENDING_EVIDENCE","RUNTIME_VALIDATION":"UNTESTED",
+  "execution_backend":"GITHUB_HOSTED_CPU_DUE_TO_GPT_LOCAL_GITHUB_RAW_DNS_UNAVAILABLE",
+  "forbidden_domains_touched":[]
+}
+reportpath=out/"B257_BF229CF4_REPORT.json"
+reportpath.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+wr=loc/"worker_results/B257_BF229CF4.json"
+wr.write_text(json.dumps({
+  "role":"B","run":RUN,"queue_index":214,"asset":"BF229CF4",
+  "source_sha256":SOURCE_SHA,"prior_sha256":PRIOR_SHA,
+  "candidate_sha256":sha(dst),"status":"MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "report":str(reportpath.relative_to(root)),"RUNTIME_VALIDATION":"UNTESTED"
+},ensure_ascii=False,indent=2)+"\n")
+print("B257_DONE",json.dumps({"sha":sha(dst),"blocks":retouched,"face":integrity,"outside":outside},ensure_ascii=False),flush=True)
