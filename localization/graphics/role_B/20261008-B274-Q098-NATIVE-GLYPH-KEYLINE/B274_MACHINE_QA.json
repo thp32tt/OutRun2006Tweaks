@@ -1,0 +1,77 @@
+{
+  "run": "B274",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "status": "B274_TRIAL_PENDING_FIRST_HAND_CONTROLLER_VISUAL_NOT_DEPLOYED",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "mask_sha256": "30b871414d43764e30ffd206caaa4be943d0389450e7749bf61f677f2a1b9370",
+  "previous_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "trial_sha256": "a906b7a637eeca200bf27fc4ac5d007021024b22045c70a90af906f3ab1872e3",
+  "method": "NEW_FULL_NATIVE_SOURCE_CONDITIONED_WHITE_AND_NAVY_4COLOR_BC1_BLOCK_RECONSTRUCTION",
+  "source_family": {
+    "native_size": [
+      2048,
+      128
+    ],
+    "source_face_rgb_90pct": [
+      255,
+      255,
+      255
+    ],
+    "source_keyline_rgb_30pct": [
+      0,
+      12,
+      57
+    ],
+    "face_support": 23914,
+    "navy_support": 38601
+  },
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "candidate_bbox": [
+    580,
+    11,
+    1524,
+    116
+  ],
+  "mipmaps": 1,
+  "format": "DXT5_BC3",
+  "raw_orientation": "MIRROR_Y",
+  "gate_plate_only": {
+    "source_clean_rgba_outside": 0,
+    "source_glyph_alpha_residual": 0,
+    "status": "MACHINE_PASS_VISUAL_PENDING"
+  },
+  "gate_composite_only": {
+    "clean_candidate_rgba_outside": 0,
+    "changed_outside_source": 0,
+    "changed_outside_target": 0,
+    "preserved_visible_outside_mask_changed": 0,
+    "status": "MACHINE_CONTAINMENT_PASS_VISUAL_PENDING"
+  },
+  "machine": {
+    "blocks_rebuilt": 3511,
+    "skipped_boundary_blocks": 0,
+    "pixel_changes": 50021,
+    "new_alpha_pixels": 0,
+    "alpha_exact": true,
+    "header_exact": true,
+    "persisted_roundtrip_exact": true,
+    "outside_source": 0,
+    "outside_target": 0
+  },
+  "producer_visual": "PENDING_CONTROLLER_SOURCE_CLEAN_OLD_TRIAL_NATIVE_RAW_75_50",
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "candidate_promoted": false,
+  "backend": "GITHUB_ACTIONS_ONLY_SOURCE_DOWNLOAD_GPT_LOCAL_DNS_UNAVAILABLE",
+  "cleanup": "GITHUB_EPHEMERAL_RUNNER",
+  "forbidden_domains_touched": []
+}
