@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B284: P0 IGR-041/q137 native six-region transmission menu rework.
+"""B285: P0 IGR-041/q137 native six-region transmission menu rework.
 
 One trial, not promoted without controller visual review. Genuine user-game
 failure overrides historical C234 PASS. GitHub runner supplies exact SHA-pinned
@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 ROOT=Path.cwd();G=ROOT/"localization/graphics"
-OUT=G/"role_B/20261009-B284-Q137-SIX-REGION-NATIVE-MODAL"
+OUT=G/"role_B/20261009-B285-Q137-SOURCE-ALPHA-FAMILY"
 OUT.mkdir(parents=True,exist_ok=True)
 REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
 CUR=G/"hd_candidates"/REL
@@ -20,14 +20,14 @@ SHA=lambda x:hashlib.sha256(x).hexdigest()
 SOURCE_SHA="11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
 CURRENT_SHA="0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4"
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B284 GitHub-hosted canonical source fetch only")
+    raise SystemExit("B285 GitHub-hosted canonical source fetch only")
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","137","--require-safe-rerender"],check=True,capture_output=True,text=True)
 tj=json.loads(tri.stdout)["assets"][0]
 if tj["next_action"]!="MATERIAL_REWORK":raise RuntimeError(("q137 not actionable",tj))
 currentbytes=CUR.read_bytes()
 assert SHA(currentbytes)==CURRENT_SHA,("concurrent q137 candidate changed",SHA(currentbytes))
 canonical="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
-with tempfile.TemporaryDirectory(prefix="b284_q137_") as temp:
+with tempfile.TemporaryDirectory(prefix="b285_q137_") as temp:
     path=Path(temp)/"source.dds";urllib.request.urlretrieve(canonical,path);eng=path.read_bytes()
 assert SHA(eng)==SOURCE_SHA
 assert eng[:128]==currentbytes[:128]
@@ -96,6 +96,13 @@ for key,english_label,korean,bbox,initial_size,initial_stroke in rows:
     # directly from the original native source pixels instead of hardcoded.
     color=np.rint(np.percentile(fg[:,:3],70,axis=0)).astype(np.uint8)
     if key=="transmission_small": color=np.rint(np.percentile(fg[:,:3],55,axis=0)).astype(np.uint8)
+    # Measure source premultiplied visible grayscale: source small labels
+    # visually look gray because their native alpha/face tint differs from
+    # the solid white large labels. RGB alone incorrectly made B284 bright.
+    effective=fg[:,:3].astype(np.float32)*(fg[:,3:4].astype(np.float32)/255.0)
+    effective_median=np.percentile(effective,75,axis=0)
+    opacity=int(np.clip(round(255.0*float(np.median(effective_median))/
+                              max(1.0,float(np.median(color)))),50,255))
     targetmask=None;font_used=None
     for size in range(initial_size,max(11,initial_size-23),-1):
         stroke=initial_stroke if size>=initial_size-8 else max(1,initial_stroke-1)
@@ -113,13 +120,14 @@ for key,english_label,korean,bbox,initial_size,initial_stroke in rows:
     oy=y0+(h-targetmask.height)//2
     assert ox>x0 and oy>y0 and ox+targetmask.width<x1 and oy+targetmask.height<y1
     glyph=Image.new("RGBA",targetmask.size,tuple(map(int,color))+(0,))
-    glyph.putalpha(targetmask)
+    alpha_mask=targetmask.point(lambda px: (int(px)*opacity+127)//255)
+    glyph.putalpha(alpha_mask)
     new.alpha_composite(glyph,(ox,oy))
     bb=[ox,oy,ox+targetmask.width,oy+targetmask.height]
     entries.append({"key":key,"english":english_label,"korean":korean,"source_bbox":bbox,
         "candidate_bbox":bb,"source_size":[w,h],"candidate_size":[targetmask.width,targetmask.height],
         "font":"Noto Sans CJK KR native","font_px":font_used[0],"native_stroke_px":font_used[1],
-        "source_face_RGB_percentile":color.tolist(),
+        "source_face_RGB_percentile":color.tolist(),"source_premultiplied_RGB_p75":effective_median.round(2).tolist(),"new_text_opacity":opacity,
         "positive_margins":[ox-x0,x1-ox-targetmask.width,oy-y0,y1-oy-targetmask.height]})
 final=np.array(new)
 # BGRA storage is mirrored-Y, identical orientation to English and previous.
@@ -150,12 +158,12 @@ for e in entries:
     if bounds[0]<=x0 or bounds[1]<=y0 or bounds[2]>=x1 or bounds[3]>=y1:raise RuntimeError(("1px edge violation",e["key"],bounds))
     visible_count+=len(xx)
 # Save trial only; producer-controller must actually view persisted bytes first.
-trialfile=OUT/"30CF0D_B284_TRIAL_NOT_PROMOTED.dds"
+trialfile=OUT/"30CF0D_B285_TRIAL_NOT_PROMOTED.dds"
 trialfile.write_bytes(trial)
 assert SHA(trialfile.read_bytes())==SHA(trial)
-Image.fromarray(persist,"RGBA").save(OUT/"B284_PERSISTED_READABLE_RGBA.png")
-Image.fromarray(np.flipud(persist),"RGBA").save(OUT/"B284_PERSISTED_RAW_RGBA.png")
-Image.fromarray(clean,"RGBA").save(OUT/"B284_PLATE_ONLY_RGBA.png")
+Image.fromarray(persist,"RGBA").save(OUT/"B285_PERSISTED_READABLE_RGBA.png")
+Image.fromarray(np.flipud(persist),"RGBA").save(OUT/"B285_PERSISTED_RAW_RGBA.png")
+Image.fromarray(clean,"RGBA").save(OUT/"B285_PLATE_ONLY_RGBA.png")
 # Distinct plate-only, glyph composite and 100/75/50, RAW visuals across BWG backgrounds.
 for orient in ("READABLE","RAW"):
     arrs=(source,clean,prior,persist) if orient=="READABLE" else tuple(np.flipud(a) for a in (source,clean,prior,persist))
@@ -170,7 +178,7 @@ for orient in ("READABLE","RAW"):
             contact=Image.new("RGB",(sum(c.width for c in cells)+12,max(c.height for c in cells)),(95,95,95))
             xx=0
             for c in cells:contact.paste(c,(xx,0));xx+=c.width+4
-            contact.save(OUT/f"B284_{orient}_{bgname}_{pct}_SOURCE_CLEAN_B165_TRIAL.png",optimize=True)
+            contact.save(OUT/f"B285_{orient}_{bgname}_{pct}_SOURCE_CLEAN_B165_TRIAL.png",optimize=True)
 for e in entries:
     x0,y0,x1,y1=e["source_bbox"]
     panels=[]
@@ -181,8 +189,8 @@ for e in entries:
     row=Image.new("RGB",(sum(z.width for z in panels)+12,max(z.height for z in panels)),(95,95,95))
     left=0
     for cell in panels:row.paste(cell,(left,0));left+=cell.width+4
-    row.save(OUT/f"B284_{e['key']}_SOURCE_CLEAN_B165_TRIAL_2X.png")
-report={"schema_version":1,"role":"B","run":"B284","index":137,
+    row.save(OUT/f"B285_{e['key']}_SOURCE_CLEAN_B165_TRIAL_2X.png")
+report={"schema_version":1,"role":"B","run":"B285","index":137,
 "asset":REL,"priority":"P0","user_in_game":["IGR-041","스크린샷(193)(1).png"],
 "triage":tj,"source_sha256":SOURCE_SHA,"source_provenance":canonical,
 "clean_png_sha256":SHA(CLEAN.read_bytes()),"previous_candidate_sha256":CURRENT_SHA,"trial_sha256":SHA(trial),
@@ -198,5 +206,5 @@ report={"schema_version":1,"role":"B","run":"B284","index":137,
 "candidate_promoted":False,"C1":"NOT_RUN","C3":"NOT_RUN","USER":"NOT_RUN",
 "RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_HOSTED_REQUIRED_PINNED_PUBLIC_SOURCE",
 "forbidden_domains_touched":[]}
-(OUT/"B284_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B284","trial_sha256":SHA(trial),"rows":len(entries),"protected_changed":outside,"visible":visible_count},ensure_ascii=False))
+(OUT/"B285_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B285","trial_sha256":SHA(trial),"rows":len(entries),"protected_changed":outside,"visible":visible_count},ensure_ascii=False))
