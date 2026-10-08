@@ -602,23 +602,10 @@ namespace OutRunVRRenderer
 			if (!Game::current_mode)
 				return PresentationUnknown;
 
-			const GameState state =
-				static_cast<GameState>(*Game::current_mode);
-			switch (state)
-			{
-			case STATE_START:
-			case STATE_WARP:
-			case STATE_RESTART:
-			case STATE_GAME:
-			case STATE_GIVEUP:
-			case STATE_SMPAUSEMENU:
-			case STATE_GOAL:
-			case STATE_TIMEUP:
-			case STATE_LINK_TIMEUP:
-				return PresentationGameplay;
-			default:
-				return PresentationTheater;
-			}
+			// This exact state set is shared with the F11 overlay owner.
+			// Never classify a Theater transition as stereoscopic ImGui.
+			return Game::is_vr_gameplay_presentation()
+				? PresentationGameplay : PresentationTheater;
 		}
 
 		void PublishClientTelemetry(std::uint32_t flags, float relativeAngleDeg)
