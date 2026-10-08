@@ -34,6 +34,10 @@
   "pre_ingame_export": "BLOCKED",
   "runtime_validation": "UNTESTED",
   "execution_backend": "GitHub connector SSOT + N100 MCP fallback only for DDS SHA/native pixel decode; GPT local raw.githubusercontent.com DNS failure",
-  "post_task_cleanup": "PENDING_AFTER_REMOTE_VERIFICATION",
-  "forbidden_domains_touched": []
+  "post_task_cleanup": "COMPLETE: only marked transient work/c2_q154_20261008_1220_scratch removed after QA publication",
+  "forbidden_domains_touched": [],
+  "cleaned_paths": [
+    "work/c2_q154_20261008_1220_scratch"
+  ],
+  "n100_free_bytes_after_cleanup": 34330877952
 }
