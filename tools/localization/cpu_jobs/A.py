@@ -10,7 +10,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261008-A183-Q214-START-GOAL-SCALE"
+run="20261008-A183R-Q214-START-GOAL-ANTIALIAS-BC3"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -20,11 +20,11 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
 SOURCE_SHA="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-PRIOR_SHA="3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b"
+PRIOR_SHA="82ddd6124d02d2fc1416ee0600ae4a1b107013e65b3df3385e58837fe8c72f3d"
 prior_bytes=candidate.read_bytes()
 if hashlib.sha256(prior_bytes).hexdigest()!=PRIOR_SHA:
     raise RuntimeError("A183 q214 prior DDS SHA drift; stop rather than overwrite")
-srcp=Path("/tmp/A183_BF229CF4.dds")
+srcp=Path("/tmp/A183R_BF229CF4.dds")
 urllib.request.urlretrieve(url,srcp)
 
 def sha256_bytes(b): return hashlib.sha256(b).hexdigest()
@@ -69,7 +69,7 @@ for i in range(1,n+1):
     w=b[2]-b[0]; h=b[3]-b[1]
     if 45<=w<=300 and 12<=h<=90 and (w/max(h,1))>=1.55:
         cands.append({"area":area,"bbox":b,"mask":m})
-print("A183_RED_CANDIDATES",[(z["area"],z["bbox"],round((z["bbox"][2]-z["bbox"][0])/max(1,z["bbox"][3]-z["bbox"][1]),2)) for z in cands],flush=True)
+print("A183R_RED_CANDIDATES",[(z["area"],z["bbox"],round((z["bbox"][2]-z["bbox"][0])/max(1,z["bbox"][3]-z["bbox"][1]),2)) for z in cands],flush=True)
 if len(cands)<2:
     raise RuntimeError(("fewer than two route-sign red components",[(c["area"],c["bbox"]) for c in cands]))
 # START is the upper-left sign, GOAL the lower-right sign. Keep the pair maximizing
@@ -86,7 +86,7 @@ if not pairs:
     raise RuntimeError(("cannot geometrically identify START/GOAL pair",[(c["area"],c["bbox"]) for c in cands]))
 pairs.sort(key=lambda z:z[0],reverse=True)
 _,start_comp,goal_comp=pairs[0]
-print("A183_SELECTED",start_comp["area"],start_comp["bbox"],goal_comp["area"],goal_comp["bbox"],flush=True)
+print("A183R_SELECTED",start_comp["area"],start_comp["bbox"],goal_comp["area"],goal_comp["bbox"],flush=True)
 
 specs=[("start","START","출발",start_comp),("goal","GOAL","골",goal_comp)]
 rows=[]
@@ -306,37 +306,40 @@ safe_target_blocks=set()
 for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_masks):
     x0,y0,x1,y1=row["source_bbox"]; sw=x1-x0; sh=y1-y0
     fill,shadow=source_colors(sm)
-    chosen=None
-    for fs in range(max(18,int(sh*1.10)),13,-1):
-        font=ImageFont.truetype(FONT,fs)
-        can=Image.new("RGBA",(max(360,sw*4),max(180,sh*4)),(0,0,0,0))
-        d=ImageDraw.Draw(can)
-        tb=d.textbbox((0,0),row["korean"],font=font)
-        ox=18-tb[0]; oy=18-tb[1]; off=max(1,round(fs*0.055))
-        d.text((ox+off,oy+off),row["korean"],font=font,fill=shadow)
-        d.text((ox,oy),row["korean"],font=font,fill=fill,stroke_width=1,stroke_fill=shadow)
-        gb=can.getchannel("A").getbbox()
-        if not gb: continue
-        glyph=shear(can.crop(gb),0.17)
-        # Restore q214 source-relative hierarchy without crossing the exact source text bbox.
-        target_w={"start":62,"goal":42}[row["key"]]
-        glyph=glyph.resize((target_w,glyph.height),Image.Resampling.LANCZOS)
-        gb=glyph.getchannel("A").getbbox()
-        if gb: glyph=glyph.crop(gb)
-        if glyph.width>sw-4 or glyph.height>sh-4: continue
-        px=x0+(sw-glyph.width)//2; py=y0+(sh-glyph.height)//2
-        lm=np.zeros((H,W),bool)
-        ma=np.asarray(glyph.getchannel("A"))>0
-        lm[py:py+glyph.height,px:px+glyph.width]=ma
-        lb=bbox(lm)
-        if lb is None: continue
-        if not(lb[0]>=x0+2 and lb[1]>=y0+2 and lb[2]<=x1-2 and lb[3]<=y1-2):
-            continue
-        blocks={(xx//4,yy//4) for yy,xx in zip(*np.nonzero(lm))}
-        if np.any(lm & ~safe_banner):
-            continue
-        chosen=(glyph,px,py,lm,lb,blocks,fs,off,fill,shadow)
-        break
+    # A183 controller rejected the widened fs16/fs18 raster: compressed thin Hangul strokes
+    # fragmented at practical scale. Render native VECTOR outlines at 4x instead,
+    # then downsample ONCE to the source-sized DXT5 sign text footprint.
+    # Keep target pixels inside full BC3 blocks wherever the source bbox permits.
+    fill,shadow=source_colors(sm)
+    fs=26
+    supersample=4
+    font=ImageFont.truetype(FONT,fs*supersample)
+    can=Image.new("RGBA",(1100,360),(0,0,0,0))
+    d=ImageDraw.Draw(can)
+    tb=d.textbbox((0,0),row["korean"],font=font)
+    ox=54-tb[0]; oy=54-tb[1]; off=4
+    d.text((ox+off,oy+off),row["korean"],font=font,fill=shadow)
+    d.text((ox,oy),row["korean"],font=font,fill=fill,stroke_width=3,stroke_fill=shadow)
+    gb=can.getchannel("A").getbbox()
+    if not gb: raise RuntimeError(("no A183R Hangul glyphs",row["key"]))
+    glyph=shear(can.crop(gb),0.17)
+    size={"start":(64,20),"goal":(43,19)}[row["key"]]
+    glyph=glyph.resize(size,Image.Resampling.LANCZOS)
+    gb=glyph.getchannel("A").getbbox()
+    if not gb: raise RuntimeError(("A183R glyph resampling empty",row["key"]))
+    glyph=glyph.crop(gb)
+    px=x0+(sw-glyph.width)//2
+    py=y0+1
+    lm=np.zeros((H,W),bool)
+    ma=np.asarray(glyph.getchannel("A"))>0
+    lm[py:py+glyph.height,px:px+glyph.width]=ma
+    lb=bbox(lm)
+    if lb is None or not (lb[0]>x0 and lb[1]>y0 and lb[2]<x1 and lb[3]<y1):
+        raise RuntimeError(("A183R glyph escaped exact source",row["key"],lb,row["source_bbox"]))
+    if np.any(lm & ~safe_banner):
+        raise RuntimeError(("A183R touched protected sign rim",row["key"]))
+    blocks={(xx//4,yy//4) for yy,xx in zip(*np.nonzero(lm))}
+    chosen=(glyph,px,py,lm,lb,blocks,fs,1,fill,shadow)
     if chosen is None:
         raise RuntimeError(("no safe render fit",row["key"],row["source_bbox"]))
     glyph,px,py,lm,lb,blocks,fs,off,fill,shadow=chosen
@@ -356,7 +359,7 @@ for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_
 # blocks touched by source removal or Korean lettering. Every other compressed block
 # remains byte-identical to the canonical DDS.
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-tmp_png=Path("/tmp/A183_final_raw.png"); tmp_dds=Path("/tmp/A183_final_nv.dds")
+tmp_png=Path("/tmp/A183R_final_raw.png"); tmp_dds=Path("/tmp/A183R_final_nv.dds")
 raw_final.save(tmp_png)
 subprocess.run(["/usr/bin/nvcompress","-bc3","-nomips",str(tmp_png),str(tmp_dds)],check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
 tb=tmp_dds.read_bytes()
@@ -497,14 +500,14 @@ if outside_blocks:
     raise RuntimeError(("compressed block drift",outside_blocks))
 
 # Evidence
-src.save(out/"A183_SOURCE_READABLE.png")
-clean.save(out/"A183_CLEAN_PLATE.png")
-dec.save(out/"A183_FINAL_READABLE.png")
-src_raw.save(out/"A183_SOURCE_RAW.png")
-dec_raw.save(out/"A183_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A183_SOURCE_TEXT_MASK.png")
-Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"A183_ALLOWED_BLOCK_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A183_TARGET_MASK.png")
+src.save(out/"A183R_SOURCE_READABLE.png")
+clean.save(out/"A183R_CLEAN_PLATE.png")
+dec.save(out/"A183R_FINAL_READABLE.png")
+src_raw.save(out/"A183R_SOURCE_RAW.png")
+dec_raw.save(out/"A183R_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A183R_SOURCE_TEXT_MASK.png")
+Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"A183R_ALLOWED_BLOCK_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A183R_TARGET_MASK.png")
 
 def on_bg(im,bg=(245,245,245,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -523,7 +526,7 @@ sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((1800,3200),Image.Resampling.LANCZOS)
-sheet.save(out/"A183_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"A183R_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_cards=[]
 for label,im in [("SOURCE_RAW_MIRROR_Y",src_raw),("FINAL_RAW_MIRROR_Y",dec_raw)]:
@@ -535,7 +538,7 @@ rs=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in raw_cards:
     rs.paste(c,(0,yy)); yy+=c.height+8
 rs.thumbnail((1400,2200),Image.Resampling.LANCZOS)
-rs.save(out/"A183_RAW_CONTACT.jpg",quality=95)
+rs.save(out/"A183R_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":2,"role":"A","run":run,"work_stolen_from_lane":"B",
@@ -556,22 +559,22 @@ report={
    "full_reencoded_blocks":full_reencoded_blocks,"partial_constrained_blocks":partial_constrained_blocks,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "rework_trigger":"C269_Q214_FAIL_SOURCE_RELATIVE_SCALE",
+ "rework_trigger":"C269_Q214_FAIL_SOURCE_RELATIVE_SCALE__A183_CONTROLLER_REJECTED_BROKEN_HANGUL_STROKES",
  "prior_candidate_sha256":PRIOR_SHA,
- "target_width_by_row":{"start":62,"goal":42},
+ "target_width_by_row":{"start":64,"goal":43},
  "exact_source_bbox_hard_gate":{"decoded_outside":outside,"alpha_outside":alpha_out,"introduced_outside":introduced,
    "previous_to_current_outside":blast_out,"previous_to_current_alpha_outside":blast_alpha},
- "execution_backend":"GITHUB_HOSTED_CPU_AFTER_CHATGPT_LOCAL_DNS_BLOCK",
+ "execution_backend":"GITHUB_HOSTED_CPU_ONEOFF_RETRY_AFTER_A183_VISUAL_FAIL",
  "fresh_independent_c":"REQUIRED_C2","c3":"REQUIRED_AFTER_FRESH_C",
  "pre_ingame":"PENDING_FRESH_C_C3","runtime_validation":"UNTESTED",
  "runtime_validation":"UNTESTED",
- "status":"A183_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A183R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A183_BF229CF4_REPORT.json"
+rp=out/"A183R_BF229CF4_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A183_BF229CF4.json").write_text(json.dumps({
+(wr/"A183R_BF229CF4.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":214,"work_stolen_from_lane":"B","asset":"BF229CF4","source_sha256":SOURCE_SHA,
- "candidate_sha256":cand_sha,"report":str(rp.relative_to(repo)),"status":"A183_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+ "candidate_sha256":cand_sha,"report":str(rp.relative_to(repo)),"status":"A183R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("A183_DONE",cand_sha,[(r["key"],r["banner_bbox"],r["source_bbox"],r["localized_bbox"]) for r in rows],flush=True)
+print("A183R_DONE",cand_sha,[(r["key"],r["banner_bbox"],r["source_bbox"],r["localized_bbox"]) for r in rows],flush=True)

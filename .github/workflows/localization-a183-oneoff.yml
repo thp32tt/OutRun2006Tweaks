@@ -1,4 +1,4 @@
-name: Localization A183 Fallback Worker
+name: Localization A183R Typography Fix
 on:
   push:
     branches: [korean-localization-recovery-20260928]
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 jobs:
-  run-a183:
+  run-a183r:
     runs-on: ubuntu-latest
     env:
       PYTHONDONTWRITEBYTECODE: '1'
@@ -27,7 +27,7 @@ jobs:
           OUTRUN_CPU_WORKER: github-actions
           OUTRUN_CPU_ROLE: A
         run: python tools/localization/cpu_jobs/A.py
-      - name: Commit isolated A183 material
+      - name: Commit isolated A183R material
         shell: bash
         run: |
           set -euo pipefail
@@ -37,7 +37,7 @@ jobs:
           git diff --cached --quiet && exit 1
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "localization(cpu): A183 q214 source scale rework"
+          git commit -m "localization(cpu): A183R q214 source scale rework"
           git fetch origin korean-localization-recovery-20260928
           git rebase origin/korean-localization-recovery-20260928
           git push origin HEAD:korean-localization-recovery-20260928
