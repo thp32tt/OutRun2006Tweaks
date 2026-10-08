@@ -114,6 +114,39 @@ def check_extra_producers(ui, contracts):
             fail('GOAL original direct-CALL owner missing ' + helper)
 
 
+def check_disprank_first(ui, contracts):
+    # This is not one of the old 71 CALLs. The original EXE producer window
+    # was independently decoded by tools/analyze_outrun_exe.py in canonical
+    # EXE HUD Inspector CI: first POSITION kind-1 CALL 0xB9DA6 -> 0x29530.
+    hits = [x for x in contracts if int(x['rva'], 16) == 0xB9DA6]
+    if len(hits) != 1:
+        fail('missing first DispRank original direct CALL')
+    item = hits[0]
+    raw = item.get('expectedBytes', '')
+    if item.get('signatureLength') != 5 or not re.fullmatch(r'e8[0-9a-fA-F]{8}', raw, re.I):
+        fail('first DispRank must have its real E8 signature')
+    target = (0xB9DA6 + 5 + int.from_bytes(bytes.fromhex(raw)[1:], 'little', signed=True)) & 0xFFFFFFFF
+    if target != 0x29530:
+        fail('first DispRank E8 targets wrong sprite producer')
+    if not any(x.get('path') == 'src/hooks_uiscaling.cpp' and
+               x.get('needle') == 'DispRankFirstSpraniCall = 0xB9DA6'
+               for x in item.get('sourceBindings', [])):
+        fail('first DispRank producer source binding missing')
+    if ui.count('DispRankFirstSpraniCall = 0xB9DA6') != 1:
+        fail('first DispRank source constant missing/duplicate')
+    body = function_body(ui, 'static int __cdecl DispRankFirst_sprani(')
+    ordered(body, 'first DispRank all-child ScreenHud producer',
+            'Game::SpritePriorityCount', 'Module::exe_ptr(0x29530)',
+            'const int result = original(spriteId, x, y, a4, a5);',
+            'TagAppendedNodes(before,', 'RenderScope::ScreenHud',
+            'return result;')
+    if len(re.findall(r'InjectHook\s*\(\s*Module::exe_ptr\(DispRankFirstSpraniCall\),\s*'
+                      r'DispRankFirst_sprani,\s*Memory::HookType::Call\);', ui, re.S)) != 1:
+        fail('first DispRank exact original CALL not installed')
+    if 'B9F3A B9F5E B9F81 B9FD0 B9FFC BA01E BA035 BA052' not in GROUPS['ExactScreenHudRight_ClipSpriteCalls'][0]:
+        fail('first DispRank must remain disjoint from eight kind0 clips')
+
+
 def check(ui, manifest):
     if manifest.get("canonicalExe", {}).get("sha256") != EXE_SHA:
         fail("wrong canonical EXE identity")
@@ -181,6 +214,7 @@ def check(ui, manifest):
     if len(owned) != 71:
         fail("expected 71 exact canonical HUD CALLs")
     check_extra_producers(ui, contracts)
+    check_disprank_first(ui, contracts)
 
     # Sibling expansion in put_clip_sprite must tag *all* original children;
     # a single tail-only tag can make one digit/menu arrow stereo and another
@@ -317,6 +351,13 @@ def test_mutations(ui, manifest):
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0xBEA5F)['sourceBindings'] = []
     must_fail('original GOAL source binding removed', changed_manifest=corrupt)
+    must_fail('first DispRank source owner bypassed',
+              ui.replace('DispRankFirst_sprani, Memory::HookType::Call',
+                         'ExactScreenHud_putClipSprite, Memory::HookType::Call', 1))
+    corrupt = copy.deepcopy(manifest)
+    next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0xB9DA6)['expectedBytes'] = 'e800000000'
+    must_fail('first DispRank rel32 original CALL corrupted', changed_manifest=corrupt)
+    print('P0 first DispRank original CALL mutations: 2/2 failures detected')
     print('P0 GOAL/RESULT original producer mutations: 4/4 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
