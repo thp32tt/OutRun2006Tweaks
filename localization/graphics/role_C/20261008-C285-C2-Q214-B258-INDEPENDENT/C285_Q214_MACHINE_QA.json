@@ -1,0 +1,103 @@
+{
+  "run": "C285",
+  "queue_index": 214,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "execution_backend": "GITHUB_HOSTED_CPU_INPUT_UNAVAILABLE_IN_GPT_LOCAL_DNS",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "clean_plate_path": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_CLEAN_PLATE.png",
+  "clean_plate_sha256": "b2a8fd17033efd4ff471b48e1f9289dadfab872cb92ea4bbb2fc6de14762255d",
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "format": "DXT5_BC3",
+  "raw_orientation": "mirror_y",
+  "dds_header_128_identical": true,
+  "decoded_changed_outside_source_effect_boxes": 0,
+  "decoded_alpha_changed_outside_source_effect_boxes": 0,
+  "rows": [
+    {
+      "id": "start",
+      "english": "START",
+      "korean": "출발",
+      "source_effect_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "source_vs_B194_clean_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "candidate_vs_B194_clean_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "margins_native": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "changed_source_to_candidate_inside_bbox": 1587,
+      "bbox_containment": "PASS",
+      "inspection_images": [
+        "start_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "start_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+        "start_SOURCE_CLEAN_FINAL_PRACTICAL50.png",
+        "start_SOURCE_RAW_NATIVE.png",
+        "start_FINAL_RAW_NATIVE.png"
+      ]
+    },
+    {
+      "id": "goal",
+      "english": "GOAL",
+      "korean": "골",
+      "source_effect_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "source_vs_B194_clean_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "candidate_vs_B194_clean_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "margins_native": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "changed_source_to_candidate_inside_bbox": 1521,
+      "bbox_containment": "PASS",
+      "inspection_images": [
+        "goal_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "goal_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+        "goal_SOURCE_CLEAN_FINAL_PRACTICAL50.png",
+        "goal_SOURCE_RAW_NATIVE.png",
+        "goal_FINAL_RAW_NATIVE.png"
+      ]
+    }
+  ],
+  "machine_result": "PASS",
+  "visual_result": "PENDING_CONTROLLER_INDEPENDENT_REVIEW",
+  "policy_gate": "NO_APPROVAL_WITHOUT_CALIBRATION_AND_COMPLETE_PER_REGION_C_C3_EVIDENCE",
+  "runtime_validation": "UNTESTED"
+}
