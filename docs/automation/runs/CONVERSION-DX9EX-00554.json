@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00554",
+  "production_id": "CONVERSION-DX9EX-00554",
+  "event_id": "CONVERSION-DX9EX-00554-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "dfe49fba263ced7129082081a5f30a99549da6b8",
+  "material_result_sha": "581626914691d1b8a6cd074dde7e78b60cab68f0",
+  "validation_bearing_result_sha": "581626914691d1b8a6cd074dde7e78b60cab68f0",
+  "result_sha": "581626914691d1b8a6cd074dde7e78b60cab68f0",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00554]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": false,
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "selected_work_item": "DX9EX-P0-PROJECTED-RANK-RIVAL-NONFINITE-ANCHOR-FAIL-CLOSED",
+  "summary": "Recover original Calc3D2D rank/rival per-car projected marker anchor safely. Finite source outputs can overflow during x*(-z)/a1 or y*(-z)/a2; ensure both reconstructed view coordinates are finite before publishing ProjectedMarkerInfo.valid. Fail closed to existing WorldBillboard fallback, preserving original VR world-stereo ownership. Add precise anchor validity ordering regression with two distinct negative injections, and repair EXE HUD Inspector push/PR watch coverage of its verifier on the final exact SHA.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_projected_marker_anchor.py",
+    ".github/workflows/outrun-exe-hud-inspector.yml",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "commits": {
+    "source": "737f43d2d427ab14c21c665e3f0733147276bd49",
+    "anchor_verifier": "c6a93224082829833d566b3c2730bd6649ca7ad4",
+    "material": "581626914691d1b8a6cd074dde7e78b60cab68f0"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub focus HEAD, AGENTS/state/work queue, Issue 13/14, original emoose UIScaling/Calc3D2D, fork HUD baseline and canonical EXE signatures examined; no prior same-task result found.",
+    "C1_REVIEW": "PASS: exact 0x49940 Calc3D2D hook and rank/rival 0xBAEE7/0xBB6F5 original CALL source contract reviewed. Existing finite raw inputs could still overflow on view-coordinate unprojection, poisoning per-eye marker anchor.",
+    "C2_IMPLEMENT": "PASS: C++ viewX/viewY nonfinite fail-closed before valid=true, dedicated projected marker verifier with two negative source mutations, exact-SHA Inspector workflow watch-list coverage. No broad HUD/world ownership reclassification.",
+    "C3_VALIDATE": "PASS: final material SHA 581626914691d1b8a6cd074dde7e78b60cab68f0 DX9Ex Active (5/5), EXE HUD Inspector, Domain Isolation, Full Source Impact all SUCCESS; no unchanged-source HUD 1000/5000 loops.",
+    "C4_COMMIT": "PASS: three production commits with exact [AUTO:CONVERSION-DX9EX-00554] on vr-d3d9ex-focus, fast-forward CAS for final validation-bearing source.",
+    "C5_PACKAGE": "PASS: exact-SHA DX9Ex Active game/host package uploaded by Github Actions, no HMD/runtime distribution or visual acceptance claimed.",
+    "C6_RESULT": "PASS: durable GitHub result record, Issue 13/14 provenance, runtime UNTESTED and canonical material SHA pinned independently of bookkeeping commit."
+  },
+  "ci_runs": {
+    "dx9ex_active": 37746475125,
+    "hud_inspector": 37746475111,
+    "domain_isolation": 37746475189,
+    "full_source_impact_supplemental": 37746475098
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "canonical_exe_hud_analysis": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "supplemental_full_source": "SUCCESS"
+  },
+  "exact_sha_validation": {
+    "material_sha": "581626914691d1b8a6cd074dde7e78b60cab68f0",
+    "active_run_id": 37746475125,
+    "active_result": "success",
+    "hud_run_id": 37746475111,
+    "hud_result": "success",
+    "domain_run_id": 37746475189,
+    "domain_result": "success",
+    "full_source_impact_run_id": 37746475098,
+    "full_source_impact_result": "success"
+  },
+  "package_artifact": {
+    "id": 11536655758,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-581626914691d1b8a6cd074dde7e78b60cab68f0",
+    "size_bytes": 2749541,
+    "digest": "sha256:7ad4888244cdaa6d49f5f891f204bb50b1de4edb79a0f068cd4134dd631a801c"
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "comment_id": 6055334048
+  },
+  "regression_ledger": {
+    "issue": 13,
+    "comment_id": 6055351955
+  },
+  "static_contract": {
+    "targeted_projected_marker": "PASS",
+    "intentional_mutations": "2 DISTINCT NEGATIVES REJECTED BY SOURCE ORDER CONTRACT",
+    "repeat_1000_5000": false
+  },
+  "runtime_note": "Quest 3/VDXR gameplay not tested. Existing 00519 white HUD, doubled visual and vehicle marker anchor failures remain OPEN/NEED_HMD_TEST. No hardware functional claims.",
+  "parallel_policy": "DX11 native A active independently, DX9Ex stabilization C active, DXVK B FROZEN. No source edits in DX11/DXVK/localization.",
+  "score_status": "PENDING_AI2_SCOREBOARD_UPDATE: award +1 once for this new material+CI production task; duplicate dispatch/retry prohibited.",
+  "next_action": "Do not rerun 00554. Continue a NEW independent DX9Ex stabilization item under a new task ID; hardware-only correctness remains NEED_HMD_TEST with RUNTIME_VALIDATION=UNTESTED."
+}
