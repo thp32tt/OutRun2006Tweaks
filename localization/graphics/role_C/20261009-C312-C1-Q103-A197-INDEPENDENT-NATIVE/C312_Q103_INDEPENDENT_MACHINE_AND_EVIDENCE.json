@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C312-C1-Q103-A197-FRESH-EVIDENCE-20261009",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "triage": {
+    "index": 103,
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+    "current_status": "a197_producer_self_qa_pass_pending_fresh_c1_c3",
+    "next_action": "FRESH_C_REVIEW",
+    "repeated_root_causes": [],
+    "reason": "Producer candidate exists; await independent pixels-first C",
+    "runtime_validation": "UNTESTED"
+  },
+  "expected": {
+    "source": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "candidate": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed"
+  },
+  "clean_path": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+  "metrics": {
+    "source_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "old_bbox": [
+      1506,
+      1986,
+      1704,
+      2026
+    ],
+    "current_bbox": [
+      1431,
+      1972,
+      1780,
+      2036
+    ],
+    "margins": [
+      20,
+      21,
+      4,
+      4
+    ],
+    "old_size": [
+      198,
+      40
+    ],
+    "current_size": [
+      349,
+      64
+    ],
+    "source_size": [
+      390,
+      72
+    ],
+    "old_source_width_ratio": 0.5077,
+    "current_source_width_ratio": 0.8949,
+    "source_slant_proxy": {
+      "top_left_20pct_median": 54.0,
+      "bottom_left_20pct_median": 38.0,
+      "horizontal_top_minus_bottom_left": 16.0,
+      "method": "whole-line top/bottom percentiles, not source-glyph per-character slope; must not auto-accept slant"
+    },
+    "old_slant_proxy": {
+      "top_left_20pct_median": 54.0,
+      "bottom_left_20pct_median": 38.0,
+      "horizontal_top_minus_bottom_left": 16.0,
+      "method": "whole-line top/bottom percentiles, not source-glyph per-character slope; must not auto-accept slant"
+    },
+    "new_slant_proxy": {
+      "top_left_20pct_median": 54.0,
+      "bottom_left_20pct_median": 38.0,
+      "horizontal_top_minus_bottom_left": 16.0,
+      "method": "whole-line top/bottom percentiles, not source-glyph per-character slope; must not auto-accept slant"
+    },
+    "clean_alpha_inside_plate": 27476
+  },
+  "pixels": {
+    "source_clean": {
+      "changed_rgba_total": 7439,
+      "changed_rgba_outside_source_bbox": 0,
+      "alpha_changed_outside_source_bbox": 0
+    },
+    "clean_final": {
+      "changed_rgba_total": 9599,
+      "changed_rgba_outside_source_bbox": 0,
+      "alpha_changed_outside_source_bbox": 0
+    },
+    "source_final": {
+      "changed_rgba_total": 12027,
+      "changed_rgba_outside_source_bbox": 0,
+      "alpha_changed_outside_source_bbox": 0
+    },
+    "old_final": {
+      "changed_rgba_total": 11766,
+      "changed_rgba_outside_source_bbox": 0,
+      "alpha_changed_outside_source_bbox": 0
+    }
+  },
+  "native_dds": {
+    "width": 2048,
+    "height": 2048,
+    "mips": 1,
+    "raw": "mirror_y",
+    "header_exact": true
+  },
+  "published_lossless": [
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_BLACK_100.png",
+      "sha256": "7e324e38e1baf76f5c816eb3f48a305fdba5616aaa7631ced593829d2676b4cc",
+      "bytes": 32378
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_BLACK_75.png",
+      "sha256": "963e30dcc8080641ea4e12703fac6a33fd0b8b159071d0d286be3e718259d4c3",
+      "bytes": 40484
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_BLACK_50.png",
+      "sha256": "3cc23f9dc07f761bc150e81c0ab7416a1638bcc13182e163a9049a7a924974d7",
+      "bytes": 23801
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_GRAY_100.png",
+      "sha256": "0545d2bc2729b26b73cf60a5a8fda44c670ad6a59235b25bec3ff7582ee5422f",
+      "bytes": 32286
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_GRAY_75.png",
+      "sha256": "dd96f874e89e9c4be523d78d3c053bf0d61cf4597da44519bb4fddbcc907579d",
+      "bytes": 40354
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_GRAY_50.png",
+      "sha256": "e2068de6be403bfb2d6e8e2209a08e6021e6b4c64a3c71dadc08aa265a30e77c",
+      "bytes": 23754
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_WHITE_100.png",
+      "sha256": "d07df04e42a41e0cdfb0bc6aab4f568edfef7c4676e2d05f0043add6bc6117d0",
+      "bytes": 32153
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_WHITE_75.png",
+      "sha256": "53d0b3f88c977660f1da5264e09e65c5d2a0c2228d3bd04d53d540e094d9a458",
+      "bytes": 40218
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_WHITE_50.png",
+      "sha256": "3b2e4ce6873aa71f0549edfc45624282673091ee2e9356b0c4e339a950197ca2",
+      "bytes": 23676
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SOURCE_READABLE_LOSSLESS.png",
+      "sha256": "238a05c783b3f2dc1ba52701b2d0c24254aba54c8170d60fa6d8d7cd0d8a74a1",
+      "bytes": 11790
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SOURCE_RAW_LOSSLESS.png",
+      "sha256": "63e8dbc2f791c34b89c6db2261c1371b67ee3be76e33ca1d64be839185c3b6bd",
+      "bytes": 13079
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CLEAN_READABLE_LOSSLESS.png",
+      "sha256": "3959e7d397496edef91294c192ae0318ff7d3fbfb9c8f3aa62b7fc1695262979",
+      "bytes": 6166
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CLEAN_RAW_LOSSLESS.png",
+      "sha256": "050c9ae00a83f333d291cf952eac6b793ac2169c93943accf3362fc3775cc014",
+      "bytes": 6765
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_OLD_REJECTED_READABLE_LOSSLESS.png",
+      "sha256": "f65968118782c01b19564f0afefa39684761667a576abbc4497a606516e11792",
+      "bytes": 14117
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_OLD_REJECTED_RAW_LOSSLESS.png",
+      "sha256": "46d2e32d3bc97fba5b7d8807b38d1f01ff2c8c47141d2ef0fd7c2e5546019f9a",
+      "bytes": 14758
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CURRENT_READABLE_LOSSLESS.png",
+      "sha256": "5db974e9edb810e905815a82201d17e21e2b586ec9ec6f102d87e7434803ef98",
+      "bytes": 14773
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CURRENT_RAW_LOSSLESS.png",
+      "sha256": "98ee04b2feb3187030a36f308bdb735ccca623baa87551ed203a0d08ea42f337",
+      "bytes": 16778
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SOURCE_ONLY_NATIVE.png",
+      "sha256": "7f2a76f1308b7b9d243354b4e4c7164eacffb3a8b0399cb39dae550f684c0c9f",
+      "bytes": 6583
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CLEAN_ONLY_NATIVE.png",
+      "sha256": "6b72408572c9a37e831a741661a01b025d04c19535604269ae9e59f9ed0fab23",
+      "bytes": 1466
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CURRENT_ONLY_NATIVE.png",
+      "sha256": "0e8ae317f6a0f96a590668109378c5aeaea2f59c6689e648daf55b421fcb7dea",
+      "bytes": 9689
+    }
+  ],
+  "num_png": 20,
+  "previous_C_failure": "ITALIC_SLANT_AND_UNDERSIZED A108: source 390x72 vs old 196x40, near-upright",
+  "visual_review_status": "NOT_AUTOMATICALLY_PASSED; requires independent human pixels-first review of files, source-family/type-weight, slant per glyph, protected/art masks and blind calibration",
+  "gate": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN",
+  "APPROVAL": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "backend": "GitHub Actions CPU worker evidence-only; no N100 heavy compute"
+}
