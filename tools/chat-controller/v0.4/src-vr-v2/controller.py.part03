@@ -192,9 +192,40 @@ def queue_rollover_prompt(active: dict) -> str:
     return "\n".join(lines)
 
 
+def rollover_has_confirmed_ui_failure(reason: str) -> bool:
+    """Silence, age, and absent commits are not evidence a ChatGPT worker stopped."""
+    normalized = str(reason or "").lower()
+    return (
+        "length limit" in normalized
+        or "reached its length" in normalized
+        or normalized.startswith("retry persisted after one recovery attempt")
+    )
+
+
+def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
+    """Keep the original TASK_ID owned while an unfinished chat is ambiguous."""
+    if active.get("chat_liveness") != "STALE_UNCONFIRMED" or active.get("last_liveness_reason") != reason:
+        active["chat_liveness"] = "STALE_UNCONFIRMED"
+        active["last_liveness_reason"] = reason
+        active["liveness_first_uncertain_at"] = datetime.now(TZ).isoformat()
+        save_queue_state(q)
+        write_runtime(
+            status="chat_liveness_unconfirmed",
+            last_action=f"{active['task_id']} retained; no auto-rollover/retry: {reason}",
+            queue=active,
+        )
+
+
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    """Move one active task to a fresh chat without consuming a repair attempt."""
+    """Rollover only after an explicit terminal UI failure, never due to wall-clock age."""
     if not CONVERSATION_ROLLOVER_ENABLED:
+        return False
+    if not rollover_has_confirmed_ui_failure(reason):
+        write_runtime(
+            status="conversation_rollover_held",
+            last_action=f"{active['task_id']}: unconfirmed worker state, rollover denied: {reason}",
+            queue=active,
+        )
         return False
     if github_stale_event_guard(active, f"rollover:{reason}"):
         return False
@@ -1553,12 +1584,10 @@ async def conversion_process_lane(
                 sent_at = _parse_iso(active.get("sent_at")) or now
                 if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                     return
-                reason = (
-                    "No assistant response was detected before the queue result grace period expired; "
-                    "the conversion lane chat may be stale, hidden, or failed before generation started."
+                hold_unconfirmed_chat(
+                    q, active,
+                    "No assistant response; UI/commit visibility is insufficient to prove worker stopped.",
                 )
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
                 return
 
             clear_rate_limit_after_response(reg)
@@ -1579,18 +1608,11 @@ async def conversion_process_lane(
                 sent_at = _parse_iso(active.get("sent_at")) or now
                 if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                     return
-                reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
-                if active["attempt"] < MAX_TASK_ATTEMPTS:
-                    previous_attempt = active["attempt"]
-                    active["attempt"] = previous_attempt + 1
-                    if await queue_send_retry(context, pages, active, reason):
-                        save_queue_state(q)
-                    else:
-                        active["attempt"] = previous_attempt
-                        save_queue_state(q)
-                    return
-                active["failure_context"] = reason
-                active["phase"] = "BLOCKED"
+                hold_unconfirmed_chat(
+                    q, active,
+                    "Stable assistant text without a verified material commit is not terminal evidence.",
+                )
+                return
             else:
                 active["result_sha"] = task_commit["sha"]
                 active["result_message"] = task_commit["message"]
@@ -1968,15 +1990,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
-            reason = (
-                "No assistant response was detected before the queue result grace period expired; "
-                "the active chat may be stale, hidden, or failed before generation started."
+            hold_unconfirmed_chat(
+                q, active,
+                "No assistant response; worker termination has not been verified.",
             )
-            if await queue_rollover_chat(context, pages, active, reason):
-                save_queue_state(q)
-                return
-            if active.get("phase") == "BLOCKED":
-                save_queue_state(q)
             return
         clear_rate_limit_after_response(reg)
         active["last_retry_backoff_at"] = None
@@ -1996,18 +2013,11 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
-            reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
-            if active["attempt"] < MAX_TASK_ATTEMPTS:
-                previous_attempt = active["attempt"]
-                active["attempt"] = previous_attempt + 1
-                if await queue_send_retry(context, pages, active, reason):
-                    save_queue_state(q)
-                else:
-                    active["attempt"] = previous_attempt
-                    save_queue_state(q)
-                return
-            active["failure_context"] = reason
-            active["phase"] = "BLOCKED"
+            hold_unconfirmed_chat(
+                q, active,
+                "Stable assistant text without a verified material commit is not terminal evidence.",
+            )
+            return
         else:
             active["result_sha"] = task_commit["sha"]
             active["result_message"] = task_commit["message"]
