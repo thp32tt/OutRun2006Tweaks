@@ -1,14 +1,12 @@
-OutRun 2006 DX9Ex VR 개선 자동 작업을 진행해줘.
+OutRun 2006 DX9Ex VR 화면·안정화 자동개발 — C 슬롯 (DX11 A와 병행).
 
-TARGET_BRANCH는 vr-d3d9ex-focus다. 이 lane은 기존 DX9Ex/OpenXR VR 경로의 품질·성능·안정성 개선 전용이다. vr-dx11-native-r71, vr-dxvk-r71-disasm, korean-localization-clean은 직접 수정하지 마. 시작 즉시 현재 branch HEAD, AGENTS.md, VR 자동화/상태/문제 기록, 최근 검증 결과를 읽고 가장 우선순위가 높은 실행 가능한 DX9Ex 개선 작업 하나를 선택해 끝까지 처리해.
+TARGET_BRANCH=vr-d3d9ex-focus. **개발 작업자 2개 A(DX11 Native 실구현)+C(DX9Ex 안정화)를 기존처럼 동시에 돌리고 B(DXVK)는 FROZEN**한다. DX11/DXVK/Localization 소스는 수정하지 말고 C의 GitHub HEAD, AGENTS.md, docs/VR_AUTODEV_STATE.json, docs/VR_WORK_QUEUE.json, docs/VR_PROBLEM_HISTORY.md, 원본 포크의 기존 HUD 관련 소스/자료, HUD Inspector, Issue #13/#14와 현재 회귀 기록을 먼저 확인해 기존 실패 가설을 재발명하지 마.
 
-이 C 슬롯은 보호된 DX9Ex 기준 유지보수 전용이며 기본 스케줄에서는 비활성이다. 사용자가 명시적으로 C만 실행하거나 원격에서 확인된 P0 충돌/크래시·필수 baseline 회귀 수정이 있을 때만 사용한다. 단순 0~1000 구조 반복, 새 성능 튜닝, 계속되는 HUD 정적검사, 비필수 기능 확장보다 DX11 네이티브 구현을 우선한다. 필요할 때에도 기존 runtime-verified 정상 세계 렌더와 HUD/flare/rank 보호 정책을 유지하고 관련 검증 1회로 제한한다. 실기 테스트만 막힌 결함은 NEED_HMD_TEST로 주차하고 독립된 실제 P0 코드 수정을 선택한다.
+[현재 구현 목표 — 안정화 활성 진행]
+DX9Ex는 긴급 크래시 유지보수 전용이 아니다. Quest 3/VDXR 실제 사용에서 남아 있는 화면·입력·복구 결함을 계속 고치는 **활성 안정화 lane**이다. 우선순위는 다음과 같다: 흰색 HUD/메뉴 글자와 < > 화살표의 복시/헤드락, HUD +TIME·체크포인트·골인 후 기록/결과·4~5등 순위 숫자 중복, 라이벌/순위 마커가 상대 차량 위에 고정되지 않는 문제, F11 메뉴 gameplay 복시, lens flare·시작 그림자 이중 출력, 차량 선택 흰색 텍스처/material, recenter·OpenXR pose·프레임 페이싱·Reset/ResetEx/device-loss·host reconnect 회귀. 정상화된 도로/차량/배경 스테레오 및 SkyGlow baseline 의미는 보호한다.
 
-한 작업은 작게 유지하고 소스 수정·정적 검증·자동 테스트·작업 기록을 같은 branch에 반영해. N100 로컬 clone/worktree/작업파일과 Google Drive는 보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용할 수 있다. 최종 결과와 완료 판정은 vr-d3d9ex-focus의 실제 material commit으로 남겨.
+실제 원본 producer→semantic registry/replay→Draw owner→per-eye 경로와 역어셈블 증거를 연결하여 반증 가능한 원인부터 안전한 최소 패치를 source/tool/test에 적용한다. blanket SpriteNode=HUD, global alpha, 근거 없는 레이어 이동·IPD 수치 튜닝은 하지 않는다. 의미 없는 1000/5000회 동일 HUD 정적 검사는 중단하고, 소스 변경 관련 정적 검사 1회, 기존 HUD Inspector CI, 필요할 경우 결함 주입 자기테스트만 수행해. 검토·계획·상태 커밋만으로 구현 완료 선언하지 않는다.
 
-실제 HMD/게임 화면 확인이 필요한 항목은 RUNTIME_VALIDATION=UNTESTED 또는 BLOCKED_RUNTIME으로 남기고 자동 검증 통과와 실기 정상 동작을 혼동하지 마. 구현 가능한 정적/소스 작업이 남아 있으면 런타임 테스트 불가만으로 종료하지 마.
+Quest 3 실기 확인이 필요한 결함은 해당 런타임 검증 또는 보호 기준 승격만 NEED_HMD_TEST/BLOCKED_RUNTIME으로 보류한다. 그 문제 때문에 전체 자동개발을 멈추지 말고, 다른 **독립 실행 가능한 DX9Ex 안정화 소스 수정**으로 넘어가 구현→검증→GitHub 커밋까지 계속해. 빌드/CI PASS를 화면 정상 동작으로 표현하지 않고 RUNTIME_VALIDATION=UNTESTED를 유지한다.
 
-반드시 docs/automation/QUEUE_CONTROLLER_CONTRACT.md를 적용하고 해당 TASK_ID의 자동화 결과 기록을 갱신해. 실제 변경 또는 검토 기록을 남긴 뒤 커밋 메시지에 컨트롤러가 지정한 [AUTO:TASK_ID] 표식을 정확히 포함해.
-
-[장시간 채팅 진행·중복 방지]
-일반 ChatGPT 채팅에서 개발을 지속한다. 작업 시작과 실제 단계 전환/도구 결과가 나올 때 TASK_ID, C0~C6 단계, 마지막 확인된 GitHub SHA/CI, 다음 행동을 간단히 중간 보고하고, 그 보고만으로 작업을 끝내지 마. 인터페이스에서 가능하면 20~30초 이상 무표시를 피하되 시간 간격을 보장하거나 백그라운드 실행을 주장하지 마. 롤오버·retry·새 채팅은 기존 TASK_ID의 미완료 단계만 이어받는다. 실제 현재 GitHub 결과가 확인되면 이미 수행한 소스 수정/검증을 재실행하지 말고 근거를 재사용한다. 작업 소유권 또는 기존 채팅의 진행 여부가 불명확하면 새 TASK_ID를 독자 생성하거나 같은 변경을 병렬로 수행하지 않는다.
+GitHub의 연결된 작업자 claim/lease와 동시 AI work_key 충돌을 확인하고 다른 작업의 소스·상태·TASK_ID를 중복 쓰지 않는다. GitHub 대상 브랜치의 C0→C6 전체 파이프라인, [AUTO:TASK_ID] 실제 구현 커밋, exact-SHA Actions 및 docs/automation/runs/ 기록을 충족한다. 성공한 동일 작업을 retry/rollover 시 재실행하지 않는다. 이번 변경은 **동시 작업 수 유지 + 각 작업의 개발 방향 변경**이며 DX9Ex를 중단하거나 DXVK를 재활성화하는 것이 아니다.
