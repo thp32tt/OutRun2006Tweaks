@@ -112,7 +112,7 @@ def check_xmt_loader_guard(source):
                   'block && entry && blockSize >= XPR0EntrySize',
                   'entryAddr >= blockAddr',
                   'entryAddr - blockAddr <= blockSize - XPR0EntrySize',
-                  'textureIdx = *reinterpret_cast<std::uint32_t*>(head + 8)')
+                  'textureIdx = *reinterpret_cast<uint32_t*>(head + 8)')
     if 'entry + XPR0EntrySize <= block + blockSize' in body:
         raise SystemExit('P0 XMT guard regressed to undefined raw pointer range comparison')
     require('skipping its remaining textures', body,
@@ -123,7 +123,7 @@ for label, old, changed in (
     ('missing minimum block length', 'blockSize >= XPR0EntrySize', 'blockSize != 0'),
     ('overrun allowed', 'entryAddr - blockAddr <= blockSize - XPR0EntrySize',
      'entryAddr - blockAddr <= blockSize'),
-    ('missing fallback skip', 'textureIdx = *reinterpret_cast<std::uint32_t*>(head + 8)',
+    ('missing fallback skip', 'textureIdx = *reinterpret_cast<uint32_t*>(head + 8)',
      'textureIdx = textureIdx'),
 ):
     try:
