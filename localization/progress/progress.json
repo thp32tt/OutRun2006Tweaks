@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 19:30 KST",
+  "updated_at_kst": "2026-10-08 19:37 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7655,5 +7655,17 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0,
     "qa": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_CONTROLLER_QA.json"
+  },
+  "b265_q172_source_family_sdf_visual_reject": {
+    "run_key": "OUTRUN-KOR-B265-Q172-STROKE-SDF-20261008-1930",
+    "asset": "q172 6C9B3611",
+    "trial_sha256": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+    "restored_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "produced_trial_dds": 1,
+    "approved_dds": 0,
+    "machine": "PASS",
+    "producer_visual": "FAIL_SOURCE_ITALIC_METAL_FAMILY",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_CONTROLLER_SELF_QA.json"
   }
 }

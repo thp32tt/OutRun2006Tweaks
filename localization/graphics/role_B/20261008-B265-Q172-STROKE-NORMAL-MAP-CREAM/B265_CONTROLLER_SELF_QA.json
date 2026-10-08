@@ -1,0 +1,55 @@
+{
+  "run": "B265",
+  "run_key": "OUTRUN-KOR-B265-Q172-STROKE-SDF-20261008-1930",
+  "role": "B",
+  "queue_index": 172,
+  "asset_hash": "6C9B3611",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "previous_candidate_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+  "rejected_trial_candidate_sha256": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+  "policy_version": "visual-evidence-v1-20261008",
+  "method_change": "Per-stroke signed-distance normal fields / individualized white-cream specular / copper offset depth; different from B264 per-glyph contour and older flat gold band palettes",
+  "method_change_gate": "q172 C291+C295 independent source-family rejections; rework_triage.py METHOD_CHANGE_REQUIRED; require-safe-rerender exit2 (blocked repetitive method)",
+  "job": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37764234947",
+  "evidence": {
+    "machine": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_MACHINE_AND_PRODUCTION_GATE.json",
+    "source_start": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/START_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "source_goal": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "practical_start": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/START_PRACTICAL_50.png",
+    "practical_goal": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/GOAL_PRACTICAL_50.png",
+    "raw_goal": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/GOAL_RAW_SOURCE_CLEAN_FINAL.png"
+  },
+  "qa_numeric": {
+    "header": "PASS_RGBA32_1024x1024_mip1",
+    "persisted_roundtrip": "PASS",
+    "bbox": "PASS_2_OF_2_WITH_POSITIVE_MARGINS",
+    "changed_rgba_outside": 0,
+    "alpha_outside": 0,
+    "source_clean_protected": "NO_NEW_CHANGE"
+  },
+  "visual_inspection": {
+    "result": "FAIL",
+    "source_native": "Original English START/GOAL have continuous forward-italic luminous cream-white front faces, pronounced orange bevel edges and source-relative label dominance. New Korean has segmented mostly horizontal cream/ochre slabs and dark brown tier shadows.",
+    "readable_50": "GOAL Korean 골 remains a short striped glyph on a broad source plate and visibly fails source tilt/volume/hierarchy at game-practical size.",
+    "raw": "Mirrored RAW comparison checked; no obvious wrong global orientation, but the same style mismatch remains.",
+    "glyph_integrity": "Source-relative style fail; do not claim glyph QA PASS",
+    "clean_plate": "No new English residue obvious in side-by-side clean/source/final; source-derived clean SHA pinned, not an independent C approval"
+  },
+  "decision": "PRODUCER_VISUAL_FAIL_ROLLED_BACK",
+  "rollback": {
+    "expected_original_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "trial_sha256": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+    "prior_git_blob": "4a0c94b8b5dd9b57ef18afa682bf5b7c65020355"
+  },
+  "new_approved_assets": 0,
+  "independent_C": "NOT_RUN",
+  "C3": "BLOCKED",
+  "APPROVAL": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "Need bespoke vector/pixel-art per-syllable reconstruction from native English cream italic bevel; do not dispatch more automatic SDF/flat-normal rerenders without new source-annotated letterform and visual redline.",
+  "backend": "GitHub-hosted CPU because source DDS could not be materialized into ChatGPT local environment (verified raw.githubusercontent.com DNS failure); N100 unused",
+  "cleanup": "GitHub Actions ephemeral workspace discarded after publishing QA; GPT local no task scratch; no N100 worktree",
+  "forbidden_domains_touched": []
+}

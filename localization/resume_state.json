@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B265 q172 2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da machine PASS but SOURCE/CLEAN/FINAL native/50%/RAW producer visual FAIL; original B263 812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a restored. Do not rerun current SDF/palette tricks; manual vector reconstruction source style needed. Fresh C2 + C3 and in-game remain blocked, RUNTIME_VALIDATION=UNTESTED.",
     "C299 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q176 independent B201 authored CLEAN SHA0fd5d518... verified against exact source 8ba40915... and current 494d42c0...: all 4 original name bboxes transparent in CLEAN, source-clean-candidate outside RGBA/alpha 0, 4/4 margin+RAW, 8 new source/clean/current native/50% reference PNG. HOLD no pixels-first C, true stem anchor/family or C3; approval/export and actual-game BLOCKED, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C299-C2-Q176-AUTHORED-CLEAN-INDEPENDENT/C299_CONTROLLER_QA.json",
     "C298 q225 A193 current exact f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333 native 9-region independent source+clean outside zero, font restored, HOLD source-family measured profile, qualified blind calibration, CLEAN protected within-bbox + separate C3. QA localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_CONTROLLER_QA.json; no same-byte rerender. RUNTIME_VALIDATION=UNTESTED.",
     "A193 A odd q225 E3C455FA nine native text labels newly re-rendered from pinned English a0c8c67f... using actual NotoSansCJK-Black.ttc (previous A95R often regular fallback, C1 found thin). Candidate old 37b8236f... to new f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333, 2048x1024 RGBA32 mip1 raw mirror-y; nine source bbox/positive margin machine PASS, outside/alpha/protected/overlap/source-residue zero, persisted DDS roundtrip. Controller inspected English SOURCE/CLEAN/FINAL native and practical 50 plus RAW, significantly restored dark heavy condensed family hierarchy; C1 calibrated blind native exact-byte and C3 still pending, PRE_INGAME/user JPG/real game unapproved RUNTIME_VALIDATION=UNTESTED. GitHub Actions 37760839622 SUCCESS; QA localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CONTROLLER_SELF_QA.json.",
@@ -6761,7 +6762,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 18:38:06 KST",
+  "updated_at_kst": "2026-10-08 19:37 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11702,5 +11703,14 @@
     "approval": false,
     "new_dds": false,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b265_q172_source_family_sdf_visual_reject": {
+    "run_key": "OUTRUN-KOR-B265-Q172-STROKE-SDF-20261008-1930",
+    "asset": "q172 6C9B3611",
+    "trial_sha256": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+    "restored_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "decision": "PRODUCER_VISUAL_FAIL_ROLLED_BACK",
+    "QA": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
