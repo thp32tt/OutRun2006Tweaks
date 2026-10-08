@@ -151,6 +151,9 @@ namespace OutRunVRStereo
         constexpr std::size_t R30BufferLockVtableIndex = 11;
         constexpr std::size_t R30BufferUnlockVtableIndex = 12;
         constexpr UINT R30MaxShadowBytes = 16u * 1024u * 1024u;
+        constexpr std::size_t R30TotalShadowBudgetBytes = 64u * 1024u * 1024u;
+        std::size_t R30ShadowReservedBytes = 0; // protected by registry mutex
+        std::uint64_t R30ShadowBudgetRejects = 0;
 
         SafetyHookInline R30CreateVertexBufferHook{};
         SafetyHookInline R30CreateIndexBufferHook{};
@@ -293,7 +296,15 @@ namespace OutRunVRStereo
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            if (desc.Size > R30TotalShadowBudgetBytes -
+                    R30ShadowReservedBytes)
+            {
+                ++R30ShadowBudgetRejects;
+                return nullptr;
+            }
             auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowReservedBytes += desc.Size;
             return inserted ? entry : it->second;
         }
 
@@ -315,7 +326,15 @@ namespace OutRunVRStereo
             entry->pool = desc.Pool;
             entry->indexFormat = desc.Format;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            if (desc.Size > R30TotalShadowBudgetBytes -
+                    R30ShadowReservedBytes)
+            {
+                ++R30ShadowBudgetRejects;
+                return nullptr;
+            }
             auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowReservedBytes += desc.Size;
             return inserted ? entry : it->second;
         }
 
@@ -454,6 +473,7 @@ namespace OutRunVRStereo
                 buffer, offset, size, data, flags);
             if (R30BufferShadowCaptureArmed.load(
                     std::memory_order_acquire) &&
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
                 SUCCEEDED(hr) && data && *data)
                 R30BeginObservedLock(
                     R30EnsureVertexShadow(buffer), offset, size, *data, flags);
@@ -486,7 +506,12 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30VertexShadows.erase(buffer);
+                const auto it = R30VertexShadows.find(buffer);
+                if (it != R30VertexShadows.end())
+                {
+                    R30ShadowReservedBytes -= it->second->size;
+                    R30VertexShadows.erase(it);
+                }
             }
             return refs;
         }
@@ -499,6 +524,7 @@ namespace OutRunVRStereo
                 buffer, offset, size, data, flags);
             if (R30BufferShadowCaptureArmed.load(
                     std::memory_order_acquire) &&
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
                 SUCCEEDED(hr) && data && *data)
                 R30BeginObservedLock(
                     R30EnsureIndexShadow(buffer), offset, size, *data, flags);
@@ -529,7 +555,12 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30IndexShadows.erase(buffer);
+                const auto it = R30IndexShadows.find(buffer);
+                if (it != R30IndexShadows.end())
+                {
+                    R30ShadowReservedBytes -= it->second->size;
+                    R30IndexShadows.erase(it);
+                }
             }
             return refs;
         }
@@ -588,7 +619,8 @@ namespace OutRunVRStereo
             {
                 R30EnsureVertexBufferHooks(*out);
                 if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
+                        std::memory_order_acquire) &&
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0)
                     R30EnsureVertexShadow(*out);
             }
             return hr;
@@ -605,7 +637,8 @@ namespace OutRunVRStereo
             {
                 R30EnsureIndexBufferHooks(*out);
                 if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
+                        std::memory_order_acquire) &&
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0)
                     R30EnsureIndexShadow(*out);
             }
             return hr;
@@ -648,6 +681,7 @@ namespace OutRunVRStereo
                     R30ShadowRegistryMutex);
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
+                R30ShadowReservedBytes = 0;
             }
         }
 
@@ -2339,12 +2373,13 @@ namespace OutRunVRStereo
             };
             if (!setEye(0))
             {
-                if (!restoreRaster())
+                const bool restoredFirstEye = restoreRaster();
+                if (!restoredFirstEye)
                 {
                     NoteRestoreFailure("R30/F11 initial projection");
                     R30ArmSafeFallback();
                 }
-                return E_NOTIMPL;
+                return restoredFirstEye ? E_NOTIMPL : E_FAIL;
             }
 
             R9NoteStereoDrawWithoutMonoBackup();
