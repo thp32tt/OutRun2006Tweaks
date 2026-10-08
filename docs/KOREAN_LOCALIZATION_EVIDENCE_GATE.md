@@ -4,6 +4,20 @@ Policy version: `visual-evidence-v1-20261008`. This is quality evidence, not a n
 The existing six launches/hour and A/B/C1/C2 ownership remain unchanged. Three assets
 per C invocation is an upper bound, never a reason to abbreviate inspection.
 
+## 2026-10-09 user screenshot gate on QA previews
+
+New actual-game visual failures override historical C3 eligibility on the
+*same exact asset*. A USER_REVIEW_NOT_APPROVED preview must exclude indexes
+with `OPEN_USER_INGAME_FAIL` in INGAME_REWORK_BACKLOG.csv even if the
+queue is stale and claims C3. Emit USER_REVIEW_EXCLUDED_INGAME.csv to show
+which candidates were withheld; preserve their bytes and QA history.
+Always keep separate counts of historical C3 preview candidates, excluded
+user failures, current evidence-approved graphics and user-accepted
+real-game assets. Missing mapping is not grounds for guessing the DDS.
+For closure, require the new candidate/runtime exact SHA, native
+SOURCE/CLEAN/FINAL 100/75/50 + RAW/FLIP-Y inspection, and new actual-game
+screenshot test. Static numerical PASS cannot promote an open user failure.
+
 ## Immediate execution order
 
 1. C1/C2 first calibrate their visual review using a normal control plus known rejected
