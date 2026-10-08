@@ -41,6 +41,7 @@ def require_order(source, meaning, *tokens):
         )
 
 ui = read('src/hooks_uiscaling.cpp')
+framerate = read('src/hooks_framerate.cpp')
 textures = read('src/hooks_textures.cpp')
 verify_dds_loader_contract(textures)
 verify_scene_texture_contract(textures)
@@ -65,6 +66,8 @@ dx9ex_active_workflow = read('.github/workflows/vr-dx9ex-active.yml')
 # workflow path-filter gap.
 for path in (
     'src/hooks_uiscaling.cpp',
+    'src/hooks_framerate.cpp',
+    'tools/verify_vr_sumo_replay_semantics.py',
     'src/hooks_textures.cpp',
     'src/vr/hud_semantics.hpp',
     'src/vr/game/render_semantics.hpp',
@@ -86,6 +89,11 @@ for path in (
         )
 require("'tools/verify_vr_projected_marker_anchor.py'",
         dx9ex_active_workflow, 'DX9Ex Active watches projected marker verifier')
+require('python tools/verify_vr_sumo_replay_semantics.py',
+        hud_inspector_workflow,
+        'HUD Inspector executes bounded Sumo no-tick mask replay contract')
+require('src/hooks_framerate.cpp', hud_inspector_workflow,
+        'HUD Inspector watches Sumo mask replay material')
 require('python tools/verify_vr_visual_composition_p0.py',
         hud_inspector_workflow, 'HUD Inspector executes the P0 contract')
 require("'.github/workflows/outrun-exe-hud-inspector.yml'",
@@ -923,6 +931,29 @@ def check_time_goal_lens_owner(source_r30, source_ui):
     ):
         require(token, binary_contract, 'original EXE Sumo text/glyph/clip identity')
 
+# One original masked Sumo sprite can outlive its ring allocation across
+# a zero-tick render replay. Enforce bounded deep-copy child_B4 ownership,
+# independent of the old 71 exact CALL and fixed-function lens assertions.
+sumo_capture = function_body(framerate, 'static void capture()')
+sumo_replay = function_body(framerate, 'static void replay()')
+require_order(
+    sumo_capture, 'masked Sumo child copies must precede VR semantic peek',
+    'entry.maskCount = 0;', 'if (entry.kind == 1)',
+    'entry.args2.child_B4 = nullptr;', 'entry.maskChildren[idx] = *child;',
+    'entry.maskChildren[idx].child_B4 = nullptr;',
+    'entry.args2.child_B4 = &entry.maskChildren[0];',
+    'entry.vrScope ='
+)
+require_order(
+    sumo_replay, 'unsafe mask replay must be filtered before original game queue',
+    'if (!entry.replayable)', 'Game::put_sprite_ex(&scratch, entry.priority);',
+    'node->kind_C = entry.kind;', 'node->args2_58 = entry.args2;',
+    'OutRunVR::GameSemantic::RegisterSpriteNodeScope('
+)
+require('maskSourceAddresses[idx] == child', sumo_capture,
+        'original Sumo mask chain cycle detection')
+require('if (entry.maskCount == Entry::MaxMaskChildren)', sumo_capture,
+        'original Sumo mask chain bounded memory')
 check_time_goal_lens_owner(r30, ui)
 
 # Four *distinct*, exactly-once fault injections. These do not repeat an
