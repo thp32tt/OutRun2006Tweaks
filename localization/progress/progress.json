@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T11:40:00+09:00",
+  "updated_at_kst": "2026-10-08T12:09:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6822,9 +6822,8 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "current_producer_rework_remaining": 3,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
-    175,
     214,
     219
   ],
@@ -6867,5 +6866,33 @@
     "candidate_changed": false,
     "controller_report": "localization/graphics/role_C/20261008-C277-C2-Q172-B251-INDEPENDENT-RECHECK/C277_Q172_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a185r_q175_thin_techno_source_family": {
+    "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "prior_candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "first_draft_rejected_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "worker_run": 37721119647,
+    "qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
+    "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "latest_a_production": {
+    "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "prior_candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "first_draft_rejected_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "worker_run": 37721119647,
+    "qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
+    "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

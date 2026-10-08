@@ -2820,3 +2820,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 
 ### C277 C2 q172 B251 recheck — 2026-10-08
 TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: original source vs B251 0 changed visible/alpha pixels outside exact START/GOAL source rectangles, all previous 425 red badge overflow pixels restored, RAW mirror-Y exact. Glyph slope/profile and new-policy C/C3 evidence still incomplete; q172 -> HOLD_STRICT_RECHECK, not approved. DDS unchanged. RUNTIME_VALIDATION=UNTESTED.
+
+
+### A185R q175 source-family typography material DDS rework — 2026-10-08 12:09 KST
+- A shard odd q175 `754F0599` C273 return: A153 5b37fdaf... has excessive black extrusion and heavy square generic Korean vs thin metallic geometric English SOURCE. Native exact HD 2048×1024 BGRA32 source `9314372585...` inspected.
+- First A185 3bdea539... machine PASS but controller human visual FAIL (overly light low-contrast letter faces and weak 50% readability). Material A185R re-render `cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab` uses Noto Regular natural-aspect source-sampled silver gradient, subdued keyline/lower extrusion, RAW mirror-Y intact, 3 actual canonical labels only. No arbitrary English-width stretch.
+- Persisted-DDS source-vs-final: 3/3 exact bbox/size/positive margins; outside/alpha/protected/residue/overlap/touch all 0, exact DDS header, original readable/RAW orientations. Producer visually checked SOURCE/CLEAN/FINAL row contact, RAW, native/75/50 practical; letter contrast, counters, weight and source relative sizes improved. Worker run 37721119647 SUCCESS; `localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json`.
+- Status `A185R_SELF_QA_PASS_PENDING_FRESH_PIXELS_FIRST_C1_AND_SEPARATE_C3`. No C/C3 approval, no PRE_INGAME export, no actual game retest. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched; Github hosted ephemeral cleanup (no N100 worktree/task scratch).

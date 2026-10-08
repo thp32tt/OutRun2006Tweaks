@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "execution_backend": "github-hosted-after-gpt-local-public-DNS-block",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "rejected_prior_A153_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+  "rejected_first_A185_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
+  "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+  "worker_action_run": 37721119647,
+  "machine_source": "localization/graphics/worker_results/A185R_754F0599.json",
+  "machine_result": "PASS",
+  "bbox": "3/3",
+  "size": "3/3",
+  "positive_margin": "3/3",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "source_residue": 0,
+  "overlap": 0,
+  "touch": 0,
+  "dds": {
+    "width": 2048,
+    "height": 1024,
+    "format": "BGRA32",
+    "mips": 1,
+    "orientation": "mirror_y",
+    "header_exact": true
+  },
+  "evidence": {
+    "source": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_SOURCE_READABLE.png",
+    "clean": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_CLEAN_PLATE.png",
+    "decoded_final": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "source_clean_final": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "raw": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_FINAL_RAW_GRAY.jpg",
+    "practical": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_PRACTICAL_100_75_50.jpg",
+    "report": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_754F0599_REPORT.json"
+  },
+  "first_generation_rejection": {
+    "run": "A185",
+    "reason": "Visual source/CLEAN/FINAL/practical view revealed insufficient face contrast and excessively thin Hangul despite numeric PASS; material re-render required"
+  },
+  "ordered_gate": [
+    {
+      "step": 1,
+      "name": "English removal/clean plate",
+      "result": "PASS",
+      "observation": "Source alpha-only clean plate; validator PASS; no script residue found"
+    },
+    {
+      "step": 2,
+      "name": "source slant",
+      "result": "PASS_PRODUCER",
+      "observation": "Readable right slant retained; preserve raw mirror Y separately"
+    },
+    {
+      "step": 3,
+      "name": "scale/readability",
+      "result": "PASS_PRODUCER",
+      "observation": "Native-height 3 rows with exact bbox margins and practical 100/75/50 readable; no forced width-ratio"
+    },
+    {
+      "step": 4,
+      "name": "effects/weight",
+      "result": "PASS_PRODUCER_PENDING_C",
+      "observation": "Replaced excessive block extrusion; silver source sampled gradient brighter; Noto Regular natural counters"
+    },
+    {
+      "step": 5,
+      "name": "clipping",
+      "result": "PASS_PRODUCER",
+      "observation": "3 rows positive >=6px margins, no definite cropped glyph pixels in practical/RAW"
+    },
+    {
+      "step": 6,
+      "name": "protected art",
+      "result": "PASS",
+      "observation": "0 altered decoded pixels outside exact original text bounding boxes"
+    },
+    {
+      "step": 7,
+      "name": "FLIP-Y and RAW",
+      "result": "PASS_PRODUCER",
+      "observation": "Both orientations inspected; raw preserved mirror-Y source convention"
+    },
+    {
+      "step": 8,
+      "name": "instant readability",
+      "result": "PASS_PRODUCER_PENDING_C",
+      "observation": "A185R legible at 50% practical, unlike rejected first A185; independent family C/C3 review pending"
+    }
+  ],
+  "producer_visual_conclusion": "SELF_QA_PASS_PENDING_INDEPENDENT_PIXELS_FIRST_C1_AND_SEPARATE_C3",
+  "independent_approval": "NOT_GRANTED",
+  "PRE_INGAME_EXPORT": "BLOCKED_PENDING_C_EVIDENCE",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "cleanup": "GitHub runner ephemeral; no N100 or ChatGPT local task scratch persisted"
+}

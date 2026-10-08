@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A185R q175 754F0599 exact cac88b8553e36b2c producer self-QA PASS; must receive genuinely pixels-first independent C1 followed by separate C3 complete lossless per-region evidence prior to any PRE_INGAME export; user JPG + actual in-game retest remain open. Never reuse C273-rejected A153 or first A185. RUNTIME_VALIDATION=UNTESTED.",
     "C276 IGR-006/007 shared runtime-text fix is independent C static PASS on current exact hooks blob 954f0998... with Win32 Release 37645785737 and Korean Test Build 37645785906/package PASS. Do not re-review unchanged source; both rows now require only NEW actual-game screenshots/retest before closure. RUNTIME_VALIDATION=UNTESTED.",
     "C274 q59 7CE1CFC5 exact A184R 261108cd... is HOLD_STRICT_RECHECK, not REWORK: supplied visual evidence is favorable and current bytes should be preserved. Future C1 must inspect exact pixels before producer verdict, generate complete lossless per-region native/zoom/practical/RAW/black-white-gray plus independent machine evidence, then separate C3. PJR-019 remains open for user JPG + NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "q214 A183R3 exact 4ff06dbe... is visual FAIL despite static PASS: broken Hangul strokes/BC3 red striping. Do not approve/ship, material rerender needed. localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
@@ -9612,20 +9613,16 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "timestamp_kst": "2026-10-08T11:07:00+09:00",
-    "role": "A",
-    "run": "20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT",
-    "queue_index": 59,
-    "asset": "7CE1CFC5",
-    "previous_c271_candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
-    "previous_a184_candidate_sha256": "9f181320dc25651925d514e36f683f8b96d3eec4b4d8ca8931cef5a6b588d221",
-    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
-    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
-    "backend": "GITHUB_HOSTED_CPU_AFTER_CHATGPT_LOCAL_DNS_BLOCK",
-    "machine": "PASS_4_OF_4_BBOX_POSITIVE_MARGIN_OUTSIDE_ALPHA_VISIBLE_RESIDUE_PROTECTED_OVERLAP_ZERO",
-    "controller_visual": "SELF_QA_PASS_SOURCE_STYLE_KEYLINE_NAVY_GRADIENT_RAW_WITH_C1_HIERARCHY_REVIEW_REQUIRED",
-    "status": "SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
-    "controller_report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json",
+    "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "prior_candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "first_draft_rejected_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "worker_run": 37721119647,
+    "qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
+    "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -10881,7 +10878,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "B251 q172 6C9B3611 exact 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018 pending fresh pixels-first C2 -> separate exact-SHA C3/evidence -> PRE_INGAME/user JPG -> NEW actual-game retest. q214 remains material REWORK_REQUIRED.",
+  "next_checkpoint": "A185R q175 new candidate cac88b8553e36b2c producer static passed, independent C1/C3 evidence pending. q219/q214 remain producer REWORK.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -10905,5 +10902,19 @@
     "candidate_changed": false,
     "controller_report": "localization/graphics/role_C/20261008-C277-C2-Q172-B251-INDEPENDENT-RECHECK/C277_Q172_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a185r_q175_thin_techno_source_family": {
+    "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "prior_candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "first_draft_rejected_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "worker_run": 37721119647,
+    "qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
+    "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
