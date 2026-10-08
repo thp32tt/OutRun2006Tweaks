@@ -38,7 +38,7 @@
   "ci_gate_complete": true,
   "controller_terminal": true,
   "next_action": "C6 complete for task 00549 on immutable material SHA 48454683252e13de9b5db4341c0b744bc72b05b6. Do not repeat/scoring on E002 rollover, docs-only child commits, or replay. Continue new P0 source task only if new material evidence, user 00519 headset regressions not visually closed. Supplemental full-source MSVC impact is independent and not a condition of core C6.",
-  "score_award": "ELIGIBLE_ONE_UNIQUE_COMPLETION_PENDING_SCOREBOARD_DEDUP",
+  "score_award": "RECORDED_AI2_ONCE_RUN_KEY_CONVERSION-DX9EX-00549_1206_PLUS_1_EQUALS_1207",
   "ci_runs": {
     "dx9ex_active": 37719835081,
     "hud_inspector": 37719834890,
@@ -58,7 +58,7 @@
     "domain_isolation": "SUCCESS",
     "hud_1000": "SUCCESS",
     "hud_5000": "SUCCESS",
-    "full_source_game_analyze": "RUNNING_SUPPLEMENTAL",
+    "full_source_game_analyze": "SUCCESS_SUPPLEMENTAL",
     "full_source_host_analyze": "SUCCESS_SUPPLEMENTAL",
     "full_source_cross_domain": "SUCCESS_SUPPLEMENTAL"
   },
@@ -118,8 +118,14 @@
     },
     "supplemental_full_source": {
       "run_id": 37719835007,
-      "conclusion": "in_progress",
-      "role": "SUPPLEMENTAL_INDEPENDENT_SOURCE_IMPACT"
+      "head_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+      "conclusion": "success",
+      "role": "SUPPLEMENTAL_INDEPENDENT_SOURCE_IMPACT",
+      "jobs": {
+        "msvc_analyze_active_game": 113124714038,
+        "msvc_analyze_openxr_host": 113124714232,
+        "source_cross_domain": 113124714237
+      }
     }
   },
   "package_artifact": {
@@ -138,6 +144,19 @@
       "id": 11525710145,
       "name": "dx9ex-active-host",
       "digest": "sha256:042974d6ca588e8bcbf36cf59f2c45f0f0b695a72c389a3e002ec38aac7fa958"
+    }
+  ],
+  "automation_result_provenance": "PASS: exact material SHA 4845468 DX9Ex Active 37719835081 (policy/game/host/full-chain/package), HUD Inspector 37719834890 (self-test 23 obligations, 17/17 mutants, EXE static, HUD Inspector), Domain Isolation 37719834951, HUD 1000/5000. Independent Full Source Impact Review 37719835007 Win32+OpenXR MSVC /analyze and cross-domain all SUCCESS. Preexisting Autodev Coordination queue-validator failure unrelated. No Quest3/VDXR HMD test.",
+  "supplemental_artifacts": [
+    {
+      "id": 11525452751,
+      "name": "dx9ex-fullsource-msvc-analyze",
+      "digest": "sha256:bb81fff5d69c91747f933dddb782190bb7cff56d80605d5fc6a5a439acf55867"
+    },
+    {
+      "id": 11525585446,
+      "name": "dx9ex-fullsource-host-msvc-analyze",
+      "digest": "sha256:d958d3b424cda4adaf4a7f17e179901fd23d3bd0afcf2b2cd5fd9fc6e4097b17"
     }
   ]
 }
