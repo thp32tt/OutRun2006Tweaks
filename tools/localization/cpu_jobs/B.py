@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B268: authored B40 target-mask interior BC3 repair for q098."""
+"""B269: BC3 endpoint correction on authored face interior q098."""
 from pathlib import Path
 import os, io, sys, json, hashlib, struct, urllib.request, tempfile, subprocess
 import numpy as np
@@ -7,14 +7,14 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import binary_erosion, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
-    raise SystemExit("B268 requires pinned source download; GitHub worker only")
+    raise SystemExit("B269 requires pinned source download; GitHub worker only")
 root=Path.cwd();gfx=root/"localization/graphics"
 relative="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target=gfx/"hd_candidates"/relative
-run=gfx/"role_B/20261008-B268-Q098-MASK-BOUND-WHITE-FACE"
+run=gfx/"role_B/20261008-B269-Q098-BC3-ENDPOINT-FACE-REPAIR"
 run.mkdir(parents=True,exist_ok=True)
 SHA=lambda b: hashlib.sha256(b).hexdigest()
-old_sha="5ee0223fed4d6b9447157b285ff144ae470afb2e5f56244926feb866c84f6531"
+old_sha="d0b912846721a7faaf2edf4080b56dd00faad2f5a73ffd604acee9c3057dd6ba"
 src_sha="3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59"
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","98","--require-safe-rerender"],capture_output=True,text=True,check=True)
 triage=json.loads(tri.stdout)["assets"][0]
@@ -86,7 +86,28 @@ for y0 in range((tgt[1]//4)*4,((tgt[3]+3)//4)*4,4):
         pal=palette(end0,end1)
         whiteindex=int(np.argmin(np.sum((pal-np.array([255,255,255]))**2,axis=1)))
         if int(pal[whiteindex].min())<210:
-            unsupported+=int(flags.sum())
+            # Without a white BC1 endpoint, changing 2-bit indices cannot fix
+            # these source-mismatch gray holes. Restrict endpoint reconstruction
+            # to strongly supported authored face blocks (6/16 interior pixels).
+            core_block=core[y0:y0+4,x0:x0+4]
+            if int(core_block.sum())<6:
+                unsupported+=int(flags.sum())
+                continue
+            # Entire 4x4 stays inside existing original Korean text bbox;
+            # preserve the exact 8-byte alpha block. Two BC1 endpoints give
+            # white face, blue/navy outline and source-like intermediate tones.
+            new0,new1=0xffff,((2<<5)|7)
+            mixed=palette(new0,new1)
+            vals=cur[y0:y0+4,x0:x0+4,:3].astype(np.int32).copy()
+            vals[flags]=[255,255,255]
+            idx=np.argmin(np.sum((vals[:,:,None,:]-mixed[None,None,:,:])**2,axis=3),axis=2)
+            bits=0
+            for yi in range(4):
+                for xi in range(4):
+                    bits|=int(idx[yi,xi])<<(2*((3-yi)*4+xi))
+            struct.pack_into("<HHI",raw,ofs+8,new0,new1,bits)
+            touched.append([x0,y0,int(flags.sum()),"endpoint_rebuild"])
+            repaired+=int(flags.sum())
             continue
         val=struct.unpack_from("<I",raw,ofs+12)[0]
         n=0
@@ -139,10 +160,10 @@ for orientation in ("READABLE","RAW"):
         for im in items:card.paste(im,(x,0));x+=im.width+8
         card.save(run/f"{orientation}_SOURCE_PREVIOUS_REPAIRED_{scale}.png")
 report={
- "run":"B268","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B268-Q098-MASKFACE-20261008",
- "status":"B268_MATERIAL_CANDIDATE_PENDING_CONTROLLER_VISUAL",
+ "run":"B269","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B269-Q098-PALETTE-20261008",
+ "status":"B269_MATERIAL_CANDIDATE_PENDING_CONTROLLER_VISUAL",
  "source_sha256":src_sha,"old_candidate_sha256":old_sha,"new_candidate_sha256":SHA(new),
- "repair_kind":"AUTHORED_TARGET_MASK_BC3_CORE_FACE_WHITEN_NO_ALPHA_CHANGE",
+ "repair_kind":"AUTHORED_MASK_BC3_WHITE_NAVY_ENDPOINT_RECONSTRUCTION_AND_ALPHA_PRESERVATION",
  "canonical_source_bbox":bbox,"prior_localized_bbox":[580,11,1524,116],
  "native_size":[w,h],"dds":"BC3/DXT5 mip1 mirror_y",
  "repair_seed_bright_count":int(bright.sum()),"authored_mask_sha256":SHA(maskfile.read_bytes()),"authored_white_seed_overlap":seed_overlap,"target_face_mask_pixels":int(face_mask.sum()),"white_pinhole_proposals":int(repair.sum()),
@@ -156,5 +177,5 @@ report={
  "backend":"GITHUB_ACTIONS_PINNED_DDS_FALLBACK_UNAVAILABLE_GPT_LOCAL_RAW_GITHUB_DNS",
  "cleanup":"runner ephemeral, no N100 heavy work","prohibited_domains_touched":[]
 }
-(run/"B268_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B269_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"sha":SHA(new),"repaired":repaired,"white_recovered":improved,"blocks":len(touched),"outside":outside,"target_outside":outside_target},ensure_ascii=False))
