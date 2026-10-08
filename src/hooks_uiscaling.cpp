@@ -1464,6 +1464,124 @@ public:
 
 UIScaling UIScaling::instance;
 
+// R64 source restoration. The original user's HMD R64 test showed 6th/6
+// single and HudScale effective only after the exact D3DXSprite Draw/Flush
+// isolation existed. R62 already restores the FVF0x142 *GPU* draw owner;
+// that alone does not force distinct queued D3DXSprite items to become
+// distinct DrawIndexedPrimitive calls. Keep batch isolation strictly on
+// screen-projected rank markers or the DispRank-specific kind0/kind1
+// original callsites; never flush unrelated menu, GOAL, +TIME or HUD sprites.
+class VRProjectedD3DXSpriteIsolationR64 : public Hook
+{
+	inline static SafetyHookInline Draw_hk{};
+	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> Failures{ 0 };
+
+	static HRESULT __stdcall DrawDest(
+		void* self, IDirect3DTexture9* texture, const RECT* rect,
+		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+	{
+		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+			self, texture, rect, center, pos, color);
+		if (FAILED(hr) || !self ||
+			!OutRunVR::GameSemantic::QueueRenderActive())
+			return hr;
+
+		const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+		const auto* marker =
+			OutRunVR::GameSemantic::CurrentProjectedMarker();
+		const bool projectedRank =
+			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) && marker && marker->valid;
+		const auto source =
+			OutRunVR::GameSemantic::CurrentQueueProducerToken();
+		const bool dispRankHud =
+			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+			(source ==
+				OutRunVR::GameSemantic::ProducerToken::DispRankFirst ||
+				source ==
+				OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite);
+		if (!projectedRank && !dispRankHud)
+			return hr;
+
+		void** vtable = *reinterpret_cast<void***>(self);
+		if (!vtable || !vtable[10])
+			return hr;
+
+		using FlushFn = HRESULT(__stdcall*)(void*);
+		const HRESULT flushHr =
+			reinterpret_cast<FlushFn>(vtable[10])(self);
+		const auto count = Flushes.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if (FAILED(flushHr))
+			Failures.fetch_add(1, std::memory_order_relaxed);
+		if ((count & (count - 1)) == 0)
+			spdlog::info(
+				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} failures={} markerValid={}",
+				projectedRank ? "projected-rank" : "disprank-hud",
+				OutRunVR::GameSemantic::Name(source),
+				count, Failures.load(std::memory_order_relaxed),
+				marker && marker->valid ? 1 : 0);
+		return hr;
+	}
+
+	static DWORD WINAPI InstallThread(void*)
+	{
+		// This is the original HMD-verified R64 D3DXSprite pointer/ABI and
+		// method layout on the canonical replacement EXE, not a global
+		// ID3DXSprite trampoline for unrelated assets.
+		for (int attempt = 0; attempt < 7200; ++attempt)
+		{
+			void* sprite = *Module::exe_ptr<void*>(0x55B218);
+			if (sprite)
+			{
+				void** vtable = *reinterpret_cast<void***>(sprite);
+				if (vtable && vtable[9] && vtable[10])
+				{
+					const auto disabled =
+						safetyhook::InlineHook::StartDisabled;
+					Draw_hk = safetyhook::create_inline(
+						vtable[9], reinterpret_cast<void*>(&DrawDest),
+						disabled);
+					if (Draw_hk && Draw_hk.enable().has_value())
+					{
+						spdlog::info(
+							"VR R64 D3DX ISOLATE RESTORED: only projected rank + exact DispRank kind0/kind1 post-Draw Flush; result/+TIME and generic HUD excluded");
+						return 0;
+					}
+					Draw_hk = {};
+				}
+			}
+			Sleep(25);
+		}
+		spdlog::warn(
+			"VR R64 D3DX ISOLATE: exact ID3DXSprite Draw hook unavailable; original no-flush behavior retained");
+		return 0;
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRProjectedD3DXSpriteIsolationR64";
+	}
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+	bool apply() override
+	{
+		HANDLE thread = CreateThread(
+			nullptr, 0, InstallThread, nullptr, 0, nullptr);
+		if (!thread)
+			return false;
+		CloseHandle(thread);
+		return true;
+	}
+	static VRProjectedD3DXSpriteIsolationR64 instance;
+};
+VRProjectedD3DXSpriteIsolationR64
+	VRProjectedD3DXSpriteIsolationR64::instance;
+
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
 // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
