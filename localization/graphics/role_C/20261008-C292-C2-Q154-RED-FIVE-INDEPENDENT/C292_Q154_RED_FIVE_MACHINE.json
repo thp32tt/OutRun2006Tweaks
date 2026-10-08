@@ -1,0 +1,230 @@
+{
+  "run": "C292",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 154,
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "native_size": [
+    4096,
+    1024
+  ],
+  "format": "BGRA32_DDS",
+  "raw_orientation": "mirror_y",
+  "source_candidate_header_128_equal": true,
+  "source_current_changed_outside_8_source_boxes": 0,
+  "source_current_alpha_outside_8_source_boxes": 0,
+  "source_clean_changed_outside_8_source_boxes": 0,
+  "five_red_regions": [
+    {
+      "id": "01_create_new_license",
+      "source_text": "CREATE NEW LICENSE",
+      "localized_text": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "source_alpha_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "candidate_alpha_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "candidate_positive_margins_lrtb": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "source_alpha_count": 142103,
+      "candidate_alpha_count": 101090,
+      "source_clean_residual_alpha_inside_bbox": 0,
+      "changed_source_to_candidate_inside_source_bbox": 158504,
+      "changed_clean_to_candidate_inside_bbox": 101090,
+      "outside_original_glyph_effect_pixels_fully_proven": "NO: exact glyph-only and protected plate mask not independently obtained",
+      "native_raw_orientation_byte_exact": true,
+      "contact_native": "01_create_new_license_GRAY_CONTACT_NATIVE.png",
+      "practical50": "01_create_new_license_SOURCE_CLEAN_FINAL_50.png",
+      "focus2x": "01_create_new_license_NATIVE_LEFT_FOCUS_2X.png"
+    },
+    {
+      "id": "02_select_license",
+      "source_text": "SELECT LICENSE",
+      "localized_text": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "source_alpha_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "candidate_alpha_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "candidate_positive_margins_lrtb": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "source_alpha_count": 105320,
+      "candidate_alpha_count": 72921,
+      "source_clean_residual_alpha_inside_bbox": 0,
+      "changed_source_to_candidate_inside_source_bbox": 120610,
+      "changed_clean_to_candidate_inside_bbox": 72921,
+      "outside_original_glyph_effect_pixels_fully_proven": "NO: exact glyph-only and protected plate mask not independently obtained",
+      "native_raw_orientation_byte_exact": true,
+      "contact_native": "02_select_license_GRAY_CONTACT_NATIVE.png",
+      "practical50": "02_select_license_SOURCE_CLEAN_FINAL_50.png",
+      "focus2x": "02_select_license_NATIVE_LEFT_FOCUS_2X.png"
+    },
+    {
+      "id": "03_single_player",
+      "source_text": "SINGLE PLAYER",
+      "localized_text": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "source_alpha_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "candidate_alpha_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "candidate_positive_margins_lrtb": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "source_alpha_count": 98927,
+      "candidate_alpha_count": 77318,
+      "source_clean_residual_alpha_inside_bbox": 0,
+      "changed_source_to_candidate_inside_source_bbox": 116321,
+      "changed_clean_to_candidate_inside_bbox": 77318,
+      "outside_original_glyph_effect_pixels_fully_proven": "NO: exact glyph-only and protected plate mask not independently obtained",
+      "native_raw_orientation_byte_exact": true,
+      "contact_native": "03_single_player_GRAY_CONTACT_NATIVE.png",
+      "practical50": "03_single_player_SOURCE_CLEAN_FINAL_50.png",
+      "focus2x": "03_single_player_NATIVE_LEFT_FOCUS_2X.png"
+    },
+    {
+      "id": "04_default_license",
+      "source_text": "DEFAULT LICENSE",
+      "localized_text": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "source_alpha_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "candidate_alpha_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "candidate_positive_margins_lrtb": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "source_alpha_count": 115127,
+      "candidate_alpha_count": 71820,
+      "source_clean_residual_alpha_inside_bbox": 0,
+      "changed_source_to_candidate_inside_source_bbox": 125898,
+      "changed_clean_to_candidate_inside_bbox": 71820,
+      "outside_original_glyph_effect_pixels_fully_proven": "NO: exact glyph-only and protected plate mask not independently obtained",
+      "native_raw_orientation_byte_exact": true,
+      "contact_native": "04_default_license_GRAY_CONTACT_NATIVE.png",
+      "practical50": "04_default_license_SOURCE_CLEAN_FINAL_50.png",
+      "focus2x": "04_default_license_NATIVE_LEFT_FOCUS_2X.png"
+    },
+    {
+      "id": "05_multiplayer",
+      "source_text": "MULTIPLAYER",
+      "localized_text": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "source_alpha_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "candidate_alpha_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "candidate_positive_margins_lrtb": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "source_alpha_count": 90633,
+      "candidate_alpha_count": 73103,
+      "source_clean_residual_alpha_inside_bbox": 0,
+      "changed_source_to_candidate_inside_source_bbox": 102549,
+      "changed_clean_to_candidate_inside_bbox": 73103,
+      "outside_original_glyph_effect_pixels_fully_proven": "NO: exact glyph-only and protected plate mask not independently obtained",
+      "native_raw_orientation_byte_exact": true,
+      "contact_native": "05_multiplayer_GRAY_CONTACT_NATIVE.png",
+      "practical50": "05_multiplayer_SOURCE_CLEAN_FINAL_50.png",
+      "focus2x": "05_multiplayer_NATIVE_LEFT_FOCUS_2X.png"
+    }
+  ],
+  "triage": {
+    "index": 154,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "current_status": "c287_hold_strict_recheck_authored_clean_confirmed_calibration_pending",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "visual_C": "PENDING_CONTROLLER",
+  "C3": "BLOCKED_PENDING_CALIBRATED_C",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
