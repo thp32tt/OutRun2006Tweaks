@@ -1,0 +1,231 @@
+{
+  "run": "C315-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "index": 60,
+  "regression": "IGR-044",
+  "screenshot": "스크린샷(203)(1).png",
+  "priority": "P0",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "current_dds": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "native_dds": [
+    4096,
+    2048
+  ],
+  "dds_header_exact": true,
+  "raw_orientation": "mirror_y",
+  "candidate_unchanged": true,
+  "triage": "MATERIAL_REWORK: active user in-game P0, missing authored plate evidence; no producer changes",
+  "regions": [
+    {
+      "region": "stage",
+      "english_bbox_readable": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "producer_korean_bbox_readable": [
+        463,
+        252,
+        679,
+        342
+      ],
+      "english_width": 235,
+      "english_height": 105,
+      "korean_width": 216,
+      "korean_height": 90,
+      "positive_margins": [
+        8,
+        11,
+        7,
+        8
+      ],
+      "source_current_changed_pixel_count_cropped": 25824,
+      "views": [
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_CURRENT_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_100pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_75pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_50pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_RAW.png"
+      ]
+    },
+    {
+      "region": "outrun_miles_white",
+      "english_bbox_readable": [
+        1090,
+        245,
+        1930,
+        385
+      ],
+      "producer_korean_bbox_readable": [
+        1096,
+        256,
+        1816,
+        374
+      ],
+      "english_width": 840,
+      "english_height": 140,
+      "korean_width": 720,
+      "korean_height": 118,
+      "positive_margins": [
+        6,
+        114,
+        11,
+        11
+      ],
+      "source_current_changed_pixel_count_cropped": 88493,
+      "views": [
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_CURRENT_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_100pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_75pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_50pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_RAW.png"
+      ]
+    },
+    {
+      "region": "outrun_miles",
+      "english_bbox_readable": [
+        2081,
+        250,
+        2860,
+        370
+      ],
+      "producer_korean_bbox_readable": [
+        2087,
+        259,
+        2752,
+        361
+      ],
+      "english_width": 779,
+      "english_height": 120,
+      "korean_width": 665,
+      "korean_height": 102,
+      "positive_margins": [
+        6,
+        108,
+        9,
+        9
+      ],
+      "source_current_changed_pixel_count_cropped": 82148,
+      "views": [
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_CURRENT_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_100pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_75pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_50pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_RAW.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_CURRENT_NATIVE_RGBA.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_100pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_75pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_50pct_GRAY.png",
+        "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_RAW.png"
+      ]
+    }
+  ],
+  "lossless_png_files": [
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_NATIVE_RGBA.png",
+      "sha256": "5a56ce55f3d56970ce2e6fff2c966683edad76904ceed7cdc20793cc4599bb14",
+      "size": 20693
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_CURRENT_NATIVE_RGBA.png",
+      "sha256": "3e842b3d4db3182a860a101dbad19051bf3b8b532ce5b5eb5d60d6369f157a25",
+      "size": 37933
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_100pct_GRAY.png",
+      "sha256": "6498bb684a9db2964be544b3630dbeafebb6c557b99d66bfc8ca9aac9b8ebfb4",
+      "size": 50987
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_75pct_GRAY.png",
+      "sha256": "861697f6ddd70e89e34dd7f21718d21e1ce4e75f349baf5471fda80d88d6858b",
+      "size": 40591
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_50pct_GRAY.png",
+      "sha256": "ae6c8fea5991cc01021914ce96eb70094302c2949d1a896f1ea07ec5b31f7bf6",
+      "size": 22273
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_RAW.png",
+      "sha256": "b2210f252cb121d310ed5bbca04d30571ab82d5e03b7b359662323ac74c51b83",
+      "size": 52652
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_NATIVE_RGBA.png",
+      "sha256": "448a35bb02ca2e452e8b46cefcc98658cf732b82e10e50f07d715fcf7098893b",
+      "size": 34894
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_CURRENT_NATIVE_RGBA.png",
+      "sha256": "cd61607ddabd4b0f114d5e19a0cabdf06e647b14a0e12da7e45d672491f8c098",
+      "size": 110097
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_100pct_GRAY.png",
+      "sha256": "4046601ffbda0943c255768c0e9793bac34967f0015379da097a12fd778cf934",
+      "size": 116559
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_75pct_GRAY.png",
+      "sha256": "0b99738def5327cbb7885de2a871cf54c2c2c1c9d3f25735a94ba60c29630a2d",
+      "size": 87312
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_50pct_GRAY.png",
+      "sha256": "f8ea847a28ff9192312d9ae9aa19000ac9dd54e9b73e8eb7d4e14c030e9954c6",
+      "size": 47207
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_RAW.png",
+      "sha256": "3a268669a0dd4819afae6e778e3a77448396598a079b9ea60e315e3fd342e054",
+      "size": 124874
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_NATIVE_RGBA.png",
+      "sha256": "b1e16647941e5584406ee1e7545d2ed5e4fd45d2737f189afdd380e1fd93df58",
+      "size": 81661
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_CURRENT_NATIVE_RGBA.png",
+      "sha256": "104fad65acd6d0a40c2e9fb5c4aaf89c7508889bf2c6ea55101460921393a266",
+      "size": 93609
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_100pct_GRAY.png",
+      "sha256": "579eb800244477272285f1cf2d95f11c5456f414aef27c3a80d138d9b72f39fc",
+      "size": 152675
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_75pct_GRAY.png",
+      "sha256": "040cf1571e4d0090abaf56c9272d11a341c9a8addf66dc2ab0d49939dadf9854",
+      "size": 119430
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_50pct_GRAY.png",
+      "sha256": "2ffbf7216a2f71b09fe44f0ac7942847d1fc6a5a1c1914d63b0fa995bdb01d71",
+      "size": 68251
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_RAW.png",
+      "sha256": "773a2a3638bdd63342d1f9198732e0a2d3c138241cc07aca02aa60f7a3cc6b64",
+      "size": 163576
+    }
+  ],
+  "plate_only": "NOT_AVAILABLE: authentic clean plate not SHA-bound in this C315 run; no CLEAN-only PASS",
+  "composite_only": "NOT_PROVEN: candidate contains additional legacy localized regions; cannot infer clean/final whole-atlas mask from English/current alone",
+  "actual_game": "OPEN_USER_INGAME_FAIL; never close on static images",
+  "C": "EVIDENCE_PENDING_CONTROLLER_PIXELS_FIRST",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0
+}
