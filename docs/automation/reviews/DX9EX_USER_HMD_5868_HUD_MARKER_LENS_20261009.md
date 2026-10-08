@@ -45,5 +45,11 @@
 - **Test ZIP [artifact #11562101269](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37803059786/artifacts/11562101269)** name `OutRun2-VR-DX9EX-ACTIVE-5fddec70829164ccf711b31da26c734381b3c483`, 2,752,908 bytes, SHA-256 `7f4e369f39157da9cbc00cf29e7bf12d671d831823d38c10b2e0d4eedc2c800a`. Packaging job 113402385537 actually confirmed staged `dinput8.dll`, `outrun-vr-host.exe`, `SOURCE_SHA.txt`, and the only CMD launcher `OutRunVR-Slot-Selector.cmd` plus `START_HERE_실행방법.txt`; Zip validation SUCCESS.
 - User extraction and launch: unzip into folder with original `OR2006C2C.EXE` → double click `OutRunVR-Slot-Selector.cmd` → in `CURRENT FOCUS / CORRECTNESS` click `설정 + 바로 실행`. Do NOT manually start `outrun-vr-host.exe`.
 - This exact material has no new Quest3/VDXR HMD result yet: `RUNTIME_VALIDATION=UNTESTED`. Original 5868 user FAIL and its nuanced successes remain the ground truth; this is a corrected code candidate, not an optical pass.
+## C3B — additional original game c64 fail-closed fix after test build 5fddec70
+- New material `2861c0bcd22370559525d6531a98d7c913d3f111` requires original same-shader raw c64 when queue-owned `ScreenOverlay2D` shader HUD would otherwise reuse head-injected live c64. Does not widen generic world/HUD semantic scope.
+- New material `9b6faf0324d0b472369f8c96d6dce0326db54507` rejects projected vehicle rank shader's fallback to already-head-injected live c64 after long direct sprite runs. OutRun rival WorldBillboard route is deliberately unchanged (user confirms correct).
+- Static contract `24ecafec140bc1bf1f1e1eee77adbfa18aeb33b9` is the newest validation-bearing source SHA. Earlier static Inspector attempt failed on an obsolete test that expected the unsafe fallback; new exact test asserts bounded original c64 instead. New CI status requires checking and may be pending.
+- NOTE: A prior 5fddec70 TEST ZIP exists with R70 0xBAAEA semantics fixes; this additional c64 fix is **not in that ZIP**. No Quest3 HMD PASS claimed for either. The user reports car select DDS and OutRun rival working, but generic ranks, HUD, lens centre still failed on tested 5868 build.
+
 ## C4 Runtime resumption
 User HMD failures stay OPEN. Any new package is SOURCE_BUILD_VERIFIED / RUNTIME_VALIDATION=UNTESTED until real test.
