@@ -1958,6 +1958,22 @@ int main()
         dynamicTextureView.upload_generation() == 0,
         "R101 foreign-context rejection must preserve generation");
 
+    // R153: a same-device deferred context may record DISCARD uploads, but
+    // cannot prove that Map/Unmap made texture content live immediately.
+    ID3D11DeviceContext* r153DeferredContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(0, &r153DeferredContext)) &&
+        r153DeferredContext != nullptr &&
+        r153DeferredContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R153 WARP same-device deferred texture upload prerequisite");
+    require(
+        !dynamicTextureView.upload_full_discard(
+            r153DeferredContext, dynamicSource.data(),
+            dynamicSourcePitch, dynamicRows) &&
+        dynamicTextureView.upload_generation() == 0 &&
+        !dynamicTextureView.content_ready(),
+        "R153 deferred Map/Unmap cannot forge a live texture upload receipt");
+
     require(
         dynamicTextureView.upload_full_discard(
             d3d.context, dynamicSource.data(), dynamicSourcePitch, dynamicRows),
@@ -1966,6 +1982,14 @@ int main()
         dynamicTextureView.content_ready() &&
         dynamicTextureView.upload_generation() == 1,
         "R101 successful upload advances content generation");
+    require(
+        !dynamicTextureView.upload_full_discard(
+            r153DeferredContext, dynamicSource.data(),
+            dynamicSourcePitch, dynamicRows) &&
+        dynamicTextureView.upload_generation() == 1 &&
+        dynamicTextureView.content_ready(),
+        "R153 deferred upload cannot advance or erase an immediate receipt");
+    r153DeferredContext->Release();
 
     D3D11_TEXTURE2D_DESC stagingDesc = dynamicTextureDesc;
     stagingDesc.Usage = D3D11_USAGE_STAGING;
