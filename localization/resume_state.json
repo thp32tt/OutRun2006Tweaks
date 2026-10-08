@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C309 EVEN q176 75C3586A: 52 new exact source/B201 authored clean/persisted Korean DDS lossless BWG native/practical 100/75/50, RAW 200%, PLATE_ONLY COMPOSITE_ONLY. Full 2048² atlas outside four source boxes delta 0 for all original-clean/final pairs. Native height ~95% and exact flat-red source/final median, no definite visible damage; historical notes viewed before first-look, source family/semantic stem/qualified calibration and protected in ROI incomplete. C HOLD, C3/approval blocked, runtime UNTESTED, new DDS0. localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_CONTROLLER_C3_HOLD.json",
     "B279 q098 42E618FD materially new DXT5 2048x128 DDS SHA256 192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b (Git blob a2471eea23c88b6971e0534d9ed589f2abde1f17) exact source 3b3cdd76... and independently QA checked CLEAN b5c9c07a...; B269 1d63cd9b superseded. Source-derived white/nv palette [255,255,255]/[0,12,57] with ~6px native navy keyline, correct int32 BC3 palette distances, 3180 blocks, 20035 changed, alpha/header/RAW/mip exact, source/clean outside 0, composite outside source/target 0. Producer SOURCE/CLEAN/PREVIOUS/B279 native and practical50 RAW75 visual PASS: striped glyph face removed, source-family navy outline present, no dirty plate/protected art intrusion observed. NEW DDS 1, C2 FRESH INDEPENDENT REVIEW REQUIRED, C3/current APPROVALS/PRE_INGAME/user/real game UNTESTED. QA localization/graphics/role_B/20261008-B279-Q098-NAVY-KEYLINE-WEIGHT/B279_CONTROLLER_SELF_QA_FINAL.json. RUNTIME_VALIDATION=UNTESTED. Earlier B272-B278 rejected trials NOT production candidates.",
     "C308 C2 EVEN q236: 14 native stage-name SOURCE/B80 authored CLEAN/current exact DDS regions, 84 lossless PNG (black/gray/white native + gray 75/50 + RAW) GH Actions successful; full 2048x2048 source-clean/clean-final/source-final outside union RGBA & alpha 0, CLEAN original alpha 0/14; historical C304 gap filled. Current C3 HOLD (uncalibrated font/stem/counter/readability, producer notes before new pixel look), no approved export/user/game, no DDS. localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_CONTROLLER_C3_HOLD.json",
     "C308 2026-10-08 23:19 KST TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) exact A196 q035 SHA cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254 independently verified against canonical English b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583 and authored CLEAN e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e. 14 NEW native 1x, zoom2, 75/50, RAW, B/G/W lossless SOURCE/CLEAN/FINAL PNG. Source-clean, source-final, clean-final outside edit 0; alpha outside0, localized bbox outside changes0; both title margins y1px; possible source-family slant/letter-spacing mismatch first-look not independently calibrated: HOLD_STRICT_RECHECK, no C/C3 PASS, DDS unchanged, user/game UNTESTED. localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_CONTROLLER_C1_HOLD.json.",
@@ -6783,7 +6784,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 23:33 KST",
+  "updated_at_kst": "2026-10-08 23:59 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12141,5 +12142,39 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_CONTROLLER_C3_HOLD.json",
     "machine": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/C308_Q236_14REGION_NATIVE_MACHINE.json"
+  },
+  "c309_c2_q176_source_family": {
+    "at_kst": "2026-10-08 23:59 KST",
+    "task_id": "OUTRUN-KOR-C309-C2-Q176-SOURCE-FAMILY-PRACTICAL-20261008-2350",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 176,
+    "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37796372269",
+    "worker": "SUCCESS",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "authored_clean_sha256": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc",
+    "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "new_lossless_png": 52,
+    "new_candidate_dds": 0,
+    "regions": 4,
+    "source_clean_rgba_outside": 0,
+    "clean_final_rgba_outside": 0,
+    "source_final_rgba_outside": 0,
+    "source_clean_alpha_outside": 0,
+    "clean_final_alpha_outside": 0,
+    "source_final_alpha_outside": 0,
+    "clean_alpha_per_region": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_CONTROLLER_C3_HOLD.json",
+    "machine": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_SOURCE_FAMILY_MACHINE.json"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 23:57 KST",
+  "updated_at_kst": "2026-10-08 23:59 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8131,5 +8131,39 @@
     "runtime_validation": "UNTESTED",
     "qa": "localization/graphics/role_B/20261008-B279-Q098-NAVY-KEYLINE-WEIGHT/B279_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "GitHub Actions fallback for pinned public source download, ChatGPT controller visual review; no N100 heavy CPU"
+  },
+  "c309_c2_q176_source_family": {
+    "at_kst": "2026-10-08 23:59 KST",
+    "task_id": "OUTRUN-KOR-C309-C2-Q176-SOURCE-FAMILY-PRACTICAL-20261008-2350",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 176,
+    "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37796372269",
+    "worker": "SUCCESS",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "authored_clean_sha256": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc",
+    "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "new_lossless_png": 52,
+    "new_candidate_dds": 0,
+    "regions": 4,
+    "source_clean_rgba_outside": 0,
+    "clean_final_rgba_outside": 0,
+    "source_final_rgba_outside": 0,
+    "source_clean_alpha_outside": 0,
+    "clean_final_alpha_outside": 0,
+    "source_final_alpha_outside": 0,
+    "clean_alpha_per_region": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_CONTROLLER_C3_HOLD.json",
+    "machine": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_SOURCE_FAMILY_MACHINE.json"
   }
 }
