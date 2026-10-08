@@ -3004,3 +3004,8 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 ## 2026-10-08 18:03 KST — C294 C2 q154 calibrated defect controls
 
 - `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`. Canonical English-derived normal control vs four labeled-after-blind-read defect examples: 5/5 binary correct, 3/5 kind correct; calibration artifacts and QA JSON persisted. This is *new calibration evidence only*, not q154 native DDS C/C3 approval. Queue `c294_hold_strict_recheck_calibration_original_control_5of5_fresh_c_pending`; exact current DDS stays unchanged and game `RUNTIME_VALIDATION=UNTESTED`. Source family/anchor and distinct review evidence still missing; PRE_INGAME blocked.
+
+## 2026-10-08 18:10 KST — A192R q119 recovered cropped white halo (candidate only)
+- Actual new q119 F6811E94 DXT5 SHA256 `b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907` generated, GitHub Actions `37754217530` SUCCESS. C294 prior A191 hard left white fringe x705/106 rows repaired by native-padded positive right-italic and protected 29px glow canvas; first new bright x713/17 rows; no 106-row straight left edge.
+- Exact original bbox [390,54,1632,200], decoded candidate [710,58,1311,196] margin [320,321,4,4], outside RGBA/alpha/overlap/protected/residue 0, RAW mirror-Y unchanged. Initial A192 runner failed safe and published no bytes.
+- **PRODUCER_HOLD_PENDING_FRESH_C1** for independent per-glyph source style/lean inspection, then C3/APPROVAL. PRE_INGAME/user JPG/new actual game retest not accepted; `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json`. VR/FFB/DX11/DXVK not touched.
