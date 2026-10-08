@@ -2786,3 +2786,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 
 ### 2026-10-08 A183R3 q214 controller visual rejection
 - q214 BF229CF4 exact `4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1`: machine 2/2 bbox/zero decoded outside PASS, but visible Hangul glyph-stripe/broken-stroke/plate-showthrough FAIL. Rework required; C2/C3/PRE_INGAME blocked; runtime untested.
+
+
+### 2026-10-08 A184R q59 new producer candidate
+- q59 7CE1CFC5 exact `261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a`: 4/4 bbox + decoded zero outside/alpha/residue/protected QA PASS; SOURCE/CLEAN/FINAL/RAW producer visual self-QA PASS pending full C1 inspection of source-family title hierarchy and 100/75/50 JPG. C3/user/actual game PENDING, runtime UNTESTED.

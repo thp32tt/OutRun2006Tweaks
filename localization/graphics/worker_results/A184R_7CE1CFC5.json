@@ -15,7 +15,9 @@
   "overlap": 0,
   "touch": 0,
   "changed_blocks_outside_patch": 0,
-  "worker_status": "A184R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "worker_status": "A184R_SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_REPORT.json"
+  "report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_REPORT.json",
+  "status": "A184R_SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
+  "controller_qa": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json"
 }

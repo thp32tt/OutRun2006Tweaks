@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "A",
+  "run": "20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT",
+  "queue_index": 59,
+  "asset": "7CE1CFC5",
+  "previous_c271_candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "previous_a184_candidate_sha256": "9f181320dc25651925d514e36f683f8b96d3eec4b4d8ca8931cef5a6b588d221",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "backend": "GITHUB_HOSTED_CPU_AFTER_CHATGPT_LOCAL_DNS_BLOCK",
+  "machine": "PASS_4_OF_4_BBOX_POSITIVE_MARGIN_OUTSIDE_ALPHA_VISIBLE_RESIDUE_PROTECTED_OVERLAP_ZERO",
+  "controller_visual": "SELF_QA_PASS_SOURCE_STYLE_KEYLINE_NAVY_GRADIENT_RAW_WITH_C1_HIERARCHY_REVIEW_REQUIRED",
+  "status": "SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
+  "controller_report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "evidence": {
+    "source_clean_final": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg",
+    "per_region_contact": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg",
+    "raw_flipy": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg",
+    "practical_100_75_50": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg"
+  },
+  "source_bbox_by_row": {
+    "next_mission": [
+      8,
+      353,
+      1293,
+      500
+    ],
+    "race_rivals": [
+      75,
+      222,
+      625,
+      304
+    ],
+    "drift_score": [
+      119,
+      53,
+      609,
+      137
+    ],
+    "slipstream_score": [
+      717,
+      225,
+      1408,
+      320
+    ]
+  },
+  "candidate_bbox_by_row": {
+    "next_mission": [
+      356,
+      358,
+      944,
+      495
+    ],
+    "race_rivals": [
+      159,
+      226,
+      541,
+      299
+    ],
+    "drift_score": [
+      142,
+      58,
+      586,
+      131
+    ],
+    "slipstream_score": [
+      817,
+      236,
+      1308,
+      309
+    ]
+  },
+  "machine_qa": {
+    "source_bbox_size_positive_margin": "PASS_4_OF_4",
+    "decoded_changed_outside_exact_source_bboxes": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "clean_source_residue": 0,
+    "protected_top_art_changed": 0,
+    "overlap": 0,
+    "touch": 0,
+    "changed_blocks_outside_patch": 0,
+    "format": "DXT5",
+    "dimensions": [
+      2048,
+      512
+    ],
+    "mips": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": {
+    "decision": "PASS_PENDING_INDEPENDENT_C1",
+    "source_family": "PASS: visible white outer ring/navy inner depth restored on all three small labels; orange-white-yellow italic graded title with navy depth",
+    "source_title_hierarchy": "IMPROVED_MATERIAL_484_TO_588PX; FRESH_C1_MUST_REVIEW_HIERARCHY",
+    "slant": "PASS_READABLE_RIGHT_ITALIC_TITLE",
+    "glyph_integrity": "PASS_READABLE_CONTACT",
+    "source_residue": "PASS_CLEAN",
+    "clipping": "PASS",
+    "protected_art": "PASS",
+    "raw_flipy": "PASS",
+    "practical_50": "PASS_READABLE_SOURCE_CLEAN_FINAL_OVERVIEW",
+    "practical_75": "EVIDENCE_GENERATED_AWAITING_C1_INDEPENDENT_REVIEW",
+    "notes": "Producer visual inspection uses 50%-native atlas overview and earlier native/RAW contacts. Consolidated 100/75/50 JPG exists but was not directly displayable through the current GitHub connector because it is too large; independent C1 must inspect the full image and lossless region evidence. This is A self-QA only, never C final approval."
+  },
+  "prior_user_jpg_rejection": "PJR-019",
+  "user_acceptance": "OPEN_REVIEW_REQUIRED",
+  "fresh_c1": "REQUIRED_PIXELS_FIRST",
+  "c3": "REQUIRED_AFTER_FRESH_C_PASS",
+  "pre_ingame": "HOLD_UNTIL_EVIDENCE_APPROVAL",
+  "actual_game": "UNTESTED"
+}

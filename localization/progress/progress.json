@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T11:00:00+09:00",
+  "updated_at_kst": "2026-10-08T11:07:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C273 C1: q161 55B57CDE A157 66a89385... -> HOLD_STRICT_RECHECK because pixels-first ordering and complete lossless per-region evidence were not satisfied; bytes preserved. q175 754F0599 A153 5b37fdaf... -> REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_EXTRUSION_WEIGHT after visual FAIL despite 3/3 numeric containment. q59/q219 remain prior REWORK. Next producer must materially rebuild q175, while future C1 may pixels-first recheck q161 or process the next unchanged odd pending-C item. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A184R q59 exact 261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a: pending fresh C1 (source style/title spacing) -> exact SHA C3 -> PRE_INGAME JPG -> new user/game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -6748,5 +6748,22 @@
     "status": "REWORK_REQUIRED",
     "report": "localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a184r_q59_source_family": {
+    "role": "A",
+    "run": "20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT",
+    "queue_index": 59,
+    "asset": "7CE1CFC5",
+    "previous_c271_candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+    "previous_a184_candidate_sha256": "9f181320dc25651925d514e36f683f8b96d3eec4b4d8ca8931cef5a6b588d221",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "backend": "GITHUB_HOSTED_CPU_AFTER_CHATGPT_LOCAL_DNS_BLOCK",
+    "machine": "PASS_4_OF_4_BBOX_POSITIVE_MARGIN_OUTSIDE_ALPHA_VISIBLE_RESIDUE_PROTECTED_OVERLAP_ZERO",
+    "controller_visual": "SELF_QA_PASS_SOURCE_STYLE_KEYLINE_NAVY_GRADIENT_RAW_WITH_C1_HIERARCHY_REVIEW_REQUIRED",
+    "status": "SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
+    "controller_report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
