@@ -1,0 +1,51 @@
+{
+  "run": "B280",
+  "role": "B",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_png_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "baseline_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "7c9c04f496fd6ded19afea99e1b3b75e0440cae4815114915b341cde6c5daf6e",
+  "machine": {
+    "new_alpha_and_color_encoder": true,
+    "bc3_blocks": 5596,
+    "changed_rgba": 51722,
+    "changed_outside_english_effect_bbox": 0,
+    "encoded_bbox": [
+      571,
+      13,
+      1532,
+      113
+    ],
+    "white_face_pixels": 49631,
+    "navy_effect_pixels": 70487,
+    "white_to_navy_ratio": 0.704,
+    "header_mip_roundtrip": "PASS"
+  },
+  "image_evidence": [
+    "B280_READABLE_GRAY_100_EN_CLEAN_B279_TRIAL.png",
+    "B280_READABLE_GRAY_50_EN_CLEAN_B279_TRIAL.png",
+    "B280_READABLE_WHITE_100_EN_CLEAN_B279_TRIAL.png",
+    "B280_RAW_BLACK_75_EN_CLEAN_B279_TRIAL.png"
+  ],
+  "producer_visual": "FAIL",
+  "visual_findings": [
+    "Full authored B40 Korean text-face mask was painted as near-solid white in B280, causing adjacent Hangul strokes and counters to merge into large white blobs at 100% and 50%, most obvious on candidate fourth panel.",
+    "Native source English is comparatively thinner white ink bounded by diffuse navy halo; B280 adds needed outer navy support but inner ink morphology is no longer legible.",
+    "Zero outside-edit pixels and increased navy support do not imply glyph integrity PASS."
+  ],
+  "reason_codes": [
+    "BROKEN_GLYPH_MERGED_WHITE_COUNTERS",
+    "EXCESSIVE_WHITE_FACE",
+    "SOURCE_FAMILY_INNER_STROKE_MISMATCH"
+  ],
+  "disposition": "REJECT_B280_TRIAL_DO_NOT_PROMOTE",
+  "next": "B281 explicitly separates inner white mask from exterior navy/blur through distance-based face inset before native BC3 encode",
+  "independent_C": "NOT_RUN",
+  "C3": "BLOCKED",
+  "user": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "cleanup": "GitHub ephemeral; no N100 work",
+  "forbidden_domains_touched": []
+}
