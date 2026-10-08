@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261009-A199-P0-Q121-ORIGINAL-WHITE-ITALIC",
+  "priority": "P0",
+  "queue_index": 121,
+  "affected_screenshots": [
+    "181",
+    "182",
+    "192"
+  ],
+  "ingame_rows": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "superseded_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "source_clean": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "source_style": "original heavy WHITE italic face with simple RIGHT-DOWN 5px BLACK depth, not multi hard gray outlines",
+  "rows": [
+    {
+      "key": "select_game_mode",
+      "english": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "source_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "old_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "new_bbox": [
+        291,
+        825,
+        1040,
+        948
+      ],
+      "old_size": [
+        649,
+        99
+      ],
+      "new_size": [
+        749,
+        123
+      ],
+      "face_size": [
+        744,
+        118
+      ],
+      "source_size": [
+        1000,
+        154
+      ],
+      "positive_margins": [
+        125,
+        126,
+        6,
+        25
+      ],
+      "band": [
+        820,
+        953
+      ],
+      "point_size": 123,
+      "shear": 0.25,
+      "shadow_delta": [
+        5,
+        5
+      ],
+      "face_rgb": [
+        250,
+        250,
+        250
+      ],
+      "shadow_rgb": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "select_car",
+      "english": "Select your car",
+      "korean": "차량 선택",
+      "source_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "old_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "new_bbox": [
+        481,
+        964,
+        917,
+        1072
+      ],
+      "old_size": [
+        428,
+        99
+      ],
+      "new_size": [
+        436,
+        108
+      ],
+      "face_size": [
+        431,
+        103
+      ],
+      "source_size": [
+        913,
+        164
+      ],
+      "positive_margins": [
+        238,
+        239,
+        17,
+        39
+      ],
+      "band": [
+        959,
+        1077
+      ],
+      "point_size": 108,
+      "shear": 0.25,
+      "shadow_delta": [
+        5,
+        5
+      ],
+      "face_rgb": [
+        250,
+        250,
+        250
+      ],
+      "shadow_rgb": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "select_course",
+      "english": "Select Course",
+      "korean": "코스 선택",
+      "source_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "old_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "new_bbox": [
+        462,
+        1088,
+        924,
+        1202
+      ],
+      "old_size": [
+        430,
+        99
+      ],
+      "new_size": [
+        462,
+        114
+      ],
+      "face_size": [
+        457,
+        109
+      ],
+      "source_size": [
+        783,
+        151
+      ],
+      "positive_margins": [
+        160,
+        161,
+        26,
+        11
+      ],
+      "band": [
+        1083,
+        1207
+      ],
+      "point_size": 114,
+      "shear": 0.25,
+      "shadow_delta": [
+        5,
+        5
+      ],
+      "face_rgb": [
+        250,
+        250,
+        250
+      ],
+      "shadow_rgb": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "machine_qa": {
+    "clean_old_unrelated_diff_outside_original_bboxes": 0,
+    "clean_final_outside_original_bboxes": 0,
+    "clean_final_outside_glyph_masks": 0,
+    "alpha_outside_original_bboxes": 0,
+    "protected_unrelated_changed_pixels": 0,
+    "source_exact_residue_outside_localized_masks": 0,
+    "label_collision_pairs": 0,
+    "header128_exact": true,
+    "native_dds_roundtrip": "PASS"
+  },
+  "native_structure": {
+    "width": 4096,
+    "height": 4096,
+    "mode": "RGBA",
+    "mips": 1,
+    "pitch": 16384,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "raw": "mirror_y"
+  },
+  "artifacts": [
+    "A199_0_select_game_mode_BLACK_100.jpg",
+    "A199_0_select_game_mode_BLACK_75.jpg",
+    "A199_0_select_game_mode_BLACK_50.jpg",
+    "A199_0_select_game_mode_GRAY_100.jpg",
+    "A199_0_select_game_mode_GRAY_75.jpg",
+    "A199_0_select_game_mode_GRAY_50.jpg",
+    "A199_0_select_game_mode_WHITE_100.jpg",
+    "A199_0_select_game_mode_WHITE_75.jpg",
+    "A199_0_select_game_mode_WHITE_50.jpg",
+    "A199_1_select_car_BLACK_100.jpg",
+    "A199_1_select_car_BLACK_75.jpg",
+    "A199_1_select_car_BLACK_50.jpg",
+    "A199_1_select_car_GRAY_100.jpg",
+    "A199_1_select_car_GRAY_75.jpg",
+    "A199_1_select_car_GRAY_50.jpg",
+    "A199_1_select_car_WHITE_100.jpg",
+    "A199_1_select_car_WHITE_75.jpg",
+    "A199_1_select_car_WHITE_50.jpg",
+    "A199_2_select_course_BLACK_100.jpg",
+    "A199_2_select_course_BLACK_75.jpg",
+    "A199_2_select_course_BLACK_50.jpg",
+    "A199_2_select_course_GRAY_100.jpg",
+    "A199_2_select_course_GRAY_75.jpg",
+    "A199_2_select_course_GRAY_50.jpg",
+    "A199_2_select_course_WHITE_100.jpg",
+    "A199_2_select_course_WHITE_75.jpg",
+    "A199_2_select_course_WHITE_50.jpg"
+  ],
+  "header_alpha_preserved": true,
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "user_game_retest": "REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "producer_decision": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "known_limitations": [
+    "In-game car header clip may also involve runtime/title-layer mapping",
+    "No protected Dino logo source established: left untouched",
+    "In-game English small info cells are separate mixed source mapping"
+  ]
+}
