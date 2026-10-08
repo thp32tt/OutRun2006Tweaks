@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C290-C1-Q119-WHITE-GLOW-NATIVE-20261008-1610",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "both_bytes": 524416,
+  "dimensions": [
+    2048,
+    256
+  ],
+  "format": "DXT5/BC3",
+  "mips": 1,
+  "headers_128_byte_equal": true,
+  "readable_transform": "mirror_y",
+  "source_visible_full_alpha_bbox": [
+    390,
+    54,
+    1632,
+    200
+  ],
+  "candidate_visible_full_alpha_bbox": [
+    664,
+    62,
+    1357,
+    192
+  ],
+  "source_visible_outside_bbox": 0,
+  "candidate_visible_outside_bbox": 0,
+  "changed_rgba_outside_source_bbox": 0,
+  "changed_alpha_outside_source_bbox": 0,
+  "changed_rgba_total": 166716,
+  "changed_alpha_total": 115480,
+  "glow_color_scope": {
+    "original_effect_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "predicate": "decoded readable RGBA pixel min(R,G,B)>=215 and alpha>=16 (fixed descriptive threshold; does not imply universal PASS rule)",
+    "source_count": 38689,
+    "candidate_count": 0,
+    "secondary_predicate": "min(R,G,B)>=180 and alpha>=5",
+    "secondary_source_count": 43360,
+    "secondary_candidate_count": 0
+  },
+  "result": "MACHINE_CONTAINMENT_PASS_VISUAL_GLOW_FAIL",
+  "method": "SHA-256 exact verified download, native Pillow DXT5 persisted-byte decode, numpy RGBA pixel tests, 1x/2x/50% source-final visual and RAW mirror_y; descriptive high-brightness threshold plus side-by-side visible white halo",
+  "not_claimed": "No independent proof of fully source-authored clean plate, glyph anchor slant or qualified C/C3 blind calibration; no native game runtime test."
+}

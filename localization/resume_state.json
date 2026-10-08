@@ -11413,5 +11413,43 @@
     "qa": "localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c290_c1_q119_white_glow_visual_fail": {
+    "run": "20261008-C290-C1-Q119-MISSING-WHITE-GLOW",
+    "run_key": "OUTRUN-KOR-C290-C1-Q119-WHITE-GLOW-NATIVE-20261008-1610",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 119,
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+    "triage": "FRESH_C_REVIEW",
+    "machine_format": "DXT5_2048x256_mip1",
+    "native_bbox_source": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "native_bbox_candidate": [
+      664,
+      62,
+      1357,
+      192
+    ],
+    "outside_rgba": 0,
+    "outside_alpha": 0,
+    "original_bright_white_glow_pixels": 38689,
+    "candidate_bright_white_glow_pixels": 0,
+    "bright_white_predicate": "min RGB>=215 and alpha>=16; descriptive, corroborated by real visual inspection",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "approval_record_created": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "DDS_changed": false,
+    "machine_report": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_CONTROLLER_QA.json",
+    "backend": "GitHub connector + N100 MCP isolated small DDS decode fallback (GPT local DNS failure)"
   }
 }

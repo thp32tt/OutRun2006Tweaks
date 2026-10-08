@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C290-C1-Q119-WHITE-GLOW-NATIVE-20261008-1610",
+  "role": "C1",
+  "run": "20261008-C290-C1-Q119-MISSING-WHITE-GLOW",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+  "triage": "FRESH_C_REVIEW; tools/localization/rework_triage.py --repo isolated-current-checkout --index 119; queue A118 self QA pending independent C; no repeated C of same bytes",
+  "execution_backend": "GitHub linked SSOT and content publishing; GPT local direct raw GitHub fetch tested and DNS failed, N100 MCP fallback used for isolated small DDS decode and image generation; N100 Git worktree read-only for base SHA",
+  "candidate_modified": false,
+  "first_look": {
+    "pixels_before_detailed_producer_verdict": true,
+    "queue_status_seen": true,
+    "observed": "Native first look exposed absent white outer halo and visibly blockier generic Korean effect. Producer A118 source-sampled orange/navy + slant claim examined afterward; producer self-QA did not describe absence of original white glow.",
+    "source_candidate_pixel_images": [
+      {
+        "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_gray.png",
+        "sha256": "34dfcf63df99862a5fc48b225183aea0548b5cdf8a1e3f800f61c6c73760e75c"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_black.png",
+        "sha256": "827eb6e9b9e9ea9d405f4a22f08f8e3715bf2f466db956d5bb0005839e593cf0"
+      }
+    ]
+  },
+  "region_inventory": [
+    {
+      "id": "mode_title",
+      "semantic": "Time Attack Mode -> 타임 어택 모드",
+      "source_full_effect_bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "final_full_effect_bbox": [
+        664,
+        62,
+        1357,
+        192
+      ],
+      "readable_transform": "flip_y"
+    }
+  ],
+  "machine_report": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_MACHINE_QA.json",
+  "lossless_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_gray.png",
+      "sha256": "34dfcf63df99862a5fc48b225183aea0548b5cdf8a1e3f800f61c6c73760e75c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_black.png",
+      "sha256": "827eb6e9b9e9ea9d405f4a22f08f8e3715bf2f466db956d5bb0005839e593cf0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_white.png",
+      "sha256": "7644e5625a49c220a898f97c2633ca19cf44d18e09170b9754f243af17279bdb"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_2x_gray.png",
+      "sha256": "ee00e74414e803973d9b8f6522e28514081e86b08831df5a65b23887703ed838"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_q119_FLIPY_practical_512.png",
+      "sha256": "fe3a06f6d0960238249787f854c898a1a079222ec5cbdc89f7708f403b6f7db1"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_q119_RAW_gray.png",
+      "sha256": "0fc3730b5d8345062fa75512b3c7ee64f07e242b22c8dacbed1d09a0f2f25df1"
+    }
+  ],
+  "controller_visual_findings": {
+    "mode_title": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Source and candidate are both right-looking slanted, but source/candidate corresponding glyph upper/lower anchors not measured; do not claim exact slope parity.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_gray.png",
+          "sha256": "34dfcf63df99862a5fc48b225183aea0548b5cdf8a1e3f800f61c6c73760e75c"
+        }
+      },
+      "clean_plate": {
+        "result": "NOT_INDEPENDENTLY_CERTIFIED",
+        "observation": "Source atlas is transparent outside single effect footprint and candidate has no source-text residue outside its glyph envelope; producer pre-render CLEAN has not been separately authenticated as required for a PASS.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_black.png",
+          "sha256": "827eb6e9b9e9ea9d405f4a22f08f8e3715bf2f466db956d5bb0005839e593cf0"
+        }
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Original Time Attack Mode has conspicuous white glow/haze immediately outside dark navy contour. Current 타임 어택 모드 decoded DDS has orange text and navy outline but no white luminous rim at native readable, black and gray views. Binary color test within exact source-effect bbox finds 38,689 near-white (RGB>=215 alpha>=16) source pixels versus 0 candidate pixels. This is a visible source-style loss, independent of valid font bbox/containment.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_black.png",
+          "sha256": "827eb6e9b9e9ea9d405f4a22f08f8e3715bf2f466db956d5bb0005839e593cf0"
+        }
+      },
+      "readability": {
+        "result": "PASS_LOCAL_TEXT_ONLY",
+        "observation": "타임 어택 모드 reads at 50% inspection scale, but white-glow hierarchy absent and therefore overall QA fails.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_q119_FLIPY_practical_512.png",
+          "sha256": "fe3a06f6d0960238249787f854c898a1a079222ec5cbdc89f7708f403b6f7db1"
+        }
+      },
+      "glyph_integrity": {
+        "result": "NO_DEFINITE_BREAKAGE_OBSERVED",
+        "observation": "No unmistakable broken Hangul glyph in source-final nearest views; this is not a C PASS and does not override white-glow failure.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_2x_gray.png",
+          "sha256": "ee00e74414e803973d9b8f6522e28514081e86b08831df5a65b23887703ed838"
+        }
+      },
+      "protected_art": {
+        "result": "PASS_MACHINE_OUTSIDE_BBOX",
+        "observation": "RGBA and alpha changed outside full source original effect bbox [390,54,1632,200]: 0 and 0; candidate fits inside [664,62,1357,192]. Text-only source and no neighboring atlas art observed.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_gray.png",
+          "sha256": "34dfcf63df99862a5fc48b225183aea0548b5cdf8a1e3f800f61c6c73760e75c"
+        }
+      },
+      "placement": {
+        "result": "PASS_BBOX_ONLY",
+        "observation": "Candidate effect bbox fits inside source with positive margins 274/275/8/8; aesthetic source-family still fails.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_Q119_NATIVE_1x_gray.png",
+          "sha256": "34dfcf63df99862a5fc48b225183aea0548b5cdf8a1e3f800f61c6c73760e75c"
+        }
+      },
+      "orientation": {
+        "result": "PASS_RAW_READABLE",
+        "observation": "2048x256 DXT5 header matches original; RAW mirror_y text is transformed to readable FLIP-Y consistently; screenshot is static, not gameplay.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261008-C290-C1-Q119-MISSING-WHITE-GLOW/C290_q119_RAW_gray.png",
+          "sha256": "0fc3730b5d8345062fa75512b3c7ee64f07e242b22c8dacbed1d09a0f2f25df1"
+        }
+      }
+    }
+  },
+  "calibration": "NOT_QUALIFIED; PASS barred anyway due concrete visual FAIL",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED_UNTIL_NEW_A_REPAIR_FRESH_C",
+  "approval_created": false,
+  "PRE_INGAME": "BLOCKED",
+  "user_jpg_accepted": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "rework_instruction": "A producer must add source-faithful WHITE OUTER GLOW outside navy stroke while retaining source orange/navy family, weight, original text bbox/positive margins, and all DXT5 partial-boundary 4x4 original endpoint/alpha outside invariants. Measure white halo using exact decoded RGB/alpha original and reproduce visible glow at native 100/75/50 + black/white/gray + RAW; avoid stretching Hangul or adding halo beyond source glyph-effect ceiling. Materially regenerate DDS then fresh independent C1 and separate C3; actual game retest independent.",
+  "forbidden_domains_touched": []
+}
