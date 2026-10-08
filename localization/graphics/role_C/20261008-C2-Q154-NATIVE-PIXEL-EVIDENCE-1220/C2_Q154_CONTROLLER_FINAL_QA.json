@@ -1,0 +1,39 @@
+{
+  "run": "20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "status": "HOLD_STRICT_RECHECK",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "prior_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "machine_evidence": "localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/C2_Q154_NATIVE_PIXEL_REPORT.json",
+  "region_evidence_dir": "localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/",
+  "independent_native_source_current_images": 16,
+  "contact_png": "localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/C2_Q154_ALL8_SOURCE_CURRENT_NATIVE_CONTACT.png",
+  "observations": {
+    "five_red": "Exact source/current native crops show five readable, upright high-contrast red Hangul labels with no definite broken syllable or source overlay in this pixel view. This review does not certify source-derived family typography equivalence.",
+    "three_gray": "Corrected native readable crops show all three gray labels present, upright and without definite clipped glyph pixels. Korean counters are visually open relative to earlier heavy B225; source-relative style still requires source-family profile and practical checks.",
+    "machine": "Verified three pinned 16,777,344-byte DDS hashes, exact header, current-vs-original 8/8 source-bbox containment, 0 RGBA and alpha outside source regions, 0 current-vs-B225 outside three gray rectangles, 29,377 RGBA changed pixels inside the gray rectangles, and byte-identical five red/protected pixels versus B225."
+  },
+  "stage_C": {
+    "result": "HOLD_STRICT_RECHECK",
+    "pixels_before_producer_verdict": false,
+    "calibration": "NOT_PERFORMED_THIS_RUN",
+    "source_clean_final_evidence": "INCOMPLETE_EXACT_CLEAN_PLATE",
+    "per_region_8_observations": "INCOMPLETE",
+    "reason": "Producer notes consumed before first native image review; cannot truthfully assert blind pixels-first verdict; clean/family/practical/black-white-gray views and all eight written check observations incomplete."
+  },
+  "stage_C3": {
+    "result": "BLOCKED_NO_INDEPENDENT_C_PASS",
+    "review_id": null
+  },
+  "approval_record_created": false,
+  "pre_ingame_export": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "execution_backend": "GitHub connector SSOT + N100 MCP fallback only for DDS SHA/native pixel decode; GPT local raw.githubusercontent.com DNS failure",
+  "post_task_cleanup": "PENDING_AFTER_REMOTE_VERIFICATION",
+  "forbidden_domains_touched": []
+}
