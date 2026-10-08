@@ -10,6 +10,8 @@ on:
       - 'tools/verify_vr_win32_cross_domain_safety.py'
       - '.github/workflows/dx9ex-fullsource-impact-review.yml'
       - 'src/**'
+      - 'external/imgui' # Pinned ImGui DX9 F11 runtime code is compiled into the game.
+      - '.gitmodules'
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'tools/Build-OutRunPCFast.ps1'
