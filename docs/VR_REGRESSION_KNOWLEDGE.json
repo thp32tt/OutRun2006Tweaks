@@ -862,7 +862,9 @@
         "3eeb5765f93df360d6454b5c0549191013bff33c — read-only GOAL/TIMEUP/LINK_TIMEUP per producer state/route/fvf/alpha telemetry at shader, XYZRHW and R62 fixedfn, not yet optical fix",
         "40d595f2771c0eec39a80385504e3b58baad726b — three distinct missing-route injected static checks",
         "docs/automation/reviews/AI2_GOAL_ENDTIME_WHITE_ALPHA_STEREO_CAUSE_REVIEW_20261009.md — full corrective user-repro and R73/R74 source differential",
-        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md — 2026-10-09 symptom correction"
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md — 2026-10-09 symptom correction",
+        "e57501f8cb411422b2a7ac6a89fb7459976bed52 — exact orthographic shader HUD original-game WVP fail-closed code path, potential GOAL binocular duplication repair; HMD UNTESTED",
+        "308bf647211f670974fb53ad7d60d398dea4667c — two shader HUD forms provenance+negative mutation tests, policy CI PASS"
       ],
       "revalidationTriggers": [
         "user reports GOAL/TIMEUP pre-restart timer overlapped or head-following (not the succeeding Theater restart page)",
@@ -879,6 +881,16 @@
           "User Quest3/VDXR: GOAL before restart time single aligned versus double; actual render path from VR P0 PRE_RESTART_HUD_FORM across 3 source candidates",
           "+TIME must be judged separately (historic unresolved), 6th/6 confirmed recovered, car rank 4/5 attached, F11/rival/DDS protected, restart 2D stays single"
         ]
+      },
+      "candidateFix": {
+        "sourceSha": "e57501f8cb411422b2a7ac6a89fb7459976bed52",
+        "verifierSha": "308bf647211f670974fb53ad7d60d398dea4667c",
+        "status": "SOURCE_CORRECTION_CI_PARTIAL_PASS_HMD_UNTESTED",
+        "finding": "R30 shader Hud2D exact ScreenHud formerly used live GetVertexShaderConstantF without original WVP provenance; unlike PerspectiveHud it could re-consume already stereo-injected c64.",
+        "change": "Hud2D joins bounded original game c64 owner and fails closed after shader-epoch/write-age proof; existing PerspectiveHud, world, rival, FVF0x142, both GOAL original calls and +TIME tick unchanged.",
+        "validation": "DX9Ex policy PASS (37859508332), EXE static analysis PASS (37859508345), Domain Isolation PASS (37859508246); final Windows game/host/HUD inspector package and full source jobs in progress at evidence time.",
+        "runtime": "UNTESTED; no claim that observed GOAL double or +TIME has been optically repaired",
+        "next": "Check exact source CI and package, then one Quest3/VDXR GOAL name + finish-time + separate +TIME optical session with VR P0 RAW_C64_OWNER and PRE_RESTART_HUD_FORM per producer"
       }
     },
     {
