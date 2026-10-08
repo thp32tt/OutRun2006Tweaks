@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B297",
+  "run_key": "OUTRUN-KOR-B297-Q060-IGR044-STAGE-NATIVE-FACE-20261009",
+  "queue_index": 60,
+  "priority": "P0",
+  "regression": "IGR-044",
+  "in_game_status": "OPEN_USER_INGAME_FAIL",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "current_candidate_sha256": "d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2",
+  "trial_sha256": "84c9a013ceb7a11240caeff48ca2dfc76f4702855b6b7fb030e5339f0ad74f70",
+  "new_working_trial_dds": 1,
+  "accepted_production_dds": 0,
+  "trial_promoted": false,
+  "machine_gates": {
+    "source_and_current_sha_pinned": true,
+    "dds_header_byte_equal": true,
+    "format": "RGBA32, mip1",
+    "native_dimensions": [
+      4096,
+      2048
+    ],
+    "original_effect_bbox": [
+      455,
+      245,
+      690,
+      350
+    ],
+    "trial_visible_bbox": [
+      462,
+      251,
+      680,
+      343
+    ],
+    "original_ceiling_and_positive_margin": "PASS",
+    "changed_rgba_pixels": 13696,
+    "changed_pixels_outside_original_stage_bbox": 0,
+    "protected_RANKING_RANK_B296_WHITE_GOLD": "EXACT_UNCHANGED",
+    "recovered_stage_source_clean_alpha": 0,
+    "source_clean_protected_outside_stage_bbox": "EXACT_UNCHANGED",
+    "final_roundtrip": "PASS",
+    "RAW_orientation": "MIRROR_Y"
+  },
+  "producer_visual": "FAIL_NATIVE_SOURCE_STYLE_AND_GLYPH_INTEGRITY",
+  "preview_inspected": [
+    "SOURCE_CLEAN_OLD_TRIAL_GRAY_100pct.png",
+    "SOURCE_CLEAN_OLD_TRIAL_GRAY_50pct.png",
+    "SOURCE_CLEAN_OLD_TRIAL_RAW.png"
+  ],
+  "observed_defects": [
+    {
+      "code": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+      "result": "FAIL",
+      "detail": "Original English Stage has solid heavy rounded italic gold face, bold navy separation and clean white outer rim; trial Hangul remains visibly narrow and outline-dominant, with patchy gold fill and unsourced edge profile."
+    },
+    {
+      "code": "GLYPH_INTEGRITY_RAGGED_PIXEL_EDGE",
+      "result": "FAIL",
+      "detail": "At 100% and mirrored RAW, trial Korean Stage shows jagged black/white edge flecks and broken/interrupted interior outline compared with smooth English rounded source."
+    },
+    {
+      "code": "FONT_FAMILY_CONDENSED_WEIGHT_MISMATCH",
+      "result": "FAIL",
+      "detail": "Native and practical 50% trial still differs significantly from English stage-family hierarchy and weight. 1px silhouette expansion and 3-band recolor cannot synthesize correct native Korean face geometry."
+    }
+  ],
+  "ordered_visual_checks": {
+    "SOURCE_CLEAN": "SOURCE_REGION_ZERO_ALPHA_EXACT; SOURCE_SIDE_NEIGHBOR_RETAINED; FULL_PLATE_GAME_COMPOSITION_UNTESTED",
+    "CLEAN_FINAL": "PROTECTED_OUTSIDE_EXACT; VISIBLE_GLYPH_FACE_FAIL",
+    "source_slope": "OLD_KOREAN_SLOPE_PRESERVED_BUT_NOT_INDEPENDENT_SOURCE_STYLE_PASS",
+    "size": "NUMERIC_CONTAINMENT_PASS_VISUAL_WEIGHT_FAIL",
+    "outline_and_effects": "FAIL_BROKEN_THIN_NEAR_EMPTY_GOLD_CORE",
+    "clipping": "BBOX_PASS_BUT_RAGGED_ANTIALIAS_FAIL",
+    "protected": "NUMERIC_CHANGED_OUTSIDE_ZERO",
+    "raw_flipy": "MIRROR_Y_PREVIEW_INSPECTED_FAIL_GLYPH",
+    "game_size": "50PCT_INSPECTED_FAIL_SOURCE_FAMILY"
+  },
+  "root_cause": "Existing C315-rejected narrow/metallic Korean outline silhouette lacks a real filled source-relative glyph core. Recoloring or radius-1 dilation alone cannot recreate the authentic English gold-heavy Stage typeface; the rejected B286 generic Noto regeneration is also unsuitable.",
+  "correction_required": "Create materially different native source-conditioned vector/glyph master with filled gold faces, source radius/tilt, soft navy-and-white depth; SOURCE/CLEAN separate lossless proof before composition and composited 100/75/50 RAW/mip proofs. Do NOT repeat the same pixel-dilation or flat Noto styling.",
+  "handoff": {
+    "index_status": "REWORK_REQUIRED",
+    "B296_white_face_fix": "PRESERVED",
+    "remaining_defects": [
+      "STAGE_SOURCE_FACE_RECONSTRUCTION",
+      "OUTRUN_MILES_GOLD_SOURCE_BEVEL_RECONSTRUCTION"
+    ],
+    "fresh_C2": "BLOCKED_UNTIL_SOURCE_STYLE_FIXED",
+    "C3": "BLOCKED",
+    "USER_RETEST": "NEW_ACTUAL_GAME_RETEST_REQUIRED"
+  },
+  "approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excludes": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "backend": "GitHub Actions native DDS; short remote PNG transfer only to N100 MCP for controller visual inspection"
+}
