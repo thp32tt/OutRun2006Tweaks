@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B261-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "BF229CF4_512x512.dds",
+  "canonical_source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "preexisting_rejected_B259_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "B260_material_trial_sha256": "0036a943265c0244ec9c9e53e6d9e55e205c08b0d59699275f02631d82b5a903",
+  "B261_material_trial_sha256": "d900d347b0e6882b9e9be072fc25bb92f9a21ca533745cc8ee584702938b8e9d",
+  "method_change_justification": [
+    "C285 source family mismatch",
+    "C289 source family mismatch"
+  ],
+  "source_derived_profile": "localization/graphics/role_B/20261008-B260-Q214-BC3-FACE-PRIORITY/B260_SOURCE_FAMILY_PROFILE.json",
+  "read_only_triage": "localization/graphics/role_B/20261008-B260-Q214-BC3-FACE-PRIORITY/B260_REWORK_TRIAGE.json",
+  "first_hand_views": [
+    "B260_SOURCE_CLEAN_B253_NEW_NATIVE6X.png",
+    "B261_SOURCE_CLEAN_B253_NEW_NATIVE6X.png",
+    "B261_FINAL_RAW.png",
+    "B261_PRACTICAL_50.png"
+  ],
+  "machine_status": "PASS_2_BBOX_ZERO_RGBA_ALPHA_OUTSIDE_BC3_FACE_RECALL_1_1",
+  "visual_decision": "REWORK_REQUIRED",
+  "B260_observation": "Warm-metal edge mask replaced much of the cream face with flat salmon/pink blobs and damaged readability; numeric bright-face recall did not detect this.",
+  "B261_observation": "Sparse-bevel fix restored some cream face and glyph counters, but direct source-native comparison still reveals washed-out salmon fronts and horizontal red scanline through GOAL; original strong condensed cream/gold 3D italic typography is absent.",
+  "promote_trial_to_current": false,
+  "recovery_action": "Restore exact pre-B260 B259 candidate bytes, which remain REWORK_REQUIRED per C289; retain source-family reference as evidence for a different manual/vector construction method. Do not treat rollback as C pass.",
+  "independent_C2": "NOT_PERFORMED_ON_B261",
+  "C3": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "github_actions": [
+    37744245830,
+    37744561228
+  ],
+  "backend": "GITHUB_HOSTED_CPU_LOCAL_PUBLIC_GITHUB_DNS_FAILED",
+  "cleanup": "GITHUB_HOSTED_EPHEMERAL_SCRATCH_NO_N100",
+  "forbidden_domains_touched": []
+}
