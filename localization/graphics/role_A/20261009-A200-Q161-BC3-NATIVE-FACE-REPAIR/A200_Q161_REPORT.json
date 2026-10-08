@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR",
+  "index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "0b12c672224ce05acb9470af895bbda335cc5543",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
+  },
+  "atlas_provenance": {
+    "blob_sha1": "70001b44445f3e10b46eb7e3480abdece8eda790",
+    "sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982",
+    "regions": 38
+  },
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "DXT5",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "old_candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "targeted_regions": [
+    {
+      "idx": 4,
+      "source": "PISCES",
+      "korean": "물고기자리",
+      "cell": [
+        0,
+        1856,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "source_mask_pixels": 5892,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1866,
+        206,
+        1909
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 44,
+      "block_safe_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "render_safe_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "render_method": "NATURAL_CJK_WIDTH_ALPHA_CONTINUOUS_NO_HORIZ_SQUISH",
+      "natural_width_before_condense": 198,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "prior_localized_width": 200,
+      "prior_localized_height": 48,
+      "prior_delta_left": 2,
+      "localized_bbox": [
+        8,
+        1866,
+        206,
+        1909
+      ],
+      "localized_width": 198,
+      "localized_height": 43,
+      "source_width": 203,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 3,
+      "delta_top": 3,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "decoded_core_interior_pinhole_pixels": 0,
+      "decoded_core_color_mismatch_pixels": 0
+    },
+    {
+      "idx": 6,
+      "source": "LEO",
+      "korean": "사자",
+      "cell": [
+        0,
+        1792,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "source_mask_pixels": 3062,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1800,
+        98,
+        1848
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "render_safe_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "render_method": "NATURAL_CJK_WIDTH_ALPHA_CONTINUOUS_NO_HORIZ_SQUISH",
+      "natural_width_before_condense": 90,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "prior_localized_width": 100,
+      "prior_localized_height": 48,
+      "prior_delta_left": 3,
+      "localized_bbox": [
+        8,
+        1800,
+        98,
+        1848
+      ],
+      "localized_width": 90,
+      "localized_height": 48,
+      "source_width": 105,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 12,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "decoded_core_interior_pinhole_pixels": 0,
+      "decoded_core_color_mismatch_pixels": 0
+    }
+  ],
+  "repaired_rows": 2,
+  "other_regions_preserved": 36,
+  "untouched_BC3_blocks": 261038,
+  "translation_policy_note": "LEO -> 사자 uses semantically accurate shorter constellation label to avoid 0.5682 horizontal squish; PISCES keeps 물고기자리 with smaller natural unscaled CJK; policy exception pending independent C/user confirmation",
+  "new_method": "Native unsqueezed Korean + exact source-flat gray RGB565 block face for non-pinhole color + fixed BC3 alpha endpoints from glyph only; untouched old compressed blocks outside original PISCES/LEO bboxes",
+  "source_clean": "Old verified source DDS versus two cleared source-effect bboxes, no changed pixels outside for retained candidate",
+  "machine_checks": {
+    "changed_pixels_outside_two_bboxes": 0,
+    "alpha_changed_outside_two_bboxes": 0,
+    "introduced_visible_outside_two_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "2/2 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "persisted_dds_roundtrip": "PASS decoded source-visible and exact output header",
+  "producer_status": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

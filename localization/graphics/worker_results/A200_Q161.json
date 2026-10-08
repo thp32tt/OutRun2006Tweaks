@@ -1,0 +1,28 @@
+{
+  "role": "A",
+  "run": "20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR",
+  "index": 161,
+  "candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "repaired_regions": [
+    4,
+    6
+  ],
+  "prior_candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "machine_qa": {
+    "changed_pixels_outside_two_bboxes": 0,
+    "alpha_changed_outside_two_bboxes": 0,
+    "introduced_visible_outside_two_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "2/2 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "worker_status": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "report": "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_Q161_REPORT.json"
+}
