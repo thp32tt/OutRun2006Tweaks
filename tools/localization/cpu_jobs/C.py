@@ -85,9 +85,14 @@ for name,en,ko,(l,t,r,b) in specs:
  assert min(margins)>0,(name,margins)
  assert np.count_nonzero(kr[:,:,3])==0,(name,"clean alpha remaining")
  # A full-width lossless native source/final comparison with optional proxies marked.
- ref=Image.new("RGBA",(2*(r-l),b-t+28),(52,52,52,255))
- ref.paste(Image.fromarray(sr,"RGBA"),(0,28))
- ref.paste(Image.fromarray(fr,"RGBA"),(r-l,28))
+ # Visual evidence must ALPHA COMPOSITE: hidden RGB in transparent DDS texels is never visible.
+ # Direct RGBA paste followed by RGB conversion wrongly reveals transparent atlas payload.
+ ref=Image.new("RGB",(2*(r-l),b-t+28),(75,75,75))
+ for arr,x0 in ((sr,0),(fr,r-l)):
+  rgba=Image.fromarray(arr,"RGBA")
+  bg=Image.new("RGBA",rgba.size,(128,128,128,255))
+  composed=Image.alpha_composite(bg,rgba).convert("RGB")
+  ref.paste(composed,(x0,28))
  d=ImageDraw.Draw(ref)
  d.text((3,7),"PINNED ENGLISH ORIGINAL",fill="white")
  d.text((r-l+3,7),"CURRENT PERSISTED KOREAN DDS",fill="white")
@@ -100,9 +105,9 @@ for name,en,ko,(l,t,r,b) in specs:
    ymax=min(ref.height-1,28+v["y"][1])
    if ymax<=ymin:continue
    d.line((offset+mid,ymin,offset+mid,ymax),fill=(0,245,245,150),width=1)
- ref.convert("RGB").save(O/(name+"_NATIVE_SOURCE_FINAL_MARKED.png"))
+ ref.save(O/(name+"_NATIVE_SOURCE_FINAL_MARKED.png"))
  # Practical 50% proof matching exact full width without truncating Korean suffixes.
- ref.resize((ref.width//2,ref.height//2),Image.Resampling.LANCZOS).convert("RGB").save(O/(name+"_PRACTICAL50_MARKED.png"))
+ ref.resize((ref.width//2,ref.height//2),Image.Resampling.LANCZOS).save(O/(name+"_PRACTICAL50_MARKED.png"))
  raw_t,raw_b=1024-b,1024-t
  assert np.array_equal(np.flipud(raw_s[raw_t:raw_b,l:r]),sr)
  assert np.array_equal(np.flipud(raw_f[raw_t:raw_b,l:r]),fr)
