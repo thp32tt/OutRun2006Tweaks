@@ -340,7 +340,42 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
 
-# R316: R275 logs exact/objectReady/snapshot only. Native R275's receipt
+R317_RECEIPT_HEX_FIELDS = ['cacheKey','vertexVersionToken','pixelVersionToken','vertexBytecodeHash','pixelBytecodeHash','translatedVertexSemanticHash','translatedPixelSemanticHash','translatorRevisionHash','semanticContractHash','sourcePairSemanticHash','sourceConstantMappingHash','sourceSamplerMappingHash','sourceMappingPlanRevisionHash','sourceMappingSemanticContractHash','translationObjectSnapshotToken','sourceMappingHandoffSnapshotToken','translationPlanSnapshotToken']
+R317_RECEIPT_BOOL_FIELDS = ['vertexSemanticExact','pixelSemanticExact','constantRegisterMappingExact','samplerMappingExact']
+R317_RECEIPT_INPUT_RE = re.compile(
+    r"VR DX11 R317 receiptInputs signature#(?P<signature>\\d+): ".replace(r"\\d", r"\d")
+    + " ".join(
+        f"{name}=0x(?P<{name}>[0-9A-Fa-f]{{1,16}})"
+        for name in R317_RECEIPT_HEX_FIELDS
+    )
+    + " "
+    + " ".join(
+        f"{name}=(?P<{name}>[01])"
+        for name in R317_RECEIPT_BOOL_FIELDS
+    )
+    + r"(?=\\s|$)".replace(r"\\s", r"\s")
+)
+
+
+def recompute_r275_receipt_scalar_snapshot(fields: dict) -> int:
+    """Replay native R275's 64-bit scalar mix, not object ownership proof."""
+    mask = (1 << 64) - 1
+    token = 0xCBF29CE484222325
+    for name in (*R317_RECEIPT_HEX_FIELDS, *R317_RECEIPT_BOOL_FIELDS):
+        value = fields[name]
+        token ^= (
+            value + 0x9E3779B97F4A7C15
+            + ((token << 6) & mask) + (token >> 2)
+        ) & mask
+        token &= mask
+    token ^= (
+        0x275276 + 0x9E3779B97F4A7C15
+        + ((token << 6) & mask) + (token >> 2)
+    ) & mask
+    return (token & mask) or 1
+
+
+# R316: Legacy R275 logs exact/objectReady/snapshot only. Native R275's receipt
 # hash binds source bytecode, the translation object and R273/R276 inputs.
 # None of those object/provenance bindings is authenticated by the R275 line.
 R275_UNLOGGED_RECEIPT_BINDINGS = (
@@ -354,9 +389,10 @@ R275_UNLOGGED_RECEIPT_BINDINGS = (
 
 
 def annotate_r275_receipt_provenance(
-    receipt: dict, plan: dict | None, handoff: dict | None
+    receipt: dict, plan: dict | None, handoff: dict | None,
+    inputs: dict | None = None, source_pair: dict | None = None
 ) -> None:
-    """Keep raw R275 claims separate from independently validated provenance."""
+    """Recompute R275 scalar digest without confusing it for device ownership."""
     exact = receipt["exact"]
     snapshot = receipt["snapshot"]
     shape_valid = (
@@ -367,15 +403,56 @@ def annotate_r275_receipt_provenance(
         plan is not None and plan.get("summary_correlation_exact")
         and handoff is not None and handoff.get("summary_correlation_exact")
     )
+    inputs_unique = bool(inputs is not None and not inputs["duplicate"])
+    calculated = (
+        recompute_r275_receipt_scalar_snapshot(inputs["fields"])
+        if inputs_unique else None
+    )
+    scalar_matches = bool(
+        exact and inputs_unique and calculated == snapshot
+    )
+    bindings_correlated = bool(
+        inputs_unique and plan is not None and handoff is not None
+        and source_pair is not None
+        and inputs["fields"]["cacheKey"] == source_pair["cache_key"]
+        and inputs["fields"]["translatedVertexSemanticHash"]
+            == plan["target_vertex_semantic_hash"]
+        and inputs["fields"]["translatedPixelSemanticHash"]
+            == plan["target_pixel_semantic_hash"]
+        and inputs["fields"]["translatorRevisionHash"]
+            == plan["translator_revision_hash"]
+        and inputs["fields"]["semanticContractHash"]
+            == plan["semantic_contract_hash"]
+        and inputs["fields"]["sourceMappingHandoffSnapshotToken"]
+            == handoff["snapshot"]
+        and inputs["fields"]["translationPlanSnapshotToken"]
+            == plan["snapshot"]
+    )
     receipt.update({
         "claim_shape_consistent": shape_valid,
         "producer_chain_correlated": producer_correlated,
-        "unlogged_receipt_bindings": list(R275_UNLOGGED_RECEIPT_BINDINGS),
+        "r317_inputs_present": inputs is not None,
+        "r317_inputs_unique": inputs_unique,
+        "r317_scalar_snapshot_calculated": calculated,
+        "r317_scalar_snapshot_matches": scalar_matches,
+        "r317_logged_producer_bindings_correlated": bindings_correlated,
+        "unlogged_receipt_bindings": (
+            [] if inputs_unique else list(R275_UNLOGGED_RECEIPT_BINDINGS)
+        ),
+        # Scalar evidence never authenticates native object/device lifetime.
         "snapshot_independently_verified": False,
         "provenance_status": (
             "CONTRADICTORY_R275_TELEMETRY" if not shape_valid
+            else "DUPLICATE_R317_RECEIPT_INPUTS"
+            if inputs is not None and not inputs_unique
+            else "R275_SCALAR_HASH_MISMATCH"
+            if exact and inputs_unique and not scalar_matches
+            else "R317_PRODUCER_SCALAR_MISMATCH"
+            if exact and inputs_unique and not bindings_correlated
             else "UNVERIFIABLE_R275_PRODUCER_CHAIN"
             if exact and not producer_correlated
+            else "R275_SCALAR_HASH_RECONSTRUCTED_OBJECT_UNVERIFIED"
+            if exact and scalar_matches
             else "UNVERIFIABLE_R275_UNLOGGED_BINDINGS"
         ),
         "diagnostic_only": True,
@@ -1325,6 +1402,7 @@ def main() -> int:
     target_materialization_contracts: dict[SignatureKey, dict] = {}
     target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
+    translated_receipt_inputs: dict[SignatureKey, dict] = {}
     production_activation_prerequisites: dict[SignatureKey, dict] = {}
     production_observations: dict[SignatureKey, dict] = {}
     production_semantic_reviews: dict[SignatureKey, dict] = {}
@@ -1726,6 +1804,27 @@ def main() -> int:
                     "snapshot": int(data["snapshot"], 16),
                     "snapshot_hex": "0x" + data["snapshot"].upper(),
                 }
+                continue
+
+            match = R317_RECEIPT_INPUT_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                fields = {
+                    name: int(data[name], 16)
+                    for name in R317_RECEIPT_HEX_FIELDS
+                }
+                fields.update({
+                    name: int(data[name])
+                    for name in R317_RECEIPT_BOOL_FIELDS
+                })
+                if signature_key in translated_receipt_inputs:
+                    translated_receipt_inputs[signature_key]["duplicate"] = True
+                else:
+                    translated_receipt_inputs[signature_key] = {
+                        "fields": fields, "duplicate": False
+                    }
                 continue
 
             match = R275_SEMANTIC_RECEIPT_RE.search(line)
@@ -2562,7 +2661,9 @@ def main() -> int:
         )
         if translated_semantic_receipt is not None:
             annotate_r275_receipt_provenance(
-                translated_semantic_receipt, semantic_plan, source_mapping_handoff
+                translated_semantic_receipt, semantic_plan, source_mapping_handoff,
+                translated_receipt_inputs.get(signature_key),
+                source_semantic_pair,
             )
         signature["translated_semantic_receipt"] = translated_semantic_receipt
         signature["production_activation_prerequisite"] = (

@@ -733,6 +733,10 @@ namespace outrun::vr::dx11
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
+            // R317: capture the actual R275 producer-owned scalar tuple at
+            // observation time; never reconstruct it from later mutable state.
+            NativeProgrammableShaderTranslatedSemanticReceipt
+                shaderTranslatedSemanticReceiptEvidence{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -2660,6 +2664,8 @@ namespace outrun::vr::dx11
                 translatedSemanticReceipt.translationObjectReady;
             sig.shaderTranslatedSemanticReceiptSnapshotToken =
                 translatedSemanticReceipt.reviewSnapshotToken;
+            sig.shaderTranslatedSemanticReceiptEvidence =
+                translatedSemanticReceipt;
 
             // R80 starts fail-closed. R215 may promote only the later
             // fixed-function branch after its resource-dependent pixel
@@ -3452,6 +3458,36 @@ namespace outrun::vr::dx11
                         sig.shaderTranslatedSemanticReceiptExact ? 1 : 0,
                         sig.shaderTranslatedSemanticReceiptObjectReady ? 1 : 0,
                         sig.shaderTranslatedSemanticReceiptSnapshotToken);
+
+                    // R317: independent scalar-hash reconstruction only.
+                    // These diagnostic values do not certify object ownership
+                    // and never grant programmable native Draw* authority.
+                    const auto& receipt =
+                        sig.shaderTranslatedSemanticReceiptEvidence;
+                    spdlog::info(
+                        "VR DX11 R317 receiptInputs signature#{}: cacheKey=0x{:016X} vertexVersionToken=0x{:016X} pixelVersionToken=0x{:016X} vertexBytecodeHash=0x{:016X} pixelBytecodeHash=0x{:016X} translatedVertexSemanticHash=0x{:016X} translatedPixelSemanticHash=0x{:016X} translatorRevisionHash=0x{:016X} semanticContractHash=0x{:016X} sourcePairSemanticHash=0x{:016X} sourceConstantMappingHash=0x{:016X} sourceSamplerMappingHash=0x{:016X} sourceMappingPlanRevisionHash=0x{:016X} sourceMappingSemanticContractHash=0x{:016X} translationObjectSnapshotToken=0x{:016X} sourceMappingHandoffSnapshotToken=0x{:016X} translationPlanSnapshotToken=0x{:016X} vertexSemanticExact={} pixelSemanticExact={} constantRegisterMappingExact={} samplerMappingExact={}",
+                        unique,
+                        receipt.cacheKey,
+                        receipt.vertexVersionToken,
+                        receipt.pixelVersionToken,
+                        receipt.vertexBytecodeHash,
+                        receipt.pixelBytecodeHash,
+                        receipt.translatedVertexSemanticHash,
+                        receipt.translatedPixelSemanticHash,
+                        receipt.translatorRevisionHash,
+                        receipt.semanticContractHash,
+                        receipt.sourcePairSemanticHash,
+                        receipt.sourceConstantMappingHash,
+                        receipt.sourceSamplerMappingHash,
+                        receipt.sourceMappingPlanRevisionHash,
+                        receipt.sourceMappingSemanticContractHash,
+                        receipt.translationObjectSnapshotToken,
+                        receipt.sourceMappingHandoffSnapshotToken,
+                        receipt.translationPlanSnapshotToken,
+                        receipt.vertexSemanticExact ? 1 : 0,
+                        receipt.pixelSemanticExact ? 1 : 0,
+                        receipt.constantRegisterMappingExact ? 1 : 0,
+                        receipt.samplerMappingExact ? 1 : 0,);
                 }
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",

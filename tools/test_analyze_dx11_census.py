@@ -2698,6 +2698,68 @@ def main() -> int:
     )
     assert r316_unbound["NativeDrawPathActivationAllowed"] is False
 
+
+    # R317: source-side scalar telemetry must permit an exact 64-bit hash
+    # reconstruction but cannot by itself authenticate real D3D11 objects.
+    from analyze_dx11_census import (
+        R317_RECEIPT_HEX_FIELDS, R317_RECEIPT_BOOL_FIELDS,
+        recompute_r275_receipt_scalar_snapshot,
+    )
+    r317_fields = {
+        name: index + 0x100
+        for index, name in enumerate(R317_RECEIPT_HEX_FIELDS)
+    }
+    r317_fields.update({name: 1 for name in R317_RECEIPT_BOOL_FIELDS})
+    r317_snapshot = recompute_r275_receipt_scalar_snapshot(r317_fields)
+    assert r317_snapshot != 0
+    r317_prefix = (
+        "VR DX11 R275 translatedSemanticReceipt signature#1: "
+        f"exact=1 objectReady=1 snapshot=0x{r317_snapshot:016X}\\n"
+    ).replace("\\\\n", "\\n")
+    r317_inputs_line = (
+        "VR DX11 R317 receiptInputs signature#1: "
+        + " ".join(
+            f"{name}=0x{r317_fields[name]:016X}"
+            for name in R317_RECEIPT_HEX_FIELDS
+        )
+        + " "
+        + " ".join(
+            f"{name}={r317_fields[name]}"
+            for name in R317_RECEIPT_BOOL_FIELDS
+        )
+        + "\\n"
+    )
+    def r317_case(snapshot_line: str, inputs_line: str) -> tuple[dict, dict]:
+        report = run_case(
+            "VR DX11 R73 signature#1: primitive=4 fixedFn=0\\n"
+            + snapshot_line + inputs_line
+        )
+        receipt = report["ActivationEvidence"]["ProgrammableShaderInventory"][
+            "Pairs"
+        ][0]["SemanticTranslationEvidence"][0]["Receipt"]
+        return report, receipt
+
+    r317_good, r317_receipt = r317_case(r317_prefix, r317_inputs_line)
+    assert r317_receipt["r317_inputs_present"] is True
+    assert r317_receipt["r317_inputs_unique"] is True
+    assert r317_receipt["r317_scalar_snapshot_matches"] is True
+    assert r317_receipt["snapshot_independently_verified"] is False
+    assert r317_receipt["activation_proof"] is False
+    assert r317_good["NativeDrawPathActivationAllowed"] is False
+
+    r317_wrong, r317_bad = r317_case(
+        r317_prefix.replace(f"{r317_snapshot:016X}", "DEADBEEFDEADBEEF"),
+        r317_inputs_line
+    )
+    assert r317_bad["r317_scalar_snapshot_matches"] is False
+    assert r317_bad["provenance_status"] == "R275_SCALAR_HASH_MISMATCH"
+    assert r317_wrong["NativeDrawPathActivationAllowed"] is False
+    _, r317_duplicate = r317_case(
+        r317_prefix, r317_inputs_line + r317_inputs_line
+    )
+    assert r317_duplicate["r317_inputs_unique"] is False
+    assert r317_duplicate["provenance_status"] == "DUPLICATE_R317_RECEIPT_INPUTS"
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
