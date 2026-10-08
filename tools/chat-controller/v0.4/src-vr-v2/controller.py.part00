@@ -64,11 +64,13 @@ LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "
 CONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
 CONVERSION_ACTIVE_LIMIT = max(1, int(os.getenv("CONVERSION_ACTIVE_LIMIT", "2")))
 CONVERSION_DX11_ENABLED = os.getenv("CONVERSION_DX11_ENABLED", "true").lower() == "true"
-CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "true").lower() == "true"
+CONVERSION_DXVK_ENABLED = os.getenv("CONVERSION_DXVK_ENABLED", "true").lower() == "true"
+# DX9Ex is a protected reference/maintenance lane, not a continuous
+# co-primary producer. Opt in only for a critical baseline regression.
+CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "false").lower() == "true"
 CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "").strip().upper()
 if CONVERSION_ONLY_SLOT not in {"", "A", "B", "C"}:
     raise ValueError(f"Unsupported CONVERSION_ONLY_SLOT={CONVERSION_ONLY_SLOT!r}; expected A, B, C, or empty")
-CONVERSION_DXVK_DEFERRED = os.getenv("CONVERSION_DXVK_DEFERRED", "true").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
@@ -276,9 +278,9 @@ runtime = {
     "conversion_parallel": CONVERSION_PARALLEL,
     "conversion_active_limit": CONVERSION_ACTIVE_LIMIT,
     "conversion_dx11_enabled": CONVERSION_DX11_ENABLED,
+    "conversion_dxvk_enabled": CONVERSION_DXVK_ENABLED,
     "conversion_dx9ex_enabled": CONVERSION_DX9EX_ENABLED,
     "conversion_only_slot": CONVERSION_ONLY_SLOT,
-    "conversion_dxvk_deferred": CONVERSION_DXVK_DEFERRED,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
@@ -1074,6 +1076,13 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if lane in {"DX11", "DXVK", "DX9EX"}:
+        lines += [
+            "실기 HMD/게임 화면 테스트가 없다는 이유로 C0~C6 소스 개발을 중단하지 마. HMD 전용 결론/백엔드 승격만 NEED_HMD_TEST 또는 BLOCKED_RUNTIME으로 주차해.",
+            "그 즉시 같은 브랜치의 다음 독립 실행 가능한 구현 항목을 선택해 실제 소스/검증 도구를 수정하고, 관련 정적 검증 1회 + exact-SHA CI를 수행해. 동일 소스의 HUD 1000/5000회 반복, 기존 PASS 재검사, 문서/해시/상태 커밋만으로 C2를 완료하지 마.",
+            "다른 작업자와 같은 work_key/파일/Task를 중복 수정하지 말고 원격 claim/HEAD를 확인해. 이미 진행 중인 CI는 새 상태 커밋으로 취소하지 마.",
+            "배포/실기 PASS는 실제 Quest3/VDXR 검증 이후에만 선언해. 완료한 C0~C6+정확한 GitHub Gate가 확인되면 기존 TASK_ID를 재실행하지 말고 다음 독립 항목을 진행해.",
+        ]
     if lane.startswith("LOCALIZATION_"):
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:

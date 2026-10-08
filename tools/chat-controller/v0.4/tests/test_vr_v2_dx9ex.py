@@ -19,6 +19,14 @@ def load_queue_target():
 
 
 
+def load_dispatch_plan():
+    tree = ast.parse(SOURCE)
+    fn = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'conversion_dispatch_plan')
+    ns = {}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), '<dispatch-plan>', 'exec'), ns)
+    return ns['conversion_dispatch_plan']
+
+
 def load_liveness_helpers():
     tree = ast.parse(SOURCE)
     names = {'rollover_has_confirmed_ui_failure', 'hold_unconfirmed_chat'}
@@ -58,12 +66,11 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('resized chat slots from %s to %s while preserving state', SOURCE)
         self.assertTrue((ROOT / 'conversion_dx9ex.md').stat().st_size > 0)
 
-    def test_dx9ex_structural_refactor_is_priority_zero(self):
+    def test_dx9ex_is_opt_in_maintenance_only(self):
         prompt = (ROOT / 'conversion_dx9ex.md').read_text()
-        self.assertIn('0순위는 현재 진행 중인 DX9Ex 구조 개선/리팩터링 작업이다', prompt)
-        self.assertIn('docs/VR_REFACTOR_STATE.json', prompt)
-        self.assertIn('R33 final dispatcher', prompt)
-        self.assertIn('구조 개선이 현재 Git 상태에서 명시적으로 완료되었거나', prompt)
+        self.assertIn('보호된 DX9Ex 기준 유지보수 전용', prompt)
+        self.assertIn('NEED_HMD_TEST', prompt)
+        self.assertNotIn('0순위는 현재 진행 중인 DX9Ex 구조 개선/리팩터링 작업이다', prompt)
 
     def test_conversion_lanes_are_independent(self):
         self.assertIn('async def conversion_parallel_cycle', SOURCE)
@@ -75,13 +82,19 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('stale pre-independent-conversion active_by_lane state', SOURCE)
         self.assertIn('for lane_key in ("A", "B", "C")', SOURCE)
 
-    def test_priority_policy_defers_dxvk(self):
-        self.assertIn('("A", CONVERSION_DX11_ENABLED)', SOURCE)
-        self.assertIn('("C", CONVERSION_DX9EX_ENABLED)', SOURCE)
-        self.assertIn('if high_active >= CONVERSION_ACTIVE_LIMIT', SOURCE)
-        self.assertIn('CONVERSION_DXVK_DEFERRED', SOURCE)
-        self.assertIn('high_active == 0', SOURCE)
-        self.assertIn('Co-primary A(DX11) + C(DX9Ex); B(DXVK deferred)', SOURCE)
+    def test_dx11_dxvk_primary_dx9ex_opt_in_and_capacity_safe(self):
+        plan = load_dispatch_plan()
+        self.assertEqual(plan({}, 2, True, True, False), ('A', 'B'))
+        self.assertEqual(plan({}, 2, True, True, True), ('A', 'B'))
+        self.assertEqual(plan({'A': {'phase': 'WAIT_ACTIONS'}}, 2, True, True, True), ('B',))
+        self.assertEqual(plan({'C': {'phase': 'WAIT_CHAT'}}, 2, True, True, True), ('A',))
+        self.assertEqual(plan({'A': {'phase': 'WAIT_CHAT'}, 'C': {'phase': 'WAIT_ACTIONS'}}, 2, True, True, True), ())
+        self.assertEqual(plan({'A': {'phase': 'DONE'}}, 2, True, True, False), ('B',))
+        self.assertEqual(plan({'A': {'phase': 'HOLD_OWNER_UNCERTAIN'}}, 2, True, True, False), ('B',))
+        self.assertEqual(plan({}, 1, False, False, True), ('C',))
+        self.assertEqual(plan({}, 0, True, True, True), ())
+        self.assertIn('for lane_key in conversion_dispatch_plan(', SOURCE)
+        self.assertNotIn('CONVERSION_DXVK_DEFERRED', SOURCE)
 
     def test_single_lane_policy_freezes_non_dx9ex(self):
         self.assertIn('CONVERSION_ONLY_SLOT', SOURCE)
@@ -236,11 +249,15 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
         self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
         self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
-        self.assertIn('CONVERSION_DX9EX_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DXVK_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DX9EX_ENABLED: "false"', compose)
         self.assertIn('CONVERSION_ONLY_SLOT: ""', compose)
-        self.assertIn('CONVERSION_DXVK_DEFERRED: "true"', compose)
+        self.assertNotIn("CONVERSION_DXVK_DEFERRED", compose)
         self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
         self.assertIn('QUEUE_NEXT_TASK_DELAY_SECONDS: "180"', compose)
+        self.assertIn("실기 HMD/게임 화면 테스트가 없다는 이유로", SOURCE)
+        self.assertIn("1000/5000회 반복", SOURCE)
+        self.assertIn("실기 테스트가 필요한 항목은", (ROOT / "conversion_dx11.md").read_text())
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "3600"', compose)
         self.assertIn('MAX_CHAT_ROLLOVERS_PER_TASK: "1"', compose)
         self.assertIn('CHAT_ROTATE_COMPLETED_TASKS: "5"', compose)

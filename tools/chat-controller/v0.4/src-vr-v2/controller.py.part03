@@ -1798,6 +1798,36 @@ async def conversion_process_lane(
         save_queue_state(q)
 
 
+def conversion_dispatch_plan(
+    active_by_lane: dict,
+    limit: int,
+    dx11_enabled: bool,
+    dxvk_enabled: bool,
+    dx9ex_enabled: bool,
+) -> tuple[str, ...]:
+    """Bounded priority order A(DX11), B(DXVK), C(DX9Ex opt-in maintenance).
+
+    Includes *all* active slots in WIP calculation, not only primary slots.
+    Never replaces/duplicates a running, uncertain, or CI-waiting task.
+    """
+    occupied = sum(
+        1 for task in active_by_lane.values()
+        if isinstance(task, dict) and task.get("phase") != "DONE"
+    )
+    available = max(0, limit - occupied)
+    if not available:
+        return ()
+    candidates = (
+        ("A", dx11_enabled),
+        ("B", dxvk_enabled),
+        ("C", dx9ex_enabled),
+    )
+    return tuple(
+        lane for lane, enabled in candidates
+        if enabled and lane not in active_by_lane
+    )[:available]
+
+
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
     """Keep DX11, DXVK and DX9Ex independently active; one stalled lane must not block the others."""
     now = datetime.now(TZ)
@@ -1884,50 +1914,24 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         )
         return
 
-    # Co-primary policy:
-    #   A = DX11 conversion (dispatch first so it resumes immediately)
-    #   C = DX9Ex structural refactor
-    #   B = DXVK fallback only when both co-primary lanes are unavailable.
-    # Fill all available high-priority capacity in one scheduler cycle instead
-    # of dispatching only one new lane and waiting for the next poll.
-    high_priority = tuple(
-        key for key, enabled in (
-            ("A", CONVERSION_DX11_ENABLED),
-            ("C", CONVERSION_DX9EX_ENABLED),
-        )
-        if enabled
-    )
-    high_active = sum(
-        1 for key in high_priority
-        if key in active_by_lane and active_by_lane[key].get("phase") != "DONE"
-    )
-
-    if high_active < CONVERSION_ACTIVE_LIMIT:
-        for lane_key in high_priority:
-            if high_active >= CONVERSION_ACTIVE_LIMIT:
-                break
-            if lane_key in active_by_lane:
-                continue
-            if await conversion_send_lane_task(context, pages, q, lane_key):
-                high_active += 1
-
-    if (
-        CONVERSION_DXVK_DEFERRED
-        and high_active == 0
-        and "B" not in active_by_lane
+    # DX11 and DXVK are the two implementation lanes. They may each advance
+    # source/static/CI independently while a Quest 3 gate is untested.
+    # DX9Ex is an explicitly enabled maintenance fallback, never co-primary.
+    # Count EVERY active lane against capacity (including a preexisting C task)
+    # so changing policy during Portainer redeploy cannot over-dispatch.
+    for lane_key in conversion_dispatch_plan(
+        active_by_lane,
+        CONVERSION_ACTIVE_LIMIT,
+        CONVERSION_DX11_ENABLED,
+        CONVERSION_DXVK_ENABLED,
+        CONVERSION_DX9EX_ENABLED,
     ):
-        await conversion_send_lane_task(context, pages, q, "B")
-    elif (
-        not CONVERSION_DXVK_DEFERRED
-        and "B" not in active_by_lane
-        and len(active_by_lane) < CONVERSION_ACTIVE_LIMIT
-    ):
-        await conversion_send_lane_task(context, pages, q, "B")
+        await conversion_send_lane_task(context, pages, q, lane_key)
 
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "Co-primary A(DX11) + C(DX9Ex); B(DXVK deferred); active: "
+            "Primary A(DX11) + B(DXVK); C(DX9Ex opt-in maintenance); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())

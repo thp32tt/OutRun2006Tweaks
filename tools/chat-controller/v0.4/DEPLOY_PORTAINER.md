@@ -230,3 +230,14 @@ Localization A/B no longer use preflight/work-order count as the main throughput
 - QA strictness is unchanged.
 
 This policy is also enforced by the live Git localization contract, so it takes effect for newly dispatched work even before the N100 stack is redeployed. Pull/redeploy the localization Portainer stack to bake the updated controller prompts into the running image.
+
+## 2026-10-08 — DX11/DXVK implementation-first VR scheduler
+
+Redeploy the **VR** Portainer stack with the exact `chat-controller-downloads` branch files from `tools/chat-controller/v0.4/`. Build the image again (do not just restart the old image). `Dockerfile.portainer-vr` assembles `src-vr-v2/controller.py.part00..03`; the legacy `src/` localization controller is not this VR application.
+
+- A = DX11 Native (first priority); B = DXVK (second primary lane); `CONVERSION_ACTIVE_LIMIT=2` keeps these two lanes in parallel. Existing in-flight C(DX9Ex) work occupies one capacity slot until reconciled; it is not overwritten.
+- C = DX9Ex **maintenance only**: `CONVERSION_DX9EX_ENABLED=false` by default, opt in only when a critical regression needs repair (or set `CONVERSION_ONLY_SLOT=C` for a dedicated maintenance run). Previous policy `CONVERSION_DXVK_DEFERRED=true` is retired and must not be carried into the new stack.
+- Missing HMD evidence parks runtime promotion as `NEED_HMD_TEST`/`RUNTIME_VALIDATION=UNTESTED`; the agent picks the next independent source implementation inside its lane, retaining TASK_ID/C0-C6, exact-SHA GitHub validation, ownership, and no duplicated task/CI.
+- Do not run unchanged HUD 1000/5000 static loops. Source changes use targeted tests + exact-sha CI. Neither a status-only commit nor static-only analysis can be reported as native Draw/DrawIndexed runtime activation.
+- Portainer deployment: update/rebuild VR stack from this GitHub branch; preserve named `/data` and `/logs` volumes, saved credentials, browser profile, and existing queue state. After deployment verify `/status`, `conversion_dx11_enabled=true`, `conversion_dxvk_enabled=true`, `conversion_dx9ex_enabled=false`, and `conversion_parallel_running` reports A(DX11)/B(DXVK). Observe new C2 material SHA + successful Gate; do not infer successful runtime rendering without Quest3/VDXR tests.
+- This commit updates the GitHub deployment source only. It neither hot-patches nor proves the running Portainer container changed.

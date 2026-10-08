@@ -2,9 +2,7 @@ OutRun 2006 DX9Ex VR 개선 자동 작업을 진행해줘.
 
 TARGET_BRANCH는 vr-d3d9ex-focus다. 이 lane은 기존 DX9Ex/OpenXR VR 경로의 품질·성능·안정성 개선 전용이다. vr-dx11-native-r71, vr-dxvk-r71-disasm, korean-localization-clean은 직접 수정하지 마. 시작 즉시 현재 branch HEAD, AGENTS.md, VR 자동화/상태/문제 기록, 최근 검증 결과를 읽고 가장 우선순위가 높은 실행 가능한 DX9Ex 개선 작업 하나를 선택해 끝까지 처리해.
 
-0순위는 현재 진행 중인 DX9Ex 구조 개선/리팩터링 작업이다. 매 작업 시작 시 docs/VR_REFACTOR_STATE.json과 최신 refactor(vr)/test(vr) 커밋을 먼저 읽고, 아직 이어지는 구조 개선 chain이 있으면 다른 성능·HUD·OpenXR 개선보다 반드시 먼저 그 chain의 다음 미완료 단위를 처리해. 이미 끝난 0~1000 구조 사이클을 반복하지 말고 최신 exact HEAD 이후부터 이어가. 현재 기준 활성 흐름은 R34 physical hook 제거/소유권 정리와 R33 final dispatcher 통합의 후속 구조 개선이며, 이후 HEAD에서 더 진행되어 있으면 그 최신 successor를 이어서 처리해. 구조 개선이 현재 Git 상태에서 명시적으로 완료되었거나 실행 가능한 다음 source/static 단위가 없을 때만 아래 일반 개선 우선순위로 내려가.
-
-일반 개선 우선순위는 실제 사용자 체감과 회귀 위험을 기준으로 잡아. frame pacing/끊김, 렌더링 동기화, OpenXR pose/recenter/swapchain, stereo/HUD/메뉴 중복, lens flare/shadow/marker 등 시각 오류, resource lifetime/reset/device-loss, 불필요한 copy/wait/lock과 hot path를 우선 검토해.
+이 C 슬롯은 보호된 DX9Ex 기준 유지보수 전용이며 기본 스케줄에서는 비활성이다. 사용자가 명시적으로 C만 실행하거나 원격에서 확인된 P0 충돌/크래시·필수 baseline 회귀 수정이 있을 때만 사용한다. 단순 0~1000 구조 반복, 새 성능 튜닝, 계속되는 HUD 정적검사, 비필수 기능 확장보다 DX11 네이티브와 DXVK 구현을 우선한다. 필요할 때에도 기존 runtime-verified 정상 세계 렌더와 HUD/flare/rank 보호 정책을 유지하고 관련 검증 1회로 제한한다. 실기 테스트만 막힌 결함은 NEED_HMD_TEST로 주차하고 독립된 실제 P0 코드 수정을 선택한다.
 
 한 작업은 작게 유지하고 소스 수정·정적 검증·자동 테스트·작업 기록을 같은 branch에 반영해. N100 로컬 clone/worktree/작업파일과 Google Drive는 보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용할 수 있다. 최종 결과와 완료 판정은 vr-d3d9ex-focus의 실제 material commit으로 남겨.
 
