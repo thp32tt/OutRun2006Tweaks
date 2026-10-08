@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "review": "independent C visual rejection of unchanged A95R producer candidate",
+  "queue_index": 225,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "result": "REWORK_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "pre_ingame": "BLOCKED",
+  "approval_created": false,
+  "actual_game_retest": false,
+  "triage_before_review": "FRESH_C_REVIEW",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9"
+  },
+  "candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+  "verified_persisted_dds": {
+    "backend": "N100 MCP metadata fallback (GPT-local GitHub DNS failed)",
+    "exact_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+    "width": 2048,
+    "height": 1024,
+    "pixel_format": "RGB32",
+    "mips": 1,
+    "file_size": 8388736
+  },
+  "qa_provenance": {
+    "source": "producer A95R report; no independent pixel-mask PASS claimed",
+    "source_file": "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_E3C455FA_REPORT.json",
+    "producer_machine_claim": "9/9 numeric containment PASS (historical producer evidence only)",
+    "controller_first_look_blind_calibration": "NOT_PERFORMED",
+    "full_lossless_per_region_evidence": "NOT_PERFORMED",
+    "note": "A visible style failure is sufficient to reject current bytes; no assertion of approved C/C3 or exported evidence is made."
+  },
+  "reviewed_visuals": [
+    "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_READABLE_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_RAW_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_SOURCE_CLEAN_FINAL_CONTACTS.jpg"
+  ],
+  "controller_observations": {
+    "readable": "Visual FAIL: dark heading/caption families lack the original heavy condensed source typography; Korean is thin/generic and some headings/captions shrink considerably relative to English.",
+    "raw": "Mirrored-Y transformation is consistent in existing SOURCE/FINAL contact; does not remedy the readable source-family mismatch.",
+    "clean_plate": "Existing clean plate inspected in contact, no new independent lossless clean plate PASS granted.",
+    "containment": "No new zero-overlap approval: prior A95R numeric PASS is retained only as historical producer evidence.",
+    "comparison": "Source vs final reviewed together; visual defect overrides historical numeric PASS.",
+    "findings": [
+      {
+        "id": "game_lobby",
+        "english": "GAME LOBBY",
+        "korean": "게임 로비",
+        "source_bbox_width": 459,
+        "current_korean_bbox_width": 220,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Dominant heavy condensed dark English is replaced by substantially weaker narrow Korean (220/459 source width); heading visual hierarchy no longer source-faithful."
+      },
+      {
+        "id": "game_list",
+        "english": "GAME LIST",
+        "korean": "게임 목록",
+        "source_bbox_width": 383,
+        "current_korean_bbox_width": 225,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Heavy English menu header replaced by lighter Korean face, reducing prominence next to protected metal frame."
+      },
+      {
+        "id": "setup",
+        "english": "SETUP",
+        "korean": "설정",
+        "source_bbox_width": 218,
+        "current_korean_bbox_width": 98,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "White label fill survives, but source heavy face versus thin Korean and 98/218 footprint require a source-family style/scale reconstruction."
+      },
+      {
+        "id": "course_type",
+        "english": "COURSE TYPE",
+        "korean": "코스 유형",
+        "source_bbox_width": 297,
+        "current_korean_bbox_width": 131,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Dark small-caption family changes from dense bold source to much lighter, narrower Korean."
+      },
+      {
+        "id": "course",
+        "english": "COURSE",
+        "korean": "코스",
+        "source_bbox_width": 175,
+        "current_korean_bbox_width": 62,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Korean dark caption occupies only 62/175 original width and loses source-equivalent bold visual hierarchy."
+      },
+      {
+        "id": "car_type",
+        "english": "CAR TYPE",
+        "korean": "차량 유형",
+        "source_bbox_width": 212,
+        "current_korean_bbox_width": 131,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Source bold condensed caption changes to a relatively light Korean face."
+      },
+      {
+        "id": "catch_up",
+        "english": "CATCH-UP",
+        "korean": "추격 보정",
+        "source_bbox_width": 217,
+        "current_korean_bbox_width": 131,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Source bold condensed caption changes to a relatively light Korean face."
+      },
+      {
+        "id": "collision",
+        "english": "COLLISION",
+        "korean": "충돌",
+        "source_bbox_width": 230,
+        "current_korean_bbox_width": 62,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Korean dark caption width 62/230; source family bold proportion/readability hierarchy not reproduced."
+      },
+      {
+        "id": "players",
+        "english": "PLAYERS",
+        "korean": "플레이어",
+        "source_bbox_width": 195,
+        "current_korean_bbox_width": 124,
+        "visual_result": "FAIL",
+        "defect": "SOURCE_FAMILY_WEIGHT_AND_HIERARCHY_MISMATCH",
+        "observation": "Source bold caption hierarchy weakened in Korean despite numeric containment."
+      }
+    ]
+  },
+  "corrective_action": "A-owned material native-HD family-profile rework from exact pinned English source: measure source font weight and condensed proportions per dark_big, white_big and dark_small rows, restore source-equivalent dense stroke/counter-space and hierarchy without arbitrary English-width quota or source-bbox overflow; retain source plate/RAW, protected artwork, and all nine translated meanings. Repeat producer decoded-DDS QA, then fresh independent calibrated C and separately reviewed exact-SHA C3 before PRE_INGAME. Do not preserve the current producer PASS.",
+  "qa_decision_basis": "Nine-row source/final visual comparison plus exact current candidate DDS hash verification. No new game evidence.",
+  "selected_head_sha": "9ccf897764fceb5a50d2e54e88d58bd25f6bfd09"
+}

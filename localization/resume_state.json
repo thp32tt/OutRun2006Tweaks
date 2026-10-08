@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL q225 E3C455FA source-family/style REWORK_REQUIRED on exact 37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d: A material typography rework against pinned English; fresh C1 calibrated visual/machine + separate C3, user JPG and actual-game retest remain. Evidence localization/graphics/role_C/20261008-C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL/C1_Q225_CONTROLLER_QA.json; RUNTIME_VALIDATION=UNTESTED.",
     "A191 q119 F6811E94 new materially corrected persisted DXT5 4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca: C290 missing white halo (old af938e...) corrected via native source white blurred rim; self-rejected A190 d7e... too hard. Machine bbox [705,58,1316,196] inside [390,54,1632,200], outside RGBA/alpha/overlap/source residue=0, decoded nearwhite 20641 vs old 0. Controller native SOURCE/CLEAN/FINAL black/gray/white + RAW review improves original diffuse glow; HOLD for source-family/glyph right-slant measurement and fresh pixels-first C1/C3; do not blindly rerender unchanged bytes. RUNTIME_VALIDATION=UNTESTED. Evidence role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_CONTROLLER_SELF_QA.json; backend GitHub Actions 37748043382 SUCCESS plus lightweight MCP image read; no VR/FFB/DX11/DXVK.",
     "A189 q217 source-gold START/GOAL materially rebuilt candidate a4d817db51c31ba6; machine 2/2 bbox/margins PASS outside badge and alpha 0. Producer HOLD natural short-Korean width/source glyph-lean fidelity; C1 pixels-first and C3/user JPG/new in-game retest pending. No repeat rerender until a fresh confirmed visual defect.",
     "A188 q175 new exact b9f60b4582ddb4db replaces C283 overdark A187 5099009f2ea599f9; material bright silver facial recovery. Machine PASS and producer source/CLEAN/FINAL RAW/practical review, but independent pixels-first C1 plus distinct calibrated C3 per-region full lossless family/slant verification and new actual-game retest NOT DONE. Preserve A188 bytes for C unless independent defect returned. q219 remains C280 source-family REWORK. RUNTIME_VALIDATION=UNTESTED.",
@@ -11570,5 +11571,21 @@
     "new_dds": false,
     "pre_ingame": "BLOCKED",
     "runtime_validation": "UNTESTED"
+  },
+  "c1_q225_visual_rework_20261008_1716": {
+    "run": "C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 225,
+    "result": "REWORK_REQUIRED",
+    "candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "source_evidence": "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_READABLE_SOURCE_FINAL.jpg",
+    "report": "localization/graphics/role_C/20261008-C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL/C1_Q225_CONTROLLER_QA.json",
+    "new_dds": false,
+    "approval": false,
+    "runtime_validation": "UNTESTED",
+    "pre_ingame": "BLOCKED"
   }
 }
