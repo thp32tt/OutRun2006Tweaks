@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A186R-Q219-SOURCE-HEIGHT-CHROME",
+  "queue_index": 219,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "execution_backend": "github_actions_fallback_chatgpt_local_github_raw_dns_block",
+  "worker_run": 37725817654,
+  "original_source": {
+    "sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+    "source_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "source_width": 1467,
+    "source_height": 118
+  },
+  "previous_candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "rejected_first_draft_sha256": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+  "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "localized_bbox": [
+    12,
+    1015,
+    533,
+    1125
+  ],
+  "localized_size": [
+    521,
+    110
+  ],
+  "source_glyph_bounded": true,
+  "deltas": {
+    "left": 6,
+    "right": 940,
+    "top": 4,
+    "bottom": 4
+  },
+  "dds": {
+    "native_dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGB32",
+    "mips": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "machine_report": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_REPORT.json",
+  "machine_qa": {
+    "bbox_containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_rgba_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "persisted_decode": "PASS"
+  },
+  "evidence": {
+    "source_old_clean_final": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "practical_100_75_50": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_PRACTICAL.jpg",
+    "raw": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_RAW.jpg",
+    "render_mask": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_RENDER_MASK.png",
+    "clean_plate": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_CLEAN_PLATE.png"
+  },
+  "family_observation": {
+    "source_language": "COURSE SELECT",
+    "korean": "코스 선택",
+    "source_title_width": 1467,
+    "localized_title_width": 521,
+    "not_an_english_width_quota": true,
+    "source_style": "broad rounded silver chrome geometric italic with dark lower extrusion",
+    "candidate": "natural-aspect NanumSquareRound Bold with silver chrome layered bevel/source-left alignment, source-height 110/118px",
+    "source_composite_top_minus_bottom_dx": -16,
+    "candidate_composite_top_minus_bottom_dx": 19,
+    "anchor_quality": "composite alpha leading edge only, not isolated glyph anchor",
+    "source_shear_direction": "UNRESOLVED",
+    "contour_family_risk": "independent per-glyph slope/family hierarchy review required"
+  },
+  "ordered_producer_gates": {
+    "english_source_removal": {
+      "result": "PASS_MACHINE",
+      "observation": "preserved A113 clean plate; source-vs-final changes restricted to exact source bbox"
+    },
+    "slant": {
+      "result": "HOLD",
+      "observation": "SOURCE composite -16 and KOREAN +19 sign mismatch from non-equivalent leading-edge samples; source glyph anchors are not isolated, cannot claim visual direction match"
+    },
+    "scale": {
+      "result": "PASS_HEIGHT_HOLD_WIDTH_HIERARCHY",
+      "observation": "110/118px high; 521/1467px wide from naturally fewer Korean glyphs, cannot impose arbitrary English percentage"
+    },
+    "weight_effect": {
+      "result": "HOLD_SOURCE_FAMILY_RECHECK",
+      "observation": "Chrome bevel/extrusion present, exact source-family roundness and weight still need independent confirmation"
+    },
+    "glyph": {
+      "result": "PASS_PRODUCER_OBSERVED",
+      "observation": "Native and 75/50 readability and counters appear intact, no definite missing syllable"
+    },
+    "protected_art": {
+      "result": "PASS_MACHINE",
+      "changed_outside": 0,
+      "alpha_outside": 0
+    },
+    "orientation": {
+      "result": "PASS_PRODUCER_OBSERVED",
+      "observation": "RAW mirror-Y matches canonical source; readable orientation inspected"
+    },
+    "readable": {
+      "result": "PASS_PRODUCER_OBSERVED",
+      "observation": "코스 선택 readable at 50% practical; relative width/style held for review"
+    }
+  },
+  "producer_conclusion": "HOLD_STRICT_RECHECK_NOT_APPROVED",
+  "fresh_pixels_first_C1": "REQUIRED_AFTER_PRODUCER_STYLE_GATE",
+  "C3": "BLOCKED",
+  "pre_ingame_export": "BLOCKED",
+  "IGR025": "OPEN_MAPPING_AND_NEW_GAME_RETEST_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "cleanup": "GitHub Actions hosted runner is ephemeral; no N100 scratch/worktree, no persisted local scratch"
+}

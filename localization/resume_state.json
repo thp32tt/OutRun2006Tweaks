@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A186R q219 D263B3F1 exact 8310a1e62adb6e74 materially replaces C272 rejected forced-width A181R. Machine 1/1 PASS, source-height 110/118 and native counters, source-vs-candidate changed/alpha outside 0. Producer visual HOLD because composite slant direction observation differs and per-glyph source anchor/hierarchy not validated; no C/C3/APPROVALS/export. q175 C278 remains producer REWORK. IGR-025 screenshot(163) remaining runtime/graphics mapping is still unresolved. RUNTIME_VALIDATION=UNTESTED.",
     "A185R q175 754F0599 exact cac88b8553e36b2c producer self-QA PASS; must receive genuinely pixels-first independent C1 followed by separate C3 complete lossless per-region evidence prior to any PRE_INGAME export; user JPG + actual in-game retest remain open. Never reuse C273-rejected A153 or first A185. RUNTIME_VALIDATION=UNTESTED.",
     "C276 IGR-006/007 shared runtime-text fix is independent C static PASS on current exact hooks blob 954f0998... with Win32 Release 37645785737 and Korean Test Build 37645785906/package PASS. Do not re-review unchanged source; both rows now require only NEW actual-game screenshots/retest before closure. RUNTIME_VALIDATION=UNTESTED.",
     "C274 q59 7CE1CFC5 exact A184R 261108cd... is HOLD_STRICT_RECHECK, not REWORK: supplied visual evidence is favorable and current bytes should be preserved. Future C1 must inspect exact pixels before producer verdict, generate complete lossless per-region native/zoom/practical/RAW/black-white-gray plus independent machine evidence, then separate C3. PJR-019 remains open for user JPG + NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
@@ -9613,16 +9614,17 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "run": "20261008-A185R-Q175-SILVER-FACE-CONTRAST",
-    "queue_index": 175,
-    "asset": "754F0599",
-    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
-    "prior_candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
-    "first_draft_rejected_sha256": "3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48",
-    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
-    "worker_run": 37721119647,
-    "qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
-    "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
+    "run": "20261008-A186R-Q219-SOURCE-HEIGHT-CHROME",
+    "role": "A",
+    "queue_index": 219,
+    "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "prior_candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+    "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+    "first_draft_rejected_sha256": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+    "worker_run": 37725817654,
+    "machine_result": "PASS",
+    "producer_visual_status": "HOLD_STRICT_RECHECK_SOURCE_PER_GLYPH_SLANT_AND_HIERARCHY",
+    "qa": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -10878,7 +10880,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "q59 independent 4-region source/candidate scope machine verified 0 outside; missing lossless PNG GitHub publish, calibration, per-region C/C3 visual and source slant anchors => HOLD. q175 C278 REWORK remains. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A186R q219 HOLD source glyph-level readable slant and chrome-family hierarchy; do not regenerate existing bytes for evidence alone. A q175 C278 REWORK, B q214 REWORK. RUNTIME_VALIDATION=UNTESTED.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -11007,6 +11009,21 @@
     "approval_created": false,
     "report": "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_CONTROLLER_QA.json",
     "decision": "HOLD_STRICT_RECHECK",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a186r_q219_native_techno": {
+    "run": "20261008-A186R-Q219-SOURCE-HEIGHT-CHROME",
+    "role": "A",
+    "queue_index": 219,
+    "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "prior_candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+    "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+    "first_draft_rejected_sha256": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+    "worker_run": 37725817654,
+    "machine_result": "PASS",
+    "producer_visual_status": "HOLD_STRICT_RECHECK_SOURCE_PER_GLYPH_SLANT_AND_HIERARCHY",
+    "qa": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
