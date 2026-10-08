@@ -2,16 +2,16 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00547",
   "production_id": "CONVERSION-DX9EX-00547",
-  "event_id": "CONVERSION-DX9EX-00547-E003",
+  "event_id": "CONVERSION-DX9EX-00547-E004",
   "event_type": "retry",
   "chat_rollover": 2,
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "ccf692cc4983ba2a469f631702d3709bfcb23995",
   "material_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00547]",
-  "status": "COMPLETE_BUILD_VERIFIED_VIA_VALIDATED_DESCENDANT",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "selected_work_item": "DX9EX-P0-UI-TEXTURE-LEGACY-D3DX-FALLBACK",
   "summary": "Restore legacy D3DX Ex trampoline on failed fast DDS UI decode (menu/car-selection texture resilience). Add deterministic source/negative-mutation contract; not a proven HMD fix.",
   "changed_paths": [
@@ -27,8 +27,8 @@
   "ci_gate_complete": true,
   "package_requested": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-  "next_action": "Stop retrying checkpoint SHA 4da487f8 as if it were material. Consumer/controller must use this record's exact validation_bearing_result_sha 850c522d and matching successful Actions 37710686730; older 7768 cancelled attempts are SUPERSEDED. Continue independent P0 evidence-first static work without re-running same corrected task; RUNTIME_VALIDATION remains UNTESTED.",
-  "score_award": "PENDING_SCOREBOARD_DEDUPLICATION_FOR_THIS_TASK_ID",
+  "next_action": "00547 is TERMINAL_COMPLETE. Scheduler must stop retries and resolve `validation_bearing_result_sha` 850c522d for validated material. A new unrelated DX9Ex P0 item requires a NEW TASK_ID. External Docker controller implementation remains to be patched separately if it still scans latest bookkeeping HEAD.",
+  "score_award": "ALREADY_CREDITED_E003_DO_NOT_ADD_AGAIN",
   "validation_bearing_result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
   "result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
   "material_commit_history": [
@@ -102,7 +102,11 @@
     "rerun_action": "Re-ran cancelled game job 113093773949 via authenticated GitHub action, producing 37710073122 run_attempt=2; later push a9f42ac8 canceled it again by branch concurrency.",
     "classification": "SUPERSEDED_CANCELLATION_NOT_SOURCE_BUILD_FAILURE",
     "descendant_verified": true,
-    "byte_identical_ui_wrapper_at_material_and_descendant": true
+    "byte_identical_ui_wrapper_at_material_and_descendant": true,
+    "e004_failure_context": "No authoritative DX9Ex Active Validation run was created for result SHA f478588b4db2e9870bdd49d334a3e9cc590afa51 after 744s (timeout=600s).",
+    "e004_evidence": "Repository workflow-run search for f478588b: 4 runs (Domain Isolation success, Autodev Coordination failure, PC Fast skipped, Evening skipped); zero DX9Ex Active Validation. This is expected for a checkpoint-only change. Existing material descendant 850c522d has active 37710686730 success, HUD Inspector 37710686700 success, Domain Isolation 37710686718 success.",
+    "e004_classification": "RESULT_SHA_SELECTION_CONTRACT_VIOLATION_REPEATED_NOT_A_SOURCE_OR_GATE_FAILURE",
+    "e004_terminal_action": "C6 update only; no new source commit, no additional run, no score. Preserve exact validated material identity. Report failure in external Docker queue controller implementation until deployed."
   },
   "package_artifact": {
     "id": 11521429152,
@@ -122,5 +126,21 @@
       "digest": "sha256:5f055c5556a313624e70f8b09fd8d71614a3fd8a32919b1a4baa793d6f07ca45"
     }
   ],
-  "automation_result_provenance": "PASS is for the descendant 850c522d exact material tree, NOT for original 7768 DX9Ex Active run. Original two attempts were cancelled; all inherited 00547 UI code is intact at 850c. No original-HMD-success assertion."
+  "automation_result_provenance": "PASS is for the descendant 850c522d exact material tree, NOT for original 7768 DX9Ex Active run. Original two attempts were cancelled; all inherited 00547 UI code is intact at 850c. No original-HMD-success assertion. E004 verification: f478588b has NO Active run as it is bookkeeping; this is not contrary evidence.",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "same_task_retry_score_delta": 0,
+  "controller_result_identity": {
+    "state": "TERMINAL_SUCCESS",
+    "task_id": "CONVERSION-DX9EX-00547",
+    "material_owner_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
+    "result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
+    "validation_bearing_result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
+    "bookkeeping_sha_that_must_not_be_validated": "f478588b4db2e9870bdd49d334a3e9cc590afa51",
+    "automatic_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "tested_workflow_run": 37710686730,
+    "failed_result_sha_selection": "Controller used a bookkeeping commit instead of the pinned validation-bearing result from docs/automation/runs/CONVERSION-DX9EX-00547.json",
+    "outcome": "Do not redispatch this TASK_ID or poll Active Validation against f478588b or the E004 checkpoint commit."
+  }
 }

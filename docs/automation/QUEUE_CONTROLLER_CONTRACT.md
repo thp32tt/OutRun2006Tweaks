@@ -60,3 +60,18 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - After 3 failed attempts, record the blocker and move to another independent runnable task.
 - Never use N100 local clones/worktrees as a project workspace.
 - GitHub branch HEAD and Actions are the durable source of truth.
+
+## Completed-task checkpoint SHA regression — 2026-10-08
+
+For `CONVERSION-DX9EX-00547`, the external queue selected documentation-only commit `f478588b4db2e9870bdd49d334a3e9cc590afa51` after E003 already recorded `automation_validation=PASS`. It timed out expecting DX9Ex Active Validation on that bookkeeping commit even though the task record pinned the completed validated material tree `850c522d67252f55a8da6fe296a466e3c43965ae` and its successful run `37710686730`.
+
+**Terminal-idempotency rule:** A retry/rollover for a task with a durable terminal PASS record MUST return the stored `result_sha`, `validation_bearing_result_sha`, `automation_validation`, and `runtime_validation`, without creating another source change, incrementing the point, or polling CI for the current branch HEAD or a newly authored checkpoint SHA. The latest run-record commit is a bookkeeping pointer, not validation-bearing result identity.
+
+**Resolver precedence for a queued attempt:**
+1. Read the exact `docs/automation/runs/<TASK_ID>.json` at latest branch HEAD; check task ID and target branch.
+2. If `controller_terminal=true` or `status=COMPLETE_BUILD_VERIFIED` with `automation_validation=PASS` and matching exact-SHA successful gate, return the pinned `validation_bearing_result_sha` and stop. Preserve `RUNTIME_VALIDATION=UNTESTED` when hardware testing has not occurred.
+3. Otherwise choose `validation_bearing_result_sha`, then `material_result_sha`, never `HEAD` or the most recent bookkeeping response SHA. Verify matching run `head_sha`, workflow name and conclusion before a timeout failure.
+4. A bookkeeping/checkpoint commit after PASS may include CI-skip; it MUST NOT replace the already validated material SHA or become the reported RESULT_SHA.
+5. When no authoritative matching run exists, distinguish an unvalidated material SHA from a checkpoint-only SHA before consuming a retry attempt. Record the mismatch rather than producing an infinite redispatch loop.
+
+This is a repository-side contract/test oracle. The separate Docker controller implementation must implement these semantics; updating this Markdown does **not** hot-reload or patch a running Docker worker. See `docs/automation/reviews/CONVERSION_DX9EX_00547_E004_RESULT_SHA_AUDIT.md`.
