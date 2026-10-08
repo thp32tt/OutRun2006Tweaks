@@ -1,5 +1,7 @@
 #pragma once
 
+#include "disasm_render_contract.hpp"
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -32,6 +34,115 @@ namespace OutRunVR::GameSemantic
         ProjectedScreenEffect2D,
     };
 
+    [[nodiscard]] constexpr RenderScope RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy policy) noexcept
+    {
+        using Policy = OutRunVR::DisasmContract::SpacePolicy;
+        switch (policy)
+        {
+        case Policy::ScreenHud: return RenderScope::ScreenHud;
+        case Policy::WorldBillboard: return RenderScope::WorldBillboard;
+        case Policy::ProjectedWorldMarker2D:
+            return RenderScope::ProjectedWorldMarker2D;
+        case Policy::ProjectedScreenEffect2D:
+            return RenderScope::ProjectedScreenEffect2D;
+        default: return RenderScope::None;
+        }
+    }
+
+    static_assert(RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy::ProjectedWorldMarker2D) ==
+        RenderScope::ProjectedWorldMarker2D);
+    static_assert(RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy::ProjectedScreenEffect2D) ==
+        RenderScope::ProjectedScreenEffect2D);
+
+    [[nodiscard]] constexpr RenderScope ClassifyCriticalProducer(
+        std::uintptr_t callerRva) noexcept
+    {
+        return RenderScopeFromSpacePolicy(
+            OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva));
+    }
+
+    static_assert(
+        ClassifyCriticalProducer(0x000B9F3Au) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BA052u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BEA5Au) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BEA5Fu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BD32Eu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BD397u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BD414u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BD472u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000B9096u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000B90B3u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000B90F6u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BDE3Au) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BDAE8u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BBA89u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00060A21u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00060D40u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00060FBCu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096AC7u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096B14u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096B39u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096B94u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096BE1u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096C10u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x00096C6Au) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FC84Eu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FC882u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FC8B4u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FC9EBu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCA1Eu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCA51u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCB20u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCDC1u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCDEAu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCEB0u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCED9u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCF22u) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000FCF4Fu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BB0FBu) == RenderScope::WorldBillboard);
+
     struct ProjectedMarkerInfo
     {
         bool valid = false;
@@ -59,7 +170,7 @@ namespace OutRunVR::GameSemantic
         return HudExperimentMode.load(std::memory_order_acquire);
     }
 
-    inline bool IsExactHudScope(RenderScope scope) noexcept
+    [[nodiscard]] constexpr bool IsExactHudScope(RenderScope scope) noexcept
     {
         // R59: ProjectedWorldMarker2D is also an exact queue owner. R58 HMD
         // telemetry proved kind-0 rank nodes were tagged correctly but helper
@@ -68,6 +179,46 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenHud ||
             scope == RenderScope::WorldBillboard ||
             scope == RenderScope::ProjectedWorldMarker2D;
+    }
+
+    // R71 DXVK visual ownership: c64/WVP classification happens before the
+    // final D3D draw consumes the queue semantic. Production mode 2 already
+    // keeps exact queue ownership sticky for ConsumeForDraw(), but the generic
+    // EffectiveScope() intentionally waits until mode 3. Expose only the exact
+    // queue tag to the c64 boundary at mode 2; never widen untagged
+    // ScreenOverlay2D into finite HUD ownership.
+    [[nodiscard]] constexpr RenderScope ResolveWvpUploadScope(
+        int mode, RenderScope currentScope,
+        RenderScope queueExactScope) noexcept
+    {
+        if (mode >= 2 && IsExactHudScope(queueExactScope))
+            return queueExactScope;
+        if (mode >= 4 && currentScope == RenderScope::ScreenOverlay2D)
+            return RenderScope::ScreenHud;
+        return currentScope;
+    }
+
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::ScreenHud) ==
+        RenderScope::ScreenHud);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::WorldBillboard) ==
+        RenderScope::WorldBillboard);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D,
+        RenderScope::ProjectedWorldMarker2D) ==
+        RenderScope::ProjectedWorldMarker2D);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::None) ==
+        RenderScope::ScreenOverlay2D);
+    static_assert(ResolveWvpUploadScope(
+        1, RenderScope::ScreenOverlay2D, RenderScope::ScreenHud) ==
+        RenderScope::ScreenOverlay2D);
+
+    inline RenderScope EffectiveWvpUploadScope() noexcept
+    {
+        return ResolveWvpUploadScope(
+            GetHudExperimentMode(), CurrentScope, CurrentQueueExactScope);
     }
 
     inline RenderScope EffectiveScope() noexcept
@@ -258,6 +409,10 @@ namespace OutRunVR::GameSemantic
     inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticStaleCleared{ 0 };
+    // F16: table pressure must never evict an already-published exact owner.
+    // Reject only the newest unique registration and expose the event so an
+    // abnormal producer burst is diagnosable without corrupting queued nodes.
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticOverflowRejected{ 0 };
     inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
@@ -337,20 +492,15 @@ namespace OutRunVR::GameSemantic
             return;
         }
 
-        // This should never be hot: exact semantic producers are sparse.
-        // If a broken frame fills the table, replace the oldest entry rather
-        // than silently disabling semantic ownership for the rest of the run.
-        std::size_t oldest = 0;
-        for (std::size_t i = 1; i < SpriteNodeSemanticCount; ++i)
-            if (SpriteNodeSemanticTags[i].serial <
-                SpriteNodeSemanticTags[oldest].serial)
-                oldest = i;
-        SpriteNodeSemanticTags[oldest] =
-            { node, scope, serial,
-              projectedMarker ? *projectedMarker : ProjectedMarkerInfo{},
-              owner };
-        SpriteNodeSemanticRegistered.fetch_add(1, std::memory_order_relaxed);
-        SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
+        // F16 fail-closed overflow policy. Existing entries may describe
+        // SpriteNodes that are already queued for this render walk; evicting
+        // the oldest live entry can silently turn an exact HUD/world marker
+        // into generic overlay ownership. Preserve every published tag and
+        // reject only this newest unique registration. A later freed slot can
+        // accept the producer normally.
+        SpriteNodeSemanticOverflowRejected.fetch_add(
+            1, std::memory_order_relaxed);
+        return;
     }
 
     inline RenderScope ConsumeSpriteNodeScope(

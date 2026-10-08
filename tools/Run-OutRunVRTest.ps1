@@ -155,8 +155,12 @@ Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 Write-Host "Profile: $TestProfile"
 
-if($backend -eq 'd3d9'){
-    $profile=Get-OutRunVRTestProfile -Name $TestProfile
+$profile=Get-OutRunVRTestProfile -Name $TestProfile
+$cleanDxvkPerformance = ($backend -eq 'dxvk-safe' -and $TestProfile -eq 'PERFORMANCE')
+if($backend -eq 'd3d9' -or $cleanDxvkPerformance){
+    # DXVK SAFE PERFORMANCE is the only non-D3D9 path allowed to consume the
+    # profile-equivalent cadence policy. CORRECTNESS and DXVK multiview remain
+    # on the conservative launch path until exact-build HMD parity exists.
     $gameArgs=@($profile.Arguments)
 }else{
     # Non-DX9Ex backends are retained only for explicit legacy comparison.
@@ -183,11 +187,39 @@ if($backend -eq 'd3d9'){
 }
 
 if($backend -ne '2d'){
-    $gameArgs += '-HudInspector=true'
+    if($cleanDxvkPerformance){
+        # A clean benchmark must not inherit an INI-level inspector enable.
+        $gameArgs += '-HudInspector=false'
+    }else{
+        $gameArgs += '-HudInspector=true'
+    }
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
+
+function Write-RunnerFailureDiagnostic(
+    [string]$Phase,
+    [string]$ErrorText,
+    [bool]$HostStillRunning = $false
+){
+    try{
+        [ordered]@{
+            SchemaVersion=1
+            RecordedUtc=(Get-Date).ToUniversalTime().ToString('o')
+            Phase=$Phase
+            Error=$ErrorText
+            Backend=$backend
+            VariantId=$variant
+            TestProfile=$TestProfile
+            SessionId=[string]$state.SessionId
+            SourceSha=$sourceSha
+            HostStillRunning=$HostStillRunning
+        }|ConvertTo-Json -Depth 5|Set-Content (Join-Path $sessionRoot 'RUNNER_FAILURE.json') -Encoding UTF8
+    }catch{
+        Write-Warning ("Could not persist RUNNER_FAILURE.json: {0}" -f $_.Exception.Message)
+    }
+}
 
 $assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
 if(!(Test-Path $assetAnalyzer)){
@@ -227,6 +259,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "hudCoordMode=$hudCoordMode"
     "hudProbe=$hudProbe"
     "r57Mode=$r57Mode"
+    "cleanDxvkPerformance=$cleanDxvkPerformance"
+    "hudInspectorEnabled=$($backend -ne '2d' -and -not $cleanDxvkPerformance)"
+    "shaderFingerprintEnabled=$($backend -ne '2d' -and -not $cleanDxvkPerformance)"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -234,6 +269,8 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldDxvkLogPath = $env:DXVK_LOG_PATH
+$oldDxvkLogLevel = $env:DXVK_LOG_LEVEL
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
@@ -268,7 +305,7 @@ if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
-if($backend -ne '2d'){
+if($backend -ne '2d' -and -not $cleanDxvkPerformance){
     $env:OUTRUN_VR_SHADER_FINGERPRINT='1'
 }else{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
@@ -282,6 +319,8 @@ if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
     $env:VK_LOADER_DEBUG='error,warn,layer'
+    $env:DXVK_LOG_PATH=$sessionRoot
+    $env:DXVK_LOG_LEVEL='info'
     $bandicam=Get-Process -ErrorAction SilentlyContinue|Where-Object{
         $_.ProcessName -match '^bdcam' -or $_.ProcessName -match 'bandicam'
     }
@@ -290,9 +329,17 @@ if($dxvkMode){
     }
 }
 
+$gameExitCode=0
+$launchFailure=$null
 try{
-    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
-    $p.WaitForExit()
+    try{
+        $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
+        $p.WaitForExit()
+        $gameExitCode=$p.ExitCode
+    }catch{
+        $launchFailure=$_.Exception
+        Write-RunnerFailureDiagnostic -Phase 'GAME_LAUNCH_OR_WAIT' -ErrorText $launchFailure.Message
+    }
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
@@ -311,6 +358,8 @@ try{
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
         $env:VK_LOADER_DEBUG=$oldVkDebug
+        $env:DXVK_LOG_PATH=$oldDxvkLogPath
+        $env:DXVK_LOG_LEVEL=$oldDxvkLogLevel
     }
 }
 
@@ -327,9 +376,68 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
         Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Milliseconds 750
 }
+$hostTeardownFailure=$null
 if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
-    throw 'Could not close outrun-vr-host.exe automatically; log collection was not started.'
+    $hostTeardownFailure=[InvalidOperationException]::new('Could not close outrun-vr-host.exe automatically; collecting an emergency snapshot before propagating failure.')
+    Write-RunnerFailureDiagnostic -Phase 'HOST_TEARDOWN' -ErrorText $hostTeardownFailure.Message -HostStillRunning $true
 }
 
-& $collector
-if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+$collectorFailure=$null
+$collectorExitCode=0
+try{
+    $LASTEXITCODE=0
+    if($hostTeardownFailure){
+        & $collector -Emergency
+    }else{
+        & $collector
+    }
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){
+        $collectorExitCode=[int]$LASTEXITCODE
+    }
+}catch{
+    $collectorFailure=$_.Exception
+}
+
+if($collectorFailure -or $collectorExitCode -ne 0){
+    $primaryFailure=if($hostTeardownFailure){
+        'HOST_TEARDOWN'
+    }elseif($launchFailure){
+        'GAME_LAUNCH_OR_WAIT'
+    }elseif($gameExitCode -ne 0){
+        'GAME_EXIT'
+    }else{
+        'NONE'
+    }
+    $collectorError=if($collectorFailure){$collectorFailure.Message}else{"Collector exited with code $collectorExitCode"}
+    try{
+        [ordered]@{
+            SchemaVersion=1
+            RecordedUtc=(Get-Date).ToUniversalTime().ToString('o')
+            Phase='DIAGNOSTIC_COLLECTION'
+            Error=$collectorError
+            ExitCode=$collectorExitCode
+            PrimaryFailure=$primaryFailure
+            GameExitCode=$gameExitCode
+            Backend=$backend
+            VariantId=$variant
+            TestProfile=$TestProfile
+            SessionId=[string]$state.SessionId
+            SourceSha=$sourceSha
+        }|ConvertTo-Json -Depth 5|Set-Content (Join-Path $sessionRoot 'COLLECTOR_FAILURE.json') -Encoding UTF8
+    }catch{
+        Write-Warning ("Could not persist COLLECTOR_FAILURE.json: {0}" -f $_.Exception.Message)
+    }
+}
+
+# Preserve the original runner/game failure as the process result. Diagnostic
+# collection is secondary and only becomes the final failure when launch,
+# host teardown and the game itself all succeeded.
+if($hostTeardownFailure){throw $hostTeardownFailure}
+if($launchFailure){throw $launchFailure}
+if($gameExitCode -ne 0){
+    Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
+    exit $gameExitCode
+}
+if($collectorFailure){throw $collectorFailure}
+if($collectorExitCode -ne 0){exit $collectorExitCode}
+exit 0

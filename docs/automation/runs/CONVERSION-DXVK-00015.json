@@ -1,0 +1,77 @@
+{
+  "task_id": "CONVERSION-DXVK-00015",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "b7525b89d2feeeb313189e34b56a93b658a7b556",
+  "result_sha": "b1057f02048048967b75e730c0952a4f8cad59ec",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-HOST-OWNED-BRIDGE-RUNTIME-TELEMETRY",
+  "summary": "Extended the automatic runtime analyzer so the next Quest 3/VDXR validation can distinguish each stage of the already-implemented DXVK host-owned shared-eye transport: host allocation/publication, game-side KMT import, host/game generation agreement, explicit host-owned direct-path selection, and fallback. This is diagnostics-only and does not change rendered pixels, transport ownership, cadence or OpenXR submission.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1"
+  ],
+  "source_commits": [
+    "b1057f02048048967b75e730c0952a4f8cad59ec"
+  ],
+  "review": {
+    "architecture": "The current host-owned shared-eye transport source 54be06b4 remains unchanged. This task observes its existing host/game log contract rather than adding another transport implementation.",
+    "lifetime_sync": "Generation identity is surfaced as DxvkHostBridgeGeneration, DxvkHostImportGeneration and DxvkHostGenerationMatches so stale/cross-generation evidence can be distinguished in the next runtime bundle.",
+    "stereo_correctness": "No world/HUD/menu/stereo draw path changed. A status can report transport activation only when the existing host-owned path log is observed and DirectFrames is greater than zero.",
+    "performance": "No pacing optimization is claimed. The analyzer preserves directFrames/fallbacks/XR timing evidence and only makes the transport stage responsible for a future failure easier to locate.",
+    "adversarial": "Bridge-ready alone is explicitly not treated as success. Separate statuses cover host allocation failure, bridge ready but import unobserved, game import failure, and direct path active with frames."
+  },
+  "behavior_verified": [
+    "DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED: host bridge ready + gameplay fallbacks + no game import.",
+    "DXVK_HOST_OWNED_IMPORT_FAILED: explicit game-side host-owned KMT eye import failure.",
+    "DXVK_HOST_OWNED_DIRECTGPU_ACTIVE: host bridge ready + game import ready + host-owned path selected + DirectFrames > 0.",
+    "DxvkHostGenerationMatches is produced when both host and game import generations are observed.",
+    "Existing shared-probe failure classification and directFrames/fallback extraction remain covered by the same behavior test."
+  ],
+  "regression_revalidation": [
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001: remains OPEN_USER_RUNTIME_VERIFIED_FAILURE because no new HMD/game execution occurred.",
+    "Current host-owned shared-eye transport remains Quest3/VDXR runtime-unverified; this task only improves evidence classification.",
+    "VR-STARTUP-WHITE-001 and VR-R50-FRAME-STABILITY-PRESERVE-001 are unaffected because renderer/transport/cadence code was not modified."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD b7525b89d2feeeb313189e34b56a93b658a7b556, AGENTS.md, the 100-review index, queue controller contract, automation state, CONVERSION-DXVK-00012 and the durable DXVK runtime/regression evidence. N100/local clone was not used.",
+    "Queue contract marked the host-owned transport runtime verdict as hardware-dependent/BLOCKED_RUNTIME, so this task selected an independent analyzer improvement instead of claiming the transport fixed.",
+    "Existing source already logs host bridge ready/allocation failure, game import ready/import failure, and host-owned direct-path selection; prior AUTO_ANALYSIS_SUMMARY did not expose those states structurally.",
+    "Backend Conversion Gate 36458351684 PASS on exact source SHA b1057f02048048967b75e730c0952a4f8cad59ec, including the expanded runtime behavior test, stock DXVK analyzer regression, pinned acquisition, Win32 build and binary verification.",
+    "Build 36458357368 PASS; OpenXR VR architecture 36458357496 PASS for host-x64 and all Win32 jobs; HUD Inspector 36458357217 PASS; PC Fast 36458351793 skipped.",
+    "Backend artifact 10986548509 digest sha256:899ad530818309907b02b6403f294b5f1d34fea93ca8699818faff9d1ca86e2e.",
+    "OpenXR host artifact 10986552796 digest sha256:643caf7a612e756c824a6652066677c4383bc21c92e1aafc3659983dbdb97266.",
+    "HUD inspector game artifact 10985808928 digest sha256:35f9b2e3ce578bedb9a94b4b81513830ddcd003d0166c9226e1fe6c152e819c2.",
+    "Issue #14 implementation comment 5875159105 and validation comment 5875259791 record the production transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-HOST-OWNED-BRIDGE-RUNTIME-TELEMETRY"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "On the next exact-build Quest 3/VDXR run, consume DxvkHostBridgeReady/AllocationFailed, DxvkHostImportReady/Failed, DxvkHostGenerationMatches, DxvkHostDirectPathActive, DirectFrames, DirectFallbacks and XR frame timing together. Do not treat bridge-ready alone as transport success. Runtime success still requires DirectFrames>0, materially reduced fallback use, pacing recovery from the prior ~33.44 ms gameplay interval, and no startup/stereo/HUD/menu/recenter regression.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36458351684,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36458357368,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36458357496,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36458357217,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36458351793,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10986548509,
+    "backend_gate_artifact_digest": "sha256:899ad530818309907b02b6403f294b5f1d34fea93ca8699818faff9d1ca86e2e",
+    "openxr_host_artifact_id": 10986552796,
+    "openxr_host_artifact_digest": "sha256:643caf7a612e756c824a6652066677c4383bc21c92e1aafc3659983dbdb97266",
+    "hud_inspector_artifact_id": 10985808928,
+    "hud_inspector_artifact_digest": "sha256:35f9b2e3ce578bedb9a94b4b81513830ddcd003d0166c9226e1fe6c152e819c2"
+  },
+  "recorded_at_kst": "2026-09-29T02:35:00+09:00"
+}

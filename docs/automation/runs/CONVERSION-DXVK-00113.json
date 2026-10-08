@@ -1,0 +1,76 @@
+{
+  "task_id": "CONVERSION-DXVK-00113",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "7eafb7b5704eb72bf5eaa48eb02c02d9bdd478bf",
+  "result_sha": "e82dba48032275c484ace0a2dc77198df0abc4c3",
+  "validation_bearing_result_sha": "e82dba48032275c484ace0a2dc77198df0abc4c3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R128_DISPTEMPHEARTNUM_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for the single exact DispTempHeartNum HUD callsite 0xBBA89. Existing negative-heart score X-position AddSpriteSpacing behavior is preserved, immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), and compile-time/verifier guards fail closed if the exact caller leaves the canonical ScreenHud contract. No producer range, world/stereo path, transport path or unrelated Heart/Rival state-toggle family was changed.",
+  "evidence": [
+    "Exact caller 0xBBA89 lies inside canonical DispTempHeartNum SCREEN_HUD range 0xBBA00-0xBBC00.",
+    "hud_semantics.hpp independently lists 0x0BBA89 as HUD_TEMP_HEART for the negative temporary heart-score '-' text.",
+    "hooks_uiscaling.cpp preserves AddSpriteSpacing((int*)(ctx.esp), false) before shared producer-map ownership handoff.",
+    "render_semantics.hpp compile-time asserts 0xBBA89 classifies as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires the exact R128 template/telemetry markers and rejects restoration of the legacy spacing-only binding.",
+    "Validation-bearing source result e82dba48032275c484ace0a2dc77198df0abc4c3 contains [AUTO:CONVERSION-DXVK-00113] and no CI-skip directive.",
+    "Backend Conversion Gate 36657893742 PASS; artifact 11073465634 digest sha256:40de2d9f92f8a1a07771840df5ed0bda5599c0313a6d80022d68f28f93e61491.",
+    "Build 36657897796 PASS.",
+    "OpenXR VR architecture 36657897703 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36657897704 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36657893735 PASS and PR 36657897756 PASS.",
+    "VR PC Fast Test Build 36657893849 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "e82dba48032275c484ace0a2dc77198df0abc4c3",
+      "message": "vr: route temp-heart HUD through shared producer map [AUTO:CONVERSION-DXVK-00113]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36657893742,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11073465634,
+    "backend_conversion_gate_artifact_digest": "sha256:40de2d9f92f8a1a07771840df5ed0bda5599c0313a6d80022d68f28f93e61491",
+    "build_run_id": 36657897796,
+    "build_result": "PASS",
+    "openxr_run_id": 36657897703,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36657897704,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36657893735,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36657897756,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36657893849,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5902600990,
+    "validation_comment_id": 5902664855
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GHOSTGAP_FORCE_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_DISPTEMPHEARTNUM_EXACT_EDGE",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded DispTempHeartNum F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven producer sub-family. The exact ctrl_icon_work position-correction family 0x60A21/0x60D40/0x60FBC is a bounded next candidate; preserve existing spacing and stack-write behavior, do not widen producer ranges, and keep runtime validation separate."
+}

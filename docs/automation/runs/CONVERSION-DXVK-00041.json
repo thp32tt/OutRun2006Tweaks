@@ -1,0 +1,62 @@
+{
+  "task_id": "CONVERSION-DXVK-00041",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "18dc8d4c678e9730bbd52104df5c737928b050e1",
+  "result_sha": "9fba9fe1e54f1d2f474820560d42546f00051106",
+  "state_checkpoint_sha": null,
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L1-RECENTER-001-IPC-ROUNDTRIP-SMOKE",
+  "summary": "Added executable Windows behavior coverage for the recenter IPC mapping/event request lifecycle and wired it into OpenXR CI. Existing application-space recenter runtime behavior is unchanged.",
+  "changed_paths": [
+    "vrhost/tests/recenter_ipc_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-openxr.yml",
+    "tools/verify_vr_recenter_contract.py"
+  ],
+  "behavior_covered": [
+    "Publish emits a nonzero request id and signals the named auto-reset event.",
+    "Pending observes the published request id and requester PID.",
+    "MarkReceived removes that request from Pending without fabricating application completion.",
+    "MarkApplied publishes the application-complete id.",
+    "A second Publish receives a distinct request id and completes the same round-trip."
+  ],
+  "scope": "Automation/regression coverage only; no game renderer, DXVK provider, DirectGPU transport, OpenXR frame submission, cadence, HUD ownership, or recenter runtime implementation changed.",
+  "recovery_evidence": {
+    "prior_task": "CONVERSION-DXVK-00039",
+    "prior_source_sha": "5540db82e8c50520a827661e31e544c82e64368a",
+    "prior_automation_validation": "PASS",
+    "prior_backend_conversion_gate_run_id": 36516967690,
+    "prior_build_run_id": 36516971520,
+    "prior_openxr_run_id": 36516971526,
+    "prior_hud_run_id": 36516971517
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36521949422,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36521952198,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36521952343,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36521952261,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36521949260,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5883674874
+  },
+  "runtime_gate": "Quest3/VDXR exact-build test is still required to judge visual gameplay/menu recenter transition, head orientation, world stereo, startup, and fallback behavior.",
+  "resume_cursor": "Software automation validation for result SHA 9fba9fe1e54f1d2f474820560d42546f00051106 is PASS. Keep runtime_validation=UNTESTED until Quest3/VDXR validation; controller recovery commit exists only to restore queue liveness.",
+  "queue_note": "Performance items VR-PERF-COMMON-001 and L2-PERF-001 are runtime-evidence blocked for DXVK; no speculative performance tuning was performed.",
+  "recorded_at_kst": "2026-09-29T13:31:00+09:00",
+  "controller_recovery": {
+    "reason": "A post-validation bookkeeping checkpoint used a CI-skip directive and shadowed the already validated result SHA in the legacy queue controller.",
+    "validated_result_sha": "9fba9fe1e54f1d2f474820560d42546f00051106",
+    "skipped_checkpoint_sha": "98565f3f47779b8e3bf1d3ec22d92809e09f7f26",
+    "backend_conversion_gate_run_id": 36521949422,
+    "recovery_strategy": "Emit one non-skipped bookkeeping commit with the same AUTO task marker so the legacy controller can bind an authoritative Gate; updated controller code separately ignores CI-skipped checkpoint commits."
+  }
+}

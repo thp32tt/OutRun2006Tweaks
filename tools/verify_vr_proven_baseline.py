@@ -9,6 +9,7 @@ known regression fixes from being silently omitted by later builds.
 
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import sys
@@ -116,12 +117,17 @@ forbid("src/hooks_uiscaling.cpp",
        "P5_NO_GLOBAL_PUT_CLIP_PROMOTION")
 
 # PASS 6 — final GOAL/TIME owns only the reverse-proven goal caller edges.
+# R121 keeps the same two exact hook edges/helpers while sourcing SCREEN_HUD
+# ownership from the shared disassembly producer map. Pin the exact caller RVAs
+# and fail closed if this regresses to an unclassified/general helper.
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBEA5A)',
     'Module::exe_ptr(0xBEA5F)',
-    'GoalTime_TagHelper(0xBE020, "BE020")',
-    'GoalTime_TagHelper(0xBE150, "BE150")',
-    'VR R66 GOAL TIME HUD:',
+    'GoalTime_TagHelper<0x000BEA5Au, 0xBE020>("BE020")',
+    'GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>("BE150")',
+    'GameSemantic::ClassifyCriticalProducer(CallerRva)',
+    'producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud',
+    'VR R121 GOAL TIME HUD: shared producer-map',
 ], "P6_GOAL_TIME_EXACT_OWNER")
 
 # PASS 7 — lens flare stays exact and uses the R26+HUD production path.
@@ -140,7 +146,7 @@ require_all("src/hooks_graphics.cpp", [
     'if (Settings::VREnabled)',
     'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE',
 ], "P8_SELECTOR_SHADOW")
-require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
+require_all("src/vr/d3d9/ex_device_upgrade_r14_overlay.inc", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
     '384 MiB total cap preserved',
@@ -150,38 +156,53 @@ require_all("src/game_addrs.hpp", [
     'GameState::STATE_START',
     '*Game::game_start_progress_code == 65',
 ], "P8_START_GATE")
-require("src/vr/d3d9/stereo_renderer_r7.inc",
-        'return Game::is_vr_gameplay_presentation();',
+require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        'if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())',
         "P8_STEREO_SHARED_PREDICATE")
 require("src/vr/game/outrun_renderer.cpp",
         'Game::is_vr_gameplay_presentation()',
         "P8_RENDERER_SHARED_PREDICATE")
-require_all("src/vr/d3d9/ex_device_upgrade_r15.cpp", [
+require_all("src/vr/d3d9/ex_device_upgrade_r15_overlay.inc", [
     'no pre-Reset state-block replay',
     'D3D9 state blocks are device-reset-sensitive COM objects. Never',
 ], "P8_RESET_STATEBLOCK_REGRESSION")
-require("src/vr/d3d9/stereo_renderer_r23.cpp",
+require("src/vr/d3d9/stereo_renderer_r23_overlay.inc",
         'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
         "P8_AUTHORITATIVE_SEED")
-require("src/vr/d3d9/stereo_renderer_r22.cpp",
+require("src/vr/d3d9/stereo_renderer_r22_overlay.inc",
         'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
         "P8_R22_VIEWPORT_DEPTH")
-require("src/vr/d3d9/stereo_renderer_r13.cpp",
+require("src/vr/d3d9/stereo_renderer_r13_overlay.inc",
         'VR R13: stereo hardening ACTIVE;',
         "P8_R13_HARDENING")
+require("src/vr/d3d9/stereo_renderer_r20_overlay.inc",
+        'VR R20 PRODUCTION: first stereo seed requires current-generation Z/stencil clears; disabled-first bootstrap transaction READY',
+        "P8_R20_BOOTSTRAP_DEPTH_BASELINE")
 require_all("vrhost/src/main_r23.cpp", [
     'Do not publish the legacy global consumed-frame',
     'R32 arms an EVENT after the',
     'dedicated per-slot GPU-completion ACK only when',
 ], "P8_DIRECTGPU_COPY_ACK_ORDER")
 
-# PASS 9 — canonical package builders explicitly pin R26+HUD.
+# PASS 9 — canonical package builders explicitly pin R26+HUD and bind run
+# identity to VR_ONE_CLICK_TARGET.json rather than duplicating a stale literal.
+one_click_target = json.loads(read("tools/VR_ONE_CLICK_TARGET.json"))
+canonical_variant_id = str(one_click_target.get("VariantId", "")).strip()
+if canonical_variant_id != "R69_FIXPACK":
+    errors.append(
+        "P9_PC_FAST_TARGET_VARIANT: expected canonical one-click VariantId "
+        f"R69_FIXPACK, got {canonical_variant_id!r}"
+    )
+else:
+    passes.append("P9_PC_FAST_TARGET_VARIANT")
 require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69'",
-    "VariantId = 'ACTIVE_R26_HUD_R69'",
+    "$canonicalVariantId = [string]$oneClickTarget.VariantId",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') $canonicalVariantId",
+    "Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') $canonicalVariantId",
+    "VariantId = $canonicalVariantId",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
@@ -227,7 +248,6 @@ forbid(".github/workflows/vr-openxr.yml",
 
 # PASS 10 — the binary contract must cover every new exact production edge.
 contract = read("docs/VR_BINARY_CONTRACT.json")
-import json
 contract_json = json.loads(contract)
 bad_sig_lengths = [
     item.get("id", "<unknown>")
@@ -260,10 +280,83 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r26_compare.cpp"',
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
+    '#include "r32_policy.hpp"',
+    '#include "r13_bridge.hpp"',
+    '#include "stereo_renderer.cpp"',
+    '#include "stereo_renderer_r13_overlay.inc"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "stereo_renderer_r20_overlay.inc"',
+    '#include "stereo_renderer_r21_overlay.inc"',
+    '#include "stereo_renderer_r22_overlay.inc"',
+    '#include "stereo_renderer_r23_overlay.inc"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
+    '#include "stereo_renderer_r29_overlay.inc"',
+    '#include <d3dcompiler.h>',
+    '#include "stereo_renderer_r30_overlay.inc"',
+    '#include "stereo_renderer_r31_overlay.inc"',
+    '#include "stereo_renderer_r32_overlay.inc"',
+    '#include "stereo_renderer_r33_overlay.inc"',
+    '#include "vr/game/render_semantics.hpp"',
+    '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
-require("src/vr/d3d9/ex_device_pipeline.cpp",
-        '#include "ex_device_upgrade_r15.cpp"',
-        "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r13.cpp"',
+       "P11_R70_STEREO_NO_R13_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r20.cpp"',
+       "P11_R70_STEREO_NO_R20_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r21.cpp"',
+       "P11_R70_STEREO_NO_R21_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r22.cpp"',
+       "P11_R70_STEREO_NO_R22_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r23.cpp"',
+       "P11_R70_STEREO_NO_R23_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r26.cpp"',
+       "P11_R70_STEREO_NO_R26_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r29.cpp"',
+       "P11_R70_STEREO_NO_R29_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r30.cpp"',
+       "P11_R70_STEREO_NO_R30_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r31.cpp"',
+       "P11_R70_STEREO_NO_R31_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r32.cpp"',
+       "P11_R70_STEREO_NO_R32_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r33.cpp"',
+       "P11_R70_STEREO_NO_R33_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r34.cpp"',
+       "P11_R70_STEREO_NO_R34_NESTING")
+require_all("src/vr/d3d9/stereo_renderer.cpp", [
+    '#include "stereo_renderer_r7.inc"',
+    'R9BuildId',
+    'R9InstallState',
+    'R9PresentCallbackHook',
+], "P11_R70_STEREO_CANONICAL_BASE_FLOOR")
+require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
+    '#include "r13_bridge.hpp"',
+    '#include "ex_device_upgrade.cpp"',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "ex_device_upgrade_r15_overlay.inc"',
+], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r13.cpp"',
+       "P11_R70_EX_DEVICE_NO_R13_NESTING")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r14.cpp"',
+       "P11_R70_EX_DEVICE_NO_R14_NESTING")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',
@@ -299,10 +392,83 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r26_compare.cpp"',
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
+    '#include "r32_policy.hpp"',
+    '#include "r13_bridge.hpp"',
+    '#include "stereo_renderer.cpp"',
+    '#include "stereo_renderer_r13_overlay.inc"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "stereo_renderer_r20_overlay.inc"',
+    '#include "stereo_renderer_r21_overlay.inc"',
+    '#include "stereo_renderer_r22_overlay.inc"',
+    '#include "stereo_renderer_r23_overlay.inc"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
+    '#include "stereo_renderer_r29_overlay.inc"',
+    '#include <d3dcompiler.h>',
+    '#include "stereo_renderer_r30_overlay.inc"',
+    '#include "stereo_renderer_r31_overlay.inc"',
+    '#include "stereo_renderer_r32_overlay.inc"',
+    '#include "stereo_renderer_r33_overlay.inc"',
+    '#include "vr/game/render_semantics.hpp"',
+    '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
-require("src/vr/d3d9/ex_device_pipeline.cpp",
-        '#include "ex_device_upgrade_r15.cpp"',
-        "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r13.cpp"',
+       "P11_R70_STEREO_NO_R13_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r20.cpp"',
+       "P11_R70_STEREO_NO_R20_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r21.cpp"',
+       "P11_R70_STEREO_NO_R21_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r22.cpp"',
+       "P11_R70_STEREO_NO_R22_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r23.cpp"',
+       "P11_R70_STEREO_NO_R23_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r26.cpp"',
+       "P11_R70_STEREO_NO_R26_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r29.cpp"',
+       "P11_R70_STEREO_NO_R29_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r30.cpp"',
+       "P11_R70_STEREO_NO_R30_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r31.cpp"',
+       "P11_R70_STEREO_NO_R31_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r32.cpp"',
+       "P11_R70_STEREO_NO_R32_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r33.cpp"',
+       "P11_R70_STEREO_NO_R33_NESTING")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r34.cpp"',
+       "P11_R70_STEREO_NO_R34_NESTING")
+require_all("src/vr/d3d9/stereo_renderer.cpp", [
+    '#include "stereo_renderer_r7.inc"',
+    'R9BuildId',
+    'R9InstallState',
+    'R9PresentCallbackHook',
+], "P11_R70_STEREO_CANONICAL_BASE_FLOOR")
+require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
+    '#include "r13_bridge.hpp"',
+    '#include "ex_device_upgrade.cpp"',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "ex_device_upgrade_r15_overlay.inc"',
+], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r13.cpp"',
+       "P11_R70_EX_DEVICE_NO_R13_NESTING")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r14.cpp"',
+       "P11_R70_EX_DEVICE_NO_R14_NESTING")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',

@@ -1,0 +1,75 @@
+{
+  "task_id": "CONVERSION-DXVK-00271",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "chat_rollover": 6,
+  "status": "ACTIVE_STATIC_PROGRESS_CI_IN_PROGRESS",
+  "stage": "WAIT_DURABLE_RESULT",
+  "base_checkpoint_sha": "cb4f001be16f27ed1a060ba3aa27c940ca8c9df0",
+  "first_durable_checkpoint_sha": "d86f65afd0c5e786f2cd84f33621e24f0f49b8f7",
+  "validation_bearing_result_sha": "83e00209698d06d0c1430b38883df037322986e7",
+  "result_commits": [
+    "6e8bb0bf459e2c536c7172d1257d6c089a1d2f7a",
+    "f377a7b15ce5aca04da3ec4de5f75e0e283dbfa9",
+    "b5aec8d71c7e802ec53dbaddcbe7728475bf6c42",
+    "74193da9b2673e4f69166108adaa7f98e7c6f8d6",
+    "37930286e51e6ff3a45820c5fb83b24224af6516",
+    "6650bde608b874671c1690f30b51c1f0eeae9828",
+    "aec297e839413611dba75022b68b32773683e72a",
+    "c8dba2ed7ff43b66b33e134cc2481e5b2f1dc948",
+    "1978d8fb00277dab94a2577418b1919b5e2ab086",
+    "83e00209698d06d0c1430b38883df037322986e7"
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "canonical_exe_evidence": {
+    "source": "previously validated GitHub Build artifact",
+    "sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "local_pc_used": false,
+    "public_github_fetch_used": false
+  },
+  "static_progress": {
+    "start_rva": "0x00182635",
+    "proven_through_exclusive": "0x00182730",
+    "continuation_15": "EXACT_182635_TO_182673_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "continuation_16": "EXACT_182673_TO_1826B3_CONTROL_FLOW_PREFIX_PROVEN",
+    "continuation_17": "EXACT_1826B3_TO_1826F1_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "continuation_18": "EXACT_1826F1_TO_182730_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "next_overlap_rva": "0x00182730",
+    "next_overlap_bytes": "9b",
+    "next_raw_window_known_from_artifact": "0x00182730..0x0018276f",
+    "semantic_scope": "BOUNDED_CONTROL_FLOW_ONLY",
+    "function_entry_status": "UNRESOLVED",
+    "render_ownership_status": "UNRESOLVED",
+    "hud_ownership_status": "UNRESOLVED"
+  },
+  "validation": {
+    "exact_sha": "83e00209698d06d0c1430b38883df037322986e7",
+    "backend_disassembly_contract": "PASS",
+    "build_run_id": 36958772416,
+    "hud_inspector_run_id": 36958772516,
+    "openxr_run_id": 36958772563,
+    "hosted_package_run_id": 36958772474,
+    "full_ci": "IN_PROGRESS"
+  },
+  "issue14_comments": [
+    5944737150,
+    5944825352,
+    5944849665,
+    5944865554,
+    5944890625
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "next_action": "Continue from overlap byte 0x9B at 0x00182730 using the same canonical EXE identity. Exact-decode only complete instructions; the current 64-byte artifact window cuts the MOV at 0x0018276D after bytes 8A 4C 24. Resolve 0x00182741 only as an instruction boundary and retain 0x001827F0/0x001827F4/0x00182863 plus call targets as external until separately captured. Consume exact-SHA CI and never promote function/render/HUD/runtime semantics from control-flow shape alone.",
+  "constraints": [
+    "GitHub-only development",
+    "no N100 clone/worktree",
+    "do not modify vr-d3d9ex-focus",
+    "no CI-skip marker on result commits",
+    "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
+  ]
+}

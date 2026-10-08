@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00404",
+  "production_id": "CONVERSION-DXVK-00404",
+  "event_id": "CONVERSION-DXVK-00404-E005",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "1ebe2e161f90de735df004915963c088ee04ed39",
+  "material_result_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+  "validation_bearing_result_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+  "result_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+  "work_item": "DXVK_F137_CANONICAL_CONTROL_FLOW_0x183B83_TO_0x183BC0",
+  "summary": "Exact-decoded the F136 0x00183B83 raw frontier through the last complete instruction at 0x00183BBF, proving 18 contiguous instructions and exact short-Jcc targets 0x00183BB9/0x00183BA8 on instruction boundaries. Preserved indirect CALL 0x00183B9A semantics as unresolved, kept raw rel32 census empty, retained no inherited forward-target debt, and preserved 0x00183BC0:68 c4 41 as the mandatory next overlap. A first exact-SHA gate exposed an over-promoted raw call_semantics marker; the same TASK repaired it back to conservative UNRESOLVED before final validation.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/test_dxvk_continuation_101_control_flow.py",
+    "tools/test_dxvk_continuation_102_control_flow.py",
+    "tools/test_extract_dxvk_canonical_window.py",
+    ".github/workflows/dxvk-disasm-evidence.yml"
+  ],
+  "material_commit_messages": [
+    "test(dxvk): require F137 frontier proof [AUTO:CONVERSION-DXVK-00404]",
+    "test(dxvk): scope F135 cut-edge regression [AUTO:CONVERSION-DXVK-00404]",
+    "dxvk: prove canonical 0x183b83 control flow [AUTO:CONVERSION-DXVK-00404]",
+    "test(dxvk): guard F137 canonical control flow [AUTO:CONVERSION-DXVK-00404]",
+    "ci(dxvk): gate F137 control-flow proof [AUTO:CONVERSION-DXVK-00404]",
+    "fix(dxvk): keep F137 raw semantics quarantined [AUTO:CONVERSION-DXVK-00404]"
+  ],
+  "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "static_evidence": {
+    "provenance_status": "EXACT_EXE_183B83_TO_183BC3_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183B83_TO_183BC0_CONTROL_FLOW_WITH_183BC0_CUT_EDGE_PROVEN",
+    "predecessor_status": "EXACT_183B44_TO_183B83_CONTROL_FLOW_WITH_183B83_CUT_EDGE_PROVEN",
+    "start_boundary_status": "F136_EXACT_183B83_RAW_FRONTIER_CONSUMED_WITH_FULL_OVERLAP",
+    "start_rva": "0x00183B83",
+    "prefix_end_rva": "0x00183BC0",
+    "capture_end_rva": "0x00183BC3",
+    "instruction_count": 18,
+    "branch_targets": [
+      {
+        "branch_rva": "0x00183B83",
+        "target_rva": "0x00183BB9"
+      },
+      {
+        "branch_rva": "0x00183BA2",
+        "target_rva": "0x00183BA8"
+      }
+    ],
+    "branch_targets_on_exact_boundaries": true,
+    "inherited_unresolved_forward_targets": [],
+    "unresolved_forward_targets": [],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "indirect_call_rva": "0x00183B9A",
+    "indirect_call_semantics": "UNRESOLVED",
+    "trailing_overlap_rva": "0x00183BC0",
+    "trailing_overlap_bytes": "68 c4 41",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
+    "ownership_effect": "NONE",
+    "next_frontier_capture": {
+      "rva_start": "0x00183BC0",
+      "rva_end_exclusive": "0x00183C00",
+      "length": 64,
+      "frontier_basis": "INCOMPLETE_RVA",
+      "frontier_continuation_id": 102,
+      "bytes_hex": "68 c4 41 00 00 6a 08 ff 35 5c bc 98 00 8d 04 80 8d 34 81 ff 15 48 61 59 00 3b c7 89 46 10 75 04 33 c0 eb 43 6a 04 68 00 20 00 00 68 00 00 10 00 57 ff 15 3c 61 59 00 3b c7 89 46 0c 75 12 ff 76"
+    }
+  },
+  "local_validation": {
+    "environment": "N100 auxiliary access unavailable because the connected Remote Desktop Commander monthly tool-call quota was exhausted; this is not a source/CI blocker.",
+    "current_material_sha_local_validation": "NOT_PERFORMED",
+    "authority_note": "GitHub Actions exact-SHA validation is completion authority for this static DXVK work item."
+  },
+  "validation": {
+    "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+    "exact_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37276049102,
+      "job_id": 111653188640,
+      "conclusion": "success",
+      "continuation_window_tests": "6/6 PASS",
+      "f137_control_flow_tests": "8/8 PASS",
+      "extractor_tests": "34/34 PASS",
+      "analyzer_status": "SUCCESS",
+      "artifact_id": 11330336773,
+      "artifact_digest": "sha256:e7548ee1327d8b315808a09114feab64402fb58daf45f29f7f91e7b790c0a087"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37276049072,
+      "job_id": 111653188283,
+      "conclusion": "success",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11330018534,
+      "artifact_digest": "sha256:6bf189b99267edd82e5443a8a42762bf75f77b359a0cc4ba5df5a63379c0361d"
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the live target branch, prior F136 durable state, current user rollover metadata, and incomplete 00404 state directly from GitHub without repeating completed F136 work. Rollover is not a retry; ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected only F137 exact control-flow proof over canonical 0x00183B83..0x00183BC0, preserving the trailing incomplete PUSH and semantic quarantine."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added continuation 102 exact decode/proof, focused F137 regressions, frontier discovery expectation, and explicit CI coverage. Repaired the raw provenance call_semantics marker after the first exact-SHA gate correctly rejected premature semantic promotion."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37276049102/111653188640 SUCCESS with 6/6 continuation tests, 8/8 F137 tests and 34/34 extractor tests; Backend Conversion Gate 37276049072/111653188283 SUCCESS including Win32 build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Cumulative validation-bearing material state 2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e is published on vr-dxvk-r71-disasm; all 00404 material/review commits include [AUTO:CONVERSION-DXVK-00404]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/provenance/tool/test/workflow change only; no runtime DXVK payload, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Durable run record is written for the current E005/CHAT_ROLLOVER=3 dispatch; branch-local lane state is reconciled separately while preserving material/result SHA and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00404",
+    "production_id": "CONVERSION-DXVK-00404",
+    "event_id": "CONVERSION-DXVK-00404-E005",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "material_result_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+    "validation_bearing_result_sha": "2e2bc748eab33a13a8cd8ca7e2218b33ae72f90e",
+    "runtime_validation": "UNTESTED"
+  },
+  "follow_on_frontier": {
+    "next_action_kind": "DXVK_F138_CANONICAL_OVERLAP_PROVENANCE_0x183BC0_TO_0x183C00",
+    "start_rva": "0x00183BC0",
+    "capture_end_rva": "0x00183C00",
+    "probe_len": 64,
+    "required_complete_first_instruction_prefix": "68 c4 41",
+    "canonical_first_instruction_bytes": "68 c4 41 00 00",
+    "inherited_unresolved_forward_targets": [],
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE",
+    "runtime_validation": "UNTESTED"
+  },
+  "exact_next_action": "Use the exact canonical 64-byte frontier capture 0x00183BC0..0x00183C00 to build F138 raw overlap provenance. Consume the inherited 68 c4 41 cut only as the complete 68 c4 41 00 00 PUSH imm32 instruction, preserve raw rel32 census and any new trailing cut fail-closed, and do not promote indirect-call/function/render/HUD/runtime semantics.",
+  "recorded_at_kst": "2026-10-05T16:13:56+09:00",
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

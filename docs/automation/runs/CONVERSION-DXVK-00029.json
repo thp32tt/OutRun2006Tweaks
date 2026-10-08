@@ -1,0 +1,78 @@
+{
+  "task_id": "CONVERSION-DXVK-00029",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "eff867e30564fde8ed83bcfff473f02580e28925",
+  "result_sha": "7da248c5389013e54b1331acf6450ed2a0f09c30",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR-PERF-COMMON-001-DXVK-ANALYZER-AGGREGATION",
+  "summary": "Structured the existing DXVK/common frame-budget telemetry into AUTO_ANALYSIS_SUMMARY without modifying runtime hot paths. Host R23 capture/commit/render/xrEndFrame windows and scalar XR/cadence/consume timings plus R32 producer fence/backpressure counters are now machine-readable for the next exact-build performance test.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "review": {
+    "architecture": "Existing runtime instrumentation was sufficient for a safe first performance-analysis step; adding more hot-path probes before consuming those logs would increase distortion risk.",
+    "ownership_lifetime": "No transport generation, resource ownership, fence or ACK behavior changed.",
+    "stereo_correctness": "No WVP, stereo, HUD/menu/effect/recenter behavior changed.",
+    "performance": "The analyzer now aggregates existing host pipeline avg/max/P95 timings and producer counters. It deliberately does not label a bottleneck or change waits/copies/cadence before HMD evidence.",
+    "adversarial": "A synthetic test supplies two host pipeline windows and two R32 producer windows and verifies exact counts/sums plus max/P95 aggregation, preventing silent regex drift."
+  },
+  "behavior_verified": [
+    "Host captureAvgMaxP95, commitAvgMaxP95, renderAvgMaxP95 and endAvgMaxP95 windows are parsed into count, average-of-window-averages, maximum observed and maximum P95.",
+    "xrWaitFrameMs, xrFrameIntervalMs, cadenceSerialWaitMs and gamePresentToConsumeMs are summarized as sample count/average/maximum.",
+    "R32 producerFenceOk, producerBudgetFallback, backpressure, pendingDrain, pendingBlock and pendingError are summed across 5-second windows.",
+    "FrameBudgetEvidenceAvailable remains false when neither host nor producer performance telemetry exists.",
+    "Existing DXVK evidence-trust and status classification remain independent from performance aggregation."
+  ],
+  "queue_update": {
+    "item_id": "VR-PERF-COMMON-001",
+    "status_unchanged": "READY",
+    "dxvk_substep": "ANALYZER_AGGREGATION_COMPLETE_NEED_HMD_DATA",
+    "reason": "The full cross-backend performance item is not closed; the next optimization decision requires exact-build runtime data."
+  },
+  "evidence": [
+    "C0 recovered current GitHub HEAD, AGENTS.md, review index/Sets 08-10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00027 and runtime regression evidence. N100/local clone was not used.",
+    "C1 confirmed R23 already emits capture/commit/render/xrEndFrame timing windows and R32 already emits producer fence/backpressure windows; analyzer previously only calculated average XR frame interval.",
+    "Backend Conversion Gate 36489032539 PASS on exact source SHA 7da248c5389013e54b1331acf6450ed2a0f09c30, including synthetic frame-budget aggregation and all existing DXVK contracts plus Win32 build/binary verification.",
+    "Build 36489037539 PASS on exact source SHA 7da248c5389013e54b1331acf6450ed2a0f09c30.",
+    "OpenXR VR architecture 36489037480 PASS on exact source SHA 7da248c5389013e54b1331acf6450ed2a0f09c30 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36489037536 PASS on exact source SHA 7da248c5389013e54b1331acf6450ed2a0f09c30.",
+    "PC Fast 36489032617 skipped; scheduled automation did not use the user's PC.",
+    "Backend artifact 11001126847 digest sha256:6c71f6326f73c702450e1fb1474db63a78de262fc91ce3e9f7e1c2eb237a3832.",
+    "OpenXR host artifact 11000526340 digest sha256:cd7e7082cb0301454ed12ae96d4c72309c40e83b06dcab69befb5bf14abad42c.",
+    "HUD inspector artifact 11000651933 digest sha256:e0a15bc2488c822d49b8414158196f16da4717e6b75596a15ed0fab7731d9061.",
+    "Issue #14 implementation comment 5879438523 and validation comment 5879533098 record the transaction."
+  ],
+  "completed_work_items": [
+    "VR-PERF-COMMON-001-DXVK-ANALYZER-AGGREGATION"
+  ],
+  "blocked_runtime_items": [
+    "VR-PERF-COMMON-001-DXVK-RUNTIME-BUDGET-LOCALIZATION",
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY"
+  ],
+  "next_action": "Run an exact-build Quest3/VDXR DXVK PERFORMANCE session. Require PackageIntegrity.Verified=true, BuildIdentityVerified=true and DxvkDirectEvidenceTrusted=true. Use FrameBudget to determine whether capture/commit/render/xrEndFrame, producer budget fallback/backpressure, or another stage dominates before changing waits/copies/cadence.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36489032539,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36489037539,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36489037480,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36489037536,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36489032617,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 11001126847,
+    "backend_gate_artifact_digest": "sha256:6c71f6326f73c702450e1fb1474db63a78de262fc91ce3e9f7e1c2eb237a3832",
+    "openxr_host_artifact_id": 11000526340,
+    "openxr_host_artifact_digest": "sha256:cd7e7082cb0301454ed12ae96d4c72309c40e83b06dcab69befb5bf14abad42c",
+    "hud_inspector_artifact_id": 11000651933,
+    "hud_inspector_artifact_digest": "sha256:e0a15bc2488c822d49b8414158196f16da4717e6b75596a15ed0fab7731d9061"
+  },
+  "recorded_at_kst": "2026-09-29T07:01:00+09:00"
+}

@@ -1,0 +1,113 @@
+{
+  "task_id": "CONVERSION-DXVK-00135",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "4abae0c1a1a995fc3d22ed39525e7f3b9c400c2f",
+  "result_sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+  "validation_bearing_result_sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R139_TARGET_65970_FIRST_CALL_ALIGNMENT",
+  "summary": "Completed a bounded exact-EXE instruction-alignment proof for guarded-GF target C's first outbound CALL. Exact GitHub CI verifies the manually reviewed prefix from 0x65970 is contiguous and byte-identical, the existing function-start heuristic resolves to 0x65970, and the E8 at 0x65997 is instruction-aligned and decodes to 0x28460 in .text. The later raw candidates 0x659AC and 0x659C1 remain unresolved; helper semantics and ScreenHud ownership are not inferred.",
+  "evidence": [
+    "CONVERSION-DXVK-00133 proved target B first-CALL alignment and named target C 0x65970 as the next bounded F13 provenance work.",
+    "CONVERSION-DXVK-00131 exact-EXE census reported target C start_guess=0x65970 with raw outbound candidates 0x65997->0x28460, 0x659AC->0x28320 and 0x659C1->0x28800.",
+    "Result tree stages the exact target-C prefix in analyzer commit 03c32bf44bc5098b430a67ef594df1a442d8b99e and makes verifier commit 28bb8d3e745fa0759bb97f08dcd2d13c177fc78e the validation-bearing result.",
+    "OutRun EXE HUD Inspector CI 36725622562 PASS. static-exe-analysis reported known_call_sites=9/9 and guarded_gf_targets=3/3.",
+    "Exact analyzer output: gf_target_alignment=0x00065970 status=EXACT_FIRST_CALL_ALIGNMENT_PROVEN start_guess=0x00065970 layout_contiguous=True bytes_match=True call=0x00065997 target=0x00028460 target_section=.text semantic_effect=UNRESOLVED remaining_raw_calls=0x000659AC,0x000659C1.",
+    "Build 36725621994 PASS and explicitly executed tools/verify_vr_backend_disasm_contract.py with output 'VR backend disassembly contract: OK'.",
+    "OpenXR VR architecture 36725622234 PASS across all six jobs.",
+    "VR Hosted Test Package 36725622013 PASS on the exact result SHA.",
+    "A newer branch descendant 8e79a03ee9007626121058720f7f786b75fc696f added only docs/automation/runs/RUNTIME-DXVK-20260930-HMD-d7017310.json with [skip ci]; compare from the validation-bearing result is one documentation-only commit, so the 00135 source tree under validation is unchanged.",
+    "The newer runtime record concerns tested source d70173104fe469efd7e6361f8114a0dfdfcb8e18, not the 00135 exact result. No Quest 3/VDXR or in-game execution was performed for 00135; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00135.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "03c32bf44bc5098b430a67ef594df1a442d8b99e",
+      "message": "vr: stage target C first-call alignment proof [AUTO:CONVERSION-DXVK-00135] [skip ci]",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "86032bffbaed3fef6873b85551c878320de8248d",
+      "message": "docs: stage CONVERSION-DXVK-00135 record [AUTO:CONVERSION-DXVK-00135] [skip ci]",
+      "role": "pending_record",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+      "message": "vr: prove guarded GF target C first call alignment [AUTO:CONVERSION-DXVK-00135]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "target_c_alignment_proof": {
+    "entry_rva": "0x00065970",
+    "status": "EXACT_FIRST_CALL_ALIGNMENT_PROVEN",
+    "function_start_guess_rva": "0x00065970",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "aligned_call_rva": "0x00065997",
+    "decoded_call_target_rva": "0x00028460",
+    "call_target_section": ".text",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_calls": [
+      "0x000659AC",
+      "0x000659C1"
+    ]
+  },
+  "validation": {
+    "build_run_id": 36725621994,
+    "build_result": "PASS",
+    "backend_disasm_contract_result": "PASS",
+    "build_artifact_id": 11103250841,
+    "build_artifact_digest": "sha256:9166ba47b4f332199fccf3888e3a5b9c581e80183aa0f6d1101c28d9b29d093d",
+    "openxr_run_id": 36725622234,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36725622562,
+    "hud_result": "PASS",
+    "hud_analysis_artifact_id": 11102199243,
+    "hud_analysis_artifact_digest": "sha256:93b65d3017a7c3148a37868515328825b3390b89cc85e8f4225cb1bc05a9a730",
+    "hud_game_artifact_id": 11102589793,
+    "hud_game_artifact_digest": "sha256:aa5d04dd86f2bfabb7d38aafc75c26845acd4fe471f07e62c3accddc090e8651",
+    "hosted_package_pr_run_id": 36725622013,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11103580620,
+    "hosted_package_pr_artifact_digest": "sha256:71b4377a48264a29e7d741dd3ed9210f524911a3d654b6973e87ca7b4c2fc6e3"
+  },
+  "branch_descendant_observed_before_bookkeeping": {
+    "sha": "8e79a03ee9007626121058720f7f786b75fc696f",
+    "message": "docs: record failed DXVK HMD runtime validation [skip ci]",
+    "source_change_relative_to_result": false,
+    "changed_path": "docs/automation/runs/RUNTIME-DXVK-20260930-HMD-d7017310.json"
+  },
+  "review_lenses": {
+    "architecture": "Exact-EXE provenance stays isolated in analyzer/verifier tooling; backend activation and transport are unchanged.",
+    "ownership": "All guarded GF hooks remain spacing-only; semantic_effect is UNRESOLVED and ownership_effect is NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification or stereo render policy changed.",
+    "performance": "No runtime hot path or telemetry was added.",
+    "adversarial": "The target-C proof fails closed on reviewed byte drift, non-contiguous layout, entry-guess mismatch, E8 position/opcode drift, decoded target drift or a target outside .text."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_TARGET_65860_EXACT_CALL_ALIGNMENT",
+    "after": "PARTIAL_PLUS_TARGET_65970_FIRST_CALL_ALIGNMENT",
+    "runtime_claim": false
+  },
+  "blocker": "Only the first target-C outbound CALL is instruction-aligned. The raw candidates at 0x659AC->0x28320 and 0x659C1->0x28800 still require independent exact instruction-boundary evidence, and none of the three helper targets has a proven semantic effect. ScreenHud ownership therefore remains unchanged.",
+  "next_action": "Do not promote any guarded GF ownership from this result. A later bounded F13 task may prove 0x659AC and 0x659C1 independently. Separately, the newer HMD runtime record for tested source d7017310 marks DXVK gameplay cadence/performance as a P0 runtime blocker; subsequent controller prioritization should account for that newer runtime evidence without treating it as runtime validation of 00135."
+}

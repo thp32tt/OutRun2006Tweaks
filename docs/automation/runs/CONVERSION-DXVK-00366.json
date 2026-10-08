@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00366",
+  "production_id": "CONVERSION-DX11-00365",
+  "event_id": "CONVERSION-DX11-00365-E002",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "f18d3428f42c19e1455138a0dae647c4a2a58f24",
+  "result_sha": "c6ee6cf465b8e1dda47f70a142ec57112b49e514",
+  "validation_bearing_result_sha": "c6ee6cf465b8e1dda47f70a142ec57112b49e514",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F120_CANONICAL_RAW_PROVENANCE_0x18398E_TO_0x1839CE",
+  "summary": "Captured and fail-closed the exact canonical 64-byte F120 continuation_94 frontier 0x0018398E..0x001839CE from the validated F119 instruction boundary. Exact bytes, .text placement, predecessor lineage and unresolved forward-target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] are pinned. Raw inbound/outbound rel32 census is empty. The final byte at 0x001839CD is a trailing 0x8B partial instruction and is explicitly preserved for mandatory overlap. No function/render/HUD/runtime semantics or ownership promotion is claimed.",
+  "review_lenses": {
+    "architecture": "Analyzer/test-only provenance advance on isolated vr-dxvk-r71-disasm; vr-d3d9ex-focus and runtime backend implementation paths were not modified.",
+    "ownership_lifetime": "No runtime resource ownership, Reset/device-loss, shared-handle, synchronization, producer/consumer generation or ACK behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter, presentation or visual path changed; HMD correctness is not claimed.",
+    "performance": "Offline static analyzer/test work only; no runtime hot path, copy, wait, draw count or frame-pacing behavior changed.",
+    "adversarial": "Canonical bytes were sourced from the prior exact-SHA F119 evidence artifact rather than inferred; the new collector requires exact F119 predecessor proof, .text placement, exact 64-byte geometry/bytes and exact unresolved-debt equality, while the trailing 0x8B remains fail-closed."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_94_raw_provenance.py"
+    ],
+    "commit_message": "dxvk: capture canonical 0x18398e provenance [AUTO:CONVERSION-DXVK-00366]",
+    "material_result_sha": "c6ee6cf465b8e1dda47f70a142ec57112b49e514",
+    "material_tree_sha": "fcf6a307d28995d3ce921d9ab7421e4520501c4e",
+    "analyzer_blob_sha": "07672a527de9bfd4c292d19752c414a4bf5dc597",
+    "test_blob_sha": "f014e528f6a1260292858e19b27ac8fdfbf2b6a0",
+    "upstream_f119_evidence_artifact_id": 11298594421,
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "provenance_status": "EXACT_EXE_18398E_TO_1839CE_PROVENANCE_CAPTURED",
+    "predecessor_status": "EXACT_18394E_TO_18398E_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "start_rva": "0x0018398E",
+    "capture_end_rva": "0x001839CE",
+    "probe_len": 64,
+    "inherited_unresolved_forward_targets": [
+      "0x0018399B",
+      "0x001839B5",
+      "0x001839CD",
+      "0x001839D2",
+      "0x00183B6F"
+    ],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "raw_outbound_rel32_candidates": [],
+    "trailing_partial_instruction": {
+      "rva": "0x001839CD",
+      "bytes": "8b",
+      "status": "MANDATORY_OVERLAP_REQUIRED"
+    },
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37192965328,
+      "job_id": 111408850024,
+      "conclusion": "success",
+      "exact_sha": "c6ee6cf465b8e1dda47f70a142ec57112b49e514",
+      "artifact_id": 11299113692,
+      "artifact_digest": "sha256:50596cd28b9d1996016a23e65cfa8ddf3234011089714be8df2daabef54b9b82"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37192965350,
+      "job_id": 111408850129,
+      "conclusion": "success",
+      "exact_sha": "c6ee6cf465b8e1dda47f70a142ec57112b49e514",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11300041309,
+      "artifact_digest": "sha256:9aba8b3c5fbfb5e94925c12f9f1182e02f48ef583439c20a2533ab4107cf4e59"
+    },
+    "issue14_change_comment_id": 5978656765
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current vr-dxvk-r71-disasm HEAD f18d3428f42c19e1455138a0dae647c4a2a58f24, VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, branch-local conversion lane state, VR_AUTODEV_STATE, regression knowledge/history, Issue #14 and AI scoreboard. Confirmed 00364 complete and no existing 00366 material commit."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the highest-priority runnable branch-local next action from the 00364 follow-on frontier: F120 exact raw provenance at 0x0018398E..0x001839CE. Five review lenses found no need to touch runtime/DX9Ex paths; canonical bytes were recovered from exact-SHA F119 artifact 11298594421."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material commit c6ee6cf465b8e1dda47f70a142ec57112b49e514 adds continuation_94 exact canonical bytes, F119 predecessor/debt checks, raw rel32 census/report/failure guard, trailing 0x8B overlap status and deterministic F120 regression tests."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37192965328/111408850024 SUCCESS including static disassembly contract, continuation tests, canonical window extraction/identity and EXE analysis. Backend Conversion Gate 37192965350/111408850129 SUCCESS including backend disassembly contract, Win32 configure/build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result c6ee6cf465b8e1dda47f70a142ec57112b49e514 is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00366] and no CI-skip directive. Issue #14 comment 5978656765 records the production change and validation."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static analyzer/test canonical provenance step only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "This durable run record and branch-local conversion state persist the 00366 validation-bearing SHA, source dispatch metadata, exact-SHA gate evidence, RUNTIME_VALIDATION=UNTESTED and exact next decode action. Run-record creation commit is daf0d671525a328eab7cb2943cf2ece3ab2897d7."
+    }
+  },
+  "blocker": null,
+  "next_action": "Exact-decode only complete canonical instructions from validated F120 raw window 0x0018398E..0x001839CE. Resolve inherited/branch targets only on exact instruction boundaries, preserve the trailing partial 0x8B at 0x001839CD for mandatory overlap, carry unresolved target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Exact-decode only complete canonical instructions from validated F120 raw window 0x0018398E..0x001839CE. Resolve inherited/branch targets only on exact instruction boundaries, preserve the trailing partial 0x8B at 0x001839CD for mandatory overlap, carry unresolved target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "validated_at_kst": "2026-10-04T18:46:48+09:00",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00366",
+    "production_id": "CONVERSION-DX11-00365",
+    "event_id": "CONVERSION-DX11-00365-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+    "rollover_is_retry": false
+  },
+  "run_record_commit_sha": "daf0d671525a328eab7cb2943cf2ece3ab2897d7"
+}

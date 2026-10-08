@@ -1,0 +1,64 @@
+{
+  "task_id": "CONVERSION-DXVK-00043",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "28f7d463a490043126514b36d4e27707c25db6ee",
+  "result_sha": "ebc079e072868450c15e896efa9e0486a0534220",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L1-RECENTER-001-STALE-QUEUE-CLOSURE",
+  "summary": "Reconciled L1-RECENTER-001 from stale READY to NEED_HMD_TEST after deterministic application-space recenter and executable IPC behavior validation were already complete, and made Backend Conversion Gate fail closed if that software/HMD boundary regresses.",
+  "changed_paths": [
+    "docs/VR_WORK_QUEUE.json",
+    "tools/verify_vr_recenter_contract.py"
+  ],
+  "source_commit": {
+    "sha": "ebc079e072868450c15e896efa9e0486a0534220",
+    "message": "Close DXVK recenter software gate [AUTO:CONVERSION-DXVK-00043]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "prior_evidence": {
+    "static_contract_task": "CONVERSION-DXVK-00039",
+    "static_contract_sha": "5540db82e8c50520a827661e31e544c82e64368a",
+    "ipc_smoke_task": "CONVERSION-DXVK-00041",
+    "ipc_smoke_sha": "9fba9fe1e54f1d2f474820560d42546f00051106",
+    "ipc_smoke_backend_gate_run_id": 36521949422
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36548811439,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36548821366,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36548821528,
+    "openxr_result": "PASS",
+    "openxr_host_recenter_ipc_step": "PASS",
+    "hud_workflow_run_id": 36548821407,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36548811472,
+    "pc_fast_result": "SKIPPED"
+  },
+  "behavior_verified": [
+    "Backend Conversion Gate requires exactly one L1-RECENTER-001 queue item.",
+    "The queue must remain NEED_HMD_TEST with automationValidation PASS and runtimeValidation UNTESTED.",
+    "The queue must retain exact CONVERSION-DXVK-00041 result provenance.",
+    "OpenXR host-x64 executes the recenter IPC Publish/Pending/MarkReceived/MarkApplied smoke successfully."
+  ],
+  "scope": "Queue reconciliation and regression verification only; no runtime recenter, renderer, DXVK provider, DirectGPU transport, OpenXR submission, cadence or HUD behavior changed.",
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5887374370,
+    "issue_14_validation_comment_id": 5887485472
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_REVIEW_STALE_RECENTER_QUEUE",
+    "C2_RECONCILE_QUEUE_AND_VERIFIER",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C6_STATE"
+  ],
+  "blocker": "Quest3/VDXR visual recenter behavior cannot be established by hosted CI.",
+  "next_action": "Quest3/VDXR exact-build CORRECTNESS test in menu and gameplay. Verify a single stable recenter transition, no false VIEW-fallback acknowledgement, startup progression, and protected road/background/vehicle stereo.",
+  "recorded_at_kst": "2026-09-29T18:29:43+09:00"
+}

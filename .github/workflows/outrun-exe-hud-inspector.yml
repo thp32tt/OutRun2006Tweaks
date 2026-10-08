@@ -3,6 +3,7 @@ name: OutRun EXE HUD Inspector CI
 on:
   workflow_dispatch:
   push:
+    branches-ignore: [ vr-dx11-native-r71, vr-dxvk-r71-disasm ]
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
       - 'OutRun2006Tweaks.ini'
@@ -54,6 +55,10 @@ on:
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
+
+concurrency:
+  group: exe-hud-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

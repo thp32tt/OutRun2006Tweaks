@@ -1,0 +1,72 @@
+{
+  "task_id": "CONVERSION-DXVK-00053",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "b2dcce2b3ee98a5bd5b5d31b66781da1e5e5e040",
+  "result_sha": "033c2838ca6ea9f1463f4fd6776321e58d772fb8",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR-BACKEND-SET04-F16-SEMANTIC-TAG-OVERFLOW",
+  "summary": "Closed Set 04 F16 on the DXVK branch by changing the fixed SpriteNode semantic-tag table to preserve all already-published live exact owners at capacity and reject only the newest unique registration, with diagnostic telemetry and executable regression coverage.",
+  "selection_reason": "All higher-priority direct DXVK queue items were either DONE or genuinely NEED_HMD_TEST. F16 was the highest remaining software-only backend-neutral semantic correctness gap from the 100-review campaign that materially affects DXVK exact HUD/rank ownership and can be completed without hardware evidence.",
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/semantic_tag_overflow_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-openxr.yml",
+    "tools/verify_vr_semantic_catalog.py"
+  ],
+  "source_commit": {
+    "sha": "033c2838ca6ea9f1463f4fd6776321e58d772fb8",
+    "message": "Fail closed DXVK semantic tag overflow [AUTO:CONVERSION-DXVK-00053]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "behavior_verified": [
+    "A full semantic-tag table no longer replaces the oldest live published entry.",
+    "Updating an existing node while the table is full remains accepted and does not count as overflow.",
+    "A new unique registration at capacity is rejected fail-closed and increments SpriteNodeSemanticOverflowRejected without incrementing SpriteNodeSemanticStaleCleared.",
+    "The oldest exact ScreenHud owner remains consumable after an overflow attempt.",
+    "The rejected newest node falls back to ScreenOverlay2D rather than stealing another queued node's exact owner.",
+    "After capacity is freed, the previously rejected producer can register and consume its ProjectedWorldMarker2D owner normally.",
+    "No ScreenHud/WorldBillboard/ProjectedWorldMarker2D classifier widening or visual placement math changed."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36562592052,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36562596953,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36562596979,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36562596965,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36562592050,
+    "pc_fast_result": "SKIPPED",
+    "semantic_overflow_smoke": "PASS"
+  },
+  "regression_scope": {
+    "related_keys": [
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "note": "The change is limited to full-table admission behavior and does not broaden semantic ownership. Existing HMD-visible visual regressions remain separate runtime gates."
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5889426159,
+    "issue_14_validation_comment_id": 5889540745
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_SELECT_HIGHEST_RUNNABLE_DXVK_RELATED_SOFTWARE_GAP",
+    "C2_IMPLEMENT_F16_FAIL_CLOSED_OVERFLOW",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for F16. Existing DXVK visual, DirectGPU transport and performance conclusions still require exact-build Quest3/VDXR evidence.",
+  "next_action": "Do not reopen F16 unless its static/behavior gate regresses or new runtime evidence identifies a distinct overflow failure. Continue the existing exact-build Quest3/VDXR gates for DXVK visual ownership, host-owned DirectGPU transport and performance; keep those runtime conclusions unproven until matching hardware evidence exists."
+}

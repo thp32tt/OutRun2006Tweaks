@@ -1,0 +1,96 @@
+{
+  "task_id": "CONVERSION-DXVK-00097",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "5f9652867c1df8bae19af6aa6e26551ae0e8d515",
+  "result_sha": "0490608b0f5f76d6fffbcb239e3f93379b616a19",
+  "validation_bearing_result_sha": "0490608b0f5f76d6fffbcb239e3f93379b616a19",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R120_DISPRANK_CLIP_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04 F13 on the DXVK branch for one bounded producer family. Eight already-proven DispRank put_clip_sprite callsites now carry their exact caller RVA into GameSemantic::ClassifyCriticalProducer and compile-time require canonical ScreenHud. Probe-19 handoff, ScopedProducerSemantic and direct SpriteNode ownership all consume that shared scope. The separate out-of-range DispRank sprani callsite 0xB9DA6 remains unchanged and no producer range was widened.",
+  "evidence": [
+    "The selected callsites 0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0, 0xB9FFC, 0xBA01E, 0xBA035 and 0xBA052 are existing exact DispRank clip hooks and all lie inside canonical CriticalProducerRanges 0x000B9E00-0x000BA100 ScreenHud.",
+    "DispRank_putClipSprite is templated by exact CallerRva; ClassifyCriticalProducer(CallerRva) is compile-time required to equal RenderScope::ScreenHud.",
+    "Existing probe-19 ArmNextDraw, ScopedProducerSemantic and direct RegisterSpriteNodeScope behavior is preserved but now consumes producerScope from the shared contract.",
+    "The out-of-range DispRank sprani callsite 0xB9DA6 is intentionally unchanged; no shared producer range was expanded to absorb it.",
+    "verify_vr_backend_disasm_contract.py requires exact boundary template instantiations and rejects the legacy non-templated DispRank_putClipSprite hook form.",
+    "Backend Conversion Gate 36640810733 PASS on exact result SHA; artifact 11066831870 digest sha256:e7df1a9324df5ce0fcb97cf0981903967943838011c04034e0f176fc9f1c224e.",
+    "Build 36640815691 PASS.",
+    "OpenXR VR architecture 36640815678 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36640815739 PASS.",
+    "VR Hosted Test Package 36640815692 (PR) PASS and 36640810771 (push) PASS.",
+    "VR PC Fast Test Build 36640810785 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "0490608b0f5f76d6fffbcb239e3f93379b616a19",
+      "message": "vr: route DispRank clip HUD through shared producer map [AUTO:CONVERSION-DXVK-00097]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36640810733,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11066831870,
+    "backend_conversion_gate_artifact_digest": "sha256:e7df1a9324df5ce0fcb97cf0981903967943838011c04034e0f176fc9f1c224e",
+    "build_workflow_run_id": 36640815691,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36640815678,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_workflow_run_id": 36640815739,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36640815692,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36640810771,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36640810785,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5900438310,
+    "issue_14_validation_comment_id": 5900513683
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_LIVE_ADOPTION_DISP_TIME_ATTACK_15_EXACT_CALLS",
+    "after": "PARTIAL_LIVE_ADOPTION_PLUS_DISPRANK_8_EXACT_CLIP_CALLS",
+    "runtime_claim": false
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "note": "This task changes only the semantic provenance source for existing exact DispRank ScreenHud clip ownership. It does not broaden HUD ownership, change the out-of-range sprani producer, or claim HMD visual convergence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_STATE_AND_LEDGER",
+    "C1_SELECT_F13_DISPRANK_EXACT_CLIP_FAMILY",
+    "C2_R120_DISPRANK_SHARED_PRODUCER_MAP_ADOPTION",
+    "C3_STATIC_FAIL_CLOSED_VERIFIER",
+    "C3_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C4_VALIDATION_BEARING_RESULT",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 0,
+  "infrastructure_retries": 0,
+  "blocker": "No software blocker remains for this bounded DispRank clip F13 adoption step. F13 remains partially live-adopted across other producer families. Visual/HMD correctness for this exact build remains untested.",
+  "next_action": "Continue F13 only with another independently proven canonical producer family. The next bounded candidate is the exact NaviPub_DispTimeAttackGoal caller-edge family at 0xBEA5A/0xBEA5F, but preserve its BE020/BE150 helper behavior and update only exact provenance/guards; do not widen producer ranges or tune DXVK DirectGPU/copy/wait/cadence without exact-build runtime evidence."
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00350",
+  "production_id": "CONVERSION-DXVK-00350",
+  "event_id": "CONVERSION-DXVK-00350-E008",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "8f675ca8eacdf8026b67aa8b0a630631c9bf1339",
+  "result_sha": "4b2d0c78e2bbef1861642d07bdf2382c87514b9f",
+  "validation_bearing_result_sha": "4b2d0c78e2bbef1861642d07bdf2382c87514b9f",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F111_CANONICAL_CONTROL_FLOW_0x18384F_TO_0x18388F",
+  "summary": "Exact-decoded all 25 complete canonical instructions in the fully pinned F110 continuation_89 window from 0x0018384F through 0x0018388F. Resolved inherited forward target 0x00183854 on an exact current-window instruction boundary, proved 0x0018384F->0x0018385A internally and 0x00183856->0x00183842 against the exact predecessor instruction boundary, proved an empty raw rel32 CALL census, and ended exactly on the 0x0018388F capture boundary. Function/render/HUD/runtime semantics remain unresolved.",
+  "review_lenses": {
+    "architecture": "Analyzer/test-only exact canonical control-flow evidence on isolated vr-dxvk-r71-disasm; no other backend lane was modified.",
+    "ownership_lifetime": "No runtime resource ownership, Reset/device-loss, shared-handle, synchronization, generation, producer/consumer or ACK behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter, presentation or visual path changed; runtime correctness is not claimed.",
+    "performance": "Offline analyzer/static evidence only; no runtime hot path, draw count, copy, wait or frame-pacing behavior changed.",
+    "adversarial": "Proof fails closed unless the F110 canonical provenance is exact, all 25 instruction byte ranges are contiguous and exact, inherited 0x00183854 resolves on a current instruction boundary, branch 0x0018384F->0x0018385A lands on a current boundary, backedge 0x00183856->0x00183842 lands on an exact predecessor boundary, the raw rel32 CALL census is empty, and the decoded end equals canonical capture end 0x0018388F."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_89_control_flow.py"
+    ],
+    "material_commit_message": "dxvk: prove canonical 0x18384f control flow [AUTO:CONVERSION-DXVK-00350]",
+    "material_result_sha": "4b2d0c78e2bbef1861642d07bdf2382c87514b9f",
+    "material_blob_sha": "9f1ff803d344094468c8d09dadf9f6379e12e7a6",
+    "test_blob_sha": "07f59bfb9c4babc5996d232ee4143ce974e8c25e",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "predecessor_provenance_status": "EXACT_EXE_18384F_TO_18388F_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_18384F_TO_18388F_CONTROL_FLOW_PROVEN",
+    "start_rva": "0x0018384F",
+    "prefix_end_rva": "0x0018388F",
+    "capture_end_rva": "0x0018388F",
+    "instruction_count": 25,
+    "resolved_inherited_forward_targets": [
+      "0x00183854"
+    ],
+    "direct_branches": [
+      "0x0018384F->0x0018385A",
+      "0x00183856->0x00183842"
+    ],
+    "predecessor_boundary_backedges": [
+      "0x00183856->0x00183842"
+    ],
+    "direct_rel32_calls": [],
+    "raw_call_census_empty": true,
+    "unresolved_forward_targets": [],
+    "local_aux_validation": {
+      "exact_material_content": true,
+      "py_compile": "success",
+      "targeted_continuation_88_89_unittest": "12/12 pass",
+      "canonical_exe_sha256_verified": true,
+      "canonical_analyzer_rc": 0,
+      "canonical_control_flow_status": "EXACT_18384F_TO_18388F_CONTROL_FLOW_PROVEN",
+      "backend_disassembly_contract": "success",
+      "git_diff_check": "success",
+      "next_frontier_start_rva": "0x0018388F",
+      "next_frontier_end_rva_exclusive": "0x001838CF"
+    },
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37178307114,
+      "job_id": 111365479488,
+      "conclusion": "success",
+      "exact_sha": "4b2d0c78e2bbef1861642d07bdf2382c87514b9f",
+      "artifact_id": 11293719966,
+      "artifact_digest": "sha256:9685b3875e8ee7fe5a4b194444480df73d2831b51f7576a92b054ad62b662cd8"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37178307024,
+      "job_id": 111365479315,
+      "conclusion": "success",
+      "exact_sha": "4b2d0c78e2bbef1861642d07bdf2382c87514b9f",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11294535587,
+      "artifact_digest": "sha256:a27c8bed98adb824032405af416c6e1def049f0f37edca08be751255dc68c64c"
+    },
+    "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE",
+    "issue14_validation_comment_id": 5976760634
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT at branch HEAD 8f675ca8eacdf8026b67aa8b0a630631c9bf1339, confirmed docs/automation/runs/CONVERSION-DXVK-00350.json was absent, and resumed from durable CONVERSION-DXVK-00348 frontier. This rollover is continuation, not retry; ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed the fully pinned 0x0018384F..0x0018388F canonical bytes. The window contains exactly 25 complete instructions, inherited target 0x00183854, internal branch 0x0018384F->0x0018385A, predecessor backedge 0x00183856->0x00183842, and no direct rel32 CALL."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material result 4b2d0c78e2bbef1861642d07bdf2382c87514b9f adds continuation_89 exact instruction/control-flow metadata, inherited-target resolution, predecessor-boundary backedge proof, analyzer report/failure wiring and regression tests."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact material content passed N100 py_compile, 12 targeted continuation_88/89 tests, canonical EXE SHA256 verification, canonical analyzer RC=0 with EXACT_18384F_TO_18388F_CONTROL_FLOW_PROVEN, backend disassembly contract, next-frontier extraction and git diff check. GitHub exact SHA passed DXVK Canonical Disassembly Evidence 37178307114/111365479488 and Backend Conversion Gate 37178307024/111365479315 including Win32 configure/build, binary verification and artifact upload. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result 4b2d0c78e2bbef1861642d07bdf2382c87514b9f is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00350] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/analyzer/test evidence only; no runtime payload, selector, transport, deployment content or package identity changed. Automated build artifacts are validation evidence, not HMD runtime validation."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "This schema-2 durable record persists the exact validation-bearing material SHA and gate evidence. The following lane-state bookkeeping commit advances latest_durable_task and static frontier to CONVERSION-DXVK-00350 while RUNTIME_VALIDATION remains UNTESTED."
+    }
+  },
+  "blocker": null,
+  "next_action": "Capture and fully pin a fresh 64-byte canonical provenance window starting at the exact instruction boundary 0x0018388F through 0x001838CF. There is no inherited forward-target debt from F111; record raw bytes/rel32 census first, then exact-decode only after provenance validation while keeping function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Capture and fully pin a fresh 64-byte canonical provenance window starting at the exact instruction boundary 0x0018388F through 0x001838CF. There is no inherited forward-target debt from F111; record raw bytes/rel32 census first, then exact-decode only after provenance validation while keeping function/render/HUD/runtime semantics unresolved.",
+  "validated_at_kst": "2026-10-04T14:00:09+09:00",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00350",
+    "event_id": "CONVERSION-DXVK-00350-E008",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 5,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "rollover_is_retry": false,
+  "chat_rollover": 5,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "prior_controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00350",
+    "event_id": "CONVERSION-DXVK-00350-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 4,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "dispatch_metadata_correction": {
+    "reason": "The current user-issued rollover dispatch is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00350, EVENT CONVERSION-DXVK-00350-E008, CHAT_ROLLOVER=5. The concurrent C6 writer persisted E002/chat_rollover=2 from an older rollover after the same material SHA and exact-SHA gates had already completed. This rollover is not a retry, so ATTEMPT remains 1/3. Material result, validation-bearing SHA, gate evidence, RUNTIME_VALIDATION and next frontier are unchanged.",
+    "corrected_to": {
+      "production_id": "CONVERSION-DXVK-00350",
+      "event_id": "CONVERSION-DXVK-00350-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "attempt_incremented": false,
+    "material_result_unchanged": true,
+    "validation_bearing_result_unchanged": true,
+    "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+    "runtime_validation_unchanged": "UNTESTED",
+    "issue14_validation_comment_id": 5976760634
+  },
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DXVK-00350",
+    "event_id": "CONVERSION-DXVK-00350-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 4,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "run_record_commit_sha": "b4acf661c3ad6deee4f22b31406dd707e1443cce"
+}

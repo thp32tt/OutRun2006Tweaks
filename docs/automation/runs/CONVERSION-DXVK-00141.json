@@ -1,0 +1,140 @@
+{
+  "task_id": "CONVERSION-DXVK-00141",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "a688f255661c8cfda81f86dab48878c1000b9ef7",
+  "result_sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
+  "validation_bearing_result_sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R141_TARGET_65970_THIRD_CALL_ALIGNMENT",
+  "selection_reason": "All current priority-13/12 DXVK queue items that can change runtime behavior require Quest3/VDXR evidence. QUEUE_CONTROLLER_CONTRACT therefore permits the independent bounded F13 provenance task explicitly left by CONVERSION-DXVK-00139: prove the remaining target-C raw outbound CALL 0x659C1->0x28800 without changing runtime ownership.",
+  "summary": "Completed the bounded exact-EXE instruction-boundary proof for guarded-GF target C's third and final raw outbound CALL at 0x659C1. The proof is anchored to the already-proven second CALL end at 0x659B1, verifies the exact contiguous instruction bytes through the E8, decodes the target as 0x28800 in .text, and leaves helper semantics/ScreenHud ownership unresolved. No renderer, transport, cadence, HUD ownership, or OpenXR runtime behavior changed.",
+  "evidence": [
+    "CONVERSION-DXVK-00139 exact result e9468bf1 proved 0x659AC->0x28320 and left 0x659C1->0x28800 as the only remaining raw target-C outbound CALL.",
+    "Discovery commit 97644a48 exposed the target-C 96-byte exact-EXE window; HUD Inspector static job 109963367524 showed the bytes beyond the previous 64-byte window.",
+    "Tail-probe commit 6dbf927a exposed an explicit 32-byte slice from 0x659B1; static job 109964534876 reported 83 c4 0c 83 f8 ff 89 46 08 74 24 8b 4e 3c 51 50 e8 3a 2e fc ff ... .",
+    "Source-stage commit 467afe0e added the bounded third-CALL proof without owning validation; validation-bearing result 5ec78a1c added fail-closed verifier guards with no CI-skip directive.",
+    "HUD Inspector run 36738529560 static job 109966780208 PASS reported status=EXACT_THIRD_CALL_ALIGNMENT_PROVEN, anchor=0x000659B1, anchor_matches=True, raw_candidate=True, layout_contiguous=True, bytes_match=True, call=0x000659C1, target=0x00028800, target_section=.text, semantic_effect=UNRESOLVED, remaining_raw_calls=none.",
+    "Backend Conversion Gate 36738520765 PASS on exact result 5ec78a1c; Build 36738529515 PASS; OpenXR VR architecture 36738530186 PASS across all six jobs; OutRun EXE HUD Inspector CI 36738529560 PASS; VR Hosted Test Package push 36738520540 PASS and pull_request 36738529499 PASS.",
+    "VR PC Fast Test Build 36738520588 was SKIPPED by branch policy and is not runtime validation.",
+    "Issue #81 P0 DXVK gameplay pacing remains ACTIVE and runtime-dependent; this exact-EXE provenance task does not change or clear it.",
+    "No Quest 3 / VDXR or in-game execution was performed for this result; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00141.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "97644a48cf176373fdd2437f9506f522c817a3a3",
+      "message": "vr: expose target C 96-byte provenance for third-call proof [AUTO:CONVERSION-DXVK-00141]",
+      "role": "evidence_probe",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "6dbf927a958d9d9b7d666b8079e46de9fdbc7ca0",
+      "message": "vr: expose target C third-call tail bytes [AUTO:CONVERSION-DXVK-00141]",
+      "role": "evidence_probe_superseded",
+      "validation_bearing": false,
+      "ci_skip": false,
+      "validation_result": "CANCELLED_SUPERSEDED"
+    },
+    {
+      "sha": "467afe0e84e40fa9f3d6e1e7a3bd3927e3516f4d",
+      "message": "vr: stage target C third-call alignment proof [AUTO:CONVERSION-DXVK-00141] [skip ci]",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
+      "message": "vr: prove target C third call alignment [AUTO:CONVERSION-DXVK-00141]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "target_c_third_call_proof": {
+    "entry_rva": "0x00065970",
+    "second_call_status": "EXACT_SECOND_CALL_ALIGNMENT_PROVEN",
+    "continuation_anchor_rva": "0x000659B1",
+    "anchor_matches_second_call_end": true,
+    "raw_candidate_carried_forward": true,
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "third_call_rva": "0x000659C1",
+    "decoded_call_target_rva": "0x00028800",
+    "call_target_section": ".text",
+    "status": "EXACT_THIRD_CALL_ALIGNMENT_PROVEN",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_call_rvas": []
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36738520765,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11109196869,
+    "backend_conversion_gate_artifact_digest": "sha256:462f8d96ce2f07b2d325d056ee64bf9318c5ba6bc1f69a2ab8bd7852c052c598",
+    "build_run_id": 36738529515,
+    "build_result": "PASS",
+    "build_artifact_id": 11110225741,
+    "build_artifact_digest": "sha256:812bd6c2e2821df2e88978ff2147f3767dc46cc9d196b1ae7747b1fd1a83cd91",
+    "openxr_run_id": 36738530186,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "openxr_host_artifact_id": 11109531372,
+    "openxr_host_artifact_digest": "sha256:6e493d81f195429a4459d8d2c7cc2b4547996ddd3924db45d6809d076509f094",
+    "hud_inspector_run_id": 36738529560,
+    "hud_inspector_result": "PASS",
+    "hud_static_analysis_job_id": 109966780208,
+    "hud_analysis_artifact_id": 11109050154,
+    "hud_analysis_artifact_digest": "sha256:b532013d8f9da047ecc2e0044a8c85c667b515d15b9b4ff3154faed904368b93",
+    "hud_game_artifact_id": 11110465350,
+    "hud_game_artifact_digest": "sha256:cdf45ddb1d81a81a7c024c01089d1e2bc23634413082719f2a5f5ab7bae326cb",
+    "hosted_package_push_run_id": 36738520540,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_push_artifact_id": 11109735535,
+    "hosted_package_push_artifact_digest": "sha256:3c79b47471727ccb735f1e184e0de9c6f6d43f5ceb98170ef808d8af88897776",
+    "hosted_package_pr_run_id": 36738529499,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11109755683,
+    "hosted_package_pr_artifact_digest": "sha256:213502ca3f20a27a3002482f98761f7fd8e40284223abb258be8710eeba06ab5",
+    "pc_fast_run_id": 36738520588,
+    "pc_fast_result": "SKIPPED"
+  },
+  "review_lenses": {
+    "architecture": "Exact-EXE provenance remains isolated in analyzer/verifier tooling; renderer/backend activation and transport code are unchanged.",
+    "ownership": "All three bounded outbound CALLs from target C are now instruction-aligned, but helper semantic effects remain UNRESOLVED; no ScreenHud or renderer ownership is promoted.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, or stereo render policy changed.",
+    "performance": "No game/host hot path, frame pacing, copy, wait, or cadence policy changed.",
+    "adversarial": "The third-call proof fails closed if the second-call proof regresses, 0x659C1 is no longer carried forward as the raw candidate, the 0x659B1 continuation bytes drift or become non-contiguous, the opcode ceases to be E8, rel32 no longer resolves to 0x28800, or the target leaves .text."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_TARGET_65970_SECOND_CALL_ALIGNMENT",
+    "after": "PARTIAL_PLUS_TARGET_65970_THIRD_CALL_ALIGNMENT",
+    "runtime_claim": false
+  },
+  "runtime_claim": "NONE",
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Keep guarded GF ownership unchanged. A later bounded F13 task may resolve the semantics of helpers 0x28460, 0x28320, and 0x28800 using exact provenance/effect evidence. Separately, Issue #81 DXVK gameplay cadence/performance remains a P0 runtime blocker requiring an exact-build Quest 3 / VDXR run after a runtime-path or pacing change.",
+  "failure_recovery": {
+    "prior_cancelled_run_id": 36737839656,
+    "prior_cancelled_sha": "6dbf927a958d9d9b7d666b8079e46de9fdbc7ca0",
+    "prior_conclusion": "CANCELLED",
+    "diagnosis": "The prior Backend Conversion Gate was superseded by later same-branch commits under cancel-in-progress while its Win32 Build step was running. All completed deterministic checks before cancellation had succeeded; this was not a reproduced source/test failure.",
+    "corrective_action": "Kept branch unchanged while validation-bearing result 5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3 completed all required hosted gates, avoiding another superseding commit until validation finished.",
+    "controller_attempt_incremented": false,
+    "controller_note": "Superseded/cancelled probe validation is not a task failure or retry under QUEUE_CONTROLLER_CONTRACT; controller attempt remains 1/3."
+  },
+  "blocker": "Target-C raw outbound CALL instruction alignment is complete for 0x65997, 0x659AC, and 0x659C1, but helper semantic effects remain unresolved. Therefore guarded GF ScreenHud/renderer ownership must not be promoted from call alignment alone."
+}

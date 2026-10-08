@@ -1,0 +1,82 @@
+{
+  "task_id": "CONVERSION-DXVK-00073",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "chat_rollover": 1,
+  "base_sha": "bfa465c4d8a98a2fb560f55c531cca752bc61f43",
+  "result_sha": "6ce7bf85e4c5aeb93fe268be12587954200edd15",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE8_R32",
+  "summary": "Removed the next default production stereo historical wrapper edge by extracting the unchanged R32 OutRunVRStereo implementation body into include-free stereo_renderer_r32_overlay.inc. Production stereo_pipeline now directly composes r32_policy.hpp plus stereo_renderer_r31.cpp, the R32 overlay, R33 overlay, render_semantics and the existing R34 overlay; historical R32/R33/R34 wrappers remain compatibility/build-graph owners and diagnostic comparison paths are unchanged.",
+  "evidence": [
+    "Parent bfa465c4d8a98a2fb560f55c531cca752bc61f43 stereo_renderer_r32.cpp OutRunVRStereo implementation body matches result stereo_renderer_r32_overlay.inc after CRLF/LF and terminal-newline normalization (1125 lines / 47423 normalized characters); no R32 runtime logic was edited.",
+    "Backend Conversion Gate 36601879479 PASS on exact result SHA, including queue/baseline/one-click/package/DXVK/disassembly/facade/semantic/session/shared-handle/transport/pinned-acquisition/SAFE/recenter checks plus Win32 build, binary verification and artifact upload.",
+    "Build 36601886514 PASS on exact result SHA.",
+    "OpenXR VR architecture 36601886483 PASS across host-x64, production game-x86, safe-draw compare, R26 HUD/SkyGlow safe, C1 R29/R28 classify, and C2 R30 HUD jobs.",
+    "OutRun EXE HUD Inspector CI 36601886460 PASS for static EXE analysis and inspector build.",
+    "VR Hosted Test Package 36601886558 (PR) PASS and 36601879698 (push) PASS on exact result SHA.",
+    "VR PC Fast Test Build 36601879530 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r32_overlay.inc",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "6ce7bf85e4c5aeb93fe268be12587954200edd15",
+      "message": "Extract R32 stereo overlay from production facade [AUTO:CONVERSION-DXVK-00073]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36601879479,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36601886514,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36601886483,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36601886460,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36601886558,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36601879698,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36601879530,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5894857096,
+    "issue_14_validation_comment_id": 5894957721
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Changed source-graph and verifier ownership only. Hosted compile, binary and architecture guards passed; no runtime-visible invariant is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER_CHAT_ROLLOVER",
+    "C1_RESUME_F04_PHASE8",
+    "C2_EXTRACT_R32_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C5_HOSTED_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for F04 phase 8. Full F04 remains open because the next deeper stereo historical include edge is R31 -> R30; runtime correctness still requires exact-build Quest3/VDXR evidence.",
+  "next_action": "Continue F04 only as another bounded, independently build-verified stereo source-graph step beginning with R31 -> R30 ownership. Do not combine whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence."
+}

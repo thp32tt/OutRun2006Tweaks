@@ -1,0 +1,107 @@
+{
+  "task_id": "CONVERSION-DXVK-00017",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 2,
+  "base_sha": "98dddffbe14fb4e81f9c469249cd892a7fcbfc25",
+  "result_sha": "561f2fee1d000eee2334fc45e08e8b199ec063bc",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-HOST-OWNED-TRANSPORT-SYNC-LIFETIME-CONTRACT",
+  "summary": "Added and validated a dedicated static CI contract for the already-implemented DXVK host-owned shared-eye transport. The verifier protects bridge ABI/publication ordering, seqlock reads, host/generation identity, 4-slot import, producer completion before publication, exact per-slot consumer ACK identity/lifetime, and the host-owned D3D11 hold-copy boundary. No runtime transport/rendering behavior was changed.",
+  "changed_paths": [
+    "tools/verify_dxvk_host_owned_transport_contract.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "source_commits": [
+    "4a5e162ea2dc04cf6ca14bed3b1aebcceee1e794",
+    "0c77f78cd9d0b849a71e28f1e4ac190f7b4e359f",
+    "561f2fee1d000eee2334fc45e08e8b199ec063bc"
+  ],
+  "review": {
+    "architecture": "The DXVK host-owned bridge remains an input to the established DirectTransportSlots/R13/R23 DirectGPU chain rather than a parallel synchronization protocol. The contract now guards that inheritance explicitly.",
+    "lifetime_sync": "The verifier requires all host eyes to be allocated before ready publication; game bridge snapshots use sequence-before/copy/sequence-after validation; host PID and bridge generation are validated; generation changes release prior direct resources; producer EVENT precedes publication; published slots are reclaimed only after exact per-slot R13 ACK identity and completedFrameId.",
+    "stereo_correctness": "No stereo draw, WVP, HUD/menu, effect or Present behavior changed. The contract only prevents future transport refactors from bypassing the already-reviewed lifetime rules.",
+    "performance": "No wait/copy/cadence optimization was introduced. The verifier is CI-only and has zero runtime hot-path cost.",
+    "adversarial": "Initial verifier assumptions were intentionally challenged by Actions. Two false verifier failures were corrected by replacing textual/count/comment assumptions with concrete control-flow and left/right allocation markers; transport implementation was not weakened to make CI pass."
+  },
+  "failure_context": {
+    "controller_failure_run_id": 36461911548,
+    "controller_failure": "New verifier failed with 'DXVK bridge must allocate both eyes for every ring slot before publish' because it incorrectly required three textual createSharedEye occurrences. The source has one lambda definition plus concrete left/right calls inside the ring loop.",
+    "repair_1": {
+      "result_sha": "0c77f78cd9d0b849a71e28f1e4ac190f7b4e359f",
+      "action": "Replace occurrence-count heuristic with explicit left/right texture and handle markers inside the ring initializer.",
+      "validation_run_id": 36462121987,
+      "outcome": "A different verifier-only false failure was exposed."
+    },
+    "repair_2": {
+      "failure_run_id": 36462121987,
+      "failure": "Verifier required exact comment text 'Published shared eyes remain immutable'; case/text did not match source even though exact ACK control flow was present.",
+      "result_sha": "561f2fee1d000eee2334fc45e08e8b199ec063bc",
+      "action": "Remove comment-string dependency and require concrete slot.published -> R13ReadGpuCompletedFrame -> exact identity -> ACK threshold -> slot clear control-flow markers.",
+      "validation_run_id": 36462406084,
+      "outcome": "PASS"
+    },
+    "repeat_policy": "The failed gate was not rerun unchanged. Each Actions failure signature was inspected directly and the verifier was narrowed to behavior-bearing source markers without relaxing the intended safety invariant."
+  },
+  "contract_verified": [
+    "Bridge shared-memory ABI uses fixed-width uint64 eye handles and RenderFrameRingSize slots.",
+    "Host bridge initialization creates left/right shared eyes for every ring slot before publishing magic/ready.",
+    "Game bridge read uses sequence-before/copy/sequence-after seqlock validation plus magic/version/structSize checks.",
+    "Game import requires HostAlive|ResourcesReady, nonzero generation/size, expected format, and matching host PID.",
+    "Generation/resource changes release prior DirectTransportSlots before importing the new host-owned ring.",
+    "Successful import binds DirectTransportGeneration=bridge.generation, DirectTransportResourcesReady=true and DirectTransportHostOwnedDxvk=true.",
+    "Producer DirectTransportSlots are unpublished until the producer EVENT completes; timed-out S_FALSE slots remain quarantined.",
+    "Published slots are released only through R13ReadGpuCompletedFrame with DirectGpuAckIdentityMatches(hostPid, clientPid, runGeneration, transportGeneration) and a sufficient per-slot completedFrameId.",
+    "R23 copies both selected producer eyes into host-owned hold textures before marking the hold valid, preserving the reviewed copy-before-consumer-ACK model.",
+    "The DXVK shared-eye bridge smoke target remains in the host build graph."
+  ],
+  "regression_revalidation": [
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001: runtime status remains OPEN_USER_RUNTIME_VERIFIED_FAILURE; this task adds prevention/verification only.",
+    "VR-R50-FRAME-STABILITY-PRESERVE-001 remains runtime-unvalidated for this candidate because no Quest3/VDXR run occurred; no runtime copy/wait/cadence source was modified.",
+    "VR-STARTUP-WHITE-001 remains protected; startup/device/Present source was not modified.",
+    "100-review Set 07 S07-R01..R09 transport/ACK invariants are now directly guarded for the DXVK host-owned bridge inheritance."
+  ],
+  "evidence": [
+    "C0 recovered GitHub HEAD, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION-DXVK-00015 and regression/runtime state; N100/local clone was not used.",
+    "The actual host-owned transport runtime verdict remains BLOCKED_RUNTIME, so this independent task guarded its synchronization/lifetime structure rather than claiming runtime success.",
+    "Backend Conversion Gate 36462406084 PASS on exact source SHA 561f2fee1d000eee2334fc45e08e8b199ec063bc; the new synchronization contract PASSed along with existing analyzer, provider acquisition, Win32 build and binary verification.",
+    "Build 36462414296 PASS on exact source SHA 561f2fee1d000eee2334fc45e08e8b199ec063bc.",
+    "OpenXR VR architecture 36462414281 PASS on exact source SHA 561f2fee1d000eee2334fc45e08e8b199ec063bc across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36462414245 PASS on exact source SHA 561f2fee1d000eee2334fc45e08e8b199ec063bc.",
+    "PC Fast 36462405748 skipped as required for scheduled automation.",
+    "Backend artifact 10987414310 digest sha256:1915e946c275fd04211db2ab1ad3acf8e3f840be494a9cc9af864b6d2c2c1b9e.",
+    "OpenXR host artifact 10988173906 digest sha256:2f57f155cfa249b98ff200d9cd071fab26d0708938609856c46be2afc47a7f62.",
+    "HUD inspector game artifact 10989015249 digest sha256:1fa7263c53cb585c9192d0223625c51a7a9b4d346c9e07a1b0a067d5f994412f.",
+    "Issue #14 implementation comment 5875621661 and validation comment 5875860512 record the production/validation transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-HOST-OWNED-TRANSPORT-SYNC-LIFETIME-CONTRACT"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "Run an exact-build Quest 3/VDXR test of the current host-owned shared-eye transport. Use the CONVERSION-DXVK-00015 structured bridge/import/path telemetry plus DirectFrames/DirectFallbacks/XR timing. Runtime success still requires DirectFrames>0, materially reduced fallback usage, pacing recovery from the prior ~33.44 ms gameplay interval, and no startup/stereo/HUD/menu/recenter regression. Do not infer runtime success from this static contract PASS.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36462406084,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36462414296,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36462414281,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36462414245,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36462405748,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10987414310,
+    "backend_gate_artifact_digest": "sha256:1915e946c275fd04211db2ab1ad3acf8e3f840be494a9cc9af864b6d2c2c1b9e",
+    "openxr_host_artifact_id": 10988173906,
+    "openxr_host_artifact_digest": "sha256:2f57f155cfa249b98ff200d9cd071fab26d0708938609856c46be2afc47a7f62",
+    "hud_inspector_artifact_id": 10989015249,
+    "hud_inspector_artifact_digest": "sha256:1fa7263c53cb585c9192d0223625c51a7a9b4d346c9e07a1b0a067d5f994412f",
+    "validation_completed_at_kst": "2026-09-29T03:13:34+09:00"
+  },
+  "recorded_at_kst": "2026-09-29T03:13:34+09:00"
+}

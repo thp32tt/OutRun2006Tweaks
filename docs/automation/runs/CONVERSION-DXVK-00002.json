@@ -1,0 +1,36 @@
+{
+  "task_id": "CONVERSION-DXVK-00002",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "693410403d0fff2cd0b994611ffd3264d6f0c584",
+  "result_sha": "d2d02c774ee85046acd42a453f2cf1f392927a20",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "Recovered the DXVK conversion gate, closed runtime-version attestation F24, unified the 25-range backend-neutral producer semantic catalog for F13/F14, and closed DXVK acquisition/cache provenance F08/F09 by pinning the official 3.1.1 release archive SHA-256 and requiring packaged provider bytes to match the verified archive. Exact-SHA Backend Conversion Gate passes semantic, provenance, Win32 build, binary, and artifact checks.",
+  "evidence": [
+    "243f5600dc2064cb795a283286e27ae399510b32 and 1090264633ee7dd30eba883721114ed7a5039620: reconciled stale protected-baseline/one-click verifiers.",
+    "8cbf77086ce143c496e66f94d815c760df9c6c30 and e46be02786f80aa9e554a24323714194b586d1f6: restored renderer bodies accidentally truncated during earlier disassembly-contract centralization.",
+    "4fc17768bb3cbb8242567f5c9ca9ce54526339dd: F24 closed; stock-provider verdict now requires one exact observed DXVK runtime version matching preflight. Gate 36390216273 PASS.",
+    "5dbaa42db595d793da7d6bb0b4272bf4500a59bf: F13/F14 semantic catalog unification; runtime HUD classification delegates to the shared 25-range DisasmContract catalog and the EXE analyzer mirrors it.",
+    "af9c7b787eeb091e0e656634ea61ad314059df2b: Acquire-OutRunDXVK.ps1 pins DXVK 3.1.1 archive SHA256 40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608, rejects unpinned/mismatched archives, and derives provider identity from verified archive bytes.",
+    "f524744080c0eb0430582aca017471c4335632e8: added isolated acquisition regression coverage for valid acquisition, cached-provider tamper repair, unpinned-version rejection, and archive-tamper rejection.",
+    "e75eaa423a7d70cd624b0a18c150c198f68ca736: explicit DxvkD3D9 package input must exactly match the provider extracted from the pinned official archive.",
+    "e59850b3a1b1dc2ee0a7974214300a5f32a0be62 and dc6760a9c6aca1e15dd182c15f68443469e9fe9b: one-click static contract plus Backend Conversion Gate enforce the pinned-provenance path.",
+    "d2d02c774ee85046acd42a453f2cf1f392927a20: reconciled the backend disassembly verifier with the canonical 25-range semantic catalog after the prior gate exposed stale 23-range literals.",
+    "Backend Conversion Gate 36391517935 on d2d02c774ee85046acd42a453f2cf1f392927a20: queue, baseline, one-click, disassembly, semantic-catalog, DXVK analyzer, pinned-acquisition, Win32 configure/build, binary verification, and artifact upload all PASS.",
+    "Artifact 10956528752: backend-autovalidated-vr-dxvk-r71-disasm-d2d02c774ee85046acd42a453f2cf1f392927a20, digest sha256:7e64b269456e0af6691be615b0c51455afb1645a6a7809dc2312ee7be995b5ee.",
+    "No HMD, Quest 3, VDXR, or in-game runtime/visual validation was performed."
+  ],
+  "attempt": 1,
+  "selected_work_item": "DXVK-F08-F09-PINNED-PROVENANCE",
+  "next_action": "Continue from exact validated SHA d2d02c774ee85046acd42a453f2cf1f392927a20 with the next independent DXVK lifecycle evidence item: re-attest provider/capability identity after full device recreation (F12). F15 projected semantic expressiveness, selector payload identity/transactionality, clean performance profiling, and exact-build Quest 3/VDXR two-pass visual parity remain open. Keep multiview blocked and RUNTIME_VALIDATION=UNTESTED until hardware evidence exists.",
+  "workflow_run_id": 36391517935,
+  "workflow_job_id": 108828195368,
+  "artifact_id": 10956528752,
+  "recorded_at": "2026-09-28T16:29:00+09:00",
+  "completed_work_items": [
+    "VR-BACKEND-CONVERSION-GATE-UNBLOCK-001",
+    "DXVK-F24-RUNTIME-VERSION-ATTESTATION",
+    "VR-BACKEND-SEMANTIC-CATALOG-F13-F14",
+    "DXVK-F08-F09-PINNED-PROVENANCE"
+  ]
+}

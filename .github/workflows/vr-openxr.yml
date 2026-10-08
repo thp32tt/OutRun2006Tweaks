@@ -37,6 +37,10 @@ on:
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
+concurrency:
+  group: openxr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   game-x86:
     runs-on: windows-2022
@@ -60,25 +64,41 @@ jobs:
               'SafetyOverlayReady',
               'BaselineVerified'
             )
-            'src/vr/d3d9/stereo_renderer_r20.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r13_overlay.inc' = @(
+              'R13InstallState',
+              'R13OverlayReady',
+              'R13EnsureAckState',
+              'R13ForceMonoShadow',
+              'single-execution MRT/occlusion fallback',
+              'StartDisabled'
+            )
+            'src/vr/d3d9/stereo_renderer_r20_overlay.inc' = @(
               'R20InstallState',
+              'R20StereoEligibilityGate',
+              'R20DepthHistorySafeForInitialSeed',
+              'R20AcceptVerifiedBaseline',
               'StartDisabled',
               'InstallState::Failed'
             )
-            'src/vr/d3d9/stereo_renderer_r21.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r21_overlay.inc' = @(
               'R21InstallState',
+              'R21HostStatus::SoftSuspend',
+              'R21ApplyHostFailClosedAtPresent',
               'IsFailed(R20InstallState)',
-              'StartDisabled'
+              'StartDisabled',
+              'without baseline reset'
             )
-            'src/vr/d3d9/stereo_renderer_r22.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r22_overlay.inc' = @(
               'R22InstallState',
               'R22ShadowState',
+              'R22StateBlockTrackingReliable',
               'R22SetScissorRectHook',
               'R22SetRenderStateHook',
+              'R22PrimeShadowState',
               'StartDisabled',
               'per-draw GetViewport/GetScissorRect/GetRenderState eliminated'
             )
-            'src/vr/d3d9/stereo_renderer_r23.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r23_overlay.inc' = @(
               'R23InstallState',
               'IsFailed(R22InstallState)',
               'R23CaptureActualGameState',
@@ -86,12 +106,27 @@ jobs:
               'passive original Clear only',
               'authoritative first seed'
             )
-            'src/vr/d3d9/stereo_renderer_r31.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r26_overlay.inc' = @(
+              'R26InstallState',
+              'R37DepthDisabledFragileOverlay',
+              'unknown state fails closed'
+            )
+            'src/vr/d3d9/stereo_renderer_r29_overlay.inc' = @(
+              'R29StableStereoBase',
+              'R29FragileEffectCached',
+              'R29MonoSafetyThroughEpoch'
+            )
+            'src/vr/d3d9/stereo_renderer_r30_overlay.inc' = @(
+              'R30DrawPrimitiveR29Hook',
+              'state.depthTestEnabled &&',
+              'state.rhwDepthEvidence'
+            )
+            'src/vr/d3d9/stereo_renderer_r31_overlay.inc' = @(
               'R31StateBlockTrackingReliable',
               'GetR28VerifiedProjection',
               'R31 fast left-eye c64 rollback'
             )
-            'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r32_overlay.inc' = @(
               'R32ResetR22Hook',
               'ResetDestR22',
               'R32ResetAfterGameReset',
@@ -102,7 +137,7 @@ jobs:
               'draw is forced to stock-WVP zero disparity',
               'VR R32 REVIEW2'
             )
-            'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r33_overlay.inc' = @(
               'R31OwnedResult R33TryFastWorld',
               'R31OwnedResult R33TryHud',
               'R32LowerFailClosed',
@@ -110,16 +145,21 @@ jobs:
               'R33ResetR32Hook.stdcall<HRESULT>',
               'top-level telemetry counted once'
             )
-            'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(
+            'src/vr/d3d9/ex_device_upgrade_r13_overlay.inc' = @(
+              'TextureLockRectR13',
+              'ResetCompatDevice',
+              'legacy ResetEx shim retained through final R15 validation'
+            )
+            'src/vr/d3d9/ex_device_upgrade_r14_overlay.inc' = @(
               'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
               'R14CopyWholeLevelByLock',
               'exact mip CPU-shadow upload failed'
             )
-            'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
+            'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(
               'D3DSBT_ALL',
               'Ex promotion rolled back transactionally'
             )
-            'src/vr/d3d9/stereo_renderer_r34.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r34_overlay.inc' = @(
               'R34ResetReplayBlocked',
               'LastResetStateReplaySucceeded',
               'stereo remains fail-closed'
@@ -129,7 +169,7 @@ jobs:
               'ZeroDisparity',
               'ClassifyEffectStereo'
             )
-            'src/vr/game/outrun_renderer_r13.cpp' = @(
+            'src/vr/game/outrun_renderer_r13_overlay.inc' = @(
               'R13FragileEffectNeedsZeroDisparity',
               'shadow/billboard/panel pass kept stock',
               'InvalidateVerifiedWvp'
@@ -138,7 +178,7 @@ jobs:
               'R29BuildCoherentUploadEnvelope',
               'R29InvalidateRendererStateAfterExternalRestore'
             )
-            'src/vr/game/outrun_renderer_r23.cpp' = @(
+            'src/vr/game/outrun_renderer_r23_overlay.inc' = @(
               'R23RenderThreadCleanupRequested',
               'R23ServiceRenderThreadCleanup',
               'R23KeepWarmupPoseStockOnRenderThread',
@@ -461,9 +501,8 @@ jobs:
             'VR R30.6 XYZRHW WORLD:',
             'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
             'VR R66 OPTION ARROW: exact node pinned',
-            'VR R66 GOAL TIME HUD:',
-            'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
-            'VR R65 SELECTOR: restored base shadow bypassed'
+            'VR R121 GOAL TIME HUD: shared producer-map',
+            'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes'
           )) {
             if (-not $ascii.Contains($marker)) {
               throw "R26 HUD marker missing: $marker"
@@ -694,6 +733,12 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-host-state-v3-channel-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "HostState v3 channel smoke failed: $LASTEXITCODE" }
 
+      - name: Run recenter IPC request/ack round-trip
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-recenter-ipc-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "recenter IPC smoke failed: $LASTEXITCODE" }
+
       - name: Run v2 to v3 shadow conversion regression
         shell: pwsh
         run: |
@@ -729,6 +774,24 @@ jobs:
         run: |
           & 'build-vrhost/bin/outrun-vr-r32-policy-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R32 policy regression failed: $LASTEXITCODE" }
+
+      - name: Run Frame.v2 producer-run identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-frame-run-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "Frame.v2 producer-run identity regression failed: $LASTEXITCODE" }
+
+      - name: Run exact DirectGPU ACK identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-direct-ack-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "DirectGPU ACK identity regression failed: $LASTEXITCODE" }
+
+      - name: Run SpriteNode semantic overflow regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-semantic-tag-overflow-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "semantic tag overflow regression failed: $LASTEXITCODE" }
 
       - name: Verify x64 R32 host binary
         shell: pwsh

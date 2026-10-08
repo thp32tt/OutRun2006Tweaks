@@ -1,0 +1,117 @@
+name: Backend Conversion Gate
+
+on:
+  push:
+    branches:
+      - vr-dx11-native-r71
+      - vr-dxvk-r71-disasm
+  workflow_dispatch:
+
+concurrency:
+  group: backend-conversion-gate-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Verify queue automation contract
+        shell: pwsh
+        run: |
+          if (-not (Test-Path docs/automation/QUEUE_CONTROLLER_CONTRACT.md)) { throw "queue automation contract missing" }
+
+      - name: Verify HMD-proven baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
+      - name: Verify one-click structure contract
+        shell: pwsh
+        run: ./tools/Test-VROneClickContract.ps1
+
+      - name: Test package-wide SHA256 integrity
+        shell: pwsh
+        run: ./tools/Test-OutRunVRPackageIntegrity.ps1
+
+      - name: Test DXVK one-click behavior
+        shell: pwsh
+        run: ./tools/Test-OutRunVROneClickBehavior.ps1
+
+      - name: Verify backend disassembly contract
+        shell: pwsh
+        run: python tools/verify_vr_backend_disasm_contract.py
+
+      - name: Verify renderer facade modularization
+        shell: pwsh
+        run: python tools/verify_vr_facade_modularization.py
+
+      - name: Verify VR semantic catalog
+        shell: pwsh
+        run: python tools/verify_vr_semantic_catalog.py
+
+      - name: Test DXVK session analyzer
+        shell: pwsh
+        run: python tools/test_analyze_dxvk_session.py
+
+      - name: Test runtime shared-handle failure classification
+        shell: pwsh
+        run: ./tools/Test-AnalyzeOutRunVRSession.ps1
+
+      - name: Verify DXVK host-owned transport synchronization contract
+        shell: pwsh
+        run: python tools/verify_dxvk_host_owned_transport_contract.py
+
+      - name: Test DXVK pinned acquisition
+        shell: pwsh
+        run: ./tools/Test-DxvkAcquisition.ps1
+
+      - name: Verify DXVK SAFE reactivation contract
+        shell: pwsh
+        run: python tools/verify_dxvk_reactivation_contract.py
+
+      - name: Verify application-space recenter contract
+        shell: pwsh
+        run: python tools/verify_vr_recenter_contract.py
+
+      - name: Configure Win32
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-auto -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/Zydis.vcxproj
+          $zycoreProject = Get-ChildItem build-auto/_deps -Recurse -Filter Zycore.vcxproj | Select-Object -First 1
+          if (-not $zycoreProject) { throw "Zycore.vcxproj missing under build-auto/_deps" }
+          (Get-Content $zycoreProject.FullName) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content $zycoreProject.FullName
+          Set-Content -Path build-auto/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32
+        run: cmake --build build-auto --config Release --target outrun2006tweaks
+
+      - name: Verify binary exists
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-auto -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          if ($dll.Length -lt 1000000) { throw "dinput8.dll unexpectedly small" }
+          Write-Host "AUTOMATION_VALIDATION candidate built from $env:GITHUB_SHA"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-autovalidated-${{ github.ref_name }}-${{ github.sha }}
+          path: |
+            build-auto/bin/dinput8.dll
+          if-no-files-found: error

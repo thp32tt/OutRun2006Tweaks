@@ -1,0 +1,72 @@
+{
+  "task_id": "CONVERSION-DXVK-00125",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "d8c18ce4e3b4b4409c493967a823a5164344ba96",
+  "result_sha": "d70173104fe469efd7e6361f8114a0dfdfcb8e18",
+  "validation_bearing_result_sha": "d70173104fe469efd7e6361f8114a0dfdfcb8e18",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R134_UNPROVEN_GF_SPEECH_NEGATIVE_GUARD",
+  "summary": "Hardened Set 04/F13 with a verifier-only fail-closed negative guard for five still-unproven C2CSpeechBubbleGF/GF-heart hooks at 0xFE8B1, 0xFD60C, 0xFD591, 0xFD5CD and 0xFD652. The guard requires the existing spacing-only callbacks to remain unchanged until exact immediate-draw provenance/effect is separately established. No game or host runtime path, semantic producer range, world/stereo path, transport path, protected DX9Ex branch or live ScreenHud ownership was changed.",
+  "evidence": [
+    "The five guarded hooks still bind to the legacy C2CSpeechBubble_AdjustPositionESP0 callback in src/hooks_uiscaling.cpp.",
+    "The existing source comment marks 0xFE8B1 as unsure/no-effect, and the four GF-heart edges remain without independently proven immediate-draw ownership.",
+    "verify_vr_backend_disasm_contract.py now fails closed if any of the five exact bindings changes without a deliberate verifier update and new provenance.",
+    "Validation-bearing source result d70173104fe469efd7e6361f8114a0dfdfcb8e18 contains [AUTO:CONVERSION-DXVK-00125] and no CI-skip directive.",
+    "Backend Conversion Gate 36711535753 PASS; artifact 11094580608 digest sha256:137a8795e31b821f93ca8591f69caf45719b1c6210e6f6406bf891e5fd89f6e4.",
+    "Build 36711539877 PASS.",
+    "OpenXR VR architecture 36711539890 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36711539876 PASS.",
+    "VR Hosted Test Package push 36711535427 PASS and PR 36711539899 PASS.",
+    "VR PC Fast Test Build 36711535518 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "d70173104fe469efd7e6361f8114a0dfdfcb8e18",
+      "message": "vr: guard unproven GF speech ownership [AUTO:CONVERSION-DXVK-00125]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36711535753,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11094580608,
+    "backend_conversion_gate_artifact_digest": "sha256:137a8795e31b821f93ca8591f69caf45719b1c6210e6f6406bf891e5fd89f6e4",
+    "build_run_id": 36711539877,
+    "build_result": "PASS",
+    "openxr_run_id": 36711539890,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36711539876,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36711535427,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36711539899,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36711535518,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5910737974,
+    "validation_comment_id": 5910869714
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_C2CSPEECHBUBBLEGF_POSITION_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_C2CSPEECHBUBBLEGF_UNPROVEN_NEGATIVE_GUARD",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this verifier-only F13 hardening step. Exact immediate-draw provenance/effect for the five guarded GF speech/heart hooks remains intentionally unproven, so no live ScreenHud ownership is added.",
+  "next_action": "Continue F13 only after independently proving exact immediate-draw ownership/effect for one guarded GF speech/heart hook. Preserve the fail-closed guard until that evidence exists and keep runtime validation distinct from hosted CI."
+}

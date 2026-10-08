@@ -1,0 +1,67 @@
+{
+  "task_id": "CONVERSION-DXVK-00057",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "f9b54cd5ab6d8fb134cf16233c9276b69d96cdee",
+  "result_sha": "a97cf26d2f6d081448dbe8695730407b8642494b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "POST_F02_F05_D3D9_VARIANT_NEGATIVE_CONTROL",
+  "summary": "Closed the remaining executable regression-coverage gap after F02 VariantId normalization by directly testing the D3D9 backend metadata mismatch path and requiring all three canonical VariantId failure paths in the DXVK reactivation verifier.",
+  "selection_reason": "All priority-13 DXVK queue items were DONE or genuinely NEED_HMD_TEST. A bounded post-F02 review found one runnable software gap: preflight fail-closed logic covered BUILD_INPUTS, backends/d3d9 and backends/dxvk, but executable behavior CI directly exercised only BUILD_INPUTS and backends/dxvk mismatches.",
+  "changed_paths": [
+    "tools/Test-OutRunVROneClickBehavior.ps1",
+    "tools/verify_dxvk_reactivation_contract.py"
+  ],
+  "source_commit": {
+    "sha": "a97cf26d2f6d081448dbe8695730407b8642494b",
+    "message": "Cover canonical DXVK variant identity layers [AUTO:CONVERSION-DXVK-00057]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "behavior_verified": [
+    "A mismatched BUILD_INPUTS VariantId fails closed.",
+    "A mismatched backends/d3d9/VARIANT_ID.txt now has an executable negative control and fails closed before selection.",
+    "A mismatched backends/dxvk/VARIANT_ID.txt remains executable negative-control covered.",
+    "The DXVK reactivation verifier requires exact fail-closed markers for all three VariantId layers and requires all three behavior-test controls.",
+    "No package selection, renderer, provider, DirectGPU, OpenXR, cadence or visual-placement behavior changed."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36568405570,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36568411746,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36568411761,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36568411751,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36568405563,
+    "pc_fast_result": "SKIPPED",
+    "dxvk_one_click_behavior": "PASS",
+    "dxvk_reactivation_contract": "PASS"
+  },
+  "regression_scope": {
+    "related_findings": [
+      "VR_BACKEND_100_REVIEW_SET_01:F05",
+      "VR_BACKEND_100_REVIEW_SET_01/02:F02"
+    ],
+    "exact_risk_path_matches": [],
+    "note": "The changed test/verifier paths do not match runtime regression riskPaths and do not change runtime behavior."
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5890330014,
+    "issue_14_validation_comment_id": 5890435966
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_POST_F02_BOUNDED_REVIEW",
+    "C2_ADD_D3D9_VARIANT_NEGATIVE_CONTROL",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for this F02/F05 coverage gap. DXVK visual, DirectGPU transport and performance conclusions remain gated on exact-build Quest3/VDXR evidence.",
+  "next_action": "Do not repeat VariantId coverage work unless the gate regresses. Continue the existing exact-build Quest3/VDXR DXVK CORRECTNESS/PERFORMANCE runtime gates; keep runtime conclusions UNTESTED until matching hardware evidence exists."
+}

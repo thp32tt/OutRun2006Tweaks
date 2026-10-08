@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "evidence_id": "DXVK-RUNTIME-20260929-93B69470",
+  "backend": "DXVK",
+  "branch": "vr-dxvk-r71-disasm",
+  "tested_sha": "93b69470a3ca72ad2c14df9d72253c3bf3721458",
+  "tested_tree_relation": "PC fast trigger commit over the CONVERSION-DXVK-00010 native-capability-gate tree",
+  "observed_at_kst": "2026-09-29T01:16:29+09:00",
+  "hardware_runtime": {
+    "hmd": "Quest 3",
+    "openxr_runtime": "VDXR",
+    "test_profile": "CORRECTNESS"
+  },
+  "provider": {
+    "dxvk_version": "3.1.1",
+    "provider_sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+    "stock_vk_handles": true,
+    "stock_vk_submission_queue": true,
+    "external_memory_win32": true,
+    "external_semaphore_win32": true,
+    "nativeTransportCandidate": true,
+    "queue_family_index": 0,
+    "queue_index": 0
+  },
+  "legacy_directgpu": {
+    "result": "USER_RUNTIME_VERIFIED_FAIL",
+    "probe_ack": 0,
+    "direct_ready": 0,
+    "direct_frames": 0,
+    "fallbacks": 1504,
+    "fence_timeouts": 0,
+    "dxvk_errors": [
+      "DxvkMemoryAllocator::createImageResource: Failed to open shared D3DKMT handle",
+      "D3D9: Failed to write shared resource info for a texture"
+    ],
+    "interpretation": "The stock DXVK provider exposes the Vulkan/external-memory prerequisites, but the existing legacy D3D9Ex shared-handle -> D3D11 DirectGPU path is not usable in this runtime session. The renderer falls back to SBS/Desktop Duplication."
+  },
+  "frame_pacing": {
+    "menu_or_local_xr_interval_ms_approx": 11.1,
+    "menu_or_local_hz_approx": 90.1,
+    "gameplay_projection_exact_xr_interval_ms_approx": 33.44,
+    "gameplay_hz_approx": 29.9,
+    "gameplay_xr_end_frame_ms_approx": 25.3,
+    "interpretation": "The severe pacing collapse is concentrated in gameplay stereo/fallback processing rather than the base HMD/menu cadence."
+  },
+  "analyzer_defect": {
+    "observed": true,
+    "field": "SharedD3D9ExProbeFailed",
+    "reported_value": false,
+    "expected_value": true,
+    "reason": "Concrete DXVK D3DKMT shared-handle failures plus probeAck=0/directReady=0/directFrames=0 contradict the false classification.",
+    "followup": "Repair the analyzer classification separately; do not let the false summary override raw runtime evidence.",
+    "resolution": {
+      "status": "AUTOMATION_FIXED",
+      "task_id": "CONVERSION-DXVK-00012",
+      "result_sha": "9a815650fe05e7313c1922d2f8030d68d90840e0",
+      "validation_run_id": 36452657989,
+      "validation": "PASS",
+      "details": "Analyze-OutRunVRSession.ps1 now recognizes the two concrete DXVK D3DKMT/shared-resource error signatures plus the legacy verification marker and emits SharedD3D9ExProbeFailureReasons. This resolves the analyzer false-negative only; it does not change the underlying runtime transport failure."
+    }
+  },
+  "visual_validation": {
+    "result": "UNSPECIFIED",
+    "reason": "TEST_RESULT.txt was blank; no HUD/menu/vehicle/sky/smoke visual parity claim is made."
+  },
+  "regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "current_head_after_test": {
+    "sha": "54be06b4bb8e6cc6d3b2995aa94369fdc9097b17",
+    "commit": "Implement DXVK host-owned shared-eye transport [AUTO:CONVERSION-DXVK-00010]",
+    "runtime_validation": "UNTESTED",
+    "note": "This implementation was committed after the tested SHA. Do not infer that the runtime failure is fixed from source/build state alone."
+  },
+  "automation_decision": {
+    "capability_gate": "PASS",
+    "legacy_directgpu": "FAIL",
+    "highest_priority_next_action": "Build and Quest3/VDXR-test the current host-owned shared-eye transport candidate. Require directReady/directFrames evidence and same-scene frame pacing before any promotion.",
+    "success_criteria": [
+      "native transport/bridge initializes without legacy D3DKMT shared-handle failure",
+      "directReady=1 and directFrames increases during gameplay",
+      "fallback count is eliminated or materially reduced for normal gameplay",
+      "gameplay XR frame interval recovers materially from the ~33.44 ms tested failure without regressing 90 Hz menu cadence",
+      "no startup/white-screen, stereo, HUD, menu, recenter or visual-parity regression"
+    ],
+    "constraints": [
+      "Preserve run generation and transport generation identity.",
+      "Preserve producer completion before publish.",
+      "Published slots/resources remain immutable until exact consumer ACK.",
+      "Fail closed to a known fallback; do not silently claim DirectGPU readiness.",
+      "Do not promote custom DXVK multiview until exact-build Quest3/VDXR parity and pacing are proven."
+    ]
+  },
+  "issue_13_comment_id": 5874110684,
+  "runtime_validation": "TESTED_CAPABILITY_PASS_LEGACY_DIRECTGPU_FAIL",
+  "current_head_runtime_validation": "UNTESTED",
+  "next_runtime_analyzer_contract": {
+    "task_id": "CONVERSION-DXVK-00015",
+    "result_sha": "b1057f02048048967b75e730c0952a4f8cad59ec",
+    "automation_validation": "PASS",
+    "fields": [
+      "DxvkHostBridgeReady",
+      "DxvkHostBridgeAllocationFailed",
+      "DxvkHostBridgeWidth",
+      "DxvkHostBridgeHeight",
+      "DxvkHostBridgeSlots",
+      "DxvkHostBridgeGeneration",
+      "DxvkHostImportReady",
+      "DxvkHostImportFailed",
+      "DxvkHostImportWidth",
+      "DxvkHostImportHeight",
+      "DxvkHostImportGeneration",
+      "DxvkHostGenerationMatches",
+      "DxvkHostDirectPathActive",
+      "DirectFrames",
+      "DirectFallbacks"
+    ],
+    "statuses": [
+      "DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED",
+      "DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED",
+      "DXVK_HOST_OWNED_IMPORT_FAILED",
+      "DXVK_HOST_OWNED_DIRECTGPU_ACTIVE"
+    ],
+    "interpretation_rule": "Bridge-ready is not success. Runtime transport success requires game import/path activation and DirectFrames>0, then pacing/visual regression gates."
+  },
+  "host_owned_transport_sync_contract": {
+    "task_id": "CONVERSION-DXVK-00017",
+    "result_sha": "561f2fee1d000eee2334fc45e08e8b199ec063bc",
+    "automation_validation": "PASS",
+    "validation_run_id": 36462406084,
+    "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
+    "runtime_validation": "UNTESTED",
+    "interpretation": "Static synchronization/lifetime inheritance is guarded, but this does not prove the DXVK host-owned transport opens or performs correctly on Quest3/VDXR."
+  },
+  "runtime_evidence_identity_gate": {
+    "task_id": "CONVERSION-DXVK-00019",
+    "result_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "automation_validation": "PASS",
+    "validation_run_id": 36465995809,
+    "runtime_validation": "UNTESTED",
+    "success_evidence_precondition": "For future exact-build DXVK HMD evidence, BuildIdentityVerified must be true before DirectGPU/pacing results are attributed to a source SHA.",
+    "fail_closed_status": "DXVK_BUILD_IDENTITY_MISMATCH",
+    "incomplete_flag": "DXVK_BUILD_IDENTITY_INCOMPLETE"
+  },
+  "direct_evidence_trust_gate": {
+    "task_id": "CONVERSION-DXVK-00025",
+    "result_sha": "4394b69096fa529cfef90eaa06001442da3272ba",
+    "automation_validation": "PASS",
+    "validation_run_id": 36480684112,
+    "runtime_validation": "UNTESTED",
+    "trusted_field": "DxvkDirectEvidenceTrusted",
+    "blocker_field": "DxvkDirectEvidenceBlockers",
+    "required_for_future_promotion_evidence": [
+      "BuildIdentityVerified=true",
+      "PackageIntegrityVerified=true",
+      "no host/import generation mismatch",
+      "DxvkHostDirectPathActive=true",
+      "DirectFrames>0"
+    ],
+    "interpretation": "A trusted evidence verdict only establishes that the DirectGPU transport telemetry belongs to an integrity-verified exact build and coherent bridge generation. Quest3/VDXR still must prove fallback reduction, pacing recovery and visual/startup/recenter correctness."
+  },
+  "frame_budget_analyzer": {
+    "task_id": "CONVERSION-DXVK-00029",
+    "result_sha": "7da248c5389013e54b1331acf6450ed2a0f09c30",
+    "automation_validation": "PASS",
+    "validation_run_id": 36489032539,
+    "runtime_validation": "UNTESTED",
+    "summary_field": "FrameBudget",
+    "source_telemetry": [
+      "R23 host capture/commit/render/xrEndFrame avg/max/P95 windows",
+      "R23 xrWaitFrame/xrFrameInterval/cadenceSerialWait/gamePresentToConsume scalar samples",
+      "R32 producerFenceOk/producerBudgetFallback/backpressure/pendingDrain/pendingBlock/pendingError windows"
+    ],
+    "next_runtime_use": "Use exact-build DXVK PERFORMANCE data to localize the ~33.44 ms gameplay failure budget before making synchronization/copy/cadence optimizations."
+  },
+  "host_copy_budget_contract": {
+    "task_id": "CONVERSION-DXVK-00031",
+    "result_sha": "807c60a62a70451600f9cef50d031ff2883d5b72",
+    "automation_validation": "PASS",
+    "validation_run_id": 36493723474,
+    "runtime_validation": "UNTESTED",
+    "invariant": [
+      "R23StageDirectHold contains exactly two CopyResource calls: one left and one right eye",
+      "R23StageDirectHold contains no directSnapshotLeft_/directSnapshotRight_ legacy work",
+      "R23StageDirectHold contains no CommitDirectStereoSource or Flush",
+      "R23CommitDirectAfterValidation orders PrepareDirectStereoSource -> size validation -> R23StageDirectHold -> ready/valid publication",
+      "R23CommitDirectAfterValidation contains no duplicate CopyResource, snapshot or Flush work"
+    ],
+    "interpretation": "This prevents accidental copy amplification. It does not authorize removal of the hold pair; exact-build FrameBudget runtime evidence must first show it is a material bottleneck."
+  }
+}

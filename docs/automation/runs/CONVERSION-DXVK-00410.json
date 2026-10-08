@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00410",
+  "production_id": "CONVERSION-DXVK-00410",
+  "event_id": "CONVERSION-DXVK-00410-E005",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "initial_observed_head": "7ffb27719de11a2996afce29c5f520caf387e618",
+  "base_sha": "7ffb27719de11a2996afce29c5f520caf387e618",
+  "material_result_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+  "validation_bearing_result_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+  "result_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+  "work_item": "DXVK_F143_CANONICAL_CONTROL_FLOW_0x183C3D_TO_0x183C7C",
+  "summary": "F143 exact-decodes validated F142 canonical bytes through 0x00183C7C. The inherited eb cut is consumed only as eb 03; 23 complete instructions and three direct short branches are pinned to exact current instruction boundaries; forward-target debt remains []; 0x00183C7C:ff remains the mandatory overlap. Same-attempt repairs removed resurrected F141 forward-target lineage and a leaked predecessor-boundary gate. No function/render/HUD/runtime semantics or ownership were promoted.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/test_extract_dxvk_canonical_window.py",
+    "tools/test_dxvk_continuation_105_control_flow.py",
+    ".github/workflows/dxvk-disasm-evidence.yml"
+  ],
+  "material_commit_messages": [
+    "dxvk: prove canonical 0x183c3d control flow [AUTO:CONVERSION-DXVK-00410]",
+    "test(dxvk): advance frontier discovery to F143 cut [AUTO:CONVERSION-DXVK-00410]",
+    "fix(dxvk): seal F143 branch and debt contract [AUTO:CONVERSION-DXVK-00410]",
+    "test(dxvk): guard F143 canonical control flow [AUTO:CONVERSION-DXVK-00410]",
+    "ci(dxvk): gate F143 control-flow proof [AUTO:CONVERSION-DXVK-00410]"
+  ],
+  "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "static_evidence": {
+    "provenance_status": "EXACT_EXE_183C3D_TO_183C7D_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183C3D_TO_183C7C_CONTROL_FLOW_WITH_183C7C_CUT_EDGE_PROVEN",
+    "predecessor_status": "EXACT_EXE_183C3D_TO_183C7D_PROVENANCE_CAPTURED",
+    "start_boundary_status": "F142_EXACT_183C3D_RAW_FRONTIER_CONSUMED_WITH_FULL_OVERLAP",
+    "start_rva": "0x00183C3D",
+    "prefix_end_rva": "0x00183C7C",
+    "capture_end_rva": "0x00183C7D",
+    "probe_len": 64,
+    "instruction_count": 23,
+    "predecessor_cut_bytes": "eb",
+    "required_overlap_instruction": "eb 03",
+    "inherited_unresolved_forward_targets": [],
+    "branch_targets": [
+      "0x00183C3D->0x00183C42",
+      "0x00183C44->0x00183C3F",
+      "0x00183C65->0x00183C5B"
+    ],
+    "branch_targets_on_exact_current_boundaries": true,
+    "unresolved_forward_targets": [],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "trailing_overlap_rva": "0x00183C7C",
+    "trailing_overlap_bytes": "ff",
+    "next_overlap_required": true,
+    "semantic_promotion": "NONE",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
+    "call_semantics": "TRAILING_FF_OPCODE_SEMANTICS_UNRESOLVED_NO_REL32_CALLS_IN_F143_PREFIX",
+    "ownership_effect": "NONE"
+  },
+  "validation": {
+    "automation_validation": "PASS",
+    "automation_validation_detail": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+    "exact_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37288540750,
+      "job_id": 111693201634,
+      "conclusion": "success",
+      "f143_control_flow_regression": "success",
+      "canonical_exe_identity": "success",
+      "canonical_extractor": "success",
+      "analyzer_status": "SUCCESS",
+      "artifact_id": 11334974006,
+      "artifact_digest": "sha256:c6a20011320781a3029e3f7b27e6481ab3f421b96c4d48601ec16ec123c59aa9"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37288540738,
+      "job_id": 111693202362,
+      "conclusion": "success",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11336045679,
+      "artifact_digest": "sha256:0c097cf01a9266c3291854c331a63f1e3e5669140e3c77d52f955de0e0f02722"
+    },
+    "superseded_same_attempt_failures": [
+      {
+        "sha": "d1b96fff1f2eb1af5888ef9780deb49fc6271923",
+        "canonical_run_id": 37287790672,
+        "backend_run_id": 37287790592,
+        "reason": "F143 raw provenance resurrected resolved F141 forward-target lineage; same revision also leaked a predecessor-boundary gate into an internal-only proof."
+      }
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT from completed 00409/F142. E005/CHAT_ROLLOVER=3 is a rollover, not a retry; ATTEMPT remains 1/3 and completed F142 work was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected only the durable F143 exact control-flow successor through 0x00183C7C with all direct targets constrained to exact current boundaries and semantic quarantine preserved."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Published F143 proof, frontier advancement, fail-closed repair, continuation_105 regression and CI gate. All material commits contain [AUTO:CONVERSION-DXVK-00410]."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Canonical Evidence 37288540750/111693201634 and Backend Conversion Gate 37288540738/111693202362 both SUCCESS; no HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material SHA fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1 is published on vr-dxvk-r71-disasm."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/proof/test/CI change only; no runtime DXVK package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Issue #14 ledger comment 5991602720 plus durable run/lane state preserve E005/CHAT_ROLLOVER=3, ATTEMPT=1/3, F144 successor and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "issue14_comment_id": 5991602720,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00410",
+    "production_id": "CONVERSION-DXVK-00410",
+    "event_id": "CONVERSION-DXVK-00410-E005",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "material_result_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+    "validation_bearing_result_sha": "fcd5a74e5a2eb3472e4bca6f7184b51e53a834b1",
+    "runtime_validation": "UNTESTED"
+  },
+  "follow_on_frontier": {
+    "next_action_kind": "DXVK_F144_CANONICAL_OVERLAP_PROVENANCE_0x183C7C_TO_0x183CBC",
+    "start_rva": "0x00183C7C",
+    "capture_end_rva": "0x00183CBC",
+    "probe_len": 64,
+    "inherited_cut_bytes": "ff",
+    "required_complete_first_instruction": "ff 15 3c 61 59 00",
+    "inherited_unresolved_forward_targets": [],
+    "trailing_incomplete_rva": "0x00183CB9",
+    "trailing_incomplete_bytes": "8d 90 fc",
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE",
+    "runtime_validation": "UNTESTED"
+  },
+  "exact_next_action": "Build F144 exact raw canonical overlap provenance for 0x00183C7C..0x00183CBC. Consume inherited 0x00183C7C:ff only after complete ff 15 3c 61 59 00 is proven from overlap; carry direct-control-flow debt fail-closed for later exact decode; preserve trailing 0x00183CB9:8d 90 fc; keep indirect-call/function/render/HUD/runtime semantics unresolved.",
+  "recorded_at_kst": "2026-10-05T18:18:31+09:00",
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

@@ -1,0 +1,99 @@
+{
+  "task_id": "CONVERSION-DXVK-00225",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "c0131a9d8516af000b40bf3c998d985cceb1524d",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R225_182529_FRESH_PROVENANCE_CAPTURE",
+  "selection_reason": "CONVERSION-DXVK-00223 proved exact control flow through exclusive 0x00182529 and preserved 0x00182529:83 as an incomplete capture edge. Its validation-bearing HEAD c0131a9d8516af000b40bf3c998d985cceb1524d has successful Build, OpenXR VR architecture, OutRun EXE HUD Inspector CI and VR Hosted Test Package runs, so the next bounded F13 action is fresh exact replacement-EXE provenance beginning at 0x00182529 with exact 83 overlap before any further decode.",
+  "summary": "ATTEMPT=1 implementation staged. Extend exact canonical replacement-EXE provenance from 0x00182529 through exclusive 0x00182569 with exact 83 overlap, strict predecessor identity, .text membership, exact probe length/end and raw rel32 census. Preserve raw-only semantics. The analyzer also indexes raw inbound rel32 offsets once per PE instance to remove repeated full-.text scans without changing evidence semantics.",
+  "evidence": [
+    "C0 GitHub branch HEAD was c0131a9d8516af000b40bf3c998d985cceb1524d; GitHub branch state and Actions artifacts were used as SSOT and no N100 clone/worktree was used.",
+    "CONVERSION-DXVK-00223 result commit c0131a9d8516af000b40bf3c998d985cceb1524d passed OpenXR VR architecture, OutRun EXE HUD Inspector CI, Build and VR Hosted Test Package workflows.",
+    "R223 proves EXACT_1824EA_TO_182529_CONTROL_FLOW_CAPTURE_EDGE_PROVEN and preserves 0x00182529:83 as an incomplete instruction byte.",
+    "R225 stages a fresh 64-byte .text provenance collector at 0x00182529 with exclusive end 0x00182569 and requires the predecessor capture end 0x0018252A plus exact 83 overlap.",
+    "The collector records raw bytes and raw rel32 candidates only; instruction/function/callee/render/HUD semantics remain unresolved.",
+    "No renderer/provider/selector/package/transport/runtime source is modified; runtime_validation remains UNTESTED.",
+    "R225 additionally caches raw inbound rel32 byte offsets once per PE instance so the 21 current inbound-candidate queries no longer rescan the complete .text section; semantic classification and function-start guesses remain query-local."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00225.json"
+  ],
+  "proof_contract": {
+    "predecessor_control_flow_status": "EXACT_1824EA_TO_182529_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "start_rva": "0x00182529",
+    "probe_len": 64,
+    "probe_end_rva": "0x00182569",
+    "prior_capture_end_rva": "0x0018252A",
+    "overlap_bytes": "83",
+    "expected_status": "EXACT_EXE_182529_TO_182569_PROVENANCE_CAPTURED",
+    "actual_status": "PENDING",
+    "predecessor_exact": "PENDING",
+    "target_section": ".text",
+    "probe_end_match": "PENDING",
+    "overlap_match": "PENDING",
+    "extends_prior_capture": "PENDING",
+    "raw_inbound_rel32_count": "PENDING",
+    "raw_outbound_rel32_candidates": "PENDING",
+    "start_boundary_status": "R223_INCOMPLETE_83_START_ONLY",
+    "function_entry_status": "UNRESOLVED_AT_182529_AND_FORWARD_BYTES",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_OVERLAP_AND_REL32_CENSUS_ONLY"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier proof only; backend/runtime activation behavior is unchanged.",
+    "ownership": "Fresh raw bytes and rel32 census do not infer ScreenHud/world/render ownership.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R223 control-flow remains exact, 0x83 overlaps exactly, the probe is exactly 64 bytes in .text, the exclusive end is 0x00182569, and the new capture strictly extends beyond 0x0018252A."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1824EA_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "after": "PENDING_182529_FRESH_PROVENANCE_CAPTURE",
+    "runtime_claim": false
+  },
+  "blocker": "Automatic validation is pending. The new 0x00182529..0x00182569 window is intentionally raw provenance only; complete instruction boundaries and all semantics remain unresolved until a separate bounded exact-decode task consumes only complete instructions from the validated window.",
+  "next_action": "Run exact-source GitHub Actions validation. If PASS, finalize this record in a separate CI-skipped bookkeeping commit with the validation-bearing result SHA, exact captured bytes and workflow evidence. Runtime remains UNTESTED.",
+  "checkpoint": "C3_VALIDATE",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "source_commits": [
+    {
+      "sha": "d2a13012e1a7e7260bcbec79c49c21c49291167c",
+      "message": "vr: stage 0x182529 provenance analyzer [AUTO:CONVERSION-DXVK-00225] [skip ci]",
+      "role": "staging",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "21b2ece4edb1179b2418a5d99054fb041c4bb4aa",
+      "message": "vr: stage 0x182529 provenance verifier [AUTO:CONVERSION-DXVK-00225] [skip ci]",
+      "role": "staging",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "34af7a88cb124d7eacc9837e1065e7cf35fe76e0",
+      "message": "perf: cache raw inbound rel32 index [AUTO:CONVERSION-DXVK-00225] [skip ci]",
+      "role": "staging_performance",
+      "validation_bearing": false,
+      "ci_skip": true
+    }
+  ]
+}

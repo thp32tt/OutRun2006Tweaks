@@ -1,0 +1,76 @@
+{
+  "task_id": "CONVERSION-DXVK-00111",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "e6ef9ea055a63d96a8d357bf4a286f2b88a7a2fa",
+  "result_sha": "62f8fcc292869e159d50bdd487a2f06cbc3e9711",
+  "validation_bearing_result_sha": "62f8fcc292869e159d50bdd487a2f06cbc3e9711",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R127_GHOSTGAP_FORCE_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Converted the remaining four bounded GhostGap ForceLeft/ForceRight spacing-state hooks at 0xBE045, 0xBE083, 0xBE0A5 and 0xBE067 to exact caller-RVA templates. Existing ForceLeft/ForceRight ScalingType transitions are preserved before immediate next-draw ScreenHud ownership is derived from GameSemantic::ClassifyCriticalProducer(CallerRva). No producer range, world/stereo path, D3D/OpenXR transport or unrelated HUD family was changed.",
+  "evidence": [
+    "All four exact RVAs lie inside canonical GhostGap SCREEN_HUD range 0xBD900-0xBE100 in disasm_render_contract.hpp and the mechanically mirrored analyzer catalog.",
+    "The R127 template calls the prior SpriteSpacingForceLeft/Right behavior unchanged before arming shared-map ScreenHud ownership.",
+    "The template compile-time requires each exact caller to classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all four exact R127 instantiations and rejects restoration of any of the four legacy spacing-only bindings.",
+    "PutGhostGapInfo 0xBDE3A and PutGhostGapInfo_sub 0xBDAE8 remain unchanged from their previously validated R125/R126 implementations.",
+    "The same bounded R127 pattern passed DX11 CONVERSION-DX11-00108, but this DXVK source result was independently validated on its own exact SHA.",
+    "Validation-bearing result 62f8fcc292869e159d50bdd487a2f06cbc3e9711 contains [AUTO:CONVERSION-DXVK-00111] and no CI-skip directive.",
+    "Backend Conversion Gate 36655230324 PASS; artifact 11072375812 digest sha256:b43e819926f5b436c5a25dbed19dec50a23ffa39590fade17026232cec54cdbd.",
+    "Build 36655235339 PASS.",
+    "OpenXR VR architecture 36655235389 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36655235398 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36655230319 PASS and PR 36655235537 PASS.",
+    "VR PC Fast Test Build 36655230311 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "62f8fcc292869e159d50bdd487a2f06cbc3e9711",
+      "message": "vr: bind GhostGap force hooks to shared semantics [AUTO:CONVERSION-DXVK-00111]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36655230324,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11072375812,
+    "backend_conversion_gate_artifact_digest": "sha256:b43e819926f5b436c5a25dbed19dec50a23ffa39590fade17026232cec54cdbd",
+    "build_run_id": 36655235339,
+    "build_result": "PASS",
+    "openxr_run_id": 36655235389,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36655235398,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36655230319,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36655235537,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36655230311,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5902260370,
+    "validation_comment_id": 5902320995
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_PUTGHOSTGAPINFO_SUB_EXACT_EDGE",
+    "after": "PARTIAL_PLUS_GHOSTGAP_FORCE_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded GhostGap force-hook F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "R127 completes the currently proven GhostGap exact force-hook sub-family. Continue Set04/F13 only with another independently proven producer family or move to the next runnable review-index priority. Do not widen producer ranges for OptionArrow/TextGlyph/DispRank sprani without separate disassembly provenance, and do not claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

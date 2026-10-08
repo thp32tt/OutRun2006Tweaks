@@ -1,0 +1,52 @@
+{
+  "task_id": "CONVERSION-DXVK-00276",
+  "lane": "DXVK",
+  "branch": "vr-dxvk-r71-disasm",
+  "attempt": "3/3",
+  "base_head": "f377a7b15ce5aca04da3ec4de5f75e0e283dbfa9",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "result_sha": "653088a0a16d7abd66549dbbbcc414eb763c42e0",
+  "result_commits": [
+    "35b1d218a32e16636b52fc7a22b6115edb38c2b5",
+    "1bc1befd040cc50b89efc7b41f006146387361a4",
+    "653088a0a16d7abd66549dbbbcc414eb763c42e0"
+  ],
+  "changed_paths": [
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "failure_recovery": {
+    "original_cancelled_run_id": 36958354108,
+    "original_cancelled_head_sha": "35b1d218a32e16636b52fc7a22b6115edb38c2b5",
+    "cancellation_root_cause": "GitHub Actions concurrency keeps at most one running and one pending run per group; rapid pushes replaced the pending exact-SHA gate even with cancel-in-progress=false.",
+    "fix": "Include github.sha in Backend Conversion Gate concurrency group so every commit has an independent group.",
+    "followup_failed_run_id": 36959125371,
+    "followup_failed_head_sha": "1bc1befd040cc50b89efc7b41f006146387361a4",
+    "followup_failure": "Apply VC2022 dependency workarounds referenced non-existent build-auto/_deps/zycore-build/Zycore.vcxproj.",
+    "followup_fix": "Resolve Zycore.vcxproj recursively under build-auto/_deps before patching it."
+  },
+  "automation_validation": {
+    "status": "PASS",
+    "exact_sha": "653088a0a16d7abd66549dbbbcc414eb763c42e0",
+    "backend_conversion_gate_run_id": 36959394789,
+    "gate_conclusion": "success",
+    "static_contracts": "PASS",
+    "configure_win32": "PASS",
+    "dependency_workarounds": "PASS",
+    "build_win32": "PASS",
+    "binary_exists": "PASS",
+    "artifact_upload": "PASS"
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claims": false,
+  "actions_completed": [
+    "Inspected cancelled run 36958354108 directly",
+    "Identified pending-run replacement from shared concurrency group",
+    "Isolated Backend Conversion Gate concurrency by github.sha",
+    "Inspected failed exact-SHA run 36959125371 job logs",
+    "Replaced stale Zycore fixed path with recursive project discovery",
+    "Validated exact result SHA with Backend Conversion Gate run 36959394789"
+  ],
+  "next_action": "No further CONVERSION-DXVK-00276 repair is required. Continue DXVK conversion from the latest branch-local durable state; Quest 3/VDXR runtime validation remains a separate hardware gate."
+}

@@ -1,0 +1,85 @@
+{
+  "task_id": "CONVERSION-DXVK-00027",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "7b95569c52a8422c6dd4cf7a5f0489b8e613204d",
+  "result_sha": "8f812341ff6cb7d6a5605f6203d5601b22dad832",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-REACTIVATE-001-STALE-QUEUE-RECONCILIATION",
+  "summary": "Applied the AGENTS staleQueueRule to DXVK-REACTIVATE-001. The isolated x86 stock-DXVK SAFE build/selector/provider-identity path already exists, so no runtime path was recreated. Added a dedicated fail-closed reactivation contract to Backend Conversion Gate and, after exact-SHA validation, reconciled the stale READY queue item to DONE.",
+  "changed_paths": [
+    "tools/verify_dxvk_reactivation_contract.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "source_commits": [
+    "39d845cbd1c69d98624a5ca4b64d2442afdb2cc2",
+    "8f812341ff6cb7d6a5605f6203d5601b22dad832"
+  ],
+  "failure_context": {
+    "initial_validation_run_id": 36484566414,
+    "failure": "New verifier failed only on a redundant generic text check requiring the word 'multiview' in Test-VROneClickContract.ps1.",
+    "repair_commit": "8f812341ff6cb7d6a5605f6203d5601b22dad832",
+    "repair": "Removed the redundant text heuristic. Concrete selector removal of multiviewpatcher.dll and package experimental-payload rejection remain mandatory verifier markers.",
+    "final_validation_run_id": 36484701256,
+    "final_result": "PASS"
+  },
+  "contract_verified": [
+    "VR_ONE_CLICK_TARGET binds DevelopmentBranch=vr-dxvk-r71-disasm, RendererTarget=dxvk, LaunchBackend=dxvk-safe and DxvkVersion=3.1.1.",
+    "Selector defaults E_DXVK_SAFE, reuses proven d3d9 game payload, copies backends/dxvk/d3d9.dll, removes multiviewpatcher.dll and performs post-selection root payload attestation.",
+    "DXVK preflight requires package-wide SHA256 integrity, pinned provider PE/hash metadata and version identity.",
+    "PC-fast package path acquires DXVK through pinned official archive bytes and rejects an explicit provider whose bytes differ from the verified stock provider.",
+    "Startup device probe and successful classic/Ex device creation paths emit DXVK provider/capability census.",
+    "DXVK session analyzer requires runtime version and device-creation re-attestation before STOCK_DXVK_PROVIDER_VERIFIED and never permits multiview promotion.",
+    "Backend Conversion Gate executes one-click/package/analyzer/synchronization/provider tests before Win32 configure/build and binary verification."
+  ],
+  "queue_reconciliation": {
+    "item_id": "DXVK-REACTIVATE-001",
+    "previous_status": "READY",
+    "new_status": "DONE",
+    "reason": "Requested software path is already present and exact-SHA verified; staleQueueRule forbids recreating unchanged completed work.",
+    "runtime_gate_separate": true
+  },
+  "evidence": [
+    "C0 recovered current GitHub HEAD, AGENTS.md, review Sets 06-10, QUEUE_CONTROLLER_CONTRACT.md, VR automation state, CONVERSION-DXVK-00025 and regression/runtime evidence. N100/local clone was not used.",
+    "VR_WORK_QUEUE.json showed DXVK-REACTIVATE-001 as priority 13 READY despite the branch already containing the requested stock-DXVK SAFE build/smoke/backend-identity implementation.",
+    "Backend Conversion Gate 36484701256 PASS on exact source SHA 8f812341ff6cb7d6a5605f6203d5601b22dad832, including the new reactivation contract and existing DXVK one-click/package/analyzer/synchronization/provider tests plus Win32 build/binary verification.",
+    "Build 36484706755 PASS on exact source SHA 8f812341ff6cb7d6a5605f6203d5601b22dad832.",
+    "OpenXR VR architecture 36484706825 PASS on exact source SHA 8f812341ff6cb7d6a5605f6203d5601b22dad832 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36484706830 PASS on exact source SHA 8f812341ff6cb7d6a5605f6203d5601b22dad832.",
+    "PC Fast 36484701046 skipped; scheduled automation did not use the user's PC.",
+    "Backend artifact 10997938726 digest sha256:fdb1436b5fc41a5b84edd0cb718955ef4105562add88d7a2d080c6612209c5f5.",
+    "OpenXR host artifact 10998417679 digest sha256:7dda2962a3882b4f2b0a9b93c1af9c73cdd921947081e13ac58946a3051ac3fe.",
+    "HUD inspector artifact 10998821216 digest sha256:0f78850849d51ce2d9b0da41b2d61c731d26eed32af8a756248639cc28f74d44.",
+    "Issue #14 implementation comment 5878711241 and validation comment 5878865430 record the transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-REACTIVATE-001"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "Do not recreate DXVK-REACTIVATE-001. The highest-priority DXVK gate is now exact-build Quest3/VDXR validation of stock SAFE plus the host-owned shared-eye path. Require PackageIntegrity.Verified=true, BuildIdentityVerified=true and DxvkDirectEvidenceTrusted=true before evaluating fallback reduction, same-scene pacing and visual/startup/recenter parity.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36484701256,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36484706755,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36484706825,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36484706830,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36484701046,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10997938726,
+    "backend_gate_artifact_digest": "sha256:fdb1436b5fc41a5b84edd0cb718955ef4105562add88d7a2d080c6612209c5f5",
+    "openxr_host_artifact_id": 10998417679,
+    "openxr_host_artifact_digest": "sha256:7dda2962a3882b4f2b0a9b93c1af9c73cdd921947081e13ac58946a3051ac3fe",
+    "hud_inspector_artifact_id": 10998821216,
+    "hud_inspector_artifact_digest": "sha256:0f78850849d51ce2d9b0da41b2d61c731d26eed32af8a756248639cc28f74d44"
+  },
+  "recorded_at_kst": "2026-09-29T06:20:00+09:00"
+}

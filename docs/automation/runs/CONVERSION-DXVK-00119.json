@@ -1,0 +1,75 @@
+{
+  "task_id": "CONVERSION-DXVK-00119",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "4719f2512922659d68809a94b0abe0bc6d06945a",
+  "result_sha": "06647382e3eb90a26ab55490203ae1430636826f",
+  "validation_bearing_result_sha": "06647382e3eb90a26ab55490203ae1430636826f",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R131_C2CSPEECHBUBBLEGF_INITIAL_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for exact C2CSpeechBubbleGF initial-position HUD edges 0xFC9EB, 0xFCA1E, 0xFCA51 and 0xFCB20. Existing UIScaling behavior is preserved exactly: the first three retain ESP0 AddSpriteSpacing and 0xFCB20 retains ESP4 AddSpriteSpacing. Immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), with exact-RVA compile-time assertions and verifier guards. No producer range, world/stereo path, transport path, uncertain/no-effect speech hook or unrelated HUD family was changed.",
+  "evidence": [
+    "All four exact callers lie inside the existing canonical C2CSpeechBubbleGF HUD_GF_SPEECH SCREEN_HUD range 0xFC900-0xFCC00.",
+    "The R131 helper preserves AddSpriteSpacing((float*)(ctx.esp + StackOffset), false): StackOffset=0 for 0xFC9EB/0xFCA1E/0xFCA51 and StackOffset=4 for 0xFCB20, exactly matching the prior callbacks.",
+    "render_semantics.hpp compile-time asserts all four exact RVAs classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all four exact R131 template bindings and marker and rejects restoration of the four legacy spacing-only bindings.",
+    "Validation-bearing source result 06647382e3eb90a26ab55490203ae1430636826f contains [AUTO:CONVERSION-DXVK-00119] and no CI-skip directive.",
+    "Backend Conversion Gate 36705122110 PASS; artifact 11091771605 digest sha256:dabd245c16d736c747225fdc01bccbfb79cc0e0910ce10b6064e493620eb3a58.",
+    "Build 36705126588 PASS.",
+    "OpenXR VR architecture 36705126594 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36705126599 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36705122072 PASS and PR 36705126693 PASS.",
+    "VR PC Fast Test Build 36705122066 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "06647382e3eb90a26ab55490203ae1430636826f",
+      "message": "vr: route GF speech initial HUD through shared producer map [AUTO:CONVERSION-DXVK-00119]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36705122110,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11091771605,
+    "backend_conversion_gate_artifact_digest": "sha256:dabd245c16d736c747225fdc01bccbfb79cc0e0910ce10b6064e493620eb3a58",
+    "build_run_id": 36705126588,
+    "build_result": "PASS",
+    "openxr_run_id": 36705126594,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36705126599,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36705122072,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36705126693,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36705122066,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5909742931,
+    "validation_comment_id": 5909823452
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_C2CSPEECHBUBBLEGF_RANK_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_C2CSPEECHBUBBLEGF_INITIAL_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded C2CSpeechBubbleGF initial-position F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven producer sub-family. Do not widen producer ranges or convert uncertain/no-effect hooks unless immediate draw ownership is separately proven. Keep runtime validation distinct from hosted CI."
+}

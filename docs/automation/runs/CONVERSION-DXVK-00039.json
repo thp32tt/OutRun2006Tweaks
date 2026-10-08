@@ -1,0 +1,60 @@
+{
+  "task_id": "CONVERSION-DXVK-00039",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "chat_rollover": 1,
+  "base_sha": "f02dd590e883030486f3a80d6ffbf205bd68a94c",
+  "result_sha": "5540db82e8c50520a827661e31e544c82e64368a",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L1-RECENTER-001-APPLICATION-SPACE-CONTRACT",
+  "summary": "Added a deterministic application-space recenter regression contract to the DXVK Backend Conversion Gate without changing runtime behavior.",
+  "changed_paths": [
+    "tools/verify_vr_recenter_contract.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "source_commits": [
+    "5540db82e8c50520a827661e31e544c82e64368a"
+  ],
+  "behavior_guarded": [
+    "The x64 OpenXR host force-includes r26_recenter_hardening.hpp.",
+    "A pending recenter locates the current VIEW pose relative to the immutable runtime LOCAL base and creates a new LOCAL application space from that pose.",
+    "The new application LOCAL handle is installed before the current-frame head/view locates in main_r23.cpp.",
+    "Startup/menu no-layer fallback is LOCAL-anchored.",
+    "R24 VIEW-space emergency fallback cannot acknowledge a pending game recenter request.",
+    "Game and runtime reference-space changes converge on the same LOCAL-space path."
+  ],
+  "scope": "Automation/regression guard only; no renderer/provider/transport/cadence/HUD/recenter runtime behavior change.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36516967690,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36516971520,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36516971526,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36516971517,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36516967645,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5883022797,
+    "issue_14_validation_comment_id": 5883685372
+  },
+  "completed_work_items": [
+    "C0_RECOVER",
+    "C1_REVIEW_RECENTER_CONTRACT",
+    "C2_IMPLEMENT_STATIC_CONTRACT",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_SOURCE_COMMIT",
+    "C6_STATE"
+  ],
+  "blocked_runtime_items": [
+    "L1-RECENTER-001-QUEST3-VDXR-VISUAL-TRANSITION"
+  ],
+  "resume_cursor": "Complete. CONVERSION-DXVK-00041 extends the static contract with executable recenter IPC behavior coverage; no 00039 work should be repeated unless its guarded source paths change.",
+  "next_action": "No further software-only work for 00039. Quest3/VDXR remains required for gameplay/menu visual recenter transition correctness.",
+  "recorded_at_kst": "2026-09-29T12:24:00+09:00",
+  "validation_completed_at_kst": "2026-09-29T13:30:00+09:00"
+}

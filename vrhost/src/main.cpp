@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "vr_shared.hpp"
+#include "vr/ipc/dxvk_shared_eye_bridge.hpp"
 #include "stereo_shader.hpp"
 
 namespace
@@ -1068,6 +1069,7 @@ namespace
             ChooseSwapchainFormat();
             CreateProjectionSwapchain();
             CreateTheaterSwapchain();
+            InitializeDxvkHostSharedBridge();
             std::cout << "OpenXR true stereo ready: runtime recommended "
                 << std::max(configs_[0].recommendedImageRectWidth, configs_[1].recommendedImageRectWidth) << "x"
                 << std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight)
@@ -1324,7 +1326,11 @@ namespace
             directActiveSlot_=slot;directFrameValid_=true;directTransportReady_=true;return true;
         }
 
-        bool DirectTransportReady() const { return directTransportEnabled_ && directTransportReady_; }
+        bool DirectTransportReady() const
+        {
+            return directTransportEnabled_ &&
+                (directTransportReady_ || dxvkBridgeReady_);
+        }
 
         bool CommitStereoSource()
         {
@@ -1765,8 +1771,176 @@ namespace
                 << uv.x << "," << uv.y << "," << uv.w << "," << uv.h << "]\n";
         }
 
+
+        bool IsDxvkBackend() const
+        {
+            char backend[64]{};
+            const DWORD n = GetEnvironmentVariableA(
+                "OUTRUN_VR_BACKEND", backend, sizeof(backend));
+            return n > 0 && n < sizeof(backend) &&
+                _strnicmp(backend, "dxvk", 4) == 0;
+        }
+
+        void PublishDxvkHostSharedBridge(bool ready)
+        {
+            if (!dxvkBridgeState_)
+                return;
+            LONG sequence = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&dxvkBridgeState_->sequence));
+            if ((sequence & 1) == 0)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&dxvkBridgeState_->sequence));
+            MemoryBarrier();
+            dxvkBridgeState_->hostPid = GetCurrentProcessId();
+            dxvkBridgeState_->flags = ready
+                ? OutRunVR::DxvkSharedEyeBridge::HostAlive |
+                  OutRunVR::DxvkSharedEyeBridge::ResourcesReady
+                : 0u;
+            MemoryBarrier();
+            sequence = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&dxvkBridgeState_->sequence));
+            if (sequence & 1)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&dxvkBridgeState_->sequence));
+        }
+
+        void ShutdownDxvkHostSharedBridge()
+        {
+            if (dxvkBridgeState_)
+                PublishDxvkHostSharedBridge(false);
+            dxvkBridgeReady_ = false;
+            for (std::uint32_t slot = 0;
+                 slot < OutRunVR::RenderFrameRingSize; ++slot)
+            {
+                ReleaseCom(dxvkBridgeLeft_[slot]);
+                ReleaseCom(dxvkBridgeRight_[slot]);
+            }
+            if (dxvkBridgeState_)
+            {
+                UnmapViewOfFile(dxvkBridgeState_);
+                dxvkBridgeState_ = nullptr;
+            }
+            if (dxvkBridgeMapping_)
+            {
+                CloseHandle(dxvkBridgeMapping_);
+                dxvkBridgeMapping_ = nullptr;
+            }
+            dxvkBridgeGeneration_ = 0;
+        }
+
+        bool InitializeDxvkHostSharedBridge()
+        {
+            if (!directTransportEnabled_ || !IsDxvkBackend())
+                return false;
+
+            ShutdownDxvkHostSharedBridge();
+            dxvkBridgeMapping_ = CreateFileMappingW(
+                INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+                static_cast<DWORD>(
+                    sizeof(OutRunVR::DxvkSharedEyeBridge::State)),
+                OutRunVR::DxvkSharedEyeBridge::MemoryName);
+            if (!dxvkBridgeMapping_)
+                return false;
+
+            dxvkBridgeState_ =
+                static_cast<OutRunVR::DxvkSharedEyeBridge::State*>(
+                    MapViewOfFile(
+                        dxvkBridgeMapping_, FILE_MAP_ALL_ACCESS, 0, 0,
+                        sizeof(OutRunVR::DxvkSharedEyeBridge::State)));
+            if (!dxvkBridgeState_)
+            {
+                CloseHandle(dxvkBridgeMapping_);
+                dxvkBridgeMapping_ = nullptr;
+                return false;
+            }
+
+            std::memset(dxvkBridgeState_, 0, sizeof(*dxvkBridgeState_));
+            dxvkBridgeState_->version =
+                OutRunVR::DxvkSharedEyeBridge::Version;
+            dxvkBridgeState_->structSize = sizeof(*dxvkBridgeState_);
+            dxvkBridgeState_->width = projection_.width;
+            dxvkBridgeState_->height = projection_.height;
+            dxvkBridgeState_->format =
+                OutRunVR::DxvkSharedEyeBridge::DxgiB8G8R8A8Unorm;
+            dxvkBridgeGeneration_ =
+                static_cast<std::uint32_t>(GetTickCount64()) ^
+                GetCurrentProcessId() ^ 0x58425652u;
+            if (!dxvkBridgeGeneration_)
+                dxvkBridgeGeneration_ = 1;
+            dxvkBridgeState_->generation = dxvkBridgeGeneration_;
+
+            D3D11_TEXTURE2D_DESC desc{};
+            desc.Width = projection_.width;
+            desc.Height = projection_.height;
+            desc.MipLevels = 1;
+            desc.ArraySize = 1;
+            desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+            desc.SampleDesc.Count = 1;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags =
+                D3D11_BIND_SHADER_RESOURCE |
+                D3D11_BIND_RENDER_TARGET;
+            desc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
+
+            auto createSharedEye = [&](
+                ID3D11Texture2D** texture,
+                std::uint64_t& publishedHandle) -> bool
+            {
+                if (FAILED(device_->CreateTexture2D(
+                        &desc, nullptr, texture)) || !*texture)
+                    return false;
+                IDXGIResource* shared = nullptr;
+                HANDLE handle = nullptr;
+                const HRESULT qi = (*texture)->QueryInterface(
+                    __uuidof(IDXGIResource),
+                    reinterpret_cast<void**>(&shared));
+                const HRESULT getHandle =
+                    SUCCEEDED(qi) && shared
+                        ? shared->GetSharedHandle(&handle)
+                        : E_FAIL;
+                ReleaseCom(shared);
+                if (FAILED(getHandle) || !handle)
+                    return false;
+                publishedHandle = static_cast<std::uint64_t>(
+                    reinterpret_cast<std::uintptr_t>(handle));
+                return publishedHandle != 0;
+            };
+
+            for (std::uint32_t slot = 0;
+                 slot < OutRunVR::RenderFrameRingSize; ++slot)
+            {
+                if (!createSharedEye(
+                        &dxvkBridgeLeft_[slot],
+                        dxvkBridgeState_->slots[slot].leftHandle) ||
+                    !createSharedEye(
+                        &dxvkBridgeRight_[slot],
+                        dxvkBridgeState_->slots[slot].rightHandle))
+                {
+                    std::cout
+                        << "DXVK host-owned shared-eye bridge allocation "
+                        << "failed; SBS/Desktop Duplication remains available.\n";
+                    ShutdownDxvkHostSharedBridge();
+                    return false;
+                }
+            }
+
+            MemoryBarrier();
+            dxvkBridgeState_->magic =
+                OutRunVR::DxvkSharedEyeBridge::Magic;
+            dxvkBridgeReady_ = true;
+            PublishDxvkHostSharedBridge(true);
+            std::cout
+                << "DXVK host-owned shared-eye bridge ready: "
+                << projection_.width << "x" << projection_.height
+                << " x2, slots=" << OutRunVR::RenderFrameRingSize
+                << ", generation=" << dxvkBridgeGeneration_
+                << "; Desktop Duplication remains menu/fail-open only.\n";
+            return true;
+        }
+
         void Reset()
         {
+            ShutdownDxvkHostSharedBridge();
             projection_.Destroy();
             theater_.Destroy();
             ReleaseCom(stereoSourceSrv_);
@@ -2151,6 +2325,15 @@ namespace
         std::uint32_t stereoSourceWidth_ = 0, stereoSourceHeight_ = 0;
         DXGI_FORMAT stereoSourceFormat_ = DXGI_FORMAT_UNKNOWN;
         bool stereoSourceValid_ = false;
+
+        HANDLE dxvkBridgeMapping_ = nullptr;
+        OutRunVR::DxvkSharedEyeBridge::State* dxvkBridgeState_ = nullptr;
+        std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize>
+            dxvkBridgeLeft_{};
+        std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize>
+            dxvkBridgeRight_{};
+        std::uint32_t dxvkBridgeGeneration_ = 0;
+        bool dxvkBridgeReady_ = false;
 
         std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize> directLeft_{};
         std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize> directRight_{};

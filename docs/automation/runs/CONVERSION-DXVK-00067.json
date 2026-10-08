@@ -1,0 +1,83 @@
+{
+  "task_id": "CONVERSION-DXVK-00067",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "chat_rollover": 2,
+  "base_sha": "a9ed117537f6adc3b80dfb4097e1755184489575",
+  "result_sha": "888cda6918e5e9639969cfde1a2ed344015eccdd",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_D3D9EX_FACADE_MODULARIZATION_PHASE5_R13",
+  "summary": "Removed the final production Ex facade edge to historical ex_device_upgrade_r13.cpp by extracting the unchanged R13 implementation body into include-free ex_device_upgrade_r13_overlay.inc. Production now composes r13_bridge.hpp plus the optimization-bounded ex_device_upgrade.cpp base plus R13/R14/R15 overlays directly; historical R13/R14/R15 wrappers remain compatibility/build-graph owners.",
+  "evidence": [
+    "Parent a9ed117537f6adc3b80dfb4097e1755184489575 R13 namespace implementation body matches ex_device_upgrade_r13_overlay.inc at result 888cda6918e5e9639969cfde1a2ed344015eccdd exactly after CRLF/LF normalization from namespace OutRunVRD3D9ExUpgradeR13 onward (10053 chars).",
+    "Backend Conversion Gate 36592888839 PASS on exact result SHA, including facade/verifier contracts, Win32 build, binary verification and artifact upload.",
+    "Build 36592896343 PASS on exact result SHA.",
+    "OpenXR VR architecture 36592896345 PASS across host-x64, production game-x86, safe-draw compare, R26 HUD/SkyGlow safe, C1 R29/R28 classify, and C2 R30 HUD jobs.",
+    "OutRun EXE HUD Inspector CI 36592896476 PASS for static EXE analysis and inspector build.",
+    "VR Hosted Test Package 36592896708 (PR) PASS and 36592888566 (push) PASS on exact result SHA.",
+    "VR PC Fast Test Build 36592888565 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/ex_device_pipeline.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "888cda6918e5e9639969cfde1a2ed344015eccdd",
+      "message": "Extract Ex R13 overlay from production facade [AUTO:CONVERSION-DXVK-00067]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36592888839,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36592896343,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36592896345,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36592896476,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36592896708,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36592888566,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36592888565,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5893668632,
+    "issue_14_validation_comment_id": 5893795540
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Changed source-graph and verifier ownership only. Hosted compile, binary and architecture guards passed; no runtime-visible invariant is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER_CHAT_ROLLOVER",
+    "C1_SELECT_F04_PHASE5",
+    "C2_EXTRACT_R13_OVERLAY_AND_FLATTEN_EX_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C5_HOSTED_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for F04 phase 5. Full F04 remains open because stereo versioned include chains are still physically nested; runtime correctness still requires Quest3/VDXR evidence.",
+  "next_action": "Continue F04 only as another bounded, independently build-verified stereo source-graph step; do not combine whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence."
+}

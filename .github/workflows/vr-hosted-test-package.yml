@@ -1,0 +1,47 @@
+name: VR Hosted Test Package
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - vr-dxvk-r71-disasm
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: vr-hosted-test-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Build packaged runtime test ZIP
+        shell: pwsh
+        env:
+          OUTRUN_TEST_DROP_ROOT: ${{ github.workspace }}\out\hosted-drop
+        run: |
+          ./tools/Build-OutRunPCFast.ps1
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          if (-not (Test-Path $zip -PathType Leaf)) { throw "Test ZIP missing: $zip" }
+          "OUTRUN_TEST_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Hosted test ZIP: $zip"
+          Get-FileHash $zip -Algorithm SHA256
+
+      - name: Upload runtime test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-TONIGHT-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: ${{ env.OUTRUN_TEST_ZIP }}
+          if-no-files-found: error
+          retention-days: 7

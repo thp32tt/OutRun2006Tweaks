@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00370",
+  "production_id": "CONVERSION-DXVK-00370",
+  "event_id": "CONVERSION-DXVK-00370-E001",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "ac8672185932a7a013d582a1c16b291e3dfda1ba",
+  "result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+  "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "work_item": "DXVK_F122_CANONICAL_RAW_OVERLAP_PROVENANCE_0x1839CD_TO_0x183A0D",
+  "summary": "Captured the exact canonical 64-byte F122 raw frontier 0x001839CD..0x00183A0D from the F121 mandatory cut edge. The successor probe's first 0x8B byte is fail-closed against both F121 expected and observed incomplete bytes, exact canonical bytes match, inherited unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] is preserved, and the raw rel32 call census is empty. No function/render/HUD/runtime semantic or ownership promotion is claimed.",
+  "review_lenses": {
+    "architecture": "Analyzer/test-only provenance advance on isolated vr-dxvk-r71-disasm; vr-d3d9ex-focus and runtime backend implementation paths were not modified.",
+    "ownership_lifetime": "No runtime resource ownership, Reset/device-loss, shared-handle, synchronization, producer/consumer generation or ACK behavior changed; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, per-eye projection, HUD, marker, recenter, presentation or visual path changed; HMD correctness is not claimed.",
+    "performance": "Offline static analyzer/test evidence only; no runtime hot path, copy, wait, draw count or frame-pacing behavior changed.",
+    "adversarial": "The raw window came from canonical EXE SHA-256 68ceb386... and is accepted only when F121 status/cut geometry, three-way 0x8B overlap identity, .text placement, exact 64-byte bytes/end geometry and unresolved-target lineage all remain fail-closed."
+  },
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_95_raw_provenance.py"
+    ],
+    "commit_message": "dxvk: capture canonical 0x1839cd overlap provenance [AUTO:CONVERSION-DXVK-00370]",
+    "material_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "material_tree_sha": "8fc73bca381180f9baf1a8b37259f87dc8974dad",
+    "analyzer_blob_sha": "3a4c83483b5357d6f1cb59b51b3579f26d273949",
+    "test_blob_sha": "ff3b65581ab45773d556aa715ddd3921172c6d83",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "provenance_status": "EXACT_EXE_1839CD_TO_183A0D_PROVENANCE_CAPTURED",
+    "predecessor_status": "EXACT_18398E_TO_1839CD_CONTROL_FLOW_WITH_1839CD_OVERLAP_PROVEN",
+    "start_rva": "0x001839CD",
+    "capture_end_rva": "0x00183A0D",
+    "probe_len": 64,
+    "required_overlap_bytes": "8b",
+    "overlap_matches": true,
+    "predecessor_overlap_matches": true,
+    "exact_bytes_match": true,
+    "inherited_unresolved_forward_targets": [
+      "0x001839CD",
+      "0x001839D2",
+      "0x00183B6F"
+    ],
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "raw_outbound_rel32_candidates": [],
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37199931166,
+      "job_id": 111429354149,
+      "conclusion": "success",
+      "exact_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+      "artifact_id": 11302777245,
+      "artifact_digest": "sha256:fbb214165ca7daf41dd370cec8962beca72abd8733b6d4a62d4f919ad8e9579d"
+    },
+    "backend_conversion_gate": {
+      "run_id": 37199931190,
+      "job_id": 111429354163,
+      "conclusion": "success",
+      "exact_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+      "backend_disassembly_contract": "success",
+      "win32_configure": "success",
+      "win32_build": "success",
+      "binary_verification": "success",
+      "artifact_upload": "success",
+      "artifact_id": 11302618313,
+      "artifact_digest": "sha256:537dd395cd42c6f06b57b4768450197253be0e4c03e211c79babefdd32e4d1b5"
+    },
+    "issue14_implementation_validation_comment_id": 5979639433
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current vr-dxvk-r71-disasm HEAD ac8672185932a7a013d582a1c16b291e3dfda1ba, VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, branch-local conversion lane state, VR_AUTODEV_STATE and the 00368 durable result before selecting new work."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the branch-authoritative next runnable unit: F122 exact raw frontier 0x001839CD..0x00183A0D with mandatory 0x8B overlap and inherited unresolved-target debt. Canonical input identity was independently confirmed as SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material commit 664b1b97a8654c44601ff2dfa03449809815b6c7 adds F122 exact raw bytes, modern predecessor cut-edge cross-proof, overlap/debt/rel32 provenance collector and deterministic regression tests without semantic promotion."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37199931166/111429354149 SUCCESS, including continuation regression/static contract/canonical EXE identity/window extraction/analysis. Backend Conversion Gate 37199931190/111429354163 SUCCESS, including backend disassembly contract and Win32 configure/build/binary/artifact. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing material result 664b1b97a8654c44601ff2dfa03449809815b6c7 is published with exact marker [AUTO:CONVERSION-DXVK-00370] and no CI-skip. Issue #14 comment 5979639433 records implementation and exact-SHA validation."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static analyzer/test canonical provenance step only; no runtime DXVK payload, selector, deployment content or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Schema-2 run record and lane state were created by 89232203cc79fa7ddc1346ca0f484705bb82e014; this follow-up state-only checkpoint binds that durable creation SHA while preserving validation-bearing RESULT_SHA 664b1b97a8654c44601ff2dfa03449809815b6c7. Rollover E001 metadata is reconciled without changing the material/result SHA or runtime-validation boundary."
+    }
+  },
+  "blocker": null,
+  "next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics.",
+  "exact_next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics.",
+  "validated_at_kst": "2026-10-04T20:51:31+09:00",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DXVK-00370",
+    "production_id": "CONVERSION-DXVK-00370",
+    "event_id": "CONVERSION-DXVK-00370-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_ROLLOVER"
+  },
+  "run_record_commit_sha": "89232203cc79fa7ddc1346ca0f484705bb82e014",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "dispatch_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DXVK-00370",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00370",
+      "production_id": "CONVERSION-DXVK-00370",
+      "event_id": "CONVERSION-DXVK-00370-E001",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+      "source": "CURRENT_USER_ROLLOVER"
+    },
+    "reason": "Newest explicit user rollover metadata supersedes prior automatic queue-dispatch bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material, validation-bearing SHA and exact-SHA gate evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "task_id": "CONVERSION-DXVK-00131",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "569112a2bf0714a01aef95e42172af57a3616664",
+  "initial_source_sha": "256420636ae72ee1221301a7e4183ab77972ed81",
+  "result_sha": "256420636ae72ee1221301a7e4183ab77972ed81",
+  "validation_bearing_result_sha": "256420636ae72ee1221301a7e4183ab77972ed81",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R137_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+  "summary": "Completed an exact-upstream-EXE function-fingerprint census for the three recurring guarded-GF raw rel32 targets 0x653C0, 0x65860 and 0x65970. Exact CI shows all three targets in .text. 0x65860 and 0x65970 coincide with the analyzer's backward function-start guesses and expose 1 and 3 bounded outbound raw E8 candidates respectively; 0x653C0 instead guesses back to 0x65290 and has no outbound raw E8 candidate in the first 96 bytes. Raw inbound counts are 34, 251 and 224. This remains byte-level provenance only: it does not prove instruction alignment, semantic effect, or ScreenHud ownership, so all five guarded GF hooks remain spacing-only.",
+  "evidence": [
+    "CONVERSION-DXVK-00129 reduced the five guarded GF hook windows to three recurring unknown .text rel32 targets: 0x653C0, 0x65860 and 0x65970.",
+    "Source result 256420636ae72ee1221301a7e4183ab77972ed81 added target bytes64, backward function-start guesses, full raw inbound E8 candidate scans and bounded 96-byte raw outbound rel32 candidate scans to the exact-EXE analyzer, plus verifier markers.",
+    "OutRun EXE HUD Inspector CI 36719354979 PASS. Static analysis reported known_call_sites=9/9 and guarded_gf_targets=3/3.",
+    "Exact analyzer output: 0x653C0 section=.text start_guess=0x65290 inbound_raw=34 outbound_raw=0.",
+    "Exact analyzer output: 0x65860 section=.text start_guess=0x65860 inbound_raw=251 outbound_raw=1; bounded raw outbound candidate 0x65874->0x285A0.",
+    "Exact analyzer output: 0x65970 section=.text start_guess=0x65970 inbound_raw=224 outbound_raw=3; bounded raw outbound candidates 0x65997->0x28460, 0x659AC->0x28320 and 0x659C1->0x28800.",
+    "HUD analysis artifact 11097706410 digest sha256:7f8f877ab64155b78710ce0799ab76eabc044db1f9a39da52324b41377487b73.",
+    "HUD inspector game artifact 11098156185 digest sha256:ec1004135177e241e534f88f4be91c8834997cf6042b0f5a3d724a965df396a7.",
+    "Backend Conversion Gate 36719347122 PASS; artifact 11097398590 digest sha256:dcfbbcb44081d8015b89122a7032ac5128d62e164987ec4acb8336f97ea356d2.",
+    "Build 36719355003 PASS; main artifact 11097612949 digest sha256:1001956e0200b596b228b025bd81d0392b20f25d85bc031901e1fae5eec00ff1.",
+    "OpenXR VR architecture 36719355004 PASS across all six jobs.",
+    "VR Hosted Test Package push 36719347111 PASS; artifact 11098641074 digest sha256:6a00e2206c6eda8924e9e06902b155ffaca06ba1b793dc6556f803630e4c4342.",
+    "VR Hosted Test Package PR 36719355020 PASS; artifact 11097931740 digest sha256:236fa3be8feceba677f178bf3652cbca7547ba88652162ed6e7ee7f7edaa9223.",
+    "VR PC Fast Test Build 36719346916 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00131.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "256420636ae72ee1221301a7e4183ab77972ed81",
+      "message": "vr: fingerprint guarded GF rel32 targets [AUTO:CONVERSION-DXVK-00131]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "target_function_fingerprint_census": [
+    {
+      "target_rva": "0x000653C0",
+      "target_section": ".text",
+      "function_start_guess_rva": "0x00065290",
+      "inbound_raw_count": 34,
+      "guarded_hook_inbound_refs": [
+        "0x000FD591->0x000653C0",
+        "0x000FD60F->0x000653C0",
+        "0x000FE8B1->0x000653C0"
+      ],
+      "outbound_raw_count": 0,
+      "outbound_raw_candidates": [],
+      "bytes64": "0f 57 c0 f3 0f 10 64 24 0c f3 0f 10 54 24 08 f3 0f 10 4c 24 04 0f 2e e0 9f f6 c4 44 c7 81 88 00 00 00 01 00 00 00 f3 0f 11 41 60 f3 0f 11 41 54 f3 0f 11 51 50 f3 0f 11 49 4c 7a 26 8b 44 24 10"
+    },
+    {
+      "target_rva": "0x00065860",
+      "target_section": ".text",
+      "function_start_guess_rva": "0x00065860",
+      "inbound_raw_count": 251,
+      "guarded_hook_inbound_refs": [
+        "0x000FD5DC->0x00065860",
+        "0x000FD661->0x00065860"
+      ],
+      "outbound_raw_count": 1,
+      "outbound_raw_candidates": [
+        "0x00065874->0x000285A0"
+      ],
+      "bytes64": "56 8b f1 8b 46 08 57 33 ff 83 f8 ff 74 1b 39 7e 24 75 09 50 e8 27 2d fc ff 83 c4 04 c7 46 08 ff ff ff ff 89 7e 2c 89 7e 28 8b 44 24 0c 8b 4c 24 18 8b 54 24 10 89 06 8b 44 24 14 89 46 10 8b 44"
+    },
+    {
+      "target_rva": "0x00065970",
+      "target_section": ".text",
+      "function_start_guess_rva": "0x00065970",
+      "inbound_raw_count": 224,
+      "guarded_hook_inbound_refs": [
+        "0x000FD616->0x00065970"
+      ],
+      "outbound_raw_count": 3,
+      "outbound_raw_candidates": [
+        "0x00065997->0x00028460",
+        "0x000659AC->0x00028320",
+        "0x000659C1->0x00028800"
+      ],
+      "bytes64": "56 8b f1 8b 46 24 85 c0 75 57 8b 4e 0c 83 f9 ff 74 1f 8b 46 10 83 f8 ff 74 17 8b 16 50 8b 46 18 51 8b 4e 14 50 51 52 e8 c4 2a fc ff 83 c4 14 eb 13 8b 46 18 8b 4e 14 8b 16 50 51 52 e8 6f 29 fc"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36719347122,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11097398590,
+    "backend_conversion_gate_artifact_digest": "sha256:dcfbbcb44081d8015b89122a7032ac5128d62e164987ec4acb8336f97ea356d2",
+    "build_run_id": 36719355003,
+    "build_result": "PASS",
+    "build_artifact_id": 11097612949,
+    "build_artifact_digest": "sha256:1001956e0200b596b228b025bd81d0392b20f25d85bc031901e1fae5eec00ff1",
+    "openxr_run_id": 36719355004,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36719354979,
+    "hud_result": "PASS",
+    "hud_analysis_artifact_id": 11097706410,
+    "hud_analysis_artifact_digest": "sha256:7f8f877ab64155b78710ce0799ab76eabc044db1f9a39da52324b41377487b73",
+    "hud_game_artifact_id": 11098156185,
+    "hud_game_artifact_digest": "sha256:ec1004135177e241e534f88f4be91c8834997cf6042b0f5a3d724a965df396a7",
+    "hosted_package_push_run_id": 36719347111,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_push_artifact_id": 11098641074,
+    "hosted_package_push_artifact_digest": "sha256:6a00e2206c6eda8924e9e06902b155ffaca06ba1b793dc6556f803630e4c4342",
+    "hosted_package_pr_run_id": 36719355020,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11097931740,
+    "hosted_package_pr_artifact_digest": "sha256:236fa3be8feceba677f178bf3652cbca7547ba88652162ed6e7ee7f7edaa9223",
+    "pc_fast_run_id": 36719346916,
+    "pc_fast_result": "SKIPPED"
+  },
+  "review_lenses": {
+    "architecture": "Kept all F13 evidence in the exact-EXE analyzer/verifier; renderer/backend activation is unchanged.",
+    "ownership": "No ArmNextDraw or semantic producer ownership change; all five guarded hooks remain spacing-only.",
+    "stereo_correctness": "No WVP/projection/HUD/world policy changed.",
+    "performance": "CI-only byte scanning; no game/host hot-path work or runtime logging was added.",
+    "adversarial": "Inbound/outbound E8 rows remain explicitly raw byte candidates. The 0x65860/0x65970 prologue-like starts and outbound rows are not treated as proof of aligned CALLs or semantic effect."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GUARDED_GF_RAW_REL32_TARGET_CENSUS",
+    "after": "PARTIAL_PLUS_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+    "runtime_claim": false
+  },
+  "blocker": "The census narrows structure but still does not establish decoded instruction boundaries or semantic effect. 0x653C0 does not coincide with the backward function-start guess, and the raw inbound counts for all three targets are far larger than the guarded-hook references, showing why raw byte matches cannot be promoted directly to call ownership. The outbound targets 0x285A0/0x28460/0x28320/0x28800 are also unresolved. Exact disassembly/control-flow provenance remains required before any ScreenHud ownership change.",
+  "next_action": "Keep all five guarded GF hooks spacing-only. Continue F13 in a later bounded task by decoding instruction-aligned control flow for 0x65860 and 0x65970 first, resolving outbound targets 0x285A0/0x28460/0x28320/0x28800 and independently locating the true entry/context around 0x653C0. Keep runtime validation distinct from hosted CI."
+}

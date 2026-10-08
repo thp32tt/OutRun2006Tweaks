@@ -1,0 +1,124 @@
+{
+  "task_id": "CONVERSION-DXVK-00159",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "ff926d94c898ca524ab334abef1ffb30619d8551",
+  "result_sha": "11e99e2d19a7b82e43d391d634949d95f831a92a",
+  "validation_bearing_result_sha": "11e99e2d19a7b82e43d391d634949d95f831a92a",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R159_HELPER_2837E_CONTINUATION_PROVENANCE",
+  "selection_reason": "DXVK runtime promotion remains Quest 3/VDXR-dependent. CONVERSION-DXVK-00157 proved complete instructions only through 0x2837D and explicitly required fresh exact bytes beginning at 0x2837E before further decoding. This provenance capture is the smallest independent HMD-free next step.",
+  "summary": "Completed a bounded exact-EXE continuation provenance capture beginning at 0x2837E, the exact exclusive end of the validated 0x28320 instruction prefix. The analyzer captured a fresh 96-byte .text window, verified predecessor status/end/aligned-call continuity, reported no function-start guess, zero raw inbound rel32 candidates and two raw outbound rel32 candidates. The bytes are preserved as provenance only; no continuation instruction, function-entry, call-semantic, or render-ownership claim is made.",
+  "evidence": [
+    "CONVERSION-DXVK-00157 validation-bearing result 317211876f1fc4c4a540c216ec9fa845351904d8 proved complete instructions through 0x2837D and aligned CALL 0x28379->0x282B0, stopping at exclusive RVA 0x2837E because the prior provenance window truncated the next instruction.",
+    "Validation-bearing result 11e99e2d19a7b82e43d391d634949d95f831a92a adds a fresh 96-byte continuation collector at 0x2837E with fail-closed predecessor status/end/aligned-call/.text/probe-length checks and contains no CI-skip directive.",
+    "HUD Inspector static job 110049317475 PASS reported status=EXACT_EXE_NEXT_CODE_CONTINUATION_PROVENANCE_CAPTURED, predecessor_status=EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN, predecessor_end=0x0002837E, predecessor_call=True, predecessor_exact=True, section=.text, start_guess=-, probe_len=96, inbound_raw=0, outbound_raw=2.",
+    "Raw outbound candidates are 0x00028390->0x0008BD20:.text and 0x0002839D->0x00182194:.text. Neither candidate is promoted to an instruction-aligned call or semantic edge by this task.",
+    "Captured 96-byte window: 83 c4 04 83 f8 ff 89 44 24 0c 0f 84 a5 00 00 00 53 55 e8 8b 39 06 00 8b d8 d9 43 08 83 c4 04 e8 f2 9d 15 00 6b ff 2c 8b 54 24 20 48 89 44 24 18 8b 44 24 14 b9 01 00 00 00 89 48 04 db 44 24 18 89 50 08 8b 54 24 28 89 70 0c 89 50 10 8b 54 24 24 89 50 14 8b 15 14 b2 95 00 89 48 24 89 70 18.",
+    "Backend Conversion Gate 36762780218 PASS; Build 36762788649 PASS; OpenXR VR architecture 36762788650 PASS across all six jobs; OutRun EXE HUD Inspector CI 36762788631 PASS; VR Hosted Test Package push 36762780299 PASS and pull_request 36762788704 PASS on exact result 11e99e2d.",
+    "VR PC Fast Test Build 36762780312 was SKIPPED by branch policy and is not runtime validation.",
+    "No Quest 3 / VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00159.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Keep guarded GF ownership unchanged. A later bounded F13 task may decode only complete instructions from the fresh 0x2837E window and independently prove whether raw candidates 0x28390->0x8BD20 and 0x2839D->0x182194 are instruction-aligned. Do not infer function entry, call semantics, ScreenHud/world ownership, or runtime correctness from raw provenance alone.",
+  "source_commits": [
+    {
+      "sha": "11e99e2d19a7b82e43d391d634949d95f831a92a",
+      "message": "vr: capture target C next-code continuation [AUTO:CONVERSION-DXVK-00159]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "next_code_2837e_continuation_provenance": {
+    "target_rva": "0x0002837E",
+    "target_section": ".text",
+    "function_start_guess_rva": null,
+    "probe_len": 96,
+    "predecessor_status": "EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "predecessor_end_rva": "0x0002837E",
+    "predecessor_call_target_matches": true,
+    "predecessor_exact": true,
+    "raw_inbound_rel32_candidate_count": 0,
+    "raw_outbound_rel32_candidate_count": 2,
+    "raw_outbound_rel32_candidates": [
+      {
+        "call_rva": "0x00028390",
+        "target_rva": "0x0008BD20",
+        "target_section": ".text",
+        "alignment_status": "UNPROVEN"
+      },
+      {
+        "call_rva": "0x0002839D",
+        "target_rva": "0x00182194",
+        "target_section": ".text",
+        "alignment_status": "UNPROVEN"
+      }
+    ],
+    "status": "EXACT_EXE_NEXT_CODE_CONTINUATION_PROVENANCE_CAPTURED",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "bytes": "83 c4 04 83 f8 ff 89 44 24 0c 0f 84 a5 00 00 00 53 55 e8 8b 39 06 00 8b d8 d9 43 08 83 c4 04 e8 f2 9d 15 00 6b ff 2c 8b 54 24 20 48 89 44 24 18 8b 44 24 14 b9 01 00 00 00 89 48 04 db 44 24 18 89 50 08 8b 54 24 28 89 70 0c 89 50 10 8b 54 24 24 89 50 14 8b 15 14 b2 95 00 89 48 24 89 70 18"
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36762780218,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11119393033,
+    "backend_conversion_gate_artifact_digest": "sha256:f9179422a1aeb93419ac01bdd57490581d017585530b9483c405e01015995582",
+    "build_run_id": 36762788649,
+    "build_result": "PASS",
+    "build_artifact_id": 11118909731,
+    "build_artifact_digest": "sha256:cfe7d7ac20251edd67191c9f2d2f0d26abdf6349ee1212711d2de67559c9f961",
+    "openxr_run_id": 36762788650,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "openxr_host_artifact_id": 11118823121,
+    "openxr_host_artifact_digest": "sha256:b27996708a017a8e6aaf2f517bd08125190122208d2b93fc01ccbf8b9b5ea83c",
+    "hud_inspector_run_id": 36762788631,
+    "hud_inspector_result": "PASS",
+    "hud_static_analysis_job_id": 110049317475,
+    "hud_analysis_artifact_id": 11118803961,
+    "hud_analysis_artifact_digest": "sha256:0b0fcc377eb057f9b5aaae97a9dd7baf305f8b31202387fa221ee411509af0d7",
+    "hud_game_artifact_id": 11118809957,
+    "hud_game_artifact_digest": "sha256:2503bfb4f1e221674a1f264410e553e51fa5303aaaffa96b99a7b470119cd237",
+    "hosted_package_push_run_id": 36762780299,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_push_artifact_id": 11119434020,
+    "hosted_package_push_artifact_digest": "sha256:fc5a568e2868ee281a0fdc2df0d278768d69b5e3383755a1baeb8a2cf2755035",
+    "hosted_package_pr_run_id": 36762788704,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11120060035,
+    "hosted_package_pr_artifact_digest": "sha256:081443be095c349525b1ae99be50c526ea995fa754f12a2ce9f74aa1c456013e",
+    "pc_fast_run_id": 36762780312,
+    "pc_fast_result": "SKIPPED"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. No runtime renderer, DXVK provider, selector, package policy, transport, or backend activation code changed.",
+    "ownership": "The 0x2837E window is raw provenance only. Neither raw outbound candidate establishes ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, or stereo behavior changed.",
+    "performance": "No game/host runtime hot path, copy, wait, Flush, cadence, telemetry, or frame-pacing behavior changed.",
+    "adversarial": "The capture fails closed if R157 no longer ends exactly at 0x2837E with its aligned-call proof intact, 0x2837E leaves .text, or the full 96-byte window cannot be read. Raw rel32 scans are explicitly not treated as aligned calls without a separate instruction proof."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_28320_ALIGNED_CALL_PREFIX",
+    "after": "PARTIAL_PLUS_HELPER_2837E_CONTINUATION_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "The 0x2837E bytes and raw rel32 census are now durable, but continuation instruction boundaries, alignment/meaning of 0x28390->0x8BD20 and 0x2839D->0x182194, function-entry status, and all ScreenHud/world/render semantics remain unproven."
+}

@@ -16,7 +16,11 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/disasm_render_contract.hpp"
+#include "vr/d3d9/dxvk_provider_probe.hpp"
+#include "vr/ipc/dxvk_shared_eye_bridge.hpp"
 #include "vr_shared.hpp"
+#include "vr/core/d3d9_draw_state.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -73,9 +77,12 @@ namespace OutRunVRStereo
 		constexpr std::size_t SetVertexShaderVtableIndex = 92;
 		constexpr std::size_t CreateQueryVtableIndex = 118;
 		constexpr std::size_t QueryIssueVtableIndex = 6;
-		constexpr UINT OutRunWvpRegister = 64;
-		constexpr UINT OutRunWvpRegisterCount = 4;
-		constexpr std::uintptr_t OutRunProjectionRva = 0x0095D8A0u - 0x00400000u;
+		constexpr UINT OutRunWvpRegister =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegister);
+		constexpr UINT OutRunWvpRegisterCount =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegisterCount);
+		constexpr std::uintptr_t OutRunProjectionRva =
+			OutRunVR::DisasmContract::ProjectionRva;
 		constexpr float VerifiedWvpEpsilon = 1.0e-4f;
 
 		SafetyHookInline ResetHook{};
@@ -138,7 +145,13 @@ namespace OutRunVRStereo
 		std::uint32_t DirectTransportWidth = 0;
 		std::uint32_t DirectTransportHeight = 0;
 		bool DirectTransportResourcesReady = false;
+		bool DirectTransportHostOwnedDxvk = false;
 		bool DirectInteropVerified = false;
+		HANDLE DxvkHostBridgeMapping = nullptr;
+		const OutRunVR::DxvkSharedEyeBridge::State* DxvkHostBridgeState = nullptr;
+		bool DxvkNativeTransportChecked = false;
+		bool DxvkNativeTransportCandidate = false;
+		std::uint32_t DxvkHostBridgeFailedGeneration = 0;
 
 		D3DSURFACE_DESC BackBufferDesc{};
 		bool StereoResourcesReady = false;
@@ -1040,8 +1053,11 @@ namespace OutRunVRStereo
 
 		void ReleaseStereoResources()
 		{
-			StereoResourcesReady=false;DirectTransportResourcesReady=false;
+			StereoResourcesReady=false;DirectTransportResourcesReady=false;DirectTransportHostOwnedDxvk=false;
 			for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}
+			if(DxvkHostBridgeState){UnmapViewOfFile(DxvkHostBridgeState);DxvkHostBridgeState=nullptr;}
+			if(DxvkHostBridgeMapping){CloseHandle(DxvkHostBridgeMapping);DxvkHostBridgeMapping=nullptr;}
+			DxvkHostBridgeFailedGeneration=0;
 			ReleaseCom(DirectInteropProbeFence);ReleaseCom(DirectInteropProbeSurface);ReleaseCom(DirectInteropProbeTexture);DirectInteropProbeHandle=nullptr;DirectInteropProbeToken=0;DirectInteropVerified=false;
 			if(SharedState&&SharedState->magic==OutRunVR::SharedMagic){InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),0);}
 			DirectTransportFormat=D3DFMT_UNKNOWN;ProjectionInverseValid=false;ReleaseCom(RightEyeSurface);ReleaseCom(RightEyeDepth);ReleaseCom(LeftResolveSurface);ReleaseCom(LeftResolveTexture);ReleaseCom(RightResolveSurface);ReleaseCom(RightResolveTexture);ReleaseCom(BackBuffer);ReleaseCom(TrackedRenderTarget);ReleaseCom(TrackedDepthStencil);RightDepthSynchronized=true;RightStencilSynchronized=true;BackBufferDesc={};
@@ -1064,7 +1080,69 @@ namespace OutRunVRStereo
 		{
 			if(!HostDirectTransportSupported()||!EnsureSharedState()||(SharedState->flags&OutRunVR::HostAdapterLuidValid)==0)return false;LUID gameLuid{};if(!QueryGameAdapterLuid(device,gameLuid))return false;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidLow),static_cast<LONG>(gameLuid.LowPart));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidHigh),static_cast<LONG>(gameLuid.HighPart));const bool adapterMatches=SharedState->hostAdapterLuidLow==gameLuid.LowPart&&SharedState->hostAdapterLuidHigh==static_cast<std::uint32_t>(gameLuid.HighPart);if(!adapterMatches){if(!FirstAdapterMismatchLogged){FirstAdapterMismatchLogged=true;spdlog::warn("VR direct transport: OpenXR D3D11 adapter LUID does not match the game D3D9Ex adapter; forcing SBS fallback");}return false;}if(DirectInteropProbeToken&&SharedState->hostInteropProbeAckToken==DirectInteropProbeToken){DirectInteropVerified=true;if(!FirstInteropVerifiedLogged){FirstInteropVerifiedLogged=true;spdlog::info("VR direct transport: D3D9Ex -> D3D11 shared-resource probe verified on the OpenXR adapter");}return true;}if(!DirectInteropProbeTexture){HANDLE handle=nullptr;if(FAILED(device->CreateTexture(1,1,1,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,&DirectInteropProbeTexture,&handle))||!DirectInteropProbeTexture||!handle||FAILED(DirectInteropProbeTexture->GetSurfaceLevel(0,&DirectInteropProbeSurface))||FAILED(device->ColorFill(DirectInteropProbeSurface,nullptr,D3DCOLOR_ARGB(0xFF,0x7B,0x7B,0x7B)))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&DirectInteropProbeFence))||!DirectInteropProbeFence||FAILED(DirectInteropProbeFence->Issue(D3DISSUE_END))||!WaitForEventQuery(DirectInteropProbeFence,50)){++DirectInteropProbeFailures;ReleaseCom(DirectInteropProbeFence);ReleaseCom(DirectInteropProbeSurface);ReleaseCom(DirectInteropProbeTexture);DirectInteropProbeHandle=nullptr;return false;}DirectInteropProbeHandle=handle;DirectInteropProbeToken=static_cast<std::uint32_t>(GetTickCount())^GetCurrentProcessId()^0x4F525652u;if(!DirectInteropProbeToken)DirectInteropProbeToken=1;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->hostInteropProbeAckToken),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),static_cast<LONG>(reinterpret_cast<std::uintptr_t>(DirectInteropProbeHandle)));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),static_cast<LONG>(DirectInteropProbeToken));}return false;
 		}
-		void ReleaseDirectTransportSlots(){DirectTransportResourcesReady=false;DirectTransportWidth=0;DirectTransportHeight=0;for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}}
+		void ReleaseDirectTransportSlots(){DirectTransportResourcesReady=false;DirectTransportHostOwnedDxvk=false;DirectTransportWidth=0;DirectTransportHeight=0;for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}}
+
+		bool ReadDxvkHostBridgeState(OutRunVR::DxvkSharedEyeBridge::State& out)
+		{
+			if(!DxvkHostBridgeState)
+			{
+				DxvkHostBridgeMapping=OpenFileMappingW(FILE_MAP_READ,FALSE,OutRunVR::DxvkSharedEyeBridge::MemoryName);
+				if(!DxvkHostBridgeMapping)return false;
+				DxvkHostBridgeState=static_cast<const OutRunVR::DxvkSharedEyeBridge::State*>(MapViewOfFile(DxvkHostBridgeMapping,FILE_MAP_READ,0,0,sizeof(OutRunVR::DxvkSharedEyeBridge::State)));
+				if(!DxvkHostBridgeState){CloseHandle(DxvkHostBridgeMapping);DxvkHostBridgeMapping=nullptr;return false;}
+			}
+			for(int attempt=0;attempt<4;++attempt)
+			{
+				const std::uint32_t before=DxvkHostBridgeState->sequence;if(before&1u)continue;MemoryBarrier();
+				std::memcpy(&out,DxvkHostBridgeState,sizeof(out));MemoryBarrier();
+				const std::uint32_t after=DxvkHostBridgeState->sequence;
+				if(before==after&&!(after&1u)&&out.magic==OutRunVR::DxvkSharedEyeBridge::Magic&&out.version==OutRunVR::DxvkSharedEyeBridge::Version&&out.structSize==sizeof(out))return true;
+			}
+			return false;
+		}
+
+		bool EnsureDxvkHostOwnedTransportResources(IDirect3DDevice9* device)
+		{
+			if(!device||!HostDirectTransportSupported()||!HostDirectTransportReady()||!EnsureRenderFrameState())return false;
+			if(!DxvkNativeTransportChecked)
+			{
+				const auto provider=OutRunVR::Dxvk::ProbeProvider(device);
+				DxvkNativeTransportCandidate=provider.stockDxvkInterop&&provider.nativeTransportCandidate;
+				DxvkNativeTransportChecked=true;
+			}
+			if(!DxvkNativeTransportCandidate)return false;
+			OutRunVR::DxvkSharedEyeBridge::State bridge{};
+			if(!ReadDxvkHostBridgeState(bridge))return false;
+			const std::uint32_t requiredFlags=OutRunVR::DxvkSharedEyeBridge::HostAlive|OutRunVR::DxvkSharedEyeBridge::ResourcesReady;
+			if((bridge.flags&requiredFlags)!=requiredFlags||!bridge.generation||!bridge.width||!bridge.height||bridge.format!=OutRunVR::DxvkSharedEyeBridge::DxgiB8G8R8A8Unorm||(SharedState&&SharedState->hostPid&&bridge.hostPid!=SharedState->hostPid))return false;
+			if(DirectTransportResourcesReady&&DirectTransportHostOwnedDxvk&&DirectTransportGeneration==bridge.generation&&DirectTransportWidth==bridge.width&&DirectTransportHeight==bridge.height)return true;
+			if(DxvkHostBridgeFailedGeneration==bridge.generation)return false;
+			if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();
+			DirectTransportFormat=D3DFMT_A8R8G8B8;
+			if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat)){DxvkHostBridgeFailedGeneration=bridge.generation;return false;}
+			for(std::uint32_t index=0;index<OutRunVR::RenderFrameRingSize;++index)
+			{
+				auto&slot=DirectTransportSlots[index];
+				const auto leftRaw=bridge.slots[index].leftHandle,rightRaw=bridge.slots[index].rightHandle;
+				const auto maxHandle=static_cast<std::uint64_t>(static_cast<std::uintptr_t>(~std::uintptr_t{}));
+				if(!leftRaw||!rightRaw||leftRaw>maxHandle||rightRaw>maxHandle){ReleaseDirectTransportSlots();DxvkHostBridgeFailedGeneration=bridge.generation;return false;}
+				HANDLE leftHandle=reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(leftRaw));
+				HANDLE rightHandle=reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(rightRaw));
+				const HANDLE publishedLeft=leftHandle,publishedRight=rightHandle;
+				const HRESULT leftHr=device->CreateTexture(bridge.width,bridge.height,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);
+				const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(bridge.width,bridge.height,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;
+				if(FAILED(leftHr)||FAILED(rightHr)||!slot.leftTexture||!slot.rightTexture||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence)
+				{
+					ReleaseDirectTransportSlots();DxvkHostBridgeFailedGeneration=bridge.generation;
+					spdlog::warn("VR DXVK native transport: host-owned KMT eye import failed generation={} slot={} leftHr=0x{:08X} rightHr=0x{:08X}; SBS fallback remains available",bridge.generation,index,static_cast<unsigned long>(leftHr),static_cast<unsigned long>(rightHr));
+					return false;
+				}
+				slot.leftHandle=publishedLeft;slot.rightHandle=publishedRight;
+			}
+			DirectTransportWidth=bridge.width;DirectTransportHeight=bridge.height;DirectTransportGeneration=bridge.generation;DirectTransportResourcesReady=true;DirectTransportHostOwnedDxvk=true;DxvkHostBridgeFailedGeneration=0;
+			spdlog::info("VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring {}x{} generation={}; Desktop Duplication is no longer required for gameplay frames",DirectTransportWidth,DirectTransportHeight,DirectTransportGeneration);
+			return true;
+		}
 		void DirectTransportTargetSize(IDirect3DDevice9* device,UINT& width,UINT& height)
 		{
 			// Once a DirectGPU eye size is active, keep it as the fallback for an
@@ -1094,7 +1172,17 @@ namespace OutRunVRStereo
 		}
 		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
 		{
-			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;DirectTransportTargetSize(device,targetWidth,targetHeight);if(DirectTransportResourcesReady&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
+			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState())return false;
+			if(EnsureDxvkHostOwnedTransportResources(device))return true;
+			if(!EnsureDirectInteropProbe(device))return false;
+			UINT targetWidth=0,targetHeight=0;DirectTransportTargetSize(device,targetWidth,targetHeight);
+			if(DirectTransportResourcesReady&&!DirectTransportHostOwnedDxvk&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;
+			if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();
+			DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);
+			if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;
+			for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}
+			DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;DirectTransportHostOwnedDxvk=false;
+			spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
 		}
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
@@ -1409,7 +1497,7 @@ namespace OutRunVRStereo
 					if(!FirstDirectTransportLogged)
 					{
 						FirstDirectTransportLogged=true;
-						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
+						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; path={} sourceEye={}x{}",DirectTransportHostOwnedDxvk?"DXVK host-owned D3D11 KMT import":"D3D9Ex exported shared ring",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
 				else if(Settings::VRDirectGpuOnly)
@@ -1467,7 +1555,7 @@ namespace OutRunVRStereo
 				if(!FirstStereoActiveLogged)
 				{
 					FirstStereoActiveLogged=true;
-					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"verified D3D9Ex->D3D11 ring":"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");
+					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?(DirectTransportHostOwnedDxvk?"DXVK host-owned D3D11 KMT ring":"verified D3D9Ex->D3D11 ring"):"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");
 				}
 			}
 			else if(!holdPreviousProjection&&!(directOnlyHold&&stereoFrameEligible&&SUCCEEDED(hr)))
@@ -1609,6 +1697,49 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool CaptureTrackedRenderStateSnapshot(
+		IDirect3DDevice9* device,
+		OutRunVR::DrawState::RenderStateSnapshot& out) noexcept
+	{
+		out = {};
+		if (!device || InternalStereoPass || !IsGameDevice(device))
+			return false;
+
+		bool ok = true;
+		auto read = [&](D3DRENDERSTATETYPE state, DWORD& value)
+		{
+			if (!ReadTrackedRenderState(device, state, value))
+				ok = false;
+		};
+
+		read(D3DRS_ZENABLE, out.zEnable);
+		read(D3DRS_ZWRITEENABLE, out.zWriteEnable);
+		read(D3DRS_ZFUNC, out.zFunc);
+
+		read(D3DRS_ALPHABLENDENABLE, out.alphaBlendEnable);
+		read(D3DRS_SRCBLEND, out.srcBlend);
+		read(D3DRS_DESTBLEND, out.destBlend);
+		read(D3DRS_BLENDOP, out.blendOp);
+		read(D3DRS_SEPARATEALPHABLENDENABLE, out.separateAlphaBlendEnable);
+
+		read(D3DRS_ALPHATESTENABLE, out.alphaTestEnable);
+		read(D3DRS_ALPHAREF, out.alphaRef);
+		read(D3DRS_ALPHAFUNC, out.alphaFunc);
+
+		read(D3DRS_CULLMODE, out.cullMode);
+		read(D3DRS_FILLMODE, out.fillMode);
+		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
+		read(D3DRS_SRGBWRITEENABLE, out.sRGBWriteEnable);
+		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
+		read(D3DRS_STENCILENABLE, out.stencilEnable);
+		read(D3DRS_STENCILWRITEMASK, out.stencilWriteMask);
+		read(D3DRS_FOGENABLE, out.fogEnable);
+		read(D3DRS_LIGHTING, out.lighting);
+
+		out.complete = ok;
+		return ok;
 	}
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept

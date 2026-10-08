@@ -1,0 +1,109 @@
+{
+  "task_id": "CONVERSION-DXVK-00193",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "49e451feed5db604e4e4666e0b786a4de2ec3b4c",
+  "result_sha": "8fd1bed60602b1f801aa8eddbf3a17cde953b868",
+  "validation_bearing_result_sha": "8fd1bed60602b1f801aa8eddbf3a17cde953b868",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R193_182314_CAPTURE_END_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DXVK-00191 proved 0x182314 as the exact immediate instruction boundary and named its continuation as the next independent F13 unit. The remaining R185 exact bytes run from 0x182314 through the probe end 0x182331 and contain the prior incoming call target 0x18231D, two raw rel32 calls, and two forward conditional targets, making this the smallest complete evidence-bounded follow-up.",
+  "summary": "ATTEMPT=1 complete. Exact result 8fd1bed6 proves all captured bytes from 0x182314 through exclusive end 0x182331, including the incoming boundary at 0x18231D, two exact rel32 calls, and two decoded forward conditional targets. All required GitHub Actions passed. Forward target bytes at 0x182331 and 0x182391 remain uncaptured; no function-entry, callee-semantic, render/HUD, or runtime claim is promoted.",
+  "evidence": [
+    "Backend Conversion Gate 36799971344 PASS; artifact 11134599748 digest sha256:69d777c0f59e2dd6895b9ef0e358ac0f09de09625a71b0266054cdd7c8eca7f6.",
+    "HUD Inspector 36799976246 PASS; static job 110171887824 emitted EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN. 0x18231D incoming target is an exact instruction boundary; calls at 0x182318 and 0x18232C match raw provenance; forward targets 0x182331/0x182391 remain uncaptured.",
+    "Build 36799976191 PASS; binary artifact 11135945200 digest sha256:033bd3abc2dc81dcddaa0be8cb7d315e299b9cbd450b0a62e2e988528bb83e4a.",
+    "OpenXR 36799976238 PASS 6/6; host artifact 11134219900 digest sha256:4ac3a2b60685d58da955b917c7b046cbb587afc6fe76694e56117593eb8bd43b.",
+    "Hosted Package push 36799971213 PASS artifact 11134549917; PR 36799976227 PASS artifact 11134649569.",
+    "PC Fast 36799971525 SKIPPED by branch policy. No Quest 3/VDXR or in-game execution occurred."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00193.json"
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "start_rva": "0x00182314",
+    "end_rva": "0x00182331",
+    "instruction_count": 9,
+    "incoming_call": "0x0018230B->0x0018231D",
+    "calls": [
+      "0x00182318->0x00188905",
+      "0x0018232C->0x001888D5"
+    ],
+    "branches": [
+      "0x00182322->0x00182391",
+      "0x0018232A->0x00182331"
+    ],
+    "expected_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "incoming_target_status": "EXACT_18231D_INCOMING_CALL_TARGET_BOUNDARY_PROVEN",
+    "forward_target_status": "DECODED_ONLY_TARGET_BYTES_NOT_CAPTURED",
+    "function_entry_status": "UNRESOLVED_AT_182314_18231D_182331_182391",
+    "semantic_effect": "BOUNDED_CAPTURE_END_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_status": "EXACT_CAPTURE_END_AT_182331_REACHED"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Incoming-target and bounded control-flow proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R191 remains exact, all remaining bytes 0x182314..0x182330 decode contiguously/exactly, predecessor call 0x18230B->0x18231D is still exact/raw-census-backed and lands on an instruction start, both new rel32 calls match raw provenance, both rel8 targets decode exactly, and the sequence ends exactly at the R185 probe boundary 0x182331. It explicitly refuses to claim target instruction boundaries at 0x182331/0x182391 without new bytes."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "after": "PARTIAL_PLUS_182314_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "Bytes through 0x182330 are proven. Targets 0x182331 and 0x182391 are outside the captured window, so their boundaries, function identities and subsequent flow remain unresolved; call and render/HUD semantics remain unresolved.",
+  "next_action": "ATTEMPT=1 complete. Capture fresh exact-EXE bytes at 0x182331 and later cover 0x182391 in a bounded follow-up before assigning target boundaries or function identity. Runtime remains UNTESTED.",
+  "validation": {
+    "result_sha": "8fd1bed60602b1f801aa8eddbf3a17cde953b868",
+    "automation_validation": "PASS",
+    "proof_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "proof_start_rva": "0x00182314",
+    "proof_end_rva": "0x00182331",
+    "proof_instruction_count": 9,
+    "proof_incoming_call": "0x0018230B->0x0018231D",
+    "proof_incoming_target_is_instruction_boundary": true,
+    "proof_calls": [
+      "0x00182318->0x00188905",
+      "0x0018232C->0x001888D5"
+    ],
+    "proof_branches": [
+      "0x00182322->0x00182391",
+      "0x0018232A->0x00182331"
+    ],
+    "proof_forward_target_status": "DECODED_ONLY_TARGET_BYTES_NOT_CAPTURED",
+    "backend_conversion_gate_run_id": 36799971344,
+    "build_run_id": 36799976191,
+    "hud_inspector_run_id": 36799976246,
+    "openxr_run_id": 36799976238,
+    "hosted_package_push_run_id": 36799971213,
+    "hosted_package_pr_run_id": 36799976227,
+    "pc_fast_run_id": 36799971525,
+    "runtime_validation": "UNTESTED"
+  },
+  "source_commits": [
+    {
+      "sha": "8fd1bed60602b1f801aa8eddbf3a17cde953b868",
+      "message": "vr: prove 0x182314 capture-end control flow [AUTO:CONVERSION-DXVK-00193]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ]
+}
