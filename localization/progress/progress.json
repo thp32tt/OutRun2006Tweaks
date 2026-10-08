@@ -8688,5 +8688,33 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "proof": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
     "backend": "GITHUB_CONNECTED_WITH_N100_SMALL_PNG_ONLY"
+  },
+  "b297_q060_stage_native_face_rejected": {
+    "run_key": "OUTRUN-KOR-B297-Q060-IGR044-STAGE-NATIVE-FACE-20261009",
+    "role": "B",
+    "index": 60,
+    "priority": "P0",
+    "regression": "IGR-044 OPEN_USER_INGAME_FAIL",
+    "current_candidate_sha256": "d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2",
+    "current_candidate_origin": "B296 q060 prior-run WHITE-only partial promotion",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "stage_trial_sha256": "84c9a013ceb7a11240caeff48ca2dfc76f4702855b6b7fb030e5339f0ad74f70",
+    "new_native_trial_dds": 1,
+    "new_production_dds": 0,
+    "stage_outside_changed_pixels": 0,
+    "native_decode": "PASS",
+    "producer_stage_visual": "FAIL_SOURCE_FAMILY_GOLD_FACE_RAGGED_EDGE",
+    "candidate_promoted": false,
+    "remaining_defects": [
+      "Stage heavy gold/navy/white face",
+      "OUTRUN MILES gold bevel depth/slant"
+    ],
+    "stage_manual_method_required": true,
+    "C2": "BLOCKED_UNTIL_REWORK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_INGAME": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B297-Q060-P0-STAGE-SOURCE-FAMILY-PIXEL-MATERIAL/B297_CONTROLLER_SELF_QA_REJECTED.json"
   }
 }
