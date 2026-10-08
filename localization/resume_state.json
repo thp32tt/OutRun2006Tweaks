@@ -11343,5 +11343,39 @@
     "github_actions_failed_guard": 37738250394,
     "cleanup": "GITHUB_HOSTED_EPHEMERAL_RUNNER_DISCARDED_NO_N100",
     "forbidden_domains_touched": []
+  },
+  "c288_c1_q217_startgoal_style_fail": {
+    "run": "20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL",
+    "run_key": "OUTRUN-KOR-C288-C1-Q217-STARTGOAL-SOURCE-FAMILY-20261008-1540",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 217,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+    "DDS_format": "BGRA32",
+    "native_size": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "changed_rgba_inside_source_badges": 3935,
+    "changed_rgba_outside_source_badges": 0,
+    "changed_alpha_pixels": 0,
+    "firstlook_prior_to_detailed_producer_qa": true,
+    "visual_decision": "REWORK_REQUIRED",
+    "visual_defect": "START/GOAL source right-lean chrome cream-gold bold italic glyph vs small plain near-upright Korean and loss of font hierarchy",
+    "machine_geometry_status": "PASS_BADGE_SCOPE_ONLY_NOT_FULL_APPROVAL",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "approval_created": false,
+    "producer_return": "A must materially rerender both signs from exact original source with right-leaning source-family cream/gold depth and protected plate unchanged",
+    "QA": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_CONTROLLER_QA.json",
+    "machine_QA": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_INDEPENDENT_MACHINE.json",
+    "candidate_DDS_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "execution_backend": "N100 MCP fallback only for small decoding; original and candidate downloaded via GH approved host after GPT local direct fetch DNS failure",
+    "forbidden_domains_touched": []
   }
 }
