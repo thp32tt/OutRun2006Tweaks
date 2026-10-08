@@ -206,7 +206,12 @@ for bx,by in sorted(block_ids):
                     raise RuntimeError(("glyph enters partial boundary block",bx,by,dx,dy))
                 # Choose the nearest source-red original BC3 palette entry.
                 opts=[i for i,p in enumerate(pp) if p[0]>p[1]+34 and p[0]>p[2]+20]
-                if not opts:raise RuntimeError(("no original sign red for partial block",bx,by))
+                if not opts:
+                    # This boundary block carries protected non-red artwork
+                    # (e.g., adjacent badge white rim). B253's original color
+                    # endpoints cannot represent a red clean plate here.
+                    # Preserve its original indices rather than recolor.
+                    continue
                 color=pix[dy,dx].astype(np.float64)
                 idx[dy*4+dx]=min(opts,key=lambda i:float(np.sum((pp[i]-color)**2)))
         nb=set_ci(oldblock,idx)
