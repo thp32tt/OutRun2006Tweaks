@@ -57,6 +57,11 @@ namespace OutRunVR::GameSemantic
         GoalTimeHelper,
         OutRunHudText,
         DispRankFirst,
+        // Two independent original GOAL E8 helper parents. Keep the
+        // generic token for historic records, but distinguish the actual
+        // 0xBEA5A vs 0xBEA5F result glyph source in HMD evidence.
+        GoalTime020,
+        GoalTime150,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -98,6 +103,8 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
         case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
+        case ProducerToken::GoalTime020: return "GOAL_TIME_HELPER_020";
+        case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";
         default: return "NONE";
         }
     }
