@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 18:24 KST",
+  "updated_at_kst": "2026-10-08 18:38:06 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7590,5 +7590,16 @@
     "graphics_output_delta": 1,
     "artifact": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json",
     "runner": 37754217530
+  },
+  "b264_q172_method_change_producer_visual_fail": {
+    "run_key": "OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
+    "queue_index": 172,
+    "candidate_rejected_sha256": "91732059f1356f3ceda1c3e0d245b799ad4929f9a8f475a8c6b29fc0a73ad5d4",
+    "restored_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "machine": "PASS",
+    "producer_visual": "FAIL_SOURCE_RELATIVE_FONT_BEVEL_50PCT_HIERARCHY",
+    "new_approved_dds": 0,
+    "qa": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_CONTROLLER_SELF_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

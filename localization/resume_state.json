@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B264 q172 6C9B3611 new method candidate 91732059f1356f3ceda1c3e0d245b799ad4929f9a8f475a8c6b29fc0a73ad5d4 was produced and MACHINE PASS; controller native 7x / 50% / RAW visual FAIL (cream beveled right-italic source-family not reconstructed, GOAL horizontal pale slab). Restored prior B263 812373b0... in Git, C295 REWORK and METHOD_CHANGE_REQUIRED remain. Next B must use independent manual/vector source-letterform reconstruction rather than same type gradient; do not blindly rerender. QA localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_CONTROLLER_SELF_QA.json. RUNTIME_VALIDATION=UNTESTED.",
     "C295 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q172 current B263 SHA 812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a rejected independently (new vs C291 B255 7282687...): source face right-italic cream/gold beveled extrusion not matched, Korean 출발/골 become horizontal dark-gold slabs at native/50% despite producer containment PASS; METHOD_CHANGE_REQUIRED per 2 distinct independent C reviews in REWORK_ESCALATIONS.json. B rebuild with genuinely different source-derived per-glyph construction, fresh C2 calibrated native/raw then C3/PRE_INGAME/user and game; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C295-C2-Q172-B263-SOURCE-FAMILY-REVIEW/C295_CONTROLLER_QA.json.",
     "A192R q119 F6811E94 new material DXT5 b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907 after C294 A191 4e971f... left white halo hard x705 (106 consecutive rows) FAIL: symmetric padded native top-right italic + uncropped soft source-white envelope, new first bright fringe x713 (17 rows), x710-712 0. Exact English source 2336da3c..., bbox source [390,54,1632,200] -> candidate [710,58,1311,196] and outside RGBA/alpha/protected/source residue zero. Worker 37754217530 SUCCESS; first worker 37753930881 failed-safe source-height overflow and did NOT publish bytes. Producer BWG/RAW first look repaired concrete C294 cutoff but source family/per-glyph anchor independent calibrated C1 and separate C3 remain pending HOLD, PRE_INGAME BLOCKED, real-game RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json.",
     "C294 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q154 independently establishes valid source-original English normal calibration (blind 5/5 binary, 3/5 subtype; first-look saved before answer-key reveal) replacing rejected Korean-normal diagnostic; exact existing source/candidate unchanged. Still HOLD_STRICT_RECHECK until independent fresh pixels-first 8-region native DDS C, per-glyph slant + source-family profile, separate C3, user JPG and actual-game retest. RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_CONTROLLER_QA.json",
@@ -6755,7 +6756,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T16:57:00+09:00",
+  "updated_at_kst": "2026-10-08 18:38:06 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11639,6 +11640,15 @@
     "previous_rejected_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
     "candidate_status": "MATERIAL_REPAIR_MACHINE_PASS_PRODUCER_HOLD_PENDING_FRESH_C1",
     "qa": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b264_q172_method_change_producer_visual_fail": {
+    "run_key": "OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
+    "queue_index": 172,
+    "trial_sha256": "91732059f1356f3ceda1c3e0d245b799ad4929f9a8f475a8c6b29fc0a73ad5d4",
+    "rollback_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "action": "MANUAL_VECTOR_SOURCE_FAMILY_REWORK_REQUIRED",
+    "report": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_CONTROLLER_SELF_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

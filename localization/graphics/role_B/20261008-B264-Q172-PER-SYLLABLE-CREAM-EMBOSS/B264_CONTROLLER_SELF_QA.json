@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B264",
+  "run_key": "OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
+  "queue_index": 172,
+  "asset": "6C9B3611",
+  "policy_version": "visual-evidence-v1-20261008",
+  "c_rejections": [
+    "C291",
+    "C295"
+  ],
+  "method_change_trigger": "SOURCE_FAMILY_BEVEL_MISMATCH",
+  "legacy_method_repeat": false,
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "prior_candidate_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+  "trial_candidate_sha256": "91732059f1356f3ceda1c3e0d245b799ad4929f9a8f475a8c6b29fc0a73ad5d4",
+  "workflow": {
+    "failed_preflight": 37757420873,
+    "corrected_worker": 37757652703,
+    "corrected_worker_result": "SUCCESS"
+  },
+  "production_reconstruction": "native 8x supersampled independently transformed Hangul syllables; individually applied pale cream face, top highlight, orange lower contour and dark extruded shadow; no whole-word scaling/old horizontal gradient rerender",
+  "numeric_self_QA": {
+    "dds_header": "PASS_1024x1024_RGBA32_MIP1",
+    "persisted_decode_roundtrip": "PASS",
+    "glyph_effect_bbox": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "rgba_outside_source_bbox": 0,
+    "alpha_outside_source_bbox": 0,
+    "raw_mirror_y": "PASS"
+  },
+  "producer_visual_review": {
+    "result": "FAIL",
+    "glyph_integrity": "UNCONFIRMED_HOLD",
+    "source_plate": "NO_VISIBLE_GHOST_IN_SOURCE_CLEAN_FINAL",
+    "slant": "FAIL_SOURCE_RELATIVE_DEPTH_AND_ITALIC_FIDELITY",
+    "source_family": "FAIL_BOTH_TEXTURES",
+    "practical_50": "FAIL_GOAL_SHORT_HORIZONTAL_SLAB",
+    "overlap": "NO_VISIBLE_INTRUSION_CANDIDATE_NUMERIC_ZERO",
+    "notes": "Native 7x and 50% FLIP-Y/RAW compared to pinned English and authored clean, not a different reviewer. START has separated cream syllables but less continuous original inclined bevel and scale/depth; GOAL still visually resembles horizontal bars rather than strong cream slanted original. Machine PASS cannot override visible failure."
+  },
+  "evidence": {
+    "machine": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_MACHINE_AND_PRODUCTION_GATE.json",
+    "start_native": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/START_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "goal_native": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "start_50": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/START_PRACTICAL_50.png",
+    "goal_50": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/GOAL_PRACTICAL_50.png",
+    "goal_raw": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/GOAL_RAW_SOURCE_CLEAN_FINAL.png"
+  },
+  "rollback": {
+    "completed": true,
+    "asset_restored_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "restored_reference_commit": "4a42b6d68b4c0819f20fffa27099e4accef75901",
+    "reason": "Producer visual rejection; prevent carrying known inferior B264 pixels into C"
+  },
+  "next": "MANUAL_VECTOR_OR_PIXEL_ART_PER_SYLLABLE_SOURCE_DERIVED_NATIVE_ITALIC_AND_EXTRUSION_REQUIRED; no repeat horizontal slabs; new render needs exact source-anchored glyph slant measurement, native and practical independent visual gate, C2+C3 and real game",
+  "producer_pass": false,
+  "independent_C": "NOT_RUN",
+  "C3": "BLOCKED",
+  "APPROVAL": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub ephemeral CPU worker",
+  "cleanup": "Ephemeral Actions job files discarded; no GPT local/N100 scratch or worktree",
+  "forbidden_domains_touched": []
+}
