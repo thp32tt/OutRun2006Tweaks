@@ -13,6 +13,120 @@ string-token C3 approval: calibration, per-region lossless evidence, separate C/
 observations and exact source/candidate binding are mandatory for current export.
 The evidence validator does not replace visual judgment or actual game testing.
 
+## Mandatory 10-stage production and artifact-contamination gate (2026-10-08)
+
+This is the **required A/B construction sequence** for each new or materially
+reworked Korean graphics asset. It expands the existing eight *ordered rework
+visual checks* below; **all eight remain mandatory**. This sequence changes
+image production and evidence, not A/B/C1/C2 scheduling or approval semantics.
+
+1. **Exact English source / DDS provenance:** pin canonical English source SHA,
+   native decoded width/height, format, alpha, authored MIPs, source glyph/effect
+   bboxes and per-sprite RAW/readable orientation. Never upscale a prior Korean
+   candidate to manufacture a source.
+2. **Segment inventory / protected masks:** account for every visible localizable
+   label; distinguish deliberately preserved names, icons, song titles and art.
+   Derive source glyph/effect masks including outline, shadow, glow, fringe and
+   protected foreground; OCR rectangles are hints, not erase/insert masks.
+3. **Source lettering removal / CLEAN_PLATE construction:** restore plate and
+   background from source-faithful flat/gradient/textured/translucent layers.
+   Remove source glyphs *and their effects*, not only bright letter interiors.
+   Korean lettering cannot be used as a cover for incomplete restoration.
+4. **Independent PLATE_ONLY_GATE:** examine SOURCE vs CLEAN **with no Korean text
+   present**, at native, high zoom and practical 100/75/50-percent sizes on
+   neutral/contrasting backdrops. Inspect RAW and readable orientation. Reject
+   source-script silhouettes, edge ghosts, glow, smears, color bands, alpha
+   discontinuities, BC blocks, donor boundaries, rectangular patch seams and
+   lost plate detail even when a scalar residue or bbox check reads zero.
+   Store the stage decision/evidence separately from final-candidate QA.
+5. **Original-family type/effect profile and method selection:** measure source
+   line hierarchy, readable top-minus-bottom slant, baseline, shape/counter
+   space, height/width, weight, stroke, fill, highlight, edge, extrusion and
+   shadow. Select source-faithful technique by family (flat UI/help, tilted
+   selection, metallic/chrome/beveled text). Generic flat fonts with arbitrary
+   width stretch, shear or bevel overlays are *not* acceptable substitutes for
+   a visibly different native source family. Record representative source PNG,
+   measurements and approved renderer-method reference before batch reuse.
+6. **Native-size Korean glyph production:** draw each Hangul syllable from a
+   suitable native-resolution glyph or source-conditioned/vector reconstruction.
+   Match the measured family and per-line hierarchy; retain a legible Korean
+   counter-space and strict original effect-bbox width/height ceiling. Do not
+   add outlines, shadows, boxes or embossed layers absent from the English.
+7. **GLYPH_ONLY_COMPOSITE_GATE:** apply only the transparent Korean glyph plus
+   *explicitly source-justified effect alpha* to the independently qualified
+   CLEAN plate. Never paste an opaque/semopaque rectangular text crop with
+   its own background pixels. A rectangular **selection region** is allowed as
+   an editing aid only if every resulting changed pixel and edge is justified
+   by plate reconstruction or intended glyph/effect masks.
+8. **Independent COMPOSITE_CONTAMINATION_GATE:** inspect CLEAN vs FINAL separately
+   from SOURCE vs CLEAN. Every changed pixel must be attributable to approved
+   glyph/effect masks; classify unwanted halos, non-glyph background deltas,
+   square blocks, box-edge seams, foreign artwork or source-script redraw as
+   hard failures. Compute outside-mask/protected-art/overlap/alpha deltas and
+   examine lossless contact crops; a machine zero cannot overrule a visible
+   defect. Do not silently widen the allowed mask to absorb an artifact.
+9. **Persisted DDS decode/mipmap presentation gate:** encode with the required
+   original native dimensions, format, alpha, MIPs and RAW sprite orientation;
+   re-decode **the actual saved DDS bytes**. Verify no BC/DXT block pinholes or
+   damaged strokes, glyph clipping, 1-pixel intrusion, bad slant, plate residue,
+   patch artifacts or readability loss at native, high zoom, 100/75/50-percent
+   practical display and authored MIP levels. Record exact source and candidate
+   SHA-256.
+10. **Independent C/C3 and user-preview handoff:** submit only candidates with
+    both plate-only and composite gates PASS (or stop as REWORK/MANUAL required).
+    Independent C then C3 inspect the exact bytes. Provide a distinctly labeled
+    **USER_REVIEW_NOT_APPROVED** in-game preview when eligible, *before* user
+    acceptance, without claiming current evidence-backed final approval.
+    Final approved export remains guarded by `qa_evidence_gate.py` and actual
+    game-validation requirements; neither historic C3 status nor preview
+    packaging can promote an asset.
+
+**Mandatory explicit defect codes** (write in per-asset producer QA findings,
+C findings and queue/backlog evidence when observed; never fabricate a count):
+
+- `SOURCE_RESIDUE_UNDER_KOREAN`: any English/source glyph, outline or
+  source-style shadow/glow ghost beneath or beside Korean text.
+- `INCOMPLETE_CLEAN_PLATE`: source lettering/background restoration leaves
+  visible smear, erased detail, brightness/alpha discontinuity or residue.
+- `FOREIGN_BOX_ARTIFACT`: a foreign UI/image chunk or extraneous graphic box
+  has been composited with the lettering.
+- `BACKGROUND_PATCH_INTRUSION`: copied/painted background patch changes
+  adjoining original/protected artwork, palette, alpha or plate continuity.
+- `RECTANGULAR_COMPOSITE_TRACE`: visible rectangular edge, luminance/alpha
+  block or crop boundary introduced by composition.
+
+Each code is **hard producer FAIL** for confirmed visual defects, even with
+zero changed pixels outside a coarse bbox. Use `HOLD_STRICT_RECHECK` when exact
+source/clean/effect-mask evidence is unavailable rather than inventing a PASS.
+The presence of a legitimate rectangular editing window alone is *not* a
+defect if persisted pixels are visually correct and remain within justified
+source-derived restoration and glyph masks.
+
+**Mandatory evidence handoff:** retain separate SOURCE/CLEAN and CLEAN/FINAL
+lossless comparisons, SOURCE/FINAL for style/hierarchy, source glyph mask,
+protected mask, justified final effect mask, actual saved DDS decoded views,
+RAW/readable and practical size/mip views, SHA hashes, concrete per-stage
+PASS/FAIL/HOLD and the defect code(s). A/B must reject and correct any bad
+CLEAN plate *before* trying new Hangul styles. C should reproduce the two
+independent comparisons, not accept producer-PASS prose as visual proof.
+
+**Source-family propagation / repeat rejection:** validate one representative
+persisted-DDS candidate against its native English family before batch-producing
+the same UI style. Two independently recorded C rejections with the **same
+visual root-cause family** require `METHOD_CHANGE_REQUIRED` under
+`docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md`: stop same-method rerenders
+and explicitly record a different source-conditioned or manual/vector approach.
+Do not rerender a currently held, unchanged good DDS merely to migrate QA
+evidence. When a rerender is blocked, A/B may select another ready, independent
+asset according to their existing shard rules.
+
+**Production metric priority:** report (a) new/materially revised candidate
+DDS with current SHA, (b) independent current-byte C/C3 reviews and passes,
+(c) defect recurrence by root cause, (d) current evidence-approved export,
+(e) preview DDS included and user feedback, (f) actual in-game closures.
+DDS file count, repeated rerender attempts, previews and historical C3 labels
+must never be reported as final approval or completed runtime validation.
+
 ## Required construction flow
 
 For every newly localized or materially reworked graphics element:
