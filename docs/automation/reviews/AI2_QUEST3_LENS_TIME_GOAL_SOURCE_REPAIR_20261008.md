@@ -39,3 +39,9 @@ The correction resolves **source-proven owner and sibling propagation gaps**, no
 
 ## Outcome
 **Implementation committed.** Source tests must be interpreted per exact commit; CI IDs/artifact appended only after verified conclusion.
+
+## Additional archived symptoms checked after P0 CI: start shadows and SkyGlow
+
+- Starting/car-selection base shadows: original `emoose/OutRun2006Tweaks/src/hooks_graphics.cpp::RestoreCarBaseShadow` intentionally reconstructs Xbox/C2C base shadow via `DrawObjectAlpha_Internal`. Current fork keeps original three exact calls `0x69EB4`, `0x6AC76`, `0x6B766` and adds only `WorldParticle` scope. The active R30 considers that exact scope spatial, separate from ScreenHud/lens. This establishes the known source ownership but **does not prove** two physical draws are incorrectly generated; broad suppression would break a valid vehicle/world shadow and should not be bundled blindly with this change.
+- SkyGlow: `src/hooks_graphics.cpp` defaults `SkyGlowFactor=4`; active R30 `R30CaptureSkyGlowSceneBeforeHud` snapshots each eye's pre-HUD scene once per `PresentEpoch`, while `R30ApplyStereoSkyGlow` runs on Present. Exact F11 and new flat lens/HUD owners trigger the same pre-HUD capture path, not a second copy of the original sun mesh. Bloom halo may *look* like lens duplication and should be differentiated via one same-SHA factor=0 vs factor=4 session, but is **not source-proven** to cause the user's double-flare artifact. Therefore no unproven exposure or bloom scalar change was made.
+- Game-independent double rendering of a real spatial billboard (shadow, lens with valid RHW depth) would require showing matching queued producer and left/right render owner on **one** exact user trace; no Quest 3 log was supplied with this request. The material lens/+TIME/goal fix above remains the verified source change. **Other historical 00519 symptoms must not be declared fully resolved based on these additional source inspections.**
