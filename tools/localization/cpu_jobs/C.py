@@ -10,8 +10,8 @@ out=base/"localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY"
 out.mkdir(parents=True,exist_ok=True)
 triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","172"],capture_output=True,text=True,check=True)
 triage_report=json.loads(triage.stdout)
-assert len(triage_report["assets"])==1 and triage_report["assets"][0]["index"]==172 and triage_report["assets"][0]["next_action"]=="EVIDENCE_ONLY_HOLD", t
-(out/"C291_Q172_TRIAGE.json").write_text(json.dumps(t,ensure_ascii=False,indent=2)+"\n")
+assert len(triage_report["assets"])==1 and triage_report["assets"][0]["index"]==172 and triage_report["assets"][0]["next_action"]=="EVIDENCE_ONLY_HOLD", triage_report
+(out/"C291_Q172_TRIAGE.json").write_text(json.dumps(triage_report,ensure_ascii=False,indent=2)+"\n")
 source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 with urllib.request.urlopen(source_url,timeout=120) as f: source_bytes=f.read()
 candidate=base/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
