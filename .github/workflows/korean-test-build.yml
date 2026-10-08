@@ -214,13 +214,7 @@ jobs:
             if (@('localize_text', 'hangul_name_entry') -notcontains [string]$row.action) { continue }
             $index = ([string]$row.index).Trim([char]0xFEFF).Trim()
             $asset = ([string]$row.path).Replace([char]92, '/')
-            if ($asset -notmatch '^textures/load/[a-zA-Z0-9_./-]+\.dds
-        with:
-          name: OutRun2-Korean-${{ steps.graphics.outputs.mode }}-${{ github.sha }}
-          path: build/bin/
-          compression-level: 9
-          retention-days: 30
- -or $asset.Contains('..')) {
+            if ($asset -notmatch '^textures/load/[a-zA-Z0-9_./-]+\.dds$' -or $asset.Contains('..')) {
               throw "Unsafe user-review asset path q${index}: $asset"
             }
             if ($seenPaths.ContainsKey($asset)) {
