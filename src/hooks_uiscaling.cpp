@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/hud_semantics.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 
