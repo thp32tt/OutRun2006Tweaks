@@ -1,0 +1,7 @@
+# Rework convergence rules (2026-10-08)
+
+A/B selection should use `python tools/localization/rework_triage.py --index N` after refreshing Git. `EVIDENCE_ONLY_HOLD` means gather missing visual proof against unchanged DDS bytes; it does not require a new DDS. `FRESH_C_REVIEW` means independent C inspection. `VALIDATION_ONLY` means current evidence and actual in-game retest are still necessary. `MATERIAL_REWORK` means correct the failed construction stage.
+
+`METHOD_CHANGE_REQUIRED` means two distinct recorded C rejections share a visual root-cause family. Do not repeat the previously rejected technique. First measure a source-derived profile (native reference, readable slant, proportions, stroke weight, plate continuity, outline, shadow, gradient, and RAW view), then materially change the renderer or use manual reconstruction. Re-run producer QA, independent C/C3 and real game retest. Record specific review evidence in `localization/graphics/REWORK_ESCALATIONS.json`; never invent past rejections.
+
+`PRESERVE_ORIGINAL` is not a Korean DDS production target. This triage is read-only and cannot mark PASS, close an in-game defect, or change A/B/C1/C2 scheduling. Completion reports must distinguish produced DDS, current evidence-backed approval, remaining user-visible defect and actual game validation. Repeat inspection of unchanged SHA without new evidence is not additional completed work.
