@@ -3447,8 +3447,10 @@ namespace
 
             if (!exitProcessHook_)
             {
-                if (auto* exitProc =
-                        GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess"))
+                // ExitProcess is a core Win32 export, but an unavailable
+                // module handle must not be forwarded into GetProcAddress.
+                if (HMODULE kernel32 = GetModuleHandleA("kernel32.dll"))
+                if (auto* exitProc = GetProcAddress(kernel32, "ExitProcess"))
                 {
                     exitProcessHook_ =
                         safetyhook::create_inline(exitProc, exit_process_hook);

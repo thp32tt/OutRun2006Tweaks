@@ -633,8 +633,15 @@ class DemonwareServerOverride : public Hook
 	{
 		InitNetwork.call();
 
-		WSADATA tmp;
-		WSAStartup(0x202, &tmp);
+		WSADATA tmp{};
+		const int wsaStatus = WSAStartup(0x202, &tmp);
+		if (wsaStatus != 0)
+		{
+			// Optional port forwarding cannot safely start after a failed
+			// socket-stack initialization. Keep the game's network owner intact.
+			spdlog::warn("DemonwareServerOverride: WSAStartup failed ({}); skipping UPnP refresh", wsaStatus);
+			return;
+		}
 
 		// Try port forwarding on UPnP thread.
 		UPnP::refresh();

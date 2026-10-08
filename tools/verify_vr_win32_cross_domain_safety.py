@@ -23,7 +23,12 @@ def verify(source):
        ("timer wait has finite QPC slice", "std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)" in fps),
        ("file loader lock failure refuses hook install",
         "if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))" in source["src/hooks_bugfixes.cpp"] and
-        "FixFileLoadRace: unable to initialize request-list lock" in source["src/hooks_bugfixes.cpp"])
+        "FixFileLoadRace: unable to initialize request-list lock" in source["src/hooks_bugfixes.cpp"]),
+       ("network hook checks WSAStartup result", "const int wsaStatus = WSAStartup(0x202, &tmp);" in source["src/hooks_misc.cpp"] and
+        "if (wsaStatus != 0)" in source["src/hooks_misc.cpp"]),
+       ("wheel exit hook validates kernel32 handle",
+        'if (HMODULE kernel32 = GetModuleHandleA("kernel32.dll"))' in source["src/hooks_wheel_ffb.cpp"] and
+        'GetProcAddress(kernel32, "ExitProcess")' in source["src/hooks_wheel_ffb.cpp"])
     ]
     for label,ok in checks:
         if not ok:raise ValueError(label)
@@ -45,7 +50,9 @@ def negatives(src):
       ("src/hooks_bugfixes.cpp","if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))"),
       ("src/hooks_framerate.cpp","if (!SetWaitableTimerEx(Timer, &due, 0, NULL, NULL, NULL, 0))"),
       ("src/hooks_framerate.cpp","WaitForSingleObject(Timer, waitBudgetMs) != WAIT_OBJECT_0"),
-      ("src/hooks_framerate.cpp","std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)")]
+      ("src/hooks_framerate.cpp","std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)"),
+      ("src/hooks_misc.cpp","if (wsaStatus != 0)"),
+      ("src/hooks_wheel_ffb.cpp",'if (HMODULE kernel32 = GetModuleHandleA("kernel32.dll"))')]
     for path,token in cases:
        copy=dict(src)
        copy[path]=src[path].replace(token,"__FAIL_CROSS_SOURCE_GUARD__",1)
@@ -56,9 +63,9 @@ def negatives(src):
     return len(cases)
 if __name__=="__main__":
     s={p:(ROOT/p).read_text(encoding="utf-8") for p in
-       ["src/hooks_drawdistance.cpp","src/hooks_framerate.cpp","src/hooks_bugfixes.cpp"]}
+       ["src/hooks_drawdistance.cpp","src/hooks_framerate.cpp","src/hooks_bugfixes.cpp","src/hooks_misc.cpp","src/hooks_wheel_ffb.cpp"]}
     try:
         n=verify(s)
         m=negatives(s) if "--self-test" in sys.argv[1:] else 0
     except ValueError as e:sys.exit("Win32 cross-domain contract FAIL: "+str(e))
-    print(f"Win32 cross-domain contracts PASS: {n}, mutation-negative={m}/13, runtime UNTESTED")
+    print(f"Win32 cross-domain contracts PASS: {n}, mutation-negative={m}/15, runtime UNTESTED")
