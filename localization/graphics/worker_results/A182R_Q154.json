@@ -1,0 +1,12 @@
+{
+  "role": "A",
+  "run": "20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE",
+  "queue_index": 154,
+  "asset": "4D38BBB0",
+  "work_stolen_from_lane": "B",
+  "before": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+  "after": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "status": "A182R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "report": "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/A182R_Q154_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
