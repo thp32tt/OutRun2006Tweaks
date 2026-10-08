@@ -550,7 +550,8 @@ def verify_r64_exact_sprite_isolation(ui_source, sem_source):
                 'R64 DispRank kind0 category not preserved across queue')
     starter = function_body(ui_source, 'static DWORD WINAPI InstallThread(')
     for token in ('0x55B218', 'vtable[9]', 'vtable[10]',
-                  'safetyhook::create_inline('):
+                  'safetyhook::create_inline(',
+                  'vtable[9], reinterpret_cast<void*>(&DrawDest)'):
         require(token, starter, 'R64 hooked original D3DXSprite vtable/ABI')
 
 verify_r64_exact_sprite_isolation(ui, sem)
