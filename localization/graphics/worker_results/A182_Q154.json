@@ -6,7 +6,8 @@
   "work_stolen_from_lane": "B",
   "before": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
   "after": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
-  "status": "A182_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "status": "A182_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_AND_INGAME",
   "report": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_Q154_REPORT.json",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "controller_qa": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_CONTROLLER_SELF_QA.json"
 }

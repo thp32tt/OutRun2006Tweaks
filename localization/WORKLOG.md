@@ -3460,3 +3460,11 @@ Applied user-authorized production/QA improvements without changing six launches
 - Blind calibration 5/5 PASS before answer key. Exact current/source SHA + native persisted DDS re-decode: machine gates still PASS (outside/alpha/protected=0).
 - Native 1x/2x/50%/RAW visual review FAILS all three gray rows for excessive block weight and reduced counter-space versus source; visual FAIL overrides numeric PASS. q154 -> REWORK_REQUIRED, C3 BLOCKED. Red rows/candidate bytes were not modified.
 - Required B repair: gray rows only, lighter/narrower source-faithful strokes and open counters while preserving C141 clean, gray color, source-left/upright layout, bbox/margins and mirror-Y. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-08 — A182 q154 gray weight/counter-space controller sync
+- Refreshed current Git/queue before selection. A primary odd material shard had no unclaimed production target: q59 was already materially repaired by B249 at commit `3675ad155e48eae1170a87767f52f982df079276`, so A did not repeat it. The newly completed A182 work-steal result for C268 q154 was consumed instead.
+- A182 candidate `dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64` rerenders only SINGLE PLAYER / SHOWROOM / MULTIPLAYER gray rows from the exact C141 clean plate using Noto Sans CJK KR Medium, zero added stroke and the source gray/upright/source-left family. B225 red rows and non-gray pixels remain exact.
+- Machine QA PASS: 3/3 source bbox+size+positive margins; changed/alpha outside=0; protected-visible=0; red-family changes=0; exact header/mip1/persisted decode/raw mirror-Y PASS.
+- Controller visual QA PASS on SOURCE/B225/CLEAN/A182, practical 100/75/50 and SOURCE_RAW/B225_RAW/A182_RAW: the three gray Korean rows are materially lighter/narrower with more open counter-space, remain readable at practical scale, and show no broken Hangul, residue, clipping, overlap, protected-art intrusion or orientation regression.
+- Reconciled the stale q59 queue status to the already-produced B249 candidate `4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8` without changing its bytes. Both q154 and q59 now require fresh independent C (C2/C1 respectively), exact-SHA C3, refreshed PRE_INGAME/user JPG and NEW actual-game retest. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

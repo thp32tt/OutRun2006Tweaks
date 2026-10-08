@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T08:15:50+09:00",
+  "updated_at_kst": "2026-10-08T09:05:37+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Evidence gate remains active. Fresh C2 must independently revalidate A182 q154 4D38BBB0 dd4a3719... gray weight/counter-space, and fresh C1 must revalidate B249 q59 7CE1CFC5 4a657e39... zero-overflow repair; then exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -6577,5 +6577,34 @@
     "controller_report": "localization/graphics/role_C/20261008-C268-C2-Q154-EVIDENCE/C268_Q154_CONTROLLER_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a182_q154_gray_weight_counterspace": {
+    "run": "20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE",
+    "role": "A",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "work_stolen_from_lane": "B",
+    "worker_commit": "6c7f9693508d2152427a4c1c95642bdfa58d7162",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "candidate_sha256": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+    "machine_qa": "PASS_3_OF_3_ZERO_OUTSIDE_ALPHA_PROTECTED_RED_CHANGE_HEADER_RAW",
+    "controller_visual_qa": "PASS_SOURCE_B225_CLEAN_A182_PRACTICAL_RAW",
+    "controller_report": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_CONTROLLER_SELF_QA.json",
+    "status": "A182_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b249_q59_zero_overflow_reconciled": {
+    "run": "20261008-B249-Q059-ZERO-OVERFLOW",
+    "role": "B",
+    "queue_index": 59,
+    "asset": "7CE1CFC5",
+    "material_commit": "3675ad155e48eae1170a87767f52f982df079276",
+    "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+    "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_VISIBLE_INTERIOR_DELTA",
+    "controller_visual_qa": "PASS",
+    "status": "B249_SELF_QA_PASS_PENDING_FRESH_C1_C3_PRE_INGAME_USER_JPG_INGAME_RETEST",
+    "runtime_validation": "UNTESTED"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": 131,
+  "schema_version": 132,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.",
+    "Evidence gate remains active. Fresh C2 must independently revalidate A182 q154 4D38BBB0 dd4a3719... gray weight/counter-space, and fresh C1 must revalidate B249 q59 7CE1CFC5 4a657e39... zero-overflow repair; then exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "A181R q219 D263B3F1 41cf4c15853e producer machine+controller visual PASS with exact Noto CJK Bold. 코스 선택 is 80.03% source width inside exact 1467x118 with positive margins; validated A113 clean/right-silver-techno family preserved. Next fresh C1 + exact-SHA C3 -> PRE_INGAME/user JPG -> NEW in-game retest. IGR-025 overall mapping HOLD remains for screenshot(163) unresolved labels. RUNTIME_VALIDATION=UNTESTED.",
     "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
     "C264 q172 6C9B3611 963445a4... returned REWORK_REQUIRED: START->출발 is 40.74% and GOAL->골 24.68% of source width. Material rework then fresh C2 + C3.",
@@ -4061,10 +4061,8 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 0,
-  "current_producer_rework_remaining": 1,
-  "current_producer_rework_assets": [
-    "7CE1CFC5"
-  ],
+  "current_producer_rework_remaining": 0,
+  "current_producer_rework_assets": [],
   "latest_b_production": {
     "run": "20261008-B248-Q172-SCALE-RESTORE",
     "timestamp_kst": "2026-10-08T07:58:06+09:00",
@@ -4224,7 +4222,9 @@
     "C4A2937B",
     "EBEF6D20",
     "A8CE339F",
-    "6C9B3611"
+    "6C9B3611",
+    "7CE1CFC5",
+    "4D38BBB0"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6741,7 +6741,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T08:15:50+09:00",
+  "updated_at_kst": "2026-10-08T09:05:37+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9610,38 +9610,20 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "timestamp_kst": "2026-10-08T04:16:20+09:00",
+    "timestamp_kst": "2026-10-08T09:05:37+09:00",
+    "run": "20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE",
     "role": "A",
-    "run": "20261008-A179-Q102-SELECTOR-HIERARCHY",
-    "queue_index": 102,
-    "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
     "work_stolen_from_lane": "B",
-    "selection_reason": "A ODD shard exhausted material work; q212 changed in current B cycle; q102 was the oldest unchanged C-returned material REWORK.",
-    "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
-    "prior_candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
-    "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
-    "preserved_time_attack": "PIXEL_EXACT",
-    "continuous_15": {
-      "source_size": [
-        1070,
-        113
-      ],
-      "localized_size": [
-        809,
-        104
-      ],
-      "margins": [
-        130,
-        131,
-        8,
-        1
-      ],
-      "width_ratio": 0.7561,
-      "prior_width_ratio": 0.4206
-    },
-    "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_BC3_OUTSIDE_0_HEADER_RAW",
-    "controller_visual_qa": "PASS_SOURCE_STYLE_HIERARCHY_PRACTICAL_RAW",
-    "status": "A179_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "worker_commit": "6c7f9693508d2152427a4c1c95642bdfa58d7162",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "candidate_sha256": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+    "machine_qa": "PASS_3_OF_3_ZERO_OUTSIDE_ALPHA_PROTECTED_RED_CHANGE_HEADER_RAW",
+    "controller_visual_qa": "PASS_SOURCE_B225_CLEAN_A182_PRACTICAL_RAW",
+    "controller_report": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_CONTROLLER_SELF_QA.json",
+    "status": "A182_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -10700,6 +10682,23 @@
     "c3": "BLOCKED",
     "execution_backend": "N100_MCP_MEMORY_STREAM_FALLBACK_AFTER_HOSTED_CPU_WORKER_UNAVAILABLE",
     "controller_report": "localization/graphics/role_C/20261008-C268-C2-Q154-EVIDENCE/C268_Q154_CONTROLLER_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a182_q154_gray_weight_counterspace": {
+    "run": "20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE",
+    "role": "A",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "work_stolen_from_lane": "B",
+    "worker_commit": "6c7f9693508d2152427a4c1c95642bdfa58d7162",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "candidate_sha256": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+    "machine_qa": "PASS_3_OF_3_ZERO_OUTSIDE_ALPHA_PROTECTED_RED_CHANGE_HEADER_RAW",
+    "controller_visual_qa": "PASS_SOURCE_B225_CLEAN_A182_PRACTICAL_RAW",
+    "controller_report": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_CONTROLLER_SELF_QA.json",
+    "status": "A182_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
