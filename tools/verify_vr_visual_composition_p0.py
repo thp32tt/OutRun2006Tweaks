@@ -840,4 +840,118 @@ require('ExactScreenHud_putClipSprite', ui,
         'stage/result clip ScreenHud wrapper')
 
 
+# Exact original producer -> original Sumo_Printf text -> glyph queue ->
+# R30 mono/stereo head-lock path. Previously the label's exact ScreenHud
+# provenance could still be vetoed by a stale verified-world shader/c64 state,
+# and masked sibling sprites from the same glyph call stayed untagged.
+# The pinned PE32 manifest already confirms all three stage/result text
+# producers target Sumo_Printf (0x2CDD0), and 0x2C808/0x2C9DB target
+# put_sprite_ex (0x2CFE0). Do not add broad 0x97000 range heuristics.
+def check_time_goal_lens_owner(source_r30, source_ui):
+    shader = function_body(source_r30, 'R30ScreenSpaceKind R30ClassifyScreenSpacePass(')
+    fixed = function_body(source_r30, 'bool R30ConfigureXyzrhwWorldEffect(')
+    glyph = function_body(source_ui, 'static int __cdecl TextGlyph_putSprite(')
+    for token in (
+        'const bool exactSceneEffect =',
+        'RenderScope::SceneEffect',
+        'CorroboratesProjectedScreenEffect(',
+        'else if (exactSceneEffect)',
+        'state.rhwDepthEvidence &&',
+        '!R30XyzrhwLooksLikeHudPlane(',
+        '!exactSceneEffect)',
+    ):
+        require(token, fixed, 'EXE-owned lens/scene fixed XYZRHW exact classification')
+    if fixed.index('else if (exactSceneEffect)') > fixed.index('if (!state.worldEffect &&'):
+        raise SystemExit('P0 lens XYZRHW exact semantic accepted too late')
+    for token in (
+        'const bool semanticHud =',
+        'if (semanticWorld)',
+        'if (semanticHud)',
+        'return R30ScreenSpaceKind::PerspectiveHud;',
+    ):
+        require(token, shader, 'shader HUD/world owner boundary')
+    precise_hud = shader[shader.index('if (semanticHud)'):]
+    for forbidden in (
+        'if (CurrentDrawMatchesVerifiedWorld(device))',
+        'if (R28CanRebindVerifiedWorld(',
+    ):
+        if forbidden in precise_hud:
+            raise SystemExit(
+                'P0 +TIME/goal semantic ScreenHud wrongly vetoed by world state: ' +
+                forbidden)
+    # World still has both strict authority gates before the exact HUD branch.
+    world_before_hud = shader[shader.index('if (semanticWorld)'):
+                               shader.index('if (semanticHud)')]
+    for token in (
+        'CurrentDrawMatchesVerifiedWorld(device)',
+        'R28CanRebindVerifiedWorld(',
+    ):
+        require(token, world_before_hud, 'world effects must retain verified-world gate')
+    require_order(glyph, 'Sumo glyph all-child scope after original put_sprite_ex',
+                  'tailsBefore', 'Module::exe_ptr(0x2CFE0)',
+                  'const int result = original(args, priority);',
+                  'TagAppendedNodes(tailsBefore,',
+                  'RenderScope::ScreenHud',
+                  'ProducerToken::TextGlyphPutSprite')
+    for token in ('Game::SpritePriorityCount', 'TagAppendedNodes(tailsBefore,'):
+        require(token, glyph, 'all stage/result +TIME glyph/mask children same HUD')
+    for token in (
+        '0x000975EE', '0x00097727', '0x000977FB',
+        '0x00097BB7', '0x00097DA7',
+        '0x0002C808', '0x0002C9DB',
+    ):
+        require(token, binary_contract, 'original EXE Sumo text/glyph/clip identity')
+
+check_time_goal_lens_owner(r30, ui)
+
+# Four *distinct*, exactly-once fault injections. These do not repeat an
+# unchanged-source static audit 1000/5000 times.
+def inject_one_function_token(source, signature, token, replacement):
+    begin = source.index(signature)
+    brace = source.index('{', begin)
+    depth = 0
+    end = None
+    for i in range(brace, len(source)):
+        if source[i] == '{':
+            depth += 1
+        elif source[i] == '}':
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    if end is None:
+        raise SystemExit('P0 lens/HUD injection: malformed function')
+    part = source[begin:end]
+    if token not in part:
+        raise SystemExit('P0 lens/HUD injection setup missing ' + token)
+    return source[:begin] + part.replace(token, replacement, 1) + source[end:]
+
+for label, broken_r30, broken_ui in (
+    ('missing exact lens fixed semantic',
+     inject_one_function_token(
+         r30, 'bool R30ConfigureXyzrhwWorldEffect(',
+         'else if (exactSceneEffect)', 'else if (false)'), ui),
+    ('lens depth evidence bypass',
+     inject_one_function_token(
+         r30, 'bool R30ConfigureXyzrhwWorldEffect(',
+         'state.rhwDepthEvidence &&',
+         'true ||'), ui),
+    ('time-goal HUD world veto resurrected',
+     inject_one_function_token(
+         r30, 'R30ScreenSpaceKind R30ClassifyScreenSpacePass(',
+         '++R44FlatOverlayClassifications;',
+         'if (CurrentDrawMatchesVerifiedWorld(device)) return R30ScreenSpaceKind::None;\n            ++R44FlatOverlayClassifications;'), ui),
+    ('stage text glyph siblings untagged',
+     r30, inject_one_function_token(
+         ui, 'static int __cdecl TextGlyph_putSprite(',
+         'TagAppendedNodes(tailsBefore,', '/* injected missing glyph siblings */')),
+):
+    try:
+        check_time_goal_lens_owner(broken_r30, broken_ui)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 source fault injection unexpectedly passed: ' + label)
+
+
 print('P0 visual composition static contract: PASS')
