@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C271",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T09:58:07+09:00",
+  "queue_index": 59,
+  "asset": "7CE1CFC5",
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "calibration_reference": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/C269_CALIBRATION_RESULT.json",
+  "calibration_note": "Same AI 1 reviewer previously detected normal vs all four defect controls 5/5. That calibration explicitly did not authorize PASS, and this run does not use it to authorize PASS.",
+  "sequencing": {
+    "pixels_before_producer_verdict": false,
+    "reason": "The live queue/producer history was necessarily read during this invocation before exact-pixel first-look. Current policy therefore forbids a PASS/approval claim from this invocation; no such claim is made."
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C271-C1-Q059-EVIDENCE/C271_Q059_MACHINE_QA.json",
+  "evidence": {
+    "source_current_fixed": {
+      "path": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg",
+      "sha256": "763370e051c2d8ebf97725bb85e81c6fbed087a5c26d79179fdd0756a7abd3cd"
+    },
+    "practical": {
+      "path": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg",
+      "sha256": "6d062023eadc86f54e7f3c8b7d79f30e6d8937f2fb60f64556e70c63673495c7"
+    },
+    "raw_flipy": {
+      "path": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg",
+      "sha256": "2dfd661b8e535f421778acdd06aa05471995bcd41698090d463ac1ec45b52aa1"
+    },
+    "boundary": {
+      "path": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_BOUNDARY_REPAIR_ZOOM.png",
+      "sha256": "db762f8a9fe13d878228d8bb01c2d6464316a7bdcf8f935f3377f56aa4ac0fdd"
+    },
+    "black_white_gray": {
+      "path": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_BLACK_WHITE_GRAY.png",
+      "sha256": "15005ce9de2d3e9e3535b7a6adbb5f013dc03e4f6b1817258b1b303601a0ef9a"
+    }
+  },
+  "stages": {
+    "C": {
+      "review_id": "C271-Q059-C-FIRST-PASS",
+      "reviewer": "ChatGPT AI 1",
+      "calibration_reference": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/C269_CALIBRATION_RESULT.json",
+      "pixels_before_producer_verdict": false,
+      "findings": {
+        "next_mission": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean remains consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "Verified A25 clean-plate provenance remains clean in the reviewed target footprint; no visible English ghost or rectangular plate seam observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: the current 다음 미션 remains a much narrower/flatter title than the dominant extended source NEXT MISSION family; source-relative hierarchy and restrained orange/white/yellow keyline-depth treatment are not faithfully restored.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Hangul remains immediately legible at native and practical 100/75/50 review sizes.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No broken Hangul, missing stroke, tofu, or clipped glyph fragment observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "Cars, speed streaks and non-target art show no visible intrusion; exact decoded scope outside the four source bboxes is unchanged.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "placement": {
+            "result": "FAIL",
+            "observation": "FAIL: horizontal presentation materially underfills the source title hierarchy even though it remains geometrically contained.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y construction and readable orientation remain consistent.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg"
+          }
+        },
+        "race_rivals": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean remains consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "Verified A25 clean-plate provenance remains clean in the reviewed target footprint; no visible English ghost or rectangular plate seam observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: source small-label family has a prominent white outer keyline/halo plus navy depth; current Korean label is visually flatter with substantially weaker white-keyline treatment.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Hangul remains immediately legible at native and practical 100/75/50 review sizes.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No broken Hangul, missing stroke, tofu, or clipped glyph fragment observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "Cars, speed streaks and non-target art show no visible intrusion; exact decoded scope outside the four source bboxes is unchanged.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Placement remains inside the source footprint with no visible overlap or border collision.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y construction and readable orientation remain consistent.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg"
+          }
+        },
+        "drift_score": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean remains consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "Verified A25 clean-plate provenance remains clean in the reviewed target footprint; no visible English ghost or rectangular plate seam observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: source small-label family has a prominent white outer keyline/halo plus navy depth; current Korean label is visually flatter with substantially weaker white-keyline treatment.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Hangul remains immediately legible at native and practical 100/75/50 review sizes.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No broken Hangul, missing stroke, tofu, or clipped glyph fragment observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "Cars, speed streaks and non-target art show no visible intrusion; exact decoded scope outside the four source bboxes is unchanged.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Placement remains inside the source footprint with no visible overlap or border collision.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y construction and readable orientation remain consistent.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg"
+          }
+        },
+        "slipstream_score": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean remains consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "Verified A25 clean-plate provenance remains clean in the reviewed target footprint; no visible English ghost or rectangular plate seam observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: source small-label family has a prominent white outer keyline/halo plus navy depth; current Korean label is visually flatter with substantially weaker white-keyline treatment.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Hangul remains immediately legible at native and practical 100/75/50 review sizes.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No broken Hangul, missing stroke, tofu, or clipped glyph fragment observed.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "Cars, speed streaks and non-target art show no visible intrusion; exact decoded scope outside the four source bboxes is unchanged.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Placement remains inside the source footprint with no visible overlap or border collision.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y construction and readable orientation remain consistent.",
+            "evidence": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg"
+          }
+        }
+      },
+      "result": "FAIL_VISUAL_SOURCE_STYLE_HIERARCHY_EFFECT_FIDELITY"
+    },
+    "C3": {
+      "result": "BLOCKED_AFTER_C_FAIL",
+      "review_id": null,
+      "prior_defect_observation": "PJR-019 remains open; C3 is not executed after a fresh C visual failure."
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "required_rework": [
+    "Preserve the B249 zero-overflow DXT5 boundary repair and verified A25 clean plate.",
+    "Rebuild all four Korean labels with source-family effect fidelity inside the exact source bboxes; small rows need the source's strong white-keyline/halo + navy-depth relationship.",
+    "Restore 다음 미션 source-relative title width/hierarchy and a restrained source-faithful orange/white/yellow keyline-depth treatment without reintroducing the user-rejected excessive internal shading.",
+    "Re-run exact decoded outside/alpha/protected gates, then a future C1 must inspect pixels before producer verdict; only then run separate C3, PRE_INGAME/user JPG review and NEW actual-game validation."
+  ],
+  "stop_reason": "Material four-label producer rerender is too large for a safe C corrective edit; batch stops after q59 rather than abbreviating evidence or stealing another shard.",
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED_C_FAIL",
+  "candidate_changed_by_C": false,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
