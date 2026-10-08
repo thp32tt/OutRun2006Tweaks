@@ -16,6 +16,10 @@ ESCALATIONS = Path('localization/graphics/REWORK_ESCALATIONS.json')
 def load_rows(repo):
     with (Path(repo) / QUEUE).open(encoding='utf-8-sig', newline='') as handle:
         rows = list(csv.DictReader(handle))
+    # The queue contains occasional embedded UTF-8 BOMs in later index cells,
+    # not just at the file start. Normalize before duplicate checks and int().
+    for row in rows:
+        row['index'] = row['index'].lstrip('\ufeff').strip()
     ids = [r['index'] for r in rows]
     if len(ids) != len(set(ids)):
         raise ValueError('Duplicate queue indexes')
