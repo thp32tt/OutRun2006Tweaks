@@ -1243,7 +1243,11 @@ bool NativeFixedFunctionTextureView::upload_full_discard(
     UINT sourceRowPitch,
     UINT sourceRows) noexcept {
 
+    // R153: deferred Map/Unmap records a command list, not a live
+    // immediate-context texture upload. Never advance content generation
+    // on a deferred context even when it belongs to the same device.
     if (!ready() || !context || !source ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
         sourceRowPitch == 0 || sourceRows == 0)
         return false;
 
