@@ -12541,6 +12541,19 @@ VSOutput main(VSInput input)
         observedDesc.CPUAccessFlags == D3D11_CPU_ACCESS_WRITE,
         "constant-buffer descriptor contract");
 
+    // R151 negative control: a same-device deferred context can record VS b0,
+    // but must never be accepted as the live immediate-context owner.
+    ID3D11DeviceContext* r151DeferredContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(0, &r151DeferredContext)) &&
+        r151DeferredContext != nullptr &&
+        r151DeferredContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R151 WARP same-device deferred context prerequisite");
+    require(
+        !owner.upload_and_bind(r151DeferredContext, transform) &&
+        owner.upload_generation() == 0,
+        "R151 deferred WVP upload must fail closed without advancing generation");
+
     DevicePair otherDevice = create_warp_device();
     require(
         !owner.upload_and_bind(otherDevice.context, transform),
@@ -12562,6 +12575,27 @@ VSOutput main(VSInput input)
         "R96 owner upload and b0 bind");
     require(owner.upload_generation() == 1,
             "R96 successful upload generation");
+
+    const auto r151ImmediateReceipt =
+        owner.binding_readiness(d3d.context, transform);
+    require(
+        r151ImmediateReceipt.ready && r151ImmediateReceipt.snapshotToken != 0 &&
+        owner.validate_binding_snapshot(
+            d3d.context, transform, r151ImmediateReceipt.snapshotToken),
+        "R151 WARP immediate WVP b0 receipt positive control");
+    ID3D11Buffer* r151RecordedBuffer = owner.buffer();
+    r151DeferredContext->VSSetConstantBuffers(0, 1, &r151RecordedBuffer);
+    const auto r151DeferredReceipt =
+        owner.binding_readiness(r151DeferredContext, transform);
+    require(
+        !r151DeferredReceipt.inputValid && !r151DeferredReceipt.ready &&
+        r151DeferredReceipt.snapshotToken == 0 &&
+        !owner.validate_binding_snapshot(
+            r151DeferredContext, transform, r151ImmediateReceipt.snapshotToken) &&
+        owner.validate_binding_snapshot(
+            d3d.context, transform, r151ImmediateReceipt.snapshotToken),
+        "R151 recorded same-device deferred VS b0 must not forge live WVP receipt");
+    r151DeferredContext->Release();
 
     ID3D11Buffer* boundBuffer = nullptr;
     d3d.context->VSGetConstantBuffers(0, 1, &boundBuffer);

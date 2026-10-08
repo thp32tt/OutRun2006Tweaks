@@ -1045,7 +1045,10 @@ bool NativeFixedFunctionTransformBuffer::upload_and_bind(
     ID3D11DeviceContext* context,
     const FixedFunctionTransformConstants& constants) noexcept {
 
-    if (!ready() || !context || !constants.exact())
+    // R151: deferred contexts record b0 updates; they cannot establish a
+    // live immediate-context WVP upload/binding receipt.
+    if (!ready() || !context || !constants.exact() ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
         return false;
 
     const auto payloadHash = hash_transform_payload_bytes(constants);
@@ -1092,7 +1095,10 @@ NativeFixedFunctionTransformBuffer::binding_readiness(
     const auto payloadHash = hash_transform_payload_bytes(constants);
     out.payloadHash = payloadHash;
     out.uploadGeneration = upload_generation_;
-    out.inputValid = context != nullptr && payloadHash != 0;
+    out.inputValid =
+        context != nullptr &&
+        context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE &&
+        payloadHash != 0;
     out.ownerReady = ready();
     out.payloadMatches = payloadHash != 0 && payload_hash_ == payloadHash;
     out.uploadPresent = upload_generation_ != 0 && payload_hash_ != 0;
