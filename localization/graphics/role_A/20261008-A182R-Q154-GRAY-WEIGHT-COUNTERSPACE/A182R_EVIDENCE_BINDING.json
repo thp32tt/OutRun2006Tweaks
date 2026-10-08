@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "run": "20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "provenance": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "c268_rejected_b225": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "a182_controller_precheck": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+    "a182r_final": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "images": {
+    "a182_comparison": {
+      "path": "localization/graphics/role_A/20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE/A182_Q154_GRAY_PRACTICAL_100_75_50.jpg",
+      "panels": [
+        "SOURCE",
+        "B225_REJECTED",
+        "A182_PRECHECK"
+      ]
+    },
+    "a182r_comparison": {
+      "path": "localization/graphics/role_A/20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE/A182R_Q154_GRAY_PRACTICAL_100_75_50.jpg",
+      "panels": [
+        "SOURCE",
+        "A182_PRECHECK",
+        "A182R_FINAL"
+      ],
+      "stale_middle_caption": "B225",
+      "authoritative_middle_sha": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64"
+    }
+  },
+  "note": "Panel provenance is bound by SHA here; fresh independent C must generate its own current-DDS evidence and does not inherit A producer approval."
+}
