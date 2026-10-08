@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C320 C1 q227 exact A198R first independent alpha-safe proof 3/16 regions, 3 BGW lossless composites published. CLEAN alpha0 for all selected; invisible RGB-only text must not be called game residue. C HOLD_STRICT_RECHECK awaiting remaining 13 lossless native BGW 75/50 RAW, family calibration and independently decoded exact DDS. localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
     "C319 q161 current A200 BC3 SHA 2d0fe080... fresh independent C1 REWORK_REQUIRED: 04/06 improved, unchanged cell08 염소자리,10 양자리,12 태국 retain native Hangul face pinhole/speckle; A must repair retained defective cells and audit rest of 36, fresh C1/C3 and exact game proof. localization/graphics/role_C/20261009-C319-Q161-A200-RETAINED-GLYPH-SPECKLE/C319_Q161_A200_CONTROLLER_C1_REWORK.json",
     "A200 q161 newly persisted 2048x2048 BC3 DDS 2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b replaces C314 rejected 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d in exactly 2 source-bound PISCES/LEO regions. 36 other Korean rows: 261038 unrelated compressed blocks byte-identical. Remove PISCES horizontal squeeze0.9091->1 native 물고기자리 198x43 vs source203x51; remove LEO 0.5682 squash by semantic shortening 사자 90x48 vs source105x51; exact flat gray RGB565 BC3 color and alpha from native glyph. Actual saved DDS core color/pinhole=0, outside-target changed/alpha/introduction/source ghost/overlap0, decoded alpha missing/extra0 and 2/2 bbox PASS, RAW/BGW/50/75/100 producer visual QA PASS; nomenclature shortened label requires independent C1/C3/user approval and game test. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json",
     "A199 P0 q121 FD90AA9 exact new DDS 4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8 fixes source-family title by native single WHITE right italic face + one BLACK lower-right depth; 3 titles increased 649x99→749x123 / 428x99→436x108 /430x99→462x114, original bbox ceiling respected, no glyph collision, original A176 CLEAN reused, outside protected/other sprite changes and English source remnants zero, persisted roundtrip and RAW/50/75 BWG producer visual PASS WITH CAUTION. Actual game IGR-030/031/040 header clipping, small text and Dino orientation OPEN; independent C1/C3/evidence approval/user-game retest pending, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261009-A199-P0-Q121-ORIGINAL-WHITE-ITALIC/A199_CONTROLLER_SELF_QA_FINAL.json",
@@ -12661,5 +12662,33 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C319-Q161-A200-RETAINED-GLYPH-SPECKLE/C319_Q161_A200_CONTROLLER_C1_REWORK.json"
+  },
+  "c320_c1_q227_a198r_alpha_safe_native": {
+    "run_key": "OUTRUN-KOR-C320-C1-Q227-A198R-ALPHA-PROOF-20261009-0420",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD",
+    "queue_index": 227,
+    "asset": "E596B7AC",
+    "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+    "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+    "triage": "FRESH_C_REVIEW",
+    "reviewed_native_lossless_regions": [
+      "professional",
+      "alpine",
+      "flagman1"
+    ],
+    "total_regions": 16,
+    "new_native_bgw_lossless_proofs": 3,
+    "source_clean_final_visible_english_ghost": "NOT_CONFIRMED; source residual RGB alpha=0",
+    "source_clean_visible_alpha_pixels_all_three": 0,
+    "raw_overview": "REVIEWED_PRODUCER_JPG_ONLY",
+    "decision": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "current_approval": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "proof": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
+    "backend": "GITHUB_CONNECTED_WITH_N100_SMALL_PNG_ONLY"
   }
 }
