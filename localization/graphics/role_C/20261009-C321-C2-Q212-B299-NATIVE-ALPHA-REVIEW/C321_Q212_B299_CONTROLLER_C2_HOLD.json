@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C321-C2-Q212-B299-FRESH-NATIVE-20261009-0820",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "date_kst": "2026-10-09",
+  "queue_index": 212,
+  "priority": "P1",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "user_ticket": "IGR-029 screenshot(179) mapping SUSPECTED; OPEN_USER_INGAME_FAIL",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "old_candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "candidate_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "current_candidate_git_blob": "cdf9a9690f1f17921141f2d3be209454563420ed",
+  "current_candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "candidate_file_metadata_checked": true,
+  "original_sprites": 12,
+  "reworked_sprites": 2,
+  "untouched_sprites": 10,
+  "triage": {
+    "tool": "GitHub pinned tools/localization/rework_triage.py",
+    "code_blob": "cad348c3995a27624615b8e3023a05101c34f063",
+    "queue_blob": "7aab80f2b148e788f0146cc8bd28a549a9217e56",
+    "executed_on": "N100 MCP small isolated script without heavy binary decode",
+    "action": "FRESH_C_REVIEW"
+  },
+  "evidence_method": "Independent C2 direct source/clean/old/B299 native 100/50/RAW inspection; producer persisted lossless PNG four-way inputs downloaded and sampled via Pillow on N100; new controller-authored native four-panel contacts saved. No independent full DDS decoding or full ten preserved regions; do not promote a full-asset C PASS.",
+  "first_look_before_producer_verdict": "Direct first-look of source/CLEAN/old/B299 (new red showroom matches source flat red; enter_name gray matches source family, no visible glyph tearing/residue/box); checked producer claims afterward. Previously known C318 source-family underfill was not used as a numerical pass threshold.",
+  "fresh_proof_pngs": [
+    {
+      "path": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_showroom_SOURCE_CLEAN_OLD_CURRENT_GRAY_NATIVE.png",
+      "git_blob_sha": "f15a13dc1c3ae77160c2f7ed731a5cd77fc6ba61",
+      "sha256": "7e65443c5d8eddd4f423ad0520a0bbc74bd86dc9213fd98f9ef4f530362b3683"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_enter_name_SOURCE_CLEAN_OLD_CURRENT_GRAY_NATIVE.png",
+      "git_blob_sha": "fcce4410bf4ddd83d516655386121bd3d578383f",
+      "sha256": "ea75fdc78f985910250ef4c90599b4b2b8f41e6b38a3a79f38f8671677c0f22a"
+    }
+  ],
+  "source_files": {
+    "producer_qa": "localization/graphics/role_B/20261009-B299-Q212-NATIVE-SOURCE-FAMILY-TRIAL/B299_CONTROLLER_SELF_QA_FINAL.json",
+    "producer_machine": "localization/graphics/role_B/20261009-B299-Q212-NATIVE-SOURCE-FAMILY-TRIAL/B299_MACHINE_QA.json",
+    "previous_c": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_CONTROLLER_C2_SOURCE_HIERARCHY_REWORK.json"
+  },
+  "independent_region_observations": [
+    {
+      "id": "showroom",
+      "source": "SHOWROOM",
+      "korean": "차량 전시장",
+      "pixel_sample_input_size": [
+        1746,
+        148
+      ],
+      "source_bbox_native": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "localized_bbox_native": [
+        18,
+        1152,
+        730,
+        1292
+      ],
+      "masked_changed_source_pixels_gray": 84586,
+      "old_changed_pixels_gray": 20000,
+      "current_changed_pixels_gray": 39724,
+      "old_local_bbox_relative": [
+        4,
+        6,
+        252,
+        142
+      ],
+      "current_local_bbox_relative": [
+        4,
+        4,
+        716,
+        144
+      ],
+      "checks": {
+        "source_clean_plate": "PASS_SCOPED opaque gray producer-labeled CLEAN is uniformly RGB130; independently inspected source vs CLEAN native and black/white previews; no English visible in CLEAN",
+        "source_slant": "PASS_SCOPED visually upright red source/current",
+        "style": "PASS_SCOPED flat red native solid face, source red family visually retained, current new glyphs not jagged at 100/50",
+        "size": "PASS_SCOPED restored 712x140 pixel source-bbox-contained new title vs prior 248x136; positive four-pixel edges; source text actual 1746x148",
+        "glyph_integrity": "PASS_SCOPED no observed broken glyph interiors in native/50 contacts",
+        "protected": "HOLD full atlas outside/protected zero is producer machine only (not independently redecoded)",
+        "placement": "PASS_SCOPED source region does not overlap neighbor visible text in native proof",
+        "orientation": "PASS_SCOPED B299 RAW FLIP-Y four-way visually consistent, whole atlas independent mip/RAW not run"
+      },
+      "decision": "SCOPED_VISUAL_PASS_NOT_C_APPROVAL",
+      "evidence": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_showroom_SOURCE_CLEAN_OLD_CURRENT_GRAY_NATIVE.png"
+    },
+    {
+      "id": "enter_name",
+      "source": "ENTER NAME",
+      "korean": "이름 입력",
+      "pixel_sample_input_size": [
+        1081,
+        76
+      ],
+      "source_bbox_native": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "localized_bbox_native": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "masked_changed_source_pixels_gray": 22724,
+      "old_changed_pixels_gray": 6384,
+      "current_changed_pixels_gray": 8351,
+      "old_local_bbox_relative": [
+        4,
+        10,
+        188,
+        66
+      ],
+      "current_local_bbox_relative": [
+        4,
+        4,
+        270,
+        72
+      ],
+      "checks": {
+        "source_clean_plate": "PASS_SCOPED uniform gray CLEAN after English removal; no visible English remnants",
+        "source_slant": "PASS_SCOPED upright, both native labels",
+        "style": "PASS_SCOPED gray source face (RGB63,71,74) visually echoed in Korean",
+        "size": "PASS_SCOPED resized from old 184x56 to new 266x68 with positive 4px margins, source height76",
+        "glyph_integrity": "PASS_SCOPED separate '이름 입력' characters readable at native/50, no observed broken counters",
+        "protected": "HOLD unchanged other ten machine-only proof",
+        "placement": "PASS_SCOPED title is left anchored in original region with no visible box or collision",
+        "orientation": "PASS_SCOPED native/RAW producer current checked; actual game composition not available"
+      },
+      "decision": "SCOPED_VISUAL_PASS_NOT_C_APPROVAL",
+      "evidence": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_enter_name_SOURCE_CLEAN_OLD_CURRENT_GRAY_NATIVE.png"
+    }
+  ],
+  "machine_corrob_from_producer_only": {
+    "changed_rgba_outside_two": 0,
+    "changed_alpha_outside_two": 0,
+    "protected_ten_pixel_exact": true,
+    "header_exact": true,
+    "decoded_roundtrip_exact": true
+  },
+  "evidence_gaps": [
+    "Other 10 localized segments not independently revalidated against current candidate",
+    "Full current 2048x2048 DDS hash/decode and source/clean/final alpha+mip/current protected zero not independently recalculated",
+    "C calibration/source-family per-region slant anchors unverified",
+    "IGR-029 screenshot(179) mapping to this DDS remains suspected, so no asserted in-game fix",
+    "No separate current SHA C3_STRICT_AUDIT, no current evidence approval or user acceptance"
+  ],
+  "C2_scoped_two_regions": "VISUAL_PASS",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED",
+  "USER_ACCEPTANCE": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_lossless_evidence_png": 2,
+  "producer_next_steps": "Preserve B299 DDS exact bytes; C must independently validate all 12 source segments, current persisted DDS/protected alpha, CLEAN and RAW/75/50 family calibration before full C and separate C3. Do NOT rerender merely for missing evidence. Keep IGR-029 OPEN for newer actual in-game retest."
+}
