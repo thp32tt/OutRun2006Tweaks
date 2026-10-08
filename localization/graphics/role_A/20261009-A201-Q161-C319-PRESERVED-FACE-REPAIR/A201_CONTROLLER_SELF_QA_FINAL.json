@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run_key": "OUTRUN-KOR-A201-Q161-C319-FACE-20261009-0830",
+  "recorded_at_kst": "2026-10-09 08:37 KST",
+  "index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "atlas_sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982",
+  "previous_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "new_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "0b12c672224ce05acb9470af895bbda335cc5543",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
+  },
+  "execution_backend": "GitHub-hosted Actions run 37860107761; N100 status only; GPT producer inspected actual persisted-DDS-generated image evidence",
+  "historical_C1_reject": "C319: pinned A200 q161 08/10/12 had pixel glyph face holes/speckles in saved BC3, despite numeric bbox PASS",
+  "producer_10_stage": {
+    "source": "PASS exact original blob SHA and 38-region atlas verified",
+    "source_mask": "PASS original source 08/10/12 exact bboxes, 35 unrelated candidate areas left byte-identical",
+    "clean_plate": "PASS target source lettering alpha removed in three source boxes without touching other cells",
+    "source_clean_visual": "PASS 3/3 native English SOURCE/CLEAN glyph removal on gray, no obvious source text underlay",
+    "style": "PASS canonical flat dark slate source palette using BC3 RGB565; original upright family and natural Korean width",
+    "native_glyph": "PASS 3/3 naturally proportioned CJK direct from font, not upscaled old Korean",
+    "transparent_composite": "PASS Korean alpha-only glyph footprint, no opaque box",
+    "composite_contamination": "PASS CLEAN/FINAL source bbox and glyph mask confinement, zero source residues, extras",
+    "persisted_dds": "PASS native 2048x2048 DXT5, 1 mip, 3/3 exact decoded bbox, color/alpha core holes0, RAW and practical 50%",
+    "handoff": "SELF_QA_PASS only. Fresh independent C1 38/38 and separate C3/current evidence approval/user/game pending"
+  },
+  "ordered_8_visual": {
+    "plate": "PASS 08/10/12 SOURCE/CLEAN/FINAL visible at gray native; no visible source ghost",
+    "lean": "PASS upright original/Korean; readable and RAW same mirror-Y orientation",
+    "size": "PASS within exact original source text bbox and positive margins 3/3 without width stretch",
+    "weight": "PASS source flat gray RGB565 and continuous Korean interior; no added stroke/halo",
+    "clipping": "PASS no clipped glyph at 100/50 in selected three",
+    "protected": "PASS zero pixels/BC3 blocks changed outside chosen three, includes A200 04/06",
+    "orientation": "PASS observed 10 RAW and normal 08/10/12; DDS original header/mip/raw retained",
+    "readability": "PASS 08 염소자리 10 양자리 12 태국 native gray/black/white and 50%; no user or game verification"
+  },
+  "reviewed_images": [
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_08_SOURCE_CLEAN_FINAL_GRAY_100.png",
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_08_SOURCE_CLEAN_FINAL_BLACK_50.png",
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_10_SOURCE_CLEAN_FINAL_GRAY_100.png",
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_12_SOURCE_CLEAN_FINAL_GRAY_100.png",
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_12_SOURCE_CLEAN_FINAL_WHITE_50.png",
+    "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_10_SOURCE_FINAL_RAW.png"
+  ],
+  "machine": {
+    "changed_pixels_outside_three_bboxes": 0,
+    "alpha_changed_outside_three_bboxes": 0,
+    "introduced_visible_outside_three_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "3/3 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "preserved_A200_04_06_and_other_33_blocks": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "rows": [
+    {
+      "index": 8,
+      "source": "CAPRICORN",
+      "korean": "염소자리",
+      "source_bbox": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "candidate_bbox": [
+        8,
+        1736,
+        182,
+        1784
+      ],
+      "alpha_core_holes": 0,
+      "color_core_mismatch": 0
+    },
+    {
+      "index": 10,
+      "source": "ARIES",
+      "korean": "양자리",
+      "source_bbox": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "candidate_bbox": [
+        4,
+        1672,
+        134,
+        1720
+      ],
+      "alpha_core_holes": 0,
+      "color_core_mismatch": 0
+    },
+    {
+      "index": 12,
+      "source": "THAILAND",
+      "korean": "태국",
+      "source_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "candidate_bbox": [
+        1,
+        1609,
+        84,
+        1655
+      ],
+      "alpha_core_holes": 0,
+      "color_core_mismatch": 0
+    }
+  ],
+  "preserved_unrelated_regions": 35,
+  "preserved_A200_regions": [
+    4,
+    6
+  ],
+  "limitations": [
+    "Producer reviewed 3 newly repaired cells, not independent C acceptance of all 38",
+    "BC3 compressed preserved areas 35 have matching blocks but their complete C-approved style/evidence is not established",
+    "User gameplay test with candidate SHA still required; RUNTIME_VALIDATION=UNTESTED"
+  ],
+  "status": "A_SELF_QA_PASS_PENDING_FRESH_C1",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "approval": false,
+  "user_acceptance": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_material_candidate_dds_count": 1
+}

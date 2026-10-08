@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A201 q161 55B57CDE material new DXT5 DDS 8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65 repairs C319-native BC3 face pinholes in regions 08 염소자리 / 10 양자리 / 12 태국; previous A200 SHA 2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b with repaired 04/06 and all other 33 unchanged (35 preserved exact BC3 regions). Pinned source sha a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d; 3/3 new exact original bboxes/decoded alpha core zeros, source residue/outside alpha/protected/overlap/changed-block outside=0. Producer persisted DDS/source-CLEAN-final 100/75/50, RAW samples SELF_QA_PASS. Fresh independent C1 all38, distinct C3/current evidence approval/user JPG/actual game pending. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_CONTROLLER_SELF_QA_FINAL.json",
     "C321 C2 q212 B299 new exact SHA efe1750f... two source-hierarchy corrections native source/CLEAN/old/current independent scoped proof PASS; 10 preserved cells still lack fresh current full DDS/mip/RAW and source-family blind calibration. HOLD C3 blocked, no rerender without pixel defect; IGR-029 open suspected mapping. localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_B299_CONTROLLER_C2_HOLD.json",
     "B302 B even q236 14-row REAL NEW native BGRA32 DDS candidate SHA256 9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337 replaces old e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8; C313 three confirmed heavy/condensed weight fails addressed with native NotoSansCJK Black glyphs 2048px, no prior 4x bitmap reuse. 14/14 original source containment and minimum 4px margins; exact CLEAN alpha zero, outside14 RGBA/alpha=0, persisted DDS BGRA/raw/header roundtrip PASS, protected REVERSED unchanged. Producer controller sampled 100% native row00/05/11, raw75 row00 and 50% all 14 source/CLEAN/prior/new, bold readable and no apparent source residue or glyph breakage in examined crops. Fresh independent C2/C3 current evidence and game still PENDING, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/B302_CONTROLLER_SELF_QA_FINAL.json",
     "B300/B301 q098 one REWORK attempt with nonpromoted trials; exact B279 candidate 192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b unchanged. B300 stored BC3 alpha trial 0c324... introduced white horizontal pinholes; B300R attempts fail safely; B301 alpha-exact palette trial 460b710... has source-family navy glow/glyph speckles. Both rejected on native/50/RAW despite numeric 0 outside. Manual source-conditioned Hangul / real BC3 halo reconstruction required; no C/C3/user/game approval. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_B/20261009-B301-Q098-ALPHA-PRESERVED-NAVY-DEPTH/B301_CONTROLLER_SELF_QA_REJECTED.json",
@@ -12796,5 +12797,28 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_B299_CONTROLLER_C2_HOLD.json"
+  },
+  "a201_q161_c319_face_repair": {
+    "run_key": "OUTRUN-KOR-A201-Q161-C319-FACE-20261009-0830",
+    "at_kst": "2026-10-09 08:37 KST",
+    "queue_index": 161,
+    "role": "A",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "prior_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+    "candidate_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "material_new_dds_count": 1,
+    "repaired_cells": [
+      8,
+      10,
+      12
+    ],
+    "preserved_cells": 35,
+    "producer_self_qa": "PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "current_approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_Q161_REPORT.json",
+    "qa": "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_CONTROLLER_SELF_QA_FINAL.json"
   }
 }
