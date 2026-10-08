@@ -65,6 +65,7 @@ on:
       - 'tools/verify_vr_projected_marker_anchor.py'
       - 'tools/verify_vr_projected_marker_telemetry.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
       - 'tools/verify_vr_texture_scene_contract.py'
       - 'tools/verify_vr_texture_cache_lifetime.py'
@@ -159,6 +160,7 @@ jobs:
             'tools/verify_vr_projected_marker_anchor.py',
             'tools/verify_vr_projected_marker_telemetry.py',
             'tools/verify_vr_visual_composition_p0.py',
+            'tools/audit_vr_result_full_source.py',
             'tools/verify_vr_texture_scene_contract.py',
             'tools/verify_vr_r31_r32_retirement_guard.py',
             'tools/verify_vr_recenter_contract.py',
