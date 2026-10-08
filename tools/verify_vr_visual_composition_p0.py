@@ -5,6 +5,7 @@ import json
 from verify_vr_hud_exact_callsite_contract import check as verify_hud_callsite_contract
 from verify_vr_hud_dds_loader import verify as verify_dds_loader_contract
 from verify_vr_texture_scene_contract import verify as verify_scene_texture_contract
+from verify_vr_texture_cache_lifetime import verify as verify_texture_cache_lifetime
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -43,6 +44,7 @@ ui = read('src/hooks_uiscaling.cpp')
 textures = read('src/hooks_textures.cpp')
 verify_dds_loader_contract(textures)
 verify_scene_texture_contract(textures)
+verify_texture_cache_lifetime(textures)
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')

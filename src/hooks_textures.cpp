@@ -331,7 +331,7 @@ class FileDataCache
 private:
 	struct CacheEntry
 	{
-		std::vector<uint8_t> data;
+		std::shared_ptr<std::vector<uint8_t>> data;
 		std::list<std::filesystem::path>::iterator lru_iterator;
 	};
 
@@ -351,16 +351,15 @@ private:
 			auto found = cache.find(lru_file);
 			if (found != cache.end())
 			{
-				current_cache_size -= found->second.data.size();
+				current_cache_size -= found->second.data->size();
 				cache.erase(found);
 			}
 			lru_list.pop_back();
 		}
 	}
 
-	std::mutex mtx1;
-	std::mutex mtx2;
-	std::mutex mtx3;
+	mutable std::mutex mtx1; // Sole owner of cache, LRU and budget state.
+	std::mutex mtx2;         // Serializes on-demand file loads only.
 
 public:
 	FileDataCache(std::size_t maxCacheSize) : max_cache_size(maxCacheSize), current_cache_size(0) {}
@@ -429,8 +428,8 @@ public:
 
 		try
 		{
-			std::vector<uint8_t> buffer(size);
-			if (!file.read(reinterpret_cast<char*>(buffer.data()),
+			auto buffer = std::make_shared<std::vector<uint8_t>>(size);
+			if (!file.read(reinterpret_cast<char*>(buffer->data()),
 				static_cast<std::streamsize>(size)))
 			{
 				spdlog::warn("Texture cache: error reading {}", filename.string());
@@ -461,81 +460,82 @@ public:
 		}
 	}
 
+	// Every returned pointer has a shared D3DX-call-scoped owner. Merely
+	// holding a lock until return is not enough: background preloading can
+	// evict a cached vector while D3D9 is still consuming its bytes.
 	const uint8_t* getFileData(
 		std::filesystem::path filename, size_t* size,
 		std::shared_ptr<std::vector<uint8_t>>* transientOwner = nullptr)
 	{
-		if (transientOwner)
-			transientOwner->reset();
-		std::lock_guard _(mtx2);
-		auto it = cache.find(filename);
-		if (it == cache.end())
+		if (!transientOwner)
+			return nullptr; // Never publish an unowned cache pointer.
+		transientOwner->reset();
+		std::lock_guard fileRequestLock(mtx2);
+
+		// All cache/LRU accesses, including background cacheFile(), use mtx1.
+		// Do not hold it while calling cacheFile(): that routine locks mtx1.
+		const auto acquireCachedOwner = [&]() -> std::shared_ptr<std::vector<uint8_t>>
 		{
-#ifdef _DEBUG
-			std::string msg = "Cache miss: " + filename.string() + "\n";
-			OutputDebugStringA(msg.c_str());
-#endif
+			std::lock_guard cacheLock(mtx1);
+			auto found = cache.find(filename);
+			if (found == cache.end())
+				return {};
+			lru_list.erase(found->second.lru_iterator);
+			lru_list.push_front(filename);
+			found->second.lru_iterator = lru_list.begin();
+			return found->second.data;
+		};
+
+		auto owner = acquireCachedOwner();
+		if (!owner)
+		{
 			cacheFile(filename);
-			it = cache.find(filename);
-			if (it == cache.end())
-			{
-				// P0 visual-composition rule: an oversized replacement must not
-				// disappear merely because it is intentionally excluded from the
-				// bounded 32-bit VR LRU. Load it transiently for this D3DX create
-				// call; the wrapper keeps the owner alive until D3DX has consumed
-				// the memory, then releases it instead of retaining it in cache.
-				if (!transientOwner)
-					return nullptr;
-				std::ifstream file(filename, std::ios::binary | std::ios::ate);
-				if (!file)
-					return nullptr;
-				const std::streamsize streamSize = file.tellg();
-				if (streamSize <= 0)
-					return nullptr;
-				try
-				{
-					auto transient = std::make_shared<std::vector<uint8_t>>(
-						static_cast<std::size_t>(streamSize));
-					file.seekg(0, std::ios::beg);
-					if (!file.read(
-							reinterpret_cast<char*>(transient->data()), streamSize))
-						return nullptr;
-					if (size)
-						*size = transient->size();
-					*transientOwner = std::move(transient);
-					spdlog::info(
-						"VR texture replacement: transient-load {} ({} MiB) outside the {} MiB LRU; data lifetime is bounded to the D3DX create call",
-						filename.string(),
-						static_cast<std::size_t>(streamSize) / (1024 * 1024),
-						max_cache_size / (1024 * 1024));
-					return (*transientOwner)->data();
-				}
-				catch (const std::bad_alloc&)
-				{
-					spdlog::warn(
-						"VR texture replacement: transient allocation failed for {} ({} MiB); preserving original texture",
-						filename.string(),
-						static_cast<std::size_t>(streamSize) / (1024 * 1024));
-					return nullptr;
-				}
-			}
+			owner = acquireCachedOwner();
+		}
+		if (owner)
+		{
+			if (size)
+				*size = owner->size();
+			*transientOwner = std::move(owner);
+			return (*transientOwner)->data();
 		}
 
-		// Move the accessed file to the front of the LRU list
-		lru_list.erase(it->second.lru_iterator);
-		lru_list.push_front(filename);
-		it->second.lru_iterator = lru_list.begin();
-
-		if (size)
-			*size = it->second.data.size();
-
-		return it->second.data.data();
+		// A legitimate large DDS exceeds the bounded cache budget: read it
+		// transiently and keep that same buffer alive through fast/native D3DX.
+		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+		if (!file)
+			return nullptr;
+		const std::streamsize streamSize = file.tellg();
+		if (streamSize <= 0)
+			return nullptr;
+		try
+		{
+			auto transient = std::make_shared<std::vector<uint8_t>>(
+				static_cast<std::size_t>(streamSize));
+			file.seekg(0, std::ios::beg);
+			if (!file.read(reinterpret_cast<char*>(transient->data()), streamSize))
+				return nullptr;
+			if (size)
+				*size = transient->size();
+			*transientOwner = std::move(transient);
+			spdlog::info(
+				"VR texture replacement: transient-load {} ({} MiB) outside bounded LRU; D3DX call retains source owner",
+				filename.string(), static_cast<std::size_t>(streamSize) / (1024 * 1024));
+			return (*transientOwner)->data();
+		}
+		catch (const std::bad_alloc&)
+		{
+			spdlog::warn("VR texture replacement: transient allocation failed for {}; preserving original", filename.string());
+			return nullptr;
+		}
 	}
 
 	std::size_t getCacheSize() const
 	{
+		std::lock_guard cacheLock(mtx1);
 		return current_cache_size;
 	}
+
 };
 
 // QnD file entry cache class, so we don't have to run std::filesystem::exists for every texture
