@@ -147,6 +147,12 @@ int main()
             ring.slot_state(slot) == SharedEyeSlotState::Acquired &&
             ring.slot_frame_id(slot) == 1,
             "acquired slot identity");
+    rejectedSlot = 99;
+    require(!ring.try_acquire_slot(d3d.context, 1, nullptr, rejectedSlot) &&
+            rejectedSlot == OutRunVR::RenderFrameRingSize &&
+            ring.slot_state(slot) == SharedEyeSlotState::Acquired &&
+            ring.slot_frame_id(slot) == 1,
+            "duplicate acquired frame must retain its sole slot owner");
     require(
         !ring.bind_lifetime(1001, 2002, 7, 10),
         "in-flight allocation must reject generation retag");
@@ -175,6 +181,12 @@ int main()
             "foreign-device context cannot signal producer EVENT");
     require(ring.signal_producer_fence(d3d.context, slot, 5),
             "signal producer EVENT after eye work");
+    rejectedSlot = 99;
+    require(!ring.try_acquire_slot(d3d.context, 5, nullptr, rejectedSlot) &&
+            rejectedSlot == OutRunVR::RenderFrameRingSize &&
+            ring.slot_state(slot) == SharedEyeSlotState::ProducerPending &&
+            ring.slot_frame_id(slot) == 5,
+            "duplicate pending frame cannot acquire a second slot");
     require(!ring.publish_if_fence_complete(foreign.context, slot, 5) &&
             ring.slot_state(slot) == SharedEyeSlotState::ProducerPending &&
             !ring.synchronization_faulted(),
@@ -190,6 +202,12 @@ int main()
     publish_bounded(ring, d3d.context, slot, 5);
     require(ring.slot_state(slot) == SharedEyeSlotState::Published,
             "completed EVENT publishes slot");
+    rejectedSlot = 99;
+    require(!ring.try_acquire_slot(d3d.context, 5, nullptr, rejectedSlot) &&
+            rejectedSlot == OutRunVR::RenderFrameRingSize &&
+            ring.slot_state(slot) == SharedEyeSlotState::Published &&
+            ring.slot_frame_id(slot) == 5,
+            "duplicate published frame cannot acquire a second slot");
 
     NativeSharedEyePublication publication{};
     require(ring.snapshot_published_frame(slot, 5, publication),
@@ -232,6 +250,11 @@ int main()
             "exact identity/frame ACK retires publication");
     require(!ring.validate_publication_snapshot(publication),
             "ACK retirement invalidates published handoff snapshot");
+    std::uint32_t recycledSlot = 99;
+    require(ring.try_acquire_slot(d3d.context, 5, nullptr, recycledSlot) &&
+            ring.cancel_acquired_slot(recycledSlot, 5) &&
+            ring.all_slots_idle(),
+            "ACK retirement permits frame-id reuse without stale ownership");
 
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 9, nullptr, slot),

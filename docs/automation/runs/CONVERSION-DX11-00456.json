@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00456",
+  "production_id": "CONVERSION-DX11-00456",
+  "event_id": "CONVERSION-DX11-00456-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_NATIVE_SHARED_EYE_SINGLE_FRAME_SLOT_OWNERSHIP",
+  "work_key": "DX11:NATIVE_SHARED_EYE_RING:UNIQUE_FRAME_ID:src/vr/d3d11/native_shared_eye_ring.cpp",
+  "conflict_keys": [
+    "DX11_NATIVE_TRANSPORT_RING",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "base_sha": "f1b31320660dee41f87a0da297b12a2f9c352d38",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C4_COMMIT",
+  "status": "WAITING_FOR_CI",
+  "summary": "Reject duplicate frame_id reservations across acquired, producer-pending and published native DX11 shared-eye ring slots before any fence refresh/ACK mutation; preserve independent frame retirement and add Windows WARP regression coverage.",
+  "changed_paths": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PASS: one in-memory source/test transformation invariant check; Windows compilation/behavior deferred to exact-SHA Gate",
+  "pipeline": {
+    "C0_RECOVER": "PASS: remote branch HEAD and prior task 00455 COMPLETE; 00456 absent",
+    "C1_REVIEW": "PASS: detected no same-frame slot uniqueness check in native eye ring",
+    "C2_IMPLEMENT": "PASS: C++ ownership guard and WARP negative-path regression cases authored",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Backend Conversion Gate",
+    "C4_COMMIT": "pending remote material CAS",
+    "C5_PACKAGE": "NOT_REQUIRED: no user HMD candidate",
+    "C6_STATE": "PENDING validated evidence"
+  },
+  "next_action": "Verify exact-SHA Backend Conversion Gate, WARP transport probe, binary build and persist canonical C6 record. Quest3/VDXR hardware remains UNTESTED."
+}

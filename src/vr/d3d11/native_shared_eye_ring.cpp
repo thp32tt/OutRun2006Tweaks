@@ -234,6 +234,16 @@ namespace outrun::vr::dx11
             frame_id == 0)
             return false;
 
+        // One transport frame has one slot owner. A duplicate acquisition
+        // could advertise the same frame in two slots, leaving one consumer ACK
+        // unable to unambiguously retire both allocations. Reject before any
+        // pending-fence refresh or ACK-driven state mutation.
+        for (const auto& entry : slots_)
+        {
+            if (entry.frame_id == frame_id)
+                return false;
+        }
+
         const std::uint32_t preferred = static_cast<std::uint32_t>(
             (frame_id - 1u) % slots_.size());
 
