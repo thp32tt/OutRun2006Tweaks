@@ -76,6 +76,10 @@
     "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_PRACTICAL50.png",
     "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_PRACTICAL75.png"
   ],
-  "post_task_cleanup": "PENDING_AFTER_PUBLICATION",
-  "forbidden_domains_touched": []
+  "post_task_cleanup": "COMPLETE_AFTER_REMOTE_QA_PUBLICATION_AND_HEAD_VERIFICATION",
+  "forbidden_domains_touched": [],
+  "cleaned_paths": [
+    "work/C279_C2_Q176_NATIVE_20261008_scratch"
+  ],
+  "n100_filesystem_free_bytes_after_cleanup": 28685918208
 }
