@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "description": "Document repeated visual root causes; no PASS or runtime claims.",
+  "cases": [
+    {
+      "queue_index": 219,
+      "asset_hash": "D263B3F1",
+      "required_method_change": "Replace forced-width or flat glyph rendering with native source-derived rounded chrome, segmented strokes, clean-plate and per-region style profiles; record new method and QA.",
+      "rejections": [
+        {
+          "review_id": "C272",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_MISMATCH",
+          "evidence_ref": "localization/resume_state.json#next_actions",
+          "finding": "A181R forced English-width percentage and source-family mismatch."
+        },
+        {
+          "review_id": "C280",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_MISMATCH",
+          "evidence_ref": "AI_SCOREBOARD.md 2026-10-08 13:16 C280; current asset_queue row 219",
+          "finding": "A186R flat/thin effects unlike original rounded chrome typography."
+        }
+      ]
+    }
+  ]
+}
