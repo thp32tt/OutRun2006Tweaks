@@ -28,15 +28,26 @@ KNOWN_TARGETS = {
     0x02CCE0: "sprPrintf",
     0x02CDD0: "Sumo_Printf",
     0x049940: "Calc3D2D",
+    0x0056D0: "DrawObjectAlpha_Internal",
     0x0BAD20: "RankMarker_sub_4BAD20",
 }
 
 PRODUCER_WINDOWS = (
     {
-        "name": "SceneEffectLensProducer_sub_40CAE0",
+        # This CALL PRECEDES the next 0xCAE0 block. It cannot legitimately
+        # be cited as a direct call from within a 0xCAE0..0xD100 window.
+        "name": "SceneEffectDrawObjectAlpha_pre_40CAE0",
+        "start_rva": 0x0000CAB0,
+        "end_rva": 0x0000CAE0,
+        "anchors": (0x0000CABE,),
+        "expected_direct_targets": {0x0000CABE: 0x0056D0},
+    },
+    {
+        "name": "SceneEffectLensProjection_40CAE0",
         "start_rva": 0x0000CAE0,
         "end_rva": 0x0000D100,
-        "anchors": (0x0000CABE, 0x0000CF4E),
+        "anchors": (0x0000CF4E,),
+        "expected_direct_targets": {0x0000CF4E: 0x049940},
     },
     {
         "name": "OutRunStageResultHud_0x97000",
@@ -284,13 +295,41 @@ def extract_producer_windows(pe: PE) -> list[dict]:
     text_begin = text_section.virtual_address
     text_end = text_begin + len(text)
     for spec in PRODUCER_WINDOWS:
-        start = max(spec["start_rva"], text_begin)
-        end = min(spec["end_rva"], text_end)
+        # Anchors are evidence only when they actually belong to their
+        # declared window. The old combined lens window started at 0xCAE0
+        # but silently cited 0xCABE, which was OUTSIDE its extracted CALLs.
+        declared_start = spec["start_rva"]
+        declared_end = spec["end_rva"]
+        if declared_start >= declared_end:
+            raise ValueError(f"invalid producer window: {spec['name']}")
+        for rva in spec["anchors"]:
+            if not declared_start <= rva < declared_end:
+                raise ValueError(
+                    f"producer anchor outside window {spec['name']}: "
+                    f"0x{rva:X} not in 0x{declared_start:X}..0x{declared_end:X}"
+                )
+        start = max(declared_start, text_begin)
+        end = min(declared_end, text_end)
         if start >= end:
-            continue
+            raise ValueError(f"producer window outside executable text: {spec['name']}")
+        expected = spec.get("expected_direct_targets", {})
+        if set(expected) - set(spec["anchors"]):
+            raise ValueError(f"untracked producer CALL binding: {spec['name']}")
+        for rva, target in expected.items():
+            code = pe.bytes_at_rva(rva, 5)
+            if len(code) != 5 or code[0] != 0xE8:
+                raise ValueError(
+                    f"missing original direct CALL at 0x{rva:X} in {spec['name']}"
+                )
+            actual = (rva + 5 + struct.unpack_from("<i", code, 1)[0]) & 0xFFFFFFFF
+            if actual != target:
+                raise ValueError(
+                    f"producer CALL 0x{rva:X} targets 0x{actual:X}, "
+                    f"not canonical 0x{target:X}"
+                )
         blob = pe.bytes_at_rva(start, end - start)
         calls = []
-        for off in range(0, max(0, len(blob) - 5)):
+        for off in range(0, max(0, len(blob) - 4)):
             if blob[off] != 0xE8:
                 continue
             rel = struct.unpack_from("<i", blob, off + 1)[0]
