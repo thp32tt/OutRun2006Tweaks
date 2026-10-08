@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:14:22+09:00",
+  "updated_at_kst": "2026-10-08T14:22:19+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7094,5 +7094,17 @@
     "report": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/C283_Q175_CONTROLLER_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED",
     "C3": "BLOCKED"
+  },
+  "c284_c1_q195_native": {
+    "run": "20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 195,
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+    "decision": "HOLD_STRICT_RECHECK",
+    "sha_bound_lossless_pngs": 18,
+    "report": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/C284_Q195_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

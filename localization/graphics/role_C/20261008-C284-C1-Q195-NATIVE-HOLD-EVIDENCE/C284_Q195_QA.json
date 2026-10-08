@@ -1,0 +1,259 @@
+{
+  "schema_version": 2,
+  "run": "20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 195,
+  "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "clean_sha256": "ba59a613d61e194066f71e04f1edd0cb5ca3b4151232e1da92c3dcd12422d790",
+  "source_text": "NOT AVAILABLE",
+  "localized_text": "사용할 수 없음",
+  "machine_result": "PASS_CONTAINMENT_SCOPE_ONLY",
+  "independent_machine": {
+    "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "clean_sha256": "ba59a613d61e194066f71e04f1edd0cb5ca3b4151232e1da92c3dcd12422d790",
+    "width": 1024,
+    "height": 128,
+    "format": "BGRA32/RGBA32 decoded",
+    "mips": 1,
+    "header_128_exact": true,
+    "raw_readable_transform": "flip_y",
+    "original_source_glyph_bbox_readable": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "independent_source_to_clean_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "independent_candidate_to_clean_bbox": [
+      182,
+      82,
+      402,
+      119
+    ],
+    "independent_source_to_candidate_change_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "original_source_bbox_width": 395,
+    "original_source_bbox_height": 41,
+    "candidate_to_clean_width": 220,
+    "candidate_to_clean_height": 37,
+    "source_to_current_rgba_changed_outside": 0,
+    "source_to_current_alpha_changed_outside": 0,
+    "source_to_clean_rgba_changed_outside": 0,
+    "candidate_to_clean_rgba_changed_outside": 0,
+    "source_to_candidate_changed_total": 10396,
+    "source_to_candidate_alpha_changed_total": 0,
+    "source_to_clean_changed_total": 8042,
+    "candidate_to_clean_changed_total": 4999,
+    "exact_file_size": 524416,
+    "files": [
+      {
+        "path": "source_readable.png",
+        "sha256": "3ccae67f95bb115d1e165e799e8f30fe2361c2bb81c262d3f6056c38f1e0f3be",
+        "bytes": 6905
+      },
+      {
+        "path": "clean_readable.png",
+        "sha256": "3e26ddc0f31892454bf0e42217fc79c986625017cfe0c6a8b4260936cda2d620",
+        "bytes": 1686
+      },
+      {
+        "path": "candidate_readable.png",
+        "sha256": "c3c9c86f035de4d1855fcddbe0b588e16f9c511097a7a2b3636555ed4f27ba7e",
+        "bytes": 11669
+      },
+      {
+        "path": "source_raw.png",
+        "sha256": "411aae5c11a10445cec9c9022d458d857c0e950d1531f839cbed4edbbb63672c",
+        "bytes": 6880
+      },
+      {
+        "path": "candidate_raw.png",
+        "sha256": "58c8d94aa290e229a7753ebe5c927150464a995378c886c2c6fceb938d19aa34",
+        "bytes": 11720
+      },
+      {
+        "path": "source_region_lossless.png",
+        "sha256": "dabc76043846871948062c9bc1c610fdfdd97584381932b945b13e8aaa34b0d7",
+        "bytes": 4870
+      },
+      {
+        "path": "clean_region_lossless.png",
+        "sha256": "9883f33e788c7e9bfeb99ba2513e450218dd43d74333dd7c725f146e89db78b3",
+        "bytes": 228
+      },
+      {
+        "path": "candidate_region_lossless.png",
+        "sha256": "6e6d0cd77ad668f5fd29cd30d6b37f278452058f7e2ce97f6f500f493d044334",
+        "bytes": 9200
+      },
+      {
+        "path": "candidate_practical_100.png",
+        "sha256": "b12beebf642e074ef5c575ef05a9719aba6b962e6df3c452fa7d31f431af2df1",
+        "bytes": 10786
+      },
+      {
+        "path": "candidate_practical_75.png",
+        "sha256": "dfb2b085a1d3320e0f3d9440727d9af8ec9a19e22a7dd778b7bb98679eab3663",
+        "bytes": 9479
+      },
+      {
+        "path": "candidate_practical_50.png",
+        "sha256": "d8e173b06b5999c6b4aa86d3e0c01562d0bf31096eb46cce551fa5d179e79e14",
+        "bytes": 5803
+      },
+      {
+        "path": "candidate_region_black.png",
+        "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+        "bytes": 8588
+      },
+      {
+        "path": "source_region_black.png",
+        "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+        "bytes": 4541
+      },
+      {
+        "path": "candidate_region_white.png",
+        "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+        "bytes": 8588
+      },
+      {
+        "path": "source_region_white.png",
+        "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+        "bytes": 4541
+      },
+      {
+        "path": "candidate_region_gray.png",
+        "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+        "bytes": 8588
+      },
+      {
+        "path": "source_region_gray.png",
+        "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+        "bytes": 4541
+      },
+      {
+        "path": "candidate_region_zoom_2x.png",
+        "sha256": "561b5869d6363c271564ec7febad64dd338c2149557a2f4902caf8fb78535177",
+        "bytes": 10339
+      }
+    ],
+    "machine_result": "PASS_CONTAINMENT_SCOPE"
+  },
+  "source_family_visual": "White heavy upright sans centered in red pill, matching broad source style; readable native/zoom/50%; no definite clipped strokes; no need to arbitrarily stretch short Korean translation.",
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "Blind known-defect calibration and source glyph anchors unavailable, no separate current C3, so strict approval withheld. Existing DDS need not be regenerated solely for evidence migration.",
+  "pixels_before_producer_verdict": false,
+  "calibration": "NOT_DONE",
+  "C3": "NOT_DONE",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "DDS_CHANGED": false,
+  "png_manifest": [
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_readable.png",
+      "sha256": "3ccae67f95bb115d1e165e799e8f30fe2361c2bb81c262d3f6056c38f1e0f3be",
+      "bytes": 6905
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/clean_readable.png",
+      "sha256": "3e26ddc0f31892454bf0e42217fc79c986625017cfe0c6a8b4260936cda2d620",
+      "bytes": 1686
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_readable.png",
+      "sha256": "c3c9c86f035de4d1855fcddbe0b588e16f9c511097a7a2b3636555ed4f27ba7e",
+      "bytes": 11669
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_raw.png",
+      "sha256": "411aae5c11a10445cec9c9022d458d857c0e950d1531f839cbed4edbbb63672c",
+      "bytes": 6880
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_raw.png",
+      "sha256": "58c8d94aa290e229a7753ebe5c927150464a995378c886c2c6fceb938d19aa34",
+      "bytes": 11720
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_region_lossless.png",
+      "sha256": "dabc76043846871948062c9bc1c610fdfdd97584381932b945b13e8aaa34b0d7",
+      "bytes": 4870
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/clean_region_lossless.png",
+      "sha256": "9883f33e788c7e9bfeb99ba2513e450218dd43d74333dd7c725f146e89db78b3",
+      "bytes": 228
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_region_lossless.png",
+      "sha256": "6e6d0cd77ad668f5fd29cd30d6b37f278452058f7e2ce97f6f500f493d044334",
+      "bytes": 9200
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_practical_100.png",
+      "sha256": "b12beebf642e074ef5c575ef05a9719aba6b962e6df3c452fa7d31f431af2df1",
+      "bytes": 10786
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_practical_75.png",
+      "sha256": "dfb2b085a1d3320e0f3d9440727d9af8ec9a19e22a7dd778b7bb98679eab3663",
+      "bytes": 9479
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_practical_50.png",
+      "sha256": "d8e173b06b5999c6b4aa86d3e0c01562d0bf31096eb46cce551fa5d179e79e14",
+      "bytes": 5803
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_region_black.png",
+      "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+      "bytes": 8588
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_region_black.png",
+      "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+      "bytes": 4541
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_region_white.png",
+      "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+      "bytes": 8588
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_region_white.png",
+      "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+      "bytes": 4541
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_region_gray.png",
+      "sha256": "3049daf0c7248149f5472b493c21adaeaf267712e71242076e1d002045902714",
+      "bytes": 8588
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/source_region_gray.png",
+      "sha256": "11a3d062040b76280ce4c6f2657ff3cbdb59752ac400a6c986f9fe36c49af142",
+      "bytes": 4541
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_region_zoom_2x.png",
+      "sha256": "561b5869d6363c271564ec7febad64dd338c2149557a2f4902caf8fb78535177",
+      "bytes": 10339
+    }
+  ],
+  "timestamp_kst": "2026-10-08T14:22:19+09:00"
+}
