@@ -8622,5 +8622,43 @@
     "USER_ACCEPTANCE": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B288-Q137-P0-SOURCE-STROKE-CALIBRATION/B288_CONTROLLER_SELF_QA_REJECTED.json"
+  },
+  "c319_c1_q161_a200_preserved_glyph_face": {
+    "run_key": "OUTRUN-KOR-C319-C1-Q161-A200-RETAINED-GLYPH-FACE-20261009-0350",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD",
+    "queue_index": 161,
+    "asset": "55B57CDE",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "prior_candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+    "repaired_regions": [
+      "04",
+      "06"
+    ],
+    "preserved_36": true,
+    "reviewed_new": [
+      "04",
+      "06"
+    ],
+    "reviewed_archived_byte_identical": [
+      "08",
+      "10",
+      "12"
+    ],
+    "confirmed_defects": [
+      "08_CAPRICORN_KO_FACE_SPECKLE",
+      "10_ARIES_KO_FACE_SPECKLE",
+      "12_THAILAND_KO_FACE_SPECKLE"
+    ],
+    "preserved_byte_equality": "Only A200 producer report says 261038 unrelated BC3 blocks identical; independent equality/current native decode still requested",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "EVIDENCE_APPROVAL": false,
+    "USER_ACCEPTANCE": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C319-Q161-A200-RETAINED-GLYPH-SPECKLE/C319_Q161_A200_CONTROLLER_C1_REWORK.json"
   }
 }
