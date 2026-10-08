@@ -62,3 +62,11 @@ Historical records verify *individual* successful visual cases: R57_03 normal HU
 ## Safety and source ownership
 
 All development/authentication to GitHub; original `emoose/OutRun2006Tweaks` and 2026-09 R57/R62/R70–R74 are historical read-only reference. Runtime tests by user only. DX11/DXVK/FFB/localization lanes stay separated. **The source having passed CI does not prove HMD fusion**. Release can be accepted only after exact head-mounted optical result.
+
+## 2026-10-09 verified Windows analyzer parser regression — repair supersession
+
+The first analyzer hotfix `c1bff6f04ce95b884617bce39086ee0828f36fd1` and next `131216005739ded02f85a247fbbd8061b6a3f148` were **not** complete: Windows HUD Inspector runs `37817513231` and `37817944131` remained parser-red. Reading the complete GitHub source identified **four copies of the generated analyzer footer (`Write-Host ($lines -join [Environment]::NewLine)`)**; an update had appended **three obsolete complete analysis bodies** and stray parentheses *after* the valid new body. This corrupt file could not parse, regardless of the regex fix.
+
+**Actual correction:** `cac1c858ed5f38e9b1fd0dfed967cf16f2f49c5f` removes **all three duplicate legacy bodies** and retains the one current validated analysis path (212 lines instead of 477). PowerShell syntax and three distinct semantic fixtures are now explicit HUD Inspector checks. **HUD Inspector static original-EXE/PowerShell gate on exact `cac1c858` run `37818356756` SUCCESS**, including the new analyzer fixture. The separate Windows game compile and DX9Ex Active package gates must still be read from the exact run, not inferred from the static test. Future fixes must inspect the **whole file** for duplicate suffixes and use Windows Parser::ParseFile, not merely string replacements.
+
+Do not cite the earlier c1/1312 failed analyzer source as a complete fix; `cac1c858` supersedes them.
