@@ -1,0 +1,30 @@
+{
+  "role": "A",
+  "run": "20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR",
+  "index": 161,
+  "candidate_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "repaired_regions": [
+    8,
+    10,
+    12
+  ],
+  "prior_candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "machine_qa": {
+    "changed_pixels_outside_three_bboxes": 0,
+    "alpha_changed_outside_three_bboxes": 0,
+    "introduced_visible_outside_three_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "3/3 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "preserved_A200_04_06_and_other_33_blocks": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "worker_status": "MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "report": "localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_Q161_REPORT.json"
+}
