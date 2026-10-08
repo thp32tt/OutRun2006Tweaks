@@ -43,6 +43,7 @@ def require_order(source, meaning, *tokens):
 ui = read('src/hooks_uiscaling.cpp')
 framerate = read('src/hooks_framerate.cpp')
 textures = read('src/hooks_textures.cpp')
+bugfixes = read('src/hooks_bugfixes.cpp')
 verify_dds_loader_contract(textures)
 verify_scene_texture_contract(textures)
 verify_texture_cache_lifetime(textures)
@@ -69,6 +70,7 @@ for path in (
     'src/hooks_framerate.cpp',
     'tools/verify_vr_sumo_replay_semantics.py',
     'src/hooks_textures.cpp',
+    'src/hooks_bugfixes.cpp',
     'src/vr/hud_semantics.hpp',
     'src/vr/game/render_semantics.hpp',
     'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
@@ -98,6 +100,38 @@ require('python tools/verify_vr_visual_composition_p0.py',
         hud_inspector_workflow, 'HUD Inspector executes the P0 contract')
 require("'.github/workflows/outrun-exe-hud-inspector.yml'",
         dx9ex_active_workflow, 'DX9Ex Active watches HUD Inspector CI wiring')
+
+# XMT loader: a corrupt/late XPR0 pointer must not read outside the XMT
+# system-memory block or overflow on pointer addition. This is a source
+# bounds fix; it cannot prove missing car/selector DDS pixels are resolved.
+def check_xmt_loader_guard(source):
+    body = function_body(source, 'static void LoadTextures_dest(')
+    require_order(body, 'overflow-safe XPR0 entry validation',
+                  'const auto blockAddr = reinterpret_cast<std::uintptr_t>(block);',
+                  'const auto entryAddr = reinterpret_cast<std::uintptr_t>(entry);',
+                  'block && entry && blockSize >= XPR0EntrySize',
+                  'entryAddr >= blockAddr',
+                  'entryAddr - blockAddr <= blockSize - XPR0EntrySize',
+                  'textureIdx = *reinterpret_cast<std::uint32_t*>(head + 8)')
+    if 'entry + XPR0EntrySize <= block + blockSize' in body:
+        raise SystemExit('P0 XMT guard regressed to undefined raw pointer range comparison')
+    require('skipping its remaining textures', body,
+            'corrupt/late XMT remains crash-safe instead of dereferenced')
+
+check_xmt_loader_guard(bugfixes)
+for label, old, changed in (
+    ('missing minimum block length', 'blockSize >= XPR0EntrySize', 'blockSize != 0'),
+    ('overrun allowed', 'entryAddr - blockAddr <= blockSize - XPR0EntrySize',
+     'entryAddr - blockAddr <= blockSize'),
+    ('missing fallback skip', 'textureIdx = *reinterpret_cast<std::uint32_t*>(head + 8)',
+     'textureIdx = textureIdx'),
+):
+    try:
+        check_xmt_loader_guard(bugfixes.replace(old, changed, 1))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 XMT overflow guard mutation survived: ' + label)
 
 # P0 F11 fork integration: upstream Dear ImGui DX9 is XYZ+orthographic and
 # cannot enter R30's XYZRHW/VS owners. Check explicit per-eye projection and
