@@ -1363,6 +1363,9 @@ class FixZBufferPrecision : public Hook
 	inline static SafetyHookInline Clr_SceneEffect = {};
 	static void Clr_SceneEffect_dest(int a1)
 	{
+		// Preserve the caller's suppression state: nested SceneEffect passes
+		// must not re-enable the gameplay near-plane override mid-pass.
+		const bool previousAllowZnearOverride = FixZBufferPrecision::allow_znear_override;
 		FixZBufferPrecision::allow_znear_override = false;
 
 		EvWorkCamera* camera = Module::exe_ptr<EvWorkCamera>(0x39FE10);
@@ -1383,7 +1386,7 @@ class FixZBufferPrecision : public Hook
 		camera->perspective_znear_BC = prev;
 		CalcCameraMatrix_dest(camera);
 
-		FixZBufferPrecision::allow_znear_override = true;
+		FixZBufferPrecision::allow_znear_override = previousAllowZnearOverride;
 	}
 
 public:
