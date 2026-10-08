@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261008-B252-Q214-BC3-GLYPH-CONTRAST",
+  "queue_index": 214,
+  "asset": "BF229CF4",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d",
+  "report": "localization/graphics/role_B/20261008-B252-Q214-BC3-GLYPH-CONTRAST/B252_BF229CF4_REPORT.json",
+  "status": "B252_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+}

@@ -1,0 +1,523 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B252-Q214-BC3-GLYPH-CONTRAST",
+  "base_head": "89ea77767822e300400fd0a575636c591d70b2ba",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "readiness_tier": "C269_RETURNED_REWORK_MATERIAL_RENDERED",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+    "sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
+  },
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_elements": 2,
+    "protected": [
+      "OutRun2 logos",
+      "course-map artwork",
+      "stage photos",
+      "route artwork",
+      "all non-label pixels"
+    ]
+  },
+  "construction": "Controller-reviewed BF229 route map uses the same START/GOAL red-badge family as B191/A116. Source-effect pixels are detected only inside the route-map red signs. Fully permitted BC3 blocks use the fresh encode; sign-edge partial blocks preserve original BC3 endpoints and all outside indices while changing only sign-hull pixel indices, so white rim/map/photo/logo pixels remain exact.",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "start",
+      "source": "START",
+      "korean": "출발",
+      "probe_roi": [
+        800,
+        480,
+        914,
+        533
+      ],
+      "red_component_bbox": [
+        812,
+        492,
+        902,
+        521
+      ],
+      "banner_bbox": [
+        813,
+        493,
+        902,
+        520
+      ],
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "source_text_pixels": 1308,
+      "source_bc3_blocks": 130,
+      "red_component_meta": [
+        [
+          1546,
+          [
+            12,
+            12,
+            103,
+            41
+          ]
+        ],
+        [
+          32,
+          [
+            55,
+            21,
+            64,
+            25
+          ]
+        ],
+        [
+          29,
+          [
+            71,
+            21,
+            79,
+            25
+          ]
+        ]
+      ],
+      "red_hull_vertices": [
+        [
+          819,
+          500
+        ],
+        [
+          823,
+          492
+        ],
+        [
+          901,
+          492
+        ],
+        [
+          902,
+          493
+        ],
+        [
+          892,
+          518
+        ],
+        [
+          891,
+          520
+        ],
+        [
+          813,
+          520
+        ],
+        [
+          812,
+          519
+        ],
+        [
+          813,
+          516
+        ]
+      ],
+      "localized_bbox": [
+        828,
+        496,
+        885,
+        515
+      ],
+      "source_width": 84,
+      "source_height": 22,
+      "localized_width": 57,
+      "localized_height": 19,
+      "delta_left": 13,
+      "delta_right": 14,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black 26px native-sampled 4x",
+      "font_size": 26,
+      "slant": "PENDING_INDEPENDENT_NATIVE_SOURCE_COMPARISON",
+      "shadow_offset": 1,
+      "fill_rgba": [
+        255,
+        248,
+        222,
+        255
+      ],
+      "shadow_rgba": [
+        110,
+        34,
+        23,
+        255
+      ],
+      "target_bc3_blocks": 70
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "probe_roi": [
+        1326,
+        750,
+        1439,
+        802
+      ],
+      "red_component_bbox": [
+        1338,
+        762,
+        1427,
+        790
+      ],
+      "banner_bbox": [
+        1339,
+        763,
+        1426,
+        789
+      ],
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "source_text_pixels": 1246,
+      "source_bc3_blocks": 106,
+      "red_component_meta": [
+        [
+          1351,
+          [
+            12,
+            12,
+            101,
+            40
+          ]
+        ],
+        [
+          64,
+          [
+            44,
+            20,
+            53,
+            30
+          ]
+        ],
+        [
+          29,
+          [
+            65,
+            20,
+            73,
+            24
+          ]
+        ]
+      ],
+      "red_hull_vertices": [
+        [
+          1348,
+          762
+        ],
+        [
+          1426,
+          762
+        ],
+        [
+          1426,
+          764
+        ],
+        [
+          1422,
+          775
+        ],
+        [
+          1417,
+          788
+        ],
+        [
+          1416,
+          789
+        ],
+        [
+          1338,
+          789
+        ],
+        [
+          1338,
+          788
+        ],
+        [
+          1340,
+          780
+        ],
+        [
+          1344,
+          770
+        ],
+        [
+          1347,
+          763
+        ]
+      ],
+      "localized_bbox": [
+        1362,
+        766,
+        1398,
+        785
+      ],
+      "source_width": 74,
+      "source_height": 23,
+      "localized_width": 36,
+      "localized_height": 19,
+      "delta_left": 19,
+      "delta_right": 19,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black 26px native-sampled 4x",
+      "font_size": 26,
+      "slant": "PENDING_INDEPENDENT_NATIVE_SOURCE_COMPARISON",
+      "shadow_offset": 1,
+      "fill_rgba": [
+        255,
+        248,
+        222,
+        255
+      ],
+      "shadow_rgba": [
+        110,
+        34,
+        23,
+        255
+      ],
+      "target_bc3_blocks": 52
+    }
+  ],
+  "bc3_decoded_glyph_integrity": [
+    {
+      "key": "start",
+      "face": 687,
+      "bright_retained": 642,
+      "face_recall": 0.9345,
+      "bad_scanlines": [],
+      "scanlines": [
+        {
+          "y": 496,
+          "ratio": 1.0
+        },
+        {
+          "y": 497,
+          "ratio": 0.9459
+        },
+        {
+          "y": 498,
+          "ratio": 0.9744
+        },
+        {
+          "y": 499,
+          "ratio": 0.9556
+        },
+        {
+          "y": 500,
+          "ratio": 0.7632
+        },
+        {
+          "y": 501,
+          "ratio": 0.9545
+        },
+        {
+          "y": 502,
+          "ratio": 1.0
+        },
+        {
+          "y": 503,
+          "ratio": 1.0
+        },
+        {
+          "y": 504,
+          "ratio": 0.8261
+        },
+        {
+          "y": 505,
+          "ratio": 0.9688
+        },
+        {
+          "y": 506,
+          "ratio": 1.0
+        },
+        {
+          "y": 507,
+          "ratio": 1.0
+        },
+        {
+          "y": 508,
+          "ratio": 0.9231
+        },
+        {
+          "y": 509,
+          "ratio": 0.878
+        },
+        {
+          "y": 510,
+          "ratio": 1.0
+        },
+        {
+          "y": 511,
+          "ratio": 0.9762
+        },
+        {
+          "y": 512,
+          "ratio": 0.7381
+        },
+        {
+          "y": 513,
+          "ratio": 0.9762
+        }
+      ]
+    },
+    {
+      "key": "goal",
+      "face": 452,
+      "bright_retained": 427,
+      "face_recall": 0.9447,
+      "bad_scanlines": [],
+      "scanlines": [
+        {
+          "y": 766,
+          "ratio": 0.7037
+        },
+        {
+          "y": 767,
+          "ratio": 1.0
+        },
+        {
+          "y": 768,
+          "ratio": 0.7407
+        },
+        {
+          "y": 769,
+          "ratio": 0.8571
+        },
+        {
+          "y": 770,
+          "ratio": 1.0
+        },
+        {
+          "y": 771,
+          "ratio": 1.0
+        },
+        {
+          "y": 772,
+          "ratio": 0.9143
+        },
+        {
+          "y": 773,
+          "ratio": 0.9714
+        },
+        {
+          "y": 774,
+          "ratio": 1.0
+        },
+        {
+          "y": 775,
+          "ratio": 1.0
+        },
+        {
+          "y": 776,
+          "ratio": 0.8519
+        },
+        {
+          "y": 777,
+          "ratio": 1.0
+        },
+        {
+          "y": 778,
+          "ratio": 1.0
+        },
+        {
+          "y": 779,
+          "ratio": 1.0
+        },
+        {
+          "y": 780,
+          "ratio": 0.963
+        },
+        {
+          "y": 781,
+          "ratio": 1.0
+        },
+        {
+          "y": 782,
+          "ratio": 1.0
+        },
+        {
+          "y": 783,
+          "ratio": 1.0
+        }
+      ]
+    }
+  ],
+  "static_qa": {
+    "elements_total": 2,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_source_residue": 0,
+    "changed_outside_allowed_blocks": 0,
+    "alpha_changed_outside_allowed_blocks": 0,
+    "introduced_visible_outside_allowed_blocks": 0,
+    "final_source_residue_exact": 38,
+    "final_source_residue_color": 0,
+    "localized_overlap": 0,
+    "changed_bc3_blocks": 218,
+    "changed_bc3_blocks_outside_allowed": 0,
+    "full_reencoded_blocks": 180,
+    "partial_constrained_blocks": 57,
+    "status": "PASS"
+  },
+  "candidate_sha256": "db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "rework_trigger": "A183R3_CONTROLLER_FAIL_BROKEN_HANGUL_BC3",
+  "prior_candidate_sha256": "4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1",
+  "target_width_by_row": {
+    "start": 56,
+    "goal": 35
+  },
+  "exact_source_bbox_hard_gate": {
+    "decoded_outside": 0,
+    "alpha_outside": 0,
+    "introduced_outside": 0,
+    "previous_to_current_outside": 0,
+    "previous_to_current_alpha_outside": 0
+  },
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER",
+  "fresh_independent_c": "REQUIRED_C2",
+  "c3": "REQUIRED_AFTER_FRESH_C",
+  "pre_ingame": "PENDING_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "status": "B252_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
