@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 21:10 KST",
+  "updated_at_kst": "2026-10-08 21:41 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7831,5 +7831,20 @@
     "report": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json",
     "machine": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_NEW14_MACHINE.json",
     "contact_jpg": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_SOURCE_KOREAN_14ROW_50_CONTACT.jpg"
+  },
+  "b270_b271_q098_producer_qa_b269_rollback": {
+    "run_key": "OUTRUN-KOR-B270-B271-Q098-PLATE-GATE-ROLLBACK-20261008-2130",
+    "index": 98,
+    "trial_sha256": "1994820e44de1966e0c5b24a63ff1a24f69c60433447b5f319254df3565fb398",
+    "restored_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+    "produced_new_trial_dds": 1,
+    "accepted_producer_dds": 0,
+    "new_proof_pngs": 54,
+    "source_clean_outside": 0,
+    "clean_final_outside": 0,
+    "producer_visual": "FAIL_B271_OUTLINE_LOSS",
+    "status": "REWORK_REQUIRED",
+    "report": "localization/graphics/role_B/20261008-B270-Q098-PLATE-COMPOSITE-GATE/B270_B271_CONTROLLER_SELF_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

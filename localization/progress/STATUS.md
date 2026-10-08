@@ -3073,3 +3073,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 21:25 KST — C304 C2 q236
 - `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`. Newly completed 10 independent native SOURCE/CURRENT regions: source bbox PASS 14/14 total, changed RGBA/alpha outside in source text Y-bands 0/0; 14-row EN/KR JPG and machine JSON published. `C3=HOLD_STRICT_RECHECK` pending exact authored CLEAN+calibration/native style and full scope, no DDS, `RUNTIME_VALIDATION=UNTESTED`. `localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json`.
+
+### 2026-10-08 21:41 KST — B270/B271 q98 visual fail-closed, byte-exact rollback
+- 54 new lossless plate/composite/source evidence PNG PASS numeric 0 outside current B269 `1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb`, but residual font face micro-perforation HOLD. B271 `1994820e44de1966e0c5b24a63ff1a24f69c60433447b5f319254df3565fb398` new native BC3 candidate corrected 25,034 indices, FAIL source-family bright white overfill/navy outline damage at native/50/RAW. Restored B269 candidate by pinned Git blob; producer PASS/C2/C3/PRE_INGAME blocked; RUN_KEY `OUTRUN-KOR-B270-B271-Q098-PLATE-GATE-ROLLBACK-20261008-2130`, RUNTIME_VALIDATION=UNTESTED.

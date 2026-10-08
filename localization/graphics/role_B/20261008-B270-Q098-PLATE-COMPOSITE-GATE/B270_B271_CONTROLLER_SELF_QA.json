@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "run": "B270/B271",
+  "run_key": "OUTRUN-KOR-B270-B271-Q098-PLATE-GATE-ROLLBACK-20261008-2130",
+  "role": "B",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "policy_version": "10_STAGE_PRODUCTION_AND_COMPOSITE_GATE_20261008",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "source_revision": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "prior_C_rejection": "C300_C2_C3_STRIPED_GLYPH_FACE",
+  "source_rework_provenance": "localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json",
+  "triage": "MATERIAL_REWORK",
+  "authored_mask_sha256": "30b871414d43764e30ffd206caaa4be943d0389450e7749bf61f677f2a1b9370",
+  "b269_pretrial_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "b271_rejected_trial_sha256": "1994820e44de1966e0c5b24a63ff1a24f69c60433447b5f319254df3565fb398",
+  "restored_candidate_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "prior_b269_machine": "localization/graphics/role_B/20261008-B269-Q098-BC3-ENDPOINT-FACE-REPAIR/B269_MACHINE_QA.json",
+  "b270_machine": "localization/graphics/role_B/20261008-B270-Q098-PLATE-COMPOSITE-GATE/B270_MACHINE_AND_PLATE_COMPOSITE_QA.json",
+  "b271_machine": "localization/graphics/role_B/20261008-B271-Q098-AUTHORED-FACE-COMPLETE/B271_MACHINE_QA.json",
+  "worker_runs": {
+    "b270": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37777851409",
+    "b271": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37778270278"
+  },
+  "b270_validation": {
+    "source_clean_changed_unconditional_outside_source_bbox": 0,
+    "clean_final_changed_unconditional_outside_target_bbox": 0,
+    "source_final_changed_outside_source_bbox": 0,
+    "source_only_alpha_residue_diagnostic": 0,
+    "b269_persisted_visible_alpha_bbox": [
+      580,
+      11,
+      1523,
+      116
+    ],
+    "b269_alpha_inside_english_source_bbox": true,
+    "source_clean_separate_plate_only_images": 18,
+    "clean_final_separate_composite_images": 18,
+    "english_clean_korean_triple_comparisons": 18,
+    "total_lossless_source_clean_final_images": 54,
+    "evidence_orientations": [
+      "READABLE_FLIPY",
+      "RAW_MIRROR_Y"
+    ],
+    "evidence_scales": [
+      100,
+      75,
+      50
+    ],
+    "backgrounds": [
+      "GRAY",
+      "WHITE",
+      "BLACK"
+    ],
+    "numeric": "PASS_SOURCE_CLEAN_AND_COMPOSITE_B269_EXACT",
+    "controller_plate_only": "PASS_NO_VISIBLE_ENGLISH_GHOST_OR_BACKGROUND_PATCH_IN_ALPHA_COMPOSITE_AT_NATIVE_50_AND_RAW",
+    "controller_b269_composite": "VISUAL_HOLD_WHITE_GLYPH_HORIZONTAL_MICRO_PERFORATION_REMAINS; NO_SOURCE_RESIDUE_OR_CROP_RECT_VISIBLE"
+  },
+  "b271_validation": {
+    "b271_native_size": [
+      2048,
+      128
+    ],
+    "format": "BC3_DXT5_MIP1_RAW_MIRROR_Y",
+    "white_pinhole_proposals": 25676,
+    "repaired_color_indices": 25034,
+    "remaining_unsupported_indices": 642,
+    "alpha_changed": false,
+    "rgba_changed_outside_source_bbox": 0,
+    "rgba_changed_outside_target_bbox": 0,
+    "header_preserved": true,
+    "persisted_dds_roundtrip": "PASS",
+    "numeric": "PASS",
+    "controller_visual": "FAIL_SOURCE_FAMILY_LOST_NAVY_OUTLINE_AND_WHITE_FACE_OVERFILL",
+    "supporting_images": [
+      "localization/graphics/role_B/20261008-B271-Q098-AUTHORED-FACE-COMPLETE/READABLE_SOURCE_PREVIOUS_REPAIRED_100.png",
+      "localization/graphics/role_B/20261008-B271-Q098-AUTHORED-FACE-COMPLETE/READABLE_SOURCE_PREVIOUS_REPAIRED_50.png",
+      "localization/graphics/role_B/20261008-B271-Q098-AUTHORED-FACE-COMPLETE/RAW_SOURCE_PREVIOUS_REPAIRED_100.png"
+    ],
+    "observed": "Repaired word loses essential navy outlines and becomes broad opaque white Hangul letters; high zoom, readable 50% and RAW fail even though alpha and changed-bbox are stable.",
+    "rejected": true
+  },
+  "restore": {
+    "from_commit": "3e4b395d93a9b1c7c9314fe494e4aa15631efd49",
+    "git_blob": "80d63074c759589e7bbf48d9518fcfc7a45cc1be",
+    "sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+    "preserve_evidence": true
+  },
+  "decision": "PRODUCER_VISUAL_FAIL_REWORK_REQUIRED_B269_HOLD_B271_ROLLED_BACK",
+  "defect_codes": [
+    "SOURCE_FAMILY_STYLE_MISMATCH",
+    "GLYPH_FACE_OVERFILL",
+    "NAVY_OUTLINE_LOSS"
+  ],
+  "scope": "B-only q98 single candidate; untouched other assets and VR/FFB/DX11/DXVK",
+  "approved_candidate_count": 0,
+  "new_independent_C_pass": 0,
+  "independent_C": "NOT_RUN",
+  "C3": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "user_acceptance": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "Do not blindly widen white authored face mask or repeat B271. Repair BC3 block per-pixel white/navy boundary with source-style outline preserving counters and antialias, or manual native vector/BC3 encoder guided by source and B270 stage images. Then repeat 10-stage producer gate, new C2, separate C3, user JPG and game.",
+  "backend": "GitHub Actions fallback after ChatGPT sandbox raw.githubusercontent.com DNS failure; N100 unused",
+  "cleanup": {
+    "github_action_scratch": "EPHEMERAL_AUTO_REMOVED",
+    "gpt_local_scratch": "NO_GENERATED_TASK_FILES",
+    "n100": "NOT_USED"
+  }
+}

@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B270/B271 q098 42E618FD: 54 independent source/clean/final native+RAW+50% plate/composite lossless PNG produced and SHA-bound to B269 1d63cd9b...; no outside pixels. B271 1994820e... core whitening erased original navy outline despite machine PASS; controller VISUAL FAIL, rollback B269 exact SHA 1d63cd9b... (also HOLD for residual micro-perforations). Need white/navy per-pixel boundary-preserving method, fresh B producer QA then C2+C3; never promote B271, no in-game test.",
     "C304 C2 EVEN q236 source/candidate exact SHA new complete 14/14 native per-region bbox and 0 RGBA/alpha changed outside source cells in all examined Y bands, 14-row contact and machine JSON now GitHub. Previous C302 covered 4; C304 newly covers 10 and independently confirms total 14. HOLD C3 current-policy until SHA-bound CLEAN, qualified blind calibration, source-family/stem slant, RAW and 100/75/50 native BGW, full atlas/mip evidence, independent APPROVALS; do not repeat same native numeric proof or rerender identical DDS. Evidence localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C303 C1 q231 A194 current SHA visually corrected but HOLD strict new-policy calibrated native pixel/slant/family/C3; q059 historic C279 44 lossless PNG evidence now GitHub-persisted, HOLD strict without new APPROVALS, PJR-019 user JPG/game retest OPEN.",
     "A194 q231 flat source-family EBE401C8 complete: delayed GitHub Actions 37767491356 SUCCESS and exact new 8,388,736B DDS SHA256 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76 (Git blob 3eb25d96958f6d09380e9f40b46ae3569651e33b), replaces rejected dc08f74a..., source English 29b87a5c.... Native BGRA32 2048x1024 RAW mirror-y, 4/4 source bbox positive margin and out-of-mask/protected/overlap/source residue 0; actual SOURCE,CLEAN,FINAL and BWG/RAW/50% producer visual confirms red/gray flat single face replacing invented offset outline, LAN labels protected. Separate PLATE_ONLY lossless 121288 source removed / 0 outside and 0 alpha uncleared, COMPOSITE lossless 90590 clean-final changes / 0 outside and 0 changed transparent pixels. Candidate PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1, C3/user/actual-game/APPROVAL/PRE_INGAME blocked, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json.",
@@ -6770,7 +6771,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 19:37 KST",
+  "updated_at_kst": "2026-10-08 21:41 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11902,5 +11903,14 @@
     "report": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json",
     "machine": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_NEW14_MACHINE.json",
     "contact_jpg": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_SOURCE_KOREAN_14ROW_50_CONTACT.jpg"
+  },
+  "b270_b271_q098_producer_qa_b269_rollback": {
+    "run_key": "OUTRUN-KOR-B270-B271-Q098-PLATE-GATE-ROLLBACK-20261008-2130",
+    "index": 98,
+    "rejected_trial_sha256": "1994820e44de1966e0c5b24a63ff1a24f69c60433447b5f319254df3565fb398",
+    "restored_candidate_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+    "status": "REWORK_REQUIRED",
+    "report": "localization/graphics/role_B/20261008-B270-Q098-PLATE-COMPOSITE-GATE/B270_B271_CONTROLLER_SELF_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
