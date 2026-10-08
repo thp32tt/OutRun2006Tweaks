@@ -17,6 +17,7 @@ typedef struct timecaps_tag {
 } TIMECAPS;
 
 #include <d3d9.h>
+#include <array>
 #include <vector>
 #include <algorithm>
 #include <cstring>
@@ -189,6 +190,14 @@ namespace SumoUISpriteReplay
 		uint32_t kind;
 		SPRARGS args;
 		SPRARGS2 args2;
+		// Source SpriteNodes are unlinked after each rendered frame. A copied
+		// SPRARGS2::child_B4 (mask chain) must never point back into a reused
+		// game sprite ring on the next no-tick replay.
+		static constexpr unsigned MaxMaskChildren = 8;
+		std::array<SPRARGS2, MaxMaskChildren> maskChildren{};
+		std::array<const SPRARGS2*, MaxMaskChildren> maskSourceAddresses{};
+		unsigned maskCount = 0;
+		bool replayable = true;
 		OutRunVR::GameSemantic::RenderScope vrScope =
 			OutRunVR::GameSemantic::RenderScope::None;
 		OutRunVR::GameSemantic::ProducerToken vrProducer =
@@ -229,6 +238,44 @@ namespace SumoUISpriteReplay
 				entry.kind = node->kind_C;
 				entry.args = node->args_10;
 				entry.args2 = node->args2_58;
+				entry.replayable = true;
+				entry.maskCount = 0;
+				if (entry.kind == 1)
+				{
+					// A masked SPRARGS2 can reference a further child_B4 mask.
+					// Make a bounded deep copy while its original queue owns the
+					// pointers; replay must use only our stable Captured storage.
+					const SPRARGS2* child = node->args2_58.child_B4;
+					entry.args2.child_B4 = nullptr;
+					while (child)
+					{
+						if (entry.maskCount == Entry::MaxMaskChildren)
+						{
+							entry.replayable = false;
+							break;
+						}
+						bool repeated = false;
+						for (unsigned idx = 0; idx < entry.maskCount; ++idx)
+							repeated |= entry.maskSourceAddresses[idx] == child;
+						if (repeated)
+						{
+							entry.replayable = false;
+							break;
+						}
+						const unsigned idx = entry.maskCount++;
+						entry.maskSourceAddresses[idx] = child;
+						entry.maskChildren[idx] = *child;
+						entry.maskChildren[idx].child_B4 = nullptr;
+						if (idx == 0)
+							entry.args2.child_B4 = &entry.maskChildren[0];
+						else
+							entry.maskChildren[idx - 1].child_B4 =
+								&entry.maskChildren[idx];
+						child = child->child_B4;
+					}
+					if (!entry.replayable)
+						entry.args2.child_B4 = nullptr;
+				}
 				entry.vrScope =
 					OutRunVR::GameSemantic::PeekSpriteNodeScope(
 						node, OutRunVR::GameSemantic::RenderScope::None,
@@ -254,6 +301,10 @@ namespace SumoUISpriteReplay
 		for (int i = 0; i < CapturedCount; i++)
 		{
 			const Entry& entry = Captured[i];
+			// Malformed/cyclic/oversized original mask chains must never
+			// borrow a freed queue pointer or render a truncated sibling.
+			if (!entry.replayable)
+				continue;
 			const int prio = int(entry.priority);
 
 			const SpriteNode* before = Game::sprite_prio_root[prio];
