@@ -1,0 +1,10 @@
+{
+  "source_to_b251_outside_rgba": 0,
+  "source_to_b251_outside_alpha": 0,
+  "b248_to_b251_inside_rgba": 0,
+  "b248_to_b251_outside_rgba": 425,
+  "b248_to_b251_outside_alpha": 0,
+  "b248_to_b251_visible_outside": 425,
+  "b248_to_b251_outside_exact_source_bytes_restored": 425,
+  "conclusion": "Source byte-exact restored outside original badge glyph/effect source rectangles; B248 exact interior preserved."
+}

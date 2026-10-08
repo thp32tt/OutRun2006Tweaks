@@ -2816,3 +2816,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - IGR-006 / IGR-007 -> **C_STATIC_PASS_PENDING_NEW_INGAME_RETEST**. No runtime closure without a new actual-game screenshot.
 - No source/DDS bytes changed by C; `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+
+
+### C277 C2 q172 B251 recheck — 2026-10-08
+TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: original source vs B251 0 changed visible/alpha pixels outside exact START/GOAL source rectangles, all previous 425 red badge overflow pixels restored, RAW mirror-Y exact. Glyph slope/profile and new-policy C/C3 evidence still incomplete; q172 -> HOLD_STRICT_RECHECK, not approved. DDS unchanged. RUNTIME_VALIDATION=UNTESTED.

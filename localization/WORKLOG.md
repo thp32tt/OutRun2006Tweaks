@@ -3565,3 +3565,10 @@ Applied user-authorized production/QA improvements without changing six launches
 - No DDS candidate, runtime source byte, translation-table row, VR/FFB/DX11/DXVK file, or PRE_INGAME graphics export was changed. Cleanup finalization: this C276 run created no GPT-local or N100 task scratch/worktree, so there was no transient path to remove.
 - Evidence: `localization/graphics/role_C/20261008-C276-C1-IGR006-007-RUNTIME/C276_CONTROLLER_FINAL_QA.json`.
 
+
+
+### C277 C2 q172 independent B251 DDS recheck — 2026-10-08 11:50 KST
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`; source SHA `d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8`, B251 candidate SHA `05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018` and rejected B248 prior SHA `51a636b12d59...` independently verified on actual persisted DDS.
+- Complete 1024×1024 RGBA32 original-vs-B251 decoded pixel scan: 0 visible/RGBA/alpha differences outside exact START [55,373,136,396] and GOAL [595,635,672,659] canonical source-region rectangles; B248-vs-B251 425 red badge spill pixels returned byte-exact to original, 0 interior changes. RAW/FLIP-Y reflected region pixels byte-identical. New source/final native, 4×, 50%, RAW and machine JSON evidence saved: `localization/graphics/role_C/20261008-C277-C2-Q172-B251-INDEPENDENT-RECHECK/C277_Q172_CONTROLLER_FINAL_QA.json`.
+- **HOLD_STRICT_RECHECK, not C/C3 PASS**: first-look policy cannot be truthfully asserted after producer prose intake, glyph-only italic/slant anchors and current clean-plate/per-region evidence incomplete, blind calibration not renewed. B251 repairs C275 red-background visual failure, but no approved/packaged claim. Separate C3/PRE_INGAME/user JPG/NEW real-game evidence outstanding. Do not regenerate B251 merely for evidence migration.
+- Backend GitHub SSOT plus minimal N100 Pillow fallback due ChatGPT-local GitHub raw DNS restriction; DDS untouched; `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
