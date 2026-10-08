@@ -16,6 +16,19 @@ def body(s,marker):
             if depth==0:return s[brace+1:j]
     raise ValueError("unbalanced: "+marker)
 
+def closing_index(s,marker):
+    pos=s.find(marker)
+    if pos<0:raise ValueError("missing: "+marker)
+    brace=s.find("{",pos)
+    if brace<0:raise ValueError("missing opening brace: "+marker)
+    depth=0
+    for j in range(brace,len(s)):
+        if s[j]=="{":depth+=1
+        elif s[j]=="}":
+            depth-=1
+            if depth==0:return j
+    raise ValueError("unbalanced: "+marker)
+
 def verify(s):
     start=s.find("class FileDataCache")
     end=s.find("// QnD file entry cache",start)
@@ -24,7 +37,14 @@ def verify(s):
     getter=body(scope,"const uint8_t* getFileData(")
     background=body(scope,"void cacheFile(")
     budget=body(scope,"void setMaxCacheSize(")
+    folder=body(scope,"void cacheFolder(")
+    cache_end=closing_index(scope,"void cacheFile(")
+    pointer_owner_comment=scope.find("// Every returned pointer",cache_end)
+    cache_tail=scope[cache_end+1:pointer_owner_comment] if pointer_owner_comment>=0 else "MISSING_OWNER_COMMENT"
     tests=[
+        ("cacheFolder traverses DDS directory", "std::filesystem::directory_iterator(folder)" in folder and "entry.is_regular_file()" in folder and "cacheFile(entry.path());" in folder),
+        ("cacheFolder and cacheFile stay sibling functions", "void cacheFile(" not in folder and scope.count("void cacheFile(")==1),
+        ("cacheFile terminates cleanly before getFileData", not cache_tail.strip()),
         ("cache owns shared data", "std::shared_ptr<std::vector<uint8_t>> data;" in scope),
         ("cache owner constructed before read", "std::make_shared<std::vector<uint8_t>>(size)" in background),
         ("preload LRU, budget and publish use mtx1", background.count("std::lock_guard cacheLock(mtx1);")==3),
@@ -68,7 +88,10 @@ def mutations(s):
         "return (*transientOwner)->data();",
         "return found->second.data;",
         "found->second.data->size()",
-        "if (!transientOwner)"
+        "if (!transientOwner)",
+        "std::filesystem::directory_iterator(folder)",
+        "entry.is_regular_file()",
+        "cacheFile(entry.path());"
     ]
     for t in tokens:
         corrupt=s.replace(t,"__UNOWNED_EVICTION_HAZARD__",1)
@@ -76,7 +99,14 @@ def mutations(s):
         try:verify(corrupt)
         except ValueError:continue
         raise ValueError("failed to catch "+t)
-    return len(tokens)
+    # Inject garbage after cacheFile's closing brace: prior review accidentally
+    # pasted an orphan error-message fragment after the function.
+    close=closing_index(s,"void cacheFile(")
+    corrupt=s[:close+1]+"\nORPHANED_SOURCE_FRAGMENT;\n"+s[close+1:]
+    try:verify(corrupt)
+    except ValueError:pass
+    else:raise ValueError("failed to catch orphaned source fragment")
+    return len(tokens)+1
 
 if __name__=="__main__":
     code=(ROOT/"src/hooks_textures.cpp").read_text(encoding="utf-8")
@@ -85,4 +115,4 @@ if __name__=="__main__":
         p=mutations(code) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("DDS CACHE LIFETIME FAIL: "+str(exc))
-    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/13; runtime UNTESTED")
+    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/17; runtime UNTESTED")

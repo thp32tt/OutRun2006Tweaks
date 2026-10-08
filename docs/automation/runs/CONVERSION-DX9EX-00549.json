@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00549",
+  "production_id": "CONVERSION-DX9EX-00549",
+  "event_id": "CONVERSION-DX9EX-00549-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "8c6bd34c034a1097b12b366b0833dd623e18b515",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00549]",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "selected_work_item": "DX9EX-P0-DDS-CACHE-SOURCE-SPLICE-RECOVERY",
+  "summary": "Repair confirmed invalid C++ source splice in texture cache preload helper from c0cf0852; add structural self-test coverage to catch prior hidden compile-time regression.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_texture_cache_lifetime.py",
+    "docs/automation/reviews/CONVERSION_DX9EX_00549_CACHE_SPLICE_RECOVERY.md",
+    "docs/automation/runs/CONVERSION-DX9EX-00549.json"
+  ],
+  "deterministic_verification": {
+    "tool": "python tools/verify_vr_texture_cache_lifetime.py --self-test",
+    "expected_contracts": 23,
+    "expected_negative_mutations": 17,
+    "local_execution": "NOT_EXECUTED",
+    "exact_sha_ci": "PENDING"
+  },
+  "ci_gate_complete": false,
+  "controller_terminal": false,
+  "next_action": "Check exact material SHA DX9Ex Active, HUD Inspector, Domain Isolation (and supplementary full-source) CI. Pin run IDs/results to the material SHA, then finalize C6. No HMD claim.",
+  "score_award": "NOT_YET_CONFIRMED"
+}

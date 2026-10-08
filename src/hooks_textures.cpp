@@ -375,7 +375,12 @@ public:
 	void cacheFolder(std::filesystem::path folder)
 	{
 		if (std::filesystem::exists(folder))
-			for (const auto& entry : std::filesyste	void cacheFile(std::filesystem::path filename)
+			for (const auto& entry : std::filesystem::directory_iterator(folder))
+				if (entry.is_regular_file())
+					cacheFile(entry.path());
+	}
+
+	void cacheFile(std::filesystem::path filename)
 	{
 		auto extension = filename.extension().string();
 		std::transform(extension.begin(), extension.end(), extension.begin(),
@@ -456,11 +461,6 @@ public:
 		{
 			spdlog::warn(
 				"Texture cache: allocation failed for {} ({} MiB); skipping entry to keep the 32-bit game alive",
-				filename.string(), size / (1024 * 1024));
-			return;
-		}
-	}
-y to keep the 32-bit game alive",
 				filename.string(), size / (1024 * 1024));
 			return;
 		}
