@@ -1,3 +1,11 @@
+## HUD static review budget — 2026-10-08 (supersedes 1000/5000-loop requests)
+
+- **Do not run or re-create the old 1000-cycle / 5000-cycle HUD static audit workflows.** The user revoked the need for repeated passes of an unchanged HUD source snapshot. Remove those push/manual CI workflows; preserve prior results as historical evidence only.
+- On a real HUD-related material/contract change, validate **once per exact material SHA** with the existing OutRun EXE HUD Inspector and relevant DX9Ex Active gates. Targeted commands include `tools/verify_vr_hud_exact_callsite_contract.py --self-test`, `tools/verify_vr_visual_composition_p0.py`, and relevant DDS/texture validators. Each validator should run once, not 1000 or 5000 times. The 10 unique intentional mutations in the dedicated self-test remain valid and are **not** repeated 1000/5000 times.
+- A genuine failure requires a material fix and then revalidation of the new SHA. A fresh commit or new issue may require another run; retrying an unchanged PASS solely to accumulate cycle counts or score points is prohibited.
+- The legacy `tools/audit_vr_hud_1000.py` and `tools/audit_vr_hud_5000.py` scripts and `docs/automation/HUD_{1000,5000}_REVIEW_CONTRACT.md` are retained only as historical records, **not active development instructions**.
+- Keep actual HUD visual regressions and `RUNTIME_VALIDATION=UNTESTED` separate from static PASS. Prioritize source fixes, CI proof, and one meaningful headset test of a changed candidate over repeated identical checks.
+
 ## Execution location and N100 disk budget policy — 2026-10-08
 
 This policy applies to all AI agents, chats, scheduled automation and retries working on this branch. It restricts **where** work happens; it does not supersede backend/domain isolation, exact-SHA validation, GitHub-only job contracts or runtime test requirements.
