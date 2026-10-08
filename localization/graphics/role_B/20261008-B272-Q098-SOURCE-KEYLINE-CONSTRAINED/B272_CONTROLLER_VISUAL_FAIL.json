@@ -1,0 +1,29 @@
+{
+  "run": "B272",
+  "role": "B",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "candidate_trial_sha256": "71d5683b1809b02a0c77e7218eb8b792c5777bca69ab5b85333d961417955fd8",
+  "production_candidate_sha256_preserved": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "visual_proof": "READABLE_SOURCE_PREVIOUS_REPAIRED_50.png",
+  "visual_comparison": "At 50% practical display, source has a white italic face with continuous broad navy keyline; old candidate retains navy keyline but shows interior stippling; B272 trial becomes thick near-solid white Hangul that visibly loses original navy keyline and letter counter-space.",
+  "failure_codes": [
+    "SOURCE_OUTLINE_KEYLINE_LOSS",
+    "FONT_FACE_OVERFILL",
+    "COUNTER_SPACE_DAMAGE"
+  ],
+  "machine_qa_context": {
+    "changed_outside_source_bbox": 0,
+    "alpha_exact": true,
+    "header_exact": true
+  },
+  "status": "PRODUCER_VISUAL_FAIL_REJECTED",
+  "candidate_promoted": false,
+  "needs": "Restrict BC3 core edits to proven small internal holes without changing protected outline",
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_WORKER_CONTROLLER_VISUAL",
+  "n100_heavy_compute": false
+}
