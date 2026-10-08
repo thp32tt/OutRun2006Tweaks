@@ -1798,6 +1798,54 @@ async def conversion_process_lane(
         save_queue_state(q)
 
 
+def reconcile_conversion_lane_freeze(q: dict, active_by_lane: dict, now: datetime,
+                                     *, dxvk_frozen: bool, dx9ex_enabled: bool,
+                                     only_slot: str) -> bool:
+    """Park in-flight DXVK; restore an A-only-parked DX9Ex task by original ID.
+
+    Preservation is not task completion or new ownership authorization. The
+    usual branch/CI/worker reconciliation runs before any resumed task advances.
+    """
+    frozen = q.setdefault("frozen_lane_tasks", [])
+    changed = False
+    if dxvk_frozen and "B" in active_by_lane:
+        task = active_by_lane.pop("B")
+        frozen.append({
+            **task,
+            "frozen_lane": "B",
+            "frozen_at": now.isoformat(),
+            "frozen_reason": "DXVK frozen by user",
+        })
+        changed = True
+    if dx9ex_enabled and not only_slot and "C" not in active_by_lane:
+        terminal_ids = {
+            row.get("task_id")
+            for group in ("completed", "blocked")
+            for row in q.get(group, [])
+            if isinstance(row, dict)
+        }
+        for idx in range(len(frozen) - 1, -1, -1):
+            task = frozen[idx]
+            if not isinstance(task, dict):
+                continue
+            if (task.get("frozen_lane") != "C"
+                    or not str(task.get("frozen_reason") or "").startswith("single-lane mode active:")
+                    or task.get("phase") == "DONE"
+                    or not task.get("task_id")
+                    or task.get("task_id") in terminal_ids):
+                continue
+            resumed = dict(task)
+            resumed["restored_from_frozen_at"] = now.isoformat()
+            resumed["owner_reconciliation_required"] = True
+            active_by_lane["C"] = resumed
+            frozen.pop(idx)
+            changed = True
+            break
+    if changed:
+        q["frozen_lane_tasks"] = frozen[-100:]
+    return changed
+
+
 def conversion_dispatch_plan(
     active_by_lane: dict,
     limit: int,
@@ -1829,7 +1877,7 @@ def conversion_dispatch_plan(
 
 
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Operate a DX11-only VR controller, freezing other lane records durably."""
+    """Develop native DX11 and stabilize DX9Ex concurrently; freeze DXVK."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reconcile_legacy_conversion_blocked(q)
@@ -1868,6 +1916,16 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             })
         q["active"] = None
         q.pop("next_task_not_before", None)
+        save_queue_state(q)
+
+    # Reconcile across the previous DX11-only deployment without losing C
+    # task identity. Park B before per-lane processing, even if B was active.
+    if reconcile_conversion_lane_freeze(
+        q, active_by_lane, now,
+        dxvk_frozen=DXVK_FROZEN,
+        dx9ex_enabled=CONVERSION_DX9EX_ENABLED,
+        only_slot=CONVERSION_ONLY_SLOT,
+    ):
         save_queue_state(q)
 
     if CONVERSION_ONLY_SLOT:
@@ -1914,11 +1972,9 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         )
         return
 
-    # DX11 native has 100% of autonomous development capacity by current user
-    # decision. DXVK is FROZEN, DX9Ex is maintenance-only and disabled.
-    # Single-slot mode moves existing B/C task records to frozen_lane_tasks
-    # without marking them PASS/FAIL or mutating the source branches.
-    # Count any pre-existing work for deployments overriding single-slot mode.
+    # Keep the previous two-worker architecture: A(DX11 implementation)
+    # + C(DX9Ex HUD/stability). B(DXVK) remains FROZEN.
+    # Capacity accounting includes ALL live tasks, including restored C.
     for lane_key in conversion_dispatch_plan(
         active_by_lane,
         CONVERSION_ACTIVE_LIMIT,
@@ -1931,7 +1987,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "DX11 native ONLY; DXVK frozen; DX9Ex disabled; active: "
+            A(DX11 native) + C(DX9Ex stability); B(DXVK frozen); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
