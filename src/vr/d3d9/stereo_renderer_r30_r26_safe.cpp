@@ -151,6 +151,61 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
         }
 
+        // R23 may reject the first GOAL eye/depth bootstrap before any
+        // screen-space classifier or R62/XYZRHW candidate is entered.
+        // The candidate-only GOAL logs therefore *cannot* distinguish
+        // absent sprite from a rejected stereo seed. Record the exact
+        // queue owner at the outer draw hook before R30SafeStereoBase().
+        // No render state change, no geometry inference from alpha/color.
+        void R30TracePreRestartHudEligibility(
+            IDirect3DDevice9* device, unsigned method) noexcept
+        {
+            if (!Settings::VRTelemetry || !device ||
+                !Game::current_mode || method >= 4u ||
+                !OutRunVR::GameSemantic::QueueRenderActive() ||
+                !IsGameDevice(device) || InternalStereoPass)
+                return;
+            const auto state = *Game::current_mode;
+            unsigned stateIndex = 0;
+            if (state == GameState::STATE_GOAL)
+                stateIndex = 0u;
+            else if (state == GameState::STATE_TIMEUP)
+                stateIndex = 1u;
+            else if (state == GameState::STATE_LINK_TIMEUP)
+                stateIndex = 2u;
+            else
+                return;
+            const auto producer =
+                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const unsigned token = static_cast<unsigned>(producer);
+            if (token >= 32u)
+                return;
+            static std::atomic<std::uint32_t> firstByMethodState[12]{};
+            const unsigned index = method * 3u + stateIndex;
+            const std::uint32_t bit = 1u << token;
+            if ((firstByMethodState[index].fetch_or(
+                    bit, std::memory_order_relaxed) & bit) != 0u)
+                return;
+            constexpr const char* kDrawMethods[4] = {
+                "DrawPrimitive", "DrawIndexedPrimitive",
+                "DrawPrimitiveUP", "DrawIndexedPrimitiveUP"
+            };
+            spdlog::info(
+                "VR P0 GOAL EARLY_GATE: method={} state={} producer={} scope={} queueEpoch={} stereoWanted={} seeded={} allowed={} frameIncomplete={} mainBackbuffer={} deferredDepth={} auxRT={}",
+                kDrawMethods[method], static_cast<int>(state),
+                OutRunVR::GameSemantic::Name(producer),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                StereoWanted() ? 1 : 0,
+                R9StereoSeeded ? 1 : 0,
+                OutRunVR::RuntimeEligibility::MayInjectStereo() ? 1 : 0,
+                FrameStereoIncomplete ? 1 : 0,
+                TargetIsBackBuffer() ? 1 : 0,
+                R9DeferredDepth ? 1 : 0,
+                AnyAuxRenderTargetActive() ? 1 : 0);
+        }
+
         SafetyHookInline R30DrawPrimitiveR29Hook{};
         SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
         SafetyHookInline R30DrawPrimitiveUPR29Hook{};
@@ -4868,6 +4923,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TracePreRestartHudEligibility(device, 0u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
@@ -4897,6 +4953,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TracePreRestartHudEligibility(device, 1u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             // F11 external ImGui uses fixed-function XYZ+orthographic
             // DrawIndexedPrimitive, never XYZRHW or a vertex shader.
@@ -4949,6 +5006,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
@@ -4979,6 +5037,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TracePreRestartHudEligibility(device, 3u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
