@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-# B255 actual q172 native DDS repair; C281 source-right-italic C-return.
+# B256 actual q172 native DDS repair; C281 source-right-italic C-return.
 import os,json,hashlib,struct,tempfile,urllib.request,subprocess
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
 if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":raise SystemExit("worker B only")
-repo=Path.cwd();run="20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR"
+repo=Path.cwd();run="20261008-B256-Q172-CLEAN-RIM-RESIDUE"
 out=repo/"localization/graphics/role_B"/run;out.mkdir(parents=True,exist_ok=True)
 file=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 platefile=repo/"localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_CLEAN_PLATE.png"
 SOURCE="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-PRIOR="26381bbba897a303934908a6057d5a7a04ae7e8ff16eee2cdb77780ca43a2110"
+PRIOR="7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2"
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 if sha(file)!=PRIOR:raise RuntimeError(("concurrent DDS changed",sha(file),PRIOR))
@@ -32,6 +32,29 @@ with tempfile.TemporaryDirectory(prefix="b254_") as td:
     for q in specs:
         x0,y0,x1,y1=q["box"];allowed[y0:y1,x0:x1]=True
         clean.paste(legacy.crop((x0,y0,x1,y1)),(x0,y0))
+    # B255 source/CLEAN 6x showed a pale source-shaped fragment at the extreme
+    # right of the START text/effect rectangle. Reconstruct ONLY confirmed
+    # cream/orange residue pixels there from same-scanline red donors.
+    # Do not edit the protected white rim outside [55,373,136,396].
+    plane=np.asarray(clean,dtype=np.uint8).copy()
+    residue_count=0
+    for row in specs:
+        if row["key"]!="START":continue
+        x0,y0,x1,y1=row["box"]
+        for yy in range(y0+1,min(y0+8,y1)):
+            donor=plane[yy,x1-19:x1-9,:].astype(np.int16)
+            red=(donor[:,0]>140)&(donor[:,0]>donor[:,1]+55)&(donor[:,1]<110)&(donor[:,2]<145)
+            if not red.any():raise RuntimeError(("no red donor",yy))
+            fill=np.median(donor[red],axis=0).astype(np.uint8)
+            for xx in range(x1-7,x1):
+                p=plane[yy,xx].astype(np.int16)
+                pale=(p[0]>195 and p[1]>115 and p[2]>65 and p[1]>p[0]*0.5)
+                if pale:
+                    plane[yy,xx]=fill
+                    residue_count+=1
+    if residue_count<1:raise RuntimeError("B255 suspected right source residue not reproduced; stop and re-inspect")
+    clean=Image.fromarray(plane,"RGBA")
+    print("B256_START_SOURCE_RESIDUE_PIXELS_REPLACED",residue_count,flush=True)
     sourcepixels=np.asarray(source,dtype=np.uint8)
     if np.count_nonzero(np.any(sourcepixels!=np.asarray(clean),axis=2)&allowed)<500:raise RuntimeError("English source-removal plate invalid")
     final=clean.copy()
@@ -50,7 +73,7 @@ with tempfile.TemporaryDirectory(prefix="b254_") as td:
         maskdata=bytes(glyph_probe.getmask(korean))
         if not maskdata or not any(maskdata) or maskdata==missing:
             raise RuntimeError(("Missing Hangul glyph / tofu fallback",korean,fp,idx))
-    print("B255_KOREAN_GLYPH_COVERAGE_OK",fp,idx,fam,flush=True)
+    print("B256_KOREAN_GLYPH_COVERAGE_OK",fp,idx,fam,flush=True)
     for q in specs:
         x0,y0,x1,y1=q["box"];fw,fh=q["textsize"];dx=q["shear"]
         f=ImageFont.truetype(fp,108,index=idx)
@@ -100,7 +123,7 @@ with tempfile.TemporaryDirectory(prefix="b254_") as td:
         contact.append(panel)
     board=Image.new("RGB",(max(x.width for x in contact),sum(x.height for x in contact)+16),(28,28,28));y=0
     for p in contact:board.paste(p,(0,y));y+=p.height+16
-    board.save(out/"B255_SOURCE_CLEAN_PREVIOUS_FINAL_NATIVE6X.png")
+    board.save(out/"B256_SOURCE_CLEAN_PREVIOUS_FINAL_NATIVE6X.png")
     for scale in [1,.75,.5]:
         pr=gray(decoded).resize((int(w*scale),int(h*scale)),Image.Resampling.LANCZOS)
         pr.save(out/("PRACTICAL_"+str(int(scale*100))+".png"))
@@ -111,13 +134,14 @@ with tempfile.TemporaryDirectory(prefix="b254_") as td:
             "regions":specs,"changed_inside":int(np.count_nonzero(changed&allowed)),
             "outside_rgba":outside,"outside_alpha":ao,
             "header_exact":file.read_bytes()[:128]==a[:128],
+            "source_right_bright_residue_pixels_replaced":residue_count,
             "roundtrip":"PASS",
             "controller_visual":"PENDING_HUMAN_REVIEW",
-            "status":"B255_MACHINE_PASS_PENDING_CONTROLLER",
+            "status":"B256_MACHINE_PASS_PENDING_CONTROLLER",
             "RUNTIME_VALIDATION":"UNTESTED","forbidden_domains_touched":[]}
-    rp=out/"B255_MACHINE_QA.json";rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-    wr=repo/"localization/graphics/worker_results/B255_6C9B3611.json"
+    rp=out/"B256_MACHINE_QA.json";rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+    wr=repo/"localization/graphics/worker_results/B256_6C9B3611.json"
     wr.write_text(json.dumps({"role":"B","run":run,"candidate_sha256":hashnow,
-         "status":"B255_MACHINE_PASS_PENDING_CONTROLLER",
+         "status":"B256_MACHINE_PASS_PENDING_CONTROLLER",
          "qa_path":str(rp.relative_to(repo))},ensure_ascii=False,indent=2)+"\n")
-    print("B255_DONE",json.dumps({"candidate_sha":hashnow,"regions":specs,"outside":outside},ensure_ascii=False),flush=True)
+    print("B256_DONE",json.dumps({"candidate_sha":hashnow,"regions":specs,"outside":outside},ensure_ascii=False),flush=True)
