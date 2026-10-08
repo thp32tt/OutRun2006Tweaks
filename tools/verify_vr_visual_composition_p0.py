@@ -2184,4 +2184,47 @@ for label, mutant in (
         raise SystemExit('P0 SceneEffect WVP mutation survived: ' + label)
 
 
+
+# Race-end GOAL/TIMEUP shader HUD must never pick up a previous
+# Present's raw c64 through the long 128-draw same-shader fallback.
+# The existing Sumo replay tag path remains independent of this rule.
+def check_fresh_frame_game_wvp(source):
+    reset = function_body(source, 'void ResetFrameState()')
+    require_order(reset, 'invalidate old game raw c64 before new pose',
+                  'InvalidateGameWvpWrite();',
+                  'LatchedHeadInverseValid = false;',
+                  'LastVerifiedWvpValid = false;')
+    latch = function_body(source, 'void LatchFramePose()')
+    require_order(latch, 'fresh frame invalidation precedes new pose acquisition',
+                  'ResetFrameState();', 'RestoreCullingCamera();',
+                  'GameRendererIsActive()')
+    # Source getters must fail closed until a fresh original upload succeeds.
+    getter = function_body(source, 'bool GetLastRawGameWvpWrite(')
+    require('!LastGameWvpWriteValid', getter,
+            'reject cross-frame original game c64')
+    owner = source[source.rfind('void InvalidateGameWvpWrite() noexcept'):]
+    invalidate = function_body(owner, 'void InvalidateGameWvpWrite() noexcept')
+    for marker in (
+        'LastGameWvpWriteValid = false;',
+        'LastGameWvpTopLevelDrawSerial = 0;',
+        'LastGameWvpShaderSerial = 0;',
+        'LastGameWvpQueueNode = nullptr;',
+        'LastGameWvpProducerToken =',
+    ):
+        require(marker, invalidate, 'reset c64 raw/queue provenance')
+
+check_fresh_frame_game_wvp(renderer)
+mutant = renderer.replace(
+    'InvalidateGameWvpWrite();\n\t\t\tLatchedHeadInverseValid = false;',
+    '/* injected stale WVP across Present */\n\t\t\tLatchedHeadInverseValid = false;', 1)
+if mutant == renderer:
+    raise SystemExit('P0 c64 per-frame guard mutation was not injected')
+try:
+    check_fresh_frame_game_wvp(mutant)
+except SystemExit:
+    pass
+else:
+    raise SystemExit('P0 stale pre-GOAL raw c64 mutation incorrectly passed')
+
+
 print('P0 visual composition static contract: PASS')
