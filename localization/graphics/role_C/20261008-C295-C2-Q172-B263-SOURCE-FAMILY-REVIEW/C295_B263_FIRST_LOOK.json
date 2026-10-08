@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "run": "C295-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "role": "C",
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "ChatGPT AI 1",
+  "producer_report_consulted_before_new_B263_pixel_review": false,
+  "producer_history_prior_B255_B262_read": true,
+  "review_scope": "Newly material B263 DDS exact candidate after B262 trial, not a repeat of C291 old B255",
+  "evidence_dir": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE",
+  "images_first_viewed": [
+    "START_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png",
+    "START_PRACTICAL_50.png",
+    "GOAL_PRACTICAL_50.png",
+    "START_RAW_SOURCE_CLEAN_FINAL.png",
+    "GOAL_RAW_SOURCE_CLEAN_FINAL.png"
+  ],
+  "first_look": {
+    "start": {
+      "readable": "Original English START uses tall, strongly forward italic cream face with pale highlights, red extrusion and high word occupancy. Current 출발 shows fairly upright thick horizontal Hangul bars with a brown/orange layered effect; overall headline appears much smaller/less dominant than English, and glyph slant is not source-direction visibly matched.",
+      "practical50": "Korean two syllables legible in tiny badge, but the source lettering occupies a substantially larger fraction of width and source tilt/depth is stronger.",
+      "raw": "Mirrored RAW image shows the same material face/geometry mismatch under expected vertical flip; no obvious entire-atlas flip discrepancy."
+    },
+    "goal": {
+      "readable": "Original English GOAL has four large italic cream letters filling most of red badge. Current 골 is centered as one visibly small gold squared/stacked glyph and does not carry comparable cream-face italic extrusion/word hierarchy. Distinct from B262 horizontally stretched form, but not a faithful visual replacement.",
+      "practical50": "The one-syllable label is visible; its much weaker scene-relative visual presence and very different shape against original is a probable source-style hierarchy failure, not solely an English/Korean text-length ratio.",
+      "raw": "RAW view similarly shows squared effect and weak source-italic geometry; not explained away by FLIP-Y."
+    }
+  },
+  "initial_decision": "LIKELY_REWORK_REQUIRED_PENDING_NATIVE_EXACT_BYTE_MACHINE_AND_CALIBRATION",
+  "prohibition": "Do not promote producer PASS or current C/C3 approval based on these JPEG/PNG previews alone; verify persisted DDS SHA and native source first.",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
