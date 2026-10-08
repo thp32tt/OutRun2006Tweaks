@@ -515,22 +515,25 @@ class UIScaling : public Hook
 	using TextGlyphPutSpriteFn = int(__cdecl*)(SPRARGS*, float);
 	static int __cdecl TextGlyph_putSprite(SPRARGS* args, float priority)
 	{
+		// The canonical original EXE's 0x2C808 / 0x2C9DB
+		// glyph-generation CALLs both reach put_sprite_ex at 0x2CFE0.
+		// Sumo_Printf (including stage/result 0x975EE / 0x97727 /
+		// 0x977FB) can emit a group, not just the final priority tail.
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
 		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
 			Module::exe_ptr(0x2CFE0));
-		int prio = int(priority);
-		prio = prio < 0 ? 0 :
-			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
-		SpriteNode* root = Game::sprite_prio_root[prio];
-		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
-
 		const int result = original(args, priority);
-
-		root = Game::sprite_prio_root[prio];
-		SpriteNode* node = root ? root->tail_4 : nullptr;
-		if (node && node != tailBefore)
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
-				OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
+		// Tag all original-produced glyph/mask children as ScreenHud;
+		// otherwise an untagged sibling bypasses the R30 head-recentered
+		// HUD owner and doubles at +TIME / checkpoint / goal/result.
+		TagAppendedNodes(tailsBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
 		return result;
 	}
 
