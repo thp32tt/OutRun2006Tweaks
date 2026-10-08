@@ -7687,5 +7687,25 @@
       "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q231_CONTROLLER_QA.json",
       "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q237_CONTROLLER_QA.json"
     ]
+  },
+  "c300_c2_q098_native_glyph_face_fail": {
+    "run_key": "OUTRUN-KOR-C300-C2-Q098-NATIVE-GLYPH-FAIL-20261008-1950",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 98,
+    "asset": "42E618FD",
+    "status": "C3_STRICT_AUDIT_REWORK_REQUIRED",
+    "source_sha256_from_prior_proof": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "candidate_sha256_from_prior_proof": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+    "concrete_visual_defect": "Decoded 2048x128 DXT5 Korean fill contains repeated horizontal dark stipple in white glyph interior; native English source white fill smooth; independent C3 early hard FAIL overrides C126 machine PASS",
+    "report": "localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json",
+    "produced_dds": 0,
+    "C_current": "REWORK_REQUIRED",
+    "C3": "FAIL",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "execution_backend": "GitHub connector data + ChatGPT local JS native DXT5 decode; no N100 computation"
   }
 }
