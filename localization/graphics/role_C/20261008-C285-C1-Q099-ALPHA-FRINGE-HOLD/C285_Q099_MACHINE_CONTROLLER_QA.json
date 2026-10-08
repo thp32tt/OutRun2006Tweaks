@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C285-C1-Q099-ALPHA-FRINGE-20261008-1440",
+  "role": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 99,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "source": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2"
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "bytes_changed": false
+  },
+  "execution_backend": "N100 MCP small native DXT5 decode fallback: local container cannot resolve github.com; GitHub connector has no direct local binary mounting; N100 worktree not modified",
+  "source_and_candidate_sha256_verified_against_exact_bytes": true,
+  "decoded_size": [
+    2048,
+    256
+  ],
+  "format": "DXT5",
+  "mips": 1,
+  "source_work_region_claimed": [
+    514,
+    37,
+    1614,
+    217
+  ],
+  "native_pixel_independent_observations": {
+    "alpha_outside_claimed_work_region": {
+      "count": 49,
+      "locations": "y=217..218; x=567..1279",
+      "source_alpha_min": 1,
+      "source_alpha_max": 3,
+      "candidate_alpha": 0,
+      "all_changed_pixels_belong_to_original_source_low_alpha_fringe": true,
+      "does_not_prove_candidate_overflow": true,
+      "producer_threshold_omitted_alpha_1_to_3": true
+    },
+    "source_and_candidate_changed_outside_claimed_work_region": 49,
+    "source_alpha_outside_claimed_work_region": 49,
+    "source_effect_bbox_remeasurement_needed": true,
+    "not_a_protected_art_intrusion_claim": true,
+    "original_aligned_candidate_overlay": "A119R exact producer JPG and independent DXT5 decode inspected; two Korean lines present; first-look blind review not satisfied because producer report was read before pixel inspection"
+  },
+  "existing_visual_references": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_ROW_SOURCE_FINAL_CONTACT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_RAW_COMPARE.jpg"
+  ],
+  "independent_lossless_region_evidence": "NOT_PUBLISHED; generated transient small decoded native comparisons in isolated N100 scratch, insufficient for new-policy approval",
+  "calibration": "NOT_VALIDATED",
+  "separate_region_c_c3_stages": "NOT_COMPLETE",
+  "full_source_alpha_bbox": "NEEDS_EXACT_REMEASUREMENT",
+  "original_source_plate": "text-only transparent source; producer CLEAN per-region exact evidence not certified",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "approval_record_created": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "A producer PASS contradicted by 49 source fringe pixels outside declared hard bbox. Recompute complete alpha>0 source effect bbox, review lossless native/RAW/FLIP-Y per-line crops and two-line slant/weight at practical scales; perform calibration and distinct C/C3 region observations, then decide PASS versus REWORK. Do not rerender DDS solely to migrate evidence.",
+  "no_vr_ffb_dx11_dxvk_changes": true
+}
