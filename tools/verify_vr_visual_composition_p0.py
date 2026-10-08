@@ -118,6 +118,30 @@ def check_xmt_loader_guard(source):
     require('skipping its remaining textures', body,
             'corrupt/late XMT remains crash-safe instead of dereferenced')
 
+def check_xmt_loader_atomic_install(source):
+    scope = source[source.index('class FixFileLoadRace'):
+                   source.index('class FileLoadSliceEndsEarly')]
+    require_order(scope, 'XMT race hook rollback on partial install',
+                  'const bool ok = ServiceRequest_hook && ServiceRequestMoveDone_hook &&',
+                  'if (!ok)', 'ServiceRequest_hook = {};',
+                  'ServiceRequestMoveDone_hook = {};', 'sumo_fread_hook = {};',
+                  'sumo_fread_finished_hook = {};', 'LoadTextures_hook = {};',
+                  'return ok;')
+
+check_xmt_loader_atomic_install(bugfixes)
+for label, old, changed in (
+    ('loader missing matching unlock rollback', 'ServiceRequestMoveDone_hook = {};',
+     'ServiceRequestMoveDone_hook = ServiceRequestMoveDone_hook;'),
+    ('loader partial XMT hook retained', 'LoadTextures_hook = {};',
+     'LoadTextures_hook = LoadTextures_hook;'),
+):
+    try:
+        check_xmt_loader_atomic_install(bugfixes.replace(old, changed, 1))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 XMT loader hook rollback mutation survived: ' + label)
+
 check_xmt_loader_guard(bugfixes)
 for label, old, changed in (
     ('missing minimum block length', 'blockSize >= XPR0EntrySize', 'blockSize != 0'),
