@@ -6,6 +6,8 @@ on:
       - '.github/workflows/localization-rework-triage-test.yml'
       - 'tools/localization/rework_triage.py'
       - 'tools/localization/test_rework_triage.py'
+      - 'tools/localization/qa_evidence_gate.py'
+      - 'tools/localization/test_qa_evidence_gate.py'
       - 'localization/graphics/REWORK_ESCALATIONS.json'
       - 'docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md'
       - 'docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md'
@@ -22,5 +24,9 @@ jobs:
           python-version: '3.12'
       - name: Test status classification and repeat-defect guard
         run: python -m unittest discover -s tools/localization -p test_rework_triage.py -v
+      - name: Install evidence test dependencies
+        run: python -m pip install Pillow
+      - name: Evidence gate user gameplay veto tests
+        run: python -m unittest discover -s tools/localization -p test_qa_evidence_gate.py -v
       - name: Exercise live read-only classification
         run: python tools/localization/rework_triage.py --index 219
