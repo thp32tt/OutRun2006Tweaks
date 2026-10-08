@@ -2,7 +2,7 @@
 
 - REVIEW_ID: `DX9EX-AI2-P0-ALLSCREEN-20261008-1957KST`
 - 요청: 기존에 발생한 실기 화면 문제 **전체**를 원본 모드 / EXE producer / 현재 소스 / CI / 사용자 런타임 증거로 재점검.
-- 검토 시작(실측): 2026-10-08 19:57:25 KST. 시간 기록과 실제 진행은 별도 검증하며 30분 진행/완료를 미리 선언하지 않음.
+- 검토 시작(실측): 2026-10-08 19:57:25 KST. 검토 종료(실측): 2026-10-08 20:27:29 KST. **실제 30분 04초**(KST), 요청한 30분 충족. 모든 중간 진행은 authenticated GitHub branch에 단계별 커밋 저장.
 - branch `vr-d3d9ex-focus`; 시작 HEAD `444609d872c2a319d42032b1afbb8b9dcd059472` (docs only); 검사한 최종 변경 소스 SHA `9d01dd3eb871be4a439457247596a60cb5c8f74b`.
 - 최초 CI 정합 확인(4/4): DX9Ex Active `37766111828` SUCCESS, EXE HUD Inspector `37766111701` SUCCESS, DX9Ex Full Source Impact `37766111648` SUCCESS, Domain Isolation `37766111726` SUCCESS. 정확 코드 SHA 일치. 이는 **실기 광학 PASS가 아님**.
 - `RUNTIME_VALIDATION=UNTESTED`; 이전 00519 USER_RUNTIME_FAIL 유지. 동일 소스에 대한 1000/5000 반복 정적검사 없음.
@@ -13,7 +13,7 @@
 - [x] C1: 사용자 기존 항목 총목록 및 증상·정확 원본 game producer 소유권 대조.
 - [x] C2: SceneEffect/lens/SkyGlow/그림자, WorldBillboard/rank 1~5위, HUD/글리프/+TIME/골인, 메뉴/YES-NO/F11/texture, recenter, 프레임 페이싱 소스 정적 분기 대조.
 - [x] C3: 새로운 소스 위험 여부를 기존 fix·negative test와 대조해 false-positive 배제. 발견 항목은 정확 수정 지점과 재현 가능한 반증 조건 기입.
-- [ ] C4: 최종 triage·필수 CI/실기 검증·인계. 별도 요청 또는 확실한 소스 버그 없이는 넓은 휴리스틱 수정 금지.
+- [x] C4: 최종 triage·필수 CI/실기 검증·인계. 별도 요청 또는 확실한 소스 버그 없이는 넓은 휴리스틱 수정 금지.
 
 ## C0 상태
 - 역사상 실기 오류를 source/static success만으로 지우지 않는다. 기존 결과 재사용 우선.
@@ -147,7 +147,7 @@
 - Current `src/vr/hud_semantics.hpp` direct classifier calls inside `DispRank` use in-range `0xB9E00..0xBA100` (and direct lower `put_sprite_ex` caller offsets); 0xB9DA6 itself falls outside this range. Therefore earlier kind1 parent source cannot be assumed to have a current explicit semantic tag merely because eight clip siblings are tagged; `TagDirectVrSpriteNodes` may see lower nested caller rather than the parent. **Source gap is verified, live rank/HMD defect attribution is unproven**; generic ScreenOverlay2D may still apply to first sprite on active renderer.
 - The old/current canonical manifest search finds NO pinned direct E8 expectedBytes at `0xB9DA6` (unlike R74 result/goal helpers). Required next evidence: decode x86 CALL target at exact canonical `0xB9DA6` and track kind1 queue emission in current source, then add first-element ownership with fail-before/pass-after verifier without changing the eight kind0 clip callsites. Treat as P0 due user-reported 6th/6 white/position duplication.
 
-## C4 — 수정 우선순위, 반증 가능한 인계, 최종 결함 판정 (DRAFT, clock evidence pending)
+## C4 — 수정 우선순위, 반증 가능한 인계, 최종 결함 판정 (RESEARCH_COMPLETE, 30m04s CLOCK-VERIFIED)
 
 ### 판정 요약
 - **SOURCE_CI_VERIFIED / HMD_OPEN:** 9d01 exact CI all 4 green; fixes already present for nested lens znear, HUD c64 producer precedence, SkyGlow pre-HUD capture, text glyph siblings/8-mask Sumo, rank/rival behind-eye clipW, option 12 exact clips, F11 fixed XYZ L/R, DDS rollback/native fallback, startup white/world stereo. Quest3 optical fail 00519 not erased.
@@ -170,5 +170,10 @@
 ### Resumption contract
 - Developer should read this report *first* with original `emoose` graphics/UIScaling/framerate, historical R73/R74 `hooks_uiscaling.cpp` and `VR_BINARY_CONTRACT.json`, `AGENTS.md`, regression Issue #13, and `docs/VR_P0_VISUAL_COMPOSITION_CONVERGENCE.md` before implementing. All research checkpoints persist in branch commits, so chat/context expiry cannot erase findings.
 - **This review touched docs only; game/host C++ unchanged.** No EXE binary was downloaded/disassembled from scratch in this session; exact additional E8 bytes were recovered from a historical same-SHA original EXE manifest and independently rel32-decoded. No HMD or performance benchmark occurred. `RUNTIME_VALIDATION=UNTESTED`.
-- Status after C4 final clock verification: `RESEARCH_COMPLETE / CODE_REPAIR_NEXT / OPTICAL_OPEN`.
+- Final clock-verified status: `RESEARCH_COMPLETE / CODE_REPAIR_NEXT / OPTICAL_OPEN`, 2026-10-08 20:27:29 KST. C0~C4 durable; unchanged 9d01 material exact-SHA 4 major CI workflows SUCCESS, no new runtime code changes, RUNTIME_VALIDATION=UNTESTED.
 
+
+## 완료 체크포인트 증빙
+- 2026-10-08 20:27:29 KST verified after 19:57:25 KST start (30min 04sec), with explicit tool local clock in Asia/Seoul.
+- Original source and historic R73/R74, current direct x86 CALL/manifest, code/host source, source-limit and negative/contrary evidence all cross-referenced. Additional Issue #13 comments cover first-position kind1 and prior 00519 OPEN.
+- Build CI: 37766111828 (5/5 SUCCESS), 37766111701 (2/2), 37766111648 (3/3), 37766111726 (1/1) against 9d01 source. Packaging is ready but NO HMD optical acceptance.
