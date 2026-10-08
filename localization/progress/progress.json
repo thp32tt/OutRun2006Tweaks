@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 20:10 KST",
+  "updated_at_kst": "2026-10-08 21:07 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7711,18 +7711,21 @@
   "a194_q231_source_edge_worker_pending": {
     "role": "A",
     "queue_index": 231,
-    "production_run": "20261008-A194-Q231-FLAT-SOURCE-FAMILY",
-    "script_sha": "0dbc72b2c6c992c16115d40591e451c0d6181336",
+    "status": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "old_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+    "new_candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+    "git_blob_sha": "3eb25d96958f6d09380e9f40b46ae3569651e33b",
     "worker_run": 37767491356,
-    "status": "IN_PROGRESS_PENDING_NO_NEW_DDS",
-    "previous_candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
-    "producer_machine_qa": "NOT_RUN",
-    "producer_visual_qa": "NOT_RUN",
-    "C1": "NOT_RUN",
-    "C3": "NOT_RUN",
+    "producer_machine_qa": "PASS_4_OF_4",
+    "plate_only": "PASS_SOURCE_MASK_121288_NO_OUTSIDE",
+    "composite_contamination": "PASS_CLEAN_FINAL_90590_NO_OUTSIDE",
+    "producer_visual": "PASS_READABLE_RAW_PRACTICAL_50",
+    "C1": "PENDING",
+    "C3": "PENDING",
     "PRE_INGAME": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
-    "evidence": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json"
+    "evidence": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json"
   },
   "c1_20261008_q035_q103_visual_fail": {
     "run": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL",
