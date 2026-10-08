@@ -3061,3 +3061,8 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 ### 2026-10-08 20:56 KST — C302 C2 q236
 - `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`; new 4/14 independent native RAW/source-bbox visual-pixel region checks; each examined region 0 changed RGBA/alpha outside intended source rectangle and positive margins.
 - Decision `C3=HOLD_STRICT_RECHECK`; current APPROVALS/PRE_INGAME blocked, no DDS output, `RUNTIME_VALIDATION=UNTESTED`. Historical C223 not equivalent to current-policy C3. Evidence `localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json`.
+
+## 2026-10-08 21:07 KST — A194 q231 delayed q231 native DDS finalized
+- New q231 EBE401C8 actual 2048x1024 BGRA32 DDS SHA `7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76` finally published by Actions `37767491356` SUCCESS after previous 20:18 PENDING. Replaces C1-rejected unsupported red/gray offset-effect old SHA `dc08f74a20...`. 4/4 native bbox/positive margins, no outside RGBA/alpha/protected/overlap/source residue, RAW mirror-Y preserved. Source original LAN untouched.
+- Dedicated source/CLEAN **PLATE_ONLY_GATE** PASS: original text mask 121288 removed, uncleared0, changed outside mask0. Dedicated **COMPOSITE_CONTAMINATION_GATE** PASS: clean-final changed 90590, outside/transparent delta0; native gray/dark/RAW/50% controller visual shows single source-flat red and heavy gray face without former double bevel. `PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1`; independent C/C3/APPROVAL/PRE_INGAME/user JPG/actual-game test not done, `RUNTIME_VALIDATION=UNTESTED`.
+- QA `localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json`. No VR/FFB/DX11/DXVK changes.
