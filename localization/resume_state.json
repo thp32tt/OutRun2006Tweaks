@@ -6747,7 +6747,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T15:25:00+09:00",
+  "updated_at_kst": "2026-10-08T15:57:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11377,5 +11377,25 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "execution_backend": "N100 MCP fallback only for small decoding; original and candidate downloaded via GH approved host after GPT local direct fetch DNS failure",
     "forbidden_domains_touched": []
+  },
+  "c289_c2_q214_b259_source_bevel_visual": {
+    "run": "C289",
+    "run_key": "OUTRUN-KOR-C289-C2-Q214-B259-NEW-SHA-VISUAL-20261008-1550",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "result": "REWORK_REQUIRED",
+    "machine_outside_rgba": 0,
+    "machine_outside_alpha": 0,
+    "intermediate_clean_outside_unclassified_rgba": 394,
+    "reason": "SOURCE_GOLD_BEVEL_FAMILY_MISMATCH_AND_GOAL_RED_LINE_GLYPH_FACE",
+    "next": "MATERIAL_SOURCE_DERIVED_BEVEL_RECONSTRUCTION_B_THEN_FRESH_C2_AND_C3",
+    "qa": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/C289_CONTROLLER_QA.json",
+    "worker_run": 37740304700,
+    "prior_failed_worker": 37740076285,
+    "runtime_validation": "UNTESTED"
   }
 }

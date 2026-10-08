@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C289",
+  "RUN_KEY": "OUTRUN-KOR-C289-C2-Q214-B259-NEW-SHA-VISUAL-20261008-1550",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "prior_C285_rejected_candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "machine_qa": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/C289_Q214_NATIVE_MACHINE.json",
+  "triage": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/C289_TRIAGE.json",
+  "source_file_origin": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "decoded_header_equal": true,
+  "format": "DXT5_BC3",
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "out_of_source_effect_boxes_rgba_pixels": 0,
+  "out_of_source_effect_boxes_alpha_pixels": 0,
+  "archived_clean_vs_source_rgba_outside_boxes": 394,
+  "archived_clean_limitation": "394 source-vs-authored-clean RGBA changes outside the 2 historical English text-effect boxes; final B259 source-vs-current outside remains zero. Clean is a construction intermediate, and pixels were not individually classified as a protected-art failure; require exact-mask reconciliation if the plate is used for new approval.",
+  "clean_delta_not_glyph_mask": true,
+  "reviewer": "ChatGPT C2 controller (not a separate human reviewer)",
+  "pixels_before_producer_verdict": false,
+  "calibration": "NOT_PERFORMED; historical producer comparison was consulted, therefore cannot claim blind calibration or current-policy C PASS",
+  "controller_observations": [
+    {
+      "id": "start",
+      "text": "START → 출발",
+      "result": "REWORK_REQUIRED",
+      "observation": "New B259 corrected candidate differs materially from C285-rejected B258, but independently decoded 4x native and 50% source side-by-side still reveal a substantially flatter, squared Korean interior compared with the source's smooth condensed right-leaning cream-to-gold bevel/extrusion. Source-family fidelity remains visibly inadequate, not cured by bbox/BC3 retention success.",
+      "native": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/start_GRAY_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+      "practical": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/start_GRAY_PRACTICAL_50.png",
+      "raw": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/start_B259_RAW.png"
+    },
+    {
+      "id": "goal",
+      "text": "GOAL → 골",
+      "result": "REWORK_REQUIRED",
+      "observation": "Source has continuous right-italic metallic cream/orange modeled letterforms. Persisted B259 골 reads as flat segmented horizontal face and the horizontal red backing stripe crosses its pale interior; style hierarchy and small-scale readability remain visibly weaker than the English original. B259 increased size/bevel but did not resolve the source-family mismatch.",
+      "native": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/goal_GRAY_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+      "practical": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/goal_GRAY_PRACTICAL_50.png",
+      "raw": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/goal_B259_RAW.png"
+    }
+  ],
+  "decision": "REWORK_REQUIRED",
+  "reason_codes": [
+    "SOURCE_FAMILY_BEVEL_MISMATCH",
+    "BACKGROUND_RED_STRIPE_CROSSES_GLYPH_FACE",
+    "SMALL_SCALE_HIERARCHY_WEAK"
+  ],
+  "method_convergence": "Do not repeat BC3 recolor / larger shear alone. B should build native source-derived per-region cream/gold beveled letterface reference (gradient, outline, extrusion, counter shapes and slant anchors) and materially reconstruct glyphs with BC3-aware block constraints and protected red badge; recheck persisted decoded RAW/FLIP-Y and 50/75/100 practical. Re-triage escalation if a second independent C review of the same documented root-cause is established.",
+  "candidate_modified_by_C": false,
+  "C3": "BLOCKED_UNTIL_NEW_MATERIAL_B_RENDER_AND_FRESH_CALIBRATED_C",
+  "PRE_INGAME": "BLOCKED_EVIDENCE_GATE",
+  "user_jpg_acceptance": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub-hosted CPU worker 37740304700; GPT local GitHub raw DNS failure; no N100 used",
+  "worker_prior_failed_run": 37740076285,
+  "worker_failure_and_fix": "Embedded UTF-8 BOM in later CSV queue index caused rework_triage.py --index 214 crash; tools/localization/rework_triage.py now strips embedded BOM. Rerun test suite 17/17 PASS and role C worker successful.",
+  "scratch_cleanup": "GitHub Actions disposable runner; no local or N100 worktree created",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
