@@ -1,0 +1,28 @@
+{
+  "run": "B262",
+  "run_key": "OUTRUN-KOR-B262-Q172-SOURCE-GOLD-20261008-1730",
+  "role": "B",
+  "queue_index": 172,
+  "asset": "6C9B3611",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "machine_report": "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/B262_POST_ENCODE_NATIVE_PRACTICAL_RAW_QA.json",
+  "controller_visual": {
+    "scope": "first-look exact source/CLEAN/decoded persisted trial 7x and 50% practical",
+    "start": "Gold/cream shading introduced and source box preserved. Still needs source italic per-glyph slant reference.",
+    "goal": "Single Hangul glyph stretched to horizontal bars at practical 50%; readability and original condensed gold-italic volume not yet source-faithful.",
+    "result": "HOLD_STRICT_RECHECK_B263_MATERIAL_CORRECTION_REQUIRED"
+  },
+  "current_sha_producer_pass": false,
+  "independent_c": "NOT_RUN",
+  "c3": "NOT_RUN",
+  "approval": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "worker_run": 37750836025,
+  "post_encode_evidence_run": 37751304110,
+  "corrective_run": 37751579835,
+  "execution_backend": "GitHub-hosted ephemeral CPU",
+  "cleanup": "No N100 worktree or scratch"
+}

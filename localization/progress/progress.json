@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 17:16 KST",
+  "updated_at_kst": "2026-10-08 17:49 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7542,5 +7542,27 @@
     "evidence": "localization/graphics/role_C/20261008-C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL/C1_Q225_CONTROLLER_QA.json",
     "runtime_validation": "UNTESTED",
     "produced_dds": 0
+  },
+  "b262_q172_source_gold_material_pending_b263": {
+    "run": "B262",
+    "run_key": "OUTRUN-KOR-B262-Q172-SOURCE-GOLD-20261008-1730",
+    "role": "B",
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "prior_candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+    "material_candidate_sha256": "15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0",
+    "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "material_dds_produced": 1,
+    "decoded_dds_machine": "PASS_HEADER_RAW_MIP1_TWO_SOURCE_BOXES_POSITIVE_MARGIN_OUTSIDE_ZERO",
+    "producer_visual": "HOLD_GOAL_50PCT_HORIZONTAL_STRETCH",
+    "b263_retry_workflow": 37751579835,
+    "b263_status": "COMPUTE_PENDING",
+    "fresh_C2": "BLOCKED_UNTIL_FINAL_PRODUCER_REVIEW",
+    "C3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/B262_POST_ENCODE_NATIVE_PRACTICAL_RAW_QA.json",
+    "execution_backend": "GitHub Actions ephemeral; no N100; local DNS failure to raw Github",
+    "cleanup": "GitHub ephemeral job workspace discarded; no N100 scratch"
   }
 }

@@ -2993,3 +2993,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ## 2026-10-08 17:16 KST — C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL
 - C1/ODD q225 E3C455FA **REWORK_REQUIRED**: native source-vs-candidate visual mismatch across 9 UI labels (source-family glyph weight, condensed proportions and hierarchy); exact candidate 37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d preserved and verified. Prior producer numeric PASS does not authorize C or C3 PASS. `localization/graphics/role_C/20261008-C1-20261008-1716-Q225-SOURCE-FAMILY-FAIL/C1_Q225_CONTROLLER_QA.json`; RUNTIME_VALIDATION=UNTESTED, PRE_INGAME blocked, NEW in-game retest pending.
+
+### 2026-10-08 17:49 KST — B262 q172 material DDS + B263 retry in flight
+- q172 6C9B3611 B262 native 1024×1024 RGBA32 DDS 15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0 produced by GitHub Actions 37750836025; decoded header/box/protected-outside/RAW numeric PASS. Source-derived warm gold bevel, original English CLEAN contact, practical100/75/50 and RAW persisted.
+- Practical 50% GOAL `골` remains visibly horizontally stretched. Producer visual HOLD. B263 rework retry 37751579835 still pending; no C/C3/PRE_INGAME approval or game acceptance. RUNTIME_VALIDATION=UNTESTED; N100 unused.
