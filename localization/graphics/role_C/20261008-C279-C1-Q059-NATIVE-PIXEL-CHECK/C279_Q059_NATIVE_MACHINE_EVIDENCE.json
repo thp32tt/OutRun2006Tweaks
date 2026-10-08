@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C279-C1-Q059-NATIVE-PIXEL-CHECK",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f"
+  },
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "clean_plate_sha256": "f88967602d454b4345c02ac0ce6ca7bfadd009cce21a23b22895f70a28c39e8f",
+  "backend": "N100_MCP_LIGHTWEIGHT_FALLBACK_LOCAL_PUBLIC_GITHUB_DNS_FAILURE",
+  "run_timestamp_kst": "2026-10-08T12:53:32+09:00",
+  "selection_reason": "PJR-019 q59 user-reported NEXT MISSION typography regression + prior C274 HOLD missing independent decoded-native pixel evidence",
+  "machine": {
+    "result": "PASS_CONTAINMENT_SCOPE_ONLY",
+    "dds": "DXT5",
+    "size": [
+      2048,
+      512
+    ],
+    "mips": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "source_vs_current_changed_outside_original_source_region": 0,
+    "source_vs_current_alpha_changed_outside": 0,
+    "source_vs_clean_changed_outside_original_source_region": 0,
+    "source_vs_clean_alpha_changed_outside": 0,
+    "per_region": [
+      {
+        "id": "next_mission",
+        "source_reference_bbox": [
+          8,
+          353,
+          1293,
+          500
+        ],
+        "raw_bbox": [
+          8,
+          12,
+          1293,
+          159
+        ],
+        "source_vs_final_changed_rgba_px": 169398,
+        "source_vs_final_alpha_changed_px": 140775,
+        "observed_change_bbox": [
+          8,
+          353,
+          1293,
+          500
+        ]
+      },
+      {
+        "id": "race_rivals",
+        "source_reference_bbox": [
+          75,
+          222,
+          625,
+          304
+        ],
+        "raw_bbox": [
+          75,
+          208,
+          625,
+          290
+        ],
+        "source_vs_final_changed_rgba_px": 39901,
+        "source_vs_final_alpha_changed_px": 24167,
+        "observed_change_bbox": [
+          75,
+          222,
+          625,
+          304
+        ]
+      },
+      {
+        "id": "drift_score",
+        "source_reference_bbox": [
+          119,
+          53,
+          609,
+          137
+        ],
+        "raw_bbox": [
+          119,
+          375,
+          609,
+          459
+        ],
+        "source_vs_final_changed_rgba_px": 35326,
+        "source_vs_final_alpha_changed_px": 16776,
+        "observed_change_bbox": [
+          119,
+          53,
+          609,
+          137
+        ]
+      },
+      {
+        "id": "slipstream_score",
+        "source_reference_bbox": [
+          717,
+          225,
+          1408,
+          320
+        ],
+        "raw_bbox": [
+          717,
+          192,
+          1408,
+          287
+        ],
+        "source_vs_final_changed_rgba_px": 47819,
+        "source_vs_final_alpha_changed_px": 25887,
+        "observed_change_bbox": [
+          717,
+          225,
+          1408,
+          320
+        ]
+      }
+    ]
+  },
+  "evidence_qa": {
+    "source_current_artwork_producer_persisted": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_SOURCE_CLEAN_FINAL.jpg",
+    "source_current_row_contact": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_ROW_CONTACT.jpg",
+    "source_current_raw": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_7CE_RAW_COMPARE.jpg",
+    "source_current_practical": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_PRACTICAL_100_75_50.jpg",
+    "n100_lossless_generated_png_count": 44,
+    "n100_lossless_manifest_sha_bound": true,
+    "n100_lossless_artifact_location": "/home/chatgpt-runner2/tmp/c279_q59_lossless",
+    "n100_lossless_binary_in_github": false,
+    "disclaimer": "Lossless files exist on N100 but GitHub binary upload failed, hence NOT valid repo-bound APPROVALS/q059.json evidence. PNG alpha=0 may hold hidden English RGB; compositor black/white/gray confirms the apparent original glyph pixels in transparent RGB are not visible. This does not substitute for complete independent visual gate."
+  },
+  "visual_observations": {
+    "reviewed_lossless": [
+      "next_mission source_native/clean_native/final_native (alpha channels must be composited)",
+      "next_mission final on black/gray/white"
+    ],
+    "next_mission": "On gray/black/white composited final the Hangul 다음 미션 is visible without visible English overlay. In straight RGBA source/clean/final PNG, transparent 0-alpha RGB visually resembles retained English, so do not call it residue without compositing. No objective zero-pixel glyph isolation/style slant anchored conclusions asserted.",
+    "other_three": "Machine region-scope verified independently; separate current-policy native C blind first-look visual findings not completed here."
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "c3": "BLOCKED",
+  "approval": "NOT_GRANTED",
+  "pre_ingame_export": "BLOCKED",
+  "missing_for_current_policy_pass": [
+    "blind defect calibration",
+    "first-look source/final before reading producer verdict (not possible this invocation)",
+    "GitHub-persisted region lossless evidence with sha256 references",
+    "independent C region-specific eight observation results",
+    "family profile and anchors/slant top-minus-bottom dx",
+    "separate review_id C3 with full eight checks and calibration",
+    "user JPG acceptance and new actual game retest"
+  ],
+  "PJR_019": "STILL_OPEN",
+  "runtime_validation": "UNTESTED",
+  "source_or_candidate_bytes_changed": false,
+  "cleanup": "post_task_cleanup.py managed scratch removed; failed temporary clone remnants are explicitly marked for removal after GitHub verification. Generated unposted N100 region evidence retained due outstanding publication requirement."
+}

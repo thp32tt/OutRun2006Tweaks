@@ -6744,7 +6744,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T12:13:32+09:00",
+  "updated_at_kst": "2026-10-08T12:53:32+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10878,7 +10878,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "C278 q175 754F0599 A185R chrome/bevel source-family visual FAIL; A odd-shard material source-faithful re-render first, then new C1 inspection + separate C3/evidence gate. C current PASS is not granted; runtime UNTESTED.",
+  "next_checkpoint": "q59 independent 4-region source/candidate scope machine verified 0 outside; missing lossless PNG GitHub publish, calibration, per-region C/C3 visual and source slant anchors => HOLD. q175 C278 REWORK remains. RUNTIME_VALIDATION=UNTESTED.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -10976,5 +10976,18 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "backend": "GITHUB_HOSTED_CPU_WORKER",
     "qa_file": "localization/graphics/role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CONTROLLER_VISUAL_QA.json"
+  },
+  "c279_c1_q059_native_pixel_scope": {
+    "run": "20261008-C279-C1-Q059-NATIVE-PIXEL-CHECK",
+    "queue_index": 59,
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "independent_rgba_outside": 0,
+    "independent_alpha_outside": 0,
+    "status": "HOLD_STRICT_RECHECK",
+    "report": "localization/graphics/role_C/20261008-C279-C1-Q059-NATIVE-PIXEL-CHECK/C279_Q059_NATIVE_MACHINE_EVIDENCE.json",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "runtime_validation": "UNTESTED"
   }
 }
