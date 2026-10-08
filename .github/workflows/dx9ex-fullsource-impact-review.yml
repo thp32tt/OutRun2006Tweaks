@@ -10,6 +10,7 @@ on:
       - 'tools/verify_vr_win32_cross_domain_safety.py'
       - '.github/workflows/dx9ex-fullsource-impact-review.yml'
       - 'src/**'
+      - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/verify_vr_visual_composition_p0.py'
@@ -35,6 +36,37 @@ jobs:
           name: dx9ex-fullsource-inventory
           path: fullsource-review-output/
           if-no-files-found: error
+          retention-days: 90
+
+  msvc-analyze-openxr-host:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure x64 OpenXR host MSVC static analysis
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host-analysis -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_FLAGS=/analyze
+      - name: Compile R23/R32 OpenXR host with MSVC analyze
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force fullsource-host-analysis-output | Out-Null
+          $log = 'fullsource-host-analysis-output/build-host-analyze.log'
+          & cmake --build build-host-analysis --config Release --target outrun-vr-host 2>&1 | Tee-Object -FilePath $log
+          $buildExit = $LASTEXITCODE
+          $analyzer = @(Get-Content $log | Where-Object { $_ -match 'warning C6\d{3}|warning C26\d{3}|error C\d+' })
+          $analyzer | Set-Content fullsource-host-analysis-output/findings.txt
+          [pscustomobject]@{ sourceSha=$env:GITHUB_SHA; buildExitCode=$buildExit; analyzerFindings=$analyzer.Count; runtimeValidation='UNTESTED'; owner='OpenXR Win64 host' } | ConvertTo-Json | Set-Content fullsource-host-analysis-output/summary.json
+          if ($buildExit -ne 0) { throw "MSVC x64 host analyzer build failed: $buildExit" }
+      - name: Archive x64 host static analyzer findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-fullsource-host-msvc-analyze
+          path: fullsource-host-analysis-output/
+          if-no-files-found: warn
           retention-days: 90
 
   msvc-analyze-active-game:

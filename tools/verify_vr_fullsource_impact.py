@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Whole-source cross-domain impact inventory for OutRun2006Tweaks.
 
-This scans every C++/H/HPP/INC in src, examines build/CI contracts,
+This scans C++/H/HPP/INC in both src (Win32 DLL) AND vrhost (Win64 XR host),
 records source-line risky interactions as review candidates, and checks that
 the hard original EXE/HUD/scene DDS invariants remain wired.
 It is NOT an AST proof, and observations != confirmed runtime defects.
@@ -19,7 +19,12 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"fullsource-review-output"
 OUT.mkdir(exist_ok=True)
 EXT={".cpp",".h",".hpp",".inc"}
-files=sorted(p for p in (ROOT/"src").rglob("*") if p.is_file() and p.suffix.lower() in EXT)
+files=sorted(
+    p
+    for root in ("src","vrhost")
+    for p in (ROOT/root).rglob("*")
+    if p.is_file() and p.suffix.lower() in EXT
+)
 inventory=[]
 source={}
 for file in files:
@@ -50,6 +55,12 @@ checks=[
 ("input wheel separation", "src/hooks_wheel_ffb.cpp", r"Settings::"),
 ("D3D renderer reset lifecycle", "src/vr/game/outrun_renderer.cpp", r"NotifyGameReset\(\)"),
 ("F11 ImGui semantic isolation", "src/overlay/hooks_overlay.cpp", r"ScopedExternalOverlaySemantic"),
+("OpenXR host Wait/Begin/End frame owner", "vrhost/src/main_r23.cpp", r"xrWaitFrame"),
+("OpenXR host begins frame", "vrhost/src/main_r23.cpp", r"xrBeginFrame"),
+("OpenXR host finishes frame", "vrhost/src/main_r23.cpp", r"xrEndFrame"),
+("OpenXR infinite swapchain wait is bounded", "vrhost/src/runtime/bounded_swapchain_wait.hpp", r"TotalBudgetMs = 250"),
+("V3 transport ordering acquire", "vrhost/src/ipc/v3_shadow_bridge.cpp", r"memory_order_acquire"),
+("V3 transport ordering release", "vrhost/src/ipc/v3_shadow_bridge.cpp", r"memory_order_release"),
 ]
 for label,path,pattern in checks:
     ok=bool(re.search(pattern,source.get(path,"")))
@@ -66,6 +77,12 @@ for flag in ["-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF",
              "-DOUTRUN_VR_C2_COMPARE=OFF"]:
     check(flag in active and flag in pcfast,"Active/PC fast config divergence: "+flag)
 check("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp" in cmake,"Active HUD source not in build")
+host_cmake=get("vrhost/CMakeLists.txt")
+check("src/main_r23.cpp" in host_cmake,"R23 OpenXR host source missing from x64 build")
+check("vrhost/**" in active,"DX9Ex host source missing canonical CI coverage")
+check("src/**" in active,"DX9Ex Active does not watch all game source families")
+check(sum(x["path"].startswith("vrhost/") for x in inventory)>=35,
+      "Host source inventory is incomplete")
 check("python tools/verify_vr_texture_scene_contract.py --self-test" in hud,
       "HUD Inspector does not run scene Ex negative test")
 check("verify_scene_texture_contract(textures)" in p0,"P0 missing scene Ex static verification")
@@ -82,8 +99,6 @@ risk_specs=[
   "src/hooks_bugfixes.cpp",r"strcpy\(patch_addr,\s*NewPath\.c_str\(\)\)"),
  ("F04","MEDIUM","DDS replacement mutates original game buffer header before GPU creation success",
   "src/hooks_textures.cpp",r"memcpy\(\*ppSrcData,\s*file,\s*sizeof\(DDS_FILE\)\)"),
- ("F05","MEDIUM","rank exact sprani path tags final node only, not all siblings",
-  "src/hooks_uiscaling.cpp",r"static int __cdecl RankMarker_sprani\("),
  ("F06","MEDIUM","fixed-function ScreenOverlay2D uses recentered HUD plane unlike shader FOV-only path",
   "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",r"state\.screenOverlay2D = semanticOverlay2D;"),
  ("F07","LOW","legacy input thread polls input COM pointer while game may tear down",
@@ -103,7 +118,7 @@ for path,txt in source.items():
         extra.append({"path":path,"line":txt.count("\n",0,match.start())+1,"token":match.group(0)})
 summary={
  "source_sha":os.getenv("GITHUB_SHA","LOCAL_UNTRUSTED"),
- "scope":"whole-current-branch-src-C++-and-cross-domain-build-graph",
+ "scope":"whole-current-branch-src-win32-plus-vrhost-win64-C++-and-cross-domain-build-graph",
  "source_files":len(files),
  "source_bytes":sum(x["bytes"] for x in inventory),
  "groups":dict(Counter("/".join(x["path"].split("/")[:3]) for x in inventory)),
