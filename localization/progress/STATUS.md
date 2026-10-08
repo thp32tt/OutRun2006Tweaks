@@ -2838,3 +2838,7 @@ TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: original source vs B251 0 changed visible/a
 
 ### C2 q154 eight-region evidence coverage review — 2026-10-08 12:20 KST
 `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`. Reviewed five red-family rows on historical B225 source/candidate contacts and three gray-family rows on corrected current A182R lossless FLIP-Y comparison. Native current red DDS binding, full eight-region clean/RAW/practical views, blind calibration, independent full machine gates, and separate C/C3 evidence are **not yet complete**. Therefore q154 remains `HOLD_STRICT_RECHECK`; no C/C3 PASS, approval, export or new DDS. Detailed report: `localization/graphics/role_C/20261008-C2-Q154-EIGHT-REGION-REVIEW-1220/C2_Q154_EIGHT_REGION_REVIEW.json`. `RUNTIME_VALIDATION=UNTESTED`. No scratch cleanup necessary.
+
+
+### C2 q154 native-source pixel check — 2026-10-08 12:33 KST
+TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: 8/8 source-bbox containment PASS on persisted current DDS; English-original outside changes=0 RGBA/alpha, B225->A182R outside changed gray boxes=0, 29377 gray interior RGBA pixels changed. Native source/current 16 PNGs and contact + machine/controller evidence committed at `localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/`. **HOLD**, not independent C/C3 approval (blind calibration, clean plate and stage check records incomplete). RUNTIME_VALIDATION=UNTESTED.
