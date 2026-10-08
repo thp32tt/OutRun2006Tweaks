@@ -16,6 +16,10 @@ on:
     paths:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_drawdistance.cpp'
+      - 'src/hooks_input.cpp'
+      - 'tools/verify_vr_win32_cross_domain_safety.py'
       - 'src/hooks_uiscaling.cpp'
       - 'src/interpolation.cpp'
       - 'src/hooks_graphics.cpp'
