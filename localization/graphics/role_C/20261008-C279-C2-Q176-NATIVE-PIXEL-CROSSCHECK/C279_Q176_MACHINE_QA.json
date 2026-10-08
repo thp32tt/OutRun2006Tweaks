@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "run": "20261008-C279-C2-Q176",
+  "policy": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 176,
+  "asset": "75C3586A_512x512.dds",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "pixel_format": "DDS BGRA32 RAW / RGBA32 viewed, mip1",
+  "raw_orientation": "mirror_y",
+  "header_128_exact": true,
+  "changed_rgba_outside_four_source_region_bboxes": 0,
+  "changed_alpha_outside_four_source_region_bboxes": 0,
+  "changed_alpha_inside": 251205,
+  "changed_rgba_inside": 251205,
+  "protected_outside_source_region_pixel_exact": true,
+  "regions": [
+    {
+      "id": "jennifer",
+      "source": "JENNIFER",
+      "korean": "제니퍼",
+      "source_region": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "actual_source_alpha_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "actual_final_alpha_bbox": [
+        3,
+        378,
+        425,
+        528
+      ],
+      "bbox_and_size_PASS": true,
+      "positive_margins_LRTB": [
+        3,
+        413,
+        4,
+        4
+      ],
+      "raw_flip_y_byte_exact": true,
+      "source_png": "01_jennifer_source_flip_y.png",
+      "final_png": "01_jennifer_current_flip_y.png",
+      "source_alpha_nonzero": 72799,
+      "final_alpha_nonzero": 31464,
+      "raw_source_png": "01_jennifer_SOURCE_RAW.png",
+      "raw_final_png": "01_jennifer_CURRENT_RAW.png",
+      "black_white_gray_png": "01_jennifer_CURRENT_BWG.png",
+      "exact_raw_flip_y_crosscheck": true
+    },
+    {
+      "id": "clarissa",
+      "source": "CLARISSA",
+      "korean": "클라리사",
+      "source_region": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "actual_source_alpha_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "actual_final_alpha_bbox": [
+        913,
+        376,
+        1494,
+        528
+      ],
+      "bbox_and_size_PASS": true,
+      "positive_margins_LRTB": [
+        8,
+        251,
+        4,
+        4
+      ],
+      "raw_flip_y_byte_exact": true,
+      "source_png": "02_clarissa_source_flip_y.png",
+      "final_png": "02_clarissa_current_flip_y.png",
+      "source_alpha_nonzero": 68689,
+      "final_alpha_nonzero": 43528,
+      "raw_source_png": "02_clarissa_SOURCE_RAW.png",
+      "raw_final_png": "02_clarissa_CURRENT_RAW.png",
+      "black_white_gray_png": "02_clarissa_CURRENT_BWG.png",
+      "exact_raw_flip_y_crosscheck": true
+    },
+    {
+      "id": "holly",
+      "source": "HOLLY",
+      "korean": "홀리",
+      "source_region": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "actual_source_alpha_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "actual_final_alpha_bbox": [
+        16,
+        216,
+        275,
+        361
+      ],
+      "bbox_and_size_PASS": true,
+      "positive_margins_LRTB": [
+        7,
+        267,
+        3,
+        3
+      ],
+      "raw_flip_y_byte_exact": true,
+      "source_png": "03_holly_source_flip_y.png",
+      "final_png": "03_holly_current_flip_y.png",
+      "source_alpha_nonzero": 41097,
+      "final_alpha_nonzero": 21834,
+      "raw_source_png": "03_holly_SOURCE_RAW.png",
+      "raw_final_png": "03_holly_CURRENT_RAW.png",
+      "black_white_gray_png": "03_holly_CURRENT_BWG.png",
+      "exact_raw_flip_y_crosscheck": true
+    },
+    {
+      "id": "flagman4",
+      "source": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "source_region": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "actual_source_alpha_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "actual_final_alpha_bbox": [
+        15,
+        53,
+        707,
+        200
+      ],
+      "bbox_and_size_PASS": true,
+      "positive_margins_LRTB": [
+        7,
+        281,
+        4,
+        4
+      ],
+      "raw_flip_y_byte_exact": true,
+      "source_png": "04_flagman4_source_flip_y.png",
+      "final_png": "04_flagman4_current_flip_y.png",
+      "source_alpha_nonzero": 75687,
+      "final_alpha_nonzero": 49663,
+      "raw_source_png": "04_flagman4_SOURCE_RAW.png",
+      "raw_final_png": "04_flagman4_CURRENT_RAW.png",
+      "black_white_gray_png": "04_flagman4_CURRENT_BWG.png",
+      "exact_raw_flip_y_crosscheck": true
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "bbox_all4_PASS": true,
+  "native_raw_source_current_exact": true,
+  "black_white_gray_per_region_evidence": 4,
+  "practical_views": [
+    "C279_Q176_PRACTICAL75.png",
+    "C279_Q176_PRACTICAL50.png"
+  ],
+  "approval_policy_limitations": "No documented known-defect blind calibration before producer prose; no independently exact CLEAN plate; no per-region slant anchors or separated C and C3 stage observations. HOLD despite independent machine PASS."
+}

@@ -1,0 +1,81 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "schema_version": 1,
+  "run": "20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "canonical_source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "native_size": [
+      2048,
+      2048
+    ]
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_MACHINE_QA.json",
+  "calibration": "NOT_PERFORMED_THIS_RUN",
+  "pixels_before_producer_verdict": false,
+  "first_look_caveat": "Previous C270/B201 verdict text was already read before this exact DDS visual review; cannot falsely claim a blind first look.",
+  "observations": {
+    "jennifer": "JENNIFER -> 제니퍼: full-height red upright strokes in source/candidate native crop; no definite broken glyph or clipping at native and 50%, but exact source-family style/profile certification not completed.",
+    "clarissa": "CLARISSA -> 클라리사: all Hangul syllables distinguishable on reviewed native and 50% contacts; upright/red style; source-artwork isolation only independently established by machine outside-mask gate.",
+    "holly": "HOLLY -> 홀리: full-height, open glyph counters on lossless crop; source width significantly longer than Korean but no universal width ratio pass/fail threshold.",
+    "flagman4": "FLAGMAN 4 -> 플래그맨 4: proper numeral 4 retained, original profile horizontally broader; Korean readable at 50%. Source clean-plate validation remains missing."
+  },
+  "machine": {
+    "four_regions_bbox_containment": "PASS_4_OF_4",
+    "original_vs_candidate_changed_RGBA_outside_source_boxes": 0,
+    "alpha_outside": 0,
+    "inside_RGBA_changes": 251205,
+    "raw_to_readable_4_region_byte_exact": true,
+    "source_header_equal": true,
+    "non_target_protected_source_pixel_exact": true
+  },
+  "orientation": "RAW full DDS crop y=2048-readable_y1:2048-readable_y0 verified byte-equals vertically inverted FLIP-Y crop across source and final",
+  "execution_backend": "GitHub connector SSOT; N100 MCP for SHA-verified DDS-only fallback because ChatGPT local DNS resolution failed; no GPU/build",
+  "C": {
+    "decision": "HOLD_STRICT_RECHECK",
+    "reason": "Visual first-look calibration was not validly performed; exact CLEAN and authored region inventory/slant anchors/family profile separate observations incomplete. This independent pixel/mask check is not current-policy C approval."
+  },
+  "C3": {
+    "decision": "BLOCKED_NO_CURRENT_POLICY_C_PASS"
+  },
+  "approval_created": false,
+  "pre_ingame_export": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "files": [
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/01_jennifer_CURRENT_BWG.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/01_jennifer_CURRENT_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/01_jennifer_SOURCE_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/01_jennifer_current_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/01_jennifer_source_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/02_clarissa_CURRENT_BWG.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/02_clarissa_CURRENT_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/02_clarissa_SOURCE_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/02_clarissa_current_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/02_clarissa_source_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/03_holly_CURRENT_BWG.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/03_holly_CURRENT_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/03_holly_SOURCE_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/03_holly_current_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/03_holly_source_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/04_flagman4_CURRENT_BWG.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/04_flagman4_CURRENT_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/04_flagman4_SOURCE_RAW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/04_flagman4_current_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/04_flagman4_source_flip_y.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_DELTA_MASK_OVERVIEW.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_FULL_ATLAS_25.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_MACHINE_QA.json",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_NATIVE_SOURCE_FINAL.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_PRACTICAL50.png",
+    "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_PRACTICAL75.png"
+  ],
+  "post_task_cleanup": "PENDING_AFTER_PUBLICATION",
+  "forbidden_domains_touched": []
+}
