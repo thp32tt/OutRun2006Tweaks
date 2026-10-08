@@ -706,7 +706,7 @@
     {
       "key": "VR-HUD-DIAGNOSTIC-SESSION-ANALYZER-PARSER-20261009",
       "title": "Session analysis PowerShell syntax could fail silently while new ZIP passed HUD static CI",
-      "status": "SOURCE_REPAIRED_NEED_EXACT_SHA_CI",
+      "status": "SOURCE_REPAIRED_POWERSHELL_STATIC_CI_VERIFIED_NEED_FINAL_PACKAGE",
       "testLevel": 2,
       "recurrenceCount": 1,
       "evidenceLevel": "WINDOWS_CI_ACTUAL_SYNTAX_FAILURE",
@@ -715,12 +715,15 @@
       ],
       "rootCause": {
         "status": "CI_COVERAGE_GAP",
-        "summary": "HUD Inspector checked runner/selector/collector PowerShell syntax but not packaged Analyze-OutRunVRSession.ps1 or GUI selector. The malformed analyzer could be shipped while tests examined only static HUD code; collector caught script error and emitted ERROR instead of real flag/summary."
+        "summary": "HUD Inspector checked runner/selector/collector PowerShell syntax but not packaged Analyze-OutRunVRSession.ps1 or GUI selector. The malformed analyzer could be shipped while tests examined only static HUD code; collector caught script error and emitted ERROR instead of real flag/summary. After the first regex hotfix, complete source inspection revealed three concatenated duplicate legacy analyzer bodies (four Write-Host footers total); Windows HUD Inspector parser correctly rejected the trailing extra ')'."
       },
       "fixReferences": [
-        "131216005739ded02f85a247fbbd8061b6a3f148 — replace malformed line with valid regex, $flags=@(), restore SBS flag",
-        "6856d006cf00c89037b4c1f54b903b30bf4ace4c — HUD Inspector syntax checks packaged analyzer/UI selector and runs 3-fixture semantics",
-        "236c95038ad26dc22ca95d76993bf4b9617cc4e8 — independent runtime analyzer fixture cases rank-zero, mismatch, healthy control"
+        "cac1c858ed5f38e9b1fd0dfed967cf16f2f49c5f — ACTUAL verified fix removes three duplicate obsolete analysis bodies, leaves one 212-line valid analyzer script",
+        "131216005739ded02f85a247fbbd8061b6a3f148 — preliminary regex/flags hotfix alone did NOT resolve duplicate trailing bodies; superseded by cac1c858",
+        "6856d006cf00c89037b4c1f54b903b30bf4ace4c — HUD Inspector Windows syntax/behavior checks (Analyzer and Slot Selector)",
+        "236c95038ad26dc22ca95d76993bf4b9617cc4e8 — three bounded actual analyzer fixtures (rank zero, stale DLL, healthy control)",
+        "1a959d13a3772d68a335e8124cffe1da0b7653de — DX9Ex Active policy now blocks game/package for invalid PS helpers and false analyzer fixtures",
+        "HUD Inspector static-exe-analysis on exact cac1c858 run 37818356756 SUCCESS; RUNTIME HMD UNTESTED"
       ],
       "riskPaths": [
         "tools/Analyze-OutRunVRSession.ps1",
@@ -739,7 +742,8 @@
         "static": [
           "PowerShell Parser::ParseFile on all shipped .ps1 in HUD Inspector",
           "tools/Test-OutRunVRAnalysisContract.ps1: zero projected exact rank returns HUD_RANK_PROJECTED_PATH_ZERO; stale DLL returns GAME_DLL_SHA256_MISMATCH; positive fixture OK",
-          "DX9Ex Active + HUD Inspector exact material SHA before delivery"
+          "DX9Ex Active + HUD Inspector exact material SHA before delivery",
+          "Require analyzer source contains one and only one final analysis report body (historic corruption had four Write-Host footer copies)."
         ],
         "runtime": [
           "Open newest Quest3 session ZIP; verify AUTO_ANALYSIS_SUMMARY.json valid, flags and GAME_DLL_IDENTITY.txt present",
