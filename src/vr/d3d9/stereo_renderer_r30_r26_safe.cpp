@@ -1618,6 +1618,49 @@ namespace OutRunVRStereo
         std::uint64_t R30ExactHudExtendedRawWvp = 0;
         std::uint64_t R30ExactHudRawWvpMiss = 0;
 
+        // Old HMD-proven R64 used live c64 when its 12-draw owner expired,
+        // whereas modern R51 correctly fails closed to prevent head injection
+        // twice. The user-observed 6th/6 regression may occur precisely at
+        // that new fallback boundary. Observe which *original GOAL producer*
+        // loses its genuine raw c64 rather than reverting the unsafe policy.
+        void R30TraceGoalOriginalC64Status(bool recovered) noexcept
+        {
+            if (!Settings::VRTelemetry || !Game::current_mode ||
+                !OutRunVR::GameSemantic::QueueRenderActive())
+                return;
+            const auto state = *Game::current_mode;
+            unsigned stateIndex = 0;
+            if (state == GameState::STATE_GOAL)
+                stateIndex = 0u;
+            else if (state == GameState::STATE_TIMEUP)
+                stateIndex = 1u;
+            else if (state == GameState::STATE_LINK_TIMEUP)
+                stateIndex = 2u;
+            else
+                return;
+            const auto producer =
+                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const unsigned token = static_cast<unsigned>(producer);
+            if (token >= 32u)
+                return;
+            static std::atomic<std::uint32_t> seen[6]{};
+            const unsigned group = 2u * stateIndex +
+                (recovered ? 1u : 0u);
+            const std::uint32_t bit = 1u << token;
+            if ((seen[group].fetch_or(
+                    bit, std::memory_order_relaxed) & bit) != 0u)
+                return;
+            spdlog::info(
+                "VR P0 GOAL RAW_C64_OWNER: status={} state={} producer={} scope={} queueEpoch={} missTotal={} recoveredTotal={}",
+                recovered ? "RECOVERED" : "MISSING_FALLBACK_TO_R29",
+                static_cast<int>(state),
+                OutRunVR::GameSemantic::Name(producer),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                R30ExactHudRawWvpMiss, R30ExactHudExtendedRawWvp);
+        }
+
         bool R30GetExtendedRawWvpForExactHud(float outConstants[16]) noexcept
         {
             // Only exact ScreenHud qualifies for this route. Generic
@@ -4122,9 +4165,11 @@ namespace OutRunVRStereo
                             !R30GetExtendedRawWvpForExactSceneEffect(original))
                         {
                             ++R30ExactHudRawWvpMiss;
+                            R30TraceGoalOriginalC64Status(false);
                             return false;
                         }
                         ++R30ExactHudExtendedRawWvp;
+                        R30TraceGoalOriginalC64Status(true);
                     }
                     else if (R30ExactSceneEffectScope())
                     {
