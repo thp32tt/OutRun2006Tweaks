@@ -163,6 +163,58 @@ for name, source in (('R26 early world-rebind', r26),
     require('OutRunVR::GameSemantic::EffectiveScope()', source,
             name + ' must use exact queued scope')
 
+# R62 USER_RUNTIME_VERIFIED: ordinal 4th/5th were single and tracked
+# vehicles through head motion only when the exact D3DXSprite FVF 0x142
+# DrawIndexedPrimitive owner existed. The R84 refactor silently removed
+# this path and retained only external F11 ImGui XYZ handling; that is
+# not an equivalent renderer. Pin the historical function and dispatch.
+def check_r62_hmd_fixed_function_owner(source):
+    owner = function_body(source,
+                          'HRESULT R62TryFixedFunctionSpriteIndexed(')
+    for marker in (
+        'type != D3DPT_TRIANGLELIST',
+        'CorroboratesProjectedWorldMarker(',
+        'CorroboratesHud(',
+        'if (!projected && !hud)',
+        'CurrentVertexShaderIdentity.load(',
+        'device->GetVertexShader(&shader)',
+        'device->GetFVF(&fvf)) || fvf != 0x00000142u',
+        'R30ConfigureXyzrhwWorldEffect(',
+        'state.projectedDeltaX[eye]',
+        'state.hudWorldLockValid',
+        'R30ExecuteXyzrhwStereo(',
+        'SetTransform(\n                    D3DTS_PROJECTION, &originalProjection)',
+        'R30ArmSafeFallback();',
+    ):
+        require(marker, owner, 'R62 HMD-confirmed exact FVF 0x142 owner')
+    draw = function_body(source, 'HRESULT __stdcall DrawIndexedPrimitiveDestR30(')
+    require_order(draw, 'F11 before exact R62 before XYZRHW indexed fallback',
+                  'R30TryExternalImGuiIndexed(',
+                  'R62TryFixedFunctionSpriteIndexed(',
+                  'R30TryXyzrhwIndexedPrimitiveVB(')
+    require('if (fixedFnSprite != E_NOTIMPL)', draw,
+            'R62 stereo result must stop fallback duplicate draw')
+
+check_r62_hmd_fixed_function_owner(r30)
+for label, bad in (
+    ('lost R62 dispatch',
+     r30.replace('R62TryFixedFunctionSpriteIndexed(\n                    device',
+                 'R62FixedFunctionRemoved(\n                    device', 1)),
+    ('lost exact FVF gate',
+     r30.replace('fvf != 0x00000142u', 'fvf != 0u', 1)),
+    ('lost original projection restore',
+     r30.replace('SetTransform(\n                    D3DTS_PROJECTION, &originalProjection)',
+                 'SetTransform(\n                    D3DTS_PROJECTION, nullptr)', 1)),
+):
+    if bad == r30:
+        raise SystemExit('R62 mutation did not change source: ' + label)
+    try:
+        check_r62_hmd_fixed_function_owner(bad)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('R62 HMD regression mutation survived: ' + label)
+
 # XMT loader: a corrupt/late XPR0 pointer must not read outside the XMT
 # system-memory block or overflow on pointer addition. This is a source
 # bounds fix; it cannot prove missing car/selector DDS pixels are resolved.
