@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00557",
+  "production_id": "CONVERSION-DX9EX-00557",
+  "event_id": "CONVERSION-DX9EX-00557-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "ae2fbdaaebc3bdecac573d737a06a00430fe1e47",
+  "material_result_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
+  "validation_bearing_result_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
+  "result_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00557]",
+  "status": "WAITING_EXACT_SHA_GATE",
+  "automation_validation": "INCOMPLETE_CI_CANCELLED_CONCURRENT_BRANCH_PUSH",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": true,
+  "controller_terminal": false,
+  "work_key": "DX9EX-P0-SCENEEFFECT-NEARPLANE-NESTED-SCOPE",
+  "conflict_keys": [
+    "DX9EX:src/hooks_graphics.cpp:Clr_SceneEffect_dest",
+    "DX9EX:tools/verify_vr_nearplane_active_gate.py"
+  ],
+  "summary": "Preserve caller near-plane suppression while nested Clr_SceneEffect renders original 0.05f near-plane, and reject unconditional re-enable through one focused static contract and deliberate mutation.",
+  "changed_paths": [
+    "src/hooks_graphics.cpp",
+    "tools/verify_vr_nearplane_active_gate.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS remote GitHub branch, original upstream, HUD history, issue ledgers, queue/state and work-area collision checked",
+    "C1_REVIEW": "PASS original 0xBE70 SceneEffect near-plane and nested override suppression source-level defect bounded; no HMD visual claim",
+    "C2_IMPLEMENT": "PASS real C++ source+focused static negative-test material commit",
+    "C3_VALIDATE": "PARTIAL exact-source SHA: HUD Inspector, Domain Isolation and Full Source Impact SUCCESS, DX9Ex Active policy+host SUCCESS; Active game/full-chain/package CANCELLED by competing push (not a product failure)",
+    "C4_COMMIT": "PASS 0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f contains exact marker, no CI skip, remote fast-forward CAS",
+    "C5_PACKAGE": "NOT_COMPLETE: exact-SHA DX9Ex Active package absent after workflow cancellation",
+    "C6_RESULT": "WAITING_EXACT_SHA_GATE. This is a durable resume checkpoint, NOT terminal PASS. No AI2 score awarded."
+  },
+  "ci_runs": {
+    "dx9ex_active": 37750869490,
+    "hud_inspector": 37750869340,
+    "domain_isolation": 37750869349,
+    "full_source_impact": 37750869517
+  },
+  "ci_observed": {
+    "hud_inspector": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS",
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "CANCELLED_BY_CONCURRENT_PUSH",
+    "dx9ex_full_chain_compile": "CANCELLED_BY_CONCURRENT_PUSH",
+    "dx9ex_package": "CANCELLED_BY_CONCURRENT_PUSH"
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "comment_id": 6056175623
+  },
+  "score_status": "NOT_AWARDED_PENDING_EXACT_GATE",
+  "score_baseline_ai2": 1226,
+  "parallel_policy": "DX11 A active; DX9Ex C active; DXVK B frozen; no DX11/DXVK/localization source changes",
+  "retry_instruction": "Resume this SAME TASK_ID and SAME material SHA. Do not duplicate source or create new material for the same work_key. Do not cancel another worker's currently running focus-branch Active CI. Once idle, re-run failed/cancelled jobs of Active run 37750869490 via GitHub Actions for exact SHA; then verify jobs/artifact and persist terminal C6 separately. No headset verification performed.",
+  "next_action": "Rerun exact-SHA DX9Ex Active cancelled game/full-chain/package when branch scoped CI idle; verify exact material artifact then mark COMPLETE_BUILD_VERIFIED, update Issue #14 and AI2 scoreboard only once."
+}
