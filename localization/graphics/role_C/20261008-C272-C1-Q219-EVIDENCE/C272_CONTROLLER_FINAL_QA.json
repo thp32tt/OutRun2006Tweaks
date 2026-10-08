@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C272-C1-Q219-EVIDENCE",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T10:21:21+09:00",
+  "selection_refresh_head": "184498dbf72f3cd8edeb8333da34369750f45ccf",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "user_regression": "IGR-025",
+  "calibration_reference": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/C269_CALIBRATION_RESULT.json",
+  "calibration_note": "Prior same-controller calibration detected normal vs all four defect controls 5/5. Its answer key is already known in controller history, so no new blind-calibration claim is fabricated and it is not used to authorize PASS.",
+  "sequencing": {
+    "pixels_before_producer_verdict": false,
+    "note": "Current queue/producer prose was read before exact-pixel review in this invocation. That prevents a PASS claim under the evidence gate, but does not prevent fail-closed rejection because a concrete visual defect was directly observed."
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C272-C1-Q219-EVIDENCE/C272_Q219_MACHINE_QA.json",
+  "evidence": {
+    "source_old_clean_final": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "practical": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_PRACTICAL.jpg",
+    "raw": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_RAW.jpg",
+    "clean_plate": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_CLEAN_PLATE.png"
+  },
+  "stages": {
+    "C": {
+      "review_id": "C272-Q219-C-VISUAL",
+      "reviewer": "ChatGPT AI 1",
+      "pixels_before_producer_verdict": false,
+      "findings": {
+        "course_select": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable right lean is present and does not reverse the source direction.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "The reviewed clean plate removes the COURSE SELECT lettering without a visible English ghost or replacement rectangle in the target strip.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_CLEAN_PLATE.png"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "The candidate uses an explicit horizontal_target_ratio=0.8 extension of Noto Sans CJK Bold. In the persisted comparison this flattens Hangul anatomy into broad slab-like forms and does not reproduce the source's rounded segmented silver-techno family. This conflicts with the evidence-gate rule not to stretch Hangul to an arbitrary percentage of English width.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg"
+          },
+          "readability": {
+            "result": "FAIL",
+            "observation": "The text is legible, but practical-scale review shows compressed counter-space and distorted character proportions, especially the right half of 선택/택; source-family readability is degraded by over-extension rather than simple size.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_PRACTICAL.jpg"
+          },
+          "glyph_integrity": {
+            "result": "FAIL",
+            "observation": "No missing Hangul syllable is observed, but horizontal stretching materially deforms stroke/counter proportions and makes the final glyph group read as slab-like blocks rather than intact source-faithful lettering.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "OutRun2/OutRun2SP artwork and non-target atlas content remain visually separated from the localized title.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_RAW.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "The title remains inside the exact source bbox with positive margins; the defect is typography/proportion, not geometric escape.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y construction remains consistent with the source/candidate review.",
+            "evidence": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_RAW.jpg"
+          }
+        }
+      },
+      "result": "FAIL_HORIZONTAL_STRETCH_COUNTERSPACE_SOURCE_TECHNO_FAMILY"
+    },
+    "C3": {
+      "review_id": null,
+      "result": "BLOCKED_AFTER_C_FAIL",
+      "prior_defect_observation": "C265 underfill was materially increased in width, but A181R introduced a new over-stretched/generic-family defect; C3 cannot run on a fresh C failure."
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "required_rework": [
+    "Preserve the validated A113 clean plate, exact source bbox, positive margins, OutRun2/OutRun2SP artwork and RAW mirror-Y orientation.",
+    "Do not target an arbitrary English-width percentage. Remove the 0.80 horizontal-target rule and choose source-faithful Hangul proportions from height, stroke weight, counter-space and family impression.",
+    "Use a materially more rounded/segmented silver-techno treatment with open counters and controlled right lean; a somewhat narrower Korean result is acceptable if hierarchy remains strong and the source family is visually closer.",
+    "Keep silver gradient/outline/depth restrained and verify practical 100/75/50 plus high zoom before producer PASS.",
+    "After material rerender, require a future pixels-first C1 review, then separate exact-SHA C3, PRE_INGAME/user JPG review and NEW actual-game validation."
+  ],
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED_C_FAIL",
+  "candidate_changed_by_C": false,
+  "stop_reason": "The repair requires a material typography rerender/family redesign rather than a safe small C corrective edit, so this C1 batch stops after q219.",
+  "igr_025": "REMAINS_HOLD_FOR_UNRESOLVED_SCREENSHOT_163_RUNTIME_VS_DDS_LABELS_AND_Q219_REWORK",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
