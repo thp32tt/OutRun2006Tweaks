@@ -7227,5 +7227,37 @@
     "qa": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c286_c1_q175_native_chrome_style_fail": {
+    "run": "20261008-C286-C1-Q175-CHROME-STYLE-FAIL",
+    "run_key": "OUTRUN-KOR-C286-C1-Q175-CHROME-FAMILY-20261008-1510",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "decoded_dimensions": [
+      2048,
+      1024
+    ],
+    "format": "BGRA32",
+    "source_bbox_exact_three_regions": true,
+    "outside_rgba_pixels": 0,
+    "outside_alpha_pixels": 0,
+    "producer_source_final_png_exact_rgba_match": true,
+    "native_lossless_region_contacts": 3,
+    "visual_C": "REWORK_REQUIRED_CHROME_GLYPH_FORM_TRACKING_DEPTH",
+    "C3": "BLOCKED",
+    "calibration": "UNTESTED; NOT PASS",
+    "PRE_INGAME": "BLOCKED",
+    "user_jpg_acceptance": "PENDING_AFTER_REWORK",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "candidate_changed": false,
+    "execution_backend": "N100 MCP small decode fallback; GPT local public GitHub DNS unavailable",
+    "machine_report": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_INDEPENDENT_MACHINE.json",
+    "controller_report": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_CONTROLLER_QA.json",
+    "next_step": "A must materially rerender all three chrome display titles with source-derived connected low-wide terminal/bevel/depth and measured glyph slant, avoiding forced Korean width, then new C1+C3; new actual-game retest required",
+    "forbidden_domains_touched": []
   }
 }
