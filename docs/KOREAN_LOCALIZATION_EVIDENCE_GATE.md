@@ -55,6 +55,50 @@ Boxes are native RAW coordinates; transforms are identity, flip_y, flip_x, rotat
 rotate_90 or rotate_270. Unsupported perspective/unresolved orientation requires
 explicitly prepared evidence and a reviewed tooling extension; never silently normalize it.
 
+## Dual-stage plate/composite evidence (producer and independent C/C3)
+
+Before accepting a **new or materially changed** localized candidate, retain
+two separately observed lossless pixel inspections, from the *same* exact
+source and saved DDS candidate:
+
+1. **PLATE_ONLY:** SOURCE vs CLEAN **without lettering**. Inspect canonical
+   English glyph/effect removal including hidden shadow/glow; inspect uniform,
+   gradient, texture, translucency, alpha edges and protected art. Record
+   source/clean identities, crop PNG and PASS/FAIL/HOLD observation.
+2. **COMPOSITE_ONLY:** CLEAN vs persisted decoded FINAL. Show the intentional
+   Korean glyph/effect mask versus actual changed pixels and identify every
+   background, alpha, protected-foreground and outside-mask delta. Record the
+   crop PNG and PASS/FAIL/HOLD observation.
+3. **STYLE/ORIENTATION cross-check:** canonical SOURCE vs FINAL at native,
+   high zoom, 100/75/50-percent practical sizes, authored MIPs, RAW and
+   readable view; compare source style family, slant, size/hierarchy, clipping,
+   compression streaks and protected element integrity.
+
+Evidence must distinguish at least these observed producer/C failure codes:
+`SOURCE_RESIDUE_UNDER_KOREAN`, `INCOMPLETE_CLEAN_PLATE`,
+`FOREIGN_BOX_ARTIFACT`, `BACKGROUND_PATCH_INTRUSION` and
+`RECTANGULAR_COMPOSITE_TRACE`. Each visually confirmed defect is hard FAIL
+even when outside-bbox changed-pixel count is zero; source/plate/effect-mask
+uncertainty is HOLD, not guessed PASS. An editing tool's rectangular selection
+is not itself a defect if it leaves no unwanted persisted pixel trace.
+
+For **current-policy machine approvals**, retain these findings within the
+already required per-region `clean_plate`, `placement`,
+`protected_art`, `glyph_integrity` and `style` observations and their PNG
+references, with the machine_report's authoritative changed-outside/protected
+pixel counts. Do not add fabricated zeroes or call a prose-only check
+machine-enforced. C/C3 must independently inspect actual images. The existing
+`qa_evidence_gate.py` schema and exact-SHA requirement remain authoritative;
+this clarification does not imply that new visual controls have already been
+coded into that validator.
+
+**Separate user-review artifact:** the deliberately unapproved
+`USER_REVIEW_NOT_APPROVED` test package may include SHA-pinned historical-C3
+candidates before user acceptance, so the user can perform real-game testing.
+It remains outside PRE_INGAME current-policy approved export, cannot bypass
+C/C3/current-policy evidence, cannot close runtime regressions without a new
+matching in-game screenshot and must never be reported as an approved patch.
+
 ## Machine-enforced approval record
 
 Store one current record per asset at `localization/graphics/role_C/APPROVALS/qNNN.json`.
