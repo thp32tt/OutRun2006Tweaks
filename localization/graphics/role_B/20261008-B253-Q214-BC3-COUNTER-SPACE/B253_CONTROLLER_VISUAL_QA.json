@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B253-Q214-BC3-COUNTER-SPACE",
+  "queue_index": 214,
+  "asset": "BF229CF4_512x512.dds",
+  "candidate_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "reading_views": [
+    "SOURCE_CLEAN_FINAL_CONTACT_from_persisted_DXT5_decode",
+    "RAW_mirror_y_evidence"
+  ],
+  "machine_result": "PASS_STRICT_2_OF_2_ZERO_SCOPE_OUTSIDE",
+  "controller_result": "REWORK_REQUIRED",
+  "visual_gate": {
+    "1_plate_restoration": "MACHINE_PASS_SOURCE_REMOVAL; VISUAL_NO_DEFINITE_EXTRA_ENGLISH",
+    "2_source_slant": "HOLD_SOURCE_FAITHFUL_ITALIC_COMPARISON",
+    "3_scale": "FAIL_PRACTICAL_GLYPH_READABILITY",
+    "4_weight_outline": "FAIL_RED_STRIPE_AND_BROKEN_HANGUL_IN_BOTH_ROWS",
+    "5_clipping": "MACHINE_BBOX_PASS_BUT_VISIBLE_BC3_STROKES_BROKEN",
+    "6_protected": "MACHINE_ZERO_CHANGE_OUTSIDE_SOURCE_BBOX",
+    "7_flip_y_raw": "RAW_MIRROR_Y_PRESERVED_BY_WORKER; C_INDEPENDENT_PENDING",
+    "8_readability": "FAIL"
+  },
+  "observations": [
+    "At source/CLEAN/persisted FINAL 4x views, START->출발 has horizontal red stripe through glyph and visible disconnected strokes; GOAL->골 similarly breaks/interleaves with red plate line and appears small. Not acceptable at practical game resolution or source-style. The numerically successful bright-face retention percentages did not detect these meaningful breaks."
+  ],
+  "decoded_face_recall": {
+    "start": 0.8328,
+    "goal": 0.8579
+  },
+  "runtime_validation": "UNTESTED",
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER",
+  "no_c_approval": true
+}

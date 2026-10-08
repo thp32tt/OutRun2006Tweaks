@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T12:13:32+09:00",
+  "updated_at_kst": "2026-10-08T12:41:16+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6908,5 +6908,24 @@
     "report": "localization/graphics/role_C/20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN/C278_Q175_CONTROLLER_QA.json",
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b253_q214_bc3_counterspace_rework": {
+    "run": "20261008-B253-Q214-BC3-COUNTER-SPACE",
+    "role": "B",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "b252_rejected_sha256": "db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d",
+    "current_candidate_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+    "material_rework": true,
+    "producer_machine_qa": "PASS_BBOX_2_OF_2_ZERO_PROTECTED_OUTSIDE",
+    "controller_visual_qa": "FAIL_BROKEN_STROKE_AND_RED_BANDING_2_OF_2",
+    "result": "REWORK_REQUIRED",
+    "source_orientation": "mirror_y",
+    "c3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_HOSTED_CPU_WORKER",
+    "qa_file": "localization/graphics/role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CONTROLLER_VISUAL_QA.json"
   }
 }

@@ -2842,3 +2842,7 @@ TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: original source vs B251 0 changed visible/a
 
 ### C2 q154 native-source pixel check — 2026-10-08 12:33 KST
 TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: 8/8 source-bbox containment PASS on persisted current DDS; English-original outside changes=0 RGBA/alpha, B225->A182R outside changed gray boxes=0, 29377 gray interior RGBA pixels changed. Native source/current 16 PNGs and contact + machine/controller evidence committed at `localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/`. **HOLD**, not independent C/C3 approval (blind calibration, clean plate and stage check records incomplete). RUNTIME_VALIDATION=UNTESTED.
+
+
+### 2026-10-08 12:41 KST — B253 q214 strict producer reject
+- q214 BF229CF4 new persisted DXT5 `2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25` (B253) supersedes B252 `db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d`. Both worker runs succeeded and strict 2/2 bbox + zero out-of-source decode differences passed; native visible pixels still show broken Hangul/red striping and deficient style/readability. **REWORK_REQUIRED**: C2/C3/evidence-backed export blocked, RUNTIME_VALIDATION=UNTESTED. Report: `localization/graphics/role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CONTROLLER_VISUAL_QA.json`. GitHub-hosted computation only; no N100 scratch.

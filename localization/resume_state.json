@@ -10957,5 +10957,24 @@
     "prior_to_current_changed_inside_gray": 29377,
     "exact_source_current_png_count": 16,
     "status": "HOLD_STRICT_RECHECK_EIGHT_REGION_NATIVE_MACHINE_PASS_PENDING_FIRST_LOOK_CALIBRATION_C_AND_C3"
+  },
+  "b253_q214_bc3_counterspace_rework": {
+    "run": "20261008-B253-Q214-BC3-COUNTER-SPACE",
+    "role": "B",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "b252_rejected_sha256": "db3fefaadd3eac56c16f0f3d68a8b8824a4b05051b13240d8d382f061a53651d",
+    "current_candidate_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+    "material_rework": true,
+    "producer_machine_qa": "PASS_BBOX_2_OF_2_ZERO_PROTECTED_OUTSIDE",
+    "controller_visual_qa": "FAIL_BROKEN_STROKE_AND_RED_BANDING_2_OF_2",
+    "result": "REWORK_REQUIRED",
+    "source_orientation": "mirror_y",
+    "c3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_HOSTED_CPU_WORKER",
+    "qa_file": "localization/graphics/role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CONTROLLER_VISUAL_QA.json"
   }
 }
