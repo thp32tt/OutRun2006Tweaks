@@ -9692,6 +9692,43 @@ VSOutput main(VSInput input)
             d3d.context, liveOutputBindingReady.snapshotToken),
         "R137 live output binding issues exact RS OM snapshot");
 
+    // R155 WARP: same-device deferred RS/OM recording cannot impersonate
+    // the live immediate output-state binding, even with identical values.
+    ID3D11DeviceContext* r155DeferredOutputContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(0, &r155DeferredOutputContext)) &&
+        r155DeferredOutputContext != nullptr &&
+        r155DeferredOutputContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R155 same-device deferred output-state prerequisite");
+    require(
+        !outputStateBinding.apply(r155DeferredOutputContext),
+        "R155 deferred output-state apply must fail closed");
+    r155DeferredOutputContext->RSSetState(
+        outputBindingRenderStateBundle.rasterizer_state());
+    r155DeferredOutputContext->RSSetViewports(1, &outputStateReady.viewport);
+    r155DeferredOutputContext->RSSetScissorRects(1, &outputStateReady.scissorRect);
+    r155DeferredOutputContext->OMSetBlendState(
+        outputBindingRenderStateBundle.blend_state(),
+        outputStateReady.blendFactor.data(), outputStateReady.sampleMask);
+    r155DeferredOutputContext->OMSetDepthStencilState(
+        outputBindingRenderStateBundle.depth_stencil_state(),
+        outputBindingRenderStateBundle.stencil_ref());
+    const auto r155DeferredOutputReceipt =
+        outputStateBinding.binding_readiness(r155DeferredOutputContext);
+    require(
+        !r155DeferredOutputReceipt.inputValid &&
+        r155DeferredOutputReceipt.ownerReady &&
+        !r155DeferredOutputReceipt.ready &&
+        r155DeferredOutputReceipt.snapshotToken == 0 &&
+        !outputStateBinding.validate_binding_snapshot(
+            r155DeferredOutputContext, liveOutputBindingReady.snapshotToken),
+        "R155 recorded deferred RS/OM state cannot forge live binding receipt");
+    require(
+        outputStateBinding.validate_binding_snapshot(
+            d3d.context, liveOutputBindingReady.snapshotToken),
+        "R155 live immediate RS/OM receipt survives deferred recording");
+    r155DeferredOutputContext->Release();
+
     d3d.context->RSSetState(nullptr);
     const auto driftedOutputBinding =
         outputStateBinding.binding_readiness(d3d.context);

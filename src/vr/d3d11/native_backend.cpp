@@ -7872,7 +7872,10 @@ void NativeFixedFunctionOutputStateBinding::shutdown() noexcept {
 bool NativeFixedFunctionOutputStateBinding::apply(
     ID3D11DeviceContext* context) const noexcept {
 
-    if (!ready() || !context)
+    // R155: only the live immediate context may own a draw-state receipt.
+    // Deferred command recording on the same device is not live RS/OM state.
+    if (!ready() || !context ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
         return false;
 
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
@@ -7895,7 +7898,10 @@ NativeFixedFunctionOutputStateBinding::binding_readiness(
     ID3D11DeviceContext* context) const noexcept {
     NativeFixedFunctionOutputBindingReadiness out{};
     out.outputBindingSnapshotToken = snapshot_token_;
-    out.inputValid = context != nullptr && snapshot_token_ != 0;
+    // R155: recorded RS/OM commands on a deferred context are not live.
+    out.inputValid = context != nullptr &&
+        context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE &&
+        snapshot_token_ != 0;
     out.ownerReady = ready();
     if (!out.inputValid || !out.ownerReady)
         return out;
