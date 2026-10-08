@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C314-C1-Q161-A157-NATIVE-BC3-HOLES",
+  "task_id": "OUTRUN-KOR-C314-C1-Q161-NATIVE-BC3-GLYPH-PINHOLES-20261009",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
+  },
+  "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "prior_candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "current_binaries": "SOURCE/CURRENT native BC3 DXT5 2048x2048 mip1 RAW mirror_y exact-header and SHA checked in worker",
+  "source_and_candidate_evidence": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_38_REGION_MACHINE_AND_PNG_MANIFEST.json",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37807237283",
+  "backend": "GitHub Actions CPU worker persisted-DDS decode/region proof (local sandbox network cannot materialize GitHub binaries); ChatGPT independent first look at lossless contact; N100 MCP limited to downloading 4 small PNG for pixel visual",
+  "created_at_kst": "2026-10-09 01:19 KST",
+  "triage_before": "EVIDENCE_ONLY_HOLD",
+  "current_decision": "REWORK_REQUIRED",
+  "failure_codes": [
+    "GLYPH_ALPHA_PINHOLES_BC3",
+    "OVERCONDENSED_GLYPH_FAMILY"
+  ],
+  "changed_rgba_outside_union": 0,
+  "changed_alpha_outside_union": 0,
+  "regions_total": 38,
+  "new_lossless_png": 190,
+  "visually_inspected_region_samples": [
+    4,
+    6,
+    7
+  ],
+  "current_pixels_first_before_producer_claims": false,
+  "observations": {
+    "native_BGWhiteGray": "Direct SOURCE vs persisted candidate pixel-view at native shows extra light/color-background points and irregular holes within Korean glyph faces in regions 04 and 06. The English source strokes are filled and smooth on the same background; candidate Korean characters appear visibly speckled/damaged. This persists on black, gray and white composites and is not explained by clipping outside source bboxes.",
+    "practical50": "Region06 letters noticeably thin/vertically streaked and visually harder to read than original LEO at 50%; corresponds to 4 Korean syllables squeezed to approximately original three Latin glyph width.",
+    "source_family": "Region06 LEO source 105x51 text-effect bbox versus Korean four syllables 100x48, generator reported horizontal scale 0.5682; severe horizontal anisotropic compression visibly squashes Hangul into narrow strokes and counters. Not an approval merely because zero bbox overflow.",
+    "zero_pixel": "Full atlas original English source-to-candidate changed RGBA outside the 38 original effect bbox union=0 and alpha outside=0; thus numeric containment is not the failing gate.",
+    "source_clean": "Exact verified authored CLEAN plate for this candidate was not newly materialized; earlier A56/C273 consolidated JPG is historical context, not lossless CLEAN approval.",
+    "region07": "GEMINI source/current visibly less aggressively compressed; sampled as source-family contrast, no separate claimed defect beyond observed small speckling.",
+    "coverage": "38/38 exact geometry/native lossless image sets published; native visual first-look explicitly inspected sample 04,06,07 only, not claiming subjective review of all 38."
+  },
+  "regions": [
+    {
+      "id": "04",
+      "english": "PISCES",
+      "korean": "물고기자리",
+      "checks": {
+        "slant": "HOLD no calibrated anchor",
+        "clean_plate": "HOLD authored CLEAN not SHA-certified",
+        "style": "FAIL condensed English stroke smooth vs speckled Korean",
+        "readability": "FAIL visible glyph face damage at native",
+        "glyph_integrity": "FAIL alpha-looking tiny pinholes and broken face pixels",
+        "protected_art": "PASS original union outside0; row-specific within-protection unqualified",
+        "placement": "PASS reported positive bbox margin; may not override visual fail",
+        "orientation": "FLIP-Y and RAW evidence created; no separate reversal proven"
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_04_SOURCE_CURRENT_BGW_NATIVE.png",
+          "sha256": "353ec252f49833b3854902b1d4e120840a2fb3d6c0819930c8f192f49dc04279"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_04_SOURCE_CURRENT_RAW.png",
+          "sha256": "dadcfce0b397ff1a16055471c95d276a775c441cc47d38a88f93ac46fd67b110"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "english": "LEO",
+      "korean": "사자자리",
+      "checks": {
+        "slant": "HOLD per-glyph direction calibration absent",
+        "clean_plate": "HOLD authored CLEAN not SHA-certified",
+        "style": "FAIL blocky overcondensed narrow Hangul 0.5682 horizontal generation scale",
+        "readability": "FAIL clear pinhole/streak appearance even at 50%",
+        "glyph_integrity": "FAIL irregular bright/transparent looking voids inside glyph strokes",
+        "protected_art": "PASS union outside0 only",
+        "placement": "FAIL source-relative natural Hangul proportions despite bbox PASS",
+        "orientation": "RAW and readable compare available no reverse defect proven"
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_06_SOURCE_CURRENT_BGW_NATIVE.png",
+          "sha256": "f85ff8227b51f983ebc8aba7111c2679f4df098abcec8657a7023c8193e3f73c"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_06_SOURCE_CURRENT_PRACTICAL50.png",
+          "sha256": "871389845db2e444affd0e2d549847baac86754528fb2d8de9d66bda665afc01"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/q161_06_SOURCE_CURRENT_RAW.png",
+          "sha256": "e99ba04f3dfceedf8e5d393034fa442f783386f810cebd200ec216c1e03766ee"
+        }
+      ]
+    }
+  ],
+  "machine_notes": "Codes name visually observed defects, not a quantitative attribution to BC3 encoder alone; verify alpha and RGB cause in producer reconstruction before asserting compression root cause. Visible damage survives persisted DDS decode.",
+  "next_producer": "Material source-conditioned alpha-preserving glyph reconstruction for confirmed damaged labels. Restore original stroke continuity and natural Korean counter space; do not simply widen beyond exact English effect region, blanket-blur or paste background rectangles. Where four Hangul syllables cannot remain readable inside short LEO effect bbox, consider semantically accurate shorter label policy or preserve-original until verified fit. Recheck all 38 decoded DDS glyphs on BGW at 100/75/50 and RAW, full protected art, CLEAN-only then COMPOSITE-only, and re-submit exact SHA to C1/C3.",
+  "C_PASS": false,
+  "C3_STRICT_PASS": false,
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED",
+  "USER_ACCEPTANCE": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0
+}

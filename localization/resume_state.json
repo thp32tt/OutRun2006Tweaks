@@ -6788,7 +6788,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 00:58 KST",
+  "updated_at_kst": "2026-10-09 01:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12363,5 +12363,28 @@
       "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md"
     ],
     "evidence_report": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md"
+  },
+  "c314_c1_q161_native_bc3_rework": {
+    "task_id": "OUTRUN-KOR-C314-C1-Q161-NATIVE-BC3-GLYPH-PINHOLES-20261009",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 161,
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "result": "REWORK_REQUIRED",
+    "observed_defects": [
+      "GLYPH_ALPHA_PINHOLES_BC3",
+      "OVERCONDENSED_GLYPH_FAMILY"
+    ],
+    "source_candidate_outside_RGBA": 0,
+    "source_candidate_outside_alpha": 0,
+    "new_lossless_png": 190,
+    "new_dds": 0,
+    "worker_run": 37807237283,
+    "qa": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_CONTROLLER_C1_REWORK.json",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 00:58 KST",
+  "updated_at_kst": "2026-10-09 01:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8345,5 +8345,29 @@
       "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md"
     ],
     "evidence_report": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md"
+  },
+  "c314_c1_q161_native_bc3_rework": {
+    "task_id": "OUTRUN-KOR-C314-C1-Q161-NATIVE-BC3-GLYPH-PINHOLES-20261009",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 161,
+    "decision": "REWORK_REQUIRED",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "independent_native_regions": 38,
+    "new_lossless_png_published": 190,
+    "observed_defect_codes": [
+      "GLYPH_ALPHA_PINHOLES_BC3",
+      "OVERCONDENSED_GLYPH_FAMILY"
+    ],
+    "changed_rgba_outside_original_regions": 0,
+    "changed_alpha_outside_original_regions": 0,
+    "new_dds": 0,
+    "C_PASS": false,
+    "C3_PASS": false,
+    "current_policy_approval": false,
+    "qa": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_CONTROLLER_C1_REWORK.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

@@ -3134,3 +3134,7 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 00:58 KST — C313 C2 EVEN q236 source-family visual failure
 - `TEMP_BACKLOG_RELIEF=C2` / `SHARD=EVEN`; q236 current DDS bytes unchanged, 3 new independently inspected native+50% SOURCE/CLEAN/FINAL row comparisons show visibly thin/weak Hangul stroke body vs original ultra-bold condensed English (rows 00/05/11). `C=REWORK_REQUIRED` (`SOURCE_FAMILY_STROKE_UNDERWEIGHT`), C3/current approval/PRE_INGAME blocked; B material source-family weight reconstruction required across 14 rows. No new DDS or lossless PNG; no new game test: `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_CONTROLLER_C2_REWORK.json`.
+
+
+### 2026-10-09 01:19 KST — C314 C1 q161 native glyph-pinhole REWORK
+- `TEMP_BACKLOG_RELIEF=C1`, `SHARD=ODD(+UNINDEXED_SPECIAL)`. 38 region current A157 source/current decoded-DXT5 proofs **190 new lossless PNGs** from Actions `37807237283` SUCCESS. Source-bbox-union outside changed RGBA/alpha0. Native source-to-Korean visual confirms pixel holes/irregular fill in PISCES→물고기자리 and LEO→사자자리; LEO Korean artificially condensed horizontally to factor0.5682. `C=REWORK_REQUIRED` over numeric PASS, C3/current approval/export BLOCKED, new DDS0, `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_CONTROLLER_C1_REWORK.json`.
