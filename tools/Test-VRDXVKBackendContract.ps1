@@ -52,6 +52,22 @@ TransparencySupersampling = true
 
     $selector = Join-Path $sandbox "Select-OutRunVRBackend.ps1"
 
+    # A stale old CURRENT_FOCUS slot must never override the new package.
+    $staleSlot = Join-Path $sandbox "slots/CURRENT_FOCUS"
+    New-Item -ItemType Directory -Force $staleSlot | Out-Null
+    Write-TestPe (Join-Path $staleSlot "dinput8.dll") 0x014C
+    Set-Content (Join-Path $staleSlot "SOURCE_SHA.txt") "stale-previous-build" -Encoding ascii
+    & $selector -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
+    $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt")
+    if ($active -notcontains "sourceSha=synthetic-source") {
+        throw "Stale CURRENT_FOCUS slot replaced canonical packaged DX9Ex payload"
+    }
+    $expectedGameHash = (Get-FileHash (Join-Path $d3d9 "dinput8.dll") -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ((Get-FileHash (Join-Path $sandbox "dinput8.dll") -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedGameHash) {
+        throw "Installed CURRENT_FOCUS DLL differs from canonical backend"
+    }
+
+
     & $selector -Backend dxvk-safe -TestProfile CORRECTNESS -VariantId E_DXVK_SAFE
     $safeHash = (Get-FileHash $dxvkDll -Algorithm SHA256).Hash.ToLowerInvariant()
     $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt")
