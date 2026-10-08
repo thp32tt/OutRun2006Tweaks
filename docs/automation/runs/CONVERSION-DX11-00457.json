@@ -17,13 +17,13 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00457",
   "lease_epoch": 1,
   "base_sha": "5d13f7351f8ee808be1ab54669b67ad4290e607e",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "result_sha": "e08581af6d63ae0ce796f8a610cb4e09651b584c",
+  "material_result_sha": "e08581af6d63ae0ce796f8a610cb4e09651b584c",
+  "validation_bearing_result_sha": "e08581af6d63ae0ce796f8a610cb4e09651b584c",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "checkpoint": "C3_VALIDATE",
-  "status": "WAITING_FOR_CI",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
   "summary": "Fail closed on same-device deferred D3D11 contexts in native surface-pair OM apply/readiness; add WARP live immediate-vs-deferred ownership regression.",
   "changed_paths": [
     "src/vr/d3d11/surface_mirror.cpp",
@@ -31,27 +31,40 @@
   ],
   "native_draw_path_activation_changed": false,
   "draw_dispatch_authorized": false,
-  "static_validation": "PASS: one scoped JS source/test anchor and invariant check before commit; Windows behavior awaits exact-SHA CI",
+  "static_validation": "PASS: one scoped source/test invariant; exact-SHA Windows Gate validates build and WARP deferred-context regression",
   "pipeline": {
     "C0_RECOVER": "PASS: GitHub HEAD, AGENTS, review index, lane state and queue controller contract checked; 00457 record absent, 00456 COMPLETE",
     "C1_REVIEW": "PASS: same-device deferred context currently passes D3D11 GetDevice equality but must not qualify live OM readiness",
     "C2_IMPLEMENT": "PASS: native C++ immediate-only OM binding/readiness and WARP deferred-context negative regression",
-    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate and DX11 readiness smoke; single scoped static source invariant PASS",
-    "C4_COMMIT": "PENDING: this material GitHub commit [AUTO:CONVERSION-DX11-00457]",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37814508337 validate 113439547871 SUCCESS; DX11 smoke 113442879886 SUCCESS including surface mirror WARP probe; artifact 11566418157 SHA256 438b33cd17dc9964715806a34710e60d5fd5b152ab530d66b3d7528c7fc0414a",
+    "C4_COMMIT": "PASS: material C++/WARP test/result record commit e08581af6d63ae0ce796f8a610cb4e09651b584c [AUTO:CONVERSION-DX11-00457]",
     "C5_PACKAGE": "NOT_REQUIRED: no HMD deploy or runtime-ready native Draw activation",
-    "C6_STATE": "PENDING: exact result SHA and CI receipts after Gate"
+    "C6_STATE": "PASS: canonical material exact-SHA CI SUCCESS, Issue #14 change ledger and HMD UNTESTED persisted after Gate"
   },
   "evidence": {
-    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
-    "ci_gate": "PENDING_EXACT_SHA",
-    "runtime": "Quest3/VDXR NOT RUN"
+    "backend_conversion_gate_run_id": 37814508337,
+    "validate_job_id": 113439547871,
+    "readiness_smoke_job_id": 113442879886,
+    "artifact_id": 11566418157,
+    "artifact_digest": "sha256:438b33cd17dc9964715806a34710e60d5fd5b152ab530d66b3d7528c7fc0414a",
+    "warp_surface_mirror_probe": "PASS: same-device deferred D3D11 context is rejected by live OM apply/readiness",
+    "ci_head_sha": "e08581af6d63ae0ce796f8a610cb4e09651b584c"
   },
-  "next_action": "After exact-SHA GitHub Gate success, seal run record and Issue #14 ledger; next independent native resource/shader ownership fix, no runtime promotion.",
-  "state_persisted": false,
-  "recorded_at_kst": "2026-10-09 02:06+",
-  "last_real_activity_at": "2026-10-09T02:06:00+09:00",
-  "last_activity_evidence": "C2 source/test code generated; CAS material commit pending",
+  "next_action": "New independent DX11 C++ item: verify native VB/IB or programmable pipeline device/context ownership and associated WARP regression; do not activate Draw/DrawIndexed until evidence gate and Quest3/VDXR validation.",
+  "state_persisted": true,
+  "recorded_at_kst": "2026-10-09 02:22:34",
+  "last_real_activity_at": "2026-10-09T02:22:34+09:00",
+  "last_activity_evidence": "Exact material SHA Gate 37814508337 validate 113439547871 and DX11 readiness smoke 113442879886 SUCCESS; native surface WARP probe PASS",
   "blockers": [
     "Quest3/VDXR runtime untested; native Draw activation remains gated"
-  ]
+  ],
+  "validation_bearing_sha": "e08581af6d63ae0ce796f8a610cb4e09651b584c",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "validation_run_id": 37814508337,
+  "validation_job_id": 113439547871,
+  "readiness_smoke_job_id": 113442879886,
+  "artifact_id": 11566418157,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-e08581af6d63ae0ce796f8a610cb4e09651b584c",
+  "artifact_digest": "sha256:438b33cd17dc9964715806a34710e60d5fd5b152ab530d66b3d7528c7fc0414a",
+  "issue14_comment_id": 6065128545
 }
