@@ -69,7 +69,13 @@ retained_altered=int(np.count_nonzero(np.any(source!=clean,axis=2)&retained))
 # color/alpha metrics alone cannot infer an English ghost or box here.
 if outside_clean or clean_source_alpha>420:
     raise RuntimeError(("PLATE_ONLY protected bbox leakage",outside_clean,clean_source_alpha,retained_altered))
-assert Path(FONTP).is_file(),("native CJK font unavailable",FONTP)
+# GitHub's current ubuntu-latest image may omit the earlier Noto CJK
+# package. Install a distro-signed canonical font on the ephemeral runner;
+# never silently fall back to missing-glyph tofu/Liberation.
+if not Path(FONTP).is_file():
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+assert Path(FONTP).is_file(),("official Noto CJK KR font not installed",FONTP)
 new=Image.fromarray(prior.copy(),"RGBA")
 cimg=Image.fromarray(clean,"RGBA")
 def pix_bbox(mask):
