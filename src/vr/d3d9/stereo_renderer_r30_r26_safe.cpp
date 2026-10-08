@@ -1883,6 +1883,7 @@ namespace OutRunVRStereo
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
+            bool worldEvidenceAuthoritative = false;
         };
 
         bool R30PrepareXyzrhwState(
@@ -2148,6 +2149,7 @@ namespace OutRunVRStereo
         // the explicit F11 external overlay may enter this path. The normal
         // game/selector XYZ geometry remains owned by R26/R23.
         std::uint64_t R30ExternalImGuiStereoDraws = 0;
+        std::uint64_t R30AmbiguousFlatWorldDraws = 0;
         bool R30ExternalImGuiIdentity(const D3DMATRIX& m) noexcept
         {
             if (!MatrixFinite(m))
@@ -2524,6 +2526,7 @@ namespace OutRunVRStereo
                     ++R57ProjectedBuildSuccesses;
                 state.projectedWorldMarker = true;
                 state.worldEffect = true;
+                state.worldEvidenceAuthoritative = true;
                 return true;
             }
 
@@ -2533,6 +2536,15 @@ namespace OutRunVRStereo
                 state.worldEffect = false;
             else
                 state.worldEffect = state.rhwDepthEvidence;
+
+            // R30 perspective screen-Z can look like real world depth even
+            // for an untagged flat RHW=1 overlay. Keep rendering that effect
+            // without granting it authority to declare a valid world stereo
+            // frame to the OpenXR host. Exact known world owners are exempt.
+            state.worldEvidenceAuthoritative = state.worldEffect &&
+                (semanticWorld ||
+                 !R30XyzrhwLooksLikeHudPlane(
+                     source, vertexCount, stride, state, usedMask));
 
             if (!state.worldEffect && !semanticHud && !semanticOverlay2D)
             {
@@ -3195,23 +3207,32 @@ namespace OutRunVRStereo
             if (state.worldEffect)
             {
                 ++R30XyzrhwWorldEffectDraws;
-                if (FrameStereoPoseSequence == 0)
+                // Only verified world evidence may mark this Present as
+                // world-stereo ready for host packet publication.
+                if (state.worldEvidenceAuthoritative)
                 {
-                    FrameStereoPoseSequence = state.stereo.poseSequence;
-                    FrameStereoMetadata = state.stereo;
+                    if (FrameStereoPoseSequence == 0)
+                    {
+                        FrameStereoPoseSequence = state.stereo.poseSequence;
+                        FrameStereoMetadata = state.stereo;
+                    }
+                    else if (FrameStereoPoseSequence != state.stereo.poseSequence)
+                    {
+                        FrameRightDrawFailed = true;
+                        PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
+                    }
+                    FrameHadWorldStereo = true;
+                    ++WorldStereoDraws;
+                    if (!R30FirstXyzrhwWorldLogged)
+                    {
+                        R30FirstXyzrhwWorldLogged = true;
+                        spdlog::info(
+                            "VR R30.4 XYZRHW WORLD: verified depth/semantic evidence yielded per-eye projected effect");
+                    }
                 }
-                else if (FrameStereoPoseSequence != state.stereo.poseSequence)
+                else
                 {
-                    FrameRightDrawFailed = true;
-                    PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
-                }
-                FrameHadWorldStereo = true;
-                ++WorldStereoDraws;
-                if (!R30FirstXyzrhwWorldLogged)
-                {
-                    R30FirstXyzrhwWorldLogged = true;
-                    spdlog::info(
-                        "VR R30.4 XYZRHW WORLD: pre-transformed particle/billboard/decal draws reconstruct clip X/Y/Z/RHW, unproject through the game projection, then reproject into each OpenXR eye; affine RHW fallback retained for unsafe vertices");
+                    ++R30AmbiguousFlatWorldDraws;
                 }
             }
             else
