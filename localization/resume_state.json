@@ -12572,5 +12572,29 @@
     "NEW_DDS": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C1-Q137-B285-P0-INDEPENDENT-STYLE-REVIEW/C_Q137_B285_CONTROLLER_REWORK.json"
+  },
+  "b286_q060_p0_source_family_trial_rejected": {
+    "time_kst": "2026-10-09 03:26 KST",
+    "run_key": "OUTRUN-KOR-B286-Q060-IGR044-SOURCE-FACE-REJECTED-20261009",
+    "role": "B",
+    "queue_index": 60,
+    "asset_hash": "A064FDFC",
+    "priority": "P0",
+    "ingame": "IGR-044 OPEN_USER_INGAME_FAIL",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "current_candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+    "trial_sha256": "8b93dba89b2343bf8e24f966914811fd3bb2510b4006e964a27e3640285f6015",
+    "producer_self_qa": "FAIL_REJECTED_SOURCE_FAMILY",
+    "trial_dds_saved": 1,
+    "new_production_candidate_dds": 0,
+    "current_candidate_unchanged": true,
+    "source_bbox_machine": "3of3 PASS",
+    "outside_rgba_and_alpha_changed_pixels": 0,
+    "C": "BLOCKED",
+    "C3": "BLOCKED",
+    "EVIDENCE_APPROVAL": false,
+    "USER_ACCEPTED": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/B286_CONTROLLER_SELF_QA_REJECTED.json"
   }
 }
