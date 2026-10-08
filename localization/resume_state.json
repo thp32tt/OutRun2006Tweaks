@@ -12321,5 +12321,47 @@
     "reason": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
     "qa": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_CONTROLLER_C2_REWORK.json",
     "metrics": "localization/graphics/role_C/20261009-C313-C2-Q236-SOURCE-FAMILY-THICKNESS/C313_Q236_SOURCE_FAMILY_THICKNESS_SAMPLE.json"
+  },
+  "user_ingame_review_20261009": {
+    "timestamp_kst": "2026-10-09 01:16 KST",
+    "run_key": "OUTRUN-KOR-USER-INGAME-REWORK-POLICY-20261009-0104",
+    "source_build_sha": "cc8f9dd6ba7163b12451f192e80d7f417aa8548a",
+    "screenshots_received": 19,
+    "new_open_regression_rows": 19,
+    "existing_regression_rows_preserved": true,
+    "reopened_queue_indexes": [
+      49,
+      60,
+      121,
+      137,
+      193,
+      201,
+      205,
+      212,
+      228
+    ],
+    "already_failed_preserved_indexes": [
+      175,
+      227,
+      219
+    ],
+    "mapping_pending": [
+      "IGR-029",
+      "IGR-034",
+      "IGR-036",
+      "IGR-039",
+      "IGR-040 (protected model)",
+      "IGR-042 (HUD runtime/DDS)",
+      "IGR-043 (rank vs dynamic Stage 2)"
+    ],
+    "current_graphics_qa_approval": "BLOCKED_FOR_REOPENED_ASSETS",
+    "user_ingame_retest": "REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "qa_policy": [
+      "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+      "docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md",
+      "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md"
+    ],
+    "evidence_report": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md"
   }
 }
