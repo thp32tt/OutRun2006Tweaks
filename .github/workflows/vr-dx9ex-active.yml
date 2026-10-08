@@ -14,7 +14,9 @@ on:
       - vr-d3d9ex-focus
       - 'vr-d3d9ex-candidate/**'
     paths:
-      - 'src/**' # Whole-source changes can affect VR runtime, reset, input and frame pacing.
+      - 'src/**'
+      - 'external/imgui' # Pinned ImGui DX9 F11 runtime code is compiled into the game.
+      - '.gitmodules' # Whole-source changes can affect VR runtime, reset, input and frame pacing.
       - 'src/hooks_framerate.cpp'
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_drawdistance.cpp'
