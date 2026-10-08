@@ -176,6 +176,9 @@ new_white=int(np.count_nonzero((native[:,:,0]>230)&(native[:,:,1]>230)&(native[:
 new_navy=int(np.count_nonzero((native[:,:,2]>native[:,:,0]+12)&(native[:,:,3]>140)&srcmask))
 source_navy=int(np.count_nonzero((source[:,:,2]>source[:,:,0]+12)&(source[:,:,3]>140)&srcmask))
 if new_white<9000 or new_navy<12000:raise RuntimeError(("glyph/glow erased",new_white,new_navy))
+# C310 regression gate: do not hand C2 a candidate with the same oversized
+# white-face vs navy-support dominance as rejected B279 (ratio >2.0).
+if new_white / max(1,new_navy) > 1.25:raise RuntimeError(("source-family white dominance C310 recurrence",new_white,new_navy))
 tfile=run/"42E618FD_B282_TRIAL_NOT_APPROVED.dds";tfile.write_bytes(trial)
 assert sha(tfile.read_bytes())==sha(trial) and np.array_equal(decode(tfile.read_bytes()),native)
 # Individual lossless decoded plate/final evidence, plus four panels
