@@ -1,0 +1,454 @@
+{
+  "schema_version": 2,
+  "run": "C317-C2",
+  "run_key": "OUTRUN-KOR-C317-C2-Q228-IGR038-91PNG-CHROME-FAMILY-20261009",
+  "review_id": "C317-C2-Q228-IGR038-P1-NATIVE-FAMILY-20261009",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 228,
+  "priority": "P1",
+  "ingame_report": "IGR-038",
+  "screenshot": "스크린샷(190)(1).png",
+  "screenshot_source_build_commit": "cc8f9dd6ba7163b12451f192e80d7f417aa8548a",
+  "selection_head": "c472fe69e739a45617574976b7e6f71454d9b6d6",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "machine_manifest": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/C317_Q228_13ROW_NATIVE_LOSSLESS_MACHINE.json",
+  "lossless_png_files": 91,
+  "files_created_by": "GitHub Actions 37812502946 success",
+  "native_size": [
+    2048,
+    2048
+  ],
+  "raw_mirror_y_verified": true,
+  "dds_header_exact": true,
+  "changed_rgba_outside_13_source_bboxes": 0,
+  "changed_alpha_outside_13_source_bboxes": 0,
+  "triage": {
+    "result": "MATERIAL_REWORK",
+    "tool": "tools/localization/rework_triage.py --index 228",
+    "selection_before": "user_ingame_20261009_rework_required"
+  },
+  "known_limitations": [
+    "C317 had canonical SOURCE/current but no independent CLEAN plate; source-vs-CLEAN and CLEAN-vs-FINAL cannot be passed or inferred from zero outside mask",
+    "The user-reported game crop itself was not reproduced or closed; black screenshot annotations are not game-drawn boxes",
+    "An earlier C258 exact-current static C3 PASS is historical and superseded by the 2026-10-09 actual game failure and new source-family visual finding",
+    "No independent blind defect-control calibration before producer notes; cannot record calibration PASS",
+    "Only 7/13 regions freshly inspected visually at practical 50/native/RAW; 91 region lossless files exist for all 13"
+  ],
+  "per_region": [
+    {
+      "id": 0,
+      "label": "coast 2 coast",
+      "original_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "korean_bbox": [
+        9,
+        30,
+        1048,
+        141
+      ],
+      "positive_margins": [
+        4,
+        408,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "Flat black hollow contour versus high-relief silver filled beveled COAST 2 COAST, visible 50% and RAW.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_RAW.png"
+      }
+    },
+    {
+      "id": 1,
+      "label": "car select",
+      "original_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "korean_bbox": [
+        9,
+        186,
+        522,
+        297
+      ],
+      "positive_margins": [
+        4,
+        602,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "CAR SELECT white/silver embossed filled lettering and dark soft shadow absent from hollow black Hangul at native100.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_RAW.png"
+      }
+    },
+    {
+      "id": 2,
+      "label": "license select",
+      "original_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "korean_bbox": [
+        10,
+        342,
+        756,
+        452
+      ],
+      "positive_margins": [
+        4,
+        744,
+        4,
+        5
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_RAW.png"
+      }
+    },
+    {
+      "id": 3,
+      "label": "game lobby",
+      "original_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "korean_bbox": [
+        11,
+        498,
+        666,
+        640
+      ],
+      "positive_margins": [
+        4,
+        466,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "GAME LOBBY filled chrome source and softened dark depth vs flat outlined game lobby Korean at practical50.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_RAW.png"
+      }
+    },
+    {
+      "id": 4,
+      "label": "main menu",
+      "original_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "korean_bbox": [
+        10,
+        648,
+        550,
+        765
+      ],
+      "positive_margins": [
+        4,
+        557,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_RAW.png"
+      }
+    },
+    {
+      "id": 5,
+      "label": "multiplayer",
+      "original_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "korean_bbox": [
+        10,
+        810,
+        778,
+        952
+      ],
+      "positive_margins": [
+        4,
+        417,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "MULTIPLAYER thick silver fill/highlight vs black outline-only candidate at practical50.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_RAW.png"
+      }
+    },
+    {
+      "id": 6,
+      "label": "music select",
+      "original_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "korean_bbox": [
+        10,
+        960,
+        529,
+        1073
+      ],
+      "positive_margins": [
+        4,
+        747,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_RAW.png"
+      }
+    },
+    {
+      "id": 7,
+      "label": "options",
+      "original_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "korean_bbox": [
+        10,
+        1118,
+        318,
+        1261
+      ],
+      "positive_margins": [
+        4,
+        430,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "OPTIONS chrome volumetric filled source vs thin outlined Korean at practical50.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_RAW.png"
+      }
+    },
+    {
+      "id": 8,
+      "label": "network",
+      "original_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "korean_bbox": [
+        10,
+        1278,
+        633,
+        1420
+      ],
+      "positive_margins": [
+        4,
+        183,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_RAW.png"
+      }
+    },
+    {
+      "id": 9,
+      "label": "rankings",
+      "original_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "korean_bbox": [
+        10,
+        1428,
+        313,
+        1576
+      ],
+      "positive_margins": [
+        4,
+        479,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "RANKINGS strong chrome face vs near-black border without source silver body at practical50.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_RAW.png"
+      }
+    },
+    {
+      "id": 10,
+      "label": "game select",
+      "original_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "korean_bbox": [
+        7,
+        1584,
+        701,
+        1732
+      ],
+      "positive_margins": [
+        4,
+        535,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_RAW.png"
+      }
+    },
+    {
+      "id": 11,
+      "label": "mode select",
+      "original_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "korean_bbox": [
+        6,
+        1740,
+        549,
+        1857
+      ],
+      "positive_margins": [
+        4,
+        703,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "NOT_INDEPENDENTLY_REVIEWED_THIS_RUN",
+      "direct_observation": "No new controller visual assertion for this row",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_RAW.png"
+      }
+    },
+    {
+      "id": 12,
+      "label": "race select",
+      "original_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "korean_bbox": [
+        10,
+        1902,
+        641,
+        2013
+      ],
+      "positive_margins": [
+        4,
+        603,
+        4,
+        4
+      ],
+      "machine": "PASS_BBOX_AND_ZERO_OUTSIDE",
+      "style_result": "FAIL_SOURCE_CHROME_MATERIAL",
+      "direct_observation": "RACE SELECT original silver metal fill/depth vs hollow stroke Korean at practical50.",
+      "proof": {
+        "practical50": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_RAW.png"
+      }
+    }
+  ],
+  "visual_failure_codes": [
+    "SOURCE_FAMILY_METALLIC_FACE_MISSING",
+    "HOLLOW_OUTLINE_SUBSTITUTED_FOR_CHROME_BEVEL"
+  ],
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "C_PASS_NEW": false,
+  "C3_PASS_NEW": false,
+  "APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED_OPEN_USER_INGAME_FAIL",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "required_producer_remediation": "B even owner q228: material rework from exact English metal/chrome family. Rebuild ALL 13 native Hangul labels using source-measured silver face gradient/bevel/highlight/dark depth, height and readable-slant stem anchors, without opaque source rectangle, generic flat outline or arbitrary width ratio. Independently validate AUTHORED CLEAN-only removal and transparent glyph-only composite, 13 source-size ceilings and 1px zero escape, 100/75/50+RAW and authored mips from exact persisted DDS. Fresh C2 then distinct C3; new screenshot(190) user actual-game retest needed. Do not change q173 protected stage atlas or other scopes.",
+  "new_dds": 0,
+  "new_png": 91,
+  "prohibited_scope_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
