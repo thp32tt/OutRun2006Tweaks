@@ -1,0 +1,35 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "ChatGPT AI 1",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "answer_key_read_before_this_record": false,
+  "cases": {
+    "case_00.png": {
+      "observed": "PASS",
+      "classified_as": "normal",
+      "observation": "TEST preserves the source START lean, stroke integrity, weight and plate presentation without an obvious defect."
+    },
+    "case_01.png": {
+      "observed": "FAIL",
+      "classified_as": "clipped_stroke",
+      "observation": "TEST loses essentially the entire lettering footprint; catastrophic clipping/glyph loss is immediately visible."
+    },
+    "case_02.png": {
+      "observed": "FAIL",
+      "classified_as": "opposite_slant",
+      "observation": "TEST no longer follows the source right-leaning italic direction and reads as the wrong/flattened lean."
+    },
+    "case_03.png": {
+      "observed": "FAIL",
+      "classified_as": "excessive_weight",
+      "observation": "TEST strokes/effects look visibly heavier and denser than SOURCE, reducing the source's open italic character."
+    },
+    "case_04.png": {
+      "observed": "FAIL",
+      "classified_as": "residue",
+      "observation": "TEST shows extra/ghosted edge material around the lettering compared with SOURCE, consistent with residual duplicate pixels."
+    }
+  }
+}
