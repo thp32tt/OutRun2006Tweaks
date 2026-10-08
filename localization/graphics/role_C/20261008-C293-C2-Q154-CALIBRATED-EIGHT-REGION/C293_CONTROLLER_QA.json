@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C293-C2",
+  "run_key": "OUTRUN-KOR-C293-C2-Q154-EIGHT-REGION-FAMILY-RECONCILIATION-20261008-1720",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "task_kind": "cross-region family width and practical-readability reconciliation of unchanged q154 candidate, not a fresh DDS rebuild",
+  "new_observation": "All 8 text regions reviewed together for family width hierarchy, based on exact hash-bound existing SOURCE/CLEAN/current native lossless proof. Five red rows retain 71.97%-78.00% of English text width; gray SHOWROOM retains 50% due shorter localized wording. Ratio is not an approval metric or automatic defect. The authoritative source-family profile and measured readable slant anchors are missing.",
+  "calibration": {
+    "first_look_record": "localization/graphics/role_C/20261008-C293-C2-Q154-CALIBRATED-EIGHT-REGION/C293_CALIBRATION_FIRST_LOOK.json",
+    "diagnostic": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_CALIBRATION_DIAGNOSTIC.json",
+    "observed_case_classification": "5_OF_5_MATCH_DIAGNOSTIC",
+    "calibration_qualified": false,
+    "reason": "Control D normal came from visually rejected q172 candidate and had never been independently certified source-faithful. Defect discrimination 5/5 does not license PASS."
+  },
+  "review_procedure": {
+    "pixels_before_producer_verdict": false,
+    "reason": "Current task had read q154 producer history before opening eight image groups; do not assert pixels-first C review. Independent pre-gate proof used as reference, not retroactively upgraded.",
+    "source_family_reference_profile": "MISSING",
+    "fresh_authored_mip_visual_review": "MISSING",
+    "native_vs_raw_images": "EXISTING_Q287_Q292_REFERENCES",
+    "machine_report_new_this_run": false,
+    "triage_execution": "NOT_RERUN; prior C292 TRIAGE referenced (no re-render triggered)"
+  },
+  "per_region_review": [
+    {
+      "id": "create_new_license_red",
+      "english_source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "current_korean_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "source_size": [
+        1941,
+        148
+      ],
+      "localized_size": [
+        1514,
+        140
+      ],
+      "localized_to_english_width_percent": 78,
+      "localized_to_english_height_percent": 94.59,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_SOURCE_CLEAN_FINAL_50.png",
+      "first_look_visual_observation": "Native source/clean/current triptych and 50% readable preview show coherent red glyphs; original English is condensed, so further source-derived typography comparison and measured anchors remain necessary.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "select_license_red",
+      "english_source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "current_korean_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "source_size": [
+        1461,
+        148
+      ],
+      "localized_size": [
+        1096,
+        140
+      ],
+      "localized_to_english_width_percent": 75.02,
+      "localized_to_english_height_percent": 94.59,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_SOURCE_CLEAN_FINAL_50.png",
+      "first_look_visual_observation": "Native source/clean/current triptych and 50% readable preview show coherent red glyphs; original English is condensed, so further source-derived typography comparison and measured anchors remain necessary.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "single_player_red",
+      "english_source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "current_korean_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "source_size": [
+        1376,
+        148
+      ],
+      "localized_size": [
+        991,
+        140
+      ],
+      "localized_to_english_width_percent": 72.02,
+      "localized_to_english_height_percent": 94.59,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_SOURCE_CLEAN_FINAL_50.png",
+      "first_look_visual_observation": "Native source/clean/current triptych and 50% readable preview show coherent red glyphs; original English is condensed, so further source-derived typography comparison and measured anchors remain necessary.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "default_license_red",
+      "english_source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "current_korean_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "source_size": [
+        1544,
+        148
+      ],
+      "localized_size": [
+        1143,
+        140
+      ],
+      "localized_to_english_width_percent": 74.03,
+      "localized_to_english_height_percent": 94.59,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_SOURCE_CLEAN_FINAL_50.png",
+      "first_look_visual_observation": "Native source/clean/current triptych and 50% readable preview show coherent red glyphs; original English is condensed, so further source-derived typography comparison and measured anchors remain necessary.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "multiplayer_red",
+      "english_source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "current_korean_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "source_size": [
+        1220,
+        144
+      ],
+      "localized_size": [
+        878,
+        140
+      ],
+      "localized_to_english_width_percent": 71.97,
+      "localized_to_english_height_percent": 97.22,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_SOURCE_CLEAN_FINAL_50.png",
+      "first_look_visual_observation": "Native source/clean/current triptych and 50% readable preview show coherent red glyphs; original English is condensed, so further source-derived typography comparison and measured anchors remain necessary.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "single_player_gray",
+      "english_source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "current_korean_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "source_size": [
+        587,
+        64
+      ],
+      "localized_size": [
+        411,
+        58
+      ],
+      "localized_to_english_width_percent": 70.02,
+      "localized_to_english_height_percent": 90.63,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/single_player_gray_ZOOM2X.png",
+      "first_look_visual_observation": "Visually the lighter gray stroke and open Hangul counters are distinguishable from C268 rejected heavy gray; source-relative font-profile equivalence not independently certified.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "showroom_gray",
+      "english_source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "current_korean_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "source_size": [
+        420,
+        62
+      ],
+      "localized_size": [
+        210,
+        55
+      ],
+      "localized_to_english_width_percent": 50,
+      "localized_to_english_height_percent": 88.71,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/showroom_gray_ZOOM2X.png",
+      "first_look_visual_observation": "Visible 2-syllable Korean retains source height but occupies 50% of English horizontal footprint; short wording alone does not prove a defect. Family-level word hierarchy remains unresolved.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "id": "multiplayer_gray",
+      "english_source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "current_korean_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "source_size": [
+        520,
+        62
+      ],
+      "localized_size": [
+        364,
+        58
+      ],
+      "localized_to_english_width_percent": 70,
+      "localized_to_english_height_percent": 93.55,
+      "source_pixel_containment": "PASS",
+      "evidence_existing_path": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/multiplayer_gray_ZOOM2X.png",
+      "first_look_visual_observation": "Visually the lighter gray stroke and open Hangul counters are distinguishable from C268 rejected heavy gray; source-relative font-profile equivalence not independently certified.",
+      "check_results": {
+        "slant": "HOLD_UNMEASURED_ANCHORS",
+        "clean_plate": "REFERENCE_CONFIRMED_C287_NOT_NEW_PASS",
+        "style": "HOLD_SOURCE_FAMILY_PROFILE",
+        "readability": "NO_DEFINITE_DEFECT_IN_REFERENCED_IMAGES",
+        "glyph_integrity": "NO_DEFINITE_BREAKAGE_IN_REFERENCED_IMAGES",
+        "protected_art": "PREVIOUS_MACHINE_ZERO_OUTSIDE_AWAIT_CURRENT_GATE",
+        "placement": "BOUNDING_CONTAINMENT_PASS_NO_SOURCE_RELATIVE_ANCHOR_PROOF",
+        "orientation": "REFERENCE_RAW_CHECK_C287_C292"
+      },
+      "decision": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "approval": "BLOCKED",
+  "C3": "BLOCKED_PENDING_CALIBRATED_PIXELS_FIRST_C",
+  "pre_ingame_export": "BLOCKED_BY_EVIDENCE_GATE",
+  "user_jpg_acceptance": "NOT_DONE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_produced": 0,
+  "execution_backend": "GitHub connector image/raw evidence review; GPT-local unavailable for this repository large binary (no native network); N100 only minimal path check, no image jobs",
+  "forbidden_domains_touched": [],
+  "cleanup": {
+    "github_files": "persisted",
+    "gpt_local_scratch": "NONE",
+    "n100_scratch": "NONE",
+    "temporary_worktree": "NONE"
+  },
+  "next_task": "Recalibrate with an independently approved native normal control (C281 current normal invalid), obtain a fresh pixels-first q154 C2 reviewer check on exact DDS, measure source/candidate per-glyph slant anchors and family profile for 8 regions, then distinct C3 with complete refs and QA evidence validator. Do not regenerate DDS without a verified defect."
+}
