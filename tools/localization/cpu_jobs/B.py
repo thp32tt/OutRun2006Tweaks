@@ -4,7 +4,7 @@ from pathlib import Path
 import os, io, sys, json, hashlib, struct, urllib.request, tempfile, subprocess
 import numpy as np
 from PIL import Image, ImageDraw
-from scipy.ndimage import binary_erosion, distance_transform_edt
+from scipy.ndimage import binary_erosion, binary_closing, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
     raise SystemExit("B273 requires pinned source download; GitHub worker only")
