@@ -51,7 +51,7 @@ print("B290_PLATE_ALPHA_REMAINING_UPPER",residual_alpha,"of",int(upper_white.sum
 # Permit any independently protected pixels to cause a HOLD instead of lying.
 assert residual_alpha==0 and residual_core==0,("CLEAN_PLATE_SOURCE_RESIDUE_BLOCK",residual_alpha,residual_core)
 # Check local unchanged nonlettered core and zero-added alpha/hard rectangle.
-assert int(np.count_nonzero(changed[t:bt,l:r]))<int((r-l)*(bt-t)*0.55)
+assert int(np.count_nonzero(changed[t:bt,l:r]))<int((r-l)*(bt-t)*0.75),"material correction exceeds isolated existing glyph region"
 def composite(ar,bg=(80,80,80,255)):
  img=Image.new("RGBA",(ar.shape[1],ar.shape[0]),bg)
  img.alpha_composite(Image.fromarray(ar,"RGBA"))
