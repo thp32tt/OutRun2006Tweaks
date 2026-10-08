@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-run="20261008-A191-Q119-SOURCE-WHITE-HALO"
+run="20261008-A192-Q119-PADDED-ITALIC-HALO"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -24,15 +24,15 @@ source_bbox=[390,54,1632,200]
 ko="타임 어택 모드"
 
 # Fail closed against concurrent producer changes and the exact rejected C290 bytes.
-REJECTED_SHA="d7e1378f1adac5ba1069985583cbcba30d8bc2f9b496110e865a3dd827b55490"
+REJECTED_SHA="4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca"
 if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=REJECTED_SHA:
-    raise RuntimeError("C290 rejected q119 bytes have changed; abort stale A191 job")
+    raise RuntimeError("C290 rejected q119 bytes have changed; abort stale A192 job")
 triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","119","--require-safe-rerender"],capture_output=True,text=True)
-print("A191 REWORK TRIAGE "+triage.stdout,flush=True)
+print("A192 REWORK TRIAGE "+triage.stdout,flush=True)
 if triage.returncode: raise RuntimeError(("q119 rework triage blocked",triage.returncode,triage.stderr))
 
 
-srcp=Path("/tmp/A191_F6811E94.dds")
+srcp=Path("/tmp/A192_F6811E94.dds")
 urllib.request.urlretrieve(url,srcp)
 raw=srcp.read_bytes()
 if hashlib.sha256(raw).hexdigest()!=SOURCE_SHA: raise RuntimeError("source drift")
@@ -78,8 +78,29 @@ FONT=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=
 if not FONT or not Path(FONT).exists(): raise RuntimeError(("font",FONT))
 
 def shear(im,k):
-    add=max(1,int(round(k*im.height)))
-    return im.transform((im.width+add,im.height),Image.Transform.AFFINE,(1,-k,add,0,1,0),resample=Image.Resampling.BICUBIC)
+    """Native-resolution inverse-affine with symmetric padding; no source-pixel truncation.
+    Positive k shifts readable TOP to the right relative to BOTTOM (English right italic).
+    A191 used a tight-cropped affine input plus one-sided add and cut its first glyph.
+    """
+    h=im.height
+    p=max(36,int(np.ceil(abs(k)*h))+16)
+    padded=Image.new("RGBA",(im.width+2*p,im.height+16),(0,0,0,0))
+    padded.alpha_composite(im,(p,8))
+    # Pillow mapping: input_x=output_x + k*(output_y - centre_y).
+    # Thus output_top is right of output_bottom, never direction inferred by variable sign.
+    centre=h/2+8
+    warped=padded.transform(padded.size,Image.Transform.AFFINE,
+                            (1,k,-k*centre,0,1,0),resample=Image.Resampling.BICUBIC)
+    if any(warped.getchannel("A").crop(edge).getbbox() for edge in (
+        (0,0,2,warped.height),(warped.width-2,0,warped.width,warped.height),
+        (0,0,warped.width,2),(0,warped.height-2,warped.width,warped.height))):
+        raise RuntimeError("padded affine text touches transformed canvas boundary")
+    before=int(np.asarray(im.getchannel("A"),dtype=np.uint32).sum())
+    after=int(np.asarray(warped.getchannel("A"),dtype=np.uint32).sum())
+    if abs(after-before)>max(128,int(before*.009)):
+        raise RuntimeError(("affine alpha coverage drift",before,after))
+    box=warped.getchannel("A").getbbox()
+    return warped.crop(box)
 
 # Render at native HD. Preserve the strong orange fill, navy outline and right italic lean.
 sw=x1-x0; sh=y1-y0
@@ -107,7 +128,7 @@ if chosen is None: raise RuntimeError("no source-faithful fit")
 glyph,px,py,font_size=chosen
 # Source-family rebuild: high-luminance white rim *outside* navy stroke,
 # then warm diffuse halo. This is not a flat recolor or a width stretch.
-HALO_PAD=12
+HALO_PAD=29
 padded=(glyph.width+2*HALO_PAD,glyph.height+2*HALO_PAD)
 letter_alpha=Image.new("L",padded,0)
 letter_alpha.paste(glyph.getchannel("A"),(HALO_PAD,HALO_PAD))
@@ -122,11 +143,20 @@ halo_alpha=ImageChops.lighter(rim_alpha,diffuse_alpha)
 letter_glow=Image.new("RGBA",padded,white_rgb+(0,))
 letter_glow.putalpha(halo_alpha)
 letter_glow.alpha_composite(glyph,(HALO_PAD,HALO_PAD))
-px-=HALO_PAD; py-=HALO_PAD
-# A controlled margin is required because the 4x4 DXT5 edge-blocks
-# must remain byte/pixel safe outside the exact English effect boundary.
+# Crop by *effect alpha* with a deliberate transparent guard: never let the
+# extended white blur be clipped against the halo drawing canvas.
+gb=letter_glow.getchannel("A").getbbox()
+if gb is None: raise RuntimeError("empty halo")
+pad_guard=3
+if min(gb[0],gb[1],letter_glow.width-gb[2],letter_glow.height-gb[3])<pad_guard:
+    raise RuntimeError(("halo touches effect canvas",gb,letter_glow.size))
+crop_box=(gb[0]-pad_guard,gb[1]-pad_guard,gb[2]+pad_guard,gb[3]+pad_guard)
+letter_glow=letter_glow.crop(crop_box)
+px=px-HALO_PAD+crop_box[0]
+py=py-HALO_PAD+crop_box[1]
+# Exact original effect bbox and independently reversible DXT5 boundary safety.
 if min(px-x0,py-y0,x1-(px+letter_glow.width),y1-(py+letter_glow.height))<2:
-    raise RuntimeError("white halo reaches source-effect border")
+    raise RuntimeError(("glow exceeds original source effect or margin",px,py,letter_glow.size))
 desired=clean.copy()
 desired.alpha_composite(letter_glow,(px,py))
 desired_arr=np.asarray(desired,dtype=np.uint8)
@@ -138,8 +168,8 @@ if (pre_bbox[2]-pre_bbox[0])>sw or (pre_bbox[3]-pre_bbox[1])>sh: raise RuntimeEr
 
 # Encode a full desired DXT5 image with ImageMagick, then splice only block-safe data.
 desired_raw=desired.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-tmp_png=Path("/tmp/A191_desired_raw.png"); desired_raw.save(tmp_png)
-tmp_dds=Path("/tmp/A191_desired_dxt5.dds")
+tmp_png=Path("/tmp/A192_desired_raw.png"); desired_raw.save(tmp_png)
+tmp_dds=Path("/tmp/A192_desired_dxt5.dds")
 cmd=["convert",str(tmp_png),"-define","dds:compression=dxt5","-define","dds:mipmaps=0",str(tmp_dds)]
 subprocess.run(cmd,check=True)
 enc=tmp_dds.read_bytes()
@@ -232,10 +262,10 @@ if payload[:128]!=raw[:128]: raise RuntimeError("header drift")
 if len(payload)!=len(raw): raise RuntimeError("size drift")
 
 # Evidence
-src.save(out/"A191_SOURCE_READABLE.png"); src_raw.save(out/"A191_SOURCE_RAW.png")
-clean.save(out/"A191_CLEAN_PLATE.png"); dec.save(out/"A191_FINAL_READABLE.png"); dec_raw.save(out/"A191_FINAL_RAW.png")
-Image.fromarray((source_alpha*255).astype(np.uint8),"L").save(out/"A191_SOURCE_TEXT_MASK.png")
-Image.fromarray((pre_mask*255).astype(np.uint8),"L").save(out/"A191_TARGET_MASK.png")
+src.save(out/"A192_SOURCE_READABLE.png"); src_raw.save(out/"A192_SOURCE_RAW.png")
+clean.save(out/"A192_CLEAN_PLATE.png"); dec.save(out/"A192_FINAL_READABLE.png"); dec_raw.save(out/"A192_FINAL_RAW.png")
+Image.fromarray((source_alpha*255).astype(np.uint8),"L").save(out/"A192_SOURCE_TEXT_MASK.png")
+Image.fromarray((pre_mask*255).astype(np.uint8),"L").save(out/"A192_TARGET_MASK.png")
 
 def white(im):
     z=Image.new("RGBA",im.size,(255,255,255,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -250,13 +280,13 @@ sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+8 for c in cards
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((2200,1500),Image.Resampling.LANCZOS)
-sheet.save(out/"A191_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"A192_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 rawsheet=Image.new("RGB",(1100,700),"white")
 for i,(lab,im) in enumerate([("SOURCE RAW mirror_y",src_raw),("FINAL RAW mirror_y",dec_raw)]):
     v=white(im); v.thumbnail((1050,280),Image.Resampling.LANCZOS)
     y=i*335+30; rawsheet.paste(v,(20,y)); ImageDraw.Draw(rawsheet).text((20,y-22),lab,fill="black")
-rawsheet.save(out/"A191_RAW_COMPARE.jpg",quality=95)
+rawsheet.save(out/"A192_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":idx,"asset":asset,
@@ -265,11 +295,11 @@ report={
  "structure":{"width":W,"height":H,"format":"DXT5","mipmaps":MIPS,"header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
  "construction":{
    "clean_plate":"exact source glyph/effect bbox cleared to transparent; source contains no nontransparent pixels outside bbox",
-   "render":"native 2048x256 Noto Sans CJK KR Black; C290 material defect correction: source-sampled white softened 3px keyline plus source-like diffuse outer halo behind orange/navy outline (A190 hard 6px rim visually rejected), same 0.25 right shear; height refit for 12px padding",
+   "render":"native 2048x256 Noto Sans CJK KR Black; C290 material defect correction: source-sampled white softened 3px keyline plus source-like diffuse outer halo behind orange/navy outline (A190 hard 6px rim visually rejected), padded native positive top-right readable italic inverse-affine, 29px uncropped white blur envelope and 3px zero-alpha guard",
    "dxt5_boundary":"full-inside 4x4 blocks use fresh DXT5 encode; partial boundary blocks retain original endpoints/color bytes/outside indices and set only inside alpha indices to an existing exact-zero palette entry; outside blocks byte-identical source",
    "block_counts":{"full_inside":full,"partial_boundary":partial,"outside_unchanged":outside}
  },
- "style":{"font":"Noto Sans CJK KR Black","font_size":font_size,"fill_rgba":fill,"outline_rgba":outline,"outline_px":10,"shear":0.25,"white_halo_rgb":white_rgb,"halo_pad":HALO_PAD,"source_bright_pixel_count":int(source_bright.sum())},
+ "style":{"font":"Noto Sans CJK KR Black","font_size":font_size,"fill_rgba":fill,"outline_rgba":outline,"outline_px":10,"shear":0.25,"white_halo_rgb":white_rgb,"halo_pad":HALO_PAD,"affine":"symmetric_source_padding_top_right_in_readable_coordinates","halo_guard":pad_guard,"source_bright_pixel_count":int(source_bright.sum())},
  "elements":[{
    "source":"Time Attack Mode","korean":ko,
    "original_bbox":source_bbox,"localized_bbox":db,
@@ -294,15 +324,18 @@ report={
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"A191_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A192_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True,
+ "supersedes_rejected_c294_sha256":REJECTED_SHA,
+ "source_family_lean_anchors":"PENDING_DIRECT_NATIVE_CONTROLLER_MEASUREMENT",
+ "C3_and_runtime_validation":"NOT_DONE",
  "supersedes_rejected_candidate_sha256":REJECTED_SHA,
  "previous_visual_failure":"A190 native BWG black/gray revealed a too-hard white rim rather than source diffuse halo; this reconstruction materially softens glow and revisits slant",
  "qa_gate":"Pending first-hand native SOURCE/CLEAN/FINAL, 4x/practical/RAW controller review; numeric PASS never authorizes C approval"
 }
-rp=out/"A191_F6811E94_REPORT.json"
+rp=out/"A192_F6811E94_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A191_F6811E94.json").write_text(json.dumps({
+(wr/"A192_F6811E94.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":idx,"asset":"F6811E94",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "original_bbox":source_bbox,"localized_bbox":db,"deltas":deltas,
