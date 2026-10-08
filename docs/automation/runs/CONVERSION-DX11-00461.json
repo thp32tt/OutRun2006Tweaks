@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00461",
+  "production_id": "CONVERSION-DX11-00461",
+  "event_id": "CONVERSION-DX11-00461-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R153_DYNAMIC_TEXTURE_MAP_UNMAP_IMMEDIATE_CONTEXT_RECEIPT",
+  "work_key": "DX11:TEXTURE_UPLOAD_MAP_UNMAP:IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/native_backend.cpp",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00461",
+  "lease_epoch": 1,
+  "base_sha": "68119ead1bc72e985cb2898f2ba70e2a7b897cef",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "implementation_commits": [
+    "d40f90b614c3df4c07bb074906d3c27206634e57",
+    "521341948286bf07c1b6d5e4d9f537d947acfc3f"
+  ],
+  "material_result_sha": "521341948286bf07c1b6d5e4d9f537d947acfc3f",
+  "validation_bearing_sha": "521341948286bf07c1b6d5e4d9f537d947acfc3f",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub head 68119ead1bc72e985cb2898f2ba70e2a7b897cef; 00460 C6 COMPLETE; 00461 absent; rollover is not retry and ATTEMPT=1/3",
+    "C1_REVIEW": "PASS: R101 dynamic texture upload_full_discard accepted same-device deferred context as if Map/Unmap established immediate live content receipt; R149-R152 already complete and not repeated",
+    "C2_IMPLEMENT": "PASS: R153 immediate-context-only texture upload guard and same-device WARP deferred-negative/immediate-positive generation/byte-readback probe",
+    "C3_VALIDATE": "PENDING: source-graph static scope checks PASSED; exact material-SHA GitHub Actions Backend Conversion Gate 37823287153 is pending",
+    "C4_COMMIT": "PASS: source d40f90b614c3df4c07bb074906d3c27206634e57 + WARP probe 521341948286bf07c1b6d5e4d9f537d947acfc3f both [AUTO:CONVERSION-DX11-00461]",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant texture-owner upload guard, no Draw activation, HMD release, or install package",
+    "C6_STATE": "PENDING: exact SHA WARP CI validate and smoke SUCCESS before final lane-state seal"
+  },
+  "static_validation": "PASS: scoped GitHub source assertions guard-before-Map, same-device negative and immediate-positive generation probes, byte readback preserved; Windows C++/WARP execution pending",
+  "state_persisted": false,
+  "validation_run_id": 37823287153,
+  "next_action": "Read GitHub Actions Backend Conversion Gate 37823287153 for exact material SHA 521341948286bf07c1b6d5e4d9f537d947acfc3f. On validate+DX11 readiness smoke SUCCESS, capture jobs/artifact, update run record and docs/CONVERSION_LANE_STATE.json C6; on failure repair SAME TASK_ID. Never increment ATTEMPT for rollover.",
+  "blockers": [
+    "Exact-SHA hosted Windows C++/WARP CI pending",
+    "Quest3/VDXR runtime untested; native Draw dormant"
+  ],
+  "evidence": {
+    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
+    "ci_gate": "PENDING_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN",
+    "backend_conversion_gate_run_id": 37823287153,
+    "ci_head_sha": "521341948286bf07c1b6d5e4d9f537d947acfc3f"
+  },
+  "last_activity_evidence": "Material C++ guard plus WARP source probe pushed on GitHub; exact material SHA gate queued; runtime UNTESTED"
+}
