@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "TASK_ID": "OUTRUN-KOR-C318-C1-Q121-A199-NEW-SHA-NATIVE-20261009",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "p0_regressions": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "triage": {
+    "index": 121,
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "current_status": "user_ingame_p0_rework_required_a199_candidate_pending_c1_c3_game",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "canonical_source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "supersedes_old_C316_SHA": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "structure": {
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_equal": true
+  },
+  "clean_provenance": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "metrics": {
+    "clean_final_rgba_outside_exact_region_union": 0,
+    "clean_final_alpha_outside_exact_region_union": 0,
+    "clean_final_rgba_inside_exact_region_union": 104723,
+    "source_clean_rgba_outside_exact_region_union": 1934984,
+    "source_final_rgba_outside_exact_region_union": 1934984
+  },
+  "rows": [
+    {
+      "id": "select_game_mode",
+      "english": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "source_original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "A199_candidate_bbox": [
+        291,
+        825,
+        1040,
+        948
+      ],
+      "source_size": [
+        1000,
+        154
+      ],
+      "A199_size": [
+        749,
+        123
+      ],
+      "source_relative_width_ratio": 0.749,
+      "source_relative_height_ratio": 0.7987,
+      "positive_margins": [
+        125,
+        126,
+        6,
+        25
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    },
+    {
+      "id": "select_car",
+      "english": "Select your car",
+      "korean": "차량 선택",
+      "source_original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "A199_candidate_bbox": [
+        481,
+        964,
+        917,
+        1072
+      ],
+      "source_size": [
+        913,
+        164
+      ],
+      "A199_size": [
+        436,
+        108
+      ],
+      "source_relative_width_ratio": 0.4775,
+      "source_relative_height_ratio": 0.6585,
+      "positive_margins": [
+        238,
+        239,
+        17,
+        39
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    },
+    {
+      "id": "select_course",
+      "english": "Select Course",
+      "korean": "코스 선택",
+      "source_original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "A199_candidate_bbox": [
+        462,
+        1088,
+        924,
+        1202
+      ],
+      "source_size": [
+        783,
+        151
+      ],
+      "A199_size": [
+        462,
+        114
+      ],
+      "source_relative_width_ratio": 0.59,
+      "source_relative_height_ratio": 0.755,
+      "positive_margins": [
+        160,
+        161,
+        26,
+        11
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    }
+  ],
+  "new_lossless_png": 45,
+  "manifest": [
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SOURCE_NATIVE.png",
+      "sha256": "9ca9083d4ac5a11e67427effa3acdfd7a138009ff06a917e18aed83b80566ead",
+      "bytes": 28174
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SOURCE_RAW.png",
+      "sha256": "c3fd401f635796d75ddc4c2c08a320e67529501e91b58a6ee51e527b0892c4cc",
+      "bytes": 29260
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_CLEAN_NATIVE.png",
+      "sha256": "df48b7c7f8a77a05f7dc1ecc0149b8d2609806f415dc6be3e9eca3e093c1df5f",
+      "bytes": 6247
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_CLEAN_RAW.png",
+      "sha256": "78b1777c182ea75e8d2b27118d7fe5e38d172cea887d6d717f185125559476ea",
+      "bytes": 6407
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_A199_NATIVE.png",
+      "sha256": "192aed45180fa6818783875a41671cd2968421fe6e0e0aef98d042af7a12766f",
+      "bytes": 24480
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_A199_RAW.png",
+      "sha256": "836ad7d59b2df4051f002f2e49153171859eb26c4fb4045bd9c1bfab83d9287f",
+      "bytes": 29894
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_BLACK_100.png",
+      "sha256": "8d6c37becae19d67efe608dbfcdcdfb5bb90a8154361280f9b6d0abbbad89079",
+      "bytes": 50641
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_GRAY_100.png",
+      "sha256": "a8bfd5e195ba9a2757628275194cacf30c013716e4e288f05253023055cf53d7",
+      "bytes": 63514
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_WHITE_100.png",
+      "sha256": "1f297604fb3a8cfad45ef6a8aa40469496689e11b167bb3f78de319260bd2007",
+      "bytes": 62724
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_BLACK_75.png",
+      "sha256": "87e2142879f2199a18d2f28bd9be7cf000cc1cb0d1fa90428f1d81842cdf62de",
+      "bytes": 68725
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_GRAY_75.png",
+      "sha256": "b0a365833b64efe872d217d8abf458d742d79d12b1c2b989b31eedef14ec24d6",
+      "bytes": 82680
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_WHITE_75.png",
+      "sha256": "6a902bc7275d241f440c469fb89244e6bcd82f8d83f61875d3d45f85e5e62b59",
+      "bytes": 78983
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_BLACK_50.png",
+      "sha256": "1ab23a2536cb1b5e1f52437c488b65bfa1694d734c0ec5a7bfd659007957133d",
+      "bytes": 38664
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_GRAY_50.png",
+      "sha256": "11a8c3aee8840e32068869b9c3f18279e521561c8eafae7349cb4273a2dd3eb2",
+      "bytes": 47948
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_WHITE_50.png",
+      "sha256": "14fff919904fab3566e4af21074d996df9805dfc277b9178f25090f960dfa31d",
+      "bytes": 44990
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SOURCE_NATIVE.png",
+      "sha256": "3ce21b66dc3735b3af9170132e5dd2ab4a6222eb4935bbbe3531256c6431fda7",
+      "bytes": 32046
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SOURCE_RAW.png",
+      "sha256": "6e7e502ecf7ac9cf63a24e62b7bda44470544bb9cb27e240709cfca47e388f44",
+      "bytes": 33168
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_CLEAN_NATIVE.png",
+      "sha256": "5e852e72b45dbc2bf88bc388148b33f8e6dbe5203907954b6daeadfad79fecec",
+      "bytes": 6309
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_CLEAN_RAW.png",
+      "sha256": "c13870f89c105e9cfa78a118dd67d0c744c8d6d15bd43afabaa195336d1429af",
+      "bytes": 6462
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_A199_NATIVE.png",
+      "sha256": "eef2d095604b625ecbce4ec7b2f562de63ff2550d0ee93dade6e5ed5b5329235",
+      "bytes": 26309
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_A199_RAW.png",
+      "sha256": "a6957bae4c59d6ffdfbd9a0afd8ea539887697b5e5fffa52fa0b520de71c6ace",
+      "bytes": 29785
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_BLACK_100.png",
+      "sha256": "ee12e05fb04bd276c6900befed6ef04859286721a25e3e27733467a9168f1f0a",
+      "bytes": 58119
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_GRAY_100.png",
+      "sha256": "f08f11a8eff3db989d0ce89bc189343bbe5763b3eed92ad2b7ebdf477e8cafd1",
+      "bytes": 65206
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_WHITE_100.png",
+      "sha256": "f6ec95006c9f09408c6c60d1c2791b756939db6af24201a1cc20d1b795f885fa",
+      "bytes": 62193
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_BLACK_75.png",
+      "sha256": "d6f501e36e15b94caa0cf44d2470197b7e50281397e395ddb3933b49a92315ef",
+      "bytes": 88275
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_GRAY_75.png",
+      "sha256": "8f567971f6b2233e9fc64fa3d767c1aaa4d959291222263ef98a44aadf5d5de2",
+      "bytes": 99539
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_WHITE_75.png",
+      "sha256": "064668494990ba25cbc5070caace6721be74664d4eaef3bd0674e4c49ff69c88",
+      "bytes": 94930
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_BLACK_50.png",
+      "sha256": "aa8029b024f539b788ac336f4966f130e3706bd32350a9fa69150ebc56c850bc",
+      "bytes": 51977
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_GRAY_50.png",
+      "sha256": "4efa3dcbc52a27e67f0fa8ef3e825287482da5b3221de8835cc653a2b0d5a7b4",
+      "bytes": 60762
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_WHITE_50.png",
+      "sha256": "42e1e972aab6fdbdaae98f15be440a86119565d80f43db2ff048af90d5d154ab",
+      "bytes": 56965
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SOURCE_NATIVE.png",
+      "sha256": "4bcd66de510f6d905d87ee14d79caf847f76dd914b8c0e1bd95889d27d7dd4ce",
+      "bytes": 30349
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SOURCE_RAW.png",
+      "sha256": "16576748ad529834fb449df0963f97dd06efeeddf5859a2165cbcef4b5f06647",
+      "bytes": 31107
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_CLEAN_NATIVE.png",
+      "sha256": "e2a0e5ab3fc1e3c7b1c20b9397efbdf0197abcc3c7edadbc88f1e86c209945c1",
+      "bytes": 8361
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_CLEAN_RAW.png",
+      "sha256": "0dd82bbc545df560e9284d4a1477ce9792867889806dd1fa867332cee259f433",
+      "bytes": 8418
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_A199_NATIVE.png",
+      "sha256": "091cd07e770b9f397d77eca7aaf93f7aa131f803b859ad424253e2525f272a4f",
+      "bytes": 23399
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_A199_RAW.png",
+      "sha256": "70903dce1124e44ced9b9d9950255eaeff9c432837349f29a557eaf47f52bc59",
+      "bytes": 26054
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_BLACK_100.png",
+      "sha256": "5445d8cbb0b6d503221d07676c24a9a6c85548e232156dccb1c52c813ba23a9c",
+      "bytes": 46550
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_GRAY_100.png",
+      "sha256": "87b81bcd25189490ac16343fb6708aa9db9e92408e4f558d6a66bad81355272a",
+      "bytes": 52650
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_WHITE_100.png",
+      "sha256": "48d7ff7c95cdfcc8d6d282b8bba932e35bfa7551202e47e3b51290e8e23bbf57",
+      "bytes": 51820
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_BLACK_75.png",
+      "sha256": "12d98b708159596fba50d634cf5de37445f4ce53dbe430f7b9ae8e0c9668f1a5",
+      "bytes": 76526
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_GRAY_75.png",
+      "sha256": "17dfd784a1442ed0ecf4d0a035ac3e5bcd5ee3bd56be4f08d299d3cd14f555c0",
+      "bytes": 87613
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_WHITE_75.png",
+      "sha256": "42a92c778195dfd145616607a1d2d134969011019d3ae6c6680f2563b44d7dde",
+      "bytes": 84693
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_BLACK_50.png",
+      "sha256": "e776d22930e0af5f573ecf7ebc1805024aa434ebf6c5c1d5910c79d9c76ac1ab",
+      "bytes": 44112
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_GRAY_50.png",
+      "sha256": "ee089ebc6fb761b02acfb8c8b92568b31c99870cce49916900e0aa9b34aee895",
+      "bytes": 53378
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_WHITE_50.png",
+      "sha256": "4fdc070e48164400066d25e818730b6effa78aca35fc398de6a783dfc7b0a85d",
+      "bytes": 50313
+    }
+  ],
+  "limit": "This is current persisted-DDS evidence only, not scene-composed runtime proof or blind calibration; annotated screenshot black outlines cannot prove native sprite box residues",
+  "C": "PENDING_INDEPENDENT_CONTROLLER",
+  "C3": "NOT_APPROVED",
+  "USER_RETEST": "NOT_PERFORMED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0
+}
