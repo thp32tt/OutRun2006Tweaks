@@ -13,8 +13,8 @@
   "validation_bearing_result_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
   "result_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00549]",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "selected_work_item": "DX9EX-P0-DDS-CACHE-SOURCE-SPLICE-RECOVERY",
@@ -27,15 +27,18 @@
   ],
   "deterministic_verification": {
     "tool": "python tools/verify_vr_texture_cache_lifetime.py --self-test",
-    "expected_contracts": 23,
-    "expected_negative_mutations": 17,
-    "local_execution": "NOT_EXECUTED",
-    "exact_sha_ci": "RUNNING"
+    "source_contracts": 23,
+    "negative_mutations": "17/17",
+    "outcome": "PASS",
+    "job_id": 113124713846,
+    "exact_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+    "visual_composition": "PASS",
+    "runtime_validation": "UNTESTED"
   },
-  "ci_gate_complete": false,
-  "controller_terminal": false,
-  "next_action": "Check exact material SHA DX9Ex Active, HUD Inspector, Domain Isolation (and supplementary full-source) CI. Pin run IDs/results to the material SHA, then finalize C6. No HMD claim.",
-  "score_award": "NOT_YET_CONFIRMED",
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "next_action": "C6 complete for task 00549 on immutable material SHA 48454683252e13de9b5db4341c0b744bc72b05b6. Do not repeat/scoring on E002 rollover, docs-only child commits, or replay. Continue new P0 source task only if new material evidence, user 00519 headset regressions not visually closed. Supplemental full-source MSVC impact is independent and not a condition of core C6.",
+  "score_award": "ELIGIBLE_ONE_UNIQUE_COMPLETION_PENDING_SCOREBOARD_DEDUP",
   "ci_runs": {
     "dx9ex_active": 37719835081,
     "hud_inspector": 37719834890,
@@ -46,16 +49,18 @@
   },
   "ci_observed": {
     "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector_build": "SUCCESS",
     "hud_exe_static": "SUCCESS",
     "domain_isolation": "SUCCESS",
     "hud_1000": "SUCCESS",
     "hud_5000": "SUCCESS",
-    "game": "RUNNING",
-    "host": "RUNNING",
-    "full_chain_compile": "RUNNING",
-    "hud_inspector_build": "RUNNING",
-    "full_source_game_analyze": "RUNNING",
-    "full_source_host_analyze": "RUNNING"
+    "full_source_game_analyze": "RUNNING_SUPPLEMENTAL",
+    "full_source_host_analyze": "SUCCESS_SUPPLEMENTAL",
+    "full_source_cross_domain": "SUCCESS_SUPPLEMENTAL"
   },
   "secondary_ci": {
     "vr_autodev_coordination": {
@@ -72,5 +77,67 @@
       "hooks_textures.cpp:378 invalid std::filesyste splice and local cacheFile definition",
       "hooks_textures.cpp:463 orphaned unterminated message causing C2001"
     ]
-  }
+  },
+  "retry_allowed": false,
+  "exact_sha_validation": {
+    "material_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+    "dx9ex_active": {
+      "run_id": 37719835081,
+      "conclusion": "success",
+      "head_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+      "jobs": {
+        "policy": 113124714525,
+        "game": 113124808948,
+        "host": 113124808908,
+        "full_chain_compile": 113124808973,
+        "package": 113126122646
+      }
+    },
+    "hud_inspector": {
+      "run_id": 37719834890,
+      "conclusion": "success",
+      "head_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+      "jobs": {
+        "build_hud_inspector": 113124713564,
+        "static_exe_analysis": 113124713846
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37719834951,
+      "conclusion": "success",
+      "head_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+      "job": 113124713649
+    },
+    "hud_1000": {
+      "run_id": 37719834983,
+      "conclusion": "success"
+    },
+    "hud_5000": {
+      "run_id": 37719835068,
+      "conclusion": "success"
+    },
+    "supplemental_full_source": {
+      "run_id": 37719835007,
+      "conclusion": "in_progress",
+      "role": "SUPPLEMENTAL_INDEPENDENT_SOURCE_IMPACT"
+    }
+  },
+  "package_artifact": {
+    "id": 11525551038,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-48454683252e13de9b5db4341c0b744bc72b05b6",
+    "size_bytes": 2744319,
+    "digest": "sha256:53e9511c5c162fed25a79c779e6c755dde5ef30927e50a3ee9cf5a784887ad48"
+  },
+  "build_artifacts": [
+    {
+      "id": 11525651270,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:4df5712d0c37b1933c4aa383e0f2d31bfac88dca6b5275d7e1663f443cba7dc1"
+    },
+    {
+      "id": 11525710145,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:042974d6ca588e8bcbf36cf59f2c45f0f0b695a72c389a3e002ec38aac7fa958"
+    }
+  ]
 }
