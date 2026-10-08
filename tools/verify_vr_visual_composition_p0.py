@@ -1142,7 +1142,7 @@ def check_skyglow_final_blur_source(source):
     if not re.search(r'IDirect3DTexture9\* compositeSource\s*=\s*'
                      r'R30SkyGlow\.reduced\[eye\]\s*;', flow):
         raise SystemExit('P0 one-pass SkyGlow composite bypassed final horizontal blur')
-    if not re.search(r'if\s*\(ok\)\s*'
+    if not re.search(r'if\s*\(ok\)\s*(?://[^\n]*\n\s*)*'
                      r'compositeSource\s*=\s*R30SkyGlow\.temp\[eye\]\s*;', flow, re.S):
         raise SystemExit('P0 two-pass SkyGlow composite bypassed final vertical blur')
 
