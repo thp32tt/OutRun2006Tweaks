@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "source_asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "actual_binary_sha256_verified_by_download": true,
+  "dds": {
+    "size_bytes": 524416,
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5/BC3",
+    "mip_count": 1,
+    "raw_transform": "mirror_y",
+    "pillow_native_decode": "PASS"
+  },
+  "pixel_comparison": {
+    "status": "INDEPENDENT_DETERMINISTIC_PIXEL_CHECK_PASS_NOT_VISUAL_APPROVAL",
+    "decode_engine": "Pillow DDS BC3/DXT5 + NumPy pixel arrays on exact downloaded source/current files",
+    "source_bbox_readable": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "changed_source_to_candidate_inside_source_bbox_rgba_pixels": 169922,
+    "changed_source_to_candidate_outside_source_bbox_rgba_pixels": 0,
+    "changed_source_to_candidate_outside_source_bbox_alpha_pixels": 0,
+    "source_visible_outside_original_bbox_pixels": 0,
+    "persisted_candidate_decoded_readable_vs_producer_final_png_changed_pixels": 0,
+    "persisted_source_decoded_readable_vs_source_readable_png_changed_pixels": 0,
+    "source_final_raw_mirror_y_readable_equality": "verified by pixel-for-pixel source/candidate DDS flip-Y matching producer native SOURCE/FINAL"
+  },
+  "first_glyph_check": {
+    "previous_rejected_candidate_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+    "previous_C294_evidence": "Readable x705 bright-white edge spanning 106 consecutive rows with preceding x704 empty; not current bytes",
+    "current_white_bright_condition": "R,G,B>=215 and alpha>=16 in readable decoded DXT5",
+    "current_edges_readable": {
+      "x710": {
+        "count": 0
+      },
+      "x711": {
+        "count": 0
+      },
+      "x712": {
+        "count": 0
+      },
+      "x713": {
+        "count": 17,
+        "min_y": 145,
+        "max_y": 161
+      },
+      "x714": {
+        "count": 24,
+        "min_y": 140,
+        "max_y": 163
+      },
+      "x715": {
+        "count": 29,
+        "min_y": 137,
+        "max_y": 165
+      },
+      "x716": {
+        "count": 34,
+        "min_y": 134,
+        "max_y": 167
+      },
+      "x717": {
+        "count": 40,
+        "min_y": 129,
+        "max_y": 168
+      },
+      "x718": {
+        "count": 46,
+        "min_y": 124,
+        "max_y": 169
+      },
+      "x719": {
+        "count": 51,
+        "min_y": 120,
+        "max_y": 170
+      },
+      "x720": {
+        "count": 53,
+        "min_y": 118,
+        "max_y": 170
+      }
+    },
+    "interpretation": "Previously reported abrupt full-height first-column white halo strip does not recur in new exact A192R; white fringe grows smoothly inward. This is not proof that all design/source-family checks pass."
+  },
+  "excluded_claims": [
+    "Full calibration PASS",
+    "per-glyph source/candidate top-minus-bottom-right-lean matched",
+    "complete lossless multi-view C PASS",
+    "independent CLEAN plate/protected within-source mask PASS",
+    "user acceptance",
+    "runtime game retest"
+  ],
+  "visual_result": "IMPROVEMENT_VERIFIED",
+  "gate_result": "HOLD_STRICT_RECHECK"
+}

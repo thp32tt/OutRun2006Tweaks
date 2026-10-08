@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 18:38:06 KST",
+  "updated_at_kst": "2026-10-08 18:48 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7601,5 +7601,22 @@
     "new_approved_dds": 0,
     "qa": "localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_CONTROLLER_SELF_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c297_c1_q119_a192r_independent": {
+    "run_key": "OUTRUN-KOR-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 119,
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "independent_pixel_changed_outside_bbox": 0,
+    "independent_alpha_changed_outside_bbox": 0,
+    "previous_hard_cut_fixed": true,
+    "current_decision": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/C297_CONTROLLER_QA.json"
   }
 }

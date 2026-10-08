@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840",
+  "review_id": "C297-Q119-A192R-INDEPENDENT-1840",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 119,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "reviewed_candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_differs_from_previously_rejected": true,
+  "target_stage": "fresh_C_regression_followup",
+  "decision": "HOLD_STRICT_RECHECK",
+  "previous_decision": "C294_REWORK_REQUIRED",
+  "machine_evidence": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/C297_Q119_INDEPENDENT_PIXEL_QA.json",
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "reason": "A192R producer report was consulted before independent C pixel comparison in earlier continuation; cannot certify blind pixels-first review.",
+    "calibration_result": "NOT_QUALIFIED",
+    "normal_control_source_faithfulness": "NOT_ESTABLISHED",
+    "no_false_claims": true
+  },
+  "observations": {
+    "source_original": "Time Attack Mode uses italic rightward slant, luminous white rim, orange face and navy outline.",
+    "candidate_source_family": "Korean 타임 어택 모드 native decoded DDS shows intact bright orange and navy outline with softened white halo; font family/right-slant degree not independently anchor-measured against source.",
+    "clean_plate": "Producer authored clean plate exists, but independent exact clean provenance and mask certification is not complete.",
+    "native_first_glyph": "Corrected white halo is rounded; first-column 106-row hard edge from C294 no longer present.",
+    "practical": "Decoded candidate reviewed at 100/75/50%; text remains legible at these sizes. This alone does not confer all-region visual PASS.",
+    "backgrounds": "Candidate decoded white halo/native render was examined on black, white and gray backgrounds.",
+    "raw": "Source/current native decoded RAW images and flipped-readable comparison are mutually consistent; source/candidate canonical headers SHA-verified.",
+    "protected": "New independent machine check source-vs-current outside source bbox RGBA/alpha=0. Per-mask protected within bbox not independently proven.",
+    "prior_defect": "The exact first-letter clipped halo symptom is resolved; existing producer family glyph anchors and certified calibration remain absent."
+  },
+  "region_checks": [
+    {
+      "id": "time_attack_mode",
+      "original_readable_bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "new_readable_bbox_producer_report": [
+        710,
+        58,
+        1311,
+        196
+      ],
+      "slant": {
+        "result": "HOLD",
+        "observation": "Readable right-lean apparent, but no independent per-letter anchor top-minus-bottom measurements to prove source-matched angle."
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "Producer clean image exists; current C did not independently reconstruct and authorize clean/source masking."
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Navy/orange/white effect regained. Original rounded italic face differs stylistically from Korean; need qualified family-profile comparison."
+      },
+      "readability": {
+        "result": "VISUAL_OK_UNAPPROVED",
+        "observation": "Readable and practical 100/75/50% images show Korean line distinctly without obvious glyph collision."
+      },
+      "glyph_integrity": {
+        "result": "VISUAL_OK_UNAPPROVED",
+        "observation": "C294 left cut removed; no certain broken first glyph on decoded native 4x; uncalibrated."
+      },
+      "protected_art": {
+        "result": "PARTIAL_MACHINE_PASS",
+        "observation": "0 source-box outside pixel/alpha changes; no independently certified internal protected region inventory."
+      },
+      "placement": {
+        "result": "PARTIAL_PASS",
+        "observation": "Within original producer bbox; machine independently confirms changes limited to original bbox."
+      },
+      "orientation": {
+        "result": "PIXEL_PASS_UNAPPROVED",
+        "observation": "RAW-flip-Y exact independent native comparison matches producer readable PNG pixel-for-pixel."
+      }
+    }
+  ],
+  "views": {
+    "source_decoded_readable.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/source_decoded_readable.png",
+    "candidate_decoded_readable.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_decoded_readable.png",
+    "source_decoded_raw.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/source_decoded_raw.png",
+    "candidate_decoded_raw.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_decoded_raw.png",
+    "source_first_native.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/source_first_native.png",
+    "candidate_first_native.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_first_native.png",
+    "source_first_4x.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/source_first_4x.png",
+    "candidate_first_4x.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_first_4x.png",
+    "source_practical_50.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/source_practical_50.png",
+    "candidate_practical_100.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_practical_100.png",
+    "candidate_practical_75.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_practical_75.png",
+    "candidate_practical_50.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_practical_50.png",
+    "candidate_black.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_black.png",
+    "candidate_white.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_white.png",
+    "candidate_gray.png": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/candidate_gray.png"
+  },
+  "prior_evidence": [
+    "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json",
+    "localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_CONTROLLER_QA.json"
+  ],
+  "blocked_exports": {
+    "C_PASS": false,
+    "C3_STRICT_AUDIT": "NOT_RUN",
+    "APPROVALS_q119_json": "NOT_CREATED",
+    "PRE_INGAME": "BLOCKED",
+    "USER_JPG_ACCEPTANCE": "PENDING",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "next_actions": [
+    "Create independent qualified blind normal+known-defects calibration and record answer key after first-look",
+    "Derive exact per-glyph native-readable source/candidate top-minus-bottom slant anchor pairs, family font profile and CLEAN provenance",
+    "Complete independent per-region evidence and first-look C; separate C3 strict audit with distinct review_id and all eight observations",
+    "Only validated exact-source/current hashes may enter PRE_INGAME; actual game screenshot still required"
+  ],
+  "production": {
+    "new_dds": false,
+    "source_and_candidate_bytes_preserved": true,
+    "qa_export_only": true
+  },
+  "backend": {
+    "GitHub": "SSOT branch and binary evidence blobs",
+    "ChatGPT_local": "Attempted direct raw GitHub source download; DNS lookup failed",
+    "N100": "MCP fallback for 0.5 MiB source+candidate DDS decode, small NumPy pixel scan and lossless PNG exports; no build, repeated job or large search",
+    "temporary_cleanup_required": true
+  },
+  "excluded_work": "No VR/FFB/DX11/DXVK work"
+}
