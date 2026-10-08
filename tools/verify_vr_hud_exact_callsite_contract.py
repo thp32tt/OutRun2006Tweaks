@@ -49,6 +49,71 @@ def ordered(text, label, *tokens):
         fail(label)
 
 
+EXTRA_PRODUCERS = {
+    0x97BE4: (0x2D200, "ResultProgressCallA = 0x97BE4"),
+    0x97DEC: (0x2D200, "ResultProgressCallB = 0x97DEC"),
+    0xBEA5A: (0xBE020, "GoalTimeHelperCallA = 0xBEA5A"),
+    0xBEA5F: (0xBE150, "GoalTimeHelperCallB = 0xBEA5F"),
+}
+
+
+def check_extra_producers(ui, contracts):
+    # Preserve 71 original HUD CALLs; verify four historically proven R74
+    # result/GOAL producers separately, including the *entire* 16-byte EXE
+    # signature and source-node queue ownership, not a broad HUD heuristic.
+    by_rva = {}
+    for item in contracts:
+        by_rva.setdefault(int(item['rva'], 16), []).append(item)
+    for rva, (target, needle) in EXTRA_PRODUCERS.items():
+        candidates = by_rva.get(rva, [])
+        if len(candidates) != 1:
+            fail('missing/duplicate R74 original CALL 0x%X' % rva)
+        entry = candidates[0]
+        raw = entry.get('expectedBytes', '')
+        if entry.get('signatureLength') != 16 or not re.fullmatch(r'[0-9a-fA-F]{32}', raw):
+            fail('invalid R74 16-byte original disassembly 0x%X' % rva)
+        op = bytes.fromhex(raw)
+        if op[0] != 0xE8 or ((rva + 5 + int.from_bytes(op[1:5], 'little', signed=True)) & 0xFFFFFFFF) != target:
+            fail('wrong R74 original E8 destination at 0x%X' % rva)
+        if not any(b.get('path') == 'src/hooks_uiscaling.cpp' and
+                   b.get('needle') == needle for b in entry.get('sourceBindings', [])):
+            fail('missing R74 source ownership binding 0x%X' % rva)
+        if ui.count(needle) != 1:
+            fail('missing/duplicate exact owner constant at 0x%X' % rva)
+
+    result_enter = function_body(ui, 'static void ResultProgressEnter(')
+    result_leave = function_body(ui, 'static void ResultProgressLeave(')
+    ordered(result_enter, 'result queue owner begin',
+            'ResultProgressDepth++', 'Game::SpritePriorityCount',
+            'ResultProgressTailsBefore[prio] =')
+    ordered(result_leave, 'result queue owner exit',
+            '--ResultProgressDepth', 'TagAppendedNodes(ResultProgressTailsBefore,',
+            'RenderScope::ScreenHud', 'ResultProgressTailsBefore = {};')
+    for edge in 'A', 'B':
+        for side in 'Enter', 'Leave':
+            name = 'ResultProgress' + side + edge
+            expected = (
+                r'%s\s*=\s*safetyhook::create_mid\s*\(\s*'
+                r'Module::exe_ptr\(ResultProgressCall%s%s\),\s*ResultProgress%s\);'
+            )
+            expr = ''.join(expected) % (name, edge, ' + 5' if side == 'Leave' else '', side)
+            if len(re.findall(expr, ui, re.S)) != 1:
+                fail('wrong/missing original exact result-progress ' + name)
+
+    goal = function_body(ui, 'static void GoalTime_TagHelper(')
+    ordered(goal, 'GOAL sprite parent call and all-node scope',
+            'Game::SpritePriorityCount', 'ScopedProducerSemantic producer(',
+            'RenderScope::ScreenHud', 'Module::exe_ptr(helperRva)',
+            'original();', 'TagAppendedNodes(before,')
+    for suffix, helper in (('A', '020'), ('B', '150')):
+        if len(re.findall(r'GoalTime_Help%s\(\)\s*\{\s*GoalTime_TagHelper\(0xBE%s\);\s*\}' % (helper, helper), ui)) != 1:
+            fail('wrong GOAL original helper ABI or target ' + helper)
+        pattern = (r'Memory::VP::InjectHook\s*\(\s*Module::exe_ptr\(GoalTimeHelperCall%s\),'
+                   r'\s*GoalTime_Help%s,\s*Memory::HookType::Call\);')
+        if len(re.findall(''.join(pattern) % (suffix, helper), ui, re.S)) != 1:
+            fail('GOAL original direct-CALL owner missing ' + helper)
+
+
 def check(ui, manifest):
     if manifest.get("canonicalExe", {}).get("sha256") != EXE_SHA:
         fail("wrong canonical EXE identity")
@@ -115,6 +180,7 @@ def check(ui, manifest):
     check_call(0xBB796, 0x29580)
     if len(owned) != 71:
         fail("expected 71 exact canonical HUD CALLs")
+    check_extra_producers(ui, contracts)
 
     # Sibling expansion in put_clip_sprite must tag *all* original children;
     # a single tail-only tag can make one digit/menu arrow stereo and another
@@ -237,6 +303,21 @@ def test_mutations(ui, manifest):
     corrupt = copy.deepcopy(manifest)
     next(c for c in corrupt["contracts"] if int(c["rva"], 16) == 0x2C808)["sourceBindings"] = []
     must_fail("glyph source evidence removed", changed_manifest=corrupt)
+    # Four independent new negative cases are strictly bounded by original
+    # result-progress / GOAL contracts, not 1000/5000 review loops.
+    must_fail('result-progress closing CALL lost',
+              ui.replace('ResultProgressLeaveB = safetyhook::create_mid(',
+                         'ResultProgressLeaveMissing = safetyhook::create_mid(', 1))
+    must_fail('goal 150 retargeted to 020',
+              ui.replace('GoalTime_TagHelper(0xBE150);',
+                         'GoalTime_TagHelper(0xBE020);', 1))
+    corrupt = copy.deepcopy(manifest)
+    next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
+    must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
+    corrupt = copy.deepcopy(manifest)
+    next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0xBEA5F)['sourceBindings'] = []
+    must_fail('original GOAL source binding removed', changed_manifest=corrupt)
+    print('P0 GOAL/RESULT original producer mutations: 4/4 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
 
