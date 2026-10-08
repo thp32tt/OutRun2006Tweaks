@@ -12,8 +12,8 @@
   "base_sha": "30ff1d7baed6a9db919850e7ac2a4efafb91c117",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00551]",
   "selected_work_item": "DX9EX-P0-UI-DDS-FAILED-REPLACEMENT-ORIGINAL-RETRY",
-  "status": "C3_EXACT_SHA_CI_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "summary": "Snapshot original DDS and scale before replacement, restore and retry original on failed selected UI decode for fast and original allocator paths.",
@@ -23,10 +23,100 @@
     "docs/automation/reviews/CONVERSION_DX9EX_00551_UI_DDS_ORIGINAL_RETRY.md",
     "docs/automation/runs/CONVERSION-DX9EX-00551.json"
   ],
-  "score_award": "NOT_AWARDED_PENDING_EXACT_SHA_VALIDATION",
+  "score_award": "RECORDED_AI2_ONCE_RUN_KEY_CONVERSION-DX9EX-00551_1213_PLUS_1_EQUALS_1214",
   "retry_allowed": false,
   "preexisting_hmd_failure": "CONVERSION-DX9EX-00519",
   "preexisting_validation": "00550 material SHA 6d9041ed5abcf2275809db289cd8614c99369cda PASS, not repeated",
   "no_hud_1000_5000_repetition": true,
-  "next_action": "Inspect exact material SHA DX9Ex Active, HUD Inspector, Domain Isolation. On PASS, close C6 once and consider distinct remaining P0 work; do not repeat same task."
+  "next_action": "C6 complete on immutable exact SHA a440a6f with package evidence. P0 visual acceptance still OPEN (00519 HMD FAIL), no new Quest3/VDXR runtime testing; no old 1000/5000 static audit. Continue a NEW independently evidenced P0 fix, not another 00551 retry or score.",
+  "material_result_sha": "bf727b3b20f0ee14da7e554ef47cac5523664c69",
+  "validation_bearing_result_sha": "a440a6ff386ac062ed950308dc0a8b1613d12c52",
+  "result_sha": "a440a6ff386ac062ed950308dc0a8b1613d12c52",
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "validation_summary": "CI PASS on exact a440a6f: DX9Ex Active 5/5, EXE HUD Inspector 2/2, Domain Isolation 1/1, supplemental Full Source Impact 3/3; 71 canonical HUD CALLs, 10/10 HUD mutants, 34 DDS source obligations, 27/27 DDS mutants, P0 composition PASS; Quest3/VDXR UNTESTED. Existing Autodev Coordination failure on preceding source commit belongs to preexisting queue validator mismatch.",
+  "deterministic_verification": {
+    "hud_exact_call_sites": 71,
+    "hud_deliberate_defects": "10/10",
+    "dds_source_obligations": 34,
+    "dds_negative_mutations": "27/27",
+    "p0_visual_composition": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "ci_runs": {
+    "dx9ex_active": 37732065738,
+    "hud_inspector": 37732065652,
+    "domain_isolation": 37732065697,
+    "full_source_impact_supplemental": 37732045211,
+    "coordination_preexisting_failure": 37732045162
+  },
+  "ci_observed": {
+    "dx9ex_policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector_build": "SUCCESS",
+    "hud_exe_static": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "supplemental_game_source_analyze": "SUCCESS",
+    "supplemental_host_source_analyze": "SUCCESS",
+    "supplemental_source_cross_domain": "SUCCESS",
+    "vr_autodev_coordination": "FAIL_PREEXISTING_IMPLEMENT_NEXT_QUEUE_VALIDATOR"
+  },
+  "exact_sha_validation": {
+    "material_sha": "a440a6ff386ac062ed950308dc0a8b1613d12c52",
+    "dx9ex_active": {
+      "run_id": 37732065738,
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113163243135,
+        "game": 113163331144,
+        "host": 113163331185,
+        "full_chain_compile": 113163331270,
+        "package": 113164677752
+      }
+    },
+    "hud_inspector": {
+      "run_id": 37732065652,
+      "conclusion": "success",
+      "jobs": {
+        "static_exe_analysis": 113163217541,
+        "build_hud_inspector": 113163217731
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37732065697,
+      "conclusion": "success",
+      "job": 113163217718
+    },
+    "supplemental_full_source": {
+      "source_sha": "bf727b3b20f0ee14da7e554ef47cac5523664c69",
+      "run_id": 37732045211,
+      "conclusion": "success",
+      "jobs": {
+        "msvc_analyze_active_game": 113163153066,
+        "source_cross_domain": 113163153297,
+        "msvc_analyze_openxr_host": 113163153334
+      }
+    }
+  },
+  "package_artifact": {
+    "id": 11530676938,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-a440a6ff386ac062ed950308dc0a8b1613d12c52",
+    "size_bytes": 2744465,
+    "digest": "sha256:cd0b0bd1796f7f83bbad3a6bfaa500d50687f2958f629c9ec9ba9d4da09805a0"
+  },
+  "hud_inspector_artifacts": [
+    {
+      "id": 11530357531,
+      "digest": "sha256:00c9151d2e090a635d5fa3abad8dc38d609b85784ef1f8f1e68797acb6cde6db"
+    },
+    {
+      "id": 11530331182,
+      "digest": "sha256:4c06fb0ba79453c82394ca1488fd2fc9a7154e0d4d38ebae51337f61451255aa"
+    }
+  ],
+  "scoreboard_commit": "f01846f5a91ff70b07d12375ee34b2097f8bb409",
+  "score_calculation": "1213 + 1 = 1214; no rollover/retry double award"
 }
