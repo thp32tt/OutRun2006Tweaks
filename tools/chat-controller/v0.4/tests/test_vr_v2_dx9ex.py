@@ -182,6 +182,45 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('if not rollover_has_confirmed_ui_failure(reason):', body)
         self.assertIn('status="conversation_rollover_held"', body)
 
+    def test_c6_terminal_verdict_guards_release_and_sha(self):
+        tree = ast.parse(SOURCE)
+        fn = next(n for n in tree.body
+                  if isinstance(n, ast.FunctionDef) and n.name == 'conversion_terminal_verdict')
+        ns = {}
+        exec(compile(ast.Module(body=[fn], type_ignores=[]), '<terminal-verdict>', 'exec'), ns)
+        verdict = ns['conversion_terminal_verdict']
+        sha = 'a' * 40
+        active = {'task_id': 'CONVERSION-DX11-00454', 'branch': 'vr-dx11-native-r71'}
+        run = {'head_sha': sha, 'status': 'completed', 'conclusion': 'success'}
+        record = {'task_id': active['task_id'], 'target_branch': active['branch'],
+                  'status': 'COMPLETE', 'checkpoint': 'C6_STATE',
+                  'automation_validation': 'PASS', 'validation_bearing_result_sha': sha}
+        self.assertEqual(verdict(record, active, run), (True, 'C6_EXACT_SHA_VERIFIED'))
+        uncompleted = dict(record, status='IN_PROGRESS')
+        self.assertEqual(verdict(uncompleted, active, run)[1], 'C6_NOT_COMPLETE')
+        failed = dict(record, automation_validation='PENDING')
+        self.assertEqual(verdict(failed, active, run)[1], 'AUTOMATION_VALIDATION_NOT_PASS')
+        mismatch = dict(record, validation_bearing_result_sha='b' * 40)
+        self.assertEqual(verdict(mismatch, active, run)[1], 'EXACT_SHA_MISMATCH')
+        self.assertEqual(verdict(None, active, run)[1], 'RUN_RECORD_NOT_FOUND')
+        dxvk = dict(record, status='COMPLETE', checkpoint='C6_STATE')
+        dxvk.pop('automation_validation')
+        dxvk['validation'] = {'automation_validation': 'PASS'}
+        self.assertTrue(verdict(dxvk, active, run)[0])
+        dx9 = dict(record, status='COMPLETE_BUILD_VERIFIED', controller_terminal=True)
+        dx9.pop('checkpoint')
+        self.assertTrue(verdict(dx9, active, run)[0])
+
+    def test_conversion_success_waits_for_terminal_c6(self):
+        tree = ast.parse(SOURCE)
+        fn = next(n for n in tree.body
+                  if isinstance(n, ast.AsyncFunctionDef) and n.name == 'conversion_process_lane')
+        body = ast.get_source_segment(SOURCE, fn)
+        self.assertIn('verified, reason = conversion_terminal_verdict(record, active, run)', body)
+        self.assertIn('status="conversion_wait_c6"', body)
+        self.assertIn('if not verified:', body)
+        self.assertIn('active["terminal_verification"] = reason', body)
+
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
