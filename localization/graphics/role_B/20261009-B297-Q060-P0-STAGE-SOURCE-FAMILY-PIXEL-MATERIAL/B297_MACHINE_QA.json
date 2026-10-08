@@ -1,0 +1,82 @@
+{
+  "role": "B",
+  "run": "B297",
+  "run_key": "OUTRUN-KOR-B297-Q060-IGR044-STAGE-NATIVE-FACE-20261009",
+  "asset_index": 60,
+  "priority": "P0",
+  "regression": "IGR-044_OPEN_USER_INGAME_FAIL",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "current_candidate_sha256": "d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2",
+  "trial_sha256": "84c9a013ceb7a11240caeff48ca2dfc76f4702855b6b7fb030e5339f0ad74f70",
+  "source_box": [
+    455,
+    245,
+    690,
+    350
+  ],
+  "localized_effect_bbox": [
+    462,
+    251,
+    680,
+    343
+  ],
+  "source_face_palette": {
+    "yellow": [
+      245,
+      204,
+      12
+    ],
+    "navy": [
+      0,
+      10,
+      65
+    ],
+    "white": [
+      255,
+      255,
+      255
+    ]
+  },
+  "source_face_palette_counts": {
+    "yellow": 2901,
+    "navy": 5809,
+    "white": 3767
+  },
+  "prior_korean_silhouette_pixels": 11493,
+  "source_english_effect_coverage": 13762,
+  "changed_pixels": 13696,
+  "outside_changed_pixels": 0,
+  "new_alpha_only_within_stage_bbox": true,
+  "source_clean_stage_alpha_remaining": 0,
+  "source_clean_protected_outside_exact": true,
+  "decoded_dds_roundtrip_exact": true,
+  "source_header_exact": true,
+  "dd_format": "RGBA32_MIP1",
+  "raw_orientation": "mirror_y",
+  "native": [
+    4096,
+    2048
+  ],
+  "new_production_dds": 0,
+  "trial_dds": 1,
+  "affected": "STAGE_ONLY",
+  "unchanged": [
+    "RANKING",
+    "RANK",
+    "OUTRUN_MILES_WHITE_B296",
+    "OUTRUN_MILES_GOLD"
+  ],
+  "producer_visual": "PENDING_DIRECT_PIXELS_FIRST_SOURCE_CLEAN_AND_NATIVE",
+  "C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "USER_IN_GAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_ACTIONS",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
