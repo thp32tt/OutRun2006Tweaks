@@ -191,13 +191,17 @@ namespace OutRunVRStereo
                 "DrawPrimitiveUP", "DrawIndexedPrimitiveUP"
             };
             spdlog::info(
-                "VR P0 GOAL EARLY_GATE: method={} state={} producer={} scope={} queueEpoch={} stereoWanted={} seeded={} allowed={} frameIncomplete={} mainBackbuffer={} deferredDepth={} auxRT={}",
+                "VR P0 GOAL EARLY_GATE: method={} state={} producer={} scope={} queueEpoch={} gameplayEligible={} hostEligible={} seeded={} allowed={} frameIncomplete={} mainBackbuffer={} deferredDepth={} auxRT={}",
                 kDrawMethods[method], static_cast<int>(state),
                 OutRunVR::GameSemantic::Name(producer),
                 OutRunVR::GameSemantic::Name(
                     OutRunVR::GameSemantic::EffectiveScope()),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
-                StereoWanted() ? 1 : 0,
+                // StereoWanted() changes LastStereoWanted and depth-sync
+                // state when a VR session becomes eligible. Telemetry must
+                // NEVER invoke it outside the actual render gate.
+                GameplayActive() ? 1 : 0,
+                HostRenderEligible() ? 1 : 0,
                 R9StereoSeeded ? 1 : 0,
                 OutRunVR::RuntimeEligibility::MayInjectStereo() ? 1 : 0,
                 FrameStereoIncomplete ? 1 : 0,
