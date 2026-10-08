@@ -880,6 +880,65 @@
           "+TIME must be judged separately (historic unresolved), 6th/6 confirmed recovered, car rank 4/5 attached, F11/rival/DDS protected, restart 2D stays single"
         ]
       }
+    },
+    {
+      "key": "VR-HUD-R64-D3DXSPRITE-DRAW-FLUSH-REMOVED-20261009",
+      "title": "R84 refactor removed HMD-proven R64 D3DXSprite per-DispRank/projection Draw->Flush batch isolation",
+      "status": "SOURCE_RESTORED_EXACT_SOURCE_CI_POLICY_SUCCESS_NEED_WIN32_BUILD_AND_HMD",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "DIRECT_USER_R64_6TH_PASS_AND_SOURCE_PROVEN_DELETED_FUNCTION_RUNTIME_NEW_HMD_UNTESTED",
+      "knownGood": {
+        "sourceSha": "10c73daa037b5cc521b42ce7fb3a7cc1820b1921",
+        "runtimeProfile": "OUTRUN_VR_R57_MODE=6 OUTRUN_VR_HUD_EXPERIMENT_MODE=2 OUTRUN_VR_HUD_PROBE=0 R26_HUD=ON",
+        "asset": "OutRun2_VR_R64_TEXT_DISPRANK_20260927.zip",
+        "actualUserObservation": "R64 Quest3 2026-09-26: 6th/6 single/normal and HUD resize works, menu font normal; option triangles/result time/name/lens still double (NOT all-HUD PASS)"
+      },
+      "knownBad": {
+        "source": "vr-d3d9ex-focus before 87a275de7d02b9509c6881539dec6f65992b242d",
+        "symptom": "R64 hook class VRProjectedD3DXSpriteIsolation and current SpriteNodeOwner::DispRank entirely absent after refactor, allowing independent rank sprites to be batched into one DrawIndexedPrimitive with one marker center; current user reported reintroduced 6th/6 and rank doubles"
+      },
+      "rootCause": {
+        "status": "CODE_CONFIRMED_MISSING_HMD_TESTED_HOOK",
+        "summary": "R62 fixedfn FVF0x142 per-eye GPU draw was restored, but historic R64 added separate ID3DXSprite vtable9 Draw→vtable10 Flush only for projected marker or DispRank source. Entire additional R64 Hook class deleted by R84. Modern exact per-queue source identity cannot be recovered from removed SpriteNodeOwner, so original 8 DispRank right CALLs needed a distinct token. Do not flush whole game/GOAL/+TIME/menus."
+      },
+      "fixReferences": [
+        "0c7fd75e966784bb303d24b7e622c7bfd3922104 — new exact DispRankClipSprite token (not generic HUD)",
+        "2cc66a7cfa223bee1ee8f2a18e49c4742eed14e1 — original exact 8 DispRank E8 children routed to rank-only right wrapper with original spacing and all sibling ScreenHud semantics",
+        "87a275de7d02b9509c6881539dec6f65992b242d — restore old HMD-tested D3DXSprite Draw/Flush with projected marker or DispRank exact owner only",
+        "e4c885b44e1915b2426379ede03f6aeebf56c7d9 — 5 bounded negative checks for lost/widened R64 isolate",
+        "666e6546322b3279e1c4f9151f0032a5f1b266e3 — exact 71 HUD binary CALL contract supports selective 8-RVA rank hook",
+        "e52a793fc0b8570c3bbe88db251ff3ba9540ddeb — cadence restore guard updated to require rank-vs-TimeAttack right-side branch",
+        "11d0732fa2b5f8428079bbf7ad7ed8d72aaebbda — detect exact vtable9 Draw target in negative test",
+        "docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md — C5 05:02 KST root-cause and CI evidence"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "tools/verify_vr_hud_exact_callsite_contract.py",
+        "tools/verify_vr_hud_cadence_restore.py",
+        "src/hooks_framerate.cpp"
+      ],
+      "revalidationTriggers": [
+        "any refactor of ID3DXSprite::Draw or Flush vtable9/vtable10 or original ID3DXSprite global 0x55B218",
+        "D3DXSprite batch merging for 4th/5th car rank or 6th/6 DispRank composite",
+        "changes to original eight DispRank kind0 calls, first kind1 0xB9DA6, projected marker payload/queue producer lifetime",
+        "changes to TimeAttack/GOAL right-side 15 CALL hooks, F11, unrelated ScreenHud/alpha source routes"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py verifies exact R64 Flush and five independent mutant failures",
+          "tools/verify_vr_hud_exact_callsite_contract.py requires same canonical original 71 E8 CALLs and rank-only selection; no generic right-side sprite target",
+          "DX9Ex Active exact Win32 game, x64 host, R33, package, HUD Inspector, Domain Isolation"
+        ],
+        "runtime": [
+          "Quest3/VDXR matching package: 6th/6 digits single/stationary and VRHudScale works; 4th/5th attached to cars while head yaw, NO extra double on result/time/GOAL/+TIME",
+          "Telemetry VR R64 D3DX ISOLATE RESTORED installed and power-of-two projected-rank/disprank Flush hit; compare FPS if dense HUD",
+          "Confirm menu options/rival/selection DDS, lens five discs, current mono restart unaltered; +TIME remains separately unresolved"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {
