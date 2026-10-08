@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX",
+  "queue_index": 214,
+  "work_stolen_from_lane": "B",
+  "asset": "BF229CF4",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "4ff06dbeccd8b093295db2e98d66b26ee565a0f4f42718118a9ac187720cdee1",
+  "report": "localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_BF229CF4_REPORT.json",
+  "status": "A183R3_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+}
