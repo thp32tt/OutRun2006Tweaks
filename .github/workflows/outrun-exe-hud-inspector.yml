@@ -16,6 +16,8 @@ on:
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_framerate.cpp'
+      - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
@@ -56,6 +58,8 @@ on:
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_framerate.cpp'
+      - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
@@ -132,6 +136,10 @@ jobs:
       - name: Verify fail-closed DDS fast texture upload and corruption probes
         shell: pwsh
         run: python tools/verify_vr_hud_dds_loader.py --self-test
+
+      - name: Verify Sumo mask-child replay ownership and targeted fault injections
+        shell: pwsh
+        run: python tools/verify_vr_sumo_replay_semantics.py
 
       - name: Verify P0 visual composition contract
         shell: pwsh
