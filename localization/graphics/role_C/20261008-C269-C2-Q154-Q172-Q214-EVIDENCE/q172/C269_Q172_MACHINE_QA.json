@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "run": "C269",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "header_128_exact": true,
+  "dimensions": [
+    1024,
+    1024
+  ],
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "original_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "localized_bbox": [
+        66,
+        374,
+        125,
+        395
+      ],
+      "delta_left": 11,
+      "delta_right": 11,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS"
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "original_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "localized_bbox": [
+        613,
+        636,
+        653,
+        658
+      ],
+      "delta_left": 18,
+      "delta_right": 19,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS"
+    }
+  ],
+  "rework_changed_outside_source_bboxes": 0,
+  "rework_alpha_changed_outside_source_bboxes": 0,
+  "machine_result": "PASS",
+  "approval_result": "PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}

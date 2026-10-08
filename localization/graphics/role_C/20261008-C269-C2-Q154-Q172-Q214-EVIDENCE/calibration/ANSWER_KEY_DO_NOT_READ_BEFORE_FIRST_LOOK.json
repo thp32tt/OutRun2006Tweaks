@@ -1,0 +1,7 @@
+{
+  "case_00.png": "normal",
+  "case_01.png": "excessive_weight",
+  "case_02.png": "opposite_slant",
+  "case_03.png": "residue",
+  "case_04.png": "clipped_stroke"
+}

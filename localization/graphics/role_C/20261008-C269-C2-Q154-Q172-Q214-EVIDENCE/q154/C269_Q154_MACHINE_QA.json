@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "run": "C269",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "header_128_exact": true,
+  "dimensions": [
+    4096,
+    1024
+  ],
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "id": "single_player_gray",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "delta_left": 2,
+      "delta_right": 174,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS"
+    },
+    {
+      "id": "showroom_gray",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "original_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "delta_left": 2,
+      "delta_right": 208,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS"
+    },
+    {
+      "id": "multiplayer_gray",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "original_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "delta_left": 2,
+      "delta_right": 154,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS"
+    }
+  ],
+  "rework_changed_outside_gray_bboxes": 0,
+  "rework_alpha_changed_outside_gray_bboxes": 0,
+  "machine_result": "PASS",
+  "approval_result": "PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
