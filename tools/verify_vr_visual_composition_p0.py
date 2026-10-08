@@ -88,6 +88,93 @@ require('python tools/verify_vr_visual_composition_p0.py',
 require("'.github/workflows/outrun-exe-hud-inspector.yml'",
         dx9ex_active_workflow, 'DX9Ex Active watches HUD Inspector CI wiring')
 
+# P0 F11 fork integration: upstream Dear ImGui DX9 is XYZ+orthographic and
+# cannot enter R30's XYZRHW/VS owners. Check explicit per-eye projection and
+# scissor ownership, preserving fallback for ordinary game/menu 3D.
+def check_f11_xyz_owner(source):
+    prepare = function_body(source, 'bool R30PrepareExternalImGuiProjection(')
+    draw = function_body(source, 'HRESULT R30TryExternalImGuiIndexed(')
+    indexed = function_body(source, 'HRESULT __stdcall DrawIndexedPrimitiveDestR30(')
+    world = function_body(source, 'bool R30ConfigureXyzrhwWorldEffect(')
+    execute = function_body(source, 'HRESULT R30ExecuteXyzrhwStereo(')
+    for token in (
+        'ExternalOverlaySemanticDepth == 0',
+        'RenderScope::ScreenOverlay2D',
+        'D3DFVF_XYZ',
+        'D3DFVF_DIFFUSE',
+        'D3DFVF_TEX1',
+        'GetTransform(D3DTS_PROJECTION',
+        'stockProjection._34',
+        'stockProjection._44',
+        'GetLatchedHeadInverse(',
+        'R30BuildHudPlaneCoefficients(state)',
+        'projected.m[row][3]',
+        'eyeScissors[eye]',
+        'FrameHadWorldStereo',
+    ):
+        require(token, prepare, 'F11 explicitly scoped XYZ/orthographic finite HUD plane')
+    for token in (
+        'R30CaptureSkyGlowSceneBeforeHud(device)',
+        'device->SetTransform(',
+        'D3DTS_PROJECTION, &eyeProjection[eye]',
+        'device->SetScissorRect(&eyeScissors[eye])',
+        'RestoreRightPassState(device,',
+        'restoreRaster()',
+        'R30ArmSafeFallback()',
+        'OutRunVR::StereoFailureRightDrawFailed',
+    ):
+        require(token, draw, 'F11 eye-specific draw and complete state restoration')
+    require_order(draw, 'F11 left/right render ordering',
+                  'if (!setEye(0))', 'const HRESULT leftHr = draw();',
+                  'rightHr = draw();', 'RestoreRightPassState(device,')
+    require('R30TryExternalImGuiIndexed(', indexed,
+            'F11 owner must be reached from actual indexed draw')
+    require('if (externalImGui != E_NOTIMPL)', indexed,
+            'F11 owner result must bypass stock R26')
+    require('R30XyzrhwLooksLikeHudPlane(', world,
+            'untagged flat RHW=1 world evidence must be checked')
+    require('state.worldEvidenceAuthoritative', world,
+            'unknown flat world draws must lack authoritative host evidence')
+    require('if (state.worldEvidenceAuthoritative)', execute,
+            'only authoritative world draws may mark host stereo readiness')
+    for token in (
+        'R30TotalShadowBudgetBytes',
+        'R30ShadowReservedBytes',
+        'ExternalOverlaySemanticDepth == 0',
+    ):
+        require(token, source, 'CPU shadows bounded and external ImGui excluded')
+
+check_f11_xyz_owner(r30)
+for path in ("'external/imgui'", "'.gitmodules'"):
+    if hud_inspector_workflow.count(path) < 2:
+        raise SystemExit(
+            f'P0 F11 drift: pinned ImGui dependency missing from Inspector push/PR: {path}')
+    require(path, dx9ex_active_workflow, 'DX9Ex Active watches ImGui gitlink')
+    require(path, read('.github/workflows/dx9ex-fullsource-impact-review.yml'),
+            'fullsource CI watches ImGui gitlink')
+require('external/imgui/backends/imgui_impl_dx9.cpp',
+        read('cmake.toml'), 'pinned upstream Dear ImGui actually compiles into game')
+
+# Fault injection is six *different* single-step source regressions, not the
+# obsolete 1000/5000 unchanged-source static repetitions.
+for label, needle in (
+    ('broad external scope', 'ExternalOverlaySemanticDepth == 0'),
+    ('XYZ vertex gate', 'D3DFVF_XYZ'),
+    ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
+    ('fixed pose plane', 'R30BuildHudPlaneCoefficients(state)'),
+    ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
+    ('global shadow budget', 'R30TotalShadowBudgetBytes'),
+):
+    if needle not in r30:
+        raise SystemExit(f'P0 F11 negative setup missing {label}')
+    broken = r30.replace(needle, '/* injected ' + label + ' regression */')
+    try:
+        check_f11_xyz_owner(broken)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit(f'P0 F11 fault injection was not caught: {label}')
+
 # Exact historical producer inventory recovered from upstream + R65-R74/R73-era work.
 for token in [
     '0xBB0FB','0xBB133','0xBB16C','0xBB1A5',
