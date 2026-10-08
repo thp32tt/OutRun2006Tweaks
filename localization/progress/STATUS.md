@@ -2775,3 +2775,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### C271 C2 q154 correction — 2026-10-08 10:50 KST
 - TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN. Re-derived exact q154 DDS 3-gray-region evidence after correcting C269 wrong RAW/FLIP-Y crop coordinates: bbox/source-size/margins 3/3 PASS and orientation byte-equality 3/3 PASS.
 - q154 remains HOLD_STRICT_RECHECK for current-policy complete 8-region C/C3/calibration evidence; DDS not changed, no PRE_INGAME approval, RUNTIME_VALIDATION=UNTESTED.
+
+### C273 C1 q161/q175 — 2026-10-08 10:53 KST
+- `TEMP_BACKLOG_RELIEF=C1` / `SHARD=ODD(+UNINDEXED_SPECIAL)`.
+- q161 55B57CDE @ 66a89385...: **HOLD_STRICT_RECHECK**. Persisted DXT5 identity and 38-row contact/RAW review favorable, but pixels-first ordering + complete lossless per-region evidence not satisfied; no C/C3 approval.
+- q175 754F0599 @ 5b37fdaf...: **REWORK_REQUIRED**. Numeric 3/3 containment PASS is overridden by source-style visual FAIL: Korean family remains too square/heavy and dark extrusion/outline forms broad block bands versus the thin rounded metallic source; C3 BLOCKED.
+- No PRE_INGAME export change. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
