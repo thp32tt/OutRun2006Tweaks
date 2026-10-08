@@ -28,6 +28,9 @@ assert sha(src)==SRC and src[:128]==candidate[:128]
 clean_path=G/"role_B/20261005-B-PRODUCTION80/FEF_CLEAN_PLATE.png"
 assert sha(clean_path.read_bytes())==CLEAN
 fontpath="/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
+if not Path(fontpath).exists():
+ subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+ subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
 assert Path(fontpath).exists(),fontpath
 def decoded(b):
  x=Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
