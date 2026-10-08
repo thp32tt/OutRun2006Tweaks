@@ -1,0 +1,547 @@
+{
+  "role": "B",
+  "run": "B302",
+  "task_id": "OUTRUN-KOR-B302-Q236-NATIVE-BLACK-SOURCE-FAMILY-20261009",
+  "queue_index": 236,
+  "source_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "decision": "MATERIAL_REWORK_PRODUCER_SELF_QA_PASS_PENDING_FRESH_C2",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "previous_candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+  "new_candidate_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "new_promoted_dds": 1,
+  "native_size": [
+    2048,
+    2048
+  ],
+  "dds_pixel_layout": "BGRA32",
+  "stored_raw": "FLIP_Y",
+  "authored_mips": 1,
+  "method": "original verified transparent B80 clean plate; native NotoSansCJK-Black drawn directly at actual output 2048px for all14 source-family name regions; right-source-anchor 4px margin, preserved English dark RGB; no 18px*4 upscaling, no arbitrary mask dilation; not a font file export",
+  "machine": {
+    "source_clean_outside_rgba": 0,
+    "clean_final_outside_rgba": 0,
+    "prior_new_outside_rgba": 0,
+    "alpha_outside_14": 0,
+    "source_alpha_residue_inside_14": 0,
+    "bbox_positive_margin": 14,
+    "bbox_max": 14,
+    "minimum_margin": 4,
+    "persisted_header_exact": true,
+    "stored_mip": "1/1",
+    "persisted_roundtrip_exact": true,
+    "protected_REVERSED": "PIXEL_EXACT",
+    "raw_flipy": "PASS"
+  },
+  "producer_visual": {
+    "evidence_png": 256,
+    "inspect_at_native": [
+      "row00_READABLE_WHITE_100_SOURCE_CLEAN_PREV_TRIAL.png",
+      "row05_READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+      "row11_READABLE_WHITE_100_SOURCE_CLEAN_PREV_TRIAL.png"
+    ],
+    "inspect_at_practical_50": "all14 row00-row13 READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+    "inspect_at_RAW": [
+      "row00_RAW_GRAY_75_SOURCE_CLEAN_PREV_TRIAL.png"
+    ],
+    "source_vs_new_style": "PASS_SCOPED_WEIGHTS_INCREASED_COMPARED_TO_B80_DENSER_SOURCE_FAMILY",
+    "glyph_integrity": "PASS_SCOPED_NO_VISIBLE_BROKEN_OR_STRETCHED_SYLLABLES",
+    "source_clean": "PASS_SCOPED_ALPHA0_NATIVE",
+    "clean_final": "PASS_SCOPED_NO_VISIBLE_PLATE_OR_BOX",
+    "protected_art": "PASS_OUTSIDE14_EXACT",
+    "orientation": "PASS_STORED_RAW_READABLE_FLIP",
+    "limits": "No independent C; not equivalent to game-composed end-user view"
+  },
+  "rows": [
+    {
+      "row": 0,
+      "english": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "original_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "new_bbox": [
+        389,
+        1941,
+        1157,
+        2020
+      ],
+      "margins": [
+        335,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 82,
+      "pixel_scale": 1,
+      "new_wh": [
+        768,
+        79
+      ],
+      "source_wh": [
+        1107,
+        87
+      ],
+      "height_ratio": 0.908
+    },
+    {
+      "row": 1,
+      "english": "WATERFALLS",
+      "korean": "워터폴스",
+      "original_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "new_bbox": [
+        709,
+        1808,
+        1034,
+        1895
+      ],
+      "margins": [
+        388,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        325,
+        87
+      ],
+      "source_wh": [
+        717,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 2,
+      "english": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "original_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "new_bbox": [
+        710,
+        1698,
+        1052,
+        1784
+      ],
+      "margins": [
+        447,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 89,
+      "pixel_scale": 1,
+      "new_wh": [
+        342,
+        86
+      ],
+      "source_wh": [
+        793,
+        94
+      ],
+      "height_ratio": 0.9149
+    },
+    {
+      "row": 3,
+      "english": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "original_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "new_bbox": [
+        717,
+        1584,
+        1059,
+        1671
+      ],
+      "margins": [
+        434,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        342,
+        87
+      ],
+      "source_wh": [
+        780,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 4,
+      "english": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "original_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "new_bbox": [
+        605,
+        1468,
+        1030,
+        1555
+      ],
+      "margins": [
+        499,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        425,
+        87
+      ],
+      "source_wh": [
+        928,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 5,
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "original_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "new_bbox": [
+        313,
+        1360,
+        1052,
+        1447
+      ],
+      "margins": [
+        58,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        739,
+        87
+      ],
+      "source_wh": [
+        801,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 6,
+      "english": "PALM BEACH",
+      "korean": "팜 비치",
+      "original_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "new_bbox": [
+        797,
+        1245,
+        1053,
+        1331
+      ],
+      "margins": [
+        446,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 89,
+      "pixel_scale": 1,
+      "new_wh": [
+        256,
+        86
+      ],
+      "source_wh": [
+        706,
+        94
+      ],
+      "height_ratio": 0.9149
+    },
+    {
+      "row": 7,
+      "english": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "original_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "new_bbox": [
+        635,
+        1138,
+        1052,
+        1223
+      ],
+      "margins": [
+        444,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 88,
+      "pixel_scale": 1,
+      "new_wh": [
+        417,
+        85
+      ],
+      "source_wh": [
+        865,
+        93
+      ],
+      "height_ratio": 0.914
+    },
+    {
+      "row": 8,
+      "english": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "original_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "new_bbox": [
+        733,
+        1027,
+        1047,
+        1108
+      ],
+      "margins": [
+        310,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 84,
+      "pixel_scale": 1,
+      "new_wh": [
+        314,
+        81
+      ],
+      "source_wh": [
+        628,
+        89
+      ],
+      "height_ratio": 0.9101
+    },
+    {
+      "row": 9,
+      "english": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "original_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "new_bbox": [
+        564,
+        912,
+        1053,
+        999
+      ],
+      "margins": [
+        217,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        489,
+        87
+      ],
+      "source_wh": [
+        710,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 10,
+      "english": "LOST CITY",
+      "korean": "로스트 시티",
+      "original_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "new_bbox": [
+        618,
+        799,
+        1046,
+        886
+      ],
+      "margins": [
+        102,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 91,
+      "pixel_scale": 1,
+      "new_wh": [
+        428,
+        87
+      ],
+      "source_wh": [
+        534,
+        95
+      ],
+      "height_ratio": 0.9158
+    },
+    {
+      "row": 11,
+      "english": "LEGEND",
+      "korean": "레전드",
+      "original_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "new_bbox": [
+        813,
+        685,
+        1051,
+        771
+      ],
+      "margins": [
+        181,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 89,
+      "pixel_scale": 1,
+      "new_wh": [
+        238,
+        86
+      ],
+      "source_wh": [
+        423,
+        94
+      ],
+      "height_ratio": 0.9149
+    },
+    {
+      "row": 12,
+      "english": "JUNGLE",
+      "korean": "정글",
+      "original_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "new_bbox": [
+        878,
+        577,
+        1039,
+        663
+      ],
+      "margins": [
+        255,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 90,
+      "pixel_scale": 1,
+      "new_wh": [
+        161,
+        86
+      ],
+      "source_wh": [
+        420,
+        94
+      ],
+      "height_ratio": 0.9149
+    },
+    {
+      "row": 13,
+      "english": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "original_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "new_bbox": [
+        468,
+        471,
+        1042,
+        555
+      ],
+      "margins": [
+        432,
+        4,
+        4,
+        4
+      ],
+      "font_native_size": 87,
+      "pixel_scale": 1,
+      "new_wh": [
+        574,
+        84
+      ],
+      "source_wh": [
+        1010,
+        92
+      ],
+      "height_ratio": 0.913
+    }
+  ],
+  "review_status": {
+    "C2": "PENDING_FRESH_INDEPENDENT_REVIEW",
+    "C3": "PENDING_SEPARATE_STRICT_REVIEW",
+    "approval": false,
+    "user_game": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "worker_run": 37852212705,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
