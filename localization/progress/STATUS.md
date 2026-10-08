@@ -3144,3 +3144,7 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 01:27 KST — C315 C2 EVEN q060 P0 user-game-reopened source-face FAIL
 - `TEMP_BACKLOG_RELIEF=C2` / `SHARD=EVEN`: q060 exact DDS SHA-bound 18 new lossless source/current 100/75/50/RAW PNG, 3 original-vs-Korean source-family face/fill/depth visual defects. User `IGR-044` remains OPEN; `C=REWORK_REQUIRED`, C3/current approval/export blocked. New DDS=0, `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/C315_Q060_CONTROLLER_C2_REWORK.json`.
+
+
+### 2026-10-09 01:48 KST — C316 C1 q121 P0 new-user-game regression
+- `TEMP_BACKLOG_RELIEF=C1`, `SHARD=ODD(+UNINDEXED_SPECIAL)` IGR-030/031/040 P0 q121; native exact-source/A176 authored clean/current persisted evidence **45 new lossless PNG**, 3 source headers; CLEAN/current outside original three-bbox union RGBA0/alpha0, CLEAN target alpha0. Controller flags reduced/hard-gray-outline Korean relative heavy white italic English (car title width 46.88%, height60.37% source). `C=REWORK_REQUIRED`; C3 and current approval/export blocked, user game failed/open and image markup not source box evidence. DDS0, `RUNTIME_VALIDATION=UNTESTED`. QA: `localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_CONTROLLER_C1_P0_SOURCE_FAMILY_REWORK.json`.

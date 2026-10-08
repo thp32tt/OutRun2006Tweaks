@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "task_id": "OUTRUN-KOR-C316-C1-Q121-IGR030-031-040-NATIVE-20261009",
+  "review_id": "20261009-C316-C1-Q121-P0-NATIVE-IGR030-031-040",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "priority": "P0",
+  "ingame_reports": [
+    "IGR-030 screenshot181",
+    "IGR-031 screenshot182",
+    "IGR-040 screenshot192"
+  ],
+  "regressed_game_commit": "cc8f9dd6ba7163b12451f192e80d7f417aa8548a",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+  },
+  "current_candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "source_clean_provenance": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "old_independent_C265": "C265 historical static C3_STRICT_PASS superseded by user actual game failure; not current approval",
+  "triage": "MATERIAL_REWORK",
+  "backend": "GitHub Actions exact persisted native DDS CPU proof; direct controller rendered lossless image first-look. ChatGPT local sandbox GitHub raw DNS failed; no heavy N100 compute.",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37811070042",
+  "machine_report": "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_MACHINE_AND_LOSSLESS_MANIFEST.json",
+  "native_geometry": "RGBA32 4096x4096 mip1 mirror-Y RAW, source/candidate header exact",
+  "lossless_png": 45,
+  "pixel_evidence": {
+    "clean_to_final_rgba_outside_three_source_bboxes": 0,
+    "clean_to_final_alpha_outside_three_source_bboxes": 0,
+    "clean_alpha_inside_each_source_bbox": 0,
+    "full_source_to_current_rgba_outside_three_bboxes": 1934984,
+    "source_to_current_outside_explanation": "Full atlas already contains unrelated earlier localized content. Do not use source-vs-current outside three header rectangles as a blast-radius gate; exact A176 CLEAN-vs-current zero-outside is verified.",
+    "validated_row_source_limit": true,
+    "positive_margins_all_three": true
+  },
+  "independent_visual": {
+    "english": "Original labels read as dominant white, heavy right-italic glyphs with simpler black lower-right depth/shadow.",
+    "current": "Current Korean glyphs have visibly narrower footprint and more contrasty gray face/multiple crisp outline and offset dark underlay. All three heading rows have reduced hierarchy: height99 vs source 154/164/151 and width 649/428/430 vs source1000/913/783. This is not equivalent to the English title family.",
+    "specificity": "Confirmed source-relative source-family typography failure in q121. User's actual screen-clipping/overlap still needs composed-game screenshot and source-layer mapping. Static atlas positive margins do not disprove user clipping. Screen-marked black outlines are annotations, not independently proven rectangle artifacts.",
+    "firstlook": "Directly inspected C316 source/CLEAN/current BLACK 75%, GRAY native100%, WHITE 50% for all 3 titles. Earlier C265 overview reused only for background context, not counted as new PNG.",
+    "protected": "No isolated Dino model-logo source DDS ID in the new screenshots; source-to-current full atlas outside three headers has other pre-existing translated content. Do not assert Dino mirror-correction or edit car models.",
+    "source_clean": "A176 original source text-only region removal to transparent plate; alpha in all 3 bboxes0. Current lettering is not a pasted opaque rectangle by itself.",
+    "no_false_conclusion": "No verified actual gameplay retest after the P0 report. Cannot isolate clipping to q121 DDS versus runtime/UI layering from this atlas alone."
+  },
+  "regions": [
+    {
+      "id": "select_game_mode",
+      "source": "Select Game Mode",
+      "ko": "게임 모드 선택",
+      "source_size": [
+        1000,
+        154
+      ],
+      "candidate_size": [
+        649,
+        99
+      ],
+      "height_ratio": 0.6429,
+      "width_ratio": 0.649,
+      "checks": {
+        "slant": "right-lean visible but source anchor not calibrated",
+        "clean_plate": "PASS alpha0 native region",
+        "style": "FAIL strong original white/black bold italic family replaced by gray multistroke outline",
+        "readability": "SOURCE_RELATIVE_UNDERFILL",
+        "glyph_integrity": "No certain broken syllable from native firstlook",
+        "protected_art": "CLEAN→FINAL outside 3 source cells0; individual car logo not mapped",
+        "placement": "FAIL source-relative hierarchy despite positive bbox margins",
+        "orientation": "Native readable and RAW pairs available; no independent flip error shown"
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_0_select_game_mode_SCF_BLACK_75.png",
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_0_select_game_mode_SOURCE_RAW.png",
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_0_select_game_mode_CURRENT_RAW.png"
+      ]
+    },
+    {
+      "id": "select_car",
+      "source": "Select your car",
+      "ko": "차량 선택",
+      "source_size": [
+        913,
+        164
+      ],
+      "candidate_size": [
+        428,
+        99
+      ],
+      "height_ratio": 0.6037,
+      "width_ratio": 0.4688,
+      "checks": {
+        "slant": "right-lean direction retained, exact angle and anchor not approved",
+        "clean_plate": "PASS target alpha0",
+        "style": "FAIL source-white heavy italic now gray-white black multiple hard outlines",
+        "readability": "FAIL source-relative visual hierarchy / underfill",
+        "glyph_integrity": "No definite isolated atlas clip but user game crop reports clipped header",
+        "protected_art": "Zero clean→final outside source rectangles; Dino logo mapping OPEN",
+        "placement": "FAIL 428/913 width, 99/164 height, large internal blank / composited position unresolved",
+        "orientation": "RAW and FLIP-Y output independently rendered, no reversal proven"
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_1_select_car_SCF_GRAY_100.png",
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_1_select_car_SCF_WHITE_50.png",
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_1_select_car_CURRENT_RAW.png"
+      ]
+    },
+    {
+      "id": "select_course",
+      "source": "Select Course",
+      "ko": "코스 선택",
+      "source_size": [
+        783,
+        151
+      ],
+      "candidate_size": [
+        430,
+        99
+      ],
+      "height_ratio": 0.6556,
+      "width_ratio": 0.5492,
+      "checks": {
+        "slant": "right-lean but source family not identical",
+        "clean_plate": "PASS target alpha0",
+        "style": "FAIL reduced source hierarchy and additional outline complexity",
+        "readability": "Some legibility remains but hierarchy mismatch",
+        "glyph_integrity": "No certain clipping within original bbox",
+        "protected_art": "Zero unrelated composite outside 3 source effect rectangles",
+        "placement": "FAIL shrunk 430/783 width and 99/151 height",
+        "orientation": "Native/RAW source clean final proof present"
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_2_select_course_SCF_GRAY_100.png",
+        "localization/graphics/role_C/20261009-C316-C1-Q121-IGR030-031-040-P0-NATIVE/C316_Q121_2_select_course_CURRENT_RAW.png"
+      ]
+    }
+  ],
+  "independent_C_decision": "REWORK_REQUIRED",
+  "defect_codes": [
+    "SOURCE_FAMILY_WHITE_ITALIC_SHADOW_MISMATCH",
+    "TITLE_HIERARCHY_UNDERFILL",
+    "USER_INGAME_CLIP_OVERLAP_UNRESOLVED_LAYER_MAP"
+  ],
+  "producer_action": "Reconstruct q121 three headers with measured original white italic/shadow/weight/height, source clean transparency and source-specific anchoring, constrained to original effect cells. Do not merely width-stretch/strengthen shadow. Audit composed car-select against original game screenshots and investigate small info overlay outside q121; do not edit protected Dino model logo without proven source ID and orientation. Fresh independent C1/C3 and NEW actual-game retest required.",
+  "C_PASS": false,
+  "C3_PASS": false,
+  "APPROVALS": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_APPROVAL": false,
+  "candidate_changed_by_C": false,
+  "new_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "as_of_kst": "2026-10-09 01:48"
+}
