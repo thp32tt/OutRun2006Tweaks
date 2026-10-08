@@ -17,7 +17,7 @@
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "score_award": "ELIGIBLE_ONCE_PENDING_AI2_SCOREBOARD_DEDUP",
+  "score_award": "RECORDED_AI2_ONCE_RUN_KEY_CONVERSION-DX9EX-00550_1208_PLUS_1_EQUALS_1209",
   "selected_work_item": "DX9EX-P0-FAST-DDS-HEADER-DESCRIPTOR-SIZE-FAIL-CLOSED",
   "summary": "Reject invalid surface and pixel descriptor sizes in fast DDS decoder prior to interpretation; preserve native D3DX fallback, extend exact-source contract and two mutations.",
   "changed_paths": [
@@ -128,5 +128,7 @@
       "digest": "sha256:194842f8fc3165349c79c4c1bcff3432a842bc032726739af33433db6508ea2d"
     }
   ],
-  "automation_result_provenance": "PASS on immutable material SHA 6d9041ed5abcf2275809db289cd8614c99369cda; DX9Ex Active 37725768200 5/5 jobs success; HUD Inspector 37725768172 2/2 success, 71 CALL + 10/10 HUD mutants, 27 DDS source obligations + 21/21 DDS mutants; Domain Isolation 37725768242 success; independent Full Source Impact 37725768222 success. VR Autodev Coordination 37725768248 fails on existing queue IMPLEMENT_NEXT validator (also failed before this change), not source build gate. No Quest3/VDXR test."
+  "automation_result_provenance": "PASS on immutable material SHA 6d9041ed5abcf2275809db289cd8614c99369cda; DX9Ex Active 37725768200 5/5 jobs success; HUD Inspector 37725768172 2/2 success, 71 CALL + 10/10 HUD mutants, 27 DDS source obligations + 21/21 DDS mutants; Domain Isolation 37725768242 success; independent Full Source Impact 37725768222 success. VR Autodev Coordination 37725768248 fails on existing queue IMPLEMENT_NEXT validator (also failed before this change), not source build gate. No Quest3/VDXR test.",
+  "scoreboard_commit": "1cd8ead697b9440cf7a4b8a7f74bd42f4bd6f120",
+  "score_calculation": "1208 + 1 = 1209; no additional E003 rollover/retry award"
 }
