@@ -213,14 +213,17 @@ def verify_goal_pre_candidate_gate(source):
         'GameState::STATE_GOAL', 'GameState::STATE_TIMEUP',
         'GameState::STATE_LINK_TIMEUP',
         'CurrentQueueProducerToken()', 'R9StereoSeeded',
-        'RuntimeEligibility::MayInjectStereo()', 'StereoWanted()',
+        'RuntimeEligibility::MayInjectStereo()', 'GameplayActive()',
+        'HostRenderEligible()',
         'FrameStereoIncomplete', 'TargetIsBackBuffer()',
         'R9DeferredDepth', 'AnyAuxRenderTargetActive()',
         'VR P0 GOAL EARLY_GATE', 'firstByMethodState[index].fetch_or(',
     ):
         require(key, helper, 'GOAL early admission source proof')
-    if 'SetRenderState(' in helper or 'RegisterSpriteNodeScope(' in helper:
-        raise SystemExit('GOAL early-gate telemetry is not read-only')
+    if ('SetRenderState(' in helper or
+            'RegisterSpriteNodeScope(' in helper or
+            'StereoWanted() ?' in helper):
+        raise SystemExit('GOAL early-gate telemetry has side effects')
     for fn, method in (
         ('HRESULT __stdcall DrawPrimitiveDestR30(', '0u'),
         ('HRESULT __stdcall DrawIndexedPrimitiveDestR30(', '1u'),
