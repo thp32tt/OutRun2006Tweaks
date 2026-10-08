@@ -14,11 +14,11 @@
   "lease_epoch": 1,
   "work_key": "DX11:FIXED_FUNCTION_OUTPUT_RS_OM:IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/native_backend.cpp",
   "selected_work_item": "DX11_R155_FIXED_FUNCTION_OUTPUT_STATE_IMMEDIATE_CONTEXT_OWNERSHIP",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
   "material_result_sha": "f7161a1b4ca0d998ede8595931b1db75711b0055",
   "validation_bearing_result_sha": "f7161a1b4ca0d998ede8595931b1db75711b0055",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "changed_paths": [
     "src/vr/d3d11/native_backend.cpp",
@@ -29,13 +29,13 @@
     "C0_RECOVER": "PASS: 00463 absent at GitHub base HEAD; 00462 complete; resumed rollover ATTEMPT 1/3 unchanged",
     "C1_REVIEW": "PASS: NativeFixedFunctionOutputStateBinding RS/OM same-device deferred command recording was not rejected as live immediate",
     "C2_IMPLEMENT": "PASS: output binding immediate-only C++ guards and WARP deferred-negative/immediate-positive probe",
-    "C3_VALIDATE": "PENDING: exact material-SHA GitHub Backend Conversion Gate 37827335714",
+    "C3_VALIDATE": "PASS: material SHA f7161a1b4ca0d998ede8595931b1db75711b0055 Backend Conversion Gate 37827335714 SUCCESS; Win32 validate 113483453557 SUCCESS; DX11 readiness smoke 113486202869 SUCCESS; artifact 11572910084 sha256:953331617071014d20c18024612d4760a8951d48806c0a72d5d2d70044153916",
     "C4_COMMIT": "PASS: substantive material commit f7161a1b4ca0d998ede8595931b1db75711b0055 [AUTO:CONVERSION-DX11-00463]",
     "C5_PACKAGE": "NOT_REQUIRED: dormant output-state observation only; native Draw unchanged; no release package",
-    "C6_STATE": "PENDING: update terminal C0-C6 record only after exact material-SHA CI result; Issue #14 material event ID 6066808445 logged"
+    "C6_STATE": "PASS: exact SHA CI PASS in run/lane records; Issue #14 material comment 6066808445 and validation comment 6071175281 persisted; runtime UNTESTED"
   },
-  "static_validation": "PENDING_CI",
-  "state_persisted": false,
+  "static_validation": "PASS: exact material-SHA Backend Conversion Gate 37827335714, Win32 validate 113483453557 SUCCESS, DX11 WARP smoke 113486202869 SUCCESS",
+  "state_persisted": true,
   "validation_run_id": 37827335714,
   "validation_job_id": 113483453557,
   "issue14_comment_id": 6066808445,
@@ -44,5 +44,16 @@
   "blockers": [
     "Quest3/VDXR in-game runtime unavailable; RUNTIME_VALIDATION=UNTESTED"
   ],
-  "next_action": "Check Backend Conversion Gate 37827335714 exact material SHA f7161a1b4ca0d998ede8595931b1db75711b0055 validate and DX11 smoke job results; fix same TASK only if failed; record artifact digest/Issue #14 validation event and finalize lane state. Do not increment ATTEMPT for rollover."
+  "next_action": "00463 is terminal PASS. Do not duplicate same work_key or allocate a new task merely from a timer tick. External Docker queue controller still requires separate live-state reconciliation; next genuinely distinct work must be assigned by atomic queue claim. Quest3/VDXR runtime validation remains UNTESTED.",
+  "result_sha": "f7161a1b4ca0d998ede8595931b1db75711b0055",
+  "validation_bearing_sha": "f7161a1b4ca0d998ede8595931b1db75711b0055",
+  "readiness_smoke_job_id": 113486202869,
+  "artifact_id": 11572910084,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-f7161a1b4ca0d998ede8595931b1db75711b0055",
+  "artifact_digest": "sha256:953331617071014d20c18024612d4760a8951d48806c0a72d5d2d70044153916",
+  "validation_issue14_comment_id": 6071175281,
+  "recorded_at_utc": "2026-10-08T19:00:36Z",
+  "last_real_activity_at": "2026-10-08T19:00:36Z",
+  "last_activity_evidence": "GitHub exact-SHA Gate 37827335714 completed SUCCESS; validate 113483453557 SUCCESS; readiness smoke 113486202869 SUCCESS; artifact 11572910084 verified digest sha256:953331617071014d20c18024612d4760a8951d48806c0a72d5d2d70044153916",
+  "automation_validation_detail": "EXACT_SHA_WIN32_VALIDATE_AND_DX11_WARP_SMOKE_SUCCESS"
 }
