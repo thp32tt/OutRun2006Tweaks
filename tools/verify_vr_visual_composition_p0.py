@@ -861,6 +861,9 @@ def check_time_goal_lens_owner(source_r30, source_ui):
         '!exactSceneEffect)',
     ):
         require(token, fixed, 'EXE-owned lens/scene fixed XYZRHW exact classification')
+    require('state.worldEffect = state.rhwDepthEvidence &&\n'
+            '                    !R30XyzrhwLooksLikeHudPlane(',
+            fixed, 'lens world stereo requires actual exact-reference depth evidence')
     if fixed.index('else if (exactSceneEffect)') > fixed.index('if (!state.worldEffect &&'):
         raise SystemExit('P0 lens XYZRHW exact semantic accepted too late')
     for token in (
