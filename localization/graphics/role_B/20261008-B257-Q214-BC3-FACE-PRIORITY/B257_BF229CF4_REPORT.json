@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B257-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "prior_rejected_candidate_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+  "candidate_sha256": "132ba8d5159196eb68d6635a7331fc08ed0269a1512acbf9abff2226fd9fe183",
+  "format": "DXT5_BC3",
+  "size": [
+    2048,
+    2048
+  ],
+  "header_exact": true,
+  "raw_orientation": "mirror_y",
+  "construction": "native Noto CJK KR Bold source-derived clean; categorical face-orange-red BC3 palette per 4x4 original source-effect block, partial original endpoints/indices protected",
+  "font_coverage_probed": "출발골",
+  "native_masks": [
+    {
+      "id": "start",
+      "english": "START",
+      "korean": "출발",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "size": [
+        51,
+        18
+      ],
+      "right_lean_px": 4,
+      "localized_bbox": [
+        830,
+        497,
+        884,
+        515
+      ],
+      "margins": [
+        15,
+        2,
+        15,
+        2
+      ],
+      "native_core_pixels": 461,
+      "native_keyline_pixels": 315
+    },
+    {
+      "id": "goal",
+      "english": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "size": [
+        29,
+        18
+      ],
+      "right_lean_px": 4,
+      "localized_bbox": [
+        1365,
+        766,
+        1396,
+        784
+      ],
+      "margins": [
+        22,
+        2,
+        21,
+        3
+      ],
+      "native_core_pixels": 266,
+      "native_keyline_pixels": 178
+    }
+  ],
+  "full_blocks_reencoded": 190,
+  "partial_blocks_protected_indices": 84,
+  "changed_bc3_blocks": 191,
+  "blocks_with_new_hangul": 101,
+  "source_vs_candidate_changed_inside": 3102,
+  "source_vs_candidate_changed_outside": 0,
+  "source_vs_candidate_alpha_outside": 0,
+  "source_vs_candidate_introduced_visible_outside": 0,
+  "previous_vs_candidate_changed_outside": 0,
+  "post_encode_native_face_integrity": [
+    {
+      "id": "start",
+      "core_pixels": 461,
+      "bright_core_retention": 1.0,
+      "worst_native_scanline": 1.0,
+      "row_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "goal",
+      "core_pixels": 266,
+      "bright_core_retention": 1.0,
+      "worst_native_scanline": 1.0,
+      "row_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_DIRECT_PERSISTED_DDS_REVIEW",
+  "independent_C2": "REQUIRED_NEW_SHA",
+  "C3": "BLOCKED_PENDING_C2",
+  "PRE_INGAME": "BLOCKED_PENDING_EVIDENCE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_HOSTED_CPU_DUE_TO_GPT_LOCAL_GITHUB_RAW_DNS_UNAVAILABLE",
+  "forbidden_domains_touched": []
+}
