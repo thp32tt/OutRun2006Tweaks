@@ -1,0 +1,282 @@
+{
+  "run": "C287",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "dds_header_identical": true,
+  "native_size": [
+    4096,
+    1024
+  ],
+  "raw_orientation": "mirror_y",
+  "clean_sources": {
+    "authored_B60": {
+      "path": "localization/graphics/role_B/20261005-B-PRODUCTION60/4D38_HD_CLEAN_PLATE.png",
+      "sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380"
+    },
+    "independent_C141": {
+      "path": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_EXACT_CLEAN_PLATE.png",
+      "sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380"
+    },
+    "inferred_C284": {
+      "path": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png",
+      "sha256": "5bb94d023849aa1ca7da18d781bad8cdc0d8283a8237bd4d4f325de9d09150a0"
+    }
+  },
+  "b60_vs_c141_rgba_differing_pixels": 0,
+  "b60_vs_c284_rgba_differing_pixels": 603341,
+  "clean_vs_source_changed_outside_eight_bboxes": 0,
+  "current_vs_source_changed_outside_eight_bboxes": 0,
+  "current_vs_source_alpha_changed_outside_eight_bboxes": 0,
+  "b60_alpha_nonzero_inside_source_eight_bboxes": 0,
+  "rows": [
+    {
+      "id": "create_new_license_red",
+      "source_text": "CREATE NEW LICENSE",
+      "korean_text": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "final_alpha_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "source_region_opaque_count": 142103,
+      "final_region_opaque_count": 101090,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 145165,
+      "final_equals_original_visible_pixels_inside_box": 35052,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "select_license_red",
+      "source_text": "SELECT LICENSE",
+      "korean_text": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "final_alpha_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "source_region_opaque_count": 105320,
+      "final_region_opaque_count": 72921,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 110908,
+      "final_equals_original_visible_pixels_inside_box": 23918,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "single_player_red",
+      "source_text": "SINGLE PLAYER",
+      "korean_text": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "final_alpha_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "source_region_opaque_count": 98927,
+      "final_region_opaque_count": 77318,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 104721,
+      "final_equals_original_visible_pixels_inside_box": 24978,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "default_license_red",
+      "source_text": "DEFAULT LICENSE",
+      "korean_text": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "final_alpha_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "source_region_opaque_count": 115127,
+      "final_region_opaque_count": 71820,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 113385,
+      "final_equals_original_visible_pixels_inside_box": 25558,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "multiplayer_red",
+      "source_text": "MULTIPLAYER",
+      "korean_text": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "final_alpha_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "source_region_opaque_count": 90633,
+      "final_region_opaque_count": 73103,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 85047,
+      "final_equals_original_visible_pixels_inside_box": 25279,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "single_player_gray",
+      "source_text": "SINGLE PLAYER",
+      "korean_text": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "final_alpha_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "source_region_opaque_count": 19100,
+      "final_region_opaque_count": 13360,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 18468,
+      "final_equals_original_visible_pixels_inside_box": 2858,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "showroom_gray",
+      "source_text": "SHOWROOM",
+      "korean_text": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "final_alpha_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "source_region_opaque_count": 15231,
+      "final_region_opaque_count": 6628,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 10809,
+      "final_equals_original_visible_pixels_inside_box": 1762,
+      "alpha_containment": "PASS"
+    },
+    {
+      "id": "multiplayer_gray",
+      "source_text": "MULTIPLAYER",
+      "korean_text": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "final_alpha_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "source_region_opaque_count": 17402,
+      "final_region_opaque_count": 12757,
+      "final_alpha_positive_margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "b60_clean_nonzero_alpha_in_source_region": 0,
+      "b60_clean_vs_c141_changed": 0,
+      "b60_clean_vs_c284_inferred_changed": 14838,
+      "final_equals_original_visible_pixels_inside_box": 2661,
+      "alpha_containment": "PASS"
+    }
+  ],
+  "machine_status": "EXACT_CLEAN_PROVENANCE_CHECKED",
+  "visual_C": "PENDING_CONTROLLER_REVIEW",
+  "C3": "NOT_PERFORMED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
