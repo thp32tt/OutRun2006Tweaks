@@ -109,6 +109,7 @@ namespace
 int main()
 {
     DevicePair d3d = create_warp_device();
+    DevicePair foreign = create_warp_device();
 
     NativeSharedEyeRing ring;
     require(!ring.ready() && !ring.activation_ready(),
@@ -135,6 +136,11 @@ int main()
             "exact lifetime identity activates dormant ring");
 
     std::uint32_t slot = 99;
+    std::uint32_t rejectedSlot = 99;
+    require(!ring.try_acquire_slot(foreign.context, 1, nullptr, rejectedSlot) &&
+            rejectedSlot == OutRunVR::RenderFrameRingSize &&
+            ring.all_slots_idle() && !ring.synchronization_faulted(),
+            "foreign-device context cannot acquire a producer slot");
     require(ring.try_acquire_slot(d3d.context, 1, nullptr, slot),
             "acquire first frame");
     require(slot < OutRunVR::RenderFrameRingSize &&
@@ -163,8 +169,22 @@ int main()
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 5, nullptr, slot),
             "acquire published-frame candidate");
+    require(!ring.signal_producer_fence(foreign.context, slot, 5) &&
+            ring.slot_state(slot) == SharedEyeSlotState::Acquired &&
+            !ring.synchronization_faulted(),
+            "foreign-device context cannot signal producer EVENT");
     require(ring.signal_producer_fence(d3d.context, slot, 5),
             "signal producer EVENT after eye work");
+    require(!ring.publish_if_fence_complete(foreign.context, slot, 5) &&
+            ring.slot_state(slot) == SharedEyeSlotState::ProducerPending &&
+            !ring.synchronization_faulted(),
+            "foreign-device context cannot publish producer EVENT");
+    rejectedSlot = 99;
+    require(!ring.try_acquire_slot(foreign.context, 6, nullptr, rejectedSlot) &&
+            rejectedSlot == OutRunVR::RenderFrameRingSize &&
+            ring.slot_state(slot) == SharedEyeSlotState::ProducerPending &&
+            !ring.synchronization_faulted(),
+            "foreign-device context cannot recycle pending producer fence");
     require(ring.slot_state(slot) == SharedEyeSlotState::ProducerPending,
             "signal transitions acquired slot to producer-pending");
     publish_bounded(ring, d3d.context, slot, 5);
@@ -261,9 +281,12 @@ int main()
             "fresh allocation accepts next generation");
 
     ring.shutdown();
+    foreign.context->Release();
+    foreign.device->Release();
     d3d.context->Release();
     d3d.device->Release();
 
+    std::cout << "DX11 native shared-eye context ownership: PASS\n";
     std::cout << "DX11 native shared-eye transport behavior R116: PASS\n";
     std::cout << "DX11 native shared-eye publication handoff R118: PASS\n";
     return 0;

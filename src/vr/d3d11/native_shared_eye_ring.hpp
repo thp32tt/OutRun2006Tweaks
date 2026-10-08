@@ -66,7 +66,7 @@ namespace outrun::vr::dx11
         [[nodiscard]] bool ready() const noexcept { return ready_; }
         [[nodiscard]] bool activation_ready() const noexcept
         {
-            return ready_ && !synchronization_faulted_ &&
+            return ready_ && producer_device_ && !synchronization_faulted_ &&
                 OutRunVR::Core::TransportIdentityValid(identity_);
         }
         [[nodiscard]] bool synchronization_faulted() const noexcept
@@ -136,11 +136,16 @@ namespace outrun::vr::dx11
             std::uint32_t slot) const noexcept;
 
     private:
+        // A frame fence belongs to the producer's exact immediate D3D11 context.
+        // Reject foreign/deferred contexts without mutating live frame slots.
+        [[nodiscard]] bool same_producer_context(
+            ID3D11DeviceContext* context) const noexcept;
         void reset_slot_lifetime(SharedEyeSlot& slot) noexcept;
         bool refresh_unpublished_fence(
             ID3D11DeviceContext* context,
             SharedEyeSlot& slot) noexcept;
 
+        Microsoft::WRL::ComPtr<ID3D11Device> producer_device_;
         std::array<SharedEyeSlot, OutRunVR::RenderFrameRingSize> slots_{};
         OutRunVR::Core::TransportIdentity identity_{};
         std::uint32_t width_{};

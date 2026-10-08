@@ -93,6 +93,7 @@ namespace outrun::vr::dx11
             reset_slot_lifetime(slot);
         }
 
+        producer_device_ = device;
         width_ = width;
         height_ = height;
         format_ = format;
@@ -117,11 +118,23 @@ namespace outrun::vr::dx11
                 slot.shared_handle[eyeIndex] = nullptr;
             }
         }
+        producer_device_.Reset();
         width_ = 0;
         height_ = 0;
         format_ = DXGI_FORMAT_UNKNOWN;
         ready_ = false;
         synchronization_faulted_ = false;
+    }
+
+    bool NativeSharedEyeRing::same_producer_context(
+        ID3D11DeviceContext* context) const noexcept
+    {
+        if (!ready_ || !producer_device_ || !context ||
+            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11Device> observedDevice;
+        context->GetDevice(observedDevice.GetAddressOf());
+        return observedDevice && observedDevice.Get() == producer_device_.Get();
     }
 
     bool NativeSharedEyeRing::bind_lifetime(
@@ -186,7 +199,7 @@ namespace outrun::vr::dx11
     {
         if (slot.state != SharedEyeSlotState::ProducerPending)
             return true;
-        if (!context || !slot.producer_fence)
+        if (!same_producer_context(context) || !slot.producer_fence)
             return false;
 
         const HRESULT status = context->GetData(
@@ -217,7 +230,8 @@ namespace outrun::vr::dx11
         std::uint32_t& out_slot) noexcept
     {
         out_slot = static_cast<std::uint32_t>(slots_.size());
-        if (!activation_ready() || !context || frame_id == 0)
+        if (!activation_ready() || !same_producer_context(context) ||
+            frame_id == 0)
             return false;
 
         const std::uint32_t preferred = static_cast<std::uint32_t>(
@@ -281,7 +295,7 @@ namespace outrun::vr::dx11
         std::uint32_t slot,
         std::uint64_t frame_id) noexcept
     {
-        if (!activation_ready() || !context ||
+        if (!activation_ready() || !same_producer_context(context) ||
             slot >= slots_.size() || frame_id == 0)
             return false;
 
@@ -303,7 +317,7 @@ namespace outrun::vr::dx11
         std::uint32_t slot,
         std::uint64_t frame_id) noexcept
     {
-        if (!activation_ready() || !context ||
+        if (!activation_ready() || !same_producer_context(context) ||
             slot >= slots_.size() || frame_id == 0)
             return false;
 

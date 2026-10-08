@@ -55,12 +55,17 @@ def main() -> None:
             "validate_publication_snapshot",
             "retire_acknowledged",
             "synchronization_faulted",
+            "same_producer_context",
+            "producer_device_",
         ],
     )
     require(
         "src/vr/d3d11/native_shared_eye_ring.cpp",
         [
             "TransportIdentityValid(next)",
+            "observedDevice.Get() == producer_device_.Get()",
+            "context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE",
+            "!same_producer_context(context)",
             "!all_slots_idle()",
             "D3D11_ASYNC_GETDATA_DONOTFLUSH",
             "context->End(entry.producer_fence.Get())",
@@ -105,6 +110,10 @@ def main() -> None:
             "lifetime invalidation rejects stale handoff snapshot",
             "DX11 native shared-eye publication handoff R118: PASS",
             "stale generation ACK cannot retire published slot",
+            "foreign-device context cannot acquire a producer slot",
+            "foreign-device context cannot signal producer EVENT",
+            "foreign-device context cannot publish producer EVENT",
+            "foreign-device context cannot recycle pending producer fence",
             "older frame ACK cannot retire newer publication",
             "exact identity/frame ACK retires publication",
             "invalidated lifetime cannot manufacture retirement",
@@ -202,6 +211,8 @@ def main() -> None:
             raise SystemExit(
                 f"DX11 R118 publication validation missing stale-snapshot evidence: {needle}"
             )
+    if ring_cpp.count("!same_producer_context(context)") != 4:
+        raise SystemExit("DX11 native ring must check all four context-bearing paths")
     print("DX11 native transport lifetime contract: OK")
 
 
