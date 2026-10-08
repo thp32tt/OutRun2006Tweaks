@@ -226,7 +226,10 @@ def verify_goal_c64_fallback_evidence(source):
             'missing GOAL c64 must be attributed before fail-closed')
     require('R30TraceGoalOriginalC64Status(true);', shader,
             'recovered GOAL c64 must be recorded per original producer')
-    require_order(shader, 'GOAL c64 fail-closed and source fingerprint',
+    c64_miss_branch = shader[shader.index(
+        '++R30ExactHudRawWvpMiss;'):]
+    require_order(c64_miss_branch,
+                  'GOAL c64 fail-closed and source fingerprint',
                   '++R30ExactHudRawWvpMiss;',
                   'R30TraceGoalOriginalC64Status(false);',
                   'return false;')
