@@ -180,6 +180,19 @@ def verify_result_theater_guard(source):
             'retain original WARP gameplay stereo')
     require('case GameState::STATE_RESTART:', body,
             'retain original RESTART gameplay stereo')
+    # The host already chooses projection during these last-frame states.
+    # Old R7 failed to produce stereo because Game::is_in_game() excluded
+    # GIVEUP/LINK_TIMEUP; GOAL/TIMEUP are in the earlier broad predicate.
+    for transition in ('STATE_GIVEUP', 'STATE_LINK_TIMEUP'):
+        require('case GameState::' + transition + ':', body,
+                'host expects gameplay but source never produces SBS: ' +
+                transition)
+    for theater in ('STATE_TRYAGAIN', 'STATE_OUTRUNMILES'):
+        if 'case GameState::' + theater + ':' in body:
+            raise SystemExit('mono restart incorrectly produces stereo: ' +
+                             theater)
+    require('game_start_progress_code == 65', game_addrs,
+            'START must retain original progress-65 gate')
     require('case STATE_GOAL:', game_addrs,
             'GOAL remains host gameplay')
     require('case STATE_TIMEUP:', game_addrs,
@@ -202,6 +215,13 @@ for label, corrupt in (
      r7.replace(
          'if (!Game::is_vr_gameplay_presentation())\n\t\t\t\treturn false;\n\t\t\tif (Game::is_in_game())',
          'if (Game::is_in_game())\n\t\t\t\treturn true;\n\t\t\tif (!Game::is_vr_gameplay_presentation())', 1)),
+    ('GOAL preceding LINK_TIMEUP producer never becomes stereo',
+     r7.replace('case GameState::STATE_LINK_TIMEUP:', '', 1)),
+    ('GIVEUP producer never becomes stereo',
+     r7.replace('case GameState::STATE_GIVEUP:', '', 1)),
+    ('restart Theater accidentally classified true stereo',
+     r7.replace('case GameState::STATE_LINK_TIMEUP:',
+                'case GameState::STATE_LINK_TIMEUP:\n\t\t\tcase GameState::STATE_TRYAGAIN:', 1)),
 ):
     if corrupt == r7:
         raise SystemExit('Theater SBS mutation did not modify source: ' +
