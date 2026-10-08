@@ -121,6 +121,28 @@ class EvidenceGateTest(unittest.TestCase):
         for status in ("c3_pass_hold_strict_recheck", "c3_pass_rework_required", "c3_pass_visual_fail"):
             self.assertFalse(current_c_pass({**self.row, "artwork_status": status}))
 
+    def test_open_user_ingame_failure_vetoes_historical_approval(self):
+        backlog = self.root / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text("queue_index,status\n154,OPEN_USER_INGAME_FAIL\n", encoding="utf-8")
+        self.assertIn("active user in-game regression blocks approval", self.check())
+
+    def test_other_open_ingame_index_does_not_block_this_candidate(self):
+        backlog = self.root / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text("queue_index,status\n155,OPEN_USER_INGAME_FAIL\n", encoding="utf-8")
+        self.assertEqual([], self.check())
+
+    def test_current_rework_status_blocks_legacy_C3_approval(self):
+        self.row["artwork_status"] = "user_ingame_20261009_rework_required"
+        self.assertIn("current queue REWORK/HOLD/FAIL blocks approval", self.check())
+
+    def test_historical_closed_user_report_is_not_a_new_veto(self):
+        backlog = self.root / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text("queue_index,status\n154,C_STATIC_PASS_PENDING_INGAME_RETEST\n", encoding="utf-8")
+        self.assertEqual([], self.check())
+
     def test_path_escape_rejected(self):
         self.data["decoded_final"]["path"] = "../outside.png"
         self.assertTrue(self.check())
