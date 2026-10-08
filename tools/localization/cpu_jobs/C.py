@@ -42,14 +42,17 @@ for name,x,y in (("source_clean",A,B),("clean_final",B,D),("source_final",A,D),(
  counts[name]={"changed_rgba_total":int(delta.sum()),"changed_rgba_outside_source_bbox":int((delta&~allowed).sum()),
  "alpha_changed_outside_source_bbox":int(((x[:,:,3]!=y[:,:,3])&~allowed).sum())}
 assert all(v["changed_rgba_outside_source_bbox"]==0 and v["alpha_changed_outside_source_bbox"]==0 for v in counts.values())
-assert not np.any(B[t:b,l:r,3]),"source clean plate alpha remnants"
+# The glyph sits on an opaque yellow selector: CLEAN must keep its backing plate.
+# Independently measure text/effect changes relative to the exact original plate,
+# never infer glyph outlines from the plate's nontransparent alpha.
+assert int(np.count_nonzero(np.any(A[t:b,l:r]!=B[t:b,l:r],axis=2)))>3000,"no source glyph removed"
 def bb(mask):
  yy,xx=np.where(mask)
  assert len(xx)
  return [int(xx.min())+l,int(yy.min())+t,int(xx.max()+1)+l,int(yy.max()+1)+t]
-srcbb=bb(A[t:b,l:r,3]>0)
-finbb=bb(D[t:b,l:r,3]>0)
-oldbb=bb(O[t:b,l:r,3]>0)
+srcbb=bb(np.any(A[t:b,l:r]!=B[t:b,l:r],axis=2))
+finbb=bb(np.any(D[t:b,l:r]!=B[t:b,l:r],axis=2))
+oldbb=bb(np.any(O[t:b,l:r]!=B[t:b,l:r],axis=2))
 assert srcbb==box and finbb==[1431,1972,1780,2036] and oldbb==[1508,1986,1704,2026],(srcbb,finbb,oldbb)
 def bands(a):
  arr=a[t:b,l:r,3];y,x=np.nonzero(arr>=128)
@@ -66,7 +69,7 @@ metrics={"source_bbox":srcbb,"old_bbox":oldbb,"current_bbox":finbb,
 "old_source_width_ratio":round((oldbb[2]-oldbb[0])/(r-l),4),
 "current_source_width_ratio":round((finbb[2]-finbb[0])/(r-l),4),
 "source_slant_proxy":bands(A),"old_slant_proxy":bands(O),"new_slant_proxy":bands(D),
-"clean_alpha_inside":int(np.count_nonzero(B[t:b,l:r,3]))}
+"clean_alpha_inside_plate":int(np.count_nonzero(B[t:b,l:r,3]))}
 out=root/"localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE"
 out.mkdir(parents=True,exist_ok=True)
 crop=(1380,1948,1820,2048)
