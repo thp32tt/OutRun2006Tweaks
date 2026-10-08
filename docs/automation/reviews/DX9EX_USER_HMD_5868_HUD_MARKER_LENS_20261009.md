@@ -19,8 +19,19 @@
 - Existing car DDS, original game input, Reset, depth and R50 correct world remain protected. Do not revert the recent texture fixes.
 - `HUD_SEMANTIC_COVERAGE` is not a HMD verification verdict; notes in TEST_RESULT are empty, but user's description is authoritative.
 
-## C2 Implementation
+## C2 Implementation — material source correction (new HMD candidate)
+
+- Actual code material commit `907710ae2f2c479c1bed53598a3dfb631a4e502d` initially added original game WVP recovery for generic 2D overlays and ordinal rank sprites. Exact DX9Ex Active policy failed on that commit: `tools/verify_vr_producer_provenance.py` explicitly prohibits converting diagnostic-only `ProducerToken::RankMarkerSprani` into render owner. This was a real architectural policy failure, not a runtime visual failure. Its first version must NOT be tested.
+- Correction commit `d37631470d17913c0e43eb9a187ebf55f149e9eb` **removes all producer-token classification from active renderer** and restricts raw WVP restoration to `RenderScope::ScreenOverlay2D` while the queue is live, with exact current shader identity+shader-serial and bounded original draw age (128). On a miss it returns false, never double-injecting a possibly head-corrected GPU c64. WORLD_BILLBOARD, ProjectedWorldMarker2D, rival proper and rank original geometry remain completely unchanged by this new correction.
+- Deterministic P0 contract commit `cd78dc7de5af698515e3258c93724f36bd7bff7b`: four targeted negative injections for queue active, overlay scope, shader serial identity and bounded WVP age, and explicit ban on semantic ownership based on producer tokens. Exact source SHA = `cd78dc7de5af698515e3258c93724f36bd7bff7b` (pending build status).
+- **Preserved user-positive invariant:** OutRun rival marker optical PASS (reported in this conversation). The former report's blanket vehicle-rival defect hypothesis is overbroad and NOT applicable to this HMD session. Vehicle ordinal ranks 1–5 remain separately OPEN; no rival code was modified.
+- **Preserved user-positive invariant:** vehicle-selection DDS normal. No DDS/XMT code changed.
+- **Lens centre:** five-disc flare includes at least one separately doubled central primitive; no evidence that all five belong to the same 2D HUD owner. Broad lens-to-HUD conversion forbidden. Exact CF53 projected light grouping still a historical hypothesis; not ported.
+- **HMD limitation:** this build only corrects 2D queued shader WVP ownership, which was a real source discrepancy; fixed-function 2D path and 1–5 car-rank reprojection may still fail. Do NOT report all listed optical regressions repaired until a new headset test.
+
+## C3 Exact SHA Actions verification
 PENDING
+
 
 ## C3 Exact SHA Actions verification
 PENDING
