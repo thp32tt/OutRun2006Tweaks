@@ -671,9 +671,10 @@ for marker, d3dx_call in (
 
 require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semantic retained')
 
-# Lens flare P0: R73 HMD proved scalar disparity tuning was not a fix.
-# Ownership must come from the canonical sub_40CAE0 producer: EXE+0xCABE
-# DrawObjectAlpha call, then pass the same exact semantic through the WVP proof.
+# Lens P0: R73 HMD proved scalar disparity tuning was not a fix.
+# The canonical CALL at 0xCABE is in the PRE-0xCAE0 region; Calc3D2D
+# 0xCF4E is in the separate 0xCAE0..0xD100 region. Do NOT treat their
+# two RVAs as proof they share one original producer function.
 require('ProjectedScreenEffect2D', sem, 'exact projected lens semantic')
 require('CorroboratesProjectedScreenEffect', sem, 'projected lens semantic predicate')
 require('VRLensFlareProjected2D', graphics, 'canonical lens producer hook')
@@ -713,10 +714,24 @@ require_order(
     'R44ClassifyOwnedOverlayMatrix(rawWvp)',
 )
 analyzer = read('tools/analyze_outrun_exe.py')
-require('SceneEffectLensProducer_sub_40CAE0', analyzer, 'canonical lens producer window')
-require('0x0000CAE0', analyzer, 'lens producer start RVA')
-require('0x0000CABE', analyzer, 'lens DrawObjectAlpha anchor RVA')
-require('0x0000CF4E', analyzer, 'lens Calc3D2D anchor RVA')
+require('SceneEffectDrawObjectAlpha_pre_40CAE0', analyzer,
+        'pre-0xCAE0 exact DrawObjectAlpha producer window')
+require('SceneEffectLensProjection_40CAE0', analyzer,
+        'separate Calc3D2D lens projection window')
+require('"start_rva": 0x0000CAB0', analyzer, 'lens direct CALL region starts before 0xCABE')
+require('"end_rva": 0x0000CAE0', analyzer, 'lens direct CALL region ends at separate block')
+require('"start_rva": 0x0000CAE0', analyzer, 'separate lens projection block')
+require('"end_rva": 0x0000D100', analyzer, 'lens projection window bound')
+require('"anchors": (0x0000CABE,)', analyzer, 'exact DrawObjectAlpha direct CALL anchor')
+require('"anchors": (0x0000CF4E,)', analyzer, 'separate Calc3D2D producer anchor')
+require('"expected_direct_targets": {0x0000CABE: 0x0056D0}', analyzer,
+        '0xCABE must resolve canonical DrawObjectAlpha_Internal 0x56D0')
+require('"expected_direct_targets": {0x0000CF4E: 0x049940}', analyzer,
+        '0xCF4E must resolve canonical Calc3D2D 0x49940')
+require('if not declared_start <= rva < declared_end:', analyzer,
+        'producer anchor must lie inside named disassembly window')
+require('if actual != target:', analyzer,
+        'producer CALL target must match original executable')
 # Canonical byte closure for the NaviPub ScreenHud scaling-state hooks.
 # Bytes are taken from HUD Inspector artifact 11501098116 for canonical
 # OR2006C2C.EXE SHA-256 68ceb386... and must remain bound to the exact current
