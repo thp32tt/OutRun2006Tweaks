@@ -1,0 +1,43 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C294-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "reviewer": "ChatGPT AI 1",
+  "blind_review_completed": true,
+  "source_control": "q172 canonical English START sprite from C269 case_00 source half, not rejected Korean candidate",
+  "image": "role_C C294 blind_contact.png; target undecoded until answer key read",
+  "answer_key_read_before_first_look": false,
+  "cases": {
+    "A": {
+      "decision": "FAIL",
+      "suspected_kind": "excessive_weight",
+      "observation": "TEST is conspicuously thicker and more solid with compressed counters relative to source."
+    },
+    "B": {
+      "decision": "FAIL",
+      "suspected_kind": "clipped_stroke",
+      "observation": "Missing crossbar/section of the START lettering and a rectangular foreign patch are evident."
+    },
+    "C": {
+      "decision": "PASS",
+      "suspected_kind": "normal",
+      "observation": "SOURCE and TEST retain source italic, edge, plate and glyph outlines without visible differences."
+    },
+    "D": {
+      "decision": "FAIL",
+      "suspected_kind": "residue",
+      "observation": "Duplicated lighter-red silhouettes and edge ghosting appear across the letter faces."
+    },
+    "E": {
+      "decision": "FAIL",
+      "suspected_kind": "opposite_slant",
+      "observation": "TEST glyph placement/lean differs from original italic source; background plate also altered so source-faithfulness cannot be assumed."
+    }
+  },
+  "limits": [
+    "Calibration first-look only; no pass has been determined for q154.",
+    "Diagnostic variants are synthetic; no production DDS rendered.",
+    "Independent-source normal cannot be certified until answer-key and exact source provenance verified."
+  ]
+}
