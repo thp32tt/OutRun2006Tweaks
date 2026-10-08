@@ -1,0 +1,708 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C304-C2",
+  "run_key": "OUTRUN-KOR-C304-C2-Q236-COMPLETE-14-NATIVE-20261008-2125",
+  "timestamp_kst": "2026-10-08 21:25 KST",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selection_head": "6f69af3016a23cd7b65a0c315a76365a88c86d81",
+  "current_head_after_binary_publication": "9a9dd4c444e8e751ceae8fc31b515e41cb2c88d1",
+  "selection": "No higher-priority fresh even A/B candidate. q154/q176/q230 same-byte current evidence HOLD already reviewed; q98/q172/q214 require material A/B rework. C302 q236 audited 4/14, so this run completes all 14 exact-byte scan rather than repeating or claiming previous C3 PASS.",
+  "triage": "VALIDATION_ONLY (source status c302_c2_c3_hold_four_region_native_evidence; no DDS rerender, new strict native evidence only)",
+  "source": {
+    "provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518"
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "previous_C223_same_exact_bytes": true
+  },
+  "new_evidence": {
+    "machine_report": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_NEW14_MACHINE.json",
+    "source_korean_14row_contact_jpg": "localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_SOURCE_KOREAN_14ROW_50_CONTACT.jpg",
+    "producer_C302_prev": "localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json",
+    "method": "sha256-verified pinned native source/candidate DDS, numpy memory-mapped READABLE Y mirrored coordinates; independently recomputed per-row source/current alpha>16 bboxes and RGB/alpha outside source effect bbox across complete Y bands; alpha-composited on opaque gray to avoid hidden RGB artifacts; rows visual contact resized to 50% gray context",
+    "total_regions": 14,
+    "prior_independently_audited_regions": 4,
+    "additional_new_region_scans": 10,
+    "all14_boundary_pass": true,
+    "changed_rgba_outside_source_bbox_in_y_bands": 0,
+    "changed_alpha_outside_source_bbox_in_y_bands": 0,
+    "format": {
+      "width": 2048,
+      "height": 2048,
+      "mips": 1,
+      "rgb_bits": 32,
+      "masks": [
+        16711680,
+        65280,
+        255,
+        4278190080
+      ]
+    },
+    "limitations": "Only source text Y bands scanned; not full-atlas outside across arbitrary rows. Crops and machine checks alone do not certify source clean plate, calibrated source-family/glyph stem, practical 100/75/50 on black white gray, game UV or user acceptance."
+  },
+  "region_evidence": [
+    {
+      "region_idx": 0,
+      "source_text": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "source_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "source_alpha16_bbox": [
+        55,
+        1937,
+        1160,
+        2023
+      ],
+      "korean_alpha16_bbox": [
+        418,
+        1939,
+        1159,
+        2022
+      ],
+      "margins_lrtb": [
+        364,
+        2,
+        2,
+        2
+      ],
+      "source_visible_pixels": 50441,
+      "korean_visible_pixels": 25428,
+      "rgba_changed_inside": 56535,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 1,
+      "source_text": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "source_alpha16_bbox": [
+        322,
+        1804,
+        1038,
+        1899
+      ],
+      "korean_alpha16_bbox": [
+        750,
+        1810,
+        1036,
+        1893
+      ],
+      "margins_lrtb": [
+        429,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 34345,
+      "korean_visible_pixels": 10268,
+      "rgba_changed_inside": 38067,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 2,
+      "source_text": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "source_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "source_alpha16_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "korean_alpha16_bbox": [
+        750,
+        1699,
+        1054,
+        1782
+      ],
+      "margins_lrtb": [
+        487,
+        2,
+        5,
+        6
+      ],
+      "source_visible_pixels": 38329,
+      "korean_visible_pixels": 11215,
+      "rgba_changed_inside": 38804,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 3,
+      "source_text": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "source_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "source_alpha16_bbox": [
+        283,
+        1581,
+        1063,
+        1675
+      ],
+      "korean_alpha16_bbox": [
+        761,
+        1586,
+        1061,
+        1669
+      ],
+      "margins_lrtb": [
+        478,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 37585,
+      "korean_visible_pixels": 9046,
+      "rgba_changed_inside": 39889,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 4,
+      "source_text": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "source_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "source_alpha16_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "korean_alpha16_bbox": [
+        658,
+        1470,
+        1032,
+        1553
+      ],
+      "margins_lrtb": [
+        552,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 46808,
+      "korean_visible_pixels": 11570,
+      "rgba_changed_inside": 47857,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 5,
+      "source_text": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "source_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "source_alpha16_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "korean_alpha16_bbox": [
+        403,
+        1362,
+        1054,
+        1445
+      ],
+      "margins_lrtb": [
+        148,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 39134,
+      "korean_visible_pixels": 20359,
+      "rgba_changed_inside": 43643,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 6,
+      "source_text": "PALM BEACH",
+      "korean": "팜 비치",
+      "source_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "source_alpha16_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "korean_alpha16_bbox": [
+        829,
+        1246,
+        1055,
+        1329
+      ],
+      "margins_lrtb": [
+        478,
+        2,
+        5,
+        6
+      ],
+      "source_visible_pixels": 33992,
+      "korean_visible_pixels": 8261,
+      "rgba_changed_inside": 35771,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 7,
+      "source_text": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "source_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "source_alpha16_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "korean_alpha16_bbox": [
+        680,
+        1139,
+        1054,
+        1222
+      ],
+      "margins_lrtb": [
+        489,
+        2,
+        5,
+        5
+      ],
+      "source_visible_pixels": 41540,
+      "korean_visible_pixels": 12716,
+      "rgba_changed_inside": 43976,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 8,
+      "source_text": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "source_alpha16_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "korean_alpha16_bbox": [
+        754,
+        1026,
+        1049,
+        1109
+      ],
+      "margins_lrtb": [
+        331,
+        2,
+        3,
+        3
+      ],
+      "source_visible_pixels": 28230,
+      "korean_visible_pixels": 11117,
+      "rgba_changed_inside": 33622,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 9,
+      "source_text": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "source_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "source_alpha16_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "korean_alpha16_bbox": [
+        625,
+        914,
+        1055,
+        997
+      ],
+      "margins_lrtb": [
+        278,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 35318,
+      "korean_visible_pixels": 15746,
+      "rgba_changed_inside": 37769,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 10,
+      "source_text": "LOST CITY",
+      "korean": "로스트 시티",
+      "source_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "source_alpha16_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "korean_alpha16_bbox": [
+        676,
+        801,
+        1048,
+        884
+      ],
+      "margins_lrtb": [
+        160,
+        2,
+        6,
+        6
+      ],
+      "source_visible_pixels": 23294,
+      "korean_visible_pixels": 11189,
+      "rgba_changed_inside": 29444,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 11,
+      "source_text": "LEGEND",
+      "korean": "레전드",
+      "source_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "source_alpha16_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "korean_alpha16_bbox": [
+        841,
+        686,
+        1053,
+        769
+      ],
+      "margins_lrtb": [
+        209,
+        2,
+        5,
+        6
+      ],
+      "source_visible_pixels": 22498,
+      "korean_visible_pixels": 7767,
+      "rgba_changed_inside": 22033,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 12,
+      "source_text": "JUNGLE",
+      "korean": "정글",
+      "source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "source_alpha16_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "korean_alpha16_bbox": [
+        901,
+        578,
+        1041,
+        661
+      ],
+      "margins_lrtb": [
+        278,
+        2,
+        5,
+        6
+      ],
+      "source_visible_pixels": 20809,
+      "korean_visible_pixels": 5803,
+      "rgba_changed_inside": 21478,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    },
+    {
+      "region_idx": 13,
+      "source_text": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "source_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "source_alpha16_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "korean_alpha16_bbox": [
+        522,
+        471,
+        1044,
+        554
+      ],
+      "margins_lrtb": [
+        486,
+        2,
+        4,
+        5
+      ],
+      "source_visible_pixels": 49374,
+      "korean_visible_pixels": 19626,
+      "rgba_changed_inside": 53230,
+      "rgba_changed_outside_source_bbox_in_band": 0,
+      "alpha_changed_outside_source_bbox_in_band": 0,
+      "numeric_boundary_decision": "PASS",
+      "c3_visual": {
+        "slant": "HOLD: upright visual first impression in source/candidate readable contact; exact semantic stem anchors not newly measured.",
+        "clean_plate": "HOLD: source vs authored CLEAN was not independently decoded in this run; no approval of source-lettering erasure, protected plate or seams.",
+        "style": "VISUAL_NO_DEFINITE_NEW_MISMATCH_IN_14ROW_CONTACT_BUT_HOLD: Korean source-family dark condensed row style viewed alongside English; weights/counter-space and native effects not certified by reference profile.",
+        "readability": "VISUAL_LEGIBLE_IN_14ROW_CONTACT_BUT_HOLD: generated lossless-from-DDS alpha-composited 50%-resized JPG on gray inspected; no 100/75 or actual game scale proof.",
+        "glyph_integrity": "NO_DEFINITE_GLYPH_BREAKAGE_IN_GRAY_CONTACT_BUT_HOLD: 14 source/current row images readable, no definitive missing syllable; alpha>16 exact pixel boundary numeric PASS does not prove current-policy image approval.",
+        "protected_art": "PASS_WITHIN_SCANNED_SOURCE_Y_BANDS: RGBA and alpha exact source-vs-Korean changed pixels outside original source bbox 0 for each row, including preserved graphics sharing Y bands. Unexamined non-source y bands not certified.",
+        "placement": "MEASURED_BOUNDARY_PASS: native alpha>16 Korean glyph inside each of 14 exact English source effect boxes with 4 positive margins; see unique row bbox values.",
+        "orientation": "RAW scanline mapping Y=2048-1-y is used, source & candidate 2048x2048 RGBA32 mip1 equal headers; untested actual game UV, authored mip visuals not separately approved."
+      }
+    }
+  ],
+  "calibration": {
+    "blinded_known_defect_quiz_completed": false,
+    "pixels_before_producer_verdict": false,
+    "reason": "Current run read existing q236 C223/C302 producer/QA notes before visual review; calibration not newly completed. Do not falsely mark a qualified PASS."
+  },
+  "C3_review": {
+    "stage": "SEPARATE_C3_STRICT_AUDIT",
+    "decision": "HOLD_STRICT_RECHECK",
+    "missing": [
+      "Independent SHA-bound authored CLEAN original source erasure check",
+      "Independent 5-control blinded visual calibration",
+      "Quantified per-glyph source/current slant/contour or justified anchor ambiguity",
+      "black/white/gray backgrounds; 100/75/50 practical and RAW rendered views",
+      "full protected/global non-text atlas scope",
+      "separate source-family proof and current APPROVALS/q236.json"
+    ],
+    "no_definite_new_glyph_fault_seen_in_current_contact": true,
+    "reason": "All 14 numeric containment/scanned band outside checks pass, but those checks are insufficient to supersede missing current strict visual/CLEAN evidence. Maintain HOLD, no new REWORK or PASS fabricated."
+  },
+  "C3_APPROVAL": false,
+  "PRE_INGAME_EXPORT": false,
+  "USER_REVIEW": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "execution": "GitHub connected tools and ChatGPT local orchestration; N100 MCP fallback only two pinned 16MiB DDS downloads plus lightweight one-off numpy/PNG evidence creation due ChatGPT local raw github DNS blocked. Cleanup only after remote SHA verified.",
+  "prohibited_domains_touched": []
+}
