@@ -2970,3 +2970,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 2026-10-08 C291 C2 (TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN)
 - Even q172 6C9B3611 current B255 SHA 7282687b... independently persisted/source-clean/FINAL native+RAW, practical and 6x. Source-vs-current outside exact 2 effect regions RGBA/alpha=0; clean/source outside=0; producer PNG exact current decoded source/final. New visual **REWORK_REQUIRED**: Korean 출발/골 pale blocky horizontal face fails source italic beveled cream-gold 3D text family, despite improved right slant. B must materially reconstruct; no C3/PRE_INGAME/approval or in-game PASS. QA `localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_CONTROLLER_QA.json`. RUNTIME_VALIDATION=UNTESTED.
+
+
+### B261 q214 method-convergence source-profile reconstruction — 2026-10-08 16:42 KST
+- B q214 source-derived BC3 method B260/B261 materially tried but **both producer VISUAL REJECT** (pink/flat Korean face and GOAL plate stripe) despite 0 RGBA/alpha outside and 100% decoded bright-core retention. Actual DDS restored to prior C289-rejected B259 SHA `ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30`; no approval count increase. `METHOD_CHANGE_REQUIRED` remains; new manual/vector source-gold geometry and independent C2 needed, C3/export/in-game blocked. `RUNTIME_VALIDATION=UNTESTED`. Producer QA `localization/graphics/role_B/20261008-B261-Q214-BC3-FACE-PRIORITY/B261_CONTROLLER_VISUAL_REJECT.json`.
