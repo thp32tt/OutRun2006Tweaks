@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T16:42:00+09:00",
+  "updated_at_kst": "2026-10-08T16:57:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7505,5 +7505,30 @@
       "per-glyph readable source/candidate measured right slant",
       "distinct C3 strict audit"
     ]
+  },
+  "c292_c2_q154_redfive_native_review": {
+    "run": "C292",
+    "run_key": "OUTRUN-KOR-C292-C2-Q154-RED-FIVE-NATIVE-20261008-1650",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "asset_hash": "4D38BBB0",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "scope": "5 previously incomplete red menu regions",
+    "machine_zero_outside_rgba": 0,
+    "machine_zero_outside_alpha": 0,
+    "red_positive_margins": "5/5",
+    "native_red_visual": "NO_DEFINITE_DEFECT",
+    "result": "HOLD_STRICT_RECHECK",
+    "remaining": "blind calibration, glyph slant, source-family reference, complete eight-segment stage and separate C3",
+    "machine": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_Q154_RED_FIVE_MACHINE.json",
+    "controller": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_CONTROLLER_QA.json",
+    "worker_run": 37746248291,
+    "new_dds": false,
+    "pre_ingame": "BLOCKED",
+    "runtime_validation": "UNTESTED"
   }
 }

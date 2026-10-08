@@ -1,0 +1,408 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C292-C2",
+  "run_key": "OUTRUN-KOR-C292-C2-Q154-RED-FIVE-NATIVE-20261008-1650",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_provenance": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "machine_evidence": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_Q154_RED_FIVE_MACHINE.json",
+  "rework_triage": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_TRIAGE.json",
+  "review_scope": "FIVE_PREVIOUSLY_UNREVIEWED_RED_REGIONS_ONLY; past C287 covered three gray",
+  "previous_review": "C287 true B60 authored CLEAN provenance confirmed; three gray rows; no new producer DDS.",
+  "machine": {
+    "format": "BGRA32_DDS",
+    "decoded_dimensions": [
+      4096,
+      1024
+    ],
+    "header_identical": true,
+    "rgba_changed_outside_all_eight_source_bboxes": 0,
+    "alpha_changed_outside_all_eight_source_bboxes": 0,
+    "clean_changed_outside_all_eight_source_bboxes": 0,
+    "red_regions_positive_containment": "5/5",
+    "clean_source_red_region_alpha": "zero in all 5",
+    "raw_flipY_exact": "5/5"
+  },
+  "controller_visual_observations": [
+    "Five native exact persisted red rows retain legible Korean red fill, approximate source height and strong weight; no unambiguous clipped or broken character visible in 50% and left-side 2x focus.",
+    "English original is visually condensed block sans and Korean is bold regular Hangul; preserving hue/height does not certify exact source-family matching or all line baselines.",
+    "Authored B60 CLEAN alpha zero in all five canonical source glyph-effect boxes; identical SHA to independently held C141 B60 CLEAN was already established C287.",
+    "Eight-region outside-source change RGBA/alpha zero. This prevents broad atlas changes but cannot by itself prove no improper within-region plate or stylistic artifacts.",
+    "RAW mirror-Y cropping byte-exact for all five. Zoom focus crop is only first 440px of each; full native contacts and 50/75% cover complete red labels."
+  ],
+  "per_region_review": [
+    {
+      "id": "01_create_new_license",
+      "english": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "original_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "final_alpha_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "alpha_margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "review": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom per-glyph readable anchors not independently measured. Source looks broadly upright; no invented degree claim."
+        },
+        "clean_plate": {
+          "result": "MEASURED_NOT_FINAL_APPROVAL",
+          "observation": "Hash-bound B60 actual CLEAN is transparent over source glyph region; other atlas regions unchanged beyond all eight effect boxes."
+        },
+        "style": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT_HOLD",
+          "observation": "Native and 50% show coherent solid red bold Hangul matching broad family hue/weight; original English condensed geometric forms do not establish exact Korean family equivalence."
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "Complete Korean phrase distinguishable in source-clean-final 50% lossless panorama; game scale not run."
+        },
+        "glyph_integrity": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "No obvious truncated syllables, malformed Hangul or letter overlaps at 50% and left-native 2x; left-native crop does not cover full phrase."
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_NOT_FULL_PLATE_APPROVAL",
+          "observation": "Current vs English pixels outside union of all 8 original source boxes RGBA/alpha zero; preserved Ferrari scenes outside text boxes unchanged by global comparison."
+        },
+        "placement": {
+          "result": "MEASURED_BOUNDARY_PASS",
+          "observation": "Final alpha bbox contained in source text bbox with strictly positive L/R/T/B margins, not yet anchor/baseline proof."
+        },
+        "orientation": {
+          "result": "MACHINE_RAW_FLIPY_EXACT",
+          "observation": "Reversed RAW per-region source/final crops exactly reproduce readable region via flip-Y."
+        }
+      },
+      "evidence": {
+        "original": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_ORIGINAL_SOURCE.png",
+        "clean": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_B60_AUTHORED_CLEAN.png",
+        "final": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_CURRENT_PERSISTED_DDS.png",
+        "native_gray": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_GRAY_CONTACT_NATIVE.png",
+        "native_black": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_BLACK_CONTACT_NATIVE.png",
+        "native_white": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_WHITE_CONTACT_NATIVE.png",
+        "focus2x": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_NATIVE_LEFT_FOCUS_2X.png",
+        "practical75": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_SOURCE_CLEAN_FINAL_75.png",
+        "practical50": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_SOURCE_CLEAN_FINAL_50.png",
+        "source_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_SOURCE_RAW.png",
+        "final_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_FINAL_RAW.png"
+      }
+    },
+    {
+      "id": "02_select_license",
+      "english": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "original_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "final_alpha_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "alpha_margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "review": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom per-glyph readable anchors not independently measured. Source looks broadly upright; no invented degree claim."
+        },
+        "clean_plate": {
+          "result": "MEASURED_NOT_FINAL_APPROVAL",
+          "observation": "Hash-bound B60 actual CLEAN is transparent over source glyph region; other atlas regions unchanged beyond all eight effect boxes."
+        },
+        "style": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT_HOLD",
+          "observation": "Native and 50% show coherent solid red bold Hangul matching broad family hue/weight; original English condensed geometric forms do not establish exact Korean family equivalence."
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "Complete Korean phrase distinguishable in source-clean-final 50% lossless panorama; game scale not run."
+        },
+        "glyph_integrity": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "No obvious truncated syllables, malformed Hangul or letter overlaps at 50% and left-native 2x; left-native crop does not cover full phrase."
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_NOT_FULL_PLATE_APPROVAL",
+          "observation": "Current vs English pixels outside union of all 8 original source boxes RGBA/alpha zero; preserved Ferrari scenes outside text boxes unchanged by global comparison."
+        },
+        "placement": {
+          "result": "MEASURED_BOUNDARY_PASS",
+          "observation": "Final alpha bbox contained in source text bbox with strictly positive L/R/T/B margins, not yet anchor/baseline proof."
+        },
+        "orientation": {
+          "result": "MACHINE_RAW_FLIPY_EXACT",
+          "observation": "Reversed RAW per-region source/final crops exactly reproduce readable region via flip-Y."
+        }
+      },
+      "evidence": {
+        "original": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_ORIGINAL_SOURCE.png",
+        "clean": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_B60_AUTHORED_CLEAN.png",
+        "final": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_CURRENT_PERSISTED_DDS.png",
+        "native_gray": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_GRAY_CONTACT_NATIVE.png",
+        "native_black": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_BLACK_CONTACT_NATIVE.png",
+        "native_white": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_WHITE_CONTACT_NATIVE.png",
+        "focus2x": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_NATIVE_LEFT_FOCUS_2X.png",
+        "practical75": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_SOURCE_CLEAN_FINAL_75.png",
+        "practical50": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_SOURCE_CLEAN_FINAL_50.png",
+        "source_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_SOURCE_RAW.png",
+        "final_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_FINAL_RAW.png"
+      }
+    },
+    {
+      "id": "03_single_player",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "final_alpha_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "alpha_margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "review": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom per-glyph readable anchors not independently measured. Source looks broadly upright; no invented degree claim."
+        },
+        "clean_plate": {
+          "result": "MEASURED_NOT_FINAL_APPROVAL",
+          "observation": "Hash-bound B60 actual CLEAN is transparent over source glyph region; other atlas regions unchanged beyond all eight effect boxes."
+        },
+        "style": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT_HOLD",
+          "observation": "Native and 50% show coherent solid red bold Hangul matching broad family hue/weight; original English condensed geometric forms do not establish exact Korean family equivalence."
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "Complete Korean phrase distinguishable in source-clean-final 50% lossless panorama; game scale not run."
+        },
+        "glyph_integrity": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "No obvious truncated syllables, malformed Hangul or letter overlaps at 50% and left-native 2x; left-native crop does not cover full phrase."
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_NOT_FULL_PLATE_APPROVAL",
+          "observation": "Current vs English pixels outside union of all 8 original source boxes RGBA/alpha zero; preserved Ferrari scenes outside text boxes unchanged by global comparison."
+        },
+        "placement": {
+          "result": "MEASURED_BOUNDARY_PASS",
+          "observation": "Final alpha bbox contained in source text bbox with strictly positive L/R/T/B margins, not yet anchor/baseline proof."
+        },
+        "orientation": {
+          "result": "MACHINE_RAW_FLIPY_EXACT",
+          "observation": "Reversed RAW per-region source/final crops exactly reproduce readable region via flip-Y."
+        }
+      },
+      "evidence": {
+        "original": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_ORIGINAL_SOURCE.png",
+        "clean": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_B60_AUTHORED_CLEAN.png",
+        "final": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_CURRENT_PERSISTED_DDS.png",
+        "native_gray": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_GRAY_CONTACT_NATIVE.png",
+        "native_black": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_BLACK_CONTACT_NATIVE.png",
+        "native_white": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_WHITE_CONTACT_NATIVE.png",
+        "focus2x": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_NATIVE_LEFT_FOCUS_2X.png",
+        "practical75": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_SOURCE_CLEAN_FINAL_75.png",
+        "practical50": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_SOURCE_CLEAN_FINAL_50.png",
+        "source_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_SOURCE_RAW.png",
+        "final_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_FINAL_RAW.png"
+      }
+    },
+    {
+      "id": "04_default_license",
+      "english": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "original_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "final_alpha_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "alpha_margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "review": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom per-glyph readable anchors not independently measured. Source looks broadly upright; no invented degree claim."
+        },
+        "clean_plate": {
+          "result": "MEASURED_NOT_FINAL_APPROVAL",
+          "observation": "Hash-bound B60 actual CLEAN is transparent over source glyph region; other atlas regions unchanged beyond all eight effect boxes."
+        },
+        "style": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT_HOLD",
+          "observation": "Native and 50% show coherent solid red bold Hangul matching broad family hue/weight; original English condensed geometric forms do not establish exact Korean family equivalence."
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "Complete Korean phrase distinguishable in source-clean-final 50% lossless panorama; game scale not run."
+        },
+        "glyph_integrity": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "No obvious truncated syllables, malformed Hangul or letter overlaps at 50% and left-native 2x; left-native crop does not cover full phrase."
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_NOT_FULL_PLATE_APPROVAL",
+          "observation": "Current vs English pixels outside union of all 8 original source boxes RGBA/alpha zero; preserved Ferrari scenes outside text boxes unchanged by global comparison."
+        },
+        "placement": {
+          "result": "MEASURED_BOUNDARY_PASS",
+          "observation": "Final alpha bbox contained in source text bbox with strictly positive L/R/T/B margins, not yet anchor/baseline proof."
+        },
+        "orientation": {
+          "result": "MACHINE_RAW_FLIPY_EXACT",
+          "observation": "Reversed RAW per-region source/final crops exactly reproduce readable region via flip-Y."
+        }
+      },
+      "evidence": {
+        "original": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_ORIGINAL_SOURCE.png",
+        "clean": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_B60_AUTHORED_CLEAN.png",
+        "final": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_CURRENT_PERSISTED_DDS.png",
+        "native_gray": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_GRAY_CONTACT_NATIVE.png",
+        "native_black": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_BLACK_CONTACT_NATIVE.png",
+        "native_white": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_WHITE_CONTACT_NATIVE.png",
+        "focus2x": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_NATIVE_LEFT_FOCUS_2X.png",
+        "practical75": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_SOURCE_CLEAN_FINAL_75.png",
+        "practical50": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_SOURCE_CLEAN_FINAL_50.png",
+        "source_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_SOURCE_RAW.png",
+        "final_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_FINAL_RAW.png"
+      }
+    },
+    {
+      "id": "05_multiplayer",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "original_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "final_alpha_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "alpha_margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "review": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom per-glyph readable anchors not independently measured. Source looks broadly upright; no invented degree claim."
+        },
+        "clean_plate": {
+          "result": "MEASURED_NOT_FINAL_APPROVAL",
+          "observation": "Hash-bound B60 actual CLEAN is transparent over source glyph region; other atlas regions unchanged beyond all eight effect boxes."
+        },
+        "style": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT_HOLD",
+          "observation": "Native and 50% show coherent solid red bold Hangul matching broad family hue/weight; original English condensed geometric forms do not establish exact Korean family equivalence."
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "Complete Korean phrase distinguishable in source-clean-final 50% lossless panorama; game scale not run."
+        },
+        "glyph_integrity": {
+          "result": "VISUAL_NO_DEFINITE_DEFECT",
+          "observation": "No obvious truncated syllables, malformed Hangul or letter overlaps at 50% and left-native 2x; left-native crop does not cover full phrase."
+        },
+        "protected_art": {
+          "result": "MACHINE_SCOPE_PASS_NOT_FULL_PLATE_APPROVAL",
+          "observation": "Current vs English pixels outside union of all 8 original source boxes RGBA/alpha zero; preserved Ferrari scenes outside text boxes unchanged by global comparison."
+        },
+        "placement": {
+          "result": "MEASURED_BOUNDARY_PASS",
+          "observation": "Final alpha bbox contained in source text bbox with strictly positive L/R/T/B margins, not yet anchor/baseline proof."
+        },
+        "orientation": {
+          "result": "MACHINE_RAW_FLIPY_EXACT",
+          "observation": "Reversed RAW per-region source/final crops exactly reproduce readable region via flip-Y."
+        }
+      },
+      "evidence": {
+        "original": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_ORIGINAL_SOURCE.png",
+        "clean": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_B60_AUTHORED_CLEAN.png",
+        "final": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_CURRENT_PERSISTED_DDS.png",
+        "native_gray": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_GRAY_CONTACT_NATIVE.png",
+        "native_black": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_BLACK_CONTACT_NATIVE.png",
+        "native_white": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_WHITE_CONTACT_NATIVE.png",
+        "focus2x": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_NATIVE_LEFT_FOCUS_2X.png",
+        "practical75": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_SOURCE_CLEAN_FINAL_75.png",
+        "practical50": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_SOURCE_CLEAN_FINAL_50.png",
+        "source_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_SOURCE_RAW.png",
+        "final_raw": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_FINAL_RAW.png"
+      }
+    }
+  ],
+  "reviewer": "ChatGPT C2 controller, no independent second human reviewer",
+  "blind_calibration": "NOT_PERFORMED",
+  "pixels_before_producer_verdict": false,
+  "reason_no_full_C_PASS": "Current visual-evidence policy requires qualified calibration, glyph-only source slant anchors, complete exact 8-region evidence, source-derived family profile, all authored mips, and separate C/C3 per-region stage records. Historical producer and C287 notes were already seen; do not claim a blinded PASS.",
+  "decision": "HOLD_STRICT_RECHECK",
+  "decision_scope": "NEW_INDEPENDENT_RED5_EVIDENCE_NO_VISUAL_DEFECT_DETECTED",
+  "C3": "BLOCKED_UNTIL_FULL_COMPLIANT_C",
+  "approval": "NOT_CREATED",
+  "pre_ingame": "BLOCKED",
+  "user_jpg_acceptance": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_produced": false,
+  "next_task": "Complete calibration and per-glyph anchor/family profile from current exact bytes, combine C287 gray3 and C292 red5 in a fresh complete eight-region reviewer stage, then distinct C3. No duplicate DDS rendering solely for evidence.",
+  "execution_backend": "GitHub Actions 37746248291 due GPT local DNS unavailable for 16 MiB native DDS, GitHub connector SSOT",
+  "cleanup": "Github-hosted ephemeral runner discarded; no GPT local worktree or N100 scratch retained",
+  "forbidden_domains_touched": []
+}
