@@ -828,8 +828,17 @@ for label, before, after in (
 ):
     if before not in r30:
         raise SystemExit('P0 RUNTIME_5868 owner negative input missing: ' + label)
+    if label == 'missing queue same-shader gate':
+        start = r30.index('bool R30GetRecentRawWvpForQueueSprite(')
+        end = r30.index('bool R30ExactSceneEffectScope()', start)
+        owned = r30[start:end]
+        if before not in owned:
+            raise SystemExit('P0 expected raw helper shader proof missing')
+        modified = r30[:start] + owned.replace(before, after, 1) + r30[end:]
+    else:
+        modified = r30.replace(before, after, 1)
     try:
-        verify_raw_queue_wvp_owner(r30.replace(before, after, 1))
+        verify_raw_queue_wvp_owner(modified)
     except SystemExit:
         pass
     else:
