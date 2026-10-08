@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "run": "OUTRUN-KOR-C276-C1-IGR006-007-RUNTIME-20261008-1140",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection_head": "a4cf8793ee913cb0c3aadf5d212e591dbc44de7c",
+  "targets": [
+    "IGR-006",
+    "IGR-007"
+  ],
+  "material_fix_shared": true,
+  "defect_domain": "RUNTIME_TEXT",
+  "source_file": "src/hooks_localization.cpp",
+  "current_source_blob_sha": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
+  "original_b170_source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
+  "original_b170_blob_sha": "8469bf87379649f29505bef915cce57176c4c549",
+  "current_validation_ref": "13e39b9baafc6bcb0bda02a43d5d006419277ee8",
+  "validation_ref_source_blob_sha": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
+  "current_vs_validation_source_blob_exact": true,
+  "branch_after_validation": {
+    "base": "13e39b9baafc6bcb0bda02a43d5d006419277ee8",
+    "head_at_review": "a4cf8793ee913cb0c3aadf5d212e591dbc44de7c",
+    "ahead_by": 235,
+    "src_changes": 0,
+    "build_configuration_changes": 0,
+    "note": "GitHub compare shows no src/ or build-system file changes after the validation ref; later commits are localization assets/state/evidence."
+  },
+  "implementation_review": {
+    "mapping": "EXE+0x65EB0 resolver -> sprPrintf/Sumo_Printf -> DrawCommand queue -> KoreanRuntime::Draw -> ImGui foreground D3D9 overlay",
+    "compact_gate": "valid translated draw AND logical font height <=24",
+    "outline": "8-direction dark keyline derived from stock ARGB; alpha preserved",
+    "stroke_screen_px": "clamp(fontSize*0.055, 1.0, 2.0)",
+    "clip": "fine clip rectangle equals the already-calculated Korean text rectangle",
+    "layout_expansion": false,
+    "larger_runtime_text_unchanged": true,
+    "current_targeted_exception": "text ID 935 only; excluded from compact keyline after separate modal over-weight regression",
+    "b170_core_policy_preserved": true,
+    "current_vs_b170_compact_section_change": "Only the ID935 exception plus explanatory comment changed inside the compact-policy decision; IGR-006/007 compact keyline path remains intact."
+  },
+  "build_evidence": {
+    "original_b170_win32": {
+      "run_id": 37379204456,
+      "job_id": 111996434383,
+      "conclusion": "success"
+    },
+    "original_b170_korean_test": {
+      "run_id": 37379204466,
+      "job_id": 111996434466,
+      "conclusion": "success",
+      "verify_package": "success"
+    },
+    "current_exact_source_win32": {
+      "run_id": 37645785737,
+      "job_id": 112876053718,
+      "conclusion": "success",
+      "artifact_id": 11494113754,
+      "artifact_name": "outrun2006tweaks-13e39b9baafc6bcb0bda02a43d5d006419277ee8",
+      "artifact_digest": "sha256:a84aa5993d6c989c629a246acd242aa7a5bc553eb052a0646ba09f9a44d28cbb"
+    },
+    "current_exact_source_korean_test": {
+      "run_id": 37645785906,
+      "job_id": 112876062161,
+      "conclusion": "success",
+      "verify_package": "success",
+      "artifact_id": 11493994362,
+      "artifact_name": "OutRun2-Korean-Test-13e39b9baafc6bcb0bda02a43d5d006419277ee8",
+      "artifact_digest": "sha256:502a6e8b734651079cbe4ed16432f3080b4cc0534068a2cf0f3289fdcb1c6a92"
+    }
+  },
+  "per_regression": {
+    "IGR-006": {
+      "screen": "스크린샷(148).png / INGAME_HUD_CITY_START",
+      "prior_defects": [
+        "LOW_RES_FONT",
+        "HUD_WEIGHT_MISMATCH",
+        "READABILITY"
+      ],
+      "c_static_review": "PASS",
+      "observation": "The exact current source retains the compact translated-cell keyline, uses captured stock cell height/scale and clips all eight stroke draws to the calculated Korean footprint. No source-code path expands the prior text rectangle.",
+      "remaining_gate": "NEW actual-game screenshot/retest"
+    },
+    "IGR-007": {
+      "screen": "스크린샷(149).png / HEART_ATTACK_SPEECH_BUBBLE",
+      "prior_defects": [
+        "LOW_RES_FONT",
+        "READABILITY",
+        "OUTLINE_TOO_WEAK"
+      ],
+      "c_static_review": "PASS",
+      "observation": "The bubble lettering is runtime text through the same compact path; FF2462BB supplies panel artwork only. Shared B170 material fix is present byte-exact in current validated source except for unrelated ID935 exclusion.",
+      "remaining_gate": "NEW actual-game screenshot/retest"
+    }
+  },
+  "decision": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
+  "decision_scope": "static source/build/package verification only; does not claim visual runtime closure",
+  "c3_status": "NOT_APPLICABLE_RUNTIME_TEXT_SPECIAL",
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_APPLICABLE_RUNTIME_TEXT",
+  "runtime_validation": "UNTESTED",
+  "in_game_backlog_closed": false,
+  "forbidden_domains_touched": [],
+  "dds_bytes_changed": false,
+  "source_bytes_changed_by_c": false
+}
