@@ -1,0 +1,100 @@
+{
+  "run": "B299",
+  "role": "B",
+  "task": "q212 C318 confirmed showroom/enter_name hierarchy underfill",
+  "queue_index": 212,
+  "triage": "MATERIAL_REWORK",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "current_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "trial_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "selection_mapping_IGR029": "SUSPECTED_UNRESOLVED",
+  "outside_two_changed_pixels": 0,
+  "protected_other_ten_regions": "PIXEL_EXACT",
+  "source_clean_alpha": 0,
+  "persisted_dds_roundtrip": "EXACT",
+  "header_raw_mip1": "PRESERVED",
+  "font": "native Noto CJK KR bold/black",
+  "method": "native source-size source-color glyph composition; showroom semantic Korean expansion, no English-width stretch",
+  "regions": [
+    {
+      "id": "showroom",
+      "source_text": "SHOWROOM",
+      "korean_text": "차량 전시장",
+      "source_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "candidate_bbox": [
+        18,
+        1152,
+        730,
+        1292
+      ],
+      "margins": [
+        4,
+        1030,
+        4,
+        4
+      ],
+      "source_median_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_size": 149,
+      "glyph_alpha_pixels": 39724
+    },
+    {
+      "id": "enter_name",
+      "source_text": "ENTER NAME",
+      "korean_text": "이름 입력",
+      "source_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "candidate_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "margins": [
+        4,
+        811,
+        4,
+        4
+      ],
+      "source_median_face_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_size": 71,
+      "glyph_alpha_pixels": 8366
+    }
+  ],
+  "preview_png_count": 32,
+  "plate_only": "PENDING_CONTROLLER_VISUAL",
+  "composite_only": "PENDING_CONTROLLER_VISUAL",
+  "producer_visual": "PENDING_CONTROLLER_VISUAL",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "USER_INGAME": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_FONT_DEPENDENCY_UNAVAILABLE_GPT_DNS",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
