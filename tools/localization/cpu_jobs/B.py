@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B272: authored original glyph core completion of q098 white DXT5 face."""
+"""B273: authored original glyph core completion of q098 white DXT5 face."""
 from pathlib import Path
 import os, io, sys, json, hashlib, struct, urllib.request, tempfile, subprocess
 import numpy as np
@@ -7,11 +7,11 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import binary_erosion, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
-    raise SystemExit("B272 requires pinned source download; GitHub worker only")
+    raise SystemExit("B273 requires pinned source download; GitHub worker only")
 root=Path.cwd();gfx=root/"localization/graphics"
 relative="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target=gfx/"hd_candidates"/relative
-run=gfx/"role_B/20261008-B272-Q098-SOURCE-KEYLINE-CONSTRAINED"
+run=gfx/"role_B/20261008-B273-Q098-MICRO-HOLE-ONLY"
 run.mkdir(parents=True,exist_ok=True)
 SHA=lambda b: hashlib.sha256(b).hexdigest()
 old_sha="1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb"
@@ -25,7 +25,7 @@ if SHA(oldbytes)!=old_sha:raise RuntimeError(("concurrent B production, stop",SH
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "a95efe01d1f136514cef94b0d9e9fd61df021754/"
 "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds")
-with tempfile.TemporaryDirectory(prefix="b272_q098_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b273_q098_") as tmp:
     file=Path(tmp)/"stock.dds"
     urllib.request.urlretrieve(url,file)
     source=file.read_bytes()
@@ -56,14 +56,19 @@ maskfile=gfx/"role_B/20261005-B-PRODUCTION40/42E618FD_TARGET_TEXT_MASK.png"
 mask=np.asarray(Image.open(maskfile).convert("L"),dtype=np.uint8)
 if mask.shape!=(h,w):raise RuntimeError(("authored target mask size changed",mask.shape))
 face_mask=(mask>212)&allowed
-core=binary_erosion(face_mask,iterations=1)
+core=binary_erosion(face_mask,iterations=3)
 rgb=cur[:,:,:3].astype(np.int16)
 alpha=cur[:,:,3]
 bright=(rgb[:,:,0]>=222)&(rgb[:,:,1]>=218)&(rgb[:,:,2]>=218)&(alpha>90)&allowed
 seed_overlap=int(np.count_nonzero(bright&face_mask))
 if seed_overlap<max(80,int(bright.sum()*0.35)):
     raise RuntimeError(("authored mask orientation or alignment mismatch",seed_overlap,int(bright.sum())))
-repair=core & (alpha>=190) & ~bright
+# Only repair microscopic breaks closed by neighboring genuine white pixels;
+# do not infer all dark authored-mask pixels to be letter interiors.
+# This avoids B271/B272 loss of the source navy outline and preserves Hangul counters.
+source_white_continuity=binary_closing(bright,iterations=2)
+pixel_depth=distance_transform_edt(face_mask)
+repair=core & source_white_continuity & (pixel_depth>=3.0) & (alpha>=190) & ~bright
 # B270 plate/composite gates showed source-derived mask interior remains dotted;
 # fill authored face core directly, not just pixels near current white seeds.
 # Preserve original glyph outlines by 1px erosion and native alpha floor.
@@ -144,7 +149,7 @@ for y0 in range((tgt[1]//4)*4,((tgt[3]+3)//4)*4,4):
         struct.pack_into("<I",raw,ofs+12,val)
         if n:touched.append([x0,y0,n])
         repaired+=n
-if repaired<10:raise RuntimeError(("no_safe_reconstruction_possible",repaired,unsupported))
+if repaired<1:raise RuntimeError(("no_safe_micro_hole_reconstruction_possible",repaired,unsupported))
 new=bytes(raw)
 if new==oldbytes:raise RuntimeError("no new compressed candidate")
 if new[:128]!=oldbytes[:128] or len(new)!=len(oldbytes):raise RuntimeError("format mutated")
@@ -158,11 +163,11 @@ changed=int(delta.sum())
 newrgb=res[:,:,:3].astype(np.int16)
 newbright=(newrgb[:,:,0]>=222)&(newrgb[:,:,1]>=218)&(newrgb[:,:,2]>=218)&(res[:,:,3]>90)&allowed
 improved=int(np.sum(repair&newbright))
-if improved<10:raise RuntimeError(("white-stroke continuity did not improve",improved,repaired))
+if improved<1:raise RuntimeError(("white-stroke continuity did not improve",improved,repaired))
 # Always verify original source-vs-candidate visible area has no new overflow
 if int(np.count_nonzero((res[:,:,3]>16)&~source_box))!=int(np.count_nonzero((cur[:,:,3]>16)&~source_box)):
     raise RuntimeError("source extent changed")
-trial=run/"42E618FD_B272_TRIAL_NOT_APPROVED.dds"
+trial=run/"42E618FD_B273_TRIAL_NOT_APPROVED.dds"
 trial.write_bytes(new)
 if SHA(trial.read_bytes())!=SHA(new):raise RuntimeError("persist verification failed")
 if not np.array_equal(dec(trial.read_bytes()),res):raise RuntimeError("persist roundtrip mismatch")
@@ -185,13 +190,13 @@ for orientation in ("READABLE","RAW"):
         for im in items:card.paste(im,(x,0));x+=im.width+8
         card.save(run/f"{orientation}_SOURCE_PREVIOUS_REPAIRED_{scale}.png")
 report={
- "run":"B272","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B272-Q098-SOURCE-KEYLINE-CONSERVATION-20261008",
- "status":"B272_EXPERIMENTAL_TRIAL_NOT_DEPLOYABLE_PENDING_CONTROLLER_VISUAL",
+ "run":"B273","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B273-Q098-SOURCE-KEYLINE-CONSERVATION-20261008",
+ "status":"B273_EXPERIMENTAL_TRIAL_NOT_DEPLOYABLE_PENDING_CONTROLLER_VISUAL",
  "source_sha256":src_sha,"old_candidate_sha256":old_sha,"new_candidate_sha256":SHA(new),
  "repair_kind":"B270_SOURCE_CLEAN_VERIFIED_SOURCE_KEYLINE_CONSTRAINED_BC3",
  "canonical_source_bbox":bbox,"prior_localized_bbox":[580,11,1524,116],
  "native_size":[w,h],"dds":"BC3/DXT5 mip1 mirror_y",
- "reconstruction_method":"STRICT_NATIVE_BC3_SOURCE_KEYLINE_PRESERVING_ENDPOINT_OPTIMIZATION", "repair_seed_bright_count":int(bright.sum()),"authored_mask_sha256":SHA(maskfile.read_bytes()),"authored_white_seed_overlap":seed_overlap,"target_face_mask_pixels":int(face_mask.sum()),"white_pinhole_proposals":int(repair.sum()),
+ "reconstruction_method":"SOURCE_KEYLINE_PRESERVING_MICRO_HOLE_ONLY_BC3", "repair_seed_bright_count":int(bright.sum()),"authored_mask_sha256":SHA(maskfile.read_bytes()),"authored_white_seed_overlap":seed_overlap,"target_face_mask_pixels":int(face_mask.sum()),"white_pinhole_proposals":int(repair.sum()),
  "repaired_indices":repaired,"unsupported_gray_pinholes":unsupported,
  "white_face_pixels_recovered":improved,"BC3_blocks_modified":len(touched),
  "modified_blocks":touched[:250],"changed_rgba_pixels":changed,
@@ -202,5 +207,5 @@ report={
  "backend":"GITHUB_ACTIONS_PINNED_DDS_FALLBACK_UNAVAILABLE_GPT_LOCAL_RAW_GITHUB_DNS",
  "cleanup":"runner ephemeral, no N100 heavy work","prohibited_domains_touched":[]
 }
-(run/"B272_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B273_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"sha":SHA(new),"repaired":repaired,"white_recovered":improved,"blocks":len(touched),"outside":outside,"target_outside":outside_target},ensure_ascii=False))
