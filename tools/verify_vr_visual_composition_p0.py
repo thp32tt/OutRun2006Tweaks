@@ -599,6 +599,57 @@ require_order(
     'else if (state.worldEffect)'
 )
 
+# Uploaded 5868 HMD evidence: a large queue-owned UI fraction was rendered
+# and several rank producers ran, but the headset still shows duplicated
+# and head-following HUD. Never build an eye HUD from GPU c64 already
+# modified by world head/eye injection. Preserve verified rival pipeline.
+def check_original_queue_wvp(source):
+    func = function_body(source, 'bool R30GetRecentRawWvpForQueueSprite(')
+    require_order(func, 'queued original game WVP identity',
+                  'QueueRenderActive()',
+                  'CurrentQueueProducerToken()',
+                  'CorroboratesScreenOverlay2D(scope)',
+                  'ProducerToken::RankMarkerSprani',
+                  'ProducerToken::RankMarkerClipSprite',
+                  'if (!genericScreen && !rank)',
+                  'GetLastRawGameWvpWrite(',
+                  'GetCurrentShaderEpoch(',
+                  'writeShader != currentShader',
+                  'writeShaderSerial != currentShaderSerial',
+                  'TopLevelDrawSerial() + 1u',
+                  'R30ExactHudRawWvpDrawWindow')
+    if 'ProducerToken::RivalMarkerSprani' in func:
+        raise SystemExit('P0 normal rival owner must not be changed by rank WVP fix')
+    build = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    require_order(build, 'queue overlay/rank original WVP before eye transform',
+                  'screenKind == R30ScreenSpaceKind::ScreenOverlay2D)',
+                  'R44GetOwnedRawOverlayWvp(original)',
+                  'R30GetRecentRawWvpForQueueSprite(original)',
+                  'GetVertexShaderConstantF(',
+                  'R30BuildEyeAffine(stereo, eyeScale, eyeOffset)')
+    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\s*\|\|', build):
+        raise SystemExit('P0 screen overlay lacks original WVP recovery')
+    if not re.search(r'!R30GetRecentRawWvpForQueueSprite\(original\)\)\s*return false;', build):
+        raise SystemExit('P0 overlay/rank must reject unproven original WVP')
+
+check_original_queue_wvp(r30)
+for label, old, bad in (
+    ('queue scope disabled', 'QueueRenderActive()', 'false'),
+    ('rank child missing', 'ProducerToken::RankMarkerClipSprite', 'ProducerToken::None'),
+    ('shader serial drift accepted', 'writeShaderSerial != currentShaderSerial',
+     'writeShaderSerial == currentShaderSerial'),
+    ('original WVP age unbounded', 'currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow',
+     'currentDraw - writeDrawSerial <= UINT64_MAX'),
+):
+    if old not in r30:
+        raise SystemExit('P0 queue WVP negative setup missing ' + label)
+    try:
+        check_original_queue_wvp(r30.replace(old, bad, 1))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 queue original WVP regression survived: ' + label)
+
 # Lens flare / SceneEffect is exact original-mod ownership, never a broad alpha heuristic.
 require('RenderScope::SceneEffect', graphics, 'original Clr_SceneEffect semantic scope')
 require('semanticSceneEffect', r30, 'exact SceneEffect classifier input')
