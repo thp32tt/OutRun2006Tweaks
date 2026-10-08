@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C269-C2-Q172",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "machine_report": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/q172/C269_Q172_MACHINE_QA.json",
+  "machine_result": "PASS_2_OF_2_CONTAINMENT_ZERO_REWORK_BLAST_OUTSIDE",
+  "visual_observations": {
+    "start": "B248 출발 materially restores the C264-rejected source-relative badge hierarchy; readable at 50%, centered inside the same red sign, with no visible clipping or map-art intrusion in current lossless evidence.",
+    "goal": "B248 골 is materially larger than B191 and remains readable at 50%; source-family pale-face/orange-shadow badge treatment and positive separation are preserved in current lossless evidence."
+  },
+  "pixels_before_producer_verdict": false,
+  "procedure_blocker": "Producer/queue PASS prose was exposed before exact persisted-DDS pixels in this invocation, so the required unbiased C first-look field cannot be set true.",
+  "calibration": "PASS_5_OF_5_BINARY_DEFECT_DETECTION_BUT_NOT_USED_FOR_PASS",
+  "decision": "HOLD_STRICT_RECHECK",
+  "required_next": "Preserve exact B248 bytes. Future C2 must review persisted C269 lossless pixels before producer prose, then complete valid C and separate C3 evidence.",
+  "c3": "BLOCKED_UNTIL_VALID_C_STAGE",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

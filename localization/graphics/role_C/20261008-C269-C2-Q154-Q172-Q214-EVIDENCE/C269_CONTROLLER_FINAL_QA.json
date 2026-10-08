@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C269-C2-Q154-Q172-Q214-EVIDENCE",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_head": "daf009b94a8406c281d3dece7e0a8400d729416d",
+  "evidence_worker_commit": "22a803aa97ce83e65151fa2b6290d1ed56d8324b",
+  "calibration_first_look_commit": "d51d4f14aa5a5ed4ad3d2022352272103c508378",
+  "pre_commit_refresh_head": "d51d4f14aa5a5ed4ad3d2022352272103c508378",
+  "calibration": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/C269_CALIBRATION_RESULT.json",
+  "assets": {
+    "q154": {
+      "decision": "HOLD_STRICT_RECHECK",
+      "status": "c269_hold_strict_recheck_pixels_first_c_then_c3",
+      "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+    },
+    "q172": {
+      "decision": "HOLD_STRICT_RECHECK",
+      "status": "c269_hold_strict_recheck_pixels_first_c_then_c3",
+      "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd"
+    },
+    "q214": {
+      "decision": "REWORK_REQUIRED",
+      "status": "c269_rework_required_source_relative_scale_practical_readability",
+      "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b"
+    }
+  },
+  "approval_records_created": 0,
+  "c_pass_membership_changed": false,
+  "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
+  "execution_backend": "GITHUB_HOSTED_ONEOFF_FALLBACK_AFTER_CHATGPT_LOCAL_LARGE_DDS_MATERIALIZATION_UNAVAILABLE_AND_SHARED_CPU_WORKER_PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

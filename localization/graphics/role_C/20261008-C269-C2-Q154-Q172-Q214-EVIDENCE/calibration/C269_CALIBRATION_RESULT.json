@@ -1,0 +1,42 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "ChatGPT AI 1",
+  "blind_review_completed": true,
+  "first_look_path": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/C269_CALIBRATION_FIRST_LOOK.json",
+  "answer_key_path": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/calibration/ANSWER_KEY_DO_NOT_READ_BEFORE_FIRST_LOOK.json",
+  "defect_detection_result": "PASS_5_OF_5_BINARY_NORMAL_VS_DEFECT",
+  "exact_kind_classification": "2_OF_5",
+  "exact_kind_note": "All four defective controls were rejected before the answer key, but three defect subtype labels differed from the hidden key. This calibration is sufficient to show no defect control was missed, but is not used to authorize PASS in this invocation.",
+  "cases": {
+    "case_00.png": {
+      "key": "normal",
+      "observed": "PASS",
+      "classified_as": "normal",
+      "kind_match": true
+    },
+    "case_01.png": {
+      "key": "excessive_weight",
+      "observed": "FAIL",
+      "classified_as": "clipped_stroke",
+      "kind_match": false
+    },
+    "case_02.png": {
+      "key": "opposite_slant",
+      "observed": "FAIL",
+      "classified_as": "opposite_slant",
+      "kind_match": true
+    },
+    "case_03.png": {
+      "key": "residue",
+      "observed": "FAIL",
+      "classified_as": "excessive_weight",
+      "kind_match": false
+    },
+    "case_04.png": {
+      "key": "clipped_stroke",
+      "observed": "FAIL",
+      "classified_as": "residue",
+      "kind_match": false
+    }
+  }
+}

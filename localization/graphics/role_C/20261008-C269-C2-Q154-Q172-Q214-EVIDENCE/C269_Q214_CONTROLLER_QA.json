@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C269-C2-Q214",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "machine_report": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/q214/C269_Q214_MACHINE_QA.json",
+  "visual_overrides_numeric_pass": true,
+  "visual_findings": {
+    "start": {
+      "source_size": [
+        84,
+        22
+      ],
+      "localized_size": [
+        30,
+        18
+      ],
+      "width_ratio_pct": 35.71,
+      "result": "FAIL",
+      "observation": "출발 is visibly tiny/weak versus the dominant START badge at native and 50% practical scale despite bbox containment."
+    },
+    "goal": {
+      "source_size": [
+        74,
+        23
+      ],
+      "localized_size": [
+        18,
+        19
+      ],
+      "width_ratio_pct": 24.32,
+      "result": "FAIL",
+      "observation": "골 is severely underfilled versus GOAL and collapses the red-badge hierarchy at practical scale."
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "required_fix": "B lane: preserve the verified red clean badges, white rims, route map, stage photos, OutRun2 artwork, DXT5/header/raw mirror-Y and pale-face/orange-shadow/right-lean family; rerender only START/GOAL Korean materially larger and source-faithful inside exact source bboxes with positive margins. Use q172/B248 as same-family visual reference, not a hard global ratio.",
+  "c3": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

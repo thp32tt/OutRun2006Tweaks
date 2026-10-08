@@ -2757,3 +2757,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
 - q154 4D38BBB0: machine PASS, controller visual FAIL -> REWORK_REQUIRED (gray-family excessive weight/counter-space collapse at native/practical scale).
 - C3 BLOCKED until B produces materially repaired gray-only bytes. RUNTIME_VALIDATION=UNTESTED.
+
+### C269 C2 evidence gate — q154/q172/q214 (2026-10-08 09:34 KST)
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+- q154 4D38BBB0: machine + visual repair evidence favorable, but pixels-first procedure not met in this invocation -> HOLD_STRICT_RECHECK; exact A182R bytes preserved.
+- q172 6C9B3611: machine + visual repair evidence favorable, but pixels-first procedure not met -> HOLD_STRICT_RECHECK; exact B248 bytes preserved.
+- q214 BF229CF4: visual scale/readability FAIL -> REWORK_REQUIRED; C3 BLOCKED.
+- No current-policy C PASS/approval or PRE_INGAME export created. RUNTIME_VALIDATION=UNTESTED.

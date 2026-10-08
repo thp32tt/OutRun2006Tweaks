@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C269-C2-Q154",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "machine_report": "localization/graphics/role_C/20261008-C269-C2-Q154-Q172-Q214-EVIDENCE/q154/C269_Q154_MACHINE_QA.json",
+  "machine_result": "PASS_3_OF_3_CONTAINMENT_ZERO_REWORK_BLAST_OUTSIDE",
+  "visual_observations": {
+    "single_player_gray": "A182R is materially lighter/narrower than rejected B225; Hangul counters are visibly reopened at native and 50% practical scale; no clipping or residue observed in current lossless contact.",
+    "showroom_gray": "A182R removes the B225 blocky counter-space collapse; 쇼룸 remains legible at 50% and visually closer to the narrow source family.",
+    "multiplayer_gray": "A182R reduces B225 density and preserves immediate 50% readability without new clipping/overlap in the reviewed lossless contact."
+  },
+  "pixels_before_producer_verdict": false,
+  "procedure_blocker": "The current invocation exposed queue/producer PASS prose before exact persisted-DDS pixels were reviewed. visual-evidence-v1-20261008 requires pixels_before_producer_verdict=true for C PASS; this cannot be truthfully asserted retroactively.",
+  "calibration": "PASS_5_OF_5_BINARY_DEFECT_DETECTION_BUT_NOT_USED_FOR_PASS",
+  "decision": "HOLD_STRICT_RECHECK",
+  "required_next": "Preserve exact A182R bytes. A future C2 invocation must select from status/path without exposing notes, review the already-persisted lossless C269 pixels first, then consult producer prose and complete separate C/C3 findings. Do not rerender solely for evidence migration.",
+  "c3": "BLOCKED_UNTIL_VALID_C_STAGE",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
