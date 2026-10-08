@@ -153,7 +153,13 @@ for marker in (
     "Module::exe_ptr(addr), ExactScreenHud_putClipSprite",
     "for (int addr : ExactScreenHud_ClipSpriteCalls)",
     "for (int addr : ExactScreenHudRight_ClipSpriteCalls)",
-    "Module::exe_ptr(addr), ExactScreenHudRight_putClipSprite",
+    # R64 exact rank 6th/6 is singled out *inside* this right-side
+    # source group, while other TimeAttack/GOAL/C2C right sprites
+    # retain the previous ScreenHud wrapper and spacing. Do not stack
+    # original 15 E8 MID hooks or apply rank batch Flush to all sprites.
+    "IsExactDispRankRightClipRva(addr)",
+    "? DispRankRight_putClipSprite",
+    ": ExactScreenHudRight_putClipSprite",
     "for (int addr : ExactScreenHudLeft_ClipSpriteCalls)",
     "Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite",
     "Module::exe_ptr(RivalMarker_SpraniCall)",
