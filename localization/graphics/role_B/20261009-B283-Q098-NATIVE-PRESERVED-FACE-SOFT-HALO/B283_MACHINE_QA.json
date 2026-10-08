@@ -1,0 +1,76 @@
+{
+  "run": "B283",
+  "index": 98,
+  "asset": "42E618FD_512x32.dds",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_png_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "previous_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "6048a192cf344808fa08a2392cdcd4c7caccd9709aba2bc96277081a3d537e2b",
+  "method": "NATIVE_NEW_BC3_NATIVE_B279_SEPARATE_WHITE_FACE_INSET_AND_SOFT_NAVY_HALO_WITH_EXACT_ENGLISH_CLEAN",
+  "method_not_same_as_B279": true,
+  "source_family": {
+    "white_rgb": [
+      255,
+      255,
+      255
+    ],
+    "navy_rgb": [
+      0,
+      12,
+      57
+    ],
+    "english_white_support": 23928,
+    "english_navy_support": 41988,
+    "source_navy_alpha_gt140": 69091,
+    "render_vertical_glyph_scale": 1.0,
+    "navy_outline_radius": "NATIVE_EXISTING_KEYLINE_ONLY",
+    "navy_diffuse_sigma": 2.45,
+    "glyph_mask_only": "B279_NATIVE_DECODED_WHITE_FACE_NO_UPSCALING"
+  },
+  "format": "BC3_DXT5",
+  "native": [
+    2048,
+    128
+  ],
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "machine": {
+    "blocks_reencoded": 5706,
+    "alpha_only_cleanup_blocks": 0,
+    "changed_rgba_pixels": 53203,
+    "outside_exact_english_source": 0,
+    "original_alpha_residue_in_clean": 0,
+    "decoded_bbox": [
+      578,
+      12,
+      1525,
+      116
+    ],
+    "source_effect_rgba_scope": [
+      431,
+      6,
+      1674,
+      123
+    ],
+    "source_visible_alpha_bbox": [
+      434,
+      9,
+      1671,
+      120
+    ],
+    "previous_white_count": 44133,
+    "trial_white_count": 36151,
+    "trial_navy_count": 64157,
+    "white_navy_ratio": 0.563,
+    "dds_header_exact": true,
+    "roundtrip_persisted_dds": true
+  },
+  "visual_producer": "PENDING_PIXELS_FIRST_SOURCE_CLEAN_B279_TRIAL_NATIVE_AND_50",
+  "candidate_promoted": false,
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_HOSTED_CANONICAL_PUBLIC_SOURCE_DNS_DEPENDENCY_NO_GPT_LOCAL_NETWORK",
+  "forbidden_domains_touched": []
+}
