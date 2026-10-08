@@ -52,6 +52,8 @@ sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
 graphics = read('src/hooks_graphics.cpp')
 overlay = read('src/overlay/hooks_overlay.cpp')
+game_addrs = read('src/game_addrs.hpp')
+renderer = read('src/vr/game/outrun_renderer.cpp')
 r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
@@ -76,6 +78,8 @@ for path in (
     'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
     'src/hooks_graphics.cpp',
     'src/overlay/hooks_overlay.cpp',
+    'src/game_addrs.hpp',
+    'src/vr/game/outrun_renderer.cpp',
     'src/vr/d3d9/ex_device_upgrade_r14.cpp',
     'tools/Run-OutRunVRTest.ps1',
     'tools/Build-OutRunPCFast.ps1',
@@ -638,7 +642,7 @@ require('ImGui_ImplDX9_RenderDrawData', overlay, 'F11 guarded draw call')
 # gameplay branch and immediately enclosing the draw call.
 endscene = function_body(overlay, 'static void D3DEndScene(')
 if not re.search(
-    r'if\s*\(\s*overlayActive\s*&&\s*Game::is_in_game\(\)\s*\)\s*'
+    r'if\s*\(\s*overlayActive\s*&&\s*Game::is_vr_gameplay_presentation\(\)\s*\)\s*'
     r'\{\s*OutRunVR::GameSemantic::ScopedExternalOverlaySemantic\s+semantic\(\s*'
     r'OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D\s*\);\s*'
     r'ImGui_ImplDX9_RenderDrawData\(ImGui::GetDrawData\(\)\);\s*\}\s*'
@@ -648,6 +652,49 @@ if not re.search(
     raise SystemExit(
         'P0 visual composition drift: F11 gameplay draw must remain RAII-guarded; menu draw stays unguarded'
     )
+
+# F11 external ImGui must share exactly the race/theater GameState predicate
+# with the R45 host game-mode owner. Game::is_in_game intentionally includes
+# TRYAGAIN / OUTRUNMILES, which are theater, and excludes WARP/RESTART.
+def check_f11_shared_presentation(game_header, game_source, overlay_source):
+    body = function_body(game_header, 'inline bool is_vr_gameplay_presentation() noexcept')
+    required = ('STATE_START', 'STATE_WARP', 'STATE_RESTART',
+                'STATE_GAME', 'STATE_GIVEUP', 'STATE_SMPAUSEMENU',
+                'STATE_GOAL', 'STATE_TIMEUP', 'STATE_LINK_TIMEUP')
+    actual = re.findall(r'case\s+(STATE_[A-Z0-9_]+)\s*:', body)
+    if actual != list(required):
+        raise SystemExit('P0 F11 VR presentation state set changed: ' + repr(actual))
+    require('if (!Game::current_mode)', body, 'null game state must never be VR gameplay')
+    require('return false;', body, 'unknown menu state must remain theater')
+    presenter = function_body(game_source, 'ClientPresentationMode CurrentPresentationMode()')
+    require('return Game::is_vr_gameplay_presentation()', presenter,
+            'renderer and F11 gameplay classification must be one source of truth')
+    if 'switch (state)' in presenter:
+        raise SystemExit('P0 renderer duplicated the F11 state switch')
+    endscene = function_body(overlay_source, 'static void D3DEndScene(')
+    if 'overlayActive && Game::is_vr_gameplay_presentation()' not in endscene:
+        raise SystemExit('P0 F11 overlay not gated by actual theater/gameplay split')
+    if 'overlayActive && Game::is_in_game()' in endscene:
+        raise SystemExit('P0 F11 regressed to broader selector-adjacent state predicate')
+
+check_f11_shared_presentation(game_addrs, renderer, overlay)
+for name, broken_h, broken_renderer, broken_overlay in (
+    ('tryagain incorrectly treated as VR gameplay',
+     game_addrs.replace('case STATE_LINK_TIMEUP:',
+                        'case STATE_TRYAGAIN:\n\t\tcase STATE_LINK_TIMEUP:', 1), renderer, overlay),
+    ('renderer stops sharing F11 source of truth',
+     game_addrs, renderer.replace('return Game::is_vr_gameplay_presentation()',
+                                'return Game::is_in_game()', 1), overlay),
+    ('F11 goes back to broad predicate',
+     game_addrs, renderer, overlay.replace('overlayActive && Game::is_vr_gameplay_presentation()',
+                                          'overlayActive && Game::is_in_game()', 1)),
+):
+    try:
+        check_f11_shared_presentation(broken_h, broken_renderer, broken_overlay)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 F11 shared presentation negative test survived: ' + name)
 
 # Translated DYNAMIC MANAGED textures must not consume the bounded CPU-shadow pool.
 require('R14TrackDirectLockable', r14, 'dynamic direct-lockable MANAGED texture path')
