@@ -23,7 +23,12 @@
 
 
 ## C2 implementation and regression protection
-PENDING
+- C++ real source commit bef9d1ff408ceadf98798995470753f1364eca14: src/hooks_uiscaling.cpp restored two historically verified R74 result-progress E8 call windows with bounded callsite enter/leave SpriteNode snapshots + ScreenHud tags, and two zero-argument GOAL sprite-producing helper wrappers which call original helpers before tagging all appended nodes.
+- Original EXE contract commit 904e8a9a0fe92bb4548a416bf65d817fa90f1481: docs/VR_BINARY_CONTRACT.json expands 103->107 signatures, pinned same canonical EXE SHA and original 16-byte E8 bytes. Goal/result sourceBindings pin exact constants.
+- Validator commits a00aa57c4eeb72cb1dcde60cd657a8d7c4bba2b5 and 38e01cba2636d4cf1aa0ca2fb1b0b2ad47da8f1a: existing 71 exact CALL producer suite untouched, four auxiliary producers verify rel32 destinations, full 16-byte fixtures, unique install ownership, queue begin/end + 4 additional unique mutated negatives. Old 10 mutations preserved; no repeat 1000/5000 audits.
+- Current code deliberately retains old world billboard/normal game sprite source; does not force broad generic UI conversions. No Quest3 HMD test or runtime visual guarantee.
+- Candidate full source SHA 38e01cba2636d4cf1aa0ca2fb1b0b2ad47da8f1a awaiting exact GitHub Actions CI.
+
 
 ## C3 exact-source CI verdict and bug triage
 PENDING
