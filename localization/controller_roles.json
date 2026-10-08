@@ -5,12 +5,21 @@
   "command_map": {
     "A": "OutRun 한글화 A 실행",
     "B": "OutRun 한글화 B 실행",
-    "C": "OutRun 한글화 C 실행"
+    "C": "OutRun 한글화 C 실행",
+    "C1": "OutRun 한글화 C 실행",
+    "C2": "OutRun 한글화 C 실행"
   },
   "schedule": {
     "A": ":00",
-    "B": ":20",
-    "C": ":40"
+    "C1": [
+      ":10",
+      ":40"
+    ],
+    "C2": [
+      ":20",
+      ":50"
+    ],
+    "B": ":30"
   },
   "lanes": {
     "A": {
@@ -24,13 +33,30 @@
     "C": {
       "mode": "cross_lane_final_qa+approval",
       "primary_index_parity": "all"
+    },
+    "C1": {
+      "mode": "cross_lane_final_qa+independent_c3",
+      "primary_index_parity": "odd",
+      "includes_unindexed_special": true,
+      "docker_slot": "C"
+    },
+    "C2": {
+      "mode": "cross_lane_final_qa+independent_c3",
+      "primary_index_parity": "even",
+      "includes_unindexed_special": false,
+      "docker_slot": "D"
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
   "priorities": [
+    "OPEN_USER_INGAME_FAIL_P0",
+    "OPEN_USER_INGAME_FAIL_P1",
     "REWORK_REQUIRED",
+    "C_CHANGED_NEW_CANDIDATE",
+    "HOLD_STRICT_RECHECK_FOR_EVIDENCE",
     "unfinished_localize_text",
     "zoom_review_localizable_text",
+    "C3_STRICT_AUDIT_IF_NO_FRESH_C",
     "other_pending"
   ],
   "zero_pixel_overflow": true,
@@ -40,5 +66,14 @@
     "enabled": true,
     "condition": "primary shard has no actionable production work and latest Git refresh confirms target has no newer current-cycle production/state change",
     "report_field": "work_stolen_from_lane"
-  }
+  },
+  "controller_mode": "temporary_c_backlog_relief",
+  "controller_policy_source": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "user_ingame_backlog": "localization/graphics/INGAME_REWORK_BACKLOG.csv",
+  "quality_pipeline": "docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md",
+  "evidence_gate": "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md",
+  "user_ingame_review": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md",
+  "approval_veto": "Current user in-game defect OPEN or REWORK/HOLD/FAIL => no current approval or preview distribution; actual user retest required.",
+  "source_refresh": "Every task fetches latest GitHub contract, queue, backlog, QA pipeline and evidence rules before selection and verifies latest HEAD before commit.",
+  "policy_note": "Schema 1 metadata records effective temporary schedule. GitHub contract is authoritative; Docker prompt only routes slots."
 }
