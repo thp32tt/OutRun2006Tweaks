@@ -3046,3 +3046,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 2026-10-08 19:48 KST — C1 odd q227/q231/q237 SOURCE-family visual REWORK_REQUIRED
 - TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q227 underweight/undersized gray and red source-family, q231 unjustified doubled offset strokes, q237 unsupported pink bevel and gray help hierarchy: 3 actual source-relative visual FAIL over old numeric PASS. QA `localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q{227,231,237}_CONTROLLER_QA.json`. New DDS/C PASS/C3/APPROVAL/PRE_INGAME/user tested/game tested = 0. Runtime validation UNTESTED; no cross-shard or VR/FFB/DX11/DXVK changes.
+
+## 2026-10-08 20:18 KST — A194 q231 rework still running, no new DDS
+- A-owned q231 EBE401C8 old exact `dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499` remains C1 `REWORK_REQUIRED`: unjustified dark/red offset outline. New A194 native Black single source-flat-face production method script commit `0dbc72b2c6c992c16115d40591e451c0d6181336` published; workflow `37767491356` still in heavy-compute step at checkpoint.
+- **Produced new DDS: 0 confirmed at checkpoint**; machine/producer visual/C/C3 NOT RUN, keep existing candidate and queue defect. No PRE_INGAME/user/game acceptance, `RUNTIME_VALIDATION=UNTESTED`. Evidence `localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json`. No VR/FFB/DX11/DXVK.
