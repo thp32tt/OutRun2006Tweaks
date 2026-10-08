@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 225,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "exact_download_verified": true
+  },
+  "candidate": {
+    "sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "exact_download_verified": true,
+    "supersedes": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+    "format": "RGBA32 DDS",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "raw_transform": "mirror_y"
+  },
+  "execution": "Small N100 MCP Pillow DDS RGBA decode + NumPy pixel comparison fallback after GPT-local raw GitHub DNS error; GitHub connector for SSOT",
+  "exact_dds_verified": true,
+  "source_readable_png_matches_persisted_dds": true,
+  "candidate_readable_png_matches_persisted_dds": true,
+  "original_source_9_boxes_outside_rgba_changed_pixels": 0,
+  "original_source_9_boxes_outside_alpha_changed_pixels": 0,
+  "producer_clean_source_9_boxes_outside_rgba_changed_pixels": 0,
+  "producer_clean_source_9_boxes_outside_alpha_changed_pixels": 0,
+  "source_final_changed_pixels_total": 66385,
+  "source_final_changed_inside_9_bboxes": 66385,
+  "pixel_evidence": [
+    {
+      "id": "game_lobby",
+      "source_bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "producer_reported_localized_bbox": [
+        3,
+        26,
+        227,
+        84
+      ],
+      "independent_RGBA_changed_in_source_box": 15754,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_lobby_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "game_list",
+      "source_bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "producer_reported_localized_bbox": [
+        963,
+        138,
+        1191,
+        196
+      ],
+      "independent_RGBA_changed_in_source_box": 12872,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_list_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "setup",
+      "source_bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "producer_reported_localized_bbox": [
+        964,
+        514,
+        1065,
+        571
+      ],
+      "independent_RGBA_changed_in_source_box": 7575,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_setup_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "course_type",
+      "source_bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        713,
+        1092,
+        747
+      ],
+      "independent_RGBA_changed_in_source_box": 6331,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_type_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "course",
+      "source_bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        768,
+        1023,
+        796
+      ],
+      "independent_RGBA_changed_in_source_box": 4137,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "car_type",
+      "source_bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        817,
+        1093,
+        851
+      ],
+      "independent_RGBA_changed_in_source_box": 4978,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_car_type_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "catch_up",
+      "source_bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        869,
+        1092,
+        903
+      ],
+      "independent_RGBA_changed_in_source_box": 4809,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_catch_up_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "collision",
+      "source_bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        921,
+        1023,
+        954
+      ],
+      "independent_RGBA_changed_in_source_box": 5125,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_collision_SOURCE_CLEAN_FINAL.png"
+    },
+    {
+      "id": "players",
+      "source_bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        976,
+        1084,
+        1010
+      ],
+      "independent_RGBA_changed_in_source_box": 4804,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_players_SOURCE_CLEAN_FINAL.png"
+    }
+  ],
+  "limits": [
+    "Independently certified no mutations outside all nine original bboxes, not full within-bbox art protection",
+    "Producer CLEAN exact mask continuity/glyph residue zero values were not independently reconstructed",
+    "Source font-family identity, shadow/weight contour similarity and black/white/gray all practical scales not independently fully calibrated",
+    "No game runtime test or C3 approval"
+  ],
+  "decision": "MACHINE_BBOX_OUTSIDE_ZERO_WITH_HOLD_ON_STYLE_AND_CALIBRATION"
+}

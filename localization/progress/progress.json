@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T19:06:00+09:00",
+  "updated_at_kst": "2026-10-08 19:18 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7637,5 +7637,23 @@
     "C3": "PENDING",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CONTROLLER_SELF_QA.json"
+  },
+  "c298_c1_q225_a193_true_black": {
+    "run_key": "OUTRUN-KOR-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 225,
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "independent_changed_outside_rgba": 0,
+    "independent_alpha_outside": 0,
+    "regions": 9,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_CONTROLLER_QA.json"
   }
 }

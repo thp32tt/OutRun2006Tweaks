@@ -1,0 +1,254 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910",
+  "review_id": "C298-Q225-A193-INDEPENDENT-NATIVE",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 225,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "current_candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+  "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+  "prior_C1_rejected_candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+  "triage": "FRESH_C_REVIEW on current queue",
+  "selected_head_sha": "d0bcbf7a6a30a3958fc14a9ccea3e32ed8ea22be",
+  "decision": "HOLD_STRICT_RECHECK",
+  "separate_C3_not_run": true,
+  "actual_game_runtime_validation": "UNTESTED",
+  "first_look": {
+    "pixel_review_before_producer_notes": false,
+    "known_defect_calibration": "NOT_QUALIFIED",
+    "reason": "A193 producer/worklog notes consulted before independent source/current pixel inspection. No blind qualified control result or reviewer identity claim.",
+    "cannot_pass_c_approval": true
+  },
+  "inspection": {
+    "source_and_current": "Canonical SOURCE readable, producer CLEAN, persisted final native (exact decoded bytes) and C298 nine independent per-row SOURCE/CLEAN/FINAL crops reviewed.",
+    "raw": "Decoded source/candidate DDS raw mirror-Y preserved, final RAW lossless evidence saved; no orientation reversal found.",
+    "practical": "A193 50% evidence and C298 regenerated 50% final reviewed; all nine localized captions look legible without obvious clipping/overlap. Other scale/source-family tests not all independently complete.",
+    "visible_improvement": "Previously C1-rejected thin generic Korean in A95R visibly gains strong heavy caption and title stroke with A193 true Black TTC; English source's heavy hierarchy closer than prior.",
+    "remaining_style_uncertainty": "Original English headings are heavy condensed, whereas new Black Korean remains geometrically more block-like/wider strokes. Native source-derived family/counter-space/weight caliper and independent blind controls required to decide full style PASS, and natural Korean word width alone does not establish a defect.",
+    "plate": "No changed RGBA/alpha pixels outside source bbox in authored CLEAN vs original. Internal glyph removal/mask acceptance not independently confirmed.",
+    "protected": "Independent no RGBA/alpha changes outside nine source bboxes; independent protected graphics INSIDE boxes still not separately reconstructed."
+  },
+  "region_observations": [
+    {
+      "id": "game_lobby",
+      "source_bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "producer_reported_localized_bbox": [
+        3,
+        26,
+        227,
+        84
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 15754,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_lobby_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "game_list",
+      "source_bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "producer_reported_localized_bbox": [
+        963,
+        138,
+        1191,
+        196
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 12872,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_list_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "setup",
+      "source_bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "producer_reported_localized_bbox": [
+        964,
+        514,
+        1065,
+        571
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 7575,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_setup_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "White source/white Korean legible on gray/metal UI; independent weight calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "course_type",
+      "source_bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        713,
+        1092,
+        747
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 6331,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_type_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "course",
+      "source_bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        768,
+        1023,
+        796
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 4137,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "car_type",
+      "source_bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        817,
+        1093,
+        851
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 4978,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_car_type_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "catch_up",
+      "source_bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        869,
+        1092,
+        903
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 4809,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_catch_up_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "collision",
+      "source_bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        921,
+        1023,
+        954
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 5125,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_collision_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    },
+    {
+      "id": "players",
+      "source_bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "producer_reported_localized_bbox": [
+        962,
+        976,
+        1084,
+        1010
+      ],
+      "positive_margin_reported": true,
+      "independent_RGBA_changed_in_source_box": 4804,
+      "evidence_png": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_players_SOURCE_CLEAN_FINAL.png",
+      "observed": "Korean glyphs present; original text removed on supplied clean plate; native contact legible; no obvious glyph overlap at inspected size",
+      "source_style_status": "Black TTC lettering heavier than previously rejected A95R and closer to source heavy family; source font shape and counter space calibration pending",
+      "decision": "HOLD_STRICT_RECHECK_NOT_INDEPENDENT_PASS"
+    }
+  ],
+  "source_family_remediation": "Improved; defect C1 formerly recorded against old sha should not automatically transfer to new sha.",
+  "machine_report": "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_Q225_INDEPENDENT_MACHINE.json",
+  "QA_assets": [
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_lobby_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_game_list_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_setup_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_type_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_course_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_car_type_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_catch_up_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_collision_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_players_SOURCE_CLEAN_FINAL.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_candidate_practical_50.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_candidate_gray_native.png",
+    "localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_candidate_raw.png"
+  ],
+  "remaining_required": [
+    "Qualified hidden-answer source-normal + known-defects visual calibration before independent PASS",
+    "Independently authenticate CLEAN glyph removal/plate, source-family stroke weight and condensed typography per nine rows",
+    "Independent per-region exact-font style/overlap/RAW/black-white-gray 100/75/50 measured reviewer evidence and distinct C3 strict audit",
+    "PRE_INGAME only with exact SHA approval manifest, user JPG review and real game retest"
+  ],
+  "approval": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "C3": "NOT_RUN",
+  "user_JPG_acceptance": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": false,
+  "no_vr_ffb_dx11_dxvk": true
+}
