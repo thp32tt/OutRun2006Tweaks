@@ -10989,5 +10989,25 @@
     "TEMP_BACKLOG_RELIEF": "C1",
     "SHARD": "ODD(+UNINDEXED_SPECIAL)",
     "runtime_validation": "UNTESTED"
+  },
+  "c279_c2_q176_native_pixel": {
+    "run": "20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 176,
+    "asset": "75C3586A",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "exact_native_source_bbox": "PASS_4_OF_4",
+    "rgba_changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "raw_flip_y_pixel": "PASS_4_OF_4",
+    "separate_C3": "BLOCKED",
+    "approval_created": false,
+    "report": "localization/graphics/role_C/20261008-C279-C2-Q176-NATIVE-PIXEL-CROSSCHECK/C279_Q176_CONTROLLER_QA.json",
+    "decision": "HOLD_STRICT_RECHECK",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
