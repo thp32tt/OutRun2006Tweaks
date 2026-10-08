@@ -3503,3 +3503,9 @@ Applied user-authorized production/QA improvements without changing six launches
 - Batch stops after q219 because the fix is a material producer typography redesign rather than a safe small C corrective edit. IGR-025 remains HOLD for q219 rework plus unresolved screenshot(163) runtime-vs-DDS labels and NEW actual-game retest. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261008-C272-C1-Q219-EVIDENCE/C272_CONTROLLER_FINAL_QA.json`.
 
+
+
+### C271 C2 q154 corrected exact DDS orientation QA — 2026-10-08 10:50 KST
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`, run `20261008-C2-Q154-ORIENTATION-EVIDENCE-1050`; latest HEAD/queue refreshed before selection and before commit. Exact DDS SHA current `94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f`, source `15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf`.
+- C269 gray SOURCE/CLEAN/FINAL evidence included invalid RAW-coordinate crops using readable bbox values, yielding apparent blank SOURCE/English ghosts; independently decoded source/current DDS after whole-atlas FLIP-Y and created correct raw-reflected crops. For all 3 gray rows: source vs final alpha bbox/size/positive margins PASS, RAW/FLIP-Y byte equivalence PASS. New 9 evidence files + C controller report: `localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_Q154_CONTROLLER_QA.json`.
+- **HOLD_STRICT_RECHECK remains** because C/C3 eight-check per-region proof for all eight regions, calibrated first-look and export approval binding are not complete; no C/C3 PASS, approval, JPG export, or DDS changes claimed. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched. Backend: GitHub SSOT + N100 low-cost evidence fallback (GPT local DNS blocked).

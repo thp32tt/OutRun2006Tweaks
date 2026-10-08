@@ -10771,5 +10771,25 @@
     "c3": "BLOCKED",
     "report": "localization/graphics/role_C/20261008-C272-C1-Q219-EVIDENCE/C272_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "c271_c2_q154_corrected_orientation_evidence": {
+    "run": "20261008-C2-Q154-ORIENTATION-EVIDENCE-1050",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "result": "HOLD_STRICT_RECHECK",
+    "corrected_gray_orientation_evidence": true,
+    "corrected_readable_vs_raw_checks": 3,
+    "bbox_and_size": 3,
+    "complete_approval": false,
+    "candidate_changed": false,
+    "report": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_Q154_CONTROLLER_QA.json",
+    "pre_commit_refresh_head": "6a13a898821b5eb0ad77496fd814802dfb34dcce",
+    "runtime_validation": "UNTESTED"
   }
 }

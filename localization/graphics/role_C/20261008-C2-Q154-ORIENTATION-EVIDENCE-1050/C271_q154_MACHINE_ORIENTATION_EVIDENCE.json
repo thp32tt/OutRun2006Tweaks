@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C271-C2-Q154-ORIENTATION-EVIDENCE",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "dimensions": [
+    4096,
+    1024
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "source_orientation": "raw_mirror_y",
+  "regions": [
+    {
+      "id": "single_player_gray",
+      "readable_region_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "raw_region_bbox": [
+        1610,
+        674,
+        2197,
+        738
+      ],
+      "actual_source_alpha_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "actual_final_alpha_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "source_alpha_nonzero": 19100,
+      "final_alpha_nonzero": 13360,
+      "pixel_bbox_subset_and_size_ceiling": true,
+      "orientation_pair_byte_exact": true
+    },
+    {
+      "id": "showroom_gray",
+      "readable_region_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "raw_region_bbox": [
+        2674,
+        674,
+        3094,
+        736
+      ],
+      "actual_source_alpha_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "actual_final_alpha_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "source_alpha_nonzero": 15231,
+      "final_alpha_nonzero": 6628,
+      "pixel_bbox_subset_and_size_ceiling": true,
+      "orientation_pair_byte_exact": true
+    },
+    {
+      "id": "multiplayer_gray",
+      "readable_region_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "raw_region_bbox": [
+        2566,
+        10,
+        3086,
+        72
+      ],
+      "actual_source_alpha_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "actual_final_alpha_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "source_alpha_nonzero": 17402,
+      "final_alpha_nonzero": 12757,
+      "pixel_bbox_subset_and_size_ceiling": true,
+      "orientation_pair_byte_exact": true
+    }
+  ],
+  "current_policy_full_machine_approval": "NOT_ASSESSED_FULL_EIGHT_SEGMENTS",
+  "note": "Previous C269 q154 per-region evidence files had RAW-vs-FLIPY bbox mismatch; corrected coords computed from flipped whole DDS and cross-checked against reflected RAW bbox. These files are QA evidence only, not final C or C3 PASS."
+}

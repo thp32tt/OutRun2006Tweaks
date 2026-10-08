@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C2-Q154-ORIENTATION-EVIDENCE-1050",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "pre_commit_refresh_head": "6a13a898821b5eb0ad77496fd814802dfb34dcce",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "backend": "GitHub SSOT; N100 MCP low-cost native Pillow evidence fallback because ChatGPT local sandbox DNS could not resolve raw.githubusercontent.com",
+  "corrected_orientation": {
+    "canonical_readable": "FLIP-Y entire native DDS before cropping measured readable bboxes",
+    "exact_raw_mapping": "RAW y0=1024-readable_y1; RAW y1=1024-readable_y0; flip(RAW crop) byte-equals readable crop",
+    "bug": "C269 q154 qNNN SOURCE/CLEAN/FINAL contacts used readable region coordinates on RAW atlas before flip, producing blanks and unrelated source English overlays. These inherited contacts must not be used as conclusive pixel visuals.",
+    "previous_proof_invalidated": true,
+    "evidence_manifest": [
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/single_player_gray_SOURCE_FLIPY_RGBA.png",
+        "git_blob_sha": "39ac125a59a057d72ea8826205d33473c1912c28"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/single_player_gray_CURRENT_FLIPY_RGBA.png",
+        "git_blob_sha": "6c2d9765643981bef217698ce8711d942f85bb96"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/showroom_gray_SOURCE_FLIPY_RGBA.png",
+        "git_blob_sha": "ebfa6ca812aa23db19f570dcf961175fcd4f076c"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/showroom_gray_CURRENT_FLIPY_RGBA.png",
+        "git_blob_sha": "173172e6036b36da896e700e4025b840a6127967"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/multiplayer_gray_SOURCE_FLIPY_RGBA.png",
+        "git_blob_sha": "b6f089975ef8c265fabca47aa4101fe5d5e0e6b0"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/multiplayer_gray_CURRENT_FLIPY_RGBA.png",
+        "git_blob_sha": "f4934cc0ee5bd8debd2510497249c87057510c46"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_CORRECT_FLIPY.png",
+        "git_blob_sha": "306a56de63d6bce1a91593f5a6deddecd037d670"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_CORRECT_RAW.png",
+        "git_blob_sha": "2caa7fc2b83a260c166d0da4f4874d91208d34e8"
+      },
+      {
+        "path": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_q154_MACHINE_ORIENTATION_EVIDENCE.json",
+        "git_blob_sha": "36852e4abf3685250e8c095c83f4270ce16096d0"
+      }
+    ]
+  },
+  "per_region": [
+    {
+      "id": "single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "alpha_bbox_and_size_ceiling": "PASS",
+      "orientation": "RAW_FLIP_Y_EXACT"
+    },
+    {
+      "id": "showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "alpha_bbox_and_size_ceiling": "PASS",
+      "orientation": "RAW_FLIP_Y_EXACT"
+    },
+    {
+      "id": "multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "alpha_bbox_and_size_ceiling": "PASS",
+      "orientation": "RAW_FLIP_Y_EXACT"
+    }
+  ],
+  "visual_findings": {
+    "source_and_current_native": "Corrected contacts show intended English source glyphs and Korean localized glyphs for each of the three gray labels at the same coordinates, without the prior ghost/superimposition artifact caused by wrong crop orientation.",
+    "slant": "All three reviewed labels remain upright as source intended; raw mirror-Y glyph ordering matches stock source transform.",
+    "style": "Current gray glyphs have visibly thinner strokes and more open inner spacing than rejected prior weight regression in prior C269 evidence; final style judgment remains HOLD pending comprehensive current policy region evidence and calibration.",
+    "clip_protected_background": "No visually definite clipping/intrusion within these 3 corrected regions; comprehensive full-atlas hard gates are not newly certified in this report."
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "Existing current-policy C/C3 approval evidence remains incomplete: 5 additional red-family regions, CLEAN final/current exact-source binding, separate C/C3 eight-item checks and calibration; historical C269 region PNG crops were invalidated by orientation mismatch. Corrected 3-gray-region evidence is a new material QA artifact, not a final approval.",
+  "pixels_before_producer_verdict": false,
+  "caveat": "This reviewer has already read historical B/A/C verdicts in earlier turns; claiming an independent blind pixel-first C PASS would be false.",
+  "current_policy_approval_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
+  "new_dds_candidate_produced": false,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "next_step": "Complete exact-source whole-atlas/clean 8-region hash-bound evidence and distinct C/C3 review before approval; do not regenerate otherwise-good candidate solely for evidence migration."
+}

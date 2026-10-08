@@ -2770,3 +2770,8 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN.
 - q176 75C3586A @ 494d42c0...: visual inspection favorable and calibration 5/5, but current-policy pixels-first ordering was not satisfiable in this invocation because producer/queue prose had already been exposed.
 - Result: HOLD_STRICT_RECHECK; bytes unchanged; no current-policy C/C3 approval or PRE_INGAME export. RUNTIME_VALIDATION=UNTESTED.
+
+
+### C271 C2 q154 correction — 2026-10-08 10:50 KST
+- TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN. Re-derived exact q154 DDS 3-gray-region evidence after correcting C269 wrong RAW/FLIP-Y crop coordinates: bbox/source-size/margins 3/3 PASS and orientation byte-equality 3/3 PASS.
+- q154 remains HOLD_STRICT_RECHECK for current-policy complete 8-region C/C3/calibration evidence; DDS not changed, no PRE_INGAME approval, RUNTIME_VALIDATION=UNTESTED.
