@@ -101,10 +101,11 @@ if not rival or int(rival.group(1), 16) != 0xBB796:
 
 screen_hud = function_body(uiscale, "static int __cdecl ExactScreenHud_putClipSprite(")
 screen_markers = [
+    "tailsBefore",
     "Game::put_clip_sprite(",
-    "if (node && node != tailBefore)",
-    "OutRunVR::GameSemantic::RegisterSpriteNodeScope(",
-    "node, OutRunVR::GameSemantic::RenderScope::ScreenHud",
+    "TagAppendedNodes(tailsBefore,",
+    "OutRunVR::GameSemantic::RenderScope::ScreenHud",
+    "OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite",
 ]
 screen_pos = [screen_hud.find(m) for m in screen_markers]
 if min(screen_pos) < 0 or screen_pos != sorted(screen_pos):
@@ -115,6 +116,8 @@ if "WorldBillboard" in screen_hud or "ScreenOverlay2D" in screen_hud:
 rival_body = function_body(uiscale, "static int __cdecl RivalMarker_sprani(")
 rival_markers = [
     "Game::sprani_play_ae_auth_alpha(",
+    "const auto projectedAnchor = RivalMarkerProjectedInfo;",
+    "RivalMarkerProjectedInfo = {};",
     "TagAppendedNodes(",
     "OutRunVR::GameSemantic::RenderScope::WorldBillboard",
 ]
