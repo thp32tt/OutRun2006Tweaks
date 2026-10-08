@@ -12,11 +12,11 @@
   "validation_bearing_result_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
   "result_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00548]",
-  "status": "VALIDATION_IN_PROGRESS",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "ci_gate_complete": false,
+  "ci_gate_complete": true,
   "selected_work_item": "DX9EX-P0-REPLACEMENT-DDS-DESCRIPTOR-FAIL-CLOSED",
   "priority_authority": "AGENTS.md P0 visual composition override; docs/VR_REFACTOR_STATE.json active chain COMPLETE; current docs/VR_WORK_QUEUE.json P0 UI texture priority",
   "summary": "Before replacing the game's original DDS header and applying sprite scales, reject replacement files whose DDSURFACEDESC2/DDPIXELFORMAT descriptor sizes do not match Windows DDS layout; reject zero-width/height original header to avoid undefined HUD sprite scale division. Source-logic hardening, not HMD symptom resolution.",
@@ -43,6 +43,75 @@
   },
   "result_identity_policy": "Only f96b661 material triggers mandatory gates. Do not poll docs checkpoint SHA; persist pinned validation_bearing_result_sha and result_sha even after bookkeeping commits.",
   "risk": "DDS layout validation is structural source hardening; it does not establish that 00519 missing UI textures or HUD duplication is visually fixed.",
-  "next_action": "C3: wait for exact-SHA DX9Ex Active policy/host/game/full-chain/package and HUD Inspector Windows build plus Domain Isolation. On confirmed success, record job IDs/artifact digest and set automation_validation=PASS. Otherwise inspect explicit failing job only. Keep runtime UNTESTED.",
-  "score_award": "DEFERRED_UNTIL_COMPLETE_AND_NOT_DUPLICATE"
+  "next_action": "C6 DONE for 00548 on exact material SHA f96b661. Do not poll or score the checkpoint commit as validation-bearing. Follow-up P0 source work requires new TASK_ID, with 00519 HMD symptoms still not visually confirmed fixed.",
+  "score_award": "ELIGIBLE_ONE_UNIQUE_COMPLETION_PENDING_SCOREBOARD_DEDUP",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "exact_sha_validation": {
+    "material_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+    "dx9ex_active": {
+      "run_id": 37714119420,
+      "head_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113106559145,
+        "game": 113106667780,
+        "full_chain_compile": 113106667797,
+        "host": 113106667807,
+        "package": 113108017607
+      }
+    },
+    "hud_inspector": {
+      "run_id": 37714119384,
+      "head_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": {
+        "static_exe_analysis": 113106557754,
+        "build_hud_inspector": 113106557492
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37714119310,
+      "head_sha": "f96b661fdededb2f61e72e4a14ad402abd76b183",
+      "status": "completed",
+      "conclusion": "success",
+      "job": 113106557679
+    },
+    "hud_1000": {
+      "run_id": 37714119449,
+      "conclusion": "success"
+    },
+    "hud_5000": {
+      "run_id": 37714119350,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 37714119321,
+      "status": "in_progress",
+      "source_cross_domain": "success",
+      "msvc_analyze": "in_progress",
+      "role": "SUPPLEMENTAL_NOT_REQUIRED_FOR_P0_GATE_AT_THIS_CHECK"
+    }
+  },
+  "package_artifact": {
+    "id": 11523475635,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-f96b661fdededb2f61e72e4a14ad402abd76b183",
+    "size_bytes": 2743531,
+    "digest": "sha256:a78168037a77d8e4ac23db69d156340b4ac2c8eb016affbbf6443d8341308be3"
+  },
+  "build_artifacts": [
+    {
+      "id": 11522784380,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:2773ee4f7d6a4c400e79868fb61deaba320ee63a75b6dd350b2feb381c10fd4d"
+    },
+    {
+      "id": 11522349780,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:bff9c5d35cebd4e9bea4737aedee30471679f385f546237fdfa988ea311b8775"
+    }
+  ],
+  "automation_result_provenance": "PASS is based on completed/success exact f96b661 DX9Ex Active 37714119420 (all 5 jobs), HUD Inspector 37714119384 (2 jobs) and Domain Isolation 37714119310. Supplemental full-source MSVC analyze is not used as evidence of this PASS. No HMD test was conducted."
 }

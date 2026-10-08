@@ -21,3 +21,13 @@
 - **No Quest3/VDXR or local game runtime test**. `RUNTIME_VALIDATION=UNTESTED`. In particular, no proof that historical 00519 HMD menu/HUD defects are resolved.
 
 The follow-up run-record commit is bookkeeping and never replaces the original material result SHA or triggers a new required game-build Gate.
+
+## Exact-SHA gate closure
+
+- `37714119420` DX9Ex Active Validation: **completed/success**, policy `113106559145`, game `113106667780`, full-chain `113106667797`, host `113106667807`, package `113108017607` all success.
+- `37714119384` HUD Inspector: **completed/success**, static and Windows build success; confirmed `20` DDS source obligations, `14/14` negative mutations, `71` canonical HUD CALLs, `10/10` HUD mutation rejects, P0 visual composition static PASS.
+- `37714119310` Domain Isolation: **completed/success**.
+- HUD 1000/5000 static reviews: `37714119449` and `37714119350` success.
+- Exact material package ID `11523475635`, SHA-256 `a78168037a77d8e4ac23db69d156340b4ac2c8eb016affbbf6443d8341308be3`.
+- Separate full-source impact MSVC analysis `37714119321` was still running at record closure; this supplemental suite is not counted as passed until it finishes.
+- `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`. No headset claims. This result record update is **bookkeeping-only** and is not a validation-bearing SHA.
