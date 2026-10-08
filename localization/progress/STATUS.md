@@ -3053,3 +3053,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 2026-10-08 20:10 KST — C1 odd q035/q103 SOURCE-family visual rework
 TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label width 45-46% original title, weakened visual hierarchy. q103 Normal Balance Korean lacks strong source right-italic and is only 196x40 against 390x72 original. Both current candidate SHA verified; historical producer bbox PASS does not override independent visual REWORK_REQUIRED. Reports localization/graphics/role_C/20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL/C1_Q{35,103}_CONTROLLER_QA.json. New DDS 0; C/C3 approval 0; user/game validation UNTESTED.
+
+### 2026-10-08 20:27 KST — C301 C2 q230 current C3 evidence
+- `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`; 2/2 pinned source/current exact-native alpha/colour ROI and source-bbox-contained Korean help row proof, outside RGBA/alpha changes 0.
+- `C3=HOLD_STRICT_RECHECK`, current evidence-approved `APPROVALS=BLOCKED`, new DDS 0, `RUNTIME_VALIDATION=UNTESTED`. Historical C230 C-pass is not upgraded. See `localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json`.
