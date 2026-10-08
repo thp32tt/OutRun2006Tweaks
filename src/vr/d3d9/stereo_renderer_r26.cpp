@@ -273,7 +273,7 @@ namespace OutRunVRStereo
             // pose-generation proof succeeds; in that case normal per-eye world
             // stereo is exactly the desired ownership for a car-attached marker.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             if (semanticScope ==
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
                 semanticScope ==
