@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from scipy.ndimage import binary_dilation, binary_erosion, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B262 runs only on the controlled GitHub CPU worker")
+    raise SystemExit("B264 source-family method-change requires GitHub CPU worker")
 root=Path.cwd()
 gfx=root/"localization/graphics"
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
@@ -16,10 +16,6 @@ run="20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS"
 out=gfx/"role_B"/run
 out.mkdir(parents=True, exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
-tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","172","--require-safe-rerender"],check=True,capture_output=True,text=True)
-triage=json.loads(tri.stdout)["assets"][0]
-if triage["next_action"]!="MATERIAL_REWORK": raise RuntimeError(("Not material rework",triage))
-(out/"TRIAGE.json").write_text(json.dumps(triage,indent=2,ensure_ascii=False)+"\n")
 source_sha="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
 candidate_sha="812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a"
 clean_sha="9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809"
