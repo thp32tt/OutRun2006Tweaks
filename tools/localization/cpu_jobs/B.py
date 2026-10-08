@@ -88,7 +88,9 @@ for key,english_label,korean,bbox,initial_size,initial_stroke in rows:
     # Reuse ONLY source-conditioned CLEAN pixels, no rectangular external crop.
     new.paste(cimg.crop((x0,y0,x1,y1)),(x0,y0))
     src=source[y0:y1,x0:x1,:]
-    fg=src[(src[:,:,3]>=190)&(src[:,:,:3].min(axis=2)>=75)]
+    # Small subtitle source uses low-alpha antialiasing; do not mistake this
+    # intentional lighter glyph for an empty English region.
+    fg=src[(src[:,:,3]>=25)&(src[:,:,:3].max(axis=2)>=20)]
     if len(fg)<100:raise RuntimeError(("cannot estimate source font palette",key,len(fg)))
     # white title/choices and lower-contrast small subtitle palettes are measured
     # directly from the original native source pixels instead of hardcoded.
