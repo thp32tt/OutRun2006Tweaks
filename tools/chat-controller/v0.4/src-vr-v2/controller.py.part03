@@ -2269,7 +2269,45 @@ def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -
         return None
     if force_refresh:
         _github_commit_list_cache.pop(branch, None)
-    commit = github_find_task_commit(branch, task_id)
+
+    # The newest [AUTO:TASK_ID] commit can be a C6 bookkeeping/checkpoint
+    # commit. It may have its own successful Gate, while the canonical C6
+    # record still points to an earlier material validation-bearing SHA.
+    # Binding to the bookkeeping commit and later recovering the material
+    # SHA oscillates forever at WAIT_ACTIONS. Prefer the immutable C6 SHA;
+    # the normal exact-SHA Actions lookup + terminal verdict below still
+    # independently verify success before releasing a lane.
+    commit = None
+    try:
+        head = github_branch_head(branch)
+        record = github_task_record(head, task_id) if head else None
+        if isinstance(record, dict):
+            nested = record.get("validation") if isinstance(record.get("validation"), dict) else {}
+            validation = str(record.get("automation_validation") or nested.get("automation_validation") or "").upper()
+            canonical_sha = str(
+                record.get("validation_bearing_result_sha")
+                or record.get("validation_bearing_sha")
+                or record.get("material_result_sha")
+                or ""
+            ).lower()
+            if (
+                str(record.get("task_id") or record.get("TASK_ID") or "") == task_id
+                and str(record.get("target_branch") or "") == branch
+                and str(record.get("status") or "").upper() in {"COMPLETE", "COMPLETE_BUILD_VERIFIED", "PASS", "DONE"}
+                and (
+                    str(record.get("checkpoint") or "").upper() == "C6_STATE"
+                    or bool(record.get("controller_terminal"))
+                )
+                and validation.startswith("PASS")
+                and len(canonical_sha) == 40
+                and all(c in "0123456789abcdef" for c in canonical_sha)
+            ):
+                commit = {"sha": canonical_sha, "message": task.get("result_message") or ""}
+    except Exception as exc:
+        log.warning("canonical C6 binding deferred task=%s: %r", task_id, exc)
+
+    if commit is None:
+        commit = github_find_task_commit(branch, task_id)
     if not commit or not commit.get("sha"):
         return None
 
