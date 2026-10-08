@@ -75,3 +75,16 @@
 - Source review, deterministic counterexample, pinned original ImGui submodule cross-check and GitHub documentation: **DONE**.
 - Static CI relied on for preexisting material a440: DX9Ex Active/HUD Inspector/Domain Isolation SUCCESS; cannot imply generated report SHA has been rebuilt.
 - Original Quest 3 failure: **OPEN**. `RUNTIME_VALIDATION=UNTESTED`.
+
+## P0-A elaboration: ImGui active clip/scissor and vertex-buffer overhead
+
+- The pinned DX9 ImGui code `ImGui_ImplDX9_RenderDrawData` (~193–260) allocates a **D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY** VB and IB, then locks both with `D3DLOCK_DISCARD` on every nonempty render; its `DrawIndexedPrimitive` (~298) applies a scissor rectangle per ImDrawCmd (~291). It subsequently restores fixed-function matrices and a D3DSBT_ALL state block (~306–311).
+- The active R30 process-wide lazy buffer observer intercepts corresponding VB/IB Lock/Unlock once armed, even though R30 cannot execute the ImGui FVF XYZ path. This couples optional F11 on-screen drawing to **unnecessary CPU-shadow memcpy** and memory accounting. Prove actual cost with lock-byte and frame-time telemetry before claiming a measured FPS regression.
+- Any F11 stereo implementation must transform/clip its scissor rects per eye or instead draw the complete ImGui UI into a dedicated texture and composite into a correctly located finite/recentered HUD surface. Simply changing the FVF eligibility condition and replaying the stock viewport/scissor can truncate the right eye. Preserve `SetTexture`, alpha blend, texture atlas lifetime, `D3DTS_WORLD/VIEW/PROJECTION`, full state block, R22 state tracker and R23 depth/target restoration. Prevent overlay from stealing a queued game sprite token.
+- The current P0 verifier `tools/verify_vr_visual_composition_p0.py` checks the F11 RAII semantic wrapper but not pinned upstream ImGui FVF/XYZ/orthographic shape or actual R30 raster ownership. This explains how an exact-SHA Inspector PASS can coexist with this unhandled path.
+
+## P0-B temporal witness and concurrency constraint
+
+- **Source-admissible witness**: `Calc3D2D_dest` updates `RankMarkerProjectedInfo` for car A (valid=true); later producer for another car B calls `RankMarker_sprani` without a preceding exact `0xBAEE7` Calc3D2D return. The B draw is tagged `ProjectedWorldMarker2D` and copies **car A's** view-space point to B's node. There is no owner, producer invocation serial, car identity or frame-epoch equality gate. This is a testable *source-admitted* incorrect result, **not evidence that the real game produces this ordering**.
+- `RankMarkerProjectedInfo` and `RivalMarkerProjectedInfo` are non-atomic global structs while `src/vr/game/render_semantics.hpp` explicitly locks the queue-node registry because producers and renderer may run on different threads. If this exact Calc3D2D writer and wrapper reader can execute concurrently, the bare struct has a possible data race. Need runtime thread-id trace of those exact hooks before classifying concurrency as an observed defect.
+- `SumoUISpriteReplay` intentionally captures both projected payload and semantic scope, but the stored payload has no frame/vehicle identity; a consistency check must allow deliberate single-tick replays while refusing incorrect cross-vehicle reuse.
