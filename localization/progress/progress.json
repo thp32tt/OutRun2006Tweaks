@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T11:36:10+09:00",
+  "updated_at_kst": "2026-10-08T11:40:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B251 q172 6C9B3611 exact 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018 pending fresh pixels-first C2 -> separate exact-SHA C3/evidence -> PRE_INGAME/user JPG -> NEW actual-game retest. q214 remains material REWORK_REQUIRED.",
+  "next_checkpoint": "C276 C1 static-reviewed shared runtime-text fix for IGR-006/007: current hooks blob 954f0998... exactly matches validation ref 13e39b9b..., current Win32 Release 37645785737 PASS and Korean Test Build 37645785906/package PASS. Both rows are C_STATIC_PASS_PENDING_NEW_INGAME_RETEST; do not close without new game screenshots. Next C1 should continue highest-priority unindexed special if newly actionable, otherwise stable odd pending-C graphics. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3102,7 +3102,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "B251 q172 6C9B3611 exact 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018 pending fresh pixels-first C2/C3 evidence; C274 C1: q59 is HOLD_STRICT_RECHECK on unchanged A184R bytes pending evidence-complete pixels-first recheck. q161/q154/q172/q176 remain HOLD; q175/q214/q219 remain REWORK unless newer producer bytes land. Queue structure repaired. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C276 C1: IGR-006/007 independent static C complete, both now pending NEW in-game retest only. q59/q161 remain HOLD; q175/q219 remain REWORK unless newer producer bytes land. Generic odd pending-C remains q35/q99/q103/q119/q195/q217/q225/q227/q231/q237. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6827,5 +6827,27 @@
     175,
     214,
     219
-  ]
+  ],
+  "c276_c1_igr006_007_runtime": {
+    "run": "20261008-C276-C1-IGR006-007-RUNTIME",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "targets": [
+      "IGR-006",
+      "IGR-007"
+    ],
+    "shared_material_fix": true,
+    "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
+    "validated_ref": "13e39b9baafc6bcb0bda02a43d5d006419277ee8",
+    "source_blob_exact": true,
+    "win32_release_run": 37645785737,
+    "korean_test_build_run": 37645785906,
+    "package_verify": "PASS",
+    "decision": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
+    "report": "localization/graphics/role_C/20261008-C276-C1-IGR006-007-RUNTIME/C276_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  }
 }
