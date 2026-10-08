@@ -3079,3 +3079,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 — C305 C1 ODD q055 new exact DXT5 evidence, C3 HOLD
 - TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). New direct-byte source/current q055 DXT5 2048x256 native RGBA changed outside source bbox 0, alpha outside 0, visible RGB outside 0, BC3 changed blocks wholly outside 0, source raw alpha bbox [1,8,1090,151] vs candidate [9,16,890,143]. 18 SHA-bound lossless PNG views plus machine QA/manifest report `localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT`. Historic C224 static pass preserved; current evidence-gate C3 remains HOLD_STRICT_RECHECK, blind calibration/source-family per-glyph slant and independent CLEAN still missing. No new DDS/C3 approval/export/game completion; RUNTIME_VALIDATION=UNTESTED.
+
+### 2026-10-08 21:56 KST — C305 C2 q154
+- `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`. 8/8 exact SOURCE/CLEAN/FINAL visual PNG/JPG contrasts on black/gray/white; new five red source rows plus prior gray. Authored CLEAN all original alpha zero, outside change 0, correct readable orientation; style/qualified calibration outstanding. `C=HOLD_STRICT_RECHECK`, C3/APPROVALS/PRE_INGAME blocked, DDS 0, `RUNTIME_VALIDATION=UNTESTED`. localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json.
