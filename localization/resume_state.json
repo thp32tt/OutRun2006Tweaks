@@ -10930,5 +10930,24 @@
     "report": "localization/graphics/role_C/20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN/C278_Q175_CONTROLLER_QA.json",
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c2_q154_eight_region_review_20261008_1220": {
+    "run": "20261008-C2-Q154-EIGHT-REGION-REVIEW-1220",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "result": "HOLD_STRICT_RECHECK",
+    "unchanged_candidate": true,
+    "red_reference_review_rows": 5,
+    "gray_current_lossless_review_rows": 3,
+    "first_look_compliance": false,
+    "calibration": "NOT_PERFORMED",
+    "independent_machine_all8": "NOT_PERFORMED",
+    "separate_C3": "NOT_PERFORMED",
+    "report": "localization/graphics/role_C/20261008-C2-Q154-EIGHT-REGION-REVIEW-1220/C2_Q154_EIGHT_REGION_REVIEW.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
