@@ -12596,5 +12596,31 @@
     "USER_ACCEPTED": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B286-Q060-P0-SOURCE-FACE-TRIAL/B286_CONTROLLER_SELF_QA_REJECTED.json"
+  },
+  "b288_q137_p0_native_stroke_rejected": {
+    "run_key": "OUTRUN-KOR-B288-Q137-IGR041-NATIVE-STROKE-REJECT-20261009",
+    "time_kst": "2026-10-09 03:54 KST",
+    "role": "B",
+    "asset_index": 137,
+    "priority": "P0",
+    "regression": "IGR-041 OPEN_USER_INGAME_FAIL",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "clean_source_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+    "old_candidate_sha256": "1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2",
+    "trial_B287": "507f8ff030846d0b8ed854a3fa8f026acdbdb33413ba62bd337a97721d1e7fa0",
+    "trial_B288": "b9cc71e2f1edc3bb0852fd1665ad8f5a2899e2e0b74ca561088d743dd5761cc4",
+    "trial_dds_count": 2,
+    "new_accepted_production_dds": 0,
+    "producer_visual": "REJECTED_SOURCE_FAMILY",
+    "machine_6_of_6_containment": "PASS",
+    "machine_outside_rgba_alpha_pixels": 0,
+    "current_candidate_preserved": true,
+    "status": "MANUAL_RECONSTRUCTION_REQUIRED",
+    "C1": "BLOCKED_PENDING_NEW_CANDIDATE",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_ACCEPTANCE": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B288-Q137-P0-SOURCE-STROKE-CALIBRATION/B288_CONTROLLER_SELF_QA_REJECTED.json"
   }
 }
