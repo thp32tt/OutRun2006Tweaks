@@ -864,7 +864,8 @@
         "docs/automation/reviews/AI2_GOAL_ENDTIME_WHITE_ALPHA_STEREO_CAUSE_REVIEW_20261009.md — full corrective user-repro and R73/R74 source differential",
         "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md — 2026-10-09 symptom correction",
         "e57501f8cb411422b2a7ac6a89fb7459976bed52 — exact orthographic shader HUD original-game WVP fail-closed code path, potential GOAL binocular duplication repair; HMD UNTESTED",
-        "308bf647211f670974fb53ad7d60d398dea4667c — two shader HUD forms provenance+negative mutation tests, policy CI PASS"
+        "308bf647211f670974fb53ad7d60d398dea4667c — two shader HUD forms provenance+negative mutation tests, policy CI PASS",
+    "7494987c2006f96d5de89d42e8ed4d7ce6bbc0ad / be2d485362e893e27d429b7ed8528cc277db0c44 — GOAL cross-frame original WVP invalidation source candidate, one mutation, PR #111; HMD UNTESTED"
       ],
       "revalidationTriggers": [
         "user reports GOAL/TIMEUP pre-restart timer overlapped or head-following (not the succeeding Theater restart page)",
