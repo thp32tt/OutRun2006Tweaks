@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A183-Q214-START-GOAL-SCALE",
+  "queue_index": 214,
+  "work_stolen_from_lane": "B",
+  "asset": "BF229CF4",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "candidate_sha256": "82ddd6124d02d2fc1416ee0600ae4a1b107013e65b3df3385e58837fe8c72f3d",
+  "report": "localization/graphics/role_A/20261008-A183-Q214-START-GOAL-SCALE/A183_BF229CF4_REPORT.json",
+  "status": "A183_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA"
+}
