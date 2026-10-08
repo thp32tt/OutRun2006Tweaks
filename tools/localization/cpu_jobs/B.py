@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""B264 q172 new per-syllable high-resolution cream-face emboss reconstruction, SHA guarded."""
+"""B265 q172 per-stroke signed-distance metal normal reconstruction, SHA guarded."""
 import hashlib, io, json, os, struct, subprocess, sys, tempfile, urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from scipy.ndimage import binary_dilation, binary_erosion, distance_transform_edt
+from scipy.ndimage import binary_dilation, binary_erosion, distance_transform_edt, gaussian_filter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B264 source-family method-change requires GitHub CPU worker")
+    raise SystemExit("B265 source-family geometry change requires GitHub CPU worker")
 root=Path.cwd()
 gfx=root/"localization/graphics"
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 target=gfx/"hd_candidates"/asset
-run="20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS"
+run="20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM"
 out=gfx/"role_B"/run
 out.mkdir(parents=True, exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -25,10 +25,10 @@ url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 triage=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","172"],check=True,capture_output=True,text=True)
 triage_decision=json.loads(triage.stdout)["assets"][0]
 if triage_decision["next_action"]!="METHOD_CHANGE_REQUIRED" or "SOURCE_FAMILY_BEVEL_MISMATCH" not in triage_decision["repeated_root_causes"]:
-    raise RuntimeError(("B264 needs actual C291+C295 method change escalation",triage_decision))
+    raise RuntimeError(("B265 needs C291+C295 method change escalation",triage_decision))
 blind=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","172","--require-safe-rerender"],capture_output=True,text=True)
 if blind.returncode!=2:raise RuntimeError("same-method rerender guard failed")
-(out/"B264_TRIAGE.json").write_text(json.dumps(triage_decision,ensure_ascii=False,indent=2)+"\n")
+(out/"B265_TRIAGE.json").write_text(json.dumps(triage_decision,ensure_ascii=False,indent=2)+"\n")
 oldbytes=target.read_bytes()
 if sha(oldbytes)!=candidate_sha:raise RuntimeError(("concurrent q172 change",sha(oldbytes)))
 cleanpath=gfx/"role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/CLEAN.png"
@@ -53,8 +53,8 @@ old=np.asarray(readable(oldbytes),dtype=np.uint8).copy()
 clean=np.asarray(Image.open(cleanpath).convert("RGBA"),dtype=np.uint8).copy()
 if src.shape!=clean.shape or src.shape!=old.shape:raise RuntimeError("source/clean/candidate native dimensions differ")
 spec=[
-    {"id":"START","korean":"출발","source_bbox":[55,373,136,396],"glyph_width":23,"face_height":17,"shear_px":7},
-    {"id":"GOAL","korean":"골","source_bbox":[595,635,672,659],"glyph_width":32,"face_height":17,"shear_px":7},
+    {"id":"START","korean":"출발","source_bbox":[55,373,136,396],"glyph_width":22,"face_height":18,"shear_px":7},
+    {"id":"GOAL","korean":"골","source_bbox":[595,635,672,659],"glyph_width":29,"face_height":19,"shear_px":7},
 ]
 allowed=np.zeros((H,W),bool)
 for item in spec:
@@ -89,81 +89,84 @@ for item in spec:
     bottom=np.percentile(px[ys > np.median(ys)],42,axis=0)
     item["profile"]={"source_gold_pixels":len(xs),"source_face_top_rgb":[int(x) for x in top],
                       "source_face_bottom_rgb":[int(x) for x in bottom]}
-    # MATERIAL METHOD CHANGE after independent C291+C295:
-    # Per-syllable vector-like supersampled masks, not a fixed-width stretched
-    # phrase or categorical horizontal color bands. Individual italic transforms
-    # and source-matched bright cream faces precede native 1px bevel/extrusion.
+
+    # Replace the C291/C295/B264 flat-band technique with physically located
+    # per-stroke surface normals, source-anchored cream-white highlights and
+    # copper extrusion. Never sample one horizontal gold band across Hangul.
     U=8
     glyphs=[]
     for ch in item["korean"]:
-        glyph_can=Image.new("L",(450,340),0)
-        gd=ImageDraw.Draw(glyph_can)
-        gb=gd.textbbox((0,0),ch,font=font)
-        gd.text((36-gb[0],36-gb[1]),ch,font=font,fill=255)
-        bounds=glyph_can.getbbox()
-        if not bounds:raise RuntimeError(("empty glyph",ch))
-        w=item["glyph_width"];h=item["face_height"];shear=item["shear_px"]
-        # Reconstruct each Hangul syllable at 8x BEFORE forward-italic affine,
-        # then antialias ONCE at native display size to preserve curved strokes.
-        high=glyph_can.crop(bounds).resize((w*U,h*U),Image.Resampling.LANCZOS)
-        high=high.transform(((w+shear)*U,h*U),Image.Transform.AFFINE,
-                            (1,shear/(h-1),-shear*U,0,1,0),
-                            resample=Image.Resampling.BICUBIC)
-        glyphs.append(np.asarray(high.resize((w+shear,h),Image.Resampling.LANCZOS),dtype=np.uint8))
+        gc=Image.new("L",(460,350),0);d=ImageDraw.Draw(gc)
+        bb=d.textbbox((0,0),ch,font=font)
+        d.text((30-bb[0],30-bb[1]),ch,font=font,fill=255)
+        ink=gc.getbbox()
+        if not ink:raise RuntimeError(("no glyph",ch))
+        w,h,s=item["glyph_width"],item["face_height"],item["shear_px"]
+        high=gc.crop(ink).resize((w*U,h*U),Image.Resampling.LANCZOS)
+        high=high.transform(((w+s)*U,h*U),Image.Transform.AFFINE,
+                            (1,s/(h-1),-s*U,0,1,0),resample=Image.Resampling.BICUBIC)
+        glyphs.append(np.asarray(high.resize((w+s,h),Image.Resampling.LANCZOS),dtype=np.uint8))
     gap=2 if len(glyphs)>1 else 0
-    content_w=sum(g.shape[1] for g in glyphs)+gap*(len(glyphs)-1)
-    content_h=max(g.shape[0] for g in glyphs)
-    canvas=np.zeros((content_h,content_w),dtype=np.uint8)
-    gx=0
+    w=sum(g.shape[1] for g in glyphs)+(len(glyphs)-1)*gap
+    h=max(g.shape[0] for g in glyphs)
+    cov=np.zeros((h,w),dtype=np.uint8)
+    off=0
     for g in glyphs:
-        canvas[:g.shape[0],gx:gx+g.shape[1]]=np.maximum(canvas[:g.shape[0],gx:gx+g.shape[1]],g)
-        gx+=g.shape[1]+gap
-    cov=np.pad(canvas,((1,1),(1,1)),constant_values=0)
-    face=cov>=105
-    if np.count_nonzero(face)<65:raise RuntimeError(("native cream face sparse",item["id"]))
+        cov[:g.shape[0],off:off+g.shape[1]]=np.maximum(cov[:g.shape[0],off:off+g.shape[1]],g)
+        off+=g.shape[1]+gap
+    cov=np.pad(cov,((2,2),(2,2)))
+    face=cov>=100
+    if np.count_nonzero(face)<75:raise RuntimeError(("invalid native syllable mask",item["id"]))
     outer=binary_dilation(face,iterations=1)
-    shadow=np.zeros_like(face,dtype=bool)
-    shadow[1:,1:]=face[:-1,:-1]
-    shadow&=~face
-    edge=outer&~face
-    above=np.zeros_like(face,dtype=bool);above[1:]=face[:-1]
-    below=np.zeros_like(face,dtype=bool);below[:-1]=face[1:]
-    # Face colors continuously cream-white: no horizontal brown stripes.
-    # True gold/copper only on narrow contour and 1px extruded depth.
-    top_edge=face&~above
-    lower_edge=face&~below
-    h,w=face.shape
-    shape=(y1-y0,x1-x0)
-    gw,gh=w,h
-    cx=(x1-x0)//2;cy=(y1-y0)//2
-    x=cx-gw//2;y=cy-gh//2
-    if min(x-1,y-1,shape[1]-(x+gw+1),shape[0]-(y+gh+1))<0:
-        raise RuntimeError(("per-syllable effect exceeds exact source bbox",item["id"],shape,w,h,x,y))
+    shadow=np.zeros_like(face)
+    shadow[2:,2:]=binary_dilation(face,iterations=1)[:-2,:-2]
+    outer_detail=outer&~face
+    shadow_only=shadow&~outer
+    dist=distance_transform_edt(face).astype(np.float32)
+    surface=gaussian_filter(cov.astype(np.float32)/255.0,0.85)
+    gy,gx=np.gradient(surface)
+    norm=np.sqrt(gx*gx+gy*gy)+1e-5
+    nx,ny=gx/norm,gy/norm
+    # Specularity follows actual curved stems/counters: no horizontal stripes.
+    specular=np.clip(0.58*(-nx)+0.82*(-ny),0,1)
+    micro=specular*np.exp(-np.maximum(dist-1,0)*0.85)
+    near_face=face&(dist<=1.12)
+    body=face&~near_face
+    shape=(y1-y0,x1-x0);gw,gh=face.shape[1],face.shape[0]
+    x=(shape[1]-gw)//2;y=(shape[0]-gh)//2
+    if min(x,y,shape[1]-x-gw,shape[0]-y-gh)<0:
+        raise RuntimeError(("normal-map effect cannot fit original source bbox",item["id"],shape,gw,gh))
     patch=clean[y0:y1,x0:x1].copy().astype(np.float32)
     region=patch[y:y+gh,x:x+gw]
-    region[shadow,:3]=[145,49,32];region[shadow,3]=255
-    region[edge,:3]=[231,125,56];region[edge,3]=255
-    YY,XX=np.indices(face.shape)
-    # Only a subtle 30% bottom-warmth and per-pixel right edge highlight;
-    # the full inner Hangul face stays luminous and continuous.
-    t=(YY.astype(float)/max(1,h-1))[:, :, None]*0.30
-    continuous=top[None,None,:]*(1-t)+bottom[None,None,:]*t
-    continuous=np.maximum(continuous,[245,222,190])
-    continuous=np.minimum(continuous,255)
-    region[face,:3]=continuous[face];region[face,3]=255
-    # Physically located contours follow each glyph—not horizontal rows.
-    region[lower_edge,:3]=[247,173,106]
-    region[top_edge,:3]=[255,251,230]
-    # The exact 1px warm fringe only follows low-coverage pixels.
-    fringe=(cov>22)&(~face)&(~outer)
-    region[fringe,:3]=[230,166,102];region[fringe,3]=255
-    bright=(region[:,:,0]>=244)&(region[:,:,1]>=210)&face
-    item["bright_cream_face_pixels"]=int(bright.sum())
-    item["native_face_pixels"]=int(face.sum())
-    if bright.sum()<face.sum()*0.60:
-        raise RuntimeError(("cream interior underfilled; no brown-slab retry",item["id"],int(bright.sum()),int(face.sum())))
-    item["rendering_method"]="SUPERSAMPLED_PER_SYLLABLE_AFFINE_THEN_CREAM_FACE_WITH_CONTOUR_EMBOSS"
-    item["glyph_shapes"]=[list(map(int,g.shape)) for g in glyphs]
+    region[shadow_only,:3]=[121,42,27];region[shadow_only,3]=255
+    copper=shadow&~face&~shadow_only
+    region[copper,:3]=[168,59,35];region[copper,3]=255
+    region[outer_detail,:3]=[229,118,49];region[outer_detail,3]=255
+    p85=np.array(item["profile"]["source_face_top_rgb"],dtype=np.float32)
+    p48=np.array(item["profile"]["source_face_bottom_rgb"],dtype=np.float32)
+    base=np.maximum(p85*0.89+p48*0.11,[248,223,191])
+    ycoords=np.indices(face.shape)[0].astype(np.float32)/max(gh-1,1)
+    base_rgb=base[None,None,:]-ycoords[:,:,None]*np.array([3,13,19])[None,None,:]
+    rgbs=np.broadcast_to(base_rgb,region[:,:,:3].shape).copy()
+    rgbs+=micro[:,:,None]*np.array([8,25,25])[None,None,:]
+    rgbs=np.clip(rgbs,0,255)
+    region[body,:3]=rgbs[body];region[body,3]=255
+    warm=np.clip(0.50*nx+0.70*ny,0,1)
+    edge_rgb=(np.array([248,200,135],dtype=np.float32)[None,None,:]
+              -warm[:,:,None]*np.array([25,65,70])[None,None,:])
+    edge_rgb+=micro[:,:,None]*np.array([7,40,60])[None,None,:]
+    edge_rgb=np.clip(edge_rgb,0,255)
+    region[near_face,:3]=edge_rgb[near_face];region[near_face,3]=255
+    highlights=near_face&(specular>0.40)
+    region[highlights,:3]=[255,250,224]
+    fringe=(cov>24)&(~face)&(~outer_detail)
+    region[fringe,:3]=[240,171,103];region[fringe,3]=255
+    creams=(region[:,:,0]>=247)&(region[:,:,1]>=220)&face
+    item["cream_face_pixels"]=int(creams.sum())
+    item["face_pixels"]=int(face.sum())
+    item["surface_method"]="SDF_STROKE_NORMALS_SOURCE_WHITE_CREAM_AND_COPPER_DEPTH"
+    if creams.sum()<face.sum()*0.40:
+        raise RuntimeError(("too little source-white face",item["id"],int(creams.sum()),int(face.sum())))
     patch=np.clip(patch,0,255).astype(np.uint8)
     result[y0:y1,x0:x1]=patch
     geom=np.zeros(shape,dtype=bool)
@@ -226,10 +229,10 @@ for sp in spec:
     card=Image.new("RGB",(sum(z.width for z in pics)+18,max(z.height for z in pics)),(85,85,85));x=0
     for im in pics:card.paste(im,(x,0));x+=im.width+9
     card.save(out/f"{sp['id']}_RAW_SOURCE_CLEAN_FINAL.png")
-qa={"run":"B264","run_key":"OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
+qa={"run":"B265","run_key":"OUTRUN-KOR-B265-Q172-STROKE-SDF-20261008-1930",
     "queue_index":172,"source_sha256":source_sha,"prior_candidate_sha256":candidate_sha,
     "new_candidate_sha256":newsha,"clean_plate_sha256":clean_sha,
-    "method":"PER_SYLLABLE_SUPERSAMPLED_ITALIC_CREAM_FACE_CONTOUR_EMBOSS",
+    "method":"SDF_PER_STROKE_NORMALS_SOURCE_CREAM_CHROME_AND_COPPER_DEPTH",
     "source_anchored_regions":spec,"native_size":[W,H],"DDS":"RGBA32 mip1 raw mirror_y",
     "machine":{"exact_dds_header":True,"roundtrip_decoded_final":"PASS","changed_rgba_outside_source_boxes":outside,"alpha_outside_source_boxes":alpha_outside,
                "bbox_size_margin":"PASS_BOTH","persisted_file":str(target.relative_to(root))},
@@ -238,5 +241,5 @@ qa={"run":"B264","run_key":"OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
     "C":"NOT_RUN","C3":"NOT_RUN","approval":"BLOCKED","RUNTIME_VALIDATION":"UNTESTED",
     "execution_backend":"GITHUB_ACTIONS_EPHEMERAL_CPU_WORKER","cleanup":"tempfile auto-removes; runner workspace ephemeral",
     "protected_domains_touched":[]}
-(out/"B264_MACHINE_AND_PRODUCTION_GATE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(out/"B265_MACHINE_AND_PRODUCTION_GATE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"result":"MATERIAL_DDS_PRODUCED_PENDING_VISUAL","candidate_sha256":newsha,"qa":str(out)},ensure_ascii=False))
