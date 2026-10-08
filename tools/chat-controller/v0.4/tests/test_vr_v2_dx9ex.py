@@ -8,6 +8,7 @@ import urllib.parse
 import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,7 +38,7 @@ def load_task_record_helpers():
     ]
     assert {node.name for node in functions} == names
     ns = {
-        're': re, 'base64': base64, 'json': json, 'urllib': urllib,
+        're': re, 'base64': base64, 'json': json, 'urllib': urllib, 'Optional': Optional,
         'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
     }
     exec(compile(ast.Module(body=functions, type_ignores=[]), '<C6-record-parser>', 'exec'), ns)
