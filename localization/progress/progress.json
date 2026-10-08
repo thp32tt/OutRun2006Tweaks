@@ -8660,5 +8660,33 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C319-Q161-A200-RETAINED-GLYPH-SPECKLE/C319_Q161_A200_CONTROLLER_C1_REWORK.json"
+  },
+  "c320_c1_q227_a198r_alpha_safe_native": {
+    "run_key": "OUTRUN-KOR-C320-C1-Q227-A198R-ALPHA-PROOF-20261009-0420",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD",
+    "queue_index": 227,
+    "asset": "E596B7AC",
+    "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+    "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+    "triage": "FRESH_C_REVIEW",
+    "reviewed_native_lossless_regions": [
+      "professional",
+      "alpine",
+      "flagman1"
+    ],
+    "total_regions": 16,
+    "new_native_bgw_lossless_proofs": 3,
+    "source_clean_final_visible_english_ghost": "NOT_CONFIRMED; source residual RGB alpha=0",
+    "source_clean_visible_alpha_pixels_all_three": 0,
+    "raw_overview": "REVIEWED_PRODUCER_JPG_ONLY",
+    "decision": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "current_approval": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "proof": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
+    "backend": "GITHUB_CONNECTED_WITH_N100_SMALL_PNG_ONLY"
   }
 }
