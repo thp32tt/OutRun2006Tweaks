@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T11:07:00+09:00",
+  "updated_at_kst": "2026-10-08T11:18:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A184R q59 exact 261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a: pending fresh C1 (source style/title spacing) -> exact SHA C3 -> PRE_INGAME JPG -> new user/game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C274 C1 q59 A184R 261108cd... -> HOLD_STRICT_RECHECK: visual SOURCE/CLEAN/FINAL/RAW/practical review favorable, but current invocation was not pixels-first and complete lossless per-region/native/zoom/practical/RAW/black-white-gray + independent machine evidence is incomplete. Queue CSV q59 extra-quote corruption repaired and 137x6 structure validated. Next C1 should pixels-first inspect q59 unchanged bytes or continue next odd pending candidate; C3/approval blocked until valid fresh C. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3102,7 +3102,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "C273 C1 update: q161 moved from pending-C to HOLD_STRICT_RECHECK; q175 moved from pending-C to REWORK_REQUIRED. q59/q219 remain REWORK_REQUIRED. Remaining odd pending-C includes q35/q99/q103/q119/q195/q217/q225/q227/q231/q237. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C274 C1: q59 is HOLD_STRICT_RECHECK on unchanged A184R bytes pending evidence-complete pixels-first recheck. q161/q154/q172/q176 remain HOLD; q175/q214/q219 remain REWORK unless newer producer bytes land. Queue structure repaired. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6763,6 +6763,27 @@
     "controller_visual": "SELF_QA_PASS_SOURCE_STYLE_KEYLINE_NAVY_GRADIENT_RAW_WITH_C1_HIERARCHY_REVIEW_REQUIRED",
     "status": "SELF_QA_PASS_PENDING_FRESH_C1_C3_USER_JPG_INGAME",
     "controller_report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c274_c1_q059_evidence": {
+    "run": "20261008-C274-C1-Q059-EVIDENCE",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 59,
+    "asset": "7CE1CFC5",
+    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "persisted_identity": "PASS_2048x512_DXT5_MIP1_EXACT_SHA",
+    "visual_review": "FAVORABLE_NO_DEFINITE_DEFECT_IN_SUPPLIED_SOURCE_CLEAN_FINAL_ROW_RAW_PRACTICAL_EVIDENCE",
+    "decision": "HOLD_STRICT_RECHECK",
+    "reason": "PIXELS_FIRST_FALSE_AND_LOSSLESS_PER_REGION_PLUS_INDEPENDENT_MACHINE_EVIDENCE_INCOMPLETE",
+    "queue_csv_repair": "EXTRA_Q59_CLOSING_QUOTE_REMOVED_137_ROWS_X_6_FIELDS_VALIDATED",
+    "c3": "BLOCKED_PENDING_FRESH_C_PASS",
+    "approval_record_created": false,
+    "pre_ingame_export": "NOT_TRIGGERED",
+    "report": "localization/graphics/role_C/20261008-C274-C1-Q059-EVIDENCE/C274_Q059_CONTROLLER_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
