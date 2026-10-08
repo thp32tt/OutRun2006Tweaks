@@ -750,6 +750,91 @@
           "Never interpret analyzer status=OK as HMD optical PASS; HMD visual user verdict is separate"
         ]
       }
+    },
+    {
+      "key": "VR-RESULT-THEATER-SBS-MODE-PARITY-20261009",
+      "title": "Game StereoWanted produced SBS in TRYAGAIN/OUTRUNMILES while host treated result/continue states as mono Theater",
+      "status": "SOURCE_FIXED_BUILD_TEST_PENDING_HMD_UNTESTED",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "CODE_PROVEN_HOST_GAME_CROSS_DOMAIN_DIVERGENCE",
+      "rootCause": {
+        "status": "CODE_CONFIRMED",
+        "summary": "stereo_renderer_r7.inc::GameplayActive accepted broad Game::is_in_game including TRYAGAIN and OUTRUNMILES, while Game::is_vr_gameplay_presentation, CurrentPresentationMode, F11 and main_r23 host classify both as mono Theater. Game-side SBS can therefore be presented as one Theater quad; whether this caused exact HMD double-image remains to be verified."
+      },
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/game_addrs.hpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "src/overlay/hooks_overlay.cpp",
+        "vrhost/src/main_r23.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "fixReferences": [
+        "8b4a3b0ee808018284a0d9148d96d04c442871bf — game side checks shared host presentation before old in_game rule",
+        "4df65a1fa2d17e3bc72be2c47373de47f2c8ab0b — two distinct theater stereo state regressions rejected, GOAL/TIMEUP kept",
+        "ac5b742ac17b4daae3a1a0a689cc823dde0d1f36 — lower R7 included in HUD Inspector push/PR watches",
+        "docs/automation/reviews/DX9EX_FULL_SOURCE_RESULT_EXTTIME_AUDIT_20261009.md — source-to-host full pipeline evidence checkpoint 02:59 KST"
+      ],
+      "revalidationTriggers": [
+        "changing either Game::is_in_game or is_vr_gameplay_presentation state sets",
+        "changing GameplayActive/StereoWanted or OpenXR CurrentPresentationMode and host final layer",
+        "changes in goal/result/timeup/tryagain state transitions or F11 overlay predicate"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py host/game presentation parity with two injected state regressions",
+          "DX9Ex Active Win32 game, x64 host, R33 full-chain, package and HUD Inspector and Domain Isolation exact-SHA validation"
+        ],
+        "runtime": [
+          "Quest3 exact build: result and TRYAGAIN/OUTRUNMILES theater appear single, not raw SBS double; GOAL/TIMEUP still render true stereo",
+          "Confirm results/goal/timeup state log and finalLayerKind; car selector textures/OutRun rival marker/world stereo preserved"
+        ]
+      }
+    },
+    {
+      "key": "VR-RESULT-EXTTIME-MISSING-EXACT-PRODUCER-FINGERPRINT-20261009",
+      "title": "R71/R74 GOAL result progress +TIME text and DispRank lacked producer identity at c64/draw sink",
+      "status": "DIAGNOSTIC_SOURCE_RESTORED_CI_PENDING_HMD_UNTESTED",
+      "testLevel": 2,
+      "recurrenceCount": 1,
+      "evidenceLevel": "CODE_PROVEN_MISSING_DIAGNOSTIC_OWNER_NOT_OPTICAL_CAUSATION",
+      "rootCause": {
+        "status": "CODE_CONFIRMED",
+        "summary": "ResultProgress, OutRunStagePrintf, GoalTime_TagHelper, R70 OutRunHudText and DispRankFirst exact ScreenHud parent wrappers registered scope but used ProducerToken::None, so R51 c64/draw fingerprint explicitly ignored them, preventing differentiation of a surviving result node vs stale c64/mono fallback. Existing visual rendering may be correct or fail independently."
+      },
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_framerate.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "fixReferences": [
+        "198646f09b0f896a0d29e08a9333a83777b1495b — bounded diagnostic-only result/GOAL/stage/DispRank producer identities",
+        "1557997f2e2e3dac13480941be5d5262ca437459 — exact parent queue children carry original token",
+        "f966af99226595206f11869b5ddd3cb22a15592a — shader route and R62 fixedfn sink emit producer/state/queue proof",
+        "7b148d552701232524df79deba01b5cf22ac8a86 and 11de1a91e1e61b27a00683d0c9cb6beaa0beb926 — three token-loss faults and R30 sink guarded"
+      ],
+      "revalidationTriggers": [
+        "changes to exact 0x975EE/97727/977FB result-stage Sumo calls and result progress 0x97BE4/0x97DEC",
+        "changes to goal 0xBEA5A/0xBEA5F, OutRunHudText 0xBA9D0 or DispRank first 0xB9DA6",
+        "changes to R30 c64, fixedfn FVF 0x142, no-tick Sumo replay or token owner propagation"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py check_result_parent_provenance and three distinct corruption cases",
+          "DX9Ex Active exact-SHA Win32 game/host/R33 package, HUD Inspector, Domain Isolation"
+        ],
+        "runtime": [
+          "Exact Quest3 session: inspect VR P0 RESULT DRAW ROUTE per parent plus VR R51 c64 DRAW FINGERPRINT and VR R62 FIXEDFN KIND0",
+          "Determine result/+TIME optical single-frame binocular correctness independently of telemetry; no optical success claim without HMD"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {
