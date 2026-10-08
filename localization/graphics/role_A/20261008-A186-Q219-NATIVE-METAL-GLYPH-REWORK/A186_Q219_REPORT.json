@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A186-Q219-NATIVE-METAL-GLYPH-REWORK",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "trigger": "C272_REWORK_REQUIRED_FORCED_RATIO_COUNTERSPACE_SILVER_TECHNO",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "prior_candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "candidate_sha256": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+  "source_bbox": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "source_size": [
+    1467,
+    118
+  ],
+  "localized_bbox": [
+    12,
+    1025,
+    400,
+    1115
+  ],
+  "localized_size": [
+    388,
+    90
+  ],
+  "width_ratio": 0.2645,
+  "margins": {
+    "left": 6,
+    "right": 1073,
+    "top": 14,
+    "bottom": 14
+  },
+  "clean_plate_provenance": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_CLEAN_PLATE.png",
+  "source_slant_measurement": {
+    "result": "MEASURED_NOT_GLYPH_EXACT",
+    "top_minus_bottom_dx": -16,
+    "anchor_observation": "leading alpha quantile for composite title; separate C visual verification required"
+  },
+  "localized_slant_measurement": {
+    "result": "MEASURED_NOT_GLYPH_EXACT",
+    "top_minus_bottom_dx": 13,
+    "anchor_observation": "leading alpha quantile for composite title; separate C visual verification required"
+  },
+  "bbox_provenance": "localization/graphics/role_C/20261008-C272-C1-Q219-EVIDENCE/C272_Q219_MACHINE_QA.json:exact_geometry_bound_to_same_candidate.source_bbox",
+  "render": {
+    "text": "코스 선택",
+    "construction": {
+      "font": "/usr/share/fonts/truetype/nanum/NanumSquareRoundB.ttf",
+      "face_index": 0,
+      "family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+      "style": "Bold,Regular",
+      "size_px": 83,
+      "tracking_px": 14.0,
+      "readable_right_shear": 0.115,
+      "horizontal_width_target": null,
+      "scale_x": 1,
+      "original_mask_px": [
+        378,
+        77
+      ],
+      "effects": {
+        "dark_outline_px": 3,
+        "extrusion_dx_dy": [
+          4,
+          7
+        ],
+        "white_top_bevel_px": 2,
+        "face": "source-derived bright chrome, steel-dark mid and baseline lip"
+      },
+      "top_minus_bottom": {
+        "result": "MEASURED_NOT_GLYPH_EXACT",
+        "top_minus_bottom_dx": 13,
+        "anchor_observation": "leading alpha quantile for composite title; separate C visual verification required"
+      }
+    },
+    "supersample": 4,
+    "horizontal_target_ratio": null,
+    "palette_from_source": [
+      [
+        230,
+        230,
+        230,
+        255
+      ],
+      [
+        1,
+        1,
+        1,
+        255
+      ],
+      [
+        0,
+        0,
+        0,
+        180
+      ]
+    ],
+    "method": "native supersampled Hangul glyphs -> per-character spacing -> readable right shear -> source-sampled chrome bevel/outline without horizontal scaling -> DDS persisted"
+  },
+  "machine_qa": {
+    "bbox_containment": "PASS",
+    "source_size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS",
+    "source_vs_final_changed_outside": 0,
+    "source_vs_final_alpha_outside": 0
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_PRESERVED_VALIDATED_CLEAN_PLATE",
+    "2_source_matching_slant": "PASS_READABLE_RIGHT_0.12",
+    "3_no_undersized_lettering": "PENDING_CONTROLLER_HEIGHT_AND_COUNTERSPACE_REVIEW_NO_FORCED_RATIO",
+    "4_source_faithful_weight_effect": "PENDING_CONTROLLER_EXACT_SOURCE_STYLE_REVIEW",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_CHANGES_OUTSIDE_EXACT_SOURCE_BBOX",
+    "7_flip_y_raw": "SOURCE_AND_CANDIDATE_RAW_SAVED_PENDING_CONTROLLER",
+    "8_immediate_readability": "PENDING_CONTROLLER_NATIVE_AND_75_50_VISUAL"
+  },
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER_REPOSITORY_BACKED_DDS",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "A186_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_C265_VISUAL_REWORK",
+  "igr_025": "REMAINS_MAPPING_HOLD_AND_NEW_INGAME_RETEST_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A186-Q219-NATIVE-METAL-GLYPH-REWORK",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "before": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "after": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+  "status": "A186_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "report": "localization/graphics/role_A/20261008-A186-Q219-NATIVE-METAL-GLYPH-REWORK/A186_Q219_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
