@@ -1987,7 +1987,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            A(DX11 native) + C(DX9Ex stability); B(DXVK frozen); active: "
+            "A(DX11 native) + C(DX9Ex stability); B(DXVK frozen); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
