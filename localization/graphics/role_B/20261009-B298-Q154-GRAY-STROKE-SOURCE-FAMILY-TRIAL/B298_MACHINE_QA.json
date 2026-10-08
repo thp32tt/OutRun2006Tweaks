@@ -1,0 +1,102 @@
+{
+  "run": "B298",
+  "role": "B",
+  "queue_index": 154,
+  "root_cause": "C311_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "previous_candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "trial_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "source_bbox_ceiling": "PASS_3_OF_3",
+  "source_clean_8_cells_zero_alpha": true,
+  "source_clean_outside_original_8": "ZERO_DELTA",
+  "candidate_outside_3_zero": true,
+  "protected_red5_exact": true,
+  "decoded_persisted_dds": "BYTE_EXACT",
+  "header_raw_mip1": "EXACT",
+  "native": "4096x1024 RGBA32 MIRROR_Y",
+  "region_results": [
+    {
+      "id": "06_single_player_gray",
+      "source_box": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "candidate_bbox": [
+        1612,
+        288,
+        2024,
+        348
+      ],
+      "new_native_stroke_pixels": 10504,
+      "source_face_rgb": [
+        78,
+        96,
+        100
+      ],
+      "source_vs_clean_alpha": 0,
+      "changed_outside_region": 0
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_box": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "candidate_bbox": [
+        2675,
+        290,
+        2887,
+        347
+      ],
+      "new_native_stroke_pixels": 4792,
+      "source_face_rgb": [
+        78,
+        96,
+        100
+      ],
+      "source_vs_clean_alpha": 0,
+      "changed_outside_region": 0
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_box": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "candidate_bbox": [
+        2567,
+        953,
+        2933,
+        1013
+      ],
+      "new_native_stroke_pixels": 9704,
+      "source_face_rgb": [
+        78,
+        96,
+        100
+      ],
+      "source_vs_clean_alpha": 0,
+      "changed_outside_region": 0
+    }
+  ],
+  "trial_dds": 1,
+  "production_dds": 0,
+  "visual": "PENDING_CONTROLLER_PIXELS_FIRST",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_FALLBACK_UNAVAILABLE_GPT_DNS",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
