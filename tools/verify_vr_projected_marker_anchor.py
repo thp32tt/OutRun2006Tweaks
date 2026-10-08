@@ -139,6 +139,51 @@ for marker in (
         fail(f"Calc3D2D anchor recovery missing: {marker}")
 
 require_finite_projected_anchor(calc)
+
+# The ordinal rank producer has the actual view-space input before
+# Calc3D2D flattens its result. Accept it only with a matching original
+# game-screen projection; keep the previously HMD-confirmed rival unchanged.
+def require_rank_original_input(source: str) -> None:
+    body = function_body(source, "static void Calc3D2D_dest(")
+    for marker in (
+        "const D3DVECTOR originalInput = in ? *in : D3DVECTOR{};",
+        "const bool finiteInput = in &&",
+        "const float projectedX =",
+        "const float projectedY =",
+        "std::fabs(projectedX - out->x)",
+        "std::fabs(projectedY - out->y)",
+        "info.viewX = originalInput.x;",
+        "info.viewY = originalInput.y;",
+        "info.viewZ = originalInput.z;",
+        "recoverViewPoint(RankMarkerProjectedInfo, true);",
+        "recoverViewPoint(RivalMarkerProjectedInfo, false);",
+    ):
+        if marker not in body:
+            fail(f"rank original-input projection contract missing: {marker}")
+    if not (body.index("const D3DVECTOR originalInput =") <
+            body.index("Calc3D2D_hk.call(") <
+            body.index("const float projectedX =") <
+            body.index("info.viewX = originalInput.x;")):
+        fail("original Calc3D2D input must be copied before aliasable output")
+
+require_rank_original_input(ui)
+for invalid in (
+    ui.replace("recoverViewPoint(RankMarkerProjectedInfo, true);",
+               "recoverViewPoint(RankMarkerProjectedInfo, false);", 1),
+    ui.replace("recoverViewPoint(RivalMarkerProjectedInfo, false);",
+               "recoverViewPoint(RivalMarkerProjectedInfo, true);", 1),
+    ui.replace("std::fabs(projectedX - out->x)",
+               "std::fabs(projectedX - projectedX)", 1),
+):
+    if invalid == ui:
+        fail("rank projection mutation did not alter the source")
+    try:
+        require_rank_original_input(invalid)
+    except SystemExit:
+        pass
+    else:
+        fail("rank original-input projection mutation escaped verifier")
+
 # Two distinct fault injections, not repeated audits of unchanged content.
 for bad_calc in (
     calc.replace("!std::isfinite(info.viewX)", "false", 1),
