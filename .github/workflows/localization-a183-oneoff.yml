@@ -1,4 +1,4 @@
-name: Localization A183R2 Opaque Glyph Fix
+name: Localization A183R3 BC3 Residue Fix
 on:
   push:
     branches: [korean-localization-recovery-20260928]
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 jobs:
-  run-a183r2:
+  run-a183r3:
     runs-on: ubuntu-latest
     env:
       PYTHONDONTWRITEBYTECODE: '1'
@@ -27,7 +27,7 @@ jobs:
           OUTRUN_CPU_WORKER: github-actions
           OUTRUN_CPU_ROLE: A
         run: python tools/localization/cpu_jobs/A.py
-      - name: Commit isolated A183R2 material
+      - name: Commit isolated A183R3 material
         shell: bash
         run: |
           set -euo pipefail
@@ -37,7 +37,7 @@ jobs:
           git diff --cached --quiet && exit 1
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "localization(cpu): A183R2 q214 source scale rework"
+          git commit -m "localization(cpu): A183R3 q214 source scale rework"
           git fetch origin korean-localization-recovery-20260928
           git rebase origin/korean-localization-recovery-20260928
           git push origin HEAD:korean-localization-recovery-20260928
