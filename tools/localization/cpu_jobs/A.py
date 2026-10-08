@@ -6,12 +6,12 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261008-A185-Q175-THIN-TECHNO-GLYPHS"
+repo=Path.cwd(); run="20261008-A185R-Q175-SILVER-FACE-CONTRAST"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
-PRIOR_SHA="5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585"
+PRIOR_SHA="3bdea5396fcee3f28e3d85daf66a10845ac0ccc90e647ea8972aa866e543ce48"
 if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=PRIOR_SHA: raise RuntimeError("q175 changed since C273; do not overwrite")
 validator=repo/"tools/localization/validate_clean_plate.py"
 work=Path("/tmp/outrun_A_prod28_final"); work.mkdir(parents=True,exist_ok=True)
@@ -140,8 +140,8 @@ smp=out/"754F0599_HD_SOURCE_TEXT_MASK.png"; apath=out/"754F0599_HD_ALLOWED_TEXT_
 pp=out/"754F0599_HD_PROTECTED_VISIBLE_MASK.png"; cpp=out/"754F0599_HD_CLEAN_PROTECTED_VISIBLE_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); allowed.save(apath); protected.save(pp); clean_protected.save(cpp)
 subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(cpp),
-                "--report",str(out/"A185_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A185_CLEAN_PLATE_VALIDATION.json").read_text())
+                "--report",str(out/"A185R_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A185R_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean",cleanrep))
 source_unchanged=count(ImageChops.multiply(source_text_mask,ImageOps.invert(dmask(src,clean))))
 if source_unchanged!=0: raise RuntimeError(("clean unchanged source",source_unchanged))
@@ -149,7 +149,7 @@ if source_unchanged!=0: raise RuntimeError(("clean unchanged source",source_unch
 def resolve_font():
     subprocess.run(["sudo","apt-get","update","-qq"],check=True)
     subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
-    for pat in ["Noto Sans CJK KR:style=Light","Noto Sans CJK KR:style=Regular"]:
+    for pat in ["Noto Sans CJK KR:style=Regular","Noto Sans CJK KR:style=Light"]:
         spec=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}",pat],text=True).strip()
         fp,idx,style=spec.rsplit("|",2)
         if Path(fp).exists() and "NotoSansCJK" in Path(fp).name and (("Light" in style) or pat.endswith("Regular")):
@@ -164,7 +164,8 @@ def shear(m,s):
 def gradient(size,profile):
     w,h=size; im=Image.new("RGBA",size,(0,0,0,0)); p=im.load(); n=len(profile)
     for yy in range(h):
-        sy=int(round((yy/max(1,h-1))*(n-1))); r,g,b=profile[sy]
+        sy=int(round((yy/max(1,h-1))*(n-1)*.62)); r,g,b=profile[sy]
+        r,g,b=[min(251,max(187,int(v))) for v in (r,g,b)]
         for xx in range(w): p[xx,yy]=(r,g,b,255)
     return im
 
@@ -184,7 +185,7 @@ def tracked_mask(text,font,stroke,tracking):
 
 def render(row):
     ob=row["original_bbox"]; aw,ah=ob[2]-ob[0],ob[3]-ob[1]; st=styles[row["row"]]
-    # Thin source-derived techno lettering: Light Hangul, natural unscaled glyphs,
+    # Source-derived techno lettering: Regular Hangul, natural unscaled glyphs,
     # moderate per-glyph tracking, subtle keyline/extrusion. Never hit an English-width quota.
     for fs in range(int(ah*1.15),36,-1):
         font=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
@@ -231,8 +232,8 @@ def render(row):
 final=clean.copy(); target_masks={}
 for row in rows:
     layer,(tx,ty),fs,outer,body,slant,shadow,target_w,target_h=render(row)
-    layer.save(out/f"A185_ROW_{row['row']}_KOREAN_LAYER.png")
-    lm=bmask(layer.getchannel("A")); final.paste(layer,(tx,ty),lm)
+    layer.save(out/f"A185R_ROW_{row['row']}_KOREAN_LAYER.png")
+    lm=bmask(layer.getchannel("A")); final.alpha_composite(layer,(tx,ty))
     tm=Image.new("L",(W,H),0); tm.paste(lm,(tx,ty)); target_masks[row["row"]]=tm
     loc=list(tm.getbbox() or ()); ob=row["original_bbox"]
     contain=len(loc)==4 and loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
@@ -243,7 +244,7 @@ for row in rows:
       "delta_left":loc[0]-ob[0],"delta_right":ob[2]-loc[2],"delta_top":loc[1]-ob[1],"delta_bottom":ob[3]-loc[3],
       "containment":"PASS" if contain else "FAIL","size_ceiling":"PASS" if size_ok else "FAIL","positive_margin":"PASS" if positive else "FAIL",
       "font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,"font_size":fs,
-      "outer_stroke":outer,"body_extra":body,"slant_px":slant,"shadow_offset":shadow,"natural_width":target_w,"natural_height":target_h,"c273_rework":"thin_noto_light_natural_glyphs_subtle_edge_tracking",
+      "outer_stroke":outer,"body_extra":body,"slant_px":slant,"shadow_offset":shadow,"natural_width":target_w,"natural_height":target_h,"c273_rework":"noto_regular_natural_ratio_silver_high_contrast_subtle_extrusion",
       "source_style":{"dark":styles[row["row"]]["dark"],"bright":styles[row["row"]]["bright"],
                       "profile_samples":[styles[row["row"]]["profile"][0],styles[row["row"]]["profile"][len(styles[row["row"]]["profile"])//2],styles[row["row"]]["profile"][-1]]}})
 
@@ -262,8 +263,8 @@ decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(decoded,final).getbbox() is not None: raise RuntimeError("roundtrip")
 dp=out/"754F0599_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 subprocess.run(["python3",str(validator),str(sp),str(dp),str(apath),"--protected-mask",str(pp),
-                "--report",str(out/"A185_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A185_FINAL_MASK_VALIDATION.json").read_text())
+                "--report",str(out/"A185R_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A185R_FINAL_MASK_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final",finalrep))
 diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -276,8 +277,8 @@ all_bbox=all(r["containment"]=="PASS" for r in rows); all_size=all(r["size_ceili
 
 sheet=Image.new("RGB",(W,H*3),(96,96,96))
 for i,im in enumerate([src,clean,decoded]): sheet.paste(gray(im),(0,i*H))
-sheet.save(out/"A185_SOURCE_CLEAN_FINAL_GRAY.jpg",quality=96)
-gray(decoded_raw).save(out/"A185_FINAL_RAW_GRAY.jpg",quality=96)
+sheet.save(out/"A185R_SOURCE_CLEAN_FINAL_GRAY.jpg",quality=96)
+gray(decoded_raw).save(out/"A185R_FINAL_RAW_GRAY.jpg",quality=96)
 contacts=[]
 for row in rows:
     ob=row["original_bbox"]; m=16; box=(max(0,ob[0]-m),max(0,ob[1]-m),min(W,ob[2]+m),min(H,ob[3]+m))
@@ -288,7 +289,7 @@ for row in rows:
 cw=max(x.width for x in contacts); ch=sum(x.height for x in contacts)+4*(len(contacts)-1)
 cs=Image.new("RGB",(cw,ch),(235,235,235)); yy=0
 for im in contacts: cs.paste(im,(0,yy)); yy+=im.height+4
-cs.save(out/"A185_ROW_CONTACT.jpg",quality=96)
+cs.save(out/"A185R_ROW_CONTACT.jpg",quality=96)
 
 status=(cleanrep["status"]=="PASS" and finalrep["status"]=="PASS" and source_unchanged==0 and all_bbox and all_size and all_positive
         and overlap==0 and touch==0 and outside==0 and alpha_out==0 and prot==0 and residue==0)
@@ -299,22 +300,22 @@ report={"schema_version":1,"role":"A","run":run,"index":175,"asset":asset_rel,"w
  "structure":{"dimensions":[W,H],"format":"RGBA32","pixel_raw_mode":RAWMODE,"pitch":pitch,"depth":depth,"mipmaps":mips,"bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y"},
  "semantic_binding":{"canonical_visible_physical_rows":3,"localized":["stage select -> 스테이지 선택","showroom -> 쇼룸","single player -> 싱글 플레이"],
   "historical_draft_rows_absent_in_canonical_hd":["system link","xbox live"],
-  "binding_evidence":"20261008-A185-Q175-THIN-TECHNO-GLYPHS-PREFLIGHT full raw/flip canonical source visuals"},
+  "binding_evidence":"20261008-A185R-Q175-SILVER-FACE-CONTRAST-PREFLIGHT full raw/flip canonical source visuals"},
  "rows":rows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "machine_checks":{"source_mask_pixels_unchanged_in_clean":source_unchanged,"localized_overlap_pixels":overlap,"localized_touch_pixels":touch,
   "changed_pixels_outside_source_bboxes":outside,"alpha_changed_pixels_outside_source_bboxes":alpha_out,"protected_visible_pixels_changed":prot,"source_residue_visible_pixels":residue},
  "all_3_bbox_pass":all_bbox,"all_3_size_ceiling_pass":all_size,"all_3_positive_margin":all_positive,
  "controller_visual_qa":"PENDING_PIXELS_FIRST_CONTROLLER_REVIEW","c273_rework_reason":"SOURCE_TECHNO_FAMILY_EXCESS_EXTRUSION_WEIGHT","c170_rework_applied":"wider/lower horizontal scaling, lighter keyline, metallic source-derived grayscale fill, lower dark extrusion; absent system link/xbox live remain omitted","runtime_validation":"UNTESTED",
- "status":"A185_WORKER_STATIC_QA_PASS_PENDING_PIXEL_VISUAL_REVIEW" if status else "A185_WORKER_REWORK_REQUIRED"}
-(out/"A185_754F0599_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A185R_WORKER_STATIC_QA_PASS_PENDING_PIXEL_VISUAL_REVIEW" if status else "A185R_WORKER_REWORK_REQUIRED"}
+(out/"A185R_754F0599_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"asset":"754F0599","index":175,"source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,
  "source_dimensions":[W,H],"format":"RGBA32","localized_rows":3,"absent_historical_rows":2,
  "bbox_pass":"3/3" if all_bbox else "FAIL","size_ceiling":"3/3" if all_size else "FAIL","positive_margin":"3/3" if all_positive else "FAIL",
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_mask_pixels_unchanged_in_clean":source_unchanged,
  "localized_overlap_pixels":overlap,"localized_touch_pixels":touch,"changed_pixels_outside_source_bboxes":outside,
  "alpha_changed_pixels_outside_source_bboxes":alpha_out,"protected_visible_pixels_changed":prot,"source_residue_visible_pixels":residue,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261008-A185-Q175-THIN-TECHNO-GLYPHS/A185_754F0599_REPORT.json"}
-(wr/"A185_754F0599.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_754F0599_REPORT.json"}
+(wr/"A185R_754F0599.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 # Source-vs-actual persisted DDS practical scale comparisons.
 practical=[]
 for row in rows:
@@ -334,6 +335,6 @@ for row in rows:
 sheet=Image.new("RGB",(max(z.width for z in practical),sum(z.height+4 for z in practical)),(70,70,70))
 yy=0
 for z in practical: sheet.paste(z,(0,yy));yy+=z.height+4
-sheet.save(out/"A185_PRACTICAL_100_75_50.jpg",quality=97,subsampling=0)
+sheet.save(out/"A185R_PRACTICAL_100_75_50.jpg",quality=97,subsampling=0)
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
