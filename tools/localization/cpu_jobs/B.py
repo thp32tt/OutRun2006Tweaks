@@ -115,7 +115,7 @@ for ori in ("READABLE","RAW"):
    nm=f"{ori}_{name}_{pct}_SOURCE_CLEAN_B279_B301.png"
    out.save(DIR/nm);views.append(nm)
 for name,arr in [("SOURCE",S),("CLEAN",C),("OLD",P),("TRIAL",D)]:
- Image.fromarray(arr,"RGBA").save(DIR/name+"_NATIVE_LOSSLESS.png")
+ Image.fromarray(arr,"RGBA").save(DIR/(name+"_NATIVE_LOSSLESS.png"))
 report={"role":"B","run":"B301","queue_index":98,"asset":R,
  "retry_of":"B300_AND_B300R_NONPROMOTED_ALPHA_ARTIFACT_AND_PALETTE_BLOCKED",
  "triage":"MATERIAL_REWORK","source_sha256":S_SHA,"clean_sha256":C_SHA,
