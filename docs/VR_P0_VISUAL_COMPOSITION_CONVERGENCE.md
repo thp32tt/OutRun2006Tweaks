@@ -24,3 +24,7 @@ DX9Ex 00519 (9a3e08cc62b6a36a8196936eacead8cc08fcc756) is USER_RUNTIME_FAIL: men
 
 ## Exit gate
 tools/verify_vr_visual_composition_p0.py plus canonical binary/HUD cadence/producer provenance/cross-thread registry/projected marker/Sumo replay/recenter/reset-transport/Domain Isolation gates must all be green before another HMD candidate is requested.
+
+## Cross-domain source review (2026-10-08, AI 2)
+- Before attempting another HUD-only correction, read [the 150-file game/host source screen and targeted ownership/error-path review](automation/reviews/AI2_QUEST3_CROSS_DOMAIN_SOURCE_REVIEW_20261008.md). It distinguishes the **packaged R26+HUD/R23 owner** from CI-only R33, exact HUD c64 upload-vs-node-draw timing, generic-overlay live-c64 use, R30 lazy VB/IB shadow fallback, off-path world semantic tokens, F11 presentation-state predicate divergence, and UI DDS replacement vs original fallback / R15/legacy-XMT resource failures.
+- New assertions should be **one targeted negative contract per proven defect**, never unchanged-source 1000/5000 repetitions. A static pass is never Quest 3 visual proof; `RUNTIME_VALIDATION=UNTESTED` until the exact candidate is headset-tested.
