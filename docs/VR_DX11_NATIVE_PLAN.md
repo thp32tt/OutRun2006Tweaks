@@ -144,3 +144,18 @@ Revised development priority:
 Promotion evidence must distinguish three layers: OpenXR compositor cadence,
 fresh game-render cadence, and 60 Hz simulation cadence. A reported 90 fps alone
 is not sufficient evidence of smooth 90 Hz rendering.
+
+
+## 2026-10-08 lower-tier VR GPU targets — RTX 2060 / RTX 3060
+
+These are **engineering targets, not proven minimum requirements or released performance claims**. User target: make this older game and its VR renderer comfortably playable on desktop-class RTX 2060 / RTX 3060 as well as the development RTX 4070. No performance entitlement follows from the game's 2006 origin: VR stereo replay, OpenXR/VDXR composition, encoding/streaming and GPU memory consume additional resources.
+
+- **PERFORMANCE / RTX 2060 6 GB:** target true fresh-render 72 Hz Quest 3/VDXR gameplay with stable frame pacing and readable HUD using a dynamically chosen lower render-resolution scale; measure VRAM and avoid high-res replacement texture and intermediate surface pressure. Do not assert success before an actual 2060 6 GB test.
+- **BALANCED / RTX 3060 8 GB or 12 GB:** target fresh-render 72 Hz first, then evaluate 90 Hz if p95/p99 CPU/GPU frame times, compositor timing and visual parity have sufficient headroom. Distinguish 8 GB and 12 GB VRAM variants in results.
+- **QUALITY / RTX 4070 12 GB:** current development comparison point for 90 Hz or above and increased render resolution; do not make its resolution/latency baseline mandatory on lower GPUs.
+- **Dynamic source resolution:** decouple game-eye backbuffer from the desktop mirror. Compare 0.65, 0.75, 0.85 and 1.0 *per-axis* scale relative to the runtime-recommended eye size as independent diagnostic candidates, preserving aspect ratio and correct texture/HUD projection. These are test candidates, not shipped defaults. Scale squared gives relative render pixels, not an assumed percentage FPS gain.
+- **Priority:** first profile unnecessary world/eye draw replay, redundant state changes and shader compilation, CPU/GPU waits, DirectGPU/copy/fence/ACK stalls, source-to-XR resampling, allocation/VRAM peaks and frame-cadence mismatches. Do not degrade existing protected HUD/menu/rank-marker/flare/shadow/recenter correctness in pursuit of benchmarks. Single-pass/multiview may be researched only after the current exact two-eye native path is correct; never assume NVIDIA VRWorks feature applicability to this intercepted legacy renderer.
+- **Measurement:** same fixed sections including dense buildings, beachfront/sand spray, menu transitions and effects at the same graphic options/stream settings. Record actual GPU model and VRAM variant, CPU, driver, Virtual Desktop/OpenXR refresh and encode settings, source/eye resolution, per-eye draw counts, GPU/CPU p50/p95/p99 and worst frame time, XR fresh-vs-cached/reprojected frames, fallbacks/fences and visual checklist. Separate the 60 Hz simulation tick from rendering and XR compositor refresh. A 72 Hz budget is 13.89 ms including practical headroom, not a mere compositor-reported 72 fps.
+- **Acceptance:** no entry may be called "RTX 2060 supported" or "RTX 3060 supported" until a user or tester validates the exact candidate package on that GPU with Quest 3/VDXR and representative scenes, visual parity and measured sustainable frame pacing. CI/WARP/static gate passing and RTX 4070 measurements alone cannot prove lower-tier support.
+- **Backend sequencing:** native draw dispatch must remain fail-closed while inactive/unsupported; prioritize performance changes only inside the branch's currently allowed native-resource/shader/draw correctness gates and do not opportunistically switch DX9Ex or DXVK behavior.
+
