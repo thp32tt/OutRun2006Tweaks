@@ -36,6 +36,10 @@ def verify(text):
         (loader,"dstRow = dest + static_cast<size_t>(row) * dstPitch","destination pitched row"),
         (loader,"memcpy(dstRow, srcRow, rowBytes)","row copy instead of pitched-blind bulk copy"),
         (handle,"*pSrcDataSize < sizeof(DDS_FILE)","original header bounds"),
+        (handle,"!header->data.dwWidth || !header->data.dwHeight","nonzero original dimensions before sprite ratio"),
+        (handle,"newhead->data.dwSize == sizeof(DDSURFACEDESC2)","replacement DDS descriptor size"),
+        (handle,"newhead->data.ddpfPixelFormat.dwSize == sizeof(DDPIXELFORMAT)","replacement pixel descriptor size"),
+        (handle,"if (validHeader && firstMipSize &&","validated replacement before original header mutation"),
         (handle,"file && size >= sizeof(DDS_FILE)","replacement header bounds"),
         (handle,"firstMipSize <= size - sizeof(DDS_FILE)","replacement first mip source bounds"),
     ]
@@ -44,6 +48,10 @@ def verify(text):
             raise ValueError(label+" not verified")
     if loader.index("if (dataSize < sizeof(DDS_FILE))") > loader.index("const DDS_FILE* header ="):
         raise ValueError("DDS header read precedes byte length")
+    if handle.index("if (validHeader && firstMipSize &&") > handle.index("memcpy(*ppSrcData, file, sizeof(DDS_FILE));"):
+        raise ValueError("game DDS header was overwritten before replacement validation")
+    if "const D3DFORMAT newFormat = validHeader" not in handle:
+        raise ValueError("invalid replacement header must not be parsed for format")
     if re.search(r"LockRect\(mipLevel,\s*&lockedRect,\s*nullptr,\s*D3DLOCK_DISCARD",loader):
         raise ValueError("unconditional DISCARD lock")
     if "memcpy(lockedRect.pBits, srcData, mipSize)" in loader:
@@ -85,6 +93,10 @@ def negatives(text):
         "static_cast<size_t>(lockedRect.Pitch) < rowBytes",
         "srcRow = srcData + static_cast<size_t>(row) * rowBytes",
         "*pSrcDataSize < sizeof(DDS_FILE)",
+        "!header->data.dwWidth || !header->data.dwHeight",
+        "newhead->data.dwSize == sizeof(DDSURFACEDESC2)",
+        "newhead->data.ddpfPixelFormat.dwSize == sizeof(DDPIXELFORMAT)",
+        "if (validHeader && firstMipSize &&",
         "firstMipSize <= size - sizeof(DDS_FILE)",
         "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)",
         "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
@@ -108,4 +120,4 @@ if __name__=="__main__":
         count=negatives(text) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("VR HUD DDS loader gate FAIL: "+str(exc))
-    print("VR HUD DDS fast loader PASS: %d source obligations; %d/10 deliberate defects rejected; runtime UNTESTED"%(n,count))
+    print("VR HUD DDS fast loader PASS: %d source obligations; %d/%d deliberate defects rejected; runtime UNTESTED"%(n,count,14))

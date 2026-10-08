@@ -849,7 +849,8 @@ class TextureReplacement : public Hook
 		bool allowExtract = isUITexture ? Settings::UITextureExtract : Settings::SceneTextureExtract;
 
 		const DDS_FILE* header = (const DDS_FILE*)*ppSrcData;
-		if (header->magic != DDS_MAGIC) [[unlikely]]
+		if (header->magic != DDS_MAGIC ||
+			!header->data.dwWidth || !header->data.dwHeight) [[unlikely]]
 			return;
 
 		int width = header->data.dwWidth;
@@ -918,12 +919,18 @@ class TextureReplacement : public Hook
 				if (file && size >= sizeof(DDS_FILE))
 				{
 					const DDS_FILE* newhead = (const DDS_FILE*)file;
-					const D3DFORMAT newFormat = GetD3DFormatFromPixelFormat(newhead->data.ddpfPixelFormat);
+					// A malformed replacement must not overwrite the game's original
+					// DDS header or publish invalid HUD sprite scaling ratios.
+					const bool validHeader = newhead->magic == DDS_MAGIC &&
+						newhead->data.dwSize == sizeof(DDSURFACEDESC2) &&
+						newhead->data.ddpfPixelFormat.dwSize == sizeof(DDPIXELFORMAT);
+					const D3DFORMAT newFormat = validHeader
+						? GetD3DFormatFromPixelFormat(newhead->data.ddpfPixelFormat) : D3DFMT_UNKNOWN;
 					const bool validDimensions = newhead->data.dwWidth && newhead->data.dwHeight &&
 						newhead->data.dwWidth <= 16384 && newhead->data.dwHeight <= 16384;
 					const size_t firstMipSize = validDimensions && newFormat != D3DFMT_UNKNOWN
 						? D3DXGetFormatSize(newFormat, newhead->data.dwWidth, newhead->data.dwHeight) : 0;
-					if (newhead->magic == DDS_MAGIC && firstMipSize &&
+					if (validHeader && firstMipSize &&
 						firstMipSize <= size - sizeof(DDS_FILE))
 					{
 						if (isUITexture)
