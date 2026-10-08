@@ -1,0 +1,345 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-A193-Q225-TRUE-BLACK-NATIVE-20261008-1900",
+  "role": "A",
+  "run": "20261008-A193-Q225-NATIVE-BLACK-FAMILY",
+  "queue_index": 225,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "original_source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+  "prior_c1_rejected_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+  "new_candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+  "construction": "Exact source-matched alpha components for three heading rows and exact RGB-source font masks for six captions; retain original background/protected masks; native 2048x1024 / 1 mip; explicit fonts-noto-cjk-extra real NotoSansCJK-Black.ttc face index=1 instead of historical uncontrolled fc-match Regular fallback. Nine Korean localized labels regenerated once with source-derived RGB and no font width-stretch.",
+  "typography": {
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+    "font_sizes": {
+      "dark_big": 59,
+      "white_big": 58,
+      "dark_small": 34
+    },
+    "source_style": "English heavy condensed dark gray headings/captions; strong white SETUP",
+    "previous_defect": "C1 independently marked old A95R labels weak/thin generic source-family vs 9 English rows",
+    "new_observation": "At original/rebuilt native SOURCE/CLEAN/FINAL and 50%, actual Black TTC heavier face and clearer original hierarchy across all 9 rows; Black face specifically verified by worker path"
+  },
+  "result_class": "A193_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C1_AND_SEPARATE_C3",
+  "machine": {
+    "status": "9/9 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_protected_overlap": 0,
+    "source_residue": 0,
+    "clean_plate_residue": 0,
+    "small_caption_rgb_source_residue": 0,
+    "overlap_pairs": [],
+    "one_pixel_touch_pairs": [],
+    "persisted_dds_roundtrip": "PASS",
+    "verified_black_font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
+  },
+  "per_region": [
+    {
+      "id": "game_lobby",
+      "original_bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "localized_bbox": [
+        3,
+        26,
+        227,
+        84
+      ],
+      "delta_left": 2,
+      "delta_right": 233,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        459,
+        62
+      ],
+      "localized_size": [
+        224,
+        58
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "game_list",
+      "original_bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "localized_bbox": [
+        963,
+        138,
+        1191,
+        196
+      ],
+      "delta_left": 2,
+      "delta_right": 153,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        383,
+        62
+      ],
+      "localized_size": [
+        228,
+        58
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "setup",
+      "original_bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "localized_bbox": [
+        964,
+        514,
+        1065,
+        571
+      ],
+      "delta_left": 2,
+      "delta_right": 115,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        218,
+        61
+      ],
+      "localized_size": [
+        101,
+        57
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "course_type",
+      "original_bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "localized_bbox": [
+        962,
+        713,
+        1092,
+        747
+      ],
+      "delta_left": 2,
+      "delta_right": 165,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        297,
+        38
+      ],
+      "localized_size": [
+        130,
+        34
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "course",
+      "original_bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "localized_bbox": [
+        962,
+        768,
+        1023,
+        796
+      ],
+      "delta_left": 2,
+      "delta_right": 112,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "source_size": [
+        175,
+        38
+      ],
+      "localized_size": [
+        61,
+        28
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "car_type",
+      "original_bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "localized_bbox": [
+        962,
+        817,
+        1093,
+        851
+      ],
+      "delta_left": 2,
+      "delta_right": 79,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        212,
+        38
+      ],
+      "localized_size": [
+        131,
+        34
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "catch_up",
+      "original_bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "localized_bbox": [
+        962,
+        869,
+        1092,
+        903
+      ],
+      "delta_left": 2,
+      "delta_right": 85,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        217,
+        38
+      ],
+      "localized_size": [
+        130,
+        34
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "collision",
+      "original_bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "localized_bbox": [
+        962,
+        921,
+        1023,
+        954
+      ],
+      "delta_left": 2,
+      "delta_right": 167,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "source_size": [
+        230,
+        38
+      ],
+      "localized_size": [
+        61,
+        33
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    },
+    {
+      "id": "players",
+      "original_bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "localized_bbox": [
+        962,
+        976,
+        1084,
+        1010
+      ],
+      "delta_left": 2,
+      "delta_right": 71,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "source_size": [
+        195,
+        44
+      ],
+      "localized_size": [
+        122,
+        34
+      ],
+      "containment": "PASS",
+      "scope": "PRODUCER_MACHINE_PASS_NOT_INDEPENDENT_C",
+      "visual": "source-family heavy Black clearly strengthened, pending independent C source-style measurement"
+    }
+  ],
+  "producer_visual": {
+    "first_look": "Manual native source/clean/final contact, original A95R comparison first, then new A193 direct check. Review is non-blinded producer by design, not independent C.",
+    "source_clean_final": "Nine source, transparent CLEAN, Korean FINAL groups examined side-by-side. Dark/source contrast preserved, white SETUP kept. Prior thin strokes materially improved.",
+    "protected_background": "Metallic separators/cards/cell backgrounds appear unchanged; worker zero protected changes",
+    "glyph_integrity": "No definite broken Korean glyph, cropping or one-pixel overlap visible at examined scale",
+    "readable_100_75_50": "Native contact and exact 50% full atlas examined; persisted 100/75 evidence also emitted; all 9 Korean labels legible at 50%",
+    "raw_orientation": "RAW source-vs-final mirror-Y images inspected, unchanged source orientation and no new foreign graphics",
+    "source_style_remaining": "Native Black family has similar dense source weight but perfect source condensed width/line-by-line font-family identity still needs C1 measured profile; natural shorter Korean strings are not an automatic failure",
+    "result": "PASS_PRODUCER_ONLY_PENDING_FRESH_CALIBRATED_C1_C3"
+  },
+  "backend": {
+    "repository": "GitHub connector SSOT",
+    "production": "GitHub Actions 37760839622 because ChatGPT local raw GitHub source DDS DNS unavailable",
+    "visual": "N100 MCP only small pre-existing/new JPG comparison and practical 50% image retrieval, no DDS/image heavy computing",
+    "runtime": "NOT_RUN"
+  },
+  "evidences": [
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_E3C455FA_REPORT.json",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_SOURCE_READABLE.png",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CLEAN_PLATE.png",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_FINAL_READABLE.png",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_RAW_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_READABLE_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_PRACTICAL_100.jpg",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_PRACTICAL_75.jpg",
+    "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_PRACTICAL_50.jpg"
+  ],
+  "independent_C": "PENDING_C1_ODD_SHARD",
+  "C3": "BLOCKED_PENDING_NEW_C1",
+  "PRE_INGAME": "BLOCKED",
+  "USER_JPG": "NOT_ACCEPTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
