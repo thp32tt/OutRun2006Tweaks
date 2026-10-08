@@ -64,5 +64,32 @@
       37732297625,
       37732383207
     ]
-  }
+  },
+  "retry_reconciliation_events": [
+    {
+      "event_id": "CONVERSION-DX11-00455-E004",
+      "event_type": "retry",
+      "requested_attempt": "2/3",
+      "context_failure_run_id": 37732297625,
+      "context_failure_head_sha": "bd7b01209e8a8070129b490784beb2a00f01ec65",
+      "context_failure_step": "Test DX11 census analyzer",
+      "context_failure_exception": "IndexError: list index out of range",
+      "failure_disposition": "SUPERSEDED_INTERMEDIATE_RESULT_FIXED",
+      "canonical_validation_bearing_result_sha": "0c5530ec7c2b4d822763b416eb1116225575ee07",
+      "canonical_gate_run_id": 37732432495,
+      "canonical_gate_conclusion": "success",
+      "canonical_validate_job_id": 113164413675,
+      "canonical_readiness_smoke_job_id": 113165914886,
+      "reconciled_against_branch_head": "10ef5b9b73ebe8569380990139723130ec17e304",
+      "outcome": "ALREADY_DONE",
+      "checkpoint": "C6_STATE",
+      "original_success_event_id": "CONVERSION-DX11-00455-E003",
+      "original_attempt_unchanged": "1/3",
+      "repeat_implementation": false,
+      "repeat_validation": false,
+      "reaward_score": false,
+      "runtime_validation": "UNTESTED",
+      "note": "This dispatched retry arrived after E003 canonical R317 exact-SHA validation and durable C6 completion. The older failed workflow belongs to an intermediate SHA and cannot override the successful task result. This reconciliation is documentation-only and is not a new material result."
+    }
+  ]
 }
