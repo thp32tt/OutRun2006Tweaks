@@ -262,6 +262,37 @@ for marker in (
     if marker not in replay:
         fail(f"Sumo replay restore missing projected payload: {marker}")
 
+# Exact projected world markers must only project points in front of the
+# camera. R44's spatial-billboard gate already uses positive clip W. The
+# historical fabs(W) condition accepted negative/behind-eye coordinates.
+def require_front_facing_projected_marker(source: str) -> None:
+    project = function_body(source, "bool R57ProjectViewPoint(")
+    required = "clipW <= 1.0e-6f"
+    valid = project.find(required)
+    perspective = project.find("!std::isfinite(clipW)")
+    divide = project.find("ndcX = clipX / clipW;")
+    if min(valid, perspective, divide) < 0 or not (
+        perspective < valid < divide
+    ) or "std::fabs(clipW)" in project:
+        fail("R57 per-eye rank/rival projection must reject negative/zero clip W")
+
+
+require_front_facing_projected_marker(r30)
+# Two distinct deliberate regressions; no repeated static cycles.
+for original, replacement in (
+    ("clipW <= 1.0e-6f", "std::fabs(clipW) <= 1.0e-6f"),
+    ("clipW <= 1.0e-6f", "clipW < -1.0e-6f"),
+):
+    mutated = r30.replace(original, replacement, 1)
+    if mutated == r30:
+        fail("projected-marker negative-W mutation did not modify source")
+    try:
+        require_front_facing_projected_marker(mutated)
+    except SystemExit:
+        pass
+    else:
+        fail("projected-marker negative-W mutant escaped the verifier")
+
 # R30 must classify only the explicit projected semantic and then reproject the
 # recovered view-space anchor through the latched head+per-eye OpenXR transform.
 for marker in (

@@ -1289,8 +1289,12 @@ namespace OutRunVRStereo
                 marker.viewY * transform._24 +
                 marker.viewZ * transform._34 +
                 transform._44;
+            // The canonical perspective convention places visible vehicle
+            // anchors at positive clip W (as in R44 spatial-billboard gating).
+            // A negative W is behind the camera, not a valid projected rank
+            // marker; fabs(W) previously mirrored such anchors into the HUD.
             if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
-                !std::isfinite(clipW) || std::fabs(clipW) <= 1.0e-6f)
+                !std::isfinite(clipW) || clipW <= 1.0e-6f)
                 return false;
 
             ndcX = clipX / clipW;
