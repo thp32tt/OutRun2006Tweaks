@@ -1,0 +1,28 @@
+{
+  "run": "B278",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "prior_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "trial_sha256": "ca342ff557fe03db0096fbb17f2e4c841b356422a4fc6c59b47904354c863b22",
+  "producer_visual": "REWORK_REQUIRED",
+  "machine": {
+    "white_coverage": 1,
+    "blocks_rebuilt": 4018,
+    "changed_pixels": 28146,
+    "outside_source": 0,
+    "outside_target": 0,
+    "alpha_exact": true,
+    "header_exact": true
+  },
+  "visual_reason": "SOURCE relative comparison at native and 50% shows Korean face now solid without stripes and thin blue outline, but original English family has materially thicker dark navy keyline and comparatively narrower white face; SOURCE_FAMILY_KEYLINE_WEIGHT_MISMATCH; not a true source-family pass",
+  "images": [
+    "READABLE_GRAY_100_SOURCE_CLEAN_OLD_B278.png",
+    "READABLE_GRAY_50_SOURCE_CLEAN_OLD_B278.png",
+    "RAW_BLACK_75_SOURCE_CLEAN_OLD_B278.png"
+  ],
+  "next": "Increase independently sourced navy ring thickness before producer PASS; keep trial isolated",
+  "candidate_promoted": false,
+  "independent_C": "NOT_RUN",
+  "runtime_validation": "UNTESTED"
+}
