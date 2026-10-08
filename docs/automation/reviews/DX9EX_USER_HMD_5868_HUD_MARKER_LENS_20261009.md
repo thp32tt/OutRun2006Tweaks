@@ -38,5 +38,11 @@
 
 ## C3 Exact SHA Actions verification
 - CURRENT material SHA `d9e26e97f8969cd925c7925f5eda055802e9fe72`. HUD Inspector static-exe-analysis `113396088606` SUCCESS, game/host/full-chain/package and domain gates require final verification; runtime HMD UNTESTED.
+### C2C — R71 original Sumo and rank long-batch c64 fix
+- Historical R71 had three exact parent Sumo_Printf calls `0x975EE`, `0x97727`, `0x977FB`, each already pinned E8→`0x2CDD0` in the canonical EXE contract. Active R84 had only lower glyph tags. Material C++ commit `fa8fd8966af208c4f58be6f49798b8965cbc1e7a` restores bounded per-CALL before/after SpriteNode snapshots; it tags all new priority siblings as ScreenHud and atomically rolls back all six midhooks if any install fails. Three manifest source bindings commit `9b29fbbb6b28c07358ef81c0ae18d685e0bee588`; three fail-closed negative tests `78524a08d14f390e56b9b1ea8056e5c25f14dff0`.
+- Later ordinal rank digits may share c64 past R44's 12-draw lifetime. Material commit `458ed26e7d5014c414fd187e9f5b94f94a78a772` extends same-shader, queue-scoped, original game WVP reuse to explicit `ProjectedWorldMarker2D` only when a real Calc3D2D anchor exists. The <=12-draw primary path is unchanged, normal rival keeps its original fallback, and ProducerToken remains diagnostic-only. P0 verifier commit `5fddec70829164ccf711b31da26c734381b3c483` asserts bounded same-shader/same-queue raw-WVP proof and five distinct negative mutations.
+- **Final source material candidate `5fddec70829164ccf711b31da26c734381b3c483`**. New DX9Ex Active `37803059786`, HUD Inspector `37803059556`, Domain Isolation `37803059660`, Full Source Impact `37803059594` exact-SHA CI running; original EXE/visual source static stage SUCCESS and source-cross-domain SUCCESS. Win32 compiled binary + final artifact still pending at this documentation checkpoint.
+- **User-positive invariants:** OutRun mode rival visual PASS and initial car-selection textures PASS by user statement. This candidate does not reclassify whole world alpha or alter DDS loader. Rank 1–5 original spatial anchoring and lens center-dot require exact-build HMD verification; do not claim total visual fix.
+
 ## C4 Runtime resumption
 User HMD failures stay OPEN. Any new package is SOURCE_BUILD_VERIFIED / RUNTIME_VALIDATION=UNTESTED until real test.
