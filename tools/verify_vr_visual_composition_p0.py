@@ -599,6 +599,64 @@ require_order(
     'else if (state.worldEffect)'
 )
 
+# R71 had three exact synchronous Sumo_Printf parents, already byte-pinned.
+# Their newly queued siblings must be tagged together, even if the two
+# inner put_sprite_ex sites miss animations/masks. This is disjoint from R74.
+def check_outrun_stage_printf_owner(src, contract):
+    required = ((0x975EE, 'e8dd57f9ff'),
+                (0x97727, 'e8a456f9ff'),
+                (0x977FB, 'e8d055f9ff'))
+    for rva, expected in required:
+        matches = [x for x in contract if int(x['rva'], 16) == rva]
+        if len(matches) != 1 or matches[0].get('expectedBytes') != expected:
+            raise SystemExit('P0 missing original R71 Sumo call 0x%X' % rva)
+        op = bytes.fromhex(expected)
+        target = (rva + 5 + int.from_bytes(op[1:], 'little', signed=True)) & 0xffffffff
+        if target != 0x2CDD0:
+            raise SystemExit('P0 original R71 Sumo target drift at 0x%X' % rva)
+        needle = '0x%X' % rva
+        if not any(b.get('path') == 'src/hooks_uiscaling.cpp' and
+                   b.get('needle') == needle for b in matches[0].get('sourceBindings', [])):
+            raise SystemExit('P0 original R71 source binding missing at 0x%X' % rva)
+        require(needle, src, 'original R71 exact Sumo call')
+
+    enter = function_body(src, 'static void OutRunStagePrintfEnter(')
+    leave = function_body(src, 'static void OutRunStagePrintfLeave(')
+    require_order(enter, 'R71 call before queue snapshot',
+                  'OutRunStagePrintfDepth++',
+                  'OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;')
+    require_order(leave, 'R71 CALL after all-child ScreenHud tag',
+                  '--OutRunStagePrintfDepth != 0',
+                  'TagAppendedNodes(OutRunStagePrintfBefore,',
+                  'RenderScope::ScreenHud',
+                  'OutRunStagePrintfBefore = {};')
+    apply = function_body(src, 'bool apply() override')
+    require_order(apply, 'R71 exact installed parent CALL plus 5 cleanup',
+                  'OutRunStagePrintfEnterHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(OutRunStagePrintfCalls[i])',
+                  'OutRunStagePrintfLeaveHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(OutRunStagePrintfCalls[i] + 5)',
+                  'if (!stageHookOk)',
+                  'OutRunStagePrintfEnterHooks[i] = {};',
+                  'OutRunStagePrintfLeaveHooks[i] = {};')
+
+check_outrun_stage_printf_owner(ui, json.loads(binary_contract)['contracts'])
+for label, old, bad in (
+    ('R71 result children lost', 'TagAppendedNodes(OutRunStagePrintfBefore,',
+     'TagAppendedNodes(OutRunStageIncorrectBefore,'),
+    ('R71 midhook wrong return', 'Module::exe_ptr(OutRunStagePrintfCalls[i] + 5)',
+     'Module::exe_ptr(OutRunStagePrintfCalls[i] + 4)'),
+    ('R71 partial install rollback lost', 'OutRunStagePrintfLeaveHooks[i] = {};',
+     'OutRunStagePrintfLeaveHooks[i] = OutRunStagePrintfLeaveHooks[i];'),
+):
+    try:
+        check_outrun_stage_printf_owner(ui.replace(old, bad, 1),
+                                        json.loads(binary_contract)['contracts'])
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 R71 Sumo negative mutation survived: ' + label)
+
 # The 5868 Quest 3 hudtrace exposes 0xBAAEA (255 rows). The original R70
 # and canonical EXE Inspector confirm this is the BA9D0 text producer's
 # sprani child, alongside the 0xBAAA0 clip child. Exact-parent scope only.
