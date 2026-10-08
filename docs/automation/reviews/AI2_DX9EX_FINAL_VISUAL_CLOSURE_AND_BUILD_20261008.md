@@ -40,4 +40,14 @@
 - `RUNTIME_VALIDATION=UNTESTED`. No new actual headset test, even if every CI job succeeds. Do not mark Issue #13/00519 resolved based on build.
 
 ## 5. Exact CI result and package
-CHECK_FINAL_SHA_CI_AND_ARTIFACT
+### RELEASED EXACT TEST PACKAGE — authentic GitHub Actions artifact
+- SOURCE_MATERIAL_SHA: `5868f8760e939e58212e9bc4fe5d15954a384f9c` (not later docs-only branch HEAD).
+- DX9Ex Active Validation https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451574: `policy` SUCCESS, `game` Win32 DLL SUCCESS, `host` x64 OpenXR SUCCESS, `package` SUCCESS; optional `full-chain-compile` still running at 22:17 KST (recheck below).
+- EXE HUD Inspector https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451549: static original x86 + all P0 F11 shared-state negatives SUCCESS, Win32 inspector build SUCCESS.
+- Domain Isolation https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451505: SUCCESS.
+- DX9Ex Full Source Impact https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451606: source-cross-domain SUCCESS, x64 host MSVC analyze SUCCESS; Win32 game analyzer pending at 22:17 KST.
+- **ONE DEPLOYABLE PACKAGE:** https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37782451574/artifacts/11553510211, artifact ID `11553510211`, name `OutRun2-VR-DX9EX-ACTIVE-5868f8760e939e58212e9bc4fe5d15954a384f9c`, size `2,752,926` bytes; uploaded digest SHA-256 `247469d6e237f00e615a9a2f1cc11082ed1a8893f9d75309daedd931051b4c3e`.
+- Package job `113330641488` downloaded exact game and host artifacts by digest, staged `dinput8.dll`, `outrun-vr-host.exe`, `SOURCE_SHA.txt`, verified each listed file and created nested `OutRun2_VR_DX9EX_ACTIVE_5868f8760e93.zip`, completed artifact upload successfully.
+- This source includes the previous full P0 GOAL/RESULT/rank/SkyGlow/XMT fixes + new F11 shared theater-state fix. **No running HMD test has been performed**, so historical issue 00519 remains open with `RUNTIME_VALIDATION=UNTESTED`.
+- Delivery policy: do not ask for repeated static checks or new pre-HMD build unless exact code changes, and do not merge speculative R73 lens 20%-disparity or turn real world car markers into flat HUD.
+
