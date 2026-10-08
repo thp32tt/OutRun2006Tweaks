@@ -2,6 +2,7 @@
 
 This validates evidence integrity, not aesthetic correctness. C must inspect pixels.
 """
+import csv
 import hashlib
 import json
 import math
@@ -63,6 +64,18 @@ def verify_approval(repo, row, candidate_sha, source_sha=None, candidate_image=N
     repo = Path(repo)
     try:
         idx = int(row["index"].lstrip("\ufeff"))
+        # Active user in-game regression blocks approval even if historical C3
+        # and exact-hash numeric evidence still say PASS. Never auto-close.
+        status = str(row.get("artwork_status", "")).lower()
+        if any(flag in status for flag in ("rework_required", "visual_fail", "hold_strict", "reopened")) or status.endswith("_fail"):
+            raise ValueError("current queue REWORK/HOLD/FAIL blocks approval")
+        backlog = repo / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+        if backlog.is_file():
+            with backlog.open(encoding="utf-8-sig", newline="") as handle:
+                for report in csv.DictReader(handle):
+                    if (report.get("status", "").strip() == "OPEN_USER_INGAME_FAIL"
+                            and report.get("queue_index", "").lstrip("\ufeff").strip() == str(idx)):
+                        raise ValueError("active user in-game regression blocks approval")
         path = repo / APPROVALS / f"q{idx:03d}.json"
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("policy_version") != POLICY or data.get("queue_index") != idx:
