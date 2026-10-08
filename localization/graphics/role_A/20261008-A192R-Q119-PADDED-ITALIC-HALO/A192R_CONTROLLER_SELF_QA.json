@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-A192-Q119-PADDED-HALO-REPAIR-20261008-1800",
+  "role": "A",
+  "run": "20261008-A192R-Q119-PADDED-ITALIC-HALO",
+  "timestamp_kst": "2026-10-08T18:09:00+09:00",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "prior_rejected_candidate_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+  "new_candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "source_origin": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "rework_root_cause": "Independent C294 exact-byte native image found straight vertical cutoff x705 spanning 106 contiguous near-white/alpha pixels from y67..172; first Hangul white halo differs from source round soft fringe.",
+  "material_change": "Padded source-glyph before bicubic inverse-affine (output readable top-right lean) with symmetric native padding; eliminated tight-source cropping. Increased white blur working envelope 12->29px, cropped to actual alpha with 2px transparent guard; source-bbox fit fail-closed on first A192 attempt (height 146 and no margin), corrected A192R source-relative font 93px and 2px transparent guard before encoding. Orange/navy family and soft white halo preserved.",
+  "backend": {
+    "candidate_compute": "GitHub Actions ubuntu runner (ChatGPT local GitHub raw DNS unavailable)",
+    "failed_first_worker_run": "37753930881, fail-closed source effect margin zero; no candidate pushed",
+    "successful_runner": "37754217530",
+    "N100": "auxiliary only to download and inspect four small persisted review PNG/JPG files, and run a 285x150 first-glyph cropped alpha/brightness probe; no full DDS processing",
+    "source_repo": "GitHub linked",
+    "cleanup": "post-publish ephemeral/temp cleanup required"
+  },
+  "source_bbox": [
+    390,
+    54,
+    1632,
+    200
+  ],
+  "final_decoded_bbox": [
+    710,
+    58,
+    1311,
+    196
+  ],
+  "bbox_deltas": {
+    "left": 320,
+    "right": 321,
+    "top": 4,
+    "bottom": 4
+  },
+  "native_size": [
+    2048,
+    256
+  ],
+  "format": "DXT5",
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "machine": {
+    "report": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_F6811E94_REPORT.json",
+    "status": "PASS",
+    "original_bbox_contains_candidate": true,
+    "changed_outside_source_rgba": 0,
+    "changed_outside_source_alpha": 0,
+    "source_residue": 0,
+    "protected_changed": 0,
+    "localized_overlap": 0,
+    "header_128_exact": true,
+    "persisted_dds_roundtrip": "PASS",
+    "source_nearwhite_pixels": 38689,
+    "current_nearwhite_pixels": 19674
+  },
+  "pixel_probe": {
+    "region": "first Hangul, source/decoded-final lossless FLIP-Y; RGB min>=215 alpha>=16",
+    "before_C294": "at x705, 106 continuous vertically contiguous bright fringe pixels; x704 empty",
+    "after_A192R": "at final x710..x712, 0 bright pixels; first bright fringe appears at x713 with 17 contiguous pixels and grows gradually x714:24, x715:29, x716:34; no C294-type full-height vertical edge at leftmost column",
+    "caution": "This local first-glyph probe is descriptive, not universal pass criterion or independent C approval."
+  },
+  "controller_qa": {
+    "source_clean_final_white": "reviewed original English, transparent clean, decoded new Korean same native dimensions",
+    "source_final_black_gray": "first-glyph source/CLEAN/final compared on black/gray/white with original orange/navy/white luminous rim: prior hard vertical glow cutoff not visible on current Korean",
+    "readable_slant": "Positive top-right glyph lean visibly more source-like than C294 rejected A191; exact source-vs-Hangul per-glyph anchor measurements absent",
+    "raw_orientation": "source and candidate share inverted RAW mirror-y; no new flip error seen",
+    "visual_defects": "No certain glyph clipping/source English residue/new collision in examined first glyph views; remaining source-family font/weight relative-scale comparison requires independent pixels-first C",
+    "result": "PRODUCER_MATERIAL_REPAIR_HOLD_PENDING_FRESH_C1_STYLE_PROFILE"
+  },
+  "evidence": {
+    "source": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_SOURCE_READABLE.png",
+    "clean": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CLEAN_PLATE.png",
+    "decoded_final": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_FINAL_READABLE.png",
+    "source_raw": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_SOURCE_RAW.png",
+    "final_raw": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_FINAL_RAW.png",
+    "source_clean_final": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "raw_comparison": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_RAW_COMPARE.jpg",
+    "numeric": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_F6811E94_REPORT.json"
+  },
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "APPROVAL": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "user_JPG_review": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Fresh C1 must independently inspect exact b29c0bb... DDS native source/clean/decoded-final, 4x/100/75/50 and RAW black/gray/white, measure per-glyph readable lean and source-family weight, then separate exact-SHA C3. Do not blindly rerender until newly evidenced defect.",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
