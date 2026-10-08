@@ -139,7 +139,7 @@ for label, old, changed in (
      'LoadTextures_hook = LoadTextures_hook;'),
 ):
     try:
-        check_xmt_loader_atomic_install(bugfixes.replace(old, changed, 1))
+        check_xmt_loader_atomic_install(bugfixes.replace('\t\t\t' + old, '\t\t\t' + changed, 1))
     except SystemExit:
         pass
     else:
