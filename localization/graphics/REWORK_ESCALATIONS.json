@@ -22,6 +22,27 @@
           "finding": "A186R flat/thin effects unlike original rounded chrome typography."
         }
       ]
+    },
+    {
+      "queue_index": 214,
+      "asset_hash": "BF229CF4",
+      "required_method_change": "Stop repeating flat categorical BC3 cream-face recolor and simply increasing shear or width. Measure the canonical English glyph/plate palette and right-slant profile, then use source-conditioned multi-tone bevel with independently selected inside-face, edge, extrusion and protected red plate masks. Persist native decoded DDS and per-region 100/75/50 + RAW visual evidence before any producer decision.",
+      "rejections": [
+        {
+          "review_id": "C285",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_BEVEL_MISMATCH",
+          "evidence_ref": "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/C285_CONTROLLER_QA.json",
+          "finding": "B258 flat cream blocks, weak condensed right-italic face and missing gold/orange volume, GOAL backing stripe."
+        },
+        {
+          "review_id": "C289",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_BEVEL_MISMATCH",
+          "evidence_ref": "localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED/C289_CONTROLLER_QA.json",
+          "finding": "B259 larger shear and right-gold edge remain flat segmented vs smooth condensed original; red backing line visible across GOAL."
+        }
+      ]
     }
   ]
 }
