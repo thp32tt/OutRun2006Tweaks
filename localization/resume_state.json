@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C301 C2 EVEN q230 E95DA5 independently SHA-verified current B228 + pinned English two help regions (2/2 native height/containment, RGBA/alpha changed outside bboxes 0; RGB source family match). C3 HOLD insufficient qualified blind/current lossless 100/75/50/mips/RAW source-clean-final; no renderer change or approved export. localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json; RUNTIME_VALIDATION=UNTESTED.",
     "A194 q231 EBE401C8 MATERIAL source-style rework script changed at 0dbc72b2c6c992c16115d40591e451c0d6181336; source original 29b87a5c..., previously rejected candidate dc08f74a...; Black TTC single flat face removes unwanted dark offset edges and red ONLINE bevel, guard preserves protected LAN and strict source bbox. GitHub Actions 37767491356 still IN_PROGRESS at 20:18 KST, candidate NOT PUBLISHED / QA NOT RUN. Do NOT count as new DDS, PASS or new scoreboard point. Keep q231 REWORK until actual final DDS exact SHA and native SOURCE/CLEAN/FINAL plus RAW/50% producer QA; then independent C1 and C3. RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json",
     "C300 C2 EVEN q98 42E618FD: C3 native DXT5 vs exact English independently identifies striped/dotted Korean white face absent in smooth English source. C126 machine PASS superseded; current candidate preserved; A/B material glyph-face+outline reconstruction then fresh C2 and C3 required. Evidence localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C1 19:48 q227/q231/q237 native source-faithful typography/effect rework required before fresh independent C/C3 and user/actual-game test; do not reproduce unchanged DDS.",
@@ -11796,5 +11797,25 @@
     "new_dds": 0,
     "approved": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c301_c2_q230_native_qa": {
+    "run_key": "OUTRUN-KOR-C301-C2-Q230-EXACT-NATIVE-REGION-QA-20261008-2027",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 230,
+    "asset": "E95DA5",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "native_row_20_21": "2/2 source/candidate pixel scope exact; zero alpha/RGBA change outside original glyph bbox within 864x76 source help cells; 2/2 bbox and height containment; source/current exact RGB [82,86,87]",
+    "triage": "VALIDATION_ONLY",
+    "C3": "HOLD_STRICT_RECHECK",
+    "approval": false,
+    "export": false,
+    "new_dds": 0,
+    "user_acceptance": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json",
+    "execution_backend": "GitHub SSOT + ChatGPT-local V8 pixel decode; N100 MCP only exact-hash large-file transfer and tiny triage script after GPT local raw GitHub DNS failure"
   }
 }
