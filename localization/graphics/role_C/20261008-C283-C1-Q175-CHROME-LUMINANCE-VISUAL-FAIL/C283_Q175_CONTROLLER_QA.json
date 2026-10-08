@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T14:14:22+09:00",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "new_candidate": true,
+  "prior_C278_rejected_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+  "execution_backend": "GitHub SSOT; N100 MCP native DDS decode fallback; GPT local public GitHub DNS inaccessible",
+  "machine": {
+    "result": "PASS_OUTSIDE_SCOPE_ONLY",
+    "native_dimensions": [
+      2048,
+      1024
+    ],
+    "format": "BGRA32",
+    "mips": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "changed_rgba_outside_source_text_bbox_union": 0,
+    "changed_alpha_outside_source_text_bbox_union": 0,
+    "interpret": "New independent full persisted DDS decode, source/candidate SHA verified; no unsourced declaration that every evidence gate passed."
+  },
+  "calibration": {
+    "blind_review_completed": false,
+    "reason": "Producer visual verdict in WORKLOG already exposed before native image; no retroactive blind calibration."
+  },
+  "pixels_before_producer_verdict": false,
+  "regions": [
+    {
+      "id": "stage_select",
+      "source_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "candidate_bbox_from_producer": [
+        12,
+        259,
+        893,
+        392
+      ],
+      "independent_source_visible_color_statistics": {
+        "opaque_pixels": 101963,
+        "bright_rgb_mean_ge_200_fraction": 0.3085,
+        "dark_rgb_mean_below_75_fraction": 0.4008
+      },
+      "independent_candidate_visible_color_statistics": {
+        "opaque_pixels": 60624,
+        "bright_rgb_mean_ge_200_fraction": 0.2324,
+        "dark_rgb_mean_below_75_fraction": 0.6056
+      },
+      "observation": "At native exact decoded readable view the original foreground broad white/silver face is visibly more prominent; candidate thick black/navy outlines+multi-extrusion disproportionately cover the face, causing a dark techno-outline rather than a chrome-dominant family. Source-family mismatch is not evaluated by arbitrary English width percent.",
+      "evidence": {
+        "source": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/stage_select_source_gray.png",
+          "sha256": "8d13efcb82e7343dce5957e4565c68caf444f73672678fe5b5bc10fb8f7ee4a9"
+        },
+        "candidate": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/stage_select_candidate_gray.png",
+          "sha256": "e90d150ec5d74275b5982b2264f4fd9e1234cf9c9dcf4ef8fcfa95e2636571b7"
+        }
+      }
+    },
+    {
+      "id": "showroom",
+      "source_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "candidate_bbox_from_producer": [
+        12,
+        402,
+        261,
+        524
+      ],
+      "independent_source_visible_color_statistics": {
+        "opaque_pixels": 69649,
+        "bright_rgb_mean_ge_200_fraction": 0.3162,
+        "dark_rgb_mean_below_75_fraction": 0.4022
+      },
+      "independent_candidate_visible_color_statistics": {
+        "opaque_pixels": 19306,
+        "bright_rgb_mean_ge_200_fraction": 0.203,
+        "dark_rgb_mean_below_75_fraction": 0.5854
+      },
+      "observation": "At native exact decoded readable view the original foreground broad white/silver face is visibly more prominent; candidate thick black/navy outlines+multi-extrusion disproportionately cover the face, causing a dark techno-outline rather than a chrome-dominant family. Source-family mismatch is not evaluated by arbitrary English width percent.",
+      "evidence": {
+        "source": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/showroom_source_gray.png",
+          "sha256": "e47d74b1dba69c8306e0de1717681095e5cc046f6132cc238144f8e5e725ca62"
+        },
+        "candidate": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/showroom_candidate_gray.png",
+          "sha256": "c7c7e7026ef948b81029bb6f24a8eb44d6a35c17d6ef5fed49e50e9e23aed87b"
+        }
+      }
+    },
+    {
+      "id": "single_player",
+      "source_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "candidate_bbox_from_producer": [
+        8,
+        571,
+        785,
+        712
+      ],
+      "independent_source_visible_color_statistics": {
+        "opaque_pixels": 99081,
+        "bright_rgb_mean_ge_200_fraction": 0.2866,
+        "dark_rgb_mean_below_75_fraction": 0.4014
+      },
+      "independent_candidate_visible_color_statistics": {
+        "opaque_pixels": 62530,
+        "bright_rgb_mean_ge_200_fraction": 0.2335,
+        "dark_rgb_mean_below_75_fraction": 0.5748
+      },
+      "observation": "At native exact decoded readable view the original foreground broad white/silver face is visibly more prominent; candidate thick black/navy outlines+multi-extrusion disproportionately cover the face, causing a dark techno-outline rather than a chrome-dominant family. Source-family mismatch is not evaluated by arbitrary English width percent.",
+      "evidence": {
+        "source": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/single_player_source_gray.png",
+          "sha256": "07e969e30fbebcd81d97d0e83569498c694830d542cd1903b008e758380d5863"
+        },
+        "candidate": {
+          "path": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/regions/single_player_candidate_gray.png",
+          "sha256": "cfbb63c75b04f1d1493fac357afb31604a1b106d2adeade46dabfc881687035f"
+        }
+      }
+    }
+  ],
+  "independent_controller_visual": {
+    "result": "FAIL_SOURCE_FAMILY_LIGHT_DARK_BALANCE",
+    "observations": [
+      "stage_select: English wide chrome face/highlight occupies substantially more original glyph material than the Korean dark keyline/black lower depth; Korean is noticeably darker even at 50% practical view.",
+      "showroom: Korean 쇼룸 has disproportionately broad black lower outline relative to bright chrome fill versus the broad silver original showroom.",
+      "single_player: same thick black/navy shadow and reduced silver-face area as other two rows; consistent family-wide visual regression rather than an isolated glyph boundary issue."
+    ],
+    "readability": "Hangul syllables legible at native and 50%; no definite glyph break/crop found from reviewed images",
+    "slant": "HOLD; isolated source/candidate readable glyph anchors not measured; do not assert slant PASS",
+    "clean_plate": "Producer clean source shows no obvious visible original letters; independent per-region background comparison not complete",
+    "protected_art": "Independent outside-bbox decoded RGBA=0 and alpha=0 only",
+    "orientation": "Mirror Y RAW provided and reviewed in A187 image; no actual in-game runtime test",
+    "numeric_note": "Bright/dark fractions from nontransparent RGB are descriptive diagnostics, NOT arbitrary mandatory universal thresholds, and regions have different glyph counts/geometry."
+  },
+  "decision": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVAL": "NOT_GRANTED",
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "A rework same 3 glyph rows only: shorten/soften lower navy-black extrusion & dark keyline; restore a clearly dominant bright source-silver chrome face with smooth bevel/highlights and segmented rounded techno traits; use source-dependent actual sample/profile and compare native/50% rather than impose fixed global brightness ratio or English target width; preserve exact original glyph bbox/positive margin/RAW orientation/clean plate/counters/protected artwork. New material SHA requires new C1+separate C3 calibration with per-region lossless native/practical/backdrops for approval.",
+  "files": {
+    "native_lossless": [
+      {
+        "id": "stage_select",
+        "source": "8d13efcb82e7343dce5957e4565c68caf444f73672678fe5b5bc10fb8f7ee4a9",
+        "candidate": "e90d150ec5d74275b5982b2264f4fd9e1234cf9c9dcf4ef8fcfa95e2636571b7"
+      },
+      {
+        "id": "showroom",
+        "source": "e47d74b1dba69c8306e0de1717681095e5cc046f6132cc238144f8e5e725ca62",
+        "candidate": "c7c7e7026ef948b81029bb6f24a8eb44d6a35c17d6ef5fed49e50e9e23aed87b"
+      },
+      {
+        "id": "single_player",
+        "source": "07e969e30fbebcd81d97d0e83569498c694830d542cd1903b008e758380d5863",
+        "candidate": "cfbb63c75b04f1d1493fac357afb31604a1b106d2adeade46dabfc881687035f"
+      }
+    ],
+    "machine_report": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/C283_Q175_MACHINE.json"
+  },
+  "cleanup": "Managed N100 scratch automatically removed; retrieved temporary DDS files to be deleted after verified remote publish. No worktrees created; VR/FFB/DX11/DXVK untouched."
+}

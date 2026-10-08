@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:07:00+09:00",
+  "updated_at_kst": "2026-10-08T14:14:22+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C280 q219 fresh A186R source-family visual FAIL; A new material chrome/rounded glyph repair first, then pixels-first C1/C3/approval. q175 C278 and q59 C279 independently remain unresolved. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C283 q175 A187 native+50% bright face versus overdark navy extrusion 3-row source-family visual REWORK_REQUIRED; do not redo exact SHA. A material re-render then separate C1/C3. q195 producer candidate pending C, q219 C280 REWORK, q59 C279 HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -7078,5 +7078,21 @@
     "qa": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c283_c1_q175_overdark_chrome": {
+    "run": "20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 175,
+    "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "decision": "REWORK_REQUIRED",
+    "reason": "Overdark navy/black extrusion dominates chrome versus source across three text rows",
+    "source_candidate_rgba_outside": 0,
+    "alpha_outside": 0,
+    "report": "localization/graphics/role_C/20261008-C283-C1-Q175-CHROME-LUMINANCE-VISUAL-FAIL/C283_Q175_CONTROLLER_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "C3": "BLOCKED"
   }
 }
