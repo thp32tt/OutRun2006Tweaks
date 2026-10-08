@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
+      - 'external/imgui'
+      - '.gitmodules'
       - 'OutRun2006Tweaks.ini'
       - 'tools/Select-OutRunVRBackend.ps1'
       - 'tools/OutRunVR-TestProfiles.ps1'
@@ -42,6 +44,8 @@ on:
   pull_request:
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
+      - 'external/imgui'
+      - '.gitmodules'
       - 'OutRun2006Tweaks.ini'
       - 'tools/Select-OutRunVRBackend.ps1'
       - 'tools/OutRunVR-TestProfiles.ps1'
