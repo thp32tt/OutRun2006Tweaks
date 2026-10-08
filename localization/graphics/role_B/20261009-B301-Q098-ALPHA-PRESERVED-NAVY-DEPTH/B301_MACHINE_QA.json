@@ -1,0 +1,83 @@
+{
+  "role": "B",
+  "run": "B301",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "retry_of": "B300_AND_B300R_NONPROMOTED_ALPHA_ARTIFACT_AND_PALETTE_BLOCKED",
+  "triage": "MATERIAL_REWORK",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "prior_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "460b710be98cf92de85362730abcc9209592a47e8037ef44390bf7c08d97d31b",
+  "new_trial_dds": 1,
+  "promoted_dds": 0,
+  "method": "native BC3 RGB palette 8-byte source white/navy block rebuild in a 2.5px inner-white border, untouched DXT5 ALPHA 8 bytes and existing alpha counters; avoids B300 alpha stripes and B300R white-only palette restriction; no raster upscaling",
+  "source_counts": {
+    "white": 24095,
+    "navy": 47827,
+    "ratio": 0.504
+  },
+  "prior_counts": {
+    "white": 44139,
+    "navy": 21036,
+    "ratio": 2.098
+  },
+  "trial_counts": {
+    "white": 45444,
+    "navy": 19720,
+    "ratio": 2.304
+  },
+  "candidate_bbox": [
+    580,
+    11,
+    1523,
+    116
+  ],
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "changed_native_pixels": 15593,
+  "native_color_indices_replaced": 9127,
+  "changed_blocks": 1545,
+  "blocked_non_navy": 0,
+  "outside_source_rgba": 0,
+  "outside_safe_rgba": 0,
+  "alpha_exact": true,
+  "header_exact": true,
+  "source_clean_residue_alpha": 0,
+  "roundtrip_exact": true,
+  "evidence_views": [
+    "READABLE_GRAY_100_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_GRAY_75_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_GRAY_50_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_WHITE_100_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_WHITE_75_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_WHITE_50_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_BLACK_100_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_BLACK_75_SOURCE_CLEAN_B279_B301.png",
+    "READABLE_BLACK_50_SOURCE_CLEAN_B279_B301.png",
+    "RAW_GRAY_100_SOURCE_CLEAN_B279_B301.png",
+    "RAW_GRAY_75_SOURCE_CLEAN_B279_B301.png",
+    "RAW_GRAY_50_SOURCE_CLEAN_B279_B301.png",
+    "RAW_WHITE_100_SOURCE_CLEAN_B279_B301.png",
+    "RAW_WHITE_75_SOURCE_CLEAN_B279_B301.png",
+    "RAW_WHITE_50_SOURCE_CLEAN_B279_B301.png",
+    "RAW_BLACK_100_SOURCE_CLEAN_B279_B301.png",
+    "RAW_BLACK_75_SOURCE_CLEAN_B279_B301.png",
+    "RAW_BLACK_50_SOURCE_CLEAN_B279_B301.png"
+  ],
+  "producer_visual": "PENDING_CONTROLLER",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
