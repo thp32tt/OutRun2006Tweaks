@@ -52,6 +52,11 @@ namespace OutRunVR::GameSemantic
         ExactScreenHudClipSprite,
         RivalMarkerSprani,
         TextGlyphPutSprite,
+        OutRunStagePrintf,
+        ResultProgress,
+        GoalTimeHelper,
+        OutRunHudText,
+        DispRankFirst,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -88,6 +93,11 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::ExactScreenHudClipSprite: return "EXACT_SCREEN_HUD_CLIP";
         case ProducerToken::RivalMarkerSprani: return "RIVAL_MARKER_SPRANI";
         case ProducerToken::TextGlyphPutSprite: return "TEXT_GLYPH_PUTSPRITE";
+        case ProducerToken::OutRunStagePrintf: return "OUTRUN_STAGE_PRINT";
+        case ProducerToken::ResultProgress: return "OUTRUN_RESULT_PROGRESS";
+        case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
+        case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
+        case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
         default: return "NONE";
         }
     }
