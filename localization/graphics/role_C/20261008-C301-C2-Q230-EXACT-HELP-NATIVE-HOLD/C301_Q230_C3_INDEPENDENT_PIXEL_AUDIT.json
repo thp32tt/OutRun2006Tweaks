@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "run": "C301-C2",
+  "run_key": "OUTRUN-KOR-C301-C2-Q230-EXACT-NATIVE-REGION-QA-20261008-2027",
+  "date_kst": "2026-10-08 20:27 KST",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 230,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "selection_head": "3d284729bc38fc9a2cf1290070c03e790358d2e0",
+  "queue_blob_sha": "4b55644d3cff9c802e2bf0efa135b1991d55db27",
+  "selection_reason": "No newly published eligible EVEN A/B candidate; q154/q176 existing unchanged-byte evidence HOLD already scrutinized, q172/q214/q098 require A/B material repair. Independently audit previously C230 static-PASS but no current C3 asset q230, do not repeat C230 verdict.",
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 230",
+    "run_on": "N100 MCP lightweight fallback against current exact branch queue/script/escalations after ChatGPT-local raw GitHub DNS failed",
+    "next_action": "VALIDATION_ONLY",
+    "notes": "Current legacy C pass is not current-policy C3 or runtime approval."
+  },
+  "policy_version": "visual-evidence-v1-20261008",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "bytes": 8388736
+  },
+  "candidate": {
+    "repo": "thp32tt/OutRun2006Tweaks",
+    "ref": "korean-localization-recovery-20260928",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+    "sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "bytes": 8388736
+  },
+  "exact_hash_transport": {
+    "N100_github_download_sha256_verified_for_both": true,
+    "ChatGPT_local_v8_decoded_exact_RAW_ROI_from_N100_base64_chunks": true,
+    "bytes_read_per_file": 622592,
+    "readable_raw_y": {
+      "readable": [
+        164,
+        240
+      ],
+      "raw": [
+        784,
+        860
+      ]
+    },
+    "pixel_color_encoding": "RGBA32; channel masks 0x000000ff,0x0000ff00,0x00ff0000,0xff000000; pitch8192; mip1; exact SOURCE and CURRENT 128B DDS headers inspected.",
+    "source_and_candidate_equal_header_dimensions": true
+  },
+  "regions": [
+    {
+      "id": "20_unavailable_help",
+      "source_text": "You cannot buy this item yet",
+      "target_text": "아직 구매할 수 없습니다",
+      "source_bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "candidate_bbox_alpha_gt16": [
+        3,
+        184,
+        465,
+        229
+      ],
+      "source_visible_alpha_gt16": 11130,
+      "candidate_visible_alpha_gt16": 8318,
+      "source_opaque_alpha_ge245": 8337,
+      "candidate_opaque_alpha_ge245": 6227,
+      "source_alpha_mean": 223.41,
+      "candidate_alpha_mean": 223.73,
+      "visible_pixels_outside_source_bbox": 0,
+      "changed_rgba_outside_source_bbox": 0,
+      "changed_alpha_outside_source_bbox": 0,
+      "rgba_changed_inside_source_bbox": 13948,
+      "source_candidate_visible_intersection_pixels": 3769,
+      "observations": {
+        "slant": "HOLD: prior JPGs show upright source-family help rows; semantic native glyph stem anchors have not been independently measured; no invented angle.",
+        "clean_plate": "HOLD: original/current pixels were measured, but separate exact B228 clean-plate lossless PNG not newly audited for within-cell reconstruction.",
+        "style": "PARTIAL: 100% alpha>16 visible source and Korean help pixels in both inspected cells share exact RGB [82,86,87]; similar low-contrast grey source/JPG effect, but stroke-weight and counter-space source-family reference not fully certified.",
+        "readability": "HOLD: current JPEG readable at displayed scale, but lossless 100/75/50 native practical and black/white/gray evidence missing.",
+        "glyph_integrity": "PARTIAL: no obvious missing Korean syllable or clipped stroke in existing contact JPG; pixel-perfect native antialias/fringe proof pending.",
+        "protected_art": "MEASURED: current vs canonical original RGBA and alpha changes outside both exact source help bboxes are zero separately within their full 864x76 atlas cells; unchanged collateral cells beyond these two were not rescanned.",
+        "placement": "MEASURED: both decoded alpha>16 current bboxes strictly inside exact canonical English glyph-effect bboxes, positive L/T/R/B margins.",
+        "orientation": "PARTIAL: source/candidate raw 2048x1024 BGRA32 mip1 headers match; RAW mirror-Y mapping applied in independently read ROI; existing C230 readable and RAW JPGs checked; game sprite-UV orientation untested."
+      }
+    },
+    {
+      "id": "21_owned_help",
+      "source_text": "You already own this item",
+      "target_text": "이미 보유 중입니다",
+      "source_bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "candidate_bbox_alpha_gt16": [
+        869,
+        184,
+        1233,
+        230
+      ],
+      "source_visible_alpha_gt16": 10143,
+      "candidate_visible_alpha_gt16": 6466,
+      "source_opaque_alpha_ge245": 7610,
+      "candidate_opaque_alpha_ge245": 5084,
+      "source_alpha_mean": 223.35,
+      "candidate_alpha_mean": 227.57,
+      "visible_pixels_outside_source_bbox": 0,
+      "changed_rgba_outside_source_bbox": 0,
+      "changed_alpha_outside_source_bbox": 0,
+      "rgba_changed_inside_source_bbox": 12933,
+      "source_candidate_visible_intersection_pixels": 2688,
+      "observations": {
+        "slant": "HOLD: prior JPGs show upright source-family help rows; semantic native glyph stem anchors have not been independently measured; no invented angle.",
+        "clean_plate": "HOLD: original/current pixels were measured, but separate exact B228 clean-plate lossless PNG not newly audited for within-cell reconstruction.",
+        "style": "PARTIAL: 100% alpha>16 visible source and Korean help pixels in both inspected cells share exact RGB [82,86,87]; similar low-contrast grey source/JPG effect, but stroke-weight and counter-space source-family reference not fully certified.",
+        "readability": "HOLD: current JPEG readable at displayed scale, but lossless 100/75/50 native practical and black/white/gray evidence missing.",
+        "glyph_integrity": "PARTIAL: no obvious missing Korean syllable or clipped stroke in existing contact JPG; pixel-perfect native antialias/fringe proof pending.",
+        "protected_art": "MEASURED: current vs canonical original RGBA and alpha changes outside both exact source help bboxes are zero separately within their full 864x76 atlas cells; unchanged collateral cells beyond these two were not rescanned.",
+        "placement": "MEASURED: both decoded alpha>16 current bboxes strictly inside exact canonical English glyph-effect bboxes, positive L/T/R/B margins.",
+        "orientation": "PARTIAL: source/candidate raw 2048x1024 BGRA32 mip1 headers match; RAW mirror-Y mapping applied in independently read ROI; existing C230 readable and RAW JPGs checked; game sprite-UV orientation untested."
+      }
+    }
+  ],
+  "existing_readable_visual_evidence": [
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_HELP_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_RAW.jpg"
+  ],
+  "legacy_independent_C": "C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME; latest exact bytes unchanged",
+  "C3": {
+    "review_id": "C301-C2-C3",
+    "decision": "HOLD_STRICT_RECHECK",
+    "pixels_before_producer_verdict": false,
+    "calibration": "UNQUALIFIED_CURRENT: previous C230 producer/prose and old JPG inspected before this audit; no claim of blind first look or normal+four defect control calibration.",
+    "prior_defect_observation": "B228 repaired PRE_INGAME #022 missing translation in two help rows. Current source/candidate ROI pixel proof supports zero overflow but not full family/mip/practical-scale source-clean-final checks.",
+    "explanation": "This C3 pass adds new exact SHA native two-region alpha/color/containment independent evidence. It is not source-faithful full-asset per-region visual approval; missing calibrated pixels-first, source-clean-target lossless per-region views, style slant anchors and family reference means HOLD, never PASS."
+  },
+  "approval": false,
+  "pre_ingame_export": "BLOCKED_BY_EVIDENCE_GATE",
+  "user_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "cleanup": "N100 transfers are temporary only; remove source/candidate/triage staging after verifying GitHub publication.",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
