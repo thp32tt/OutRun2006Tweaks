@@ -2,9 +2,9 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00557",
   "production_id": "CONVERSION-DX9EX-00557",
-  "event_id": "CONVERSION-DX9EX-00557-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00557-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "ae2fbdaaebc3bdecac573d737a06a00430fe1e47",
@@ -12,12 +12,12 @@
   "validation_bearing_result_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
   "result_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00557]",
-  "status": "WAITING_EXACT_SHA_GATE",
-  "automation_validation": "INCOMPLETE_CI_CANCELLED_CONCURRENT_BRANCH_PUSH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "retry_allowed": true,
-  "controller_terminal": false,
+  "retry_allowed": false,
+  "controller_terminal": true,
   "work_key": "DX9EX-P0-SCENEEFFECT-NEARPLANE-NESTED-SCOPE",
   "conflict_keys": [
     "DX9EX:src/hooks_graphics.cpp:Clr_SceneEffect_dest",
@@ -29,37 +29,66 @@
     "tools/verify_vr_nearplane_active_gate.py"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS remote GitHub branch, original upstream, HUD history, issue ledgers, queue/state and work-area collision checked",
-    "C1_REVIEW": "PASS original 0xBE70 SceneEffect near-plane and nested override suppression source-level defect bounded; no HMD visual claim",
-    "C2_IMPLEMENT": "PASS real C++ source+focused static negative-test material commit",
-    "C3_VALIDATE": "PARTIAL exact-source SHA: HUD Inspector, Domain Isolation and Full Source Impact SUCCESS, DX9Ex Active policy+host SUCCESS; Active game/full-chain/package CANCELLED by competing push (not a product failure)",
-    "C4_COMMIT": "PASS 0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f contains exact marker, no CI skip, remote fast-forward CAS",
-    "C5_PACKAGE": "NOT_COMPLETE: exact-SHA DX9Ex Active package absent after workflow cancellation",
-    "C6_RESULT": "WAITING_EXACT_SHA_GATE. This is a durable resume checkpoint, NOT terminal PASS. No AI2 score awarded."
+    "C0_RECOVER": "PASS prior E001 material/source and cancelled workflow recovered, latest GitHub HEAD, original upstream SceneEffect code, claim/work-key, HUD docs and Issue #13/#14 checked",
+    "C1_REVIEW": "PASS original emoose 0xBE70 SceneEffect unconditional allow_znear_override=true confirmed; existing 00557 saves/restores enclosing caller state, keeps 0.05f lens plane and semantic scope",
+    "C2_IMPLEMENT": "PASS pre-existing real material C++ and one focused Python source-order verifier with false-restore injected mutant at 0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f; E003 retry did not duplicate same TASK_ID source changes",
+    "C3_VALIDATE": "PASS exact-SHA 0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f on isolated candidate ref: DX9Ex Active 37752011583 policy, game, host, R33 full-chain-compile and package all SUCCESS; HUD Inspector 37752011570 SUCCESS; original-sha Domain Isolation 37750869349 SUCCESS and Full Source Impact 37750869517 SUCCESS. Prior focus-run 37750869490 was cancelled by branch concurrency, not compiler failure.",
+    "C4_COMMIT": "PASS original 00557 material source commit includes [AUTO:CONVERSION-DX9EX-00557] without CI-skip; no source moved, no duplicate work_key; run-state bookkeeping separate from gate-bearing SHA",
+    "C5_PACKAGE": "PASS artifact 11538577746 name OutRun2-VR-DX9EX-ACTIVE-0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f, 2749558 bytes, digest sha256:595778efe7d425ab07aaafbaff0e1814cd1023c8b76ede1101658b1ff6b1a2b2; user HMD and deployment NOT TESTED",
+    "C6_RESULT": "PASS validation closure Issue #14 comment 6056331761 supplements original source event 6056175623; run record terminalized after exact-SHA PASS; AI2 score awarded once via 3689be7775e308071cb7d1e7f87166ce8e1e628c (1227+1=1228)."
   },
   "ci_runs": {
-    "dx9ex_active": 37750869490,
-    "hud_inspector": 37750869340,
+    "dx9ex_active": 37752011583,
+    "original_cancelled_active": 37750869490,
+    "isolated_hud_inspector": 37752011570,
+    "original_hud_inspector": 37750869340,
     "domain_isolation": 37750869349,
     "full_source_impact": 37750869517
   },
   "ci_observed": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
     "hud_inspector": "SUCCESS",
     "domain_isolation": "SUCCESS",
     "full_source_impact": "SUCCESS",
-    "dx9ex_policy": "SUCCESS",
-    "dx9ex_host": "SUCCESS",
-    "dx9ex_game": "CANCELLED_BY_CONCURRENT_PUSH",
-    "dx9ex_full_chain_compile": "CANCELLED_BY_CONCURRENT_PUSH",
-    "dx9ex_package": "CANCELLED_BY_CONCURRENT_PUSH"
+    "original_focus_attempt": "CANCELLED_BY_CONCURRENT_PUSH"
   },
   "production_change_ledger": {
     "issue": 14,
-    "comment_id": 6056175623
+    "comment_id": 6056175623,
+    "closure_comment_id": 6056331761
   },
-  "score_status": "NOT_AWARDED_PENDING_EXACT_GATE",
-  "score_baseline_ai2": 1226,
+  "score_status": "AWARDED_AI2_ONCE_CONVERSION-DX9EX-00557",
+  "score_baseline_ai2": 1227,
   "parallel_policy": "DX11 A active; DX9Ex C active; DXVK B frozen; no DX11/DXVK/localization source changes",
-  "retry_instruction": "Resume this SAME TASK_ID and SAME material SHA. Do not duplicate source or create new material for the same work_key. Do not cancel another worker's currently running focus-branch Active CI. Once idle, re-run failed/cancelled jobs of Active run 37750869490 via GitHub Actions for exact SHA; then verify jobs/artifact and persist terminal C6 separately. No headset verification performed.",
-  "next_action": "Rerun exact-SHA DX9Ex Active cancelled game/full-chain/package when branch scoped CI idle; verify exact material artifact then mark COMPLETE_BUILD_VERIFIED, update Issue #14 and AI2 scoreboard only once."
+  "next_action": "00557 fully complete for automated C0-C6 and scored once. Do not redispatch/retry. Select next independent DX9Ex stabilization item on its own TASK_ID; do not modify DX11/DXVK/localization. Hardware-only visual acceptance remains NEED_HMD_TEST.",
+  "ci_gate_complete": true,
+  "validation_branch": "vr-d3d9ex-candidate/conv-dx9ex-00557-exact-gate",
+  "validation_branch_role": "isolated exact-SHA CI only; target remains vr-d3d9ex-focus; no new source commit",
+  "score_total_ai2": 1228,
+  "score_calculation": "AI2 previous confirmed 1227 + one newly completed source/CI outcome +1 = cumulative 1228; E003 retry separately +0",
+  "scoreboard_commit": "3689be7775e308071cb7d1e7f87166ce8e1e628c",
+  "updated_kst": "2026-10-08 17:55:24",
+  "exact_sha_validation": {
+    "material_sha": "0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
+    "active_run_id": 37752011583,
+    "active_result": "success",
+    "hud_run_id": 37752011570,
+    "hud_result": "success",
+    "domain_run_id": 37750869349,
+    "domain_result": "success",
+    "impact_run_id": 37750869517,
+    "impact_result": "success",
+    "note": "All runs on exact source SHA; Active/HUD isolated CI branch because focus branch concurrency cancels older runs"
+  },
+  "package_artifact": {
+    "id": 11538577746,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-0f349f4b6b62d41bdb61d8a53dba3ce3a1815e4f",
+    "size_bytes": 2749558,
+    "digest": "sha256:595778efe7d425ab07aaafbaff0e1814cd1023c8b76ede1101658b1ff6b1a2b2"
+  },
+  "runtime_note": "Quest 3 / VDXR headset display, F11/menu/HUD, rival/rank anchors, lens flare, SkyGlow and frame pacing NOT TESTED. Existing 00519 regressions stay OPEN; no visual PASS."
 }
