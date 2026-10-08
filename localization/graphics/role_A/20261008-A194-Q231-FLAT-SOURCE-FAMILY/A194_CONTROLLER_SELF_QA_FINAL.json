@@ -1,0 +1,197 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-A194-Q231-FLAT-FAMILY-FINALIZE-20261008-2100",
+  "role": "A",
+  "run": "20261008-A194-Q231-FLAT-SOURCE-FAMILY",
+  "assessment_at_kst": "2026-10-08T21:05:00+09:00",
+  "queue_index": 231,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34"
+  },
+  "prior_independent_c1_reject_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+  "new_candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+  "published_candidate_git_blob_sha": "3eb25d96958f6d09380e9f40b46ae3569651e33b",
+  "candidate_file_size": 8388736,
+  "method_change": "Physical NotoSansCJK-Black.ttc with source-derived dark-gray/red fill, zero artificial stroke, zero invented offset shadow; exact source alpha erase for four target text rows. Preserve original LAN large/small rows.",
+  "backend": {
+    "source_of_truth": "GitHub",
+    "generation": "GitHub Actions run 37767491356; completed SUCCESS 2026-10-08 after previous 20:18 KST checkpoint; compute runner evidence",
+    "local_execution_attempt": "ChatGPT container raw.githubusercontent.com DNS unavailable; no local raw DDS file retrieval",
+    "visual_inspection": "N100 MCP fallback only sub-MiB SOURCE/CLEAN/FINAL JPG, RAW JPG, practical 50% JPG and four existing PNGs, ~2MP PIL/NumPy mask QA, no DDS encoding or large repository operations"
+  },
+  "source_family_profile": {
+    "gray_help": "Single heavy condensed dark gray (~RGB 63,71,74), no offset dark/shadow edge in English",
+    "red_big": "Single flat saturated dark-red (~RGB 186,0,0), no light red beveled offset shadow",
+    "gray_small": "Single heavy dark-gray face, no displaced double outline"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "pixel_format": "BGRA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "dds_size_bytes": 8388736,
+    "exact_header_roundtrip": "PASS from persisted candidate worker report"
+  },
+  "regions": [
+    {
+      "key": "help_online",
+      "source_bbox": [
+        7,
+        371,
+        1446,
+        437
+      ],
+      "decoded_final_bbox": [
+        9,
+        376,
+        1441,
+        431
+      ],
+      "positive_margins": [
+        2,
+        5,
+        5,
+        6
+      ]
+    },
+    {
+      "key": "help_lan",
+      "source_bbox": [
+        2,
+        531,
+        1122,
+        597
+      ],
+      "decoded_final_bbox": [
+        4,
+        536,
+        957,
+        591
+      ],
+      "positive_margins": [
+        2,
+        5,
+        165,
+        6
+      ]
+    },
+    {
+      "key": "online_big",
+      "source_bbox": [
+        6,
+        867,
+        640,
+        1012
+      ],
+      "decoded_final_bbox": [
+        8,
+        874,
+        369,
+        1004
+      ],
+      "positive_margins": [
+        2,
+        7,
+        271,
+        8
+      ]
+    },
+    {
+      "key": "online_small",
+      "source_bbox": [
+        1298,
+        949,
+        1560,
+        1011
+      ],
+      "decoded_final_bbox": [
+        1300,
+        951,
+        1454,
+        1008
+      ],
+      "positive_margins": [
+        2,
+        2,
+        106,
+        3
+      ]
+    }
+  ],
+  "machine_qa": {
+    "source_and_candidate_declared_by_worker": "PASS",
+    "bbox_and_positive_margins": "4/4 PASS",
+    "changed_pixels_vs_original": 140523,
+    "changed_outside_original_source_bboxes": 0,
+    "alpha_outside_original_bboxes": 0,
+    "protected_changed": 0,
+    "render_protected_overlap": 0,
+    "source_residue": 0,
+    "clean_plate_residue_outside_korean": 0,
+    "pairwise_glyph_overlap": 0,
+    "pairwise_one_pixel_touches": 0,
+    "persisted_dds_roundtrip": "PASS",
+    "preserved_LAN_large_small": "PIXEL_EXACT outside changed source bounds"
+  },
+  "plate_only_gate": {
+    "assessment": "PASS_PRODUCER_NATIVE_AND_CONTRAST",
+    "evidence": [
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_SOURCE_READABLE.png",
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CLEAN_PLATE.png",
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_SOURCE_TEXT_MASK.png"
+    ],
+    "fresh_mask_probe": "Direct source-vs-CLEAN and source text mask pixel-wise Pillow/NumPy compare on existing lossless PNG bytes via N100 small-image fallback",
+    "source_mask_pixels": 121288,
+    "source_clean_changed_pixels": 121288,
+    "source_clean_changed_outside_source_mask": 0,
+    "source_mask_pixels_with_uncleared_alpha": 0,
+    "source_clean_changed_outside_original_four_bboxes": 0,
+    "visual": "Viewed CLEAN alone on contrasting dark, and SOURCE/CLEAN in native contact on light background. Intended original glyphs fully disappear; preserved LAN (large/small) remain exactly visible; no ghost, rectangular box, seam or lost plate art observed. Transparent source atlas, so plate reconstruction is alpha=0, not arbitrary opaque fill."
+  },
+  "composite_contamination_gate": {
+    "assessment": "PASS_PRODUCER_PIXEL_MASK_AND_VISUAL",
+    "evidence": [
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CLEAN_PLATE.png",
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_FINAL_READABLE.png",
+      "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_SOURCE_CLEAN_FINAL_CONTACTS.jpg"
+    ],
+    "clean_final_changed_pixels": 90590,
+    "clean_final_changed_outside_original_four_bboxes": 0,
+    "clean_final_alpha_changed_outside_original_four_bboxes": 0,
+    "clean_final_changes_with_zero_final_alpha": 0,
+    "visual": "CLEAN and FINAL examined as separate stages plus original/CLEAN/final four-section comparison. New text consists of only solid gray/red Black glyphs with antialias; old doubled offset and red underline/bevel no longer visible, no extra rectangular transfer or protected-LAN intrusion."
+  },
+  "eight_stage_visual_gate": {
+    "english_removed": "PASS no target English residue, LAN preserved intentionally",
+    "readable_lean": "PASS source labels upright, Korean upright; RAW inverse matched",
+    "size": "PASS 4/4 source height/width ceiling and practical 50% relative reading (new Korean natural shorter large ONLINE allowed)",
+    "weight_and_effect": "PASS producer compared original red ONLINE single flat strong red and gray help solid to new Korean; old A93 added shadow/outline removed",
+    "clip": "PASS no observed missing component in native four region contact and 50%",
+    "protected": "PASS preserved LAN label/nontext graphics unchanged",
+    "flipY_RAW": "PASS compared source and final mirrored-Y RAW; no added flip error",
+    "readability": "PASS four Korean labels immediately legible in native and 50% contact"
+  },
+  "controller_visual_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C1",
+  "independent_C1": "PENDING",
+  "independent_C3": "PENDING",
+  "current_evidence_approval": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "user_review": "PENDING",
+  "actual_game_retest": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence_export": [
+    "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PRACTICAL_100.jpg",
+    "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PRACTICAL_75.jpg",
+    "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PRACTICAL_50.jpg",
+    "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_RAW_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_EBE401C8_REPORT.json"
+  ],
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "completion_note": "This is delayed successful output of original A194 work, not a second asset/retry. Previous A194 pending call awarded zero."
+}
