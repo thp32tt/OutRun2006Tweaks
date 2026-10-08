@@ -1,0 +1,44 @@
+{
+  "run": "B281",
+  "queue_index": 98,
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "previous_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "8520251c67b33c838c7685444c3ed5e167d98142fc4bef307a9e3cacf61b2438",
+  "method": "B40_MASK_ERODED_INNER_WHITE_PLUS_ENGLISH_NAVY_DIFFUSE_HALO",
+  "machine": {
+    "changed_rgba": 56954,
+    "decoded_english_outside_rgba": 0,
+    "alpha_mips_headers": "PRESERVED",
+    "decoded_bbox": [
+      571,
+      13,
+      1532,
+      113
+    ],
+    "white_pixels": 38330,
+    "navy_pixels": 70487
+  },
+  "visual_findings": [
+    "Source English native and 50-percent contrast views retain separated inner white strokes and thick navy diffuse halo.",
+    "B281 further narrows white mask but still presents fused or closed Hangul counters and abnormal heavy white faces, visible at 100% and 50%.",
+    "B40 authored glyph mask is a broad footprint, not an exact glyph interior; erosion alone cannot repair its shape."
+  ],
+  "views": [
+    "B281_READABLE_GRAY_100_EN_CLEAN_B279_TRIAL.png",
+    "B281_READABLE_GRAY_50_EN_CLEAN_B279_TRIAL.png",
+    "B281_READABLE_WHITE_100_EN_CLEAN_B279_TRIAL.png",
+    "B281_RAW_BLACK_75_EN_CLEAN_B279_TRIAL.png"
+  ],
+  "producer_visual": "FAIL",
+  "reason_codes": [
+    "BROKEN_GLYPH_CLOSED_COUNTERS",
+    "UNQUALIFIED_WHITE_FACE_SOURCE_FAMILY"
+  ],
+  "decision": "REWORK_REQUIRED_NO_PROMOTION",
+  "next": "B282 uses only previously recovered B279 native glyph geometry as mask, builds clean RGB independently with pinned English source style; no prior JPEG or raster base.",
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "candidate_promoted": false,
+  "backend": "GITHUB_ACTIONS_AND_CONTROLLER_VISUAL"
+}
