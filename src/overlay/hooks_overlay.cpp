@@ -219,7 +219,7 @@ class D3DHooks : public Hook
 			// give it explicit SCREEN_OVERLAY_2D ownership so R30 applies the
 			// established binocular common-ray/FOV correction. Keep front-end/menu
 			// rendering untouched, where the user-observed overlay is already correct.
-			if (overlayActive && Game::is_in_game())
+			if (overlayActive && Game::is_vr_gameplay_presentation())
 			{
 				OutRunVR::GameSemantic::ScopedExternalOverlaySemantic semantic(
 					OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D);
