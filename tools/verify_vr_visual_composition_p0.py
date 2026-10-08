@@ -447,13 +447,15 @@ require('FileData.getFileData(', textures, 'replacement file data lookup')
 require('&transientOwner', textures, 'transient owner handoff into file lookup')
 
 # Pin the lifetime fix itself, not just the presence of transient-load symbols.
+# For the UI fast-loader fallback, keep the transient owner alive through both
+# the attempted fast decoder and any legacy Ex-trampoline retry.
 # Each wrapper must own the shared buffer in the same function scope that calls
 # D3DX, so an oversized replacement cannot dangle between HandleTexture and the
 # actual texture creation call.
 for marker, d3dx_call in (
     (
         'static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(',
-        'return D3DXCreateTextureFromFileInMemoryEx_Custom(',
+        'const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom(',
     ),
     (
         'static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(',
