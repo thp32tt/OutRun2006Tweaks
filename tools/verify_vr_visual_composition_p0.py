@@ -599,6 +599,79 @@ require_order(
     'else if (state.worldEffect)'
 )
 
+# The 5868 Quest 3 hudtrace exposes 0xBAAEA (255 rows). The original R70
+# and canonical EXE Inspector confirm this is the BA9D0 text producer's
+# sprani child, alongside the 0xBAAA0 clip child. Exact-parent scope only.
+def check_outrun_text_owner(source, contracts):
+    for rva, expected, target, needle in (
+        (0xBAAA0, 'e8db27f7ff', 0x2D280, 'OutRunHudTextClipCallRva = 0xBAAA0'),
+        (0xBAAEA, 'e891eaf6ff', 0x29580, 'OutRunHudTextSpraniCallRva = 0xBAAEA'),
+    ):
+        found = [x for x in contracts if int(x['rva'], 16) == rva]
+        if len(found) != 1:
+            raise SystemExit('P0 missing/duplicate BA9D0 original EXE CALL %X' % rva)
+        e = found[0]
+        raw = e.get('expectedBytes', '')
+        if e.get('signatureLength') != 5 or raw != expected:
+            raise SystemExit('P0 original BA9D0 CALL bytes mismatch %X' % rva)
+        op = bytes.fromhex(raw)
+        if op[0] != 0xe8 or ((rva + 5 + int.from_bytes(op[1:], 'little', signed=True)) & 0xffffffff) != target:
+            raise SystemExit('P0 original BA9D0 CALL target mismatch %X' % rva)
+        if not any(b.get('path') == 'src/hooks_uiscaling.cpp' and b.get('needle') == needle
+                   for b in e.get('sourceBindings', [])):
+            raise SystemExit('P0 original BA9D0 child source binding missing %X' % rva)
+        require(needle, source, 'exact BA9D0 child RVA source')
+
+    parent = function_body(source, 'static void __cdecl OutRunHudTextProducer_dest(')
+    require_order(parent, 'scope only original ScreenHud parents of BA9D0',
+                  'OutRunHudTextCallerRva(_ReturnAddress())',
+                  'OutRunVRHudSemantics::ClassifyCaller(caller)',
+                  'const bool previous = OutRunHudTextScreenHud;',
+                  'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
+                  'OutRunHudTextProducerHook.call(',
+                  'OutRunHudTextScreenHud = previous;')
+    for sig, original in (
+        ('static int __cdecl OutRunHudText_clip(', 'Game::put_clip_sprite('),
+        ('static int __cdecl OutRunHudText_sprani(', 'Game::sprani_play_ae_auth_alpha('),
+    ):
+        body = function_body(source, sig)
+        require_order(body, sig + ' all-node ScreenHud ownership',
+                      'if (!OutRunHudTextScreenHud)',
+                      'std::array<SpriteNode*, Game::SpritePriorityCount> before{};',
+                      'const int result = ' + original,
+                      'TagAppendedNodes(before,',
+                      'RenderScope::ScreenHud',
+                      'return result;')
+    install = function_body(source, 'bool apply() override')
+    require_order(install, 'BA9D0 source-to-E8-child install',
+                  'OutRunHudTextProducerHook = safetyhook::create_inline(',
+                  'Module::exe_ptr(OutRunHudTextProducerRva)',
+                  'if (OutRunHudTextProducerHook)',
+                  'Module::exe_ptr(OutRunHudTextClipCallRva)',
+                  'Module::exe_ptr(OutRunHudTextSpraniCallRva)')
+    if 'ScopedProducerSemantic' in parent:
+        raise SystemExit('P0 retired R70 API reintroduced')
+
+check_outrun_text_owner(ui, json.loads(binary_contract)['contracts'])
+for label, marker0, mutant in (
+    ('parent classification bypass',
+     'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
+     'semantic.space != OutRunVRHudSemantics::SpacePolicy::ScreenHud;'),
+    ('clip child no tag',
+     'OutRunHudText_clip(', 'OutRunHudText_clip_untagged('),
+    ('sprani child no tag',
+     'OutRunHudText_sprani(', 'OutRunHudText_sprani_untagged('),
+):
+    if marker0 not in ui:
+        raise SystemExit('P0 BA9D0 mutation fixture missing ' + label)
+    try:
+        check_outrun_text_owner(ui.replace(marker0, mutant, 1),
+                               json.loads(binary_contract)['contracts'])
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 BA9D0 negative mutation survived: ' + label)
+
 # Uploaded 5868 HMD evidence: a large queue-owned UI fraction was rendered
 # and several rank producers ran, but the headset still shows duplicated
 # and head-following HUD. Never build an eye HUD from GPU c64 already
