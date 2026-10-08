@@ -12,7 +12,7 @@
 - [x] C0: 인증된 GitHub 현재 브랜치, 원본 리그레션 기록, 정확 SHA 4종 CI 완료 재검증.
 - [x] C1: 사용자 기존 항목 총목록 및 증상·정확 원본 game producer 소유권 대조.
 - [x] C2: SceneEffect/lens/SkyGlow/그림자, WorldBillboard/rank 1~5위, HUD/글리프/+TIME/골인, 메뉴/YES-NO/F11/texture, recenter, 프레임 페이싱 소스 정적 분기 대조.
-- [ ] C3: 새로운 소스 위험 여부를 기존 fix·negative test와 대조해 false-positive 배제. 발견 항목은 정확 수정 지점과 재현 가능한 반증 조건 기입.
+- [x] C3: 새로운 소스 위험 여부를 기존 fix·negative test와 대조해 false-positive 배제. 발견 항목은 정확 수정 지점과 재현 가능한 반증 조건 기입.
 - [ ] C4: 최종 triage·필수 CI/실기 검증·인계. 별도 요청 또는 확실한 소스 버그 없이는 넓은 휴리스틱 수정 금지.
 
 ## C0 상태
@@ -76,8 +76,42 @@
 - All H1-H8 are *conditional source gaps* or original error paths, not new confirmed user HMD optical failures. Distinguish H7 upstream backend error path (source-confirmed) from actual occurrence (unproven).
 
 
-## C3 — 반증·남은 결함
-PENDING
+## C3 — 반증 검증, 실제 빌드 경로, 잔존 위험 분류 (C3_COMPLETED)
+
+### 오래된 분석을 현재 결함으로 잘못 등록하지 않기 위한 다섯 가지 반증
+1. **교차-Present stale raw-WVP 가설 반증:** `outrun_renderer.cpp::NotifyGamePresent` -> `InvalidateGameWvpWrite`, 이어 `stereo_renderer_r7.inc`가 `PresentEpoch` 증가. 따라서 유효한 마지막 원본 WVP가 다른 Present로 넘어간다는 초기 H1 가정은 잘못되었음. 의심 영역은 동일 Present 안 c64 writer vs SpriteNode consumer timing에 한정.
+2. **정확 ScreenHud의 world-veto 구버전 지적 해소:** 현재 R30 shader classifier는 exact `semanticHud`를 perspective ScreenHud로 인정하고, world verification veto는 `semanticWorld` 분기 내부로 제한됨. 2026-10-08 초기 `AI2_QUEST3_CROSS_DOMAIN_SOURCE_REVIEW_20261008.md`의 옛 world-veto finding을 현재 소스 결함으로 재등록하지 않음.
+3. **F11 fixed XYZ에 active owner가 없다는 과거 진단 해소:** 현재 `R30PrepareExternalImGuiProjection` + `R30TryExternalImGuiIndexed`에서 null VS, FVF XYZ, orthographic, L/R per-eye projection/scissor, raster state 복원이 구현됨. 부정되는 것은 과거의 '완전 미처리' 주장뿐. 실제 gameplay Quest 3 복시 종료는 미검증; `Game::is_in_game` vs renderer mode predicate mismatch는 남음.
+4. **4~5위 multi-child 일부 태그 누락 및 rival last-car cache:** `TagAppendedNodes`는 모든 priority와 node sibling을 돌고, `RankMarkerSub_dest`는 호출 단위 projected anchor 초기화하며 rival payload는 한 번 소비한다. 예전 last-tail-only / global-sticky-rival 상태와 같다고 오진 금지; 단 skipped producer 이후 `RivalMarkerProjectedInfo`의 같은-thread 소비가 지연되는 경우는 미확인.
+5. **ImGui gitlink만 변경하면 CI가 안 돈다는 이전 지적 해소:** 현재 `vr-dx9ex-active.yml`, `outrun-exe-hud-inspector.yml`(push/PR), `dx9ex-fullsource-impact-review.yml`은 `external/imgui`와 `.gitmodules`를 트리거/주요 입력으로 감시한다. 핀된 ImGui의 실제 LockRect 실패 취급은 이 CI watcher 수정과 별개.
+
+### 생산 바이너리 판별과 완료한 실제 CI
+- P0 production selector is **ACTIVE_R26_R43_R44** not an R33 production binary. `.github/workflows/vr-dx9ex-active.yml` game build line205 sets OUTRUN_VR_SAFE_DRAW_COMPARE=OFF, OUTRUN_VR_R26_HUD_COMPARE=ON, C1/C2=OFF and stages VARIANT_ID. `CMakeLists.txt` line188 compiles `stereo_renderer_r30_r26_safe.cpp` in this selector. R33 is a separate full-chain-compile gate, not packaged game payload.
+- Frozen source material SHA: `9d01dd3eb871be4a439457247596a60cb5c8f74b`. Four jobs from same exact SHA SUCCESS: DX9Ex Active 37766111828 (policy/game/host/full-chain/package), EXE HUD Inspector 37766111701 (71 original calls; P0 composed verifier/mutations; game build), Full Source Impact 37766111648 (source + Win32 and x64 MSVC analyze), Domain Isolation 37766111726.
+- Actual GitHub published package artifact 11544895824, name `OutRun2-VR-DX9EX-ACTIVE-9d01dd3eb871be4a439457247596a60cb5c8f74b`, SHA-256 digest `ad9feea78a712d4ef901981c264c1b42c8da0b03af203bdff70b42d26498bcdc` (ZIP digest, not an HMD test). Source code commit is 9d01dd3e; docs-only focus HEAD advanced during this review.
+- MSVC `game /analyze` SUCCESS **with warnings**: render_semantics.hpp lines307/473 C28020 (analyzer cannot prove 0..capacity array index); source counts/oldest replacement/compaction ensure bounds to capacity under registry lock, no source-evidence of OOB found from those warnings. External fmt/spdlog/miniz and unrelated wheel warnings are not a Quest HUD FAIL. x64 host has C6262 34–38 KB stack-local warnings in main.cpp/main_r23.cpp; risk to monitor, no demonstrated HMD performance root cause.
+
+### 실제 미종결 결함·실측이 필요한 반례 우선순위
+| Rank | 증상·발화 조건 | 정확 구분 테스트 / 원인 아님을 입증하는 결과 | 상태 |
+|---|---|---|---|
+| P0-A | +TIME/골인/흰 글자 복시/헤드락 | same *within-Present* game c64 original vs transformed, `LastGameWvpSemanticScope`, queue node/epoch, shader identity, `R30ExactHudExtendedRawWvp`/Miss, fallback, left/right HUD count. Valid c64 original before queue active may use wrong frame-local producer even though Present invalidation works | USER_00519_FAIL, CURRENT_HMD_UNTESTED |
+| P0-B | 메뉴/차량 선택 텍스처 유실·흰색/갈색 UI | log `FixFileLoadRace: XPR0 entry outside xmtset block ... skipping remaining textures` and native D3DX/UiDdsOriginalState fallback, texture ID/LockRect/UnlockRect/UpdateSurface; compare *theater* screenshot and raw DDS. Absence of skip log falsifies H5 for that reproduction | USER_00519_FAIL, DDS_SOURCE_CI_PASS/OPTIC_OPEN |
+| P0-C | 1~5위/라이벌 마커 차량에서 떨어짐/중복 | rank 0xBAEE7→0xBAD20 invocation & rival 0xBB6F5→0xBB796 producer, *car identity*, `R57ProjectedPayloadMissing`, behind-eye clipW, eye-specific delta, child count; if all current car/pose epochs align, old stale-car hypothesis falsified | USER_00519_FAIL/CURRENT_HMD_UNTESTED |
+| P0-D | 렌즈 flare+빛 번짐 vs 시작 그림자 | distinguish lens original 0xCABE alpha, 0xCF4E projected 2D and scoped camera near restore; per-eye pass count, c64 raw WVP, SkyGlow `SceneCaptureEpoch/UiCaptureSkips`, car-ground original 3 draw callsites, depth/stencil. Factor=0 vs current separately, no generic alpha changes | HMD_UNTESTED |
+| P0-E | F11 UI doubled in race, arrows/YES-NO | `Game::is_in_game` versus `CurrentPresentationMode` actual state; F11 null VS/FVF XYZ, present worldStereo available, eye projection/scissor+restore. Theater/menu must remain single; options exact game sprites are not ImGui | H6 source predicate MISMATCH, HMD_UNTESTED |
+| P1-F | result scene +TIME vs GOAL gameplay | explicit renderer mode: STATE_GOAL/TIMEUP Gameplay, STATE_RESULT/CONTINUE Theater; source-state label and host actual layer on display, independent of Sumo +TIME ticks. Do not apply game finite HUD plane to result theater without proof | OPTIC_OPEN |
+| P1-G | recenter and performance | R23 host `candidateRejectReason`, `sourcePoseSequence`, stereo flags, cached projection 1s / mode debounce 750ms, capture/commit/render/endFrame P95 + game duplicate draw per Present, 72/90-Hz timing and finite HUD pose epoch | USER_90HZ_FAIL/CURRENT_UNMEASURED |
+| P2 | world heart / particle marker | `ArmNextDraw` one-shot skipped-draw counterexample across frame/queue. Before source fix, require one deterministic no-D3D-draw injection to prove stale tag can be consumed by a later different object | SOURCE_CONDITIONAL H3 |
+| P2 | blank F11 atlas / no-tick 8+ masked children | pinned ImGui `WantCreate/WantUpdates` LockRect failure marks OK despite no pixels, assert successful upload before status OK under fault injection; original mask count >8 proof before adjusting bounded Sumo deep-copy | CONFIRMED_LIB_ERROR_PATH / ACTUAL_USE_UNPROVEN |
+
+### Producer family coverage beyond the headline symptoms
+- `src/vr/hud_semantics.hpp` directly maps `HUD_GEAR_REV`, `HUD_GHOST`, `HUD_GOAL_TIME`, `HUD_HEART_TOTAL`, `HUD_RANK_EMOJI/TEXT`, `HUD_GF_WARNING`, slipstream, fruit, C2C speech, while `WORLD_HEART`/`WORLD_RIVAL_MARKER` stay WorldBillboard. `src/hooks_textures.cpp::ClassifyDirectVrSpriteCaller` and `TagDirectVrSpriteNodes` map exact return RVA without hot-path callstack walk. These are **protected by static semantic map, NOT user-verified every overlay**.
+- Original source maps and canonical 71 direct HUD CALL manifest correspond to code path, but not all possible GPU runtime branches. Goal and result have different gameplay/theater owners.
+
+### Avoid false successes
+- HUD Inspector passing means known producer routing and source invariants are intact, not that lens intensity or location, number of HMD images, DDS pixels, world shadow or frame-time is visually correct.
+- No actual Quest3 test, GPU capture or runtime log occurred during C3. Do not close Issue #13 failures and do not change R50 protected world or startup behavior based on conditional H3–H8.
+
 
 ## C4 — 최종 판정과 다음 변경
 PENDING
