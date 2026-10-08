@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 23:59 KST",
+  "updated_at_kst": "2026-10-09 00:02 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8165,5 +8165,19 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_CONTROLLER_C3_HOLD.json",
     "machine": "localization/graphics/role_C/20261008-C309-C2-Q176-SOURCE-FAMILY-52-PROOF/C309_Q176_SOURCE_FAMILY_MACHINE.json"
+  },
+  "c309_c1_q111_a161_supersession": {
+    "task_id": "OUTRUN-KOR-C309-C1-Q111-A161-STALE-C-PASS-20261008",
+    "index": 111,
+    "current_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+    "old_c111_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+    "new_png": 24,
+    "rgba_changed_outside_four": 0,
+    "current_C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVALS": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_CONTROLLER_C1_HOLD.json"
   }
 }

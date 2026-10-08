@@ -1,0 +1,13 @@
+{
+  "old_sha_source": "C111 A_RECOVERY12 decoded readable PNG (candidate old d5fa57... according C111 report)",
+  "old_rgba_in_new_diff_pixels": 149294,
+  "changed_rgba_outside_four_source_bboxes": 0,
+  "changed_alpha_outside_four_source_bboxes": 0,
+  "old_bboxes_coverage_pixels": 242367,
+  "changed_bbox": [
+    4,
+    125,
+    1587,
+    344
+  ]
+}

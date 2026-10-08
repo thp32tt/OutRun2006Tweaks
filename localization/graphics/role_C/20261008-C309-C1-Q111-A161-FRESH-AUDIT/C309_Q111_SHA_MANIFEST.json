@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C309-C1-Q111-A161-STALE-C-PASS-20261008",
+  "index": 111,
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "current_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+  "clean_sha256": "23445c207db63ab4fd2a01e164231857b373d69139352c82f7b01ac25d031685",
+  "prior_candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+  "native_images": [
+    {
+      "name": "C309_Q111_01_keep_passing_native_GRAY.png",
+      "sha256": "178e2668cd3e4e4e3ee765f7d12cdc63f8ac4d95bd3232b0a1c8f0e0ea9b2914",
+      "bytes": 84940,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_GRAY.png",
+      "git_blob_sha": "c14ad95bd16d54fcf8b9d47da0d7263659e2f348"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_native_BLACK.png",
+      "sha256": "d62d1abc8ec33d745e66b4256789114bfacbda7c75242ff4d5be5662991c9f78",
+      "bytes": 85644,
+      "row": "keep_passing",
+      "background": "BLACK",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_BLACK.png",
+      "git_blob_sha": "ea76bc0f75f034d28adf52f18881f389bc58d3d9"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_native_WHITE.png",
+      "sha256": "6020f115cd0c6703a899f331d0cdba337dabee7582b0afccbf92abd88e77c76d",
+      "bytes": 78662,
+      "row": "keep_passing",
+      "background": "WHITE",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_WHITE.png",
+      "git_blob_sha": "6256e8d4311e017aec256ef0063b4f05c17ec9df"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_zoom2_GRAY.png",
+      "sha256": "b3d7ea5d636eed6e2fc1d1c70412e8da8ce98ca4f8fcf50d7a90d7cd2b785c69",
+      "bytes": 108312,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "zoom2",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_zoom2_GRAY.png",
+      "git_blob_sha": "294cb5d1236b0149b7ca404c681b809baf8f3d4e"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_practical50_GRAY.png",
+      "sha256": "6b91298872fa2a185b633983ceb9723421088583ad34c65ce26d56e238fc68a7",
+      "bytes": 45618,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "practical50",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_practical50_GRAY.png",
+      "git_blob_sha": "3779813061f39a0e8ca688c08291203828ae2f29"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_raw_GRAY.png",
+      "sha256": "94239ba09206ea9bdf952b9dc0ec63e9176e89f8531497fc5a6adb4f68870436",
+      "bytes": 82725,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "raw",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_raw_GRAY.png",
+      "git_blob_sha": "c70a7ce8bfd8357caff48756c7b6d370e10702a7"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_GRAY.png",
+      "sha256": "dd215a8014127df74a7e2119debc95e05c8d48d33419d616e7eed8060a0de373",
+      "bytes": 32436,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_GRAY.png",
+      "git_blob_sha": "6b53f3c3a6a84639e5986623b063ee7ea3870e5e"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_BLACK.png",
+      "sha256": "74f6f0e55a36a471803b431d26b572dbe08c4d1c269f1c123c4546512c213206",
+      "bytes": 32895,
+      "row": "drift",
+      "background": "BLACK",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_BLACK.png",
+      "git_blob_sha": "90bf9cd4b97cd54944faa83344baf4352c3acd8d"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_WHITE.png",
+      "sha256": "262cb9e77a94d6bb2078ceab898ba99f76b89ccbb494afcc2df8c71daf6ca9b4",
+      "bytes": 27988,
+      "row": "drift",
+      "background": "WHITE",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_WHITE.png",
+      "git_blob_sha": "3109628e6e8359cf58611f5cf1148f0cf3478ee2"
+    },
+    {
+      "name": "C309_Q111_02_drift_zoom2_GRAY.png",
+      "sha256": "c02a62be3f3dd623e790412b8c19ec642c967a805349fca715990631820bfd55",
+      "bytes": 42618,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "zoom2",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_zoom2_GRAY.png",
+      "git_blob_sha": "ffceac9137d5e1fc5887b73b7464ecdc79c6f724"
+    },
+    {
+      "name": "C309_Q111_02_drift_practical50_GRAY.png",
+      "sha256": "541af023997d294ece59dd30e3432ed43431bf3f03ac9d775aed547e1338bc14",
+      "bytes": 18505,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "practical50",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_practical50_GRAY.png",
+      "git_blob_sha": "04f75acecedfc5ae0a701871bb094e6033ca28a4"
+    },
+    {
+      "name": "C309_Q111_02_drift_raw_GRAY.png",
+      "sha256": "7c1dfd41a3034066e327fff7584f2a72885cb177f7b5a724cc0e7a7c0bac985c",
+      "bytes": 31950,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "raw",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_raw_GRAY.png",
+      "git_blob_sha": "e5ecef1ed62ad001342a0f087c9d8128fd8bc36e"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_GRAY.png",
+      "sha256": "d85073a463567bd14f3eb51a30d72e3f0348165bb1ee16e09805aa17dd7dff31",
+      "bytes": 109201,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_GRAY.png",
+      "git_blob_sha": "01c090f7b3a6af57af0e5b3b15dfc4bdeaf1b7cd"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_BLACK.png",
+      "sha256": "0cfdcc5d51f98d24f984d9197c189792c67bca89b8f66db6af9362c8305f4e8f",
+      "bytes": 109532,
+      "row": "dont_crash",
+      "background": "BLACK",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_BLACK.png",
+      "git_blob_sha": "2ce37439f589b750a7a914078eca9f98f4072531"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_WHITE.png",
+      "sha256": "d87c64e72611c576947dedb06dedfa6b0b053ae7a89964e603d21e479586fa4e",
+      "bytes": 96238,
+      "row": "dont_crash",
+      "background": "WHITE",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_WHITE.png",
+      "git_blob_sha": "3c43bb0c1a298a11613e4843e4b7635950c01fed"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_zoom2_GRAY.png",
+      "sha256": "b6acd61a1506f7dd15509915a1490706361294407dc0dcdbe3b316f880a1e82d",
+      "bytes": 141656,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "zoom2",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_zoom2_GRAY.png",
+      "git_blob_sha": "4a0aee936874ed933dd3157cb7a260b27094a310"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_practical50_GRAY.png",
+      "sha256": "56017eaf48f1ff092568daa7f404b7d7ce85eb98a37a2c073aaf1eda2a39a3f5",
+      "bytes": 58526,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "practical50",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_practical50_GRAY.png",
+      "git_blob_sha": "9dcdd9528f1deabe406f3fce29ad4873a61056d3"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_raw_GRAY.png",
+      "sha256": "ca45a2f46feffa8fd7afe7b14f76c1e1f1b3fc3ab29941adee958ccdd4bc72cd",
+      "bytes": 107580,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "raw",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_raw_GRAY.png",
+      "git_blob_sha": "ced2b4f17bdd5626de97f95001f081d92c79482d"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_GRAY.png",
+      "sha256": "4ad96b42b38dfa1239165bb13120959c6f07090f3a5f1b1084f4d928c9d65657",
+      "bytes": 106609,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_GRAY.png",
+      "git_blob_sha": "6a80f2fac67427ea2b51577e3e93ed2f5c2b08be"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_BLACK.png",
+      "sha256": "9bcefad9cfee38c5295e1a09a1265372c49a4f1d134dbd62b6cc9494cc2e8e43",
+      "bytes": 106963,
+      "row": "go_gate",
+      "background": "BLACK",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_BLACK.png",
+      "git_blob_sha": "1474ba2248d9c04d26f0cfd6242c79ec44dda517"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_WHITE.png",
+      "sha256": "076bce78bbcc35ce1c892dfbe02c5cc3b2a7dab3674b575669678df06a81b007",
+      "bytes": 97368,
+      "row": "go_gate",
+      "background": "WHITE",
+      "variant": "native",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_WHITE.png",
+      "git_blob_sha": "4140f3c5aef926060f736d0236ca041bffbfb820"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_zoom2_GRAY.png",
+      "sha256": "6746fe736fb7f811c5aead59d719d2f5cdb14c354fef87a9ffd632865cc713e6",
+      "bytes": 137821,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "zoom2",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_zoom2_GRAY.png",
+      "git_blob_sha": "c53b0ba94e4d85b8a9d3505df53e4d6b62744c57"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_practical50_GRAY.png",
+      "sha256": "2b7056d385a767f0e95db1fe1e8fed7ecacd425fe198be0f69609354f12e8d0e",
+      "bytes": 55199,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "practical50",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_practical50_GRAY.png",
+      "git_blob_sha": "8a7d350d712188dfea60cc829804a9e70e274170"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_raw_GRAY.png",
+      "sha256": "e871495b799077d5f692a3f6284d03b0276f824498bcb21dc58bc9dcd8d69627",
+      "bytes": 105340,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "raw",
+      "path": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_raw_GRAY.png",
+      "git_blob_sha": "a145ac9969e42ec06352de129e966bad5c397495"
+    }
+  ],
+  "image_count": 24,
+  "total_bytes": 1904326,
+  "new_dds": 0,
+  "orientation": "DDS raw mirror-Y, readable FLIP-Y",
+  "QA": "HOLD_STRICT_RECHECK",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

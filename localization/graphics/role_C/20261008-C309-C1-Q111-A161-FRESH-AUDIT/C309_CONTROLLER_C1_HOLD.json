@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C309-C1-Q111-A161-STALE-C-PASS-20261008",
+  "at_kst": "2026-10-08 23:56 KST",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 111,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036"
+  },
+  "current_candidate_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+  "producer": "A161",
+  "old_C111_candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+  "old_C111_static_decision": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "CRITICAL_FINDING": "Current branch physically contains A161 changed DDS. Historic C111 pass is for DIFFERENT old SHA. Queue status was stale and cannot confer any current-byte PASS; correct queue to current C HOLD. This is FRESH C review, not historical C3.",
+  "triage_run": "python tools/localization/rework_triage.py --index 111 => VALIDATION_ONLY from stale queue; exact-byte SHA supersession overrides status",
+  "backend": "GitHub authoritative read/upload, ChatGPT native source/clean/final visual firstlook, N100 MCP fallback bounded download/decode because GPT local DNS unavailable",
+  "machine_report": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_MACHINE.json",
+  "old_new_diff_report": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_C111_TO_A161_DIFF.json",
+  "sha_manifest": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_SHA_MANIFEST.json",
+  "pixel_gate": {
+    "dds_header_equal": true,
+    "raw_orientation": "flip_y",
+    "old_C111_preview_candidate_delta_pixels": 149294,
+    "old_to_new_changed_outside_four_source_boxes": 0,
+    "old_to_new_alpha_changed_outside_four_source_boxes": 0,
+    "all17_source_clean_outside": 0,
+    "all17_source_final_outside": 0,
+    "all17_clean_final_outside": 0,
+    "all17_alpha_changed_outside": 0,
+    "local_rows": [
+      {
+        "id": "keep_passing",
+        "source_bbox": [
+          1,
+          143,
+          520,
+          236
+        ],
+        "candidate_claimed_bbox": [
+          4,
+          146,
+          496,
+          233
+        ],
+        "bbox_margin": [
+          3,
+          24,
+          3,
+          3
+        ],
+        "source_wh": [
+          519,
+          93
+        ],
+        "candidate_wh": [
+          492,
+          87
+        ],
+        "source_clean_rgba_diff": 36248,
+        "clean_final_rgba_diff": 35807,
+        "source_final_rgba_diff": 41026,
+        "clean_final_outside_claimed_in_source": 1034,
+        "clean_alpha_min_max": [
+          0,
+          0
+        ]
+      },
+      {
+        "id": "drift",
+        "source_bbox": [
+          500,
+          120,
+          720,
+          228
+        ],
+        "candidate_claimed_bbox": [
+          503,
+          125,
+          717,
+          222
+        ],
+        "bbox_margin": [
+          3,
+          3,
+          5,
+          6
+        ],
+        "source_wh": [
+          220,
+          108
+        ],
+        "candidate_wh": [
+          214,
+          97
+        ],
+        "source_clean_rgba_diff": 14040,
+        "clean_final_rgba_diff": 14576,
+        "source_final_rgba_diff": 19527,
+        "clean_final_outside_claimed_in_source": 46,
+        "clean_alpha_min_max": [
+          0,
+          5
+        ]
+      },
+      {
+        "id": "dont_crash",
+        "source_bbox": [
+          550,
+          200,
+          1070,
+          370
+        ],
+        "candidate_claimed_bbox": [
+          553,
+          226,
+          1017,
+          344
+        ],
+        "bbox_margin": [
+          3,
+          53,
+          26,
+          26
+        ],
+        "source_wh": [
+          520,
+          170
+        ],
+        "candidate_wh": [
+          464,
+          118
+        ],
+        "source_clean_rgba_diff": 36797,
+        "clean_final_rgba_diff": 46953,
+        "source_final_rgba_diff": 62350,
+        "clean_final_outside_claimed_in_source": 3607,
+        "clean_alpha_min_max": [
+          0,
+          93
+        ]
+      },
+      {
+        "id": "go_gate",
+        "source_bbox": [
+          1020,
+          200,
+          1590,
+          370
+        ],
+        "candidate_claimed_bbox": [
+          1023,
+          227,
+          1587,
+          342
+        ],
+        "bbox_margin": [
+          3,
+          3,
+          27,
+          28
+        ],
+        "source_wh": [
+          570,
+          170
+        ],
+        "candidate_wh": [
+          564,
+          115
+        ],
+        "source_clean_rgba_diff": 38264,
+        "clean_final_rgba_diff": 51654,
+        "source_final_rgba_diff": 61913,
+        "clean_final_outside_claimed_in_source": 0,
+        "clean_alpha_min_max": [
+          0,
+          94
+        ]
+      }
+    ]
+  },
+  "lossless_physical_artifacts": 24,
+  "visual_evidence_manifest": [
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_01_keep_passing_raw_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_02_drift_raw_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_03_dont_crash_raw_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_Q111_04_go_gate_raw_GRAY.png"
+  ],
+  "four_region_ordered_visual": [
+    {
+      "key": "keep_passing",
+      "first_look": "Source English yellow/navy/white source family compared to native large Hangul; Korean has readable right lean, 3px top/bottom margin, no definite broken glyph or extra background box. Adjacent sprite row visible at crop edges; not a proven overlap.",
+      "source_clean": "Independent native SOURCE/CLEAN inspected; valid transparent plate in target glyph region but adjoining atlas cells can include text",
+      "style": "Unqualified source-family weight and outline; no definitive visual fail observed",
+      "slant": "Right-lean visibly present but no calibrated independent per-glyph slope reference",
+      "scale": "Significantly larger than historic C111, source bbox claimed margins positive; checked 50% readability",
+      "glyph_integrity": "No definite missing Hangul strokes in native/zoom/50%",
+      "protected": "Whole-atlas 17 source-bbox union outside RGBA/alpha zero; neighbor effects need calibrated masks",
+      "raw": "FLIP-Y/RAW aligned; no apparent orientation inversion",
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "key": "drift",
+      "first_look": "Native larger yellow Korean right-lean, readable in RAW and practical 50%; source cells overlap neighboring atlas geometry so crop edges include unrelated text; isolated masks need separate blind review.",
+      "source_clean": "Independent native SOURCE/CLEAN inspected; valid transparent plate in target glyph region but adjoining atlas cells can include text",
+      "style": "Unqualified source-family weight and outline; no definitive visual fail observed",
+      "slant": "Right-lean visibly present but no calibrated independent per-glyph slope reference",
+      "scale": "Significantly larger than historic C111, source bbox claimed margins positive; checked 50% readability",
+      "glyph_integrity": "No definite missing Hangul strokes in native/zoom/50%",
+      "protected": "Whole-atlas 17 source-bbox union outside RGBA/alpha zero; neighbor effects need calibrated masks",
+      "raw": "FLIP-Y/RAW aligned; no apparent orientation inversion",
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "key": "dont_crash",
+      "first_look": "Larger Hangul recovers prior weak hierarchy. Yellow/navy/white effect appears source-related, but 50% practical and native need qualified first-look font-family/weight test; neighboring graphic enters crop above/below.",
+      "source_clean": "Independent native SOURCE/CLEAN inspected; valid transparent plate in target glyph region but adjoining atlas cells can include text",
+      "style": "Unqualified source-family weight and outline; no definitive visual fail observed",
+      "slant": "Right-lean visibly present but no calibrated independent per-glyph slope reference",
+      "scale": "Significantly larger than historic C111, source bbox claimed margins positive; checked 50% readability",
+      "glyph_integrity": "No definite missing Hangul strokes in native/zoom/50%",
+      "protected": "Whole-atlas 17 source-bbox union outside RGBA/alpha zero; neighbor effects need calibrated masks",
+      "raw": "FLIP-Y/RAW aligned; no apparent orientation inversion",
+      "decision": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "key": "go_gate",
+      "first_look": "New Hangul substantially larger with right-lean. Cropped original and FINAL show adjacent sprite fragments from other source labels. No definite 1px escape outside all 17 original source boxes.",
+      "source_clean": "Independent native SOURCE/CLEAN inspected; valid transparent plate in target glyph region but adjoining atlas cells can include text",
+      "style": "Unqualified source-family weight and outline; no definitive visual fail observed",
+      "slant": "Right-lean visibly present but no calibrated independent per-glyph slope reference",
+      "scale": "Significantly larger than historic C111, source bbox claimed margins positive; checked 50% readability",
+      "glyph_integrity": "No definite missing Hangul strokes in native/zoom/50%",
+      "protected": "Whole-atlas 17 source-bbox union outside RGBA/alpha zero; neighbor effects need calibrated masks",
+      "raw": "FLIP-Y/RAW aligned; no apparent orientation inversion",
+      "decision": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "qualification_limits": [
+    "Source family/native per-glyph slant blind control and rejected-case calibration uncompleted",
+    "Four changed A161 slots have overlapping atlas source envelopes and some source-cell outer pixels contain adjacent localized labels; do not falsely count as glyph overflow",
+    "Only four changed source areas inspected in current independent role; historic thirteen other rows have C111 for old bytes, but full current 17-row new-policy review and distinct C3/evidence approval remain unproven",
+    "Old decoded readable PNG belongs to A_RECOVERY12 associated C111; current A161 exact DDS downloaded and SHA256 verified; no old DDS bytes themselves rerendered"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED_PENDING_FRESH_C_PASS",
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME_CURRENT_APPROVED_SET": "EXCLUDED",
+  "USER_REVIEW": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_independent_C_pass": 0,
+  "new_in_game_closures": 0,
+  "VR_FFB_DX11_DXVK_touched": false
+}

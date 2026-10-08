@@ -1,0 +1,366 @@
+{
+  "run": "C309_C1_q111",
+  "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "candidate_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+  "clean_sha256": "23445c207db63ab4fd2a01e164231857b373d69139352c82f7b01ac25d031685",
+  "structure": [
+    2048,
+    2048
+  ],
+  "header_equal": true,
+  "single_mip": true,
+  "raw_transform": "flip_y",
+  "clean_orientation_outside": [
+    0,
+    2744028
+  ],
+  "all17_source_vs_clean_outside": 0,
+  "all17_source_vs_final_outside": 0,
+  "all17_clean_vs_final_outside": 0,
+  "outside17_alpha_changed": 0,
+  "regions": [
+    {
+      "id": "keep_passing",
+      "source_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "candidate_claimed_bbox": [
+        4,
+        146,
+        496,
+        233
+      ],
+      "bbox_margin": [
+        3,
+        24,
+        3,
+        3
+      ],
+      "source_wh": [
+        519,
+        93
+      ],
+      "candidate_wh": [
+        492,
+        87
+      ],
+      "source_clean_rgba_diff": 36248,
+      "clean_final_rgba_diff": 35807,
+      "source_final_rgba_diff": 41026,
+      "clean_final_outside_claimed_in_source": 1034,
+      "clean_alpha_min_max": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "drift",
+      "source_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "candidate_claimed_bbox": [
+        503,
+        125,
+        717,
+        222
+      ],
+      "bbox_margin": [
+        3,
+        3,
+        5,
+        6
+      ],
+      "source_wh": [
+        220,
+        108
+      ],
+      "candidate_wh": [
+        214,
+        97
+      ],
+      "source_clean_rgba_diff": 14040,
+      "clean_final_rgba_diff": 14576,
+      "source_final_rgba_diff": 19527,
+      "clean_final_outside_claimed_in_source": 46,
+      "clean_alpha_min_max": [
+        0,
+        5
+      ]
+    },
+    {
+      "id": "dont_crash",
+      "source_bbox": [
+        550,
+        200,
+        1070,
+        370
+      ],
+      "candidate_claimed_bbox": [
+        553,
+        226,
+        1017,
+        344
+      ],
+      "bbox_margin": [
+        3,
+        53,
+        26,
+        26
+      ],
+      "source_wh": [
+        520,
+        170
+      ],
+      "candidate_wh": [
+        464,
+        118
+      ],
+      "source_clean_rgba_diff": 36797,
+      "clean_final_rgba_diff": 46953,
+      "source_final_rgba_diff": 62350,
+      "clean_final_outside_claimed_in_source": 3607,
+      "clean_alpha_min_max": [
+        0,
+        93
+      ]
+    },
+    {
+      "id": "go_gate",
+      "source_bbox": [
+        1020,
+        200,
+        1590,
+        370
+      ],
+      "candidate_claimed_bbox": [
+        1023,
+        227,
+        1587,
+        342
+      ],
+      "bbox_margin": [
+        3,
+        3,
+        27,
+        28
+      ],
+      "source_wh": [
+        570,
+        170
+      ],
+      "candidate_wh": [
+        564,
+        115
+      ],
+      "source_clean_rgba_diff": 38264,
+      "clean_final_rgba_diff": 51654,
+      "source_final_rgba_diff": 61913,
+      "clean_final_outside_claimed_in_source": 0,
+      "clean_alpha_min_max": [
+        0,
+        94
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "C309_Q111_01_keep_passing_native_GRAY.png",
+      "sha256": "178e2668cd3e4e4e3ee765f7d12cdc63f8ac4d95bd3232b0a1c8f0e0ea9b2914",
+      "bytes": 84940,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_native_BLACK.png",
+      "sha256": "d62d1abc8ec33d745e66b4256789114bfacbda7c75242ff4d5be5662991c9f78",
+      "bytes": 85644,
+      "row": "keep_passing",
+      "background": "BLACK",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_native_WHITE.png",
+      "sha256": "6020f115cd0c6703a899f331d0cdba337dabee7582b0afccbf92abd88e77c76d",
+      "bytes": 78662,
+      "row": "keep_passing",
+      "background": "WHITE",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_zoom2_GRAY.png",
+      "sha256": "b3d7ea5d636eed6e2fc1d1c70412e8da8ce98ca4f8fcf50d7a90d7cd2b785c69",
+      "bytes": 108312,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "zoom2"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_practical50_GRAY.png",
+      "sha256": "6b91298872fa2a185b633983ceb9723421088583ad34c65ce26d56e238fc68a7",
+      "bytes": 45618,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "practical50"
+    },
+    {
+      "name": "C309_Q111_01_keep_passing_raw_GRAY.png",
+      "sha256": "94239ba09206ea9bdf952b9dc0ec63e9176e89f8531497fc5a6adb4f68870436",
+      "bytes": 82725,
+      "row": "keep_passing",
+      "background": "GRAY",
+      "variant": "raw"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_GRAY.png",
+      "sha256": "dd215a8014127df74a7e2119debc95e05c8d48d33419d616e7eed8060a0de373",
+      "bytes": 32436,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_BLACK.png",
+      "sha256": "74f6f0e55a36a471803b431d26b572dbe08c4d1c269f1c123c4546512c213206",
+      "bytes": 32895,
+      "row": "drift",
+      "background": "BLACK",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_02_drift_native_WHITE.png",
+      "sha256": "262cb9e77a94d6bb2078ceab898ba99f76b89ccbb494afcc2df8c71daf6ca9b4",
+      "bytes": 27988,
+      "row": "drift",
+      "background": "WHITE",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_02_drift_zoom2_GRAY.png",
+      "sha256": "c02a62be3f3dd623e790412b8c19ec642c967a805349fca715990631820bfd55",
+      "bytes": 42618,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "zoom2"
+    },
+    {
+      "name": "C309_Q111_02_drift_practical50_GRAY.png",
+      "sha256": "541af023997d294ece59dd30e3432ed43431bf3f03ac9d775aed547e1338bc14",
+      "bytes": 18505,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "practical50"
+    },
+    {
+      "name": "C309_Q111_02_drift_raw_GRAY.png",
+      "sha256": "7c1dfd41a3034066e327fff7584f2a72885cb177f7b5a724cc0e7a7c0bac985c",
+      "bytes": 31950,
+      "row": "drift",
+      "background": "GRAY",
+      "variant": "raw"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_GRAY.png",
+      "sha256": "d85073a463567bd14f3eb51a30d72e3f0348165bb1ee16e09805aa17dd7dff31",
+      "bytes": 109201,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_BLACK.png",
+      "sha256": "0cfdcc5d51f98d24f984d9197c189792c67bca89b8f66db6af9362c8305f4e8f",
+      "bytes": 109532,
+      "row": "dont_crash",
+      "background": "BLACK",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_native_WHITE.png",
+      "sha256": "d87c64e72611c576947dedb06dedfa6b0b053ae7a89964e603d21e479586fa4e",
+      "bytes": 96238,
+      "row": "dont_crash",
+      "background": "WHITE",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_zoom2_GRAY.png",
+      "sha256": "b6acd61a1506f7dd15509915a1490706361294407dc0dcdbe3b316f880a1e82d",
+      "bytes": 141656,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "zoom2"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_practical50_GRAY.png",
+      "sha256": "56017eaf48f1ff092568daa7f404b7d7ce85eb98a37a2c073aaf1eda2a39a3f5",
+      "bytes": 58526,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "practical50"
+    },
+    {
+      "name": "C309_Q111_03_dont_crash_raw_GRAY.png",
+      "sha256": "ca45a2f46feffa8fd7afe7b14f76c1e1f1b3fc3ab29941adee958ccdd4bc72cd",
+      "bytes": 107580,
+      "row": "dont_crash",
+      "background": "GRAY",
+      "variant": "raw"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_GRAY.png",
+      "sha256": "4ad96b42b38dfa1239165bb13120959c6f07090f3a5f1b1084f4d928c9d65657",
+      "bytes": 106609,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_BLACK.png",
+      "sha256": "9bcefad9cfee38c5295e1a09a1265372c49a4f1d134dbd62b6cc9494cc2e8e43",
+      "bytes": 106963,
+      "row": "go_gate",
+      "background": "BLACK",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_native_WHITE.png",
+      "sha256": "076bce78bbcc35ce1c892dfbe02c5cc3b2a7dab3674b575669678df06a81b007",
+      "bytes": 97368,
+      "row": "go_gate",
+      "background": "WHITE",
+      "variant": "native"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_zoom2_GRAY.png",
+      "sha256": "6746fe736fb7f811c5aead59d719d2f5cdb14c354fef87a9ffd632865cc713e6",
+      "bytes": 137821,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "zoom2"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_practical50_GRAY.png",
+      "sha256": "2b7056d385a767f0e95db1fe1e8fed7ecacd425fe198be0f69609354f12e8d0e",
+      "bytes": 55199,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "practical50"
+    },
+    {
+      "name": "C309_Q111_04_go_gate_raw_GRAY.png",
+      "sha256": "e871495b799077d5f692a3f6284d03b0276f824498bcb21dc58bc9dcd8d69627",
+      "bytes": 105340,
+      "row": "go_gate",
+      "background": "GRAY",
+      "variant": "raw"
+    }
+  ],
+  "comment": "CLEAN source cell may overlap neighboring atlas labels; nonzero difference outside a SINGLE row claimed bbox is not automatically overflow; full 17 union outside=0"
+}
