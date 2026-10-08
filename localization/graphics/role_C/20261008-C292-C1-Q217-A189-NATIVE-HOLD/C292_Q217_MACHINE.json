@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C292-C1-Q217-A189-NATIVE-HOLD-20261008-1640",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 217,
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "superseded_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "native_DDS": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "BGRA32",
+    "mips": 1,
+    "header_bytes_128_equal": true,
+    "readable_transform": "flip_y",
+    "raw_orientation": "mirror_y"
+  },
+  "independent_pixel_statistics": {
+    "readable_changed_rgba_total": 3940,
+    "source_to_candidate_changed_outside_original_badges": 0,
+    "source_to_candidate_changed_alpha_outside_original_badges": 0,
+    "source_candidate_changed_bbox": [
+      801,
+      508,
+      1428,
+      796
+    ],
+    "badge_regions": [
+      {
+        "id": "start",
+        "original_source_text_bbox": [
+          803,
+          509,
+          884,
+          532
+        ],
+        "original_banner_bbox": [
+          800,
+          507,
+          890,
+          534
+        ],
+        "source_authorized_review_roi": [
+          780,
+          490,
+          921,
+          551
+        ],
+        "changed_rgba_pixels_in_roi": 1950,
+        "changed_outside_text_bbox_inside_roi": 195,
+        "alpha_changed_pixels_in_roi": 0,
+        "A189_producer_final_glyph_bbox": [
+          824,
+          510,
+          863,
+          531
+        ],
+        "source_glyph_size": [
+          81,
+          23
+        ],
+        "candidate_glyph_size": [
+          39,
+          21
+        ]
+      },
+      {
+        "id": "goal",
+        "original_source_text_bbox": [
+          1343,
+          771,
+          1420,
+          795
+        ],
+        "original_banner_bbox": [
+          1339,
+          770,
+          1429,
+          797
+        ],
+        "source_authorized_review_roi": [
+          1322,
+          754,
+          1444,
+          813
+        ],
+        "changed_rgba_pixels_in_roi": 1990,
+        "changed_outside_text_bbox_inside_roi": 230,
+        "alpha_changed_pixels_in_roi": 0,
+        "A189_producer_final_glyph_bbox": [
+          1371,
+          772,
+          1392,
+          794
+        ],
+        "source_glyph_size": [
+          77,
+          24
+        ],
+        "candidate_glyph_size": [
+          21,
+          22
+        ]
+      }
+    ]
+  },
+  "source_bbox_vs_candidate_height_note": "A189 developer report glyph bboxes not independently segmented; glyph height is close to source 21/23 and 22/24, so short translated word width alone is not a verified pixel defect. Do not enforce arbitrary source English width quota.",
+  "changed_pixels_outside_text_bbox_note": "425 changed pixels are inside original red badge reconstruction and do not establish protected-art damage",
+  "visual_images": [
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_start_gray_4x.png",
+      "sha256": "f6e37b7911573cf3dae30e7c7e0bedb9bada7aada95e038f67dccdd5c990e3a4"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_goal_gray_4x.png",
+      "sha256": "34156856fcf5acc44eaa5ac221af546be5a38474ffe81e66091a7c53aeb28abd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_start_gray_1x.png",
+      "sha256": "6ecaca9bf3830046792dd91b052ed2385ac210aa4a1e82c562d3b74f2a08373d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_goal_gray_1x.png",
+      "sha256": "8521cb856eda1f5605bb1b29b86df8e5ec0db46fe56a128278ccf6544b800cc4"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_start_READABLE_50.png",
+      "sha256": "c53441beb2ae616095e812226de4e135544efcfedb262467059fb430ba8bec30"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_goal_READABLE_50.png",
+      "sha256": "41c1609556396da6f562bf5a1266ac62f2cc54100ccab87482f27bb482dee386"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_start_RAW_100.png",
+      "sha256": "f8af58bb9b15e4f7d2b8513579d66058b74d01e4b6b9148011ec53626ff9fea9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_goal_RAW_100.png",
+      "sha256": "df53d982331f0130c988bd2d46ebf56b6528aa390fb216d5ff19b74e221634c7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_full_atlas.png",
+      "sha256": "0e23104073badd21ad3e312ebf8ecba0c15fc64d7e4a59546494eeb50f6ddb01"
+    }
+  ],
+  "machine_result": "PASS_EXACT_NATIVE_BADGE_SCOPE_ONLY",
+  "visual_approval": "HOLD: authenticated CLEAN plate, source-derived per-glyph anchor slant, family calibration, second C3 pass, user/game acceptance missing",
+  "candidate_bytes_modified": false,
+  "runtime_validation": "UNTESTED"
+}
