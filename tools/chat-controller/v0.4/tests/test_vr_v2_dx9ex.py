@@ -19,6 +19,14 @@ def load_queue_target():
 
 
 
+def load_freeze_reconcile():
+    tree = ast.parse(SOURCE)
+    fn = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'reconcile_conversion_lane_freeze')
+    ns = {'datetime': datetime}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), '<freeze>', 'exec'), ns)
+    return ns['reconcile_conversion_lane_freeze']
+
+
 def load_dispatch_plan():
     tree = ast.parse(SOURCE)
     fn = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'conversion_dispatch_plan')
@@ -66,11 +74,11 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('resized chat slots from %s to %s while preserving state', SOURCE)
         self.assertTrue((ROOT / 'conversion_dx9ex.md').stat().st_size > 0)
 
-    def test_dx9ex_is_opt_in_maintenance_only(self):
+    def test_dx9ex_active_visual_stabilization_policy(self):
         prompt = (ROOT / 'conversion_dx9ex.md').read_text()
-        self.assertIn('보호된 DX9Ex 기준 유지보수 전용', prompt)
-        self.assertIn('NEED_HMD_TEST', prompt)
-        self.assertNotIn('0순위는 현재 진행 중인 DX9Ex 구조 개선/리팩터링 작업이다', prompt)
+        for marker in ('동시', '흰색 HUD', '+TIME', 'lens flare', 'NEED_HMD_TEST', '1000/5000회', '포크된 원본'):
+            self.assertIn(marker, prompt)
+        self.assertIn('실기', prompt)
 
     def test_conversion_lanes_are_independent(self):
         self.assertIn('async def conversion_parallel_cycle', SOURCE)
@@ -82,21 +90,45 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('stale pre-independent-conversion active_by_lane state', SOURCE)
         self.assertIn('for lane_key in ("A", "B", "C")', SOURCE)
 
-    def test_dx11_only_priority_dxvk_frozen_and_capacity_safe(self):
+    def test_two_active_dx11_dx9ex_lanes_with_dxvk_frozen(self):
         plan = load_dispatch_plan()
-        self.assertEqual(plan({}, 1, True, False, False), ('A',))
-        self.assertEqual(plan({}, 2, True, False, False), ('A',))
-        self.assertEqual(plan({}, 1, True, False, True), ('A',))
-        self.assertEqual(plan({}, 2, True, True, True), ('A', 'B'))
-        self.assertEqual(plan({'A': {'phase': 'WAIT_ACTIONS'}}, 2, True, True, True), ('B',))
-        self.assertEqual(plan({'C': {'phase': 'WAIT_CHAT'}}, 2, True, True, True), ('A',))
-        self.assertEqual(plan({'A': {'phase': 'WAIT_CHAT'}, 'C': {'phase': 'WAIT_ACTIONS'}}, 2, True, True, True), ())
-        self.assertEqual(plan({'A': {'phase': 'DONE'}}, 2, True, True, False), ('B',))
-        self.assertEqual(plan({'A': {'phase': 'HOLD_OWNER_UNCERTAIN'}}, 2, True, True, False), ('B',))
+        self.assertEqual(plan({}, 2, True, False, True), ('A', 'C'))
+        self.assertEqual(plan({'A': {'phase': 'WAIT_ACTIONS'}}, 2, True, False, True), ('C',))
+        self.assertEqual(plan({'C': {'phase': 'WAIT_CHAT'}}, 2, True, False, True), ('A',))
+        self.assertEqual(plan({'A': {'phase': 'WAIT_CHAT'}, 'C': {'phase': 'WAIT_ACTIONS'}}, 2, True, False, True), ())
+        self.assertEqual(plan({'A': {'phase': 'HOLD_OWNER_UNCERTAIN'}}, 2, True, False, True), ('C',))
         self.assertEqual(plan({}, 1, False, False, True), ('C',))
-        self.assertEqual(plan({}, 0, True, True, True), ())
+        self.assertEqual(plan({}, 0, True, False, True), ())
         self.assertIn('for lane_key in conversion_dispatch_plan(', SOURCE)
+        self.assertIn('reconcile_conversion_lane_freeze(', SOURCE)
         self.assertNotIn('CONVERSION_DXVK_DEFERRED', SOURCE)
+
+    def test_freeze_dxvk_restore_parked_dx9ex_without_duplicate_id(self):
+        fn = load_freeze_reconcile()
+        now = datetime(2026, 10, 8, tzinfo=timezone.utc)
+        c = {'task_id': 'CONVERSION-DX9EX-00520', 'slot': 'C', 'phase': 'WAIT_ACTIONS', 'result_sha': 'a' * 40}
+        b = {'task_id': 'CONVERSION-DXVK-00422', 'slot': 'B', 'phase': 'WAIT_CHAT'}
+        q = {'frozen_lane_tasks': [dict(c, frozen_lane='C', frozen_reason='single-lane mode active: A')]}
+        live = {'A': {'task_id': 'CONVERSION-DX11-00455', 'phase': 'WAIT_CHAT'}, 'B': b}
+        self.assertTrue(fn(q, live, now, dxvk_frozen=True, dx9ex_enabled=True, only_slot=''))
+        self.assertNotIn('B', live)
+        self.assertEqual(live['C']['task_id'], c['task_id'])
+        self.assertEqual(live['C']['result_sha'], c['result_sha'])
+        self.assertTrue(live['C']['owner_reconciliation_required'])
+        self.assertEqual(q['frozen_lane_tasks'][0]['task_id'], b['task_id'])
+        self.assertFalse(fn(q, live, now, dxvk_frozen=True, dx9ex_enabled=True, only_slot=''))
+        self.assertEqual(load_dispatch_plan()(live, 2, True, False, True), ())
+
+    def test_terminal_parked_dx9ex_is_not_resumed(self):
+        fn = load_freeze_reconcile()
+        now = datetime(2026, 10, 8, tzinfo=timezone.utc)
+        q = {'frozen_lane_tasks': [
+            {'task_id': 'CONVERSION-DX9EX-00519', 'frozen_lane': 'C',
+             'frozen_reason': 'single-lane mode active: A', 'phase': 'WAIT_ACTIONS'}],
+             'completed': [{'task_id': 'CONVERSION-DX9EX-00519'}]}
+        active = {}
+        self.assertFalse(fn(q, active, now, dxvk_frozen=True, dx9ex_enabled=True, only_slot=''))
+        self.assertNotIn('C', active)
 
     def test_single_lane_policy_freezes_non_dx9ex(self):
         self.assertIn('CONVERSION_ONLY_SLOT', SOURCE)
@@ -249,16 +281,16 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('PROFILE_CACHE_PRUNE_ON_START: "true"', compose)
         self.assertIn('mem_limit: 4g', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
-        self.assertIn('CONVERSION_ACTIVE_LIMIT: "1"', compose)
+        self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
         self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
         self.assertIn('DXVK_FROZEN: "true"', compose)
         self.assertIn('CONVERSION_DXVK_ENABLED: "false"', compose)
-        self.assertIn('CONVERSION_DX9EX_ENABLED: "false"', compose)
-        self.assertIn('CONVERSION_ONLY_SLOT: "A"', compose)
+        self.assertIn('CONVERSION_DX9EX_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_ONLY_SLOT: ""', compose)
         self.assertIn("if DXVK_FROZEN and CONVERSION_ONLY_SLOT == \"B\"", SOURCE)
         self.assertIn("DXVK is frozen: cannot select conversion-only DXVK slot B", SOURCE)
         self.assertIn("frozen_lane_tasks", SOURCE)
-        self.assertIn("사용자 최종 우선순위", (ROOT / "conversion_dx11.md").read_text())
+        self.assertIn("사용자 최신 우선순위", (ROOT / "conversion_dx11.md").read_text())
         self.assertIn("동결(FROZEN)", (ROOT / "conversion_dxvk.md").read_text())
         self.assertNotIn("CONVERSION_DXVK_DEFERRED", compose)
         self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
