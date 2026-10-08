@@ -4,6 +4,66 @@
 
 This is the canonical contract for the A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md, localization/graphics/TRANSLATION_NAMING_POLICY.md and localization/graphics/INGAME_REWORK_BACKLOG.csv. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
+## Mandatory production contamination prevention — 2026-10-08
+
+Every A/B localization run MUST apply the **10-stage producer sequence** in
+`docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` to every new/materially revised
+DDS. This supplements, never replaces, the existing eight ordered visual
+checks, source-size/bbox ceiling, zero overlap, exact orientation and C/C3 gates.
+
+- **Before lettering:** identify exact SHA-pinned English source and protected
+  source effects; reconstruct CLEAN_PLATE and **independently QA SOURCE vs CLEAN**
+  with no Korean lettering hiding the result. English remnants, glyph shadows,
+  bright/dark ghosts, damaged background, alpha discontinuity, donor seam,
+  rectangular patched areas or source-shaped residuals are producer FAIL.
+- **At composition:** render Korean at the actual source resolution from an
+  English source-derived UI-family type/effect profile. Use a transparent glyph
+  mask plus only justified source-family effects over CLEAN; never paste opaque
+  or semitransparent background rectangles with letter crops. A clean editing
+  rectangle is not intrinsically bad; a visible changed plate/edge is bad.
+- **After composition:** independently QA **CLEAN vs FINAL** for visible
+  box-edge traces, extra artwork, shifted background patches, glow/stroke
+  residue, changes outside justified effect masks and protected-layer
+  intrusions. Also compare SOURCE vs FINAL for font hierarchy/style. A/B must
+  preserve lossless plate-only and composite-only proof, masks and decoded DDS.
+  Zero bbox violations cannot overrule a visually dirty final.
+- **After DDS encode:** visually inspect native decoded persisted-DDS bytes,
+  RAW/FLIP-Y, all authored MIPs, full/practical 75/50-percent previews, glyph
+  integrity, style match and protected-art isolation; fail any 1-pixel escape.
+- **Reason codes:** use `SOURCE_RESIDUE_UNDER_KOREAN`,
+  `INCOMPLETE_CLEAN_PLATE`, `FOREIGN_BOX_ARTIFACT`,
+  `BACKGROUND_PATCH_INTRUSION`, and `RECTANGULAR_COMPOSITE_TRACE` to
+  distinguish background/removal/composite defects in per-asset QA. Confirmed
+  visual defect => `REWORK_REQUIRED` or `MANUAL_RECONSTRUCTION_REQUIRED`;
+  missing exact-byte/plate proof => `HOLD_STRICT_RECHECK`. Never add false
+  PASS evidence.
+- **Family first:** establish a source-derived profile for each flat/menu/help,
+  italic/selector, chrome/metallic family and independently review ONE
+  representative persisted candidate before applying that method across
+  multiple DDS. q172/q214 bevel failures and q175/q219 chrome/style failures
+  must not be addressed by repeated width-only, flat, shear-only, or arbitrary
+  bevel/shadow overlays. If two independent C rejections share an evidenced
+  root cause, use the existing `METHOD_CHANGE_REQUIRED` triage and switch to
+  actual source-conditioned or manual/vector construction. No new queue engine.
+- **User validation before final approval:** the separate
+  `USER_REVIEW_NOT_APPROVED` build may include clearly marked historical-C3
+  current candidates with SHA-pinned manifests for actual user testing.
+  This is NOT `PRE_INGAME_JPG_REVIEW` final approved export and must never
+  declare current `qa_evidence_gate.py` PASS, user acceptance or
+  `RUNTIME_VALIDATION=PASS`. The evidence-approved package remains
+  independently fail-closed. The user may report a new in-game defect and
+  reopen the exact DDS even after past C/C3 PASS.
+- **Producer handoff and performance:** account for source removal, plate
+  QA, source-family profile, exact candidate SHA, composite-only/RAW/mip
+  evidence and root-cause codes before marking producer PASS. Count genuinely
+  new/revised candidate DDS, first-pass independent C acceptance, defect
+  recurrence, final evidence approvals and user in-game closures separately.
+  Repeated same-SHA inspection and new evidence alone do not count as new DDS.
+
+Roles and scheduling remain unchanged: A/B do production/self-QA; C1/C2
+review their shards independently, C3 is additional strict QA, and only the
+user's actual-game evidence can close a user-reported in-game regression.
+
 ## Rework convergence selection guard — 2026-10-08
 
 Before each A/B production selection and C1/C2 evidence selection, read `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md`, refresh the Git queue, and run `python tools/localization/rework_triage.py --index N` on the selected asset. Use `--require-safe-rerender` before ordinary same-method DDS rerender attempts; a nonzero result prevents blind rerender, not genuine corrective reconstruction. Do not use this read-only triage as visual QA or approval.
@@ -180,7 +240,7 @@ When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated pr
 - Static producer PASS without actual game evidence remains runtime-unvalidated and must retain `RUNTIME_VALIDATION=UNTESTED` or pending-in-game state.
 
 ### Ordered rework construction gate
-- Every new or materially reworked graphics candidate MUST execute the eight-step ordered generation gate in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` before producer PASS: (1) English/source removal and complete plate/background restoration, (2) source-matching readable slant direction, (3) no unnecessarily undersized Korean lettering while still obeying the exact source-bbox ceiling, (4) source-faithful weight/outline/shadow without excessive effects, (5) no clipped glyph/effect pixels, (6) no intrusion into protected graphics/vehicle/name/box content, (7) clean/correct FLIP-Y and RAW views, and (8) immediate readability versus the English source.
+- Every new or materially reworked graphics candidate MUST first execute the mandatory 10-stage producer sequence (including independent PLATE_ONLY and COMPOSITE_CONTAMINATION gates) and MUST retain all eight existing ordered visual checks in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` before producer PASS: (1) English/source removal and complete plate/background restoration, (2) source-matching readable slant direction, (3) no unnecessarily undersized Korean lettering while still obeying the exact source-bbox ceiling, (4) source-faithful weight/outline/shadow without excessive effects, (5) no clipped glyph/effect pixels, (6) no intrusion into protected graphics/vehicle/name/box content, (7) clean/correct FLIP-Y and RAW views, and (8) immediate readability versus the English source.
 - This is a **generation loop**, not a final-review-only checklist. A/B must correct the failed construction stage and regenerate before recording producer PASS; C must return any missed violation as `REWORK_REQUIRED`.
 - Machine bbox/mask success cannot override any failed ordered step.
 - The post-encode/presentation hardening gate in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` is mandatory for all new/materially reworked graphics: producer QA must judge pixels decoded from the persisted DDS, not only pre-encode renders; text-bearing authored mips and practical display scale must be reviewed; shared UI-family style must remain consistent; and current reworks must have zero unintended blast-radius changes outside the declared rework mask.
