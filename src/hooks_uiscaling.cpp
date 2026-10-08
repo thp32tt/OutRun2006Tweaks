@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/hud_semantics.hpp"
 
 #include <array>
 #include <cmath>
@@ -96,6 +97,15 @@ class UIScaling : public Hook
 		0xBEB98, 0xBED83, 0xBED9E, 0xBEDAE
 	};
 	inline static thread_local unsigned RankMarkerSubScreenHudDepth = 0;
+	// Restored R70 exact producer bridge. The historic BA9D0 text function
+	// queues both a direct clip and sprani child at canonical E8 sites. User
+	// 5868 runtime hudtrace saw 255 unknown BA... sprani rows. Only explicitly
+	// ScreenHud-classified parents may tag these child sprites as ScreenHud.
+	static inline SafetyHookInline OutRunHudTextProducerHook{};
+	inline static thread_local bool OutRunHudTextScreenHud = false;
+	static constexpr int OutRunHudTextProducerRva = 0xBA9D0;
+	static constexpr int OutRunHudTextClipCallRva = 0xBAAA0;
+	static constexpr int OutRunHudTextSpraniCallRva = 0xBAAEA;
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
 	// Canonical EXE Inspector verified first DispRank kind-1 CALL E8->0x29530.
@@ -402,6 +412,67 @@ class UIScaling : public Hook
 		}
 	}
 
+
+	// Exact FUN_004BA9D0 caller identity is lost after the child E8 CALLs.
+	// Restore the historical source-map bridge, but persist semantics on the
+	// actual newly queued sprite nodes, not in retired ScopedProducerSemantic.
+	static std::uint32_t OutRunHudTextCallerRva(const void* address) noexcept
+	{
+		const auto base = reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+		const auto value = reinterpret_cast<std::uintptr_t>(address);
+		if (!base || value < base + 5 || value - base > 0xFFFFFFFFu)
+			return 0;
+		return static_cast<std::uint32_t>(value - base - 5);
+	}
+	static void __cdecl OutRunHudTextProducer_dest(
+		int glyphSet, int x, int y, const char* text, int a4, float alpha)
+	{
+		const auto caller = OutRunHudTextCallerRva(_ReturnAddress());
+		const auto semantic = OutRunVRHudSemantics::ClassifyCaller(caller);
+		const bool previous = OutRunHudTextScreenHud;
+		OutRunHudTextScreenHud = previous ||
+			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;
+		OutRunHudTextProducerHook.call(
+			glyphSet, x, y, text, a4, alpha);
+		OutRunHudTextScreenHud = previous;
+	}
+	static int __cdecl OutRunHudText_clip(
+		int sprite, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		if (!OutRunHudTextScreenHud)
+			return Game::put_clip_sprite(
+				sprite, x, y, flags, priority, color);
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int p = 0; p < Game::SpritePriorityCount; ++p)
+		{
+			SpriteNode* root = Game::sprite_prio_root[p];
+			before[p] = root ? root->tail_4 : nullptr;
+		}
+		const int result = Game::put_clip_sprite(
+			sprite, x, y, flags, priority, color);
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+	static int __cdecl OutRunHudText_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		if (!OutRunHudTextScreenHud)
+			return Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int p = 0; p < Game::SpritePriorityCount; ++p)
+		{
+			SpriteNode* root = Game::sprite_prio_root[p];
+			before[p] = root ? root->tail_4 : nullptr;
+		}
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
 
 	// R74 exact result-progress CALL boundaries: the parent 0x2D200 creates
 	// queued SpriteNodes, so lower glyph/put_clip hooks do not capture every
@@ -1005,6 +1076,24 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+		// 5868 runtime/old R70 evidence: FUN_004BA9D0's two proven E8
+		// children lost their parent HUD identity. Do not install a broad
+		// sprani/clip hook; intercept only these two canonical CALL sites.
+		OutRunHudTextProducerHook = safetyhook::create_inline(
+			Module::exe_ptr(OutRunHudTextProducerRva),
+			OutRunHudTextProducer_dest);
+		if (OutRunHudTextProducerHook)
+		{
+			Memory::VP::InjectHook(Module::exe_ptr(OutRunHudTextClipCallRva),
+				OutRunHudText_clip, Memory::HookType::Call);
+			Memory::VP::InjectHook(Module::exe_ptr(OutRunHudTextSpraniCallRva),
+				OutRunHudText_sprani, Memory::HookType::Call);
+			spdlog::info(
+				"VR P0: original BA9D0 HUD text producer and its two exact child CALLs restored");
+		}
+		else
+			spdlog::error(
+				"VR P0: BA9D0 producer hook unavailable; child CALLs left original");
 		RankMarkerSub_hk = safetyhook::create_inline(
 			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
