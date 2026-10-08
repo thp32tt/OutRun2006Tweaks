@@ -63,9 +63,18 @@ def mutations(text):
         ("scene mip filter","MipFilter != D3DX_FILTER_NONE && MipFilter != D3DX_DEFAULT"),
         ("scene guarded fast","if (!requiresLegacyD3DX && pDevice && pSrcData && SrcDataSize && ppTexture)"),
         ("scene result check","if (SUCCEEDED(fastResult))")]
+    # The same identifier appears in the older fast helper as well as the
+    # scene wrapper. Mutate ONLY the intended scene Ex API boundary.
+    marker="static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest("
+    final="static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest("
+    begin=text.find(marker)
+    finish=text.find(final,begin)
+    if begin<0 or finish<0:raise ValueError("scene Ex boundaries missing")
+    original=text[begin:finish]
     for label,token in tokens:
-        part=text.replace(token,"__SCENE_EX_CORRUPTION__",1)
-        if part==text:raise ValueError("failed to inject "+label)
+        mutated=original.replace(token,"__SCENE_EX_CORRUPTION__",1)
+        if mutated==original:raise ValueError("failed to inject "+label)
+        part=text[:begin]+mutated+text[finish:]
         try:verify(part)
         except ValueError:continue
         raise ValueError("missed negative test "+label)
