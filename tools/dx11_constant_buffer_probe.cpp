@@ -11417,6 +11417,18 @@ VSOutput main(VSInput input)
             !r156Probe(d3d.context, outputColorSurface.render_target_view(),
                        r156Forged),
             "R156 refuses stale nonindexed Draw argument tuple");
+        auto r156WrongElementCount = nonIndexedDirectDispatch;
+        r156WrongElementCount.elementCount += 1u;
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       r156WrongElementCount),
+            "R156 copied Draw packet cannot forge an extra vertex count");
+        auto r156WrongLineage = nonIndexedDirectDispatch;
+        r156WrongLineage.geometrySnapshotToken ^= 1u;
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       r156WrongLineage),
+            "R156 copied Draw packet cannot borrow a foreign geometry token");
         d3d.context->Begin(r156Stats);
         require(
             r156Probe(d3d.context, outputColorSurface.render_target_view(),

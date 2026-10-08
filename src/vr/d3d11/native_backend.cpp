@@ -14457,10 +14457,26 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
     D3DPRIMITIVETYPE primitive,
     UINT primitiveCount,
     UINT startVertexLocation) noexcept {
+    // A recomputed snapshot by itself does not validate mutable copied
+    // dispatch fields. Recheck the exact packet fields before GPU submission.
+    UINT expectedElements = 0;
+    const auto topology = translate_primitive(primitive);
     if (!context || !expectedProbeTarget ||
         context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
         dispatch.indexed || !dispatch.ready || dispatch.snapshotToken == 0 ||
-        dispatch.elementCount == 0 ||
+        !direct_draw_element_count(primitive, primitiveCount, expectedElements) ||
+        expectedElements == 0 ||
+        !topology.exact || dispatch.topology != topology.value ||
+        dispatch.elementCount != expectedElements ||
+        dispatch.primitiveCount != primitiveCount ||
+        dispatch.startVertexLocation != startVertexLocation ||
+        dispatch.startIndexLocation != 0u ||
+        dispatch.baseVertexLocation != 0 ||
+        dispatch.renderTargetBoundDrawSnapshotToken != boundDraw.snapshotToken ||
+        dispatch.drawSnapshotToken != draw.snapshotToken ||
+        dispatch.geometrySnapshotToken != geometry.snapshotToken ||
+        !dispatch.bufferRangeExact || !dispatch.dispatchArgumentsExact ||
+        !dispatch.pointRasterSemanticsExact || !dispatch.lineRasterSemanticsExact ||
         !validate_fixed_function_direct_draw_dispatch_snapshot(
             boundDraw, draw, geometry, primitive, primitiveCount, false,
             startVertexLocation, 0u, 0, dispatch.snapshotToken))
