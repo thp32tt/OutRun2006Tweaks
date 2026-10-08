@@ -77,6 +77,8 @@ on:
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Analyze-OutRunVRSession.ps1'
       - 'tools/OutRunVR-Slot-Selector.ps1'
       - 'tools/Test-VRDXVKBackendContract.ps1'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
