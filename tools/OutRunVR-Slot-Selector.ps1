@@ -125,7 +125,7 @@ $($cfg.Help)
     $profile=New-Object System.Windows.Forms.Label
     $profile.Text="$($cfg.Backend) / $($cfg.Profile)"
     $profile.AutoSize=$true
-    $profile.Location=New-Object System.Drawing.Point(450,$y+14)
+    $profile.Location=[System.Drawing.Point]::new(450, ($y + 14))
     $form.Controls.Add($profile)
     $y+=58
 }
