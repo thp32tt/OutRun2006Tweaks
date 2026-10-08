@@ -79,7 +79,43 @@
 - 이미 수행한 독립 cross-domain screen: https://github.com/thp32tt/OutRun2006Tweaks/blob/vr-d3d9ex-focus/docs/automation/reviews/AI2_QUEST3_CROSS_DOMAIN_SOURCE_REVIEW_20261008.md / https://github.com/thp32tt/OutRun2006Tweaks/blob/vr-d3d9ex-focus/docs/automation/reviews/AI2_QUEST3_SECOND_30MIN_RENDER_LIFETIME_REVIEW_20261008.md
 
 
-## Checkpoint 4 — 수정 순서·검증 행렬·최종 인계 (PENDING)
+## Checkpoint 4 — 개발 인계 / 감별 테스트 / 완료 조건 (RESEARCH_COMPLETE; SOURCE_NOT_CHANGED)
+
+### 수정 전 우선순위 — 기존 코드는 함부로 재수정하지 말 것
+1. **P0 렌즈 + +TIME/골인 + 흰 HUD 단일성:** 00558 이후 exact 소스에서 이미 적용된 SceneEffect/XYZRHW, stale-world ScreenHud 우선, glyph multi-child, Sumo deep replay와 original extension expiry(`fn43FA10`) 보존을 먼저 확인. 새 코드 버그를 주장하려면 동작 증거가 기존 정적 계약을 뚫는 **구체적 producer→frame/pose→draw** 반례여야 한다.
+2. **P0 차량 마커/옵션/F11:** per-car rank/rival anchor freshness(4위 이상 multi-child 및 behind-eye clipW 제외)와 gameplay external ImGui XYZ/orthographic L/R+scissor를 각각 독립 검사. 기존 R57/ImGui 코드를 중복 포팅하거나 HUD 소유권을 일반 월드 draw로 확장하지 않는다.
+3. **P0 메뉴 DDS:** `UiDdsOriginalState`/scene rollback/legacy retry, D3D9Ex MANAGED→DEFAULT 호환, R15 partial rect, SkyGlow 입력 텍스처를 원본 bytes·GPU surface 측면에서 단계적으로 확인. 파일 내용 증거 없이 가로채기/필터 전면 변경 금지.
+4. **P1 그림자·SkyGlow·recenter·프레임:** 게임+host에 걸친 eye state/epoch/RT, stateblock, F11 상태복구/viewport, pacing/transport timings를 분리 분석. 72Hz/90Hz 목표 성능은 하드웨어 측정 후에만 주장.
+
+### 정확 SHA 1회 타깃 진단 설계 (같은 소스 반복 테스트 금지)
+| 그룹 | 재현 시 기록/확인 | 실패 판별 기준 |
+|---|---|---|
+| LENS-FLARE | 0xCABE/0xCF4E 및 0xBE70 producer scope, FVF/VS, original c64 WVP/flat-vs-spatial depth, near plane restore, pose gen, 좌우 flare 좌표 | 동일 광원과 다른 frame/pose나 한쪽/모노 replay; camera near-plane 반환 누락; 눈 회전과 flare 상대 위치 오류 |
+| TIME-GOAL | 0x975EE/0x97727/0x977FB와 put_sprite_ex/clip 계열, node priority·sibling·mask, `fn43FA10` numUpdates, result state vs theater | 같은 source producer가 한 눈에 두 번, source tick expiry 실패, 서로 다른 eye에 sourcePoseSequence 불일치 |
+| HUD/ARROWS | glyph `ScreenHud` enqueue/c64 upload/rawWVP timestamp, queue node epoch, raw owner hit/miss, exact CALL 71 계약, user HUD 0.82 | 정확 HUD인데 non-HUD lower fallback; 이미 변환된 c64에 중복 변환; 왼/오른 화살표 좌표가 원본 반전 |
+| MARKERS | Calc3D2D rank/rival return address, car identity, 4~5위 각 child, clipW, world projected anchor/eye-specific delta | 이전 차량/이전 프레임 앵커 재사용; 4/5위 일부 자식 누락; behind-eye 마커 출력 |
+| F11/MENU | Gameplay vs Theater 프레젠테이션, ImGui FVF XYZ/ortho, L/R draw/scissor, overlay state restore, DDS LockRect·fallback | F11만 좌우 불일치 또는 reset 후 state 오염; 원본 DDS로 fallback해도 화소가 비어 있는 경우 |
+| SHADOW/SKYGLOW | base shadow original 3 CALL, StateBlock Z/stencil, per-eye pre-HUD scene capture epoch, factor=0/default 비교 | 하나의 shadow source 재생 중복·stencil 누락·SkyGlow capture에 HUD 오염 |
+| RECENTER/PERF | head inverse, sourcePoseSequence/latch, recenter generation, DirectGPU slot/ACK/fence wait, game tick vs XR frame, draw amplification/P95/P99 | 입·출력 pose 혼합, frame reuse를 GPU 병목으로 오진, target 72Hz에서 13.89ms budget 위반 |
+
+### 단계별 증명 규약
+- C0: 항상 최신 `vr-d3d9ex-focus` SHA와 해당 변경된 **material code SHA**를 구별해 복구. 이 보고서 작성 당시 증거 material은 00558 `b14901f8b70b1b6fda8a9aded1e340147a453e68`; 이후 자동 작업이 코드를 바꾸면 완전히 새 증거 필요.
+- C1: 이번 레포트 및 원본 `emoose`·binary manifest·Issue #13 및 P0 종료조건·이미 완료된 AI2 리뷰를 먼저 읽고, 동일 finding 중복 재등록 금지. `docs/automation/reviews/AI2_QUEST3_CROSS_DOMAIN_SOURCE_REVIEW_20261008.md`에는 기존 150개 C++ 파일(게임 124/호스트 26) lexical sweep이 별도로 기록되어 있어, 본 세션의 **초점 파일 다중 교차 검토**와 구분해야 한다.
+- C2 (향후 승인된 개발): **유일하게 재현한 producer/lifetime boundary 한 건**만 소규모 수정. OpenXR/DX11/DXVK/Localization/FFB 격리. 신규 HUD 오류마다 원본 call→canonical EXE bytes→source owner→negative verifier 순서. Microsoft D3D9 FVF/Reset/StateBlock 계약 준수.
+- C3: material SHA 기준 `OutRun EXE HUD Inspector`(원본 EXE/CALL 71과 결함주입), `tools/verify_vr_visual_composition_p0.py`, DX9Ex Active Win32 game+x64 host+full-chain/package, Full Source Impact, Domain Isolation을 필요한 범위에서 **각 1회**. 동일 SHA로 1000/5000 회 audit 금지; 증거가 되는 10개 서로 다른 결함 주입은 허용.
+- C4/C5: CI 상태, artifact SHA-256, selector/R26+HUD active path, source material SHA를 일치시켜 기록. 브랜치의 docs-only HEAD, 별도 R33 compile-only 검증과 실제 설치할 R26/HUD runtime 아티팩트를 혼동하지 않는다.
+- C6: static/build PASS와 Quest3/VDXR user-visible 결과를 구별. 실기 이전 `RUNTIME_VALIDATION=UNTESTED`, P0 임의 폐쇄 불가. CI 종료 후 같은 바이너리 반복 헤드셋 테스트 대신 한 차례 타깃 HMD 패스, 이후 실제 실패 항목만 재오픈.
+
+### 증거의 한계 / 남은 완료 항목
+- **확인됨:** 원본 3개 훅 소스와 game 주소 계열, 포크 runtime 8개 축, canonical manifest 103 계약/71 exact HUD CALL, analyzer producer windows, 과거 HMD 기록, 00557/00558·별도 deep audit의 CI 성공, Microsoft D3D9 문서. 기존 150파일 lexical 전체 소스 리뷰 결과를 읽고 현재 변경된 고위험 경로를 표본 함수 단위로 재확인.
+- **이번에 하지 않음:** 이 작업 턴에서 원본 EXE를 직접 disassemble 실행, GPU RenderDoc 캡처, Quest3/VDXR 실행, 신규 소스/버그 패치, CI 재실행, 성능 벤치마크. 따라서 '전체 파일을 모든 문장까지 재독'했다고 주장하지 않음.
+- **현 상태:** 조사 보고서 완료. 00519의 user-runtime FAIL 유지; 현재 code material의 실제 lens/+TIME/goal/marker/menu/F11 광학 acceptance는 모두 `NEED_HMD_TEST`. 새 수정 착수 전 이 체크포인트를 `docs/VR_P0_VISUAL_COMPOSITION_CONVERGENCE.md`에서 읽도록 연결한다.
+
+## 최종 인계
+- 문서 상태: `RESEARCH_COMPLETE / RECOMMENDATIONS_ONLY / NO_RUNTIME_CODE_CHANGES`.
+- 이전 중간 커밋: C0 `350fe18b6cad50afda59056fe5049a930d05e83c`, C1 `54cd080c76e00361ed0853f4763411066c0514da`, C2 `49b78f08401a201da9427e681aca7e01c4c8626f`, C3 `39e88dd9f1efb4356af0d8a7b718fe6c86bffea0`.
+- 이후 개발자는 파일의 근거를 재검증하여 실제 소스 수정·단일 테스트·CI·사용자 광학 승인으로 진행. 연구기록 자체는 renderer 수정 지시가 아니다.
+
 
 ## 변경·출처
 - 중간 체크포인트를 동일 파일의 개별 GitHub 커밋으로 업데이트하고 각 파일 URL 또는 SHA를 명시합니다.
