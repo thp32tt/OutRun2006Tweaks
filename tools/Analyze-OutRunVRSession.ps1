@@ -116,7 +116,9 @@ if($projectedSummary){$projectedSemantic=[int64]$projectedSummary.Groups[1].Valu
 $rankProjectionNotReached=($rankProducerObserved -and $projectedSemantic -eq 0)
 
 $gameDllIdentity=Read-AllText 'GAME_DLL_IDENTITY.txt'
-$gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*{$flags+='SBS_DESKTOP_DUP_FALLBACK'}
+$gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*$')
+$flags=@()
+if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
 if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
 if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
