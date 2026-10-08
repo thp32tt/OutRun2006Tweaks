@@ -2879,3 +2879,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR — 2026-10-08 13:41 KST
 - B q172 6C9B3611 new Korean DDS `7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2` (native CJK rendered START→출발, GOAL→골, readable right-lean). Exact 2/2 source bbox/size/positive margins, original outside RGBA/alpha 0, 1024x1024 RGBA32 header/RAW mirror-Y exact. B254 tofu rejected; B256 unproven source-right remnant probe aborted before writing. Independent pixels-first C2 source-slant anchors and plate evidence pending, so current queue HOLD_STRICT_RECHECK; C3/PRE_INGAME blocked, actual game UNTESTED. QA `localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/B255_CONTROLLER_SELF_QA.json`. No VR/FFB/DX11/DXVK.
+
+
+### C282 C2 EVEN q172 B255 independent pixel recovery — 2026-10-08
+- Fresh q172 B255 native actual SHA 7282687b... validated; B251->B255 only 1819 source-text-box interior RGBA changes and 0 exterior; canonical source->B255 outside two source boxes RGBA/alpha=0, RAW/FLIP-Y=2/2; source/old/new native + 50% practical confirms right-italic restoration with no definite new graphic defect. **C HOLD_STRICT_RECHECK** for independently exact CLEAN, source-glyph slant anchors, qualified calibration/C3 evidence, not a repeat C281 FAIL. No DDS changes, C3/APPROVAL/export BLOCKED. TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN, RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_CONTROLLER_QA.json`.
