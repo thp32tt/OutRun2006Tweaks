@@ -1,0 +1,75 @@
+name: DX9Ex Full Source Impact Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - 'tools/verify_vr_fullsource_impact.py'
+      - '.github/workflows/dx9ex-fullsource-impact-review.yml'
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'tools/Build-OutRunPCFast.ps1'
+      - 'tools/verify_vr_visual_composition_p0.py'
+      - '.github/workflows/vr-dx9ex-active.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-cross-domain:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Whole source inventory and unexpected cross-domain impacts
+        run: python3 tools/verify_vr_fullsource_impact.py
+      - name: Archive evidence for all C++/headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-fullsource-inventory
+          path: fullsource-review-output/
+          if-no-files-found: error
+          retention-days: 90
+
+  msvc-analyze-active-game:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure exact active DX9Ex game for MSVC static analysis
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-analysis -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DCMAKE_CXX_FLAGS=/analyze
+      - name: Apply same dependency compatibility fixes as DX9Ex Active
+        shell: pwsh
+        run: |
+          (Get-Content build-analysis/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-analysis/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-analysis/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-analysis/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-analysis/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-analysis/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-analysis/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-analysis/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-analysis/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 game with MSVC analyze and preserve analyzer warnings
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force fullsource-msvc-output | Out-Null
+          $log = 'fullsource-msvc-output/build-analyze.log'
+          & cmake --build build-analysis --config Release --target outrun2006tweaks 2>&1 | Tee-Object -FilePath $log
+          $buildExit = $LASTEXITCODE
+          $analyzer = @(Get-Content $log | Where-Object { $_ -match 'warning C6\d{3}|warning C26\d{3}|error C\d+' })
+          $analyzer | Set-Content fullsource-msvc-output/findings.txt
+          [pscustomobject]@{ sourceSha=$env:GITHUB_SHA; buildExitCode=$buildExit; analyzerFindings=$analyzer.Count; runtimeValidation='UNTESTED' } | ConvertTo-Json | Set-Content fullsource-msvc-output/summary.json
+          if ($buildExit -ne 0) { throw "MSVC analyzer build failed: $buildExit" }
+      - name: Archive static analyzer output, including warnings on failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-fullsource-msvc-analyze
+          path: fullsource-msvc-output/
+          if-no-files-found: warn
+          retention-days: 90
