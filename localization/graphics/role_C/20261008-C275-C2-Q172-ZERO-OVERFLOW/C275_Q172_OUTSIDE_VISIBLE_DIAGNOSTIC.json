@@ -1,0 +1,17 @@
+{
+  "source_vs_candidate_raw_rgba_changed_outside_readable_source_region_boxes": 425,
+  "of_which_both_alpha_zero_hidden_RGB": 0,
+  "outside_visible_with_source_or_final_nonzero_alpha": 425,
+  "outside_alpha_changed": 0,
+  "comparison_space": "1024x1024 RAW; equivalent readable FLIP-Y",
+  "location_readable_bbox": [
+    53,
+    372,
+    680,
+    660
+  ],
+  "max_distance_to_source_text_bbox_px": 8,
+  "result": "FAIL",
+  "interpretation": "All 425 changes outside both original English label rectangles modify fully visible opaque pixels of the red badge/plate. Alpha equality does not make changed RGB invisible. Outside changes violate the zero-pixel containment/protected-art rule, regardless of legibility or producer-vs-previous-candidate blast radius.",
+  "runtime_validation": "UNTESTED"
+}

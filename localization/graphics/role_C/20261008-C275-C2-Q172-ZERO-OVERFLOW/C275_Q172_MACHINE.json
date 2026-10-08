@@ -1,0 +1,115 @@
+{
+  "run": "C275",
+  "queue_index": 172,
+  "size": [
+    1024,
+    1024
+  ],
+  "mips": 1,
+  "src_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "final_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "orientation": "flip_y",
+  "regions": [
+    {
+      "id": "start",
+      "source_alpha_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "current_alpha_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "margins_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size_leq_source": true,
+      "positive_margin": false,
+      "raw_box": [
+        55,
+        628,
+        136,
+        651
+      ],
+      "readable_box": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "raw_flipy_byte_exact": true
+    },
+    {
+      "id": "goal",
+      "source_alpha_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "current_alpha_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "margins_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size_leq_source": true,
+      "positive_margin": false,
+      "raw_box": [
+        595,
+        365,
+        672,
+        389
+      ],
+      "readable_box": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "raw_flipy_byte_exact": true
+    }
+  ],
+  "changed_outside_both_source_alpha_bbox_rectangles": 425,
+  "alpha_changed_outside_rectangles": 0,
+  "changed_inside": 3541,
+  "alpha_changed_inside": 0,
+  "output_files": [
+    "start_SOURCE.png",
+    "start_FINAL.png",
+    "start_SOURCE_RAW.png",
+    "start_FINAL_RAW.png",
+    "start_FINAL_black.png",
+    "start_FINAL_white.png",
+    "start_FINAL_gray.png",
+    "start_FINAL_ZOOM2.png",
+    "start_FINAL_PRACTICAL75.png",
+    "start_FINAL_PRACTICAL50.png",
+    "start_CONTACT.png",
+    "goal_SOURCE.png",
+    "goal_FINAL.png",
+    "goal_SOURCE_RAW.png",
+    "goal_FINAL_RAW.png",
+    "goal_FINAL_black.png",
+    "goal_FINAL_white.png",
+    "goal_FINAL_gray.png",
+    "goal_FINAL_ZOOM2.png",
+    "goal_FINAL_PRACTICAL75.png",
+    "goal_FINAL_PRACTICAL50.png",
+    "goal_CONTACT.png"
+  ],
+  "scope_note": "Current-vs-source exact RGBA32/alpha change gate across both label source bbox rectangles; review original stage/sprite artwork overlays separately"
+}

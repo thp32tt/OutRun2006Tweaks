@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "run": "OUTRUN-KOR-C275-C2-Q172-VISIBLE-425-PIXEL-FAIL-20261008-1120",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "selected_head_before_commit": "085befdea5dbf98349a81826f3cfe80510c4e5dc",
+  "backend": "GitHub SSOT with N100 MCP minimal DDS decode fallback after GPT local raw.githubusercontent.com DNS failure",
+  "visual_first_look": {
+    "source": "red START/GOAL badges",
+    "current": "출발/골 glyphs displayed within red badges and legible at native and 50% practical",
+    "pixels_viewed_before_current_producer_report": true,
+    "calibration_note": "No current blind calibration PASS or C/C3 approval asserted; source geometry hard FAIL blocks PASS regardless."
+  },
+  "geometry": {
+    "native_dimensions": [
+      1024,
+      1024
+    ],
+    "pixel_format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "source_start_bbox": [
+      55,
+      373,
+      136,
+      396
+    ],
+    "source_goal_bbox": [
+      595,
+      635,
+      672,
+      659
+    ],
+    "raw_flip_y_crop_byte_exact": true
+  },
+  "independent_full_texture_diff": {
+    "reference": "exact canonical English source DDS",
+    "comparison": "exact persisted B248 final DDS",
+    "source_bbox_union_source": "C269 source-alpha/glyph physical regions",
+    "outside_source_text_rectangles_changed_rgb_visible": 425,
+    "outside_alpha_changed": 0,
+    "max_outside_distance_px": 8,
+    "visible_changed_explanation": "All 425 changed RGB pixels have non-zero source or final alpha and alter red badge/plate outside permitted source-text rectangles; not hidden alpha-zero pixels.",
+    "prior_b248_vs_b191_claim_note": "Earlier reported blast-radius zero was final-vs-previous-candidate, not final-vs-canonical-source; cannot certify original protected areas."
+  },
+  "findings": {
+    "start": {
+      "slant": "right-lean source badge text; current text legible, fail due border background changed",
+      "clean_plate": "red badge pixels altered outside source text enclosure",
+      "style": "pale label with orange-shadow remains visibly comparable but plate background differs outside source glyph scope",
+      "readability": "legible 50%",
+      "glyph_integrity": "no definite broken glyph",
+      "protected_art": "FAIL original red plate changed outside source bbox",
+      "placement": "source envelope visually occupied; zero-pixel hard gate fails",
+      "orientation": "RAW mirror-Y exact"
+    },
+    "goal": {
+      "slant": "right-lean source badge text; current text legible, fail due red background change",
+      "clean_plate": "original red badge/plate colors not exact outside original text enclosure",
+      "style": "source pale orange-shadow family visible",
+      "readability": "legible 50%",
+      "glyph_integrity": "no definite broken glyph",
+      "protected_art": "FAIL original red plate changed outside source bbox",
+      "placement": "source envelope visually occupied; zero-pixel hard gate fails",
+      "orientation": "RAW mirror-Y exact"
+    }
+  },
+  "evidence": {
+    "independent_machine": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/C275_Q172_MACHINE.json",
+    "visible_outside_diagnostic": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/C275_Q172_OUTSIDE_VISIBLE_DIAGNOSTIC.json",
+    "pixel_location": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/C275_OUTSIDE_PIXELS_LOCATION.json",
+    "overlay": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/C275_OUTSIDE_PIXELS_OVERLAY.png",
+    "start_contact": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/start_CONTACT.png",
+    "goal_contact": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/goal_CONTACT.png",
+    "start_raw": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/start_FINAL_RAW.png",
+    "goal_raw": "localization/graphics/role_C/20261008-C275-C2-Q172-ZERO-OVERFLOW/goal_FINAL_RAW.png"
+  },
+  "decision": "REWORK_REQUIRED",
+  "approval_record_created": false,
+  "c3_status": "BLOCKED_HARD_FAIL",
+  "pre_ingame_export": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "dds_bytes_changed": false,
+  "producer_return": "Restore opaque red badge/plate and rim strictly pixel-exact beyond the canonical English source glyph/effect regions; retain correct translated START/GOAL legibility and rightward slant, plus native header/mips, RAW orientation. Re-verify final-vs-original visible pixels, not only new-vs-prior-candidate blast radius."
+}

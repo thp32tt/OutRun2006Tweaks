@@ -2798,3 +2798,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - Repaired A184R's q59 extra CSV closing quote; queue now validates as 137 rows × 6 fields with q60 separate again.
 - PJR-019 remains open; `RUNTIME_VALIDATION=UNTESTED`; forbidden domains untouched.
 
+
+
+### 2026-10-08 C275 C2 q172 hard visual/protected-pixel FAIL
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: q172 6C9B3611 final 51a636b1… vs canonical source d5f4a36d… has **425 visible changed opaque RGB pixels outside** exact START/GOAL original source glyph region rectangles; outside alpha delta=0 but nonzero-alpha rendered colors still differ. RAW/FLIP-Y exact. Current display legibility is insufficient; q172 REWORK_REQUIRED, C3/export blocked. No DDS change; RUNTIME_VALIDATION=UNTESTED.
