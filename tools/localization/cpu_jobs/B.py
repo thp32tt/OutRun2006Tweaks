@@ -87,7 +87,7 @@ for row in rows:
 # Encode exact original 32-bit BGRA byte layout, one mip, vertically mirrored RAW.
 assert len(candidate)==128+2048*2048*4
 assert struct.unpack_from("<I",candidate,28)[0]==1
-raw=OUT[::-1].copy().tobytes("raw","BGRA")
+raw=Image.fromarray(OUT[::-1].copy(),"RGBA").tobytes("raw","BGRA")
 trial=candidate[:128]+raw
 assert sha(trial)!=CUR and trial[:128]==candidate[:128]
 D=decoded(trial)
