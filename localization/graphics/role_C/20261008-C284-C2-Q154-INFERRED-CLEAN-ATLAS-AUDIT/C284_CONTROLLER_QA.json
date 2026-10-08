@@ -554,11 +554,13 @@
     "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_ENGLISH_CLEAN_KOREAN_JPG_REVIEW.jpg",
     "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png"
   ],
-  "post_task_cleanup": "PENDING_AFTER_VERIFIED_PUBLICATION",
+  "post_task_cleanup": "COMPLETE_AFTER_QA_EVIDENCE_COMMITTED_AND_REMOTE_HEAD_VERIFIED",
   "excluded_work": [
     "VR",
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "cleanup_removed_path": "work/C284_C2_Q154_CLEAN_PLATE_20261008_scratch",
+  "n100_free_bytes_after_cleanup": 27663527936
 }
