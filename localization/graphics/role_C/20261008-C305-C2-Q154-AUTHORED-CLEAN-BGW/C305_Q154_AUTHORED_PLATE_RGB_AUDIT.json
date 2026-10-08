@@ -1,0 +1,178 @@
+{
+  "run": "C305-C2",
+  "queue_index": 154,
+  "native_size": [
+    4096,
+    1024
+  ],
+  "clean_orientation_detected": "READABLE",
+  "orientation_compared_outside_differences": [
+    [
+      0,
+      "READABLE"
+    ],
+    [
+      1984494,
+      "RAW_REVERSED"
+    ]
+  ],
+  "sha256": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "authored_clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "candidate": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "source_final_changed_outside_union": 0,
+  "source_final_alpha_changed_outside_union": 0,
+  "source_clean_changed_outside_union": 0,
+  "regions": [
+    {
+      "idx": 0,
+      "id": "01_create_new_license",
+      "source": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 142103,
+      "source_to_clean_changed_rgba_pixels": 142103,
+      "clean_to_final_changed_rgba_pixels": 101090,
+      "clean_to_final_alpha_positive_pixels": 96028,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 1,
+      "id": "02_select_license",
+      "source": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 105320,
+      "source_to_clean_changed_rgba_pixels": 105320,
+      "clean_to_final_changed_rgba_pixels": 72921,
+      "clean_to_final_alpha_positive_pixels": 69351,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 2,
+      "id": "03_single_player_red",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 98927,
+      "source_to_clean_changed_rgba_pixels": 98927,
+      "clean_to_final_changed_rgba_pixels": 77318,
+      "clean_to_final_alpha_positive_pixels": 74084,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 3,
+      "id": "04_default_license",
+      "source": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 115127,
+      "source_to_clean_changed_rgba_pixels": 115127,
+      "clean_to_final_changed_rgba_pixels": 71820,
+      "clean_to_final_alpha_positive_pixels": 68234,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 4,
+      "id": "05_multiplayer_red",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 90633,
+      "source_to_clean_changed_rgba_pixels": 90633,
+      "clean_to_final_changed_rgba_pixels": 73103,
+      "clean_to_final_alpha_positive_pixels": 69976,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 5,
+      "id": "06_single_player_gray",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 19100,
+      "source_to_clean_changed_rgba_pixels": 19100,
+      "clean_to_final_changed_rgba_pixels": 13360,
+      "clean_to_final_alpha_positive_pixels": 11482,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 6,
+      "id": "07_showroom_gray",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 15231,
+      "source_to_clean_changed_rgba_pixels": 15231,
+      "clean_to_final_changed_rgba_pixels": 6628,
+      "clean_to_final_alpha_positive_pixels": 5828,
+      "inside_plate_zero_alpha": true
+    },
+    {
+      "idx": 7,
+      "id": "08_multiplayer_gray",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 17402,
+      "source_to_clean_changed_rgba_pixels": 17402,
+      "clean_to_final_changed_rgba_pixels": 12757,
+      "clean_to_final_alpha_positive_pixels": 10953,
+      "inside_plate_zero_alpha": true
+    }
+  ],
+  "triptych_outputs": [
+    "work/C305_C2_Q154_20261008/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_BLACK.jpg",
+    "work/C305_C2_Q154_20261008/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_GRAY.jpg",
+    "work/C305_C2_Q154_20261008/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_WHITE.jpg"
+  ]
+}
