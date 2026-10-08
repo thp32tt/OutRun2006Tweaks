@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T16:34:00+09:00",
+  "updated_at_kst": "2026-10-08T16:42:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7433,5 +7433,40 @@
     "pre_ingame": "BLOCKED",
     "c3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b261_q214_method_change_visual_reject_rollback": {
+    "run_key": "OUTRUN-KOR-B261-Q214-METHOD-CHANGE-20261008-1630",
+    "role": "B",
+    "index": 214,
+    "asset": "BF229CF4",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "restored_current_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "source_profile": "localization/graphics/role_B/20261008-B260-Q214-BC3-FACE-PRIORITY/B260_SOURCE_FAMILY_PROFILE.json",
+    "triage": "METHOD_CHANGE_REQUIRED",
+    "independent_rejections": [
+      "C285",
+      "C289"
+    ],
+    "B260_trial_sha256": "0036a943265c0244ec9c9e53e6d9e55e205c08b0d59699275f02631d82b5a903",
+    "B261_trial_sha256": "d900d347b0e6882b9e9be072fc25bb92f9a21ca533745cc8ee584702938b8e9d",
+    "trial_machine_qa": "2/2_PASS_BUT_SOURCE_STYLE_NOT_PROVEN",
+    "producer_visual": "B260_PINK_BLOB_FAIL_B261_PALE_FLAT_FACE_GOAL_RED_STRIPE_FAIL",
+    "trial_final_status": "REJECTED_RESTORED_B259",
+    "current_queue": "REWORK_REQUIRED_METHOD_CHANGE_MANUAL_VECTOR_RECONSTRUCTION",
+    "approved_DDS_count_delta": 0,
+    "manual_next_stage": "Native source-derived per-glyph sculpted beveled cream/gold letterforms using new manually constructed geometry and exact source English plate-mask; avoid old categorical BC3 palette/signed distance repeat",
+    "C2": "REQUIRED_AFTER_NEW_MATERIAL_BYTES",
+    "C3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "github_actions_runs": [
+      37744245830,
+      37744561228
+    ],
+    "backend": "GITHUB_HOSTED_CPU_LOCAL_RAW_GITHUB_DNS_UNAVAILABLE",
+    "qa": "localization/graphics/role_B/20261008-B261-Q214-BC3-FACE-PRIORITY/B261_CONTROLLER_VISUAL_REJECT.json",
+    "restoration_commit": "aba7568d8d4e2157c9eb74dbd6e979f63277b996",
+    "post_task_cleanup": "github ephemeral scratch discarded; N100 not used",
+    "forbidden_domains_touched": []
   }
 }
