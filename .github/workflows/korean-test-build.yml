@@ -297,3 +297,4 @@ jobs:
           path: build/bin/
           compression-level: 9
           retention-days: 30
+# Manual USER_REVIEW_NOT_APPROVED build trigger: 2026-10-09 00:14 KST
