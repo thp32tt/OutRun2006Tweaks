@@ -206,6 +206,14 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT))
 		return E_FAIL;
 
+	// Raw DDS rows are packed at the file's intrinsic dimensions. The fast
+	// uploader does not resample: an explicit smaller/larger D3DX size would
+	// reinterpret source row pitch and can corrupt HUD/car-selection textures.
+	// Fail to the caller's original D3DX trampoline instead of clamping.
+	if ((Width != D3DX_DEFAULT && Width != header->data.dwWidth) ||
+		(Height != D3DX_DEFAULT && Height != header->data.dwHeight))
+		return E_FAIL;
+
 	// Extract texture information
 	Width = (Width != D3DX_DEFAULT) ? Width : header->data.dwWidth;
 	if (Width > header->data.dwWidth)

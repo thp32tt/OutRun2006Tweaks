@@ -33,6 +33,8 @@ def verify(text):
         (loader,"*ppTexture = nullptr;","released output cleared"),
         (loader,"bytes > remainingSourceBytes","mip source bounded"),
         (loader,"Width > 16384","oversized DDS rejected"),
+        (loader,"Width != D3DX_DEFAULT && Width != header->data.dwWidth","explicit resized DDS width rejected before packed row copy"),
+        (loader,"Height != D3DX_DEFAULT && Height != header->data.dwHeight","explicit resized DDS height rejected before packed row copy"),
         (loader,"dynamicTexture && mipLevel == 0","only dynamic top mip discards"),
         (loader,"? D3DLOCK_DISCARD : 0;","MANAGED static lock uses zero flags"),
         (loader,"LockRect(mipLevel, &lockedRect, nullptr, lockFlags)","safe lock flag passed"),
@@ -66,6 +68,11 @@ def verify(text):
     if max(loader.index("header->data.dwSize != sizeof(DDSURFACEDESC2)"),
            loader.index("header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)")) > loader.index("Width = (Width != D3DX_DEFAULT)"):
         raise ValueError("fast DDS descriptor validation must precede dimension/format interpretation")
+    if (loader.index("Width != D3DX_DEFAULT && Width != header->data.dwWidth") >
+            loader.index("Width = (Width != D3DX_DEFAULT)") or
+            loader.index("Height != D3DX_DEFAULT && Height != header->data.dwHeight") >
+            loader.index("Height = (Height != D3DX_DEFAULT)")):
+        raise ValueError("fast DDS explicit size guard must precede raw row-size decoding")
     if handle.index("if (validHeader && completeMipPayload && firstMipSize &&") > handle.index("memcpy(*ppSrcData, file, sizeof(DDS_FILE));"):
         raise ValueError("game DDS header was overwritten before replacement validation")
     if "const D3DFORMAT newFormat = validHeader" not in handle:
@@ -144,6 +151,8 @@ def negatives(text):
         "header->data.dwSize != sizeof(DDSURFACEDESC2)",
         "header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)",
         "bytes > remainingSourceBytes",
+        "Width != D3DX_DEFAULT && Width != header->data.dwWidth",
+        "Height != D3DX_DEFAULT && Height != header->data.dwHeight",
         "dynamicTexture && mipLevel == 0",
         "LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
         "static_cast<size_t>(lockedRect.Pitch) < rowBytes",
