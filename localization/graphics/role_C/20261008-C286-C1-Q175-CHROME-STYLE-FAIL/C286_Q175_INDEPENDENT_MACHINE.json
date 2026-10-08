@@ -1,0 +1,132 @@
+{
+  "queue_index": 175,
+  "run": "C286-C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "width": 2048,
+  "height": 1024,
+  "format": "BGRA32",
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "headers_byte_exact": true,
+  "producer_source_readable_rgba_mismatch_pixels": 0,
+  "producer_final_readable_rgba_mismatch_pixels": 0,
+  "changed_rgba_outside_three_ORIGINAL_effect_bboxes": 0,
+  "changed_alpha_outside": 0,
+  "clean_rgba_outside": 0,
+  "changed_rgba_global": 324732,
+  "regions": [
+    {
+      "id": "stage_select",
+      "readable_source_region": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "source_bbox_local": [
+        0,
+        0,
+        1366,
+        143
+      ],
+      "candidate_bbox_local": [
+        6,
+        5,
+        917,
+        138
+      ],
+      "changed_rgba": 119049,
+      "source_visible_pixels": 101963,
+      "candidate_visible_pixels": 53780,
+      "source_alpha_fringes_1_to_3": 4368,
+      "candidate_alpha_fringes_1_to_3": 4250
+    },
+    {
+      "id": "showroom",
+      "readable_source_region": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "source_bbox_local": [
+        0,
+        0,
+        950,
+        132
+      ],
+      "candidate_bbox_local": [
+        6,
+        5,
+        261,
+        127
+      ],
+      "changed_rgba": 77015,
+      "source_visible_pixels": 69649,
+      "candidate_visible_pixels": 18016,
+      "source_alpha_fringes_1_to_3": 3779,
+      "candidate_alpha_fringes_1_to_3": 873
+    },
+    {
+      "id": "single_player",
+      "readable_source_region": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "source_bbox_local": [
+        0,
+        0,
+        1384,
+        151
+      ],
+      "candidate_bbox_local": [
+        6,
+        5,
+        808,
+        146
+      ],
+      "changed_rgba": 128668,
+      "source_visible_pixels": 99081,
+      "candidate_visible_pixels": 57225,
+      "source_alpha_fringes_1_to_3": 4610,
+      "candidate_alpha_fringes_1_to_3": 3712
+    }
+  ],
+  "note": "Independent raw DDS decode with complete SOURCE effect regions, alpha>0. The reviewer read producer metadata before pixel inspection; blind first-look is not claimed. Machine PASS cannot override native visual family mismatch.",
+  "readable_original_source_bboxes": [
+    {
+      "id": "stage_select",
+      "bbox": [
+        6,
+        254,
+        1372,
+        397
+      ]
+    },
+    {
+      "id": "showroom",
+      "bbox": [
+        6,
+        397,
+        956,
+        529
+      ]
+    },
+    {
+      "id": "single_player",
+      "bbox": [
+        2,
+        566,
+        1386,
+        717
+      ]
+    }
+  ],
+  "status": "MACHINE_CONTAINMENT_PASS_VISUAL_STYLE_FAIL",
+  "source_native_evidence_provenance": "Producer's source/clean decoded images matched independently fetched exact persisted DDS source/final (RGBA mismatch pixels 0), but clean plate remains producer evidence"
+}

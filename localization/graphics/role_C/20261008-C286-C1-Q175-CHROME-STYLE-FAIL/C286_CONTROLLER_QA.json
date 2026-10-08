@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C286-C1-Q175-CHROME-STYLE-FAIL",
+  "run_key": "OUTRUN-KOR-C286-C1-Q175-CHROME-FAMILY-20261008-1510",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 175,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "producer": "A188",
+  "candidate_bytes_changed": false,
+  "execution_backend": "N100 MCP small native-DDS decode fallback: ChatGPT-local GitHub DNS unavailable; binary remote inputs cannot be mounted through linked GitHub reader. No N100 repository/worktree mutated.",
+  "machine_report": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_INDEPENDENT_MACHINE.json",
+  "machine_verified": {
+    "native_2048x1024_BGRA32": true,
+    "source_and_candidate_sha256_pinned": true,
+    "header128_match": true,
+    "source_current_changed_outside_original_effect_bboxes": 0,
+    "source_current_alpha_changed_outside": 0,
+    "clean_changed_outside_original_effect_bboxes": 0,
+    "published_producer_source_and_decoded_current_RGBA_match_exact_native_pixels": true
+  },
+  "review": {
+    "reviewer": "ChatGPT AI1 C1",
+    "pixels_before_producer_verdict": false,
+    "reason": "Source producer report read before first native visual inspection; do not claim blinded first-look.",
+    "calibration": "NOT_COMPLETED; no C PASS can be issued",
+    "visual_evidence": [
+      {
+        "id": "stage_select",
+        "path": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "sha256": "e4ceb15cd7a71e54b0284a4bea22e2040d9f87398ccf34e9e16b166de6dd5f11"
+      },
+      {
+        "id": "showroom",
+        "path": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "sha256": "f51633bc53b62c2f26cbbcb98b238081d1224a1f0e5e130f0a7442cb8c470bc9"
+      },
+      {
+        "id": "single_player",
+        "path": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png",
+        "sha256": "eb37ce1ae3974749bb42020c16e44961ebd3405e289e16cc76dbdfe1b02e6df7"
+      }
+    ],
+    "reference_source": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_SOURCE_READABLE.png",
+    "reference_clean": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_CLEAN_PLATE.png",
+    "reference_candidate": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "reference_raw": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_FINAL_RAW_GRAY.jpg",
+    "reference_practical": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_PRACTICAL_100_75_50.jpg",
+    "region_findings": {
+      "stage_select": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "HOLD: exact corresponding source/candidate glyph anchor top-bottom displacement not measured; do not claim lean equivalence.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "clean_plate": {
+          "result": "PASS_MACHINE_AND_VISIBLE_CONTACT",
+          "observation": "Producer clean plate is transparent in letter-only source regions and outside-source-pixel changes are zero; exact in-region appearance compared in lossless SOURCE/CLEAN/FINAL contact.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "FAIL: English has horizontally continuous low/wide sci-fi chrome segments and deeper bevel/extrusion. Korean glyphs look like ordinary upright spaced round sans with flatter silver face, altered glyph proportions and much weaker source character.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "readability": {
+          "result": "PASS_ON_AVAILABLE_VIEW",
+          "observation": "PASS: Hangul legible at native and practical 50% reference.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE",
+          "observation": "No obvious missing Hangul syllable strokes at original resolution, but style failure is independent of glyph integrity.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE",
+          "observation": "Native DDS RGBA/alpha changed pixels outside three exact source effect bboxes = 0; no protected region altered outside those bboxes.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "placement": {
+          "result": "FAIL",
+          "observation": "FAIL: Korean uses visibly disjoint syllable tracking relative to continuous original title; source-faithful hierarchy not attained.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "orientation": {
+          "result": "PASS_AS_OBSERVED",
+          "observation": "RAW DDS mirror_y as source; readable FLIP-Y compare agrees byte-decoded final with published decoded view.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_stage_select_SOURCE_CLEAN_FINAL_NATIVE.png"
+        }
+      },
+      "showroom": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "HOLD: glyph anchor-direction not independently quantified.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "clean_plate": {
+          "result": "PASS_MACHINE_AND_VISIBLE_CONTACT",
+          "observation": "Producer clean plate is transparent in letter-only source regions and outside-source-pixel changes are zero; exact in-region appearance compared in lossless SOURCE/CLEAN/FINAL contact.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "FAIL: original low-wide metallic techno word contrasted with generic isolated 쇼 룸 sans. Source bevel/connected terminal design absent; shape/depth not source-faithful.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "readability": {
+          "result": "PASS_ON_AVAILABLE_VIEW",
+          "observation": "PASS: 쇼룸 legible at native and 50%.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE",
+          "observation": "No obvious missing Hangul syllable strokes at original resolution, but style failure is independent of glyph integrity.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE",
+          "observation": "Native DDS RGBA/alpha changed pixels outside three exact source effect bboxes = 0; no protected region altered outside those bboxes.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "placement": {
+          "result": "FAIL",
+          "observation": "FAIL: original compact long source title becomes an isolated small two-syllable mark with visibly different occupied hierarchy; avoid artificially stretching to meet English width.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "orientation": {
+          "result": "PASS_AS_OBSERVED",
+          "observation": "RAW DDS mirror_y as source; readable FLIP-Y compare agrees byte-decoded final with published decoded view.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_showroom_SOURCE_CLEAN_FINAL_NATIVE.png"
+        }
+      },
+      "single_player": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "HOLD: source-relative individual glyph slant anchors not independently measured.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "clean_plate": {
+          "result": "PASS_MACHINE_AND_VISIBLE_CONTACT",
+          "observation": "Producer clean plate is transparent in letter-only source regions and outside-source-pixel changes are zero; exact in-region appearance compared in lossless SOURCE/CLEAN/FINAL contact.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "FAIL: original connected elongated chrome display family with lower extruded shadow vs plain spaced 싱글 플레이 glyphs, with distinctly different terminals, weight/relief and face character.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "readability": {
+          "result": "PASS_ON_AVAILABLE_VIEW",
+          "observation": "PASS: native and 50% Hangul can be read.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE",
+          "observation": "No obvious missing Hangul syllable strokes at original resolution, but style failure is independent of glyph integrity.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE",
+          "observation": "Native DDS RGBA/alpha changed pixels outside three exact source effect bboxes = 0; no protected region altered outside those bboxes.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "placement": {
+          "result": "FAIL",
+          "observation": "FAIL: disjoint syllable spacing and simpler relief materially depart from original display hierarchy.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        },
+        "orientation": {
+          "result": "PASS_AS_OBSERVED",
+          "observation": "RAW DDS mirror_y as source; readable FLIP-Y compare agrees byte-decoded final with published decoded view.",
+          "evidence": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_Q175_single_player_SOURCE_CLEAN_FINAL_NATIVE.png"
+        }
+      }
+    }
+  },
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED_UNTIL_FRESH_A_REWORK_AND_C",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_in_game_backlog": "IGR-003 remains open/pending newer actual game retest; C must not close it",
+  "next_producer_action": "Rebuild all three titles from exact 2048x1024 source with source-faithful rounded low-wide chrome techno glyph construction: segmented horizontal/connected terminals, silver bevel and layered dark extrusion, source-measured top/bottom slant anchors, and restrained source-like Hangul spacing while preserving natural Hangul aspect and exact original bbox ceiling. Check all 3 regions SOURCE/CLEAN/FINAL RAW/FLIP-Y and 100/75/50%; no forced arbitrary English-width fill. Submit materially changed DDS for fresh C1 and separate C3.",
+  "no_vr_ffb_dx11_dxvk_changes": true
+}
