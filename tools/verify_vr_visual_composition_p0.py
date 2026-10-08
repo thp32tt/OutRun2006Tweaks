@@ -1121,7 +1121,7 @@ def check_exact_hud_raw_wvp(source):
         raw_fallback, 'exact ScreenHud fallback must not feed live already-injected c64',
         'if (!R44GetOwnedRawOverlayWvp(original))',
         'if (screenKind == R30ScreenSpaceKind::PerspectiveHud)',
-        'if (!R30GetExtendedRawWvpForExactHud(original))',
+        'if (!R30GetExtendedRawWvpForExactHud(original) &&',
         '++R30ExactHudRawWvpMiss;',
         'return false;',
         '++R30ExactHudExtendedRawWvp;',
@@ -1151,7 +1151,7 @@ for label, corrupt in (
     ('HUD once again reads potentially injected live c64',
      inject_one_function_token(
          r30, 'bool R30BuildScreenSpaceEyeConstants(',
-         'if (!R30GetExtendedRawWvpForExactHud(original))',
+         'if (!R30GetExtendedRawWvpForExactHud(original) &&',
          'if (FAILED(device->GetVertexShaderConstantF(')),
 ):
     try:
@@ -1160,6 +1160,76 @@ for label, corrupt in (
         pass
     else:
         raise SystemExit('P0 original HUD c64 mutation survived: ' + label)
+
+
+# The original EXE+0xCABE lens/Clr_SceneEffect owns two shader variants:
+# flat lens is classified as PerspectiveHud, spatial effect WorldBillboard.
+# Neither may accidentally inherit only ScreenHud's recovery gate.
+def check_exact_scene_effect_raw_wvp(source):
+    scope = function_body(source, 'bool R30ExactSceneEffectScope(')
+    require('RenderScope::SceneEffect', scope,
+            'original Clr_SceneEffect exact shader producer')
+    require('CorroboratesProjectedScreenEffect(scope)', scope,
+            'EXE+0xCABE exact projected-lens producer')
+    recover = function_body(source,
+                            'bool R30GetExtendedRawWvpForExactSceneEffect(')
+    for token in (
+        'if (!outConstants || !R30ExactSceneEffectScope())',
+        'GetLastRawGameWvpWrite(',
+        'GetCurrentShaderEpoch(',
+        'writeShader != currentShader',
+        'writeShaderSerial != currentShaderSerial',
+        'currentDraw > writeDrawSerial',
+        'currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow',
+    ):
+        require(token, recover, 'bounded original-lens raw c64 provenance')
+    classifier = function_body(source,
+                                'R30ScreenSpaceKind R30ClassifyScreenSpacePass(')
+    require_order(
+        classifier, 'scene producer classifies only on original game WVP',
+        'if (semanticProjectedScreen || semanticSceneEffect)',
+        'if (!R44GetOwnedRawOverlayWvp(rawWvp) &&',
+        '!R30GetExtendedRawWvpForExactSceneEffect(rawWvp))',
+        'R44ClassifyOwnedOverlayMatrix(rawWvp)'
+    )
+    eye = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    fallback = eye[eye.index('if (!R44GetOwnedRawOverlayWvp(original))'):]
+    require_order(
+        fallback, 'both flat and spatial lens use original game WVP',
+        'if (!R30GetExtendedRawWvpForExactHud(original) &&',
+        '!R30GetExtendedRawWvpForExactSceneEffect(original))',
+        'else if (R30ExactSceneEffectScope())',
+        'if (!R30GetExtendedRawWvpForExactSceneEffect(original))',
+        'else',
+        'GetVertexShaderConstantF('
+    )
+    if fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 2:
+        raise SystemExit('P0 exact SceneEffect flat/spatial coverage mismatch')
+
+check_exact_scene_effect_raw_wvp(r30)
+for label, mutant in (
+    ('flat scene effect loses owned raw fallback',
+     inject_one_function_token(
+         r30, 'bool R30BuildScreenSpaceEyeConstants(',
+         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
+         '!false)')),
+    ('spatial lens raw WVP no longer checked',
+     inject_one_function_token(
+         r30, 'bool R30BuildScreenSpaceEyeConstants(',
+         'else if (R30ExactSceneEffectScope())',
+         'else if (false)')),
+    ('generic alpha promoted as exact lens',
+     inject_one_function_token(
+         r30, 'bool R30GetExtendedRawWvpForExactSceneEffect(',
+         'if (!outConstants || !R30ExactSceneEffectScope())',
+         'if (!outConstants)')),
+):
+    try:
+        check_exact_scene_effect_raw_wvp(mutant)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 SceneEffect WVP mutation survived: ' + label)
 
 
 print('P0 visual composition static contract: PASS')
