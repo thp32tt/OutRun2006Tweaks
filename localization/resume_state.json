@@ -7,12 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "A184R q59 7CE1CFC5 exact 261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a producer 4/4 machine+controller style self-QA PASS. Fresh independent pixels-first C1 + C3 then PRE_INGAME JPG user review/new actual-game retest. Do not close PJR-019 or promote from A-only PASS.",
+    "C274 q59 7CE1CFC5 exact A184R 261108cd... is HOLD_STRICT_RECHECK, not REWORK: supplied visual evidence is favorable and current bytes should be preserved. Future C1 must inspect exact pixels before producer verdict, generate complete lossless per-region native/zoom/practical/RAW/black-white-gray plus independent machine evidence, then separate C3. PJR-019 remains open for user JPG + NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "q214 A183R3 exact 4ff06dbe... is visual FAIL despite static PASS: broken Hangul strokes/BC3 red striping. Do not approve/ship, material rerender needed. localization/graphics/role_A/20261008-A183R3-Q214-START-GOAL-RESIDUE-FIX/A183R3_CONTROLLER_SELF_QA.json",
     "C273 q175 754F0599 exact A153 5b37fdaf... is REWORK_REQUIRED: preserve clean/bbox/source-left/RAW but reduce broad black extrusion/outline and rebuild thinner rounded/segmented techno Hangul family. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
     "C273 q161 55B57CDE exact A157 66a89385... is HOLD_STRICT_RECHECK: visual contact/RAW is favorable but current invocation was not pixels-first and lacks complete lossless per-region evidence. Preserve bytes; future C1 must inspect exact pixels before producer verdict and generate complete region evidence, then separate C3. RUNTIME_VALIDATION=UNTESTED.",
     "C272 q219 D263B3F1 exact A181R candidate 41cf4c15... is REWORK_REQUIRED: remove arbitrary 0.80 English-width targeting and rebuild rounded/segmented silver-techno Hangul with open counters while preserving A113 clean plate, exact bbox/margins, OutRun2 artwork and RAW mirror-Y. Then future pixels-first C1 + separate C3 + PRE_INGAME/user JPG + NEW actual-game retest. IGR-025 also remains HOLD for unresolved screenshot(163) labels. RUNTIME_VALIDATION=UNTESTED.",
-    "C271 q59 7CE1CFC5 remains REWORK_REQUIRED for source-style/hierarchy/effect fidelity; do not re-review until producer bytes materially change. RUNTIME_VALIDATION=UNTESTED.",
     "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
     "C264 q172 6C9B3611 963445a4... returned REWORK_REQUIRED: START->출발 is 40.74% and GOAL->골 24.68% of source width. Material rework then fresh C2 + C3.",
     "Fresh-C/C3 q205 exact 7598af3375... then regenerate test package; NEW in-game retest screenshots 159-164. IGR-020..023 are GRAPHICS q205, IGR-024 is runtime ID935.",
@@ -10836,5 +10835,12 @@
     "controller_report": "localization/graphics/role_A/20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT/A184R_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c274_c1_q059_evidence": {
+    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "status": "HOLD_STRICT_RECHECK_PIXELS_FIRST_LOSSLESS_EVIDENCE",
+    "queue_csv_repair": "VALIDATED_137_ROWS_6_FIELDS",
+    "report": "localization/graphics/role_C/20261008-C274-C1-Q059-EVIDENCE/C274_Q059_CONTROLLER_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
