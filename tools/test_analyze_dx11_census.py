@@ -2731,8 +2731,8 @@ def main() -> int:
     )
     def r317_case(snapshot_line: str, inputs_line: str) -> tuple[dict, dict]:
         report = run_case(
-            "VR DX11 R73 signature#1: primitive=4 fixedFn=0\n"
-            + snapshot_line + inputs_line
+            r315_good_support + snapshot_line + inputs_line
+            + r306_signature_tail
         )
         receipt = report["ActivationEvidence"]["ProgrammableShaderInventory"][
             "Pairs"
