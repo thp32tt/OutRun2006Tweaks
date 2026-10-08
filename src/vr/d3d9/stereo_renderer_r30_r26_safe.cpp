@@ -1838,8 +1838,11 @@ namespace OutRunVRStereo
                 const unsigned family = static_cast<unsigned>(producer);
                 constexpr unsigned first = static_cast<unsigned>(
                     OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+                // Include the two distinct GOAL helper parents appended
+                // after legacy families; their exact source identity is
+                // only diagnostic and never grants rendering permission.
                 constexpr unsigned last = static_cast<unsigned>(
-                    OutRunVR::GameSemantic::ProducerToken::DispRankFirst);
+                    OutRunVR::GameSemantic::ProducerToken::GoalTime150);
                 if (family >= first && family <= last && family < 32)
                 {
                     static std::uint32_t reportedResultProducerBits = 0;
