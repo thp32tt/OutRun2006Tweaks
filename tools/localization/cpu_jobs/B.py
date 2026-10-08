@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""B280 q098: new source-conditioned soft-navy-effect trial; NEVER auto-promote."""
+"""B281 q098: new source-conditioned soft-navy-effect trial; NEVER auto-promote."""
 import os,io,sys,json,struct,hashlib,urllib.request,tempfile,subprocess
 from pathlib import Path
 import numpy as np
 from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter, binary_dilation
 if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B280 source fetch requires remote runner; not for unqualified automatic promotion")
+    raise SystemExit("B281 source fetch requires remote runner; not for unqualified automatic promotion")
 root=Path.cwd(); gfx=root/"localization/graphics"
 rel="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 dest=gfx/"hd_candidates"/rel
-run=gfx/"role_B/20261009-B280-Q098-SOURCE-SOFT-NAVY-EFFECT";run.mkdir(parents=True,exist_ok=True)
+run=gfx/"role_B/20261009-B281-Q098-INSIDE-WHITE-NAVY-SEPARATION";run.mkdir(parents=True,exist_ok=True)
 sha=lambda data:hashlib.sha256(data).hexdigest()
 source_sha="3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59"
 old_sha="192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b"
@@ -20,7 +20,7 @@ assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK","q0
 old=dest.read_bytes()
 assert sha(old)==old_sha,("q098 remote producer collision",sha(old))
 source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
-with tempfile.TemporaryDirectory(prefix="b280_github_src_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b281_github_src_") as tmp:
     p=Path(tmp)/"pinned_source.dds";urllib.request.urlretrieve(source_url,p);eng=p.read_bytes()
 assert sha(eng)==source_sha
 assert eng[:128]==old[:128] and old[84:88]==b"DXT5"
@@ -70,7 +70,12 @@ blur=gaussian_filter(halo_seed.astype(np.float32),sigma=3.1)
 out_alpha=np.clip((blur-0.05)/0.95,0,1)*0.42
 hard_alpha=halo_seed.astype(np.float32)*0.94
 key_alpha=np.maximum(out_alpha,hard_alpha)
-white_alpha=np.clip(face*0.98,0,1)
+# B280 visual FAIL: B40 full target mask includes the entire glyph/stroke
+# footprint. Painting it WHITE produced fused blobs. Cut back to the inner
+# face while retaining separately sourced navy extrusion and soft halo.
+interior_distance=distance_transform_edt(glyph)
+white_transition=np.clip((interior_distance-1.6)/2.7,0,1)
+white_alpha=np.clip(face*white_transition*0.98,0,1)
 target_alpha=key_alpha+white_alpha*(1-key_alpha)
 # Prior candidate had a smooth continuous face; recreate full white mask, not
 # BC3 index-only pore filling, and blend navy halo only where justified.
@@ -165,12 +170,12 @@ new_white=int(np.count_nonzero((native[:,:,0]>230)&(native[:,:,1]>230)&(native[:
 new_navy=int(np.count_nonzero((native[:,:,2]>native[:,:,0]+12)&(native[:,:,3]>140)&srcmask))
 source_navy=int(np.count_nonzero((source[:,:,2]>source[:,:,0]+12)&(source[:,:,3]>140)&srcmask))
 if new_white<9000 or new_navy<12000:raise RuntimeError(("glyph/glow erased",new_white,new_navy))
-tfile=run/"42E618FD_B280_TRIAL_NOT_APPROVED.dds";tfile.write_bytes(trial)
+tfile=run/"42E618FD_B281_TRIAL_NOT_APPROVED.dds";tfile.write_bytes(trial)
 assert sha(tfile.read_bytes())==sha(trial) and np.array_equal(decode(tfile.read_bytes()),native)
 # Individual lossless decoded plate/final evidence, plus four panels
-Image.fromarray(native,"RGBA").save(run/"B280_PERSISTED_READABLE_RGBA.png")
-Image.fromarray(np.flipud(native),"RGBA").save(run/"B280_PERSISTED_RAW_RGBA.png")
-Image.fromarray(clean,"RGBA").save(run/"B280_PLATE_ONLY_RGBA.png")
+Image.fromarray(native,"RGBA").save(run/"B281_PERSISTED_READABLE_RGBA.png")
+Image.fromarray(np.flipud(native),"RGBA").save(run/"B281_PERSISTED_RAW_RGBA.png")
+Image.fromarray(clean,"RGBA").save(run/"B281_PLATE_ONLY_RGBA.png")
 for direction in ("READABLE","RAW"):
     ims=(source,clean,current,native) if direction=="READABLE" else tuple(np.flipud(z) for z in (source,clean,current,native))
     for back,bgc in (("WHITE",(255,255,255,255)),("GRAY",(72,72,72,255)),("BLACK",(0,0,0,255))):
@@ -183,7 +188,7 @@ for direction in ("READABLE","RAW"):
             panel=Image.new("RGB",(sum(z.width for z in chunks)+12,max(z.height for z in chunks)),(87,87,87))
             left=0
             for z in chunks:panel.paste(z,(left,0));left+=z.width+4
-            panel.save(run/f"B280_{direction}_{back}_{scale}_EN_CLEAN_B279_TRIAL.png",optimize=True)
-report={"run":"B280","index":98,"asset":"42E618FD_512x32.dds","source_sha256":source_sha,"clean_png_sha256":clean_sha,"previous_sha256":old_sha,"trial_sha256":sha(trial),"method":"NATIVE_NEW_BC3_ALPHA_RGB_PER_BLOCK_WHITE_INK_7PX_NAVY_KEYLINE_GAUSSIAN_HALO","method_not_same_as_B279":True,"source_family":{"white_rgb":white.tolist(),"navy_rgb":navy.tolist(),"english_white_support":int(sface.sum()),"english_navy_support":int(snavy.sum()),"source_navy_alpha_gt140":source_navy,"render_vertical_glyph_scale":0.76,"navy_outline_radius":7,"navy_diffuse_sigma":3.1},"format":"BC3_DXT5","native":[width,height],"mips":mips,"raw_orientation":"mirror_y","machine":{"blocks_reencoded":touched,"alpha_only_cleanup_blocks":alpha_touched,"changed_rgba_pixels":int(delta.sum()),"outside_exact_english_source":outside_src,"original_alpha_residue_in_clean":0,"decoded_bbox":nbbox,"source_effect_rgba_scope":srcbbox,"source_visible_alpha_bbox":visible_source_bbox,"previous_white_count":old_white,"trial_white_count":new_white,"trial_navy_count":new_navy,"white_navy_ratio":round(new_white/max(new_navy,1),3),"dds_header_exact":True,"roundtrip_persisted_dds":True},"visual_producer":"PENDING_PIXELS_FIRST_SOURCE_CLEAN_B279_TRIAL_NATIVE_AND_50","candidate_promoted":False,"independent_C2":"NOT_RUN","C3":"NOT_RUN","USER":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_HOSTED_CANONICAL_PUBLIC_SOURCE_DNS_DEPENDENCY_NO_GPT_LOCAL_NETWORK","forbidden_domains_touched":[]}
-(run/"B280_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+            panel.save(run/f"B281_{direction}_{back}_{scale}_EN_CLEAN_B279_TRIAL.png",optimize=True)
+report={"run":"B281","index":98,"asset":"42E618FD_512x32.dds","source_sha256":source_sha,"clean_png_sha256":clean_sha,"previous_sha256":old_sha,"trial_sha256":sha(trial),"method":"NATIVE_NEW_BC3_ALPHA_RGB_PER_BLOCK_WHITE_INK_7PX_NAVY_KEYLINE_GAUSSIAN_HALO","method_not_same_as_B279":True,"source_family":{"white_rgb":white.tolist(),"navy_rgb":navy.tolist(),"english_white_support":int(sface.sum()),"english_navy_support":int(snavy.sum()),"source_navy_alpha_gt140":source_navy,"render_vertical_glyph_scale":0.76,"navy_outline_radius":7,"navy_diffuse_sigma":3.1,"white_face_inset_px":1.6,"white_face_transition_px":2.7},"format":"BC3_DXT5","native":[width,height],"mips":mips,"raw_orientation":"mirror_y","machine":{"blocks_reencoded":touched,"alpha_only_cleanup_blocks":alpha_touched,"changed_rgba_pixels":int(delta.sum()),"outside_exact_english_source":outside_src,"original_alpha_residue_in_clean":0,"decoded_bbox":nbbox,"source_effect_rgba_scope":srcbbox,"source_visible_alpha_bbox":visible_source_bbox,"previous_white_count":old_white,"trial_white_count":new_white,"trial_navy_count":new_navy,"white_navy_ratio":round(new_white/max(new_navy,1),3),"dds_header_exact":True,"roundtrip_persisted_dds":True},"visual_producer":"PENDING_PIXELS_FIRST_SOURCE_CLEAN_B279_TRIAL_NATIVE_AND_50","candidate_promoted":False,"independent_C2":"NOT_RUN","C3":"NOT_RUN","USER":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_HOSTED_CANONICAL_PUBLIC_SOURCE_DNS_DEPENDENCY_NO_GPT_LOCAL_NETWORK","forbidden_domains_touched":[]}
+(run/"B281_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"trial":sha(trial),"changed":int(delta.sum()),"white":new_white,"navy":new_navy,"bbox":nbbox},ensure_ascii=False))
