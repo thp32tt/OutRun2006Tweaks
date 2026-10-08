@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A192R q119 F6811E94 new material DXT5 b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907 after C294 A191 4e971f... left white halo hard x705 (106 consecutive rows) FAIL: symmetric padded native top-right italic + uncropped soft source-white envelope, new first bright fringe x713 (17 rows), x710-712 0. Exact English source 2336da3c..., bbox source [390,54,1632,200] -> candidate [710,58,1311,196] and outside RGBA/alpha/protected/source residue zero. Worker 37754217530 SUCCESS; first worker 37753930881 failed-safe source-height overflow and did NOT publish bytes. Producer BWG/RAW first look repaired concrete C294 cutoff but source family/per-glyph anchor independent calibrated C1 and separate C3 remain pending HOLD, PRE_INGAME BLOCKED, real-game RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json.",
     "C294 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q154 independently establishes valid source-original English normal calibration (blind 5/5 binary, 3/5 subtype; first-look saved before answer-key reveal) replacing rejected Korean-normal diagnostic; exact existing source/candidate unchanged. Still HOLD_STRICT_RECHECK until independent fresh pixels-first 8-region native DDS C, per-glyph slant + source-family profile, separate C3, user JPG and actual-game retest. RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_CONTROLLER_QA.json",
     "C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740 q119 A191 exact 4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca independently C1 REWORK_REQUIRED: first-letter white fringe clipped to vertical alpha edge x705 and source italic-family not yet matched. Repair source-derived padded glow/slant, then new independent calibrated C1 + separate C3, PRE_INGAME JPG and real-game retest. QA localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_CONTROLLER_QA.json; RUNTIME_VALIDATION=UNTESTED.",
     "B262 q172: new material 15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0 machine PASS but source-relative GOAL 50% visually under-readable; B263 same-task trial GitHub Actions 37751579835 pending. Do not C-approve old B262; wait for final persisted SHA then independent C2/C3 and game. RUNTIME_VALIDATION=UNTESTED.",
@@ -11627,6 +11628,16 @@
     "produced_dds": 0,
     "approval": false,
     "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a192r_q119_padded_halo_material": {
+    "queue_index": 119,
+    "role": "A",
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "previous_rejected_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+    "candidate_status": "MATERIAL_REPAIR_MACHINE_PASS_PRODUCER_HOLD_PENDING_FRESH_C1",
+    "qa": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
