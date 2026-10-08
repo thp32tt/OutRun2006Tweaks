@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B257 q214: BC3 face-priority, constrained original-block Hangul correction.
+"""B258 q214: BC3 face-priority, constrained original-block Hangul correction.
 
 Do not reuse an old Korean raster. New native Noto CJK glyph mask is rendered on the
 verified source-derived B253 clean plate, then RGB565 BC3 blocks are fitted to
@@ -12,16 +12,16 @@ from io import BytesIO
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="B":
-    raise SystemExit("B257 GitHub-hosted CPU runner (ChatGPT local GitHub raw DNS unavailable)")
+    raise SystemExit("B258 GitHub-hosted CPU runner (ChatGPT local GitHub raw DNS unavailable)")
 root=Path.cwd()
-RUN="20261008-B257-Q214-BC3-FACE-PRIORITY"
+RUN="20261008-B258-Q214-BC3-FACE-PRIORITY"
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
 loc=root/"localization/graphics"
 path=loc/"hd_candidates"/asset
 out=loc/"role_B"/RUN
 out.mkdir(parents=True,exist_ok=True)
 SOURCE_SHA="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-PRIOR_SHA="2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25"
+PRIOR_SHA="132ba8d5159196eb68d6635a7331fc08ed0269a1512acbf9abff2226fd9fe183"
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "3da79726739ac631d8e2703a65330dbb0c310770/"
 "Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds")
@@ -29,7 +29,7 @@ cleanpath=loc/"role_B/20261008-B253-Q214-BC3-COUNTER-SPACE/B253_CLEAN_PLATE.png"
 def sha(b):return hashlib.sha256(b).hexdigest()
 old=path.read_bytes()
 if sha(old)!=PRIOR_SHA: raise RuntimeError(("q214 changed concurrently",sha(old),PRIOR_SHA))
-with tempfile.TemporaryDirectory(prefix="b257_source_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b258_source_") as tmp:
     sourcefile=Path(tmp)/"source.dds"
     urllib.request.urlretrieve(url,sourcefile)
     sourcebytes=sourcefile.read_bytes()
@@ -51,8 +51,8 @@ base=np.asarray(clean,dtype=np.uint8)
 previous=np.asarray(prev,dtype=np.uint8)
 # Source effect bboxes measured from the canonical English HD DDS, not Korean pixels.
 specs=[
-    {"id":"start","english":"START","korean":"출발","source_bbox":[815,495,899,517],"size":[51,18],"right_lean_px":4},
-    {"id":"goal","english":"GOAL","korean":"골","source_bbox":[1343,764,1417,787],"size":[29,18],"right_lean_px":4}
+    {"id":"start","english":"START","korean":"출발","source_bbox":[815,495,899,517],"size":[51,18],"right_lean_px":7},
+    {"id":"goal","english":"GOAL","korean":"골","source_bbox":[1343,764,1417,787],"size":[29,18],"right_lean_px":7}
 ]
 allowed=np.zeros((H,W),bool)
 for r in specs:
@@ -116,7 +116,7 @@ for r in specs:
     parr[tile==1]=[155,56,32,255]
     parr[tile==2]=[238,141,73,255]
     parr[tile==3]=[255,242,205,255]
-    Image.fromarray(parr,"RGBA").save(out/("B257_"+r["id"]+"_PREENCODE.png"))
+    Image.fromarray(parr,"RGBA").save(out/("B258_"+r["id"]+"_PREENCODE.png"))
 if np.any((glyphkind>0)&~allowed):raise RuntimeError("glyph outside original text effect boxes")
 # Compose ideal RGBA for human comparison, but QA uses actual saved BC3 decode.
 ideal=base.copy()
@@ -171,7 +171,13 @@ for bx,by in sorted(block_ids):
             face_blocks+=1
             bgpix=pix[kind==0]
             plate_rgb=np.median(bgpix,axis=0) if len(bgpix) else np.array([220,25,44])
-            hi=rgb565((255,245,210));lo=rgb565(plate_rgb)
+            # Preserve source pale-ivory top and warmer gold base without
+            # reviving BC3 red cut-through in any cream glyph face.
+            readable_y=H-1-yy
+            top_y=495 if readable_y<630 else 764
+            phase=min(1.0,max(0.0,(readable_y-top_y)/23.0))
+            cream=(255,round(247-13*phase),round(221-32*phase))
+            hi=rgb565(cream);lo=rgb565(plate_rgb)
             if hi<=lo:raise RuntimeError("BC3 endpoints invalid")
             idx=np.zeros((4,4),dtype=np.uint8)
             idx[kind==0]=1 # original red plate
@@ -256,12 +262,12 @@ for r in specs:
 # within the measured original text-effect area.
 path.write_bytes(dst)
 if sha(path.read_bytes())!=sha(dst):raise RuntimeError("publish byte drift")
-src.save(out/"B257_SOURCE_READABLE.png")
-clean.save(out/"B257_CLEAN_PLATE.png")
-Image.fromarray(ideal,"RGBA").save(out/"B257_PREENCODE_READABLE.png")
-prev.save(out/"B257_PREVIOUS_READABLE.png")
-after.save(out/"B257_FINAL_READABLE.png")
-after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B257_FINAL_RAW.png")
+src.save(out/"B258_SOURCE_READABLE.png")
+clean.save(out/"B258_CLEAN_PLATE.png")
+Image.fromarray(ideal,"RGBA").save(out/"B258_PREENCODE_READABLE.png")
+prev.save(out/"B258_PREVIOUS_READABLE.png")
+after.save(out/"B258_FINAL_READABLE.png")
+after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B258_FINAL_RAW.png")
 def over_bg(im,col=(115,115,115,255)):
     canvas=Image.new("RGBA",im.size,col)
     canvas.alpha_composite(im)
@@ -272,7 +278,7 @@ def make_contact():
         x0,y0,x1,y1=r["source_bbox"]
         box=(x0-10,y0-7,x1+10,y1+7)
         tiles=[]
-        for name,im in [("SOURCE",src),("CLEAN",clean),("B253_REJECTED",prev),("B257_NEW",after)]:
+        for name,im in [("SOURCE",src),("CLEAN",clean),("B257_PREVIOUS",prev),("B258_NEW",after)]:
             crop=over_bg(im).crop(box)
             crop=crop.resize((crop.width*6,crop.height*6),Image.Resampling.NEAREST)
             tile=Image.new("RGB",(crop.width,crop.height+24),(35,35,35))
@@ -287,10 +293,10 @@ def make_contact():
     py=0
     for im in strips:board.paste(im,(0,py));py+=im.height+16
     return board
-make_contact().save(out/"B257_SOURCE_CLEAN_B253_NEW_NATIVE6X.png")
+make_contact().save(out/"B258_SOURCE_CLEAN_B253_NEW_NATIVE6X.png")
 for percent in (100,75,50):
     dest=over_bg(after).resize((W*percent//100,H*percent//100),Image.Resampling.LANCZOS)
-    dest.save(out/("B257_PRACTICAL_"+str(percent)+".png"))
+    dest.save(out/("B258_PRACTICAL_"+str(percent)+".png"))
 report={
   "schema_version":2,"role":"B","run":RUN,"queue_index":214,"asset":asset,
   "source_sha256":SOURCE_SHA,"prior_rejected_candidate_sha256":PRIOR_SHA,
@@ -313,13 +319,13 @@ report={
   "execution_backend":"GITHUB_HOSTED_CPU_DUE_TO_GPT_LOCAL_GITHUB_RAW_DNS_UNAVAILABLE",
   "forbidden_domains_touched":[]
 }
-reportpath=out/"B257_BF229CF4_REPORT.json"
+reportpath=out/"B258_BF229CF4_REPORT.json"
 reportpath.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-wr=loc/"worker_results/B257_BF229CF4.json"
+wr=loc/"worker_results/B258_BF229CF4.json"
 wr.write_text(json.dumps({
   "role":"B","run":RUN,"queue_index":214,"asset":"BF229CF4",
   "source_sha256":SOURCE_SHA,"prior_sha256":PRIOR_SHA,
   "candidate_sha256":sha(dst),"status":"MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
   "report":str(reportpath.relative_to(root)),"RUNTIME_VALIDATION":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
-print("B257_DONE",json.dumps({"sha":sha(dst),"blocks":retouched,"face":integrity,"outside":outside},ensure_ascii=False),flush=True)
+print("B258_DONE",json.dumps({"sha":sha(dst),"blocks":retouched,"face":integrity,"outside":outside},ensure_ascii=False),flush=True)
