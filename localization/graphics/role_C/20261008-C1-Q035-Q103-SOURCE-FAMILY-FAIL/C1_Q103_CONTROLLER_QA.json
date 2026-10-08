@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "review_id": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL-Q103",
+  "temp_backlog_relief": "C1",
+  "shard": "ODD(+UNINDEXED_SPECIAL)",
+  "index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "decision": "REWORK_REQUIRED",
+  "defect": "ITALIC_SLANT_AND_UNDERSIZED",
+  "observation": "Original Normal Balance is strongly right-italic and visually fills the yellow selector. Korean 일반 밸런스 is near-upright and blockier; exact source 390x72 bbox versus Korean 196x40 (50.3% width and 55.6% height) leaves source-inconsistent empty space. Yellow plate border and surrounding art appear protected, but glyph slant and readable hierarchy fail.",
+  "source_sha256_pinned": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "candidate_sha256_verified": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+  "source_sha_reverified": false,
+  "regions": [
+    {
+      "id": "normal_balance",
+      "source_bbox": [
+        1411,
+        1968,
+        1801,
+        2040
+      ],
+      "candidate_bbox": [
+        1508,
+        1986,
+        1704,
+        2026
+      ],
+      "observations": {
+        "slant": "FAIL source italic vs near-upright Korean",
+        "clean_plate": "NO NEW RESIDUE DEFECT DETERMINED; not a fresh proof of zero",
+        "style": "FAIL Original Normal Balance is strongly right-italic and visually fills the yellow selector. Korean 일반 밸런스 is near-upright and blockier; exact source 390x72 bbox versus Korean 196x40 (50.3% width and 55.6% height) leaves source-inconsistent empty space. Yellow plate border and surrounding art appear protected, but glyph slant and readable hierarchy fail.",
+        "readability": "FAIL source-relative hierarchy",
+        "glyph_integrity": "NO NEW DEFECT PROVEN",
+        "protected_art": "NO NEW DEFECT PROVEN; independent pixel mask check not repeated",
+        "placement": "FAIL source-relative title scale",
+        "orientation": "RAW and readable visually compared; no distinct orientation failure determined"
+      }
+    }
+  ],
+  "triage": "FRESH_C_REVIEW",
+  "prior_producer_machine": "PASS (not independent C)",
+  "evidence": {
+    "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A4724_REPORT.json",
+    "readable_triptych": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A_CONTACTS.jpg",
+    "raw_source_current": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A_RAW_COMPARE.jpg",
+    "clean_png": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+    "source_png": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_SOURCE_READABLE.png",
+    "final_png": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_FINAL_READABLE.png"
+  },
+  "method": "GitHub QA evidence plus human source-to-final readable and RAW inspection; candidate exact SHA256 via MCP hash_file on existing DDS",
+  "limitations": [
+    "Known-defect blind calibration not performed: no PASS claim",
+    "Source digest taken from pinned original producer provenance and not separately byte-verified",
+    "New lossless per-region pixel check not performed; previous machine PASS only history"
+  ],
+  "A_action": "Reconstruct native Normal Balance with source right italic and source-faithful weight/height without exceeding source bbox",
+  "C_PASS": false,
+  "C3_PASS": false,
+  "PRE_INGAME": false,
+  "actual_game_tested": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "dds_changed": false
+}

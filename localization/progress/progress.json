@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 20:18 KST",
+  "updated_at_kst": "2026-10-08 20:10 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7723,5 +7723,19 @@
     "PRE_INGAME": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json"
+  },
+  "c1_20261008_q035_q103_visual_fail": {
+    "run": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL",
+    "shard": "ODD(+UNINDEXED_SPECIAL)",
+    "indexes": [
+      35,
+      103
+    ],
+    "result": "REWORK_REQUIRED",
+    "count": 2,
+    "dds_produced": 0,
+    "c_pass": 0,
+    "c3_pass": 0,
+    "runtime_validation": "UNTESTED"
   }
 }

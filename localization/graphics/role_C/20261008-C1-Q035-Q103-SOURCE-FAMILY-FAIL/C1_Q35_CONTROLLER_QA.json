@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "review_id": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL-Q35",
+  "temp_backlog_relief": "C1",
+  "shard": "ODD(+UNINDEXED_SPECIAL)",
+  "index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "decision": "REWORK_REQUIRED",
+  "defect": "TOTAL_RANK_UNDERSIZED_WIDTH",
+  "observation": "English Total Rank source title effects are 504 and 505 px wide; Korean 종합 랭킹 is only 232 and 227 px, 46.0% and 45.0% respectively. Source heading spans the center of pink and green bubbles while Korean title is much narrower with weaker hierarchy. Native height remains 64/62 vs 72 px source, so this is a source-relative typographic balance failure, not bbox overflow.",
+  "source_sha256_pinned": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "candidate_sha256_verified": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "source_sha_reverified": false,
+  "regions": [
+    {
+      "id": "pink",
+      "source_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "candidate_bbox": [
+        745,
+        361,
+        977,
+        425
+      ],
+      "observations": {
+        "slant": "NOT NEWLY FAILED",
+        "clean_plate": "NO NEW RESIDUE DEFECT DETERMINED; not a fresh proof of zero",
+        "style": "FAIL English Total Rank source title effects are 504 and 505 px wide; Korean 종합 랭킹 is only 232 and 227 px, 46.0% and 45.0% respectively. Source heading spans the center of pink and green bubbles while Korean title is much narrower with weaker hierarchy. Native height remains 64/62 vs 72 px source, so this is a source-relative typographic balance failure, not bbox overflow.",
+        "readability": "FAIL source-relative hierarchy",
+        "glyph_integrity": "NO NEW DEFECT PROVEN",
+        "protected_art": "NO NEW DEFECT PROVEN; independent pixel mask check not repeated",
+        "placement": "FAIL source-relative title scale",
+        "orientation": "RAW and readable visually compared; no distinct orientation failure determined"
+      }
+    },
+    {
+      "id": "green",
+      "source_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "candidate_bbox": [
+        2412,
+        375,
+        2639,
+        437
+      ],
+      "observations": {
+        "slant": "NOT NEWLY FAILED",
+        "clean_plate": "NO NEW RESIDUE DEFECT DETERMINED; not a fresh proof of zero",
+        "style": "FAIL English Total Rank source title effects are 504 and 505 px wide; Korean 종합 랭킹 is only 232 and 227 px, 46.0% and 45.0% respectively. Source heading spans the center of pink and green bubbles while Korean title is much narrower with weaker hierarchy. Native height remains 64/62 vs 72 px source, so this is a source-relative typographic balance failure, not bbox overflow.",
+        "readability": "FAIL source-relative hierarchy",
+        "glyph_integrity": "NO NEW DEFECT PROVEN",
+        "protected_art": "NO NEW DEFECT PROVEN; independent pixel mask check not repeated",
+        "placement": "FAIL source-relative title scale",
+        "orientation": "RAW and readable visually compared; no distinct orientation failure determined"
+      }
+    }
+  ],
+  "triage": "FRESH_C_REVIEW",
+  "prior_producer_machine": "PASS (not independent C)",
+  "evidence": {
+    "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989E3B7_REPORT.json",
+    "readable_triptych": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989_CONTACTS.jpg",
+    "raw_source_current": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989_RAW_COMPARE.jpg",
+    "clean_png": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CLEAN_PLATE.png",
+    "source_png": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_SOURCE_READABLE.png",
+    "final_png": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_FINAL_READABLE.png"
+  },
+  "method": "GitHub QA evidence plus human source-to-final readable and RAW inspection; candidate exact SHA256 via MCP hash_file on existing DDS",
+  "limitations": [
+    "Known-defect blind calibration not performed: no PASS claim",
+    "Source digest taken from pinned original producer provenance and not separately byte-verified",
+    "New lossless per-region pixel check not performed; previous machine PASS only history"
+  ],
+  "A_action": "Reconstruct native Total Rank with source-faithful width/hierarchy and same pink/green effect without exceeding each source bbox",
+  "C_PASS": false,
+  "C3_PASS": false,
+  "PRE_INGAME": false,
+  "actual_game_tested": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "dds_changed": false
+}

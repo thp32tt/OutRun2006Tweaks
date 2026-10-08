@@ -11775,5 +11775,26 @@
     "expected_previous_candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json"
+  },
+  "c1_20261008_q035_q103_visual_fail": {
+    "run": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL",
+    "shard": "ODD(+UNINDEXED_SPECIAL)",
+    "items": [
+      {
+        "index": 35,
+        "decision": "REWORK_REQUIRED",
+        "candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+        "report": "localization/graphics/role_C/20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL/C1_Q35_CONTROLLER_QA.json"
+      },
+      {
+        "index": 103,
+        "decision": "REWORK_REQUIRED",
+        "candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+        "report": "localization/graphics/role_C/20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL/C1_Q103_CONTROLLER_QA.json"
+      }
+    ],
+    "new_dds": 0,
+    "approved": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
