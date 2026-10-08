@@ -131,6 +131,7 @@ jobs:
             'tools/verify_vr_projected_marker_anchor.py',
             'tools/verify_vr_projected_marker_telemetry.py',
             'tools/verify_vr_visual_composition_p0.py',
+            'tools/verify_vr_texture_scene_contract.py',
             'tools/verify_vr_r31_r32_retirement_guard.py',
             'tools/verify_vr_recenter_contract.py',
             'tools/verify_vr_dx9ex_reset_transport_contract.py',
