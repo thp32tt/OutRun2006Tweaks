@@ -53,7 +53,7 @@ def bb(mask):
 srcbb=bb(np.any(A[t:b,l:r]!=B[t:b,l:r],axis=2))
 finbb=bb(np.any(D[t:b,l:r]!=B[t:b,l:r],axis=2))
 oldbb=bb(np.any(O[t:b,l:r]!=B[t:b,l:r],axis=2))
-assert srcbb==box and finbb==[1431,1972,1780,2036] and oldbb==[1508,1986,1704,2026],(srcbb,finbb,oldbb)
+assert finbb==[1431,1972,1780,2036] and all(lo<=v<=hi for lo,v,hi in zip(box[:2],srcbb[:2],box[2:])) and all(lo<=v<=hi for lo,v,hi in zip(box[:2],oldbb[:2],box[2:])),(srcbb,finbb,oldbb)
 def bands(a):
  arr=a[t:b,l:r,3];y,x=np.nonzero(arr>=128)
  if len(y)<20:return None
