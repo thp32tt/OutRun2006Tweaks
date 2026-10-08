@@ -9323,6 +9323,42 @@ VSOutput main(VSInput input)
             pipelineIdentityReady.snapshotToken),
         "dormant pipeline binding accepts exact same-device R97 snapshot");
 
+    // R154 WARP: same-device command recording must not acquire an
+    // immediate-context IA/VS/PS receipt or alter the live pipeline.
+    ID3D11DeviceContext* r154DeferredContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(0, &r154DeferredContext)) &&
+        r154DeferredContext != nullptr &&
+        r154DeferredContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R154 same-device deferred pipeline prerequisite");
+    require(
+        !pipelineBundle.bind_for_observation(
+            r154DeferredContext, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R154 deferred context rejected by pipeline binding");
+    const auto r154DeferredPipeline = pipelineBundle.binding_readiness(
+        r154DeferredContext, inputLayout, vertexPrototype, pixelPrototype,
+        pipelineIdentityReady.snapshotToken);
+    require(
+        !r154DeferredPipeline.inputValid && !r154DeferredPipeline.ready &&
+        r154DeferredPipeline.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            r154DeferredContext, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken, 1),
+        "R154 deferred pipeline never yields a live receipt");
+    const auto r154ImmediatePipeline = pipelineBundle.binding_readiness(
+        d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+        pipelineIdentityReady.snapshotToken);
+    require(
+        r154ImmediatePipeline.ready &&
+        r154ImmediatePipeline.snapshotToken != 0 &&
+        pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            r154ImmediatePipeline.snapshotToken),
+        "R154 immediate pipeline remains bound and valid");
+    r154DeferredContext->Release();
+
     ID3D11InputLayout* boundPipelineLayout = nullptr;
     ID3D11VertexShader* boundPipelineVertexShader = nullptr;
     ID3D11PixelShader* boundPipelinePixelShader = nullptr;

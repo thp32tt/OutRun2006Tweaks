@@ -6834,7 +6834,11 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     const FixedFunctionPixelShaderPrototype& pixelPrototype,
     std::uint64_t snapshotToken) const noexcept {
 
-    if (!context || !ready() || snapshotToken == 0 ||
+    // R154: a deferred context records commands but does not own the live
+    // immediate IA/VS/PS pipeline consumed by native Draw.
+    if (!context ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+        !ready() || snapshotToken == 0 ||
         !validate_translation_snapshot(
             device_.Get(), layout, vertexPrototype, pixelPrototype,
             snapshotToken))
@@ -6929,7 +6933,10 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
     std::uint64_t pipelineSnapshotToken) const noexcept {
     NativeFixedFunctionPipelineBindingReadiness out{};
     out.pipelineSnapshotToken = pipelineSnapshotToken;
-    out.inputValid = context != nullptr && pipelineSnapshotToken != 0;
+    // R154: same-device deferred context state is not a live draw receipt.
+    out.inputValid = context != nullptr &&
+        context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE &&
+        pipelineSnapshotToken != 0;
     out.bundleReady = ready();
     out.translationSnapshotValid =
         out.inputValid && out.bundleReady &&

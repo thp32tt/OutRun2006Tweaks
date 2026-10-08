@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00462",
+  "production_id": "CONVERSION-DX11-00462",
+  "event_id": "CONVERSION-DX11-00462-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "60806ff362c9b0ffeb2a22d95bc013ceed54e06c",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00462",
+  "lease_epoch": 1,
+  "work_key": "DX11:FIXED_FUNCTION_PIPELINE:IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:NativeFixedFunctionPipelineBundle",
+    "tools/dx11_constant_buffer_probe.cpp:R154"
+  ],
+  "selected_work_item": "DX11_R154_FIXED_FUNCTION_PIPELINE_IMMEDIATE_CONTEXT_OWNERSHIP",
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "summary": "Reject same-device deferred contexts for dormant fixed-function pipeline bind/readiness; WARP negative and immediate-positive checks; no native Draw enablement.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: base GitHub HEAD 60806ff362c9b0ffeb2a22d95bc013ceed54e06c; 00461 terminal; 00462 absent",
+    "C1_REVIEW": "PASS: deferred-context live IA/VS/PS receipt ownership gap isolated",
+    "C2_IMPLEMENT": "PASS: R154 C++ source guard and WARP negative/positive probe",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate",
+    "C4_COMMIT": "MATERIAL_COMMIT_PENDING_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: no native Draw activation, no runtime package requested",
+    "C6_STATE": "PENDING: exact-SHA CI and durable final result"
+  },
+  "static_validation": "PASS: focused source guard/test insertion scope and no Draw activation check",
+  "state_persisted": false,
+  "next_action": "Verify required exact-SHA Backend Conversion Gate and DX11 smoke, then finalize run record and lane state in a separate bookkeeping commit.",
+  "blockers": [
+    "Quest3/VDXR in-game runtime unavailable; RUNTIME_VALIDATION=UNTESTED"
+  ],
+  "evidence": {
+    "source_guard": "R154_IMMEDIATE_ONLY",
+    "warp_negative": "DEFERRED_REJECTED_EXPECTED",
+    "warp_positive": "IMMEDIATE_VALID_EXPECTED",
+    "ci_gate": "PENDING",
+    "runtime": "Quest3/VDXR NOT RUN"
+  }
+}
