@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "run": "C299-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 176,
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "clean_sha256": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc",
+  "width": 2048,
+  "height": 2048,
+  "raw_format": "RGBA32",
+  "mips": 1,
+  "source_candidate_dds_header_equal": true,
+  "region_mask": "four canonical B201 actual source alpha-effect bounding boxes, not actual glyph-specific morphology",
+  "source_clean_changed_rgba_outside_four_boxes": 0,
+  "source_clean_alpha_changed_outside_four_boxes": 0,
+  "source_final_changed_rgba_outside_four_boxes": 0,
+  "source_final_alpha_changed_outside_four_boxes": 0,
+  "clean_final_changed_rgba_outside_four_boxes": 0,
+  "clean_final_alpha_changed_outside_four_boxes": 0,
+  "all_preserved_content_outside_region_union_exact": true,
+  "region_results": [
+    {
+      "id": "01_jennifer",
+      "atlas_index": 35,
+      "source_text": "JENNIFER",
+      "candidate_text": "제니퍼",
+      "source_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_alpha_bbox": [
+        0,
+        0,
+        838,
+        158
+      ],
+      "candidate_alpha_bbox": [
+        3,
+        378,
+        425,
+        528
+      ],
+      "margins_LRTB": [
+        3,
+        413,
+        4,
+        4
+      ],
+      "source_alpha_pixels": 72799,
+      "authored_clean_alpha_in_source_box": 0,
+      "source_clean_changed_rgba_inside_region": 72799,
+      "clean_final_changed_rgba_inside_region": 31464,
+      "readable_raw_flip_y_exact": true,
+      "native_png": "01_jennifer_SOURCE_CLEAN_CURRENT_NATIVE.png",
+      "practical50_png": "01_jennifer_SOURCE_CLEAN_CURRENT_50.png"
+    },
+    {
+      "id": "02_clarissa",
+      "atlas_index": 36,
+      "source_text": "CLARISSA",
+      "candidate_text": "클라리사",
+      "source_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_alpha_bbox": [
+        0,
+        0,
+        840,
+        160
+      ],
+      "candidate_alpha_bbox": [
+        913,
+        376,
+        1494,
+        528
+      ],
+      "margins_LRTB": [
+        8,
+        251,
+        4,
+        4
+      ],
+      "source_alpha_pixels": 68689,
+      "authored_clean_alpha_in_source_box": 0,
+      "source_clean_changed_rgba_inside_region": 68689,
+      "clean_final_changed_rgba_inside_region": 43528,
+      "readable_raw_flip_y_exact": true,
+      "native_png": "02_clarissa_SOURCE_CLEAN_CURRENT_NATIVE.png",
+      "practical50_png": "02_clarissa_SOURCE_CLEAN_CURRENT_50.png"
+    },
+    {
+      "id": "03_holly",
+      "atlas_index": 37,
+      "source_text": "HOLLY",
+      "candidate_text": "홀리",
+      "source_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_alpha_bbox": [
+        0,
+        0,
+        533,
+        151
+      ],
+      "candidate_alpha_bbox": [
+        16,
+        216,
+        275,
+        361
+      ],
+      "margins_LRTB": [
+        7,
+        267,
+        3,
+        3
+      ],
+      "source_alpha_pixels": 41097,
+      "authored_clean_alpha_in_source_box": 0,
+      "source_clean_changed_rgba_inside_region": 41097,
+      "clean_final_changed_rgba_inside_region": 21834,
+      "readable_raw_flip_y_exact": true,
+      "native_png": "03_holly_SOURCE_CLEAN_CURRENT_NATIVE.png",
+      "practical50_png": "03_holly_SOURCE_CLEAN_CURRENT_50.png"
+    },
+    {
+      "id": "04_flagman4",
+      "atlas_index": 39,
+      "source_text": "FLAGMAN 4",
+      "candidate_text": "플래그맨 4",
+      "source_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_alpha_bbox": [
+        0,
+        0,
+        980,
+        155
+      ],
+      "candidate_alpha_bbox": [
+        15,
+        53,
+        707,
+        200
+      ],
+      "margins_LRTB": [
+        7,
+        281,
+        4,
+        4
+      ],
+      "source_alpha_pixels": 75687,
+      "authored_clean_alpha_in_source_box": 0,
+      "source_clean_changed_rgba_inside_region": 75687,
+      "clean_final_changed_rgba_inside_region": 49663,
+      "readable_raw_flip_y_exact": true,
+      "native_png": "04_flagman4_SOURCE_CLEAN_CURRENT_NATIVE.png",
+      "practical50_png": "04_flagman4_SOURCE_CLEAN_CURRENT_50.png"
+    }
+  ],
+  "note": "Whole-cell containment and authored CLEAN alpha removal are machine evidence, not aesthetic style or complete inside-cell protected-object-mask pass. No C/C3 visual approval inferred.",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
