@@ -1,0 +1,2381 @@
+{
+  "run": "C298",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "readable_size": [
+    4096,
+    1024
+  ],
+  "dds_header_identical": true,
+  "outside_8_source_bbox_RGBA_changed": 0,
+  "outside_8_source_bbox_alpha_changed": 0,
+  "triage": {
+    "index": 154,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "current_status": "c294_hold_strict_recheck_calibration_original_control_5of5_fresh_c_pending",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "metric_limit": "Projection runs do not identify semantic syllables; top-minus-bottom centroid proxies do not establish genuine stem-anchor slant, family equivalence or C PASS.",
+  "regions": [
+    {
+      "id": "01_create_new_license",
+      "english": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "candidate_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "source_area_alpha": 142103,
+      "candidate_area_alpha": 101090,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            95
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 47.486,
+          "bottom_band_mean_x": 47.399,
+          "top_minus_bottom_dx": 0.088,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            108,
+            212
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 152.725,
+          "bottom_band_mean_x": 154.628,
+          "top_minus_bottom_dx": -1.903,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            229,
+            328
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 271.459,
+          "bottom_band_mean_x": 272.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            337,
+            554
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 461.558,
+          "bottom_band_mean_x": 426.508,
+          "top_minus_bottom_dx": 35.05,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            568,
+            667
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 610.459,
+          "bottom_band_mean_x": 611.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            730,
+            832
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 777.618,
+          "bottom_band_mean_x": 782.826,
+          "top_minus_bottom_dx": -5.207,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            855,
+            954
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 897.459,
+          "bottom_band_mean_x": 898.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            965,
+            1131
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1047.55,
+          "bottom_band_mean_x": 1047.61,
+          "top_minus_bottom_dx": -0.06,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1198,
+            1291
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1213.5,
+          "bottom_band_mean_x": 1239.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1309,
+            1363
+          ],
+          "y": [
+            2,
+            144
+          ],
+          "top_band_mean_x": 1335.5,
+          "bottom_band_mean_x": 1335.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1379,
+            1474
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 1426.486,
+          "bottom_band_mean_x": 1426.399,
+          "top_minus_bottom_dx": 0.088,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1489,
+            1588
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1531.459,
+          "bottom_band_mean_x": 1532.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1605,
+            1707
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1652.618,
+          "bottom_band_mean_x": 1657.826,
+          "top_minus_bottom_dx": -5.207,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1725,
+            1824
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 1770.192,
+          "bottom_band_mean_x": 1776.106,
+          "top_minus_bottom_dx": -5.913,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1842,
+            1941
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1884.459,
+          "bottom_band_mean_x": 1885.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            168
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 111.002,
+          "bottom_band_mean_x": 117.91,
+          "top_minus_bottom_dx": -6.908,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            237,
+            343
+          ],
+          "y": [
+            16,
+            112
+          ],
+          "top_band_mean_x": 286.118,
+          "bottom_band_mean_x": 285.476,
+          "top_minus_bottom_dx": 0.643,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            346,
+            406
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 362.5,
+          "bottom_band_mean_x": 362.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            416,
+            519
+          ],
+          "y": [
+            14,
+            114
+          ],
+          "top_band_mean_x": 467.184,
+          "bottom_band_mean_x": 467.141,
+          "top_minus_bottom_dx": 0.043,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            536,
+            569
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 551.989,
+          "bottom_band_mean_x": 552.0,
+          "top_minus_bottom_dx": -0.011,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            590,
+            754
+          ],
+          "y": [
+            4,
+            141
+          ],
+          "top_band_mean_x": 695.958,
+          "bottom_band_mean_x": 681.887,
+          "top_minus_bottom_dx": 14.071,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            773,
+            944
+          ],
+          "y": [
+            12,
+            127
+          ],
+          "top_band_mean_x": 856.858,
+          "bottom_band_mean_x": 857.975,
+          "top_minus_bottom_dx": -1.117,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1002,
+            1172
+          ],
+          "y": [
+            4,
+            141
+          ],
+          "top_band_mean_x": 1078.247,
+          "bottom_band_mean_x": 1081.043,
+          "top_minus_bottom_dx": -2.796,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1177,
+            1349
+          ],
+          "y": [
+            7,
+            142
+          ],
+          "top_band_mean_x": 1260.213,
+          "bottom_band_mean_x": 1261.667,
+          "top_minus_bottom_dx": -1.455,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1359,
+            1463
+          ],
+          "y": [
+            18,
+            121
+          ],
+          "top_band_mean_x": 1419.377,
+          "bottom_band_mean_x": 1390.157,
+          "top_minus_bottom_dx": 29.22,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1483,
+            1516
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 1499.044,
+          "bottom_band_mean_x": 1499.024,
+          "top_minus_bottom_dx": 0.021,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 15,
+        "candidate_runs": 11
+      },
+      "source_candidate_native": "01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "01_create_new_license_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "02_select_license",
+      "english": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "candidate_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "source_area_alpha": 105320,
+      "candidate_area_alpha": 72921,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            99
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 45.192,
+          "bottom_band_mean_x": 51.106,
+          "top_minus_bottom_dx": -5.913,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            112,
+            211
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 154.459,
+          "bottom_band_mean_x": 155.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            228,
+            321
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 243.5,
+          "bottom_band_mean_x": 269.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            336,
+            435
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 378.459,
+          "bottom_band_mean_x": 379.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            453,
+            548
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 500.486,
+          "bottom_band_mean_x": 500.399,
+          "top_minus_bottom_dx": 0.088,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            559,
+            662
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 610.0,
+          "bottom_band_mean_x": 610.0,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            718,
+            811
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 733.5,
+          "bottom_band_mean_x": 759.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            829,
+            883
+          ],
+          "y": [
+            2,
+            144
+          ],
+          "top_band_mean_x": 855.5,
+          "bottom_band_mean_x": 855.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            899,
+            994
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 946.486,
+          "bottom_band_mean_x": 946.399,
+          "top_minus_bottom_dx": 0.088,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1009,
+            1108
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1051.459,
+          "bottom_band_mean_x": 1052.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1125,
+            1227
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1172.618,
+          "bottom_band_mean_x": 1177.826,
+          "top_minus_bottom_dx": -5.207,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1245,
+            1344
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 1290.192,
+          "bottom_band_mean_x": 1296.106,
+          "top_minus_bottom_dx": -5.913,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1362,
+            1461
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1404.459,
+          "bottom_band_mean_x": 1405.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            107
+          ],
+          "y": [
+            16,
+            112
+          ],
+          "top_band_mean_x": 50.54,
+          "bottom_band_mean_x": 49.979,
+          "top_minus_bottom_dx": 0.561,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            110,
+            169
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 126.011,
+          "bottom_band_mean_x": 126.0,
+          "top_minus_bottom_dx": 0.011,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            178,
+            281
+          ],
+          "y": [
+            14,
+            114
+          ],
+          "top_band_mean_x": 228.964,
+          "bottom_band_mean_x": 228.969,
+          "top_minus_bottom_dx": -0.005,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            297,
+            331
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 313.5,
+          "bottom_band_mean_x": 313.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            353,
+            516
+          ],
+          "y": [
+            4,
+            141
+          ],
+          "top_band_mean_x": 457.442,
+          "bottom_band_mean_x": 443.618,
+          "top_minus_bottom_dx": 13.824,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            533,
+            704
+          ],
+          "y": [
+            12,
+            127
+          ],
+          "top_band_mean_x": 616.867,
+          "bottom_band_mean_x": 617.951,
+          "top_minus_bottom_dx": -1.084,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            757,
+            921
+          ],
+          "y": [
+            4,
+            141
+          ],
+          "top_band_mean_x": 861.994,
+          "bottom_band_mean_x": 848.687,
+          "top_minus_bottom_dx": 13.307,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            943,
+            1098
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 1024.364,
+          "bottom_band_mean_x": 1053.462,
+          "top_minus_bottom_dx": -29.099,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 13,
+        "candidate_runs": 8
+      },
+      "source_candidate_native": "02_select_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "02_select_license_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "03_single_player_red",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "candidate_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "source_area_alpha": 98927,
+      "candidate_area_alpha": 77318,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            99
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 45.192,
+          "bottom_band_mean_x": 51.106,
+          "top_minus_bottom_dx": -5.913,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            114,
+            167
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 140.0,
+          "bottom_band_mean_x": 140.0,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            187,
+            289
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 234.618,
+          "bottom_band_mean_x": 239.826,
+          "top_minus_bottom_dx": -5.207,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            308,
+            403
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 354.99,
+          "bottom_band_mean_x": 358.559,
+          "top_minus_bottom_dx": -3.569,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            424,
+            517
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 439.5,
+          "bottom_band_mean_x": 465.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            533,
+            632
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 575.459,
+          "bottom_band_mean_x": 576.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            695,
+            794
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 739.481,
+          "bottom_band_mean_x": 710.5,
+          "top_minus_bottom_dx": 28.981,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            807,
+            900
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 822.5,
+          "bottom_band_mean_x": 848.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            914,
+            1135
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1032.413,
+          "bottom_band_mean_x": 1003.465,
+          "top_minus_bottom_dx": 28.947,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1156,
+            1255
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1198.459,
+          "bottom_band_mean_x": 1199.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1272,
+            1376
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1316.725,
+          "bottom_band_mean_x": 1318.628,
+          "top_minus_bottom_dx": -1.903,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            173
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 111.088,
+          "bottom_band_mean_x": 102.01,
+          "top_minus_bottom_dx": 9.078,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            195,
+            379
+          ],
+          "y": [
+            10,
+            142
+          ],
+          "top_band_mean_x": 297.483,
+          "bottom_band_mean_x": 285.45,
+          "top_minus_bottom_dx": 12.033,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            437,
+            621
+          ],
+          "y": [
+            8,
+            142
+          ],
+          "top_band_mean_x": 528.225,
+          "bottom_band_mean_x": 528.641,
+          "top_minus_bottom_dx": -0.417,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            635,
+            764
+          ],
+          "y": [
+            7,
+            137
+          ],
+          "top_band_mean_x": 705.636,
+          "bottom_band_mean_x": 713.871,
+          "top_minus_bottom_dx": -8.235,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            771,
+            805
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 787.478,
+          "bottom_band_mean_x": 787.488,
+          "top_minus_bottom_dx": -0.011,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            829,
+            940
+          ],
+          "y": [
+            14,
+            114
+          ],
+          "top_band_mean_x": 884.017,
+          "bottom_band_mean_x": 884.009,
+          "top_minus_bottom_dx": 0.008,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            957,
+            993
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 974.512,
+          "bottom_band_mean_x": 974.51,
+          "top_minus_bottom_dx": 0.002,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 11,
+        "candidate_runs": 7
+      },
+      "source_candidate_native": "03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "03_single_player_red_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "04_default_license",
+      "english": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "candidate_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "source_area_alpha": 115127,
+      "candidate_area_alpha": 71820,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            98
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 44.281,
+          "bottom_band_mean_x": 44.437,
+          "top_minus_bottom_dx": -0.156,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            119,
+            218
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 161.459,
+          "bottom_band_mean_x": 162.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            233,
+            439
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 316.432,
+          "bottom_band_mean_x": 340.428,
+          "top_minus_bottom_dx": -23.995,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            448,
+            548
+          ],
+          "y": [
+            4,
+            148
+          ],
+          "top_band_mean_x": 497.5,
+          "bottom_band_mean_x": 497.506,
+          "top_minus_bottom_dx": -0.006,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            576,
+            745
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 663.739,
+          "bottom_band_mean_x": 640.123,
+          "top_minus_bottom_dx": 23.616,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            801,
+            894
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 816.5,
+          "bottom_band_mean_x": 842.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            912,
+            966
+          ],
+          "y": [
+            2,
+            144
+          ],
+          "top_band_mean_x": 938.5,
+          "bottom_band_mean_x": 938.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            982,
+            1077
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 1029.486,
+          "bottom_band_mean_x": 1029.399,
+          "top_minus_bottom_dx": 0.088,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1092,
+            1191
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1134.459,
+          "bottom_band_mean_x": 1135.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1208,
+            1310
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1255.618,
+          "bottom_band_mean_x": 1260.826,
+          "top_minus_bottom_dx": -5.207,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1328,
+            1427
+          ],
+          "y": [
+            0,
+            148
+          ],
+          "top_band_mean_x": 1373.192,
+          "bottom_band_mean_x": 1379.106,
+          "top_minus_bottom_dx": -5.913,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1445,
+            1544
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 1487.459,
+          "bottom_band_mean_x": 1488.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            108
+          ],
+          "y": [
+            18,
+            121
+          ],
+          "top_band_mean_x": 63.515,
+          "bottom_band_mean_x": 33.571,
+          "top_minus_bottom_dx": 29.945,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            129,
+            163
+          ],
+          "y": [
+            4,
+            143
+          ],
+          "top_band_mean_x": 145.512,
+          "bottom_band_mean_x": 145.5,
+          "top_minus_bottom_dx": 0.012,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            185,
+            361
+          ],
+          "y": [
+            9,
+            141
+          ],
+          "top_band_mean_x": 272.0,
+          "bottom_band_mean_x": 262.74,
+          "top_minus_bottom_dx": 9.26,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            424,
+            532
+          ],
+          "y": [
+            16,
+            112
+          ],
+          "top_band_mean_x": 474.166,
+          "bottom_band_mean_x": 473.376,
+          "top_minus_bottom_dx": 0.79,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            535,
+            596
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 552.0,
+          "bottom_band_mean_x": 552.0,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            605,
+            711
+          ],
+          "y": [
+            14,
+            114
+          ],
+          "top_band_mean_x": 657.559,
+          "bottom_band_mean_x": 657.556,
+          "top_minus_bottom_dx": 0.004,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            728,
+            762
+          ],
+          "y": [
+            4,
+            144
+          ],
+          "top_band_mean_x": 744.478,
+          "bottom_band_mean_x": 744.5,
+          "top_minus_bottom_dx": -0.022,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            785,
+            953
+          ],
+          "y": [
+            4,
+            141
+          ],
+          "top_band_mean_x": 892.617,
+          "bottom_band_mean_x": 878.459,
+          "top_minus_bottom_dx": 14.157,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            970,
+            1145
+          ],
+          "y": [
+            12,
+            127
+          ],
+          "top_band_mean_x": 1056.102,
+          "bottom_band_mean_x": 1057.0,
+          "top_minus_bottom_dx": -0.898,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 12,
+        "candidate_runs": 9
+      },
+      "source_candidate_native": "04_default_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "04_default_license_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "05_multiplayer_red",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "candidate_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "source_area_alpha": 90633,
+      "candidate_area_alpha": 73103,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            134
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 66.526,
+          "bottom_band_mean_x": 66.468,
+          "top_minus_bottom_dx": 0.058,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            153,
+            253
+          ],
+          "y": [
+            0,
+            144
+          ],
+          "top_band_mean_x": 202.5,
+          "bottom_band_mean_x": 202.506,
+          "top_minus_bottom_dx": -0.006,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            273,
+            449
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 365.721,
+          "bottom_band_mean_x": 339.246,
+          "top_minus_bottom_dx": 26.475,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            467,
+            520
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 493.0,
+          "bottom_band_mean_x": 493.0,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            539,
+            638
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 583.481,
+          "bottom_band_mean_x": 554.5,
+          "top_minus_bottom_dx": 28.981,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            651,
+            744
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 666.5,
+          "bottom_band_mean_x": 692.105,
+          "top_minus_bottom_dx": -25.605,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            758,
+            979
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 876.413,
+          "bottom_band_mean_x": 847.465,
+          "top_minus_bottom_dx": 28.947,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1000,
+            1099
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 1042.459,
+          "bottom_band_mean_x": 1043.9,
+          "top_minus_bottom_dx": -1.441,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            1116,
+            1220
+          ],
+          "y": [
+            0,
+            140
+          ],
+          "top_band_mean_x": 1160.725,
+          "bottom_band_mean_x": 1162.628,
+          "top_minus_bottom_dx": -1.903,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            160
+          ],
+          "y": [
+            2,
+            140
+          ],
+          "top_band_mean_x": 79.919,
+          "bottom_band_mean_x": 89.397,
+          "top_minus_bottom_dx": -9.478,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            185,
+            295
+          ],
+          "y": [
+            14,
+            111
+          ],
+          "top_band_mean_x": 229.682,
+          "bottom_band_mean_x": 234.524,
+          "top_minus_bottom_dx": -4.842,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            301,
+            335
+          ],
+          "y": [
+            2,
+            141
+          ],
+          "top_band_mean_x": 317.5,
+          "bottom_band_mean_x": 317.512,
+          "top_minus_bottom_dx": -0.012,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            357,
+            530
+          ],
+          "y": [
+            6,
+            140
+          ],
+          "top_band_mean_x": 443.24,
+          "bottom_band_mean_x": 443.901,
+          "top_minus_bottom_dx": -0.661,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            543,
+            665
+          ],
+          "y": [
+            5,
+            135
+          ],
+          "top_band_mean_x": 609.767,
+          "bottom_band_mean_x": 617.875,
+          "top_minus_bottom_dx": -8.108,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            671,
+            703
+          ],
+          "y": [
+            2,
+            141
+          ],
+          "top_band_mean_x": 686.488,
+          "bottom_band_mean_x": 686.5,
+          "top_minus_bottom_dx": -0.012,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            726,
+            830
+          ],
+          "y": [
+            12,
+            112
+          ],
+          "top_band_mean_x": 777.537,
+          "bottom_band_mean_x": 777.557,
+          "top_minus_bottom_dx": -0.02,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            847,
+            880
+          ],
+          "y": [
+            2,
+            142
+          ],
+          "top_band_mean_x": 863.0,
+          "bottom_band_mean_x": 862.988,
+          "top_minus_bottom_dx": 0.012,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 9,
+        "candidate_runs": 8
+      },
+      "source_candidate_native": "05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "05_multiplayer_red_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "06_single_player_gray",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "candidate_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "source_area_alpha": 19100,
+      "candidate_area_alpha": 13360,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            43
+          ],
+          "y": [
+            0,
+            64
+          ],
+          "top_band_mean_x": 19.38,
+          "bottom_band_mean_x": 21.943,
+          "top_minus_bottom_dx": -2.563,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            49,
+            77
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 62.5,
+          "bottom_band_mean_x": 62.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            83,
+            127
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 103.573,
+          "bottom_band_mean_x": 105.636,
+          "top_minus_bottom_dx": -2.063,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            135,
+            176
+          ],
+          "y": [
+            0,
+            64
+          ],
+          "top_band_mean_x": 154.601,
+          "bottom_band_mean_x": 156.322,
+          "top_minus_bottom_dx": -1.721,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            182,
+            223
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 188.5,
+          "bottom_band_mean_x": 199.993,
+          "top_minus_bottom_dx": -11.493,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            227,
+            270
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 245.031,
+          "bottom_band_mean_x": 245.97,
+          "top_minus_bottom_dx": -0.939,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            298,
+            341
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 317.157,
+          "bottom_band_mean_x": 304.5,
+          "top_minus_bottom_dx": 12.657,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            345,
+            486
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 420.157,
+          "bottom_band_mean_x": 399.76,
+          "top_minus_bottom_dx": 20.397,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            492,
+            535
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 510.031,
+          "bottom_band_mean_x": 510.97,
+          "top_minus_bottom_dx": -0.939,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            542,
+            587
+          ],
+          "y": [
+            2,
+            62
+          ],
+          "top_band_mean_x": 561.339,
+          "bottom_band_mean_x": 562.023,
+          "top_minus_bottom_dx": -0.683,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            71
+          ],
+          "y": [
+            3,
+            61
+          ],
+          "top_band_mean_x": 44.66,
+          "bottom_band_mean_x": 42.241,
+          "top_minus_bottom_dx": 2.418,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            83,
+            157
+          ],
+          "y": [
+            5,
+            61
+          ],
+          "top_band_mean_x": 124.217,
+          "bottom_band_mean_x": 118.676,
+          "top_minus_bottom_dx": 5.54,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            183,
+            258
+          ],
+          "y": [
+            4,
+            61
+          ],
+          "top_band_mean_x": 220.0,
+          "bottom_band_mean_x": 220.187,
+          "top_minus_bottom_dx": -0.187,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            266,
+            318
+          ],
+          "y": [
+            4,
+            59
+          ],
+          "top_band_mean_x": 294.173,
+          "bottom_band_mean_x": 297.989,
+          "top_minus_bottom_dx": -3.816,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            323,
+            335
+          ],
+          "y": [
+            3,
+            61
+          ],
+          "top_band_mean_x": 328.5,
+          "bottom_band_mean_x": 328.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            347,
+            391
+          ],
+          "y": [
+            7,
+            49
+          ],
+          "top_band_mean_x": 368.394,
+          "bottom_band_mean_x": 368.46,
+          "top_minus_bottom_dx": -0.066,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            400,
+            413
+          ],
+          "y": [
+            3,
+            61
+          ],
+          "top_band_mean_x": 406.026,
+          "bottom_band_mean_x": 406.0,
+          "top_minus_bottom_dx": 0.026,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 10,
+        "candidate_runs": 7
+      },
+      "source_candidate_native": "06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "06_single_player_gray_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "07_showroom_gray",
+      "english": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "candidate_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "source_area_alpha": 15231,
+      "candidate_area_alpha": 6628,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            42
+          ],
+          "y": [
+            0,
+            62
+          ],
+          "top_band_mean_x": 18.812,
+          "bottom_band_mean_x": 20.759,
+          "top_minus_bottom_dx": -1.947,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            48,
+            91
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 69.0,
+          "bottom_band_mean_x": 69.0,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            99,
+            139
+          ],
+          "y": [
+            0,
+            62
+          ],
+          "top_band_mean_x": 118.91,
+          "bottom_band_mean_x": 118.915,
+          "top_minus_bottom_dx": -0.006,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            143,
+            212
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 176.751,
+          "bottom_band_mean_x": 176.765,
+          "top_minus_bottom_dx": -0.013,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            220,
+            263
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 238.473,
+          "bottom_band_mean_x": 239.055,
+          "top_minus_bottom_dx": -0.582,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            268,
+            308
+          ],
+          "y": [
+            0,
+            62
+          ],
+          "top_band_mean_x": 287.91,
+          "bottom_band_mean_x": 287.915,
+          "top_minus_bottom_dx": -0.006,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            317,
+            357
+          ],
+          "y": [
+            0,
+            62
+          ],
+          "top_band_mean_x": 336.91,
+          "bottom_band_mean_x": 336.915,
+          "top_minus_bottom_dx": -0.006,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            364,
+            420
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 391.492,
+          "bottom_band_mean_x": 391.543,
+          "top_minus_bottom_dx": -0.051,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            103
+          ],
+          "y": [
+            4,
+            53
+          ],
+          "top_band_mean_x": 51.17,
+          "bottom_band_mean_x": 51.85,
+          "top_minus_bottom_dx": -0.679,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            111,
+            212
+          ],
+          "y": [
+            3,
+            58
+          ],
+          "top_band_mean_x": 161.461,
+          "bottom_band_mean_x": 162.021,
+          "top_minus_bottom_dx": -0.56,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 8,
+        "candidate_runs": 2
+      },
+      "source_candidate_native": "07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "07_showroom_gray_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "candidate_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "source_area_alpha": 17402,
+      "candidate_area_alpha": 12757,
+      "clean_alpha_in_source_bbox": 0,
+      "source_column_runs": [
+        {
+          "x_columns": [
+            0,
+            57
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 28.001,
+          "bottom_band_mean_x": 27.993,
+          "top_minus_bottom_dx": 0.009,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            64,
+            108
+          ],
+          "y": [
+            0,
+            62
+          ],
+          "top_band_mean_x": 85.759,
+          "bottom_band_mean_x": 85.147,
+          "top_minus_bottom_dx": 0.612,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            116,
+            193
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 156.5,
+          "bottom_band_mean_x": 145.117,
+          "top_minus_bottom_dx": 11.383,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            198,
+            226
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 211.5,
+          "bottom_band_mean_x": 211.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            232,
+            275
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 251.157,
+          "bottom_band_mean_x": 238.5,
+          "top_minus_bottom_dx": 12.657,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            279,
+            418
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 353.47,
+          "bottom_band_mean_x": 333.401,
+          "top_minus_bottom_dx": 20.068,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            424,
+            467
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 442.031,
+          "bottom_band_mean_x": 442.97,
+          "top_minus_bottom_dx": -0.939,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            475,
+            520
+          ],
+          "y": [
+            0,
+            60
+          ],
+          "top_band_mean_x": 494.339,
+          "bottom_band_mean_x": 495.023,
+          "top_minus_bottom_dx": -0.683,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "candidate_column_runs": [
+        {
+          "x_columns": [
+            2,
+            66
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 32.611,
+          "bottom_band_mean_x": 37.153,
+          "top_minus_bottom_dx": -4.541,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            78,
+            122
+          ],
+          "y": [
+            6,
+            47
+          ],
+          "top_band_mean_x": 95.278,
+          "bottom_band_mean_x": 97.479,
+          "top_minus_bottom_dx": -2.201,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            127,
+            139
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 132.5,
+          "bottom_band_mean_x": 132.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            150,
+            220
+          ],
+          "y": [
+            3,
+            60
+          ],
+          "top_band_mean_x": 184.628,
+          "bottom_band_mean_x": 184.674,
+          "top_minus_bottom_dx": -0.046,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            228,
+            277
+          ],
+          "y": [
+            3,
+            58
+          ],
+          "top_band_mean_x": 254.308,
+          "bottom_band_mean_x": 257.97,
+          "top_minus_bottom_dx": -3.662,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            281,
+            293
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 286.5,
+          "bottom_band_mean_x": 286.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            304,
+            345
+          ],
+          "y": [
+            6,
+            48
+          ],
+          "top_band_mean_x": 324.061,
+          "bottom_band_mean_x": 324.163,
+          "top_minus_bottom_dx": -0.102,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        },
+        {
+          "x_columns": [
+            354,
+            366
+          ],
+          "y": [
+            2,
+            60
+          ],
+          "top_band_mean_x": 359.5,
+          "bottom_band_mean_x": 359.5,
+          "top_minus_bottom_dx": 0.0,
+          "warning": "Silhouette centroid proxy only; not a semantic glyph stem anchor."
+        }
+      ],
+      "counts": {
+        "source_runs": 8,
+        "candidate_runs": 8
+      },
+      "source_candidate_native": "08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "source_candidate_practical50": "08_multiplayer_gray_PRACTICAL50_MARKED.png",
+      "raw_y_mirror_exact": true,
+      "per_glyph_slant_certified": false
+    }
+  ],
+  "visual_C": "REQUIRES_CONTROLLER_FIRST_LOOK_AFTER_THIS_EVIDENCE",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
