@@ -11320,5 +11320,28 @@
     "controller": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/C287_Q154_CONTROLLER_QA.json",
     "worker_run": 37737259974,
     "runtime_validation": "UNTESTED"
+  },
+  "b259_q214_native_bc3_gold_bevel_rework": {
+    "run_key": "OUTRUN-KOR-B259-Q214-BC3-BEVEL-20261008-1530",
+    "run": "20261008-B259-Q214-BC3-FACE-PRIORITY",
+    "role": "B",
+    "queue_index": 214,
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "C285_rejected_prior_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+    "candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "actual_dds_modified": true,
+    "machine_result": "PASS_2_SOURCE_BBOX_ZERO_RGBA_ALPHA_OUTSIDE_BRIGHT_CORE_BOTH_100PCT",
+    "visual_result": "MATERIAL_IMPROVEMENT_GOLD_BEVEL_RIGHT_ITALIC__SOURCE_FAMILY_HOLD",
+    "status": "HOLD_STRICT_RECHECK_FRESH_C2",
+    "C2": "PENDING",
+    "C3": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261008-B259-Q214-BC3-FACE-PRIORITY/B259_CONTROLLER_SELF_QA.json",
+    "execution_backend": "GITHUB_HOSTED_CPU_GPT_LOCAL_RAW_GITHUB_DNS_UNAVAILABLE",
+    "github_actions_success": 37738486621,
+    "github_actions_failed_guard": 37738250394,
+    "cleanup": "GITHUB_HOSTED_EPHEMERAL_RUNNER_DISCARDED_NO_N100",
+    "forbidden_domains_touched": []
   }
 }
