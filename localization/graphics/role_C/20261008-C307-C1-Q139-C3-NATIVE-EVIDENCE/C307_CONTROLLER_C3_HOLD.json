@@ -1,0 +1,142 @@
+{
+  "run_key": "OUTRUN-KOR-C307-C1-Q139-C3-NATIVE-20261008",
+  "role": "C3_STRICT_AUDIT",
+  "review_id": "C307-C3-Q139",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 139,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+  "selected_head": "968e0ebccd047578a984abc132faf05ed611d112",
+  "triage": "VALIDATION_ONLY",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786"
+  },
+  "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+  "clean_sha256": "e8745b1dfd223a6201ac7bb1902e14126ec6608c7bfe51fc26d3e544de8177e2",
+  "clean_path": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/313DB8CB_HD_CLEAN_PLATE.png",
+  "prior_independent_c": {
+    "review_id": "C226",
+    "result": "HISTORICAL_STATIC_PASS",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7"
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_Q139_NATIVE_MACHINE.json",
+  "manifest": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_Q139_SHA_MANIFEST.json",
+  "method": "Exact verified 2048x1024 persisted DDS decode, independently rederive source/CLEAN/final and render 14 lossless comparison PNG at native, 2x, 75/50% and RAW, black/gray/white",
+  "eight_visual_observations": {
+    "slant": "SOURCE and Korean labels both upright in FLIP-Y; RAW has same mirror-Y",
+    "clean_plate": "Distinct 1:1 SOURCE/CLEAN shows empty native glyph plate with no definite English ghost; exact source-vs-clean outside0; plate/source style needs qualified calibration",
+    "style": "Source heavy plain white, current native heavy Hangul; no definite overstroke or offset in reviewed crops; family review remains unqualified",
+    "readability": "Prior tiny Korean width fixed: 튜닝 사양 121/139 px, 일반 사양 120/174 px, 32/36px height; native/75/50 legible",
+    "glyph_integrity": "Two labels visibly unbroken at 1x and 2x; DDS header identical; mip1",
+    "protected_art": "Outside both source text boxes 0 changed RGBA/alpha; adjacent bar/vehicle/flags protected in source/current panels",
+    "placement": "2/2 within source box with margins [9,9,2,2] and [27,27,2,2]",
+    "orientation": "Both persisted RAW and readable FLIP-Y inspect with consistent intended mirror-Y"
+  },
+  "region_observations": [
+    {
+      "id": "tuned",
+      "source_bbox": [
+        1405,
+        982,
+        1544,
+        1018
+      ],
+      "localized_bbox": [
+        1414,
+        984,
+        1535,
+        1016
+      ],
+      "delta_margins": [
+        9,
+        9,
+        2,
+        2
+      ],
+      "source_bbox_wh": [
+        139,
+        36
+      ],
+      "localized_bbox_wh": [
+        121,
+        32
+      ],
+      "clean_rgba_unique_count": 2,
+      "clean_rgba_most_common": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "clean_rgba_most_common_fraction": 0.58313,
+      "candidate_vs_source_changed_in_source_bbox": 3040,
+      "source_vs_clean_changed_in_source_bbox": 2918
+    },
+    {
+      "id": "normal",
+      "source_bbox": [
+        1730,
+        981,
+        1904,
+        1017
+      ],
+      "localized_bbox": [
+        1757,
+        983,
+        1877,
+        1015
+      ],
+      "delta_margins": [
+        27,
+        27,
+        2,
+        2
+      ],
+      "source_bbox_wh": [
+        174,
+        36
+      ],
+      "localized_bbox_wh": [
+        120,
+        32
+      ],
+      "clean_rgba_unique_count": 2,
+      "clean_rgba_most_common": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "clean_rgba_most_common_fraction": 0.5977,
+      "candidate_vs_source_changed_in_source_bbox": 3627,
+      "source_vs_clean_changed_in_source_bbox": 3744
+    }
+  ],
+  "policy_version": "visual-evidence-v1-20261008",
+  "qualified_blind_calibration": false,
+  "pixels_before_producer_verdict": false,
+  "calibration_note": "Historical producer/C226 findings and PRE_INGAME card were visible before independent pixel review; cannot claim blind C3 evidence or independent C PASS anew",
+  "qualifications_outstanding": [
+    "blind normal/opposite-slant/clipped-stroke/residue/excessive-weight calibration",
+    "full current-policy region schema with source-family and slant anchors",
+    "complete accepted protected masks and per-region evidence validator binding",
+    "distinct qualified C3 approval record"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C3": "HOLD_STRICT_RECHECK",
+  "historical_C226_static_pass_retained": true,
+  "current_policy_approval": false,
+  "user_review": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "independent_new_C_PASS": 0,
+  "third_stage_new_PASS": 0,
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

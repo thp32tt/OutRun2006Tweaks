@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C307 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) C3_STRICT_AUDIT fallback (fresh odd C done/none actionable). Reverified exact 313DB8CB source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and unchanged A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; 14 independent lossless SOURCE/CLEAN/FINAL native black/gray/white 2x/75/50/RAW views. 2/2 source bbox positive margin, outside source/clean/candidate 0, alpha-outside0, header/RAW matched; no definite visual source residue, wrong slant or glyph loss observed. Historical C226 C PASS retained, C3 HOLD_STRICT_RECHECK lacking qualified blind calibration and full current-policy family/anchor/approval evidence. No new DDS/approval/user/actual-game; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json.",
     "B273 B EVEN q098 42E618FD rejected source-white-face/BC3 trials: B272 trial SHA 71d5683b... 23854 pixels erased navy outline; B273 trial SHA 7f9bc391... 1321 microhole pixels/320 BC3 blocks exact alpha/header/outside0 but native/practical 100/50 shows dark glyph-face streaks, controller VISUAL FAIL. Both trial DDS only under role_B, neither promoted. Existing B269 SHA 1d63cd9b... remains byte-identical production candidate and C300 REWORK_REQUIRED. Next use source-derived native white face + navy keyline and qualified CLEAN, not more same-method BC3 fill; fresh C2/C3/user/game blocked. B273_CONTROLLER_VISUAL_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C306 C2 EVEN q154: 30 SHA-bound lossless PNG proof source/authored CLEAN/current DDS, 3 gray menu regions × BLACK/GRAY/WHITE × 100/75/50 plus RAW. Still HOLD_STRICT_RECHECK until first-look calibrated C + source-family counter/weight/semantic anchors + whole-atlas/mips/source separation; no DDS rerender, no C3/approval, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json",
     "C306 2026-10-08 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL): fresh q237 exact A195 SHA 39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2 independent 9 native SOURCE/CLEAN/FINAL lossless PNG; source->clean and source->final outside source0, clean->final outside candidate0, clean alpha source cells0, all positive margins; earlier red bevel gone. C HOLD_STRICT_RECHECK pending blinded calibration/per-region family + full BGW/practical/C3 evidence (not independent C PASS); no new DDS or game test. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_CONTROLLER_C_HOLD.json.",
@@ -6777,7 +6778,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 22:28 KST",
+  "updated_at_kst": "2026-10-08 22:52 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12037,5 +12038,19 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_GRAY_NATIVE_MACHINE.json",
     "qa": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json"
+  },
+  "c307_c1_q139_c3_native": {
+    "task_id": "OUTRUN-KOR-C307-C1-Q139-C3-NATIVE-20261008",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 139,
+    "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+    "new_native_lossless_png": 14,
+    "old_independent_C": "C226 PASS HISTORICAL",
+    "C3": "HOLD_STRICT_RECHECK",
+    "current_policy_approval": false,
+    "qa": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

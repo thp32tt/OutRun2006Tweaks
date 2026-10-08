@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 22:42",
+  "updated_at_kst": "2026-10-08 22:52 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7993,5 +7993,19 @@
     "qa": "localization/graphics/role_B/20261008-B273-Q098-MICRO-HOLE-ONLY/B273_CONTROLLER_VISUAL_FAIL.json",
     "backend": "GITHUB_ACTIONS_AND_CHATGPT_VISUAL",
     "n100_heavy_compute": false
+  },
+  "c307_c1_q139_c3_native": {
+    "at_kst": "2026-10-08 22:52 KST",
+    "index": 139,
+    "native_lossless_png": 14,
+    "outside_rgba": 0,
+    "outside_alpha": 0,
+    "source_original_margin": "2/2 PASS",
+    "historical_c": "C226",
+    "current_c3": "HOLD_STRICT_RECHECK",
+    "APPROVAL": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json"
   }
 }
