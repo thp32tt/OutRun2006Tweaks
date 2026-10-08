@@ -1,0 +1,262 @@
+{
+  "role": "C",
+  "run": "C307-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 230,
+  "policy_version": "visual-evidence-v1-20261008",
+  "triage": {
+    "index": 230,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+    "current_status": "c301_c2_c3_hold_strict_recheck_native_help_evidence",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "authored_clean_provenance": "B228_E95_HELP_CLEAN_PLATE.png carries earlier B73 localized regions; clean-vs-final only is full-atlas two-help scope, while source-vs-clean outside help is NOT a protected-art equivalence test.",
+  "SHA256": {
+    "source": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "authored_clean": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914"
+  },
+  "dds_header_128_identical": true,
+  "dds_size": [
+    2048,
+    1024
+  ],
+  "dds_mips": 1,
+  "full_atlas_clean_final_changed_RGBA_outside_two_help_bbox": 0,
+  "full_atlas_clean_final_alpha_changed_outside_two_help_bbox": 0,
+  "full_atlas_clean_final_visible_changed_outside_two_help_bbox": 0,
+  "regions": [
+    {
+      "id": "20_unavailable_help",
+      "english": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다",
+      "source_effect_bbox_readable": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source_visible_bbox_crop": [
+        0,
+        0,
+        617,
+        50
+      ],
+      "korean_visible_bbox_crop": [
+        2,
+        2,
+        464,
+        48
+      ],
+      "margins_lrtb": [
+        2,
+        153,
+        2,
+        2
+      ],
+      "source_visible_pixels_alpha_gt16": 11130,
+      "korean_visible_pixels_alpha_gt16": 8318,
+      "clean_nonzero_alpha_pixels": 0,
+      "source_clean_changed_RGBA": 11407,
+      "clean_candidate_changed_RGBA": 8584,
+      "source_candidate_changed_RGBA": 13948,
+      "native_and_practical_proofs": [
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "23ee1f682728e12baa0f013f1910122ce59a1a4393a423b007b4e67c874d61b0",
+          "bytes": 15929,
+          "background": "BLACK",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d8ac104407ff6c9c452fb047f3b2f9fa55145dc061800c009f8f6e0b93a87707",
+          "bytes": 28186,
+          "background": "BLACK",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3bbf6e0677fe0bf248c814b6918669554a75c01eceb9e261a66f06d83af1ee2c",
+          "bytes": 17360,
+          "background": "BLACK",
+          "scale": 50
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "537ec7174f305d0c515e99427c432aec74c0d79b8022d3edddbd43e5ce8b04a6",
+          "bytes": 12797,
+          "background": "GRAY",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3a532468a165f2f1df94631d262f42f981e086919dcb6c0828cba2dfbb2daf2b",
+          "bytes": 20078,
+          "background": "GRAY",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "61f96ee69382d5f99ebec60910ea66b0fe5ffd137c0ba7e178e46a3e5ae3091c",
+          "bytes": 12248,
+          "background": "GRAY",
+          "scale": 50
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0259e6b383f8256f258502ec6b6c1b3adf1319fa18b57c1f76ec49d6bb68f0d4",
+          "bytes": 17619,
+          "background": "WHITE",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7dfe47dd281e6a3b7feba8f8ae7d4f654a8f7626ae1fe5af923e25d45c20bfbc",
+          "bytes": 32871,
+          "background": "WHITE",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b9dec4c37b61177b4ef92d9b8ba49a6e846f8812a4b42d3f2c1e8c7ebfe4fdd5",
+          "bytes": 20722,
+          "background": "WHITE",
+          "scale": 50
+        }
+      ],
+      "raw": {
+        "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_RAW_SOURCE_FINAL.png",
+        "sha256": "d953a184efb21c5abc195edb8be8f36842ae42f7c6fa0efdf6a4c0adcf211d02",
+        "bytes": 11825
+      },
+      "zoom_200": {
+        "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_ZOOM200_SOURCE_FINAL.png",
+        "sha256": "391ac796d52f141f711df2dd1d245ea80fcc8ee0900cd51d338f2f5d93abb3f3",
+        "bytes": 17963
+      },
+      "native_pixel_evidence_only_not_visual_pass": true
+    },
+    {
+      "id": "21_owned_help",
+      "english": "You already own this item",
+      "korean": "이미 보유 중입니다",
+      "source_effect_bbox_readable": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source_visible_bbox_crop": [
+        0,
+        0,
+        555,
+        50
+      ],
+      "korean_visible_bbox_crop": [
+        2,
+        2,
+        366,
+        48
+      ],
+      "margins_lrtb": [
+        2,
+        189,
+        2,
+        2
+      ],
+      "source_visible_pixels_alpha_gt16": 10143,
+      "korean_visible_pixels_alpha_gt16": 6466,
+      "clean_nonzero_alpha_pixels": 0,
+      "source_clean_changed_RGBA": 10420,
+      "clean_candidate_changed_RGBA": 6814,
+      "source_candidate_changed_RGBA": 12933,
+      "native_and_practical_proofs": [
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3088ae04a97c4c6c50b24f6d0e86bbdf1d602bd6d9286cbbf611dec5e638b722",
+          "bytes": 14814,
+          "background": "BLACK",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_BLACK_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "55b3f31ffaf9fbb8575eb47d3a1bc8e5b3488fe3fe9ae948f872f911291b6e66",
+          "bytes": 25186,
+          "background": "BLACK",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a852bddab5c2200034295f363f18f51433addf4384173e1cdaf8a99d1b52a34d",
+          "bytes": 15139,
+          "background": "BLACK",
+          "scale": 50
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "85bbeda35b94864a26e9ce7328f9e86f7da5f6a5e912175b54aec85b0690ffc0",
+          "bytes": 11942,
+          "background": "GRAY",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_GRAY_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4809e68ca7245b4878835f09d5ef037d10459d292dfe7003e0d636d02d58b99a",
+          "bytes": 18466,
+          "background": "GRAY",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_GRAY_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "780310aea5a0e4fdeddcb74f38058c46f2b541e7c1980cc0bd69363fa959b822",
+          "bytes": 10885,
+          "background": "GRAY",
+          "scale": 50
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "17241fe2bf01e1a6cbd77f4a1adbc7f92c0c603d2483db510c1259bd69aef8fd",
+          "bytes": 16298,
+          "background": "WHITE",
+          "scale": 100
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "789d52f279c10432f531b67cbade4448303de827c264af60497d3d67f329a1c4",
+          "bytes": 29321,
+          "background": "WHITE",
+          "scale": 75
+        },
+        {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "502bd9d48f027a0797895e042ee2d7c2cc41ba0c8dde2de698057910b32afb11",
+          "bytes": 18018,
+          "background": "WHITE",
+          "scale": 50
+        }
+      ],
+      "raw": {
+        "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_RAW_SOURCE_FINAL.png",
+        "sha256": "f346a169fe35b37e0329fed28c700dfb5b2af3d8c158d14ee913b7bfbf5ef0fa",
+        "bytes": 11054
+      },
+      "zoom_200": {
+        "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_ZOOM200_SOURCE_FINAL.png",
+        "sha256": "b448e6d689c227d9f2e0c9b09dafe7bc9d809215b0e38b5374d80fd2c0a0f4bc",
+        "bytes": 16650
+      },
+      "native_pixel_evidence_only_not_visual_pass": true
+    }
+  ],
+  "images_count": 22,
+  "result": "EVIDENCE_ONLY_NOT_VISUAL_APPROVAL",
+  "C": "CONTROLLER_REVIEW_REQUIRED",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
