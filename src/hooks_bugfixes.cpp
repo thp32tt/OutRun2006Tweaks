@@ -743,7 +743,23 @@ public:
 		sumo_fread_finished_hook = safetyhook::create_inline(Module::exe_ptr(sumo_fread_finished_Addr), sumo_fread_finished_dest);
 		LoadTextures_hook = safetyhook::create_mid(Module::exe_ptr(LoadTextures_Addr), LoadTextures_dest);
 
-		return ServiceRequest_hook && ServiceRequestMoveDone_hook && sumo_fread_hook && sumo_fread_finished_hook && LoadTextures_hook;
+		const bool ok = ServiceRequest_hook && ServiceRequestMoveDone_hook &&
+			sumo_fread_hook && sumo_fread_finished_hook && LoadTextures_hook;
+		if (!ok)
+		{
+			// Partial installation can keep the request-list lock held without
+			// installing the matching release hook, deadlocking the XMT loader.
+			// Undo every hook before returning failure; the lock object remains
+			// initialized to avoid racing any in-flight callback.
+			ServiceRequest_hook = {};
+			ServiceRequestMoveDone_hook = {};
+			sumo_fread_hook = {};
+			sumo_fread_finished_hook = {};
+			LoadTextures_hook = {};
+			spdlog::error(
+				"FixFileLoadRace: incomplete request-list hook installation; rolled back all hooks");
+		}
+		return ok;
 	}
 
 	static FixFileLoadRace instance;
