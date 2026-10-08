@@ -2,6 +2,42 @@
 
 This document is a quality-only layer for `korean-localization-recovery-20260928`. It intentionally does not define controller scheduling, retries, rollovers, task IDs or orchestration.
 
+## User screenshots: 14 hard-stop presentation observations — 2026-10-09
+
+Add these to, **not instead of**, the existing 10-stage construction and
+eight ordered rework checks. Require PASS/FAIL/HOLD with actual native
+evidence per affected label: 1. English glyph/effects fully removed on
+CLEAN without Korean; 2. plate/gradient/alpha continuity; 3. no added
+rectangular composite trace; 4. native Hangul contour/counter-space and
+no prior low-res raster upscale/font fallback; 5. persisted DDS codec,
+block, mip and glyph-edge integrity; 6. readability at 100/75/50%;
+7. original source family stroke, width/height and *per-line* hierarchy;
+8. readable top-minus-bottom slant and perspective from measured anchors;
+9. source effect-bbox ceiling and positive separation where possible;
+10. zero clipping or overlap between letters, dynamic Stage 2, rank,
+HUD numbers/icons and protected artwork; 11. RAW/FLIP-Y orientation and
+source-equivalent transforms; 12. exact preservation of Ferrari names,
+model marks, songs and logos; 13. composited in-game UI at true display
+scale, including HUD animation/foreground; 14. region-by-region review
+of the user's annotated screenshot against unobscured game pixels.
+
+A single visible defect HARD FAILS producer/C/C3 regardless of scalar
+outside-mask zero or past C3 PASS. The black screenshot rectangles are
+user review outlines, NOT automatically composited artifacts; distinguish
+them from actually visible plate/crop remnants. Missing exact mapping,
+plate evidence or unmarked comparison is HOLD/MAPPING_REQUIRED, never
+an invented pixel FAIL or PASS.
+
+Separate reference renderer families for tiny HUD, small gray menu,
+italic selector, silver-techno header, showroom metadata and rank/stage
+overlay. Approve ONE exact saved-DDS example against canonical original
+before propagating its method; reject generic stretched/blurred Korean
+rasters, wrong italics, overthick shadows and too-small-to-read results.
+No additional automatic scaling bypasses native source bbox ceiling.
+Qualify text-free SOURCE-vs-CLEAN before lettering and CLEAN-vs-FINAL
+after. Keep runtime stack-order/screen-scale as a required new user
+regression retest; static PASS does not close an actual-game failure.
+
 ## Repeat-defect convergence selection (2026-10-08)
 
 For A/B/C selection, apply `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md` and the read-only `tools/localization/rework_triage.py` to the current queue before DDS reconstruction. Missing-only evidence remains HOLD for fresh evidence; confirmed repeat source-family failures require a changed rendering method. Neither state is a PASS. Existing independent C/C3 evidence and actual-game acceptance requirements still apply.
