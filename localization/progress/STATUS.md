@@ -2875,3 +2875,7 @@ TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: 8/8 source-bbox containment PASS on persist
 
 ### C281 C2 q172 SOURCE SLANT VISUAL FAIL — 2026-10-08 13:28 KST
 TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic vs B251 Korean 출발/골 insufficient rightward slant. Exact source-vs-current SHA matched, 3,541 changed inside allowed boxes; RGBA/alpha outside 0; RAW mapping exact. **REWORK_REQUIRED** now, not prior C277 HOLD; return B typography without altering source badge/map. No C3/APPROVAL/PRE_INGAME or actual-game acceptance. Detailed evidence `localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_CONTROLLER_QA.json`. RUNTIME_VALIDATION=UNTESTED.
+
+
+### 20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR — 2026-10-08 13:41 KST
+- B q172 6C9B3611 new Korean DDS `7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2` (native CJK rendered START→출발, GOAL→골, readable right-lean). Exact 2/2 source bbox/size/positive margins, original outside RGBA/alpha 0, 1024x1024 RGBA32 header/RAW mirror-Y exact. B254 tofu rejected; B256 unproven source-right remnant probe aborted before writing. Independent pixels-first C2 source-slant anchors and plate evidence pending, so current queue HOLD_STRICT_RECHECK; C3/PRE_INGAME blocked, actual game UNTESTED. QA `localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/B255_CONTROLLER_SELF_QA.json`. No VR/FFB/DX11/DXVK.
