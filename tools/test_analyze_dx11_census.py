@@ -2439,7 +2439,7 @@ def main() -> int:
     # of these analyzer receipts promotes NativeDrawPath or a Draw* call.
     r313_handoff_line = (
         "VR DX11 R273 sourceMappingHandoff: "
-        "exact=1 snapshot=0xDEADBEEF00000001\\n"
+        "exact=1 snapshot=0xDEADBEEF00000001\n"
     )
     r313_support = r311_register_mapping_support.replace(
         "VR DX11 R276 semanticTranslationPlan signature#1:",
