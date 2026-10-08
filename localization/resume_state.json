@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B299 B even q212 source-derived native typography repaired C318-confirmed showroom/enter_name underfill with one newly promoted 2048x2048 DDS SHA256 efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089. Two source glyph/effect bboxes [14,1148,1760,1296] and [0,496,1081,572] pass 4px positive source margins, original font-family red [186,0,0] and gray [63,71,74]; all other 10 localized region pixels unchanged, outside RGBA/alpha 0; SOURCE/CLEAN/OLD/NEW 100/75/50/RAW BGW producer visual PASS, clean alpha0 and saved DDS decode exact. Fresh C2/C3/approval and actual game retest PENDING; IGR-029 screenshot mapping remains SUSPECTED OPEN. RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B299-Q212-NATIVE-SOURCE-FAMILY-TRIAL/B299_CONTROLLER_SELF_QA_FINAL.json",
     "B298 q154 new native gray-family candidate c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524: three C311-failed gray menu glyphs refitted with one native source-gray pixel alpha ring, three bboxes with strictly positive margins, no changed pixels outside 3 cells; five red source rows and authored header/RAW preserved. Producer visual native/50/RAW scoped PASS. Fresh independent C2 + C3, actual game retest and user acceptance REQUIRED; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B298-Q154-GRAY-STROKE-SOURCE-FAMILY-TRIAL/B298_CONTROLLER_SELF_QA_FINAL.json",
     "C320 C1 q227 exact A198R first independent alpha-safe proof 3/16 regions, 3 BGW lossless composites published. CLEAN alpha0 for all selected; invisible RGB-only text must not be called game residue. C HOLD_STRICT_RECHECK awaiting remaining 13 lossless native BGW 75/50 RAW, family calibration and independently decoded exact DDS. localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
     "C319 q161 current A200 BC3 SHA 2d0fe080... fresh independent C1 REWORK_REQUIRED: 04/06 improved, unchanged cell08 염소자리,10 양자리,12 태국 retain native Hangul face pinhole/speckle; A must repair retained defective cells and audit rest of 36, fresh C1/C3 and exact game proof. localization/graphics/role_C/20261009-C319-Q161-A200-RETAINED-GLYPH-SPECKLE/C319_Q161_A200_CONTROLLER_C1_REWORK.json",
@@ -6795,7 +6796,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 02:29 KST",
+  "updated_at_kst": "2026-10-09 06:17 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",

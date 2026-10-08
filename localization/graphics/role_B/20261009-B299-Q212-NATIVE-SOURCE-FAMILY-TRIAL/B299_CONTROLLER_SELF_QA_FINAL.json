@@ -1,0 +1,114 @@
+{
+  "role": "B",
+  "run": "B299",
+  "task_id": "OUTRUN-KOR-B299-Q212-NATIVE-SOURCE-HIERARCHY-20261009",
+  "queue_index": 212,
+  "action": "MATERIAL_REWORK_PROMOTED_PRODUCER_SELF_QA_PENDING_FRESH_C2",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "new_candidate_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "new_dds_count": 1,
+  "trial_blob_sha": "cdf9a9690f1f17921141f2d3be209454563420ed",
+  "worker_run_id": 37845326676,
+  "asset": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "method": "native Noto CJK KR Bold, semantically expanded showroom title to 차량 전시장; source-derived color, transparent glyph-only composition on text-free transparent source plate; no prior lowres bitmap reuse",
+  "regions": [
+    {
+      "id": "showroom",
+      "original_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "localized_bbox": [
+        18,
+        1152,
+        730,
+        1292
+      ],
+      "margins": [
+        4,
+        1030,
+        4,
+        4
+      ],
+      "color": [
+        186,
+        0,
+        0
+      ],
+      "text": "차량 전시장"
+    },
+    {
+      "id": "enter_name",
+      "original_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "localized_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "margins": [
+        4,
+        811,
+        4,
+        4
+      ],
+      "color": [
+        63,
+        71,
+        74
+      ],
+      "text": "이름 입력"
+    }
+  ],
+  "contamination_gates": {
+    "plate_only": "PASS_SCOPED_TEXT_FREE_CLEAN_NO_SOURCE_GLYPHS",
+    "composite_only": "PASS_SCOPED_TRANSPARENT_GLYPH_COMPOSITE_ZERO_OUTSIDE_TWO",
+    "source_vs_final": "PASS_NATIVE_CONTROLLER_VISIBLE_TWO_CELLS",
+    "outside_two_rgba_changed_pixels": 0,
+    "outside_two_alpha_changed_pixels": 0,
+    "protected_other_ten": "EXACT",
+    "stored_dds_decoded_roundtrip": "EXACT",
+    "original_header": "EXACT",
+    "mip": "MIP1_NATIVE",
+    "raw_flipy": "PASS",
+    "native_and_practical": "PASS_100_75_50_BLACK_GRAY_WHITE_SCOPED",
+    "visual": "PASS_SOURCE_RELATIVE_HIERARCHY_IMPROVED_NO_VISIBLE_BOX_OR_CLIPPING_IN_REVIEWED_CROPS"
+  },
+  "eight_checks": {
+    "english_removed": "PASS_SCOPED",
+    "source_slant": "PASS_UPRIGHT",
+    "size": "PASS_SOURCE_BBOX_4PX_MARGIN",
+    "weight_effect": "PASS_PRODUCER_CONTOURS_NATIVE_PENDING_C",
+    "clipping": "PASS",
+    "protected": "PASS_UNCHANGED_TEN",
+    "raw_flipy": "PASS",
+    "readability": "PASS_PRODUCER_100_75_50_PENDING_GAME"
+  },
+  "independent_C2": "NOT_RUN",
+  "independent_C3": "NOT_RUN",
+  "approval": false,
+  "preview_approval": false,
+  "user_ingame_report": "IGR-029 OPEN_USER_INGAME_FAIL mapping SUSPECTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions fallback direct ChatGPT GitHub DNS unavailable",
+  "evidence_directory": "localization/graphics/role_B/20261009-B299-Q212-NATIVE-SOURCE-FAMILY-TRIAL/",
+  "limitations": [
+    "Full game-composed UI and newer user screenshot not available",
+    "Screenshot 179 runtime-vs-DDS source mapping remains SUSPECTED",
+    "Human user approval and independent C2/C3 not inferred from machine/source-self-QA"
+  ],
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
