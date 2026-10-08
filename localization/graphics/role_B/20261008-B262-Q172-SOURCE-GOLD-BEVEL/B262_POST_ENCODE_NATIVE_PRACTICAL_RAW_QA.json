@@ -1,0 +1,58 @@
+{
+  "run": "B262",
+  "queue_index": 172,
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "candidate_prior_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "decoded_current_exact": "PASS",
+  "native_size": [
+    1024,
+    1024
+  ],
+  "mips": 1,
+  "changed_rgba_outside_source_regions": 0,
+  "alpha_outside_source_regions": 0,
+  "native_100_75_50_raw": [
+    {
+      "label": "START",
+      "korean": "출발",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "practical_evidence": [
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/START_PRACTICAL_100.png",
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/START_PRACTICAL_75.png",
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/START_PRACTICAL_50.png"
+      ],
+      "raw_evidence": "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/START_SOURCE_CLEAN_FINAL_RAW.png",
+      "source_relative_style": "NOT_AUTO_APPROVED_CONTROLLER_VISUAL_PENDING"
+    },
+    {
+      "label": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "practical_evidence": [
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/GOAL_PRACTICAL_100.png",
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/GOAL_PRACTICAL_75.png",
+        "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/GOAL_PRACTICAL_50.png"
+      ],
+      "raw_evidence": "localization/graphics/role_B/20261008-B262-Q172-SOURCE-GOLD-BEVEL/GOAL_SOURCE_CLEAN_FINAL_RAW.png",
+      "source_relative_style": "NOT_AUTO_APPROVED_CONTROLLER_VISUAL_PENDING"
+    }
+  ],
+  "source_slant_per_glyph": "UNMEASURED; do not assert source-style PASS",
+  "source_family_visual": "HOLD_FOR_CONTROLLER_JUDGMENT",
+  "independent_c": "PENDING",
+  "c3": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "execution_backend": "GITHUB_ACTIONS_EPHEMERAL"
+}
