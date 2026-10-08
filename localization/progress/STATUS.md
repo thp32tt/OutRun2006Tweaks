@@ -2984,3 +2984,9 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 2026-10-08 C292 C2 q154 — TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
 - Five red header labels added to independent exact persisted q154 DDS SOURCE/authored B60 CLEAN/FINAL lossless native & 75/50/RAW/BWG evidence. Positive margins red5/5, zero source/current RGBA & alpha outside eight text cells, authored CLEAN transparent in red 5 cells. No definite clipping/legibility failure observed. C287 prior gray3+authored-clean provenance not repeated. **HOLD_STRICT_RECHECK** for qualified blind calibration/glyph-only slant/family/complete 8-region C & separate C3. Approval/export BLOCKED; real game UNTESTED. QA `localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_CONTROLLER_QA.json`.
+
+
+### 2026-10-08 17:15 KST — A191 q119 source white outer glow reconstruction
+- Native DXT5 candidate F6811E94 material replacement: `4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca`, GitHub Actions 37748043382 SUCCESS, 2048x256/RAW mirror_y preserved. Source/decoded final bbox containment PASS, 0 outside RGBA/alpha/protected/overlap/residue, glow near-white from previously 0 to 20641 decoded pixels.
+- A190 hard white edge self-QA visual rejection materially corrected with A191 softened diffused glow. Current producer visual `HOLD_STRICT_RECHECK` pending exact family-font/slant-anchor independent C1 + separate C3, NOT final C/APPROVAL/PRE_INGAME/user acceptance; `RUNTIME_VALIDATION=UNTESTED`.
+- Evidence: `localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_CONTROLLER_SELF_QA.json`. No VR/FFB/DX11/DXVK work.
