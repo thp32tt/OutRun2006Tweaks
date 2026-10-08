@@ -442,8 +442,14 @@ class UIScaling : public Hook
 				? tailsBefore[prio]->next_0 : root->next_0;
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
-				node->args_10.float24 += RankMarkerFracX;
-				node->args_10.float28 += RankMarkerFracY;
+				// Only kind_C==0 stores SPRARGS at args_10. The original
+				// clip producer had modified a single SPRARGS tail; a sibling
+				// emitted through put_sprite_ex2 owns args2_58 instead.
+				if (node->kind_C == 0)
+				{
+					node->args_10.float24 += RankMarkerFracX;
+					node->args_10.float28 += RankMarkerFracY;
+				}
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
