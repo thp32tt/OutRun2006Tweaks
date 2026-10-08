@@ -26,7 +26,7 @@ try {
     New-Item -ItemType Directory -Force $d3d9,$dxvk | Out-Null
 
     foreach ($dir in @($d3d9,$dxvk)) {
-        Set-Content (Join-Path $dir "dinput8.dll") "synthetic-game-dll" -Encoding ascii
+        Write-TestPe (Join-Path $dir "dinput8.dll") 0x014C
         Set-Content (Join-Path $dir "outrun-vr-host.exe") "synthetic-host" -Encoding ascii
         Set-Content (Join-Path $dir "SOURCE_SHA.txt") "synthetic-source" -Encoding ascii
     }
@@ -58,6 +58,8 @@ TransparencySupersampling = true
     if ($active -notcontains "backend=dxvk-safe") { throw "DXVK SAFE backend identity missing" }
     if ($active -notcontains "provider=DXVK_X86_SAFE") { throw "DXVK SAFE provider identity missing" }
     if ($active -notcontains "dxvkD3D9Sha256=$safeHash") { throw "DXVK SAFE SHA256 identity missing" }
+    $gameDllHash = (Get-FileHash (Join-Path $sandbox "dinput8.dll") -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($active -notcontains "gameDllSha256=$gameDllHash") { throw "Selected game DLL SHA256 attestation missing" }
     if (Test-Path (Join-Path $sandbox "multiviewpatcher.dll")) { throw "DXVK SAFE must not install multiviewpatcher.dll" }
 
     $manifest = Get-Content (Join-Path $sandbox "CURRENT_VR_SESSION.json") -Raw | ConvertFrom-Json
