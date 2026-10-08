@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C306 C2 EVEN q154: 30 SHA-bound lossless PNG proof source/authored CLEAN/current DDS, 3 gray menu regions × BLACK/GRAY/WHITE × 100/75/50 plus RAW. Still HOLD_STRICT_RECHECK until first-look calibrated C + source-family counter/weight/semantic anchors + whole-atlas/mips/source separation; no DDS rerender, no C3/approval, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json",
     "C306 2026-10-08 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL): fresh q237 exact A195 SHA 39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2 independent 9 native SOURCE/CLEAN/FINAL lossless PNG; source->clean and source->final outside source0, clean->final outside candidate0, clean alpha source cells0, all positive margins; earlier red bevel gone. C HOLD_STRICT_RECHECK pending blinded calibration/per-region family + full BGW/practical/C3 evidence (not independent C PASS); no new DDS or game test. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_CONTROLLER_C_HOLD.json.",
     "A195 A ODD q237 FF514CEB NEW material source-flat DDS 39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2: prior C1 red-offset bevel visual FAIL repaired with no added shadow/stroke and native flat red/gray source palette; authored A94 clean independently verified 402833 removed source-alpha pixels, plate outside=0; persisted DDS 9/9 bbox positive margin and changed/protected/alpha/residue/composite outside/overlap/touch 0. Controller SOURCE/CLEAN/FINAL readable/RAW + 100/75/50 visual producer PASS, fresh independent C1+C3/current evidence approval/user JPG/actual game remain PENDING. No game run; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261008-A195-Q237-FLAT-EFFECT-RECONSTRUCTION/A195_CONTROLLER_SELF_QA_FINAL.json.",
     "C305 C2 EVEN q154 4D38BBB0 authentic B60 authored clean (exact a4d707fa) newly inspected 8/8 including 5 red UI labels over BLACK/GRAY/WHITE with SOURCE/CLEAN/CURRENT triple contact. CLEAN source region alpha all zero, source-clean/source-current RGBA outside union zero. HOLD: font weight/counter-space/source-anchored slant + qualified blind first-look and current full native+RAW 100/75/50 protected evidence not certified. No rerender unchanged bytes or repeat plate visual. localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
@@ -6775,7 +6776,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 22:24 KST",
+  "updated_at_kst": "2026-10-08 22:28 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12001,5 +12002,39 @@
     "result": "HOLD_STRICT_RECHECK",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_CONTROLLER_C_HOLD.json"
+  },
+  "c306_c2_q154_gray_native_lossless": {
+    "at_kst": "2026-10-08 22:28 KST",
+    "task_id": "OUTRUN-KOR-C306-C2-Q154-GRAY-NATIVE-LOSSLESS-20261008-2220",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "mode": "EVIDENCE_ONLY_HOLD",
+    "worker_run": 37784106115,
+    "worker_result": "SUCCESS",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_lossless_png": 30,
+    "regions": 3,
+    "sizes": [
+      100,
+      75,
+      50
+    ],
+    "backgrounds": [
+      "BLACK",
+      "GRAY",
+      "WHITE"
+    ],
+    "raw_proof": 3,
+    "dds_new": 0,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "current_evidence_approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_GRAY_NATIVE_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json"
   }
 }

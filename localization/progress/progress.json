@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 22:24 KST",
+  "updated_at_kst": "2026-10-08 22:28 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7933,5 +7933,39 @@
     "approved": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C306-C1-Q237-NATIVE-PLATE-REVIEW/C306_CONTROLLER_C_HOLD.json"
+  },
+  "c306_c2_q154_gray_native_lossless": {
+    "at_kst": "2026-10-08 22:28 KST",
+    "task_id": "OUTRUN-KOR-C306-C2-Q154-GRAY-NATIVE-LOSSLESS-20261008-2220",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "mode": "EVIDENCE_ONLY_HOLD",
+    "worker_run": 37784106115,
+    "worker_result": "SUCCESS",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_lossless_png": 30,
+    "regions": 3,
+    "sizes": [
+      100,
+      75,
+      50
+    ],
+    "backgrounds": [
+      "BLACK",
+      "GRAY",
+      "WHITE"
+    ],
+    "raw_proof": 3,
+    "dds_new": 0,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "current_evidence_approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_GRAY_NATIVE_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json"
   }
 }

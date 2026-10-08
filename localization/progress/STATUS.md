@@ -3088,3 +3088,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 22:24 KST — C306 C1 q237
 - `TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL)`; 9 independent native lossless SOURCE/CLEAN/FINAL panels. Outside-changes 0 for three stages and clean alpha0 within source regions, 9 positive margins, no new DDS. Visual flat-red prior bevel issue not reproduced. C `HOLD_STRICT_RECHECK` until qualified blind calibration/per-region family and distinct C3. PRE_INGAME/user/game not approved. `RUNTIME_VALIDATION=UNTESTED`.
+
+### 2026-10-08 22:28 KST — C306 C2 EVEN q154 30 native gray evidence PNG
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`, SHA-bound 3 gray SOURCE/CLEAN/FINAL rows × BLACK/GRAY/WHITE × 100/75/50 plus RAW (30 PNG), GitHub run 37784106115 SUCCESS, controller viewed native and reduced images. q154 current DDS preserved, clean alpha zero for 3/3, no definite plate residue/clipping in inspected crops; qualified calibrated source-family gray weight/counter space/whole atlas+RAW gates **HOLD_STRICT_RECHECK**, C3/APPROVAL/export blocked, no DDS, `RUNTIME_VALIDATION=UNTESTED`. Report `localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_CONTROLLER_C_HOLD.json`.
