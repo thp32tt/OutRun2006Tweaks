@@ -7880,5 +7880,30 @@
     "new_C3_pass": 0,
     "current_approval": false,
     "runtime_validation": "UNTESTED"
+  },
+  "c305_c2_q154_authored_clean_bgw": {
+    "run_key": "OUTRUN-KOR-C305-C2-Q154-AUTHORED-CLEAN-BGW-20261008-2150",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_visual_rows": 8,
+    "new_red_visual_rows": 5,
+    "clean_orientation": "READABLE",
+    "source_clean_outside_RGBA": 0,
+    "clean_alpha_positive_source_regions": 0,
+    "source_candidate_outside_RGBA": 0,
+    "visual": "NO_DEFINITE_PLATE_RESIDUE_IN_BGW_CONTACT; font-family/counter-space not approved",
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED_PENDING_QUALIFIED_C",
+    "APPROVAL": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_AUTHORED_PLATE_RGB_AUDIT.json",
+    "qa": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json"
   }
 }
