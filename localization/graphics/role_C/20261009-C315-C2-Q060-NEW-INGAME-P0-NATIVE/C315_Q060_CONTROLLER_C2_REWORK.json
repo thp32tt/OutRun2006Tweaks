@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C315-C2",
+  "run_key": "OUTRUN-KOR-C315-C2-Q060-IGR044-SOURCE-FACE-REWORK-20261009",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 60,
+  "priority": "P0",
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "regression": "IGR-044",
+  "screenshot": "스크린샷(203)(1).png",
+  "ingame_status": "OPEN_USER_INGAME_FAIL",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "original_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "manifest_path": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/C315_Q060_MACHINE_AND_LOSSLESS_MANIFEST.json",
+  "worker_run": 37808549971,
+  "worker_status": "SUCCESS",
+  "triage": "MATERIAL_REWORK (read-only tools/localization/rework_triage.py --index 60)",
+  "new_lossless_png": 18,
+  "new_dds": 0,
+  "machine_checks": {
+    "source_and_candidate_sha": "EXACT_MATCH",
+    "header": "EXACT",
+    "raw_flipy": "BYTE_MATCH_CROP",
+    "bbox_margin": "3/3 PASS",
+    "full_clean_plate": "MISSING",
+    "composite_only": "MISSING",
+    "whole_atlas_zero_outside": "NOT_RECOMPUTED_FOR_LEGACY_ADDITIONAL_LOCALIZED_REGIONS",
+    "authored_mips": 1
+  },
+  "regions": [
+    {
+      "id": "stage",
+      "decision": "FAIL_SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+      "observation": "English thick filled yellow/navy italic; current Hangul thin strokes and weak original fill depth.",
+      "views": {
+        "native": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_100pct_GRAY.png",
+        "practical75": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_75pct_GRAY.png",
+        "practical50": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_50pct_GRAY.png",
+        "raw": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_CURRENT_RAW.png",
+        "source_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_SOURCE_NATIVE_RGBA.png",
+        "candidate_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/stage_CURRENT_NATIVE_RGBA.png"
+      }
+    },
+    {
+      "id": "outrun_miles_white",
+      "decision": "FAIL_SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+      "observation": "English thick near-solid softened white italic; current Hangul metallic silver/dark inset hard-outline. Major native and 50% source-effect mismatch.",
+      "views": {
+        "native": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_100pct_GRAY.png",
+        "practical75": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_75pct_GRAY.png",
+        "practical50": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_50pct_GRAY.png",
+        "raw": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_CURRENT_RAW.png",
+        "source_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_SOURCE_NATIVE_RGBA.png",
+        "candidate_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_white_CURRENT_NATIVE_RGBA.png"
+      }
+    },
+    {
+      "id": "outrun_miles",
+      "decision": "FAIL_SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+      "observation": "English thick cream/gold italic fill and soft navy depth; current Hangul thinner flat gold hard navy outline.",
+      "views": {
+        "native": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_100pct_GRAY.png",
+        "practical75": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_75pct_GRAY.png",
+        "practical50": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_50pct_GRAY.png",
+        "raw": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_CURRENT_RAW.png",
+        "source_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_SOURCE_NATIVE_RGBA.png",
+        "candidate_rgba": "localization/graphics/role_C/20261009-C315-C2-Q060-NEW-INGAME-P0-NATIVE/outrun_miles_CURRENT_NATIVE_RGBA.png"
+      }
+    }
+  ],
+  "controller_visual_finding": "3 SOURCE/KOREAN labels directly inspected from exact DDS decoded PNG, original 100% and practical 50%, RAW for white and yellow. Native source face depth and fill are categorically incompatible with narrower hard-outlined Korean candidate. No claim that user markup black rectangle is intrinsic; under-glyph residue/actual game overlay cannot be decided without authentic CLEAN and unmarked shot.",
+  "calibration": {
+    "qualified": false,
+    "pixels_before_producer_verdict": false,
+    "reason": "Existing producer narrative seen before evidence, so no current-policy PASS"
+  },
+  "defect_code": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED_OPEN_USER_INGAME_FAIL",
+  "USER_INGAME": "NEW_RETEST_REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "required_fix": "B-even reconstruct native Stage yellow/navy heavy italic, OUTRUN MILES white near-solid soft source fill and yellow cream/navy source depth; no arbitrary chrome outlines, no rectangles. Preserve all protected HUD sprites/heart/other localized regions. Independently prove SOURCE vs authored CLEAN and CLEAN vs persisted FINAL, source-bbox ceiling/zero overlaps/RAW-FLIPY/all MIPs and practical 100/75/50. Fresh C2 and separate C3 then matching new actual-game screenshot needed.",
+  "execution_backend": "GitHub Actions (full DDS heavy work), N100 MCP small PNG transport only",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
