@@ -1114,8 +1114,11 @@ def check_exact_hud_raw_wvp(source):
     require('constexpr std::uint64_t R30ExactHudRawWvpDrawWindow = 128u;',
             source, 'bounded max HUD raw WVP draw reuse')
     eye = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    # Restrict sequence assertions to the raw-WVP fallback block; unrelated
+    # early guards elsewhere in this function legitimately return false first.
+    raw_fallback = eye[eye.index('if (!R44GetOwnedRawOverlayWvp(original))'):]
     require_order(
-        eye, 'exact ScreenHud fallback must not feed live already-injected c64',
+        raw_fallback, 'exact ScreenHud fallback must not feed live already-injected c64',
         'if (!R44GetOwnedRawOverlayWvp(original))',
         'if (screenKind == R30ScreenSpaceKind::PerspectiveHud)',
         'if (!R30GetExtendedRawWvpForExactHud(original))',
