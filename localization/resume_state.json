@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C302 C2 EVEN q236 FEF70E85 current exact unchanged candidate e0a01c50... and pinned source a1c7f7d6... independent RAW mirrored-Y native 4/14 stage-name regions (Industrial Complex, Waterfalls, Milky Way, Jungle) all inside canonical bboxes with changed RGBA/alpha outside region bands 0; previously unnoticed preserved atlas artwork x1995 explicitly excluded from glyph bbox. C3 HOLD (10 uninspected, missing current qualified calibration/clean/full visual), do not rerender identical bytes/approve. QA localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C301 C2 EVEN q230 E95DA5 independently SHA-verified current B228 + pinned English two help regions (2/2 native height/containment, RGBA/alpha changed outside bboxes 0; RGB source family match). C3 HOLD insufficient qualified blind/current lossless 100/75/50/mips/RAW source-clean-final; no renderer change or approved export. localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json; RUNTIME_VALIDATION=UNTESTED.",
     "A194 q231 EBE401C8 MATERIAL source-style rework script changed at 0dbc72b2c6c992c16115d40591e451c0d6181336; source original 29b87a5c..., previously rejected candidate dc08f74a...; Black TTC single flat face removes unwanted dark offset edges and red ONLINE bevel, guard preserves protected LAN and strict source bbox. GitHub Actions 37767491356 still IN_PROGRESS at 20:18 KST, candidate NOT PUBLISHED / QA NOT RUN. Do NOT count as new DDS, PASS or new scoreboard point. Keep q231 REWORK until actual final DDS exact SHA and native SOURCE/CLEAN/FINAL plus RAW/50% producer QA; then independent C1 and C3. RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json",
     "C300 C2 EVEN q98 42E618FD: C3 native DXT5 vs exact English independently identifies striped/dotted Korean white face absent in smooth English source. C126 machine PASS superseded; current candidate preserved; A/B material glyph-face+outline reconstruction then fresh C2 and C3 required. Evidence localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
@@ -11817,5 +11818,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json",
     "execution_backend": "GitHub SSOT + ChatGPT-local V8 pixel decode; N100 MCP only exact-hash large-file transfer and tiny triage script after GPT local raw GitHub DNS failure"
+  },
+  "c302_c2_q236_four_native_region_audit": {
+    "run_key": "OUTRUN-KOR-C302-C2-Q236-FOUR-NATIVE-REGIONS-20261008-2056",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "independent_native_regions": 4,
+    "total_source_regions": 14,
+    "subset_containment": "4/4 alpha>16 native source bbox positive-margin PASS; no changed RGBA/alpha outside original horizontal source-region extents within examined row bands",
+    "legacy_C": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "C3": "HOLD_STRICT_RECHECK",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "report": "localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json",
+    "execution_backend": "GitHub SSOT + ChatGPT-local JavaScript targeted RAW DDS pixels, N100 fallback only hashed DDS transfer and short triage due local raw GitHub DNS failure"
   }
 }
