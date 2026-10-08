@@ -1,0 +1,9 @@
+{
+  "index": 172,
+  "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "current_status": "c291_c2_rework_required_b255_source_gold_bevel_family",
+  "next_action": "MATERIAL_REWORK",
+  "repeated_root_causes": [],
+  "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+  "runtime_validation": "UNTESTED"
+}
