@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "review_id": "C305-C1-Q055-C3-STRICT-AUDIT",
+  "run_key": "OUTRUN-KOR-C305-C1-Q055-NATIVE-C3-HOLD-20261008",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "prior_C_record": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_MACHINE_QA.json",
+  "historic_C": "C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_INGAME; historic only, not a current evidence-gate approval",
+  "C3_review_identity": "C305 C1 same assistant separate inspection (not a different person)",
+  "native_machine_source": "NEW_C305_EXACT_DDS_MEASUREMENT",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "triage": "VALIDATION_ONLY",
+  "decision": "HOLD_STRICT_RECHECK",
+  "machine": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "dds": "DXT5 1 mip",
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "source_bbox_raw": [
+      1,
+      8,
+      1090,
+      151
+    ],
+    "candidate_bbox_raw": [
+      9,
+      16,
+      890,
+      143
+    ],
+    "source_bbox_readable": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "candidate_bbox_readable": [
+      9,
+      113,
+      890,
+      240
+    ],
+    "source_positive_alpha_pixels": 116439,
+    "candidate_positive_alpha_pixels": 88589,
+    "alpha_outside_source_bbox": 0,
+    "visible_rgb_changes_outside_bbox": 0,
+    "raw_rgba_changes_outside_bbox": 0,
+    "bc3_changed_blocks": 9509,
+    "bc3_blocks_wholly_outside_source": 0,
+    "source_size_ceiling": "PASS_NARROWER",
+    "candidate_contained": true
+  },
+  "segment_inventory": {
+    "identified_segments": [
+      {
+        "id": "next_round_title",
+        "source": "NEXT ROUND",
+        "korean": "다음 라운드",
+        "source_bbox_raw": [
+          1,
+          8,
+          1090,
+          151
+        ],
+        "candidate_bbox_raw": [
+          9,
+          16,
+          890,
+          143
+        ]
+      }
+    ],
+    "song_or_protected": "None visually evident in this title-only sprite; comprehensive source catalog not separately revalidated"
+  },
+  "c3_region_observations": {
+    "next_round_title": {
+      "slant": {
+        "status": "INCOMPLETE",
+        "observation": "Readable source and Korean both display right-leaning treatment; no independently measured top-minus-bottom per-glyph x offsets/padded source-derived numeric anchor chart"
+      },
+      "clean_plate": {
+        "status": "HOLD",
+        "observation": "Existing producer C224 clean-plate JPG shows empty transparent title region, but new authenticated exact native DDS->clean mask validation and independent lossless CLEAN are not part of 18 images"
+      },
+      "style": {
+        "status": "NO_NEW_FAIL_PROVEN",
+        "observation": "Source and current display cyan/white/blue gradient with white/navy edges; composite black/gray/white current views show no obvious new mismatched effects; this is not calibrated style PASS"
+      },
+      "readability": {
+        "status": "OBSERVED_WITH_LIMITATIONS",
+        "observation": "Korean '다음 라운드' legible at native and practical 75/50 on gray; game context/screen scaling untested"
+      },
+      "glyph_integrity": {
+        "status": "NO_VISIBLE_FAIL_PROVEN",
+        "observation": "No evident broken glyph at native or 50%; no new padded affine pre/post glyph audit"
+      },
+      "protected_art": {
+        "status": "MACHINE_OUTSIDE_PASS",
+        "observation": "New independent decoded DDS RGBA/alpha outside source bbox =0; source is title-only atlas, full protected segment inventory not certified"
+      },
+      "placement": {
+        "status": "MACHINE_PASS_VISUAL_FAVORABLE",
+        "observation": "Source bbox [1,105,1090,248]; localized [9,113,890,240], left/top/bottom 8px, right margin 200px; source-left hierarchy retained, size not artificially forced to match English width"
+      },
+      "orientation": {
+        "status": "NATIVE_AND_RAW_REVIEW",
+        "observation": "DXT5 RAW source/current and FLIP-Y readable images visually compared, no reversed orientation; exact DDS HEADER PASS"
+      }
+    }
+  },
+  "evidence": {
+    "manifest": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/C305_Q055_SHA_MANIFEST.json",
+    "new_independent_machine_report": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/C305_Q055_NATIVE_MACHINE.json",
+    "lossless_pngs": 18,
+    "producer_source_clean_final": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_CLEAN_FINAL_READABLE.jpg"
+  },
+  "calibration": "NOT_COMPLETED; reviewer read previous queue verdict before viewing pixels",
+  "first_look_pixels_before_producer": "FALSE",
+  "separate_c3_observations": "RECORDED_WITH_HOLDS",
+  "mips": "single mip1 decoded; no additional levels",
+  "missing": [
+    "five-control blind known-defect calibration (source/labels/reject controls)",
+    "independent authenticated exact source-CLEAN-FINAL per-region lossless with masks",
+    "per-glyph measured slant anchors/reference family profile",
+    "qualified C3 and C observations plus current evidence-gate validator"
+  ],
+  "current_policy_approval": "BLOCKED",
+  "C3_STRICT_PASS": false,
+  "PRE_INGAME": "BLOCKED",
+  "user_image_review": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0
+}

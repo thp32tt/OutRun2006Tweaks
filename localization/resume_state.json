@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C305 C1 q055 18 native lossless views and exact DXT5 scope QA published; historical C224 C PASS retained but C3 strict HOLD until blind calibration, native clean/anchor/family profile, current evidence validator; user JPG and actual in-game still UNTESTED. No repeat exact q055 C3 evidence without new inputs.",
     "B270/B271 q098 42E618FD: 54 independent source/clean/final native+RAW+50% plate/composite lossless PNG produced and SHA-bound to B269 1d63cd9b...; no outside pixels. B271 1994820e... core whitening erased original navy outline despite machine PASS; controller VISUAL FAIL, rollback B269 exact SHA 1d63cd9b... (also HOLD for residual micro-perforations). Need white/navy per-pixel boundary-preserving method, fresh B producer QA then C2+C3; never promote B271, no in-game test.",
     "C304 C2 EVEN q236 source/candidate exact SHA new complete 14/14 native per-region bbox and 0 RGBA/alpha changed outside source cells in all examined Y bands, 14-row contact and machine JSON now GitHub. Previous C302 covered 4; C304 newly covers 10 and independently confirms total 14. HOLD C3 current-policy until SHA-bound CLEAN, qualified blind calibration, source-family/stem slant, RAW and 100/75/50 native BGW, full atlas/mip evidence, independent APPROVALS; do not repeat same native numeric proof or rerender identical DDS. Evidence localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C303 C1 q231 A194 current SHA visually corrected but HOLD strict new-policy calibrated native pixel/slant/family/C3; q059 historic C279 44 lossless PNG evidence now GitHub-persisted, HOLD strict without new APPROVALS, PJR-019 user JPG/game retest OPEN.",
@@ -11912,5 +11913,39 @@
     "status": "REWORK_REQUIRED",
     "report": "localization/graphics/role_B/20261008-B270-Q098-PLATE-COMPOSITE-GATE/B270_B271_CONTROLLER_SELF_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c305_c1_q055_new_native_c3_hold": {
+    "run_key": "OUTRUN-KOR-C305-C1-Q055-NATIVE-C3-HOLD-20261008",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 55,
+    "selected_since_no_fresh_odd_C": true,
+    "decision": "HOLD_STRICT_RECHECK",
+    "C224_prior_C_static": "PASS_HISTORICAL",
+    "independent_new_native_DDS_metrics": {
+      "source_bbox_raw": [
+        1,
+        8,
+        1090,
+        151
+      ],
+      "candidate_bbox_raw": [
+        9,
+        16,
+        890,
+        143
+      ],
+      "rgba_outside": 0,
+      "alpha_outside": 0,
+      "visible_rgb_outside": 0,
+      "bc3_blocks_wholly_outside": 0
+    },
+    "new_lossless_PNG": 18,
+    "files": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT",
+    "added_DDS": 0,
+    "new_C3_pass": 0,
+    "current_approval": false,
+    "runtime_validation": "UNTESTED"
   }
 }

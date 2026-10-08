@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "independent_run": "C305_C1_Q055_C3_NativeScope",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "size": [
+    2048,
+    256
+  ],
+  "mode": "DXT5 mip1",
+  "header_exact": true,
+  "source_alpha_positive_bbox_raw": [
+    1,
+    8,
+    1090,
+    151
+  ],
+  "candidate_alpha_positive_bbox_raw": [
+    9,
+    16,
+    890,
+    143
+  ],
+  "source_bbox_readable": [
+    1,
+    105,
+    1090,
+    248
+  ],
+  "candidate_bbox_readable": [
+    9,
+    113,
+    890,
+    240
+  ],
+  "source_positive_alpha_pixels": 116439,
+  "candidate_positive_alpha_pixels": 88589,
+  "candidate_alpha_pixels_outside_source": 0,
+  "alpha_changed_outside_source": 0,
+  "visible_rgb_changed_outside_source": 0,
+  "any_rgba_changed_outside_source": 0,
+  "any_rgba_changed_total": 130768,
+  "source_effect_bbox_contained": true,
+  "candidate_visible_outside": 0,
+  "all_changed_bc3_blocks": 9509,
+  "bc3_blocks_wholly_outside_source": 0,
+  "files": [
+    {
+      "path": "source_readable_rgba.png",
+      "sha256": "886f70728e77ebd9190befc1929e2ce72568424f9e7962f60c71ef1cc9c2d5f7",
+      "bytes": 90122
+    },
+    {
+      "path": "source_raw_rgba.png",
+      "sha256": "3ae80a5c83bd3382e5ba6cbcc8917dc2944fac5755974a6bd75adb13aca3335c",
+      "bytes": 93703
+    },
+    {
+      "path": "source_readable_on_black.png",
+      "sha256": "16251a73934ae374061e2e195162d641681a452f3cf80f72733512b3f3a441ce",
+      "bytes": 79297
+    },
+    {
+      "path": "source_readable_on_gray.png",
+      "sha256": "74dfea2a9f0c25842519d88935f014ff98f79089f707b302b40e85f7281d52fb",
+      "bytes": 82790
+    },
+    {
+      "path": "source_readable_on_white.png",
+      "sha256": "1cdaa810263d29e80069c556c99c6743ddaa5b62bcbb3f62bc789186ec21470d",
+      "bytes": 92571
+    },
+    {
+      "path": "source_practical_100.png",
+      "sha256": "74dfea2a9f0c25842519d88935f014ff98f79089f707b302b40e85f7281d52fb",
+      "bytes": 82790
+    },
+    {
+      "path": "source_practical_75.png",
+      "sha256": "1e6779420296e2f375aae10fc0cbed3354e3f9bf1c1b217a8ac3ee0aa462dd3a",
+      "bytes": 94513
+    },
+    {
+      "path": "source_practical_50.png",
+      "sha256": "8cba70b1e57f8541aff021af3ff1a9e0105e0d5d69b8a7a5ff7d024d038c73da",
+      "bytes": 51998
+    },
+    {
+      "path": "candidate_readable_rgba.png",
+      "sha256": "0dc25a76b4d9a528150ce91038ecbe177e3a06384469dd4a172749bf420e192e",
+      "bytes": 56076
+    },
+    {
+      "path": "candidate_raw_rgba.png",
+      "sha256": "da0f4562eedf57934fa6cf5cf7f4b79338d56373827b690814b0cef1086ee0c2",
+      "bytes": 58262
+    },
+    {
+      "path": "candidate_readable_on_black.png",
+      "sha256": "d675b15cdfb87e270d9dd6c80870e0418ea8f997be18f0a7fe5c116dedaf0efb",
+      "bytes": 42699
+    },
+    {
+      "path": "candidate_readable_on_gray.png",
+      "sha256": "a68a5ccc39cbb70d35434adac93053074dc24afb1fdb54c9a38afb2a347377c5",
+      "bytes": 47480
+    },
+    {
+      "path": "candidate_readable_on_white.png",
+      "sha256": "a25fee5735464901f763dc9c62af11d31d5413272ede671c72c7a09f170f0cfb",
+      "bytes": 51762
+    },
+    {
+      "path": "candidate_practical_100.png",
+      "sha256": "a68a5ccc39cbb70d35434adac93053074dc24afb1fdb54c9a38afb2a347377c5",
+      "bytes": 47480
+    },
+    {
+      "path": "candidate_practical_75.png",
+      "sha256": "f529d075bb3735f2cb96ca657083f0beddfea7bfd3fa8f2d1be7251f3131d2a4",
+      "bytes": 48893
+    },
+    {
+      "path": "candidate_practical_50.png",
+      "sha256": "0aeefce387300219965fe1b7325ffc39ac88e5598e51f6ccc4c2378307fbbd47",
+      "bytes": 27463
+    },
+    {
+      "path": "source_readable_bbox.png",
+      "sha256": "d6b6160d2b55e4b8b25013ccb3e07f24ddce6cdc09fdad83449d6501d1f56cfc",
+      "bytes": 82788
+    },
+    {
+      "path": "candidate_readable_bbox.png",
+      "sha256": "6828760832ef73193ec9f432b2c02181668e7fcfbe06c2df045c39e5d7a89327",
+      "bytes": 47664
+    }
+  ],
+  "review_limitation": "visible RGB only where either source/candidate alpha>0; hidden RGB outside not treated as visible residue"
+}

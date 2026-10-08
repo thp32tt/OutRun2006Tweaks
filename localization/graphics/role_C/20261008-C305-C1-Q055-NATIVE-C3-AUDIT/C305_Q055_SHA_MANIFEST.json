@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C305-C1-Q055-NATIVE-C3-HOLD-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "images": [
+    {
+      "name": "source_readable_rgba.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_readable_rgba.png",
+      "sha256": "886f70728e77ebd9190befc1929e2ce72568424f9e7962f60c71ef1cc9c2d5f7",
+      "github_blob_sha": "4bae1b1b7a2e2b69683f80ada596ffe37a94e014",
+      "bytes": 90122
+    },
+    {
+      "name": "source_raw_rgba.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_raw_rgba.png",
+      "sha256": "3ae80a5c83bd3382e5ba6cbcc8917dc2944fac5755974a6bd75adb13aca3335c",
+      "github_blob_sha": "9767568a28b228408431e86af96fa5a11976419d",
+      "bytes": 93703
+    },
+    {
+      "name": "source_readable_on_black.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_readable_on_black.png",
+      "sha256": "16251a73934ae374061e2e195162d641681a452f3cf80f72733512b3f3a441ce",
+      "github_blob_sha": "d12194744a7ce1087501e0073d9a5359c343f35e",
+      "bytes": 79297
+    },
+    {
+      "name": "source_readable_on_gray.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_readable_on_gray.png",
+      "sha256": "74dfea2a9f0c25842519d88935f014ff98f79089f707b302b40e85f7281d52fb",
+      "github_blob_sha": "3976bd9e18f5b2fd055f646dd8ef9a8e77ca5b79",
+      "bytes": 82790
+    },
+    {
+      "name": "source_readable_on_white.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_readable_on_white.png",
+      "sha256": "1cdaa810263d29e80069c556c99c6743ddaa5b62bcbb3f62bc789186ec21470d",
+      "github_blob_sha": "cf987f7903b04cde6b9aef97e158ff22af3fec57",
+      "bytes": 92571
+    },
+    {
+      "name": "source_practical_100.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_practical_100.png",
+      "sha256": "74dfea2a9f0c25842519d88935f014ff98f79089f707b302b40e85f7281d52fb",
+      "github_blob_sha": "3976bd9e18f5b2fd055f646dd8ef9a8e77ca5b79",
+      "bytes": 82790
+    },
+    {
+      "name": "source_practical_75.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_practical_75.png",
+      "sha256": "1e6779420296e2f375aae10fc0cbed3354e3f9bf1c1b217a8ac3ee0aa462dd3a",
+      "github_blob_sha": "c3fb04143d217d2e44c545202942d5cae0314692",
+      "bytes": 94513
+    },
+    {
+      "name": "source_practical_50.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_practical_50.png",
+      "sha256": "8cba70b1e57f8541aff021af3ff1a9e0105e0d5d69b8a7a5ff7d024d038c73da",
+      "github_blob_sha": "45e00f92be8bf92bab4b291d8706a0f821dcd191",
+      "bytes": 51998
+    },
+    {
+      "name": "candidate_readable_rgba.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_readable_rgba.png",
+      "sha256": "0dc25a76b4d9a528150ce91038ecbe177e3a06384469dd4a172749bf420e192e",
+      "github_blob_sha": "99e83b53072ec0c2863e1b7d1481daaaf0f93285",
+      "bytes": 56076
+    },
+    {
+      "name": "candidate_raw_rgba.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_raw_rgba.png",
+      "sha256": "da0f4562eedf57934fa6cf5cf7f4b79338d56373827b690814b0cef1086ee0c2",
+      "github_blob_sha": "422236f405fcb7728fa244fed176dfea8cde60ca",
+      "bytes": 58262
+    },
+    {
+      "name": "candidate_readable_on_black.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_readable_on_black.png",
+      "sha256": "d675b15cdfb87e270d9dd6c80870e0418ea8f997be18f0a7fe5c116dedaf0efb",
+      "github_blob_sha": "a1a5868dc3bce73252b4a0b25b7864e2808ed728",
+      "bytes": 42699
+    },
+    {
+      "name": "candidate_readable_on_gray.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_readable_on_gray.png",
+      "sha256": "a68a5ccc39cbb70d35434adac93053074dc24afb1fdb54c9a38afb2a347377c5",
+      "github_blob_sha": "01018157225afeba030966cb7171e9154cc1dabd",
+      "bytes": 47480
+    },
+    {
+      "name": "candidate_readable_on_white.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_readable_on_white.png",
+      "sha256": "a25fee5735464901f763dc9c62af11d31d5413272ede671c72c7a09f170f0cfb",
+      "github_blob_sha": "29217465c4ca01b6d6e98d3de2e538f06b468378",
+      "bytes": 51762
+    },
+    {
+      "name": "candidate_practical_100.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_practical_100.png",
+      "sha256": "a68a5ccc39cbb70d35434adac93053074dc24afb1fdb54c9a38afb2a347377c5",
+      "github_blob_sha": "01018157225afeba030966cb7171e9154cc1dabd",
+      "bytes": 47480
+    },
+    {
+      "name": "candidate_practical_75.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_practical_75.png",
+      "sha256": "f529d075bb3735f2cb96ca657083f0beddfea7bfd3fa8f2d1be7251f3131d2a4",
+      "github_blob_sha": "e2e4de2ad1d54305dd34bc06b19f2303b46926fe",
+      "bytes": 48893
+    },
+    {
+      "name": "candidate_practical_50.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_practical_50.png",
+      "sha256": "0aeefce387300219965fe1b7325ffc39ac88e5598e51f6ccc4c2378307fbbd47",
+      "github_blob_sha": "48fa3fac629faa9cfaae13b612de4e78382aecb5",
+      "bytes": 27463
+    },
+    {
+      "name": "source_readable_bbox.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/source_readable_bbox.png",
+      "sha256": "d6b6160d2b55e4b8b25013ccb3e07f24ddce6cdc09fdad83449d6501d1f56cfc",
+      "github_blob_sha": "e3ada04e575bc96092f94a0926307cad0a79f25b",
+      "bytes": 82788
+    },
+    {
+      "name": "candidate_readable_bbox.png",
+      "path": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT/candidate_readable_bbox.png",
+      "sha256": "6828760832ef73193ec9f432b2c02181668e7fcfbe06c2df045c39e5d7a89327",
+      "github_blob_sha": "1c77d914519c376af8828bdef989398ad37867f9",
+      "bytes": 47664
+    }
+  ],
+  "source": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "provenance": "New independent exact DXT5 decode image evidence; hosted to N100 MCP fallback because source/candidate DDS not locally mountable and raw GitHub DNS unavailable",
+  "no_dds_changes": true,
+  "approval": "NOT_GRANTED"
+}

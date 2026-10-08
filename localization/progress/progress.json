@@ -7846,5 +7846,39 @@
     "status": "REWORK_REQUIRED",
     "report": "localization/graphics/role_B/20261008-B270-Q098-PLATE-COMPOSITE-GATE/B270_B271_CONTROLLER_SELF_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c305_c1_q055_new_native_c3_hold": {
+    "run_key": "OUTRUN-KOR-C305-C1-Q055-NATIVE-C3-HOLD-20261008",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 55,
+    "selected_since_no_fresh_odd_C": true,
+    "decision": "HOLD_STRICT_RECHECK",
+    "C224_prior_C_static": "PASS_HISTORICAL",
+    "independent_new_native_DDS_metrics": {
+      "source_bbox_raw": [
+        1,
+        8,
+        1090,
+        151
+      ],
+      "candidate_bbox_raw": [
+        9,
+        16,
+        890,
+        143
+      ],
+      "rgba_outside": 0,
+      "alpha_outside": 0,
+      "visible_rgb_outside": 0,
+      "bc3_blocks_wholly_outside": 0
+    },
+    "new_lossless_PNG": 18,
+    "files": "localization/graphics/role_C/20261008-C305-C1-Q055-NATIVE-C3-AUDIT",
+    "added_DDS": 0,
+    "new_C3_pass": 0,
+    "current_approval": false,
+    "runtime_validation": "UNTESTED"
   }
 }
