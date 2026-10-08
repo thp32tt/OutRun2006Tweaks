@@ -39,10 +39,41 @@ Each command means:
 - Use `.github/workflows/localization-cpu-worker.yml` plus the role slot in `tools/localization/cpu_jobs/` for heavy repo-backed candidate/evidence generation.
 - N100 heavy-Python execution is fallback-only and must record why off-host compute was not usable.
 
-## Scheduler mapping
+## Effective Docker scheduler mapping — confirmed 2026-10-09
 
-- :00 -> `OutRun 한글화 A 실행`
-- :20 -> `OutRun 한글화 B 실행`
-- :40 -> `OutRun 한글화 C 실행`
+The running N100 Docker controller `outrun-chat-controller-localization-recovery`
+was inspected in-place on 2026-10-09 01:50 KST: `auto_send=true`,
+`controller_mode=localization`, `schedule_minutes=[0,10,20,30,40,50]`,
+and the latest active tick sent dedicated slot D (C2). Its internal
+`prompt_for_slot` produces the source-contract-first prompts shown below.
+The Docker image need not be rebuilt for ordinary **GitHub contract** updates
+because every launch prompt requires the latest branch policy first.
 
-This file is a controller entry map only. The automation contract is authoritative.
+- :00 -> Docker slot A -> `OutRun 한글화 A 실행` (production, odd)
+- :10 -> Docker slot C -> `OutRun 한글화 C 실행`, **C1**, odd-index and unindexed special QA
+- :20 -> Docker slot D -> `OutRun 한글화 C 실행`, **C2**, even-index QA
+- :30 -> Docker slot B -> `OutRun 한글화 B 실행` (production, even)
+- :40 -> Docker slot C -> **C1**, odd-index/unindexed special QA
+- :50 -> Docker slot D -> **C2**, even-index QA
+
+**Required current GitHub policy references**:
+`docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md`,
+`docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md`,
+`docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md`,
+`docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md`,
+`localization/graphics/INGAME_REWORK_BACKLOG.csv`,
+`localization/graphics/asset_queue.csv` and
+`tools/localization/rework_triage.py`.
+
+October 9 real-game failures `IGR-026..044` supersede historical C3 verdicts.
+Use `OPEN_USER_INGAME_FAIL` before generic work: nine reopened queue items
+and source-mapping holds must remain blocked from approval and preview until
+actual material repair, independent C/C3, and a new user-confirmed in-game test.
+No policy logic is copied into Docker slot prompts; only routing instructions
+and the authoritative GitHub contract path remain there. This file and
+`localization/controller_roles.json` are documentation/metadata; the actual
+live Docker config was verified separately. The contract takes precedence.
+
+The temporary six-launch mode stays in place until the contract's C-backlog
+relief exit condition or explicit user instruction restores the baseline.
+
