@@ -115,6 +115,14 @@ def check_extra_producers(ui, contracts):
             'Game::SpritePriorityCount', 'Module::exe_ptr(helperRva)',
             'original();', 'TagAppendedNodes(before,',
             'RenderScope::ScreenHud')
+    # There are two intentionally different original components on the GOAL
+    # screen (likely course/stage label and recorded time). Do not interpret
+    # adjacent E8 calls as the same white timer emitted twice; either
+    # suppressing one or executing either one twice corrupts original UI.
+    if goal.count('original();') != 1 or 'return;' in goal:
+        fail('each GOAL helper must execute its original once, without skipping')
+    if goal.count('TagAppendedNodes(before,') != 1:
+        fail('GOAL helper must preserve one sibling ownership publication')
     if 'ScopedProducerSemantic' in goal and 'Current R84 queue authority' not in goal:
         fail('retired goal producer scope API reintroduced')
     for suffix, helper in (('A', '020'), ('B', '150')):
@@ -380,6 +388,12 @@ def test_mutations(ui, manifest):
     must_fail('goal 150 retargeted to 020',
               ui.replace('GoalTime_TagHelper(0xBE150);',
                          'GoalTime_TagHelper(0xBE020);', 1))
+    must_fail('original course/time helper called twice',
+              ui.replace('original();\n\t\t// Both original GOAL helpers',
+                         'original();\n\t\toriginal();\n\t\t// Both original GOAL helpers', 1))
+    must_fail('original course/time helper skipped',
+              ui.replace('original();\n\t\t// Both original GOAL helpers',
+                         'return;\n\t\t// Both original GOAL helpers', 1))
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
     must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
