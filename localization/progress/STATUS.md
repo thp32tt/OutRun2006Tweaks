@@ -2802,3 +2802,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 
 ### 2026-10-08 C275 C2 q172 hard visual/protected-pixel FAIL
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN: q172 6C9B3611 final 51a636b1… vs canonical source d5f4a36d… has **425 visible changed opaque RGB pixels outside** exact START/GOAL original source glyph region rectangles; outside alpha delta=0 but nonzero-alpha rendered colors still differ. RAW/FLIP-Y exact. Current display legibility is insufficient; q172 REWORK_REQUIRED, C3/export blocked. No DDS change; RUNTIME_VALIDATION=UNTESTED.
+
+
+### B251 q172 canonical-boundary restore — 2026-10-08 11:36 KST
+- q172 6C9B3611: C275's 425 visible source-scope overflow pixels removed by canonical-source-base reconstruction; B248 localized interior preserved byte-exact.
+- Exact candidate 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018: source-vs-final outside/alpha outside = 0/0, B248-vs-final inside allowed = 0, RGBA32 mip1 RAW mirror-Y exact; producer visual QA PASS.
+- Pending fresh pixels-first C2 + separate C3/evidence, PRE_INGAME/user JPG and NEW in-game validation. RUNTIME_VALIDATION=UNTESTED.

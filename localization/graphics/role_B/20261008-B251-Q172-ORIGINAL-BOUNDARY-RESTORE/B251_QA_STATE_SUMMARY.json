@@ -1,0 +1,40 @@
+{
+  "source": "localization/graphics/asset_queue.csv",
+  "queue_total": 137,
+  "localize_text_total": 94,
+  "current_status_counts": {
+    "declared_c_pass_not_final_approval": 73,
+    "pending_c": 11,
+    "hold_strict_recheck": 4,
+    "declared_preserve_original": 3,
+    "rework_required": 3
+  },
+  "members": {
+    "pending_c": [
+      35,
+      99,
+      103,
+      119,
+      172,
+      195,
+      217,
+      225,
+      227,
+      231,
+      237
+    ],
+    "hold_strict_recheck": [
+      59,
+      154,
+      161,
+      176
+    ],
+    "rework_required": [
+      175,
+      214,
+      219
+    ]
+  },
+  "runtime_validation": "UNTESTED",
+  "note": "Declared C PASS is not evidence-policy approval, user acceptance or runtime completion."
+}

@@ -1,0 +1,13 @@
+{
+  "role": "B",
+  "run": "20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE",
+  "queue_index": 172,
+  "asset": "6C9B3611",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+  "report": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_CONTROLLER_SELF_QA.json",
+  "family_profile": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_FAMILY_PROFILE.json",
+  "status": "SELF_QA_PASS_PENDING_FRESH_C2_C3",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "family_id": "sumo_fe_start_goal_red_badge",
+  "timestamp_kst": "2026-10-08T11:36:10+09:00",
+  "queue_index": 172,
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+  "source_derived_profile": {
+    "shared_family": "START/GOAL red route-map badges",
+    "source_characteristics": "compact pale/cream face with warm orange shadow on red badge, readable right lean, high vertical occupancy, white rim and route artwork protected",
+    "geometry_policy": "canonical source text/effect rectangles are hard ceilings; preserve positive margins for localized glyph/effect pixels and never modify opaque badge/rim/art beyond them",
+    "transform_policy": "match source right-lean visually; do not force a universal shear or arbitrary English-width percentage",
+    "reference_q172_b251": "B251 preserves the already-legible B248 interior exactly while making the surrounding badge source-exact",
+    "related_visual_reference": "q214 BF229CF4 same-family START/GOAL is a visual family reference only and requires its own source-derived sizing/BC3-resistant render"
+  },
+  "regions": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "retained_localized_bbox": [
+        66,
+        374,
+        125,
+        395
+      ]
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "retained_localized_bbox": [
+        613,
+        636,
+        653,
+        658
+      ]
+    }
+  ],
+  "evidence": {
+    "source_current_final": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_SOURCE_B248_FINAL.jpg",
+    "boundary": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_BOUNDARY_CONTACT.png",
+    "practical": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_PRACTICAL_100_75_50.jpg",
+    "raw_readable": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_RAW_READABLE.jpg",
+    "backgrounds": "localization/graphics/role_B/20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE/B251_BLACK_WHITE_GRAY.png"
+  },
+  "runtime_validation": "UNTESTED"
+}

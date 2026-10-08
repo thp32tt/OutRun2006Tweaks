@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "run": "20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE",
+  "role": "B",
+  "timestamp_kst": "2026-10-08T11:36:10+09:00",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "base_head_at_selection": "a4cf8793ee913cb0c3aadf5d212e591dbc44de7c",
+  "selection_reason": "B primary EVEN shard direct C275 REWORK_REQUIRED. C275 found 425 fully visible canonical-source-vs-B248 RGB changes outside exact START/GOAL source regions; q214 was also actionable but q172 had a deterministic zero-overflow repair using exact source/current bytes.",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
+  },
+  "prior_candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+  "construction": {
+    "method": "Use exact canonical source DDS as the base; transplant the exact prior B248 RGBA32 bytes only inside the canonical START [55,373,136,396] and GOAL [595,635,672,659] readable source text/effect rectangles, converting to RAW mirror-Y row coordinates for byte replacement.",
+    "typography": "No glyph rerender, scaling, or arbitrary English-width stretch. B248 출발/골 pixels are retained byte-exact inside the two source regions because C275 judged them legible/right-leaning; only the erroneous plate/background edits outside those regions are removed.",
+    "source_outside_preservation": "Every pixel outside the two canonical source rectangles is byte-identical to the pinned English source DDS."
+  },
+  "source_bboxes": {
+    "start": [
+      55,
+      373,
+      136,
+      396
+    ],
+    "goal": [
+      595,
+      635,
+      672,
+      659
+    ]
+  },
+  "retained_b248_metrics": {
+    "start": {
+      "localized_bbox": [
+        66,
+        374,
+        125,
+        395
+      ],
+      "localized_size": [
+        59,
+        21
+      ],
+      "source_size": [
+        81,
+        23
+      ],
+      "width_ratio_pct": 72.84,
+      "height_ratio_pct": 91.3,
+      "margins": [
+        11,
+        11,
+        1,
+        1
+      ]
+    },
+    "goal": {
+      "localized_bbox": [
+        613,
+        636,
+        653,
+        658
+      ],
+      "localized_size": [
+        40,
+        22
+      ],
+      "source_size": [
+        77,
+        24
+      ],
+      "width_ratio_pct": 51.95,
+      "height_ratio_pct": 91.67,
+      "margins": [
+        18,
+        19,
+        1,
+        1
+      ]
+    }
+  },
+  "machine_qa": {
+    "format": "RGBA32",
+    "size": [
+      1024,
+      1024
+    ],
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "source_vs_final_changed_outside_exact_rectangles": 0,
+    "source_vs_final_alpha_changed_outside_exact_rectangles": 0,
+    "final_vs_b248_changed_inside_exact_rectangles": 0,
+    "source_vs_final_changed_inside_exact_rectangles": 3541,
+    "result": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_clean_plate_background": "PASS — canonical source bytes restored everywhere outside exact source text/effect rectangles; no broad reconstructed red plate remains.",
+    "2_slant": "PASS — prior B248 right-leaning localized pixels retained byte-exact; no new transform.",
+    "3_size_hierarchy": "PASS — prior B248 localized geometry retained byte-exact; no arbitrary English-width stretch introduced.",
+    "4_weight_outline_shadow": "PASS — prior pale-face/orange-shadow badge treatment retained inside allowed regions; no new effect.",
+    "5_clipping": "PASS — B248 localized bboxes retain positive margins inside canonical source rectangles.",
+    "6_protected_art": "PASS — source-vs-final outside exact rectangles = 0 pixels; route map, rims, photos, logo and red plate outside source regions are canonical-source exact.",
+    "7_raw_flipy": "PASS — RGBA32 mip1 header exact; RAW mirror-Y/readable evidence inspected.",
+    "8_immediate_readability": "PASS — native and 100/75/50 practical evidence preserves readable 출발/골 while restoring source-exact surroundings."
+  },
+  "controller_visual_observations": [
+    "SOURCE/B248/B251 boundary contact shows the C275 plate/background spill removed while the B248 Korean label interiors remain visually unchanged.",
+    "At 100/75/50 practical scale, 출발 and 골 remain legible and retain the red-badge hierarchy; no new broken Hangul, clipping, residue, overlap or protected-art intrusion is visible.",
+    "RAW/readable comparison confirms the expected mirror-Y construction without orientation regression.",
+    "Black/white/gray composites show no alpha halo or background seam introduced by the boundary restoration."
+  ],
+  "controller_visual_qa": "PASS",
+  "status": "B251_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_INGAME_RETEST",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

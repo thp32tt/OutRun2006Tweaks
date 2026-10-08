@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "run": "20261008-B251-Q172-ORIGINAL-BOUNDARY-RESTORE",
+  "role": "B",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+  "dds": {
+    "size": [
+      1024,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "channel_order": "RGBA",
+    "raw_orientation": "mirror_y"
+  },
+  "repair": {
+    "method": "canonical source bytes as base; transplant prior B248 bytes only inside exact canonical START/GOAL source text/effect rectangles",
+    "source_bboxes": {
+      "start": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "goal": [
+        595,
+        635,
+        672,
+        659
+      ]
+    },
+    "preserves_prior_b248_inside_bboxes_byte_exact": true
+  },
+  "zero_pixel_gate": {
+    "source_vs_final_changed_outside_exact_rectangles": 0,
+    "alpha_changed_outside_exact_rectangles": 0,
+    "final_vs_b248_changed_inside_exact_rectangles": 0,
+    "changed_inside_vs_source": 3541,
+    "result": "PASS"
+  },
+  "regions": [
+    {
+      "id": "start",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "source_vs_final_changed_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "changed_pixels_vs_source": 1766,
+      "bbox_size": [
+        81,
+        23
+      ]
+    },
+    {
+      "id": "goal",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "source_vs_final_changed_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "changed_pixels_vs_source": 1775,
+      "bbox_size": [
+        77,
+        24
+      ]
+    }
+  ],
+  "legacy_b248_localized_metrics_retained_byte_exact": {
+    "start": {
+      "localized_bbox": [
+        66,
+        374,
+        125,
+        395
+      ],
+      "localized_size": [
+        59,
+        21
+      ],
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ]
+    },
+    "goal": {
+      "localized_bbox": [
+        613,
+        636,
+        653,
+        658
+      ],
+      "localized_size": [
+        40,
+        22
+      ],
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ]
+    }
+  },
+  "runtime_validation": "UNTESTED"
+}
