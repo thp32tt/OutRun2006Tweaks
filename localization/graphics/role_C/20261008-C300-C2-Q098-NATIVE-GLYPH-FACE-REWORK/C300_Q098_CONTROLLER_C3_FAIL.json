@@ -84,5 +84,13 @@
   "reconstruction_required": "A/B: derive source smooth white face, navy outline, italic direction and original clean plate; remove DXT5/renderer-induced dotted glyph interiors while maintaining <= source exact bbox, protected art and native 100/75/50/RAW visual QA; then fresh independent C2 and separate C3.",
   "evidence_caveat": "Current independent lossless decoded pixels were visually examined in the controller but a lossless crop has not yet been persisted. Legacy JPEGs are supporting comparison only, not evidence-backed APPROVALS. Do not mark C3_STRICT_PASS or approved export.",
   "cleanup": "No persistent GPT scratch or N100 compute was created.",
-  "prohibited_domains_touched": []
+  "prohibited_domains_touched": [],
+  "independent_sha256_verification": {
+    "method": "Controller-local pure JavaScript SHA-256 over current GitHub base64 DDS bytes; separately fetched from each pinned repo/ref",
+    "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "source_expected_match": true,
+    "candidate_sha256": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+    "candidate_expected_match": true,
+    "each_binary_bytes": 262272
+  }
 }
