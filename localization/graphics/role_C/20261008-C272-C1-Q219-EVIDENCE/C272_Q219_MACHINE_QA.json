@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C272",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T10:21:21+09:00",
+  "queue_index": 219,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "independent_persisted_identity": {
+    "result": "PASS",
+    "width": 2048,
+    "height": 2048,
+    "pixel_format": "RGB32",
+    "mipmaps": 1,
+    "file_size": 16777344,
+    "sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+    "evidence_source": "N100 MCP inspect_dds against current Git branch material"
+  },
+  "exact_geometry_bound_to_same_candidate": {
+    "source_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "source_size": [
+      1467,
+      118
+    ],
+    "localized_bbox": [
+      152,
+      1018,
+      1326,
+      1121
+    ],
+    "localized_size": [
+      1174,
+      103
+    ],
+    "positive_margins": {
+      "left": 146,
+      "right": 147,
+      "top": 7,
+      "bottom": 8
+    },
+    "producer_report": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_REPORT.json",
+    "producer_report_zero_scope": {
+      "changed_outside_source_bbox": 0,
+      "alpha_changed_outside_source_bbox": 0
+    },
+    "note": "Geometry/scope figures are exact-candidate producer evidence and are retained as context. C272 does not use them to override the visual failure."
+  },
+  "result": "IDENTITY_AND_GEOMETRIC_CONTEXT_PASS_VISUAL_GATE_FAILS",
+  "runtime_validation": "UNTESTED"
+}
