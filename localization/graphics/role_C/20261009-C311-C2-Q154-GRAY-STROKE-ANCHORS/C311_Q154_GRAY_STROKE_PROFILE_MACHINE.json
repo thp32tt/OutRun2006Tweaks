@@ -1,0 +1,323 @@
+{
+  "run": "C311-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "triage": {
+    "index": 154,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "current_status": "c306_c2_hold_gray_native30_pending_calibration",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "exact_shas": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "final": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "native_dimensions": [
+    4096,
+    1024
+  ],
+  "outside_8_full_atlas": {
+    "SOURCE_CLEAN": {
+      "rgba_outside_8": 0,
+      "alpha_outside_8": 0
+    },
+    "CLEAN_FINAL": {
+      "rgba_outside_8": 0,
+      "alpha_outside_8": 0
+    },
+    "SOURCE_FINAL": {
+      "rgba_outside_8": 0,
+      "alpha_outside_8": 0
+    }
+  },
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "bbox_readable": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source": {
+        "visible_bbox_local_gt128": [
+          1,
+          0,
+          586,
+          64
+        ],
+        "pixel_gt0": 19100,
+        "pixel_gt128": 17703,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 16263,
+        "ridge_radius_median_px": 6.3246,
+        "ridge_radius_q25_q75": [
+          6.0,
+          7.0
+        ],
+        "interior_distance_median_px": 3.1623,
+        "connected_ink_components": 11,
+        "horizontal_centroid_px": 286.598,
+        "vertical_centroid_px": 31.83,
+        "black_ink_fill_frac_bbox": 0.4728,
+        "face_1px_edge_pixels": 2951,
+        "ink_bbox_margin_from_roi": [
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      "korean_exact_dds": {
+        "visible_bbox_local_gt128": [
+          3,
+          3,
+          413,
+          61
+        ],
+        "pixel_gt0": 13360,
+        "pixel_gt128": 9898,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 8663,
+        "ridge_radius_median_px": 3.0,
+        "ridge_radius_q25_q75": [
+          3.0,
+          5.0
+        ],
+        "interior_distance_median_px": 2.0,
+        "connected_ink_components": 13,
+        "horizontal_centroid_px": 213.323,
+        "vertical_centroid_px": 31.711,
+        "black_ink_fill_frac_bbox": 0.4162,
+        "face_1px_edge_pixels": 2547,
+        "ink_bbox_margin_from_roi": [
+          3,
+          174,
+          3,
+          3
+        ]
+      },
+      "measurements": {
+        "median_radius_ratio": 0.4743,
+        "visible_height_ratio": 0.9062,
+        "visible_width_ratio": 0.7009,
+        "opaque_color_rgb_equal": true,
+        "clean_alpha_nonzero": 0
+      },
+      "stroke_map_native": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/06_single_player_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "b8f1a68c9a6bb42c599db9a1fd71e30e8f68094bd28a058f6a6b46d1b2c32461"
+      },
+      "stroke_map_zoom200": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/06_single_player_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "1c4beb4cbe6d9a138e322bbde5c462afa8014ed383b26f0a93cb3c3d66e5419e"
+      },
+      "disclaimer": "EDT local-maxima radius and components are nonsemantic optical proxies, not proof of matching glyph anatomy or slant; do not auto-PASS."
+    },
+    {
+      "id": "07_showroom_gray",
+      "english": "SHOWROOM",
+      "korean": "쇼룸",
+      "bbox_readable": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source": {
+        "visible_bbox_local_gt128": [
+          1,
+          1,
+          419,
+          61
+        ],
+        "pixel_gt0": 15231,
+        "pixel_gt128": 13912,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 12826,
+        "ridge_radius_median_px": 6.4031,
+        "ridge_radius_q25_q75": [
+          6.0,
+          7.0
+        ],
+        "interior_distance_median_px": 3.0,
+        "connected_ink_components": 8,
+        "horizontal_centroid_px": 214.052,
+        "vertical_centroid_px": 30.204,
+        "black_ink_fill_frac_bbox": 0.5547,
+        "face_1px_edge_pixels": 2345,
+        "ink_bbox_margin_from_roi": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "korean_exact_dds": {
+        "visible_bbox_local_gt128": [
+          2,
+          3,
+          212,
+          58
+        ],
+        "pixel_gt0": 6628,
+        "pixel_gt128": 5287,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 4564,
+        "ridge_radius_median_px": 3.0,
+        "ridge_radius_q25_q75": [
+          3.0,
+          4.0
+        ],
+        "interior_distance_median_px": 2.0,
+        "connected_ink_components": 4,
+        "horizontal_centroid_px": 120.422,
+        "vertical_centroid_px": 31.486,
+        "black_ink_fill_frac_bbox": 0.4577,
+        "face_1px_edge_pixels": 1350,
+        "ink_bbox_margin_from_roi": [
+          2,
+          208,
+          3,
+          4
+        ]
+      },
+      "measurements": {
+        "median_radius_ratio": 0.4685,
+        "visible_height_ratio": 0.9167,
+        "visible_width_ratio": 0.5024,
+        "opaque_color_rgb_equal": true,
+        "clean_alpha_nonzero": 0
+      },
+      "stroke_map_native": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/07_showroom_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "edf3e1f4ba6c8d73dfc692e901fdb363e202317b707ec560ad3f399b7d6c9d2a"
+      },
+      "stroke_map_zoom200": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/07_showroom_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "d281b7148fb67def1a39d691f3c2cec32be8f66cefded1c5a51b035dd0e7475e"
+      },
+      "disclaimer": "EDT local-maxima radius and components are nonsemantic optical proxies, not proof of matching glyph anatomy or slant; do not auto-PASS."
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "bbox_readable": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source": {
+        "visible_bbox_local_gt128": [
+          0,
+          0,
+          519,
+          61
+        ],
+        "pixel_gt0": 17402,
+        "pixel_gt128": 16291,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 14773,
+        "ridge_radius_median_px": 7.0,
+        "ridge_radius_q25_q75": [
+          6.0,
+          7.0
+        ],
+        "interior_distance_median_px": 4.0,
+        "connected_ink_components": 10,
+        "horizontal_centroid_px": 252.491,
+        "vertical_centroid_px": 29.278,
+        "black_ink_fill_frac_bbox": 0.5146,
+        "face_1px_edge_pixels": 2445,
+        "ink_bbox_margin_from_roi": [
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "korean_exact_dds": {
+        "visible_bbox_local_gt128": [
+          2,
+          2,
+          366,
+          60
+        ],
+        "pixel_gt0": 12757,
+        "pixel_gt128": 9473,
+        "face_rgb_median": [
+          78,
+          96,
+          100
+        ],
+        "alpha_245_count": 8262,
+        "ridge_radius_median_px": 4.0,
+        "ridge_radius_q25_q75": [
+          3.0,
+          5.0
+        ],
+        "interior_distance_median_px": 2.0,
+        "connected_ink_components": 12,
+        "horizontal_centroid_px": 179.734,
+        "vertical_centroid_px": 29.355,
+        "black_ink_fill_frac_bbox": 0.4487,
+        "face_1px_edge_pixels": 2421,
+        "ink_bbox_margin_from_roi": [
+          2,
+          154,
+          2,
+          2
+        ]
+      },
+      "measurements": {
+        "median_radius_ratio": 0.5714,
+        "visible_height_ratio": 0.9508,
+        "visible_width_ratio": 0.7013,
+        "opaque_color_rgb_equal": true,
+        "clean_alpha_nonzero": 0
+      },
+      "stroke_map_native": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/08_multiplayer_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "05dade70a22611be5fc4e76de9e5d8ecfa7709cd3e0de9a00b523cd099fafe23"
+      },
+      "stroke_map_zoom200": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/08_multiplayer_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "1f4d418d9b6f0e6ff54e6d489a995f4fdad7477e5a5f53321cd105d2f15e80d2"
+      },
+      "disclaimer": "EDT local-maxima radius and components are nonsemantic optical proxies, not proof of matching glyph anatomy or slant; do not auto-PASS."
+    }
+  ],
+  "new_png_files": 6,
+  "scope": "NEW source/final unwarped stroke-core distance transform/color/counter proxy for three gray labels; not duplicate C306 triptych and not independent subjective approval",
+  "automatic_result": "EVIDENCE_ONLY_HOLD",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
