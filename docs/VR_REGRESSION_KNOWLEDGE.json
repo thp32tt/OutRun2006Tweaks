@@ -608,6 +608,144 @@
       "validationBearingSha": "bc78913199ce141883f35e93dfe9265e903489be",
       "runtimeValidation": "UNTESTED",
       "nextAction": "Quest 3/VDXR runtime-test the exact validated build before promoting HUD visual correctness or cadence smoothness to PASS."
+    },
+    {
+      "key": "VR-HUD-R62-FVF142-OWNER-REMOVED-20261009",
+      "title": "Refactor removed HMD-proven R62 fixed-function FVF 0x142 stereo path for 4th/5th and white HUD",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_HMD_HISTORICAL_PARTIAL_PASS_AND_SOURCE_DIFF",
+      "knownGood": [
+        "R57_03 ordinary HUD optically fused; R57_06 rank 1st–3rd attached under head movement (docs/VR_R58_HMD_FINDINGS_20260926.md)",
+        "R62 fixed-function indexed sprite 4th/5th HMD success historical source SHA 945e4471d6463f757f38b4b39d3eb8e492b2254f"
+      ],
+      "knownBad": [
+        "6e80036fd519 Quest3 user HMD FAIL: ranks and white HUD doubled/head-following, projected[semantic=0]",
+        "Refactored R84 DrawIndexedPrimitiveDestR30 had only external ImGui and XYZRHW, not R62TryFixedFunctionSpriteIndexed"
+      ],
+      "rootCause": {
+        "status": "CODE_DIFFERENCE_CONFIRMED",
+        "summary": "The R84 implementation lost the exact null-vertex-shader D3DXSprite XYZ|DIFFUSE|TEX1 FVF 0x00000142 DrawIndexedPrimitive stereo owner and its dispatch. External F11 ImGui is a different fixed-function owner and cannot replace the game rank/ScreenHud quad transform."
+      },
+      "fixReferences": [
+        "f2153aa263560c6cf24f0faf6b547db6a2e80052 — reintroduce exact R62 owner/call in active R30 after F11, before XYZRHW",
+        "9dd3e61303d7f2550fac90b224bdd25e237f2297 — three distinct regression fault injections",
+        "3f6ab1b18414d5e93e1bcbc4898eff5edf00db31 — DX9Ex Active, HUD Inspector, Domain Isolation exact-SHA successful compiled package, Quest3 UNTESTED"
+      ],
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_uiscaling.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function DrawIndexedPrimitive and R30 dispatch including F11 external ImGui",
+        "changes to R62TryFixedFunctionSpriteIndexed, exact no-VS FVF 0x142, game marker/HudScale matrix and projection restore",
+        "changes to Calc3D2D projected rank payload or queue node exact ownership"
+      ],
+      "verifier": {
+        "static": [
+          "python tools/verify_vr_visual_composition_p0.py (includes 3 independent R62 mutation checks)",
+          "python tools/verify_vr_projected_marker_anchor.py",
+          "DX9Ex Active Win32 game, x64 host, R33 full-chain, package; HUD Inspector; Domain Isolation, once per changed SHA"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS exact-SHA: 4th/5th digits single and above matching vehicles while head yaw moves",
+          "6th/6 has one world-locked HUD image and VRHudScale changes visible size; confirm white glyph/menu and 1st–3rd",
+          "preserve user-confirmed OutRun rival marker, menu car-selector DDS, world stereo, F11 during gameplay"
+        ]
+      }
+    },
+    {
+      "key": "VR-HUD-R57-BAEE7-RANK-ANCHOR-EXTRA-GATE-20261009",
+      "title": "R57/R62 rank 1st–3rd exact Calc3D2D anchor suppressed by optional R84 sub-entry detour state",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_HMD_HISTORICAL_R57_06_PASS_VS_MODERN_SOURCE_DIFF",
+      "knownGood": [
+        "R57_06 real Quest3 head-yaw tracking of rank 1st–3rd; exact 0xBAEE7 rank Calc3D2D returned view point"
+      ],
+      "knownBad": [
+        "6e800 user HMD rank 1st–5th detached, final projected[semantic=0,buildAttempts=0]"
+      ],
+      "rootCause": {
+        "status": "SOURCE_BOUNDARY_MISMATCH",
+        "summary": "Modern source added RankMarkerSubActiveDepth != 0 as another prerequisite to already exact original 0xBAEE7 Calc3D2D return-site capture. If the optional inline sub hook is absent/rejected the payload never reaches valid ProjectedWorldMarker2D despite original caller. Specific observed failed hook at runtime is unproven."
+      },
+      "fixReferences": [
+        "270e7a15f022bfa2f798c2e07a946db075ef62b8 — remove added optional-depth prerequisite, keep screen-HUD suppression",
+        "3f6ab1b18414d5e93e1bcbc4898eff5edf00db31 — exact-SHA compiler/test validation and one-shot rank gate negative verifier"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_projected_marker_anchor.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D_dest 0xBAEE7 rank and 0xBB6F5 rival producers",
+        "changes to RankMarkerSubDest depth and head inverse / pose correlation",
+        "changes to rank SPRARGS1/SPRARGS2 all sibling tags or no-tick replay"
+      ],
+      "verifier": {
+        "static": [
+          "python tools/verify_vr_projected_marker_anchor.py: fail injected optional-depth gate; finite source-view anchor; rival isolation",
+          "canonical original EXE 0xBAEE7 caller byte/ABI verification",
+          "DX9Ex Active/EXE HUD Inspector and Domain Isolation success on exact material"
+        ],
+        "runtime": [
+          "Quest3/VDXR exact package rank 1st–3rd follow cars in yaw and not head",
+          "4th/5th + rival remain car attached, projected render path nonzero during rank session"
+        ]
+      }
+    },
+    {
+      "key": "VR-HUD-DIAGNOSTIC-SESSION-ANALYZER-PARSER-20261009",
+      "title": "Session analysis PowerShell syntax could fail silently while new ZIP passed HUD static CI",
+      "status": "SOURCE_REPAIRED_NEED_EXACT_SHA_CI",
+      "testLevel": 2,
+      "recurrenceCount": 1,
+      "evidenceLevel": "WINDOWS_CI_ACTUAL_SYNTAX_FAILURE",
+      "knownBad": [
+        "HUD Inspector run 37817513231 failed Windows PowerShell helper parser while tool Analyze-OutRunVRSession.ps1 had malformed $gameDllMismatch condition and missing $flags initialization"
+      ],
+      "rootCause": {
+        "status": "CI_COVERAGE_GAP",
+        "summary": "HUD Inspector checked runner/selector/collector PowerShell syntax but not packaged Analyze-OutRunVRSession.ps1 or GUI selector. The malformed analyzer could be shipped while tests examined only static HUD code; collector caught script error and emitted ERROR instead of real flag/summary."
+      },
+      "fixReferences": [
+        "131216005739ded02f85a247fbbd8061b6a3f148 — replace malformed line with valid regex, $flags=@(), restore SBS flag",
+        "6856d006cf00c89037b4c1f54b903b30bf4ace4c — HUD Inspector syntax checks packaged analyzer/UI selector and runs 3-fixture semantics",
+        "236c95038ad26dc22ca95d76993bf4b9617cc4e8 — independent runtime analyzer fixture cases rank-zero, mismatch, healthy control"
+      ],
+      "riskPaths": [
+        "tools/Analyze-OutRunVRSession.ps1",
+        "tools/Collect-OutRunVRLogs.ps1",
+        "tools/Select-OutRunVRBackend.ps1",
+        "tools/OutRunVR-Slot-Selector.ps1",
+        "tools/Test-OutRunVRAnalysisContract.ps1",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "revalidationTriggers": [
+        "modifying any shipped PS session/analyzer/selector helper",
+        "modifying PowerShell CI helper path watch/syntax list",
+        "modifying rank projected telemetry, SESSION_SHA identity, DLL hash attestation or status precedence"
+      ],
+      "verifier": {
+        "static": [
+          "PowerShell Parser::ParseFile on all shipped .ps1 in HUD Inspector",
+          "tools/Test-OutRunVRAnalysisContract.ps1: zero projected exact rank returns HUD_RANK_PROJECTED_PATH_ZERO; stale DLL returns GAME_DLL_SHA256_MISMATCH; positive fixture OK",
+          "DX9Ex Active + HUD Inspector exact material SHA before delivery"
+        ],
+        "runtime": [
+          "Open newest Quest3 session ZIP; verify AUTO_ANALYSIS_SUMMARY.json valid, flags and GAME_DLL_IDENTITY.txt present",
+          "Never interpret analyzer status=OK as HMD optical PASS; HMD visual user verdict is separate"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {
