@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 175,
+  "policy_version": "visual-evidence-v1-20261008",
+  "task": "fresh independent C adjudication after A185R new candidate",
+  "backend": "GitHub connected artifact fetch / controller first-hand image visual assessment",
+  "status": "REWORK_REQUIRED",
+  "decision": "REWORK_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "canonical_source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+  },
+  "prior_A185R_self_qa": "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_CONTROLLER_SELF_QA.json",
+  "visual_material": [
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_SOURCE_READABLE.png",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_CLEAN_PLATE.png",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_ROW_CONTACT.jpg",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_PRACTICAL_100_75_50.jpg",
+    "localization/graphics/role_A/20261008-A185R-Q175-SILVER-FACE-CONTRAST/A185R_FINAL_RAW_GRAY.jpg"
+  ],
+  "c_calibration": "INCOMPLETE; no calibration PASS asserted; defect adjudication only",
+  "pixels_before_producer_verdict": false,
+  "visual_observation": "Direct SOURCE versus persisted candidate inspection at full-row/native and 100/75/50 review scale; raw Korean orientation independently inspected. Defect is positive and not resolved by numeric containment.",
+  "segment_findings": [
+    {
+      "id": "stage_select",
+      "source": "stage select",
+      "candidate": "스테이지 선택",
+      "verdict": "REWORK_REQUIRED",
+      "finding": "English shows curved techno/chrome engraved bevel with white top highlight and deep dark lower extrusion; Korean is upright-ish thin, flat-faced sans with shallow bottom edge. Source-family contrast and dimensional depth not preserved.",
+      "source_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "candidate_bbox": [
+        12,
+        260,
+        863,
+        391
+      ]
+    },
+    {
+      "id": "showroom",
+      "source": "showroom",
+      "candidate": "쇼룸",
+      "verdict": "REWORK_REQUIRED",
+      "finding": "English wide rounded metallic extrusion/shaded inner face; Korean two syllables have plain sharp linear strokes and insufficient raised-bevel/shine; visual character is substantially different. Do not force source-width stretch.",
+      "source_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "candidate_bbox": [
+        12,
+        403,
+        259,
+        523
+      ]
+    },
+    {
+      "id": "single_player",
+      "source": "single player",
+      "candidate": "싱글 플레이",
+      "verdict": "REWORK_REQUIRED",
+      "finding": "English bulbous chrome/embossed lower shadow has markedly greater depth and rounded connected forms than flat Korean Noto Regular; mismatched style evident at 50% practical comparison.",
+      "source_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "candidate_bbox": [
+        8,
+        572,
+        759,
+        711
+      ]
+    }
+  ],
+  "prior_machine_evidence": {
+    "provenance": "A185R producer report only (not independently remeasured)",
+    "claimed_bbox": "3/3 PASS",
+    "claimed_source_size": "3/3 PASS",
+    "claimed_outside": 0,
+    "claimed_overlap": 0,
+    "interpretation": "Producer numeric pass cannot override confirmed style/family visual failure; no unsupported independent numerical PASS claimed."
+  },
+  "visual_gates": {
+    "slant": "UNDETERMINED_FROM_CROP; not basis of FAIL",
+    "clean_plate": "NOT_INDEPENDENTLY_PIXEL_VERIFIED",
+    "style": "FAIL",
+    "readability": "LEGIBLE_BUT_SOURCE_STYLE_FAIL",
+    "glyph_integrity": "NO_SPECIFIC_BREAKAGE_CONFIRMED",
+    "protected_art": "NOT_INDEPENDENTLY_REMEASURED",
+    "placement": "NO_SPECIFIC_OVERFLOW_CONFIRMED",
+    "orientation": "RAW_AND_READABLE_VIEW_OBSERVED; precise transformed proof not asserted"
+  },
+  "c3_status": "NOT_ELIGIBLE_C_REWORK",
+  "approval_record": "NONE",
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "new_in_game_retest": "PENDING",
+  "next_A_rework": "Rebuild per-row source-derived chrome family: rounded/connected techno profile, brighter top bevel/face gradation and lower deep shadow matching English. Keep natural Korean counters, exact source original glyph bbox ceiling, protected mask and source-complete inventory; native DDS post-encode + RAW/FLIP-Y + practical 75/50 evidence required. Never simply increase extrusion indiscriminately.",
+  "timestamp_kst": "2026-10-08T12:13:32+09:00",
+  "post_task_cleanup": "No GPT local scratch, no N100 resources or GitHub runner allocated; GitHub file fetch only."
+}

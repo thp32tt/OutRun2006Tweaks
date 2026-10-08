@@ -6744,7 +6744,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T11:36:10+09:00",
+  "updated_at_kst": "2026-10-08T12:13:32+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10878,7 +10878,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "A185R q175 new candidate cac88b8553e36b2c producer static passed, independent C1/C3 evidence pending. q219/q214 remain producer REWORK.",
+  "next_checkpoint": "C278 q175 754F0599 A185R chrome/bevel source-family visual FAIL; A odd-shard material source-faithful re-render first, then new C1 inspection + separate C3/evidence gate. C current PASS is not granted; runtime UNTESTED.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -10916,5 +10916,19 @@
     "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c278_c1_q175_visual_fidelity_rework": {
+    "run": "20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "decision": "REWORK_REQUIRED",
+    "reason": "native/practical source chrome bevel and deep lower extrusion absent from plain Korean faces",
+    "report": "localization/graphics/role_C/20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN/C278_Q175_CONTROLLER_QA.json",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

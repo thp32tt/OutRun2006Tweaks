@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T12:09:00+09:00",
+  "updated_at_kst": "2026-10-08T12:13:32+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C276 C1 static-reviewed shared runtime-text fix for IGR-006/007: current hooks blob 954f0998... exactly matches validation ref 13e39b9b..., current Win32 Release 37645785737 PASS and Korean Test Build 37645785906/package PASS. Both rows are C_STATIC_PASS_PENDING_NEW_INGAME_RETEST; do not close without new game screenshots. Next C1 should continue highest-priority unindexed special if newly actionable, otherwise stable odd pending-C graphics. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C278 q175 754F0599 A185R chrome/bevel source-family visual FAIL; A odd-shard material source-faithful re-render first, then new C1 inspection + separate C3/evidence gate. C current PASS is not granted; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -6894,5 +6894,19 @@
     "status": "A185R_SELF_QA_PASS_PENDING_FRESH_C1_C3",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c278_c1_q175_visual_fidelity_rework": {
+    "run": "20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "decision": "REWORK_REQUIRED",
+    "reason": "native/practical source chrome bevel and deep lower extrusion absent from plain Korean faces",
+    "report": "localization/graphics/role_C/20261008-C278-C1-Q175-VISUAL-FIDELITY-RETURN/C278_Q175_CONTROLLER_QA.json",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
