@@ -4,7 +4,7 @@
   "count": 0,
   "localized_candidate_count": 0,
   "policy_pass_no_candidate_count": 0,
-  "mandatory_c3_blocked_count": 71,
+  "mandatory_c3_blocked_count": 70,
   "mandatory_c3_blocked": [
     {
       "queue_index": 12,
@@ -249,14 +249,6 @@
     {
       "queue_index": 97,
       "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
-      "status": "HOLD_STRICT_RECHECK",
-      "reasons": [
-        "New-policy per-region approval/calibration evidence pending; legacy PASS retained as history"
-      ]
-    },
-    {
-      "queue_index": 98,
-      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
       "status": "HOLD_STRICT_RECHECK",
       "reasons": [
         "New-policy per-region approval/calibration evidence pending; legacy PASS retained as history"
@@ -577,5 +569,14 @@
   ],
   "items": [],
   "legacy_archive": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW_ARCHIVE/20261008-before-evidence-gate/",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "c300_c2_reopened_rework_excluded": {
+    "queue_index": 98,
+    "asset": "42E618FD",
+    "reason": "C300 C2 C3 native source comparison confirmed repeated speckled/striped Hangul white fill; supersedes C126 historical PASS. This asset is no longer eligible C-pass/current approval/export until material rework and fresh independent C/C3.",
+    "report": "localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
 }
