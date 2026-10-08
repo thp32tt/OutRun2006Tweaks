@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C288-C1-Q217-STARTGOAL-SOURCE-FAMILY-20261008-1540",
+  "run": "20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "execution_backend": "GitHub connector SSOT; ChatGPT local attempted direct fetch and hit DNS/network failure, then N100 MCP isolated small DDS decode as permitted fallback; no N100 git worktree/repository modification",
+  "selection": "fresh pending independent C, odd index, no previous independent C pass; producer A116 candidate",
+  "first_look": {
+    "pixels_before_producer_detailed_qa": true,
+    "queue_self_qa_status_seen": true,
+    "first_persisted_pixel_views": [
+      "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_firstlook_gray.png",
+      "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_full_firstlook.png"
+    ],
+    "observations": "Actual source original white/cream italic START and GOAL, target simple flat small pale-orange Hangul on red plates. Before reading A116 controller self-QA details, identified both labels as style/lean hierarchy regression."
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_INDEPENDENT_MACHINE.json",
+  "machine_verified": {
+    "pinned_sha256_both": true,
+    "header_orientation": true,
+    "outside_original_badge_rgba_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "detailed_clean_plate_independently_validated": false
+  },
+  "producer_clean_plate_reference": "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D103_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+  "calibration": "NOT_COMPLETED (C FAIL only; do not claim approval)",
+  "evidence": [
+    {
+      "id": "start",
+      "name": "C288_Q217_start_NATIVE_1x.png",
+      "sha256": "08d01d43c31d21fe03acd8e91547e0fc6740b2793b2cdb7bfc41296af9246969",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_1x.png"
+    },
+    {
+      "id": "start_zoom",
+      "name": "C288_Q217_start_NATIVE_8x.png",
+      "sha256": "18a98a86bbd287f6241097328917769425507a3b8e63ebda4fb30e2091b029c8",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+    },
+    {
+      "id": "goal",
+      "name": "C288_Q217_goal_NATIVE_1x.png",
+      "sha256": "0586c669ffc65ecaeaec9d063e556a6bb2350d66fac4d26332501154b763b170",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_1x.png"
+    },
+    {
+      "id": "goal_zoom",
+      "name": "C288_Q217_goal_NATIVE_8x.png",
+      "sha256": "357c57595ffaec8a1e135e41393d41737675fb73b84d8e58dbed3d613c56d0ce",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+    },
+    {
+      "id": "full_atlas",
+      "name": "C288_Q217_full_firstlook.png",
+      "sha256": "355d9f21baff16bc23bbd34dfef2465dd3442a96c18e18767d4b28c68a103d3c",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_full_firstlook.png"
+    },
+    {
+      "id": "firstlook_gray",
+      "name": "C288_Q217_firstlook_gray.png",
+      "sha256": "a4d12fe5168e453c2ca1a0714b09952ff7cf8daaae9b7803f2af3aa583cb4ba0",
+      "path": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_firstlook_gray.png"
+    }
+  ],
+  "region_findings": {
+    "start": {
+      "slant": {
+        "result": "FAIL_VISUAL",
+        "observation": "Source right-leaning italic display lettering versus noticeably less-slanted Korean glyphs; exact top-bottom anchor displacement not calibrated.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "clean_plate": {
+        "result": "HOLD_NOT_INDEPENDENTLY_CERTIFIED",
+        "observation": "Producer A116 SOURCE/CLEAN/FINAL JPG inspected only after blind decoded-pixel first look. Rebuilt red plate exhibits horizontal bands, but without authenticated pre-render original plate pixels, a restoration defect is not asserted as independent fact.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Source italic/flared cream-white START has prominent right-leaning geometry and orange highlight with dominant broad letterforms; current pale-orange 출발 appears nearly upright, narrow and weak, with plain glyph terminals and insufficient original shadow/outline character.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "readability": {
+        "result": "FAIL_STYLE_HIERARCHY",
+        "observation": "Korean can be deciphered at 1x atlas crop but loses original oversized display emphasis and has visibly undersized/weak cream-gold styling; game runtime untested.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "glyph_integrity": {
+        "result": "NO_DEFINITE_BREAKAGE_OBSERVED",
+        "observation": "Characters decode as 출발 / 골 without definite missing strokes in the native crop; this does not negate family FAIL.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "protected_art": {
+        "result": "PASS_BANNER_SCOPE_ONLY",
+        "observation": "Changed RGBA outside two original red badge polygons = 0 and alpha changed = 0; source surrounding road/map and card art remain byte-decoded visually intact. Badge interior reconstructed pixels are not certified source-accurate.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "placement": {
+        "result": "FAIL_RELATIVE_HIERARCHY",
+        "observation": "Small compact central plain Hangul lacks the original broad diagonally leaning START/GOAL effect within the same red banner; no artificial width quota proposed.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      },
+      "orientation": {
+        "result": "PASS",
+        "observation": "Pinned source/current DDS identical 128-byte headers, actual 2048x2048 BGRA32 mip1, preserved raw mirror-Y; readable FLIP-Y matches mapped labels.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_start_NATIVE_8x.png"
+      }
+    },
+    "goal": {
+      "slant": {
+        "result": "FAIL_VISUAL",
+        "observation": "Source right-leaning italic display lettering versus noticeably less-slanted Korean glyphs; exact top-bottom anchor displacement not calibrated.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "clean_plate": {
+        "result": "HOLD_NOT_INDEPENDENTLY_CERTIFIED",
+        "observation": "Producer A116 SOURCE/CLEAN/FINAL JPG inspected only after blind decoded-pixel first look. Rebuilt red plate exhibits horizontal bands, but without authenticated pre-render original plate pixels, a restoration defect is not asserted as independent fact.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Source wide right-leaning GOAL has orange/beveled white display characters; current 골 is visually small and near-upright with a generic squared glyph/weak bevel; the bold label hierarchy of the source is lost.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "readability": {
+        "result": "FAIL_STYLE_HIERARCHY",
+        "observation": "Korean can be deciphered at 1x atlas crop but loses original oversized display emphasis and has visibly undersized/weak cream-gold styling; game runtime untested.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "glyph_integrity": {
+        "result": "NO_DEFINITE_BREAKAGE_OBSERVED",
+        "observation": "Characters decode as 출발 / 골 without definite missing strokes in the native crop; this does not negate family FAIL.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "protected_art": {
+        "result": "PASS_BANNER_SCOPE_ONLY",
+        "observation": "Changed RGBA outside two original red badge polygons = 0 and alpha changed = 0; source surrounding road/map and card art remain byte-decoded visually intact. Badge interior reconstructed pixels are not certified source-accurate.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "placement": {
+        "result": "FAIL_RELATIVE_HIERARCHY",
+        "observation": "Small compact central plain Hangul lacks the original broad diagonally leaning START/GOAL effect within the same red banner; no artificial width quota proposed.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      },
+      "orientation": {
+        "result": "PASS",
+        "observation": "Pinned source/current DDS identical 128-byte headers, actual 2048x2048 BGRA32 mip1, preserved raw mirror-Y; readable FLIP-Y matches mapped labels.",
+        "evidence": "localization/graphics/role_C/20261008-C288-C1-Q217-STARTGOAL-STYLE-FAIL/C288_Q217_goal_NATIVE_8x.png"
+      }
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED_NEW_A_REWORK_REQUIRED",
+  "PRE_INGAME": "BLOCKED",
+  "APPROVAL_CREATED": false,
+  "USER_JPG": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "recommended_A_actions": "Rerender q217 START/GOAL only from pinned HD original and exact native clean, retaining original red slanted banner and surrounding art while constructing a bright gold/cream thick RIGHT-LEANING source-family bevel/outline/drop-shadow Korean label, source-faithful lettering height/hierarchy and pixel bbox ceiling. Restore style without stretching Hangul to English width. Validate clean plate, top-minus-bottom anchor slant, native+8x+100/75/50+RAW/FLIP-Y, no 1px protected overlap. Submit materially changed DDS to a fresh C1 and distinct C3; no in-game closure without NEW actual game screenshot.",
+  "candidate_bytes_changed": false,
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C288-C1-Q217-STARTGOAL-SOURCE-FAMILY-20261008-1540",
+  "policy_version": "visual-evidence-v1-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 217,
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "decoded_dimensions": [
+    2048,
+    2048
+  ],
+  "format": "BGRA32",
+  "mipmaps": 1,
+  "header128_equal_to_pinned_source": true,
+  "raw_orientation": "mirror_y",
+  "independent_pixel_diff": {
+    "changed_rgba_pixels": 3935,
+    "readable_bbox": [
+      801,
+      508,
+      1428,
+      796
+    ],
+    "two_disjoint_vertical_clusters": [
+      [
+        508,
+        533
+      ],
+      [
+        771,
+        796
+      ]
+    ],
+    "changed_rgba_outside_union_of_two_declared_source_badges": 0,
+    "alpha_changed_pixels_all_regions": 0,
+    "regions": {
+      "start": {
+        "roi": [
+          788,
+          495,
+          910,
+          545
+        ],
+        "producer_source_glyph_bbox_not_independently_matted": [
+          803,
+          509,
+          884,
+          532
+        ],
+        "producer_banner_bbox": [
+          800,
+          507,
+          890,
+          534
+        ],
+        "independent_changed_bbox": [
+          801,
+          508,
+          889,
+          533
+        ],
+        "changed_rgba_pixels_in_roi": 1945,
+        "rgba_changed_outside_glyph_bbox_inside_banner": 195,
+        "alpha_changed_pixels": 0
+      },
+      "goal": {
+        "roi": [
+          1325,
+          755,
+          1445,
+          810
+        ],
+        "producer_source_glyph_bbox_not_independently_matted": [
+          1343,
+          771,
+          1420,
+          795
+        ],
+        "producer_banner_bbox": [
+          1339,
+          770,
+          1429,
+          797
+        ],
+        "independent_changed_bbox": [
+          1340,
+          771,
+          1428,
+          796
+        ],
+        "changed_rgba_pixels_in_roi": 1990,
+        "rgba_changed_outside_glyph_bbox_inside_banner": 230,
+        "alpha_changed_pixels": 0
+      }
+    }
+  },
+  "not_a_protected_art_claim": "The 425 changed pixels beyond glyph bbox are within original badge/banner polygons; cleanup/reconstruction is expected there and does not alone establish protected art damage. Neither zero outside the banner nor original producer PASS proves source-faithful styling.",
+  "method": "Pinned original and candidate byte downloads verified by SHA256, Pillow native DDS decode and readable FLIP-Y; numpy exact RGBA diff before consulting producer detailed visual QA. Source banner locations independently observed, then verified against producer geometry; no inferred CLEAN plate treated as authoritative.",
+  "machine_result": "NATIVE_HEADER_ORIENTATION_AND_BANNER_SCOPE_PASS; NOT_C_APPROVAL",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
