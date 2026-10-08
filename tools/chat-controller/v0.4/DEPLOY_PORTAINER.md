@@ -252,3 +252,21 @@ Redeploy the **VR** Portainer stack with the exact `chat-controller-downloads` b
 * DX11 must continue **real native implementation** on its own lane even without HMD runtime access. Runtime-only results are `UNTESTED/NEED_HMD_TEST` and block only promotion to runtime verified. No unchanged 1000/5000 static loops, unearned native activation, or state-only progress.
 * Keep `outrun_chat_vr_data` and `outrun_chat_vr_logs` volumes and configured browser/session credentials. Verify `/status` shows `dxvk_frozen=true`, `conversion_dx11_enabled=true`, `conversion_dxvk_enabled=false`, `conversion_dx9ex_enabled=false`, `conversion_only_slot=A` and that no slot B/C messages are sent after deployment.
 * The GitHub commit only changes redeployable source. Actual Portainer application and Quest 3 runtime behavior are not proved until separately tested.
+
+## 2026-10-08 — CURRENT POLICY: two concurrent workers (A DX11 + C DX9Ex), B DXVK frozen
+
+This **latest user correction overrides the DX11-only paragraph above**. Keep the existing two-worker scheduling structure; only change each lane's development direction. Rebuild/redeploy the VR Portainer image from the **latest** `chat-controller-downloads` branch using `Dockerfile.portainer-vr`. Do not redeploy the earlier DX11-only commit or simply restart a stale image.
+
+| Slot | Enabled | Development direction |
+|---|---|---|
+| A | yes | Native DX11 implementation, device/resource/shader/Draw/DrawIndexed/OpenXR, exact-SHA static/build CI |
+| C | yes | DX9Ex VR baseline stabilization: HUD/menu duplication, head-lock, rank markers, +TIME/results, flare/shadow/selector, reset/host reconnect |
+| B | NO | DXVK development FROZEN; no new DXVK task or resumed DXVK implementation |
+
+Portainer compose settings: `CONVERSION_PARALLEL=true`, `CONVERSION_ACTIVE_LIMIT=2`, `CONVERSION_DX11_ENABLED=true`, `CONVERSION_DX9EX_ENABLED=true`, `DXVK_FROZEN=true`, `CONVERSION_DXVK_ENABLED=false`, `CONVERSION_ONLY_SLOT=""`. `CHAT_SLOTS=3` remains unchanged because A and C map to their original slot names; the B slot is idle/frozen. No new containers, queues or ChatGPT accounts are required.
+
+The controller parks any previously active B/DXVK work in persistent `frozen_lane_tasks`. If an interim DX11-only deployment parked an unfinished C/DX9Ex task, it restores that same C task identity and reconciles its existing GitHub/CI evidence; this is not a newly completed task. Preserve `/data`, `/logs`, browser login and existing queue data, and never reset a claimed task merely to reactivate its slot.
+
+If the Quest 3 HMD is unavailable, park only that runtime/visual confirmation as `UNTESTED`/`NEED_HMD_TEST` and continue independent actual source changes in **both** A and C. Run changed-source targeted static/CI checks; do not repeat unchanged HUD 1000/5000 static passes. Build PASS does not equal runtime PASS. DXVK stays frozen until the user explicitly changes direction.
+
+After deployment verify `/status`: active limit 2, DX11 and DX9Ex enabled, DXVK disabled and frozen, `conversion_only_slot` empty. Confirm A/C progress with separate task IDs and material commits while B produces no new work. GitHub source verification alone does not mean Portainer deployment or Quest3 runtime testing has occurred.
