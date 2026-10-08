@@ -1576,7 +1576,7 @@ async def conversion_process_lane(
     q: dict,
     lane_key: str,
 ) -> None:
-    """Advance one independent DX11/DXVK/DX9Ex task without serializing the other lanes."""
+    """Advance an existing lane; production deployment dispatches DX11 only."""
     active = q.get("active_by_lane", {}).get(lane_key)
     if not active or active.get("phase") == "DONE":
         return
@@ -1805,7 +1805,7 @@ def conversion_dispatch_plan(
     dxvk_enabled: bool,
     dx9ex_enabled: bool,
 ) -> tuple[str, ...]:
-    """Bounded priority order A(DX11), B(DXVK), C(DX9Ex opt-in maintenance).
+    """Capacity-safe lane selection; frozen DXVK is never enabled by default.
 
     Includes *all* active slots in WIP calculation, not only primary slots.
     Never replaces/duplicates a running, uncertain, or CI-waiting task.
@@ -1829,7 +1829,7 @@ def conversion_dispatch_plan(
 
 
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Keep DX11, DXVK and DX9Ex independently active; one stalled lane must not block the others."""
+    """Operate a DX11-only VR controller, freezing other lane records durably."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reconcile_legacy_conversion_blocked(q)
@@ -1914,11 +1914,11 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         )
         return
 
-    # DX11 and DXVK are the two implementation lanes. They may each advance
-    # source/static/CI independently while a Quest 3 gate is untested.
-    # DX9Ex is an explicitly enabled maintenance fallback, never co-primary.
-    # Count EVERY active lane against capacity (including a preexisting C task)
-    # so changing policy during Portainer redeploy cannot over-dispatch.
+    # DX11 native has 100% of autonomous development capacity by current user
+    # decision. DXVK is FROZEN, DX9Ex is maintenance-only and disabled.
+    # Single-slot mode moves existing B/C task records to frozen_lane_tasks
+    # without marking them PASS/FAIL or mutating the source branches.
+    # Count any pre-existing work for deployments overriding single-slot mode.
     for lane_key in conversion_dispatch_plan(
         active_by_lane,
         CONVERSION_ACTIVE_LIMIT,
@@ -1931,7 +1931,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "Primary A(DX11) + B(DXVK); C(DX9Ex opt-in maintenance); active: "
+            "DX11 native ONLY; DXVK frozen; DX9Ex disabled; active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())

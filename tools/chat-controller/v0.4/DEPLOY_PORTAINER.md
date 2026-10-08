@@ -241,3 +241,14 @@ Redeploy the **VR** Portainer stack with the exact `chat-controller-downloads` b
 - Do not run unchanged HUD 1000/5000 static loops. Source changes use targeted tests + exact-sha CI. Neither a status-only commit nor static-only analysis can be reported as native Draw/DrawIndexed runtime activation.
 - Portainer deployment: update/rebuild VR stack from this GitHub branch; preserve named `/data` and `/logs` volumes, saved credentials, browser profile, and existing queue state. After deployment verify `/status`, `conversion_dx11_enabled=true`, `conversion_dxvk_enabled=true`, `conversion_dx9ex_enabled=false`, and `conversion_parallel_running` reports A(DX11)/B(DXVK). Observe new C2 material SHA + successful Gate; do not infer successful runtime rendering without Quest3/VDXR tests.
 - This commit updates the GitHub deployment source only. It neither hot-patches nor proves the running Portainer container changed.
+
+## 2026-10-08 — FINAL OVERRIDE: DXVK FROZEN; DX11 Native only
+
+**The user's later explicit directive supersedes the immediately preceding dual DX11/DXVK priority note and every older DX9Ex co-primary policy in this file.** Redeploy only the current `chat-controller-downloads` branch VR stack, rebuilding `Dockerfile.portainer-vr` from GitHub rather than simply restarting its old Docker image.
+
+* A(DX11) is the **only** automatic work lane: `CONVERSION_ONLY_SLOT=A`, `CONVERSION_ACTIVE_LIMIT=1`, `CONVERSION_DX11_ENABLED=true`.
+* DXVK B is **FROZEN**: `DXVK_FROZEN=true`, `CONVERSION_DXVK_ENABLED=false`. It must not start, resume or create commits; the controller rejects a misconfigured `CONVERSION_ONLY_SLOT=B` while the freeze is enabled.
+* DX9Ex C is **disabled for normal automatic work**: `CONVERSION_DX9EX_ENABLED=false`. Existing B/C active records are moved to persistent `frozen_lane_tasks` on the first reconciled scheduler cycle; they are not deleted, interpreted as successes, or granted new TASK_IDs.
+* DX11 must continue **real native implementation** on its own lane even without HMD runtime access. Runtime-only results are `UNTESTED/NEED_HMD_TEST` and block only promotion to runtime verified. No unchanged 1000/5000 static loops, unearned native activation, or state-only progress.
+* Keep `outrun_chat_vr_data` and `outrun_chat_vr_logs` volumes and configured browser/session credentials. Verify `/status` shows `dxvk_frozen=true`, `conversion_dx11_enabled=true`, `conversion_dxvk_enabled=false`, `conversion_dx9ex_enabled=false`, `conversion_only_slot=A` and that no slot B/C messages are sent after deployment.
+* The GitHub commit only changes redeployable source. Actual Portainer application and Quest 3 runtime behavior are not proved until separately tested.
