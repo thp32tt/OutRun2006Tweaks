@@ -166,8 +166,7 @@ with tempfile.TemporaryDirectory() as td:
     payload=cb[:128]+raw_new.tobytes("raw",meta["mode"])
     candidate.write_bytes(payload)
     after=sha_bytes(payload)
-    rb,rraw,decoded,rmeta=decode(payload)
-    if rb if False else False: pass
+    rraw,decoded,rmeta=decode(payload)
     if rmeta!=meta or payload[:128]!=cb[:128] or ImageChops.difference(decoded,final).getbbox() is not None:
         raise RuntimeError("persisted DDS roundtrip mismatch")
 
