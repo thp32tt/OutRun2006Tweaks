@@ -1,0 +1,92 @@
+{
+  "role": "B",
+  "run": "20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR",
+  "queue_index": 172,
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "prior_sha256": "26381bbba897a303934908a6057d5a7a04ae7e8ff16eee2cdb77780ca43a2110",
+  "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "execution_backend": "GITHUB_HOSTED_CPU_INPUT_NOT_MATERIALIZABLE_IN_GPT_LOCAL",
+  "format": "RGBA32",
+  "native_size": [
+    1024,
+    1024
+  ],
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "regions": [
+    {
+      "key": "START",
+      "ko": "출발",
+      "box": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "textsize": [
+        47,
+        18
+      ],
+      "shear": 8,
+      "local_bbox": [
+        68,
+        375,
+        122,
+        394
+      ],
+      "margins": [
+        13,
+        2,
+        14,
+        2
+      ],
+      "generated_face": [
+        54,
+        18
+      ],
+      "source_top_vs_bottom_shift_target_px": 8
+    },
+    {
+      "key": "GOAL",
+      "ko": "골",
+      "box": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "textsize": [
+        31,
+        19
+      ],
+      "shear": 8,
+      "local_bbox": [
+        615,
+        637,
+        652,
+        657
+      ],
+      "margins": [
+        20,
+        2,
+        20,
+        2
+      ],
+      "generated_face": [
+        37,
+        19
+      ],
+      "source_top_vs_bottom_shift_target_px": 8
+    }
+  ],
+  "changed_inside": 3520,
+  "outside_rgba": 0,
+  "outside_alpha": 0,
+  "header_exact": true,
+  "roundtrip": "PASS",
+  "controller_visual": "PENDING_HUMAN_REVIEW",
+  "status": "B255_MACHINE_PASS_PENDING_CONTROLLER",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}

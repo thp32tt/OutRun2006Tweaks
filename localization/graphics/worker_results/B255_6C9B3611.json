@@ -1,0 +1,7 @@
+{
+  "role": "B",
+  "run": "20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR",
+  "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+  "status": "B255_MACHINE_PASS_PENDING_CONTROLLER",
+  "qa_path": "localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/B255_MACHINE_QA.json"
+}
