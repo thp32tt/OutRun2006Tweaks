@@ -738,8 +738,11 @@ def check_original_queue_wvp(source):
     func = function_body(source, 'bool R30GetRecentRawWvpForQueueSprite(')
     require_order(func, 'queued original game WVP identity',
                   'QueueRenderActive()',
-                  'CorroboratesScreenOverlay2D(',
-                  'CurrentScope)',
+                  'const auto scope =',
+                  'CorroboratesScreenOverlay2D(scope)',
+                  'CorroboratesProjectedWorldMarker(scope)',
+                  'CurrentProjectedMarker() != nullptr',
+                  'if (!screenOverlay && !projectedMarker)',
                   'GetLastRawGameWvpWrite(',
                   'GetCurrentShaderEpoch(',
                   'writeShader != currentShader',
@@ -755,6 +758,9 @@ def check_original_queue_wvp(source):
                   'R30GetRecentRawWvpForQueueSprite(original)',
                   'GetVertexShaderConstantF(',
                   'R30BuildEyeAffine(stereo, eyeScale, eyeOffset)')
+    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D\s*&&\s*'
+                     r'R30GetRecentRawWvpForQueueSprite\(original\)\)', build):
+        raise SystemExit('P0 exact projected marker long-batch raw game WVP fallback lost')
     if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\s*\)', build):
         raise SystemExit('P0 screen overlay lacks original WVP recovery')
     if not re.search(r'!R30GetRecentRawWvpForQueueSprite\(original\)\)\s*return false;', build):
@@ -763,7 +769,8 @@ def check_original_queue_wvp(source):
 check_original_queue_wvp(r30)
 for label, old, bad in (
     ('queue scope disabled', 'QueueRenderActive()', 'false'),
-    ('queue overlay scope unproven', 'CorroboratesScreenOverlay2D(', 'CorroboratesWorld('),
+    ('queue overlay scope unproven', 'CorroboratesScreenOverlay2D(scope)', 'CorroboratesWorld(scope)'),
+    ('projected anchor unproven', 'CurrentProjectedMarker() != nullptr', 'true'),
     ('shader serial drift accepted', 'writeShaderSerial != currentShaderSerial',
      'writeShaderSerial == currentShaderSerial'),
     ('original WVP age unbounded', 'currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow',
