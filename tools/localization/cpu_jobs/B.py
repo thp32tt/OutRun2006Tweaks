@@ -52,7 +52,7 @@ previous=np.asarray(prev,dtype=np.uint8)
 # Source effect bboxes measured from the canonical English HD DDS, not Korean pixels.
 specs=[
     {"id":"start","english":"START","korean":"출발","source_bbox":[815,495,899,517],"size":[57,19],"right_lean_px":10},
-    {"id":"goal","english":"GOAL","korean":"골","source_bbox":[1343,764,1417,787],"size":[35,19],"right_lean_px":10}
+    {"id":"goal","english":"GOAL","korean":"골","source_bbox":[1343,764,1417,787],"size":[35,18],"right_lean_px":10}
 ]
 allowed=np.zeros((H,W),bool)
 for r in specs:
@@ -110,6 +110,18 @@ for r in specs:
     x0,y0,x1,y1=r["source_bbox"]
     cx=(x0+x1)//2; cy=(y0+y1)//2
     px=cx-tile.shape[1]//2;py=cy-tile.shape[0]//2
+    # Partial BC3 edge blocks can contain protected red-rim/photo pixels.
+    # Full blocks in readable space are [ceil(y0/4)*4, floor(y1/4)*4).
+    # Constrain text to full source-contained blocks BEFORE encoding, with
+    # independent +1px margin from the original English text-effect bbox.
+    first_safe_y=((y0+3)//4)*4
+    last_safe_y=(y1//4)*4
+    if tile.shape[0]>last_safe_y-max(y0+1,first_safe_y):
+        raise RuntimeError(("glyph too tall for safe complete BC3 blocks",r["id"],tile.shape))
+    py=min(py,last_safe_y-tile.shape[0])
+    py=max(py,max(y0+1,first_safe_y))
+    if py+tile.shape[0]>last_safe_y:
+        raise RuntimeError(("glyph would enter partial BC3 boundary",r["id"],py,tile.shape[0],last_safe_y))
     bound=[px,py,px+tile.shape[1],py+tile.shape[0]]
     margins=[px-x0,py-y0,x1-bound[2],y1-bound[3]]
     if min(margins)<1:raise RuntimeError(("glyph touches exact source boundary",r["id"],bound,margins))
