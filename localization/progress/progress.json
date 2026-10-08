@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 03:12 KST",
+  "updated_at_kst": "2026-10-09 05:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8716,5 +8716,49 @@
     "USER_INGAME": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B297-Q060-P0-STAGE-SOURCE-FAMILY-PIXEL-MATERIAL/B297_CONTROLLER_SELF_QA_REJECTED.json"
+  },
+  "b298_q154_gray_stroke_native_rework": {
+    "role": "B",
+    "run": "B298",
+    "task_id": "OUTRUN-KOR-B298-Q154-GRAY-SOURCE-FAMILY-NATIVE-20261009",
+    "queue_index": 154,
+    "action": "PRODUCER_MATERIAL_REWORK_SELF_QA_PASS_AWAIT_INDEPENDENT_C2",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "prior_candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "new_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "new_dds_count": 1,
+    "changed_cells": [
+      "SINGLE PLAYER -> 싱글 플레이",
+      "SHOWROOM -> 쇼룸",
+      "MULTIPLAYER -> 멀티플레이"
+    ],
+    "unchanged_five_red_cells": true,
+    "method": "1 native-pixel source-gray masked alpha/core reconstruction of the three retained Korean glyph silhouettes; do not upscale raster or paint rectangular plate; source SHA-conditioned gray RGB [78,96,100]",
+    "bbox_pass": 3,
+    "positive_margin": true,
+    "outside_delta_3_regions_rgba": 0,
+    "source_clean_eight_regions_alpha_nonzero": 0,
+    "codec": "RGBA32 native 4096x1024 mip1 RAW mirror_y persisted DDS exact decode",
+    "native_and_practical_visually_inspected": [
+      "SOURCE/CLEAN/OLD/NEW native 3 regions",
+      "SOURCE/CLEAN/OLD/NEW 50% 3 regions",
+      "RAW mirror Y for multiplayer"
+    ],
+    "producer_visual": "PASS_SCOPED_SOURCE_GRAY_STROKE_IMPROVED_NO_VISIBLE_GLYPH_BREAK_OR_BOX_IN_VIEWED_REGIONS",
+    "independent_C2": "PENDING_NEW_EXACT_SHA",
+    "C3": "NOT_RUN",
+    "approval": false,
+    "real_game": "UNTESTED",
+    "runtime_validation": "UNTESTED",
+    "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37841527581",
+    "qa": "localization/graphics/role_B/20261009-B298-Q154-GRAY-STROKE-SOURCE-FAMILY-TRIAL/B298_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "GitHub Action (GPT native GitHub DNS unavailable); GPT visual controller; N100 tiny images only",
+    "excluded_domains": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
   }
 }
