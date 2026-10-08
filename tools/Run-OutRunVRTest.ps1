@@ -253,7 +253,7 @@ do{
 }while((Get-Date) -lt $deadline)
 
 if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
-    Write-Warning 'outrun-vr-host.exe is still running. Close it, then run Collect-OutRunVRLogs.cmd once. No logs were deleted.'
+    Write-Warning 'outrun-vr-host.exe is still running. Close it, then run: powershell -NoProfile -ExecutionPolicy Bypass -File .\Collect-OutRunVRLogs.ps1 . No logs were deleted.'
     exit 2
 }
 
