@@ -38,3 +38,5 @@ jobs:
           git push origin HEAD:korean-localization-recovery-20260928
 
 # retry: A182 persisted decode fix
+
+# retry: A182R source-weight refinement
