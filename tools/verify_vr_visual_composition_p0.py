@@ -197,6 +197,17 @@ def check_result_parent_provenance(ui_source, semantics_source):
         raise SystemExit("Sumo no-tick replay loses exact result producer")
 
 check_result_parent_provenance(ui, sem)
+# Shader and R62 fixed-function both need the exact originating family in
+# telemetry; without this, +TIME vs final-result ambiguity returns.
+for marker in (
+    '"VR P0 RESULT DRAW ROUTE: producer={} scope={} gameState={} mode={} queueEpoch={} shaderPresent={}"',
+    'OutRunVR::GameSemantic::CurrentQueueProducerToken()',
+    'ProducerToken::OutRunStagePrintf',
+    'ProducerToken::DispRankFirst',
+    '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}"',
+):
+    require(marker, r30, 'result sink provenance / R62 fixedfn telemetry')
+
 for label, corrupt in (
     ("result parent no provenance",
      ui.replace("ProducerToken::ResultProgress);",
