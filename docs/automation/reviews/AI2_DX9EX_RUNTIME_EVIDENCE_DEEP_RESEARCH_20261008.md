@@ -28,7 +28,19 @@
 - 소스·원본·기존 리뷰 파일을 직접 열어 읽은 사실까지만 확인. 새 GPU 캡처·게임 실행·전체 바이너리 동적 disassembly를 수행한 것으로 주장하지 않는다. 렌즈와 골인 화면의 눈에 보이는 복시는 '과거 사용자가 확인한 회귀'이지 최신 SHA의 재현 결과가 아니다.
 
 
-## Checkpoint 2 — canonical EXE / disassembly / producer map (PENDING)
+## Checkpoint 2 — canonical EXE / 디스어셈블리 계약 (EVIDENCE_REVIEWED)
+
+- 기준 EXE: `OR2006C2C.EXE` x86/PE32, image base 0x00400000, SHA-256 `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`, 크기 3,674,112 bytes. 원본 emoose v0.1 배포물과 동일 파일을 CI에서 다운로드·SHA 검증하도록 설정; 바이너리 자체는 Git 저장소에 없음. https://github.com/thp32tt/OutRun2006Tweaks/blob/vr-d3d9ex-focus/docs/VR_BINARY_CONTRACT.json
+- manifest `docs/VR_BINARY_CONTRACT.json`에서 **총 103개 계약** 확인(모두 HUD direct CALL만은 아님). `tools/verify_vr_hud_exact_callsite_contract.py`의 고정 그룹+추가 scalar 계약으로 **71 canonical HUD CALL 위치, 5-byte x86 E8 rel32 목적지, 상호 중복 없는 훅 소유권**을 검증하도록 구성됨. `--self-test` 10종은 동일 소스 1000·5000반복과 다른 의도적 결함 주입이다.
+- **렌즈 플레어:** `tools/analyze_outrun_exe.py::PRODUCER_WINDOWS`가 0xCAB0–0xCAE0의 `0xCABE→0x56D0 DrawObjectAlpha_Internal`와 0xCAE0–0xD100의 `0xCF4E→0x49940 Calc3D2D`를 **서로 별개의 CALL producer 창**으로 정의하고 정확 E8 rel32 목적지를 검사한다. 0xCABE가 0xCAE0 이후라고 추정한 과거 창은 이미 수정됐다. 두 producer 간 같은 광원/동일 draw instance 연결은 이 주소 증거만으로 확정 불가.
+- **+TIME/골인 글리프:** 0x975EE·0x97727·0x977FB direct CALL→0x2CDD0 `Sumo_Printf`; glyph 내부의 0x2C808·0x2C9DB→0x2CFE0 `put_sprite_ex`. 골인/기록 등과 연결되는 0x97BB7·0x97DA7→0x2D280 `put_clip_sprite`; TimeAttack scroll 0xBE5CD..0xBE9A3 역시 별도 exact right HUD ownership. 하나의 glyph/scroll 래퍼만 고쳐서는 다중 자식·priority·tick 차이를 설명하지 못함.
+- **순위 및 옵션:** 4위 이상 `0xBB21F...0xBB2D0→0x2D280` clip, 1~3위 `0xBB0FB...0xBB1A5→0x29580` sprani, 상대 마커 `0xBB796→0x29580`, 메뉴 화살표 12개 exact `0xE358B..0xED7A3→0x2D280`. 동일 원본 함수(`put_clip_sprite`)의 호출점별 ScreenHud/WorldBillboard 소유권 분리가 필요.
+- **관련 validator:** `tools/analyze_outrun_exe.py`는 known target 지도·producer windows·CALL RVA 분석을 제공하고, `tools/verify_vr_hud_exact_callsite_contract.py`는 source wrappers/hook arrays 및 manifest 서명검사를 수행한다. https://github.com/thp32tt/OutRun2006Tweaks/blob/vr-d3d9ex-focus/tools/analyze_outrun_exe.py / https://github.com/thp32tt/OutRun2006Tweaks/blob/vr-d3d9ex-focus/tools/verify_vr_hud_exact_callsite_contract.py
+- 증거 수준: **체크인된 정적 분석기·EXE 계약·기록된 CI 성공을 대조**했다. 이번 조사 세션에서 독자적으로 원본 EXE 바이트를 다운로드·새 바이너리 디스어셈블 또는 CI 실행한 것은 아님. 신규 바이너리 증거나 optical PASS로 과대 표기 금지.
+
+### 이미 검증된 소스 상태와 과거 HMD의 간격
+- 00558 material `b14901f8b70b1b6fda8a9aded1e340147a453e68`: DX9Ex Active `37752619285`, HUD Inspector `37752619496`, Full Source Impact `37752619267`, Domain Isolation `37752619334` PASS 보고. 이 정적 검증은 00519에서 사용자가 관찰한 복시/헤드락/90Hz pacing 실패를 자동으로 폐쇄하지 않는다.
+
 
 ## Checkpoint 3 — 런타임 경로와 결함별 원인·반증 (PENDING)
 
