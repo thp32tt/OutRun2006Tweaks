@@ -120,3 +120,9 @@
 | Whole screen appears SBS or freezes | Host R23 source/candidate rejection + cached projection/theater | `candidateRejectReason`, finalLayerKind, frame and sourcePoseSequence, frame duplicate flags | headset runtime presentation despite green CI |
 
 Keep any test on an **exact frozen package SHA**; no claiming `RUNTIME_VALIDATION=PASS` without user Quest 3/VDXR observations.
+
+## P2 diagnostic misleading logs: active R26 owner still called "R29" in R30 installer
+
+- `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp::R30InstallThread` (~4072–4145) actually waits for `R26InstallState` and hooks `DrawPrimitiveDestR26/DrawIndexedPrimitiveDestR26` plus `PresentDestR27`. Yet its failure/timeout messages still say "R29 prerequisite failed; R29 remains active" and the local hook names are `R30...R29Hook`. This is **literal old log text**, not evidence the production package enters R29.
+- The same installer logs "unknown draw heuristics are disabled" while R30's *actual* `R30ConfigureXyzrhwWorldEffect` still admits untagged `state.rhwDepthEvidence` for world effects. Therefore success messages describe only intent, not an exhaustive runtime classification contract.
+- Review recommendation: do not diagnose a live HMD log as "R29 active" solely by that string; trust **packaged CMake flags, `VARIANT_ID=ACTIVE_R26_R43_R44`, hook target addresses and actual draw flags**. This is a low-risk observability/documentation cleanup, not a source behavior fix and not a separately scoreable achievement.
