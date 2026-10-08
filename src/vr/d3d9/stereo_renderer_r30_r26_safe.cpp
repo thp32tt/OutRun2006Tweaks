@@ -1569,28 +1569,18 @@ namespace OutRunVRStereo
             return true;
         }
 
-        // Generic queued screen sprites and ordinary position digits share
-        // the game's c64 across draw calls. Reading live GPU c64 here can
-        // recover an R23/R30 head-injected world matrix rather than the
-        // original game matrix. Keep this strictly queue-scoped; the proven
-        // OutRun rival producer is intentionally NOT opted into this repair.
+        // Generic queued screen sprites share the game's c64 across draw
+        // calls. Reading live GPU c64 may recover an already head-injected
+        // world WVP. Restrict this recovery to the explicit SCREEN_OVERLAY_2D
+        // semantic: no ProducerToken (diagnostic-only), no rank/rival or world
+        // classification changes. The scene owner remains authoritative.
         bool R30GetRecentRawWvpForQueueSprite(
             float outConstants[16]) noexcept
         {
             if (!outConstants ||
-                !OutRunVR::GameSemantic::QueueRenderActive())
-                return false;
-            const auto scope = OutRunVR::GameSemantic::CurrentScope;
-            const auto token =
-                OutRunVR::GameSemantic::CurrentQueueProducerToken();
-            const bool genericScreen =
-                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope);
-            const bool rank =
-                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
-                    scope) &&
-                (token == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
-                 token == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
-            if (!genericScreen && !rank)
+                !OutRunVR::GameSemantic::QueueRenderActive() ||
+                !OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    OutRunVR::GameSemantic::CurrentScope))
                 return false;
             std::uint64_t writeSerial = 0;
             std::uint64_t writeDrawSerial = 0;
@@ -4014,16 +4004,13 @@ namespace OutRunVRStereo
                         if (!R30GetExtendedRawWvpForExactSceneEffect(original))
                             return false;
                     }
-                    else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D ||
-                             (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D &&
-                              (OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
-                               OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
-                               OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
-                               OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite)))
+                    else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
                     {
-                        // Never reapply head/eye transforms to injected live
-                        // c64. An unproven original game upload fails closed.
-                        // Do not change the already-correct rival producer.
+                        // Never apply the HUD plane to head-injected live
+                        // c64 for a queued 2D sprite. Fail closed when the
+                        // original same-shader upload cannot be proven.
+                        // Both rank and correctly placed rival world routes
+                        // retain their existing original transform owners.
                         if (!R30GetRecentRawWvpForQueueSprite(original))
                             return false;
                     }
