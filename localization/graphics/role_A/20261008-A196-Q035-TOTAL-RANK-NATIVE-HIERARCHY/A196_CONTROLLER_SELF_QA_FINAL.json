@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run_key": "OUTRUN-KOR-A196-Q035-TOTAL-RANK-20261008-2301",
+  "reviewed_at_kst": "2026-10-08 23:09 KST",
+  "index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "previous_candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "new_candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "execution_backend": "GITHUB_ACTIONS_HOSTED_SOURCE_DDS_NOT_MOUNTABLE_CHATGPT_LOCAL",
+  "github_workflow_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37789511758",
+  "source_clean_report": "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_WORKER_REPORT.json",
+  "source_clean_native": [
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_pink_SOURCE_CLEAN_FINAL_NATIVE.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_green_SOURCE_CLEAN_FINAL_NATIVE.png"
+  ],
+  "raw_and_readable": [
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_READABLE_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_RAW_SOURCE_FINAL.jpg"
+  ],
+  "contact_practical": [
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_pink_SOURCE_CLEAN_FINAL_100.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_green_SOURCE_CLEAN_FINAL_100.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_pink_SOURCE_CLEAN_FINAL_75.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_green_SOURCE_CLEAN_FINAL_75.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_pink_SOURCE_CLEAN_FINAL_50.png",
+    "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_green_SOURCE_CLEAN_FINAL_50.png"
+  ],
+  "QA_10_stages": {
+    "01_canonical_source": "PASS 4096x4096 RGBA32 1 mip; exact HD source sha verified",
+    "02_full_label_inventory": "PASS two title labels pink/green; Holly character and bubble backgrounds protected",
+    "03_clean_plate": "PASS validated A102 English plate before Korean lettering",
+    "04_plate_only": "PASS independent SOURCE/CLEAN observed pink/green without English glyphs, protected artwork preserved",
+    "05_native_style_profile": "PASS bright-white text, deep navy border, readable right italic; source-family approximate glyph style subject to fresh C",
+    "06_native_render": "PASS direct native Noto CJK Black 66pt, right lean; no old-Korean bitmap upscale",
+    "07_transparent_composite": "PASS native mask + original-family navy outline, no background pasted with text",
+    "08_contamination": "PASS CLEAN versus FINAL only declared glyph/effect mask pixels; no rectangular box/foreign art",
+    "09_saved_dds": "PASS actual persisted DDS roundtrip, RAW mirror Y, one authored MIP, 100/75/50 images",
+    "10_independent_handoff": "PENDING new C1, distinct C3, current-policy APPROVAL, user JPG + real-game"
+  },
+  "eight_ordered_checks": {
+    "clean_plate": "PASS no English left in two independent source/clean native contacts",
+    "readable_slant": "PASS right-lean source-family intent reproduced; per-glyph semantic anchors require independent C",
+    "source_relative_size": "PASS material widths +95/+100 px; 327/504 and 327/505 high-risk not yet C-approved",
+    "effect_weight": "PASS white fill + navy outline; no extra box or shadow",
+    "clipping": "PASS no observed broken Hangul pixels",
+    "protected_art": "PASS 0 outside original effect scope; sprites unchanged",
+    "orientation": "PASS RAW is upside-down mirror-Y just like canonical English; readable FLIP-Y matches",
+    "readability": "PASS 종합 랭킹 legible at native and 50%; independent C visual confirmation pending"
+  },
+  "rows": [
+    {
+      "region": "pink",
+      "original_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "localized_bbox": [
+        697,
+        358,
+        1024,
+        428
+      ],
+      "prior_width": 232,
+      "new_width": 327,
+      "gain_px": 95,
+      "margin_px": [
+        88,
+        89,
+        1,
+        1
+      ]
+    },
+    {
+      "region": "green",
+      "original_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "localized_bbox": [
+        2362,
+        371,
+        2689,
+        441
+      ],
+      "prior_width": 227,
+      "new_width": 327,
+      "gain_px": 100,
+      "margin_px": [
+        89,
+        89,
+        1,
+        1
+      ]
+    }
+  ],
+  "machine_qa": {
+    "source_edited_pixels": [
+      32656,
+      35931
+    ],
+    "changed_outside_english_effect_scope": 0,
+    "alpha_changed_outside_english_effect_scope": 0,
+    "clean_to_final_outside_transparent_korean_effect_mask": 0,
+    "protected_changed": 0,
+    "exact_english_source_remnant": 0,
+    "local_glyph_overlap": 0,
+    "ddspersist_roundtrip": "PASS"
+  },
+  "visual_limitations": [
+    "Korean width remains 327px against original English 504/505; source family horizontal hierarchy remains independently reviewable",
+    "top and bottom source glyph bbox margins are only 1px; must receive high-zoom C and actual game review",
+    "producer visual PASS is not blinded/independent C PASS or user acceptance"
+  ],
+  "role_A_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_approved": false,
+  "new_material_candidate_dds": 1
+}

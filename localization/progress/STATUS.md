@@ -3100,3 +3100,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-08 22:59 KST — C307 C2 EVEN q230 lossless/whole-atlas HOLD
 - `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`. 22 new source/CLEAN/final native+75+50/RAW/zoom lossless PNG and full-atlas CLEAN/FINAL pixel gate outside q230 two help bboxes 0/0/0. Exact DDS preserved. Independent blind calibration/source-family/semantic anchors/full approval outstanding: `C3_STRICT_AUDIT=HOLD_STRICT_RECHECK`, current APPROVALS/export blocked, DDS 0, `RUNTIME_VALIDATION=UNTESTED`. Controller `localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json`.
+
+### 2026-10-08 23:09 KST — A196 q035 Total Rank title rework
+- New candidate DDS `cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254` (A odd). Source family italic white/navy; pink/green widths **232/227 → 327/327** with exact source glyph ceilings 504/505px. Plate-only and composite-only zero unauthorized pixels; native+100/75/50+RAW producer self-QA PASS, original sprite/bubbles protected. 1px top/bottom margin and visual hierarchy require fresh independent C1 then distinct C3, user JPG/actual game still UNTESTED. QA `localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_CONTROLLER_SELF_QA_FINAL.json`.

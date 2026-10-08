@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A196 q035 E989E3B7 actual new DDS cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254; verified source/CLEAN native and 100/75/50, RAW, 2/2 original bboxes, width pink 232->327/504, green 227->327/505, 0 out-of-scope/protected/ghost/composite. A producer self-QA PASS, 1px top/bottom margin high-risk, fresh C1 and separate C3 plus current approval/JPG/user actual-game retest still outstanding. localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_CONTROLLER_SELF_QA_FINAL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C307 C2 EVEN q230 E95DA5: 22 new exact-SHA lossless SOURCE/CLEAN/FINAL, BLACK/GRAY/WHITE native/75/50, RAW and 200%; complete clean/final atlas outside 2 help regions RGBA/alpha/visible 0/0/0. Calibrated blind source-family weight/counter-space/slant/full-inventory review missing; C3 HOLD and no approval; no DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
     "C307 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) C3_STRICT_AUDIT fallback (fresh odd C done/none actionable). Reverified exact 313DB8CB source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and unchanged A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; 14 independent lossless SOURCE/CLEAN/FINAL native black/gray/white 2x/75/50/RAW views. 2/2 source bbox positive margin, outside source/clean/candidate 0, alpha-outside0, header/RAW matched; no definite visual source residue, wrong slant or glyph loss observed. Historical C226 C PASS retained, C3 HOLD_STRICT_RECHECK lacking qualified blind calibration and full current-policy family/anchor/approval evidence. No new DDS/approval/user/actual-game; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json.",
     "B273 B EVEN q098 42E618FD rejected source-white-face/BC3 trials: B272 trial SHA 71d5683b... 23854 pixels erased navy outline; B273 trial SHA 7f9bc391... 1321 microhole pixels/320 BC3 blocks exact alpha/header/outside0 but native/practical 100/50 shows dark glyph-face streaks, controller VISUAL FAIL. Both trial DDS only under role_B, neither promoted. Existing B269 SHA 1d63cd9b... remains byte-identical production candidate and C300 REWORK_REQUIRED. Next use source-derived native white face + navy keyline and qualified CLEAN, not more same-method BC3 fill; fresh C2/C3/user/game blocked. B273_CONTROLLER_VISUAL_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
@@ -12074,5 +12075,23 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
     "machine": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_PLATE_COMPOSITE_NATIVE_MACHINE.json"
+  },
+  "a196_q035_total_rank": {
+    "at_kst": "2026-10-08 23:09 KST",
+    "run_key": "OUTRUN-KOR-A196-Q035-TOTAL-RANK-20261008-2301",
+    "index": 35,
+    "asset": "E989E3B7",
+    "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "previous_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+    "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "new_materially_reworked_dds": 1,
+    "bbox_regions_pass": 2,
+    "producer": "SELF_QA_PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "approval": false,
+    "user_acceptance": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_CONTROLLER_SELF_QA_FINAL.json"
   }
 }
