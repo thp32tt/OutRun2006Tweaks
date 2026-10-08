@@ -189,7 +189,7 @@ mutation_must_fail("stale original child pointer retained",
                    "entry.args2.child_B4 = nullptr;",
                    "/* original pointer reused */")
 mutation_must_fail("unsafe no-tick replay",
-                   "if (!entry.replayable)",
-                   "if (false)")
+                   "\t\t\tif (!entry.replayable)\n\t\t\t\tcontinue;",
+                   "\t\t\tif (false)\n\t\t\t\tcontinue;")
 
 print("VR Sumo replay semantic and bounded mask lifetime contract PASS")
