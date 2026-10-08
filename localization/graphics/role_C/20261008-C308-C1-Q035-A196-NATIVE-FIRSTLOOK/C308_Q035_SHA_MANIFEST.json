@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C308-C1-Q035-A196-FIRSTLOOK-20261008",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+  "verified_persisted_DDS": true,
+  "files": [
+    {
+      "file": "C308_Q035_pink_native_GRAY.png",
+      "sha256": "b19e963a483e22398e0f9bf681fcbf37cfbb66d6e0db9f0a973fdfe9d64ca6f5",
+      "size": 60010,
+      "region": "pink",
+      "variant": "native",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_GRAY.png",
+      "git_blob_sha": "999c099edd34a1247bc1dcc0f9cd2cf6ba6ba3f8"
+    },
+    {
+      "file": "C308_Q035_pink_native_BLACK.png",
+      "sha256": "c916be442dc66c0269271cdcdb3f3b4c3b8cdbab62b255b562826007f7458a9f",
+      "size": 60986,
+      "region": "pink",
+      "variant": "native",
+      "background": "BLACK",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_BLACK.png",
+      "git_blob_sha": "b152fae4b57ebf7724f7226ae36f610db1cc7b99"
+    },
+    {
+      "file": "C308_Q035_pink_native_WHITE.png",
+      "sha256": "aef7b88a7d17f677f85879fb11628f71f2b1ab0b00a809661de4f6346f739363",
+      "size": 59023,
+      "region": "pink",
+      "variant": "native",
+      "background": "WHITE",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_WHITE.png",
+      "git_blob_sha": "aee59c964dbb75c36dc740833018e9d2d1f10939"
+    },
+    {
+      "file": "C308_Q035_pink_zoom2_GRAY.png",
+      "sha256": "1bf1b35a000a42fcda92a63530cbf8a98a6f95e1d373cff3962e0c682e3d5eed",
+      "size": 79713,
+      "region": "pink",
+      "variant": "zoom2",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_zoom2_GRAY.png",
+      "git_blob_sha": "b56ac072445bea116218c386b0db2c7862bb75ca"
+    },
+    {
+      "file": "C308_Q035_pink_practical75_GRAY.png",
+      "sha256": "40175998c5f3ddde2ccefd191b60d3a444cf086c0589c73423fd0b2ec9f5bd68",
+      "size": 66901,
+      "region": "pink",
+      "variant": "practical75",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_practical75_GRAY.png",
+      "git_blob_sha": "3590debdf52a38b133f6b9dd8b8bce825277dfee"
+    },
+    {
+      "file": "C308_Q035_pink_practical50_GRAY.png",
+      "sha256": "d03adfbd4d9199b886805091bcb54c2b6fd99dd28567224b1994ae6605c312f6",
+      "size": 37568,
+      "region": "pink",
+      "variant": "practical50",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_practical50_GRAY.png",
+      "git_blob_sha": "3aa41a6c9a59fa616386f7ea574ec18d69637ef3"
+    },
+    {
+      "file": "C308_Q035_pink_raw_GRAY.png",
+      "sha256": "da7b3e4b159359ef4583b0509f1f48bf88207e906396dcd85d3afecfb94dd906",
+      "size": 63518,
+      "region": "pink",
+      "variant": "raw",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_raw_GRAY.png",
+      "git_blob_sha": "37c93f5a69f34f7a28d0bb9ac792d5cff6985eed"
+    },
+    {
+      "file": "C308_Q035_green_native_GRAY.png",
+      "sha256": "ff381f5e922e0f5427f809253bc48b79a69ce0949a63625f8b96f4e0beda5a9d",
+      "size": 51182,
+      "region": "green",
+      "variant": "native",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_GRAY.png",
+      "git_blob_sha": "7d596b828ebe46ab2394f68aeca4c30b31cda23a"
+    },
+    {
+      "file": "C308_Q035_green_native_BLACK.png",
+      "sha256": "b5c0dd985164ca20f2b63edda71bcc26866ed0ffd8b0162eca4755935bc3109b",
+      "size": 51539,
+      "region": "green",
+      "variant": "native",
+      "background": "BLACK",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_BLACK.png",
+      "git_blob_sha": "ab5e6055c18d1e75a69da42fe6c0130eb4a0ce39"
+    },
+    {
+      "file": "C308_Q035_green_native_WHITE.png",
+      "sha256": "a4290cb62cd89ad8806fa17f4be1e562dabb2865f258418e4fe2a928864dfe76",
+      "size": 51144,
+      "region": "green",
+      "variant": "native",
+      "background": "WHITE",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_WHITE.png",
+      "git_blob_sha": "266ecf2323e289e1a793110deaf7ef8355c327a3"
+    },
+    {
+      "file": "C308_Q035_green_zoom2_GRAY.png",
+      "sha256": "18854284b1796e59b7d39ffc3b082d206b4f102b51e6cb8ab10c2bc8204cc145",
+      "size": 66866,
+      "region": "green",
+      "variant": "zoom2",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_zoom2_GRAY.png",
+      "git_blob_sha": "c00c05e22a16aaa338256b351c4a6cc7fcfcad2a"
+    },
+    {
+      "file": "C308_Q035_green_practical75_GRAY.png",
+      "sha256": "7a3d1dd46cba98694d78833b63d2af8a89072e8820325fd31cb411ab12b4dfb4",
+      "size": 62162,
+      "region": "green",
+      "variant": "practical75",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_practical75_GRAY.png",
+      "git_blob_sha": "892a7201bf379db4aad868db672650441d5073aa"
+    },
+    {
+      "file": "C308_Q035_green_practical50_GRAY.png",
+      "sha256": "291a39efd37ce991d96605cc8376fc98824e7daad6e8b54b42f58220113f1052",
+      "size": 35526,
+      "region": "green",
+      "variant": "practical50",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_practical50_GRAY.png",
+      "git_blob_sha": "43ad59ecdbea77092259f4be0518969306b28a3e"
+    },
+    {
+      "file": "C308_Q035_green_raw_GRAY.png",
+      "sha256": "bc05570190f765344bc6ef60be39795eb8f329ded2a42dad237747eb823099b4",
+      "size": 55665,
+      "region": "green",
+      "variant": "raw",
+      "background": "GRAY",
+      "git_path": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_raw_GRAY.png",
+      "git_blob_sha": "b61df3d4e0927c3a041d6c4baf76c097bf695226"
+    }
+  ],
+  "image_count": 14,
+  "total_bytes": 801803
+}

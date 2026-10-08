@@ -1,0 +1,218 @@
+{
+  "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+  "dds_header_exact": true,
+  "dds_size": [
+    4096,
+    4096
+  ],
+  "raw": "mirror_y",
+  "clean_orientation_counts": [
+    0,
+    12038301
+  ],
+  "source_clean_outside_edit_regions": 0,
+  "source_final_outside_edit_regions": 0,
+  "clean_final_outside_edit_regions": 0,
+  "alpha_source_final_outside": 0,
+  "rows": [
+    {
+      "id": "pink",
+      "source_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "edit_bbox": [
+        594,
+        342,
+        1128,
+        444
+      ],
+      "localized_bbox": [
+        697,
+        358,
+        1024,
+        428
+      ],
+      "margin": [
+        88,
+        89,
+        1,
+        1
+      ],
+      "source_wh": [
+        504,
+        72
+      ],
+      "localized_wh": [
+        327,
+        70
+      ],
+      "source_clean_changed_inside_bbox": 32656,
+      "clean_final_changed_inside_bbox": 14596,
+      "clean_final_outside_candidate_bbox_in_region": 0,
+      "clean_rgba_in_source_bbox_nonzero_alpha": 36288,
+      "source_rgba_in_source_bbox_nonzero_alpha": 36288,
+      "final_rgba_in_source_bbox_nonzero_alpha": 36288
+    },
+    {
+      "id": "green",
+      "source_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "edit_bbox": [
+        2266,
+        363,
+        2785,
+        448
+      ],
+      "localized_bbox": [
+        2362,
+        371,
+        2689,
+        441
+      ],
+      "margin": [
+        89,
+        89,
+        1,
+        1
+      ],
+      "source_wh": [
+        505,
+        72
+      ],
+      "localized_wh": [
+        327,
+        70
+      ],
+      "source_clean_changed_inside_bbox": 35931,
+      "clean_final_changed_inside_bbox": 14596,
+      "clean_final_outside_candidate_bbox_in_region": 0,
+      "clean_rgba_in_source_bbox_nonzero_alpha": 36360,
+      "source_rgba_in_source_bbox_nonzero_alpha": 36360,
+      "final_rgba_in_source_bbox_nonzero_alpha": 36360
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "C308_Q035_pink_native_GRAY.png",
+      "sha256": "b19e963a483e22398e0f9bf681fcbf37cfbb66d6e0db9f0a973fdfe9d64ca6f5",
+      "size": 60010,
+      "region": "pink",
+      "variant": "native",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_pink_native_BLACK.png",
+      "sha256": "c916be442dc66c0269271cdcdb3f3b4c3b8cdbab62b255b562826007f7458a9f",
+      "size": 60986,
+      "region": "pink",
+      "variant": "native",
+      "background": "BLACK"
+    },
+    {
+      "file": "C308_Q035_pink_native_WHITE.png",
+      "sha256": "aef7b88a7d17f677f85879fb11628f71f2b1ab0b00a809661de4f6346f739363",
+      "size": 59023,
+      "region": "pink",
+      "variant": "native",
+      "background": "WHITE"
+    },
+    {
+      "file": "C308_Q035_pink_zoom2_GRAY.png",
+      "sha256": "1bf1b35a000a42fcda92a63530cbf8a98a6f95e1d373cff3962e0c682e3d5eed",
+      "size": 79713,
+      "region": "pink",
+      "variant": "zoom2",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_pink_practical75_GRAY.png",
+      "sha256": "40175998c5f3ddde2ccefd191b60d3a444cf086c0589c73423fd0b2ec9f5bd68",
+      "size": 66901,
+      "region": "pink",
+      "variant": "practical75",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_pink_practical50_GRAY.png",
+      "sha256": "d03adfbd4d9199b886805091bcb54c2b6fd99dd28567224b1994ae6605c312f6",
+      "size": 37568,
+      "region": "pink",
+      "variant": "practical50",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_pink_raw_GRAY.png",
+      "sha256": "da7b3e4b159359ef4583b0509f1f48bf88207e906396dcd85d3afecfb94dd906",
+      "size": 63518,
+      "region": "pink",
+      "variant": "raw",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_green_native_GRAY.png",
+      "sha256": "ff381f5e922e0f5427f809253bc48b79a69ce0949a63625f8b96f4e0beda5a9d",
+      "size": 51182,
+      "region": "green",
+      "variant": "native",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_green_native_BLACK.png",
+      "sha256": "b5c0dd985164ca20f2b63edda71bcc26866ed0ffd8b0162eca4755935bc3109b",
+      "size": 51539,
+      "region": "green",
+      "variant": "native",
+      "background": "BLACK"
+    },
+    {
+      "file": "C308_Q035_green_native_WHITE.png",
+      "sha256": "a4290cb62cd89ad8806fa17f4be1e562dabb2865f258418e4fe2a928864dfe76",
+      "size": 51144,
+      "region": "green",
+      "variant": "native",
+      "background": "WHITE"
+    },
+    {
+      "file": "C308_Q035_green_zoom2_GRAY.png",
+      "sha256": "18854284b1796e59b7d39ffc3b082d206b4f102b51e6cb8ab10c2bc8204cc145",
+      "size": 66866,
+      "region": "green",
+      "variant": "zoom2",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_green_practical75_GRAY.png",
+      "sha256": "7a3d1dd46cba98694d78833b63d2af8a89072e8820325fd31cb411ab12b4dfb4",
+      "size": 62162,
+      "region": "green",
+      "variant": "practical75",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_green_practical50_GRAY.png",
+      "sha256": "291a39efd37ce991d96605cc8376fc98824e7daad6e8b54b42f58220113f1052",
+      "size": 35526,
+      "region": "green",
+      "variant": "practical50",
+      "background": "GRAY"
+    },
+    {
+      "file": "C308_Q035_green_raw_GRAY.png",
+      "sha256": "bc05570190f765344bc6ef60be39795eb8f329ded2a42dad237747eb823099b4",
+      "size": 55665,
+      "region": "green",
+      "variant": "raw",
+      "background": "GRAY"
+    }
+  ],
+  "comment": "CLEAN source bbox contains opaque scene background (do not interpret nonzero alpha there as English residue); orientation match and out-of-region pixel preservation prove scope only, not subjective style"
+}

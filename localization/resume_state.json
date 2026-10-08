@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C308 2026-10-08 23:19 KST TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) exact A196 q035 SHA cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254 independently verified against canonical English b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583 and authored CLEAN e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e. 14 NEW native 1x, zoom2, 75/50, RAW, B/G/W lossless SOURCE/CLEAN/FINAL PNG. Source-clean, source-final, clean-final outside edit 0; alpha outside0, localized bbox outside changes0; both title margins y1px; possible source-family slant/letter-spacing mismatch first-look not independently calibrated: HOLD_STRICT_RECHECK, no C/C3 PASS, DDS unchanged, user/game UNTESTED. localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_CONTROLLER_C1_HOLD.json.",
     "A196 q035 E989E3B7 actual new DDS cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254; verified source/CLEAN native and 100/75/50, RAW, 2/2 original bboxes, width pink 232->327/504, green 227->327/505, 0 out-of-scope/protected/ghost/composite. A producer self-QA PASS, 1px top/bottom margin high-risk, fresh C1 and separate C3 plus current approval/JPG/user actual-game retest still outstanding. localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_CONTROLLER_SELF_QA_FINAL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C307 C2 EVEN q230 E95DA5: 22 new exact-SHA lossless SOURCE/CLEAN/FINAL, BLACK/GRAY/WHITE native/75/50, RAW and 200%; complete clean/final atlas outside 2 help regions RGBA/alpha/visible 0/0/0. Calibrated blind source-family weight/counter-space/slant/full-inventory review missing; C3 HOLD and no approval; no DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_CONTROLLER_C3_HOLD.json",
     "C307 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD(+UNINDEXED_SPECIAL) C3_STRICT_AUDIT fallback (fresh odd C done/none actionable). Reverified exact 313DB8CB source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and unchanged A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; 14 independent lossless SOURCE/CLEAN/FINAL native black/gray/white 2x/75/50/RAW views. 2/2 source bbox positive margin, outside source/clean/candidate 0, alpha-outside0, header/RAW matched; no definite visual source residue, wrong slant or glyph loss observed. Historical C226 C PASS retained, C3 HOLD_STRICT_RECHECK lacking qualified blind calibration and full current-policy family/anchor/approval evidence. No new DDS/approval/user/actual-game; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261008-C307-C1-Q139-C3-NATIVE-EVIDENCE/C307_CONTROLLER_C3_HOLD.json.",
@@ -6780,7 +6781,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 22:59 KST",
+  "updated_at_kst": "2026-10-08 23:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12093,5 +12094,21 @@
     "user_acceptance": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261008-A196-Q035-TOTAL-RANK-NATIVE-HIERARCHY/A196_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c308_c1_q035_a196_native": {
+    "task_id": "OUTRUN-KOR-C308-C1-Q035-A196-FIRSTLOOK-20261008",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 35,
+    "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "new_lossless_png": 14,
+    "changed_outside": 0,
+    "slant_family_qualified": false,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED_UNTIL_C",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_CONTROLLER_C1_HOLD.json"
   }
 }

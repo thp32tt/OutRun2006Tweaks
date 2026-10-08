@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C308-C1-Q035-A196-FIRSTLOOK-20261008",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583"
+  },
+  "current_candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "supersedes_C1_rejected_SHA": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+  "original_clean": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CLEAN_PLATE.png",
+  "first_look_before_producer_report": true,
+  "first_look_observations": "SOURCE/CLEAN/FINAL readable original and Korean high-resolution rows reviewed before worker/self-QA prose. Both Korean labels appear visually more spaced and less strongly italic than the compact strong-right-lean English Total Rank. The first-look suspicion alone is NOT a definitive defect without matched original family/per-glyph anchor calibration.",
+  "prior_defect": "C1 2026-10-08 q035 prior text width 232/227 source width 504/505 rejected as undersized; newly persisted A196 width327 both",
+  "producer_review_read_after_firstlook": true,
+  "triage_command": "python tools/localization/rework_triage.py --index 35",
+  "triage_result": "FRESH_C_REVIEW",
+  "backend": "GitHub as SSOT + ChatGPT visual firstlook + N100 MCP bounded read-only 2x64MiB DDS fallback after local GitHub DNS failed",
+  "native_dds": {
+    "width": 4096,
+    "height": 4096,
+    "mips": 1,
+    "raw": "mirror_y",
+    "header_exact_match": true
+  },
+  "pixel_measures": {
+    "source_clean_outside_edit": 0,
+    "source_final_outside_edit": 0,
+    "clean_final_outside_edit": 0,
+    "alpha_source_final_outside": 0,
+    "clean_orientation_counts": [
+      0,
+      12038301
+    ],
+    "rows": [
+      {
+        "id": "pink",
+        "source_bbox": [
+          609,
+          357,
+          1113,
+          429
+        ],
+        "localized_bbox": [
+          697,
+          358,
+          1024,
+          428
+        ],
+        "margin": [
+          88,
+          89,
+          1,
+          1
+        ],
+        "source_height": 72,
+        "localized_height": 70,
+        "source_width": 504,
+        "localized_width": 327,
+        "source_clean_changed_inside_bbox": 32656,
+        "clean_final_changed_inside_bbox": 14596,
+        "clean_final_outside_candidate_bbox_in_region": 0
+      },
+      {
+        "id": "green",
+        "source_bbox": [
+          2273,
+          370,
+          2778,
+          442
+        ],
+        "localized_bbox": [
+          2362,
+          371,
+          2689,
+          441
+        ],
+        "margin": [
+          89,
+          89,
+          1,
+          1
+        ],
+        "source_height": 72,
+        "localized_height": 70,
+        "source_width": 505,
+        "localized_width": 327,
+        "source_clean_changed_inside_bbox": 35931,
+        "clean_final_changed_inside_bbox": 14596,
+        "clean_final_outside_candidate_bbox_in_region": 0
+      }
+    ]
+  },
+  "per_region_evidence": [
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_practical75_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_pink_raw_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_BLACK.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_native_WHITE.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_zoom2_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_practical75_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_practical50_GRAY.png",
+    "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_green_raw_GRAY.png"
+  ],
+  "eight_checks": {
+    "english_removal": "SOURCE/CLEAN visually no definite ghost; outside both edit regions=0; complete calibrated plate-gradient review pending",
+    "slant_direction": "READABLE English strong-right italic, Korean visibly slightly shallower/more spaced; not quantified with qualified glyph anchors -> HOLD",
+    "scale": "327px Korean versus 504/505px English width, 70/72px height. Width ratio alone is NOT failure; type hierarchy/kerning needs qualified source-family comparison",
+    "font_style": "White/navy approximate source family, visually different letter shape and tracking; no defensible independent threshold to fail/pass",
+    "glyph_integrity": "Native/zoom2/practical50 shows legible four Hangul characters; 1px top/bottom margin high clipping risk, no definite cropped stroke observed",
+    "protected": "SOURCE/CLEAN/FINAL outside declared edit regions0; candidate change outside candidate bbox 0 in both source regions; protected sprite mask independent coverage not fully proven",
+    "placement": "Both Korean bboxes strict inside English source boxes, margin x=88/89, y=1/1; source-relative vertical and spacing deserve review",
+    "raw_flip_y": "DDS headers match, source/final RAW mirror_y readable consistent"
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_NATIVE_MACHINE.json",
+  "manifest": "localization/graphics/role_C/20261008-C308-C1-Q035-A196-NATIVE-FIRSTLOOK/C308_Q035_SHA_MANIFEST.json",
+  "calibration_status": "NOT_QUALIFIED",
+  "known_defect_blind_control": "NOT_RUN",
+  "source_family_per_glyph_slant_anchor": "INCOMPLETE",
+  "plate_only_mask_calibration": "INCOMPLETE",
+  "current_C_decision": "HOLD_STRICT_RECHECK",
+  "C3": "PENDING_NEW_QUALIFIED_C",
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED_CURRENT_POLICY",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_independent_C_pass": 0,
+  "rework_declared": false,
+  "reason_for_hold": "Firstlook found possible source-family italic/letter-spacing divergence but not a calibrated confirmed visual failure. New policy requires known-defect blind calibration, quantitative per-glyph readable slant anchors and distinct C/C3 evidence before PASS. Preserve latest A196 DDS; no arbitrary width-driven rerender.",
+  "created_at_kst": "2026-10-08 23:18 KST"
+}
