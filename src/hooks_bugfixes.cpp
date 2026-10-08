@@ -695,7 +695,15 @@ class FixFileLoadRace : public Hook
 		uint8_t* entry = *reinterpret_cast<uint8_t**>(Module::exe_ptr(XPR0Entry_Addr));
 		uint8_t* block = objectHandle ? *objectHandle : nullptr;
 
-		if (block && entry >= block && entry + XPR0EntrySize <= block + blockSize)
+		// Never form entry+20 or block+size as raw pointers. A corrupt XMT
+		// header can overflow that addition, and relational pointer compares
+		// across allocations are not a valid range proof. Work in offsets only;
+		// retain the existing fail-closed skip for genuinely missing data.
+		const auto blockAddr = reinterpret_cast<std::uintptr_t>(block);
+		const auto entryAddr = reinterpret_cast<std::uintptr_t>(entry);
+		if (block && entry && blockSize >= XPR0EntrySize &&
+			entryAddr >= blockAddr &&
+			entryAddr - blockAddr <= blockSize - XPR0EntrySize)
 			return;
 
 		spdlog::error("FixFileLoadRace: XPR0 entry {:p} outside xmtset block {:p}+{:X}, skipping its remaining textures",
