@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "B",
+  "run": "20261008-B258-Q214-BC3-FACE-PRIORITY",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "prior_rejected_B253_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+  "intermediate_B257_sha256": "132ba8d5159196eb68d6635a7331fc08ed0269a1512acbf9abff2226fd9fe183",
+  "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "source_pixel_evidence": "B258_SOURCE_CLEAN_B253_NEW_NATIVE6X.png",
+  "practical_evidence": [
+    "B258_PRACTICAL_100.png",
+    "B258_PRACTICAL_75.png",
+    "B258_PRACTICAL_50.png"
+  ],
+  "raw_evidence": "B258_FINAL_RAW.png",
+  "machine_qa": {
+    "status": "PASS",
+    "source_rectangles": 2,
+    "changed_rgba_outside_source_rectangles": 0,
+    "changed_alpha_outside_source_rectangles": 0,
+    "introduced_visible_outside": 0,
+    "header_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "DXT5_BC3",
+    "raw_orientation": "mirror_y",
+    "source_to_final_changed_inside": 3102,
+    "decode_face_retention": {
+      "start": 1,
+      "goal": 1
+    },
+    "worst_decoded_native_face_scanline": {
+      "start": 1,
+      "goal": 1
+    },
+    "note": "B258 full palette optimization persists cream in every flagged glyph core pixel; numeric metrics are not a source-style acceptance proof"
+  },
+  "controller_first_hand": {
+    "views": [
+      "source/clean/B257/B258 native6x comparison",
+      "B258 persisted DDS practical50 full atlas"
+    ],
+    "observations": [
+      "Both Hangul labels are real Korean characters, not tofu; persisted B258 decoded glyph core is continuous with no B253-style horizontal red stripes through cream stems.",
+      "Original START and GOAL have strongly diagonal cream/gold wordmark character, versus Korean Noto CJK Bold block-letter family. A stronger 7px top-right shift and warm per-block face gradient improve correspondence over B257 but do not independently establish exact original letterform/italic fidelity.",
+      "Red badge border, right-adjacent traffic light, route map, scenic photos and OutRun logos have no changed decoded RGBA outside the two exact source-text effect rectangles.",
+      "50% atlas shows Korean readable as small red-sign labels but independent scale/hierarchy judgment remains outstanding."
+    ]
+  },
+  "regions": [
+    {
+      "id": "start",
+      "source": "START",
+      "korean": "출발",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "localized_bbox": [
+        830,
+        497,
+        885,
+        515
+      ],
+      "margins": [
+        15,
+        2,
+        14,
+        2
+      ],
+      "rightward_top_shift_px": 7,
+      "bright_core_retained": 1
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "localized_bbox": [
+        1364,
+        766,
+        1396,
+        784
+      ],
+      "margins": [
+        21,
+        2,
+        21,
+        3
+      ],
+      "rightward_top_shift_px": 7,
+      "bright_core_retained": 1
+    }
+  ],
+  "ordered_producer_gate": {
+    "1_source_removal_plate": "PASS_SOURCE_DERIVED_CLEAN_INSIDE_BBOX_BUT_SOURCE_PLATE_STYLE_INDEPENDENT_C_PENDING",
+    "2_slant": "HOLD_SOURCE_GLYPH_ONLY_TOP_BOTTOM_ANCHORS_NOT_MEASURED",
+    "3_size": "PASS_EXACT_BBOX_POSITIVE_MARGINS__PRACTICAL_HIERARCHY_NEEDS_C",
+    "4_font_weight_outline_shadow": "HOLD_BLOCK_NOTO_SOURCE_STYLE_MATCH_NOT_FULLY_ESTABLISHED",
+    "5_glyph_integrity": "PASS_NO_RED_STROKE_BLEED_IN_PERSISTED_DDS",
+    "6_protected_art": "PASS_ZERO_PIXEL_RGBA_ALPHA_CHANGE_OUTSIDE_SOURCE_BBOX",
+    "7_FLIP_Y_RAW": "MACHINE_PASS_RAW_MIRROR_Y_VISUAL_RAW_INDEPENDENT_RECHECK_PENDING",
+    "8_immediate_readability": "IMPROVED_NATIVE_AND_PRACTICAL_50__C_CONFIRMATION_REQUIRED"
+  },
+  "producer_result": "HOLD_STRICT_RECHECK_SOURCE_STYLE_PENDING_FRESH_C2",
+  "independent_c": "PENDING_FRESH_C2",
+  "c3": "BLOCKED_PENDING_C2",
+  "pre_ingame": "BLOCKED_UNTIL_VALID_CURRENT_APPROVAL",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "execution_backend": "GITHUB_HOSTED_CPU_BECAUSE_GPT_LOCAL_CANNOT_RESOLVE_RAW_GITHUB_DNS",
+  "run_history": [
+    "B257 first attempt failed safely on BC3 non-red protected boundary",
+    "B257 corrected encoder material DDS produced and visually inspected",
+    "B258 material source-style slant and gold-gradient rework generated and persisted"
+  ]
+}
