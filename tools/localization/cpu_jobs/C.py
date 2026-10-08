@@ -29,7 +29,8 @@ f=np.flipud(np.asarray(Image.open(BytesIO(native)).convert("RGBA"))).copy()
 c=np.asarray(Image.open(BytesIO(clean_bytes)).convert("RGBA")).copy()
 assert s.shape==f.shape==c.shape==(2048,2048,4)
 report=json.loads((root/"localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF70E85_REPORT.json").read_text(encoding="utf-8"))
-assert report["source_sha256"]==expected["source"] and len(report["rows"])==14\nassert report["candidate_sha256"]!=expected["candidate"], "This historical B217 row/bbox reference is from a superseded candidate; never reuse its candidate SHA"
+assert report["source_sha256"]==expected["source"] and len(report["rows"])==14
+assert report["candidate_sha256"]!=expected["candidate"], "This historical B217 row/bbox reference is from a superseded candidate; never reuse its candidate SHA"
 dir=root/"localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION"
 dir.mkdir(parents=True,exist_ok=True)
 def save(im,name):
