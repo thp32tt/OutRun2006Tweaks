@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B266: targeted BC3 index-plane repair of dotted white Hangul face (q098)."""
+"""B267: stronger BC3 color-index inpainting for white Hangul face q098."""
 from pathlib import Path
 import os, io, sys, json, hashlib, struct, urllib.request, tempfile, subprocess
 import numpy as np
@@ -7,14 +7,14 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import binary_closing, convolve, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
-    raise SystemExit("B266 requires pinned source download; GitHub worker only")
+    raise SystemExit("B267 requires pinned source download; GitHub worker only")
 root=Path.cwd();gfx=root/"localization/graphics"
 relative="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target=gfx/"hd_candidates"/relative
-run=gfx/"role_B/20261008-B266-Q098-DXT5-WHITE-FACE-REPAIR"
+run=gfx/"role_B/20261008-B267-Q098-DXT5-ANTIDITHER-FACE-REPAIR"
 run.mkdir(parents=True,exist_ok=True)
 SHA=lambda b: hashlib.sha256(b).hexdigest()
-old_sha="86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a"
+old_sha="2f5d97318e6ebf6ea9b2edf3808206154cc66486d4707c0586f71684c188fc30"
 src_sha="3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59"
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","98","--require-safe-rerender"],capture_output=True,text=True,check=True)
 triage=json.loads(tri.stdout)["assets"][0]
@@ -56,10 +56,10 @@ rgb=cur[:,:,:3].astype(np.int16)
 alpha=cur[:,:,3]
 bright=(rgb[:,:,0]>=222)&(rgb[:,:,1]>=218)&(rgb[:,:,2]>=218)&(alpha>90)&allowed
 # Interleaved 1px dark dots along horizontal strokes, not semantic counters.
-closing=binary_closing(bright,structure=np.ones((3,5),bool))
-neighbor=convolve(bright.astype(np.uint8),np.ones((3,3),dtype=np.uint8),mode="constant")
-grayish=(rgb.min(axis=2)>65)&(rgb.sum(axis=2)>325)&(alpha>90)
-repair=closing & ~bright & grayish & (neighbor>=3) & allowed
+closing=binary_closing(bright,structure=np.ones((5,11),bool))
+neighbor=convolve(bright.astype(np.uint8),np.ones((5,7),dtype=np.uint8),mode="constant")
+grayish=(rgb.min(axis=2)>22)&(rgb.sum(axis=2)>190)&(alpha>90)
+repair=closing & ~bright & grayish & (neighbor>=5) & allowed
 if int(repair.sum())<10:
     raise RuntimeError(("no source-family compression pinholes detected",int(repair.sum())))
 raw=bytearray(oldbytes)
@@ -131,8 +131,8 @@ for orientation in ("READABLE","RAW"):
         for im in items:card.paste(im,(x,0));x+=im.width+8
         card.save(run/f"{orientation}_SOURCE_PREVIOUS_REPAIRED_{scale}.png")
 report={
- "run":"B266","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B266-Q098-BC3-WHITE-FACE-20261008",
- "status":"B266_MATERIAL_CANDIDATE_PENDING_CONTROLLER_VISUAL",
+ "run":"B267","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B267-Q098-ANTIDITHER-20261008",
+ "status":"B267_MATERIAL_CANDIDATE_PENDING_CONTROLLER_VISUAL",
  "source_sha256":src_sha,"old_candidate_sha256":old_sha,"new_candidate_sha256":SHA(new),
  "repair_kind":"LOSSLESS_BC3_ALPHA_AND_ENDPOINT_PRESERVING_COLOR_INDEX_PINHOLE_REPAIR",
  "canonical_source_bbox":bbox,"prior_localized_bbox":[580,11,1524,116],
@@ -148,5 +148,5 @@ report={
  "backend":"GITHUB_ACTIONS_PINNED_DDS_FALLBACK_UNAVAILABLE_GPT_LOCAL_RAW_GITHUB_DNS",
  "cleanup":"runner ephemeral, no N100 heavy work","prohibited_domains_touched":[]
 }
-(run/"B266_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B267_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"sha":SHA(new),"repaired":repaired,"white_recovered":improved,"blocks":len(touched),"outside":outside,"target_outside":outside_target},ensure_ascii=False))
