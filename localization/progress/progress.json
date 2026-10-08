@@ -7737,5 +7737,25 @@
     "c_pass": 0,
     "c3_pass": 0,
     "runtime_validation": "UNTESTED"
+  },
+  "c301_c2_q230_native_qa": {
+    "run_key": "OUTRUN-KOR-C301-C2-Q230-EXACT-NATIVE-REGION-QA-20261008-2027",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 230,
+    "asset": "E95DA5",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "native_row_20_21": "2/2 source/candidate pixel scope exact; zero alpha/RGBA change outside original glyph bbox within 864x76 source help cells; 2/2 bbox and height containment; source/current exact RGB [82,86,87]",
+    "triage": "VALIDATION_ONLY",
+    "C3": "HOLD_STRICT_RECHECK",
+    "approval": false,
+    "export": false,
+    "new_dds": 0,
+    "user_acceptance": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json",
+    "execution_backend": "GitHub SSOT + ChatGPT-local V8 pixel decode; N100 MCP only exact-hash large-file transfer and tiny triage script after GPT local raw GitHub DNS failure"
   }
 }
