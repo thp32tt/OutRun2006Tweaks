@@ -102,9 +102,11 @@ def check_extra_producers(ui, contracts):
 
     goal = function_body(ui, 'static void GoalTime_TagHelper(')
     ordered(goal, 'GOAL sprite parent call and all-node scope',
-            'Game::SpritePriorityCount', 'ScopedProducerSemantic producer(',
-            'RenderScope::ScreenHud', 'Module::exe_ptr(helperRva)',
-            'original();', 'TagAppendedNodes(before,')
+            'Game::SpritePriorityCount', 'Module::exe_ptr(helperRva)',
+            'original();', 'TagAppendedNodes(before,',
+            'RenderScope::ScreenHud')
+    if 'ScopedProducerSemantic' in goal and 'Current R84 queue authority' not in goal:
+        fail('retired goal producer scope API reintroduced')
     for suffix, helper in (('A', '020'), ('B', '150')):
         if len(re.findall(r'GoalTime_Help%s\(\)\s*\{\s*GoalTime_TagHelper\(0xBE%s\);\s*\}' % (helper, helper), ui)) != 1:
             fail('wrong GOAL original helper ABI or target ' + helper)
