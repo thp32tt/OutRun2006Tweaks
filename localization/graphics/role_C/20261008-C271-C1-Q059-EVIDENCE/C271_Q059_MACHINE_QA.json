@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C271",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T09:58:07+09:00",
+  "queue_index": 59,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "persisted_dds": {
+    "width": 2048,
+    "height": 512,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "file_size": 1048704
+  },
+  "exact_source_readable_evidence": {
+    "path": "localization/graphics/role_A/20261005-A-PRODUCTION25/7CE_SOURCE_READABLE.png",
+    "sha256": "e68c91aad0efcb7298edaab92f28948d56547ebae2e6a0ab4796fc6e60a4ed7a"
+  },
+  "clean_plate": {
+    "path": "localization/graphics/role_A/20261005-A-PRODUCTION25/7CE_CLEAN_PLATE.png",
+    "sha256": "f88967602d454b4345c02ac0ce6ca7bfadd009cce21a23b22895f70a28c39e8f"
+  },
+  "exact_source_bboxes_readable": [
+    {
+      "id": "next_mission",
+      "bbox": [
+        8,
+        353,
+        1293,
+        500
+      ]
+    },
+    {
+      "id": "race_rivals",
+      "bbox": [
+        75,
+        222,
+        625,
+        304
+      ]
+    },
+    {
+      "id": "drift_score",
+      "bbox": [
+        119,
+        53,
+        609,
+        137
+      ]
+    },
+    {
+      "id": "slipstream_score",
+      "bbox": [
+        717,
+        225,
+        1408,
+        320
+      ]
+    }
+  ],
+  "decoded_scope": {
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "visible_presence_changed_outside": 0,
+    "comparison": "exact persisted candidate decoded and mirror-Y normalized versus exact source-readable evidence",
+    "result": "PASS"
+  },
+  "evidence_note": "This is a hard-scope machine report for a FAIL adjudication, not an approval record. No unsupported final visual PASS is inferred from the zero-pixel result.",
+  "result": "PASS_HARD_SCOPE_ONLY_VISUAL_REVIEW_REQUIRED",
+  "runtime_validation": "UNTESTED"
+}
