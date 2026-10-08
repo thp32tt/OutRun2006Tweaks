@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "A",
+  "run": "20261008-A191-Q119-SOURCE-WHITE-HALO",
+  "completed_at_kst": "2026-10-08T17:15:00+09:00",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "prior_c290_rejected_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+  "rejected_in_current_run_A190_sha256": "d7e1378f1adac5ba1069985583cbcba30d8bc2f9b496110e865a3dd827b55490",
+  "candidate_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+  "triage": "MATERIAL_REWORK; --require-safe-rerender exit 0 on current C290 status at worker selection",
+  "change": "Corrected confirmed C290 white luminous halo loss. A190 recreated white but native black/gray visual inspection FAIL because 6px rim too hard. A191 materially softens to a narrow blurred 3px keyline plus broad Gaussian white halo and updates readable right-slant; original clean/title/source protected.",
+  "execution_backend": {
+    "dds_compute": "GitHub Actions 37748043382 (SUCCESS)",
+    "controller": "GitHub connector + first-hand source/clean/final/RAW native image review; N100 MCP only for small evidence image reading/black-gray-white contact visualization where local GitHub binary fetch unavailable",
+    "n100_heavy_compute": false
+  },
+  "dds": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_byte_exact": true
+  },
+  "machine": {
+    "report": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_F6811E94_REPORT.json",
+    "result": "PASS",
+    "source_original_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "localized_decoded_bbox": [
+      705,
+      58,
+      1316,
+      196
+    ],
+    "delta_left": 315,
+    "delta_right": 316,
+    "delta_top": 4,
+    "delta_bottom": 4,
+    "outside_rgba_changed": 0,
+    "alpha_changed_outside": 0,
+    "source_residue_outside_korean": 0,
+    "localized_overlap": 0,
+    "protected_changed": 0,
+    "decoded_bright_pixel_count": 20641,
+    "original_bright_pixel_count": 38689,
+    "prior_rejected_bright_pixel_count": 0
+  },
+  "producer_visual": {
+    "source_clean_final": "reviewed at readable orientation",
+    "native_black_gray_white": "reviewed exact persisted A191 source/final decoded PNG; A190 rejected for rigid white rim; A191 diffuse white glow visibly restored",
+    "raw": "source/current both mirror_y, same inverted RAW transform",
+    "glyph_integrity": "no definite clipping, broken syllable, source ghost or overlap visible in contact",
+    "style": "HOLD: current Korean has visually less italic, rounded glyph-family fidelity relative to English; per-glyph top-bottom slant anchors, measured family profile and native independent C1 remain unavailable",
+    "clean_plate": "transparent source-text footprint evidence present in A191_CLEAN_PLATE.png; not an independent C-certified plate",
+    "result": "HOLD_SOURCE_FAMILY_MEASUREMENT_NOT_PRODUCER_PASS"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_READABLE.png",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_RAW.png",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_CLEAN_PLATE.png",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_FINAL_READABLE.png",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_FINAL_RAW.png",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_RAW_COMPARE.jpg",
+    "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_F6811E94_REPORT.json"
+  ],
+  "next_action": "Preserve A191 new DDS bytes and conduct first-hand independent C1 SOURCE/CLEAN/CANDIDATE lossless native/practical/RAW and source-family glyph slant anchoring, C3 separately; if a concrete visual defect is confirmed return MATERIAL_REWORK. No blind same-method rerender. No C/approval claim.",
+  "decision": "A191_MATERIAL_DDS_PRODUCED_STATIC_MACHINE_PASS_PRODUCER_VISUAL_HOLD_PENDING_INDEPENDENT_C1",
+  "C": "NOT_DONE",
+  "C3": "NOT_DONE",
+  "APPROVAL": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_acceptance": "PENDING",
+  "actual_game_retest": "NOT_DONE",
+  "vr_ffb_dx11_dxvk_touched": false
+}
