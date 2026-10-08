@@ -2790,3 +2790,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 
 ### 2026-10-08 A184R q59 new producer candidate
 - q59 7CE1CFC5 exact `261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a`: 4/4 bbox + decoded zero outside/alpha/residue/protected QA PASS; SOURCE/CLEAN/FINAL/RAW producer visual self-QA PASS pending full C1 inspection of source-family title hierarchy and 100/75/50 JPG. C3/user/actual game PENDING, runtime UNTESTED.
+
+### C274 C1 q59 — 2026-10-08 11:18 KST
+- `TEMP_BACKLOG_RELIEF=C1` / `SHARD=ODD(+UNINDEXED_SPECIAL)`.
+- q59 7CE1CFC5 @ `261108cd...`: persisted DXT5 identity verified; SOURCE/CLEAN/FINAL, row, RAW and full 100/75/50 visual review favorable with no definite visible hard defect.
+- **HOLD_STRICT_RECHECK** because the invocation was not pixels-first and complete lossless per-region/current-policy evidence is incomplete. No C/C3 approval or PRE_INGAME promotion.
+- Repaired A184R's q59 extra CSV closing quote; queue now validates as 137 rows × 6 fields with q60 separate again.
+- PJR-019 remains open; `RUNTIME_VALIDATION=UNTESTED`; forbidden domains untouched.
+
