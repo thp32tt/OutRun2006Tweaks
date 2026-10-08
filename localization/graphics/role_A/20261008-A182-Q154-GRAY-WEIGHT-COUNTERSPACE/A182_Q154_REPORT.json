@@ -1,0 +1,245 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "work_stolen_from_lane": "B",
+  "trigger": "C268_REWORK_REQUIRED_GRAY_WEIGHT_COUNTER_SPACE",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "prior_candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "candidate_sha256": "dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64",
+  "repair_scope": "ONLY_GRAY_SINGLE_PLAYER_SHOWROOM_MULTIPLAYER",
+  "method": "restore exact C141 clean plate inside only the three gray source bboxes; rerender native Noto Sans CJK Korean with zero added stroke and density-selected lighter face; preserve B225 red rows and all non-gray pixels byte/pixel-exact",
+  "rows": [
+    {
+      "key": "single_player_gray",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_size": [
+        587,
+        64
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "localized_size": [
+        411,
+        58
+      ],
+      "margins": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "target_size": [
+        411,
+        58
+      ],
+      "source_text_density": 0.508411,
+      "c268_prior_density_ratio": 1.3933,
+      "a182_density_ratio": 0.815,
+      "density_reduction_pct": 41.5,
+      "font": {
+        "style": "Medium",
+        "font": "NotoSansCJK-Medium.ttc",
+        "face_index": 1,
+        "resolved_style": "Medium,Regular"
+      },
+      "stroke_width": 0,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "persisted_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "persisted_margins": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "persisted_density": 0.499203
+    },
+    {
+      "key": "showroom_gray",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_size": [
+        420,
+        62
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "localized_size": [
+        210,
+        55
+      ],
+      "margins": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "target_size": [
+        210,
+        55
+      ],
+      "source_text_density": 0.584908,
+      "c268_prior_density_ratio": 1.2361,
+      "a182_density_ratio": 0.7352,
+      "density_reduction_pct": 40.52,
+      "font": {
+        "style": "Medium",
+        "font": "NotoSansCJK-Medium.ttc",
+        "face_index": 1,
+        "resolved_style": "Medium,Regular"
+      },
+      "stroke_width": 0,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "persisted_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "persisted_margins": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "persisted_density": 0.518268
+    },
+    {
+      "key": "multiplayer_gray",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_size": [
+        520,
+        62
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "localized_size": [
+        364,
+        58
+      ],
+      "margins": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "target_size": [
+        364,
+        58
+      ],
+      "source_text_density": 0.539764,
+      "c268_prior_density_ratio": 1.3872,
+      "a182_density_ratio": 0.8203,
+      "density_reduction_pct": 40.86,
+      "font": {
+        "style": "Medium",
+        "font": "NotoSansCJK-Medium.ttc",
+        "face_index": 1,
+        "resolved_style": "Medium,Regular"
+      },
+      "stroke_width": 0,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "persisted_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "persisted_margins": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "persisted_density": 0.531925
+    }
+  ],
+  "machine_qa": {
+    "gray_bbox_source_size_positive_margin": "3/3 PASS",
+    "changed_pixels_outside_gray_source_bboxes": 0,
+    "alpha_changed_outside_gray_source_bboxes": 0,
+    "protected_visible_changed": 0,
+    "red_family_changed_pixels": 0,
+    "header_128_exact": true,
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "mips": 1,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_C141_EXACT_CLEAN_THREE_GRAY_BBOXES_ONLY",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_B225_HORIZONTAL_HIERARCHY_PRESERVED",
+    "4_weight_outline_shadow": "PASS_LIGHTER_DENSITY_SELECTED_NO_ADDED_STROKE",
+    "5_no_clipped_pixels": "PASS_3_OF_3_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_PROTECTED_RED_CHANGE",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_N100_ENOSPC",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "A182_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "fresh_independent_c": "REQUIRED_C2",
+  "mandatory_c3": "REQUIRED_AFTER_C268_VISUAL_REWORK",
+  "pre_ingame": "REQUIRED_AFTER_C_PASS",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
