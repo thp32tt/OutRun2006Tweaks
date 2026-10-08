@@ -720,7 +720,14 @@ public:
 	{
 		// Held only across a list pop and push, so a waiter is better off spinning
 		// than paying for the trip into the kernel.
-		InitializeCriticalSectionAndSpinCount(&ListLock, 4000);
+		if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))
+		{
+			// These hooks call EnterCriticalSection from both loader and main
+			// threads. Installing them after an unsuccessful initialization
+			// would turn the file-race fix into a startup crash.
+			spdlog::error("FixFileLoadRace: unable to initialize request-list lock; refusing unsafe hook installation");
+			return false;
+		}
 
 		ServiceRequest_hook = safetyhook::create_mid(Module::exe_ptr(ServiceRequest_Addr), ServiceRequest_dest);
 		ServiceRequestMoveDone_hook = safetyhook::create_mid(Module::exe_ptr(ServiceRequestMoveDone_Addr), ServiceRequestMoveDone_dest);
