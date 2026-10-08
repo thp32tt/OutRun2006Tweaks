@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C305 C2 EVEN q154 4D38BBB0 authentic B60 authored clean (exact a4d707fa) newly inspected 8/8 including 5 red UI labels over BLACK/GRAY/WHITE with SOURCE/CLEAN/CURRENT triple contact. CLEAN source region alpha all zero, source-clean/source-current RGBA outside union zero. HOLD: font weight/counter-space/source-anchored slant + qualified blind first-look and current full native+RAW 100/75/50 protected evidence not certified. No rerender unchanged bytes or repeat plate visual. localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C305 C1 q055 18 native lossless views and exact DXT5 scope QA published; historical C224 C PASS retained but C3 strict HOLD until blind calibration, native clean/anchor/family profile, current evidence validator; user JPG and actual in-game still UNTESTED. No repeat exact q055 C3 evidence without new inputs.",
     "B270/B271 q098 42E618FD: 54 independent source/clean/final native+RAW+50% plate/composite lossless PNG produced and SHA-bound to B269 1d63cd9b...; no outside pixels. B271 1994820e... core whitening erased original navy outline despite machine PASS; controller VISUAL FAIL, rollback B269 exact SHA 1d63cd9b... (also HOLD for residual micro-perforations). Need white/navy per-pixel boundary-preserving method, fresh B producer QA then C2+C3; never promote B271, no in-game test.",
     "C304 C2 EVEN q236 source/candidate exact SHA new complete 14/14 native per-region bbox and 0 RGBA/alpha changed outside source cells in all examined Y bands, 14-row contact and machine JSON now GitHub. Previous C302 covered 4; C304 newly covers 10 and independently confirms total 14. HOLD C3 current-policy until SHA-bound CLEAN, qualified blind calibration, source-family/stem slant, RAW and 100/75/50 native BGW, full atlas/mip evidence, independent APPROVALS; do not repeat same native numeric proof or rerender identical DDS. Evidence localization/graphics/role_C/20261008-C304-C2-Q236-ALL14-NATIVE-SOURCE-BOUNDARY/C304_Q236_CONTROLLER_C3_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
@@ -11947,5 +11948,30 @@
     "new_C3_pass": 0,
     "current_approval": false,
     "runtime_validation": "UNTESTED"
+  },
+  "c305_c2_q154_authored_clean_bgw": {
+    "run_key": "OUTRUN-KOR-C305-C2-Q154-AUTHORED-CLEAN-BGW-20261008-2150",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "new_visual_rows": 8,
+    "new_red_visual_rows": 5,
+    "clean_orientation": "READABLE",
+    "source_clean_outside_RGBA": 0,
+    "clean_alpha_positive_source_regions": 0,
+    "source_candidate_outside_RGBA": 0,
+    "visual": "NO_DEFINITE_PLATE_RESIDUE_IN_BGW_CONTACT; font-family/counter-space not approved",
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED_PENDING_QUALIFIED_C",
+    "APPROVAL": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_AUTHORED_PLATE_RGB_AUDIT.json",
+    "qa": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json"
   }
 }
