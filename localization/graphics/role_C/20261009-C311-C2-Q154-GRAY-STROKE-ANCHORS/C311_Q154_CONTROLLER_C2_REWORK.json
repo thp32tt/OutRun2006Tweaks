@@ -1,0 +1,333 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C311-C2",
+  "run_key": "OUTRUN-KOR-C311-C2-Q154-GRAY-SOURCE-STROKE-UNDERWEIGHT-20261009-0020",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "role": "C",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "review_date_kst": "2026-10-09 00:24 KST",
+  "selection_head": "01aa3e335670b44c3ce4337fc2ec52585aa2766e",
+  "queue_sha_at_selection": "a65a24b03712c7d4aaa9a43cdfe502dd9bf3f34c",
+  "runner_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37800584333",
+  "runner_result": "success",
+  "backend": "GitHub Actions Ubuntu CPU worker for canonical DDS inputs not available in GPT local (DNS unavailable), ChatGPT C2 controller directly inspected resulting lossless maps",
+  "exact_sha256": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "final": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "machine_report": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_GRAY_STROKE_PROFILE_MACHINE.json",
+  "new_evidence": {
+    "new_lossless_png_files": 6,
+    "morphological_font_metrics": 3,
+    "source_original_clean_final_outside_8": {
+      "SOURCE_CLEAN": {
+        "rgba_outside_8": 0,
+        "alpha_outside_8": 0
+      },
+      "CLEAN_FINAL": {
+        "rgba_outside_8": 0,
+        "alpha_outside_8": 0
+      },
+      "SOURCE_FINAL": {
+        "rgba_outside_8": 0,
+        "alpha_outside_8": 0
+      }
+    },
+    "unchanged_candidate_dds": true,
+    "previous_C306_30_contact_png_not_rerendered": true
+  },
+  "source_family_visual_decision": "REWORK_REQUIRED",
+  "defect_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+  "root_cause": "All 3 gray sublabels rendered with weaker condensed-family inner stroke mass than exact native source. Original broad source core visually absent in Korean despite exact gray fill and source-relative height; visual mismatch outranks source-bbox numeric PASS.",
+  "calibration": {
+    "historical_c294": "5/5 binary known defective control detected with 3/5 subtype; historical only",
+    "qualified_current_first_look": false,
+    "read_prior_producer_notes_before_pixel_visual": true,
+    "decision_basis": "Direct current native/zoom source-vs-candidate morphological visual defect plus nonsemantic EDT quantitative corroboration, not a calibrated PASS assertion."
+  },
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "native_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_ridge_radius_median_px": 6.3246,
+      "candidate_ridge_radius_median_px": 3,
+      "source_ridge_radius_q25_q75": [
+        6,
+        7
+      ],
+      "candidate_ridge_radius_q25_q75": [
+        3,
+        5
+      ],
+      "median_radius_ratio": 0.4743,
+      "native_height_ratio": 0.9062,
+      "opaque_color_rgb_source": [
+        78,
+        96,
+        100
+      ],
+      "opaque_color_rgb_korean": [
+        78,
+        96,
+        100
+      ],
+      "original_alpha_bbox": [
+        1,
+        0,
+        586,
+        64
+      ],
+      "korean_alpha_bbox": [
+        3,
+        3,
+        413,
+        61
+      ],
+      "source_component_count": 11,
+      "candidate_component_count": 13,
+      "source_core_map": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/06_single_player_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "b8f1a68c9a6bb42c599db9a1fd71e30e8f68094bd28a058f6a6b46d1b2c32461"
+      },
+      "korean_core_map_zoom": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/06_single_player_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "1c4beb4cbe6d9a138e322bbde5c462afa8014ed383b26f0a93cb3c3d66e5419e"
+      },
+      "checks": {
+        "slant": {
+          "decision": "HOLD",
+          "observation": "Original and Korean gray labels appear upright in readable coordinates; no trustworthy corresponding glyph stem-anchor pair for exact top-bottom displacement, so no numeric slope PASS."
+        },
+        "clean_plate": {
+          "decision": "PASS_PIXEL_AND_VISUAL_SCOPED",
+          "observation": "B60 authored CLEAN source-effect pixels alpha=0 inside region. New full-atlas original/CLEAN/FINAL changed pixels outside all 8 exact original glyph boxes=0; prior C305 visual plate showed no source shadow."
+        },
+        "style": {
+          "decision": "REWORK_REQUIRED",
+          "reason_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Controller directly inspected exact native original-vs-current distance-transform core map and 200%-nearest diagnostic. Original condensed heavy face has continuous broad inner-stroke cores; current gray Hangul at same native pixel scale has visibly smaller core area, thinner interior stroke impression and altered gray-family weight. EDT local-max median radius ratio 0.4743 supports visually apparent underweight; algorithmic radii are character-shape dependent and NOT a universal ratio FAIL alone."
+        },
+        "readability": {
+          "decision": "STATIC_LEGIBLE_NOT_GAME",
+          "observation": "New native and zoom200 diagnostic readable; C306 50% static panel legible against light background, dark-bg legibility/real displayed scale untested."
+        },
+        "glyph_integrity": {
+          "decision": "NO_DEFINITE_MISSING_GLYPH",
+          "observation": "New native/200% diagnostic shows intact Korean syllable components; source-like stroke family mismatch is style FAIL, not alleged malformed Hangul."
+        },
+        "protected_art": {
+          "decision": "MACHINE_OUTSIDE_ZERO_INTERNAL_UNCERTAIN",
+          "observation": "Full atlas RGBA/alpha changed outside union of all eight source bboxes zero. Semantic protected-art near/inside target box not separately certified."
+        },
+        "placement": {
+          "decision": "WITHIN_SOURCE_CROP_NOT_FINAL_PASS",
+          "observation": "Alpha>128 localized bbox inside original source-effect region with positive in-box margins; spatial containment does not override style failure."
+        },
+        "orientation": {
+          "decision": "STATIC_RAW_MATCH_NOT_GAME",
+          "observation": "Native source/final decoded in same readable mirror-Y convention as C305/C306, persisted DDS exact SHA; not a runtime sprite/UV test."
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "english": "SHOWROOM",
+      "korean": "쇼룸",
+      "native_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_ridge_radius_median_px": 6.4031,
+      "candidate_ridge_radius_median_px": 3,
+      "source_ridge_radius_q25_q75": [
+        6,
+        7
+      ],
+      "candidate_ridge_radius_q25_q75": [
+        3,
+        4
+      ],
+      "median_radius_ratio": 0.4685,
+      "native_height_ratio": 0.9167,
+      "opaque_color_rgb_source": [
+        78,
+        96,
+        100
+      ],
+      "opaque_color_rgb_korean": [
+        78,
+        96,
+        100
+      ],
+      "original_alpha_bbox": [
+        1,
+        1,
+        419,
+        61
+      ],
+      "korean_alpha_bbox": [
+        2,
+        3,
+        212,
+        58
+      ],
+      "source_component_count": 8,
+      "candidate_component_count": 4,
+      "source_core_map": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/07_showroom_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "edf3e1f4ba6c8d73dfc692e901fdb363e202317b707ec560ad3f399b7d6c9d2a"
+      },
+      "korean_core_map_zoom": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/07_showroom_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "d281b7148fb67def1a39d691f3c2cec32be8f66cefded1c5a51b035dd0e7475e"
+      },
+      "checks": {
+        "slant": {
+          "decision": "HOLD",
+          "observation": "Original and Korean gray labels appear upright in readable coordinates; no trustworthy corresponding glyph stem-anchor pair for exact top-bottom displacement, so no numeric slope PASS."
+        },
+        "clean_plate": {
+          "decision": "PASS_PIXEL_AND_VISUAL_SCOPED",
+          "observation": "B60 authored CLEAN source-effect pixels alpha=0 inside region. New full-atlas original/CLEAN/FINAL changed pixels outside all 8 exact original glyph boxes=0; prior C305 visual plate showed no source shadow."
+        },
+        "style": {
+          "decision": "REWORK_REQUIRED",
+          "reason_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Controller directly inspected exact native original-vs-current distance-transform core map and 200%-nearest diagnostic. Original condensed heavy face has continuous broad inner-stroke cores; current gray Hangul at same native pixel scale has visibly smaller core area, thinner interior stroke impression and altered gray-family weight. EDT local-max median radius ratio 0.4685 supports visually apparent underweight; algorithmic radii are character-shape dependent and NOT a universal ratio FAIL alone."
+        },
+        "readability": {
+          "decision": "STATIC_LEGIBLE_NOT_GAME",
+          "observation": "New native and zoom200 diagnostic readable; C306 50% static panel legible against light background, dark-bg legibility/real displayed scale untested."
+        },
+        "glyph_integrity": {
+          "decision": "NO_DEFINITE_MISSING_GLYPH",
+          "observation": "New native/200% diagnostic shows intact Korean syllable components; source-like stroke family mismatch is style FAIL, not alleged malformed Hangul."
+        },
+        "protected_art": {
+          "decision": "MACHINE_OUTSIDE_ZERO_INTERNAL_UNCERTAIN",
+          "observation": "Full atlas RGBA/alpha changed outside union of all eight source bboxes zero. Semantic protected-art near/inside target box not separately certified."
+        },
+        "placement": {
+          "decision": "WITHIN_SOURCE_CROP_NOT_FINAL_PASS",
+          "observation": "Alpha>128 localized bbox inside original source-effect region with positive in-box margins; spatial containment does not override style failure."
+        },
+        "orientation": {
+          "decision": "STATIC_RAW_MATCH_NOT_GAME",
+          "observation": "Native source/final decoded in same readable mirror-Y convention as C305/C306, persisted DDS exact SHA; not a runtime sprite/UV test."
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "native_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_ridge_radius_median_px": 7,
+      "candidate_ridge_radius_median_px": 4,
+      "source_ridge_radius_q25_q75": [
+        6,
+        7
+      ],
+      "candidate_ridge_radius_q25_q75": [
+        3,
+        5
+      ],
+      "median_radius_ratio": 0.5714,
+      "native_height_ratio": 0.9508,
+      "opaque_color_rgb_source": [
+        78,
+        96,
+        100
+      ],
+      "opaque_color_rgb_korean": [
+        78,
+        96,
+        100
+      ],
+      "original_alpha_bbox": [
+        0,
+        0,
+        519,
+        61
+      ],
+      "korean_alpha_bbox": [
+        2,
+        2,
+        366,
+        60
+      ],
+      "source_component_count": 10,
+      "candidate_component_count": 12,
+      "source_core_map": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/08_multiplayer_gray_SOURCE_FINAL_STROKE_CORE_NATIVE.png",
+        "sha256": "05dade70a22611be5fc4e76de9e5d8ecfa7709cd3e0de9a00b523cd099fafe23"
+      },
+      "korean_core_map_zoom": {
+        "path": "localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/08_multiplayer_gray_SOURCE_FINAL_STROKE_CORE_ZOOM200.png",
+        "sha256": "1f4d418d9b6f0e6ff54e6d489a995f4fdad7477e5a5f53321cd105d2f15e80d2"
+      },
+      "checks": {
+        "slant": {
+          "decision": "HOLD",
+          "observation": "Original and Korean gray labels appear upright in readable coordinates; no trustworthy corresponding glyph stem-anchor pair for exact top-bottom displacement, so no numeric slope PASS."
+        },
+        "clean_plate": {
+          "decision": "PASS_PIXEL_AND_VISUAL_SCOPED",
+          "observation": "B60 authored CLEAN source-effect pixels alpha=0 inside region. New full-atlas original/CLEAN/FINAL changed pixels outside all 8 exact original glyph boxes=0; prior C305 visual plate showed no source shadow."
+        },
+        "style": {
+          "decision": "REWORK_REQUIRED",
+          "reason_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Controller directly inspected exact native original-vs-current distance-transform core map and 200%-nearest diagnostic. Original condensed heavy face has continuous broad inner-stroke cores; current gray Hangul at same native pixel scale has visibly smaller core area, thinner interior stroke impression and altered gray-family weight. EDT local-max median radius ratio 0.5714 supports visually apparent underweight; algorithmic radii are character-shape dependent and NOT a universal ratio FAIL alone."
+        },
+        "readability": {
+          "decision": "STATIC_LEGIBLE_NOT_GAME",
+          "observation": "New native and zoom200 diagnostic readable; C306 50% static panel legible against light background, dark-bg legibility/real displayed scale untested."
+        },
+        "glyph_integrity": {
+          "decision": "NO_DEFINITE_MISSING_GLYPH",
+          "observation": "New native/200% diagnostic shows intact Korean syllable components; source-like stroke family mismatch is style FAIL, not alleged malformed Hangul."
+        },
+        "protected_art": {
+          "decision": "MACHINE_OUTSIDE_ZERO_INTERNAL_UNCERTAIN",
+          "observation": "Full atlas RGBA/alpha changed outside union of all eight source bboxes zero. Semantic protected-art near/inside target box not separately certified."
+        },
+        "placement": {
+          "decision": "WITHIN_SOURCE_CROP_NOT_FINAL_PASS",
+          "observation": "Alpha>128 localized bbox inside original source-effect region with positive in-box margins; spatial containment does not override style failure."
+        },
+        "orientation": {
+          "decision": "STATIC_RAW_MATCH_NOT_GAME",
+          "observation": "Native source/final decoded in same readable mirror-Y convention as C305/C306, persisted DDS exact SHA; not a runtime sprite/UV test."
+        }
+      }
+    }
+  ],
+  "red_5_regions": "NOT_REOPENED_BY_THIS_REVIEW; retain current exact DDS bytes and validated five red regions when A/B corrects gray 3; full 8-region isolation QA required on revised output",
+  "rework_requirements": "B-owner: native 4096x1024 source-derived gray font-family glyph-specific stroke/counter construction; preserve exact gray RGB median [78,96,100] unless native source justifies change; rebuild only three gray effect masks on proven B60 CLEAN; preserve red five and protected art byte-equivalent, source glyph bbox ceiling positive pixel separation; retain isolated PLATE_ONLY, COMPOSITE_ONLY, exact persisted decoded DDS native/75/50 black-white-gray and RAW; do not use arbitrary dilation/width scaling that erases counters.",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_REVIEW": "PENDING_NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0
+}
