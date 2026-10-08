@@ -275,6 +275,14 @@ class UIScaling : public Hook
 	static inline SafetyHookInline Calc3D2D_hk = {};
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
+		// Capture the game's actual pre-projection view-space input before
+		// Calc3D2D can alias/overwrite its output. The inverse-screen recovery
+		// below is a fallback, not the sole source of ordinal rank depth.
+		const D3DVECTOR originalInput = in ? *in : D3DVECTOR{};
+		const bool finiteInput = in &&
+			std::isfinite(originalInput.x) &&
+			std::isfinite(originalInput.y) &&
+			std::isfinite(originalInput.z);
 		Calc3D2D_hk.call(a1, a2, in, out);
 
 		// Exact rank/rival producers flatten a real game-view point into the
@@ -282,9 +290,37 @@ class UIScaling : public Hook
 		// only the two proven Calc3D2D callsites so R30 can reproject it per eye.
 		const void* returnAddress = _ReturnAddress();
 		auto recoverViewPoint =
-			[&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info)
+			[&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info,
+				bool exactOrdinalRank)
 		{
 			info = {};
+			// For ordinal rank only, accept the raw input if it reprojections
+			// to the original game's resulting 2D point. This checks the
+			// coordinate space rather than guessing it from the function name.
+			// The user's correctly attached OutRun rival stays on its old path.
+			if (exactOrdinalRank && finiteInput && out &&
+				std::isfinite(out->x) && std::isfinite(out->y) &&
+				std::isfinite(a1) && std::isfinite(a2) &&
+				originalInput.z < -1.0e-6f)
+			{
+				const float projectedX =
+					originalInput.x * a1 / (-originalInput.z);
+				const float projectedY =
+					originalInput.y * a2 / (-originalInput.z);
+				if (std::isfinite(projectedX) &&
+					std::isfinite(projectedY) &&
+					std::fabs(projectedX - out->x) <=
+						std::max(0.25f, std::fabs(out->x) * 0.002f) &&
+					std::fabs(projectedY - out->y) <=
+						std::max(0.25f, std::fabs(out->y) * 0.002f))
+				{
+					info.viewX = originalInput.x;
+					info.viewY = originalInput.y;
+					info.viewZ = originalInput.z;
+					info.valid = true;
+					return;
+				}
+			}
 			if (!out || !std::isfinite(out->x) ||
 				!std::isfinite(out->y) || !std::isfinite(out->z) ||
 				!std::isfinite(a1) || !std::isfinite(a2) ||
@@ -309,9 +345,21 @@ class UIScaling : public Hook
 		if (returnAddress == Module::exe_ptr(0xBAEE7) &&
 			RankMarkerSubActiveDepth != 0 &&
 			RankMarkerSubScreenHudDepth == 0)
-			recoverViewPoint(RankMarkerProjectedInfo);
+		{
+			recoverViewPoint(RankMarkerProjectedInfo, true);
+			static thread_local bool loggedOrdinalCalc = false;
+			if (!loggedOrdinalCalc)
+			{
+				loggedOrdinalCalc = true;
+				spdlog::info(
+					"VR R57 rank Calc3D2D: ordinal capture valid={} inputFinite={} "
+					"screenZ={} sourceZ={}",
+					RankMarkerProjectedInfo.valid, finiteInput,
+					out ? out->z : 0.0f, originalInput.z);
+			}
+		}
 		else if (returnAddress == Module::exe_ptr(0xBB6F5))
-			recoverViewPoint(RivalMarkerProjectedInfo);
+			recoverViewPoint(RivalMarkerProjectedInfo, false);
 
 		// TODO: OnlineArcade mode needs to add position here
 
