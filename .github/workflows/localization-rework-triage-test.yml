@@ -1,0 +1,26 @@
+name: Localization Rework Triage Tests
+on:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - '.github/workflows/localization-rework-triage-test.yml'
+      - 'tools/localization/rework_triage.py'
+      - 'tools/localization/test_rework_triage.py'
+      - 'localization/graphics/REWORK_ESCALATIONS.json'
+      - 'docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md'
+      - 'docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  triage-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test status classification and repeat-defect guard
+        run: python -m unittest discover -s tools/localization -p test_rework_triage.py -v
+      - name: Exercise live read-only classification
+        run: python tools/localization/rework_triage.py --index 219
