@@ -1,0 +1,32 @@
+{
+  "role": "A",
+  "run": "20261008-A191-Q119-SOURCE-WHITE-HALO",
+  "queue_index": 119,
+  "asset": "F6811E94",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca",
+  "original_bbox": [
+    390,
+    54,
+    1632,
+    200
+  ],
+  "localized_bbox": [
+    705,
+    58,
+    1316,
+    196
+  ],
+  "deltas": {
+    "delta_left": 315,
+    "delta_right": 316,
+    "delta_top": 4,
+    "delta_bottom": 4
+  },
+  "outside_changed": 0,
+  "alpha_outside": 0,
+  "residue": 0,
+  "report": "localization/graphics/role_A/20261008-A191-Q119-SOURCE-WHITE-HALO/A191_F6811E94_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
