@@ -1554,7 +1554,7 @@ def check_exact_hud_raw_wvp(source):
     raw = function_body(source, 'bool R30GetExtendedRawWvpForExactHud(')
     for token in (
         'CorroboratesHud(',
-        'GameSemantic::CurrentScope',
+        'GameSemantic::EffectiveScope()',
         'GetLastRawGameWvpWrite(',
         'GetCurrentShaderEpoch(',
         'writeShader != currentShader',
