@@ -13,11 +13,11 @@
   "material_result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
   "validation_bearing_result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00550]",
-  "status": "MATERIAL_COMMITTED_VALIDATING",
-  "automation_validation": "PENDING_FULL_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "score_award": "PENDING_VERIFIED_COMPLETION_NO_DUPLICATES",
+  "score_award": "ELIGIBLE_ONCE_PENDING_AI2_SCOREBOARD_DEDUP",
   "selected_work_item": "DX9EX-P0-FAST-DDS-HEADER-DESCRIPTOR-SIZE-FAIL-CLOSED",
   "summary": "Reject invalid surface and pixel descriptor sizes in fast DDS decoder prior to interpretation; preserve native D3DX fallback, extend exact-source contract and two mutations.",
   "changed_paths": [
@@ -39,9 +39,9 @@
     "hosted_compiler": "PENDING",
     "hmd": "UNTESTED"
   },
-  "ci_gate_complete": false,
-  "controller_terminal": false,
-  "next_action": "CI remains active for material 6d9041ed5abcf2275809db289cd8614c99369cda. Confirm exact-SHA DX9Ex game/host/full-chain/package, HUD inspector build and Domain Isolation jobs; then persist terminal C6 and score once. Do not rerun 00549 or retired 1000/5000 loops; RUNTIME_VALIDATION=UNTESTED.",
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "next_action": "C6 complete for 00550; do not retry or score rollover E003 a second time. Material SHA 6d9041ed5abcf2275809db289cd8614c99369cda PASS. Pre-existing Autodev Coordination queue-validator mismatch independent. P0 headset visual acceptance still outstanding; runtime UNTESTED. No 1000/5000 static audit cycle.",
   "result_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
   "ci_runs": {
     "hud_inspector": 37725768172,
@@ -51,14 +51,82 @@
     "vr_autodev_coordination": 37725768248
   },
   "ci_observed": {
-    "hud_inspector_static_exe_analysis": "SUCCESS",
-    "hud_call_sites": "71/71",
-    "hud_mutations": "10/10",
-    "dds_loader_mutations": "21/21",
-    "dds_cache_mutations": "17/17",
-    "visual_composition_static": "SUCCESS",
-    "dx9ex_policy": "SUCCESS",
-    "source_cross_domain": "SUCCESS",
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector_build": "SUCCESS",
+    "hud_exe_static": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_game_analyze": "SUCCESS_SUPPLEMENTAL",
+    "full_source_host_analyze": "SUCCESS_SUPPLEMENTAL",
+    "full_source_cross_domain": "SUCCESS_SUPPLEMENTAL",
     "vr_autodev_coordination": "FAIL_PREEXISTING_IMPLEMENT_NEXT_QUEUE_VALIDATOR"
-  }
+  },
+  "retry_allowed": false,
+  "exact_sha_validation": {
+    "material_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+    "dx9ex_active": {
+      "run_id": 37725768200,
+      "conclusion": "success",
+      "head_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+      "jobs": {
+        "policy": 113143449378,
+        "game": 113143546746,
+        "full_chain_compile": 113143546761,
+        "host": 113143546919,
+        "package": 113144805298
+      }
+    },
+    "hud_inspector": {
+      "run_id": 37725768172,
+      "conclusion": "success",
+      "head_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+      "jobs": {
+        "build_hud_inspector": 113143448708,
+        "static_exe_analysis": 113143449044
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37725768242,
+      "conclusion": "success",
+      "head_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+      "job": 113143449037
+    },
+    "supplemental_full_source": {
+      "run_id": 37725768222,
+      "conclusion": "success",
+      "head_sha": "6d9041ed5abcf2275809db289cd8614c99369cda",
+      "jobs": {
+        "game": 113143448810,
+        "host": 113143449046,
+        "cross_domain": 113143449036
+      }
+    }
+  },
+  "package_artifact": {
+    "id": 11527609250,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-6d9041ed5abcf2275809db289cd8614c99369cda",
+    "size_bytes": 2744351,
+    "digest": "sha256:559e794b2138a307884ea2364fd725854c09afc6c68445f033ad3b9ac5c4ad9a"
+  },
+  "build_artifacts": [
+    {
+      "id": 11527434887,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:340e86b9dde9be793f5b33f5cd3d8017865b7430018df0abf2cefd9055adc498"
+    },
+    {
+      "id": 11527133407,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:8e192617bc459c94a4074af3d3b4b3b88f4bb32ff61625b1d4e1c44025a93143"
+    },
+    {
+      "id": 11527648986,
+      "name": "HUD-inspector-game",
+      "digest": "sha256:194842f8fc3165349c79c4c1bcff3432a842bc032726739af33433db6508ea2d"
+    }
+  ],
+  "automation_result_provenance": "PASS on immutable material SHA 6d9041ed5abcf2275809db289cd8614c99369cda; DX9Ex Active 37725768200 5/5 jobs success; HUD Inspector 37725768172 2/2 success, 71 CALL + 10/10 HUD mutants, 27 DDS source obligations + 21/21 DDS mutants; Domain Isolation 37725768242 success; independent Full Source Impact 37725768222 success. VR Autodev Coordination 37725768248 fails on existing queue IMPLEMENT_NEXT validator (also failed before this change), not source build gate. No Quest3/VDXR test."
 }
