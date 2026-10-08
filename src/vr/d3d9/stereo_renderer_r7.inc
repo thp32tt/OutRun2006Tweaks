@@ -284,13 +284,22 @@ namespace OutRunVRStereo
 			if (Game::is_in_game())
 				return true;
 
-			// WARP/RESTART are short race-adjacent transition states. Preserve
-			// gameplay presentation through them; the following menu/result states
-			// still fall back to theater normally.
+			// C2 finish-transition parity: is_in_game() excludes GIVEUP
+			// and LINK_TIMEUP even though the shared host presentation owner
+			// treats both as true-stereo Gameplay. Before this repair the host
+			// waited for a stereo packet that the game's R7 StereoWanted()
+			// refused to produce. That can expose mono/head-locked fallback
+			// during the time/result transition immediately BEFORE TRYAGAIN.
+			// Only restore exact host-allowed transition states; START remains
+			// gated by the original game_start_progress_code == 65 rule.
+			// The already-correct TRYAGAIN/OUTRUNMILES Theater remains excluded
+			// by is_vr_gameplay_presentation() above.
 			switch (*Game::current_mode)
 			{
 			case GameState::STATE_WARP:
 			case GameState::STATE_RESTART:
+			case GameState::STATE_GIVEUP:
+			case GameState::STATE_LINK_TIMEUP:
 				return true;
 			default:
 				return false;
