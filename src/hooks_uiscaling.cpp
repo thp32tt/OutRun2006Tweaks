@@ -604,9 +604,17 @@ class UIScaling : public Hook
 		auto original = reinterpret_cast<GoalTimeHelperFn>(
 			Module::exe_ptr(helperRva));
 		original();
+		// Both helpers are genuine original GOAL sprite producers, but the
+		// white time may duplicate in only one. Diagnostic producer identity
+		// must distinguish each original E8 parent while retaining the exact
+		// same ScreenHud ownership and all-children registration.
+		const auto producer = helperRva == 0xBE020
+			? OutRunVR::GameSemantic::ProducerToken::GoalTime020
+			: (helperRva == 0xBE150
+				? OutRunVR::GameSemantic::ProducerToken::GoalTime150
+				: OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
