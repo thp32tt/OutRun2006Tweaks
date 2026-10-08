@@ -12549,5 +12549,28 @@
     "EVIDENCE_APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c1_20261009_q137_b285_p0_native_source_family_rework": {
+    "run_key": "OUTRUN-KOR-C1-Q137-B285-P0-STYLE-20261009-0322",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD",
+    "priority": "P0",
+    "queue_index": 137,
+    "ingame": "IGR-041 OPEN_USER_INGAME_FAIL",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "candidate_sha256": "1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2",
+    "C": "REWORK_REQUIRED",
+    "visual_failures": [
+      "SOURCE_FAMILY_GLYPH_WEIGHT_MISMATCH",
+      "SOURCE_FAMILY_CONDENSED_SHAPE_MISMATCH"
+    ],
+    "visually_failed_regions": 5,
+    "small_subtitle": "HOLD",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "NEW_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C1-Q137-B285-P0-INDEPENDENT-STYLE-REVIEW/C_Q137_B285_CONTROLLER_REWORK.json"
   }
 }
