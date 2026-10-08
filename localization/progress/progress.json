@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C272 C1 returned q219 D263B3F1 A181R exact candidate 41cf4c15... to REWORK_REQUIRED: fixed horizontal_target_ratio=0.8 over-stretches Hangul, compresses counter-space and remains unlike the rounded segmented silver-techno COURSE SELECT source. Preserve clean/bbox/art/orientation, rerender without arbitrary English-width targeting, then future pixels-first C1 + separate C3. q59 remains C271 REWORK. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C273 C1: q161 55B57CDE A157 66a89385... -> HOLD_STRICT_RECHECK because pixels-first ordering and complete lossless per-region evidence were not satisfied; bytes preserved. q175 754F0599 A153 5b37fdaf... -> REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_EXTRUSION_WEIGHT after visual FAIL despite 3/3 numeric containment. q59/q219 remain prior REWORK. Next producer must materially rebuild q175, while future C1 may pixels-first recheck q161 or process the next unchanged odd pending-C item. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3102,7 +3102,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "C272 C1 update: q219 D263B3F1 is REWORK_REQUIRED_HORIZONTAL_STRETCH_COUNTERSPACE_TECHNO_FAMILY; C3 blocked. q59 remains prior C271 REWORK_REQUIRED. Other odd pending-C items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C273 C1 update: q161 moved from pending-C to HOLD_STRICT_RECHECK; q175 moved from pending-C to REWORK_REQUIRED. q59/q219 remain REWORK_REQUIRED. Remaining odd pending-C includes q35/q99/q103/q119/q195/q217/q225/q227/q231/q237. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6715,5 +6715,29 @@
     "report": "localization/graphics/role_C/20261008-C2-Q154-ORIENTATION-EVIDENCE-1050/C271_Q154_CONTROLLER_QA.json",
     "pre_commit_refresh_head": "6a13a898821b5eb0ad77496fd814802dfb34dcce",
     "runtime_validation": "UNTESTED"
+  },
+  "c273_c1_q161_q175_evidence": {
+    "run": "20261008-C273-C1-Q161-Q175-EVIDENCE",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "q161": {
+      "asset": "55B57CDE",
+      "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+      "decision": "HOLD_STRICT_RECHECK",
+      "c3": "BLOCKED_PENDING_FRESH_C_PASS"
+    },
+    "q175": {
+      "asset": "754F0599",
+      "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+      "decision": "REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_EXTRUSION_WEIGHT",
+      "c3": "BLOCKED"
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C273-C1-Q161-Q175-EVIDENCE/C273_BATCH_REPORT.json",
+    "approval_records_created": 0,
+    "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
