@@ -27,7 +27,11 @@ def verify(s):
     tests=[
         ("cache owns shared data", "std::shared_ptr<std::vector<uint8_t>> data;" in scope),
         ("cache owner constructed before read", "std::make_shared<std::vector<uint8_t>>(size)" in background),
-        ("preload updates under mtx1", "std::lock_guard _(mtx1);" in background),
+        ("preload LRU, budget and publish use mtx1", background.count("std::lock_guard cacheLock(mtx1);")==3),
+        ("serialize competing cache loads", "std::lock_guard populationLock(cachePopulationMutex);" in background),
+        ("never hold mtx1 while reading disk", "evictToFit(size);\n\t\t}\n\t\tfile.seekg(0, std::ios::beg);" in background),
+        ("publish lock acquired only after read", background.rfind("std::lock_guard cacheLock(mtx1);") > background.find("if (!file.read(")),
+        ("never open file with cache lock held", "}\n\n\t\tstd::ifstream file(" in background),
         ("cache budget protected", "std::lock_guard _(mtx1);" in budget),
         ("file loads serialized", "std::lock_guard fileRequestLock(mtx2);" in getter),
         ("all cached read+LRU under same mutex", "std::lock_guard cacheLock(mtx1);" in getter),
@@ -55,6 +59,9 @@ def mutations(s):
         "std::shared_ptr<std::vector<uint8_t>> data;",
         "std::make_shared<std::vector<uint8_t>>(size)",
         "std::lock_guard _(mtx1);",
+        "std::lock_guard populationLock(cachePopulationMutex);",
+        "evictToFit(size);\n\t\t}\n\t\tfile.seekg(0, std::ios::beg);",
+        "std::ifstream file(filename, std::ios::binary | std::ios::ate);",
         "std::lock_guard fileRequestLock(mtx2);",
         "std::lock_guard cacheLock(mtx1);",
         "*transientOwner = std::move(owner);",
@@ -78,4 +85,4 @@ if __name__=="__main__":
         p=mutations(code) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("DDS CACHE LIFETIME FAIL: "+str(exc))
-    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/10; runtime UNTESTED")
+    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/13; runtime UNTESTED")

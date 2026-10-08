@@ -360,6 +360,7 @@ private:
 
 	mutable std::mutex mtx1; // Sole owner of cache, LRU and budget state.
 	std::mutex mtx2;         // Serializes on-demand file loads only.
+	std::mutex cachePopulationMutex; // Serializes cache-miss insertions without stalling read hits.
 
 public:
 	FileDataCache(std::size_t maxCacheSize) : max_cache_size(maxCacheSize), current_cache_size(0) {}
@@ -374,29 +375,28 @@ public:
 	void cacheFolder(std::filesystem::path folder)
 	{
 		if (std::filesystem::exists(folder))
-			for (const auto& entry : std::filesystem::directory_iterator(folder))
-				if (entry.is_regular_file())
-					cacheFile(entry.path());
-	}
-
-	void cacheFile(std::filesystem::path filename)
+			for (const auto& entry : std::filesyste	void cacheFile(std::filesystem::path filename)
 	{
 		auto extension = filename.extension().string();
 		std::transform(extension.begin(), extension.end(), extension.begin(),
 			[](unsigned char c) { return std::tolower(c); });
-
 		if (extension != ".dds")
 			return;
 
-		std::lock_guard _(mtx1);
-
-		if (cache.find(filename) != cache.end())
+		// Cache misses may originate on the background preload thread while
+		// the game consumes other cached HUD/world DDS entries. Serialize only
+		// cache *population*; never retain mtx1 across disk I/O.
+		std::lock_guard populationLock(cachePopulationMutex);
 		{
-			// File is already cached, move it to the front of LRU list
-			lru_list.erase(cache[filename].lru_iterator);
-			lru_list.push_front(filename);
-			cache[filename].lru_iterator = lru_list.begin();
-			return;
+			std::lock_guard cacheLock(mtx1);
+			auto found = cache.find(filename);
+			if (found != cache.end())
+			{
+				lru_list.erase(found->second.lru_iterator);
+				lru_list.push_front(filename);
+				found->second.lru_iterator = lru_list.begin();
+				return;
+			}
 		}
 
 		std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -405,25 +405,23 @@ public:
 			spdlog::warn("Texture cache: unable to open {}", filename.string());
 			return;
 		}
-
 		const std::streamsize streamSize = file.tellg();
 		if (streamSize <= 0)
 			return;
 		const std::size_t size = static_cast<std::size_t>(streamSize);
-		if (size > max_cache_size)
 		{
-			spdlog::warn(
-				"Texture cache: skipping {} ({} MiB) because it exceeds the {} MiB cache budget",
-				filename.string(), size / (1024 * 1024),
-				max_cache_size / (1024 * 1024));
-			return;
+			std::lock_guard cacheLock(mtx1);
+			if (size > max_cache_size)
+			{
+				spdlog::warn("Texture cache: skipping {} ({} MiB) because it exceeds the {} MiB cache budget",
+					filename.string(), size / (1024 * 1024),
+					max_cache_size / (1024 * 1024));
+				return;
+			}
+			// Evict before the transient allocation to protect the 32-bit
+			// address space, while read hits remain lock-free of disk stalls.
+			evictToFit(size);
 		}
-
-		// R35.1: make address-space room before allocating the incoming DDS.
-		// The old code allocated first and evicted afterwards, allowing a
-		// 32-bit process to throw std::bad_alloc even while the configured LRU
-		// budget would eventually have been respected.
-		evictToFit(size);
 		file.seekg(0, std::ios::beg);
 
 		try
@@ -436,6 +434,12 @@ public:
 				return;
 			}
 
+			// A concurrent budget change may have occurred while the file was
+			// read. Re-evaluate it just before publishing the entry.
+			std::lock_guard cacheLock(mtx1);
+			if (size > max_cache_size)
+				return;
+			evictToFit(size);
 			lru_list.push_front(filename);
 			try
 			{
@@ -450,11 +454,13 @@ public:
 		}
 		catch (const std::bad_alloc&)
 		{
-			// Texture replacement is optional. Under 32-bit VR memory pressure,
-			// failing this cache entry must not terminate the game; a cache miss
-			// falls back to the normal/original texture path.
 			spdlog::warn(
-				"Texture cache: allocation failed for {} ({} MiB); skipping cache entry to keep the 32-bit game alive",
+				"Texture cache: allocation failed for {} ({} MiB); skipping entry to keep the 32-bit game alive",
+				filename.string(), size / (1024 * 1024));
+			return;
+		}
+	}
+y to keep the 32-bit game alive",
 				filename.string(), size / (1024 * 1024));
 			return;
 		}
