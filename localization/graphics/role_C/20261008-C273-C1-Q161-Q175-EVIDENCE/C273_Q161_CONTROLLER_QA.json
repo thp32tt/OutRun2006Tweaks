@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C273-C1-Q161-Q175-EVIDENCE",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T10:53:40+09:00",
+  "queue_index": 161,
+  "asset": "55B57CDE",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "persisted_dds_identity": {
+    "result": "PASS",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "file_size": 4194432,
+    "raw_orientation": "mirror_y",
+    "sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d"
+  },
+  "producer_machine_context": {
+    "report": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_REPORT.json",
+    "bbox_size_positive_margin": "38/38 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch": 0,
+    "decoded_alpha_extra": 0,
+    "decoded_alpha_missing": 0,
+    "note": "Producer figures are bound to the exact candidate and retained only as machine context; C273 does not turn them into an approval."
+  },
+  "controller_evidence": {
+    "source_clean_final_contact": {
+      "path": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_SOURCE_CLEAN_FINAL.jpg",
+      "sha256": "52ea515feb78df66d4b323e119be996aac40cb5687d26b7d659c6434d563fadb"
+    },
+    "raw": {
+      "path": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",
+      "sha256": "6212d8f346534251a09326f212ec34fe2f9650e6a7ae739bf4c526cf127fb8ff"
+    }
+  },
+  "visual_observation": {
+    "rows_reviewed": "38/38 nationality/zodiac rows in consolidated SOURCE/A56/CLEAN/A157 contact plus RAW mirror-Y evidence",
+    "definite_visual_fail_found": false,
+    "observation": "A157 visibly restores source-height emphasis and source-left anchoring versus A56. In the available contact/RAW evidence no definite broken Hangul, clipping, English residue, overlap, protected-art intrusion or orientation reversal was established.",
+    "caution": "Several short English labels necessarily map to longer Korean names and some rows are strongly condensed, so current-policy approval requires native lossless per-region views rather than only the consolidated JPEG."
+  },
+  "sequencing": {
+    "pixels_before_producer_verdict": false,
+    "reason": "This invocation read the live queue producer notes before the first exact-pixel view. The evidence gate therefore forbids a PASS/approval claim."
+  },
+  "evidence_completeness": {
+    "lossless_per_region_native_zoom_practical_black_white_gray": false,
+    "approval_schema_complete": false,
+    "result": "INCOMPLETE_FOR_PASS"
+  },
+  "stages": {
+    "C": {
+      "review_id": "C273-Q161-C-HOLD",
+      "reviewer": "ChatGPT AI 1",
+      "result": "HOLD_STRICT_RECHECK",
+      "reason": "Pixels-first ordering was not satisfied and complete lossless per-region evidence is absent. Favorable JPEG/RAW review cannot be promoted to current-policy PASS."
+    },
+    "C3": {
+      "review_id": null,
+      "result": "BLOCKED_PENDING_FRESH_C_PASS"
+    }
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "candidate_changed_by_C": false,
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
