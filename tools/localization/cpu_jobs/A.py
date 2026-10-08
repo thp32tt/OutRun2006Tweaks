@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# A186: q219 D263B3F1 material rework after C265 visual underfill/family rejection.
+# A186R: q219 D263B3F1 material rework after C265 visual underfill/family rejection.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
@@ -10,14 +10,14 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageFilter
 
 repo=Path.cwd()
-RUN="20261008-A186-Q219-NATIVE-METAL-GLYPH-REWORK"
+RUN="20261008-A186R-Q219-SOURCE-HEIGHT-CHROME"
 out=repo/"localization/graphics/role_A"/RUN
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
 rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
 cand=repo/"localization/graphics/hd_candidates"/rel
-INPUT="41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19"
+INPUT="ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b"
 SOURCE="6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d"
 SRC_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
 TEXT="코스 선택"
@@ -165,7 +165,7 @@ def render_extended(source_crop,max_w,max_h):
     # Fit by natural Korean glyph anatomy and source *height*, not English width.
     for fontsize in range(124,74,-1):
         font=ImageFont.truetype(fontpath,fontsize*SS,index=fontindex)
-        tracking=int(round(fontsize*.17*SS))
+        tracking=int(round(fontsize*.26*SS))
         chars=list(TEXT)
         glyphw=int(sum(font.getlength(ch) for ch in chars)+tracking*max(0,len(chars)-1))
         bbox=font.getbbox(TEXT)
@@ -194,7 +194,8 @@ def render_extended(source_crop,max_w,max_h):
         pad=16
         mask=Image.new("L",(core.width+pad*2,core.height+pad*2),0)
         mask.paste(core,(pad,pad))
-        if mask.width>max_w-8 or mask.height>max_h-9:continue
+        # Supersample composition canvas includes transparent padding; only the
+        # actual persisted cropped glyph/effects must fit source bbox.
         # Native solid face, source-like dark keyline, downward extrusion, and
         # narrow white top bevel. Do not expand counters or flatten strokes.
         outer=mask.filter(ImageFilter.MaxFilter(7))
@@ -287,7 +288,7 @@ with tempfile.TemporaryDirectory() as td:
         clean=old.copy()
         region=Image.new("RGBA",(db[2]-db[0],db[3]-db[1]),(0,0,0,0))
         clean.paste(region,(x0+db[0],y0+db[1]))
-        clean_path=Path("derived:A186_failclosed_transparent_title_footprint")
+        clean_path=Path("derived:A186R_failclosed_transparent_title_footprint")
 
     source_crop=source.crop(tuple(bbox))
     glyph,render_meta=render_extended(source_crop,x1-x0,y1-y0)
@@ -296,6 +297,7 @@ with tempfile.TemporaryDirectory() as td:
         raise RuntimeError(("glyph exceeds source",glyph.size,EXPECTED_SIZE))
 
     # Source-left alignment of title with positive 6px margin; no forced width quota.
+    # Prior A186 numeric PASS was visually rejected by producer for 90/118px height underfill.
     ax=x0+6
     ay=y0+((y1-y0)-glyph.height)//2
     margins=[ax-x0,x1-(ax+glyph.width),ay-y0,y1-(ay+glyph.height)]
@@ -331,18 +333,18 @@ with tempfile.TemporaryDirectory() as td:
     if not fbox.getbbox(): raise RuntimeError("no final visible title")
 
     # Evidence.
-    clean.save(out/"A186_Q219_CLEAN_PLATE.png")
-    gm=Image.new("L",old.size,0); gm.paste(glyph.getchannel("A"),(ax,ay)); gm.save(out/"A186_Q219_RENDER_MASK.png")
+    clean.save(out/"A186R_Q219_CLEAN_PLATE.png")
+    gm=Image.new("L",old.size,0); gm.paste(glyph.getchannel("A"),(ax,ay)); gm.save(out/"A186R_Q219_RENDER_MASK.png")
 
     p=48; cropbox=(max(0,x0-p),max(0,y0-p),min(old.width,x1+p),min(old.height,y1+p))
     ims=[]
-    for lab,im in [("SOURCE COURSE SELECT",source),("C265 REJECT A113",old),("VALIDATED CLEAN",clean),("A186 FINAL",decoded)]:
+    for lab,im in [("SOURCE COURSE SELECT",source),("C265 REJECT A113",old),("VALIDATED CLEAN",clean),("A186R FINAL",decoded)]:
         z=flat(im.crop(cropbox)); z=z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST)
         card=Image.new("RGB",(z.width,z.height+30),(20,20,20)); card.paste(z,(0,30)); ImageDraw.Draw(card).text((6,6),lab,fill="white"); ims.append(card)
     sheet=Image.new("RGB",(max(i.width for i in ims)*2+12,max(i.height for i in ims)*2+12),(14,14,14))
     sheet.paste(ims[0],(0,0)); sheet.paste(ims[1],(ims[0].width+12,0))
     sheet.paste(ims[2],(0,ims[0].height+12)); sheet.paste(ims[3],(ims[2].width+12,ims[1].height+12))
-    sheet.save(out/"A186_Q219_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
+    sheet.save(out/"A186R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
 
     pr=[]
     for scale in (1.0,0.75,0.5):
@@ -352,18 +354,18 @@ with tempfile.TemporaryDirectory() as td:
             b=b.resize((max(1,int(b.width*scale)),max(1,int(b.height*scale))),Image.Resampling.LANCZOS)
         row=Image.new("RGB",(a.width+b.width+8,max(a.height,b.height)+26),(18,18,18))
         row.paste(a,(0,26)); row.paste(b,(a.width+8,26))
-        ImageDraw.Draw(row).text((4,5),f"SOURCE | A186 @ {int(scale*100)}%",fill="white")
+        ImageDraw.Draw(row).text((4,5),f"SOURCE | A186R @ {int(scale*100)}%",fill="white")
         pr.append(row)
     practical=Image.new("RGB",(max(i.width for i in pr),sum(i.height for i in pr)+12),(14,14,14)); yy=0
     for z in pr: practical.paste(z,(0,yy)); yy+=z.height+6
-    practical.save(out/"A186_Q219_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
+    practical.save(out/"A186R_Q219_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
 
     rs,ro,rn=flat(sraw),flat(raw_old),flat(rraw)
     for z in (rs,ro,rn): z.thumbnail((700,420),Image.Resampling.LANCZOS)
     rw=Image.new("RGB",(rs.width+ro.width+rn.width+24,max(rs.height,ro.height,rn.height)+30),(16,16,16)); xx=0
-    for lab,z in [("SOURCE RAW",rs),("A113 RAW",ro),("A186 RAW",rn)]:
+    for lab,z in [("SOURCE RAW",rs),("A113 RAW",ro),("A186R RAW",rn)]:
         rw.paste(z,(xx,30)); ImageDraw.Draw(rw).text((xx+4,6),lab,fill="white"); xx+=z.width+12
-    rw.save(out/"A186_Q219_RAW.jpg","JPEG",quality=94,subsampling=0)
+    rw.save(out/"A186R_Q219_RAW.jpg","JPEG",quality=94,subsampling=0)
 
     report={
       "schema_version":2,"role":"A","run":RUN,"queue_index":219,"asset":"D263B3F1",
@@ -375,6 +377,8 @@ with tempfile.TemporaryDirectory() as td:
       "width_ratio":round(glyph.width/(x1-x0),4),
       "margins":{"left":margins[0],"right":margins[1],"top":margins[2],"bottom":margins[3]},
       "clean_plate_provenance":str(clean_path),
+      "rejected_initial_A186_sha256":"ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
+      "rejected_initial_A186_reason":"visually underfilled 90px target versus 118px English source despite numeric PASS",
       "source_slant_measurement":profile_slant(source_crop),"localized_slant_measurement":render_meta["top_minus_bottom"],
       "bbox_provenance":chosen[0]+":"+chosen[1] if chosen else "source_vs_A113_exact_changed_bbox",
       "render":{
@@ -391,7 +395,7 @@ with tempfile.TemporaryDirectory() as td:
       "ordered_generation_gate":{
         "1_plate_restoration":"PASS_PRESERVED_VALIDATED_CLEAN_PLATE",
         "2_source_matching_slant":"PASS_READABLE_RIGHT_0.12",
-        "3_no_undersized_lettering":"PENDING_CONTROLLER_HEIGHT_AND_COUNTERSPACE_REVIEW_NO_FORCED_RATIO",
+        "3_no_undersized_lettering":"SOURCE_HEIGHT_REFIT_NO_FORCED_WIDTH_RATIO_PENDING_CONTROLLER_VISUAL",
         "4_source_faithful_weight_effect":"PENDING_CONTROLLER_EXACT_SOURCE_STYLE_REVIEW",
         "5_no_clipped_pixels":"PASS_POSITIVE_MARGIN",
         "6_protected_art_clearance":"PASS_ZERO_CHANGES_OUTSIDE_EXACT_SOURCE_BBOX",
@@ -400,16 +404,16 @@ with tempfile.TemporaryDirectory() as td:
       },
       "execution_backend":"GITHUB_HOSTED_CPU_WORKER_REPOSITORY_BACKED_DDS",
       "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
-      "status":"A186_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+      "status":"A186R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
       "fresh_independent_c":"REQUIRED","mandatory_c3":"REQUIRED_C265_VISUAL_REWORK",
       "igr_025":"REMAINS_MAPPING_HOLD_AND_NEW_INGAME_RETEST_REQUIRED",
       "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
     }
-    (out/"A186_Q219_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    (wr/"A186_Q219.json").write_text(json.dumps({
+    (out/"A186R_Q219_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"A186R_Q219.json").write_text(json.dumps({
       "role":"A","run":RUN,"queue_index":219,"asset":"D263B3F1",
       "before":INPUT,"after":csha,"status":report["status"],
-      "report":str((out/"A186_Q219_REPORT.json").relative_to(repo)),
+      "report":str((out/"A186R_Q219_REPORT.json").relative_to(repo)),
       "runtime_validation":"UNTESTED"
     },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"run":RUN,"bbox":bbox,"localized_bbox":report["localized_bbox"],
