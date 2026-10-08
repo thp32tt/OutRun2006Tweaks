@@ -3057,3 +3057,7 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 ### 2026-10-08 20:27 KST — C301 C2 q230 current C3 evidence
 - `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`; 2/2 pinned source/current exact-native alpha/colour ROI and source-bbox-contained Korean help row proof, outside RGBA/alpha changes 0.
 - `C3=HOLD_STRICT_RECHECK`, current evidence-approved `APPROVALS=BLOCKED`, new DDS 0, `RUNTIME_VALIDATION=UNTESTED`. Historical C230 C-pass is not upgraded. See `localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json`.
+
+### 2026-10-08 20:56 KST — C302 C2 q236
+- `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`; new 4/14 independent native RAW/source-bbox visual-pixel region checks; each examined region 0 changed RGBA/alpha outside intended source rectangle and positive margins.
+- Decision `C3=HOLD_STRICT_RECHECK`; current APPROVALS/PRE_INGAME blocked, no DDS output, `RUNTIME_VALIDATION=UNTESTED`. Historical C223 not equivalent to current-policy C3. Evidence `localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json`.
