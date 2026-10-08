@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B274 q098: separate full-face source-family white/navy BC3 reconstruction.
+"""B275 q098: separate full-face source-family white/navy BC3 reconstruction.
 
 Experiment is QA-gated: do NOT replace the hd_candidates DDS until a human
 controller inspects the source/CLEAN/trial's persisted bytes.
@@ -11,12 +11,12 @@ from scipy.ndimage import distance_transform_edt
 from PIL import Image
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
-    raise SystemExit("B274 requires GitHub hosted access to SHA-pinned source DDS")
+    raise SystemExit("B275 requires GitHub hosted access to SHA-pinned source DDS")
 root = Path.cwd()
 gfx = root / "localization/graphics"
 relative = "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target = gfx / "hd_candidates" / relative
-run = gfx / "role_B/20261008-B274-Q098-NATIVE-GLYPH-KEYLINE"
+run = gfx / "role_B/20261008-B275-Q098-NATIVE-GLYPH-KEYLINE"
 run.mkdir(parents=True, exist_ok=True)
 def SHA(x): return hashlib.sha256(x).hexdigest()
 old_sha = "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb"
@@ -29,7 +29,7 @@ assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
 old = target.read_bytes()
 assert SHA(old)==old_sha, "q098 concurrently changed; do not touch"
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
-with tempfile.TemporaryDirectory(prefix="b274_github_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b275_github_") as tmp:
     original = Path(tmp)/"source.dds"
     urllib.request.urlretrieve(url,original)
     english = original.read_bytes()
@@ -65,22 +65,20 @@ white=np.rint(np.percentile(source_face,90,axis=0)).astype(np.uint8)
 navy=np.rint(np.percentile(source_keyline,30,axis=0)).astype(np.uint8)
 # A colored antialias ring is quantized via the native 4-color BC1 interpolants.
 # Face ink is keyed by the native typesetter alpha; counter-holes remain blank.
-distance=distance_transform_edt(targetmask>=160)
-face_core=(targetmask>=160)&(distance>=5)&allowed
-narrow_face=(targetmask>=160)&(distance>=3)&allowed
-# Preserve source-era alpha and exact target footprint, to guarantee no 1px
-# expansion. Only recolor *visible* glyph pixels; no rectangle is composited.
+# The B274 native visual rejection showed that eroding 3-5px deletes most
+# Korean glyph face and produces solid navy silhouettes. Here the *authored*
+# 8-bit target face mask (not a distance-eroded mask) defines full white ink.
+# The original dark-outline exterior is retained where mask alpha is low.
+face_core=(targetmask>=212)&allowed
 visible=(previous[:,:,3]>16)&allowed
 oldrgb=previous[:,:,:3].astype(np.int16)
 desired=oldrgb.copy()
-desired[narrow_face&visible]=np.array(white,dtype=np.int16)
-# Leave 1-3px inner keyline/silhouette edge source navy, not B272 white.
-edge=(targetmask>=65)&(distance<3)&visible
-desired[edge]=np.array(navy,dtype=np.int16)
-# Source-style exterior outline retains dark pixel placement and old alpha;
-# explicit reconstruction also removes BC3 horizontal stripe face artifacts.
+desired[face_core&visible]=np.array(white,dtype=np.int16)
+edge=(targetmask>=65)&(targetmask<212)&visible
+fade=(targetmask[edge].astype(np.float32)-65)/147.0
+desired[edge]=np.rint(np.array(navy,dtype=np.float32)[None,:]*(1-fade[:,None])+np.array(white,dtype=np.float32)[None,:]*fade[:,None]).astype(np.int16)
 face_count=int((face_core&visible).sum())
-if face_count<6000 or face_count>62000:raise RuntimeError(("unexpected family core",face_count))
+if face_count<20000 or face_count>85000:raise RuntimeError(("authored full-face mismatch",face_count))
 def rgb565(px):
     r,g,b=[int(t) for t in px]
     return ((r*31+127)//255<<11)|((g*63+127)//255<<5)|((b*31+127)//255)
@@ -121,15 +119,23 @@ change=np.any(candidate!=previous,axis=2)
 outside_source=int(change[~source_region].sum())
 outside_target=int(change[~allowed].sum())
 assert outside_source==outside_target==0,(outside_source,outside_target)
+# The submitted proof will be inspected visually before any DDS promotion.
 # BC3 block modifications may alter nonletter RGB in text region. Report it
 # honestly; visual reviewer decides whether the effect/outline is acceptable.
 damage_to_preserved=int((change & (~(targetmask>=65)) & visible).sum())
+authored_ink=face_core&visible
+white_new=(candidate[:,:,0]>=213)&(candidate[:,:,1]>=213)&(candidate[:,:,2]>=213)
+white_coverage=float(np.mean(white_new[authored_ink]))
+# Automated visual-family guard against the exact over-navy B274 failure:
+# no PASS, and do not write even the trial when encoded bright-face is lost.
+if white_coverage<0.72:
+    raise RuntimeError(("full authored face still navy/striped",white_coverage))
 composite_outside=int(np.any(candidate!=clean,axis=2)[~source_region].sum())
 if composite_outside:raise RuntimeError(("COMPOSITE outside source region",composite_outside))
 # Preserve original source/client layout native bbox; no new alpha pixels.
 source_extra=int((candidate[:,:,3]>16)[~source_region].sum()-(previous[:,:,3]>16)[~source_region].sum())
 assert source_extra==0
-testpath=run/"42E618FD_B274_EXPERIMENT_NOT_APPROVED.dds"
+testpath=run/"42E618FD_B275_EXPERIMENT_NOT_APPROVED.dds"
 testpath.write_bytes(trial)
 assert SHA(testpath.read_bytes())==SHA(trial)
 assert np.array_equal(decode(testpath.read_bytes()),candidate)
@@ -149,14 +155,14 @@ for orientation in ("READABLE","RAW"):
             frame=Image.new("RGB",(sum(z.width for z in chunks)+12,max(z.height for z in chunks)),(87,87,87))
             pos=0
             for z in chunks:frame.paste(z,(pos,0));pos+=z.width+4
-            frame.save(run/f"{orientation}_{bgname}_{percent}_SOURCE_CLEAN_OLD_B274.png",optimize=True)
+            frame.save(run/f"{orientation}_{bgname}_{percent}_SOURCE_CLEAN_OLD_B275.png",optimize=True)
 # Preserve actual full-resolution individual decoded clean/trial as proof.
-Image.fromarray(candidate,"RGBA").save(run/"B274_PERSISTED_DECODE_READABLE.png")
-Image.fromarray(np.flipud(candidate),"RGBA").save(run/"B274_PERSISTED_DECODE_RAW.png")
-Image.fromarray(clean,"RGBA").save(run/"B274_AUTHORED_CLEAN_PLATE.png")
+Image.fromarray(candidate,"RGBA").save(run/"B275_PERSISTED_DECODE_READABLE.png")
+Image.fromarray(np.flipud(candidate),"RGBA").save(run/"B275_PERSISTED_DECODE_RAW.png")
+Image.fromarray(clean,"RGBA").save(run/"B275_AUTHORED_CLEAN_PLATE.png")
 report={
- "run":"B274","queue_index":98,"asset":"42E618FD",
- "status":"B274_TRIAL_PENDING_FIRST_HAND_CONTROLLER_VISUAL_NOT_DEPLOYED",
+ "run":"B275","queue_index":98,"asset":"42E618FD",
+ "status":"B275_TRIAL_PENDING_FIRST_HAND_CONTROLLER_VISUAL_NOT_DEPLOYED",
  "source_sha256":source_sha,"clean_sha256":SHA(cleanpath.read_bytes()),"mask_sha256":SHA(maskpath.read_bytes()),
  "previous_sha256":old_sha,"trial_sha256":SHA(trial),
  "method":"NEW_FULL_NATIVE_SOURCE_CONDITIONED_WHITE_AND_NAVY_4COLOR_BC1_BLOCK_RECONSTRUCTION",
@@ -165,7 +171,7 @@ report={
  "gate_plate_only":{"source_clean_rgba_outside":source_clean_out,"source_glyph_alpha_residual":source_alpha_unremoved,"status":"MACHINE_PASS_VISUAL_PENDING"},
  "gate_composite_only":{"clean_candidate_rgba_outside":composite_outside,"changed_outside_source":outside_source,"changed_outside_target":outside_target,"preserved_visible_outside_mask_changed":damage_to_preserved,"status":"MACHINE_CONTAINMENT_PASS_VISUAL_PENDING"},
  "machine":{"blocks_rebuilt":changed_blocks,"skipped_boundary_blocks":blocks_skipped,
- "pixel_changes":int(change.sum()),"new_alpha_pixels":0,"alpha_exact":True,"header_exact":True,"persisted_roundtrip_exact":True,
+ "pixel_changes":int(change.sum()),"authored_white_face_decoded_coverage":white_coverage,"new_alpha_pixels":0,"alpha_exact":True,"header_exact":True,"persisted_roundtrip_exact":True,
  "outside_source":outside_source,"outside_target":outside_target},
  "producer_visual":"PENDING_CONTROLLER_SOURCE_CLEAN_OLD_TRIAL_NATIVE_RAW_75_50",
  "independent_C":"NOT_RUN","C3":"NOT_RUN","user":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED",
@@ -173,5 +179,5 @@ report={
  "cleanup":"GITHUB_EPHEMERAL_RUNNER",
  "forbidden_domains_touched":[]
 }
-(run/"B274_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B275_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"trial_sha256":SHA(trial),"blocks":changed_blocks,"changed":int(change.sum()),"nonletter_visible_delta":damage_to_preserved,"outside":outside_target},ensure_ascii=False))
