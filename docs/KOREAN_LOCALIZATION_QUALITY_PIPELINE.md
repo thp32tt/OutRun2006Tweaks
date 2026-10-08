@@ -2,6 +2,10 @@
 
 This document is a quality-only layer for `korean-localization-recovery-20260928`. It intentionally does not define controller scheduling, retries, rollovers, task IDs or orchestration.
 
+## Repeat-defect convergence selection (2026-10-08)
+
+For A/B/C selection, apply `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md` and the read-only `tools/localization/rework_triage.py` to the current queue before DDS reconstruction. Missing-only evidence remains HOLD for fresh evidence; confirmed repeat source-family failures require a changed rendering method. Neither state is a PASS. Existing independent C/C3 evidence and actual-game acceptance requirements still apply.
+
 ## Evidence enforcement update — 2026-10-08
 
 Follow `docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md`. It supersedes historical
