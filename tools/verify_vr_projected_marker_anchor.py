@@ -107,6 +107,23 @@ end = function_body(semantics, "inline void EndSpriteQueueRender() noexcept")
 if "CurrentQueueProjectedMarker = {};" not in end:
     fail("queue end must clear current projected marker")
 
+# Recovered finite screen values can still overflow to infinity during the
+# x*(-z)/scale inverse. A poisoned projected anchor can propagate through
+# replay/queue metadata to the eye transforms, so validity must be published
+# only after both computed view coordinates are confirmed finite.
+def require_finite_projected_anchor(calc_body: str) -> None:
+    x = calc_body.find("info.viewX = out->x * (-out->z) / a1;")
+    y = calc_body.find("info.viewY = out->y * (-out->z) / a2;")
+    fx = calc_body.find("!std::isfinite(info.viewX)")
+    fy = calc_body.find("!std::isfinite(info.viewY)")
+    clear = calc_body.find("info = {};", fy)
+    valid = calc_body.find("info.valid = true;")
+    if min(x, y, fx, fy, clear, valid) < 0 or not (
+        x < y < fx < fy < clear < valid
+    ):
+        fail("Calc3D2D anchor must reject nonfinite inverse coordinates before valid=true")
+
+
 # Only exact Calc3D2D callsites for rank/rival may populate this payload.
 calc = function_body(ui, "static void Calc3D2D_dest(")
 for marker in (
@@ -120,6 +137,19 @@ for marker in (
 ):
     if marker not in calc:
         fail(f"Calc3D2D anchor recovery missing: {marker}")
+
+require_finite_projected_anchor(calc)
+# Two distinct fault injections, not repeated audits of unchanged content.
+for bad_calc in (
+    calc.replace("!std::isfinite(info.viewX)", "false", 1),
+    calc.replace("info.valid = true;", "/* premature validity */", 1),
+):
+    try:
+        require_finite_projected_anchor(bad_calc)
+    except SystemExit:
+        pass
+    else:
+        fail("nonfinite projected-anchor fault injection escaped verifier")
 
 rank13 = function_body(ui, "static int __cdecl RankMarker_sprani(")
 rank46 = function_body(ui, "static int __cdecl RankMarker_putClipSprite(")
