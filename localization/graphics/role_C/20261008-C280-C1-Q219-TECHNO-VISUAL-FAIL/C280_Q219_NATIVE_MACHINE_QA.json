@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL",
+  "queue_index": 219,
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "format": "RGBA32/BGRA",
+  "width": 2048,
+  "height": 2048,
+  "mips": 1,
+  "source_bbox_readable": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "source_candidate_rgba_changed_outside_bbox": 0,
+  "source_candidate_alpha_changed_outside_bbox": 0,
+  "source_candidate_visible_rgba_changed_outside_bbox": 0,
+  "source_candidate_rgba_changed_inside_bbox": 107196,
+  "alpha_changed_inside_bbox": 100487,
+  "header_128_exact": true,
+  "evidence_png": [
+    {
+      "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/source_gray.png",
+      "sha256": "5247d5b820c33a0795f36049e6d957af614e0dfd52e619e09509818cdc566cf6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_gray.png",
+      "sha256": "e45f4c7a7a54ad42e4de2138f1daff903744da8092568b5c5296364526a8b235"
+    },
+    {
+      "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_50.png",
+      "sha256": "5a0e76bad42d22328a9ce5e447fe5c2375e4d726306c7acec4b0be9895afb24f"
+    }
+  ],
+  "scope_result": "PASS_CONTAINMENT_SCOPE_ONLY",
+  "final_result": "REWORK_REQUIRED_SOURCE_FAMILY_VISUAL",
+  "runtime_validation": "UNTESTED",
+  "backend": "N100 MCP fallback (GPT sandbox DNS unavailable)"
+}

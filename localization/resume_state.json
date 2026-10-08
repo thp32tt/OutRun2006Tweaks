@@ -6745,7 +6745,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T12:53:32+09:00",
+  "updated_at_kst": "2026-10-08T13:15:17+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10880,7 +10880,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "A186R q219 HOLD source glyph-level readable slant and chrome-family hierarchy; do not regenerate existing bytes for evidence alone. A q175 C278 REWORK, B q214 REWORK. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C280 q219 fresh A186R source-family visual FAIL; A new material chrome/rounded glyph repair first, then pixels-first C1/C3/approval. q175 C278 and q59 C279 independently remain unresolved. RUNTIME_VALIDATION=UNTESTED.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -11026,5 +11026,22 @@
     "qa": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c280_c1_q219_source_family_visual": {
+    "run": "20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL",
+    "queue_index": 219,
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+    "machine_outside_rgba": 0,
+    "machine_outside_alpha": 0,
+    "status": "REWORK_REQUIRED",
+    "reason": "visual source-family rounded chrome bevel/extrusion fail despite numeric containment pass",
+    "report": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/C280_Q219_CONTROLLER_QA.json",
+    "C3": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "IGR025": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

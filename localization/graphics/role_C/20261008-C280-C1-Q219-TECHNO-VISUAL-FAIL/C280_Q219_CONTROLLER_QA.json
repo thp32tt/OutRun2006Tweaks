@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T13:15:17+09:00",
+  "queue_index": 219,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "producer": "A186R",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "source_origin": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "executed_backend": "GitHub authoritative state/artifact read; local public GitHub DNS failed so N100 MCP fallback used for exact native DDS download and lightweight 2048x2048 pixel comparison",
+  "trigger": "new current A186R candidate; user screenshot(163) IGR-025 coverage regression and previous C272 rejected A181R bytes",
+  "decision": "REWORK_REQUIRED",
+  "visual_priority": "Source and candidate independently viewed native neutral-grey lossless, practical 50%, plus earlier SOURCE/OLD/CLEAN/FINAL, RAW, 75% and 100% preview; producer machine prose had been read before exact-pixel first look, so blind calibration and pixels-first PASS cannot be claimed.",
+  "machine": {
+    "source_file_sha256_verified": true,
+    "candidate_file_sha256_verified": true,
+    "source_candidate_dds_header_128_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32/BGRA",
+    "mipmaps": 1,
+    "readable_source_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "source_candidate_rgba_changed_outside_bbox": 0,
+    "alpha_changed_outside_bbox": 0,
+    "visible_rgba_changed_outside_bbox": 0,
+    "source_candidate_rgba_changed_inside_bbox": 107196,
+    "alpha_changed_inside_bbox": 100487,
+    "original_bbox_and_candidate_bbox_from_producer_only": {
+      "source": [
+        6,
+        1011,
+        1473,
+        1129
+      ],
+      "candidate": [
+        12,
+        1015,
+        533,
+        1125
+      ]
+    },
+    "meaning": "Original-source bbox containment/mutation and DDS/header valid. These numerical facts cannot override independent source-family typography visual FAIL."
+  },
+  "segment_inventory": [
+    {
+      "id": "course_select",
+      "english": "COURSE SELECT",
+      "korean": "코스 선택",
+      "localizable": true
+    }
+  ],
+  "regions": [
+    {
+      "id": "course_select",
+      "source_bbox": [
+        6,
+        1011,
+        1473,
+        1129
+      ],
+      "views": {
+        "source_native": {
+          "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/source_gray.png",
+          "sha256": "5247d5b820c33a0795f36049e6d957af614e0dfd52e619e09509818cdc566cf6"
+        },
+        "candidate_native": {
+          "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_gray.png",
+          "sha256": "e45f4c7a7a54ad42e4de2138f1daff903744da8092568b5c5296364526a8b235"
+        },
+        "candidate_practical_50": {
+          "path": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_50.png",
+          "sha256": "5a0e76bad42d22328a9ce5e447fe5c2375e4d726306c7acec4b0be9895afb24f"
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_STRICT_RECHECK",
+          "observation": "Source versus candidate composite leading alpha displacement -16 vs +19 reported by producer is NOT isolated-per-glyph slope; no defensible direction PASS/FAIL from this proxy.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/source_gray.png"
+        },
+        "clean_plate": {
+          "result": "HOLD_STRICT_RECHECK",
+          "observation": "Producer clean plate visual is provided but not independently pixel-remeasured; original DDS and current DDS match outside approved bbox, which alone does not prove a clean plate.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/source_gray.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "SOURCE has broad connected rounded segmented futuristic chrome forms with pronounced bright upper bevel and deep lower dark extrusion; current Korean has clearly separated ordinary rounded sans glyphs with largely uniform thin outline/light face and much shallower embossing. The metallic volume and glyph-family impression do not match source at native 100% nor at 50%. Not a width-percentage rejection.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_gray.png"
+        },
+        "readability": {
+          "result": "PASS_VISUAL_ONLY",
+          "observation": "코스 선택 remains legible at 50% practical scale; legibility alone does not compensate for failed source-family chrome depth, hierarchy and proportion.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_50.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_VISIBLE_BREAKAGE_DETECTED",
+          "observation": "No definite missing Hangul syllables or visibly broken strokes in native and 50% gray-background crop; other-scale full gate not approved.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_gray.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPE_ONLY",
+          "observation": "Independent source-candidate RGBA and alpha outside the exact canonical source text bbox are both 0px; protected art within the source region is not independently separated here.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/source_gray.png"
+        },
+        "placement": {
+          "result": "PASS_SCOPE_HOLD_VISUAL",
+          "observation": "Candidate remains source-left and within source original rect; source title occupies broad metallic visual hierarchy while replacement reads as an ordinary condensed-looking short header, requiring new family reconstruction without forced English-width targets.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_50.png"
+        },
+        "orientation": {
+          "result": "NO_VISIBLE_RAW_REVERSAL_IN_SUPPLIED_PREVIEW",
+          "observation": "Existing A186R RAW comparison shows matching mirror-Y convention; no new in-game transform test or independent oriented-cell proof claimed.",
+          "evidence": "localization/graphics/role_C/20261008-C280-C1-Q219-TECHNO-VISUAL-FAIL/regions/candidate_gray.png"
+        }
+      }
+    }
+  ],
+  "calibration": {
+    "performed": false,
+    "blind_review_completed": false,
+    "reason": "Producer verdict and source reports were consulted before this independent native crop; cannot backfill the required first-look calibration or claim full evidence-gate PASS."
+  },
+  "C3": {
+    "status": "BLOCKED_BY_C_VISUAL_FAIL",
+    "separate_review_id": null
+  },
+  "current_policy_approval": {
+    "granted": false,
+    "APPROVALS_q219_json": "NOT_CREATED",
+    "pre_ingame_export": "BLOCKED"
+  },
+  "repair_instructions": [
+    "Return to A: redraw Korean from the source-derived rounded connected metallic-techno family with source-like bevel layers and deep but controlled lower shadow; do not simply increase stroke thickness.",
+    "Keep the validated clean plate, native size and exact original bbox; maintain open Korean counters, natural width and no forced English-width ratio.",
+    "Determine slant on isolated English and Korean glyph anchors in readable FLIP-Y, verify native 100/75/50 and RAW, source/clean/final pixel masks and no protected-art change.",
+    "After new material DDS candidate, require genuinely new independent C1 then separate C3 with published calibrated per-region evidence before export; IGR-025 overall runtime/DDS mapping and actual game retest stay OPEN."
+  ],
+  "runtime_validation": "UNTESTED",
+  "ingame_backlog": "IGR-025_OPEN",
+  "candidate_dds_changed_by_C": false,
+  "post_task_cleanup": "N100 managed scratch automatically deleted, review PNG evidence committed to GitHub; temporary q219 DDS inputs are to be cleaned after verified publish; no N100 git worktrees created.",
+  "forbidden_domains_touched": []
+}
