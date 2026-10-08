@@ -1,99 +1,96 @@
 #!/usr/bin/env python3
-"""C2 q214 NEW B259: independently decoded, source-bound lossless QA evidence ONLY."""
+"""C2 q172 exact persisted B255 DDS evidence for source-family review; evidence only."""
 import hashlib, io, json, os, subprocess, urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
-
-if os.getenv("OUTRUN_CPU_WORKER") != "github-actions" or os.getenv("OUTRUN_CPU_ROLE") != "C":
-    raise SystemExit("Only approved GitHub Actions role C worker")
-R=Path(".")
-O=R/"localization/graphics/role_C/20261008-C289-C2-Q214-B259-PERSISTED"
-O.mkdir(parents=True,exist_ok=True)
-TRIAGE=subprocess.run(["python","tools/localization/rework_triage.py","--index","214"],capture_output=True,text=True)
-if TRIAGE.returncode:
-    raise SystemExit("q214 rework triage failed: "+TRIAGE.stderr.strip())
-triage=json.loads(TRIAGE.stdout)
-assert len(triage["assets"])==1 and triage["assets"][0]["index"]==214
-(O/"C289_TRIAGE.json").write_text(json.dumps(triage,ensure_ascii=False,indent=2)+"\n")
-p=R/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
-cleanp=R/"localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_CLEAN_PLATE.png"
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
-with urllib.request.urlopen(url,timeout=160) as f: sb=f.read()
-cb=p.read_bytes()
-H=lambda b:hashlib.sha256(b).hexdigest()
-assert H(sb)=="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-assert H(cb)=="ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30"
-assert sb[:128]==cb[:128], "DDS header drift"
-decode=lambda b:np.asarray(Image.open(io.BytesIO(b)).convert("RGBA")).copy()
-raws=decode(sb);rawf=decode(cb)
-s=np.flipud(raws).copy();f=np.flipud(rawf).copy()
-clean=np.asarray(Image.open(cleanp).convert("RGBA")).copy()
-assert s.shape==f.shape==clean.shape==(2048,2048,4)
-def comps(a,b):return np.any(a!=b,axis=2)
+assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="C"
+base=Path(".")
+out=base/"localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY"
+out.mkdir(parents=True,exist_ok=True)
+triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","172"],capture_output=True,text=True,check=True)
+t=json.loads(triage.stdout)
+assert len(t["assets"])==1 and t["assets"][0]["index"]==172 and t["assets"][0]["next_action"]=="EVIDENCE_ONLY_HOLD", t
+(out/"C291_Q172_TRIAGE.json").write_text(json.dumps(t,ensure_ascii=False,indent=2)+"\n")
+source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
+with urllib.request.urlopen(source_url,timeout=120) as f: source_bytes=f.read()
+candidate=base/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
+producer=base/"localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR"
+final_bytes=candidate.read_bytes()
+sha=lambda b:hashlib.sha256(b).hexdigest()
+expected_source="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
+expected_final="7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2"
+assert sha(source_bytes)==expected_source
+assert sha(final_bytes)==expected_final,sha(final_bytes)
+assert source_bytes[:128]==final_bytes[:128]
+def decode_bytes(b):return np.array(Image.open(io.BytesIO(b)).convert("RGBA"))
+src_raw=decode_bytes(source_bytes);final_raw=decode_bytes(final_bytes)
+src=np.flipud(src_raw).copy();fin=np.flipud(final_raw).copy()
+clean=np.array(Image.open(producer/"CLEAN.png").convert("RGBA"))
+src_producer=np.array(Image.open(producer/"SOURCE.png").convert("RGBA"))
+fin_producer=np.array(Image.open(producer/"FINAL.png").convert("RGBA"))
+assert src.shape==fin.shape==clean.shape==(1024,1024,4)
+raw_match_source=bool(np.array_equal(src,src_producer))
+raw_match_final=bool(np.array_equal(fin,fin_producer))
+def changed(a,b):return np.any(a!=b,axis=2)
+bboxes=[("start","START","출발",(55,373,136,396)),("goal","GOAL","골",(595,635,672,659))]
+allowed=np.zeros((1024,1024),bool)
+for _,_,_,(x0,y0,x1,y1) in bboxes:allowed[y0:y1,x0:x1]=1
+rgbo=int(np.count_nonzero(changed(src,fin)&~allowed))
+alphao=int(np.count_nonzero((src[...,3]!=fin[...,3])&~allowed))
+cleano=int(np.count_nonzero(changed(src,clean)&~allowed))
+clean_alpha_out=int(np.count_nonzero((src[...,3]!=clean[...,3])&~allowed))
 def flatten(a,bg):
-  A=a[...,3:4].astype(np.uint16);rgb=a[...,:3].astype(np.uint16)
-  return ((rgb*A+bg*(255-A)+127)//255).astype(np.uint8)
-rows=[("start","START","출발",(815,495,899,517)),("goal","GOAL","골",(1343,764,1417,787))]
-allow=np.zeros((2048,2048),dtype=bool)
-for _id,en,ko,(x0,y0,x1,y1) in rows:allow[y0:y1,x0:x1]=True
-off=int(np.count_nonzero(comps(s,f)&~allow))
-alpha_off=int(np.count_nonzero((s[:,:,3]!=f[:,:,3])&~allow))
-clean_off=int(np.count_nonzero(comps(s,clean)&~allow))
-def get_bbox(mask):
-  yy,xx=np.where(mask)
-  return None if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
-evidence=[]
-for rid,en,ko,box in rows:
-  x0,y0,x1,y1=box
-  gap=14
-  l=max(0,x0-gap);t=max(0,y0-gap);r=min(2048,x1+gap);b=min(2048,y1+gap)
-  arr=[a[t:b,l:r] for a in (s,clean,f)]
-  for a,tag in zip(arr,("SOURCE_ENGLISH","CLEAN_B194","FINAL_B259_DECODED")):
-    Image.fromarray(a,"RGBA").save(O/f"{rid}_{tag}_LOSSLESS.png")
-  for bg,name in [(0,"BLACK"),(128,"GRAY"),(255,"WHITE")]:
-    imgs=[Image.fromarray(flatten(a,bg),"RGB") for a in arr]
-    w,h=imgs[0].size
-    montage=Image.new("RGB",(3*w,h+22),(60,60,60));d=ImageDraw.Draw(montage)
-    for n,(im,label) in enumerate(zip(imgs,("ENGLISH SOURCE","AUTHORED CLEAN","PERSISTED B259 DDS"))):
-      montage.paste(im,(n*w,22));d.text((n*w+2,4),label,fill="white")
-    montage.save(O/f"{rid}_{name}_SOURCE_CLEAN_FINAL_NATIVE.png")
-    if name=="GRAY":
-      montage.resize((montage.width*4,montage.height*4),Image.Resampling.NEAREST).save(O/f"{rid}_GRAY_SOURCE_CLEAN_FINAL_ZOOM4X.png")
-      for factor in (0.75,0.5):
-        montage.resize((round(montage.width*factor),round(montage.height*factor)),Image.Resampling.LANCZOS).save(O/f"{rid}_GRAY_PRACTICAL_{int(factor*100)}.png")
-  rt,rb=2048-b,2048-t
-  Image.fromarray(raws[rt:rb,l:r],"RGBA").save(O/f"{rid}_ENGLISH_RAW.png")
-  Image.fromarray(rawf[rt:rb,l:r],"RGBA").save(O/f"{rid}_B259_RAW.png")
-  # Raw candidate min/max vs clean is an effect + restored plate delta,
-  # NOT a glyph-only bounding box and NOT a strict positive-margin proof.
-  changed=comps(s[y0:y1,x0:x1],f[y0:y1,x0:x1])
-  delta=comps(clean[y0:y1,x0:x1],f[y0:y1,x0:x1])
-  bb=get_bbox(delta)
-  if bb:bb=[bb[0]+x0,bb[1]+y0,bb[2]+x0,bb[3]+y0]
-  evidence.append({"id":rid,"source":en,"korean":ko,"source_effect_bbox":list(box),
-   "candidate_vs_clean_effect_delta_bbox":bb,
-   "clean_delta_not_a_glyph_mask":True,
-   "decoded_source_vs_candidate_changed_inside_bbox":int(changed.sum()),
-   "source_alpha_pixels":int(np.count_nonzero(s[y0:y1,x0:x1,3])),
-   "candidate_alpha_pixels":int(np.count_nonzero(f[y0:y1,x0:x1,3])),
-   "raw_flipY_crop_coords":[l,rt,r,rb],
-   "evidence_native":[f"{rid}_GRAY_SOURCE_CLEAN_FINAL_NATIVE.png",f"{rid}_BLACK_SOURCE_CLEAN_FINAL_NATIVE.png",f"{rid}_WHITE_SOURCE_CLEAN_FINAL_NATIVE.png"],
-   "evidence_practical":[f"{rid}_GRAY_PRACTICAL_75.png",f"{rid}_GRAY_PRACTICAL_50.png"],
-   "evidence_raw":[f"{rid}_ENGLISH_RAW.png",f"{rid}_B259_RAW.png"]})
-m={"run":"C289","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","queue_index":214,
-"source_sha256":H(sb),"candidate_sha256":H(cb),"clean_plate_sha256":H(cleanp.read_bytes()),"source_provenance":url,
-"native_dimensions":[2048,2048],"dds_format":"DXT5_BC3","readable_orientation":"FLIP_Y","raw_orientation":"MIRROR_Y",
-"header_128_equal":True,"source_vs_candidate_changed_outside_2_exact_effect_bboxes":off,
-"source_vs_candidate_alpha_outside_2_exact_effect_bboxes":alpha_off,
-"source_vs_authored_clean_changed_outside_2_exact_effect_bboxes":clean_off,
-"regions":evidence,"rework_triage":triage["assets"][0],
-"triage_note":"Current queue status contains material_rework historically but new B259 exact SHA awaits independent fresh C; do not auto-rerender.",
-"machine_result":"OUTSIDE_ZERO" if off==alpha_off==0 else "OUTSIDE_FAIL",
-"glyph_only_bbox":"UNPROVEN_SOURCE_EFFECT_AND_CLEAN_DELTA_ARE_NOT_GLYPH_ONLY_MASKS",
-"calibration":"NOT_PERFORMED_BY_SCRIPT","visual_result":"PENDING_INDEPENDENT_CONTROLLER",
-"c3":"BLOCKED_UNTIL_C_VISUAL_AND_PER_REGION_POLICY_EVIDENCE",
-"runtime_validation":"UNTESTED","no_candidate_modified":True}
-(O/"C289_Q214_NATIVE_MACHINE.json").write_text(json.dumps(m,ensure_ascii=False,indent=2)+"\n")
-print("C289 candidate",H(cb),"region outside RGBA",off,"alpha",alpha_off,
-      "clean_outside",clean_off,"triage",triage["assets"][0]["next_action"])
+ alpha=a[...,3:4].astype(np.uint16);rgb=a[...,:3].astype(np.uint16)
+ return ((rgb*alpha+bg*(255-alpha)+127)//255).astype(np.uint8)
+def bb(mask):
+ yy,xx=np.where(mask)
+ return None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+rows=[]
+for name,en,ko,b in bboxes:
+ x0,y0,x1,y1=b; pad=14;l=max(0,x0-pad);t=max(0,y0-pad);r=min(1024,x1+pad);bottom=min(1024,y1+pad)
+ arrays=[a[t:bottom,l:r] for a in (src,clean,fin)]
+ for tag,a in zip(("ORIGINAL_ENGLISH","B255_AUTHORED_CLEAN","PERSISTED_B255_KOREAN"),arrays):
+  Image.fromarray(a).save(out/f"{name}_{tag}.png")
+ for bg,cname in [(0,"BLACK"),(128,"GRAY"),(255,"WHITE")]:
+  images=[Image.fromarray(flatten(a,bg)) for a in arrays]
+  w,h=images[0].size
+  contact=Image.new("RGB",(3*w,h+22),(45,45,45));d=ImageDraw.Draw(contact)
+  for k,(im,title) in enumerate(zip(images,("ORIGINAL","B255 CLEAN","PERSISTED B255"))):
+   contact.paste(im,(w*k,22));d.text((w*k+2,3),title,fill="white")
+  contact.save(out/f"{name}_{cname}_CONTACT_NATIVE.png")
+  if cname=="GRAY":
+   contact.resize((contact.width*6,contact.height*6),Image.Resampling.NEAREST).save(out/f"{name}_GRAY_CONTACT_6X.png")
+   for pct in (75,50):
+    contact.resize((round(contact.width*pct/100),round(contact.height*pct/100)),Image.Resampling.LANCZOS).save(out/f"{name}_PRACTICAL_{pct}.png")
+ # raw location = H - bottom : H - top
+ Image.fromarray(src_raw[1024-bottom:1024-t,l:r]).save(out/f"{name}_ORIGINAL_RAW.png")
+ Image.fromarray(final_raw[1024-bottom:1024-t,l:r]).save(out/f"{name}_CURRENT_RAW.png")
+ region_src=src[y0:y1,x0:x1];region_fin=fin[y0:y1,x0:x1];region_clean=clean[y0:y1,x0:x1]
+ # Source clean plate comparison is an effect delta, not glyph-only source bbox.
+ src_effect=changed(region_src,region_clean);new_effect=changed(region_fin,region_clean)
+ new_bbox=bb(new_effect)
+ if new_bbox:new_bbox=[new_bbox[0]+x0,new_bbox[1]+y0,new_bbox[2]+x0,new_bbox[3]+y0]
+ # Actual all-pixel drawing provenance, interior RGB and alpha; these metrics are
+ # descriptive, not aesthetic acceptance thresholds.
+ rows.append({"id":name,"english":en,"korean":ko,"source_effect_bbox":list(b),"source_vs_clean_pixels":int(src_effect.sum()),
+ "candidate_vs_clean_pixels":int(new_effect.sum()),"candidate_vs_clean_bbox":new_bbox,
+ "source_to_candidate_changes_inside":int(changed(region_src,region_fin).sum()),
+ "source_bright_face_pixels_rgb_min_ge_205_alpha_ge_16":int(((region_src[...,:3].min(2)>=205)&(region_src[...,3]>=16)).sum()),
+ "candidate_bright_face_pixels_rgb_min_ge_205_alpha_ge_16":int(((region_fin[...,:3].min(2)>=205)&(region_fin[...,3]>=16)).sum()),
+ "actual_glyph_only_bbox":"UNMEASURED; source effect plate and clean comparison cannot certify precise glyph bounds",
+ "raw_bbox":[l,1024-bottom,r,1024-t],
+ "evidence":{k:f"{name}_{k}_CONTACT_NATIVE.png" for k in ("BLACK","GRAY","WHITE")},
+ "zoom":f"{name}_GRAY_CONTACT_6X.png","practical50":f"{name}_PRACTICAL_50.png","raw":f"{name}_CURRENT_RAW.png"})
+rep={"schema_version":1,"run":"C291","role":"C","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","queue_index":172,
+"source_provenance":source_url,"source_sha256":expected_source,"candidate_sha256":expected_final,
+"clean_plate_path":str(producer/"CLEAN.png"),"clean_plate_sha256":sha((producer/"CLEAN.png").read_bytes()),
+"native_dimensions":[1024,1024],"format":"RGBA32","raw_orientation":"mirror_y",
+"source_candidate_dds_header_exact":True,"producer_source_png_exact_matches_persisted_source_decode":raw_match_source,
+"producer_final_png_exact_matches_persisted_candidate_decode":raw_match_final,
+"source_to_candidate_RGBA_outside_two_boxes":rgbo,"source_to_candidate_alpha_outside_two_boxes":alphao,
+"source_to_authored_clean_RGBA_outside_two_boxes":cleano,"source_to_authored_clean_alpha_outside_two_boxes":clean_alpha_out,
+"region_notes":rows,"triage_result":t["assets"][0],"C_result":"PENDING_CONTROLLER_NEW_STYLE_INSPECTION",
+"C3":"BLOCKED_PENDING_COMPLETE_C_EVIDENCE","runtime_validation":"UNTESTED"}
+(out/"C291_Q172_NATIVE_MACHINE.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
+print("C291 q172",expected_final,"SRC_PNG",raw_match_source,"FIN_PNG",raw_match_final,"outside",rgbo,alphao,"clean outside",cleano,clean_alpha_out)
