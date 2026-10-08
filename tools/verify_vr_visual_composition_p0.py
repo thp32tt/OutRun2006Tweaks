@@ -789,6 +789,46 @@ for label, old, bad in (
     else:
         raise SystemExit('P0 queue original WVP regression survived: ' + label)
 
+# Runtime 5868 Quest3: generic queued 2D sprites and projected rank digits
+# may not read already head-injected c64 and apply R30 head correction twice.
+# The original 12-draw ownership is preserved where it succeeds; extending
+# it to 128 draws still requires exact queue scope plus same shader epoch.
+def verify_raw_queue_wvp_owner(source):
+    raw = function_body(source, 'bool R30GetRecentRawWvpForQueueSprite(')
+    require_order(raw, 'original raw queue c64 bounded to actual game shader',
+                  'QueueRenderActive()', 'CorroboratesScreenOverlay2D(scope)',
+                  'CorroboratesProjectedWorldMarker(scope)',
+                  'GetLastRawGameWvpWrite(', 'GetCurrentShaderEpoch(')
+    require('currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow', raw,
+            'prevent cross-frame unbounded queue c64 reuse')
+    builder = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    require_order(builder, 'queue c64 ownership before original GPU fallback',
+                  'if (!R44GetOwnedRawOverlayWvp(original))',
+                  'R30ScreenSpaceKind::ScreenOverlay2D',
+                  'R30GetRecentRawWvpForQueueSprite(original)',
+                  'R30ScreenSpaceKind::ProjectedWorldMarker2D',
+                  'if (!R30GetRecentRawWvpForQueueSprite(original))',
+                  'GetVertexShaderConstantF(')
+    require('return false;', builder, 'reject unowned rank c64 retransform')
+verify_raw_queue_wvp_owner(r30)
+for label, before, after in (
+    ('unproven projected rank c64',
+     'if (!R30GetRecentRawWvpForQueueSprite(original))',
+     'if (R30GetRecentRawWvpForQueueSprite(original))'),
+    ('unproven generic queued HUD c64',
+     'if (!R30GetRecentRawWvpForQueueSprite(original))',
+     'if (R30GetRecentRawWvpForQueueSprite(original))'),
+):
+    if before not in r30:
+        raise SystemExit('P0 RUNTIME_5868 owner negative input missing: ' + label)
+    modified = r30.replace(before, after, 1) if label.startswith('unproven projected') else r30.replace(before, after, 1)
+    try:
+        verify_raw_queue_wvp_owner(modified)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 RUNTIME_5868 rank/HUD raw WVP mutation survived: ' + label)
+
 # Lens flare / SceneEffect is exact original-mod ownership, never a broad alpha heuristic.
 require('RenderScope::SceneEffect', graphics, 'original Clr_SceneEffect semantic scope')
 require('semanticSceneEffect', r30, 'exact SceneEffect classifier input')
