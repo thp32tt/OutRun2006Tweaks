@@ -444,13 +444,12 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
-		{
-			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
-			auto original = reinterpret_cast<GoalTimeHelperFn>(
-				Module::exe_ptr(helperRva));
-			original();
-		}
+		// Current R84 queue authority has no ScopedProducerSemantic class.
+		// The original helper is synchronous; tag its appended nodes after it
+		// returns, preserving the exact parent producer identity.
+		auto original = reinterpret_cast<GoalTimeHelperFn>(
+			Module::exe_ptr(helperRva));
+		original();
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
