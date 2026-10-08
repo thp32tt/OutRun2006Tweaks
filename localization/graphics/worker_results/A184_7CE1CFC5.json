@@ -1,0 +1,21 @@
+{
+  "run": "20261008-A184-Q059-SOURCE-FAMILY-KEYLINE-TRACKING",
+  "index": 59,
+  "asset": "7CE1CFC5",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "9f181320dc25651925d514e36f683f8b96d3eec4b4d8ca8931cef5a6b588d221",
+  "localized_physical_elements": 4,
+  "bbox_size_positive_margin": "4/4",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_residue": 0,
+  "decoded_changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_top_art_changed": 0,
+  "overlap": 0,
+  "touch": 0,
+  "changed_blocks_outside_patch": 0,
+  "worker_status": "A184_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261008-A184-Q059-SOURCE-FAMILY-KEYLINE-TRACKING/A184_7CE_REPORT.json"
+}
