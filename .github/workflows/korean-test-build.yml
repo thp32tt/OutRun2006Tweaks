@@ -188,6 +188,114 @@ jobs:
           if (-not (Test-Path build/bin/KOREAN_QA_BUILD_SCOPE.txt)) { throw 'Missing QA scope receipt' }
           Write-Host "QA mode: $mode; runtime rows: $rows; approved DDS: $dds"
 
+      # User acceptance must be possible BEFORE final production approval.
+      # This is a separate, clearly UNAPPROVED preview package.
+      - name: Assemble historical C3 user-review graphics (NOT APPROVED)
+        id: user_review
+        shell: pwsh
+        run: |
+          $queue = Import-Csv localization/graphics/asset_queue.csv
+          New-Item -ItemType Directory -Path build/user-review -Force | Out-Null
+          Copy-Item -Path build/bin/* -Destination build/user-review -Recurse -Force
+          if (Test-Path build/user-review/textures) {
+            Remove-Item build/user-review/textures -Recurse -Force
+          }
+          if (Test-Path build/user-review/KOREAN_TEST_GRAPHICS_MANIFEST.csv) {
+            Remove-Item build/user-review/KOREAN_TEST_GRAPHICS_MANIFEST.csv -Force
+          }
+
+          $selected = @()
+          $missing = @()
+          $seenPaths = @{}
+          foreach ($row in $queue) {
+            $status = [string]$row.artwork_status
+            if ($status -notmatch '(?i)c3_strict_pass') { continue }
+            if ($status -match '(?i)rework_required|visual_fail|hold_strict|reopened|_fail') { continue }
+            if (@('localize_text', 'hangul_name_entry') -notcontains [string]$row.action) { continue }
+            $index = ([string]$row.index).Trim([char]0xFEFF).Trim()
+            $asset = ([string]$row.path).Replace([char]92, '/')
+            if ($asset -notmatch '^textures/load/[a-zA-Z0-9_./-]+\.dds
+        with:
+          name: OutRun2-Korean-${{ steps.graphics.outputs.mode }}-${{ github.sha }}
+          path: build/bin/
+          compression-level: 9
+          retention-days: 30
+ -or $asset.Contains('..')) {
+              throw "Unsafe user-review asset path q${index}: $asset"
+            }
+            if ($seenPaths.ContainsKey($asset)) {
+              throw "Duplicate preview destination q${index}: $asset"
+            }
+            $source = Join-Path 'localization/graphics/hd_candidates' $asset
+            if (-not (Test-Path -LiteralPath $source)) {
+              $missing += [pscustomobject]@{index = $index; path = $asset; reason = 'candidate_missing_at_HEAD'}
+              Write-Warning "User-review q${index} candidate missing; omitting: $asset"
+              continue
+            }
+            $seenPaths[$asset] = $true
+            $hash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+            $dest = Join-Path 'build/user-review' $asset
+            New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
+            Copy-Item -LiteralPath $source -Destination $dest -Force
+            if ((Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) {
+              throw "Copied user-review DDS hash mismatch q${index}"
+            }
+            $selected += [pscustomobject]@{
+              queue_index = $index
+              path = $asset
+              sha256 = $hash
+              queue_status = $status
+              approval = 'NOT_APPROVED_HISTORICAL_C3_ONLY'
+              game_test = 'UNTESTED'
+            }
+          }
+
+          if ($selected.Count -eq 0) {
+            throw 'No historical-C3 candidate DDS available for user review.'
+          }
+          $selected | Export-Csv build/user-review/USER_REVIEW_UNAPPROVED_GRAPHICS.csv -NoTypeInformation -Encoding UTF8
+          if ($missing.Count -gt 0) {
+            $missing | Export-Csv build/user-review/USER_REVIEW_MISSING_CANDIDATES.csv -NoTypeInformation -Encoding UTF8
+          }
+          @(
+            'OUTRUN 2006 KOREAN - USER GRAPHICS REVIEW PREVIEW - NOT APPROVED'
+            "Source commit: $env:GITHUB_SHA"
+            "Historical C3 candidate DDS included: $($selected.Count)"
+            "Missing candidate DDS: $($missing.Count)"
+            'This is a USER FEEDBACK build, NOT a final approved graphics distribution.'
+            'Prior C3 queue status does NOT establish current evidence approval.'
+            'Every included DDS current-byte SHA256 is pinned in USER_REVIEW_UNAPPROVED_GRAPHICS.csv.'
+            'Known visual defects may remain; report queue_index and original-size screenshots.'
+            'Install in a separate copy of the game, NEVER over earlier test builds.'
+            'Runtime files are bundled from the SAME source commit.'
+            'Actual game validation: UNTESTED; user acceptance NOT YET GRANTED.'
+            'Attach screenshots and OutRun2006Tweaks.log for issues.'
+          ) | Set-Content build/user-review/READ_ME_FIRST_USER_REVIEW.txt -Encoding UTF8
+          @(
+            "source_sha=$env:GITHUB_SHA"
+            'mode=USER_REVIEW_NOT_APPROVED'
+            "graphics_selected=$($selected.Count)"
+            "graphics_missing=$($missing.Count)"
+            'production_approval=NO'
+            'runtime_validation=UNTESTED'
+          ) | Set-Content build/user-review/USER_REVIEW_SCOPE.txt -Encoding UTF8
+          $actual = @(Get-ChildItem build/user-review/textures/load -Recurse -Filter *.dds -ErrorAction SilentlyContinue).Count
+          if ($actual -ne $selected.Count) {
+            throw "User-review DDS manifest/file-count mismatch: expected $($selected.Count) actual $actual"
+          }
+          "count=$($selected.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "USER REVIEW: $($selected.Count) historical C3 DDS, $($missing.Count) missing, zero new approvals."
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "Separate **USER_REVIEW_NOT_APPROVED** preview: **$($selected.Count) historical C3 DDS**. NOT production-approved."
+
+      - name: Upload UNAPPROVED user graphics review build
+        if: steps.user_review.outputs.count != '' && steps.user_review.outputs.count != '0'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: OutRun2-Korean-USER_REVIEW_NOT_APPROVED-${{ github.sha }}
+          path: build/user-review/
+          compression-level: 9
+          retention-days: 30
+
       - name: Upload Korean test build
         uses: actions/upload-artifact@v7.0.1
         with:
