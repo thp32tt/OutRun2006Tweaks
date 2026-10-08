@@ -2050,8 +2050,19 @@ def check_exact_hud_raw_wvp(source):
         'else',
         'GetVertexShaderConstantF('
     )
-    if eye.count('R30GetExtendedRawWvpForExactHud(original)') != 1:
-        raise SystemExit('P0 HUD raw WVP: exact screen call missing/duplicated')
+    require('screenKind == R30ScreenSpaceKind::Hud2D ||', eye,
+            'orthographic shader HUD must use raw c64 owner')
+    if 'else if (screenKind == R30ScreenSpaceKind::Hud2D)' not in eye:
+        raise SystemExit('P0 orthographic shader HUD raw WVP branch missing')
+    hud2d = eye.split('else if (screenKind == R30ScreenSpaceKind::Hud2D)', 1)[1]
+    hud2d = hud2d.split('else if (R30ExactSceneEffectScope())', 1)[0]
+    require_order(hud2d, 'Hud2D original game c64 fail-closed',
+                  'if (!R30GetExtendedRawWvpForExactHud(original))',
+                  '++R30ExactHudRawWvpMiss;',
+                  'return false;',
+                  '++R30ExactHudExtendedRawWvp;')
+    if eye.count('R30GetExtendedRawWvpForExactHud(original)') != 2:
+        raise SystemExit('P0 original c64 required for perspective and orthographic HUD')
     for token in (
         'R30ScreenSpaceKind::WorldBillboard',
         'R30ScreenSpaceKind::ProjectedWorldMarker2D',
@@ -2059,6 +2070,20 @@ def check_exact_hud_raw_wvp(source):
         require(token, eye, 'original rival marker source route unchanged')
 
 check_exact_hud_raw_wvp(r30)
+for label, mutant in (
+    ('Hud2D raw guard removed', r30.replace(
+        'if (!R30GetExtendedRawWvpForExactHud(original))',
+        'if (false && !R30GetExtendedRawWvpForExactHud(original))', 1)),
+    ('Hud2D shader owner removed', r30.replace(
+        'else if (screenKind == R30ScreenSpaceKind::Hud2D)',
+        'else if (screenKind == R30ScreenSpaceKind::WorldBillboard)', 1)),
+):
+    try:
+        check_exact_hud_raw_wvp(mutant)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 orthographic original c64 mutation survived: ' + label)
 for label, corrupt in (
     ('exact HUD tag authority lost',
      inject_one_function_token(
