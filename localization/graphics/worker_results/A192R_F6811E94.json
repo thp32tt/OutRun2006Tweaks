@@ -1,0 +1,32 @@
+{
+  "role": "A",
+  "run": "20261008-A192R-Q119-PADDED-ITALIC-HALO",
+  "queue_index": 119,
+  "asset": "F6811E94",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "original_bbox": [
+    390,
+    54,
+    1632,
+    200
+  ],
+  "localized_bbox": [
+    710,
+    58,
+    1311,
+    196
+  ],
+  "deltas": {
+    "delta_left": 320,
+    "delta_right": 321,
+    "delta_top": 4,
+    "delta_bottom": 4
+  },
+  "outside_changed": 0,
+  "alpha_outside": 0,
+  "residue": 0,
+  "report": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_F6811E94_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
