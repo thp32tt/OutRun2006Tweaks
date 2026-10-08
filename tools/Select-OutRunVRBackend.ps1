@@ -43,7 +43,16 @@ $variant = if ($requestedVariant -eq "AUTO") { $defaultVariant } else { $request
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
-$src = if (Test-Path $slotPayload) { $slotPayload } else { $backendPayload }
+# CURRENT_FOCUS is the canonical shipped DX9Ex payload. Older overlays may
+# leave slots/CURRENT_FOCUS behind; never allow that stale directory to
+# shadow backends/d3d9 from the new package.
+$src = if ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {
+    $backendPayload
+} elseif (Test-Path $slotPayload) {
+    $slotPayload
+} else {
+    $backendPayload
+}
 if (-not (Test-Path $src)) { throw "Test payload not found for variant=$variant backend=$Backend : $src" }
 
 $sourceFile = Join-Path $src "SOURCE_SHA.txt"
