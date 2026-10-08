@@ -9,9 +9,9 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "8c6bd34c034a1097b12b366b0833dd623e18b515",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+  "validation_bearing_result_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
+  "result_sha": "48454683252e13de9b5db4341c0b744bc72b05b6",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00549]",
   "status": "MATERIAL_COMMITTED_CI_PENDING",
   "automation_validation": "PENDING",
@@ -30,10 +30,47 @@
     "expected_contracts": 23,
     "expected_negative_mutations": 17,
     "local_execution": "NOT_EXECUTED",
-    "exact_sha_ci": "PENDING"
+    "exact_sha_ci": "RUNNING"
   },
   "ci_gate_complete": false,
   "controller_terminal": false,
   "next_action": "Check exact material SHA DX9Ex Active, HUD Inspector, Domain Isolation (and supplementary full-source) CI. Pin run IDs/results to the material SHA, then finalize C6. No HMD claim.",
-  "score_award": "NOT_YET_CONFIRMED"
+  "score_award": "NOT_YET_CONFIRMED",
+  "ci_runs": {
+    "dx9ex_active": 37719835081,
+    "hud_inspector": 37719834890,
+    "domain_isolation": 37719834951,
+    "hud_1000": 37719834983,
+    "hud_5000": 37719835068,
+    "full_source_impact": 37719835007
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "hud_exe_static": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "hud_1000": "SUCCESS",
+    "hud_5000": "SUCCESS",
+    "game": "RUNNING",
+    "host": "RUNNING",
+    "full_chain_compile": "RUNNING",
+    "hud_inspector_build": "RUNNING",
+    "full_source_game_analyze": "RUNNING",
+    "full_source_host_analyze": "RUNNING"
+  },
+  "secondary_ci": {
+    "vr_autodev_coordination": {
+      "run_id": 37719835123,
+      "status": "FAIL_PREEXISTING",
+      "reason": "IMPLEMENT_NEXT queue status not accepted by tools/Test-VRAutodevCoordination.ps1; same failure occurred on base SHA 8c6bd34 (run 37716969993). Not caused by 00549 source change."
+    }
+  },
+  "pre_fix_compile_failure": {
+    "sha": "8c6bd34c034a1097b12b366b0833dd623e18b515",
+    "workflow_run": 37716969923,
+    "failed_job": 113115552510,
+    "errors": [
+      "hooks_textures.cpp:378 invalid std::filesyste splice and local cacheFile definition",
+      "hooks_textures.cpp:463 orphaned unterminated message causing C2001"
+    ]
+  }
 }
