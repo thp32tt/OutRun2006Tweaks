@@ -8,14 +8,14 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261008-A184-Q059-SOURCE-FAMILY-KEYLINE-TRACKING"
+repo=Path.cwd(); run="20261008-A184R-Q059-SOURCE-FAMILY-TRACKING-REFIT"
 out=repo/"localization/graphics/role_A"/run; wr=repo/"localization/graphics/worker_results"
 out.mkdir(parents=True,exist_ok=True); wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"; base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+commit
 srcp=Path("/tmp/7CE1CFC5_HD.dds"); atp=Path("/tmp/7CE1CFC5_atlas.json")
-PRIOR_SHA="4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8"
+PRIOR_SHA="9f181320dc25651925d514e36f683f8b96d3eec4b4d8ca8931cef5a6b588d221"
 if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=PRIOR_SHA:
     raise RuntimeError("A184 q59 previous B249 candidate bytes changed; abort")
 urllib.request.urlretrieve(base+"/Release/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",srcp)
@@ -146,7 +146,7 @@ def make_big(text,fs):
     f=ImageFont.truetype(fp,fs,index=fi)
     d=ImageDraw.Draw(Image.new("L",(4,4),0)); bb=d.textbbox((0,0),text,font=f,stroke_width=outer)
     # Preserve Hangul anatomy: source-like tracking, not arbitrary width stretch.
-    tracking=int(round(fs*.31))
+    tracking=int(round(fs*.22))
     tracked_width=int(round(sum(f.getlength(ch) for ch in text)+max(0,len(text)-1)*tracking))
     pad=outer+shadow+10
     size=(tracked_width+2*pad+outer*2,bb[3]-bb[1]+2*pad)
@@ -286,15 +286,15 @@ src.save(source_png); clean.save(clean_png); dec.save(final_png)
 smimg=Image.fromarray((source_mask.astype(np.uint8)*255),"L"); alimg=Image.fromarray((allowed.astype(np.uint8)*255),"L"); protimg=ImageOps.invert(alimg)
 smimg.save(out/"7CE_SOURCE_TEXT_MASK.png"); alimg.save(out/"7CE_ALLOWED_BBOX_MASK.png"); protimg.save(out/"7CE_PROTECTED_MASK.png")
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(out/"7CE_SOURCE_TEXT_MASK.png"),"--report",str(out/"A184_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(out/"7CE_ALLOWED_BBOX_MASK.png"),"--protected-mask",str(out/"7CE_PROTECTED_MASK.png"),"--report",str(out/"A184_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A184_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"A184_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(out/"7CE_SOURCE_TEXT_MASK.png"),"--report",str(out/"A184R_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(out/"7CE_ALLOWED_BBOX_MASK.png"),"--protected-mask",str(out/"7CE_PROTECTED_MASK.png"),"--report",str(out/"A184R_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A184R_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"A184R_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 stack=Image.new("RGB",(1024,3*282),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS); stack.paste(z,(0,i*282+24)); ImageDraw.Draw(stack).text((5,i*282+5),label,fill="black")
-stack.save(out/"A184_7CE_SOURCE_CLEAN_FINAL.jpg",quality=97)
+stack.save(out/"A184R_7CE_SOURCE_CLEAN_FINAL.jpg",quality=97)
 cards=[]
 for row in outrows:
     x0,y0,x1,y1=row["original_bbox"]; p=16; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -305,11 +305,33 @@ for row in outrows:
     ImageDraw.Draw(c).text((5,5),f'{row["region_idx"]} {row["source"]} -> {row["korean"]}',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"A184_7CE_ROW_CONTACT.jpg",quality=97)
+sheet.save(out/"A184R_7CE_ROW_CONTACT.jpg",quality=97)
 rr=Image.new("RGB",(1024,2*282),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS); rr.paste(z,(0,i*282+24)); ImageDraw.Draw(rr).text((5,i*282+5),label,fill="black")
-rr.save(out/"A184_7CE_RAW_COMPARE.jpg",quality=97)
+rr.save(out/"A184R_7CE_RAW_COMPARE.jpg",quality=97)
+# Native/practical evidence FROM persisted DDS, not the pre-compressed render.
+sheets=[]
+for row in outrows:
+    x0,y0,x1,y1=row["original_bbox"]; p=12
+    cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
+    for scale in (1.0,.75,.5):
+        ims=[]
+        for label,im in (("ENGLISH SOURCE",src),("KOREAN DDS",dec)):
+            crop=comp(im).crop(cr)
+            crop=crop.resize((max(1,int(crop.width*scale)),max(1,int(crop.height*scale))),Image.Resampling.LANCZOS)
+            tile=Image.new("RGB",(crop.width,crop.height+24),(22,22,22))
+            tile.paste(crop,(0,24))
+            ImageDraw.Draw(tile).text((4,4),f"{row['region_idx']} {label} {scale:.2f}",fill="white")
+            ims.append(tile)
+        line=Image.new("RGB",(sum(z.width for z in ims)+8,max(z.height for z in ims)),(20,20,20))
+        xx=0
+        for z in ims:line.paste(z,(xx,0));xx+=z.width+8
+        sheets.append(line)
+contact=Image.new("RGB",(max(z.width for z in sheets),sum(z.height+4 for z in sheets)),(17,17,17))
+yy=0
+for z in sheets:contact.paste(z,(0,yy));yy+=z.height+4
+contact.save(out/"A184R_PRACTICAL_100_75_50.jpg",quality=96,subsampling=0)
 
 report={"schema_version":1,"role":"A","run":run,"queue_index":59,"asset":asset,"readiness_tier":"ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"source_git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(srcp)},
@@ -320,11 +342,11 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":59,"asset":asset,"
  "decoded_changes":{"changed_pixels_outside_exact_source_bboxes":outside,"alpha_outside":alphaout,"introduced_visible_outside":visout,"source_residue":residue,"protected_top_art_changed":protected_top_changed,"localized_overlap":overlap,"localized_touch":touch},
  "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_alpha_blocks":len(source_full),"partial_alpha_only_blocks":len(partial),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_endpoints_and_color_bytes_preserved":True},
  "prior_candidate_sha256":PRIOR_SHA,"source_family_rework":"C271 source-family tracking not horizontal stretching, white/blue/keyline-depth small text","work_item":"PJR-019","execution_backend":"GITHUB_HOSTED_CPU_AFTER_CHATGPT_LOCAL_DNS_BLOCK","fresh_c1":"REQUIRED","c3":"REQUIRED_AFTER_C1","candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"A184_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"A184_7CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A184R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"A184R_7CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":59,"asset":"7CE1CFC5","source_sha256":sha(srcp),"candidate_sha256":cand_sha,"localized_physical_elements":4,
  "bbox_size_positive_margin":"4/4","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,
  "decoded_changed_outside":outside,"alpha_outside":alphaout,"protected_top_art_changed":protected_top_changed,"overlap":overlap,"touch":touch,
- "changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":str((out/"A184_7CE_REPORT.json").relative_to(repo))}
-(wr/"A184_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":str((out/"A184R_7CE_REPORT.json").relative_to(repo))}
+(wr/"A184R_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
