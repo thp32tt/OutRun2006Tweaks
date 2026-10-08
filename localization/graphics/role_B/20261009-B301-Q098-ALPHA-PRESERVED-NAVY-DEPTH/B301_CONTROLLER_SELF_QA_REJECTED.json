@@ -1,0 +1,48 @@
+{
+  "role": "B",
+  "run": "B300-B301",
+  "queue_index": 98,
+  "task_id": "OUTRUN-KOR-B300-Q098-DUAL-BC3-SOURCE-HALO-REWORK-20261009",
+  "decision": "REWORK_REQUIRED_PRODUCER_VISUAL_FAIL",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "preserved_current_dds_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_B300": {
+    "sha256": "0c32437332ed4cf25b8ea774b6c673db2a13939818eec73de64015ce03966be5",
+    "worker": 37848643824,
+    "changed_blocks": 2979,
+    "region_outside": 0,
+    "visual": "FAIL_HORIZONTAL_WHITE_FRAGMENT_BROKEN_GLYPH",
+    "qa_dir": "localization/graphics/role_B/20261009-B300-Q098-ALPHA-GLOW-SOURCE-PROFILE"
+  },
+  "trial_B300R": {
+    "runs": [
+      37848984259,
+      37849229958
+    ],
+    "status": "NO_OUTPUT_PALETTE_RESTRICTION"
+  },
+  "trial_B301": {
+    "sha256": "460b710be98cf92de85362730abcc9209592a47e8037ef44390bf7c08d97d31b",
+    "worker": 37849835336,
+    "changed_blocks": 1545,
+    "changed_native_pixels": 15593,
+    "alpha_exact": true,
+    "header_exact": true,
+    "persisted_roundtrip_exact": true,
+    "region_outside": 0,
+    "source_white_navy_ratio": 0.504,
+    "b279_white_navy_ratio": 2.098,
+    "b301_white_navy_ratio": 2.304,
+    "visual": "FAIL_DOTTED_WHITE_HANGUL_FACE_AND_THIN_NAVY_GLOW",
+    "qa_dir": "localization/graphics/role_B/20261009-B301-Q098-ALPHA-PRESERVED-NAVY-DEPTH"
+  },
+  "visual_source": "SOURCE/CLEAN/PREVIOUS/TRIAL readable native100/75/50 and RAW75; white/gray/black; pixel comparison directly observed",
+  "recommendation": "MANUAL_SOURCE_CONDITIONED_NATIVE_GLYPH_AND_BC3_COLOR_ALPHA_CONSTRUCTION_REQUIRED; do not repeat failed palette recolors",
+  "new_promoted_dds": 0,
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_changed": []
+}
