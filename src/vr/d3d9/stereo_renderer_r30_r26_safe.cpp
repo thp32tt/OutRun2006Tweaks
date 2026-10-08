@@ -1748,6 +1748,41 @@ namespace OutRunVRStereo
 
             const auto semanticScope =
                 OutRunVR::GameSemantic::EffectiveScope();
+
+            // Exact R71/R74 result/+TIME producer evidence survives queue
+            // ownership only if this draw sees the original registered node.
+            // A first-hit diagnostic separates missing producer tags from
+            // shader c64/FVF/recovery rejection without changing render policy.
+            if (Settings::VRTelemetry &&
+                OutRunVR::GameSemantic::QueueRenderActive())
+            {
+                const auto producer =
+                    OutRunVR::GameSemantic::CurrentQueueProducerToken();
+                const unsigned family = static_cast<unsigned>(producer);
+                constexpr unsigned first = static_cast<unsigned>(
+                    OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+                constexpr unsigned last = static_cast<unsigned>(
+                    OutRunVR::GameSemantic::ProducerToken::DispRankFirst);
+                if (family >= first && family <= last && family < 32)
+                {
+                    static std::uint32_t reportedResultProducerBits = 0;
+                    const std::uint32_t bit = 1u << family;
+                    if ((reportedResultProducerBits & bit) == 0)
+                    {
+                        reportedResultProducerBits |= bit;
+                        spdlog::info(
+                            "VR P0 RESULT DRAW ROUTE: producer={} scope={} gameState={} mode={} queueEpoch={} shaderPresent={}",
+                            OutRunVR::GameSemantic::Name(producer),
+                            OutRunVR::GameSemantic::Name(semanticScope),
+                            Game::current_mode
+                                ? static_cast<int>(*Game::current_mode) : -1,
+                            Game::game_mode ? *Game::game_mode : -1,
+                            OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                            CurrentVertexShaderIdentity.load(
+                                std::memory_order_acquire) != 0 ? 1 : 0);
+                    }
+                }
+            }
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticSceneEffect =
@@ -4682,8 +4717,10 @@ namespace OutRunVRStereo
                 counter.fetch_add(1, std::memory_order_relaxed) + 1;
             if ((hit & (hit - 1)) == 0)
                 spdlog::info(
-                    "VR R62 FIXEDFN KIND0: owner={} fvf=0x{:08X} prim={} marker={} hits={}",
+                    "VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}",
                     projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentQueueProducerToken()),
                     static_cast<unsigned>(fvf),
                     primitiveCount,
                     OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
