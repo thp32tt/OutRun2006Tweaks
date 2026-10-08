@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "run": "20261008-C270-C2-Q176-EVIDENCE",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "pre_commit_refresh_head": "2062213fad9c8ce37dc1593fb9bc0a5ad3d4248a",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "calibration": {
+    "source_run": "20261008-C269-C2-Q154-Q172-Q214-EVIDENCE",
+    "cases": [
+      {
+        "case": "case_00.png",
+        "first_look": "PASS",
+        "answer_kind": "normal"
+      },
+      {
+        "case": "case_01.png",
+        "first_look": "FAIL",
+        "answer_kind": "excessive_weight"
+      },
+      {
+        "case": "case_02.png",
+        "first_look": "FAIL",
+        "answer_kind": "opposite_slant"
+      },
+      {
+        "case": "case_03.png",
+        "first_look": "FAIL",
+        "answer_kind": "residue"
+      },
+      {
+        "case": "case_04.png",
+        "first_look": "FAIL",
+        "answer_kind": "clipped_stroke"
+      }
+    ],
+    "binary_defect_detection": "5/5 PASS"
+  },
+  "pixel_review": {
+    "pixels_before_producer_verdict": false,
+    "evidence": [
+      "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+      "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_SOURCE_READABLE.png",
+      "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CLEAN_PLATE.png",
+      "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_FINAL_READABLE.png",
+      "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_FINAL_RAW.png"
+    ],
+    "regions": {
+      "jennifer": {
+        "observation": "No definite glyph breakage, residue, clipping, protected-art intrusion or orientation defect visible; semantic binding appears correct."
+      },
+      "clarissa": {
+        "observation": "No definite glyph breakage, residue, clipping, protected-art intrusion or orientation defect visible; semantic binding appears correct."
+      },
+      "holly": {
+        "observation": "No definite glyph breakage, residue, clipping, protected-art intrusion or orientation defect visible; semantic binding appears correct."
+      },
+      "flagman4": {
+        "observation": "No definite glyph breakage, residue, clipping, protected-art intrusion or orientation defect visible; semantic binding appears correct."
+      }
+    },
+    "preserve_checks": [
+      "atlas idx38 ??? preserved",
+      "atlas idx40 route artwork preserved"
+    ]
+  },
+  "machine_reference": {
+    "producer_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json",
+    "historical_machine_result": "PASS",
+    "current_policy_approval_machine_report_created": false
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "Current invocation cannot truthfully satisfy pixels_before_producer_verdict=true because queue/producer prose was exposed before exact-pixel first look. Current evidence package also predates the required per-region C/C3 approval schema. No PASS fabricated; exact candidate bytes preserved.",
+  "next_required": "Fresh C2 pixels-first review on unchanged bytes, complete per-region lossless evidence, current machine report, segment inventory/family profile/mip views, then separate C and C3 findings before APPROVALS/q176.json or PRE_INGAME export.",
+  "candidate_changed_by_c": false,
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

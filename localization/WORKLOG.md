@@ -3477,3 +3477,10 @@ Applied user-authorized production/QA improvements without changing six launches
 - q172 `6C9B3611` @ `51a636b1...`: 2/2 containment/margins + B248-vs-B191 outside/alpha blast radius=0. Current lossless/native/50% review shows C264 scale return materially repaired, but the same first-look sequencing blocker prevents current-policy PASS. **HOLD_STRICT_RECHECK**, bytes preserved.
 - q214 `BF229CF4` @ `3d292729...`: definite visual FAIL. 출발 30/84px (35.71%) and 골 18/74px (24.32%) remain visibly undersized/weak at native and 50% practical scale. **REWORK_REQUIRED**, C3 blocked; B must restore source-relative badge hierarchy while preserving clean/protected DXT5 artwork.
 - No approval JSON or PRE_INGAME membership/export added. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+
+### C270 C2 q176 evidence-gate hold — 2026-10-08 09:50 KST
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`; HEAD/queue refreshed immediately before synchronization at `2062213fad9c8ce37dc1593fb9bc0a5ad3d4248a`.
+- q176 `75C3586A` exact B201 candidate `494d42c09c58...`: known-defect calibration binary decision 5/5. SOURCE/CLEAN/FINAL/RAW visual review found no definite glyph breakage, source residue, clipping, protected-art intrusion, semantic-binding error, or mirror-Y orientation defect; idx38 `???` and idx40 route artwork remain preserved.
+- **HOLD_STRICT_RECHECK**: this invocation exposed producer/queue prose before exact-pixel first look, so current evidence policy `pixels_before_producer_verdict=true` cannot be asserted. No C/C3 PASS, approval JSON, PRE_INGAME export, or DDS byte change was fabricated.
+- Next C2: inspect unchanged q176 pixels first, then build complete per-region evidence and separate C/C3 findings. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
