@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C302-C2",
+  "run_key": "OUTRUN-KOR-C302-C2-Q236-FOUR-NATIVE-REGIONS-20261008-2056",
+  "date_kst": "2026-10-08 20:56 KST",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selection_head": "21621fec45e63cee01bfdfe6d2beee363c7e9ae3",
+  "selection_queue_blob": "104148e182312ca780a62eaf6233496197e6629d",
+  "selection_reason": "No new/changed EVEN A/B candidate available. q236 has historical independent C223 static PASS on unchanged bytes without current-policy C3. q154 and q176 recent C2 HOLD evidence not repeated; q98/q172/q214 await material producer repair; q230 C301 C3 HOLD already audited.",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "bytes": 16777344
+  },
+  "candidate": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-recovery-20260928",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "bytes": 16777344,
+    "unchanged_since_C223": true
+  },
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 236",
+    "result": "VALIDATION_ONLY",
+    "execution": "N100 lightweight fallback with branch-exact downloaded script/queue/escalations; no DDS rerender authorized"
+  },
+  "execution_backend": "ChatGPT-local JavaScript targeted RAW DDS pixel analysis using N100 MCP as verified SHA large file transfer only; ChatGPT local raw GitHub DNS failure; first whole-atlas client-side attempt hit tool capacity and no results claimed",
+  "native_structure": "2048x2048 RGBA32 mip1, preserved RAW mirror-Y; source/current exact DDS SHA-256 verified on download",
+  "pixel_threshold": "alpha > 16",
+  "scope": "Four source text-effect regions independently inspected from pinned DDS. Other 10 rows not newly full-pixel inspected. Historical 14/14 numeric proof belongs to C223 and is not counted as new current-policy approval.",
+  "regions": [
+    {
+      "id": "industrial_complex",
+      "region_idx": 0,
+      "source_text": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "source_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "observed_source_bbox": [
+        55,
+        1937,
+        1160,
+        2023
+      ],
+      "observed_candidate_bbox": [
+        418,
+        1939,
+        1159,
+        2022
+      ],
+      "source_visible_alpha_gt16": 50441,
+      "candidate_visible_alpha_gt16": 25428,
+      "changed_rgba_inside_source_bbox": 56535,
+      "changed_rgba_outside_source_horizontal_extent": 0,
+      "changed_alpha_outside_source_horizontal_extent": 0,
+      "margins_lrtb": [
+        364,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "id": "waterfalls",
+      "region_idx": 1,
+      "source_text": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "observed_source_bbox": [
+        322,
+        1804,
+        1038,
+        1899
+      ],
+      "observed_candidate_bbox": [
+        750,
+        1810,
+        1036,
+        1893
+      ],
+      "source_visible_alpha_gt16": 34345,
+      "candidate_visible_alpha_gt16": 10268,
+      "changed_rgba_outside_source_horizontal_extent": 0,
+      "changed_alpha_outside_source_horizontal_extent": 0,
+      "margins_lrtb": [
+        429,
+        2,
+        6,
+        6
+      ],
+      "protected_art_note": "Another preserved source label at x1995 in same atlas row initially broadened an unscoped silhouette. Corrected analysis clips source/candidate visible bboxes to the canonical source text region, and independently confirms changed RGBA/alpha outside original region zero."
+    },
+    {
+      "id": "milky_way",
+      "region_idx": 8,
+      "source_text": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "observed_source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "observed_candidate_bbox": [
+        754,
+        1026,
+        1049,
+        1109
+      ],
+      "source_visible_alpha_gt16": 28230,
+      "candidate_visible_alpha_gt16": 11117,
+      "changed_rgba_outside_source_horizontal_extent": 0,
+      "changed_alpha_outside_source_horizontal_extent": 0,
+      "margins_lrtb": [
+        331,
+        2,
+        3,
+        3
+      ]
+    },
+    {
+      "id": "jungle",
+      "region_idx": 12,
+      "source_text": "JUNGLE",
+      "korean": "정글",
+      "source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "observed_source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "observed_candidate_bbox": [
+        901,
+        578,
+        1041,
+        661
+      ],
+      "source_visible_alpha_gt16": 20809,
+      "candidate_visible_alpha_gt16": 5803,
+      "changed_rgba_outside_source_horizontal_extent": 0,
+      "changed_alpha_outside_source_horizontal_extent": 0,
+      "margins_lrtb": [
+        278,
+        2,
+        5,
+        6
+      ]
+    }
+  ],
+  "mandatory_c3_observations": {
+    "slant": {
+      "result": "HOLD",
+      "observation": "Historical C223 JPG shows upright stage list; current per-glyph stem anchors and native font perspective were not freshly independently measured."
+    },
+    "clean_plate": {
+      "result": "HOLD",
+      "observation": "C153/C223 historical clean-plate visual evidence exists; exact authored CLEAN PNG and per-region lossless comparison not independently rebound to current C3 in this run."
+    },
+    "style": {
+      "result": "HOLD",
+      "observation": "Historical source-family correction is documented, but source-relative condensed typeface and counter-space cannot be newly accepted by four small numeric ROI samples alone."
+    },
+    "readability": {
+      "result": "HOLD",
+      "observation": "Historical contact JPG indicates legible text, but no fresh 100/75/50 native lossless practical-size review for all 14 labels."
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "No demonstrated clipping in four inspected decoded alpha bboxes; absence of a visual defect across remaining ten areas cannot be established."
+    },
+    "protected_art": {
+      "result": "PARTIAL_NUMERIC_PASS",
+      "observation": "Four inspected horizontal glyph bands show zero RGBA and alpha changes outside source bbox including preserved x1995 artwork; remaining atlas protected-art mask not independently rescanned."
+    },
+    "placement": {
+      "result": "PARTIAL_NUMERIC_PASS",
+      "observation": "Four native decoded alpha>16 Hangul boxes each fully contained with strictly positive margins; not a full-asset C3."
+    },
+    "orientation": {
+      "result": "PARTIAL",
+      "observation": "Analysis explicitly maps RAW scanline 2048-y to readable coordinates; runtime UV in-game test still unperformed."
+    }
+  },
+  "calibration": {
+    "qualified_blind_review": false,
+    "pixels_before_producer_verdict": false,
+    "explanation": "Queue/producer descriptions were inspected before raw pixels. Policy does not allow representing this as blind current C/C3 PASS."
+  },
+  "legacy_C": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME remains historical static evidence only.",
+  "C3_decision": "HOLD_STRICT_RECHECK",
+  "C3_approval": false,
+  "APPROVALS_q236": "NOT_CREATED",
+  "PRE_INGAME": "BLOCKED",
+  "user_review": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "follow_up": "Complete 14/14 native SOURCE/CLEAN/FINAL exact hash-bound per-region lossless proof with qualified visual calibration, style/slant, 100/75/50/RAW/practical/black/white/gray, separate C and C3 stage before approval. No same-byte rerender or promotion merely to migrate policy.",
+  "cleanup": "N100 targeted temporary transfer and lightweight triage must be removed after remote publication, without touching shared tracked files or other worktrees.",
+  "forbidden_domains_touched": []
+}
