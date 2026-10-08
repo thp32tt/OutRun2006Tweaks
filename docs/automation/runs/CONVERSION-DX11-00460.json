@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00460",
+  "production_id": "CONVERSION-DX11-00460",
+  "event_id": "CONVERSION-DX11-00460-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R152_TEXTURE_STAGE_IMMEDIATE_CONTEXT_LIVE_RECEIPT",
+  "work_key": "DX11:PS_SAMPLER_SRV:IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/native_backend.cpp",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00460",
+  "lease_epoch": 1,
+  "base_sha": "4e391ed1292eedea3218d44f65f0a37671772af7",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_HOSTED_CI",
+  "runtime_validation": "UNTESTED",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch HEAD 4e391ed and 00459 C6; 00460 absent; rollover not retry, ATTEMPT=1/3",
+    "C1_REVIEW": "PASS: texture stage allowed same-device deferred PS sampler/SRV recorded state to masquerade as live immediate state; R149-R151 unchanged",
+    "C2_IMPLEMENT": "PASS: R152 immediate-only live PS sampler/SRV guard and WARP deferred-negative/immediate-positive preservation probes",
+    "C3_VALIDATE": "IN_PROGRESS: exact-SHA Backend Conversion Gate 37820902405 validate 113461376600 executing Windows Win32 build after source static checks PASS",
+    "C4_COMMIT": "PASS: material source/probe commit 4bb96209f74bc235b9815d39b9e9bd456ab97bb9 [AUTO:CONVERSION-DX11-00460]",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant PS texture stage live-receipt guard only; no Draw activation, release or HMD deployment",
+    "C6_STATE": "PENDING final exact-SHA CI results and artifact before completion"
+  },
+  "static_validation": "PASS: scoped text patch invariant and source graph/static analyzer phases in hosted validate job; C++/WARP execution pending",
+  "state_persisted": false,
+  "next_action": "Check GitHub Actions Backend Conversion Gate 37820902405 for exact material SHA 4bb962..., validate 113461376600 and dx11-smoke; on SUCCESS persist complete C0-C6 state and evidence. On failure repair same TASK_ID. Do not advance ATTEMPT for rollover.",
+  "blockers": [
+    "Quest3/VDXR runtime untested; native Draw dormant"
+  ],
+  "material_result_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+  "validation_bearing_sha": "4bb96209f74bc235b9815d39b9e9bd456ab97bb9",
+  "validation_run_id": 37820902405,
+  "validation_job_id": 113461376600,
+  "issue14_comment_id": 6065970844
+}
