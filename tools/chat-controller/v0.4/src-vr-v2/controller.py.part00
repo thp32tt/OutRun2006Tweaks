@@ -62,14 +62,14 @@ QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECO
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 CONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
-CONVERSION_ACTIVE_LIMIT = max(1, int(os.getenv("CONVERSION_ACTIVE_LIMIT", "1")))
+CONVERSION_ACTIVE_LIMIT = max(1, int(os.getenv("CONVERSION_ACTIVE_LIMIT", "2")))
 CONVERSION_DX11_ENABLED = os.getenv("CONVERSION_DX11_ENABLED", "true").lower() == "true"
 DXVK_FROZEN = os.getenv("DXVK_FROZEN", "true").lower() == "true"
 CONVERSION_DXVK_ENABLED = (not DXVK_FROZEN) and os.getenv("CONVERSION_DXVK_ENABLED", "false").lower() == "true"
-# DX9Ex is a protected reference/maintenance lane, not a continuous
-# co-primary producer. Opt in only for a critical baseline regression.
-CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "false").lower() == "true"
-CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "A").strip().upper()
+# DX9Ex is the active visual/stability lane alongside native DX11.
+# DXVK remains frozen independently of the C lane.
+CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "true").lower() == "true"
+CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "").strip().upper()
 if CONVERSION_ONLY_SLOT not in {"", "A", "B", "C"}:
     raise ValueError(f"Unsupported CONVERSION_ONLY_SLOT={CONVERSION_ONLY_SLOT!r}; expected A, B, C, or empty")
 if DXVK_FROZEN and CONVERSION_ONLY_SLOT == "B":
