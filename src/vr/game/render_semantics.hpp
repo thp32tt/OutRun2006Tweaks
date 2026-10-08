@@ -55,6 +55,10 @@ namespace OutRunVR::GameSemantic
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
+    // An explicit SpriteNode producer owns its render space through the
+    // complete queue draw. Temporary helper scopes must not replace it.
+    // Generic untagged ScreenOverlay2D is deliberately excluded.
+    inline thread_local RenderScope CurrentQueueExactScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
 
@@ -125,6 +129,18 @@ namespace OutRunVR::GameSemantic
         ScopedExternalOverlaySemantic& operator=(const ScopedExternalOverlaySemantic&) = delete;
     };
 
+    inline RenderScope EffectiveScope() noexcept
+    {
+        // F11 is an external overlay, never a game SpriteNode consumer.
+        if (ExternalOverlaySemanticDepth != 0)
+            return CurrentScope;
+        if (CurrentQueueExactScope == RenderScope::ScreenHud ||
+            CurrentQueueExactScope == RenderScope::WorldBillboard ||
+            CurrentQueueExactScope == RenderScope::ProjectedWorldMarker2D)
+            return CurrentQueueExactScope;
+        return CurrentScope;
+    }
+
     inline void ArmNextDraw(RenderScope scope) noexcept
     {
         NextDrawScope = scope;
@@ -142,7 +158,7 @@ namespace OutRunVR::GameSemantic
             NextDrawScope = RenderScope::None;
             return scope;
         }
-        return CurrentScope;
+        return EffectiveScope();
     }
 
     inline bool ForceZeroDisparity(RenderScope scope) noexcept
@@ -354,10 +370,13 @@ namespace OutRunVR::GameSemantic
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D,
-        ProducerToken* producer = nullptr) noexcept
+        ProducerToken* producer = nullptr,
+        bool* exactTag = nullptr) noexcept
     {
         if (producer)
             *producer = ProducerToken::None;
+        if (exactTag)
+            *exactTag = false;
         if (!node ||
             SpriteNodeSemanticPublishedCount.load(
                 std::memory_order_acquire) == 0)
@@ -370,6 +389,8 @@ namespace OutRunVR::GameSemantic
             if (SpriteNodeSemanticTags[i].node != node)
                 continue;
             const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+            if (exactTag)
+                *exactTag = true;
             if (producer)
                 *producer = SpriteNodeSemanticTags[i].producer;
             CurrentQueueProjectedMarker =
@@ -390,6 +411,7 @@ namespace OutRunVR::GameSemantic
     {
         if (SpriteQueueDepth++ == 0)
         {
+            CurrentQueueExactScope = RenderScope::None;
             SpriteQueuePreviousScope = CurrentScope;
             // Serial publication and queue snapshot must share a mutex.
             {
@@ -429,12 +451,18 @@ namespace OutRunVR::GameSemantic
         }
         CurrentSpriteQueueNode = node;
         CurrentQueueProjectedMarker = {};
+        CurrentQueueExactScope = RenderScope::None;
         if (++SpriteQueueNodeEpoch == 0)
             ++SpriteQueueNodeEpoch;
         CurrentSpriteQueueProducer = ProducerToken::None;
+        bool exactTag = false;
         CurrentScope = ConsumeSpriteNodeScope(
             node, RenderScope::ScreenOverlay2D,
-            &CurrentSpriteQueueProducer);
+            &CurrentSpriteQueueProducer, &exactTag);
+        if (exactTag && (CurrentScope == RenderScope::ScreenHud ||
+                         CurrentScope == RenderScope::WorldBillboard ||
+                         CurrentScope == RenderScope::ProjectedWorldMarker2D))
+            CurrentQueueExactScope = CurrentScope;
     }
 
     inline void EndSpriteQueueRender() noexcept
@@ -448,6 +476,7 @@ namespace OutRunVR::GameSemantic
             CurrentSpriteQueueNode = nullptr;
             CurrentSpriteQueueProducer = ProducerToken::None;
             CurrentQueueProjectedMarker = {};
+            CurrentQueueExactScope = RenderScope::None;
 
             // Remove only tags that existed when this queue walk began. A
             // producer thread may already be preparing the next frame while
