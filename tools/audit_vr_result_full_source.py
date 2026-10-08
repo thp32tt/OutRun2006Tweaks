@@ -110,11 +110,34 @@ require("requestedPresentation == OutRunVR::PresentationGameplay" in host and
         "if (presentation != OutRunVR::PresentationGameplay)" in host,
         "host missing projection vs mono Theater transition boundaries")
 
+# Sources on disk are not necessarily production artifacts. Guard the exact
+# Win32 game + x64 host BUILD GRAPH: the packaged DX9Ex candidate uses
+# R26+HUD, not R33-only compare, and the host runs main_r23.cpp rather than
+# the older inert main.cpp. Never claim a review of the wrong source owns VR.
+game_cmake = source("CMakeLists.txt")
+host_cmake = source("vrhost/CMakeLists.txt")
+active_workflow = source(".github/workflows/vr-dx9ex-active.yml")
+require("option(OUTRUN_VR_R26_HUD_COMPARE" in game_cmake and
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp" in game_cmake,
+        "packaged R26+HUD game renderer source graph disappeared")
+require("add_executable(outrun-vr-host" in host_cmake and
+        "src/main_r23.cpp" in host_cmake,
+        "reviewed OpenXR host main_r23.cpp no longer compiled")
+require('cmake -S . -B build-game' in active_workflow and
+        '-DOUTRUN_VR_R26_HUD_COMPARE=ON' in active_workflow,
+        "DX9Ex package no longer builds reviewed R26+HUD game path")
+require('cmake -S . -B build-full-chain' in active_workflow and
+        '-DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON' in active_workflow,
+        "R33 full-chain CI must remain a separate compile comparison")
+
 report = {
     "schemaVersion": 1,
     "status": "SOURCE_CROSS_DOMAIN_CONTRACT_PASS_RUNTIME_HMD_UNTESTED",
     "scannedFiles": len(all_sources),
     "sourceRoots": list(SOURCE_DIRS),
+    "productionGameBackend": "Win32 R26 + R30 HUD",
+    "productionHostEntry": "vrhost/src/main_r23.cpp",
+    "comparisonOnlyCompile": "Win32 R33",
     "riskReferences": records,
     "resultOriginalCallsites": ["975EE", "97727", "977FB", "97BE4",
                                 "97DEC", "BEA5A", "BEA5F", "2C808",
