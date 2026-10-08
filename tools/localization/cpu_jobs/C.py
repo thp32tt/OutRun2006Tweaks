@@ -1,99 +1,104 @@
 #!/usr/bin/env python3
-"""C317 C2 EVEN q228: exact DDS 13-row lossless source/current evidence for NEW IGR-038.
-Do not confer independent PASS, C3 approval or game acceptance.
+"""C318 C1 q121: independent persisted-DDS source/CLEAN/A199 exact-SHA P0 review.
+
+No machine PASS means visual approval or in-game validation.
 """
-import os,io,json,hashlib,urllib.request,struct,csv
+import io,os,json,hashlib,struct,urllib.request,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw
-assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions"
-assert os.getenv("OUTRUN_CPU_ROLE")=="C"
-ROOT=Path.cwd()
-ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
-SRC_SHA="3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154"
-FIN_SHA="28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808"
-DIR=ROOT/"localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY"
-PREV=ROOT/"localization/graphics/role_C/20261008-C258-C2-Q198-Q226_Q228/C258_Q228_MACHINE_QA.json"
-PREV=ROOT/"localization/graphics/role_C/20261008-C258-C2-Q198-Q226-Q228/C258_Q228_MACHINE_QA.json"
-H=lambda bs:hashlib.sha256(bs).hexdigest()
-with (ROOT/"localization/graphics/asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
- row=next(z for z in csv.DictReader(f) if z["index"].lstrip("\ufeff")=="228")
-assert row["path"]==ASSET and row["artwork_status"]=="user_ingame_20261009_rework_required",row["artwork_status"]
-with (ROOT/"localization/graphics/INGAME_REWORK_BACKLOG.csv").open(encoding="utf-8-sig",newline="") as f:
- igr=next(z for z in csv.DictReader(f) if z["id"]=="IGR-038")
-assert igr["status"]=="OPEN_USER_INGAME_FAIL" and igr["queue_index"]=="228"
-prev=json.loads(PREV.read_text(encoding="utf-8"))
-assert prev["source_sha256"]==SRC_SHA and prev["candidate_sha256"]==FIN_SHA
-assert len(prev["rows"])==13
-uri="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
-s=urllib.request.urlopen(uri,timeout=180).read()
-f=(ROOT/"localization/graphics/hd_candidates"/ASSET).read_bytes()
-assert H(s)==SRC_SHA,("source",H(s))
-assert H(f)==FIN_SHA,("candidate",H(f))
-assert s[:128]==f[:128] and s[:4]==b"DDS "
-assert struct.unpack_from("<II",s,12)==(2048,2048)
-def decode(raw):
- im=Image.open(io.BytesIO(raw)).convert("RGBA")
- assert im.size==(2048,2048)
- return im
-sraw,fraw=decode(s),decode(f)
-S,F=sraw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),fraw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-sa,fa=np.asarray(S),np.asarray(F)
-union=np.zeros((2048,2048),dtype=bool)
-for row in prev["rows"]:
- l,t,r,b=row["source_bbox"]
- assert 0<=l<r<=2048 and 0<=t<b<=2048
- union[t:b,l:r]=True
-mask=np.any(sa!=fa,axis=2)
-outside=int(np.count_nonzero(mask &~union))
-outside_alpha=int(np.count_nonzero((sa[:,:,3]!=fa[:,:,3])&~union))
-assert outside==outside_alpha==0,(outside,outside_alpha)
-DIR.mkdir(parents=True,exist_ok=True)
-manifest=[]
-def save(img,name):
- path=DIR/name;img.save(path,"PNG")
- manifest.append({"path":str(path.relative_to(ROOT)),"sha256":H(path.read_bytes()),"bytes":path.stat().st_size})
- return name
-def composite(img,color):
- bg=Image.new("RGBA",img.size,(*color,255));bg.alpha_composite(img);return bg.convert("RGB")
-def joined(left,right,scale,color,mode):
- a,b=composite(left,color),composite(right,color)
- if scale!=100:
-  dims=(max(1,round(a.width*scale/100)),max(1,round(a.height*scale/100)))
-  a=a.resize(dims,Image.Resampling.LANCZOS);b=b.resize(dims,Image.Resampling.LANCZOS)
- out=Image.new("RGB",(a.width+b.width+8,max(a.height,b.height)+24),(255,255,255))
- d=ImageDraw.Draw(out);d.text((2,3),"EN "+mode,fill=(0,0,0));d.text((a.width+10,3),"KO "+mode,fill=(0,0,0))
- out.paste(a,(0,24));out.paste(b,(a.width+8,24))
- return out
-rows=[]
-for i,row in enumerate(prev["rows"]):
- l,t,r,b=row["source_bbox"];pad=6
- box=(max(l-pad,0),max(t-pad,0),min(r+pad,2048),min(b+pad,2048))
- ss,ff=S.crop(box),F.crop(box)
- stem=f"{i:02d}_{row['key'].replace(' ','_')}"
- files=[]
- for suffix,img in (("SOURCE_RGBA",ss),("CURRENT_RGBA",ff)):
-  files.append(save(img,stem+"_"+suffix+".png"))
- for scale in (100,75,50):
-  files.append(save(joined(ss,ff,scale,(128,128,128),str(scale)+"pct"),stem+f"_GRAY_{scale}pct.png"))
- files.append(save(joined(ss,ff,100,(245,245,245),"WHITE_NATIVE"),stem+"_WHITE_NATIVE.png"))
- raw=(box[0],2048-box[3],box[2],2048-box[1])
- sr,fr=sraw.crop(raw),fraw.crop(raw)
- assert np.array_equal(np.asarray(sr),np.flipud(np.asarray(ss)))
- assert np.array_equal(np.asarray(fr),np.flipud(np.asarray(ff)))
- files.append(save(joined(sr,fr,100,(128,128,128),"RAW"),stem+"_RAW.png"))
- cl,ct,cr,cb=row["localized_bbox"]
- margins=[cl-l,r-cr,ct-t,b-cb]
- assert min(margins)>0
- rows.append({"i":i,"key":row["key"],"source_bbox":row["source_bbox"],"candidate_bbox":row["localized_bbox"],"margins":margins,"source_size":row["source_size"],"candidate_size":row["localized_size"],"files":files})
-manifestfile=DIR/"C317_Q228_13ROW_NATIVE_LOSSLESS_MACHINE.json"
-manifestfile.write_text(json.dumps({"schema_version":2,"run":"C317-C2","role":"C","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","index":228,
- "ingame":"IGR-038","priority":"P1","canonical_source_url":uri,"source_sha256":SRC_SHA,"candidate_sha256":FIN_SHA,
- "dimensions":[2048,2048],"dds_header_equal":True,"raw_flip_y_validated":True,
- "outside_13_original_bboxes_rgba":outside,"outside_13_original_bboxes_alpha":outside_alpha,
- "C":"EVIDENCE_ONLY_NO_PASS","C3":"BLOCKED","USER_INGAME":"OPEN_USER_INGAME_FAIL",
- "authored_clean":"NOT_AVAILABLE_IN_THIS_RUN; no plate-only PASS or CLEAN-vs-FINAL assumption",
- "current_approval":False,"RUNTIME_VALIDATION":"UNTESTED","rows":rows,"lossless_pngs":len(manifest),"manifest":manifest,
- "new_dds":0},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-assert len(manifest)==91
-print("C317_C2_Q228_OK",json.dumps({"index":228,"png":len(manifest),"source_sha256":SRC_SHA,"candidate_sha256":FIN_SHA,"outside":outside,"outside_alpha":outside_alpha,"rows":len(rows)},ensure_ascii=False),flush=True)
+from PIL import Image,ImageDraw,ImageChops
+assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="C"
+root=Path.cwd()
+asset="textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+status=(root/"localization/graphics/asset_queue.csv").read_text(encoding="utf-8-sig")
+assert "121,"+asset+",localize_text,user_ingame_p0_rework_required_a199_candidate_pending_c1_c3_game" in status
+tri=json.loads(subprocess.check_output(["python","tools/localization/rework_triage.py","--index","121"],text=True))["assets"][0]
+assert tri["next_action"] in ("MATERIAL_REWORK","FRESH_C_REVIEW"),tri
+SH=lambda b:hashlib.sha256(b).hexdigest()
+source_sha="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+final_sha="4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8"
+source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+source=urllib.request.urlopen(source_url,timeout=120).read()
+final=(root/"localization/graphics/hd_candidates"/asset).read_bytes()
+assert SH(source)==source_sha and SH(final)==final_sha and source[:128]==final[:128]
+def decode(b):
+ assert b[:4]==b"DDS " and b[84:88]==bytes(4) and len(b)==128+4096*4096*4
+ h,w=struct.unpack_from("<II",b,12)
+ m=struct.unpack_from("<I",b,28)[0]
+ masks=struct.unpack_from("<IIII",b,92)
+ mode={(255,65280,16711680,4278190080):"RGBA",(16711680,65280,255,4278190080):"BGRA"}[masks]
+ assert (w,h,m)==(4096,4096,1)
+ return Image.frombytes("RGBA",(w,h),b[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+src=decode(source); fin=decode(final)
+cleanpath=root/"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png"
+clean=Image.open(cleanpath).convert("RGBA")
+assert clean.size==src.size==fin.size
+S=np.asarray(src);C=np.asarray(clean);F=np.asarray(fin)
+regions=[
+ ("select_game_mode","Select Game Mode","게임 모드 선택",(166,819,1166,973),(291,825,1040,948)),
+ ("select_car","Select your car","차량 선택",(243,947,1156,1111),(481,964,917,1072)),
+ ("select_course","Select Course","코스 선택",(302,1062,1085,1213),(462,1088,924,1202))]
+allowed=np.zeros((4096,4096),dtype=bool)
+for k,en,ko,box,glyphbox in regions:
+ l,t,r,b=box;allowed[t:b,l:r]=True
+ assert l<glyphbox[0]<glyphbox[2]<r and t<glyphbox[1]<glyphbox[3]<b
+ assert np.count_nonzero(C[t:b,l:r,3])==0,("not a clean plate",k)
+diff=np.any(C!=F,axis=2);alphadiff=C[:,:,3]!=F[:,:,3]
+counts={"clean_final_rgba_outside_exact_region_union":int((diff&~allowed).sum()),
+"clean_final_alpha_outside_exact_region_union":int((alphadiff&~allowed).sum()),
+"clean_final_rgba_inside_exact_region_union":int((diff&allowed).sum()),
+"source_clean_rgba_outside_exact_region_union":int((np.any(S!=C,axis=2)&~allowed).sum()),
+"source_final_rgba_outside_exact_region_union":int((np.any(S!=F,axis=2)&~allowed).sum())}
+assert counts["clean_final_rgba_outside_exact_region_union"]==0 and counts["clean_final_alpha_outside_exact_region_union"]==0
+# SOURCE/CLEAN may differ outside due other earlier localized atlas cells. Do not assert zero there.
+def bgview(p,color):
+ plate=Image.new("RGBA",p.size,(*color,255));plate.alpha_composite(p);return plate.convert("RGB")
+out=root/"localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA"
+out.mkdir(parents=True,exist_ok=True)
+files=[]
+def save(name,im):
+ f=out/name;im.save(f);files.append({"path":str(f.relative_to(root)),"sha256":SH(f.read_bytes()),"bytes":f.stat().st_size})
+details=[]
+for i,(k,en,ko,box,glyphbox) in enumerate(regions):
+ l,t,r,b=box
+ crop=(max(0,l-24),max(0,t-24),min(4096,r+24),min(4096,b+24))
+ tiles=[im.crop(crop) for im in (src,clean,fin)]
+ for stage,p in zip(("SOURCE","CLEAN","A199"),tiles):
+  save(f"C318_q121_{k}_{stage}_NATIVE.png",p)
+  mirror=im=None
+  mirror=p.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+  save(f"C318_q121_{k}_{stage}_RAW.png",mirror)
+ # Check raw output isn't just a duplicate of native view
+ assert np.array_equal(np.asarray(tiles[2].transpose(Image.Transpose.FLIP_TOP_BOTTOM)),np.asarray(mirror))
+ for pct in (100,75,50):
+  for cname,color in (("BLACK",(0,0,0)),("GRAY",(127,127,127)),("WHITE",(245,245,245))):
+   cells=[bgview(p,color) for p in tiles]
+   if pct!=100:cells=[p.resize((p.width*pct//100,p.height*pct//100),Image.Resampling.LANCZOS) for p in cells]
+   w,h=cells[0].size
+   board=Image.new("RGB",(w*3+24,h+26),"white")
+   draw=ImageDraw.Draw(board)
+   for j,(lbl,p) in enumerate(zip(("EN_SOURCE","A176_CLEAN","A199_NEW_SHA"),cells)):
+    board.paste(p,(j*(w+12),26))
+    draw.text((j*(w+12)+3,3),lbl,fill=(0,0,0))
+   save(f"C318_q121_{k}_SCF_{cname}_{pct}.png",board)
+ m=[glyphbox[0]-l,r-glyphbox[2],glyphbox[1]-t,b-glyphbox[3]]
+ assert min(m)>0
+ details.append({"id":k,"english":en,"korean":ko,"source_original_bbox":box,
+ "A199_candidate_bbox":glyphbox,"source_size":[r-l,b-t],
+ "A199_size":[glyphbox[2]-glyphbox[0],glyphbox[3]-glyphbox[1]],
+ "source_relative_width_ratio":round((glyphbox[2]-glyphbox[0])/(r-l),4),
+ "source_relative_height_ratio":round((glyphbox[3]-glyphbox[1])/(b-t),4),
+ "positive_margins":m,"CLEAN_alpha_in_source_box":0})
+report={"schema_version":1,"TASK_ID":"OUTRUN-KOR-C318-C1-Q121-A199-NEW-SHA-NATIVE-20261009",
+"TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)","queue_index":121,
+"p0_regressions":["IGR-030","IGR-031","IGR-040"],"triage":tri,
+"canonical_source_url":source_url,"source_sha256":source_sha,"candidate_sha256":final_sha,
+"supersedes_old_C316_SHA":"d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+"structure":{"width":4096,"height":4096,"format":"RGBA32","mips":1,"raw_orientation":"mirror_y","header_equal":True},
+"clean_provenance":str(cleanpath.relative_to(root)),"metrics":counts,"rows":details,
+"new_lossless_png":len(files),"manifest":files,
+"limit":"This is current persisted-DDS evidence only, not scene-composed runtime proof or blind calibration; annotated screenshot black outlines cannot prove native sprite box residues",
+"C":"PENDING_INDEPENDENT_CONTROLLER","C3":"NOT_APPROVED",
+"USER_RETEST":"NOT_PERFORMED","RUNTIME_VALIDATION":"UNTESTED","new_DDS":0}
+(out/"C318_Q121_A199_INDEPENDENT_MACHINE_PROOF.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C318_C1_Q121",json.dumps({"source":source_sha,"candidate":final_sha,"new_PNG":len(files),"rows":details,"metrics":counts},ensure_ascii=False),flush=True)
