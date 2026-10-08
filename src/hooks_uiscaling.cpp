@@ -114,6 +114,11 @@ class UIScaling : public Hook
 	// The original result screen emits a progress/percentage sprite through
 	// two separate calls to 0x2D200. Both had their own exact ownership in
 	// the historically validated R74 producer map (canonical EXE SHA pinned).
+	// Original R71 3 E8 edges all CALL Sumo_Printf 0x2CDD0; glyph/mask
+	// siblings may be queued across priorities without lower glyph tags.
+	static constexpr int OutRunStagePrintfCalls[] = {
+		0x975EE, 0x97727, 0x977FB
+	};
 	static constexpr int ResultProgressCallA = 0x97BE4;
 	static constexpr int ResultProgressCallB = 0x97DEC;
 	// The GOAL time panel also calls two sprite-producing helpers directly.
@@ -472,6 +477,32 @@ class UIScaling : public Hook
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud);
 		return result;
+	}
+
+	// R71 synchronous stage/checkpoint/result Sumo_Printf CALL producer.
+	// Keep exact parent lifetime, then tag every appended SpriteNode.
+	inline static SafetyHookMid OutRunStagePrintfEnterHooks[3]{};
+	inline static SafetyHookMid OutRunStagePrintfLeaveHooks[3]{};
+	inline static thread_local unsigned OutRunStagePrintfDepth = 0;
+	inline static thread_local
+		std::array<SpriteNode*, Game::SpritePriorityCount> OutRunStagePrintfBefore{};
+	static void OutRunStagePrintfEnter(safetyhook::Context&)
+	{
+		if (OutRunStagePrintfDepth++ != 0)
+			return;
+		for (int p = 0; p < Game::SpritePriorityCount; ++p)
+		{
+			SpriteNode* root = Game::sprite_prio_root[p];
+			OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;
+		}
+	}
+	static void OutRunStagePrintfLeave(safetyhook::Context&)
+	{
+		if (!OutRunStagePrintfDepth || --OutRunStagePrintfDepth != 0)
+			return;
+		TagAppendedNodes(OutRunStagePrintfBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		OutRunStagePrintfBefore = {};
 	}
 
 	// R74 exact result-progress CALL boundaries: the parent 0x2D200 creates
@@ -1131,6 +1162,30 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
 				Memory::HookType::Call);
+		// Exact canonical original x86 CALLs: 0x975EE/0x97727/0x977FB
+		// -> 0x2CDD0. Scope only the producer CALL duration, never
+		// globally hook Sumo_Printf or classify unproven game sprites.
+		bool stageHookOk = true;
+		for (int i = 0; i < 3; ++i)
+		{
+			OutRunStagePrintfEnterHooks[i] = safetyhook::create_mid(
+				Module::exe_ptr(OutRunStagePrintfCalls[i]),
+				OutRunStagePrintfEnter);
+			OutRunStagePrintfLeaveHooks[i] = safetyhook::create_mid(
+				Module::exe_ptr(OutRunStagePrintfCalls[i] + 5),
+				OutRunStagePrintfLeave);
+			stageHookOk = stageHookOk &&
+				OutRunStagePrintfEnterHooks[i] && OutRunStagePrintfLeaveHooks[i];
+		}
+		if (!stageHookOk)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				OutRunStagePrintfEnterHooks[i] = {};
+				OutRunStagePrintfLeaveHooks[i] = {};
+			}
+			spdlog::error("VR P0: stage Sumo_Printf producer partial install rolled back");
+		}
 		// Original R74 exact CALL window has already been byte-fingerprinted:
 		// result 0x97BE4/0x97DEC E8 -> 0x2D200, and GOAL helpers
 		// 0xBEA5A -> 0xBE020 / 0xBEA5F -> 0xBE150.
