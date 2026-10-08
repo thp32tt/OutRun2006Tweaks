@@ -1,0 +1,995 @@
+{
+  "run": "C308-C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 236,
+  "policy_version": "visual-evidence-v1-20261008",
+  "execution_backend": "GitHub Actions ubuntu-latest; inputs unavailable from ChatGPT local due raw.githubusercontent.com DNS failure",
+  "exact_sha256": {
+    "source": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "authored_clean": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7"
+  },
+  "triage": {
+    "index": 236,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "current_status": "c304_c2_c3_hold_all14_native_done_clean_calibration_pending",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "native_size": [
+    2048,
+    2048
+  ],
+  "header_equal": true,
+  "dds_source_candidate_format": "RGBA32 mirror_y mip1",
+  "full_atlas_changed_pixels_outside_14_exact_source_bbox_union": {
+    "source_clean_RGBA": 0,
+    "clean_final_RGBA": 0,
+    "source_final_RGBA": 0,
+    "source_clean_alpha": 0,
+    "clean_final_alpha": 0,
+    "source_final_alpha": 0
+  },
+  "regions": [
+    {
+      "index": 0,
+      "source_text": "INDUSTRIAL COMPLEX",
+      "korean_text": "인더스트리얼 컴플렉스",
+      "source_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        1107,
+        87
+      ],
+      "candidate_visible_bbox_local": [
+        364,
+        2,
+        1105,
+        85
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 50903,
+      "clean_final_changed_RGBA": 27806,
+      "region_alpha_source": 50903,
+      "region_alpha_candidate": 27806,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "79d3757e45f33dd15037d0e770df64ecc7d38d9f1d0dee52edfb4c98c03b3483",
+          "size": 38712
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f073f1fd675f8f132bc71c07109cbd85c939d6dde57e7cb92b884ddebfc03855",
+          "size": 31154
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "11d16f6d012d0999e2e8dc95c4371357a36daa8726297b3fc9350bc771a3755b",
+          "size": 32881
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a44204a7d5a340672b10259c55226cdb8d83e31de54a06c91859d62987e90b0e",
+          "size": 42676
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9ca7d40198257abbafdd807f45a4c336d176ddc66a96a3f64b54bef041163885",
+          "size": 28198
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row00_RAW_SOURCE_FINAL.png",
+          "sha256": "60e61be4475590f76c35a43c472d2f932c0c4b36023ea72c1877e7f17750ceb7",
+          "size": 30621
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "source_text": "WATERFALLS",
+      "korean_text": "워터폴스",
+      "source_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        717,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        429,
+        6,
+        715,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 34348,
+      "clean_final_changed_RGBA": 11228,
+      "region_alpha_source": 34348,
+      "region_alpha_candidate": 11228,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f337fdf2ecadee54b29997f6a9aa3e6c7efb0c78da322a9b7cb194a676d33027",
+          "size": 21063
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2bc67c870888109f1be803cca5d73cef01b7f929076eb5e856b2b1885772d5fd",
+          "size": 18432
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7613b7c8f8290f97b303d7afda99ab7c708697d87ca97e8b93de1578ece1e39c",
+          "size": 19007
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "51943f2740bb115e51d323e4c0dc131dc1ed509ffec416be4936cd3423dbe7de",
+          "size": 30142
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "776df272fac2fa358085981148f585cb59d1f971b5eaff3298a239875f1bad51",
+          "size": 19624
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row01_RAW_SOURCE_FINAL.png",
+          "sha256": "c6f39970e4294381d135f1731772810450a0e13a27899a7840cfb916c9c91dda",
+          "size": 17142
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "source_text": "TULIP GARDEN",
+      "korean_text": "튤립 가든",
+      "source_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        793,
+        94
+      ],
+      "candidate_visible_bbox_local": [
+        487,
+        5,
+        791,
+        88
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 38353,
+      "clean_final_changed_RGBA": 12204,
+      "region_alpha_source": 38353,
+      "region_alpha_candidate": 12204,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a29858abd8215cb93946d88a4257b211dfce480037e9006b3194f269de6010af",
+          "size": 17122
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d6f1e3c2bfd221e9a3b913a3f94f9b3b4fbd7cade0d25132ad43d70d20d5866f",
+          "size": 15280
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2a059334ef3c161f5046d712f94b213127abbd12eeb440423c814b4d26f985e4",
+          "size": 15707
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "38af6e7bf2b0b58b59f83419165fbd31103e6d87c8b6838da0d14628aefbe20a",
+          "size": 25960
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d9a0987e27764d8ab3acec2c1d5d53ba95335aa219e6849f50e44f0b825465db",
+          "size": 17677
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row02_RAW_SOURCE_FINAL.png",
+          "sha256": "775f2181395cec5b49a3978c02f60448efd76ecf61feeca5be08a74d52f64a30",
+          "size": 14080
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "source_text": "SUNNY BEACH",
+      "korean_text": "서니 비치",
+      "source_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        780,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        478,
+        6,
+        778,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 37623,
+      "clean_final_changed_RGBA": 10195,
+      "region_alpha_source": 37623,
+      "region_alpha_candidate": 10195,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "84e44735bfb411790e539e0c9df0fc7c6a0377f61051be2f82e05f506c49698c",
+          "size": 21704
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b8c5a0c1e7c97c36b0f91718eee281d7ab5ff7a9dd272bc2be8e4514d74575bd",
+          "size": 18972
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "c24e907ca27c78775f4c09b111c60283f87ec30d0a8e1e2545c8ac7189723c51",
+          "size": 19572
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9e78ab5ee19a3581847e1a5cc07410dab3a95e402208e2d667b9a6b55befafdf",
+          "size": 28855
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "51a10cc318afc943b2c6b59c2c7a8a0320aff74e343842c1303d38863c538832",
+          "size": 18349
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row03_RAW_SOURCE_FINAL.png",
+          "sha256": "3cfc70fa714c2fc57768bf6d8b912a546e29631456992b693c19c85e7c989890",
+          "size": 17679
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "source_text": "SNOW MOUNTAIN",
+      "korean_text": "스노 마운틴",
+      "source_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        928,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        552,
+        6,
+        926,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 46922,
+      "clean_final_changed_RGBA": 12540,
+      "region_alpha_source": 46922,
+      "region_alpha_candidate": 12540,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d12a95fbca25c31b07ce5656d397fdd0102e0aa17703690bfdc559d634532a96",
+          "size": 26964
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "6efa8f6d35a0b52b94d28c68c5093a5fd8970cde507eb8c95e10c3708b35325a",
+          "size": 23458
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f9032a9d79a1318c6c031cc565925235b8d3ab5fb2c294cbbdab4f09ec10c8c9",
+          "size": 24303
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7b9809eeb1b7a7ea7a9f9cd4d2696a7fb3d311d7eaa7bd7a2e70c65b88afe9f5",
+          "size": 36616
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5ccc36f88af0b447e6cb0b52ec4f9d509370c3c26a1264085005cf147c83e5ce",
+          "size": 23137
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row04_RAW_SOURCE_FINAL.png",
+          "sha256": "1717bee6dbed1b092987ade058eb06ff83752280b88f06b971f9968645b11daa",
+          "size": 22043
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "source_text": "SKYSCRAPERS",
+      "korean_text": "스카이스크레이퍼스",
+      "source_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        801,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        148,
+        6,
+        799,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 39204,
+      "clean_final_changed_RGBA": 22644,
+      "region_alpha_source": 39204,
+      "region_alpha_candidate": 22644,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1cfab94ed1f0869e7aeac992d9b7dd4d24f0ab123b6540eec76ef213944e025f",
+          "size": 35293
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "258cbd15a47c6275ce0565c47945e9e2443b3359631b9dc9fbff337a9b08bbcc",
+          "size": 29121
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "81925455fbf64814bfe88d98762e388b3b638a83869ebc79f95509b15b0ae380",
+          "size": 30457
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0f5bd337d304e6b48da083c186d8648dd21d721472a399ae3fa44d94716ffb50",
+          "size": 43394
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "48253587d503d8027f3cdb7370c0884244046e8bcf49c353edc003d1723fc1c1",
+          "size": 27722
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row05_RAW_SOURCE_FINAL.png",
+          "sha256": "21417a632f04349514ae339133e181477f8db5dee351faafc521efed3a9de9c3",
+          "size": 28169
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "source_text": "PALM BEACH",
+      "korean_text": "팜 비치",
+      "source_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        706,
+        94
+      ],
+      "candidate_visible_bbox_local": [
+        478,
+        5,
+        704,
+        88
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 34035,
+      "clean_final_changed_RGBA": 9041,
+      "region_alpha_source": 34035,
+      "region_alpha_candidate": 9041,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0ac6b2f4912bec244d245217865ea534eb53d0719f5fb4466e9766570d002cb5",
+          "size": 17188
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "8ee2191f6e3a8272cbf6cae3477900fc2b82694e81fc0aaa25fae8594d16351a",
+          "size": 15188
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "deae8d788cf15cc5d5e147945dfee3beeab515368e27223a77e2016fac5b23c2",
+          "size": 15667
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e3226c9bbb793e43d43943d205493c71fe204a50985bd94f8b52c5b1589b983f",
+          "size": 24958
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ab2bf01d34b3fa4308b48b1bf7a44f17ee081fc371a1bbc76aac05a520cd198e",
+          "size": 16248
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row06_RAW_SOURCE_FINAL.png",
+          "sha256": "f599a84d0fdd7a19a2d61c6958c401dbdf2fe734c54bafb5b2e97aad0ae6c39e",
+          "size": 14079
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "source_text": "NATIONAL PARK",
+      "korean_text": "내셔널 파크",
+      "source_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        865,
+        93
+      ],
+      "candidate_visible_bbox_local": [
+        489,
+        5,
+        863,
+        88
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 41589,
+      "clean_final_changed_RGBA": 13933,
+      "region_alpha_source": 41589,
+      "region_alpha_candidate": 13933,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0f5d8d3290f38f88571fb911a599c916075e1c7be7ac1212d5be5ffbeaf2cad9",
+          "size": 23953
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d71978887f9d646e12a4dfdd7f800ec9383865197ee85db13737740b617644fd",
+          "size": 20751
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "09b41fc21743cb064fa1c69b7198af2fa60f3e89629acbe4de1eec5d67c74451",
+          "size": 21538
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "032d9243651929d8502c5d2723d5c2d4c822e6a26c606da4e265b6c8f7b13204",
+          "size": 32580
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "097fbe64df26b417bef0187915d80655ce004a9eef65cb73893203fbe0482b36",
+          "size": 21328
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row07_RAW_SOURCE_FINAL.png",
+          "sha256": "d08f6cef6fd1c9348a2cee87a4f3834e00f6587edd89d8423230ab6c0c1cb727",
+          "size": 19390
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "source_text": "MILKY WAY",
+      "korean_text": "밀키 웨이",
+      "source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        628,
+        89
+      ],
+      "candidate_visible_bbox_local": [
+        331,
+        3,
+        626,
+        86
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 28237,
+      "clean_final_changed_RGBA": 12482,
+      "region_alpha_source": 28237,
+      "region_alpha_candidate": 12482,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "6d435964379230149eb45f1256f2903045129abe6dccbf5783be1ddec1c33f8e",
+          "size": 21183
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f96b3a98f355c19c24de285995e666192ef8f1ef119bfce37bdca4402191eb22",
+          "size": 18231
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "00756d9355576760ed5fa72be516d52299e95ae50ec0422ad1d5a47ed28fee61",
+          "size": 18911
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b178e99670133eb9b0abb347836259c9e1ca31cc17f184aad5eb81474174fe46",
+          "size": 27597
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "19c6d798902f7db010505567cda0e39cb491667f1db1cf8e29aa05d220c81ad9",
+          "size": 17209
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row08_RAW_SOURCE_FINAL.png",
+          "sha256": "294a469ac4652852ef8534ee07564c3ee0a06e3d8bf2e0104c31820e477ebc85",
+          "size": 17307
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "source_text": "METROPOLIS",
+      "korean_text": "메트로폴리스",
+      "source_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        710,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        278,
+        6,
+        708,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 35325,
+      "clean_final_changed_RGBA": 16883,
+      "region_alpha_source": 35325,
+      "region_alpha_candidate": 16883,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "97670213aefdd19d6c278844ea8d1f24b0a9909b09a39926444388ad1294055c",
+          "size": 18379
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ad619c912137f90f8225f0c6d583895e99c3fcbfaeadf7ecdf196f87186eef07",
+          "size": 16353
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1be383595c431ddb9a4f7571093ffb67e231b93b46d0754bdec96619215df86f",
+          "size": 16752
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1d514f31add79df89040686cf6fb98190a58681442fe2651000656f62fd4d99d",
+          "size": 28453
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d306eeea70b155476b60e50b3377ebb27e08d4d0ab2d8ac3a232f870a3aa6b7b",
+          "size": 18727
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row09_RAW_SOURCE_FINAL.png",
+          "sha256": "5946847eec75ceaa0a23be64b0b66d86498bbdbc6cdb84b436774c9b49cd4bc6",
+          "size": 14941
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "source_text": "LOST CITY",
+      "korean_text": "로스트 시티",
+      "source_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        534,
+        95
+      ],
+      "candidate_visible_bbox_local": [
+        160,
+        6,
+        532,
+        89
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 23310,
+      "clean_final_changed_RGBA": 12113,
+      "region_alpha_source": 23310,
+      "region_alpha_candidate": 12113,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "35a44e55531b38e32e51eec507c82d49a72d0bd547dbe5aa853d1404398f2672",
+          "size": 16050
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "11b89e90db4f0fa7c092d52b16fa36f420226d4f257bda710d8898ed820bffd9",
+          "size": 13964
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5f5bf1d1528ed9ccee025fb363af4f6b59655ab9eb9a81b620580027a491522a",
+          "size": 14479
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2d2dfadfcb4659ea00e12cfbff5e8896fb36cac0ba9d740fb3c3213ea0c41500",
+          "size": 22975
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9164f0d0b3eff812d258cfa1e6fa94edeeb5ebbb326fcd6d248ebe07c97a18f1",
+          "size": 14476
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row10_RAW_SOURCE_FINAL.png",
+          "sha256": "75c14813c13df4a8756ef957f894cb0eacb2ec2adde0c044640528d43f774f2c",
+          "size": 12802
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "source_text": "LEGEND",
+      "korean_text": "레전드",
+      "source_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        423,
+        94
+      ],
+      "candidate_visible_bbox_local": [
+        209,
+        5,
+        421,
+        88
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 22506,
+      "clean_final_changed_RGBA": 8496,
+      "region_alpha_source": 22506,
+      "region_alpha_candidate": 8496,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "515f21ce1e19d63fa4aaa2605991e99d38aa75547be2ffcb88cc995aa082a437",
+          "size": 9994
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "19b295188e2ffd5cf759ac722249ea5fc5b20ea99a4bd36248f633592b9b7ce7",
+          "size": 8911
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4a2b89eded95822f7c32517e9e83f9fb9a0c6856c110c3c11d4a70f5bbd3d86c",
+          "size": 9133
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d94bb408770a84aefbbfcfe2afa3fe89c920abe138711af675fc2d3abc098718",
+          "size": 15879
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "753fa77b703f575a33aa750d743a5c4d83b024ef87e2ebaefe250816f32fae23",
+          "size": 10617
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row11_RAW_SOURCE_FINAL.png",
+          "sha256": "3eb551624aacfd932da8d88abed50e693ca30b40ed1e1c8e969196928f605c8b",
+          "size": 7744
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "source_text": "JUNGLE",
+      "korean_text": "정글",
+      "source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        420,
+        94
+      ],
+      "candidate_visible_bbox_local": [
+        278,
+        5,
+        418,
+        88
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 20811,
+      "clean_final_changed_RGBA": 6249,
+      "region_alpha_source": 20811,
+      "region_alpha_candidate": 6249,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "662875f0e088c02c5e2caa0ab73e3d98cfa434cb4dad6b940baf49a18fc56990",
+          "size": 11266
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7c67b4f1fc0903158be889b7e2e18ec6298096d49aecf29bae2ae4c66b85294e",
+          "size": 9901
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1af6a763fac7b47bdab76ba48e5f35da8f4b15a673c21d86c35c38664e035094",
+          "size": 10171
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "c4d69d51106afd3f8e8df97dcb04db4fc12b7167a311eedbf27022a9d307f242",
+          "size": 16745
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9266caf69dec9db2e6b9ce9d1198460ab374a9f91d1769cc66d6607a4fece3c7",
+          "size": 10999
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row12_RAW_SOURCE_FINAL.png",
+          "sha256": "351b4968f33281ee7abc1f18d6a6f86f06a426defce59081bec717cdbb6c68ba",
+          "size": 8816
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "source_text": "IMPERIAL AVENUE",
+      "korean_text": "임페리얼 애비뉴",
+      "source_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        1010,
+        92
+      ],
+      "candidate_visible_bbox_local": [
+        486,
+        4,
+        1008,
+        87
+      ],
+      "all_candidate_alpha_within_source_bbox": true,
+      "authored_clean_nonzero_alpha": 0,
+      "source_clean_changed_RGBA": 49460,
+      "clean_final_changed_RGBA": 21933,
+      "region_alpha_source": 49460,
+      "region_alpha_candidate": 21933,
+      "source_vs_clean_inside_bbox_identity": "Exact B80 authored CLEAN only, independent calibration required; B217 is ROW METADATA ONLY (superseded candidate)",
+      "views": [
+        {
+          "kind": "WHITE_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_WHITE_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b1d5f08bc973f5959eaeb68ae6beccde2c58457ce46603df77e996ee24ef5921",
+          "size": 24795
+        },
+        {
+          "kind": "BLACK_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_BLACK_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5c0f3e1b8fe76bc5bb91cebbae2e0b3317a0983ef4b0002b1e7119f1ed72a4ec",
+          "size": 20999
+        },
+        {
+          "kind": "GRAY_NATIVE",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_NATIVE_SOURCE_CLEAN_FINAL.png",
+          "sha256": "591ae2b9f3c231d6212eb7427230ccf01a72103254ca9e8079bb765f72b97abc",
+          "size": 21825
+        },
+        {
+          "kind": "GRAY_75",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "bbadfc617a4557d5e33453c0ee7722f190d3f8c49cf05c5082c892cb37c30b07",
+          "size": 35006
+        },
+        {
+          "kind": "GRAY_50",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "669f3c31e1b9cfb827887f78c3fe5b8c407dda4abfa7720acc786bc297030d57",
+          "size": 21155
+        },
+        {
+          "kind": "RAW",
+          "path": "localization/graphics/role_C/20261008-C308-C2-Q236-PLATE-COMPOSITE-14REGION/row13_RAW_SOURCE_FINAL.png",
+          "sha256": "23ee9b350ccf217c9987f937ef6204bf2b8302fdf3168a547b1e36dc8ef038d6",
+          "size": 19686
+        }
+      ]
+    }
+  ],
+  "evidence_png_count": 84,
+  "interpretation": "Exact pixel evidence only. Visual source-family, clean reconstruction, high-zoom, protected-art, blind calibration and in-game NOT automatically passed.",
+  "C": "CONTROLLER_PENDING",
+  "C3": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
