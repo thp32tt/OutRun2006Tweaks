@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:28:54+09:00",
+  "updated_at_kst": "2026-10-08T14:41:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7144,5 +7144,31 @@
     "rework_required": 3,
     "declared_preserve_original": 3,
     "at_kst": "2026-10-08T14:28:54+09:00"
+  },
+  "b258_q214_bc3_face_priority_native": {
+    "run": "20261008-B258-Q214-BC3-FACE-PRIORITY",
+    "role": "B",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "prior_rejected_sha256": "2d6f2a6949c0b35c1f334314f1003d2722c8108ac1cef887adb6056ee7097c25",
+    "intermediate_B257_sha256": "132ba8d5159196eb68d6635a7331fc08ed0269a1512acbf9abff2226fd9fe183",
+    "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+    "actual_DDS_generated": true,
+    "machine_status": "PASS_EXACT_2_SOURCE_BBOX_ZERO_RGBA_ALPHA_OUTSIDE",
+    "decoded_face_recall": {
+      "start": 1,
+      "goal": 1
+    },
+    "controller_visual": "NO_B253_RED_STROKE_BLEED; SOURCE_STYLE_SLANT_NEEDS_C",
+    "status": "HOLD_STRICT_RECHECK_PENDING_FRESH_C2",
+    "independent_C2": "PENDING",
+    "C3": "BLOCKED",
+    "pre_ingame": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_HOSTED_CPU_GPT_LOCAL_GITHUB_DNS_UNAVAILABLE",
+    "github_actions_run": 37733481816,
+    "qa": "localization/graphics/role_B/20261008-B258-Q214-BC3-FACE-PRIORITY/B258_CONTROLLER_SELF_QA.json",
+    "cleanup": "GITHUB_ACTIONS_EPHEMERAL_WORKSPACE_NO_N100"
   }
 }
