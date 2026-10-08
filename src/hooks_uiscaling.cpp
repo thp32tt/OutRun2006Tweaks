@@ -103,6 +103,10 @@ class UIScaling : public Hook
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
 	inline static thread_local
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RivalMarkerProjectedInfo{};
+	// Calc3D2D is a producer-local datum, not a sticky "last car" cache.
+	// Rank state belongs to exactly one sub_4BAD20 invocation; rival state
+	// belongs to the next exact 0xBB796 producer and is consumed once.
+	inline static thread_local unsigned RankMarkerSubActiveDepth = 0;
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -268,7 +272,9 @@ class UIScaling : public Hook
 			info.viewY = out->y * (-out->z) / a2;
 		};
 
-		if (returnAddress == Module::exe_ptr(0xBAEE7))
+		if (returnAddress == Module::exe_ptr(0xBAEE7) &&
+			RankMarkerSubActiveDepth != 0 &&
+			RankMarkerSubScreenHudDepth == 0)
 			recoverViewPoint(RankMarkerProjectedInfo);
 		else if (returnAddress == Module::exe_ptr(0xBB6F5))
 			recoverViewPoint(RivalMarkerProjectedInfo);
@@ -297,6 +303,21 @@ class UIScaling : public Hook
 		// the marker that draw sits at.
 		RankMarkerFracX = (x + 320.0f) - float(int(ctx.esi));
 		RankMarkerFracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
+	}
+
+	// The original sub_4BAD20 owns exactly one rank producer group, including
+	// all 1st-3rd sprites and 4th+ clip digits. Scope its captured projection
+	// to the whole invocation instead of reusing the preceding vehicle's anchor.
+	static inline SafetyHookInline RankMarkerSub_hk{};
+	static int __cdecl RankMarkerSub_dest(std::uint32_t arg)
+	{
+		const auto saved = RankMarkerProjectedInfo;
+		RankMarkerProjectedInfo = {};
+		++RankMarkerSubActiveDepth;
+		const int result = RankMarkerSub_hk.call<int>(arg);
+		--RankMarkerSubActiveDepth;
+		RankMarkerProjectedInfo = saved;
+		return result;
 	}
 
 	using RankMarkerSubFn = int(__cdecl*)(std::uint32_t);
@@ -384,68 +405,69 @@ class UIScaling : public Hook
 	// put_clip_sprite, which takes its position as int. It converts that to
 	// float when filling in the sprite it queues, so the fraction goes back on
 	// there instead.
-	static int __cdecl RankMarker_putClipSprite(int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
+	static int __cdecl RankMarker_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
-		int prio = int(priority);
-		prio = prio < 0 ? 0 : (prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
-
-		SpriteNode* root = Game::sprite_prio_root[prio];
-		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
-
-		int result = Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
-
-		// tail_4 is the last sprite queued at that priority. If it has not
-		// changed then the sprite pool was full and nothing was queued.
-		root = Game::sprite_prio_root[prio];
-		SpriteNode* node = root ? root->tail_4 : nullptr;
-		if (node && node != tailBefore)
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
-			node->args_10.float24 += RankMarkerFracX;
-			node->args_10.float28 += RankMarkerFracY;
-			OutRunVR::GameSemantic::RenderScope scope{};
-			const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
-			if (RankMarkerSubScreenHudDepth != 0)
-			{
-				scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
-			}
-			else
-			{
-				const bool projected = RankMarkerProjectedInfo.valid;
-				scope = projected
-					? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-				marker = projected ? &RankMarkerProjectedInfo : nullptr;
-			}
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, scope,
-				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
-				marker);
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
+		const int result =
+			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
 
+		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
+		const bool projected = !screenHud && RankMarkerProjectedInfo.valid;
+		const auto scope = screenHud
+			? OutRunVR::GameSemantic::RenderScope::ScreenHud
+			: (projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+		// put_clip_sprite normally queues one glyph. If an animation/mask
+		// expands it to sibling nodes (even at another priority), every child
+		// needs the original fractional offset and the same spatial owner.
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+				continue;
+			SpriteNode* node = tailsBefore[prio]
+				? tailsBefore[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
+			{
+				node->args_10.float24 += RankMarkerFracX;
+				node->args_10.float28 += RankMarkerFracY;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+		TagAppendedNodes(tailsBefore, scope,
+			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
+			projected ? &RankMarkerProjectedInfo : nullptr);
 		return result;
 	}
-
-
 
 	static int __cdecl ExactScreenHud_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags,
 		float priority, uint32_t color)
 	{
-		int prio = int(priority);
-		prio = prio < 0 ? 0 :
-			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
-		SpriteNode* root = Game::sprite_prio_root[prio];
-		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
-
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
 		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
-
-		root = Game::sprite_prio_root[prio];
-		SpriteNode* node = root ? root->tail_4 : nullptr;
-		if (node && node != tailBefore)
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
-				OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
+		// All exact-address menu arrows, position HUD and result glyph
+		// siblings are SCREEN_HUD; tagging only tail_4 left earlier
+		// siblings head-locked in generic ScreenOverlay2D.
+		TagAppendedNodes(tailsBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
 		return result;
 	}
 
@@ -464,14 +486,18 @@ class UIScaling : public Hook
 		// R71 HMD evidence binds this exact 0xBB796 producer to the
 		// vehicle-relative rival marker. Reuse its proven Calc3D2D anchor when
 		// available; fail softly to the current strict WorldBillboard route.
-		const bool projected = RivalMarkerProjectedInfo.valid;
+		const auto projectedAnchor = RivalMarkerProjectedInfo;
+		// Only the first marker from the matching 0xBB6F5 Calc3D2D producer
+		// can consume this anchor. No subsequent vehicle or frame may inherit it.
+		RivalMarkerProjectedInfo = {};
+		const bool projected = projectedAnchor.valid;
 		TagAppendedNodes(
 			before,
 			projected
 				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
-			projected ? &RivalMarkerProjectedInfo : nullptr);
+			projected ? &projectedAnchor : nullptr);
 		return result;
 	}
 
@@ -857,6 +883,8 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+		RankMarkerSub_hk = safetyhook::create_inline(
+			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarkerSubScreenHudCalls)
