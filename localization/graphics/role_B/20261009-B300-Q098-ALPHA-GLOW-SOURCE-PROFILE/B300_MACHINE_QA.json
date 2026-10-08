@@ -1,0 +1,99 @@
+{
+  "role": "B",
+  "run": "B300",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "triage": "MATERIAL_REWORK",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "current_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "0c32437332ed4cf25b8ea774b6c673db2a13939818eec73de64015ce03966be5",
+  "trial_dds": 1,
+  "new_promoted_dds": 0,
+  "worker": "GITHUB_ACTIONS",
+  "native": [
+    2048,
+    128
+  ],
+  "format": "BC3 DXT5 mip1 RAW_FLIPY",
+  "new_method": "source-conditioned dual-stage actual BC3 alpha halo (max 3.1px) plus inner navy redistribution 2.2px; distinct from B279 color-only sharp keyline; preserve font silhouette and old white core; no font stretching/upscale",
+  "source_profile": {
+    "face": [
+      255,
+      255,
+      255
+    ],
+    "navy": [
+      0,
+      12,
+      57
+    ],
+    "canonical_ratio": {
+      "white": 24095,
+      "navy": 47827,
+      "white_navy": 0.504
+    }
+  },
+  "prior_ratio": {
+    "white": 44139,
+    "navy": 21036,
+    "white_navy": 2.098
+  },
+  "trial_ratio": {
+    "white": 50896,
+    "navy": 13887,
+    "white_navy": 3.665
+  },
+  "trial_bbox": [
+    577,
+    8,
+    1526,
+    119
+  ],
+  "original_effect_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "changed_bc3_blocks": 2979,
+  "changed_native_pixels": 39643,
+  "changed_alpha_native_pixels": 12889,
+  "outside_source_rgba": 0,
+  "outside_render_zone_rgba": 0,
+  "source_clean_outside_rgba": 0,
+  "clean_text_alpha_residual": 0,
+  "header_exact": true,
+  "persisted_decode_exact": true,
+  "evidence_comparisons": [
+    "READABLE_GRAY_100_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_GRAY_75_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_GRAY_50_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_WHITE_100_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_WHITE_75_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_WHITE_50_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_BLACK_100_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_BLACK_75_SOURCE_CLEAN_B279_B300.png",
+    "READABLE_BLACK_50_SOURCE_CLEAN_B279_B300.png",
+    "RAW_GRAY_100_SOURCE_CLEAN_B279_B300.png",
+    "RAW_GRAY_75_SOURCE_CLEAN_B279_B300.png",
+    "RAW_GRAY_50_SOURCE_CLEAN_B279_B300.png",
+    "RAW_WHITE_100_SOURCE_CLEAN_B279_B300.png",
+    "RAW_WHITE_75_SOURCE_CLEAN_B279_B300.png",
+    "RAW_WHITE_50_SOURCE_CLEAN_B279_B300.png",
+    "RAW_BLACK_100_SOURCE_CLEAN_B279_B300.png",
+    "RAW_BLACK_75_SOURCE_CLEAN_B279_B300.png",
+    "RAW_BLACK_50_SOURCE_CLEAN_B279_B300.png"
+  ],
+  "producer_visual": "PENDING_FIRST_LOOK",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
