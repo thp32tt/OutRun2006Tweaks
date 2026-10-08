@@ -1006,4 +1006,90 @@ for label, broken_r30, broken_ui in (
         raise SystemExit('P0 source fault injection unexpectedly passed: ' + label)
 
 
+# A recognizably exact ScreenHud/ScreenOverlay2D node can be delegated to R29
+# after R30 fails a prepare gate. The pre-HUD SkyGlow snapshot must happen
+# before *every* such dispatch, not just after the optional stereo owner wins.
+# Reject the unsafe Present fallback that resamples an already drawn glyph.
+def check_skyglow_clean_screen_source(source):
+    observe = function_body(source, 'void R30BeforeScreenDrawForSkyGlow(')
+    for token in (
+        'Settings::SkyGlowFactor <= 0',
+        '!IsGameDevice(device)',
+        'InternalStereoPass',
+        '!TargetIsBackBuffer()',
+        'CorroboratesHud(scope)',
+        'CorroboratesScreenOverlay2D(scope)',
+        'R30SkyGlowScreenDrawEpoch == PresentEpoch',
+    ):
+        require(token, observe, 'exact game screen owner-only bloom guard')
+    require_order(
+        observe, 'first exact HUD draw captures before any lower owner',
+        'R30SkyGlowScreenDrawEpoch = PresentEpoch;',
+        'R30CaptureSkyGlowSceneBeforeHud(device);'
+    )
+
+    for draw_name in (
+        'DrawPrimitiveDestR30',
+        'DrawIndexedPrimitiveDestR30',
+        'DrawPrimitiveUPDestR30',
+        'DrawIndexedPrimitiveUPDestR30',
+    ):
+        body = function_body(source, 'HRESULT __stdcall ' + draw_name + '(')
+        require_order(
+            body, draw_name + ' must capture before R30/R29 fallback',
+            'ScopedRenderSemantic drawSemantic(',
+            'R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);',
+            'const HRESULT'
+        )
+
+    apply = function_body(source, 'bool R30ApplyStereoSkyGlow(')
+    require_order(
+        apply, 'no pre-HUD scene means no UI-contaminated additive bloom',
+        'if (R30SkyGlowSceneCaptureEpoch != PresentEpoch &&',
+        'R30SkyGlowScreenDrawEpoch == PresentEpoch)',
+        '++R30SkyGlowUiCaptureSkips;',
+        'return true;\n            }\n\n            if (!R30EnsureSkyGlowResources(device))',
+        'if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)\n                {'
+    )
+    require('std::uint64_t R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;',
+            source, 'zero PresentEpoch must not look already captured')
+    reset = function_body(source, 'HRESULT __stdcall ResetDestR30(')
+    require_order(
+        reset, 'device reset invalidates both bloom epochs',
+        'R30ReleaseSkyGlowResources();',
+        'R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;',
+        'R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;'
+    )
+
+check_skyglow_clean_screen_source(r30)
+for label, damaged in (
+    ('HUD accepted by fallback without scene snapshot',
+     inject_one_function_token(
+         r30, 'HRESULT __stdcall DrawPrimitiveUPDestR30(',
+         'R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);',
+         '/* injected missing pre-HUD snapshot */')),
+    ('additive bloom condition reversed',
+     inject_one_function_token(
+         r30, 'bool R30ApplyStereoSkyGlow(',
+         'R30SkyGlowScreenDrawEpoch == PresentEpoch)',
+         'R30SkyGlowScreenDrawEpoch != PresentEpoch)')),
+    ('capture taken before frame screen draw flag',
+     inject_one_function_token(
+         r30, 'void R30BeforeScreenDrawForSkyGlow(',
+         'R30SkyGlowScreenDrawEpoch = PresentEpoch;',
+         '/* injected missing screen epoch */')),
+    ('Reset leaks contaminated screen epoch',
+     inject_one_function_token(
+         r30, 'HRESULT __stdcall ResetDestR30(',
+         'R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;',
+         '/* injected reset epoch omission */')),
+):
+    try:
+        check_skyglow_clean_screen_source(damaged)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 SkyGlow negative case incorrectly passed: ' + label)
+
+
 print('P0 visual composition static contract: PASS')
