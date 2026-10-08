@@ -11,7 +11,7 @@
   "base_sha": "ccf692cc4983ba2a469f631702d3709bfcb23995",
   "material_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00547]",
-  "status": "MATERIAL_COMMITTED_CI_IN_PROGRESS",
+  "status": "STATIC_AND_HOST_PASS_BUILD_PENDING",
   "selected_work_item": "DX9EX-P0-UI-TEXTURE-LEGACY-D3DX-FALLBACK",
   "summary": "Restore legacy D3DX Ex trampoline on failed fast DDS UI decode (menu/car-selection texture resilience). Add deterministic source/negative-mutation contract; not a proven HMD fix.",
   "changed_paths": [
@@ -27,8 +27,8 @@
   "ci_gate_complete": false,
   "package_requested": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-  "next_action": "Wait for exact material SHA 7768a745 HUD Inspector build and DX9Ex game/host/full-chain/package; if CI fails, inspect job logs and repair, then persist success/failure. Keep RUNTIME_VALIDATION=UNTESTED; do not package another HMD candidate.",
-  "score_award": "PENDING_NEW_MATERIAL_VALIDATION",
+  "next_action": "C3: resolve exact-SHA CI runs 37710072983 and 37710073122, persist completion/diagnostics and artifact digests. C4/C6 material commit is 7768a745 and all source changes already published. No repeat or retry increment. RUNTIME_VALIDATION remains UNTESTED.",
+  "score_award": "DEFERRED_UNTIL_EXACT_SHA_CI_COMPLETE",
   "validation_bearing_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "material_commit_history": [
@@ -51,12 +51,18 @@
       "game_job": 113093773949,
       "host_job": 113093773910,
       "full_chain_job": 113093773912,
-      "build_status": "in_progress"
+      "build_status": "game/full-chain in_progress",
+      "host_status": "success"
     },
     "domain_isolation": {
       "id": 37710073156,
       "job": 113093671247,
       "status": "success"
     }
-  }
+  },
+  "blockers": [
+    "Exact material SHA hosted game and full-chain builds still in progress",
+    "HUD Inspector Windows build still in progress",
+    "Quest 3/VDXR actual test not performed"
+  ]
 }
