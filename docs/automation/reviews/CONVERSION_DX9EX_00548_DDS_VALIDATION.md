@@ -31,3 +31,8 @@ The follow-up run-record commit is bookkeeping and never replaces the original m
 - Exact material package ID `11523475635`, SHA-256 `a78168037a77d8e4ac23db69d156340b4ac2c8eb016affbbf6443d8341308be3`.
 - Separate full-source impact MSVC analysis `37714119321` was still running at record closure; this supplemental suite is not counted as passed until it finishes.
 - `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`. No headset claims. This result record update is **bookkeeping-only** and is not a validation-bearing SHA.
+
+## Supplemental source impact closure
+
+- The independent `DX9Ex Full Source Impact Review` [37714119321](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37714119321) also **completed/success** on the exact material SHA. Both source-cross-domain and MSVC analyze jobs passed.
+- This is supplemental to, and does not alter, the already completed mandatory build and HUD gates; the tested material SHA remains `f96b661fdededb2f61e72e4a14ad402abd76b183`.

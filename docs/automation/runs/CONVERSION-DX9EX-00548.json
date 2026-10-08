@@ -89,10 +89,11 @@
     },
     "full_source_impact": {
       "run_id": 37714119321,
-      "status": "in_progress",
+      "status": "completed",
+      "conclusion": "success",
       "source_cross_domain": "success",
-      "msvc_analyze": "in_progress",
-      "role": "SUPPLEMENTAL_NOT_REQUIRED_FOR_P0_GATE_AT_THIS_CHECK"
+      "msvc_analyze": "success",
+      "role": "SUPPLEMENTAL_INDEPENDENT_IMPACT_CHECK"
     }
   },
   "package_artifact": {
@@ -113,5 +114,5 @@
       "digest": "sha256:bff9c5d35cebd4e9bea4737aedee30471679f385f546237fdfa988ea311b8775"
     }
   ],
-  "automation_result_provenance": "PASS is based on completed/success exact f96b661 DX9Ex Active 37714119420 (all 5 jobs), HUD Inspector 37714119384 (2 jobs) and Domain Isolation 37714119310. Supplemental full-source MSVC analyze is not used as evidence of this PASS. No HMD test was conducted."
+  "automation_result_provenance": "PASS is based on completed/success exact f96b661 DX9Ex Active 37714119420 (all 5 jobs), HUD Inspector 37714119384 (2 jobs) and Domain Isolation 37714119310. Supplemental full-source MSVC analyzer 37714119321 also completed/success, independently, and is not required for the core PASS. No HMD test was conducted."
 }
