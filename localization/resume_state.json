@@ -6791,7 +6791,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 02:19 KST",
+  "updated_at_kst": "2026-10-09 02:29 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12505,6 +12505,27 @@
     "qa": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_Q121_A199_CONTROLLER_C1_HOLD.json",
     "C3": "BLOCKED",
     "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c318_c2_q212_igr029_family_underfill": {
+    "run_key": "OUTRUN-KOR-C318-C2-Q212-IGR029-SMALL-FAMILY-UNDERFILL-20261009",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+    "worker_run": 37816320879,
+    "new_png": 36,
+    "new_dds": 0,
+    "defects": [
+      "SOURCE_HIERARCHY_UNDERFILL",
+      "SMALL_FONT_PRACTICAL_READABILITY"
+    ],
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "IGR_029": "OPEN_MAPPING_SUSPECTED",
+    "qa": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_CONTROLLER_C2_SOURCE_HIERARCHY_REWORK.json",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

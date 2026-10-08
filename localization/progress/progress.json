@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 02:19 KST",
+  "updated_at_kst": "2026-10-09 02:29 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8510,5 +8510,23 @@
     "C3": "BLOCKED",
     "APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c318_c2_q212_igr029_family_underfill": {
+    "run_key": "OUTRUN-KOR-C318-C2-Q212-IGR029-SMALL-FAMILY-UNDERFILL-20261009",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 212,
+    "decision": "REWORK_REQUIRED",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+    "reviewed": 6,
+    "failed": 2,
+    "lossless_png": 36,
+    "new_dds": 0,
+    "user_ingame": "OPEN_USER_INGAME_FAIL_MAPPING_UNVERIFIED",
+    "C3": "BLOCKED",
+    "approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_CONTROLLER_C2_SOURCE_HIERARCHY_REWORK.json"
   }
 }

@@ -1,0 +1,212 @@
+{
+  "schema_version": 2,
+  "run_id": "C318-C2",
+  "run_key": "OUTRUN-KOR-C318-C2-Q212-IGR029-SMALL-FAMILY-UNDERFILL-20261009",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 212,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "priority": "P1",
+  "new_ingame_regression": "IGR-029",
+  "screenshot": "스크린샷(179).png",
+  "screenshot_mapping": "SUSPECTED_Q212_SHARED_MODE_INTRO_NOT_EXACT",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "selection_head": "d48856800173596347f7d06639eba8a6ad8bc1c8",
+  "read_only_triage": "MATERIAL_REWORK (tools/localization/rework_triage.py --index 212)",
+  "worker_run_id": 37816320879,
+  "worker_status": "SUCCESS",
+  "machine_manifest": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_NATIVE_SOURCE_HIERARCHY_MACHINE.json",
+  "native_resolution": [
+    2048,
+    2048
+  ],
+  "new_lossless_png": 36,
+  "new_dds": 0,
+  "machine": {
+    "header_exact": true,
+    "orientation_raw_flipy": true,
+    "changed_rgba_outside_original_12_bboxes": 0,
+    "changed_alpha_outside_original_12_bboxes": 0,
+    "source_candidate_sha_bound": true,
+    "plate_only_current_evidence": "NOT_REVIEWED_IN_NEW_RUN",
+    "composite_clean_vs_final": "NOT_REVIEWED_IN_NEW_RUN",
+    "actual_composited_game_crop": "NOT_AVAILABLE"
+  },
+  "observations": [
+    {
+      "key": "showroom",
+      "status": "REWORK_REQUIRED",
+      "reason": "SOURCE_HIERARCHY_UNDERFILL",
+      "detail": "SHOWROOM 1746px wide vs current 쇼룸 248px (14.2% of source); current is a small isolated title in original expansive red all-caps display family. At practical 50% it visibly loses original headline emphasis and hierarchy.",
+      "source": "SHOWROOM",
+      "ko": "쇼룸",
+      "source_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "ko_bbox": [
+        18,
+        1154,
+        266,
+        1290
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/showroom_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/showroom_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/showroom_EN_KO_RAW.png"
+      }
+    },
+    {
+      "key": "enter_name",
+      "status": "REWORK_REQUIRED",
+      "reason": "SMALL_FONT_PRACTICAL_READABILITY",
+      "detail": "ENTER NAME source 1081px wide/current 이름 입력 184px (17.02%); current glyph body at 50% is visibly pixel-like, overly shrunken vs original medium gray display label. Native/RAW cross-check confirms this is persisted image appearance.",
+      "source": "ENTER NAME",
+      "ko": "이름 입력",
+      "source_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "ko_bbox": [
+        4,
+        506,
+        188,
+        562
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/enter_name_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/enter_name_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/enter_name_EN_KO_RAW.png"
+      }
+    },
+    {
+      "key": "outrun_big",
+      "status": "HOLD_CONTEXT",
+      "reason": "MAPPING_TO_SCREENSHOT_UNVERIFIED",
+      "detail": "Large OUTRUN 718px/source to Korean 아웃런 372px (51.81%) at 94.59% height; smaller visual width but standalone source-vs-candidate comparison does not prove screenshot(179) is this sprite or incorrect game composition.",
+      "source": "OUTRUN",
+      "ko": "아웃런",
+      "source_bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "ko_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_big_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_big_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_big_EN_KO_RAW.png"
+      }
+    },
+    {
+      "key": "coast2coast",
+      "status": "CONTROL_NO_NEW_FAILURE",
+      "reason": "CONTRAST_SOURCE_HIERARCHY",
+      "detail": "COAST 2 COAST remains 1253/1760 (71.19%) at 96.25% original height; a non-uniform treatment across source family; not an approval of whole q212.",
+      "source": "COAST 2 COAST",
+      "ko": "코스트 2 코스트",
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "ko_bbox": [
+        91,
+        966,
+        1344,
+        1120
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/coast2coast_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/coast2coast_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/coast2coast_EN_KO_RAW.png"
+      }
+    },
+    {
+      "key": "professional",
+      "status": "NOT_FAIL_ESTABLISHED",
+      "reason": "SHORT_TRANSLATION_AND_RIGHT_ALIGNMENT",
+      "detail": "Professional/프로 original ratio 112/638 (17.55%) but appears intentionally right-anchored in sample; absent exact game UV do not call false failure solely from ratio.",
+      "source": "PROFESSIONAL",
+      "ko": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "ko_bbox": [
+        522,
+        346,
+        634,
+        398
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/professional_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/professional_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/professional_EN_KO_RAW.png"
+      }
+    },
+    {
+      "key": "outrun_small",
+      "status": "NO_NEW_FAIL_ESTABLISHED",
+      "reason": "SHORT_LABEL_AND_SCALE",
+      "detail": "OUTRUN small 132/211 (62.56%) and 82.54% height; targeted screenshots do not prove source failure.",
+      "source": "OUTRUN",
+      "ko": "아웃런",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "ko_bbox": [
+        1701,
+        529,
+        1833,
+        581
+      ],
+      "views": {
+        "practical50": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_small_EN_KO_GRAY_50pct.png",
+        "native100": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_small_EN_KO_GRAY_100pct.png",
+        "raw": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/outrun_small_EN_KO_RAW.png"
+      }
+    }
+  ],
+  "visual_result": "REWORK_REQUIRED",
+  "hard_fail": [
+    "SOURCE_HIERARCHY_UNDERFILL_SHOWROOM",
+    "SMALL_FONT_PRACTICAL_READABILITY_ENTER_NAME"
+  ],
+  "scope_of_failure": "Two confirmed atlas typography/scale defects; independent evidence for six of 12 current labels; remaining six not newly visually adjudicated. No claim that IGR029 screenshot pixels are exactly these regions.",
+  "calibration": {
+    "blind_control_pass": false,
+    "reason": "Producer and prior QA notes were known before visual inspection; cannot label a blind first-look qualification as done."
+  },
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED_OPEN_USER_INGAME_FAIL",
+  "USER_IN_GAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "producer_fix": "B even must compare original red headline SHOWROOM/other labels and medium gray ENTER NAME type family from canonical source, reconstruct usable native display weight and width while obeying exact source glyph/effect bbox and 1px protection; do not artificially stretch to English width. Establish real CLEAN plate and composite-only proofs, persisted DDS native/100/75/50/RAW/MIPs, current atlas 12 region and game UV; separately resolve whether screenshot179 subtitle is q212 or runtime before claiming in-game closure. Reinspect C2 and separate C3, then new actual game screenshot.",
+  "untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
