@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 00:02 KST",
+  "updated_at_kst": "2026-10-09 00:10 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8179,5 +8179,20 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_C/20261008-C309-C1-Q111-A161-FRESH-AUDIT/C309_CONTROLLER_C1_HOLD.json"
+  },
+  "a197_q103_normal_balance": {
+    "at_kst": "2026-10-09 00:10 KST",
+    "run_key": "OUTRUN-KOR-A197-Q103-ITALIC-20261009-0000",
+    "queue_index": 103,
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "prior_candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+    "new_dds": 1,
+    "producer_self_qa": "PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CONTROLLER_SELF_QA_FINAL.json"
   }
 }
