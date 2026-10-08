@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00455",
+  "production_id": "CONVERSION-DX11-00455",
+  "event_id": "CONVERSION-DX11-00455-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R317_R275_SCALAR_RECEIPT_PROVENANCE_LOGGING",
+  "base_sha": "c7242f7087c52ad663e846fa7c28da7e236cf810",
+  "result_sha": "0c5530ec7c2b4d822763b416eb1116225575ee07",
+  "material_result_sha": "0c5530ec7c2b4d822763b416eb1116225575ee07",
+  "validation_bearing_sha": "0c5530ec7c2b4d822763b416eb1116225575ee07",
+  "validation_bearing_result_sha": "0c5530ec7c2b4d822763b416eb1116225575ee07",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "validation_run_id": 37732432495,
+  "validation_job_id": 113164413675,
+  "readiness_smoke_job_id": 113165914886,
+  "artifact_id": 11529803567,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-0c5530ec7c2b4d822763b416eb1116225575ee07",
+  "artifact_digest": "sha256:d84ca207fbe22bd9e1cfca428bf6a5f6ea69b8f3cbc1ff25d72f63411a8aa3a5",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00455.json",
+  "implementation_commits": [
+    "bd7b01209e8a8070129b490784beb2a00f01ec65",
+    "8ad41f51e3147b0475eb863fd9900e8838b71a69",
+    "0c5530ec7c2b4d822763b416eb1116225575ee07"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "state_persisted": true,
+  "issue14_comment_id": 6053030688,
+  "summary": "R317 captures 17 R275 producer-owned scalar hash inputs plus 4 exactness booleans in passive signature census, reconstructs native R275 64-bit hash in offline analyzer, detects counterfeit snapshots and duplicate evidence, and correlates logged source/plan inputs while explicitly withholding object/device lifetime proof and NativeDrawPath authority. Source/tests/Win32 build/readiness smoke passed exact-SHA Github Gate.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub branch HEAD c7242f7; 00454 COMPLETE and 00455 absent; E003 rollover #2 preserves ATTEMPT 1/3, no dispatch duplicate.",
+    "C1_REVIEW": "PASS: R316 audit proved old R275 receipt line exact/objectReady/snapshot omits source/plan/object scalar bindings; reviewed native R275 composer/validator, production census capture, offline parser/tests, branch isolation.",
+    "C2_IMPLEMENT": "PASS: R317 producer-owned scalar capture and signature-scoped diagnostics; reconstruct R275 scalar hash, reject wrong hash/duplicate evidence and retain object lifetime unverified. Material source/test commits bd7b012, 8ad41f5, 0c5530e; no Draw/DrawIndexed activation.",
+    "C3_VALIDATE": "PASS: exact-SHA 0c5530ec7c2b4d822763b416eb1116225575ee07 Backend Conversion Gate #37732432495 validate #113164413675 and DX11 readiness smoke #113165914886 both SUCCESS. Census tests, static probes, Win32 build and binary artifact passed; artifact #11529803567 digest sha256:d84ca207fbe22bd9e1cfca428bf6a5f6ea69b8f3cbc1ff25d72f63411a8aa3a5. Earlier intermediate SHA Gate #37732297625 and #37732383207 failed regression fixture and were superseded, not counted as PASS.",
+    "C4_COMMIT": "PASS: substantive source/analyzer/tests material SHA 0c5530ec7c2b4d822763b416eb1116225575ee07 and ancestor fix commits, each carrying [AUTO:CONVERSION-DX11-00455].",
+    "C5_PACKAGE": "NOT_REQUIRED: R317 changes diagnostic-only census source and analyzer; canonical Win32 CI artifact exists but no Quest3 HMD test candidate requested.",
+    "C6_STATE": "PASS: durable run and conversion lane state persisted with exact C3 result, E003 ATTEMPT 1/3, issue #14 event, next action and RUNTIME_VALIDATION=UNTESTED."
+  },
+  "next_action": "R318: investigate object/device/lifetime generation evidence for R275 beyond hash scalar coincidence; strengthen source receipt-to-object identity correlation without activating native programmable Draw/DrawIndexed. Require exact-build Quest3/VDXR evidence for runtime promotion.",
+  "recorded_at_kst": "2026-10-08T14:36:35+09:00",
+  "evidence": {
+    "backend_conversion_gate_run_id": 37732432495,
+    "validate_job_id": 113164413675,
+    "readiness_smoke_job_id": 113165914886,
+    "artifact_id": 11529803567,
+    "artifact_digest": "sha256:d84ca207fbe22bd9e1cfca428bf6a5f6ea69b8f3cbc1ff25d72f63411a8aa3a5",
+    "intermediate_failed_gates_not_pass": [
+      37732297625,
+      37732383207
+    ]
+  }
+}
