@@ -10948,6 +10948,14 @@
     "independent_machine_all8": "NOT_PERFORMED",
     "separate_C3": "NOT_PERFORMED",
     "report": "localization/graphics/role_C/20261008-C2-Q154-EIGHT-REGION-REVIEW-1220/C2_Q154_EIGHT_REGION_REVIEW.json",
-    "RUNTIME_VALIDATION": "UNTESTED"
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "independent_native_pixel_evidence": "localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/C2_Q154_NATIVE_PIXEL_REPORT.json",
+    "controller_native_report": "localization/graphics/role_C/20261008-C2-Q154-NATIVE-PIXEL-EVIDENCE-1220/C2_Q154_CONTROLLER_FINAL_QA.json",
+    "native_8_bbox_result": "PASS_8_OF_8",
+    "original_to_current_changed_outside": 0,
+    "prior_to_current_changed_outside_gray": 0,
+    "prior_to_current_changed_inside_gray": 29377,
+    "exact_source_current_png_count": 16,
+    "status": "HOLD_STRICT_RECHECK_EIGHT_REGION_NATIVE_MACHINE_PASS_PENDING_FIRST_LOOK_CALIBRATION_C_AND_C3"
   }
 }
