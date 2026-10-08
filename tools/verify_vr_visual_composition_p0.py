@@ -1122,6 +1122,48 @@ def check_skyglow_clean_screen_source(source):
         'R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;'
     )
 
+def check_skyglow_final_blur_source(source):
+    apply = function_body(source, 'bool R30ApplyStereoSkyGlow(')
+    # Eye image flow: reduced(scene) -> temp(bright) -> reduced(horizontal)
+    # -> temp(vertical if enabled). The additive composite must never read
+    # an intermediate from a preceding pass as the final blur texture.
+    flow = apply[apply.index('const float horizontal[4]'):
+                 apply.index('const float composite[4]')]
+    require_order(flow, 'per-eye SkyGlow final blur texture ownership',
+                  'R30SkyGlow.temp[eye],',
+                  'R30SkyGlow.blur, horizontal, false);',
+                  'const bool effectiveTwoStep =',
+                  'IDirect3DTexture9* compositeSource =',
+                  'R30SkyGlow.reduced[eye];',
+                  'if (effectiveTwoStep)',
+                  'R30SkyGlow.reduced[eye],',
+                  'R30SkyGlow.blur, vertical, false);',
+                  'compositeSource = R30SkyGlow.temp[eye];')
+    if not re.search(r'IDirect3DTexture9\* compositeSource\s*=\s*'
+                     r'R30SkyGlow\.reduced\[eye\]\s*;', flow):
+        raise SystemExit('P0 one-pass SkyGlow composite bypassed final horizontal blur')
+    if not re.search(r'if\s*\(ok\)\s*\{[^{}]*'
+                     r'compositeSource\s*=\s*R30SkyGlow\.temp\[eye\]\s*;', flow, re.S):
+        raise SystemExit('P0 two-pass SkyGlow composite bypassed final vertical blur')
+
+check_skyglow_final_blur_source(r30)
+for label, before, bad in (
+    ('single pass uses unblurred bright texture',
+     'IDirect3DTexture9* compositeSource =\n                    R30SkyGlow.reduced[eye];',
+     'IDirect3DTexture9* compositeSource =\n                    R30SkyGlow.temp[eye];'),
+    ('two-pass ignores vertical blur output',
+     'compositeSource = R30SkyGlow.temp[eye];',
+     'compositeSource = R30SkyGlow.reduced[eye];'),
+):
+    if before not in r30:
+        raise SystemExit('P0 SkyGlow mutation input missing: ' + label)
+    try:
+        check_skyglow_final_blur_source(r30.replace(before, bad, 1))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 SkyGlow final-stage mutation survived: ' + label)
+
 check_skyglow_clean_screen_source(r30)
 for label, damaged in (
     ('HUD accepted by fallback without scene snapshot',
