@@ -278,10 +278,31 @@ jobs:
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1','OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
+          # Keep one GUI launcher. The slot selector invokes the PowerShell
+          # test runner directly; duplicate batch entrypoints are not needed.
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          @(
+            'OUTRUN 2006 VR DX9EX - START HERE / 실행 방법'
+            ''
+            '1. Extract ZIP contents into the folder containing OR2006C2C.EXE.'
+            '   ZIP 내용물을 OR2006C2C.EXE가 있는 게임 폴더에 풀어주세요.'
+            '2. Double-click OutRunVR-Slot-Selector.cmd (the only included CMD launcher).'
+            '   OutRunVR-Slot-Selector.cmd를 더블클릭하세요.'
+            '3. CURRENT FOCUS / CORRECTNESS -> 설정 + 바로 실행.'
+            '   첫 행 CURRENT FOCUS 오른쪽의 설정 + 바로 실행을 누르세요.'
+            '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
+            '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
+            '5. After the game closes, its diagnostic ZIP is auto-collected.'
+            '   게임 종료 후 진단 로그 ZIP이 자동 생성됩니다.'
+            ''
+            'outrun-vr-host.exe is a helper process, not the user launcher.'
+            'outrun-vr-host.exe는 직접 실행하는 파일이 아닙니다.'
+            'Old CMD files may remain if extracted over an old test folder.'
+            '구버전 CMD가 남아 있다면 이번 패키지 파일이 아니므로 무시하세요.'
+          ) | Set-Content (Join-Path $dir 'START_HERE_실행방법.txt') -Encoding UTF8
           @(
             'OUTRUN VR TEST / LOG UPLOAD'
             ''
@@ -317,8 +338,19 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
+          }
+          # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.
+          $launchers = @(Get-ChildItem verify -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
+          if ($launchers.Count -ne 1 -or $launchers[0].Name -ne 'OutRunVR-Slot-Selector.cmd') {
+            throw "Unexpected launch batch files in ZIP: $($launchers.Name -join ', ')"
+          }
+          $launcherText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.cmd') -Raw
+          if ($launcherText -notlike '*OutRunVR-Slot-Selector.ps1*') { throw 'Main launcher no longer opens slot selector' }
+          $slotText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
+          foreach ($marker in @('CURRENT_FOCUS','Run-OutRunVRTest.ps1','Start-Slot','설정 + 바로 실행')) {
+            if ($slotText -notlike "*$marker*") { throw "Slot selector marker missing: $marker" }
           }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
           foreach ($requiredMarker in @('ANALYSIS_REQUEST.json','AutoAnalyzeOnUpload=$true','RequiresUserDescription=$false','OutRun2_VR_ANALYZE_')) {
