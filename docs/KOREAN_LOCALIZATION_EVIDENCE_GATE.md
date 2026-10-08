@@ -114,3 +114,35 @@ static PASS, evidence-backed export, user acceptance and in-game acceptance sepa
 Historical pre-gate JPG exports are archived once under PRE_INGAME_JPG_REVIEW_ARCHIVE.
 An empty current export during migration means evidence pending, not erased production.
 Do not promote historical C/C3 PASS or claim runtime validation simply to restore counts.
+
+## User in-game review before final graphics approval
+
+The user cannot validate in-game pixels when export blocks **all** Korean DDS pending
+user acceptance. Maintain two explicitly separate package stages:
+
+- **USER_REVIEW_NOT_APPROVED:** A QA-preview artifact for a separate/backed-up game
+  installation. The Windows test workflow copies the *same-commit* runtime and the
+  current candidate bytes for queue rows with historical `c3_strict_pass` status.
+  Its CSV lists exact DDS SHA-256, queue index and unapproved status. It excludes
+  rows currently marked REWORK/FAIL/HOLD and missing candidate files. Historical C3
+  is an eligibility heuristic for user inspection, not proof of current C3 approval,
+  user acceptance or game correctness. Known defects can still surface.
+- **EVIDENCE_APPROVED_GRAPHICS:** The independent package for final graphical
+  approval flow. Every DDS must still satisfy `qa_evidence_gate.py` and current
+  `role_C/APPROVALS/qNNN.json` evidence before it enters this package. The preview
+  never modifies the approval list, queue state, calibration or runtime validation.
+- **RUNTIME_ONLY:** With zero approved DDS, keep a current-head runtime debugging
+  package instead of failing Windows compilation; it is not a graphics test package.
+
+The user may test the unapproved preview **before** final approval and report queue
+index, scene, screenshot and logs. A user-observed defect reopens the affected
+graphics candidate under the existing in-game regression rules, regardless of
+historical C/C3 labels. A user screenshot also does **not** automatically approve
+untested assets or close other regressions. Production approval still requires the
+current independent source/candidate evidence and actual game follow-up where
+applicable.
+
+No current-vs-historical build must be called a final Korean patch until all gates
+are met. In progress reporting, give the three counts separately: historical C3
+preview candidates, current evidence-approved exported DDS, user-tested/accepted
+in-game assets.
