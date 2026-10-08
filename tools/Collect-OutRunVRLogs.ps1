@@ -156,6 +156,29 @@ if(Test-Path $gameExe){
     $copied+='EXE_IDENTITY.txt'
 }
 
+# Record the installed game DLL bytes, not only the package's declarative
+# source SHA. This catches stale root DLLs surviving extraction/selection.
+$installedDll=Join-Path $root 'dinput8.dll'
+$selectedDll=Join-Path $root 'backends/d3d9/dinput8.dll'
+if($backend -eq '2d'){$selectedDll=Join-Path $root 'backends/2d/dinput8.dll'}
+$installedHash=if(Test-Path $installedDll){(Get-FileHash $installedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
+$selectedHash=if(Test-Path $selectedDll){(Get-FileHash $selectedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
+$expectedHash=if($kv.gameDllSha256){[string]$kv.gameDllSha256}else{'NOT_RECORDED'}
+$gameDllMatches=($installedHash -ne 'MISSING' -and
+    $selectedHash -ne 'MISSING' -and
+    $installedHash -eq $selectedHash -and
+    ($expectedHash -eq 'NOT_RECORDED' -or $installedHash -eq $expectedHash))
+@(
+    "session=$session"
+    "sourceShaDeclared=$activeSourceSha"
+    "installedDllSha256=$installedHash"
+    "selectedPayloadDllSha256=$selectedHash"
+    "launchSelectionDllSha256=$expectedHash"
+    "installedMatchesSelected=$gameDllMatches"
+    "runtimeLoadedModuleHash=NOT_ATTESTED"
+)|Set-Content (Join-Path $dest 'GAME_DLL_IDENTITY.txt') -Encoding UTF8
+$copied+='GAME_DLL_IDENTITY.txt'
+
 $gameLogs=Get-ChildItem $dest -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue
 $shaderLines=@()
 foreach($log in $gameLogs){
