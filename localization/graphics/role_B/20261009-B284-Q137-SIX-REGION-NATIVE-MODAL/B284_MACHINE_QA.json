@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B284",
+  "index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "priority": "P0",
+  "user_in_game": [
+    "IGR-041",
+    "스크린샷(193)(1).png"
+  ],
+  "triage": {
+    "index": 137,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "current_status": "user_ingame_20261009_rework_required",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "source_provenance": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "previous_candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "trial_sha256": "1248721f20d2ac69afd0f8c97d407a5886d8850f4c56060f51aa93d1fa511e53",
+  "method": "ALL_SIX_NATIVE_UNSCALED_KOREAN_FONT_FROM_VERIFIED_CANONICAL_CLEAN_PLATE",
+  "source_family": "NATIVE_ENGLISH_WHITE_VS_GRAY_OPAQUE_FACE_WITH_PERSOURCE_CHROME_NOT_REDRAWN",
+  "rows": [
+    {
+      "key": "select_transmission",
+      "english": "SELECT TRANSMISSION",
+      "korean": "변속기 선택",
+      "source_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "candidate_bbox": [
+        299,
+        70,
+        573,
+        127
+      ],
+      "source_size": [
+        863,
+        63
+      ],
+      "candidate_size": [
+        274,
+        57
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 56,
+      "native_stroke_px": 2,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        294,
+        295,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        304,
+        70,
+        568,
+        127
+      ]
+    },
+    {
+      "key": "transmission_small",
+      "english": "TRANSMISSION",
+      "korean": "변속기",
+      "source_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "candidate_bbox": [
+        1394,
+        99,
+        1462,
+        125
+      ],
+      "source_size": [
+        281,
+        32
+      ],
+      "candidate_size": [
+        68,
+        26
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 24,
+      "native_stroke_px": 1,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        106,
+        107,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        1396,
+        99,
+        1459,
+        125
+      ]
+    },
+    {
+      "key": "manual_small",
+      "english": "MANUAL",
+      "korean": "수동",
+      "source_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "candidate_bbox": [
+        122,
+        151,
+        231,
+        207
+      ],
+      "source_size": [
+        325,
+        62
+      ],
+      "candidate_size": [
+        109,
+        56
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 57,
+      "native_stroke_px": 2,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        108,
+        108,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        124,
+        151,
+        228,
+        207
+      ]
+    },
+    {
+      "key": "automatic_small",
+      "english": "AUTOMATIC",
+      "korean": "자동",
+      "source_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "candidate_bbox": [
+        1039,
+        150,
+        1159,
+        213
+      ],
+      "source_size": [
+        554,
+        69
+      ],
+      "candidate_size": [
+        120,
+        63
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 63,
+      "native_stroke_px": 2,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        217,
+        217,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        1041,
+        150,
+        1156,
+        213
+      ]
+    },
+    {
+      "key": "manual_large",
+      "english": "MANUAL",
+      "korean": "수동",
+      "source_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "candidate_bbox": [
+        126,
+        238,
+        272,
+        312
+      ],
+      "source_size": [
+        396,
+        80
+      ],
+      "candidate_size": [
+        146,
+        74
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 76,
+      "native_stroke_px": 3,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        125,
+        125,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        129,
+        238,
+        268,
+        312
+      ]
+    },
+    {
+      "key": "automatic_large",
+      "english": "AUTOMATIC",
+      "korean": "자동",
+      "source_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "candidate_bbox": [
+        1260,
+        236,
+        1404,
+        312
+      ],
+      "source_size": [
+        886,
+        82
+      ],
+      "candidate_size": [
+        144,
+        76
+      ],
+      "font": "Noto Sans CJK KR native",
+      "font_px": 75,
+      "native_stroke_px": 3,
+      "source_face_RGB_percentile": [
+        255,
+        255,
+        255
+      ],
+      "positive_margins": [
+        371,
+        371,
+        3,
+        3
+      ],
+      "persisted_visible_bbox": [
+        1262,
+        236,
+        1401,
+        312
+      ]
+    }
+  ],
+  "native": [
+    2048,
+    1024
+  ],
+  "format": "BGRA32_mip1",
+  "raw": "MIRROR_Y",
+  "plate_gate": {
+    "source_clean_changed_outside_6_regions": 0,
+    "retained_source_identical_protected_rule_pixels": 396,
+    "retained_source_pixels_altered": 44,
+    "retained_source_cleanup_requires_native_visual": true,
+    "clean_english_visible_letters": "ZERO_BY_INDEPENDENT_PLATE_ONLY_VISUAL_PENDING"
+  },
+  "composite_gate": {
+    "changed_outside_original_6_bboxes": 0,
+    "alpha_changed_outside_6_bboxes": 0,
+    "protected_AT_MT_AND_PANEL_changed": 0,
+    "original_english_glyphs_visible_in_clean": "PENDING_CONTROLLER_PLATE_ONLY_NATIVE_VISUAL"
+  },
+  "persisted_machine": {
+    "header_exact": true,
+    "size_exact": true,
+    "decoded_roundtrip_exact": true,
+    "changed_rgba_pixels": 22760,
+    "visible_candidate_pixels": 26629
+  },
+  "producer_visual": "PENDING_CONTROLLER_SOURCE_CLEAN_FINAL_AND_NATIVE_PRACTICAL",
+  "candidate_promoted": false,
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_HOSTED_REQUIRED_PINNED_PUBLIC_SOURCE",
+  "forbidden_domains_touched": []
+}
