@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A194 q231 EBE401C8 MATERIAL source-style rework script changed at 0dbc72b2c6c992c16115d40591e451c0d6181336; source original 29b87a5c..., previously rejected candidate dc08f74a...; Black TTC single flat face removes unwanted dark offset edges and red ONLINE bevel, guard preserves protected LAN and strict source bbox. GitHub Actions 37767491356 still IN_PROGRESS at 20:18 KST, candidate NOT PUBLISHED / QA NOT RUN. Do NOT count as new DDS, PASS or new scoreboard point. Keep q231 REWORK until actual final DDS exact SHA and native SOURCE/CLEAN/FINAL plus RAW/50% producer QA; then independent C1 and C3. RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json",
     "C300 C2 EVEN q98 42E618FD: C3 native DXT5 vs exact English independently identifies striped/dotted Korean white face absent in smooth English source. C126 machine PASS superseded; current candidate preserved; A/B material glyph-face+outline reconstruction then fresh C2 and C3 required. Evidence localization/graphics/role_C/20261008-C300-C2-Q098-NATIVE-GLYPH-FACE-REWORK/C300_Q098_CONTROLLER_C3_FAIL.json; RUNTIME_VALIDATION=UNTESTED.",
     "C1 19:48 q227/q231/q237 native source-faithful typography/effect rework required before fresh independent C/C3 and user/actual-game test; do not reproduce unchanged DDS.",
     "B265 q172 2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da machine PASS but SOURCE/CLEAN/FINAL native/50%/RAW producer visual FAIL; original B263 812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a restored. Do not rerun current SDF/palette tricks; manual vector reconstruction source style needed. Fresh C2 + C3 and in-game remain blocked, RUNTIME_VALIDATION=UNTESTED.",
@@ -11765,5 +11766,14 @@
     "PRE_INGAME": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "execution_backend": "GitHub connector data + ChatGPT local JS native DXT5 decode; no N100 computation"
+  },
+  "a194_q231_source_edge_worker_pending": {
+    "role": "A",
+    "queue_index": 231,
+    "status": "WORKER_RUNNING_PENDING_NO_CANDIDATE",
+    "workflow_run": 37767491356,
+    "expected_previous_candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json"
   }
 }
