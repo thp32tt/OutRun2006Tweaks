@@ -604,10 +604,14 @@ class UIScaling : public Hook
 		auto original = reinterpret_cast<GoalTimeHelperFn>(
 			Module::exe_ptr(helperRva));
 		original();
-		// Both helpers are genuine original GOAL sprite producers, but the
-		// white time may duplicate in only one. Diagnostic producer identity
-		// must distinguish each original E8 parent while retaining the exact
-		// same ScreenHud ownership and all-children registration.
+		// Both original GOAL helpers are required and intentional. The
+		// user's screen evidence suggests different visible components
+		// (course/stage name and recorded time), NOT two redundant calls
+		// rendering one time glyph. Exact component-to-address mapping remains
+		// unproven until original function disassembly or a matching HMD trace.
+		// Always execute EACH original exactly once and keep all siblings.
+		// Distinct producer tokens are diagnostic only: do not suppress,
+		// merge or deduplicate either helper, even if both draw white/alpha.
 		const auto producer = helperRva == 0xBE020
 			? OutRunVR::GameSemantic::ProducerToken::GoalTime020
 			: (helperRva == 0xBE150
