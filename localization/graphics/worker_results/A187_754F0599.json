@@ -1,0 +1,29 @@
+{
+  "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
+  "asset": "754F0599",
+  "index": 175,
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "format": "RGBA32",
+  "localized_rows": 3,
+  "absent_historical_rows": 2,
+  "bbox_pass": "3/3",
+  "size_ceiling": "3/3",
+  "positive_margin": "3/3",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_mask_pixels_unchanged_in_clean": 0,
+  "localized_overlap_pixels": 0,
+  "localized_touch_pixels": 0,
+  "changed_pixels_outside_source_bboxes": 0,
+  "alpha_changed_pixels_outside_source_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "source_residue_visible_pixels": 0,
+  "worker_status": "A187_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_PIXEL_VISUAL_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_754F0599_REPORT.json"
+}

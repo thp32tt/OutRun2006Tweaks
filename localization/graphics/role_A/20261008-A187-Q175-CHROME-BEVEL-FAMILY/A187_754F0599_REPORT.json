@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
+  "index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "worker": "github-actions",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "60cbe90be5765b4ade3ce80916d9b2c7ed23e589",
+    "sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "classification": "authoritative HD source; actual DDS 2048x1024 RGBA32"
+  },
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "previous_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+  "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "pixel_raw_mode": "BGRA",
+    "pitch": 8192,
+    "depth": 0,
+    "mipmaps": 1,
+    "bytes": 8388736,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "canonical_visible_physical_rows": 3,
+    "localized": [
+      "stage select -> 스테이지 선택",
+      "showroom -> 쇼룸",
+      "single player -> 싱글 플레이"
+    ],
+    "historical_draft_rows_absent_in_canonical_hd": [
+      "system link",
+      "xbox live"
+    ],
+    "binding_evidence": "20261008-A187-Q175-CHROME-BEVEL-FAMILY-PREFLIGHT full raw/flip canonical source visuals"
+  },
+  "rows": [
+    {
+      "row": 0,
+      "source": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "raw_original_bbox": [
+        6,
+        627,
+        1372,
+        770
+      ],
+      "source_width": 1366,
+      "source_height": 143,
+      "localized_bbox": [
+        12,
+        259,
+        893,
+        392
+      ],
+      "raw_localized_bbox": [
+        12,
+        632,
+        893,
+        765
+      ],
+      "localized_width": 881,
+      "localized_height": 133,
+      "delta_left": 6,
+      "delta_right": 479,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/truetype/nanum/NanumSquareRoundB.ttf",
+      "font_face_index": 0,
+      "font_pattern": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold:Bold,Regular",
+      "font_size": 127,
+      "outer_stroke": 3,
+      "body_extra": 0,
+      "slant_px": 15,
+      "shadow_offset": [
+        5,
+        9
+      ],
+      "natural_width": 881,
+      "natural_height": 133,
+      "c278_rework": "source_rounded_chrome_bevel_lower_extrusion_without_forced_width",
+      "native_chrome_family_effects": {
+        "font_family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+        "font_style": "Bold,Regular",
+        "source_style": "thick bright silver beveled rounded geometric lower extrusion",
+        "face_chrome_gradient": "source sampled top + specular band + dark lower channel",
+        "bevel_highlight_px": 3,
+        "lower_inner_dark_px": 3,
+        "extrusion_layers": [
+          [
+            5,
+            9,
+            135
+          ],
+          [
+            4,
+            7,
+            170
+          ],
+          [
+            3,
+            5,
+            205
+          ]
+        ],
+        "outline_px": 3,
+        "readable_right_shear": 0.115,
+        "natural_hangul_width_no_forced_resize": true,
+        "tracking_px": 25,
+        "prior_flat_chrome_A185R_source_style_rework": true
+      },
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          249,
+          249,
+          249,
+          255
+        ],
+        "profile_samples": [
+          [
+            244,
+            244,
+            244
+          ],
+          [
+            156,
+            156,
+            156
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "row": 1,
+      "source": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "raw_original_bbox": [
+        6,
+        495,
+        956,
+        627
+      ],
+      "source_width": 950,
+      "source_height": 132,
+      "localized_bbox": [
+        12,
+        402,
+        261,
+        524
+      ],
+      "raw_localized_bbox": [
+        12,
+        500,
+        261,
+        622
+      ],
+      "localized_width": 249,
+      "localized_height": 122,
+      "delta_left": 6,
+      "delta_right": 695,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/truetype/nanum/NanumSquareRoundB.ttf",
+      "font_face_index": 0,
+      "font_pattern": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold:Bold,Regular",
+      "font_size": 120,
+      "outer_stroke": 3,
+      "body_extra": 0,
+      "slant_px": 14,
+      "shadow_offset": [
+        5,
+        9
+      ],
+      "natural_width": 249,
+      "natural_height": 122,
+      "c278_rework": "source_rounded_chrome_bevel_lower_extrusion_without_forced_width",
+      "native_chrome_family_effects": {
+        "font_family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+        "font_style": "Bold,Regular",
+        "source_style": "thick bright silver beveled rounded geometric lower extrusion",
+        "face_chrome_gradient": "source sampled top + specular band + dark lower channel",
+        "bevel_highlight_px": 3,
+        "lower_inner_dark_px": 3,
+        "extrusion_layers": [
+          [
+            5,
+            9,
+            135
+          ],
+          [
+            4,
+            7,
+            170
+          ],
+          [
+            3,
+            5,
+            205
+          ]
+        ],
+        "outline_px": 3,
+        "readable_right_shear": 0.115,
+        "natural_hangul_width_no_forced_resize": true,
+        "tracking_px": 24,
+        "prior_flat_chrome_A185R_source_style_rework": true
+      },
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          248,
+          248,
+          248,
+          255
+        ],
+        "profile_samples": [
+          [
+            244,
+            244,
+            244
+          ],
+          [
+            62,
+            62,
+            62
+          ],
+          [
+            21,
+            21,
+            21
+          ]
+        ]
+      }
+    },
+    {
+      "row": 2,
+      "source": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "raw_original_bbox": [
+        2,
+        307,
+        1386,
+        458
+      ],
+      "source_width": 1384,
+      "source_height": 151,
+      "localized_bbox": [
+        8,
+        571,
+        785,
+        712
+      ],
+      "raw_localized_bbox": [
+        8,
+        312,
+        785,
+        453
+      ],
+      "localized_width": 777,
+      "localized_height": 141,
+      "delta_left": 6,
+      "delta_right": 601,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/truetype/nanum/NanumSquareRoundB.ttf",
+      "font_face_index": 0,
+      "font_pattern": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold:Bold,Regular",
+      "font_size": 135,
+      "outer_stroke": 3,
+      "body_extra": 0,
+      "slant_px": 16,
+      "shadow_offset": [
+        5,
+        9
+      ],
+      "natural_width": 777,
+      "natural_height": 141,
+      "c278_rework": "source_rounded_chrome_bevel_lower_extrusion_without_forced_width",
+      "native_chrome_family_effects": {
+        "font_family": "NanumSquareRound,나눔스퀘어라운드,NanumSquareRound Bold,나눔스퀘어라운드 Bold",
+        "font_style": "Bold,Regular",
+        "source_style": "thick bright silver beveled rounded geometric lower extrusion",
+        "face_chrome_gradient": "source sampled top + specular band + dark lower channel",
+        "bevel_highlight_px": 3,
+        "lower_inner_dark_px": 3,
+        "extrusion_layers": [
+          [
+            5,
+            9,
+            135
+          ],
+          [
+            4,
+            7,
+            170
+          ],
+          [
+            3,
+            5,
+            205
+          ]
+        ],
+        "outline_px": 3,
+        "readable_right_shear": 0.115,
+        "natural_hangul_width_no_forced_resize": true,
+        "tracking_px": 27,
+        "prior_flat_chrome_A185R_source_style_rework": true
+      },
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          245,
+          245,
+          245,
+          255
+        ],
+        "profile_samples": [
+          [
+            246,
+            246,
+            246
+          ],
+          [
+            89,
+            89,
+            89
+          ],
+          [
+            21,
+            21,
+            21
+          ]
+        ]
+      }
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 270693,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "baseline_candidate": null,
+    "rework_mask": null,
+    "rework_changed_pixels": 0,
+    "rework_changed_bbox": null,
+    "rework_changed_pixels_outside_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 329463,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "baseline_candidate": null,
+    "rework_mask": null,
+    "rework_changed_pixels": 0,
+    "rework_changed_bbox": null,
+    "rework_changed_pixels_outside_mask": 0,
+    "status": "PASS"
+  },
+  "machine_checks": {
+    "source_mask_pixels_unchanged_in_clean": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0
+  },
+  "all_3_bbox_pass": true,
+  "all_3_size_ceiling_pass": true,
+  "all_3_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_SOURCE_CLEAN_FINAL_RAW_PRACTICAL",
+  "c278_rework_reason": "C278_SOURCE_CHROME_BEVEL_EXTRUSION_UNDERDEPTH",
+  "c170_rework_applied": "wider/lower horizontal scaling, lighter keyline, metallic source-derived grayscale fill, lower dark extrusion; absent system link/xbox live remain omitted",
+  "runtime_validation": "UNTESTED",
+  "status": "A187_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_PIXEL_VISUAL_REVIEW"
+}
