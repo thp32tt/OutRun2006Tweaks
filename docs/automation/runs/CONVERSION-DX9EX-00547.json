@@ -2,16 +2,16 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00547",
   "production_id": "CONVERSION-DX9EX-00547",
-  "event_id": "CONVERSION-DX9EX-00547-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX9EX-00547-E003",
+  "event_type": "retry",
   "chat_rollover": 2,
-  "attempt": "1/3",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "ccf692cc4983ba2a469f631702d3709bfcb23995",
   "material_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00547]",
-  "status": "STATIC_AND_HOST_PASS_BUILD_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED_VIA_VALIDATED_DESCENDANT",
   "selected_work_item": "DX9EX-P0-UI-TEXTURE-LEGACY-D3DX-FALLBACK",
   "summary": "Restore legacy D3DX Ex trampoline on failed fast DDS UI decode (menu/car-selection texture resilience). Add deterministic source/negative-mutation contract; not a proven HMD fix.",
   "changed_paths": [
@@ -24,45 +24,103 @@
   "deterministic_preflight": "EXACT-SHA HUD Inspector static-exe-analysis success: 71 CALLs, 10/10 HUD mutations, 16 DDS source obligations, 10/10 DDS mutations, P0 visual PASS.",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "ci_gate_complete": false,
+  "ci_gate_complete": true,
   "package_requested": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-  "next_action": "C3: resolve exact-SHA CI runs 37710072983 and 37710073122, persist completion/diagnostics and artifact digests. C4/C6 material commit is 7768a745 and all source changes already published. No repeat or retry increment. RUNTIME_VALIDATION remains UNTESTED.",
-  "score_award": "DEFERRED_UNTIL_EXACT_SHA_CI_COMPLETE",
-  "validation_bearing_result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
-  "result_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
+  "next_action": "Stop retrying checkpoint SHA 4da487f8 as if it were material. Consumer/controller must use this record's exact validation_bearing_result_sha 850c522d and matching successful Actions 37710686730; older 7768 cancelled attempts are SUPERSEDED. Continue independent P0 evidence-first static work without re-running same corrected task; RUNTIME_VALIDATION remains UNTESTED.",
+  "score_award": "PENDING_SCOREBOARD_DEDUPLICATION_FOR_THIS_TASK_ID",
+  "validation_bearing_result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
+  "result_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
   "material_commit_history": [
     "fed8ae3f577644be6107c3c6bfe5b228ff7ff27d",
     "f46e2ec42fea9bc62f02384f8ef6cb66bbe8819c",
     "7768a745037c6453e85caf036f2001b1c8d379eb"
   ],
   "validation_runs": {
-    "hud_inspector": {
-      "id": 37710072983,
-      "static_job": 113093670470,
-      "static_status": "success",
-      "build_job": 113093670640,
-      "build_status": "in_progress"
+    "original_material": {
+      "head_sha": "7768a745037c6453e85caf036f2001b1c8d379eb",
+      "hud_inspector": {
+        "id": 37710072983,
+        "conclusion": "success"
+      },
+      "domain_isolation": {
+        "id": 37710073156,
+        "conclusion": "success"
+      },
+      "dx9ex_active": {
+        "id": 37710073122,
+        "run_attempts": 2,
+        "conclusion": "cancelled",
+        "successful_jobs": [
+          "policy",
+          "host",
+          "full-chain-compile"
+        ],
+        "cancelled_jobs": [
+          "game",
+          "package"
+        ]
+      }
     },
-    "dx9ex_active": {
-      "id": 37710073122,
-      "policy_job": 113093671339,
-      "policy_status": "success",
-      "game_job": 113093773949,
-      "host_job": 113093773910,
-      "full_chain_job": 113093773912,
-      "build_status": "game/full-chain in_progress",
-      "host_status": "success"
-    },
-    "domain_isolation": {
-      "id": 37710073156,
-      "job": 113093671247,
-      "status": "success"
+    "validated_descendant": {
+      "head_sha": "850c522d67252f55a8da6fe296a466e3c43965ae",
+      "ancestry": "four commits ahead, zero behind",
+      "ui_wrapper": "BYTE_IDENTICAL",
+      "dx9ex_active": {
+        "id": 37710686730,
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "host",
+          "game",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      "hud_inspector": {
+        "id": 37710686700,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "domain_isolation": {
+        "id": 37710686718,
+        "status": "completed",
+        "conclusion": "success"
+      }
     }
   },
   "blockers": [
-    "Exact material SHA hosted game and full-chain builds still in progress",
-    "HUD Inspector Windows build still in progress",
-    "Quest 3/VDXR actual test not performed"
-  ]
+    "No Quest3/VDXR exact-build user validation performed; 00519 HUD/menu/car-selection visual regression is NOT resolved by automated gates"
+  ],
+  "automation_validation": "PASS",
+  "result_identity_explanation": "Original 00547 source/material SHA 7768a745 had HUD Inspector and Domain Isolation SUCCESS, but DX9Ex Active Validation game/package was cancelled by later branch pushes (including a targeted rerun of cancelled game job). The descendant 850c522d is ahead by four commits, preserves byte-identical 00547 UI fast/legacy texture wrapper, and completed its own exact-SHA DX9Ex Active Validation+HUD Inspector+Domain Isolation. This record promotes the later real material SHA only as validation-bearing evidence; ownership of its separate fullsource-scene change stays with its own TASK_ID. Do not look for a gate on checkpoint SHA 4da487f8.",
+  "retry_recovery": {
+    "failure_context": "No authoritative DX9Ex Active Validation run was created for result SHA 4da487f8b74ddfb760a0d4ba7feedf589e175da0 after 673s (timeout=600s).",
+    "root_cause": "4da487f8 is a bookkeeping/checkpoint commit that intentionally did not trigger DX9Ex Active. The material SHA was 7768a745. The controller erroneously used latest/bookkeeping SHA instead of validation_bearing_result_sha.",
+    "attempts": "E002 1/3, E003 2/3 (rerun, not a fresh source implementation)",
+    "rerun_action": "Re-ran cancelled game job 113093773949 via authenticated GitHub action, producing 37710073122 run_attempt=2; later push a9f42ac8 canceled it again by branch concurrency.",
+    "classification": "SUPERSEDED_CANCELLATION_NOT_SOURCE_BUILD_FAILURE",
+    "descendant_verified": true,
+    "byte_identical_ui_wrapper_at_material_and_descendant": true
+  },
+  "package_artifact": {
+    "id": 11521429152,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-850c522d67252f55a8da6fe296a466e3c43965ae",
+    "digest": "sha256:07adb08148f644f8a7e19866da270cd4133b7aa95a4e64217658875e856452ae",
+    "size_bytes": 2742853
+  },
+  "build_artifacts": [
+    {
+      "id": 11522036594,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:5cdddc8b241af75a6630dcd1f858d46268c5c4b0dece8c32cbce170e6c6a7ae6"
+    },
+    {
+      "id": 11521352942,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:5f055c5556a313624e70f8b09fd8d71614a3fd8a32919b1a4baa793d6f07ca45"
+    }
+  ],
+  "automation_result_provenance": "PASS is for the descendant 850c522d exact material tree, NOT for original 7768 DX9Ex Active run. Original two attempts were cancelled; all inherited 00547 UI code is intact at 850c. No original-HMD-success assertion."
 }
