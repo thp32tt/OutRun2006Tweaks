@@ -7,6 +7,7 @@ on:
       - vr-d3d9ex-focus
     paths:
       - 'tools/verify_vr_fullsource_impact.py'
+      - 'tools/verify_vr_win32_cross_domain_safety.py'
       - '.github/workflows/dx9ex-fullsource-impact-review.yml'
       - 'src/**'
       - 'CMakeLists.txt'
@@ -23,6 +24,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Verify Win32 clipboard and timer API failure guards
+        run: python3 tools/verify_vr_win32_cross_domain_safety.py --self-test
       - name: Whole source inventory and unexpected cross-domain impacts
         run: python3 tools/verify_vr_fullsource_impact.py
       - name: Archive evidence for all C++/headers
