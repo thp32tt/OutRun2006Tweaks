@@ -50,6 +50,8 @@ verify_texture_cache_lifetime(textures)
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
+r26 = read('src/vr/d3d9/stereo_renderer_r26.cpp')
+r29 = read('src/vr/d3d9/stereo_renderer_r29.cpp')
 graphics = read('src/hooks_graphics.cpp')
 overlay = read('src/overlay/hooks_overlay.cpp')
 game_addrs = read('src/game_addrs.hpp')
@@ -75,6 +77,8 @@ for path in (
     'src/hooks_bugfixes.cpp',
     'src/vr/hud_semantics.hpp',
     'src/vr/game/render_semantics.hpp',
+    'src/vr/d3d9/stereo_renderer_r26.cpp',
+    'src/vr/d3d9/stereo_renderer_r29.cpp',
     'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
     'src/hooks_graphics.cpp',
     'src/overlay/hooks_overlay.cpp',
@@ -104,6 +108,60 @@ require('python tools/verify_vr_visual_composition_p0.py',
         hud_inspector_workflow, 'HUD Inspector executes the P0 contract')
 require("'.github/workflows/outrun-exe-hud-inspector.yml'",
         dx9ex_active_workflow, 'DX9Ex Active watches HUD Inspector CI wiring')
+
+# R59 actual-user ordinal 4th+ rank experiment proved helper scopes can
+# replace a correctly tagged queue-node world marker at draw time. The direct
+# node owner, not a temporary helper or producer token, must win for exactly
+# ScreenHud, WorldBillboard, ProjectedWorldMarker2D. Unknown sprites remain
+# generic and F11 remains externally scoped.
+def check_exact_queue_owner(source):
+    effective = function_body(source, 'inline RenderScope EffectiveScope() noexcept')
+    for marker in (
+        'ExternalOverlaySemanticDepth != 0',
+        'CurrentQueueExactScope == RenderScope::ScreenHud',
+        'CurrentQueueExactScope == RenderScope::WorldBillboard',
+        'CurrentQueueExactScope == RenderScope::ProjectedWorldMarker2D',
+        'return CurrentQueueExactScope;',
+        'return CurrentScope;',
+    ):
+        require(marker, effective, 'exact SpriteNode priority over transient helper scope')
+    consume = function_body(source, 'inline RenderScope ConsumeSpriteNodeScope(')
+    require('*exactTag = false;', consume, 'untagged node cannot inherit prior exact ownership')
+    require('*exactTag = true;', consume, 'only an actual matched node grants exact ownership')
+    select = function_body(source, 'inline void SelectSpriteQueueNode(')
+    require('CurrentQueueExactScope = RenderScope::None;', select,
+            'new queue node must clear stale exact ownership')
+    require('&CurrentSpriteQueueProducer, &exactTag', select, 'matched node handoff')
+    require('if (exactTag &&', select, 'explicit tag is required for exact owner')
+    require('CurrentQueueExactScope = CurrentScope;', select, 'exact owner published for draw')
+    end = function_body(source, 'inline void EndSpriteQueueRender() noexcept')
+    require('CurrentQueueExactScope = RenderScope::None;', end,
+            'queue end must clear exact owner')
+    draw = function_body(source, 'inline RenderScope ConsumeForDraw() noexcept')
+    require('return EffectiveScope();', draw,
+            'D3D draw must not regress to helper-overridden CurrentScope')
+
+check_exact_queue_owner(sem)
+for label, mutated in (
+    ('transient helper steals exact tag',
+     sem.replace('return CurrentQueueExactScope;', 'return CurrentScope;', 1)),
+    ('unmatched queue node accepted as exact',
+     sem.replace('*exactTag = true;', '/* invalid tag accepted */', 1)),
+    ('queue node exact owner never published',
+     sem.replace('CurrentQueueExactScope = CurrentScope;',
+                 'CurrentQueueExactScope = RenderScope::None;', 1)),
+):
+    try:
+        check_exact_queue_owner(mutated)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 exact queue owner mutation survived: ' + label)
+for name, source in (('R26 early world-rebind', r26),
+                     ('R29 world helper', r29),
+                     ('R30 HUD/XYZRHW draw', r30)):
+    require('OutRunVR::GameSemantic::EffectiveScope()', source,
+            name + ' must use exact queued scope')
 
 # XMT loader: a corrupt/late XPR0 pointer must not read outside the XMT
 # system-memory block or overflow on pointer addition. This is a source
