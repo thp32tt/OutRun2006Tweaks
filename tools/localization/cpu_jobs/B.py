@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B271: authored original glyph core completion of q098 white DXT5 face."""
+"""B272: authored original glyph core completion of q098 white DXT5 face."""
 from pathlib import Path
 import os, io, sys, json, hashlib, struct, urllib.request, tempfile, subprocess
 import numpy as np
@@ -7,11 +7,11 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import binary_erosion, distance_transform_edt
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
-    raise SystemExit("B271 requires pinned source download; GitHub worker only")
+    raise SystemExit("B272 requires pinned source download; GitHub worker only")
 root=Path.cwd();gfx=root/"localization/graphics"
 relative="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target=gfx/"hd_candidates"/relative
-run=gfx/"role_B/20261008-B271-Q098-AUTHORED-FACE-COMPLETE"
+run=gfx/"role_B/20261008-B272-Q098-SOURCE-KEYLINE-CONSTRAINED"
 run.mkdir(parents=True,exist_ok=True)
 SHA=lambda b: hashlib.sha256(b).hexdigest()
 old_sha="1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb"
@@ -25,7 +25,7 @@ if SHA(oldbytes)!=old_sha:raise RuntimeError(("concurrent B production, stop",SH
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "a95efe01d1f136514cef94b0d9e9fd61df021754/"
 "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds")
-with tempfile.TemporaryDirectory(prefix="b266_q098_") as tmp:
+with tempfile.TemporaryDirectory(prefix="b272_q098_") as tmp:
     file=Path(tmp)/"stock.dds"
     urllib.request.urlretrieve(url,file)
     source=file.read_bytes()
@@ -86,28 +86,51 @@ for y0 in range((tgt[1]//4)*4,((tgt[3]+3)//4)*4,4):
         end0,end1=struct.unpack_from("<HH",raw,ofs+8)
         pal=palette(end0,end1)
         whiteindex=int(np.argmin(np.sum((pal-np.array([255,255,255]))**2,axis=1)))
-        if int(pal[whiteindex].min())<210:
-            # Without a white BC1 endpoint, changing 2-bit indices cannot fix
-            # these source-mismatch gray holes. Restrict endpoint reconstruction
-            # to strongly supported authored face blocks (6/16 interior pixels).
-            core_block=core[y0:y0+4,x0:x0+4]
-            if int(core_block.sum())<6:
+        if int(pal[whiteindex].min())<222:
+            # B272 incident: changing both BC1 endpoints to unconditional
+            # white/navy erased source ink/keyline. Reconstruct only when
+            # original non-core BC3 pixels retain their native palette values.
+            tile=cur[y0:y0+4,x0:x0+4,:3].astype(np.int32)
+            dark=tile.reshape(-1,3)
+            darkest=dark[np.argmin(dark.sum(axis=1))]
+            def pack565(px):
+                r,g,b=[int(k) for k in px]
+                return ((r*31+127)//255<<11)|((g*63+127)//255<<5)|((b*31+127)//255)
+            proposed=[]
+            for low in [int(end0),int(end1),pack565(darkest),
+                        pack565(np.percentile(dark,15,axis=0))]:
+                proposed += [(65535,low),(low,65535)]
+            best=None
+            for eA,eB in proposed:
+                if eA==eB:continue
+                cols=palette(eA,eB)
+                if min(np.linalg.norm(v-np.array([255,255,255])) for v in cols)>27:continue
+                desired=tile.copy()
+                desired[flags]=[255,255,255]
+                dif=((desired[:,:,None,:]-cols[None,None,:,:])**2).sum(axis=3)
+                choices=np.argmin(dif,axis=2)
+                approx=cols[choices]
+                outside=~flags
+                err=np.abs(approx.astype(int)-tile.astype(int))
+                if outside.any() and (err[outside].max()>12 or np.count_nonzero(np.any(err[outside]>4,axis=1))>2):continue
+                # The original dark/navy outline is protected even inside
+                # nominal glyph strokes except exact authored core holes.
+                oldnavy=(tile[:,:,2]>tile[:,:,0]+10)&(tile[:,:,0]<125)&outside
+                if np.any(err[oldnavy]>3):continue
+                whitepix=approx[flags]
+                if not len(whitepix) or not np.all(whitepix.min(axis=1)>212):continue
+                penalty=float((err[outside]**2).sum())+float(((255-whitepix)**2).sum())*0.25
+                if best is None or penalty<best[0]:best=(penalty,eA,eB,choices)
+            if best is None:
                 unsupported+=int(flags.sum())
                 continue
-            # Entire 4x4 stays inside existing original Korean text bbox;
-            # preserve the exact 8-byte alpha block. Two BC1 endpoints give
-            # white face, blue/navy outline and source-like intermediate tones.
-            new0,new1=0xffff,((2<<5)|7)
-            mixed=palette(new0,new1)
-            vals=cur[y0:y0+4,x0:x0+4,:3].astype(np.int32).copy()
-            vals[flags]=[255,255,255]
-            idx=np.argmin(np.sum((vals[:,:,None,:]-mixed[None,None,:,:])**2,axis=3),axis=2)
-            bits=0
+            _,eA,eB,choices=best
+            colorbits=0
             for yi in range(4):
                 for xi in range(4):
-                    bits|=int(idx[yi,xi])<<(2*((3-yi)*4+xi))
-            struct.pack_into("<HHI",raw,ofs+8,new0,new1,bits)
-            touched.append([x0,y0,int(flags.sum()),"endpoint_rebuild"])
+                    colorbits|=int(choices[yi,xi])<<(2*((3-yi)*4+xi))
+            struct.pack_into("<HHI",raw,ofs+8,eA,eB,colorbits)
+            touched.append([x0,y0,int(flags.sum()),"source_keyline_constrained_endpoint"])
             repaired+=int(flags.sum())
             continue
         val=struct.unpack_from("<I",raw,ofs+12)[0]
@@ -121,7 +144,7 @@ for y0 in range((tgt[1]//4)*4,((tgt[3]+3)//4)*4,4):
         struct.pack_into("<I",raw,ofs+12,val)
         if n:touched.append([x0,y0,n])
         repaired+=n
-if repaired<10:raise RuntimeError(("no editable white palette blocks",repaired,unsupported))
+if repaired<10:raise RuntimeError(("no_safe_reconstruction_possible",repaired,unsupported))
 new=bytes(raw)
 if new==oldbytes:raise RuntimeError("no new compressed candidate")
 if new[:128]!=oldbytes[:128] or len(new)!=len(oldbytes):raise RuntimeError("format mutated")
@@ -139,9 +162,9 @@ if improved<10:raise RuntimeError(("white-stroke continuity did not improve",imp
 # Always verify original source-vs-candidate visible area has no new overflow
 if int(np.count_nonzero((res[:,:,3]>16)&~source_box))!=int(np.count_nonzero((cur[:,:,3]>16)&~source_box)):
     raise RuntimeError("source extent changed")
-target.write_bytes(new)
-if SHA(target.read_bytes())!=SHA(new):raise RuntimeError("persist verification failed")
-if not np.array_equal(dec(target.read_bytes()),res):raise RuntimeError("persist roundtrip mismatch")
+trial=run/"42E618FD_B272_TRIAL_NOT_APPROVED.dds"\ntrial.write_bytes(new)
+if SHA(trial.read_bytes())!=SHA(new):raise RuntimeError("persist verification failed")
+if not np.array_equal(dec(trial.read_bytes()),res):raise RuntimeError("persist roundtrip mismatch")
 # Small side-by-side independent pixel evidence with canonical source
 # and old/new identical native dimensions, RAW plus FLIPY, 100/75/50.
 for orientation in ("READABLE","RAW"):
@@ -161,22 +184,22 @@ for orientation in ("READABLE","RAW"):
         for im in items:card.paste(im,(x,0));x+=im.width+8
         card.save(run/f"{orientation}_SOURCE_PREVIOUS_REPAIRED_{scale}.png")
 report={
- "run":"B271","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B269-Q098-PALETTE-20261008-FACECORE-RETRY",
- "status":"B271_MATERIAL_CANDIDATE_PENDING_CONTROLLER_VISUAL",
+ "run":"B272","queue_index":98,"asset":"42E618FD","run_key":"OUTRUN-KOR-B272-Q098-SOURCE-KEYLINE-CONSERVATION-20261008",
+ "status":"B272_EXPERIMENTAL_TRIAL_NOT_DEPLOYABLE_PENDING_CONTROLLER_VISUAL",
  "source_sha256":src_sha,"old_candidate_sha256":old_sha,"new_candidate_sha256":SHA(new),
- "repair_kind":"B270_SOURCE_CLEAN_VERIFIED_AUTHORED_CORE_WHITEN_BC3_ALPHA_PRESERVED",
+ "repair_kind":"B270_SOURCE_CLEAN_VERIFIED_SOURCE_KEYLINE_CONSTRAINED_BC3",
  "canonical_source_bbox":bbox,"prior_localized_bbox":[580,11,1524,116],
  "native_size":[w,h],"dds":"BC3/DXT5 mip1 mirror_y",
- "repair_seed_bright_count":int(bright.sum()),"authored_mask_sha256":SHA(maskfile.read_bytes()),"authored_white_seed_overlap":seed_overlap,"target_face_mask_pixels":int(face_mask.sum()),"white_pinhole_proposals":int(repair.sum()),
+ "reconstruction_method":"STRICT_NATIVE_BC3_SOURCE_KEYLINE_PRESERVING_ENDPOINT_OPTIMIZATION", "repair_seed_bright_count":int(bright.sum()),"authored_mask_sha256":SHA(maskfile.read_bytes()),"authored_white_seed_overlap":seed_overlap,"target_face_mask_pixels":int(face_mask.sum()),"white_pinhole_proposals":int(repair.sum()),
  "repaired_indices":repaired,"unsupported_gray_pinholes":unsupported,
  "white_face_pixels_recovered":improved,"BC3_blocks_modified":len(touched),
  "modified_blocks":touched[:250],"changed_rgba_pixels":changed,
  "changed_rgba_outside_source_bbox":outside,"changed_rgba_outside_target_bbox":outside_target,
  "alpha_exact":True,"header_exact":True,"persisted_DDS_roundtrip_exact":True,
- "producer_visual":"PENDING_CONTROLLER_NATIVE_AND_50_PERCENT",
+ "producer_visual":"PENDING_CONTROLLER_NATIVE_AND_50_PERCENT", "no_candidate_promotion": True, "source_outline_integrity":"PENDING_INDEPENDENT_VISUAL",
  "independent_C":"NOT_RUN","C3":"NOT_RUN","PRE_INGAME":"BLOCKED","RUNTIME_VALIDATION":"UNTESTED",
  "backend":"GITHUB_ACTIONS_PINNED_DDS_FALLBACK_UNAVAILABLE_GPT_LOCAL_RAW_GITHUB_DNS",
  "cleanup":"runner ephemeral, no N100 heavy work","prohibited_domains_touched":[]
 }
-(run/"B271_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B272_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"sha":SHA(new),"repaired":repaired,"white_recovered":improved,"blocks":len(touched),"outside":outside,"target_outside":outside_target},ensure_ascii=False))
