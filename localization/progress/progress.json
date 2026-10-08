@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T15:57:00+09:00",
+  "updated_at_kst": "2026-10-08T16:13:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6822,10 +6822,11 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "current_producer_rework_remaining": 2,
+  "current_producer_rework_remaining": 3,
   "current_producer_rework_assets": [
     214,
-    219
+    219,
+    175
   ],
   "c276_c1_igr006_007_runtime": {
     "run": "20261008-C276-C1-IGR006-007-RUNTIME",
@@ -6882,17 +6883,17 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "run": "20261008-A188-Q175-CHROME-FACE-RECOVERY",
+    "run": "20261008-A189-Q217-SOURCE-GOLD-ITALIC",
     "role": "A",
-    "queue_index": 175,
-    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
-    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
-    "prior_candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
-    "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
-    "worker_run_id": 37735449746,
+    "queue_index": 217,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "prior_candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "worker_run": 37741430790,
     "machine_result": "PASS",
-    "producer_visual_status": "SELF_QA_PASS_PENDING_C1_CHROME_FAMILY_AND_C3",
-    "qa": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_CONTROLLER_SELF_QA.json",
+    "producer_visual_status": "HOLD_SOURCE_HIERARCHY_PENDING_FRESH_C1",
+    "qa": "localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -7358,5 +7359,20 @@
     "worker_run": 37740304700,
     "prior_failed_worker": 37740076285,
     "runtime_validation": "UNTESTED"
+  },
+  "a189_q217_startgoal_source_gold_italic": {
+    "run": "20261008-A189-Q217-SOURCE-GOLD-ITALIC",
+    "role": "A",
+    "queue_index": 217,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "prior_candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "worker_run": 37741430790,
+    "machine_result": "PASS",
+    "producer_visual_status": "HOLD_SOURCE_HIERARCHY_PENDING_FRESH_C1",
+    "qa": "localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
