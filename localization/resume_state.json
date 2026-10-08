@@ -7,8 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Evidence gate remains active. Fresh C2 must independently revalidate A182 q154 4D38BBB0 dd4a3719... gray weight/counter-space, and fresh C1 must revalidate B249 q59 7CE1CFC5 4a657e39... zero-overflow repair; then exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
-    "A181R q219 D263B3F1 41cf4c15853e producer machine+controller visual PASS with exact Noto CJK Bold. 코스 선택 is 80.03% source width inside exact 1467x118 with positive margins; validated A113 clean/right-silver-techno family preserved. Next fresh C1 + exact-SHA C3 -> PRE_INGAME/user JPG -> NEW in-game retest. IGR-025 overall mapping HOLD remains for screenshot(163) unresolved labels. RUNTIME_VALIDATION=UNTESTED.",
+    "C271 q59 7CE1CFC5 exact B249 candidate 4a657e39... is REWORK_REQUIRED for source-style/hierarchy/effect fidelity despite zero decoded outside/alpha/visible overflow. Producer must preserve B249 boundary repair/A25 clean plate and rebuild the four labels; then future C1 must inspect pixels before producer verdict, followed by separate C3, PRE_INGAME/user JPG and NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
+    "A181R q219 D263B3F1 41cf4c15853e remains the next high-priority odd fresh-C candidate: producer machine/controller PASS at 80.03% source width. Fresh pixels-first C1 + separate C3 are required; IGR-025 overall mapping still HOLDs unresolved screenshot(163) labels. RUNTIME_VALIDATION=UNTESTED.",
     "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
     "C264 q172 6C9B3611 963445a4... returned REWORK_REQUIRED: START->출발 is 40.74% and GOAL->골 24.68% of source width. Material rework then fresh C2 + C3.",
     "Fresh-C/C3 q205 exact 7598af3375... then regenerate test package; NEW in-game retest screenshots 159-164. IGR-020..023 are GRAPHICS q205, IGR-024 is runtime ID935.",
@@ -10750,6 +10750,16 @@
     "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c271_c1_q059_evidence": {
+    "run": "20261008-C271-C1-Q059-EVIDENCE",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+    "status": "REWORK_REQUIRED_SOURCE_STYLE_HIERARCHY_EFFECT_FIDELITY",
+    "machine_scope": "PASS_ZERO_OUTSIDE_ALPHA_VISIBLE",
+    "c3": "BLOCKED",
+    "report": "localization/graphics/role_C/20261008-C271-C1-Q059-EVIDENCE/C271_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
   }
-
 }
