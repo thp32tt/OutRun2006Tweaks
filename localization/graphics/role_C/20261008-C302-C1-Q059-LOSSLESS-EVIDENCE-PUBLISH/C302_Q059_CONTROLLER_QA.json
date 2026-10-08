@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "role": "C1",
+  "review_id": "20261008-C302-C1-Q059-EVIDENCE-PUBLICATION",
+  "run_key": "OUTRUN-KOR-C302-C1-Q059-PUBLISH-LOSSLESS-EVIDENCE-20261008-2040",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "decision": "HOLD_STRICT_RECHECK",
+  "new_C_pass": false,
+  "new_C3_pass": false,
+  "pre_ingame_approved": false,
+  "actual_game_validation": "UNTESTED",
+  "review_motivation": "PJR-019 user JPG regression; C279 created lossless 4 region 44 PNG bundle but N100-only; publish without new DDS or duplicative quality pass",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "clean_plate_sha256": "f88967602d454b4345c02ac0ce6ca7bfadd009cce21a23b22895f70a28c39e8f",
+  "publication": {
+    "manifest": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/C302_Q059_LOSSLESS_MANIFEST.json",
+    "files": 44,
+    "bytes": 1666708,
+    "preflight_sha256_file_verification": "44/44 PASS; sizes 44/44 match C279 native machine manifest",
+    "mcp_binary_transfer": "N100 MCP read_binary_base64 -> GitHub native blob API encoding=base64, persisted same bytes; Git blobs linked in tree on commit",
+    "original_machine_report": "localization/graphics/role_C/20261008-C279-C1-Q059-NATIVE-PIXEL-CHECK/C279_Q059_NATIVE_MACHINE_EVIDENCE.json"
+  },
+  "pixel_review": {
+    "source_clean_final_c279_reused": true,
+    "FLIPY_native": "C279 source-native/clean-native/final-native lossless visually inspected; source-like white/orange/yellow and yellow/navy title family visible",
+    "RAW": "mirror-Y source and final reviewed; hidden source RGB behind alpha0 requires composite to prevent false residue report",
+    "backgrounds": "gray and black final composites inspected for all four regions; no distinct surviving visible English residue in these composites",
+    "practical": "next_mission final practical_50 inspected; legible at displayed comparison, exact game scale remains unknown",
+    "source_family_slant": "UNRESOLVED; per-glyph top-vs-bottom slant anchors not independently measured",
+    "coverage": "4/4 regions have 11 lossless variants each, C279 source/candidate/clean fixed SHA; segment inventory+calibration still missing"
+  },
+  "region_findings": {
+    "next_mission": {
+      "slant": "UNRESOLVED_ANCHOR_MEASUREMENT",
+      "clean_plate": "C279 machine scope 0 outside; old CLEAN visual evidence reused but new approval not proven",
+      "style": "NO_NEW_FAIL_PROVEN; formal family reference outstanding",
+      "readability": "NO_NEW_FAIL_PROVEN; practical lossless images posted; user JPG PJR-019 still OPEN",
+      "glyph_integrity": "NO_NEW_FAIL_PROVEN from composite; independent full gate not complete",
+      "protected_art": "C279 machine scope 0 outside; in-game mask/context not certified",
+      "placement": "NO_NEW_FAIL_PROVEN; source bbox numerical scope 0 from C279",
+      "orientation": "RAW+FLIPY image files posted; no current game verification"
+    },
+    "race_rivals": {
+      "slant": "UNRESOLVED_ANCHOR_MEASUREMENT",
+      "clean_plate": "C279 machine scope 0 outside; old CLEAN visual evidence reused but new approval not proven",
+      "style": "NO_NEW_FAIL_PROVEN; formal family reference outstanding",
+      "readability": "NO_NEW_FAIL_PROVEN; practical lossless images posted; user JPG PJR-019 still OPEN",
+      "glyph_integrity": "NO_NEW_FAIL_PROVEN from composite; independent full gate not complete",
+      "protected_art": "C279 machine scope 0 outside; in-game mask/context not certified",
+      "placement": "NO_NEW_FAIL_PROVEN; source bbox numerical scope 0 from C279",
+      "orientation": "RAW+FLIPY image files posted; no current game verification"
+    },
+    "drift_score": {
+      "slant": "UNRESOLVED_ANCHOR_MEASUREMENT",
+      "clean_plate": "C279 machine scope 0 outside; old CLEAN visual evidence reused but new approval not proven",
+      "style": "NO_NEW_FAIL_PROVEN; formal family reference outstanding",
+      "readability": "NO_NEW_FAIL_PROVEN; practical lossless images posted; user JPG PJR-019 still OPEN",
+      "glyph_integrity": "NO_NEW_FAIL_PROVEN from composite; independent full gate not complete",
+      "protected_art": "C279 machine scope 0 outside; in-game mask/context not certified",
+      "placement": "NO_NEW_FAIL_PROVEN; source bbox numerical scope 0 from C279",
+      "orientation": "RAW+FLIPY image files posted; no current game verification"
+    },
+    "slipstream_score": {
+      "slant": "UNRESOLVED_ANCHOR_MEASUREMENT",
+      "clean_plate": "C279 machine scope 0 outside; old CLEAN visual evidence reused but new approval not proven",
+      "style": "NO_NEW_FAIL_PROVEN; formal family reference outstanding",
+      "readability": "NO_NEW_FAIL_PROVEN; practical lossless images posted; user JPG PJR-019 still OPEN",
+      "glyph_integrity": "NO_NEW_FAIL_PROVEN from composite; independent full gate not complete",
+      "protected_art": "C279 machine scope 0 outside; in-game mask/context not certified",
+      "placement": "NO_NEW_FAIL_PROVEN; source bbox numerical scope 0 from C279",
+      "orientation": "RAW+FLIPY image files posted; no current game verification"
+    }
+  },
+  "not_claimed": [
+    "New pixel-derived QA (C279 existing)",
+    "Blind first look calibration; reviewer already saw producer notes",
+    "Fully qualified 8-element C/C3 PASS",
+    "Fresh user screenshot or actual game run",
+    "APPROVALS/q059.json"
+  ],
+  "unresolved": [
+    "formal calibrated control set",
+    "blind pixels-before-producer policy",
+    "source slant anchor measurements and matched family profile",
+    "current-policy segment inventory and separate C3 reviewer findings",
+    "full exact-grade approval validator",
+    "user JPG acceptance and actual game retest"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

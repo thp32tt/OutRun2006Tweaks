@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C302-C1-Q059-PUBLISH-LOSSLESS-EVIDENCE-20261008-2040",
+  "previous_generation": "20261008-C279-C1-Q059-NATIVE-LOSSLESS",
+  "new_publication": "20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH",
+  "temp_backlog_relief": "C1",
+  "shard": "ODD(+UNINDEXED_SPECIAL)",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "clean_plate_sha256": "f88967602d454b4345c02ac0ce6ca7bfadd009cce21a23b22895f70a28c39e8f",
+  "preserved_existing_DDS": true,
+  "dds_format": "DXT5",
+  "dds_size": [
+    2048,
+    512
+  ],
+  "raw_orientation": "mirror_y",
+  "calibration": "NOT_DONE",
+  "evidence_kind": "ALREADY_GENERATED_C279_FILES_NOW_GITHUB_PERSISTED_NOT_NEW_GLYPH_QA",
+  "machine_scope_summary": {
+    "source_vs_candidate_changed_outside": 0,
+    "source_vs_candidate_alpha_outside": 0,
+    "source_vs_clean_changed_outside": 0,
+    "source_vs_clean_alpha_outside": 0
+  },
+  "regions": [
+    {
+      "id": "next_mission",
+      "source_reference_bbox": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "raw_bbox": [
+        8,
+        12,
+        1293,
+        159
+      ],
+      "source_vs_final_changed_rgba_px": 169398,
+      "source_vs_final_alpha_changed_px": 140775
+    },
+    {
+      "id": "race_rivals",
+      "source_reference_bbox": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "raw_bbox": [
+        75,
+        208,
+        625,
+        290
+      ],
+      "source_vs_final_changed_rgba_px": 39901,
+      "source_vs_final_alpha_changed_px": 24167
+    },
+    {
+      "id": "drift_score",
+      "source_reference_bbox": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "raw_bbox": [
+        119,
+        375,
+        609,
+        459
+      ],
+      "source_vs_final_changed_rgba_px": 35326,
+      "source_vs_final_alpha_changed_px": 16776
+    },
+    {
+      "id": "slipstream_score",
+      "source_reference_bbox": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "raw_bbox": [
+        717,
+        192,
+        1408,
+        287
+      ],
+      "source_vs_final_changed_rgba_px": 47819,
+      "source_vs_final_alpha_changed_px": 25887
+    }
+  ],
+  "files": [
+    {
+      "file": "next_mission__source_native.png",
+      "sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815",
+      "bytes": 138932,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png",
+      "github_blob_sha": "7af0ad160c8eabd370bc0b4a24b0adfadc18d73c"
+    },
+    {
+      "file": "next_mission__clean_native.png",
+      "sha256": "6e013c10f871ed1ac4cafe346184418a4eb8ff00841657a725cd13eb2b432bec",
+      "bytes": 106930,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__clean_native.png",
+      "github_blob_sha": "cf0f6cf8c465d34132c1eba5f497cad9af04c07c"
+    },
+    {
+      "file": "next_mission__final_native.png",
+      "sha256": "37535572fe6f44d73185b98981d909ce61103b3faedc0a57542378380511c0a4",
+      "bytes": 112811,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__final_native.png",
+      "github_blob_sha": "635add9abbcac0d81fa83e9834ef6f7e7f593851"
+    },
+    {
+      "file": "next_mission__source_raw.png",
+      "sha256": "c6d0bd2d90a6d21089ce361fe50c8a4a86cc97d0ac468181f1e3ca85c84c84c6",
+      "bytes": 154182,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_raw.png",
+      "github_blob_sha": "ab29cf4fcb98a2252ad7a814f77200e7899faeb4"
+    },
+    {
+      "file": "next_mission__final_raw.png",
+      "sha256": "0b76d783f37b7f165166c83908f4c7e467bec3c5e256a9371e23bb68bc61a01a",
+      "bytes": 119161,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__final_raw.png",
+      "github_blob_sha": "7efadc61bb1851545c2d1c7fd51b7f012eeed747"
+    },
+    {
+      "file": "next_mission__practical_75.png",
+      "sha256": "6396bfd4bb044ec5a407a6b3b3ef41f250d4f81921b8c7480073c956eaf8f205",
+      "bytes": 52555,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__practical_75.png",
+      "github_blob_sha": "028abc943344ef540262ad9677668803b8ae1b77"
+    },
+    {
+      "file": "next_mission__practical_50.png",
+      "sha256": "73ec1c160a30d1da5b61594e79c4c8c4706f336508ffbca2a47faa88f3133817",
+      "bytes": 28917,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__practical_50.png",
+      "github_blob_sha": "7828a331204d446ab5fc74c07d4bf5b20b09c58a"
+    },
+    {
+      "file": "next_mission__zoom_2x.png",
+      "sha256": "451a7d0e0e861bd4a555b86be621d6e9276a06ec911bdb2061803a6aa1d82b1f",
+      "bytes": 138306,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__zoom_2x.png",
+      "github_blob_sha": "731ca5b1fdaad20021ed82a81a8c9482f29c54bc"
+    },
+    {
+      "file": "next_mission__on_black.png",
+      "sha256": "34983c6f3608b0ee421c8383ceb847ac98d7ff5584320b827ce7d6109e5a79b9",
+      "bytes": 31470,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_black.png",
+      "github_blob_sha": "159c9b6833c51728b38413522d57e378ea806bc7"
+    },
+    {
+      "file": "next_mission__on_white.png",
+      "sha256": "95c1559c1114576d0780cde799361c0b23f379b35924c83fc5197f1306172f7d",
+      "bytes": 33510,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_white.png",
+      "github_blob_sha": "14208d729831d9e0e6d862aa9269932c54f07e18"
+    },
+    {
+      "file": "next_mission__on_gray.png",
+      "sha256": "7ebb8c32ff807e4eb848a4abcc56c98c04197e9ed6db7714b4c502ccdbeaf257",
+      "bytes": 32414,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_gray.png",
+      "github_blob_sha": "dea8cb38921853677e5757a4efdb6c6609aba5fd"
+    },
+    {
+      "file": "race_rivals__source_native.png",
+      "sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6",
+      "bytes": 20653,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png",
+      "github_blob_sha": "59fc0f947fbbd900c06561dfc98119ce308fff6c"
+    },
+    {
+      "file": "race_rivals__clean_native.png",
+      "sha256": "c3d32a81fc0f420382b871a176819900f21e15000b0d9da0dcd8a8c55ac3b7f8",
+      "bytes": 13597,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__clean_native.png",
+      "github_blob_sha": "c770bdbc77f2bc449925c958e5d1cf5be4b9741d"
+    },
+    {
+      "file": "race_rivals__final_native.png",
+      "sha256": "5c383096a27da32edcb5bbe624029afc10f25ebd31ade92978fed4c765c7052c",
+      "bytes": 24373,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__final_native.png",
+      "github_blob_sha": "d1e511e727ca590d2c522393e78951dd7bc98fca"
+    },
+    {
+      "file": "race_rivals__source_raw.png",
+      "sha256": "869db31029029db992fc9cc096808c772d62eef46e7314bce35fae2aaf8527bc",
+      "bytes": 20619,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_raw.png",
+      "github_blob_sha": "5a70cd7a34a064618dd4388d54860762aea7e1b6"
+    },
+    {
+      "file": "race_rivals__final_raw.png",
+      "sha256": "da1c9d95447e250bf16430ab885328d7a7daf575c4041283c35eef6d1c0fcea0",
+      "bytes": 23456,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__final_raw.png",
+      "github_blob_sha": "aed46a3fb07920da9857a8ba4ad5562f8663c8e8"
+    },
+    {
+      "file": "race_rivals__practical_75.png",
+      "sha256": "a3dae06c6f842252fc6330bb9225e260bce873e7e0620b5bca98edc3b018c8f2",
+      "bytes": 32971,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__practical_75.png",
+      "github_blob_sha": "f32ce1eb10d72ae74c8b72a1ccf951f0890c8a5d"
+    },
+    {
+      "file": "race_rivals__practical_50.png",
+      "sha256": "5b8db94170d35061216394d72d5d51222ee27e0a933a1e03c51fedbf1f59465b",
+      "bytes": 15889,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__practical_50.png",
+      "github_blob_sha": "87ab000f34abbcfb5396e28612caccaa10bf3764"
+    },
+    {
+      "file": "race_rivals__zoom_2x.png",
+      "sha256": "4350461974a2ec5961fbdc14ac7b30750dca909bc575ca4dd4b66d6f987e6098",
+      "bytes": 30538,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__zoom_2x.png",
+      "github_blob_sha": "e289a8db7b60726a3be3c06bdae87d4dddb90d0a"
+    },
+    {
+      "file": "race_rivals__on_black.png",
+      "sha256": "1c78773b1581ad864a06e8a8ad3de228fcc0fdf78a02be2ce213ab5b129e2cdd",
+      "bytes": 18966,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_black.png",
+      "github_blob_sha": "3395ed5710ced0b1b0b30de14df6bcedc74a32c7"
+    },
+    {
+      "file": "race_rivals__on_white.png",
+      "sha256": "1c6786833d2d8bb7da73ceb555e68992c92306e99121467c6a4dfc40f8c807b1",
+      "bytes": 14522,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_white.png",
+      "github_blob_sha": "499b391a6800a1d3c0453baf18ee64ae5d167b8a"
+    },
+    {
+      "file": "race_rivals__on_gray.png",
+      "sha256": "6da591659f540c4a13d08357b151b1c0dba1a782dae3cdd01a5b0f271c0a4f87",
+      "bytes": 18880,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_gray.png",
+      "github_blob_sha": "d58e22d908c6a8178c6a8057eb70c5644a2484d0"
+    },
+    {
+      "file": "drift_score__source_native.png",
+      "sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5",
+      "bytes": 21291,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png",
+      "github_blob_sha": "42b0b6304ded7c2b12133995311213bcecf9808a"
+    },
+    {
+      "file": "drift_score__clean_native.png",
+      "sha256": "392716079569802749f7bf0fe5a0bbff329f4aaf424514da5d0949424186e84c",
+      "bytes": 13675,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__clean_native.png",
+      "github_blob_sha": "62a76004e585249995282773b53ca7066701cba7"
+    },
+    {
+      "file": "drift_score__final_native.png",
+      "sha256": "b8086e70d8fffa99dad00f13bf4381ec8870bdddec4cce5559c575eeb2d510bc",
+      "bytes": 18450,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__final_native.png",
+      "github_blob_sha": "4b303b79b486e38c67b7299ccb492301cc0e8915"
+    },
+    {
+      "file": "drift_score__source_raw.png",
+      "sha256": "ce99c203cc8536b36d06c4a85ed69481694bfdd49cad0c25d97a11a2b662939b",
+      "bytes": 21188,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_raw.png",
+      "github_blob_sha": "09b77b44d8d8bb63f600feff3929e811a6f81896"
+    },
+    {
+      "file": "drift_score__final_raw.png",
+      "sha256": "93f3c2c84177f13c218adcf4e0de529c3ce1e1be68c2617375b81bb9efc96694",
+      "bytes": 17799,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__final_raw.png",
+      "github_blob_sha": "da1cfa870f93bf2d948cc2e9cda345d91cd9d09d"
+    },
+    {
+      "file": "drift_score__practical_75.png",
+      "sha256": "4b1d59f75f04e1a9d1d4c1de26cb12f54250a2f742b62aad4f1a22253cd3f067",
+      "bytes": 30559,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__practical_75.png",
+      "github_blob_sha": "ac048d3a63df97ea723b9e081e5a5e4579ab1ade"
+    },
+    {
+      "file": "drift_score__practical_50.png",
+      "sha256": "2d0ba3ad7c5b355b2bf82b93649e629fbb692a9e136a79465580e6f21fd666e7",
+      "bytes": 15404,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__practical_50.png",
+      "github_blob_sha": "02e49e89bf469dcd936c4e8b6216c71afa3cf7b4"
+    },
+    {
+      "file": "drift_score__zoom_2x.png",
+      "sha256": "c17b236bc23b18b00aa22f0fa060f350ed8024f175cd3158167da5203f0ad6f8",
+      "bytes": 22604,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__zoom_2x.png",
+      "github_blob_sha": "2928baf4779f55149334fe5174880a6bc3b71e7a"
+    },
+    {
+      "file": "drift_score__on_black.png",
+      "sha256": "c9662fbfb40b10704412f16c196b79be4e25d0b22f2666f5c4896031ea808d8a",
+      "bytes": 17101,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_black.png",
+      "github_blob_sha": "4ed435241743f59cd6fcdef5859f0251a6dd2376"
+    },
+    {
+      "file": "drift_score__on_white.png",
+      "sha256": "ce6988b9061f7061612f176231a1a318b6254d3360999a0ecfa5792c043eb4af",
+      "bytes": 12837,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_white.png",
+      "github_blob_sha": "f38e8d3e271e0ed92521959b8c2c9c4092357161"
+    },
+    {
+      "file": "drift_score__on_gray.png",
+      "sha256": "cb3ce81175780957c046bbe531e83f3ac3099c5b996a9d6524250c3ab769ea6f",
+      "bytes": 16914,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_gray.png",
+      "github_blob_sha": "bde0cae6cae52035cd5f0d8f1b555808d5780199"
+    },
+    {
+      "file": "slipstream_score__source_native.png",
+      "sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292",
+      "bytes": 27424,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png",
+      "github_blob_sha": "4bc0898e6488a30b15d9276ecaafa98f774e5de7"
+    },
+    {
+      "file": "slipstream_score__clean_native.png",
+      "sha256": "748f278db378335a5e8d30d7ceeee151f34993c684c1c2ac47b67cc41383ab49",
+      "bytes": 18192,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__clean_native.png",
+      "github_blob_sha": "47548b5b45de866541c2b1106bdbb95d640b2aae"
+    },
+    {
+      "file": "slipstream_score__final_native.png",
+      "sha256": "1d0e4302eb826283e3ca5b665aecbe3c3d5d61c5a908396a472fc3a57f0c528f",
+      "bytes": 27184,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__final_native.png",
+      "github_blob_sha": "ff5978e8df5b030e28811646bcd7ddbcfb065765"
+    },
+    {
+      "file": "slipstream_score__source_raw.png",
+      "sha256": "70be6cb862e2e926fe52a0636658d2b34bc441fabbce1bb7096fce879be75602",
+      "bytes": 27714,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_raw.png",
+      "github_blob_sha": "a9a989aa5d8daf8d154908fc1eb1c854422868f2"
+    },
+    {
+      "file": "slipstream_score__final_raw.png",
+      "sha256": "1e75ed3e61be646e35f7ab21fded2d834b6cb277d57edccefb9dafe43c22afaf",
+      "bytes": 26578,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__final_raw.png",
+      "github_blob_sha": "22ab9b6b2bd9b649f2c811560e291b2b911629ea"
+    },
+    {
+      "file": "slipstream_score__practical_75.png",
+      "sha256": "ca30c4eb74cbd529e17a51be958471e4184112bf74a8f19f27a7a55c1335b1f6",
+      "bytes": 35790,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__practical_75.png",
+      "github_blob_sha": "2682d74ecb209635fa35cd40046eb57495179287"
+    },
+    {
+      "file": "slipstream_score__practical_50.png",
+      "sha256": "1c875b33e1eab56d93ac24760a81651e279017757ff33d35702a02f1f7d2904c",
+      "bytes": 19645,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__practical_50.png",
+      "github_blob_sha": "12bf55cfa02a35ab6f7f5af439e215f9186d3b8b"
+    },
+    {
+      "file": "slipstream_score__zoom_2x.png",
+      "sha256": "753f42990da950abb3c2845f60c5c0a50d21071ca1f83f1d42388c3f767304c3",
+      "bytes": 34516,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__zoom_2x.png",
+      "github_blob_sha": "2fd8c26fa254b634083b4d289fc7672008e53389"
+    },
+    {
+      "file": "slipstream_score__on_black.png",
+      "sha256": "f1d23e386ac996f93fc60b507bf4cd27a948c6a2aae092094105ac80272c8542",
+      "bytes": 20964,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_black.png",
+      "github_blob_sha": "a02259f2bd5ac8557a032ceb3dc82be2bf8353b4"
+    },
+    {
+      "file": "slipstream_score__on_white.png",
+      "sha256": "2e88d4e402355d083c816a02f670ff7a73747827ec2cba6fc6fe0ba7bf38f8ce",
+      "bytes": 16319,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_white.png",
+      "github_blob_sha": "95b35bed88289604cecdcc48f28616c5f9efe284"
+    },
+    {
+      "file": "slipstream_score__on_gray.png",
+      "sha256": "ff884e3cf2abcf4f822f144cc4dca262879c00869612fc0a1e4035442083de60",
+      "bytes": 20908,
+      "repository_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_gray.png",
+      "github_blob_sha": "bac59ed077d57317b7be1f339fb8083134de4f4f"
+    }
+  ]
+}

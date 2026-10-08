@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 21:07 KST",
+  "updated_at_kst": "2026-10-08 21:10 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7781,5 +7781,32 @@
     "new_dds": 0,
     "report": "localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json",
     "execution_backend": "GitHub SSOT + ChatGPT-local JavaScript targeted RAW DDS pixels, N100 fallback only hashed DDS transfer and short triage due local raw GitHub DNS failure"
+  },
+  "c303_c1_q231_q059_evidence": {
+    "run_key": "OUTRUN-KOR-C303-C1-Q231-AND-C302-Q059-EVIDENCE-20261008-2110",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "reviewed": [
+      231,
+      59
+    ],
+    "q231": {
+      "status": "HOLD_STRICT_RECHECK",
+      "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+      "report": "localization/graphics/role_C/20261008-C303-C1-Q231-A194-FLAT-FAMILY-INDEPENDENT/C303_Q231_CONTROLLER_QA.json"
+    },
+    "q59": {
+      "status": "HOLD_STRICT_RECHECK",
+      "new_persisted_evidence_images": 44,
+      "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+      "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+      "manifest": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/C302_Q059_LOSSLESS_MANIFEST.json",
+      "review": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/C302_Q059_CONTROLLER_QA.json"
+    },
+    "new_dds": 0,
+    "new_C_pass": 0,
+    "new_C3_pass": 0,
+    "new_approval": 0,
+    "runtime_validation": "UNTESTED"
   }
 }

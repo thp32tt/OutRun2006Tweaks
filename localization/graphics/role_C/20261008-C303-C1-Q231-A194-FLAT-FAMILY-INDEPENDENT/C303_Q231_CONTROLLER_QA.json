@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "review_id": "C303-C1-Q231-A194-20261008-2110",
+  "run_key": "OUTRUN-KOR-C303-C1-Q231-AND-C302-Q059-EVIDENCE-20261008-2110",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 231,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+  "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+  "prior_rejected_candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+  "pinned_canonical_source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+  "producer_A194_report": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json",
+  "original_source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "run_backend": "GitHub state/SSOT, ChatGPT local attempted raw.githubusercontent.com DNS but failed, N100 MCP fallback limited 4 comparison JPGs and 8MiB exact current candidate download, no heavy image compute",
+  "persisted_candidate_sha_verified": true,
+  "source_sha_independently_rechecked": false,
+  "visual_first_look_before_producer_prose": false,
+  "triage_readonly": "FRESH_C_REVIEW",
+  "visual_known_defect_retest": {
+    "prior_fail": "C1 2026-10-08 q231 A93 doubled-offset dark gray help and red ONLINE beveled offset",
+    "new_candidate": "A194 source-family flat face replaces invented underlay; comparing source/clean/final, readable/RAW, and practical_50 old visual defect is not apparent",
+    "outcome": "VISUAL_REGRESSION_APPEARS_CORRECTED_NOT_AN_APPROVAL"
+  },
+  "region_observations": {
+    "help_online": {
+      "source_style": "dark gray tall sentence",
+      "slant": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Source and Korean look upright in displayed readable view; native top-minus-bottom glyph anchors not independently measured"
+      },
+      "clean_plate": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Producer CLEAN image referenced, visibly flat transparent cell in contact; not a new independently certified source-to-clean pixel comparison"
+      },
+      "style": {
+        "decision": "VISUALLY_CORRECTED",
+        "observation": "SOURCE has dark, condensed, upright 1-stroke lettering; Korean now heavy upright charcoal with no visible doubled edge; target text native source-bbox positive-margin from A194, not independently recalculated"
+      },
+      "readability": {
+        "decision": "VISUALLY_READABLE_AT_50_PERCENT",
+        "observation": "Korean is legible in producer practical 50% view; not actual game-scale validation"
+      },
+      "glyph_integrity": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "No visibly clipped Hangul in current JPG; no new native pixel clipping proof"
+      },
+      "protected_art": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "The unmodified LAN large and small rows visible in readable and RAW views; producer pixel-exact not independently repeated"
+      },
+      "placement": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "Four Korean target regions remain in their original UI rows; exact mask stats are historical producer results"
+      },
+      "orientation": {
+        "decision": "INSPECTED_READABLE_AND_RAW",
+        "observation": "RAW mirror-Y output looks correctly inverse to readable labels; no game runtime validation"
+      }
+    },
+    "help_lan": {
+      "source_style": "dark gray LAN help",
+      "slant": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Source and Korean look upright in displayed readable view; native top-minus-bottom glyph anchors not independently measured"
+      },
+      "clean_plate": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Producer CLEAN image referenced, visibly flat transparent cell in contact; not a new independently certified source-to-clean pixel comparison"
+      },
+      "style": {
+        "decision": "VISUALLY_CORRECTED",
+        "observation": "New Korean visually retains dark charcoal, flat and upright; protected source LAN labels remain visible in full atlas and RAW"
+      },
+      "readability": {
+        "decision": "VISUALLY_READABLE_AT_50_PERCENT",
+        "observation": "Korean is legible in producer practical 50% view; not actual game-scale validation"
+      },
+      "glyph_integrity": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "No visibly clipped Hangul in current JPG; no new native pixel clipping proof"
+      },
+      "protected_art": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "The unmodified LAN large and small rows visible in readable and RAW views; producer pixel-exact not independently repeated"
+      },
+      "placement": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "Four Korean target regions remain in their original UI rows; exact mask stats are historical producer results"
+      },
+      "orientation": {
+        "decision": "INSPECTED_READABLE_AND_RAW",
+        "observation": "RAW mirror-Y output looks correctly inverse to readable labels; no game runtime validation"
+      }
+    },
+    "online_big": {
+      "source_style": "flat solid red title",
+      "slant": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Source and Korean look upright in displayed readable view; native top-minus-bottom glyph anchors not independently measured"
+      },
+      "clean_plate": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Producer CLEAN image referenced, visibly flat transparent cell in contact; not a new independently certified source-to-clean pixel comparison"
+      },
+      "style": {
+        "decision": "VISUALLY_CORRECTED",
+        "observation": "Old A93 offset edge absent in new solid-flat red 온라인; English original ONLINE flat red and longer width, new naturally shorter Korean, not an objective failure from width alone"
+      },
+      "readability": {
+        "decision": "VISUALLY_READABLE_AT_50_PERCENT",
+        "observation": "Korean is legible in producer practical 50% view; not actual game-scale validation"
+      },
+      "glyph_integrity": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "No visibly clipped Hangul in current JPG; no new native pixel clipping proof"
+      },
+      "protected_art": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "The unmodified LAN large and small rows visible in readable and RAW views; producer pixel-exact not independently repeated"
+      },
+      "placement": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "Four Korean target regions remain in their original UI rows; exact mask stats are historical producer results"
+      },
+      "orientation": {
+        "decision": "INSPECTED_READABLE_AND_RAW",
+        "observation": "RAW mirror-Y output looks correctly inverse to readable labels; no game runtime validation"
+      }
+    },
+    "online_small": {
+      "source_style": "small charcoal label",
+      "slant": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Source and Korean look upright in displayed readable view; native top-minus-bottom glyph anchors not independently measured"
+      },
+      "clean_plate": {
+        "decision": "INSPECTION_ONLY",
+        "observation": "Producer CLEAN image referenced, visibly flat transparent cell in contact; not a new independently certified source-to-clean pixel comparison"
+      },
+      "style": {
+        "decision": "VISUALLY_CORRECTED",
+        "observation": "English ONLINE and Korean 온라인 appear flat dark-gray, no apparent doubled shadow at practical 50%; width shorter but legible"
+      },
+      "readability": {
+        "decision": "VISUALLY_READABLE_AT_50_PERCENT",
+        "observation": "Korean is legible in producer practical 50% view; not actual game-scale validation"
+      },
+      "glyph_integrity": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "No visibly clipped Hangul in current JPG; no new native pixel clipping proof"
+      },
+      "protected_art": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "The unmodified LAN large and small rows visible in readable and RAW views; producer pixel-exact not independently repeated"
+      },
+      "placement": {
+        "decision": "NO_OBVIOUS_NEW_DEFECT",
+        "observation": "Four Korean target regions remain in their original UI rows; exact mask stats are historical producer results"
+      },
+      "orientation": {
+        "decision": "INSPECTED_READABLE_AND_RAW",
+        "observation": "RAW mirror-Y output looks correctly inverse to readable labels; no game runtime validation"
+      }
+    }
+  },
+  "evidence": {
+    "source_clean_final_comparison": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "readable_source_final": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_READABLE_SOURCE_FINAL.jpg",
+    "raw_source_final": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_RAW_SOURCE_FINAL.jpg",
+    "practical_50": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PRACTICAL_50.jpg",
+    "new_exact_sha_input": "Current branch persisted DDS verified SHA256 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76"
+  },
+  "not_claimed": [
+    "new calibrated known-defect 5-control PASS",
+    "pixels-before-producer-verdict true",
+    "new independent persisted DDS decoded pixel/alpha scope count",
+    "independently revalidated canonical English DDS SHA",
+    "all lossless per-region practical/background bound PNG evidence",
+    "separate per-region C3 strict review or APPPROVAL record"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C_PASSED": false,
+  "C3_PASSED": false,
+  "PRE_INGAME": "BLOCKED",
+  "user_jpg_accepted": false,
+  "actual_game_retest": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "producer_action": "Do not rerender same corrected SHA absent demonstrated defect. C1 must run calibration, exact source+candidate independent decoded pixel and per-glyph slant profile, lossless current evidence, distinct C3 before approval."
+}
