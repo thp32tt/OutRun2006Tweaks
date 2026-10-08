@@ -1,0 +1,109 @@
+{
+  "run": "B279",
+  "role": "B",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "source_provenance": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "previous_candidate_sha256": "1d63cd9b50422375bd0693b40302c01702f193a91dc19af1517eb3476fa20ceb",
+  "new_candidate_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "native": "2048x128 BC3 DXT5 mip1 MIRROR_Y",
+  "english": "Challenge the course record.",
+  "korean": "코스 기록에 도전하세요.",
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "korean_bbox": [
+    580,
+    11,
+    1524,
+    116
+  ],
+  "deltas": {
+    "left": 149,
+    "right": 150,
+    "top": 5,
+    "bottom": 7
+  },
+  "original_wh": [
+    1243,
+    117
+  ],
+  "korean_wh": [
+    944,
+    105
+  ],
+  "candidate_sha_bound_source": true,
+  "profile": {
+    "source_face_rgb": [
+      255,
+      255,
+      255
+    ],
+    "source_navy_rgb": [
+      0,
+      12,
+      57
+    ],
+    "source_white_to_navy_ratio": 0.38253219227385427,
+    "white_face_decoded_coverage": 1,
+    "source_derived_navy_ring_inside_px": 6,
+    "changed_BC3_blocks": 3180
+  },
+  "producer_sequence": {
+    "exact_source": "PASS",
+    "segment_protected_masks": "PASS",
+    "clean_plate_construction": "PASS",
+    "plate_only_source_clean": "PASS",
+    "source_family_measurement": "PASS",
+    "korean_native_glyphs": "PASS",
+    "glyph_only_composite": "PASS",
+    "composite_only": "PASS",
+    "persisted_decoded_native_raw_and_practical": "PASS",
+    "independent_c_and_user": "PENDING"
+  },
+  "eight_ordered_visual": {
+    "english_removed": "PASS",
+    "source_slant_direction": "PASS",
+    "not_undersized": "PASS",
+    "source_weight_outline": "PASS_NATIVE_VISUAL_SOURCE_RELATIVE",
+    "glyph_clipping": "PASS",
+    "protected_art_isolation": "PASS",
+    "raw_and_flip_y": "PASS",
+    "immediate_readability": "PASS_NATIVE_AND_50_PERCENT"
+  },
+  "machine": {
+    "outside_source_rgba": 0,
+    "outside_target_rgba": 0,
+    "source_glyph_residual_in_clean_alpha": 0,
+    "alpha_exact": true,
+    "dds_header_exact": true,
+    "roundtrip_exact": true,
+    "changed_visible_pixels": 20035,
+    "authored_mips": 1
+  },
+  "producer_visual": "PASS_PENDING_INDEPENDENT_C2",
+  "evidence": [
+    "B279_MACHINE_QA.json",
+    "READABLE_GRAY_100_SOURCE_CLEAN_OLD_B279.png",
+    "READABLE_GRAY_50_SOURCE_CLEAN_OLD_B279.png",
+    "RAW_BLACK_75_SOURCE_CLEAN_OLD_B279.png",
+    "B279_PERSISTED_DECODE_READABLE.png",
+    "B279_PERSISTED_DECODE_RAW.png"
+  ],
+  "past_failures": "B272/273 stippled/outline; B274 int16-overflow false navy, B275 target-block spill, B276 incorrect RGB 16-bit metric, B277 thin/absent source-keyline, B278 insufficient source-keyline weight. B279 source-conditioned palette 32-bit metric and native 6px navy ring materially reconstructs face.",
+  "status": "B279_PRODUCER_SELF_QA_PASS_PENDING_FRESH_C2_AND_C3",
+  "fresh_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVALS": "NOT_APPROVED",
+  "PRE_INGAME": "BLOCKED_CURRENT_POLICY",
+  "user_review": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_DNS_DEPENDENCY_WITH_CHATGPT_CONTROLLER_SOURCE_CLEAN_FINAL_VISUAL",
+  "N100_heavy_compute": false,
+  "cleanup": "GitHub worker ephemeral; no N100 scratch created",
+  "forbidden_domains_touched": []
+}
