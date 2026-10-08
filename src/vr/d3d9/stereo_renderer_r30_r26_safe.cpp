@@ -75,6 +75,82 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // GOAL/TIMEUP occurs BEFORE the correctly mono 2D restart menu.
+        // The white/translucent finish-time glyph could be VS/c64, XYZRHW
+        // or indexed fixed-function FVF 0x142, like historical rank 4/5.
+        // Keep a bounded first-per-producer/state/route trace so source logs
+        // distinguish the *actual* route without inferring scope from alpha.
+        // This is diagnostic-only and never changes stereo ownership.
+        void R30TracePreRestartHudDrawForm(
+            IDirect3DDevice9* device, unsigned route) noexcept
+        {
+            if (!Settings::VRTelemetry || !device ||
+                !Game::current_mode ||
+                !OutRunVR::GameSemantic::QueueRenderActive() ||
+                route >= 3u)
+                return;
+
+            const auto phase = *Game::current_mode;
+            unsigned phaseIndex = 0;
+            if (phase == GameState::STATE_GOAL)
+                phaseIndex = 0;
+            else if (phase == GameState::STATE_TIMEUP)
+                phaseIndex = 1;
+            else if (phase == GameState::STATE_LINK_TIMEUP)
+                phaseIndex = 2;
+            else
+                return;
+
+            const auto producer =
+                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const unsigned producerIndex = static_cast<unsigned>(producer);
+            if (producerIndex >= 32u)
+                return;
+
+            static std::atomic<std::uint32_t> logged[9]{};
+            const unsigned slot = route * 3u + phaseIndex;
+            const std::uint32_t bit = 1u << producerIndex;
+            if ((logged[slot].fetch_or(
+                    bit, std::memory_order_relaxed) & bit) != 0u)
+                return;
+
+            DWORD fvf = 0xFFFFFFFFu;
+            DWORD blendEnabled = 0xFFFFFFFFu;
+            DWORD srcBlend = 0xFFFFFFFFu;
+            DWORD dstBlend = 0xFFFFFFFFu;
+            if (FAILED(device->GetFVF(&fvf)))
+                fvf = 0xFFFFFFFFu;
+            if (FAILED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &blendEnabled)))
+                blendEnabled = 0xFFFFFFFFu;
+            if (FAILED(device->GetRenderState(
+                    D3DRS_SRCBLEND, &srcBlend)))
+                srcBlend = 0xFFFFFFFFu;
+            if (FAILED(device->GetRenderState(
+                    D3DRS_DESTBLEND, &dstBlend)))
+                dstBlend = 0xFFFFFFFFu;
+
+            constexpr const char* routeNames[3] = {
+                "SHADER_C64_CANDIDATE",
+                "XYZRHW_CANDIDATE",
+                "D3DX_XYZ_FVF142_CANDIDATE"
+            };
+            spdlog::info(
+                "VR P0 PRE_RESTART_HUD_FORM: route={} state={} mode={} producer={} scope={} fvf=0x{:08X} shader={} alpha={} srcBlend={} dstBlend={} queueEpoch={}",
+                routeNames[route], static_cast<int>(phase),
+                Game::game_mode ? *Game::game_mode : -1,
+                OutRunVR::GameSemantic::Name(producer),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                static_cast<unsigned>(fvf),
+                CurrentVertexShaderIdentity.load(
+                    std::memory_order_acquire) != 0 ? 1 : 0,
+                static_cast<unsigned>(blendEnabled),
+                static_cast<unsigned>(srcBlend),
+                static_cast<unsigned>(dstBlend),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+        }
+
         SafetyHookInline R30DrawPrimitiveR29Hook{};
         SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
         SafetyHookInline R30DrawPrimitiveUPR29Hook{};
@@ -1748,6 +1824,7 @@ namespace OutRunVRStereo
 
             const auto semanticScope =
                 OutRunVR::GameSemantic::EffectiveScope();
+            R30TracePreRestartHudDrawForm(device, 0u);
 
             // Exact R71/R74 result/+TIME producer evidence survives queue
             // ownership only if this draw sees the original registered node.
@@ -2666,6 +2743,7 @@ namespace OutRunVRStereo
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
                 OutRunVR::GameSemantic::EffectiveScope();
+            R30TracePreRestartHudDrawForm(device, 1u);
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -4574,6 +4652,7 @@ namespace OutRunVRStereo
             DWORD fvf = 0;
             if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
                 return E_NOTIMPL;
+            R30TracePreRestartHudDrawForm(device, 2u);
 
             R30XyzrhwState state{};
             if (!EnsureStereoResources(device) ||
