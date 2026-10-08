@@ -1457,6 +1457,62 @@
           "needle": "0x4BE575"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-P0-RESULT-PROGRESS-A",
+      "rva": "0x00097BE4",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e81756f9fff30f2c7c245c6a00e8ba50",
+      "purpose": "Exact R74 final-result progress/percentage producer CALL to 0x2D200; all queued siblings belong to ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "ResultProgressCallA = 0x97BE4"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-P0-RESULT-PROGRESS-B",
+      "rva": "0x00097DEC",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e80f54f9fff30f10872c100000f30f59",
+      "purpose": "Second exact R74 final-result progress/percentage producer CALL to 0x2D200.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "ResultProgressCallB = 0x97DEC"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-P0-GOAL-TIME-020",
+      "rva": "0x000BEA5A",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8c1f5ffffe8ecf6ffffb801000000c3",
+      "purpose": "Canonical R74 GOAL TIME CALL to 0xBE020 sprite-producing helper.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "GoalTimeHelperCallA = 0xBEA5A"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-P0-GOAL-TIME-150",
+      "rva": "0x000BEA5F",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8ecf6ffffb801000000c333c0c3cccc",
+      "purpose": "Canonical R74 GOAL TIME CALL to 0xBE150 sprite-producing helper.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "GoalTimeHelperCallB = 0xBEA5F"
+        }
+      ]
     }
   ]
 }
