@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:55:00+09:00",
+  "updated_at_kst": "2026-10-08T15:05:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6882,18 +6882,17 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
+    "run": "20261008-A188-Q175-CHROME-FACE-RECOVERY",
     "role": "A",
     "queue_index": 175,
     "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
     "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
-    "prior_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
-    "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
-    "worker_run": 37730583751,
-    "first_worker_failed_metadata_run": 37730365040,
+    "prior_candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+    "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "worker_run_id": 37735449746,
     "machine_result": "PASS",
-    "producer_visual_status": "SELF_QA_PASS_PENDING_FRESH_PIXELS_FIRST_C1_AND_C3",
-    "qa": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_CONTROLLER_SELF_QA.json",
+    "producer_visual_status": "SELF_QA_PASS_PENDING_C1_CHROME_FAMILY_AND_C3",
+    "qa": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -7213,5 +7212,20 @@
     "worker_run": 37734575967,
     "c3": "BLOCKED",
     "runtime_validation": "UNTESTED"
+  },
+  "a188_q175_chrome_face_recovery": {
+    "run": "20261008-A188-Q175-CHROME-FACE-RECOVERY",
+    "role": "A",
+    "queue_index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "prior_candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+    "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "worker_run_id": 37735449746,
+    "machine_result": "PASS",
+    "producer_visual_status": "SELF_QA_PASS_PENDING_C1_CHROME_FAMILY_AND_C3",
+    "qa": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

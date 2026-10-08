@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "A",
+  "run": "20261008-A188-Q175-CHROME-FACE-RECOVERY",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "prior_rejected_C283_candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+  "candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "execution_backend": "github_actions (GPT local public GitHub DNS unusable; remote pinned DDS required)",
+  "worker_run_id": 37735449746,
+  "worker_report": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_754F0599_REPORT.json",
+  "machine_qa": {
+    "bbox_size_margin": "3/3 PASS",
+    "clean_plate": "PASS",
+    "final_mask": "PASS",
+    "outside_rgba": 0,
+    "outside_alpha": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0,
+    "format": "BGRA32",
+    "size": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "original_header_exact": true,
+    "orientation": "mirror_y"
+  },
+  "per_region": [
+    {
+      "id": "stage_select",
+      "english": "stage select",
+      "korean": "스테이지 선택",
+      "bbox": [
+        12,
+        259,
+        923,
+        392
+      ],
+      "source_bright_ge_200_fraction": 0.33949,
+      "candidate_bright_ge_200_fraction": 0.46719,
+      "source_dark_below_75_fraction": 0.33163,
+      "candidate_dark_below_75_fraction": 0.38298
+    },
+    {
+      "id": "showroom",
+      "english": "showroom",
+      "korean": "쇼룸",
+      "bbox": [
+        12,
+        402,
+        267,
+        524
+      ],
+      "source_bright_ge_200_fraction": 0.36314,
+      "candidate_bright_ge_200_fraction": 0.42523,
+      "source_dark_below_75_fraction": 0.30852,
+      "candidate_dark_below_75_fraction": 0.4074
+    },
+    {
+      "id": "single_player",
+      "english": "single player",
+      "korean": "싱글 플레이",
+      "bbox": [
+        8,
+        571,
+        810,
+        712
+      ],
+      "source_bright_ge_200_fraction": 0.31841,
+      "candidate_bright_ge_200_fraction": 0.45464,
+      "source_dark_below_75_fraction": 0.32422,
+      "candidate_dark_below_75_fraction": 0.37614
+    }
+  ],
+  "brightness_statistics_note": "Both source/candidate measured using same alpha>=60; descriptive pixel diagnostics, not new universal brightness or source-width quotas; only original source and current are directly comparable under same method",
+  "render_changes": {
+    "font_family": "NanumSquareRound Bold",
+    "horizontal_width_quota": "none",
+    "gradient": "broaden light silver fill/soften lower steel",
+    "edge_filter": "max5 vs prior max7",
+    "extrusion": "[(3,6,74),(2,4,98)] vs [(5,9,135),(4,7,170),(3,5,205)]",
+    "lower_inset_opacity": "80 vs 190",
+    "source_sampled_top_brightness": true
+  },
+  "ordered_rework_gate": [
+    {
+      "name": "clean_plate",
+      "result": "PASS_MACHINE_AND_PRODUCER_VISUAL"
+    },
+    {
+      "name": "source_slant",
+      "result": "HOLD_PER_GLYPH_GROUNDED_ANCHORS_NOT_YET_CONFIRMED"
+    },
+    {
+      "name": "scale",
+      "result": "PASS_3_OF_3_EXACT_SOURCE_CEILING_AND_POSITIVE_MARGINS"
+    },
+    {
+      "name": "weight_outline_gradient",
+      "result": "PRODUCER_VISUAL_FAVORABLE_PENDING_INDEPENDENT_C1_SOURCE_FAMILY"
+    },
+    {
+      "name": "glyph_integrity",
+      "result": "PRODUCER_VISUAL_NO_DEFINITE_BREAKAGE_NATIVE_OR_50_PERCENT"
+    },
+    {
+      "name": "protected_art",
+      "result": "PASS_ZERO_CHANGE_OUTSIDE_ORIGINAL_SOURCE_BBOX"
+    },
+    {
+      "name": "RAW_FLIPY",
+      "result": "PRODUCER_VISUAL_AND_HEADER_MIRROR_Y_PASS"
+    },
+    {
+      "name": "readability",
+      "result": "PRODUCER_VISUAL_READABLE_NATIVE_AND_50_PERCENT"
+    }
+  ],
+  "evidence": {
+    "source": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_SOURCE_READABLE.png",
+    "clean": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_CLEAN_PLATE.png",
+    "final": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "row_contact": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_ROW_CONTACT.jpg",
+    "practical_100_75_50": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_PRACTICAL_100_75_50.jpg",
+    "raw": "localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/A188_FINAL_RAW_GRAY.jpg"
+  },
+  "producer_result": "SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C1_C3",
+  "independent_C1": "NOT_PERFORMED",
+  "C3": "NOT_PERFORMED",
+  "pre_ingame": "BLOCKED",
+  "user_jpg": "PENDING",
+  "game_test": "UNTESTED",
+  "cleanup": "GitHub Actions ephemeral runner: all transient scratch discarded; no N100 or ChatGPT local project worktree",
+  "forbidden_domains_touched": []
+}
