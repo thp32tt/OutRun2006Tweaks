@@ -1054,6 +1054,19 @@ public:
 			Module::exe_ptr(ResultProgressCallB), ResultProgressEnter);
 		ResultProgressLeaveB = safetyhook::create_mid(
 			Module::exe_ptr(ResultProgressCallB + 5), ResultProgressLeave);
+		if (!ResultProgressEnterA || !ResultProgressLeaveA ||
+			!ResultProgressEnterB || !ResultProgressLeaveB)
+		{
+			// A half-installed producer boundary can leave the following
+			// result's SpriteNode semantic attached to the wrong call.
+			// Keep original game CALLs intact and disable this repair atomically.
+			ResultProgressEnterA = {};
+			ResultProgressLeaveA = {};
+			ResultProgressEnterB = {};
+			ResultProgressLeaveB = {};
+			spdlog::error(
+				"VR P0 RESULT: exact R74 producer midhooks incomplete; all rolled back");
+		}
 		// The two GOAL CALLs are adjacent, so preserve the original function
 		// signatures and redirect only their individually proven E8 edges.
 		Memory::VP::InjectHook(Module::exe_ptr(GoalTimeHelperCallA),
