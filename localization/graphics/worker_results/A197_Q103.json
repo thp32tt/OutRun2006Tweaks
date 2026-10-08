@@ -1,0 +1,36 @@
+{
+  "run": "20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE",
+  "queue_index": 103,
+  "asset": "590A4724",
+  "candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "new_bbox": [
+    1431,
+    1972,
+    1780,
+    2036
+  ],
+  "new_size": [
+    349,
+    64
+  ],
+  "previous_size": [
+    196,
+    40
+  ],
+  "machine_qa": {
+    "source_clean_outside_source_bbox": 0,
+    "source_clean_exact_removed_pixels": 7439,
+    "source_final_changed_outside_original_bbox": 0,
+    "source_final_alpha_changed_outside": 0,
+    "clean_to_final_changed_outside_transparent_glyph_mask": 0,
+    "protected_changed_outside_declared_effect_region": 0,
+    "source_exact_residue_outside_korean_glyph": 0,
+    "foreign_rectangle_pixels": 0,
+    "glyph_border_1px_intrusion": 0,
+    "localized_overlap_pairs": 0
+  },
+  "status": "WORKER_MACHINE_PASS_CONTROLLER_SELF_QA_PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "report": "localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_WORKER_REPORT.json"
+}

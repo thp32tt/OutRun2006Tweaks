@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+  },
+  "prior_candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+  "candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "bitcount": 32,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "mode": "RGBA",
+    "raw_orientation": "mirror_y"
+  },
+  "header_exact": true,
+  "preserve_nontext_artwork": true,
+  "source_clean_provenance": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+  "transcription": {
+    "english": "Normal Balance",
+    "korean": "일반 밸런스"
+  },
+  "original_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "previous_bbox": [
+    1508,
+    1986,
+    1704,
+    2026
+  ],
+  "new_bbox": [
+    1431,
+    1972,
+    1780,
+    2036
+  ],
+  "source_height": 72,
+  "source_width": 390,
+  "previous_size": [
+    196,
+    40
+  ],
+  "new_size": [
+    349,
+    64
+  ],
+  "new_margins": [
+    20,
+    21,
+    4,
+    4
+  ],
+  "source_italic_family": {
+    "method": "native glyph direct raster + 0.27 rightward top shift shear (no width scaling), source-median olive-gray fill",
+    "source_core_median_rgb": [
+      143,
+      137,
+      84
+    ],
+    "korean_font": "NotoSansCJK-Bold.ttc index 1",
+    "point_size": 68,
+    "tracking": 5,
+    "rightward_shift_over_height": 17.28,
+    "source_glyph_angle": "RIGHT_ITALIC_VISUALLY_SOURCE; exact source anchor review pending controller"
+  },
+  "machine_qa": {
+    "source_clean_outside_source_bbox": 0,
+    "source_clean_exact_removed_pixels": 7439,
+    "source_final_changed_outside_original_bbox": 0,
+    "source_final_alpha_changed_outside": 0,
+    "clean_to_final_changed_outside_transparent_glyph_mask": 0,
+    "protected_changed_outside_declared_effect_region": 0,
+    "source_exact_residue_outside_korean_glyph": 0,
+    "foreign_rectangle_pixels": 0,
+    "glyph_border_1px_intrusion": 0,
+    "localized_overlap_pairs": 0
+  },
+  "readable_orientation": "FLIP-Y; raw sprite mirror-Y source equals final",
+  "authored_mips": 1,
+  "persisted_roundtrip": "PASS",
+  "source_clean_visual": "PENDING_CONTROLLER_INDEPENDENT_REVIEW",
+  "clean_final_visual": "PENDING_CONTROLLER_INDEPENDENT_REVIEW",
+  "producer_decision": "PENDING_CONTROLLER_SELF_QA",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
