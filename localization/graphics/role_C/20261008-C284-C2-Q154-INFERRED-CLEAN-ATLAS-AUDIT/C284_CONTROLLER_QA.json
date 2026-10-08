@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "raw_orientation": "mirror_y",
+  "machine_report": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_MACHINE_AUDIT.json",
+  "new_evidence": "Independent exact source/candidate SHA-bound inferred transparent glyph-only CLEAN plane; native 8-region source-clean-current contact and 8 separate lossless clean crops. This does NOT certify B/A's authored CLEAN plate.",
+  "machine_summary": {
+    "header_exact": true,
+    "size": [
+      4096,
+      1024
+    ],
+    "source_vs_candidate_outside_8_exact_source_boxes_rgba": 0,
+    "alpha_outside": 0,
+    "inferred_clean_changed_outside": 0,
+    "positive_margin_8_of_8": true,
+    "inferred_clean_alpha_nonzero_in_8_regions": 0
+  },
+  "observed_8_regions": {
+    "create_new_license_red": {
+      "source_text": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "final_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "positive_margins": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "alpha_source_count": 142103,
+      "alpha_final_count": 101090,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/01_create_new_license_red_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Large flat red lettering visibly coherent; exact English-vs-Korean font-family acceptance remains unproven."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/425/4/4; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "select_license_red": {
+      "source_text": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "final_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "positive_margins": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "alpha_source_count": 105320,
+      "alpha_final_count": 72921,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/02_select_license_red_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Large flat red lettering visibly coherent; exact English-vs-Korean font-family acceptance remains unproven."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/363/4/4; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "single_player_red": {
+      "source_text": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "final_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "positive_margins": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "alpha_source_count": 98927,
+      "alpha_final_count": 77318,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/03_single_player_red_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Large flat red lettering visibly coherent; exact English-vs-Korean font-family acceptance remains unproven."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/383/4/4; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "default_license_red": {
+      "source_text": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "final_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "positive_margins": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "alpha_source_count": 115127,
+      "alpha_final_count": 71820,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/04_default_license_red_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Large flat red lettering visibly coherent; exact English-vs-Korean font-family acceptance remains unproven."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/399/4/4; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "multiplayer_red": {
+      "source_text": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "final_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "positive_margins": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "alpha_source_count": 90633,
+      "alpha_final_count": 73103,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/05_multiplayer_red_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Large flat red lettering visibly coherent; exact English-vs-Korean font-family acceptance remains unproven."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/340/2/2; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "single_player_gray": {
+      "source_text": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "final_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "positive_margins": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "alpha_source_count": 19100,
+      "alpha_final_count": 13360,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/06_single_player_gray_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Gray menu lettering appears readable with open counterspace; no source-derived accepted family profile supplied."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/174/3/3; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "showroom_gray": {
+      "source_text": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "final_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "positive_margins": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "alpha_source_count": 15231,
+      "alpha_final_count": 6628,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/07_showroom_gray_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Gray menu lettering appears readable with open counterspace; no source-derived accepted family profile supplied."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/208/3/4; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    },
+    "multiplayer_gray": {
+      "source_text": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "final_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "positive_margins": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "alpha_source_count": 17402,
+      "alpha_final_count": 12757,
+      "source_clean_final_views": {
+        "source_and_current": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+        "inferred_clean": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/08_multiplayer_gray_INFERRED_CLEAN_FLIPY.png"
+      },
+      "eight_checks": {
+        "slant": {
+          "status": "VISUALLY_REVIEWED_PENDING_SOURCE_GLYPH_ANCHORS",
+          "observation": "Source-family and current lettering both appear upright in readable orientation; per-glyph top-minus-bottom anchor not independently measured."
+        },
+        "clean_plate": {
+          "status": "HOLD_EXACT_PRODUCER_CLEAN_NOT_BOUND",
+          "observation": "Constructed transparent inferred clean only; absence of visible overlay outside the current alpha bbox is not proof of no embedded source-color remnants beneath current strokes."
+        },
+        "style": {
+          "status": "VISUAL_OBSERVATION_PENDING_REFERENCE_PROFILE",
+          "observation": "Gray menu lettering appears readable with open counterspace; no source-derived accepted family profile supplied."
+        },
+        "readability": {
+          "status": "VISIBLE_NATIVE",
+          "observation": "Current Korean syllables visible in native contact; 75/50% practical actual native region proof from this run not sufficient to assert universal practical approval."
+        },
+        "glyph_integrity": {
+          "status": "NO_DEFINITE_DEFECT_VISIBLE_AT_CONTACT_SCALE",
+          "observation": "No unequivocal syllable truncation or malformed character detected visually in lossless source/current contact; high-zoom individual evidence not yet complete."
+        },
+        "protected_art": {
+          "status": "MACHINE_CHECK_0_OUTSIDE",
+          "observation": "Full persisted RGBA source/current delta outside union of 8 canonical source boxes is exactly zero."
+        },
+        "placement": {
+          "status": "BBOX_INSIDE_8_OF_8_BUT_ANCHOR_REVIEW_INCOMPLETE",
+          "observation": "Persisted alpha silhouette margins L/R/T/B 2/154/2/2; source-anchor/baseline source-style placement remains uncertaified."
+        },
+        "orientation": {
+          "status": "READABLE_FLIPY_OBSERVED_RAW_PREVIOUS_C271",
+          "observation": "Readable FLIP-Y images inspected; earlier exact RAW parity applies to same candidate SHA but was not re-run in this CLEAN-only investigation."
+        }
+      }
+    }
+  },
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "why": "Earlier C267/C269/C271 and production notes for same SHA already known; cannot claim a blind first look."
+  },
+  "calibration": {
+    "qualified": false,
+    "reason": "No source-faithful good-control blind defect calibration executed this invocation; do not reuse or fabricate unit-test fixtures."
+  },
+  "clean_validation": {
+    "result": "HOLD_EXACT_PRODUCER_CLEAN_MISSING",
+    "inferred_clean_png": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png",
+    "inferred_vs_producer_clean": "NOT_VERIFIED",
+    "inferred_clean_cannot_be_current_approval_clean_plate": true
+  },
+  "C": {
+    "decision": "HOLD_STRICT_RECHECK",
+    "reason": "Source-derived inferred transparent plate is new evidence, but not exact producer CLEAN and doesn't prove under-glyph residue absence. Other evidence gate calibration, source-derived family/slant and per-region practical/bw/RAW binding are incomplete."
+  },
+  "C3": {
+    "result": "BLOCKED_NO_CURRENT_POLICY_C_APPROVAL"
+  },
+  "approval_created": false,
+  "pre_ingame_export": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds_generated": false,
+  "execution_backend": "GitHub repository SSOT + N100 MCP exact DDS download/CPU pixel decode fallback; no GitHub Actions",
+  "files": [
+    "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_SOURCE_INFERRED_CLEAN_FINAL_CONTACT.png",
+    "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_ENGLISH_CLEAN_KOREAN_JPG_REVIEW.jpg",
+    "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png"
+  ],
+  "post_task_cleanup": "PENDING_AFTER_VERIFIED_PUBLICATION",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

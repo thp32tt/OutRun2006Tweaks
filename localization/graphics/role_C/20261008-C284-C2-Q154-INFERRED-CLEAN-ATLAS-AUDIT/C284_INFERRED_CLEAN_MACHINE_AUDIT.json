@@ -1,0 +1,272 @@
+{
+  "run": "20261008-C284-C2-Q154-INFERRED-CLEAN-AUDIT",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "size": [
+    4096,
+    1024
+  ],
+  "header_exact": true,
+  "source_vs_current_outside_8_source_bboxes": 0,
+  "source_vs_current_alpha_outside_8_source_bboxes": 0,
+  "source_vs_inferred_clean_changed_outside_8_source_bboxes": 0,
+  "inferred_clean_definition": "Source DDR RGBA decoded, source-only text regions hard cleared to RGBA=(0,0,0,0). Not same as exact B/A archived CLEAN; must not substitute for clean_plate required by gate without proof.",
+  "rows": [
+    {
+      "id": "create_new_license_red",
+      "source_text": "CREATE NEW LICENSE",
+      "localized_text": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "final_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 142103,
+      "current_nontransparent_in_source_text_rect": 101090,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 128764,
+      "source_only_nonzero_alpha_where_final_transparent": 92466
+    },
+    {
+      "id": "select_license_red",
+      "source_text": "SELECT LICENSE",
+      "localized_text": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "final_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 105320,
+      "current_nontransparent_in_source_text_rect": 72921,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 95618,
+      "source_only_nonzero_alpha_where_final_transparent": 71607
+    },
+    {
+      "id": "single_player_red",
+      "source_text": "SINGLE PLAYER",
+      "localized_text": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "final_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 98927,
+      "current_nontransparent_in_source_text_rect": 77318,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 87327,
+      "source_only_nonzero_alpha_where_final_transparent": 63981
+    },
+    {
+      "id": "default_license_red",
+      "source_text": "DEFAULT LICENSE",
+      "localized_text": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "final_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 115127,
+      "current_nontransparent_in_source_text_rect": 71820,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 102614,
+      "source_only_nonzero_alpha_where_final_transparent": 79636
+    },
+    {
+      "id": "multiplayer_red",
+      "source_text": "MULTIPLAYER",
+      "localized_text": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "final_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 90633,
+      "current_nontransparent_in_source_text_rect": 73103,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 73131,
+      "source_only_nonzero_alpha_where_final_transparent": 54725
+    },
+    {
+      "id": "single_player_gray",
+      "source_text": "SINGLE PLAYER",
+      "localized_text": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "final_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 19100,
+      "current_nontransparent_in_source_text_rect": 13360,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 15134,
+      "source_only_nonzero_alpha_where_final_transparent": 11932
+    },
+    {
+      "id": "showroom_gray",
+      "source_text": "SHOWROOM",
+      "localized_text": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "final_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 15231,
+      "current_nontransparent_in_source_text_rect": 6628,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 10005,
+      "source_only_nonzero_alpha_where_final_transparent": 11169
+    },
+    {
+      "id": "multiplayer_gray",
+      "source_text": "MULTIPLAYER",
+      "localized_text": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "final_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "bbox_positive_margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "bbox_containment": true,
+      "source_nontransparent_in_source_text_rect": 17402,
+      "current_nontransparent_in_source_text_rect": 12757,
+      "orphan_final_alpha_outside_actual_final_bbox_within_source_bbox": 0,
+      "inferred_clean_alpha_nonzero_in_source_bbox": 0,
+      "source_color_alpha_pixel_context": "source & current text-only atlas glyphs on transparent outside-source-cell; CLEAN is inferred, not producer-authored",
+      "source_target_unchanged_pixels_inside_region": 11558,
+      "source_only_nonzero_alpha_where_final_transparent": 10586
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "all8_containment": true,
+  "source_original_alpha_restoration_proven": false,
+  "source_only_text_alpha_clean_prediction_no_residue": true,
+  "clean_validation_status": "INFERRED_ALPHA_ONLY_NOT_ACCEPTED_CURRENT_POLICY_CLEAN_PLATE"
+}
