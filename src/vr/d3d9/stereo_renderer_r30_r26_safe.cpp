@@ -712,7 +712,13 @@ namespace OutRunVRStereo
         R30SkyGlowResources R30SkyGlow{};
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
-        std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
+        // A zero PresentEpoch is valid before the first completed Present.
+        // Use an impossible sentinel so it never denotes a clean capture.
+        constexpr std::uint64_t R30NoSkyGlowEpoch =
+            static_cast<std::uint64_t>(-1);
+        std::uint64_t R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
+        std::uint64_t R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;
+        std::uint64_t R30SkyGlowUiCaptureSkips = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
 
@@ -986,6 +992,27 @@ namespace OutRunVRStereo
             return ok;
         }
 
+        // This runs before any delegated R29/R26 draw too. A HUD rejected by
+        // our stereo owner still reaches the screen and may contaminate the
+        // Present-time bright-pass source if the clean snapshot failed.
+        void R30BeforeScreenDrawForSkyGlow(
+            IDirect3DDevice9* device,
+            OutRunVR::GameSemantic::RenderScope scope)
+        {
+            if (!device || Settings::SkyGlowFactor <= 0 ||
+                !IsGameDevice(device) || InternalStereoPass ||
+                !TargetIsBackBuffer() ||
+                (!OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+                 !OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope)) ||
+                R30SkyGlowScreenDrawEpoch == PresentEpoch)
+                return;
+
+            // Stamp before attempting capture. A failed capture must never be
+            // retried after this (possibly R29-owned) HUD draw reaches an eye.
+            R30SkyGlowScreenDrawEpoch = PresentEpoch;
+            R30CaptureSkyGlowSceneBeforeHud(device);
+        }
+
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
             if (!device || Settings::SkyGlowFactor <= 0 ||
@@ -994,6 +1021,20 @@ namespace OutRunVRStereo
                 FrameStereoIncomplete || !BackBuffer ||
                 !RightEyeSurface)
                 return true;
+
+            // A screen draw was already submitted but its pre-HUD stereo scene
+            // was never captured. Never use the current HUD-filled backbuffers
+            // for bloom: +TIME, finish text and F11 otherwise become halos.
+            // When there was no UI draw, retain the original Present fallback.
+            if (R30SkyGlowSceneCaptureEpoch != PresentEpoch &&
+                R30SkyGlowScreenDrawEpoch == PresentEpoch)
+            {
+                ++R30SkyGlowUiCaptureSkips;
+                if (Settings::VRTelemetry && R30SkyGlowUiCaptureSkips == 1)
+                    spdlog::warn(
+                        "VR SKY GLOW: no clean pre-HUD scene; skipping additive glow instead of blooming HUD");
+                return true;
+            }
 
             if (!R30EnsureSkyGlowResources(device))
                 return false;
@@ -1248,7 +1289,8 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             R30ReleaseSkyGlowResources();
-            R30SkyGlowSceneCaptureEpoch = 0;
+            R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
+            R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
@@ -4310,6 +4352,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -4338,6 +4381,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             // F11 external ImGui uses fixed-function XYZ+orthographic
             // DrawIndexedPrimitive, never XYZRHW or a vertex shader.
             const HRESULT externalImGui = R30TryExternalImGuiIndexed(
@@ -4379,6 +4423,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -4408,6 +4453,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
