@@ -43,6 +43,27 @@
           "finding": "B259 larger shear and right-gold edge remain flat segmented vs smooth condensed original; red backing line visible across GOAL."
         }
       ]
+    },
+    {
+      "queue_index": 172,
+      "asset_hash": "6C9B3611",
+      "required_method_change": "Do not iterate continuous horizontal gold bands, fixed-shear or source-width percentages. Reconstruct the native original per-glyph angled cream-white highlight, inner orange gradient, dark/orange extrusion, rounded contours and per-letter perspective with source-image-proven clean plate. For Korean syllables, rebuild legible face segments rather than long monochrome horizontal bars; separately measure top-bottom readable slant and preserve natural Hangul counters, original visual hierarchy, exact source bboxes, 1024px DDS RAW mirror-Y, zero outside/protected/residue. Then producer native and 50/75 RAW self-QA and fresh independent C2 followed by distinct C3.",
+      "rejections": [
+        {
+          "review_id": "C291",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_BEVEL_MISMATCH",
+          "evidence_ref": "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_CONTROLLER_QA.json",
+          "finding": "B255 current 7282687bbc... visibly flat regular orange bars with weak source cream bevel/italic depth despite numeric containment."
+        },
+        {
+          "review_id": "C295",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_FAMILY_BEVEL_MISMATCH",
+          "evidence_ref": "localization/graphics/role_C/20261008-C295-C2-Q172-B263-SOURCE-FAMILY-REVIEW/C295_CONTROLLER_QA.json",
+          "finding": "B263 new exact 812373b0... reproduces horizontal gold/brown slab faces and insufficient source right-italic cream-white depth/word hierarchy at native, 8x and 50%; unlike prior B255/first B262 material SHA."
+        }
+      ]
     }
   ]
 }

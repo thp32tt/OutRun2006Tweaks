@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "run": "C295-C2",
+  "run_key": "OUTRUN-KOR-C295-C2-Q172-B263-SOURCE-BEVEL-FAIL-20261008",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 172,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+  "clean_plate_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "reviewer": "ChatGPT C2 controller single reviewer",
+  "stage": "INDEPENDENT_C",
+  "pixels_before_producer_verdict": true,
+  "scope": "New material B263 vs last rejected B255; first-look commit 286e64cb0dd69572f7ed9ed9327e101972c73903 made before B263 machine report was read",
+  "first_look": "localization/graphics/role_C/20261008-C295-C2-Q172-B263-SOURCE-FAMILY-REVIEW/C295_B263_FIRST_LOOK.json",
+  "calibration": {
+    "source_normal_provenance": "localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_CALIBRATION_RESULT.json",
+    "binary_5_cases": "5/5",
+    "exact_defect_subtype": "3/5",
+    "note": "Qualified English-source-derived normal and detection of all four synthetic defects recorded C294; this reviewer reuses prior calibration evidence, not a new claimed calibration run."
+  },
+  "machine_report": "localization/graphics/role_C/20261008-C295-C2-Q172-B263-SOURCE-FAMILY-REVIEW/C295_Q172_MACHINE_PROVENANCE.json",
+  "source_current_exact_sha_verified_at": "N100 MCP lightweight GitHub download with expectedSha256; local raw GitHub DNS failed",
+  "native_image_views": "B263 producer-created PNGs viewed directly through GitHub after hash proof; no game renderer",
+  "regions": [
+    {
+      "id": "START",
+      "source_text": "START",
+      "localized_text": "출발",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "candidate_bbox": [
+        62,
+        375,
+        130,
+        393
+      ],
+      "source_effect": "Cream-white continuous italic face with peach/orange bevel and strong rightward direction; fills sign as a high-dominance label.",
+      "candidate_effect": "Two Korean syllables rendered as segmented nearly-horizontal brown-gold stacked slabs; while the golden palette is improved relative to B255 and may be readable, the cream face and italic extrusion are much weaker.",
+      "evidence": [
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_ENGLISH_CLEAN_FINAL_CONTACT.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_TRIAL_8X.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_PRACTICAL_50.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_RAW_SOURCE_CLEAN_FINAL.png"
+      ],
+      "source_width": 81,
+      "candidate_width": 68,
+      "width_ratio_percent": 83.95,
+      "checks": {
+        "slant": {
+          "result": "FAIL",
+          "observation": "At readable orientation Korean face appears substantially flatter/upright compared with source-italic cream geometry; no numerical glyph-anchor slope is invented.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "clean_plate": {
+          "result": "HOLD_NO_NEW_INDEPENDENT_CLEAN_PIXEL_QA",
+          "observation": "B263 supplied source/CLEAN/FINAL preview with no obvious original-letter ghost, but this C did not independently re-decode the authored clean-plate pixel mask.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Two Korean syllables rendered as segmented nearly-horizontal brown-gold stacked slabs; while the golden palette is improved relative to B255 and may be readable, the cream face and italic extrusion are much weaker. Reference: Cream-white continuous italic face with peach/orange bevel and strong rightward direction; fills sign as a high-dominance label.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_TRIAL_8X.png"
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+          "observation": "The Korean is decipherable at nominal scale but under-represents original typographic depth and hierarchy at 50% view; ratio is descriptive only, not a fixed acceptance threshold.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_PRACTICAL_50.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_SYLLABLE_OBSERVED",
+          "observation": "Syllable identity appears intact in provided 8x crop, though edge/face structure is source-style incorrect.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_TRIAL_8X.png"
+        },
+        "protected_art": {
+          "result": "NO_VISUAL_INTRUSION_SEEN_MACHINE_PRODUCER_ZERO_ONLY",
+          "observation": "Sign and protected background appear intact in contacts; C did not independently compute pixel-change mask.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "placement": {
+          "result": "SOURCE_BBOX_NUMERIC_PASS_VISUAL_FAIL",
+          "observation": "Producer reports positive margins; original line hierarchy and source italic contour remain visually mismatched.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "orientation": {
+          "result": "RAW_FLIPY_IMAGE_REVIEWED",
+          "observation": "RAW comparison exhibits expected mirrored character geometry; style defect exists in both views.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/START_RAW_SOURCE_CLEAN_FINAL.png"
+        }
+      }
+    },
+    {
+      "id": "GOAL",
+      "source_text": "GOAL",
+      "localized_text": "골",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "candidate_bbox": [
+        619,
+        638,
+        649,
+        656
+      ],
+      "source_effect": "Tall forward-italic cream/orange bevel letters with depth and strong dominance over the red banner.",
+      "candidate_effect": "Korean 골 now less horizontally stretched than B262 but visually resembles a short layered orange slab with pale highlights; only the central narrow part of source sign is filled, and reference letter contour/italic bevel visual hierarchy is not reproduced.",
+      "evidence": [
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_TRIAL_8X.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_PRACTICAL_50.png",
+        "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_RAW_SOURCE_CLEAN_FINAL.png"
+      ],
+      "source_width": 77,
+      "candidate_width": 30,
+      "width_ratio_percent": 38.96,
+      "checks": {
+        "slant": {
+          "result": "FAIL",
+          "observation": "At readable orientation Korean face appears substantially flatter/upright compared with source-italic cream geometry; no numerical glyph-anchor slope is invented.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "clean_plate": {
+          "result": "HOLD_NO_NEW_INDEPENDENT_CLEAN_PIXEL_QA",
+          "observation": "B263 supplied source/CLEAN/FINAL preview with no obvious original-letter ghost, but this C did not independently re-decode the authored clean-plate pixel mask.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Korean 골 now less horizontally stretched than B262 but visually resembles a short layered orange slab with pale highlights; only the central narrow part of source sign is filled, and reference letter contour/italic bevel visual hierarchy is not reproduced. Reference: Tall forward-italic cream/orange bevel letters with depth and strong dominance over the red banner.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_TRIAL_8X.png"
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+          "observation": "The Korean is decipherable at nominal scale but under-represents original typographic depth and hierarchy at 50% view; ratio is descriptive only, not a fixed acceptance threshold.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_PRACTICAL_50.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_SYLLABLE_OBSERVED",
+          "observation": "Syllable identity appears intact in provided 8x crop, though edge/face structure is source-style incorrect.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_TRIAL_8X.png"
+        },
+        "protected_art": {
+          "result": "NO_VISUAL_INTRUSION_SEEN_MACHINE_PRODUCER_ZERO_ONLY",
+          "observation": "Sign and protected background appear intact in contacts; C did not independently compute pixel-change mask.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "placement": {
+          "result": "SOURCE_BBOX_NUMERIC_PASS_VISUAL_FAIL",
+          "observation": "Producer reports positive margins; original line hierarchy and source italic contour remain visually mismatched.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_ENGLISH_CLEAN_FINAL_CONTACT.png"
+        },
+        "orientation": {
+          "result": "RAW_FLIPY_IMAGE_REVIEWED",
+          "observation": "RAW comparison exhibits expected mirrored character geometry; style defect exists in both views.",
+          "evidence": "localization/graphics/role_B/20261008-B263-Q172-READABLE-GLYPH-REBALANCE/GOAL_RAW_SOURCE_CLEAN_FINAL.png"
+        }
+      }
+    }
+  ],
+  "decision": "REWORK_REQUIRED",
+  "defects": [
+    "SOURCE_FAMILY_BEVEL_MISMATCH",
+    "RIGHT_ITALIC_GEOMETRY_WEAK",
+    "SOURCE_RELATIVE_DEPTH_AND_HIERARCHY_MISMATCH"
+  ],
+  "prior_distinct_rejection": {
+    "review_id": "C291",
+    "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+    "evidence": "localization/graphics/role_C/20261008-C291-C2-Q172-B255-SOURCE-FAMILY/C291_Q172_CONTROLLER_QA.json",
+    "same_root_family": "SOURCE_FAMILY_BEVEL_MISMATCH"
+  },
+  "required_method_change": "Do not iterate continuous horizontal gold bands, fixed-shear or source-width percentages. Reconstruct the native original per-glyph angled cream-white highlight, inner orange gradient, dark/orange extrusion, rounded contours and per-letter perspective with source-image-proven clean plate. For Korean syllables, rebuild legible face segments rather than long monochrome horizontal bars; separately measure top-bottom readable slant and preserve natural Hangul counters, original visual hierarchy, exact source bboxes, 1024px DDS RAW mirror-Y, zero outside/protected/residue. Then producer native and 50/75 RAW self-QA and fresh independent C2 followed by distinct C3.",
+  "producer_original_gate": "B263 new output says NEW_MATERIAL_CANDIDATE_NOT_PRODUCER_PASS; C visual rejects before producer promotion",
+  "C3": "BLOCKED",
+  "approval": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "user_acceptance": "NOT_DONE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_produced_by_C": 0,
+  "execution_backend": "GitHub first for source/producer images, ChatGPT native attempted raw download but GitHub DNS blocked, N100 MCP fallback for only 4MB source/candidate transfer and SHA/DDS header inspection; no full resolution image computation or N100 worktree",
+  "cleanup": "N100 scratch to be removed after verified commit; no GPT generated persistent scratch needed",
+  "forbidden_domains_touched": []
+}
