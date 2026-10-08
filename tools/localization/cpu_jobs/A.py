@@ -131,7 +131,10 @@ for row in rows:
     # Render from native mask, not the old candidate, and remeasure effects.
     buffered=Image.new("L",(ink.width+2*effect_r,ink.height+2*effect_r),0)
     buffered.paste(ink,(effect_r,effect_r))
-    mask=buffered.filter(ImageFilter.MaxFilter(pad))
+    if pad==1:
+        mask=buffered  # Native face only; Pillow MaxFilter(size=1) can trigger native FPE
+    else:
+        mask=buffered.filter(ImageFilter.MaxFilter(pad))
     ink_density=float(np.mean(np.asarray(mask)>170))
     if ink_density>0.74:raise RuntimeError(("new counter occlusion too dense",row["key"],ink_density))
     mw,mh=mask.size
