@@ -1,0 +1,463 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C305-C2",
+  "run_key": "OUTRUN-KOR-C305-C2-Q154-AUTHORED-CLEAN-BGW-20261008-2150",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "selection_head": "8e38722df78e19559bcb5cc9466520242679805a",
+  "publication_head": "3276d81d3640101785cc10e50d9c98dc61a9f9ab",
+  "reason": "Evidence-only HOLD q154 explicitly prioritized by current EVIDENCE_GATE; do not repeat C298 native 8-region projection/bboxes or C287 3 gray plate. This run newly inspects all FIVE RED + three gray SOURCE / original B60 authored CLEAN / current exact DDS on black/gray/white static background contacts.",
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 154",
+    "result": "EVIDENCE_ONLY_HOLD",
+    "reason": "No rerender without defect proof"
+  },
+  "bound_shas": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "authored_clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "candidate": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "clean_orientation": {
+    "readable_detected": "READABLE",
+    "changed_source_clean_outside_at_readable": 0,
+    "changed_source_clean_outside_if_y_reversed": 1984494
+  },
+  "machine": {
+    "report": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_AUTHORED_PLATE_RGB_AUDIT.json",
+    "authored_clean_alpha_gt0_in_any_source_bbox": 0,
+    "source_clean_rgba_outside_8box_union": 0,
+    "source_candidate_rgba_outside_8box_union": 0,
+    "source_candidate_alpha_outside_8box_union": 0,
+    "exact_native_size": [
+      4096,
+      1024
+    ],
+    "regions_8_of_8": true,
+    "note": "C287 already established authored clean exact provenance; new contribution is all-eight authored CLEAN visual proof on three compositing backgrounds and orientation comparison, not a second claim of new candidate or regression closure."
+  },
+  "first_look": {
+    "qualified_pixels_before_producer_notes": false,
+    "calibration_historical": "C294 valid 5/5 defect binary earlier; not independently re-administered or used to claim current qualified C PASS",
+    "reason": "Reviewed C287/C298 notes before direct C305 new visual triad; cannot claim blind first-look."
+  },
+  "visual_evidence": {
+    "black": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_BLACK.jpg",
+    "gray": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_GRAY.jpg",
+    "white": "localization/graphics/role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_SOURCE_CLEAN_FINAL_8ROWS_WHITE.jpg",
+    "method": "Exact source/CLEAN/candidate alpha-composited over opaque black=38 gray=96 white=245 in native bounding windows with proportional thumbnail up to 585×145 per contact; source/CLEAN/candidate aligned per row. Static derived from 4096×1024 originals; no claim of independent in-game UV."
+  },
+  "per_region": [
+    {
+      "region_idx": 2,
+      "text_label": "CREATE NEW LICENSE",
+      "korean_text": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "source_alpha_gt0": 142103,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 142103,
+      "clean_to_current_rgba_changed": 101090,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Red English condensed-bold and red Hangul are both legible, but exact family, counter-space and stroke-weight equivalence require independent style profiling."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 3,
+      "text_label": "SELECT LICENSE",
+      "korean_text": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "source_alpha_gt0": 105320,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 105320,
+      "clean_to_current_rgba_changed": 72921,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Red English condensed-bold and red Hangul are both legible, but exact family, counter-space and stroke-weight equivalence require independent style profiling."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 4,
+      "text_label": "SINGLE PLAYER",
+      "korean_text": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "source_alpha_gt0": 98927,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 98927,
+      "clean_to_current_rgba_changed": 77318,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Red English condensed-bold and red Hangul are both legible, but exact family, counter-space and stroke-weight equivalence require independent style profiling."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 5,
+      "text_label": "DEFAULT LICENSE",
+      "korean_text": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "source_alpha_gt0": 115127,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 115127,
+      "clean_to_current_rgba_changed": 71820,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Red English condensed-bold and red Hangul are both legible, but exact family, counter-space and stroke-weight equivalence require independent style profiling."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 6,
+      "text_label": "MULTIPLAYER",
+      "korean_text": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "source_alpha_gt0": 90633,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 90633,
+      "clean_to_current_rgba_changed": 73103,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Red English condensed-bold and red Hangul are both legible, but exact family, counter-space and stroke-weight equivalence require independent style profiling."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 7,
+      "text_label": "SINGLE PLAYER",
+      "korean_text": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_alpha_gt0": 19100,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 19100,
+      "clean_to_current_rgba_changed": 13360,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Gray English and Korean labels similar low contrast and visually readable on white/gray; actual menu contrast and exact original font family not independently established."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 8,
+      "text_label": "SHOWROOM",
+      "korean_text": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_alpha_gt0": 15231,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 15231,
+      "clean_to_current_rgba_changed": 6628,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Gray English and Korean labels similar low contrast and visually readable on white/gray; actual menu contrast and exact original font family not independently established."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    },
+    {
+      "region_idx": 9,
+      "text_label": "MULTIPLAYER",
+      "korean_text": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_alpha_gt0": 17402,
+      "authored_clean_alpha_gt0": 0,
+      "source_to_clean_rgba_changed": 17402,
+      "clean_to_current_rgba_changed": 12757,
+      "observations": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "detail": "Visual upright comparison does not substitute independently measured semantic glyph stem anchors; no claim of angle equivalence."
+        },
+        "clean_plate": {
+          "result": "VISUAL_PLATE_PASS_FOR_THIS_SOURCE_EFFECT_BBOX",
+          "detail": "Exact B60-authored CLEAN decoded; image on black, gray and white shows uniform transparent source-effect region, no visible English residue/ghost. Alpha=0 in entire exact source text bbox; source vs clean outside union 0. Alpha-zero hidden RGB is not displayed."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_COUNTER_WEIGHT",
+          "detail": "Gray English and Korean labels similar low contrast and visually readable on white/gray; actual menu contrast and exact original font family not independently established."
+        },
+        "readability": {
+          "result": "STATIC_VIEW_LEGIBLE_NOT_RUNTIME",
+          "detail": "All three gray/white/black 8-row triptychs visually inspected; text readable in static crop, no game-size acceptance."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAKAGE_IN_THIS_CONTACT_NOT_C_PASS",
+          "detail": "No definite cut syllable or extra patch visible on 50%-fit JPG; native lossless individual glyph anti-alias check and qualified calibration not completed."
+        },
+        "protected_art": {
+          "result": "NUMERIC_OLD_OUTSIDE_AND_NEW_CLEAN_CHECK",
+          "detail": "Exact SOURCE/CLEAN + SOURCE/CURRENT RGB outside 8-region union zero. No complete independently calibrated full atlas object semantic protection check claimed."
+        },
+        "placement": {
+          "result": "EARLIER_C298_NUMERIC_POSITIVE_MARGIN_NOT_RERUN",
+          "detail": "Already measured C298, no re-count as new visual approval; current exact DDS SHA unchanged."
+        },
+        "orientation": {
+          "result": "SOURCE_CLEAN_DIRECTION_NEWLY_VERIFIED",
+          "detail": "Authored CLEAN decoded READABLE orientation; original/CLEAN RGBA differences outside mask =0 readable, whereas reversed RAW comparison produced 1,984,494 differences. Source/current RAW Y flip per original DDS policy; in-game UV untested."
+        }
+      }
+    }
+  ],
+  "review_decision": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED_PENDING_CURRENT_QUALIFIED_C",
+  "APPROVAL": false,
+  "pre_ingame_export": false,
+  "user_review": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "missing_evidence": [
+    "Current qualified pixels-first blind calibration",
+    "Per-segment source-derived stem/slope/font weight and counter-space measurement",
+    "Independent lossless source/clean/final native+practical 100/75/50 and RAW orientation including protected-object masks",
+    "Actual-game user retest",
+    "Valid role_C/APPROVALS/q154.json"
+  ],
+  "cleanup_policy": "Remove only temporary C305 download/script/images after verification of all output GitHub blob and remote HEAD.",
+  "forbidden_domains_touched": []
+}
