@@ -2808,3 +2808,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q172 6C9B3611: C275's 425 visible source-scope overflow pixels removed by canonical-source-base reconstruction; B248 localized interior preserved byte-exact.
 - Exact candidate 05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018: source-vs-final outside/alpha outside = 0/0, B248-vs-final inside allowed = 0, RGBA32 mip1 RAW mirror-Y exact; producer visual QA PASS.
 - Pending fresh pixels-first C2 + separate C3/evidence, PRE_INGAME/user JPG and NEW in-game validation. RUNTIME_VALIDATION=UNTESTED.
+
+### C276 C1 IGR-006/007 runtime special — 2026-10-08 11:40 KST
+- `TEMP_BACKLOG_RELIEF=C1` / `SHARD=ODD(+UNINDEXED_SPECIAL)`.
+- Shared B170 compact runtime path independently reviewed on exact current hooks blob `954f0998...`; exact current validation-ref blob match confirmed.
+- Win32 Release `37645785737` PASS; Korean Test Build `37645785906` PASS including package verification.
+- IGR-006 / IGR-007 -> **C_STATIC_PASS_PENDING_NEW_INGAME_RETEST**. No runtime closure without a new actual-game screenshot.
+- No source/DDS bytes changed by C; `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
