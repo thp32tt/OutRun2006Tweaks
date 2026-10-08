@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B263 q172 source-measured continuous gold bevel reconstruction, SHA guarded."""
+"""B264 q172 new per-syllable high-resolution cream-face emboss reconstruction, SHA guarded."""
 import hashlib, io, json, os, struct, subprocess, sys, tempfile, urllib.request
 from pathlib import Path
 import numpy as np
@@ -12,7 +12,7 @@ root=Path.cwd()
 gfx=root/"localization/graphics"
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 target=gfx/"hd_candidates"/asset
-run="20261008-B263-Q172-READABLE-GLYPH-REBALANCE"
+run="20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS"
 out=gfx/"role_B"/run
 out.mkdir(parents=True, exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -21,11 +21,18 @@ triage=json.loads(tri.stdout)["assets"][0]
 if triage["next_action"]!="MATERIAL_REWORK": raise RuntimeError(("Not material rework",triage))
 (out/"TRIAGE.json").write_text(json.dumps(triage,indent=2,ensure_ascii=False)+"\n")
 source_sha="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-candidate_sha="15f58551dff16c000c57763a469c4ae1d6f2c8e35c9e5dd1b44259c25bc2e8d0"
+candidate_sha="812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a"
 clean_sha="9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809"
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
  "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/"
  "Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds")
+triage=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","172"],check=True,capture_output=True,text=True)
+triage_decision=json.loads(triage.stdout)["assets"][0]
+if triage_decision["next_action"]!="METHOD_CHANGE_REQUIRED" or "SOURCE_FAMILY_BEVEL_MISMATCH" not in triage_decision["repeated_root_causes"]:
+    raise RuntimeError(("B264 needs actual C291+C295 method change escalation",triage_decision))
+blind=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","172","--require-safe-rerender"],capture_output=True,text=True)
+if blind.returncode!=2:raise RuntimeError("same-method rerender guard failed")
+(out/"B264_TRIAGE.json").write_text(json.dumps(triage_decision,ensure_ascii=False,indent=2)+"\n")
 oldbytes=target.read_bytes()
 if sha(oldbytes)!=candidate_sha:raise RuntimeError(("concurrent q172 change",sha(oldbytes)))
 cleanpath=gfx/"role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/CLEAN.png"
@@ -50,8 +57,8 @@ old=np.asarray(readable(oldbytes),dtype=np.uint8).copy()
 clean=np.asarray(Image.open(cleanpath).convert("RGBA"),dtype=np.uint8).copy()
 if src.shape!=clean.shape or src.shape!=old.shape:raise RuntimeError("source/clean/candidate native dimensions differ")
 spec=[
-    {"id":"START","korean":"출발","source_bbox":[55,373,136,396],"face_width":62,"face_height":18,"shear_px":8},
-    {"id":"GOAL","korean":"골","source_bbox":[595,635,672,659],"face_width":25,"face_height":18,"shear_px":8},
+    {"id":"START","korean":"출발","source_bbox":[55,373,136,396],"glyph_width":23,"face_height":17,"shear_px":7},
+    {"id":"GOAL","korean":"골","source_bbox":[595,635,672,659],"glyph_width":32,"face_height":17,"shear_px":7},
 ]
 allowed=np.zeros((H,W),bool)
 for item in spec:
@@ -86,60 +93,81 @@ for item in spec:
     bottom=np.percentile(px[ys > np.median(ys)],42,axis=0)
     item["profile"]={"source_gold_pixels":len(xs),"source_face_top_rgb":[int(x) for x in top],
                       "source_face_bottom_rgb":[int(x) for x in bottom]}
-    can=Image.new("L",(700,300),0);d=ImageDraw.Draw(can)
-    bb=d.textbbox((0,0),item["korean"],font=font)
-    d.text((30-bb[0],30-bb[1]),item["korean"],font=font,fill=255)
-    bounds=can.getbbox()
-    if not bounds:raise RuntimeError("empty Hangul glyph")
-    mask=can.crop(bounds).resize((item["face_width"],item["face_height"]),Image.Resampling.LANCZOS)
-    w,h=mask.size;s=item["shear_px"]
-    mask=mask.transform((w+s,h),Image.Transform.AFFINE,(1,s/(h-1),-s,0,1,0),
-                        resample=Image.Resampling.BICUBIC)
-    cov=np.asarray(mask,dtype=np.uint8)
-    face=cov>105
-    if np.count_nonzero(face)<100:raise RuntimeError(("too little Hangul face",item["id"]))
-    # 2-pixel right-italic extrusion, warm gold contour and continuous
-    # face gradient. This replaces B255 horizontal-bar fill, not its shear.
-    shadow=np.zeros_like(face)
-    shadow[1:,1:]=binary_dilation(face,iterations=1)[:-1,:-1]
+    # MATERIAL METHOD CHANGE after independent C291+C295:
+    # Per-syllable vector-like supersampled masks, not a fixed-width stretched
+    # phrase or categorical horizontal color bands. Individual italic transforms
+    # and source-matched bright cream faces precede native 1px bevel/extrusion.
+    U=8
+    glyphs=[]
+    for ch in item["korean"]:
+        glyph_can=Image.new("L",(450,340),0)
+        gd=ImageDraw.Draw(glyph_can)
+        gb=gd.textbbox((0,0),ch,font=font)
+        gd.text((36-gb[0],36-gb[1]),ch,font=font,fill=255)
+        bounds=glyph_can.getbbox()
+        if not bounds:raise RuntimeError(("empty glyph",ch))
+        w=item["glyph_width"];h=item["face_height"];shear=item["shear_px"]
+        # Reconstruct each Hangul syllable at 8x BEFORE forward-italic affine,
+        # then antialias ONCE at native display size to preserve curved strokes.
+        high=glyph_can.crop(bounds).resize((w*U,h*U),Image.Resampling.LANCZOS)
+        high=high.transform(((w+shear)*U,h*U),Image.Transform.AFFINE,
+                            (1,shear/(h-1),-shear*U,0,1,0),
+                            resample=Image.Resampling.BICUBIC)
+        glyphs.append(np.asarray(high.resize((w+shear,h),Image.Resampling.LANCZOS),dtype=np.uint8))
+    gap=2 if len(glyphs)>1 else 0
+    content_w=sum(g.shape[1] for g in glyphs)+gap*(len(glyphs)-1)
+    content_h=max(g.shape[0] for g in glyphs)
+    canvas=np.zeros((content_h,content_w),dtype=np.uint8)
+    gx=0
+    for g in glyphs:
+        canvas[:g.shape[0],gx:gx+g.shape[1]]=np.maximum(canvas[:g.shape[0],gx:gx+g.shape[1]],g)
+        gx+=g.shape[1]+gap
+    cov=np.pad(canvas,((1,1),(1,1)),constant_values=0)
+    face=cov>=105
+    if np.count_nonzero(face)<65:raise RuntimeError(("native cream face sparse",item["id"]))
     outer=binary_dilation(face,iterations=1)
-    bevel=face & ~binary_erosion(face,iterations=1)
-    top_edge=bevel & (np.indices(face.shape)[0]<=h//2)
-    inner=face & ~bevel
-    # The glyph-effect extent must remain strictly inside the native English bbox.
+    shadow=np.zeros_like(face,dtype=bool)
+    shadow[1:,1:]=face[:-1,:-1]
+    shadow&=~face
+    edge=outer&~face
+    above=np.zeros_like(face,dtype=bool);above[1:]=face[:-1]
+    below=np.zeros_like(face,dtype=bool);below[:-1]=face[1:]
+    # Face colors continuously cream-white: no horizontal brown stripes.
+    # True gold/copper only on narrow contour and 1px extruded depth.
+    top_edge=face&~above
+    lower_edge=face&~below
+    h,w=face.shape
     shape=(y1-y0,x1-x0)
-    patch=result[y0:y1,x0:x1].copy().astype(np.float32)
-    cleanpatch=clean[y0:y1,x0:x1].copy().astype(np.float32)
-    patch[:]=cleanpatch
-    gw,gh=outer.shape[1],outer.shape[0]
+    gw,gh=w,h
     cx=(x1-x0)//2;cy=(y1-y0)//2
     x=cx-gw//2;y=cy-gh//2
-    if min(x-2,y-2,shape[1]-(x+gw+2),shape[0]-(y+gh+2))<0:
-        raise RuntimeError(("effect doesn't fit native English bbox",item["id"],x,y,gw,gh,shape))
+    if min(x-1,y-1,shape[1]-(x+gw+1),shape[0]-(y+gh+1))<0:
+        raise RuntimeError(("per-syllable effect exceeds exact source bbox",item["id"],shape,w,h,x,y))
+    patch=clean[y0:y1,x0:x1].copy().astype(np.float32)
     region=patch[y:y+gh,x:x+gw]
-    shadow_only=shadow & ~outer
-    region[shadow_only,:3]=[129,31,28]
-    region[shadow_only,3]=255
-    edge=outer & ~face
-    region[edge,:3]=[179,64,28]
-    region[edge,3]=255
-    region[bevel,:3]=[230,135,48]
-    region[bevel,3]=255
-    region[top_edge,:3]=[255,217,118]
-    region[top_edge,3]=255
+    region[shadow,:3]=[145,49,32];region[shadow,3]=255
+    region[edge,:3]=[231,125,56];region[edge,3]=255
     YY,XX=np.indices(face.shape)
-    # Across each Hangul stroke: continuous bright center to warm bottom.
-    # No discrete horizontal-palette stripes or post-scale bitmap effects.
-    mix=np.clip((YY / max(h-1,1))*0.82 + 0.05,0,1)[...,None]
-    grad=top[None,None,:]*(1-mix)+bottom[None,None,:]*mix
-    grad=np.maximum(grad,[218,139,85])
-    grad=np.clip(grad,0,255)
-    region[inner,:3]=grad[inner]
-    region[inner,3]=255
-    # Native antialiased fringe blends with warm contour at partial coverage.
-    aa=(cov>12)&~outer
-    region[aa,:3]=[183,83,39]
-    region[aa,3]=255
+    # Only a subtle 30% bottom-warmth and per-pixel right edge highlight;
+    # the full inner Hangul face stays luminous and continuous.
+    t=(YY.astype(float)/max(1,h-1))[:, :, None]*0.30
+    continuous=top[None,None,:]*(1-t)+bottom[None,None,:]*t
+    continuous=np.maximum(continuous,[245,222,190])
+    continuous=np.minimum(continuous,255)
+    region[face,:3]=continuous[face];region[face,3]=255
+    # Physically located contours follow each glyph—not horizontal rows.
+    region[lower_edge,:3]=[247,173,106]
+    region[top_edge,:3]=[255,251,230]
+    # The exact 1px warm fringe only follows low-coverage pixels.
+    fringe=(cov>22)&(~face)&(~outer)
+    region[fringe,:3]=[230,166,102];region[fringe,3]=255
+    bright=(region[:,:,0]>=244)&(region[:,:,1]>=210)&face
+    item["bright_cream_face_pixels"]=int(bright.sum())
+    item["native_face_pixels"]=int(face.sum())
+    if bright.sum()<face.sum()*0.60:
+        raise RuntimeError(("cream interior underfilled; no brown-slab retry",item["id"],int(bright.sum()),int(face.sum())))
+    item["rendering_method"]="SUPERSAMPLED_PER_SYLLABLE_AFFINE_THEN_CREAM_FACE_WITH_CONTOUR_EMBOSS"
+    item["glyph_shapes"]=[list(map(int,g.shape)) for g in glyphs]
     patch=np.clip(patch,0,255).astype(np.uint8)
     result[y0:y1,x0:x1]=patch
     geom=np.zeros(shape,dtype=bool)
@@ -202,10 +230,10 @@ for sp in spec:
     card=Image.new("RGB",(sum(z.width for z in pics)+18,max(z.height for z in pics)),(85,85,85));x=0
     for im in pics:card.paste(im,(x,0));x+=im.width+9
     card.save(out/f"{sp['id']}_RAW_SOURCE_CLEAN_FINAL.png")
-qa={"run":"B263","run_key":"OUTRUN-KOR-B262-Q172-SOURCE-GOLD-20261008-1730-REWORK-RETRY",
+qa={"run":"B264","run_key":"OUTRUN-KOR-B264-Q172-METHOD-CHANGE-20261008-1830",
     "queue_index":172,"source_sha256":source_sha,"prior_candidate_sha256":candidate_sha,
     "new_candidate_sha256":newsha,"clean_plate_sha256":clean_sha,
-    "method":"SOURCE-SAMPLED-CONTINUOUS-CREAM-GOLD-GRADIENT_PLUS_PER_GLYPH_BEVEL",
+    "method":"PER_SYLLABLE_SUPERSAMPLED_ITALIC_CREAM_FACE_CONTOUR_EMBOSS",
     "source_anchored_regions":spec,"native_size":[W,H],"DDS":"RGBA32 mip1 raw mirror_y",
     "machine":{"exact_dds_header":True,"roundtrip_decoded_final":"PASS","changed_rgba_outside_source_boxes":outside,"alpha_outside_source_boxes":alpha_outside,
                "bbox_size_margin":"PASS_BOTH","persisted_file":str(target.relative_to(root))},
@@ -214,5 +242,5 @@ qa={"run":"B263","run_key":"OUTRUN-KOR-B262-Q172-SOURCE-GOLD-20261008-1730-REWOR
     "C":"NOT_RUN","C3":"NOT_RUN","approval":"BLOCKED","RUNTIME_VALIDATION":"UNTESTED",
     "execution_backend":"GITHUB_ACTIONS_EPHEMERAL_CPU_WORKER","cleanup":"tempfile auto-removes; runner workspace ephemeral",
     "protected_domains_touched":[]}
-(out/"B262_MACHINE_AND_PRODUCTION_GATE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(out/"B264_MACHINE_AND_PRODUCTION_GATE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"result":"MATERIAL_DDS_PRODUCED_PENDING_VISUAL","candidate_sha256":newsha,"qa":str(out)},ensure_ascii=False))
