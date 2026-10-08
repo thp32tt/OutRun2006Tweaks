@@ -3164,3 +3164,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 02:29 KST — C318 C2 EVEN q212 IGR-029 atlas typography REWORK_REQUIRED
 - `TEMP_BACKLOG_RELIEF=C2` `SHARD=EVEN`; exact q212 SOURCE/CURRENT 36 new lossless 100/75/50/RAW PNG, 12 region machine zero-outside, six visually reviewed, SHOWROOM+ENTER NAME disproportionately small/weak at practical scale. `C=REWORK_REQUIRED`; C3/approval/export blocked, `IGR-029` remains OPEN/SUSPECTED mapping, no new DDS or actual-game test. QA `localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_CONTROLLER_C2_SOURCE_HIERARCHY_REWORK.json`.
+
+### 2026-10-09 03:12 KST — A200 q161 BC3 2-cell pinpoint replacement
+- `RUN_KEY=OUTRUN-KOR-A200-Q161-BC3-LEO-PISCES-20261009-0311`; saved candidate `2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b` corrected C314 PISCES/LEO unsqueezed color/alpha glyph and preserved 36 others byte-exact. Current 2/2 bbox + 0 core pinholes/changed outside, RAW/BGW native/50 producer self QA PASS; C1/C3/current APPROVAL/user naming/actual game PENDING, RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json`.

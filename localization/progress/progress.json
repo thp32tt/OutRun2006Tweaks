@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 02:29 KST",
+  "updated_at_kst": "2026-10-09 03:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8528,5 +8528,26 @@
     "approval": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C318-C2-Q212-IGR029-UNDERFILL/C318_Q212_CONTROLLER_C2_SOURCE_HIERARCHY_REWORK.json"
+  },
+  "a200_q161_native_face_repair": {
+    "time_kst": "2026-10-09 03:12 KST",
+    "run_key": "OUTRUN-KOR-A200-Q161-BC3-LEO-PISCES-20261009-0311",
+    "queue_index": 161,
+    "asset_hash": "55B57CDE",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "old_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "new_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+    "repaired_regions": [
+      4,
+      6
+    ],
+    "other_36_untouched": true,
+    "new_material_dds_count": 1,
+    "producer_self_qa": "PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "EVIDENCE_APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json"
   }
 }

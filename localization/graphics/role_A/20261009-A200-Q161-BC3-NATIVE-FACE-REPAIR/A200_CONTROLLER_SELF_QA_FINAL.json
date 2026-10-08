@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "task_id": "OUTRUN-KOR-A200-Q161-BC3-LEO-PISCES-20261009-0311",
+  "review_at_kst": "2026-10-09 03:12 KST",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "canonical_source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "previous_candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "new_candidate_sha256": "2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37822017746",
+  "native_DDS": {
+    "size": [
+      2048,
+      2048
+    ],
+    "codec": "BC3 DXT5",
+    "mips": 1,
+    "header_original_exact": true,
+    "RAW": "mirror_y"
+  },
+  "producer_10_stages": {
+    "01_SOURCE": "PASS pinned original and atlas verified by Git blob and SHA256",
+    "02_MASK": "PASS exact source bboxes for diagnosed regions04/06; 36 other Korean labels preserved exact compressed blocks",
+    "03_CLEAN": "PASS previous source lettering cleared to transparent plate in target bboxes only",
+    "04_PLATE_ONLY": "PASS visual SOURCE/CLEAN native 100%, white+gray+black; no definite English source ghost or rectangular damage in two cells",
+    "05_STYLE": "PASS no horizontal CJK compression, source flat gray RGB565, 49pt native for 사자 and 44pt native for 물고기자리; shorten LEO by semantically accurate policy exception",
+    "06_NATIVE": "PASS naturally proportioned Korean glyph masks, source bbox 2/2 with strictly positive margins",
+    "07_COMPOSITE": "PASS direct alpha glyph-only, no foreign opaque rectangular background and no arbitrary shadow",
+    "08_COMPOSITE_QA": "PASS CLEAN/FINAL pixels confined to two original source cells, other DDS blocks byte-identical",
+    "09_SAVED_DDS": "PASS actual decoded BC3 and native 100/75/50 BWG; RAW mirror-Y from persisted output; one authored mip",
+    "10_HANDOFF": "A SELF_QA_PASS pending independent C1 C3 and user/game validation"
+  },
+  "visual_ordered_8": {
+    "english_removal": "PASS SOURCE/CLEAN visually cleared in both repaired source cells",
+    "slant": "PASS upright source+Korean family, RAW source/final identical convention",
+    "size": "PASS original source heights PISCES51, LEO51; Korean heights43/48 with natural aspect and no forced 0.5682 squash",
+    "stroke_style": "PASS source gray flat face, decoded opaque core no color holes; do not claim whole-family calibration C",
+    "clipping": "PASS 2/2 positive bbox margins, no glyph clipped at native/50 in sampled regions",
+    "protected": "PASS zero changed visible/alpha pixels outside targeted regions, 36 other compressed regions unchanged",
+    "raw_flipY": "PASS SOURCE/CLEAN/FINAL gray/black/white, RAW mirror-Y representative",
+    "readability": "PASS PISCES/물고기자리 and LEO/사자 readable native and 50%; translation shortening awaits independent acceptance"
+  },
+  "machine": {
+    "changed_pixels_outside_two_bboxes": 0,
+    "alpha_changed_outside_two_bboxes": 0,
+    "introduced_visible_outside_two_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "2/2 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "region_evidence": [
+    {
+      "idx": 4,
+      "source": "PISCES",
+      "korean": "물고기자리",
+      "source_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "candidate_bbox": [
+        8,
+        1866,
+        206,
+        1909
+      ],
+      "natural_width": 198,
+      "horizontal_scale": 1,
+      "source_size": [
+        203,
+        51
+      ],
+      "render_size": [
+        198,
+        43
+      ],
+      "native_font_size": 44,
+      "decoded_core_pinhole_pixels": 0,
+      "decoded_color_mismatch_pixels": 0
+    },
+    {
+      "idx": 6,
+      "source": "LEO",
+      "korean": "사자",
+      "source_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "candidate_bbox": [
+        8,
+        1800,
+        98,
+        1848
+      ],
+      "natural_width": 90,
+      "horizontal_scale": 1,
+      "source_size": [
+        105,
+        51
+      ],
+      "render_size": [
+        90,
+        48
+      ],
+      "native_font_size": 49,
+      "decoded_core_pinhole_pixels": 0,
+      "decoded_color_mismatch_pixels": 0
+    }
+  ],
+  "saved_image_evidence": {
+    "source_clean_final_gray_native": [
+      "A200_04_SOURCE_CLEAN_FINAL_GRAY_100.png",
+      "A200_06_SOURCE_CLEAN_FINAL_GRAY_100.png"
+    ],
+    "black_half": "A200_04_SOURCE_CLEAN_FINAL_BLACK_50.png",
+    "white_half": "A200_06_SOURCE_CLEAN_FINAL_WHITE_50.png",
+    "raw": "A200_06_SOURCE_FINAL_RAW.png",
+    "other_BGWhiteGray_all_scales": "A200_{04|06}_SOURCE_CLEAN_FINAL_{BLACK|GRAY|WHITE}_{100|75|50}.png"
+  },
+  "producer_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+  "independent_C1": "PENDING",
+  "independent_C3": "PENDING",
+  "translation_exception": "LEO abbreviation 사자 (Leo/lion) requires independent review; do not count as approved Korean nomenclature",
+  "current_evidence_approval": false,
+  "USER_ACCEPTANCE": false,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
