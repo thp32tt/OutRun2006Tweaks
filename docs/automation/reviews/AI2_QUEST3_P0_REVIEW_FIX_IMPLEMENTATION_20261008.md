@@ -1,0 +1,39 @@
+# AI 2 / DX9Ex Quest 3 P0 — consolidated two-review remediation (2026-10-08)
+
+## Authority and limits
+- Repository: `thp32tt/OutRun2006Tweaks`, production branch `vr-d3d9ex-focus`.
+- Historical HMD failure: `CONVERSION-DX9EX-00519`, SHA `9a3e08cc62b6a36a8196936eacead8cc08fcc756`, **still not resolved by headset evidence**.
+- Reviews merged into this work: `AI2_QUEST3_CROSS_DOMAIN_SOURCE_REVIEW_20261008.md` and `AI2_QUEST3_SECOND_30MIN_RENDER_LIFETIME_REVIEW_20261008.md`.
+- Implementation code material SHA (before this documentary commit): `f2e290417fe9e4f6f822f0009feca7410103adf7`.
+- Quest3/VDXR: **RUNTIME_VALIDATION=UNTESTED**. Static tests can prove source/build contracts but not optical convergence.
+- User policy: **no 1000/5000 unchanged-source HUD loops**. Only one exact-SHA CI pipeline and six distinct defect-injection cases.
+
+## Implemented — material changes (2026-10-08)
+
+| Priority | Prior review finding | Actual implemented source | Proof / limit |
+| --- | --- | --- | --- |
+| **P0 F11 binocular UI** | Pinned original ImGui DX9 uses `D3DFVF_XYZ`, VS=null and orthographic projection, so old R30 shader/XYZRHW owners both rejected its gameplay overlay Draw | `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp`: **strict external `ScopedExternalOverlaySemantic` only**, fixed `XYZ + DIFFUSE + TEX1`, orthographic + world/view identity gate. Compose existing R30 finite head-recentered HUD plane into **per-eye D3D9 projection matrix**, and remap the **per-command scissor** bounding rectangles per eye. Draw L/R once, restore projection, scissor, RT/depth/viewport and poison fail-closed on right-eye/state failures. Trigger scene-only SkyGlow snapshot before first owned F11 draw | New one-time diagnostic `VR R30 F11 IMGUI` on first owned draw. No broad menu-selector/world XYZ promotion. HMD visual correctness UNTESTED; actual compositor optical result not inferred from this source change |
+| **P1 memory/pacing** | R30 lazy VB/IB CPU shadow hooks stay globally armed after first candidate Draw and might copy ImGui/world dynamic buffers, with no whole-registry budget | R30: **64 MiB global reservation cap** (16 MiB max per VB/IB preserved), decrement on COM final Release, reset on rollback. Skip VB/IB CPU shadow capture and creation when explicit F11 ImGui overlay scope is active. Missing/over-budget buffers continue safely down existing lower renderer fallback | Reservation cap is conservative, not a measured memory/perf gain; normal XYZRHW dynamic buffers retain Lock/Unlock tracking. Additional actual GPU/CPU telemetry needed |
+| **P1 host world readiness** | Untagged flat RHW=1 constant-Z vertices can pass Z-only depth heuristic and poison `FrameHadWorldStereo` / host admission | R30: keep optional unknown-world eye-render behavior, but **separate `worldEvidenceAuthoritative`**. Exact `WorldBillboard/ProjectedWorldMarker` remains authoritative; unknown flat RHW=1 signatures detected by existing `R30XyzrhwLooksLikeHudPlane` are **not allowed to seed `FrameHadWorldStereo`, `FrameStereoPoseSequence` or `WorldStereoDraws`**. Record first `R30 XYZRHW` diagnostic. Other confirmed world Draw remains unaffected | No claim this was observed in the HMD. Avoids broad particle/displacement regressions while preventing ambiguous input from being a host readiness authority |
+| **P0 deterministic gates** | Previous CI passed semantic tag presence but never checked actual pinned ImGui Draw eligibility or host authority | `tools/verify_vr_visual_composition_p0.py`: validate fixed XYZ/ortho gate, scissor + eye matrix and restoration, external ownership, source ordering, authoritative world flag, shadow cap and compiled ImGui dependency. Six intentional **distinct** fail-closed source mutation cases per test invocation | Structural proof, not runtime or GPU pipeline simulation. The existing HUD Inspector executes this verifier |
+| **P1 CI dependency coverage** | Active game builds compile `external/imgui/backends/imgui_impl_dx9.cpp` but changes to gitlink did not trigger DX9Ex/HUD gates | Added `external/imgui` and `.gitmodules` to push/PR-relevant paths in `.github/workflows/vr-dx9ex-active.yml`, `dx9ex-fullsource-impact-review.yml`, `outrun-exe-hud-inspector.yml` | Ensures *future* ImGui gitlink changes are watched; future exact submodule update still requires proper CI and HMD verification |
+
+## Prior finding already fixed by separate DX9Ex task
+- `CONVERSION-DX9EX-00551` restored original UI DDS header, sprite scale and fallback after optional replacement decode failure in `src/hooks_textures.cpp`. It had separate static CI SUCCESS. **Not modified or scored by this remediation**; selection-menu pixels remain HMD UNTESTED.
+
+## Reviewed but intentionally deferred for discriminating evidence
+- **P0 rank/rival Calc3D2D anchor lifetime**: `RankMarkerProjectedInfo/RivalMarkerProjectedInfo` lack vehicle/sample frame ownership; blindly expiring one sample can break legal multiglyph 4–5th rank marks and no-tick Sumo sprite replay. Require one diagnostic trace correlating return RVA (`0xBAEE7/0xBB6F5`), vehicle ID, source sample serial, queue-node producer, interpolation alpha and final draw pose. Current project may execute Calc3D2D after interpolation; do **not** assert timing is broken just by comparing hook file order. Do not rewrite unproven EXE callsite lifetime semantics.
+- **R30 c64 late node selection / HUD headlock**: tracked raw c64 pre-node versus exact SpriteNode scope remains a separate issue for 6th/6, arrows, gear and checkpoint/goal. Existing all-node sibling tags and cross-thread epoch lock are already fixed; the new external F11 owner does not touch this game's c64 path.
+- **Lens/SceneEffect XYZRHW**, **R15 partial rect upload**, **upstream Sumo pointer snapshot** and **pinned upstream ImGui texture atlas LockRect failure**: code-level possible regressions; changes require concrete producer/FVF/failed HRESULT or texture-lifecycle evidence, not blind broad shader or submodule rewrite. Per-frame SkyGlow late snapshot should be separately checked with factor 0/default on one frozen exact build.
+- **Host cached projection**: raw SBS versus theater fallback and frozen cached frame issues are separately owned by host R23; no host changes without exact state/pose lifecycle diagnostics.
+
+## Verification order
+1. **Exact material SHA** `f2e290417fe9e4f6f822f0009feca7410103adf7`: obtain HUD Inspector CI, DX9Ex Active Win32/host/full-chain/package, Full Source Impact and Domain Isolation. Any CI failure means the material is not accepted and must be corrected at another material SHA.
+2. Verify package actually uses R26+HUD and not R33 compile-only path. Do not use old safe-draw baseline as active HMD evidence.
+3. Only if static CI all succeeds, freeze this executable build and ask for one Quest3/VDXR session covering F11 overlay in actual race, 6th/6, 4/5 rank/rival markers, selector DDS, lens flare and pacing. No repeated unchanged-package tests.
+4. **Never** mark Quest 3 visual pass unless the user runs the exact SHA and reports/records the result. `RUNTIME_VALIDATION=UNTESTED`.
+
+## Status
+- Code implementation: material changes committed.
+- Canonical static/build CI: **pending verification of exact material** at time of report creation; earlier successful CI on a prior SHA cannot be transferred.
+- Headset: **UNTESTED**.
