@@ -11082,5 +11082,32 @@
     "qa": "localization/graphics/role_B/20261008-B255-Q172-EXPLICIT-KOREAN-FONT-SHEAR/B255_CONTROLLER_SELF_QA.json",
     "backend": "GITHUB_ACTIONS",
     "forbidden_domains_touched": []
+  },
+  "c282_c2_q172_b255_native_recovery": {
+    "run": "20261008-C282-C2-Q172-B255-NATIVE-RECOVERY",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "candidate_sha256": "7282687bbc3f5b4e7ea45c03043d84b27204a5b183a8eaa9a08c35bb63eb84e2",
+    "previous_rejected_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+    "source_changed_outside_rgba": 0,
+    "source_changed_outside_alpha": 0,
+    "B251_to_B255_inside_rgba": 1819,
+    "B251_to_B255_outside_rgba": 0,
+    "raw_readable_regions_byte_exact": "2/2",
+    "independent_visual": "RECOVERED_RIGHT_ITALIC_DIRECTION_NO_DEFINITE_NEW_FAILURE",
+    "decision": "HOLD_STRICT_RECHECK",
+    "reason": "Qualified blind known-good calibration, exact bound clean plate, measured glyph-only native source anchors and separate C/C3 evidence missing",
+    "C3": "BLOCKED",
+    "approval_created": false,
+    "pre_ingame": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_CONTROLLER_QA.json",
+    "machine_report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_NATIVE_MACHINE.json",
+    "cleanup": "PENDING_AFTER_REMOTE_VERIFICATION",
+    "forbidden_domains_touched": []
   }
 }
