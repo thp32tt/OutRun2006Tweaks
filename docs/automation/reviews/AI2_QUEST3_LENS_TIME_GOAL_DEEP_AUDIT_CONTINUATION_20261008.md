@@ -21,3 +21,14 @@ The same-day preceding [AI2 lens/time/goal real source repair](AI2_QUEST3_LENS_T
 ## C1 review status
 - Current source retrieval completed and existing material 5011d1e... SUCCESS recovered.
 - New cause **not yet established**. Continue deeper on source/producer life cycle and code paths; avoid speculatively claiming user optical issues are fixed.
+
+## C1-C2 first verified correction: canonical lens disassembly coverage was structurally false
+**Finding LENS-XREF-001 (source-proven):** previous `tools/analyze_outrun_exe.py::PRODUCER_WINDOWS` described lens `SceneEffectLensProducer_sub_40CAE0` with start `0xCAE0` and anchors `0xCABE`, `0xCF4E`. Since `0xCABE < 0xCAE0`, the pre-existing `extract_producer_windows` direct-CALL loop could **never** include the first “proved” lens producer call within its named window. It separately extracted 32 raw bytes at the out-of-window anchor, masking the mismatch. `tools/verify_vr_visual_composition_p0.py` only matched address strings, not containment or rel32 destination. The prior review asserted an unproven single enclosing producer function.
+
+**Original-mod/binary distinction:** `src/game_addrs.hpp` resolves `DrawObjectAlpha_Internal` at RVA `0x56D0`; `Calc3D2D` at `0x49940`. The canonical C++ hook `0xCABE` and projected Calc anchor `0xCF4E` are distinct producer CALLs in separate ordered code ranges; do not assume one output belongs to the other without disassembly/XREF proof. `emoose/OutRun2006Tweaks/src/hooks_graphics.cpp` originally wraps `Clr_SceneEffect` `0xBE70` with its 0.05 near-plane fix, **not** with any shared assumption that those two CALLs have identical caller scope.
+
+**Actual changes committed in production:**
+- `a869acfca72bd263d898bc198c5498cf9ea2e5ae`: split independent nonoverlapping `0xCAB0..0xCAE0` `DrawObjectAlpha` and `0xCAE0..0xD100` `Calc3D2D` windows. Require every declared anchor to reside in its window, exact x86 E8 rel32 of `0xCABE -> 0x56D0` and `0xCF4E -> 0x49940`; fail closed on malformed/unmapped source. Also fix last-5-byte direct CALL enumeration boundary (`len(blob)-4`).
+- `fe52e916da9fba1482afb2f82956e11d3df88dd5`: update mandatory P0 visual static gate from the false combined producer marker to two exact anchor windows and target/containment invariants.
+
+**Interpretation:** This is a real disassembly-audit and preventive EXE-producer proof fix; it is **not** yet a new optical renderer correction. Preserve previous `5011d1e7...` lens fixed-function and +TIME/goal source owner changes; do not confuse a stronger proof map with demonstrated headset visual improvement. Exact material CI for `fe52e916...` launched runs: DX9Ex Active `37751359391`, EXE Inspector `37751359410`, Full Source `37751359246`, Domain Isolation `37751359275` — **PENDING**, check explicit conclusion before reporting.
