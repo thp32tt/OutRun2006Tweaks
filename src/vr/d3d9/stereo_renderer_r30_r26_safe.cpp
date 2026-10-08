@@ -1569,6 +1569,48 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Generic queued screen sprites and ordinary position digits share
+        // the game's c64 across draw calls. Reading live GPU c64 here can
+        // recover an R23/R30 head-injected world matrix rather than the
+        // original game matrix. Keep this strictly queue-scoped; the proven
+        // OutRun rival producer is intentionally NOT opted into this repair.
+        bool R30GetRecentRawWvpForQueueSprite(
+            float outConstants[16]) noexcept
+        {
+            if (!outConstants ||
+                !OutRunVR::GameSemantic::QueueRenderActive())
+                return false;
+            const auto scope = OutRunVR::GameSemantic::CurrentScope;
+            const auto token =
+                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const bool genericScreen =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope);
+            const bool rank =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    scope) &&
+                (token == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                 token == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
+            if (!genericScreen && !rank)
+                return false;
+            std::uint64_t writeSerial = 0;
+            std::uint64_t writeDrawSerial = 0;
+            std::uintptr_t writeShader = 0;
+            std::uint64_t writeShaderSerial = 0;
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderSerial = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    outConstants, writeSerial, writeDrawSerial,
+                    writeShader, writeShaderSerial) ||
+                !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
+                writeShader == 0 || writeShader != currentShader ||
+                writeShaderSerial == 0 ||
+                writeShaderSerial != currentShaderSerial)
+                return false;
+            const std::uint64_t currentDraw = TopLevelDrawSerial() + 1u;
+            return currentDraw > writeDrawSerial &&
+                currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow;
+        }
+
         bool R30ExactSceneEffectScope() noexcept
         {
             const auto scope = OutRunVR::GameSemantic::CurrentScope;
@@ -3935,7 +3977,8 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
                 screenKind == R30ScreenSpaceKind::WorldBillboard ||
-                screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
+                screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D ||
+                screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
                 // several consecutive draws. Use the original game upload, not
@@ -3971,10 +4014,23 @@ namespace OutRunVRStereo
                         if (!R30GetExtendedRawWvpForExactSceneEffect(original))
                             return false;
                     }
+                    else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D ||
+                             (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                              (OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
+                               OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                               OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
+                               OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite)))
+                    {
+                        // Never reapply head/eye transforms to injected live
+                        // c64. An unproven original game upload fails closed.
+                        // Do not change the already-correct rival producer.
+                        if (!R30GetRecentRawWvpForQueueSprite(original))
+                            return false;
+                    }
                     else
                     {
-                        // Exact WorldBillboard and ProjectedWorldMarker2D
-                        // preserve the existing proven R51 long-batch route.
+                        // Unchanged exact WORLD_BILLBOARD, rival and world
+                        // paths: no risky projection or per-eye rewrites.
                         if (FAILED(device->GetVertexShaderConstantF(
                                 OutRunWvpRegister, original,
                                 OutRunWvpRegisterCount)))
