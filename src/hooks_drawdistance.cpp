@@ -185,12 +185,22 @@ public:
 			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, clipboard.length() + 1);
 			if (hMem)
 			{
-				memcpy(GlobalLock(hMem), clipboard.c_str(), clipboard.length() + 1);
-				GlobalUnlock(hMem);
-				OpenClipboard(0);
-				EmptyClipboard();
-				SetClipboardData(CF_TEXT, hMem);
-				CloseClipboard();
+				void* destination = GlobalLock(hMem);
+				if (destination)
+				{
+					memcpy(destination, clipboard.c_str(), clipboard.length() + 1);
+					GlobalUnlock(hMem);
+					// Windows owns the memory only after successful SetClipboardData.
+					// A failed OpenClipboard must not leak the allocation.
+					if (OpenClipboard(nullptr))
+					{
+						if (EmptyClipboard() && SetClipboardData(CF_TEXT, hMem))
+							hMem = nullptr;
+						CloseClipboard();
+					}
+				}
+				if (hMem)
+					GlobalFree(hMem);
 			}
 		}
 

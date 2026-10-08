@@ -114,18 +114,31 @@ public:
 		typedef int(__stdcall* timeGetDevCaps_Fn) (TIMECAPS* ptc, UINT cbtc);
 
 		auto winmm = LoadLibraryA("winmm.dll");
-		auto timeBeginPeriod = (timeBeginPeriod_Fn)GetProcAddress(winmm, "timeBeginPeriod");
-		auto timeGetDevCaps = (timeGetDevCaps_Fn)GetProcAddress(winmm, "timeGetDevCaps");
+		auto timeBeginPeriod = winmm
+			? (timeBeginPeriod_Fn)GetProcAddress(winmm, "timeBeginPeriod") : nullptr;
+		auto timeGetDevCaps = winmm
+			? (timeGetDevCaps_Fn)GetProcAddress(winmm, "timeGetDevCaps") : nullptr;
 
-		// Initialization
-		Timer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
-		TIMECAPS caps;
-		timeGetDevCaps(&caps, sizeof caps);
-		timeBeginPeriod(caps.wPeriodMin);
-		SchedulerPeriodMs = (int)caps.wPeriodMin;
-		LARGE_INTEGER qpf;
-		QueryPerformanceFrequency(&qpf);
-		QpcPerSecond = qpf.QuadPart;
+		// Missing winmm/exports must not crash the whole game during timer
+		// setup. Always leave a positive scheduler period for Sleep fallback.
+		TIMECAPS caps{ 1, 1 };
+		if (timeGetDevCaps && timeGetDevCaps(&caps, sizeof caps) != 0)
+			caps = { 1, 1 };
+		if (caps.wPeriodMin == 0)
+			caps.wPeriodMin = 1;
+		if (timeBeginPeriod)
+			timeBeginPeriod(caps.wPeriodMin);
+		SchedulerPeriodMs = static_cast<int>(caps.wPeriodMin);
+		LARGE_INTEGER qpf{};
+		if (!QueryPerformanceFrequency(&qpf) || qpf.QuadPart <= 0)
+		{
+			// QPC exists on supported Windows. Defend the divisor anyway.
+			QpcPerSecond = 1;
+		}
+		else
+			QpcPerSecond = qpf.QuadPart;
+		Timer = CreateWaitableTimerExW(NULL, NULL,
+			CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
 	}
 };
 
