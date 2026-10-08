@@ -59,7 +59,8 @@ jobs:
           Copy-Item localization/text/runtime_ko.tsv build/bin/localization/text/runtime_ko.tsv -Force
           Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
 
-      - name: Copy PRE_INGAME-approved Korean graphics
+      - name: Select evidence-approved Korean graphics or runtime-only QA
+        id: graphics
         shell: pwsh
         run: |
           $rows = Import-Csv localization/graphics/asset_queue.csv
@@ -119,24 +120,45 @@ jobs:
             }
           }
 
-          if ($selected.Count -eq 0) {
-            throw 'No PRE_INGAME-approved Korean graphics selected.'
+          # Zero approved candidates is a graphics export HOLD, not a Win32 build error.
+          $mode = if ($selected.Count -eq 0) { 'RUNTIME_ONLY' } else { 'EVIDENCE_APPROVED_GRAPHICS' }
+          "mode=$mode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "selected_count=$($selected.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $blockedCount = @($review.mandatory_c3_blocked).Count
+          if ($mode -eq 'EVIDENCE_APPROVED_GRAPHICS') {
+            $selected | Export-Csv build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv -NoTypeInformation -Encoding UTF8
+          } else {
+            if (Test-Path build/bin/textures) {
+              throw 'RUNTIME_ONLY must not contain any graphics textures.'
+            }
+            Write-Warning 'No currently approved Korean DDS; omitted all graphics. RUNTIME_ONLY.'
           }
 
-          $selected | Export-Csv build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv -NoTypeInformation -Encoding UTF8
           @(
-            'OutRun 2006 Korean localization test build'
+            'OutRun 2006 Korean localization QA test package'
             "Source commit: $env:GITHUB_SHA"
-            "Graphics included: $($selected.Count)"
-            'Selection: PRE_INGAME manifest localized candidates, excluding mandatory_c3_blocked'
-            'Integrity: every included DDS SHA-256 must match PRE_INGAME manifest'
-            'Runtime text: localization/text/runtime_ko.tsv'
-            'Status: TEST BUILD / IN-GAME VALIDATION REQUIRED'
+            "QA package mode: $mode"
+            "Approved Korean graphics included: $($selected.Count)"
+            "Graphics held from export: $blockedCount"
+            'Graphics source: role_C/PRE_INGAME_JPG_REVIEW/manifest.json'
+            'Graphics require independently validated exact-source/exact-candidate C/C3 evidence.'
+            'Runtime translations: localization/text/runtime_ko.tsv'
+            'RUNTIME_ONLY has NO Korean DDS; it cannot validate the latest graphic rework.'
+            'EVIDENCE_APPROVED_GRAPHICS contains only SHA-pinned approved Korean DDS.'
+            'Actual in-game validation: UNTESTED'
             ''
-            'Install: extract into the OutRun 2006 Coast 2 Coast game folder, where OR2006C2C.EXE is located.'
-            'Keep OutRun2006Tweaks.log and screenshots for failures.'
+            'Install in a separate backup/copy of OutRun 2006 Coast 2 Coast, not over earlier QA builds.'
+            'Keep OutRun2006Tweaks.log, screenshots, and exact source commit for failures.'
           ) | Set-Content build/bin/KOREAN_TEST_BUILD_README.txt -Encoding UTF8
-          Write-Host "Selected Korean graphics: $($selected.Count)"
+          @(
+            "source_sha=$env:GITHUB_SHA"
+            "mode=$mode"
+            "graphics_selected=$($selected.Count)"
+            "graphics_held=$blockedCount"
+            'actual_game_validation=UNTESTED'
+          ) | Set-Content build/bin/KOREAN_QA_BUILD_SCOPE.txt -Encoding UTF8
+          Write-Host "QA package mode: $mode; approved graphics: $($selected.Count); held graphics: $blockedCount"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "Korean test build: **$mode**, approved Korean DDS: **$($selected.Count)**, held: **$blockedCount**. Game testing: **UNTESTED**."
 
       - name: Verify package
         shell: pwsh
@@ -145,15 +167,28 @@ jobs:
           if (-not (Test-Path build/bin/OR2006C2C.exe)) { throw 'OR2006C2C.exe missing' }
           $rows = (Get-Content build/bin/localization/text/runtime_ko.tsv | Measure-Object -Line).Lines
           if ($rows -lt 1355) { throw "runtime_ko.tsv unexpectedly short: $rows lines" }
-          $dds = (Get-ChildItem build/bin/textures/load -Recurse -Filter *.dds | Measure-Object).Count
-          if ($dds -lt 1) { throw 'No Korean DDS files copied' }
-          Write-Host "runtime rows: $rows"
-          Write-Host "Korean DDS files: $dds"
+          $dds = @(Get-ChildItem build/bin/textures -Recurse -Filter *.dds -ErrorAction SilentlyContinue).Count
+          $mode = '${{ steps.graphics.outputs.mode }}'
+          $expected = [int]'${{ steps.graphics.outputs.selected_count }}'
+          if ($mode -eq 'RUNTIME_ONLY') {
+            if ($expected -ne 0 -or $dds -ne 0 -or (Test-Path build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv)) {
+              throw 'RUNTIME_ONLY must contain zero Korean DDS and no graphics manifest.'
+            }
+          } elseif ($mode -eq 'EVIDENCE_APPROVED_GRAPHICS') {
+            if ($expected -lt 1 -or $dds -ne $expected) {
+              throw "Approved graphics count mismatch: expected=$expected actual=$dds"
+            }
+            if (-not (Test-Path build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv)) { throw 'Missing approved graphics manifest' }
+          } else {
+            throw "Unknown QA package mode: $mode"
+          }
+          if (-not (Test-Path build/bin/KOREAN_QA_BUILD_SCOPE.txt)) { throw 'Missing QA scope receipt' }
+          Write-Host "QA mode: $mode; runtime rows: $rows; approved DDS: $dds"
 
       - name: Upload Korean test build
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: OutRun2-Korean-Test-${{ github.sha }}
+          name: OutRun2-Korean-${{ steps.graphics.outputs.mode }}-${{ github.sha }}
           path: build/bin/
           compression-level: 9
           retention-days: 30
