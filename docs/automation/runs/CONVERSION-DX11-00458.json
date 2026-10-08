@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00458",
+  "production_id": "CONVERSION-DX11-00458",
+  "event_id": "CONVERSION-DX11-00458-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R150_TRIANGLE_FAN_IMMEDIATE_CONTEXT_OWNERSHIP",
+  "work_key": "DX11:TRIANGLE_FAN:LIVE_IA_IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/triangle_fan_index_buffer.cpp",
+  "conflict_keys": [
+    "DX11_NATIVE_TRIANGLE_FAN_IA",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp",
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00458",
+  "lease_epoch": 1,
+  "base_sha": "55db0604c9371c712170bdc15bd57d6f089a1809",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAITING_FOR_CI",
+  "summary": "Reject same-device deferred D3D11 contexts from dormant generated triangle-fan index-buffer live IA binding/readiness, including a WARP negative regression that seeds identical deferred IA state.",
+  "changed_paths": [
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp",
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PASS: one deterministic scoped source/test anchor and invariant check before material commit",
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated branch HEAD and AGENTS, 00457 terminal CI, run directory (00458 absent), queue policy and protected regression ledger inspected; rollover ATTEMPT 1/3",
+    "C1_REVIEW": "PASS: generated fan IA context currently checks matching device only, accepting same-device deferred context as live; independent R149 surface fix covers OM not IA",
+    "C2_IMPLEMENT": "PASS: native C++ immediate-context-only generated fan IA bind/readiness and WARP same-device deferred negative+immediate positive control",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate validate and dx11-smoke; one scoped source/test JS invariant PASS",
+    "C4_COMMIT": "PENDING: GitHub material commit with [AUTO:CONVERSION-DX11-00458]",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant binding correctness only, no native Draw activation or HMD deploy",
+    "C6_STATE": "PENDING: exact CI receipts and Issue #14 change ledger"
+  },
+  "evidence": {
+    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
+    "static_checks": {
+      "patchAnchorsExact": true,
+      "cppImmediateGuards": true,
+      "probeNegativeAndImmediateControl": true,
+      "dormantNoDrawCall": true,
+      "unchangedForeignDeviceCase": true
+    },
+    "ci_gate": "PENDING_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN"
+  },
+  "next_action": "After material commit, fetch exact-SHA Backend Conversion Gate validate + DX11 smoke jobs; update Issue #14 and persist canonical C6 while retaining UNTESTED.",
+  "state_persisted": false,
+  "recorded_at_utc": "2026-10-08T17:29:35.872Z",
+  "last_real_activity_at": "2026-10-08T17:29:35.873Z",
+  "last_activity_evidence": "C2 C++/WARP test patch verified against GitHub source; branch compare-and-swap material commit targeted",
+  "blockers": [
+    "Quest3/VDXR runtime untested; native Draw activation remains gated"
+  ]
+}

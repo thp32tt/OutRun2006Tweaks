@@ -234,7 +234,11 @@ NativeTriangleFanIndexBufferBindingReadiness
 NativeTriangleFanIndexBuffer::binding_readiness(
     ID3D11DeviceContext* context) const noexcept {
     NativeTriangleFanIndexBufferBindingReadiness out{};
-    out.inputValid = context != nullptr;
+    // R150: a deferred context only records IA commands; it cannot prove the
+    // immediate producer's live index-buffer/topology state. Fail closed.
+    out.inputValid =
+        context != nullptr &&
+        context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE;
     if (!out.inputValid)
         return out;
 
@@ -299,7 +303,9 @@ bool NativeTriangleFanIndexBuffer::validate_binding_snapshot(
 
 bool NativeTriangleFanIndexBuffer::bind(
     ID3D11DeviceContext* context) const noexcept {
-    if (!ready() || !context)
+    // Same-device deferred contexts must not qualify as live IA binding.
+    if (!ready() || !context ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
         return false;
 
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;

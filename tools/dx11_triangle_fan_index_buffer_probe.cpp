@@ -166,6 +166,32 @@ int main() {
                 context.Get(), liveFanBinding.snapshotToken),
         "R141 live generated fan IA binding seals exact owner identity");
 
+    // R150 negative live ownership: a same-device deferred context can
+    // record the identical IA state but must never seal live readiness.
+    ComPtr<ID3D11DeviceContext> deferredContext;
+    require(
+        SUCCEEDED(device->CreateDeferredContext(
+            0, deferredContext.GetAddressOf())) &&
+            deferredContext &&
+            deferredContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED,
+        "R150 same-device deferred context creation");
+    deferredContext->IASetIndexBuffer(
+        owner.buffer(), DXGI_FORMAT_R32_UINT, 0);
+    deferredContext->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    const auto deferredFanBinding =
+        owner.binding_readiness(deferredContext.Get());
+    require(
+        !owner.bind(deferredContext.Get()) &&
+            !deferredFanBinding.inputValid &&
+            !deferredFanBinding.ready &&
+            deferredFanBinding.snapshotToken == 0 &&
+            !owner.validate_binding_snapshot(
+                deferredContext.Get(), liveFanBinding.snapshotToken) &&
+            owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R150 same-device deferred IA state must not be live-ready");
+
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     const auto driftedFanBinding = owner.binding_readiness(context.Get());
     require(
@@ -348,5 +374,6 @@ int main() {
     std::cout << "DX11 triangle-fan generated index buffer R126: PASS\n";
     std::cout << "DX11 indexed triangle-fan source provenance R129: PASS\n";
     std::cout << "DX11 triangle-fan live IA binding R141: PASS\n";
+    std::cout << "DX11 triangle-fan immediate-context ownership R150: PASS\n";
     return 0;
 }
