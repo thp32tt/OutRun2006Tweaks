@@ -289,8 +289,8 @@ class UIScaling : public Hook
 
 	// The fraction of a pixel sub_4BAD20 discarded when it rounded the marker
 	// position down, for the draws below to add back.
-	static inline float RankMarkerFracX = 0.0f;
-	static inline float RankMarkerFracY = 0.0f;
+	inline static thread_local float RankMarkerFracX = 0.0f;
+	inline static thread_local float RankMarkerFracY = 0.0f;
 
 	static inline SafetyHookMid RankMarker_Truncate_hk{};
 	static void RankMarker_Truncate_dest(safetyhook::Context& ctx)
@@ -312,11 +312,16 @@ class UIScaling : public Hook
 	static int __cdecl RankMarkerSub_dest(std::uint32_t arg)
 	{
 		const auto saved = RankMarkerProjectedInfo;
+		const float savedFractionX = RankMarkerFracX;
+		const float savedFractionY = RankMarkerFracY;
 		RankMarkerProjectedInfo = {};
+		RankMarkerFracX = RankMarkerFracY = 0.0f;
 		++RankMarkerSubActiveDepth;
 		const int result = RankMarkerSub_hk.call<int>(arg);
 		--RankMarkerSubActiveDepth;
 		RankMarkerProjectedInfo = saved;
+		RankMarkerFracX = savedFractionX;
+		RankMarkerFracY = savedFractionY;
 		return result;
 	}
 
