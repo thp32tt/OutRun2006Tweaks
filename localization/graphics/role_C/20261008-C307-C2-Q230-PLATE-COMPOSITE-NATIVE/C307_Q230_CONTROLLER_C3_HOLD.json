@@ -1,0 +1,274 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "run": "C307-C2",
+  "review_id": "C307-C2-Q230-PLATE-COMPOSITE-20261008",
+  "run_key": "OUTRUN-KOR-C307-C2-Q230-PLATE-COMPOSITE-20261008-2250",
+  "timestamp_kst": "2026-10-08 22:56 KST",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 230,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "selection_head": "968e0ebccd047578a984abc132faf05ed611d112",
+  "selection_queue_blob": "1bfd8c34d7c0f7a81040cf6311f789e82c4a2c88",
+  "worker_run": 37787917114,
+  "worker_result": "SUCCESS",
+  "backend": "GitHub Actions Linux worker for exact SHA persisted DDS native evidence; ChatGPT C2 controller visual review",
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 230",
+    "action": "EVIDENCE_ONLY_HOLD"
+  },
+  "sha256": {
+    "source": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "authored_clean": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914"
+  },
+  "original_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "machine_report": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/C307_Q230_PLATE_COMPOSITE_NATIVE_MACHINE.json",
+  "source_to_clean_limitation": "B228_E95_HELP_CLEAN_PLATE.png carries earlier B73 localized regions; clean-vs-final only is full-atlas two-help scope, while source-vs-clean outside help is NOT a protected-art equivalence test.",
+  "native_evidence": {
+    "lossless_png_count": 22,
+    "items": [
+      "2 regions × 3 backgrounds × 100/75/50 SOURCE/CLEAN/FINAL native proof",
+      "2 paired RAW original/final",
+      "2 nearest 200% source/final"
+    ],
+    "native_decoded_dimensions": [
+      2048,
+      1024
+    ],
+    "authored_mips": 1
+  },
+  "per_region": [
+    {
+      "id": "20_unavailable_help",
+      "source_text": "You cannot buy this item yet",
+      "korean_text": "아직 구매할 수 없습니다",
+      "source_bbox_readable": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "localized_visible_bbox": [
+        2,
+        2,
+        464,
+        48
+      ],
+      "margins_lrtb": [
+        2,
+        153,
+        2,
+        2
+      ],
+      "proofs": {
+        "native_white": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0259e6b383f8256f258502ec6b6c1b3adf1319fa18b57c1f76ec49d6bb68f0d4",
+          "bytes": 17619,
+          "background": "WHITE",
+          "scale": 100
+        },
+        "native_gray": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "537ec7174f305d0c515e99427c432aec74c0d79b8022d3edddbd43e5ce8b04a6",
+          "bytes": 12797,
+          "background": "GRAY",
+          "scale": 100
+        },
+        "native_black": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "23ee1f682728e12baa0f013f1910122ce59a1a4393a423b007b4e67c874d61b0",
+          "bytes": 15929,
+          "background": "BLACK",
+          "scale": 100
+        },
+        "practical_75": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7dfe47dd281e6a3b7feba8f8ae7d4f654a8f7626ae1fe5af923e25d45c20bfbc",
+          "bytes": 32871,
+          "background": "WHITE",
+          "scale": 75
+        },
+        "practical_50": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3bbf6e0677fe0bf248c814b6918669554a75c01eceb9e261a66f06d83af1ee2c",
+          "bytes": 17360,
+          "background": "BLACK",
+          "scale": 50
+        },
+        "raw": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_RAW_SOURCE_FINAL.png",
+          "sha256": "d953a184efb21c5abc195edb8be8f36842ae42f7c6fa0efdf6a4c0adcf211d02",
+          "bytes": 11825
+        },
+        "zoom200": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/20_unavailable_help_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "391ac796d52f141f711df2dd1d245ea80fcc8ee0900cd51d338f2f5d93abb3f3",
+          "bytes": 17963
+        }
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHOR",
+          "observation": "Source help family appears upright in readable orientation; Korean also upright without visible opposite lean. Semantic per-stem top-minus-bottom anchors were not independently mapped, so exact source slant equivalence remains HOLD."
+        },
+        "clean_plate": {
+          "result": "PARTIAL_PASS_TWO_TEXT_ROIS",
+          "observation": "Direct SOURCE vs authored CLEAN on native WHITE/BLACK shows glyph footprints replaced by transparent region, no visible English shadows, seam, foreign box or patch trace in two inspected help bboxes; pixel mask clean alpha count 0 per bbox. B228 CLEAN preserves preexisting B73 localization outside help, so SOURCE vs CLEAN whole atlas is NOT a zero-change comparison."
+        },
+        "style": {
+          "result": "HOLD_UNCALIBRATED_FAMILY",
+          "observation": "English condensed-ish low-contrast gray sans source vs Hangul low-contrast gray output use similar flat effect and near-source height. Korean strokes appear geometric/blocky compared with source; lack of separate measured accepted font-family reference and blind calibrated weight/counter-space judgments blocks C3 PASS."
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Opened native WHITE source/CLEAN/final and BLACK practical 50% for both rows; Hangul readable in those static contacts. Gray 75% viewed for second row. Cannot assert actual displayed game size or visual UX acceptance."
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Direct 200% nearest-source/final crops show complete Hangul syllables and no definite missing strokes, clipping or bleed in shown region; native DDS decode source/target header exact, mip1. Not a blind-calibrated native anti-alias or in-game verdict."
+        },
+        "protected_art": {
+          "result": "PARTIAL_MACHINE_PASS",
+          "observation": "Full native 2048×1024 authored CLEAN vs current DDS comparison computed RGBA/alpha visible deltas 0 outside the two exact help source bboxes. No claim that SOURCE vs CLEAN outside help is zero, because CLEAN contains existing B73 Korean edits; all source/candidate collateral policy regions require approved inventory."
+        },
+        "placement": {
+          "result": "PASS_NUMERIC_ONLY",
+          "observation": "New decoded final alpha bboxes strictly inside original source glyph/effect bboxes with positive margins L/T/R/B, 2/153/2/2 for unavailable and 2/189/2/2 for owned; native white crop visually left-anchored like English."
+        },
+        "orientation": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Opened new RAW paired original/candidate for both rows: same vertical inversion; readable SOURCE/CLEAN/FINAL text upright under mirror-Y. No actual runtime texture-coordinate test, RUNTIME_VALIDATION=UNTESTED."
+        }
+      }
+    },
+    {
+      "id": "21_owned_help",
+      "source_text": "You already own this item",
+      "korean_text": "이미 보유 중입니다",
+      "source_bbox_readable": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "localized_visible_bbox": [
+        2,
+        2,
+        366,
+        48
+      ],
+      "margins_lrtb": [
+        2,
+        189,
+        2,
+        2
+      ],
+      "proofs": {
+        "native_white": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "17241fe2bf01e1a6cbd77f4a1adbc7f92c0c603d2483db510c1259bd69aef8fd",
+          "bytes": 16298,
+          "background": "WHITE",
+          "scale": 100
+        },
+        "native_gray": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "85bbeda35b94864a26e9ce7328f9e86f7da5f6a5e912175b54aec85b0690ffc0",
+          "bytes": 11942,
+          "background": "GRAY",
+          "scale": 100
+        },
+        "native_black": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3088ae04a97c4c6c50b24f6d0e86bbdf1d602bd6d9286cbbf611dec5e638b722",
+          "bytes": 14814,
+          "background": "BLACK",
+          "scale": 100
+        },
+        "practical_75": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "789d52f279c10432f531b67cbade4448303de827c264af60497d3d67f329a1c4",
+          "bytes": 29321,
+          "background": "WHITE",
+          "scale": 75
+        },
+        "practical_50": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a852bddab5c2200034295f363f18f51433addf4384173e1cdaf8a99d1b52a34d",
+          "bytes": 15139,
+          "background": "BLACK",
+          "scale": 50
+        },
+        "raw": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_RAW_SOURCE_FINAL.png",
+          "sha256": "f346a169fe35b37e0329fed28c700dfb5b2af3d8c158d14ee913b7bfbf5ef0fa",
+          "bytes": 11054
+        },
+        "zoom200": {
+          "path": "localization/graphics/role_C/20261008-C307-C2-Q230-PLATE-COMPOSITE-NATIVE/21_owned_help_ZOOM200_SOURCE_FINAL.png",
+          "sha256": "b448e6d689c227d9f2e0c9b09dafe7bc9d809215b0e38b5374d80fd2c0a0f4bc",
+          "bytes": 16650
+        }
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHOR",
+          "observation": "Source help family appears upright in readable orientation; Korean also upright without visible opposite lean. Semantic per-stem top-minus-bottom anchors were not independently mapped, so exact source slant equivalence remains HOLD."
+        },
+        "clean_plate": {
+          "result": "PARTIAL_PASS_TWO_TEXT_ROIS",
+          "observation": "Direct SOURCE vs authored CLEAN on native WHITE/BLACK shows glyph footprints replaced by transparent region, no visible English shadows, seam, foreign box or patch trace in two inspected help bboxes; pixel mask clean alpha count 0 per bbox. B228 CLEAN preserves preexisting B73 localization outside help, so SOURCE vs CLEAN whole atlas is NOT a zero-change comparison."
+        },
+        "style": {
+          "result": "HOLD_UNCALIBRATED_FAMILY",
+          "observation": "English condensed-ish low-contrast gray sans source vs Hangul low-contrast gray output use similar flat effect and near-source height. Korean strokes appear geometric/blocky compared with source; lack of separate measured accepted font-family reference and blind calibrated weight/counter-space judgments blocks C3 PASS."
+        },
+        "readability": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Opened native WHITE source/CLEAN/final and BLACK practical 50% for both rows; Hangul readable in those static contacts. Gray 75% viewed for second row. Cannot assert actual displayed game size or visual UX acceptance."
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Direct 200% nearest-source/final crops show complete Hangul syllables and no definite missing strokes, clipping or bleed in shown region; native DDS decode source/target header exact, mip1. Not a blind-calibrated native anti-alias or in-game verdict."
+        },
+        "protected_art": {
+          "result": "PARTIAL_MACHINE_PASS",
+          "observation": "Full native 2048×1024 authored CLEAN vs current DDS comparison computed RGBA/alpha visible deltas 0 outside the two exact help source bboxes. No claim that SOURCE vs CLEAN outside help is zero, because CLEAN contains existing B73 Korean edits; all source/candidate collateral policy regions require approved inventory."
+        },
+        "placement": {
+          "result": "PASS_NUMERIC_ONLY",
+          "observation": "New decoded final alpha bboxes strictly inside original source glyph/effect bboxes with positive margins L/T/R/B, 2/153/2/2 for unavailable and 2/189/2/2 for owned; native white crop visually left-anchored like English."
+        },
+        "orientation": {
+          "result": "PARTIAL_STATIC_PASS",
+          "observation": "Opened new RAW paired original/candidate for both rows: same vertical inversion; readable SOURCE/CLEAN/FINAL text upright under mirror-Y. No actual runtime texture-coordinate test, RUNTIME_VALIDATION=UNTESTED."
+        }
+      }
+    }
+  ],
+  "full_atlas_clean_final": {
+    "changed_rgba_outside_two_help_boxes": 0,
+    "alpha_changed_outside_two_help_boxes": 0,
+    "visible_changed_outside_two_help_boxes": 0,
+    "observation": "Complete atlas scoped to B228 authored CLEAN versus persisted final; all 3 measured outside counts zero, not a broader source-vs-clean protection approval."
+  },
+  "review_independence": {
+    "reviewer": "ChatGPT C2 controller",
+    "separate_review_id": true,
+    "pixels_before_producer_verdict": false,
+    "qualified_blind_calibration": false,
+    "reason": "Already consulted C301/B228 earlier per-asset QA notes before newly generated lossless visual proof; cannot falsely label this a blinded first-look calibrated independent pass."
+  },
+  "C": "HOLD_STRICT_RECHECK",
+  "C3_STRICT_AUDIT": "HOLD_STRICT_RECHECK",
+  "current_qa_evidence_gate": "NOT_APPROVED",
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED_CURRENT_POLICY",
+  "user_JPG_acceptance": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "next_action": "Independent first-look calibration with source-derived small-help font-family reference, explicitly measured stem/counter-space/readability and protected full-segment inventory; new exact-byte C/C3 evidence needed before approval. Keep existing DDS, no automated rerender."
+}
