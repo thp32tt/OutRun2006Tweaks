@@ -1106,6 +1106,34 @@ class TextureReplacement : public Hook
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 	}
 
+
+	// The optional scene/cube replacement rewrites the original DDS header.
+	// Preserve the untouched original in case the decoder rejects the replacement.
+	struct SceneDdsOriginalState
+	{
+		void* data;
+		UINT bytes;
+		DDS_FILE header{};
+		bool snapshotted = false;
+		SceneDdsOriginalState(void* source, UINT size) : data(source), bytes(size)
+		{
+			if (data && bytes >= sizeof(DDS_FILE))
+			{
+				memcpy(&header, data, sizeof(DDS_FILE));
+				snapshotted = true;
+			}
+		}
+		bool replacementSelected(const void* selectedData) const
+		{
+			return snapshotted && selectedData && selectedData != data;
+		}
+		void restoreOriginal() const
+		{
+			if (snapshotted)
+				memcpy(data, &header, sizeof(DDS_FILE));
+		}
+	};
+
 	//
 	// Scene texture replacement code
 	//
@@ -1117,6 +1145,7 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline D3DXCreateTextureFromFileInMemoryEx = {};
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		const SceneDdsOriginalState original(pSrcData, SrcDataSize);
 		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
@@ -1147,13 +1176,21 @@ class TextureReplacement : public Hook
 		// A failed/unsupported fast decoder must not make world/environment
 		// textures disappear. Preserve every Ex argument on the native path;
 		// transientTextureData remains alive through both decoder attempts.
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+		const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
 			pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels,
+			Usage, Format, Pool, Filter, MipFilter, ColorKey,
+			pSrcInfo, pPalette, ppTexture);
+		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+			return nativeResult;
+		original.restoreOriginal();
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, original.data, original.bytes, Width, Height, MipLevels,
 			Usage, Format, Pool, Filter, MipFilter, ColorKey,
 			pSrcInfo, pPalette, ppTexture);
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		const SceneDdsOriginalState original(pSrcData, SrcDataSize);
 		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
@@ -1161,12 +1198,23 @@ class TextureReplacement : public Hook
 				transientTextureData);
 		}
 
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels, Usage, Format, Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppTexture);
+		const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels,
+			Usage, Format, Pool, Filter, MipFilter, ColorKey,
+			pSrcInfo, pPalette, ppTexture);
+		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+			return nativeResult;
+		original.restoreOriginal();
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, original.data, original.bytes, Width, Height, MipLevels,
+			Usage, Format, Pool, Filter, MipFilter, ColorKey,
+			pSrcInfo, pPalette, ppTexture);
 	}
 
 	inline static SafetyHookInline D3DXCreateCubeTextureFromFileInMemoryEx = {};
 	static HRESULT __stdcall D3DXCreateCubeTextureFromFileInMemoryEx_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Size, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DCUBETEXTURE9* ppCubeTexture)
 	{
+		const SceneDdsOriginalState original(pSrcData, SrcDataSize);
 		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
@@ -1174,7 +1222,15 @@ class TextureReplacement : public Hook
 				transientTextureData);
 		}
 
-		return D3DXCreateCubeTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, Size, MipLevels, Usage, Format, Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppCubeTexture);
+		const HRESULT nativeResult = D3DXCreateCubeTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, pSrcData, SrcDataSize, Size, MipLevels, Usage, Format,
+			Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppCubeTexture);
+		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+			return nativeResult;
+		original.restoreOriginal();
+		return D3DXCreateCubeTextureFromFileInMemoryEx.stdcall<HRESULT>(
+			pDevice, original.data, original.bytes, Size, MipLevels, Usage, Format,
+			Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppCubeTexture);
 	}
 
 	inline static SafetyHookInline LoadXmtsetObject = {};
