@@ -808,12 +808,14 @@ def verify_raw_queue_wvp_owner(source):
     builder = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
     # Ignore initial kind enumeration: only test actual fallback branch order.
     branch = builder[builder.index('if (!R44GetOwnedRawOverlayWvp(original)'):]
-    require_order(branch, 'queue c64 owner precedes live GPU fallback',
-                  'R30ScreenSpaceKind::ScreenOverlay2D',
-                  'R30GetRecentRawWvpForQueueSprite(original)',
-                  'R30ScreenSpaceKind::ProjectedWorldMarker2D',
-                  'if (!R30GetRecentRawWvpForQueueSprite(original))',
-                  'GetVertexShaderConstantF(')
+    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\)'
+                     r'\s*\{[^{}]*R30GetRecentRawWvpForQueueSprite\(original\)', branch, re.S):
+        raise SystemExit('P0 queued 2D HUD must consume original game c64')
+    if not re.search(r'else if\s*\(screenKind ==\s*'
+                     r'R30ScreenSpaceKind::ProjectedWorldMarker2D\)'
+                     r'\s*\{[^{}]*if\s*\(!R30GetRecentRawWvpForQueueSprite\(original\)\)'
+                     r'\s*return false;', branch, re.S):
+        raise SystemExit('P0 vehicle rank must reject unowned live head c64')
     require('return false;', builder, 'reject unowned rank c64 retransform')
 verify_raw_queue_wvp_owner(r30)
 for label, before, after in (
