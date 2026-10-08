@@ -40,5 +40,6 @@ The world/ScreenHud split is explicit. World car markers retain original positio
 
 - Material source changed: `src/hooks_uiscaling.cpp`, strict producer and P0 regression scripts. No changes to EXE binary or canonical RVA manifest.
 - Validation source SHA `79a0dcb7495d7a8af9eb0d410d716bf72f024444`.
-- **CI:** pending at initial report authoring; update with exact result and artifact after all jobs complete.
+- **CI status, same exact SHA:** DX9Ex Active Validation `37741691863` **SUCCESS** (policy, Win32 game, x64 OpenXR host, R33 full-chain, package); EXE HUD Inspector `37741691867` **SUCCESS** (canonical EXE contracts + new P0 fault injections + game Win32 Inspector build); Domain Isolation Guard `37741692068` **SUCCESS**. DX9Ex Full Source Impact Review `37741692064` currently source inventory/host MSVC analyzer SUCCESS with game /analyze still in progress; do not infer its final result until finished.
+- **Packaged GitHub Actions artifact:** ID `11533599078`, `OutRun2-VR-DX9EX-ACTIVE-79a0dcb7495d7a8af9eb0d410d716bf72f024444`, digest `sha256:c7909cb0511373bc27bb56bc679069ba0326d83257f8d1d48b3b61f512797ef7`; size 2,749,477 bytes. No hardware execution occurred.
 - **Quest 3 headset:** `RUNTIME_VALIDATION=UNTESTED`.
