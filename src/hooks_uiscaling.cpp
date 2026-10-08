@@ -469,7 +469,7 @@ class UIScaling : public Hook
 			xstnum, x, y, flags, priority, color);
 		// All exact-address menu arrows, position HUD and result glyph
 		// siblings are SCREEN_HUD; tagging only tail_4 left earlier
-		// siblings head-locked in generic ScreenOverlay2D.
+		// siblings head-locked by the generic fallback path.
 		TagAppendedNodes(tailsBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
