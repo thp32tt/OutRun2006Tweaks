@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261008-C273-C1-Q161-Q175-EVIDENCE",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T10:53:40+09:00",
+  "queue_index": 175,
+  "asset": "754F0599",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "trigger": "C227R source typography-family rework -> A153",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+  "persisted_dds_identity": {
+    "result": "PASS",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGB32",
+    "mipmaps": 1,
+    "file_size": 8388736,
+    "raw_orientation": "mirror_y",
+    "sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585"
+  },
+  "machine_context": {
+    "source_bboxes": {
+      "stage_select": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "showroom": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "single_player": [
+        2,
+        566,
+        1386,
+        717
+      ]
+    },
+    "localized_bboxes": {
+      "stage_select": [
+        10,
+        279,
+        1180,
+        371
+      ],
+      "showroom": [
+        10,
+        421,
+        691,
+        504
+      ],
+      "single_player": [
+        6,
+        592,
+        1198,
+        690
+      ]
+    },
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "report": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_754F0599_REPORT.json",
+    "note": "Numeric containment is accepted as context but cannot override the visible source-style defect."
+  },
+  "sequencing": {
+    "pixels_before_producer_verdict": false,
+    "note": "Producer prose was exposed before first-look, so no PASS claim is permitted. A concrete visual FAIL is nevertheless valid and fail-closed."
+  },
+  "evidence": {
+    "source": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_SOURCE_READABLE.png",
+    "clean": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_CLEAN_PLATE.png",
+    "final": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "rows": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg",
+    "source_a151_final": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL.jpg",
+    "raw": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+  },
+  "stages": {
+    "C": {
+      "review_id": "C273-Q175-C-VISUAL",
+      "reviewer": "ChatGPT AI 1",
+      "pixels_before_producer_verdict": false,
+      "findings": {
+        "stage_select": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean is consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "The supplied clean plate removes source lettering without a visible English ghost in the reviewed title regions.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_CLEAN_PLATE.png"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: A153 remains substantially heavier and squarer than the thin rounded geometric source. The dark lower extrusion/outline forms broad block-like bands beneath and between Hangul strokes, overpowering the source's restrained edge/depth treatment.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Korean wording is legible, but legibility does not override the source-style/effect failure.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No missing syllable or broken Hangul stroke is clearly visible in the persisted final evidence.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "No unrelated atlas artwork intrusion is visible; producer mask evidence reports zero protected changes.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Localized rows remain within the exact source bboxes with positive margins; the defect is presentation/style, not bbox escape.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y evidence is consistent with the source/candidate orientation.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          }
+        },
+        "showroom": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean is consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "The supplied clean plate removes source lettering without a visible English ghost in the reviewed title regions.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_CLEAN_PLATE.png"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: 쇼룸 shows the clearest mismatch: thick continuous black lower bars and rectangular extrusion dominate the compact silver face, whereas source SHOWROOM uses a much thinner rounded techno skeleton and controlled lower shadow.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Korean wording is legible, but legibility does not override the source-style/effect failure.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No missing syllable or broken Hangul stroke is clearly visible in the persisted final evidence.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "No unrelated atlas artwork intrusion is visible; producer mask evidence reports zero protected changes.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Localized rows remain within the exact source bboxes with positive margins; the defect is presentation/style, not bbox escape.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y evidence is consistent with the source/candidate orientation.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          }
+        },
+        "single_player": {
+          "slant": {
+            "result": "PASS",
+            "observation": "Readable lean is consistent with the source direction; no opposite-slant regression observed.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "clean_plate": {
+            "result": "PASS",
+            "observation": "The supplied clean plate removes source lettering without a visible English ghost in the reviewed title regions.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_CLEAN_PLATE.png"
+          },
+          "style": {
+            "result": "FAIL",
+            "observation": "FAIL: 싱글 플레이 remains a generic wide Hangul skeleton with heavy black extrusion; the source has thinner rounded connected techno forms and much lighter edge/depth balance.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "readability": {
+            "result": "PASS",
+            "observation": "Korean wording is legible, but legibility does not override the source-style/effect failure.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL.jpg"
+          },
+          "glyph_integrity": {
+            "result": "PASS",
+            "observation": "No missing syllable or broken Hangul stroke is clearly visible in the persisted final evidence.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png"
+          },
+          "protected_art": {
+            "result": "PASS",
+            "observation": "No unrelated atlas artwork intrusion is visible; producer mask evidence reports zero protected changes.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          },
+          "placement": {
+            "result": "PASS",
+            "observation": "Localized rows remain within the exact source bboxes with positive margins; the defect is presentation/style, not bbox escape.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_ROW_CONTACT.jpg"
+          },
+          "orientation": {
+            "result": "PASS",
+            "observation": "RAW mirror-Y evidence is consistent with the source/candidate orientation.",
+            "evidence": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_SOURCE_A151_FINAL_RAW.jpg"
+          }
+        }
+      },
+      "result": "FAIL_SOURCE_TYPOGRAPHY_FAMILY_AND_EXTRUSION_WEIGHT"
+    },
+    "C3": {
+      "review_id": null,
+      "result": "BLOCKED_AFTER_C_FAIL",
+      "prior_defect_observation": "C227R's generic-Noto family defect was materially changed by A153, but the current Nanum-derived result still fails the source-family/effect-weight comparison."
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "required_rework": [
+    "Preserve the validated clean plate, exact source bboxes/positive margins, source-left layout and RAW mirror-Y orientation.",
+    "Reduce the black outline/lower extrusion so it no longer forms broad rectangular bands or bridges around Hangul strokes.",
+    "Reconstruct a thinner rounded geometric/segmented techno Hangul skeleton closer to the English source; do not solve family mismatch by generic horizontal widening alone.",
+    "Retain metallic vertical grayscale fill and readable lean, but keep edge/depth weight subordinate to the silver face.",
+    "After material rerender: producer native/high-zoom/practical/RAW review -> future pixels-first C1 -> separate exact-SHA C3 -> PRE_INGAME/user JPG -> actual-game validation."
+  ],
+  "candidate_changed_by_C": false,
+  "approval_record_created": false,
+  "pre_ingame_export": "NOT_TRIGGERED_C_FAIL",
+  "stop_reason": "The required typography/extrusion reconstruction is a material producer rework, not a safe small C corrective edit. C1 batch stops after q175.",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
