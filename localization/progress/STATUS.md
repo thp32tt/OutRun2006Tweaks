@@ -3121,3 +3121,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 00:10 KST — A197 q103
 - RUN_KEY=OUTRUN-KOR-A197-Q103-ITALIC-20261009-0000. Source-faithful native Korean right italic, new DDS `9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed` 349x64 (prior196x40) within source390x72. SOURCE/CLEAN/FINAL zero unauthorized changes and decoded/RAW/100/75/50 source-relative producer review PASS. C1/C3/approval/user/real game **pending**, RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CONTROLLER_SELF_QA_FINAL.json`.
+
+### 2026-10-09 00:16 KST — C310 C2 EVEN q098 B279 fresh C hard visual FAIL
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`: 13 new exact native/75/50/RAW/zoom source-CLEAN-current lossless PNG; correct DDS/bbox and outside-alpha/RGBA zero but visibly thin navy glow/over-heavy white fill vs canonical English. Prior B273 stripes improved. `C=REWORK_REQUIRED` for source-family mismatch, C3/approval/export blocked, no C DDS, actual game UNTESTED. Evidence `localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json`.

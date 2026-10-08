@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 00:10 KST",
+  "updated_at_kst": "2026-10-09 00:16 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8194,5 +8194,32 @@
     "APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c310_c2_q098_b279_rework": {
+    "at_kst": "2026-10-09 00:16 KST",
+    "task_id": "OUTRUN-KOR-C310-C2-Q098-B279-NATIVE-SOURCE-FAMILY-FAIL-20261009",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "index": 98,
+    "role": "C",
+    "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+    "candidate_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+    "worker_run": 37797838142,
+    "worker_result": "SUCCESS",
+    "new_lossless_png": 13,
+    "new_candidate_dds": 0,
+    "source_white_navy_ratio": 0.413,
+    "candidate_white_navy_ratio": 2.018,
+    "source_clean_rgba_outside": 0,
+    "clean_final_rgba_outside": 0,
+    "source_final_rgba_outside": 0,
+    "visual_defect": "SOURCE_FAMILY_NAVY_GLOW_UNDERWEIGHT_WHITE_FACE_DOMINANCE",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED_REWORK_REQUIRED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json"
   }
 }
