@@ -754,13 +754,13 @@
     {
       "key": "VR-RESULT-THEATER-SBS-MODE-PARITY-20261009",
       "title": "Game StereoWanted produced SBS in TRYAGAIN/OUTRUNMILES while host treated result/continue states as mono Theater",
-      "status": "SOURCE_FIXED_BUILD_TEST_PENDING_HMD_UNTESTED",
+      "status": "SOURCE_PARITY_FIXED_BUT_NOT_USER_GOAL_TIME_ROOT_CAUSE",
       "testLevel": 3,
       "recurrenceCount": 1,
-      "evidenceLevel": "CODE_PROVEN_HOST_GAME_CROSS_DOMAIN_DIVERGENCE",
+      "evidenceLevel": "CODE_PROVEN_PREDICATE_DIVERGENCE_USER_REPRO_EXCLUDES_2D_RESTART",
       "rootCause": {
         "status": "CODE_CONFIRMED",
-        "summary": "stereo_renderer_r7.inc::GameplayActive accepted broad Game::is_in_game including TRYAGAIN and OUTRUNMILES, while Game::is_vr_gameplay_presentation, CurrentPresentationMode, F11 and main_r23 host classify both as mono Theater. Game-side SBS can therefore be presented as one Theater quad; whether this caused exact HMD double-image remains to be verified."
+        "summary": "Separate source-policy inconsistency: stereo_renderer_r7.inc::GameplayActive originally admitted TRYAGAIN/OUTRUNMILES SBS while OpenXR host chose mono Theater. User explicitly confirms restart/try-again screen is already visually correct in 2D, and doubled clock is displayed beforehand in GOAL/TIMEUP. Therefore this source mismatch is NOT evidence explaining reported pre-restart timer diplopia; host/game parity correction remains preventive only."
       },
       "riskPaths": [
         "src/vr/d3d9/stereo_renderer_r7.inc",
@@ -833,6 +833,51 @@
         "runtime": [
           "Exact Quest3 session: inspect VR P0 RESULT DRAW ROUTE per parent plus VR R51 c64 DRAW FINGERPRINT and VR R62 FIXEDFN KIND0",
           "Determine result/+TIME optical single-frame binocular correctness independently of telemetry; no optical success claim without HMD"
+        ]
+      }
+    },
+    {
+      "key": "VR-PRE-RESTART-GOAL-TIME-WHITE-TRANSLUCENT-DIPLOPIA-20261009",
+      "title": "Duplicated white/semitransparent time HUD immediately before correct mono restart screen: GOAL/TIMEUP",
+      "status": "USER_HMD_FAILURE_HISTORICAL_WORKING_LINE_NEW_SOURCE_DIAGNOSTIC_HMD_UNTESTED",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_EXACT_REPRO_PROVEN_CODE_PATH_HYPOTHESES_UNRESOLVED",
+      "rootCause": {
+        "status": "UNRESOLVED",
+        "summary": "User says time text doubles immediately before a normal single mono 2D restart screen, during race-end GOAL/TIMEUP. Past normal 6th/6 and rank 4/5 were solved; transient +TIME never solved. The actual failing white glyph renderer type (VS c64 vs XYZRHW vs FVF0x142) is not yet confirmed from an exact-source Quest3/HMD frame. Avoid attributing to separate Theater/TRYAGAIN mismatch. Do not infer semantics from alpha."
+      },
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/hooks_framerate.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/game/outrun_renderer.cpp",
+        "vrhost/src/main_r23.cpp",
+        "tools/verify_vr_visual_composition_p0.py"
+      ],
+      "fixReferences": [
+        "945e4471d6463f757f38b4b39d3eb8e492b2254f — historically HMD-confirmed R62 FVF 0x142 4th/5th fixedfn owner, NOT a blanket GOAL HUD pass",
+        "3eeb5765f93df360d6454b5c0549191013bff33c — read-only GOAL/TIMEUP/LINK_TIMEUP per producer state/route/fvf/alpha telemetry at shader, XYZRHW and R62 fixedfn, not yet optical fix",
+        "40d595f2771c0eec39a80385504e3b58baad726b — three distinct missing-route injected static checks",
+        "docs/automation/reviews/AI2_GOAL_ENDTIME_WHITE_ALPHA_STEREO_CAUSE_REVIEW_20261009.md — full corrective user-repro and R73/R74 source differential",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md — 2026-10-09 symptom correction"
+      ],
+      "revalidationTriggers": [
+        "user reports GOAL/TIMEUP pre-restart timer overlapped or head-following (not the succeeding Theater restart page)",
+        "alter original GOAL time 0xBEA5A/0xBEA5F, stage 0x975EE/97727/977FB, result progress 0x97BE4/0x97DEC, original glyph 0x2C808/0x2C9DB",
+        "change shader c64 ownership/age, fixedfn XYZRHW, D3DXSprite FVF0x142, depth/alpha handling, pose capture or queue replay",
+        "change old verified 6th/6, rank car 4th/5th or one-frame transient +TIME scene"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py verify_pre_restart_hud_routes and 3 missing route fault injections",
+          "Exact-SHA DX9Ex Active game/host/R33/package + original EXE HUD inspector + domain isolation"
+        ],
+        "runtime": [
+          "User Quest3/VDXR: GOAL before restart time single aligned versus double; actual render path from VR P0 PRE_RESTART_HUD_FORM across 3 source candidates",
+          "+TIME must be judged separately (historic unresolved), 6th/6 confirmed recovered, car rank 4/5 attached, F11/rival/DDS protected, restart 2D stays single"
         ]
       }
     }
