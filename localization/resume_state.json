@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A187 q175 754F0599 new exact 5099009f2ea599f9 self-QA static PASS on 3 native Korean chrome labels. C278 flat-face rejection materially repaired; fresh genuinely pixels-first C1 + separate C3, per-glyph readable right-slant source anchor proof and complete lossless views still required. No PRE_INGAME/export/actual-game close; RUNTIME_VALIDATION=UNTESTED. q219 C280 source-family REWORK remains A owned.",
     "A186R q219 D263B3F1 exact 8310a1e62adb6e74 materially replaces C272 rejected forced-width A181R. Machine 1/1 PASS, source-height 110/118 and native counters, source-vs-candidate changed/alpha outside 0. Producer visual HOLD because composite slant direction observation differs and per-glyph source anchor/hierarchy not validated; no C/C3/APPROVALS/export. q175 C278 remains producer REWORK. IGR-025 screenshot(163) remaining runtime/graphics mapping is still unresolved. RUNTIME_VALIDATION=UNTESTED.",
     "A185R q175 754F0599 exact cac88b8553e36b2c producer self-QA PASS; must receive genuinely pixels-first independent C1 followed by separate C3 complete lossless per-region evidence prior to any PRE_INGAME export; user JPG + actual in-game retest remain open. Never reuse C273-rejected A153 or first A185. RUNTIME_VALIDATION=UNTESTED.",
     "C276 IGR-006/007 shared runtime-text fix is independent C static PASS on current exact hooks blob 954f0998... with Win32 Release 37645785737 and Korean Test Build 37645785906/package PASS. Do not re-review unchanged source; both rows now require only NEW actual-game screenshots/retest before closure. RUNTIME_VALIDATION=UNTESTED.",
@@ -9614,17 +9615,18 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "run": "20261008-A186R-Q219-SOURCE-HEIGHT-CHROME",
+    "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
     "role": "A",
-    "queue_index": 219,
-    "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
-    "prior_candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
-    "candidate_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
-    "first_draft_rejected_sha256": "ecc2bca164cffacd6eec1b627c22a1154caa5ce61e8a751e0606348dac55a43b",
-    "worker_run": 37725817654,
+    "queue_index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "prior_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+    "worker_run": 37730583751,
+    "first_worker_failed_metadata_run": 37730365040,
     "machine_result": "PASS",
-    "producer_visual_status": "HOLD_STRICT_RECHECK_SOURCE_PER_GLYPH_SLANT_AND_HIERARCHY",
-    "qa": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_CONTROLLER_SELF_QA.json",
+    "producer_visual_status": "SELF_QA_PASS_PENDING_FRESH_PIXELS_FIRST_C1_AND_C3",
+    "qa": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -10880,7 +10882,7 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
-  "next_checkpoint": "C280 q219 fresh A186R source-family visual FAIL; A new material chrome/rounded glyph repair first, then pixels-first C1/C3/approval. q175 C278 and q59 C279 independently remain unresolved. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A187 q175 new DDS 5099009f2ea5 static producer QA success, independent C1/C3 evidence and NEW in-game retest remain. A q219 C280 REWORK.",
   "c276_c1_igr006_007_runtime": {
     "status": "C_STATIC_PASS_PENDING_NEW_INGAME_RETEST",
     "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
@@ -11108,6 +11110,22 @@
     "report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_CONTROLLER_QA.json",
     "machine_report": "localization/graphics/role_C/20261008-C282-C2-Q172-B255-NATIVE-RECOVERY/C282_Q172_NATIVE_MACHINE.json",
     "cleanup": "PENDING_AFTER_REMOTE_VERIFICATION",
+    "forbidden_domains_touched": []
+  },
+  "a187_q175_source_chrome": {
+    "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
+    "role": "A",
+    "queue_index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "prior_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+    "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+    "worker_run": 37730583751,
+    "first_worker_failed_metadata_run": 37730365040,
+    "machine_result": "PASS",
+    "producer_visual_status": "SELF_QA_PASS_PENDING_FRESH_PIXELS_FIRST_C1_AND_C3",
+    "qa": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
 }

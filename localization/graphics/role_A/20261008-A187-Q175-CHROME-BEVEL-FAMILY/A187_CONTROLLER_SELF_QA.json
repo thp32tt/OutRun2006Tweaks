@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "run": "20261008-A187-Q175-CHROME-BEVEL-FAMILY",
+  "role": "A",
+  "queue_index": 175,
+  "policy_version": "visual-evidence-v1-20261008",
+  "candidate_sha256": "5099009f2ea599f9702ee1011ed1b5b482aa369e7a2bb6794919e26b0a749fc5",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "previous_candidate_sha256": "cac88b8553e36b2cf8e87edbc9edea7edf25f2b9e0ff651b14ea21f75a6c91ab",
+  "source_path": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "execution_backend": "GitHub Actions CPU (ChatGPT local GitHub DNS unavailable; source/candidate only accessible via remote fetch)",
+  "worker_run_id": 37730583751,
+  "worker_failed_attempt": 37730365040,
+  "worker_failed_reason": "Unbound FONT_PATTERN reporting variable; first attempt did not publish a candidate",
+  "machine_qa": {
+    "source_bbox_and_positive_margin": "3/3 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "source_text_pixels_unchanged_after_clean": 0,
+    "changed_rgba_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0,
+    "dds_format": "BGRA32",
+    "size": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "evidence": {
+    "machine_report": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_754F0599_REPORT.json",
+    "source": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_SOURCE_READABLE.png",
+    "clean": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_CLEAN_PLATE.png",
+    "final_decode": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "row_contact": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_ROW_CONTACT.jpg",
+    "practical": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_PRACTICAL_100_75_50.jpg",
+    "raw": "localization/graphics/role_A/20261008-A187-Q175-CHROME-BEVEL-FAMILY/A187_FINAL_RAW_GRAY.jpg"
+  },
+  "visible_regions": [
+    {
+      "name": "stage_select",
+      "english": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "localized_bbox": [
+        12,
+        259,
+        893,
+        392
+      ],
+      "source_depth": "bright chrome face / top bevel / pronounced dark lower 3D extrusion",
+      "observed": "Korean chrome upper highlight and multiple lower shadows reconstructed; Hangul legs/counters readable native/50%"
+    },
+    {
+      "name": "showroom",
+      "english": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "localized_bbox": [
+        12,
+        402,
+        261,
+        524
+      ],
+      "observed": "new bright raised chrome face and dark lower depth, no forced width-stretch; two Korean syllables readable at 50%"
+    },
+    {
+      "name": "single_player",
+      "english": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "localized_bbox": [
+        8,
+        571,
+        785,
+        712
+      ],
+      "observed": "new chrome upper lip and darker extruded depth; native 50% readable without disconnected broken glyphs"
+    }
+  ],
+  "ordered_gate": {
+    "source_removal": "PASS_MACHINE_AND_PRODUCER_VISUAL",
+    "source_slant": "PRODUCER_VISUAL_FAVORABLE_PER_GLYPH_MEASUREMENT_NOT_YET_CERTIFIED",
+    "size_height": "3/3_SOURCE_BBOX_HEIGHT_CEILING_AND_POSITIVE_MARGIN_PASS",
+    "source_style": "PRODUCER_VISUAL_IMPROVED_PENDING_C_GENUINE_REVIEW",
+    "glyph_integrity": "PRODUCER_VISUAL_NO_CONFIRMED_BREAKAGE",
+    "protected_art": "PASS_PIXEL_ZERO",
+    "raw_and_flip_y": "PASS_PRODUCER_VISUAL_WITH_ORIGINAL_MIRROR",
+    "immediate_readability": "PRODUCER_NATIVE_100_75_50_READABLE"
+  },
+  "limitations": {
+    "current_C_first_look": false,
+    "C3_stage": false,
+    "lossless_all_backgrounds": false,
+    "blind_calibration": false,
+    "per_glyph_slant_anchors": false,
+    "user_accepted": false,
+    "actual_game_retested": false
+  },
+  "producer_decision": "PRODUCER_SELF_QA_PASS_NOT_C_APPROVED",
+  "fresh_C1": "REQUIRED",
+  "separate_C3": "REQUIRED",
+  "approval_json": "NOT_CREATED",
+  "pre_ingame_export": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "cleanup": "All transformed intermediate files lived solely in ephemeral GitHub Actions runner, destroyed on job completion; no N100 scratch or local persistent task temp"
+}
