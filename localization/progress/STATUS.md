@@ -3167,3 +3167,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 03:12 KST — A200 q161 BC3 2-cell pinpoint replacement
 - `RUN_KEY=OUTRUN-KOR-A200-Q161-BC3-LEO-PISCES-20261009-0311`; saved candidate `2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b` corrected C314 PISCES/LEO unsqueezed color/alpha glyph and preserved 36 others byte-exact. Current 2/2 bbox + 0 core pinholes/changed outside, RAW/BGW native/50 producer self QA PASS; C1/C3/current APPROVAL/user naming/actual game PENDING, RUNTIME_VALIDATION=UNTESTED. `localization/graphics/role_A/20261009-A200-Q161-BC3-NATIVE-FACE-REPAIR/A200_CONTROLLER_SELF_QA_FINAL.json`.
+
+### 2026-10-09 — C1 P0 q137 B285 IGR-041 C REWORK_REQUIRED
+- Independent 6-region SOURCE/CLEAN/B165/B285, native/50, RAW review of exact B285 `1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2`: 5 regions visibly heavier/bulkier than English condensed source family; subtitle HOLD. C1 rejects current DDS despite producer bbox/outside-zero PASS. Original IGR-041 OPEN; B family-method correction → fresh C1/C3 → user game retest, no approval/new DDS, RUNTIME_VALIDATION=UNTESTED. QA `localization/graphics/role_C/20261009-C1-Q137-B285-P0-INDEPENDENT-STYLE-REVIEW/C_Q137_B285_CONTROLLER_REWORK.json`.
