@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Evidence gate remains active. Fresh C2 must independently revalidate A182 q154 4D38BBB0 dd4a3719... gray weight/counter-space, and fresh C1 must revalidate B249 q59 7CE1CFC5 4a657e39... zero-overflow repair; then exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C271 C1 returned q59 7CE1CFC5 B249 exact candidate 4a657e39... to REWORK_REQUIRED for source-style/hierarchy/effect fidelity after independently confirming zero decoded outside/alpha/visible-presence overflow. Producer rework must preserve B249 boundary repair, then a future pixels-first C1 + separate C3. q219 A181R remains the next unchanged high-priority odd fresh-C candidate. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3102,7 +3102,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "C268 C1 update: q59 7CE1CFC5 returned REWORK_REQUIRED after fresh decode found 7 changed/alpha pixels outside exact source bboxes and 7 protected-source changes; C3 blocked. q89 43B07A77 and q135 2B0863D6 passed fresh C + exact-SHA C3 and now await PRE_INGAME English-original refresh/user JPG and actual-game validation. Other pending-C items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C271 C1 update: q59 7CE1CFC5 exact B249 candidate 4a657e39... now REWORK_REQUIRED_SOURCE_STYLE_HIERARCHY_EFFECT_FIDELITY; hard decoded scope is clean, but visual source-family hierarchy/keyline treatment still fails. C3 blocked. q219 A181R remains pending fresh C1; general odd pending-C items remain unchanged. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6655,6 +6655,25 @@
     "pre_ingame_export": "NOT_TRIGGERED_NO_NEW_C_PASS",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c271_c1_q059_evidence": {
+    "run": "20261008-C271-C1-Q059-EVIDENCE",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "timestamp_kst": "2026-10-08T09:58:07+09:00",
+    "queue_index": 59,
+    "asset": "7CE1CFC5",
+    "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "machine_qa": "PASS_ZERO_CHANGED_ALPHA_VISIBLE_PRESENCE_OUTSIDE_4_EXACT_SOURCE_BBOXES",
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_HIERARCHY_EFFECT_FIDELITY",
+    "decision": "REWORK_REQUIRED",
+    "c3": "BLOCKED",
+    "approval_record_created": false,
+    "controller_report": "localization/graphics/role_C/20261008-C271-C1-Q059-EVIDENCE/C271_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
-
 }
