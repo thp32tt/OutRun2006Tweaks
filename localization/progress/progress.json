@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:41:00+09:00",
+  "updated_at_kst": "2026-10-08T14:55:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7198,5 +7198,20 @@
     "dds_changed": false,
     "qa_report": "localization/graphics/role_C/20261008-C285-C1-Q099-ALPHA-FRINGE-HOLD/C285_Q099_MACHINE_CONTROLLER_QA.json",
     "next_action": "Recompute source alpha>0 glyph effect bbox and collect calibrated full lossless per-region C/C3 review before reconsidering approval."
+  },
+  "c285_c2_q214_b258_native_dxt5_review": {
+    "queue_index": 214,
+    "run": "C285-C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "result": "REWORK_REQUIRED",
+    "machine_outside_rgba": 0,
+    "machine_outside_alpha": 0,
+    "controller_qa": "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/C285_CONTROLLER_QA.json",
+    "worker_run": 37734575967,
+    "c3": "BLOCKED",
+    "runtime_validation": "UNTESTED"
   }
 }

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C285-C2",
+  "task_id": "OUTRUN-KOR-C285-C2-Q214-B258-DDS-20261008-1450",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "candidate_sha256": "8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_plate_sha256": "b2a8fd17033efd4ff471b48e1f9289dadfab872cb92ea4bbb2fc6de14762255d",
+  "machine_evidence": "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/C285_Q214_MACHINE_QA.json",
+  "decoded_dds": "2048x2048 DXT5_BC3 RAW mirror_y",
+  "machine_findings": {
+    "header_equal": true,
+    "changed_outside_source_effect_bboxes": 0,
+    "alpha_changed_outside_source_effect_bboxes": 0,
+    "clean_delta_bbox_limitation": "Both candidate-vs-B194-clean delta bboxes touch source region edges; these include clean/BC3/color effects and cannot be treated as exact glyph bounding boxes, positive glyph margins or standalone text-containment proof."
+  },
+  "independent_controller_observations": [
+    {
+      "id": "start",
+      "source": "START",
+      "candidate": "출발",
+      "result": "REWORK_REQUIRED",
+      "description": "Persisted native DDS readable/source/clean side-by-side: Korean shows flatter, blockier cream strokes and much weaker original beveled/condensed right-italic face/keyline; at practical 50% the badge loses English family hierarchy.",
+      "images": [
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/start_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/start_SOURCE_CLEAN_FINAL_PRACTICAL50.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/start_SOURCE_RAW_NATIVE.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/start_FINAL_RAW_NATIVE.png"
+      ]
+    },
+    {
+      "id": "goal",
+      "source": "GOAL",
+      "candidate": "골",
+      "result": "REWORK_REQUIRED",
+      "description": "Persisted native DDS readable/source/clean side-by-side: Korean glyph has large flat face and red background scanline/face boundary across its interior, without source's continuous gold/orange bevel/italic volume; reduced native/practical source-relative word hierarchy.",
+      "images": [
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/goal_SOURCE_CLEAN_FINAL_ZOOM4X.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/goal_SOURCE_CLEAN_FINAL_PRACTICAL50.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/goal_SOURCE_RAW_NATIVE.png",
+        "localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT/goal_FINAL_RAW_NATIVE.png"
+      ]
+    }
+  ],
+  "reviewer": "single ChatGPT C2 controller, no independent second reviewer",
+  "pixels_before_producer_verdict": false,
+  "calibration": "NOT_PERFORMED_AS_BLIND_REVIEW; producer prose was previously read, so no compliant C PASS can be claimed.",
+  "result": "REWORK_REQUIRED",
+  "source_family_action": "B: rebuild both native BC3 badges from B194 verified plate; match continuous face bevel/gradient, original narrow italic/weight and counter separation. Preserve original DDS header/mips, red badge/rim/scene/photo/art, source glyph-effect rectangles and zero decoded changes outside.",
+  "c3": "BLOCKED_UNTIL_NEW_PRODUCER_BYTES_AND_FRESH_CALIBRATED_C",
+  "pre_ingame": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "execution_backend": "GitHub Actions CPU worker 37734575967 for exact DDS decode; GitHub connector for controller visual"
+}
