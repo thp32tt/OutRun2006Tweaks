@@ -1,0 +1,621 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C298-C2",
+  "run_key": "OUTRUN-KOR-C298-C2-Q154-EIGHT-NATIVE-GLYPH-PROJECTION-20261008-1900",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "exact_sha_native_machine": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json",
+  "review_scope": "NEW: all eight native source-vs-current alpha-composited per-column silhouette-centroid guide with independent persisted DDS source/candidate/CLEAN SHA binding; not repeated C292 5 red-only QA nor C287 3 gray-only auth-clean confirmation.",
+  "runtime_and_approval": "NO_RUNTIME_EXECUTION_OR_FINAL_APPROVAL",
+  "calibration": {
+    "reference": "localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_CALIBRATION_RESULT.json",
+    "source_original_normal": true,
+    "binary_correct": "5_OF_5",
+    "subtype_correct": "3_OF_5",
+    "note": "Historical valid source-normal blind exercise; not repeated as fresh calibration in this run."
+  },
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "reason": "Controller read prior q154 queue/producer QA and historical family concerns before native screenshot review, so cannot truthfully set this required C PASS flag. This C stage records new independent machine/projection evidence and conservative HOLD."
+  },
+  "machine": {
+    "source_candidate_header_identical": true,
+    "format": "BGRA32_RGBA8",
+    "native_size": [
+      4096,
+      1024
+    ],
+    "outside_scope_changed_rgba": 0,
+    "outside_scope_changed_alpha": 0,
+    "regions_verified": 8,
+    "positive_margin_regions": 8,
+    "all8_clean_source_alpha_zero": true,
+    "all8_raw_mirror_exact": true,
+    "projection_run_counts_not_semantic_glyphs": true
+  },
+  "evidence_quality_correction": {
+    "defect": "C298 first runner incorrectly rendered hidden RGB in transparent DDS texels after direct RGBA-to-RGB conversion, invalid for visual review.",
+    "fix": "Recomposited original and candidate over opaque gray based on alpha before RGB proof output, then regenerated/refreshed all 8 native and 50% PNGs. Cyan marker is guide, not part of candidate DDS.",
+    "published_corrected_worker_commit": "1dddcbf88e052c6d741cc73a559ca622c025bb6a",
+    "action_runs": [
+      37759742594,
+      37760123949,
+      37760179032
+    ],
+    "final_run_success": true
+  },
+  "per_region_findings": [
+    {
+      "id": "01_create_new_license",
+      "source_text": "CREATE NEW LICENSE",
+      "target_text": "새 라이선스 만들기",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "candidate_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "source_projection_runs": 15,
+      "candidate_projection_runs": 11,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/425/4/4 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/01_create_new_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "02_select_license",
+      "source_text": "SELECT LICENSE",
+      "target_text": "라이선스 선택",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "candidate_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "source_projection_runs": 13,
+      "candidate_projection_runs": 8,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/363/4/4 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/02_select_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "03_single_player_red",
+      "source_text": "SINGLE PLAYER",
+      "target_text": "싱글 플레이",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "candidate_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "source_projection_runs": 11,
+      "candidate_projection_runs": 7,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/383/4/4 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/03_single_player_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "04_default_license",
+      "source_text": "DEFAULT LICENSE",
+      "target_text": "기본 라이선스",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "candidate_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "source_projection_runs": 12,
+      "candidate_projection_runs": 9,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/399/4/4 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/04_default_license_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "05_multiplayer_red",
+      "source_text": "MULTIPLAYER",
+      "target_text": "멀티플레이",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "candidate_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "source_projection_runs": 9,
+      "candidate_projection_runs": 8,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Red Korean bold letters are legible and appear contained in source English condensed red-label envelope at native/50%; script length differs and no arbitrary width ratio is imposed. Glyph family equivalence has not been proven by a semantic stem anchor. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/340/2/2 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/05_multiplayer_red_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "06_single_player_gray",
+      "source_text": "SINGLE PLAYER",
+      "target_text": "싱글 플레이",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "candidate_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "source_projection_runs": 10,
+      "candidate_projection_runs": 7,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Dark blue-gray Hangul remains legible and uses approx source-like letter height; cyan guide marks show projection-run centroid only, not real stem slant. No unambiguous clipped syllable found in calibrated presented view.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Dark blue-gray Hangul remains legible and uses approx source-like letter height; cyan guide marks show projection-run centroid only, not real stem slant. No unambiguous clipped syllable found in calibrated presented view. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/174/3/3 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/06_single_player_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_text": "SHOWROOM",
+      "target_text": "쇼룸",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "candidate_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "source_projection_runs": 8,
+      "candidate_projection_runs": 2,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Source SHOWROOM is eight English letters; Korean 쇼룸 has two syllable blocks and half the source horizontal span. Smaller natural translation width alone does not establish a visual failure. Same-height gray family appearance is legible at native, but hierarchy remains unapproved.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Source SHOWROOM is eight English letters; Korean 쇼룸 has two syllable blocks and half the source horizontal span. Smaller natural translation width alone does not establish a visual failure. Same-height gray family appearance is legible at native, but hierarchy remains unapproved. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/208/3/4 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/07_showroom_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_text": "MULTIPLAYER",
+      "target_text": "멀티플레이",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "candidate_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "source_projection_runs": 8,
+      "candidate_projection_runs": 8,
+      "native_source_current": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png",
+      "practical50": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_PRACTICAL50_MARKED.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Top-versus-bottom silhouette centroid lines are only optical proxies; script-specific character topology prevents source-faithful per-glyph stem slant approval. No claim of measured source/candidate semantic italic angle.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "clean_plate": {
+          "result": "MEASURED_ALPHA_PASS_NOT_FINAL",
+          "observation": "Authenticated B60 CLEAN SHA a4d707fa...; 0 nonzero-alpha CLEAN pixels within canonical source glyph bbox, but aesthetic plate/source-family judgment requires separate exact source matching.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY_NOT_PROVEN",
+          "observation": "Dark blue-gray Hangul remains legible and uses approx source-like letter height; cyan guide marks show projection-run centroid only, not real stem slant. No unambiguous clipped syllable found in calibrated presented view.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "readability": {
+          "result": "VISUAL_NO_DEFINITE_BREAKAGE_STATIC",
+          "observation": "Dark blue-gray Hangul remains legible and uses approx source-like letter height; cyan guide marks show projection-run centroid only, not real stem slant. No unambiguous clipped syllable found in calibrated presented view. Actual game-scale runtime UNTESTED.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_PRACTICAL50_MARKED.png"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BROKEN_HANGUL_IN_CURRENT_IMAGES",
+          "observation": "No unequivocal missing component or overlap visible in correctly alpha-composited native/50% proof. Cyan vertical centroids are QA overlays, not glyph damage.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "protected_art": {
+          "result": "OUTSIDE_SCOPE_ZERO_NOT_FULL_PROTECTION_APPROVAL",
+          "observation": "Source-vs-persisted candidate RGBA/alpha changed outside union of all eight source-effect bboxes = 0/0; this is not a perfect inside-cell object-mask proof.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        },
+        "placement": {
+          "result": "POSITIVE_MARGIN_BOUNDARY_PASS",
+          "observation": "Source glyph-effect box contains current alpha bbox with strict margins 2/154/2/2 (L/R/T/B). No inferred real-game baseline alignment.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/08_multiplayer_gray_NATIVE_SOURCE_FINAL_MARKED.png"
+        },
+        "orientation": {
+          "result": "RAW_MIRROR_Y_BYTE_EXACT",
+          "observation": "RAW source/current crop reversed by Y equals readable crop exactly for this region, as measured by C298 independent decode. In-game render untested.",
+          "evidence": "localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_ALL8_FAMILY_ANCHOR_MACHINE.json"
+        }
+      }
+    }
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C_PASS": false,
+  "C3": "BLOCKED_FRESH_COMPLIANT_C_NOT_YET_GRANTED",
+  "APPROVALS": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "user_jpg_acceptance": "NOT_DONE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_produced": 0,
+  "execution_backend": "GitHub-hosted ephemeral CPU worker required because ChatGPT local GitHub raw DNS lookup failed; N100 unused. GitHub connector reviewed alpha-composited PNGs.",
+  "cleanup": "GitHub runner ephemeral discard; ChatGPT local scratch NONE; N100 scratch/worktree NONE",
+  "forbidden_domains_touched": [],
+  "next_task": "Perform truly pixels-before-producer-compliant exact-SHA C2 using semantic stem-anchor source/candidate left/right slant, complete source-family style profile and verified CLEAN on all 8 with black/white/gray/practical/RAW; then separate exact-SHA C3 and approval-gate validation. Preserve candidate bytes absent new verified defect."
+}
