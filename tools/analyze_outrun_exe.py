@@ -19,6 +19,7 @@ from pathlib import Path
 KNOWN_TARGETS = {
     0x02CFE0: "put_sprite_ex",
     0x029580: "sprani_play_ae_auth_alpha",
+    0x029530: "sprani_play_ae_auth",
     0x02D280: "put_clip_sprite",
     0x02CCB0: "sprSetFontPriority",
     0x02CA60: "sprSetPrintFont",
@@ -33,6 +34,16 @@ KNOWN_TARGETS = {
 }
 
 PRODUCER_WINDOWS = (
+    {
+        # R59/R74 HMD position HUD: the first rank glyph uses a five-arg
+        # sprani producer; eight following clip siblings have separate CALLs.
+        # Verify this against pinned EXE before adding any new hook.
+        "name": "DispRank_first_kind1_0xB9DA6",
+        "start_rva": 0x000B9D90,
+        "end_rva": 0x000B9DC0,
+        "anchors": (0x000B9DA6,),
+        "expected_direct_targets": {0x000B9DA6: 0x029530},
+    },
     {
         # This CALL PRECEDES the next 0xCAE0 block. It cannot legitimately
         # be cited as a direct call from within a 0xCAE0..0xD100 window.
@@ -84,6 +95,7 @@ PRODUCER_WINDOWS = (
 )
 
 KNOWN_CALL_SITES = {
+    0x0B9DA6: "DispRank first kind1 sprani ScreenHud producer",
     0x0BB0FB: "RankMarker sprani #1",
     0x0BB133: "RankMarker sprani #2",
     0x0BB16C: "RankMarker sprani #3",
