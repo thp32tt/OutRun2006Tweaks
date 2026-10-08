@@ -344,7 +344,6 @@ class UIScaling : public Hook
 		};
 
 		if (returnAddress == Module::exe_ptr(0xBAEE7) &&
-			RankMarkerSubActiveDepth != 0 &&
 			RankMarkerSubScreenHudDepth == 0)
 		{
 			recoverViewPoint(RankMarkerProjectedInfo, true);
