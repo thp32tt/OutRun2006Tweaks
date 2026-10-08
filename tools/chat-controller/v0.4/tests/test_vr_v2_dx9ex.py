@@ -1,6 +1,11 @@
 """Regression coverage for the isolated VR Controller v2 DX11/DXVK/DX9Ex queue."""
 import ast
+import base64
+import json
+import re
 import unittest
+import urllib.parse
+import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import Mock
@@ -17,6 +22,26 @@ def load_queue_target():
     exec(compile(module, '<queue-target>', 'exec'), ns)
     return ns['queue_target_for_slot']
 
+
+
+def load_task_record_helpers():
+    """Compile just the deployed GitHub C6 lookup and counter parser."""
+    tree = ast.parse(SOURCE)
+    names = {
+        'parse_task_record_counter', 'production_id_from_identifier',
+        '_task_records', 'github_task_record', 'restore_task_counters',
+    }
+    functions = [
+        node for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name in names
+    ]
+    assert {node.name for node in functions} == names
+    ns = {
+        're': re, 'base64': base64, 'json': json, 'urllib': urllib,
+        'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
+    }
+    exec(compile(ast.Module(body=functions, type_ignores=[]), '<C6-record-parser>', 'exec'), ns)
+    return ns
 
 
 def load_freeze_reconcile():
@@ -102,6 +127,51 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('for lane_key in conversion_dispatch_plan(', SOURCE)
         self.assertIn('reconcile_conversion_lane_freeze(', SOURCE)
         self.assertNotIn('CONVERSION_DXVK_DEFERRED', SOURCE)
+
+    def test_c6_record_counter_legacy_1_over_3_does_not_hide_pass(self):
+        helpers = load_task_record_helpers()
+        parse = helpers['parse_task_record_counter']
+        self.assertEqual(parse('1/3', field='attempt'), 1)
+        self.assertEqual(parse(' 2 / 3 ', field='attempt'), 2)
+        self.assertEqual(parse(3, field='attempt'), 3)
+        self.assertEqual(parse('0/2', field='rollover'), 0)
+        for malformed in ('garbage', '4/3', '1/0', '-1', '', True, 1.3):
+            with self.subTest(value=malformed), self.assertRaises(ValueError):
+                parse(malformed, field='attempt')
+
+        for task_id, branch, status, terminal in (
+            ('CONVERSION-DX11-00455', 'vr-dx11-native-r71', 'COMPLETE', False),
+            ('CONVERSION-DX9EX-00551', 'vr-d3d9ex-focus', 'COMPLETE_BUILD_VERIFIED', True),
+        ):
+            with self.subTest(task_id=task_id):
+                sha = 'a' * 40
+                record = {
+                    'task_id': task_id,
+                    'production_id': task_id,
+                    'target_branch': branch,
+                    'attempt': '1/3',
+                    'chat_rollover': 2,
+                    'status': status,
+                    'checkpoint': 'C6_STATE',
+                    'controller_terminal': terminal,
+                    'automation_validation': 'PASS',
+                    'validation_bearing_result_sha': sha,
+                }
+                calls = []
+                def github_api_json(url):
+                    calls.append(url)
+                    self.assertIn('/contents/docs/automation/runs/', url)
+                    return {
+                        'content': base64.b64encode(json.dumps(record).encode()).decode(),
+                    }
+                helpers['github_api_json'] = github_api_json
+                loaded = helpers['github_task_record']('f' * 40, task_id)
+                self.assertEqual(loaded, record)
+                self.assertEqual(len(calls), 1)
+                active = {'task_id': task_id, 'attempt': 2, 'chat_rollovers': 0}
+                helpers['restore_task_counters'](active, loaded)
+                self.assertEqual(active['attempt'], 2)
+                self.assertEqual(active['chat_rollovers'], 2)
 
     def test_freeze_dxvk_restore_parked_dx9ex_without_duplicate_id(self):
         fn = load_freeze_reconcile()
