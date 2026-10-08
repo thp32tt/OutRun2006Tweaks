@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B288",
+  "run_key": "OUTRUN-KOR-B288-Q137-IGR041-NATIVE-STROKE-REJECT-20261009",
+  "queue_index": 137,
+  "priority": "P0",
+  "source": "INGAME_REWORK_BACKLOG.csv#IGR-041",
+  "source_mapping": "EXACT",
+  "in_game_status": "OPEN_USER_INGAME_FAIL",
+  "old_candidate_sha256": "1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2",
+  "canonical_source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_source_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "trials": [
+    {
+      "run": "B287",
+      "sha256": "507f8ff030846d0b8ed854a3fa8f026acdbdb33413ba62bd337a97721d1e7fa0",
+      "variant": "remove all added stroke/dilation 0px",
+      "result": "FAIL_VISUAL_UNDERWEIGHT",
+      "producer_sha": "9cc4481659fb045a1c0db9173011b68beee9a490",
+      "qa_path": "localization/graphics/role_B/20261009-B287-Q137-P0-SOURCE-STROKE-CALIBRATION/B287_MACHINE_QA.json"
+    },
+    {
+      "run": "B288",
+      "sha256": "b9cc71e2f1edc3bb0852fd1665ad8f5a2899e2e0b74ca561088d743dd5761cc4",
+      "variant": "0px tiny, 1px gray/title, 2px large source-family calibration from C1 rejection",
+      "result": "FAIL_VISUAL_SOURCE_FAMILY_MISMATCH",
+      "qa_path": "localization/graphics/role_B/20261009-B288-Q137-P0-SOURCE-STROKE-CALIBRATION/B288_MACHINE_QA.json"
+    }
+  ],
+  "current_production_candidate_unchanged": true,
+  "promoted": false,
+  "new_production_dds": 0,
+  "trial_dds_generated": 2,
+  "triage": "MATERIAL_REWORK; no same-SHA retry; did not bypass --require-safe-rerender",
+  "machine_checks": {
+    "persisted_dds_native_decode": "PASS_B287_AND_B288",
+    "header_pixel_masks_orientation": "PASS_B287_AND_B288",
+    "native_dimensions": "2048x1024",
+    "format": "BGRA32",
+    "mips": 1,
+    "source_clean_changed_outside_six_bboxes": 0,
+    "final_changed_outside_six_bboxes": 0,
+    "alpha_changed_outside_six_bboxes": 0,
+    "bbox_positive_margin": "6/6 BOTH_TRIALS",
+    "protected_unrelated_exact": "unchanged outside original six regions"
+  },
+  "pixel_first_observations": [
+    {
+      "region": "select_transmission",
+      "source": "original SELECT TRANSMISSION tall narrow uppercase white; source width 863px",
+      "observed": "B287 no-dilation 288px and B288 calibrated 280px Hangul still generic round/square sans, wrong original font-family proportion and weak relative title hierarchy; width 32-33% is context and not automatically a pixel violation.",
+      "decision": "FAIL_SOURCE_FAMILY_CONDENSED_SHAPE_MISMATCH"
+    },
+    {
+      "region": "manual_large",
+      "source": "MANUAL condensed dense white face",
+      "observed": "At 100% and 50%, B288 Korean 수동 uses visually stockier/square letter structure rather than narrow angular source. B287 without stroke is too thin; 2px intermediate change does not reconstruct contour style.",
+      "decision": "FAIL_SOURCE_FAMILY_GLYPH_CONTOUR_MISMATCH"
+    },
+    {
+      "region": "transmission_small",
+      "observed": "B287 tiny gray subtitle was visibly lighter; B288 identical 0px. Practical game-scale 50% and source family not independently approved.",
+      "decision": "HOLD_GAME_SCALE_READABILITY"
+    },
+    {
+      "region": "manual_small",
+      "observed": "B287 zero-stroke visual too light versus English source; B288 1px saved and machine pass, independent full native/50 review pending.",
+      "decision": "HOLD_NEEDS_PIXEL_FIRST_FULL"
+    },
+    {
+      "region": "automatic_small",
+      "observed": "B287 zero-stroke source vs candidate visual family mismatch; B288 1px created, no distinct independent C assessment.",
+      "decision": "HOLD_NEEDS_PIXEL_FIRST_FULL"
+    },
+    {
+      "region": "automatic_large",
+      "observed": "B287 0px was much thinner than source; B288 2px created, no distinct independent C assessment.",
+      "decision": "HOLD_NEEDS_PIXEL_FIRST_FULL"
+    }
+  ],
+  "plate_gate": "HOLD: A22 source-derived CLEAN exact SHA machine-pinned but no new full-plate per-region independent PASS",
+  "composite_gate": "HOLD: outside-mask exact machine 0 does not certify source-family style",
+  "B_eight_ordered_checks": {
+    "source_removal": "HOLD",
+    "slant": "SOURCE_UPRIGHT_EXPECTED; no unintended italic transform",
+    "size": "PASS_BBOX_BUT_HIERARCHY_FAIL",
+    "effects": "FAIL_VISUAL_FAMILY",
+    "clipping": "MACHINE_PASS",
+    "protected": "OUTSIDE_UNION_ZERO",
+    "raw_flipy": "PERSISTED_DECODE_ORIENTATION_MACHINE_PASS; full controller visual not complete",
+    "readability": "FAIL_NATIVE_FAMILY_ON_TITLE"
+  },
+  "decision": "PRODUCER_FAIL_MANUAL_RECONSTRUCTION_REQUIRED",
+  "rationale": "Native no-stroke and calibrated 0/1/2px variants are material trial DDS, but neither reproduces tall condensed/angular UI title/choice typography. Do not rerender same Noto glyph-width/stroke variants again. Establish actual source-derived vector/contour family, independently approve native plate, then produce new candidate. Producer numerical PASS cannot override observed source-style failure.",
+  "next_action": "Make font-family/contour-calibrated per-glyph manual/vector master (not forced overall width/shear or another blanket stroke change), rebuild approved CLEAN, 100/75/50 and RAW/mip including real AT/MT composition. New candidate -> fresh independent C1/C3 -> NEW game screenshot.",
+  "C1": "REVIEW_REQUIRED_AFTER_MATERIAL_NEW_CANDIDATE",
+  "C3": "BLOCKED",
+  "USER": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions heavy DDS inputs unavailable in ChatGPT local sandbox; ChatGPT visual QA using GitHub-persisted PNG transferred via N100 MCP small-file transport",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
