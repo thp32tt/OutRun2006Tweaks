@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A194 q231 flat source-family EBE401C8 complete: delayed GitHub Actions 37767491356 SUCCESS and exact new 8,388,736B DDS SHA256 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76 (Git blob 3eb25d96958f6d09380e9f40b46ae3569651e33b), replaces rejected dc08f74a..., source English 29b87a5c.... Native BGRA32 2048x1024 RAW mirror-y, 4/4 source bbox positive margin and out-of-mask/protected/overlap/source residue 0; actual SOURCE,CLEAN,FINAL and BWG/RAW/50% producer visual confirms red/gray flat single face replacing invented offset outline, LAN labels protected. Separate PLATE_ONLY lossless 121288 source removed / 0 outside and 0 alpha uncleared, COMPOSITE lossless 90590 clean-final changes / 0 outside and 0 changed transparent pixels. Candidate PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1, C3/user/actual-game/APPROVAL/PRE_INGAME blocked, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json.",
     "C302 C2 EVEN q236 FEF70E85 current exact unchanged candidate e0a01c50... and pinned source a1c7f7d6... independent RAW mirrored-Y native 4/14 stage-name regions (Industrial Complex, Waterfalls, Milky Way, Jungle) all inside canonical bboxes with changed RGBA/alpha outside region bands 0; previously unnoticed preserved atlas artwork x1995 explicitly excluded from glyph bbox. C3 HOLD (10 uninspected, missing current qualified calibration/clean/full visual), do not rerender identical bytes/approve. QA localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json; RUNTIME_VALIDATION=UNTESTED.",
     "C301 C2 EVEN q230 E95DA5 independently SHA-verified current B228 + pinned English two help regions (2/2 native height/containment, RGBA/alpha changed outside bboxes 0; RGB source family match). C3 HOLD insufficient qualified blind/current lossless 100/75/50/mips/RAW source-clean-final; no renderer change or approved export. localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json; RUNTIME_VALIDATION=UNTESTED.",
     "A194 q231 EBE401C8 MATERIAL source-style rework script changed at 0dbc72b2c6c992c16115d40591e451c0d6181336; source original 29b87a5c..., previously rejected candidate dc08f74a...; Black TTC single flat face removes unwanted dark offset edges and red ONLINE bevel, guard preserves protected LAN and strict source bbox. GitHub Actions 37767491356 still IN_PROGRESS at 20:18 KST, candidate NOT PUBLISHED / QA NOT RUN. Do NOT count as new DDS, PASS or new scoreboard point. Keep q231 REWORK until actual final DDS exact SHA and native SOURCE/CLEAN/FINAL plus RAW/50% producer QA; then independent C1 and C3. RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json",
@@ -11772,11 +11773,21 @@
   "a194_q231_source_edge_worker_pending": {
     "role": "A",
     "queue_index": 231,
-    "status": "WORKER_RUNNING_PENDING_NO_CANDIDATE",
+    "status": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C1",
     "workflow_run": 37767491356,
-    "expected_previous_candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
-    "RUNTIME_VALIDATION": "UNTESTED",
-    "qa": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_PENDING_CONTROLLER_QA.json"
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "old_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+    "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+    "producer_machine_qa": "PASS_4_OF_4",
+    "plate_only_gate": "PASS",
+    "composite_contamination_gate": "PASS",
+    "producer_visual": "PASS_SOURCE_RELATIVE_FLAT_GRAY_RED",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_CONTROLLER_SELF_QA_FINAL.json"
   },
   "c1_20261008_q035_q103_visual_fail": {
     "run": "20261008-C1-Q035-Q103-SOURCE-FAMILY-FAIL",
