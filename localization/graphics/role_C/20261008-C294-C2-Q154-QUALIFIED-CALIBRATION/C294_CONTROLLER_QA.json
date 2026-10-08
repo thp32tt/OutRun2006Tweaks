@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C294-C2",
+  "run_key": "OUTRUN-KOR-C294-C2-Q154-VALID-SOURCE-NORMAL-CALIBRATION-20261008-1803",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_candidate_hash_provenance": "Latest historical exact native DDS QA C292/C287; this invocation did not re-download/redecode the large q154 DDS and does not assert a fresh SHA comparison",
+  "new_work": "Replaced uncertified C281 q172 Korean rejected-candidate normal with canonical-source-derived original English normal plus shuffled synthetic defects; independent blind first-look persisted before answer-key reveal",
+  "calibration_file": "localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_CALIBRATION_RESULT.json",
+  "blind_look_file": "localization/graphics/role_C/20261008-C294-C2-Q154-QUALIFIED-CALIBRATION/C294_FIRST_LOOK.json",
+  "calibration_binary_detected": "5/5",
+  "calibration_subtype": "3/5",
+  "calibration_qualified_for_defect_detection": true,
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --repo work/outrun_C294_calibration --index 154",
+    "result": "EVIDENCE_ONLY_HOLD",
+    "execution_backend": "N100 MCP lightweight fallback because local GitHub raw DNS failed; no full-res DDS or game compute on N100"
+  },
+  "machine_qa_new_this_run": false,
+  "complete_region_fresh_pixels_first": false,
+  "reason": "Producer notes and prior C evidence were consulted; new q154 source/candidate native first-look cannot be asserted, nor current exact-source glyph slant anchors/family profile, complete 8-region observations, separate C3.",
+  "decision": "HOLD_STRICT_RECHECK",
+  "C_static_approval": "NOT_GRANTED",
+  "C3": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_produced": 0,
+  "not_run": [
+    "q154 current 4096x1024 native DDS re-decode",
+    "fresh q154 eight-region calibrated C pass",
+    "separate exact-SHA C3",
+    "actual game retest"
+  ],
+  "forbidden_domains_touched": [],
+  "next": "With calibrated source-original control now available, run genuinely fresh q154 exact-bytes pixels-first eight-region C review using authored B60 clean, measured source/candidate glyph slant anchors, native/RAW/zoom/practical/BWG, then distinct C3 and qa_evidence_gate validation. Preserve candidate absent independently verified pixel defect."
+}

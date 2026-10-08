@@ -3000,3 +3000,7 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ## 2026-10-08 17:46 KST — C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740
 - C1 `ODD(+UNINDEXED_SPECIAL)` q119 F6811E94: A191 exact 4e971f32fd0b5367ec0e91167900d83b097e67f16f72a67b1264f114ee2ba3ca independently rejected for native first-Hangul left white-halo vertical truncation (PNG x705 106 near-white rows, preceding x704 transparent). C3/approval/PRE_INGAME blocked; A padded white-halo and source-lean rework required. Candidate unchanged, independent full-DDS machine PASS not claimed; actual game UNTESTED. Evidence `localization/graphics/role_C/20261008-C294-C1-Q119-LEFT-HALO-FAIL-20261008-1740/C294_CONTROLLER_QA.json`.
+
+## 2026-10-08 18:03 KST — C294 C2 q154 calibrated defect controls
+
+- `TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN`. Canonical English-derived normal control vs four labeled-after-blind-read defect examples: 5/5 binary correct, 3/5 kind correct; calibration artifacts and QA JSON persisted. This is *new calibration evidence only*, not q154 native DDS C/C3 approval. Queue `c294_hold_strict_recheck_calibration_original_control_5of5_fresh_c_pending`; exact current DDS stays unchanged and game `RUNTIME_VALIDATION=UNTESTED`. Source family/anchor and distinct review evidence still missing; PRE_INGAME blocked.
