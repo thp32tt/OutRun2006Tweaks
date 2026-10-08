@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# A182: q154 gray menu weight/counter-space rework after C268 evidence-gate visual failure.
+# A182R: q154 controller-refined gray menu weight/counter-space rework after A182 underweight-risk precheck.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 repo=Path.cwd()
-RUN="20261008-A182-Q154-GRAY-WEIGHT-COUNTERSPACE"
+RUN="20261008-A182R-Q154-GRAY-WEIGHT-COUNTERSPACE"
 out=repo/"localization/graphics/role_A"/RUN
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -19,7 +19,7 @@ asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset
 clean_path=repo/"localization/graphics/role_C/20261005-C141-4D38BBB0/C141_EXACT_CLEAN_PLATE.png"
 protected_path=repo/"localization/graphics/role_C/20261005-C141-4D38BBB0/C141_PROTECTED_VISIBLE_MASK.png"
-EXPECTED="815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288"
+EXPECTED="dd4a3719b9af01b12e5f962b49f937ef7290dcc893ef970c19110f0611afaf64"
 SOURCE_SHA="15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf"
 SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
 SS=4
@@ -78,7 +78,7 @@ with tempfile.TemporaryDirectory() as td:
     subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
 
     styles=[]
-    for style in ("DemiLight","Regular","Medium"):
+    for style in ("DemiLight","Regular","Medium","Bold"):
         fm=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}",f"Noto Sans CJK KR:style={style}"],text=True).strip()
         fp,fi,fs=fm.rsplit("|",2)
         if Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
@@ -122,8 +122,8 @@ with tempfile.TemporaryDirectory() as td:
             mb=mask.getbbox()
             den=coverage(mask.crop(mb))
             ratio=den/src_density if src_density else 999.0
-            variants.append((abs(ratio-0.92),ratio,tile,mask,meta_font))
-        acceptable=[v for v in variants if 0.72<=v[1]<=1.08]
+            variants.append((abs(ratio-0.97),ratio,tile,mask,meta_font))
+        acceptable=[v for v in variants if 0.86<=v[1]<=1.08]
         chosen=min(acceptable or variants,key=lambda v:v[0])
         _,ratio,tile,mask,fontmeta=chosen
         if ratio>1.12 or ratio<0.62:
@@ -147,7 +147,7 @@ with tempfile.TemporaryDirectory() as td:
           "margins":margins,"target_size":cfg["target"],
           "source_text_density":round(src_density,6),
           "c268_prior_density_ratio":cfg["c268_ratio"],
-          "a182_density_ratio":round(ratio,4),
+          "a182r_density_ratio":round(ratio,4),
           "density_reduction_pct":round((1-ratio/cfg["c268_ratio"])*100,2),
           "font":fontmeta,"stroke_width":0,"fill_rgba":list(GRAY)
         })
@@ -189,7 +189,7 @@ with tempfile.TemporaryDirectory() as td:
         crop=(max(0,x0-p),max(0,y0-p),min(old.width,x1+p),min(old.height,y1+p))
         for scale in (1.0,0.75,0.5):
             ims=[]
-            for label,im in (("SOURCE",source),("B225",old),("A182",decoded)):
+            for label,im in (("SOURCE",source),("B225",old),("A182R",decoded)):
                 z=flat(im.crop(crop))
                 if scale!=1:
                     z=z.resize((max(1,int(z.width*scale)),max(1,int(z.height*scale))),Image.Resampling.LANCZOS)
@@ -202,7 +202,7 @@ with tempfile.TemporaryDirectory() as td:
             contacts.append(row)
     sheet=Image.new("RGB",(max(i.width for i in contacts),sum(i.height for i in contacts)+8),(14,14,14)); yy=0
     for z in contacts: sheet.paste(z,(0,yy)); yy+=z.height+4
-    sheet.save(out/"A182_Q154_GRAY_PRACTICAL_100_75_50.jpg","JPEG",quality=96,subsampling=0)
+    sheet.save(out/"A182R_Q154_GRAY_PRACTICAL_100_75_50.jpg","JPEG",quality=96,subsampling=0)
 
     # Source/B225/clean/A182 native gray-row contact sheet.
     rowsheets=[]
@@ -210,7 +210,7 @@ with tempfile.TemporaryDirectory() as td:
         x0,y0,x1,y1=rr["source_bbox"]; p=12
         crop=(max(0,x0-p),max(0,y0-p),min(old.width,x1+p),min(old.height,y1+p))
         ims=[]
-        for label,im in (("SOURCE",source),("B225",old),("C141 CLEAN",clean),("A182",decoded)):
+        for label,im in (("SOURCE",source),("B225",old),("C141 CLEAN",clean),("A182R",decoded)):
             z=flat(im.crop(crop)).resize(((crop[2]-crop[0])*2,(crop[3]-crop[1])*2),Image.Resampling.NEAREST)
             c=Image.new("RGB",(z.width,z.height+24),(18,18,18)); c.paste(z,(0,24)); ImageDraw.Draw(c).text((4,4),label,fill="white"); ims.append(c)
         rw=Image.new("RGB",(sum(i.width for i in ims)+18,max(i.height for i in ims)),(16,16,16)); xx=0
@@ -218,7 +218,7 @@ with tempfile.TemporaryDirectory() as td:
         rowsheets.append(rw)
     sheet2=Image.new("RGB",(max(i.width for i in rowsheets),sum(i.height for i in rowsheets)+8),(14,14,14)); yy=0
     for z in rowsheets: sheet2.paste(z,(0,yy)); yy+=z.height+4
-    sheet2.save(out/"A182_Q154_SOURCE_B225_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
+    sheet2.save(out/"A182R_Q154_SOURCE_B225_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
 
     for label,raw in (("SOURCE RAW",source_raw),("B225 RAW",old_raw),("A182 RAW",rraw)):
         z=flat(raw); z.thumbnail((900,260),Image.Resampling.LANCZOS)
@@ -227,7 +227,7 @@ with tempfile.TemporaryDirectory() as td:
     report={
       "schema_version":2,"role":"A","run":RUN,"queue_index":154,"asset":asset,
       "work_stolen_from_lane":"B",
-      "trigger":"C268_REWORK_REQUIRED_GRAY_WEIGHT_COUNTER_SPACE",
+      "trigger":"C268_REWORK_REQUIRED_GRAY_WEIGHT_COUNTER_SPACE__A182_CONTROLLER_PRECHECK_UNDERWEIGHT_RISK",
       "source_sha256":SOURCE_SHA,"prior_candidate_sha256":EXPECTED,"candidate_sha256":after,
       "repair_scope":"ONLY_GRAY_SINGLE_PLAYER_SHOWROOM_MULTIPLAYER",
       "method":"restore exact C141 clean plate inside only the three gray source bboxes; rerender native Noto Sans CJK Korean with zero added stroke and density-selected lighter face; preserve B225 red rows and all non-gray pixels byte/pixel-exact",
@@ -253,12 +253,12 @@ with tempfile.TemporaryDirectory() as td:
       },
       "execution_backend":"GITHUB_HOSTED_CPU_WORKER_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_N100_ENOSPC",
       "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
-      "status":"A182_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+      "status":"A182R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
       "fresh_independent_c":"REQUIRED_C2","mandatory_c3":"REQUIRED_AFTER_C268_VISUAL_REWORK",
       "pre_ingame":"REQUIRED_AFTER_C_PASS","runtime_validation":"UNTESTED",
       "forbidden_domains_touched":[]
     }
-    rp=out/"A182_Q154_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    rp=out/"A182R_Q154_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     (wr/"A182_Q154.json").write_text(json.dumps({
       "role":"A","run":RUN,"queue_index":154,"asset":"4D38BBB0","work_stolen_from_lane":"B",
       "before":EXPECTED,"after":after,"status":report["status"],"report":str(rp.relative_to(repo)),
