@@ -8760,5 +8760,34 @@
       "DX11",
       "DXVK"
     ]
+  },
+  "c321_c2_q212_b299_fresh_native_two_region": {
+    "time_kst": "2026-10-09 08:20 KST",
+    "run_key": "OUTRUN-KOR-C321-C2-Q212-B299-FRESH-NATIVE-20261009-0820",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "prior_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+    "current_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+    "current_blob_sha": "cdf9a9690f1f17921141f2d3be209454563420ed",
+    "triage": "FRESH_C_REVIEW",
+    "independent_visual_scoped_pass": [
+      "showroom",
+      "enter_name"
+    ],
+    "independent_gray_native_proofs": 2,
+    "preserved_other_regions": 10,
+    "independent_other_regions_done": false,
+    "independent_full_dds_decode_done": false,
+    "C": "HOLD_STRICT_RECHECK",
+    "C2": "SCOPED_VISUAL_PASS_2OF2",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR029": "OPEN_MAPPING_SUSPECTED",
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C321-C2-Q212-B299-NATIVE-ALPHA-REVIEW/C321_Q212_B299_CONTROLLER_C2_HOLD.json"
   }
 }
