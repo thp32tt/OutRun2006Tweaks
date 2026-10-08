@@ -7757,5 +7757,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261008-C301-C2-Q230-EXACT-HELP-NATIVE-HOLD/C301_Q230_C3_INDEPENDENT_PIXEL_AUDIT.json",
     "execution_backend": "GitHub SSOT + ChatGPT-local V8 pixel decode; N100 MCP only exact-hash large-file transfer and tiny triage script after GPT local raw GitHub DNS failure"
+  },
+  "c302_c2_q236_four_native_region_audit": {
+    "run_key": "OUTRUN-KOR-C302-C2-Q236-FOUR-NATIVE-REGIONS-20261008-2056",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "independent_native_regions": 4,
+    "total_source_regions": 14,
+    "subset_containment": "4/4 alpha>16 native source bbox positive-margin PASS; no changed RGBA/alpha outside original horizontal source-region extents within examined row bands",
+    "legacy_C": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "C3": "HOLD_STRICT_RECHECK",
+    "APPROVAL": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "report": "localization/graphics/role_C/20261008-C302-C2-Q236-FOUR-REGION-NATIVE-HOLD/C302_Q236_CONTROLLER_C3_HOLD.json",
+    "execution_backend": "GitHub SSOT + ChatGPT-local JavaScript targeted RAW DDS pixels, N100 fallback only hashed DDS transfer and short triage due local raw GitHub DNS failure"
   }
 }
