@@ -309,8 +309,24 @@ class UIScaling : public Hook
 		// esi and ebp hold the rounded position. Keeping the difference instead
 		// of the exact position lets every draw apply it, whatever offset from
 		// the marker that draw sits at.
-		RankMarkerFracX = (x + 320.0f) - float(int(ctx.esi));
-		RankMarkerFracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
+		// A broken/transitioning Calc3D2D producer can expose non-finite
+		// stack coordinates at this exact rank-marker truncate hook. Do not
+		// forward a NaN/Inf fractional offset to every queued sibling glyph.
+		// Valid original subpixel correction is intentionally unchanged.
+		if (!std::isfinite(x) || !std::isfinite(y))
+		{
+			RankMarkerFracX = RankMarkerFracY = 0.0f;
+			return;
+		}
+		const float fracX = (x + 320.0f) - float(int(ctx.esi));
+		const float fracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
+		if (!std::isfinite(fracX) || !std::isfinite(fracY))
+		{
+			RankMarkerFracX = RankMarkerFracY = 0.0f;
+			return;
+		}
+		RankMarkerFracX = fracX;
+		RankMarkerFracY = fracY;
 	}
 
 	// The original sub_4BAD20 owns exactly one rank producer group, including

@@ -170,6 +170,43 @@ if "&RankMarkerProjectedInfo" not in rank13 or "&RankMarkerProjectedInfo" not in
     fail("rank marker nodes do not carry recovered rank anchor")
 if "&projectedAnchor" not in rival or "RivalMarkerProjectedInfo = {};" not in rival:
     fail("rival marker must consume one exact recovered anchor and copy it to all sibling nodes")
+# Original emoose/OutRun2006Tweaks 0xBB046 fractional correction is
+# retained for all finite inputs. This exact producer can otherwise forward
+# NaN/Inf through both 1st-3rd sprani and 4th+ clip-sprite sibling draws.
+# Reject corrupt stack or computed offsets before publishing either fraction.
+def require_finite_rank_fraction(body: str) -> None:
+    tokens = (
+        "!std::isfinite(x) || !std::isfinite(y)",
+        "RankMarkerFracX = RankMarkerFracY = 0.0f;",
+        "!std::isfinite(fracX) || !std::isfinite(fracY)",
+        "RankMarkerFracX = fracX;",
+        "RankMarkerFracY = fracY;",
+    )
+    positions = [body.find(token) for token in tokens]
+    if min(positions) < 0 or positions != sorted(positions):
+        fail("rank truncate must reject invalid raw/computed fractions before publishing")
+    if body.count("RankMarkerFracX = RankMarkerFracY = 0.0f;") != 2:
+        fail("rank truncate must clear both fractional offsets on either invalid path")
+
+
+truncate = function_body(ui, "static void RankMarker_Truncate_dest(")
+require_finite_rank_fraction(truncate)
+# Two independent one-step source mutations; no unchanged 1000/5000 loop.
+for broken in (
+    truncate.replace(
+        "!std::isfinite(x) || !std::isfinite(y)", "false", 1),
+    truncate.replace(
+        "!std::isfinite(fracX) || !std::isfinite(fracY)", "false", 1),
+):
+    if broken == truncate:
+        fail("rank fraction fault-injection setup did not mutate source")
+    try:
+        require_finite_rank_fraction(broken)
+    except SystemExit:
+        pass
+    else:
+        fail("rank fraction invalid-value mutant escaped verifier")
+
 rank_owner = function_body(ui, "static int __cdecl RankMarkerSub_dest(")
 for marker in (
     "RankMarkerProjectedInfo = {};",
