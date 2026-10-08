@@ -1,0 +1,26 @@
+{
+  "run": "20261008-A194-Q231-FLAT-SOURCE-FAMILY",
+  "queue_index": 231,
+  "asset": "EBE401C8",
+  "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+  "localized_physical_rows": 4,
+  "transcription_correction": "ADD_2_EXPLANATORY_SOURCE_LINES",
+  "bbox_size_positive_margin": "4/4 PASS",
+  "machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "changed_pixels": 140523,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS",
+    "preserved_LAN_rows": "PIXEL_EXACT_BY_OUTSIDE_SCOPE"
+  },
+  "worker_status": "A194_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261008-A194-Q231-FLAT-SOURCE-FAMILY/A194_EBE401C8_REPORT.json"
+}

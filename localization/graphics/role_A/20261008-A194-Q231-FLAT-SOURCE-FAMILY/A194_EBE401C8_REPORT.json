@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A194-Q231-FLAT-SOURCE-FAMILY",
+  "queue_index": 231,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "bpp": 32,
+    "masks": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "raw_mode": "BGRA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "transcription_correction": {
+    "prior_segment_count": 2,
+    "corrected_segment_count": 4,
+    "added_source_lines": [
+      "Play OutRun Online with Friends or other players!",
+      "Join or Create a LAN game of OutRun!"
+    ],
+    "preserved_original": [
+      "LAN (large)",
+      "LAN (small)"
+    ],
+    "localized_physical_rows": 4
+  },
+  "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+  "rows": [
+    {
+      "key": "help_online",
+      "source": "Play OutRun Online with Friends or other players!",
+      "korean": "아웃런 온라인에서 친구나 다른 플레이어와 함께 플레이하세요!",
+      "family": "gray_help",
+      "original_bbox": [
+        7,
+        371,
+        1446,
+        437
+      ],
+      "localized_bbox": [
+        9,
+        376,
+        1441,
+        431
+      ],
+      "source_width": 1439,
+      "source_height": 66,
+      "localized_width": 1432,
+      "localized_height": 55,
+      "delta_left": 2,
+      "delta_right": 5,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "NotoSansCJK-Black.ttc index1",
+      "font_size": 56,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 0,
+      "stroke_width": 0,
+      "source_style": "single native solid face; no displaced edge",
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "help_lan",
+      "source": "Join or Create a LAN game of OutRun!",
+      "korean": "아웃런 LAN 게임에 참가하거나 만드세요!",
+      "family": "gray_help",
+      "original_bbox": [
+        2,
+        531,
+        1122,
+        597
+      ],
+      "localized_bbox": [
+        4,
+        536,
+        957,
+        591
+      ],
+      "source_width": 1120,
+      "source_height": 66,
+      "localized_width": 953,
+      "localized_height": 55,
+      "delta_left": 2,
+      "delta_right": 165,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "NotoSansCJK-Black.ttc index1",
+      "font_size": 56,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 0,
+      "stroke_width": 0,
+      "source_style": "single native solid face; no displaced edge",
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "online_big",
+      "source": "ONLINE",
+      "korean": "온라인",
+      "family": "red_big",
+      "original_bbox": [
+        6,
+        867,
+        640,
+        1012
+      ],
+      "localized_bbox": [
+        8,
+        874,
+        369,
+        1004
+      ],
+      "source_width": 634,
+      "source_height": 145,
+      "localized_width": 361,
+      "localized_height": 130,
+      "delta_left": 2,
+      "delta_right": 271,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "NotoSansCJK-Black.ttc index1",
+      "font_size": 136,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "shadow_rgba": [
+        186,
+        0,
+        0,
+        230
+      ],
+      "shadow_offset": 0,
+      "stroke_width": 0,
+      "source_style": "single native solid face; no displaced edge",
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "online_small",
+      "source": "ONLINE",
+      "korean": "온라인",
+      "family": "gray_small",
+      "original_bbox": [
+        1298,
+        949,
+        1560,
+        1011
+      ],
+      "localized_bbox": [
+        1300,
+        951,
+        1454,
+        1008
+      ],
+      "source_width": 262,
+      "source_height": 62,
+      "localized_width": 154,
+      "localized_height": 57,
+      "delta_left": 2,
+      "delta_right": 106,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "NotoSansCJK-Black.ttc index1",
+      "font_size": 58,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        71,
+        73,
+        120
+      ],
+      "shadow_offset": 0,
+      "stroke_width": 0,
+      "source_style": "single native solid face; no displaced edge",
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "changed_pixels": 140523,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS",
+    "preserved_LAN_rows": "PIXEL_EXACT_BY_OUTSIDE_SCOPE"
+  },
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "verified_font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+  "supersedes_rejected_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+  "rework_reason": "C1 found non-source displaced dark double edge on gray help and red ONLINE. Removed false offset shadow and contrasting stroke, actual heavy Black source-like single face.",
+  "runtime_validation": "UNTESTED",
+  "status": "A194_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
