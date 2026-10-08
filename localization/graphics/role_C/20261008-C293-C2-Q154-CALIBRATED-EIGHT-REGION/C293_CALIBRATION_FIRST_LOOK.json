@@ -1,0 +1,49 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "C293-C2",
+  "purpose": "Independent calibration first-look before consulting C281 diagnostic/answer key; NOT producer DDS evidence",
+  "control_source": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_BLIND_CALIBRATION.png",
+  "answer_key_consulted_before_this_record": false,
+  "reviewer": "ChatGPT AI 1",
+  "blind_review_completed": true,
+  "cases": [
+    {
+      "id": "A",
+      "observed": "FAIL",
+      "classified_as": "excessive_weight",
+      "observation": "Pale face expansion largely fills the Korean counters; source-like separation unclear."
+    },
+    {
+      "id": "B",
+      "observed": "FAIL",
+      "classified_as": "residue",
+      "observation": "Ghosted or duplicate dark edging shows behind main strokes in the enlarged text."
+    },
+    {
+      "id": "C",
+      "observed": "FAIL",
+      "classified_as": "opposite_slant",
+      "observation": "Strong rightward distortion compared with mostly upright other samples; source-direction match cannot be proven."
+    },
+    {
+      "id": "D",
+      "observed": "PASS",
+      "classified_as": "normal",
+      "observation": "Most coherent text plate, stroke geometry and edge continuity among these controls, no definite defect."
+    },
+    {
+      "id": "E",
+      "observed": "FAIL",
+      "classified_as": "clipped_stroke",
+      "observation": "Right-side text/plate edge looks abruptly terminated on a darker red background."
+    }
+  ],
+  "limitations": [
+    "Control is existing historical synthetic test; this is a fresh first-look of the displayed controls, not verification of q154 candidate.",
+    "No q154 C PASS may be granted from calibration alone.",
+    "Classification is provisional pending the hidden diagnostic; any misclassification blocks calibration-backed approval."
+  ]
+}
