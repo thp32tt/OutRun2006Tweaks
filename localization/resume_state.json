@@ -11208,5 +11208,33 @@
     "github_actions_run": 37733481816,
     "qa": "localization/graphics/role_B/20261008-B258-Q214-BC3-FACE-PRIORITY/B258_CONTROLLER_SELF_QA.json",
     "cleanup": "GITHUB_ACTIONS_EPHEMERAL_WORKSPACE_NO_N100"
+  },
+  "c285_c1_q099_native_alpha_fringe": {
+    "run_key": "OUTRUN-KOR-C285-C1-Q099-ALPHA-FRINGE-20261008-1440",
+    "at_kst": "2026-10-08T14:51:00+09:00",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 99,
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "source_alpha_fringe_outside_producer_bbox_pixels": 49,
+    "source_fringe_alpha_range": [
+      1,
+      3
+    ],
+    "source_fringe_y_range": [
+      217,
+      218
+    ],
+    "source_fringe_removed_in_candidate": true,
+    "not_a_candidate_overflow": true,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "approval_created": false,
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "dds_changed": false,
+    "qa_report": "localization/graphics/role_C/20261008-C285-C1-Q099-ALPHA-FRINGE-HOLD/C285_Q099_MACHINE_CONTROLLER_QA.json",
+    "next_action": "Recompute source alpha>0 glyph effect bbox and collect calibrated full lossless per-region C/C3 review before reconsidering approval."
   }
 }
