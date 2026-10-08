@@ -117,4 +117,79 @@ replay_pos = update.find("replay();")
 if min(capture_pos, replay_pos) < 0 or capture_pos > replay_pos:
     fail("update must capture on tick frames and replay on non-tick frames")
 
-print("VR Sumo replay semantic contract PASS")
+# The original no-tick Sumo replay snapshots SPRARGS2 shallowly. That is
+# insufficient for masked HUD/menu/result sprites: child_B4 refers into the
+# per-frame game sprite pool, which is released/reused after rendering.
+# Keep the original render-order/semantics checks above and additionally guard
+# bounded, stable, cycle-checked ownership of every copied mask child.
+def verify_mask_lifetime(code: str) -> None:
+    entry_start = code.find("struct Entry")
+    capture_body = function_body(code, "static void capture()")
+    replay_body = function_body(code, "static void replay()")
+    if entry_start < 0:
+        fail("mask replay Entry missing")
+    entry_text = code[entry_start:code.find("static Entry Captured", entry_start)]
+    for needle in (
+        "static constexpr unsigned MaxMaskChildren = 8;",
+        "std::array<SPRARGS2, MaxMaskChildren> maskChildren{};",
+        "std::array<const SPRARGS2*, MaxMaskChildren> maskSourceAddresses{};",
+        "bool replayable = true;",
+    ):
+        if needle not in entry_text:
+            fail("mask snapshot lost stable bounded storage: " + needle)
+    ordered_mask = (
+        "entry.maskCount = 0;",
+        "if (entry.kind == 1)",
+        "const SPRARGS2* child = node->args2_58.child_B4;",
+        "entry.args2.child_B4 = nullptr;",
+        "while (child)",
+        "if (entry.maskCount == Entry::MaxMaskChildren)",
+        "entry.replayable = false;",
+        "entry.maskSourceAddresses[idx] == child",
+        "entry.maskChildren[idx] = *child;",
+        "entry.maskChildren[idx].child_B4 = nullptr;",
+        "entry.args2.child_B4 = &entry.maskChildren[0];",
+        "entry.maskChildren[idx - 1].child_B4 =",
+        "child = child->child_B4;",
+    )
+    positions = [capture_body.find(x) for x in ordered_mask]
+    if min(positions) < 0 or positions != sorted(positions):
+        fail("masked Sumo node snapshot no longer deep-copies original mask chain")
+    if capture_body.count("entry.replayable = false;") != 2:
+        fail("masked Sumo replay must reject oversized AND cyclic pointer chains")
+    guard = replay_body.find("if (!entry.replayable)")
+    producer = replay_body.find("Game::put_sprite_ex(&scratch, entry.priority);")
+    if guard < 0 or producer < 0 or guard >= producer:
+        fail("unsafe masked Sumo child chain replayed before validation")
+    if "node->args2_58 = entry.args2;" not in replay_body:
+        fail("replay lost stable copied SPRARGS2 mask-root assignment")
+
+
+verify_mask_lifetime(framerate)
+
+# Four genuinely different injected failures. No unchanged-source 1000/5000 loop.
+def mutation_must_fail(label: str, old: str, new: str) -> None:
+    if old not in framerate:
+        fail("invalid negative-test setup: " + label)
+    broken = framerate.replace(old, new, 1)
+    try:
+        verify_mask_lifetime(broken)
+    except SystemExit:
+        return
+    fail("undetected mask-lifetime regression: " + label)
+
+
+mutation_must_fail("unbounded deep mask chain",
+                   "if (entry.maskCount == Entry::MaxMaskChildren)",
+                   "if (false)")
+mutation_must_fail("cyclic child mask acceptance",
+                   "entry.maskSourceAddresses[idx] == child",
+                   "false")
+mutation_must_fail("stale original child pointer retained",
+                   "entry.args2.child_B4 = nullptr;",
+                   "/* original pointer reused */")
+mutation_must_fail("unsafe no-tick replay",
+                   "if (!entry.replayable)",
+                   "if (false)")
+
+print("VR Sumo replay semantic and bounded mask lifetime contract PASS")
