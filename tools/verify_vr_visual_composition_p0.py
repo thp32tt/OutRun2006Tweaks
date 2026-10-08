@@ -607,35 +607,32 @@ def check_original_queue_wvp(source):
     func = function_body(source, 'bool R30GetRecentRawWvpForQueueSprite(')
     require_order(func, 'queued original game WVP identity',
                   'QueueRenderActive()',
-                  'CurrentQueueProducerToken()',
-                  'CorroboratesScreenOverlay2D(scope)',
-                  'ProducerToken::RankMarkerSprani',
-                  'ProducerToken::RankMarkerClipSprite',
-                  'if (!genericScreen && !rank)',
+                  'CorroboratesScreenOverlay2D(',
+                  'CurrentScope)',
                   'GetLastRawGameWvpWrite(',
                   'GetCurrentShaderEpoch(',
                   'writeShader != currentShader',
                   'writeShaderSerial != currentShaderSerial',
                   'TopLevelDrawSerial() + 1u',
                   'R30ExactHudRawWvpDrawWindow')
-    if 'ProducerToken::RivalMarkerSprani' in func:
-        raise SystemExit('P0 normal rival owner must not be changed by rank WVP fix')
+    if 'ProducerToken::' in func or 'CurrentQueueProducerToken' in func:
+        raise SystemExit('P0 queue WVP must never infer render classification from diagnostic tokens')
     build = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
-    require_order(build, 'queue overlay/rank original WVP before eye transform',
+    require_order(build, 'queue screen overlay original WVP before eye transform',
                   'screenKind == R30ScreenSpaceKind::ScreenOverlay2D)',
                   'R44GetOwnedRawOverlayWvp(original)',
                   'R30GetRecentRawWvpForQueueSprite(original)',
                   'GetVertexShaderConstantF(',
                   'R30BuildEyeAffine(stereo, eyeScale, eyeOffset)')
-    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\s*\|\|', build):
+    if not re.search(r'else if\s*\(screenKind == R30ScreenSpaceKind::ScreenOverlay2D\s*\)', build):
         raise SystemExit('P0 screen overlay lacks original WVP recovery')
     if not re.search(r'!R30GetRecentRawWvpForQueueSprite\(original\)\)\s*return false;', build):
-        raise SystemExit('P0 overlay/rank must reject unproven original WVP')
+        raise SystemExit('P0 queue overlay must reject unproven original WVP')
 
 check_original_queue_wvp(r30)
 for label, old, bad in (
     ('queue scope disabled', 'QueueRenderActive()', 'false'),
-    ('rank child missing', 'ProducerToken::RankMarkerClipSprite', 'ProducerToken::None'),
+    ('queue overlay scope unproven', 'CorroboratesScreenOverlay2D(', 'CorroboratesWorld('),
     ('shader serial drift accepted', 'writeShaderSerial != currentShaderSerial',
      'writeShaderSerial == currentShaderSerial'),
     ('original WVP age unbounded', 'currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow',
