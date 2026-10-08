@@ -116,16 +116,23 @@ def check(ui, manifest):
     if len(owned) != 71:
         fail("expected 71 exact canonical HUD CALLs")
 
-    for func, token in (
-        ("static int __cdecl ExactScreenHud_putClipSprite(", "ExactScreenHudClipSprite"),
-        ("static int __cdecl TextGlyph_putSprite(", "TextGlyphPutSprite"),
-    ):
-        chunk = function_body(ui, func)
-        ordered(chunk, func + " publishes before original draw",
-                "tailBefore", "const int result = ", "if (node && node != tailBefore)",
-                "RegisterSpriteNodeScope(")
-        if "RenderScope::ScreenHud" not in chunk or "ProducerToken::" + token not in chunk:
-            fail(func + " lost screen-HUD producer tag")
+    # Sibling expansion in put_clip_sprite must tag *all* original children;
+    # a single tail-only tag can make one digit/menu arrow stereo and another
+    # generic, despite correct CALL addresses.
+    exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
+    ordered(exact_clip, "exact clip HUD sibling tagging",
+            "tailsBefore", "const int result = Game::put_clip_sprite(",
+            "TagAppendedNodes(tailsBefore,")
+    if ("RenderScope::ScreenHud" not in exact_clip or
+            "ProducerToken::ExactScreenHudClipSprite" not in exact_clip):
+        fail("exact clip HUD lost all-node ScreenHud tagging")
+    glyph = function_body(ui, "static int __cdecl TextGlyph_putSprite(")
+    ordered(glyph, "glyph must tag node after original draw",
+            "tailBefore", "const int result = ", "if (node && node != tailBefore)",
+            "RegisterSpriteNodeScope(")
+    if ("RenderScope::ScreenHud" not in glyph or
+            "ProducerToken::TextGlyphPutSprite" not in glyph):
+        fail("glyph ScreenHud lost tag")
     # Left/right HUD entry points adjust position before forwarding to the
     # one exact ScreenHud registration owner. A valid EXE CALL map alone cannot
     # detect accidental reversed offsets, dropped spacing, or bypassing the
@@ -151,29 +158,48 @@ def check(ui, manifest):
         ("static int __cdecl RankMarker_putClipSprite(", "RankMarkerClipSprite"),
     ):
         chunk = function_body(ui, func)
-        ordered(chunk, "rank screen-vs-world precedence",
-                "if (RankMarkerSubScreenHudDepth != 0)", "RenderScope::ScreenHud",
-                "const bool projected = RankMarkerProjectedInfo.valid",
-                "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard")
-        if "ProducerToken::" + token not in chunk:
-            fail(func + " producer identity missing")
         if token == "RankMarkerSprani":
+            ordered(chunk, "rank screen-vs-world precedence",
+                    "if (RankMarkerSubScreenHudDepth != 0)", "RenderScope::ScreenHud",
+                    "const bool projected = RankMarkerProjectedInfo.valid",
+                    "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
                 fail("rank sprani lost all-node exact producer tagging")
-        elif "RegisterSpriteNodeScope(" not in chunk:
-            fail(func + " marker registration missing")
+        else:
+            ordered(chunk, "4th+ rank clip screen-vs-world precedence",
+                    "const bool screenHud = RankMarkerSubScreenHudDepth != 0;",
+                    "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;",
+                    "RenderScope::ScreenHud", "RenderScope::ProjectedWorldMarker2D",
+                    "RenderScope::WorldBillboard", "TagAppendedNodes(tailsBefore, scope,")
+            if "node->args_10.float24 += RankMarkerFracX" not in chunk or (
+                "node->args_10.float28 += RankMarkerFracY" not in chunk):
+                fail("4th+ digit siblings lost subpixel restoration")
+        if "ProducerToken::" + token not in chunk:
+            fail(func + " producer identity missing")
     rank = function_body(ui, "static int __cdecl RankMarker_sprani(")
     if "TagAppendedNodes(tailsBefore, scope," not in rank:
         fail("multi-node rank producer not tagged")
-    # Both rank/rival producers share the existing guarded all-node walk.
-    # Rival's actual producer uses a bounded multi-node tagging helper,
-    # unlike the single-node rank wrappers. Guard this real ownership path.
+    # Rank 1-3/4+ and rival all use the bounded multi-node tagging helper.
     rival = function_body(ui, "static int __cdecl RivalMarker_sprani(")
-    for token in ("RivalMarkerProjectedInfo.valid", "RenderScope::ProjectedWorldMarker2D",
+    for token in ("const auto projectedAnchor = RivalMarkerProjectedInfo;",
+                  "RivalMarkerProjectedInfo = {};", "RenderScope::ProjectedWorldMarker2D",
                   "RenderScope::WorldBillboard", "ProducerToken::RivalMarkerSprani",
                   "TagAppendedNodes("):
         if token not in rival:
             fail("rival world marker lost " + token)
+    rank_owner = function_body(ui, "static int __cdecl RankMarkerSub_dest(")
+    ordered(rank_owner, "rank anchor must be cleared for each original sub_4BAD20",
+            "RankMarkerProjectedInfo = {};",
+            "++RankMarkerSubActiveDepth;",
+            "RankMarkerSub_hk.call<int>(arg)",
+            "--RankMarkerSubActiveDepth;",
+            "RankMarkerProjectedInfo = saved;")
+    if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
+        fail("rank sub_4BAD20 entry hook is not installed")
+    ordered(rival, "rival anchor must be consumed once",
+            "const auto projectedAnchor = RivalMarkerProjectedInfo;",
+            "RivalMarkerProjectedInfo = {};",
+            "TagAppendedNodes(")
     tag_nodes = function_body(ui, "static void TagAppendedNodes(")
     ordered(tag_nodes, "rival multi-node producer tagging",
             "tailAfter", "node = before[prio]", "RegisterSpriteNodeScope(")
