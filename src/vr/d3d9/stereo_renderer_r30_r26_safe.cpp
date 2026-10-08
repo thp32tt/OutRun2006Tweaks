@@ -4197,6 +4197,7 @@ namespace OutRunVRStereo
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
+                screenKind == R30ScreenSpaceKind::Hud2D ||
                 screenKind == R30ScreenSpaceKind::WorldBillboard ||
                 screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D ||
                 screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
@@ -4222,6 +4223,20 @@ namespace OutRunVRStereo
                         // exact owner, never a possibly injected live c64.
                         if (!R30GetExtendedRawWvpForExactHud(original) &&
                             !R30GetExtendedRawWvpForExactSceneEffect(original))
+                        {
+                            ++R30ExactHudRawWvpMiss;
+                            R30TraceGoalOriginalC64Status(false);
+                            return false;
+                        }
+                        ++R30ExactHudExtendedRawWvp;
+                        R30TraceGoalOriginalC64Status(true);
+                    }
+                    else if (screenKind == R30ScreenSpaceKind::Hud2D)
+                    {
+                        // Exact orthographic HUD must not recycle live GPU c64
+                        // after a prior draw applied head/eye correction.
+                        // Recover the original same-shader game upload only.
+                        if (!R30GetExtendedRawWvpForExactHud(original))
                         {
                             ++R30ExactHudRawWvpMiss;
                             R30TraceGoalOriginalC64Status(false);
