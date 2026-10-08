@@ -116,7 +116,185 @@ if($projectedSummary){$projectedSemantic=[int64]$projectedSummary.Groups[1].Valu
 $rankProjectionNotReached=($rankProducerObserved -and $projectedSemantic -eq 0)
 
 $gameDllIdentity=Read-AllText 'GAME_DLL_IDENTITY.txt'
-$gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*
+$gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*{$flags+='SBS_DESKTOP_DUP_FALLBACK'}
+if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
+if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
+if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
+if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
+if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
+if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
+if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
+if($rankProjectionNotReached){$flags+='HUD_RANK_PROJECTED_PATH_ZERO'}
+if($gameDllMismatch){$flags+='GAME_DLL_SHA256_MISMATCH'}
+if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
+
+$variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
+$backend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
+$profile=if($session.TestProfile){[string]$session.TestProfile}else{'UNKNOWN'}
+$sourceSha=if($session.SourceSha){[string]$session.SourceSha}else{'UNKNOWN'}
+
+$status='OK'
+if($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
+elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED_DRIVER_SEAT_CAMERA_ACTIVE'}
+elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
+elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
+elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
+
+$result=[ordered]@{
+    SchemaVersion=1
+    Status=$status
+    VariantId=$variant
+    Backend=$backend
+    TestProfile=$profile
+    SourceSha=$sourceSha
+    Provider=$provider
+    SBSDesktopDupFallback=$sbsFallback
+    PlainD3D9Device=$plainD3D9
+    SharedD3D9ExProbeFailed=$sharedProbeFailed
+    RankProducerObserved=$rankProducerObserved
+    ProjectedMarkerSemanticCount=$projectedSemantic
+    GameDllIdentityMismatch=$gameDllMismatch
+    DirectFrames=$directFrames
+    DirectFallbacks=$directFallbacks
+    FenceTimeouts=$fenceTimeout
+    DriverSeatCameraActivationCount=$driverSeatCount
+    ApproxAverageXrFrameMs=$avgFrameMs
+    ApproxAverageXrHz=$approxHz
+    PerfSpikeCount=$perfSpikeCount
+    PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
+    PerfSpikeMaxDraws=$perfSpikeMaxDraws
+    PerfSpikeMaxPrimitives=$perfSpikeMaxPrimitives
+    PerfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws
+    PerfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives
+    PerfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs
+    Flags=$flags
+}
+$result|ConvertTo-Json -Depth 4|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.json') -Encoding UTF8
+
+$lines=@(
+    'OUTRUN VR AUTO ANALYSIS'
+    "status=$status"
+    "variant=$variant"
+    "backend=$backend"
+    "profile=$profile"
+    "sourceSha=$sourceSha"
+    "provider=$provider"
+    "sbsDesktopDupFallback=$sbsFallback"
+    "plainD3D9Device=$plainD3D9"
+    "sharedD3D9ExProbeFailed=$sharedProbeFailed"
+    "rankProducerObserved=$rankProducerObserved"
+    "projectedMarkerSemanticCount=$projectedSemantic"
+    "gameDllIdentityMismatch=$gameDllMismatch"
+    "directFrames=$directFrames"
+    "directFallbacks=$directFallbacks"
+    "fenceTimeouts=$fenceTimeout"
+    "driverSeatCameraActivationCount=$driverSeatCount"
+    ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
+    ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
+    "perfSpikeCount=$perfSpikeCount"
+    "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
+    "perfSpikeMaxDraws=$perfSpikeMaxDraws"
+    "perfSpikeMaxPrimitives=$perfSpikeMaxPrimitives"
+    "perfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws"
+    "perfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives"
+    "perfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs"
+    "flags=$($flags -join ',')"
+)
+if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
+    $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
+}
+if($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){
+    $lines+='interpretation_camera=Driver-seat camera code activated during a non-cockpit test slot.'
+}
+$lines|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.txt') -Encoding UTF8
+Write-Host ($lines -join [Environment]::NewLine)
+)
+
+$flags=@()
+if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
+if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
+if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
+if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
+if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
+if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
+if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
+if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
+if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
+
+$variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
+$backend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
+$profile=if($session.TestProfile){[string]$session.TestProfile}else{'UNKNOWN'}
+$sourceSha=if($session.SourceSha){[string]$session.SourceSha}else{'UNKNOWN'}
+
+$status='OK'
+if($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
+elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED_DRIVER_SEAT_CAMERA_ACTIVE'}
+elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
+
+$result=[ordered]@{
+    SchemaVersion=1
+    Status=$status
+    VariantId=$variant
+    Backend=$backend
+    TestProfile=$profile
+    SourceSha=$sourceSha
+    Provider=$provider
+    SBSDesktopDupFallback=$sbsFallback
+    PlainD3D9Device=$plainD3D9
+    SharedD3D9ExProbeFailed=$sharedProbeFailed
+    DirectFrames=$directFrames
+    DirectFallbacks=$directFallbacks
+    FenceTimeouts=$fenceTimeout
+    DriverSeatCameraActivationCount=$driverSeatCount
+    ApproxAverageXrFrameMs=$avgFrameMs
+    ApproxAverageXrHz=$approxHz
+    PerfSpikeCount=$perfSpikeCount
+    PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
+    PerfSpikeMaxDraws=$perfSpikeMaxDraws
+    PerfSpikeMaxPrimitives=$perfSpikeMaxPrimitives
+    PerfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws
+    PerfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives
+    PerfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs
+    Flags=$flags
+}
+$result|ConvertTo-Json -Depth 4|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.json') -Encoding UTF8
+
+$lines=@(
+    'OUTRUN VR AUTO ANALYSIS'
+    "status=$status"
+    "variant=$variant"
+    "backend=$backend"
+    "profile=$profile"
+    "sourceSha=$sourceSha"
+    "provider=$provider"
+    "sbsDesktopDupFallback=$sbsFallback"
+    "plainD3D9Device=$plainD3D9"
+    "sharedD3D9ExProbeFailed=$sharedProbeFailed"
+    "directFrames=$directFrames"
+    "directFallbacks=$directFallbacks"
+    "fenceTimeouts=$fenceTimeout"
+    "driverSeatCameraActivationCount=$driverSeatCount"
+    ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
+    ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
+    "perfSpikeCount=$perfSpikeCount"
+    "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
+    "perfSpikeMaxDraws=$perfSpikeMaxDraws"
+    "perfSpikeMaxPrimitives=$perfSpikeMaxPrimitives"
+    "perfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws"
+    "perfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives"
+    "perfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs"
+    "flags=$($flags -join ',')"
+)
+if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
+    $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
+}
+if($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){
+    $lines+='interpretation_camera=Driver-seat camera code activated during a non-cockpit test slot.'
+}
+$lines|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.txt') -Encoding UTF8
+Write-Host ($lines -join [Environment]::NewLine)
+)
+$flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
 if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
