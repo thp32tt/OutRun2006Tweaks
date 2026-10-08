@@ -313,7 +313,7 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             }
 
-            const auto semanticScope = OutRunVR::GameSemantic::CurrentScope;
+            const auto semanticScope = OutRunVR::GameSemantic::EffectiveScope();
             if (OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope))
             {
                 // Exact original-game post-process ownership beats a generic
