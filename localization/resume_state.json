@@ -6747,7 +6747,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T14:55:00+09:00",
+  "updated_at_kst": "2026-10-08T15:25:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -11298,5 +11298,27 @@
     "controller_report": "localization/graphics/role_C/20261008-C286-C1-Q175-CHROME-STYLE-FAIL/C286_CONTROLLER_QA.json",
     "next_step": "A must materially rerender all three chrome display titles with source-derived connected low-wide terminal/bevel/depth and measured glyph slant, avoiding forced Korean width, then new C1+C3; new actual-game retest required",
     "forbidden_domains_touched": []
+  },
+  "c287_c2_q154_authored_clean_provenance": {
+    "run": "C287",
+    "run_key": "OUTRUN-KOR-C287-C2-Q154-CLEAN-PROVENANCE-20261008-1520",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "asset": "4D38BBB0",
+    "queue_index": 154,
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "authored_clean_verified_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "independent_C141_clean_identical": true,
+    "inferred_C284_diff_rgba_pixels": 603341,
+    "source_final_rgba_outside": 0,
+    "source_final_alpha_outside": 0,
+    "source_bbox_containment": "8/8 positive margin",
+    "result": "HOLD_STRICT_RECHECK",
+    "remaining": "blinded_calibration_and_full_per_region_independent_C_C3",
+    "machine": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/C287_Q154_AUTHORED_CLEAN_MACHINE.json",
+    "controller": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/C287_Q154_CONTROLLER_QA.json",
+    "worker_run": 37737259974,
+    "runtime_validation": "UNTESTED"
   }
 }

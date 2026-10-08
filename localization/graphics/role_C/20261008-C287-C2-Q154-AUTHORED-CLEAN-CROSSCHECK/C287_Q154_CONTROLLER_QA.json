@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "run": "C287",
+  "run_key": "OUTRUN-KOR-C287-C2-Q154-CLEAN-PROVENANCE-20261008-1520",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "policy_version": "visual-evidence-v1-20261008",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "queue_index": 154,
+  "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "authored_B60_and_independent_C141_exact_pixel_match": true,
+  "authored_B60_and_independent_C141_exact_file_hash_match": true,
+  "authored_B60_vs_C284_inferred_rgba_difference_pixels": 603341,
+  "authored_B60_vs_C284_inferred_alpha_difference_in_source_regions": "both zero alpha across eight source bboxes; difference not evidence of visible background damage",
+  "source_vs_current_rgba_outside_bbox_pixels": 0,
+  "source_vs_current_alpha_outside_bbox_pixels": 0,
+  "clean_vs_source_rgba_outside_bbox_pixels": 0,
+  "all8_current_alpha_contained_positive_margin": true,
+  "runtime_validation": "UNTESTED",
+  "machine_evidence": "localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK/C287_Q154_AUTHORED_CLEAN_MACHINE.json",
+  "source_and_clean_provenance": {
+    "source": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "authored_clean_B60": {
+      "path": "localization/graphics/role_B/20261005-B-PRODUCTION60/4D38_HD_CLEAN_PLATE.png",
+      "sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380"
+    },
+    "independent_clean_C141": {
+      "path": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_EXACT_CLEAN_PLATE.png",
+      "sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380"
+    },
+    "inferred_clean_C284": {
+      "path": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png",
+      "sha256": "5bb94d023849aa1ca7da18d781bad8cdc0d8283a8237bd4d4f325de9d09150a0"
+    }
+  },
+  "observations": {
+    "8of8_source_clean_decoded_alpha_zero": "B60 authored plate alpha is zero inside all eight exact source text bboxes; historical C141 independent clean matches B60 pixel-for-pixel; C284 inferred CLEAN differs in RGBA hidden content and must not replace authored artifact without proof.",
+    "8of8_containment": "Current Korean alpha bboxes remain strictly within canonical English source text effect bboxes with positive pixel margins on four sides; native RGBA and alpha outside all eight boxes are unmodified from pinned English DDS.",
+    "three_gray_rows_visual": "Direct manual review of persisted-DDS SOURCE / actual B60-CLEAN / FINAL 2x lossless + 50% practical grayscale: 싱글 플레이, 쇼룸, 멀티플레이 appear visibly legible, with opened syllable counters relative to older C268 excessive-weight defect; no obvious displayed source English remnants. Korean font width/hierarchy source-family equivalence remains an independent reviewer decision; no calibrated C PASS claimed.",
+    "raw_orientation": "Source/current exact DDS decoded in RAW mirror-Y; lossless RAW crops published for three gray rows. No game runtime verification.",
+    "limited_scope": "Provenance and three gray-region visual recheck only. Five red rows were remeasured numerically; this run did NOT make full calibrated per-region C/C3 source-style/slant/mip/black-white-gray findings."
+  },
+  "per_region_machine_observations": [
+    {
+      "id": "create_new_license_red",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "localized_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "positive_margins_LRTB": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "select_license_red",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "localized_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "positive_margins_LRTB": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "single_player_red",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "localized_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "positive_margins_LRTB": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "default_license_red",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "localized_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "positive_margins_LRTB": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "multiplayer_red",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "localized_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "positive_margins_LRTB": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "positive_margins_LRTB": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "positive_margins_LRTB": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    },
+    {
+      "id": "multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "positive_margins_LRTB": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "authored_clean_source_alpha_zero": true,
+      "clean_B60_vs_C141_diff": 0
+    }
+  ],
+  "reviewer": "ChatGPT C2 single reviewer",
+  "first_look_blind_review": false,
+  "blind_calibration": "NOT_PERFORMED_IN_THIS_INVOCATION",
+  "C_stage": "HOLD_STRICT_RECHECK",
+  "C3_stage": "BLOCKED_PENDING_COMPLIANT_C",
+  "export": "BLOCKED_PENDING_EVIDENCE_APPROVAL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "outcome": "HOLD_STRICT_RECHECK_AUTHORED_CLEAN_PROVENANCE_CONFIRMED",
+  "next_steps": "Fresh blind calibrated C2 pixels-first SOURCE/B60 CLEAN/current persisted DDS per region; compare complete 8 segments at native/practical 75/50/RAW black/white/gray, measured readable slant/anchors, source-derived family and exact machine report. Then separate exact-SHA C3 and approval validation; never infer runtime from static QA.",
+  "execution_backend": "GitHub-hosted CPU Worker 37737259974 because source/current DDS unavailable by native container DNS; GitHub connector inspected PNGs; N100 not used.",
+  "forbidden_domains_touched": [],
+  "scratch_cleanup": "GitHub-hosted ephemeral runner automatically discards scratch; no N100 worktree or GPT-local scratch created."
+}
