@@ -336,7 +336,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         fn = next(n for n in tree.body
                   if isinstance(n, ast.FunctionDef) and n.name == 'refresh_wait_actions_task_binding')
         ns = {
-            'datetime': datetime, 'TZ': timezone.utc, 'log': Mock(),
+            'datetime': datetime, 'TZ': timezone.utc, 'log': Mock(), 'Optional': Optional,
             '_github_commit_list_cache': {},
             'github_branch_head': Mock(return_value='c' * 40),
             'github_find_task_commit': Mock(return_value={
