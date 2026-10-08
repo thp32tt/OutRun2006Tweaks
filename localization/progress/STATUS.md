@@ -3043,3 +3043,6 @@ TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Native source START/GOAL strong right italic
 
 ### 2026-10-08 19:37 KST — B265 q172 trial rejected and previous DDS restored
 - New native output `2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da`, GitHub worker 37764234947, machine header/roundtrip/zero outside PASS; SOURCE/CLEAN/FINAL native/50%/RAW controller visual FAIL for source-family cream italic bevel and GOAL/골 horizontal slabs. Old q172 `812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a` restored in remote. QA `localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_CONTROLLER_SELF_QA.json`. Manual vector reconstruction next; C/C3/PRE_INGAME BLOCKED, runtime UNTESTED.
+
+### 2026-10-08 19:48 KST — C1 odd q227/q231/q237 SOURCE-family visual REWORK_REQUIRED
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q227 underweight/undersized gray and red source-family, q231 unjustified doubled offset strokes, q237 unsupported pink bevel and gray help hierarchy: 3 actual source-relative visual FAIL over old numeric PASS. QA `localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q{227,231,237}_CONTROLLER_QA.json`. New DDS/C PASS/C3/APPROVAL/PRE_INGAME/user tested/game tested = 0. Runtime validation UNTESTED; no cross-shard or VR/FFB/DX11/DXVK changes.

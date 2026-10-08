@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 19:37 KST",
+  "updated_at_kst": "2026-10-08 19:48 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7667,5 +7667,25 @@
     "producer_visual": "FAIL_SOURCE_ITALIC_METAL_FAMILY",
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_CONTROLLER_SELF_QA.json"
+  },
+  "c1_20261008_1948_odd_source_family_fail": {
+    "run_key": "OUTRUN-KOR-C1-ODD-227-231-237-STYLE-20261008-1948",
+    "run": "20261008-C1-Q227-Q231-Q237-STYLE-REJECT",
+    "shard": "ODD(+UNINDEXED_SPECIAL)",
+    "indexes": [
+      227,
+      231,
+      237
+    ],
+    "result": "3_REWORK_REQUIRED",
+    "dds_produced": 0,
+    "approved": 0,
+    "c3_approved": 0,
+    "runtime_validation": "UNTESTED",
+    "reports": [
+      "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q227_CONTROLLER_QA.json",
+      "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q231_CONTROLLER_QA.json",
+      "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q237_CONTROLLER_QA.json"
+    ]
   }
 }

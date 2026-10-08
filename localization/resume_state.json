@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 19:48 q227/q231/q237 native source-faithful typography/effect rework required before fresh independent C/C3 and user/actual-game test; do not reproduce unchanged DDS.",
     "B265 q172 2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da machine PASS but SOURCE/CLEAN/FINAL native/50%/RAW producer visual FAIL; original B263 812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a restored. Do not rerun current SDF/palette tricks; manual vector reconstruction source style needed. Fresh C2 + C3 and in-game remain blocked, RUNTIME_VALIDATION=UNTESTED.",
     "C299 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q176 independent B201 authored CLEAN SHA0fd5d518... verified against exact source 8ba40915... and current 494d42c0...: all 4 original name bboxes transparent in CLEAN, source-clean-candidate outside RGBA/alpha 0, 4/4 margin+RAW, 8 new source/clean/current native/50% reference PNG. HOLD no pixels-first C, true stem anchor/family or C3; approval/export and actual-game BLOCKED, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261008-C299-C2-Q176-AUTHORED-CLEAN-INDEPENDENT/C299_CONTROLLER_QA.json",
     "C298 q225 A193 current exact f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333 native 9-region independent source+clean outside zero, font restored, HOLD source-family measured profile, qualified blind calibration, CLEAN protected within-bbox + separate C3. QA localization/graphics/role_C/20261008-C298-C1-Q225-A193-BLACK-FAMILY-NATIVE-20261008-1910/C298_CONTROLLER_QA.json; no same-byte rerender. RUNTIME_VALIDATION=UNTESTED.",
@@ -11712,5 +11713,36 @@
     "decision": "PRODUCER_VISUAL_FAIL_ROLLED_BACK",
     "QA": "localization/graphics/role_B/20261008-B265-Q172-STROKE-NORMAL-MAP-CREAM/B265_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "c1_20261008_1948_odd_source_family_fail": {
+    "run_key": "OUTRUN-KOR-C1-ODD-227-231-237-STYLE-20261008-1948",
+    "run": "20261008-C1-Q227-Q231-Q237-STYLE-REJECT",
+    "shard": "ODD(+UNINDEXED_SPECIAL)",
+    "decisions": [
+      {
+        "index": 227,
+        "candidate_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+        "decision": "REWORK_REQUIRED",
+        "failure": "SOURCE_WEIGHT_SCALE_HIERARCHY",
+        "qa": "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q227_CONTROLLER_QA.json"
+      },
+      {
+        "index": 231,
+        "candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+        "decision": "REWORK_REQUIRED",
+        "failure": "UNJUSTIFIED_OUTLINE_AND_OFFSET_EDGE",
+        "qa": "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q231_CONTROLLER_QA.json"
+      },
+      {
+        "index": 237,
+        "candidate_sha256": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3",
+        "decision": "REWORK_REQUIRED",
+        "failure": "UNSUPPORTED_RED_BEVEL_SHADOW_FAMILY",
+        "qa": "localization/graphics/role_C/20261008-C1-Q227-Q231-Q237-STYLE-REJECT/C1_Q237_CONTROLLER_QA.json"
+      }
+    ],
+    "dds_produced": 0,
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
