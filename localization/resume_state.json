@@ -11043,5 +11043,27 @@
     "PRE_INGAME": "BLOCKED",
     "IGR025": "OPEN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c281_c2_q172_source_slant_visual_fail": {
+    "run": "20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "candidate_sha256": "05aee26d0f03508304d01ec90e588f2d3aa2b91b76e043174e6389f99c87a018",
+    "independent_original_vs_candidate_rgba_outside": 0,
+    "alpha_outside": 0,
+    "inside_changed_rgba": 3541,
+    "source_stroke": "strong right italic",
+    "candidate_stroke": "near-upright insufficient right lean",
+    "status": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "approval_created": false,
+    "source_candidate_bytes_unchanged": true,
+    "controller_report": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_CONTROLLER_QA.json",
+    "machine_report": "localization/graphics/role_C/20261008-C281-C2-Q172-SOURCE-SLANT-VISUAL-FAIL/C281_MACHINE_QA.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
