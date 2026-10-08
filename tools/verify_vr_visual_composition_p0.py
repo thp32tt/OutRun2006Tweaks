@@ -813,17 +813,16 @@ def verify_raw_queue_wvp_owner(source):
 verify_raw_queue_wvp_owner(r30)
 for label, before, after in (
     ('unproven projected rank c64',
-     'if (!R30GetRecentRawWvpForQueueSprite(original))',
-     'if (R30GetRecentRawWvpForQueueSprite(original))'),
-    ('unproven generic queued HUD c64',
-     'if (!R30GetRecentRawWvpForQueueSprite(original))',
-     'if (R30GetRecentRawWvpForQueueSprite(original))'),
+     'else if (screenKind ==\n                        R30ScreenSpaceKind::ProjectedWorldMarker2D)\n                    {',
+     'else if (screenKind ==\n                        R30ScreenSpaceKind::WorldBillboard)\n                    {'),
+    ('missing queue same-shader gate',
+     'writeShader != currentShader ||',
+     'writeShader == currentShader ||'),
 ):
     if before not in r30:
         raise SystemExit('P0 RUNTIME_5868 owner negative input missing: ' + label)
-    modified = r30.replace(before, after, 1) if label.startswith('unproven projected') else r30.replace(before, after, 1)
     try:
-        verify_raw_queue_wvp_owner(modified)
+        verify_raw_queue_wvp_owner(r30.replace(before, after, 1))
     except SystemExit:
         pass
     else:
