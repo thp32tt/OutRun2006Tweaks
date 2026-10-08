@@ -202,6 +202,57 @@ for name, corrupt in (
     else:
         raise SystemExit('GOAL source alias regression escaped: ' + name)
 
+# GOAL can reach an outer D3D9 draw with an exact producer yet fail
+# R23 baseline/eye-stereo admission before ALL shader/fixedfn candidate
+# loggers. Attribute source and admission flags at the four *outer* hooks.
+def verify_goal_pre_candidate_gate(source):
+    helper = function_body(
+        source, 'void R30TracePreRestartHudEligibility(')
+    for key in (
+        'Settings::VRTelemetry', 'QueueRenderActive()',
+        'GameState::STATE_GOAL', 'GameState::STATE_TIMEUP',
+        'GameState::STATE_LINK_TIMEUP',
+        'CurrentQueueProducerToken()', 'R9StereoSeeded',
+        'RuntimeEligibility::MayInjectStereo()', 'StereoWanted()',
+        'FrameStereoIncomplete', 'TargetIsBackBuffer()',
+        'R9DeferredDepth', 'AnyAuxRenderTargetActive()',
+        'VR P0 GOAL EARLY_GATE', 'firstByMethodState[index].fetch_or(',
+    ):
+        require(key, helper, 'GOAL early admission source proof')
+    if 'SetRenderState(' in helper or 'RegisterSpriteNodeScope(' in helper:
+        raise SystemExit('GOAL early-gate telemetry is not read-only')
+    for fn, method in (
+        ('HRESULT __stdcall DrawPrimitiveDestR30(', '0u'),
+        ('HRESULT __stdcall DrawIndexedPrimitiveDestR30(', '1u'),
+        ('HRESULT __stdcall DrawPrimitiveUPDestR30(', '2u'),
+        ('HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(', '3u'),
+    ):
+        b = function_body(source, fn)
+        require_order(b, 'GOAL early gate before render route ' + method,
+                      'ScopedRenderSemantic drawSemantic(',
+                      'R30TracePreRestartHudEligibility(device, ' + method + ')',
+                      'R30BeforeScreenDrawForSkyGlow(')
+
+verify_goal_pre_candidate_gate(r30)
+for fn, corrupt in (
+    ('missing primitive pre-candidate',
+     r30.replace('R30TracePreRestartHudEligibility(device, 0u);', '', 1)),
+    ('missing indexed primitive pre-candidate',
+     r30.replace('R30TracePreRestartHudEligibility(device, 1u);', '', 1)),
+    ('missing primitive UP pre-candidate',
+     r30.replace('R30TracePreRestartHudEligibility(device, 2u);', '', 1)),
+    ('missing indexed UP pre-candidate',
+     r30.replace('R30TracePreRestartHudEligibility(device, 3u);', '', 1)),
+):
+    if corrupt == r30:
+        raise SystemExit('failed to mutate early GOAL source trace: ' + fn)
+    try:
+        verify_goal_pre_candidate_gate(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL pre-candidate source disappeared unguarded: ' + fn)
+
 # R64 used live original-or-injected c64 as a late fallback. Current R51
 # must never restore that unsafe behaviour even when a GOAL/6th glyph misses
 # its original WVP; emit bounded per-parent missing/recovered evidence instead.
