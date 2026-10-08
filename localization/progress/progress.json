@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T14:22:19+09:00",
+  "updated_at_kst": "2026-10-08T14:28:54+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7106,5 +7106,43 @@
     "sha_bound_lossless_pngs": 18,
     "report": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/C284_Q195_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c284_c2_q154_inferred_clean_plate": {
+    "run": "20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 154,
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+    "source_current_rgba_changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "source_bbox_positive_margins": "8/8",
+    "independent_inferred_alpha_clean_png_count": 8,
+    "inferred_clean_not_producer_exact": true,
+    "exact_producer_clean_plate_approved": false,
+    "controller_report": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_CONTROLLER_QA.json",
+    "machine_report": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_MACHINE_AUDIT.json",
+    "english_original_jpg": "localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_ALL8_ENGLISH_CLEAN_KOREAN_JPG_REVIEW.jpg",
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "approval_created": false,
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "candidate_changed": false,
+    "TEMP_SCRATCH": "work/C284_C2_Q154_CLEAN_PLATE_20261008_scratch",
+    "cleanup": "PENDING_AFTER_VERIFIED_REMOTE",
+    "forbidden_domains_touched": []
+  },
+  "current_qa_queue_snapshot": {
+    "source": "tools/localization/summarize_qa_state.py",
+    "queue_total": 137,
+    "localize_text_total": 94,
+    "declared_c_pass_not_final_approval": 73,
+    "pending_c": 9,
+    "hold_strict_recheck": 6,
+    "rework_required": 3,
+    "declared_preserve_original": 3,
+    "at_kst": "2026-10-08T14:28:54+09:00"
   }
 }
