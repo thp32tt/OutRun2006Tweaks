@@ -1124,8 +1124,11 @@ namespace OutRunVRStereo
                 const bool effectiveTwoStep =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
+                // Horizontal blur writes reduced[eye]. If TwoStep is
+                // disabled, that texture is the completed blur; temp[eye]
+                // still contains only the earlier bright-pass image.
                 IDirect3DTexture9* compositeSource =
-                    R30SkyGlow.temp[eye];
+                    R30SkyGlow.reduced[eye];
                 if (effectiveTwoStep)
                 {
                     const float vertical[4]{
@@ -1142,7 +1145,9 @@ namespace OutRunVRStereo
                             R30SkyGlow.reduced[eye],
                             R30SkyGlow.blur, vertical, false);
                     if (ok)
-                        compositeSource = R30SkyGlow.reduced[eye];
+                        // Vertical blur writes temp[eye]. Composite from
+                        // that *final* pass, never the old horizontal input.
+                        compositeSource = R30SkyGlow.temp[eye];
                 }
 
                 const float composite[4]{ 0.38f, 0, 0, 0 };
