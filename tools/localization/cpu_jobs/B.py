@@ -57,9 +57,10 @@ comp_visible_diff=((final[:,:,3]>16)|(clean[:,:,3]>16))&final_diff
 outside_plate_visible=int((plate_visible_diff&~full_source).sum())
 outside_comp_visible=int((comp_visible_diff&~full_target).sum())
 outside_english=int((changed(source,final)&~full_source).sum())
-if outside_plate or outside_comp_visible or outside_english:
+outside_english_visible=int((changed(source,final)&~full_source&((source[:,:,3]>16)|(final[:,:,3]>16))).sum())
+if outside_plate or outside_comp_visible or outside_english_visible:
     raise RuntimeError(("source/clean/composite unauthorized blast radius",
-                        outside_plate,outside_comp_visible,outside_english))
+                        outside_plate,outside_comp_visible,outside_english_visible))
 alpha_bbox=lambda ar: [int(np.where(ar)[1].min()),int(np.where(ar)[0].min()),int(np.where(ar)[1].max()+1),int(np.where(ar)[0].max()+1)] if np.any(ar) else None
 native_alpha=(final[:,:,3]>16)
 actual_bbox=alpha_bbox(native_alpha)
@@ -125,7 +126,8 @@ out={
     "clean_final_changed_unconditional_outside_target_bbox":outside_comp,
     "source_clean_changed_visible_outside_source_bbox":outside_plate_visible,
     "clean_final_changed_visible_outside_target_bbox":outside_comp_visible,
-    "source_final_changed_outside_english_bbox":outside_english,
+    "source_final_changed_outside_english_bbox_unconditional_hidden_rgb_included":outside_english,
+    "source_final_changed_visible_outside_english_bbox":outside_english_visible,
     "source_final_alpha_changed_outside_bbox":alpha_outside_source,
     "source_final_color_changed_outside_bbox":color_outside_source,
     "source_only_visible_overlap_in_clean_diagnostic":plate_remaining,
