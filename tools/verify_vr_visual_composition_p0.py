@@ -121,7 +121,10 @@ def check_xmt_loader_guard(source):
 def check_xmt_loader_atomic_install(source):
     scope = source[source.index('class FixFileLoadRace'):
                    source.index('class FileLoadSliceEndsEarly')]
-    require_order(scope, 'XMT race hook rollback on partial install',
+    # Hook declarations contain = {} before apply(); check only after the
+    # actual installed-hook conjunction, not the class-wide declarations.
+    install = scope[scope.index('const bool ok = ServiceRequest_hook &&'):]
+    require_order(install, 'XMT race hook rollback on partial install',
                   'const bool ok = ServiceRequest_hook && ServiceRequestMoveDone_hook &&',
                   'if (!ok)', 'ServiceRequest_hook = {};',
                   'ServiceRequestMoveDone_hook = {};', 'sumo_fread_hook = {};',
