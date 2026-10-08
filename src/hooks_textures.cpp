@@ -187,6 +187,10 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (!pDevice || !pData || !ppTexture)
 		return E_POINTER;
 
+	// Refuse truncated DDS before reading the header and touching the UI resource.
+	if (dataSize < sizeof(DDS_FILE))
+		return E_FAIL;
+	*ppTexture = nullptr;
 	const uint8_t* data = static_cast<const uint8_t*>(pData);
 	const DDS_FILE* header = reinterpret_cast<const DDS_FILE*>(data);
 
@@ -211,11 +215,23 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	// (though mip gen is still needed when caller asks for more mips than the texture file contains...)
 	if (MipLevels == 0)
 		MipLevels = 1; 
+	if (!Width || !Height || Width > 16384 || Height > 16384 || MipLevels > 32)
+		return E_FAIL;
 
 	D3DFORMAT format_orig = GetD3DFormatFromPixelFormat(header->data.ddpfPixelFormat);
 	if (format_orig == D3DFMT_UNKNOWN)
 		return E_FAIL;
 
+	// Check requested mip source byte ranges *before* allocating any D3D texture.
+	size_t remainingSourceBytes = dataSize - sizeof(DDS_FILE);
+	for (UINT level = 0; level < MipLevels; ++level)
+	{
+		const size_t bytes = D3DXGetFormatSize(format_orig,
+			max(1U, Width >> level), max(1U, Height >> level));
+		if (!bytes || bytes > remainingSourceBytes)
+			return E_FAIL;
+		remainingSourceBytes -= bytes;
+	}
 	D3DFORMAT format_present = format_orig;
 	if (format_orig == D3DFMT_A8B8G8R8)
 		format_present = D3DFMT_A8R8G8B8;
@@ -239,48 +255,67 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (FAILED(hr))
 		return hr;
 
-	// Lock the texture and copy data
-	D3DLOCKED_RECT lockedRect;
-	uint8_t* srcData = const_cast<uint8_t*>(data) + sizeof(DDS_FILE);
+	// MANAGED UI textures cannot be dynamic; DISCARD is legal only for
+	// a dynamic texture's first mip level, never for ordinary UI uploads.
+	const bool dynamicTexture = (Usage & D3DUSAGE_DYNAMIC) != 0;
+	const uint8_t* srcData = data + sizeof(DDS_FILE);
 	for (UINT mipLevel = 0; mipLevel < MipLevels; ++mipLevel)
 	{
-		hr = (*ppTexture)->LockRect(mipLevel, &lockedRect, nullptr, D3DLOCK_DISCARD);
+		D3DLOCKED_RECT lockedRect{};
+		const DWORD lockFlags = (dynamicTexture && mipLevel == 0)
+			? D3DLOCK_DISCARD : 0;
+		hr = (*ppTexture)->LockRect(mipLevel, &lockedRect, nullptr, lockFlags);
 		if (FAILED(hr))
 		{
 			(*ppTexture)->Release();
+			*ppTexture = nullptr;
 			return hr;
 		}
 
-		// Calculate mip size
-		UINT mipWidth = max(1U, Width >> mipLevel);
-		UINT mipHeight = max(1U, Height >> mipLevel);
-		size_t mipSize = D3DXGetFormatSize(format_present, mipWidth, mipHeight);
-
-		if (format_orig == D3DFMT_A8B8G8R8)
+		const UINT mipWidth = max(1U, Width >> mipLevel);
+		const UINT mipHeight = max(1U, Height >> mipLevel);
+		const size_t mipSize = D3DXGetFormatSize(format_orig, mipWidth, mipHeight);
+		const bool compressed = format_orig == D3DFMT_DXT1 ||
+			format_orig == D3DFMT_DXT3 || format_orig == D3DFMT_DXT5;
+		const UINT rows = compressed ? max(1U, (mipHeight + 3) / 4) : mipHeight;
+		const size_t rowBytes = mipSize / rows;
+		if (!lockedRect.pBits || lockedRect.Pitch <= 0 ||
+			static_cast<size_t>(lockedRect.Pitch) < rowBytes)
 		{
-			// Convert A8B8G8R8 to A8R8G8B8
-			uint8_t* destData = static_cast<uint8_t*>(lockedRect.pBits);
-			for (UINT y = 0; y < mipHeight; ++y) {
-				for (UINT x = 0; x < mipWidth; ++x) {
-					uint8_t b = srcData[4 * (y * mipWidth + x)];
-					uint8_t g = srcData[4 * (y * mipWidth + x) + 1];
-					uint8_t r = srcData[4 * (y * mipWidth + x) + 2];
-					uint8_t a = srcData[4 * (y * mipWidth + x) + 3];
-					destData[4 * (y * mipWidth + x)] = r;
-					destData[4 * (y * mipWidth + x) + 1] = g;
-					destData[4 * (y * mipWidth + x) + 2] = b;
-					destData[4 * (y * mipWidth + x) + 3] = a;
+			(*ppTexture)->UnlockRect(mipLevel);
+			(*ppTexture)->Release();
+			*ppTexture = nullptr;
+			return E_FAIL;
+		}
+
+		// D3D9 row pitch is not necessarily the same as packed DDS source pitch.
+		uint8_t* dest = static_cast<uint8_t*>(lockedRect.pBits);
+		const size_t dstPitch = static_cast<size_t>(lockedRect.Pitch);
+		for (UINT row = 0; row < rows; ++row)
+		{
+			const uint8_t* srcRow = srcData + static_cast<size_t>(row) * rowBytes;
+			uint8_t* dstRow = dest + static_cast<size_t>(row) * dstPitch;
+			if (format_orig == D3DFMT_A8B8G8R8)
+			{
+				for (UINT x = 0; x < mipWidth; ++x)
+				{
+					const size_t p = static_cast<size_t>(x) * 4;
+					dstRow[p] = srcRow[p + 2];
+					dstRow[p + 1] = srcRow[p + 1];
+					dstRow[p + 2] = srcRow[p];
+					dstRow[p + 3] = srcRow[p + 3];
 				}
 			}
+			else
+				memcpy(dstRow, srcRow, rowBytes);
 		}
-		else {
-			// Copy image data to the texture directly
-			memcpy(lockedRect.pBits, srcData, mipSize);
+		hr = (*ppTexture)->UnlockRect(mipLevel);
+		if (FAILED(hr))
+		{
+			(*ppTexture)->Release();
+			*ppTexture = nullptr;
+			return hr;
 		}
-
-		(*ppTexture)->UnlockRect(mipLevel);
-
-		// Move to the next mip level
 		srcData += mipSize;
 	}
 
@@ -822,7 +857,7 @@ class TextureReplacement : public Hook
 		std::filesystem::path texturePackName, bool isUITexture,
 		std::shared_ptr<std::vector<uint8_t>>& transientOwner)
 	{
-		if (!*ppSrcData || !*pSrcDataSize) [[unlikely]]
+		if (!*ppSrcData || *pSrcDataSize < sizeof(DDS_FILE)) [[unlikely]]
 			return;
 
 		bool allowReplacement = isUITexture ? Settings::UITextureReplacement : Settings::SceneTextureReplacement;
@@ -895,10 +930,16 @@ class TextureReplacement : public Hook
 				size_t size = 0;
 				const uint8_t* file = FileData.getFileData(
 					path_load, &size, &transientOwner);
-				if (file)
+				if (file && size >= sizeof(DDS_FILE))
 				{
 					const DDS_FILE* newhead = (const DDS_FILE*)file;
-					if (newhead->magic == DDS_MAGIC)
+					const D3DFORMAT newFormat = GetD3DFormatFromPixelFormat(newhead->data.ddpfPixelFormat);
+					const bool validDimensions = newhead->data.dwWidth && newhead->data.dwHeight &&
+						newhead->data.dwWidth <= 16384 && newhead->data.dwHeight <= 16384;
+					const size_t firstMipSize = validDimensions && newFormat != D3DFMT_UNKNOWN
+						? D3DXGetFormatSize(newFormat, newhead->data.dwWidth, newhead->data.dwHeight) : 0;
+					if (newhead->magic == DDS_MAGIC && firstMipSize &&
+						firstMipSize <= size - sizeof(DDS_FILE))
 					{
 						if (isUITexture)
 						{

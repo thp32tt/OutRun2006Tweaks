@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import json
 from verify_vr_hud_exact_callsite_contract import check as verify_hud_callsite_contract
+from verify_vr_hud_dds_loader import verify as verify_dds_loader_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -39,6 +40,7 @@ def require_order(source, meaning, *tokens):
 
 ui = read('src/hooks_uiscaling.cpp')
 textures = read('src/hooks_textures.cpp')
+verify_dds_loader_contract(textures)
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
