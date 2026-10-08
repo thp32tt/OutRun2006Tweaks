@@ -71,3 +71,17 @@ The same-day preceding [AI2 lens/time/goal real source repair](AI2_QUEST3_LENS_T
 **Packaged artifact:** ID `11538619117`, exact name `OutRun2-VR-DX9EX-ACTIVE-b14901f8b70b1b6fda8a9aded1e340147a453e68`, 2,750,394 bytes, digest `sha256:6085109d2fb0664d4e6cd645d1cf72b2b21e20a5910580c4ddf4e4eeadb75ad1`. Game artifact `11539120427` sha256 `c39fb1a1ba9bab09b097393caf7a76d26c3e56d3c744d615ee9097ce54453aff`; host artifact `11538169989` sha256 `86d3ab3bbfbf99a67d54efe903394c205a9843ad3bb68098cd82a25e085281df`. This is a **build-verified user candidate, not HMD-verified resolution**. Historical Quest3/VDXR runtime 00519 visual failure remains OPEN and `RUNTIME_VALIDATION=UNTESTED`.
 
 **User-visible repaired source defects:** false lens producer disassembly provenance (0xCABE outside previous 0xCAE0 window), stale Sumo masked child_B4 queue storage at no-tick replays, plus previous separately scored lens fixed-function and +TIME/finish semantic owners. Not claimed fixed solely via static CI: optical lens light attachment, +TIME and goal binocular placement, SkyGlow flare halo, user hardware performance.
+
+## C6 final integrated exact-SHA validation and handoff
+
+**FINAL SOURCE VALIDATION: ALL FOUR PASS, EXACT CODE SHA `b14901f8b70b1b6fda8a9aded1e340147a453e68`.**
+1. DX9Ex Active Validation `37752619285` **SUCCESS** — policy, Win32 game DLL, x64 OpenXR host, R33 full-chain compile, one packaged ZIP.
+2. OutRun EXE HUD Inspector CI `37752619496` **SUCCESS** — original pinned EXE/x86 producer map, Sumo child mask fault injection, P0 owner contract, Win32 HUD Inspector.
+3. DX9Ex Full Source Impact Review `37752619267` **SUCCESS** — source cross-domain, x64 OpenXR host MSVC /analyze, Win32 game MSVC /analyze (all jobs).
+4. Domain Isolation Guard `37752619334` **SUCCESS**.
+
+**Validated package:** GitHub Actions run `37752619285` artifact `11538619117`, `OutRun2-VR-DX9EX-ACTIVE-b14901f8b70b1b6fda8a9aded1e340147a453e68`, 2,750,394 bytes, `sha256:6085109d2fb0664d4e6cd645d1cf72b2b21e20a5910580c4ddf4e4eeadb75ad1`. Validation is **source/build/package SUCCESS, headset UNTESTED**.
+
+**Actual material fixed by this AI 2 deep audit:** canonical 0xCABE/0xCF4E lens producer disassembly window misattribution and missing rel32 target validation; stale Sumo mask `SPRARGS2::child_B4` on no-tick replay, deep ownership/cycle/limit fail-closed; new static negative guards and HUD Inspector source-path closure. Prior validated lens shader/fixed-function and +TIME/goal glyph stereoscopic owner fixes remain intact; 00558 independent rank behind-eye guard integrated in code SHA. **Do not call optical doubled lens, +TIME or goal/result HUD user-verified** without the user's Quest3/VDXR run on this exact package; historical 00519 HMD FAIL remains OPEN and `RUNTIME_VALIDATION=UNTESTED`. No 1000/5000 repeated audits.
+
+**Resume protocol if chat truncates:** This document, the four run IDs, artifact digest and exact code SHA are sufficient; re-check branch HEAD before editing, do not re-run a passed unchanged SHA, examine any later HMD feedback (lens source position, +TIME/goal, SkyGlow halo, frame pacing) and only fix new evidence. Source of truth remains authenticated GitHub.
