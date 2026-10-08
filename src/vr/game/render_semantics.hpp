@@ -26,8 +26,12 @@ namespace OutRunVR::GameSemantic
         // but the draw still needs an exact VR owner rather than generic alpha.
         ProjectedScreenEffect2D,
         ReflectionCube,
-        // Generic canonical 2D queue content. It needs only per-eye
-        // asymmetric-FOV alignment, never head/IPD/world-plane placement.
+        // Generic canonical 2D queue content is NOT evidence of game
+        // world geometry or an exact named HUD producer. The current
+        // R51 R26+HUD renderer nevertheless uses the same finite,
+        // recentered HUD-plane eye transform when it can prove a safe
+        // original c64 (VS) or source geometry (XYZRHW). Never describe
+        // the *current* accepted ScreenOverlay2D GPU route as FOV-only.
         ScreenOverlay2D,
         ScreenHud,
     };
