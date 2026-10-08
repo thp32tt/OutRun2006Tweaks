@@ -1,90 +1,95 @@
 #!/usr/bin/env python3
-"""C2 q214 B258 independent native DDS evidence; NO C/C3 approval by script."""
-import hashlib, io, json, os, urllib.request
+"""C2 q154 exact historical producer-clean provenance recheck; evidence only."""
+import io, hashlib, json, os, urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
-
-if os.getenv("OUTRUN_CPU_WORKER")!="github-actions" or os.getenv("OUTRUN_CPU_ROLE")!="C":
-    raise SystemExit("GitHub-hosted role C only")
+assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="C"
 root=Path(".")
-out=root/"localization/graphics/role_C/20261008-C285-C2-Q214-B258-INDEPENDENT"
-out.mkdir(parents=True,exist_ok=True)
-candidate=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
-clean=root/"localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_CLEAN_PLATE.png"
-source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"
-with urllib.request.urlopen(source_url,timeout=180) as f: sb=f.read()
+p=root/"localization/graphics/role_C/20261008-C287-C2-Q154-AUTHORED-CLEAN-CROSSCHECK"
+p.mkdir(parents=True,exist_ok=True)
+b60=root/"localization/graphics/role_B/20261005-B-PRODUCTION60/4D38_HD_CLEAN_PLATE.png"
+c141=root/"localization/graphics/role_C/20261005-C141-4D38BBB0/C141_EXACT_CLEAN_PLATE.png"
+c284=root/"localization/graphics/role_C/20261008-C284-C2-Q154-INFERRED-CLEAN-ATLAS-AUDIT/C284_INFERRED_CLEAN_WHOLE_ATLAS_FLIPY.png"
+candidate=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+with urllib.request.urlopen(url,timeout=180) as f:sb=f.read()
 cb=candidate.read_bytes()
-sha=lambda b:hashlib.sha256(b).hexdigest()
-source_sha="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
-candidate_sha="8b13c2aed450aad4072b97c9adaceaf0e413cd71554c6106b037ad6011fb5549"
-assert sha(sb)==source_sha,(sha(sb),source_sha)
-assert sha(cb)==candidate_sha,(sha(cb),candidate_sha)
-assert sb[:128]==cb[:128],"DDS header diverged"
-as_rgba=lambda b:np.asarray(Image.open(io.BytesIO(b)).convert("RGBA")).copy()
-raws=as_rgba(sb); rawc=as_rgba(cb)
-src=np.flipud(raws).copy(); cur=np.flipud(rawc).copy()
-cl=np.asarray(Image.open(clean).convert("RGBA")).copy()
-assert src.shape==cur.shape==cl.shape==(2048,2048,4)
-rows=[("start","START","출발",(815,495,899,517)),("goal","GOAL","골",(1343,764,1417,787))]
-allowed=np.zeros(src.shape[:2],dtype=bool)
-for _,_,_,(x0,y0,x1,y1) in rows: allowed[y0:y1,x0:x1]=True
-changed=np.any(src!=cur,axis=2)
-alpha=src[:,:,3]!=cur[:,:,3]
-outside=int(np.count_nonzero(changed&~allowed))
-alpha_outside=int(np.count_nonzero(alpha&~allowed))
-def bb(m):
-    ys,xs=np.where(m)
+hash=lambda b:hashlib.sha256(b).hexdigest()
+source_sha="15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf"
+candidate_sha="94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+assert hash(sb)==source_sha and hash(cb)==candidate_sha, "source/candidate SHA drift"
+assert sb[:128]==cb[:128], "DDS header drift"
+def png(x):return np.asarray(Image.open(x).convert("RGBA")).copy()
+rawsrc=np.asarray(Image.open(io.BytesIO(sb)).convert("RGBA")).copy()
+rawfin=np.asarray(Image.open(io.BytesIO(cb)).convert("RGBA")).copy()
+src=np.flipud(rawsrc).copy(); final=np.flipud(rawfin).copy()
+clean=png(b60); cclean=png(c141); inferred=png(c284)
+assert all(x.shape==(1024,4096,4) for x in (src,final,clean,cclean,inferred))
+rows=[
+("create_new_license_red","CREATE NEW LICENSE","새 라이선스 만들기",(13,548,1954,696)),
+("select_license_red","SELECT LICENSE","라이선스 선택",(2007,541,3468,689)),
+("single_player_red","SINGLE PLAYER","싱글 플레이",(12,374,1388,522)),
+("default_license_red","DEFAULT LICENSE","기본 라이선스",(1772,374,3316,522)),
+("multiplayer_red","MULTIPLAYER","멀티플레이",(15,203,1235,347)),
+("single_player_gray","SINGLE PLAYER","싱글 플레이",(1610,286,2197,350)),
+("showroom_gray","SHOWROOM","쇼룸",(2674,288,3094,350)),
+("multiplayer_gray","MULTIPLAYER","멀티플레이",(2566,952,3086,1014))]
+allowed=np.zeros((1024,4096),bool)
+for _,_,_,(x0,y0,x1,y1) in rows:allowed[y0:y1,x0:x1]=True
+diff=lambda x,y:np.any(x!=y,axis=2)
+def bbox(mask):
+    ys,xs=np.where(mask)
     return None if len(xs)==0 else [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-def neutral(a):
-    al=a[...,3:4].astype(np.uint16)
-    rgb=a[...,:3].astype(np.uint16)
-    return ((rgb*al+128*(255-al)+127)//255).astype(np.uint8)
-details=[]
-for rid,english,korean,box in rows:
+def neutral(a,bg):
+    rgb=a[:,:,:3].astype(np.uint16);alpha=a[:,:,3:4].astype(np.uint16)
+    return ((rgb*alpha+bg*(255-alpha)+127)//255).astype(np.uint8)
+observed=[]
+for rid,en,ko,box in rows:
     x0,y0,x1,y1=box
-    srcmask=np.any(src[y0:y1,x0:x1]!=cl[y0:y1,x0:x1],axis=2)
-    finmask=np.any(cur[y0:y1,x0:x1]!=cl[y0:y1,x0:x1],axis=2)
-    sbbox=bb(srcmask); cbbox=bb(finmask)
-    def globalbb(b):return None if b is None else [b[0]+x0,b[1]+y0,b[2]+x0,b[3]+y0]
-    sbbox=globalbb(sbbox);cbbox=globalbb(cbbox)
-    margins=None if cbbox is None else [cbbox[0]-x0,cbbox[1]-y0,x1-cbbox[2],y1-cbbox[3]]
-    padding=16
-    l=max(0,x0-padding);t=max(0,y0-padding);r=min(2048,x1+padding);b=min(2048,y1+padding)
-    crops=[arr[t:b,l:r] for arr in (src,cl,cur)]
-    for tag,a in zip(("ENGLISH_SOURCE","CLEAN_B194","PERSISTED_B258"),crops):
-        Image.fromarray(a).save(out/f"{rid}_{tag}.png")
-    labels=("ENGLISH SOURCE","B194 CLEAN","B258 DDS DECODE")
-    imgs=[Image.fromarray(neutral(a),"RGB") for a in crops]
-    w,h=imgs[0].size; contact=Image.new("RGB",(3*w,h+20),(50,50,50))
-    draw=ImageDraw.Draw(contact)
-    for i,(im,label) in enumerate(zip(imgs,labels)):
-        contact.paste(im,(i*w,20));draw.text((i*w+2,2),label,fill="white")
-    contact.save(out/f"{rid}_SOURCE_CLEAN_FINAL_NATIVE.png")
-    contact.resize((contact.width*4,contact.height*4),Image.Resampling.NEAREST).save(out/f"{rid}_SOURCE_CLEAN_FINAL_ZOOM4X.png")
-    for pct in (75,50):
-        contact.resize((round(contact.width*pct/100),round(contact.height*pct/100)),Image.Resampling.LANCZOS).save(out/f"{rid}_SOURCE_CLEAN_FINAL_PRACTICAL{pct}.png")
-    # Corresponding RAW crop must use H-y1:H-y0, not readable bbox coordinates.
-    rt,rb=2048-b,2048-t
-    Image.fromarray(raws[rt:rb,l:r]).save(out/f"{rid}_SOURCE_RAW_NATIVE.png")
-    Image.fromarray(rawc[rt:rb,l:r]).save(out/f"{rid}_FINAL_RAW_NATIVE.png")
-    subchange=changed[y0:y1,x0:x1]
-    details.append({"id":rid,"english":english,"korean":korean,"source_effect_bbox":list(box),
-        "source_vs_B194_clean_bbox":sbbox,"candidate_vs_B194_clean_bbox":cbbox,
-        "margins_native":margins,"changed_source_to_candidate_inside_bbox":int(np.count_nonzero(subchange)),
-        "bbox_containment":"PASS" if margins is not None and all(x>=0 for x in margins) else "HOLD",
-        "inspection_images":[f"{rid}_SOURCE_CLEAN_FINAL_NATIVE.png",f"{rid}_SOURCE_CLEAN_FINAL_ZOOM4X.png",
-                             f"{rid}_SOURCE_CLEAN_FINAL_PRACTICAL50.png",f"{rid}_SOURCE_RAW_NATIVE.png",f"{rid}_FINAL_RAW_NATIVE.png"]})
-report={"run":"C285","queue_index":214,"TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN",
-    "execution_backend":"GITHUB_HOSTED_CPU_INPUT_UNAVAILABLE_IN_GPT_LOCAL_DNS",
-    "source_url":source_url,"source_sha256":source_sha,"candidate_sha256":candidate_sha,
-    "clean_plate_path":str(clean),"clean_plate_sha256":sha(clean.read_bytes()),
-    "native_dimensions":[2048,2048],"format":"DXT5_BC3","raw_orientation":"mirror_y","dds_header_128_identical":True,
-    "decoded_changed_outside_source_effect_boxes":outside,
-    "decoded_alpha_changed_outside_source_effect_boxes":alpha_outside,
-    "rows":details,"machine_result":"PASS" if outside==alpha_outside==0 and all(x["bbox_containment"]=="PASS" for x in details) else "HOLD",
-    "visual_result":"PENDING_CONTROLLER_INDEPENDENT_REVIEW",
-    "policy_gate":"NO_APPROVAL_WITHOUT_CALIBRATION_AND_COMPLETE_PER_REGION_C_C3_EVIDENCE",
-    "runtime_validation":"UNTESTED"}
-(out/"C285_Q214_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print("C285_SHA",candidate_sha,"machine",report["machine_result"],"outside",outside,alpha_outside)
+    source_alpha=src[y0:y1,x0:x1,3]>0
+    local_alpha=final[y0:y1,x0:x1,3]>0
+    candbbox=bbox(local_alpha)
+    if candbbox: candbbox=[candbbox[0]+x0,candbbox[1]+y0,candbbox[2]+x0,candbbox[3]+y0]
+    margins=None if candbbox is None else [candbbox[0]-x0,x1-candbbox[2],candbbox[1]-y0,y1-candbbox[3]]
+    r={"id":rid,"source_text":en,"korean_text":ko,"source_bbox":list(box),
+       "final_alpha_bbox":candbbox,"source_region_opaque_count":int(source_alpha.sum()),
+       "final_region_opaque_count":int(local_alpha.sum()),"final_alpha_positive_margins_LRTB":margins,
+       "b60_clean_nonzero_alpha_in_source_region":int(np.count_nonzero(clean[y0:y1,x0:x1,3])),
+       "b60_clean_vs_c141_changed":int(np.count_nonzero(diff(clean[y0:y1,x0:x1],cclean[y0:y1,x0:x1]))),
+       "b60_clean_vs_c284_inferred_changed":int(np.count_nonzero(diff(clean[y0:y1,x0:x1],inferred[y0:y1,x0:x1]))),
+       "final_equals_original_visible_pixels_inside_box":int(np.count_nonzero(np.all(src[y0:y1,x0:x1]==final[y0:y1,x0:x1],axis=2)&local_alpha)),
+       "alpha_containment":"PASS" if margins is not None and all(v>0 for v in margins) else "FAIL"}
+    observed.append(r)
+    if rid.endswith("gray"):
+        pad=12;l=max(0,x0-pad);t=max(0,y0-pad);rr=min(4096,x1+pad);bb=min(1024,y1+pad)
+        images=[Image.fromarray(neutral(a[t:bb,l:rr],128),"RGB") for a in (src,clean,final)]
+        w,h=images[0].size
+        base=Image.new("RGB",(3*w,h+22),(42,42,42));d=ImageDraw.Draw(base)
+        for j,(im,label) in enumerate(zip(images,("SOURCE ENGLISH","B60 AUTHORED CLEAN","CURRENT KOREAN DDS"))):
+            base.paste(im,(j*w,22));d.text((j*w+3,4),label,fill="white")
+        for kind,im in (("NATIVE",base),("ZOOM2X",base.resize((base.width*2,base.height*2),Image.Resampling.NEAREST)),("PRACTICAL50",base.resize((base.width//2,base.height//2),Image.Resampling.LANCZOS))):
+            im.save(p/f"{rid}_{kind}.png")
+        Image.fromarray(rawsrc[1024-bb:1024-t,l:rr]).save(p/f"{rid}_SOURCE_RAW.png")
+        Image.fromarray(rawfin[1024-bb:1024-t,l:rr]).save(p/f"{rid}_FINAL_RAW.png")
+machine={
+"run":"C287","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","queue_index":154,
+"policy_version":"visual-evidence-v1-20261008","source_sha256":source_sha,"candidate_sha256":candidate_sha,
+"source_url":url,"dds_header_identical":True,"native_size":[4096,1024],"raw_orientation":"mirror_y",
+"clean_sources":{"authored_B60":{"path":str(b60),"sha256":hash(b60.read_bytes())},
+"independent_C141":{"path":str(c141),"sha256":hash(c141.read_bytes())},
+"inferred_C284":{"path":str(c284),"sha256":hash(c284.read_bytes())}},
+"b60_vs_c141_rgba_differing_pixels":int(np.count_nonzero(diff(clean,cclean))),
+"b60_vs_c284_rgba_differing_pixels":int(np.count_nonzero(diff(clean,inferred))),
+"clean_vs_source_changed_outside_eight_bboxes":int(np.count_nonzero(diff(src,clean)&~allowed)),
+"current_vs_source_changed_outside_eight_bboxes":int(np.count_nonzero(diff(src,final)&~allowed)),
+"current_vs_source_alpha_changed_outside_eight_bboxes":int(np.count_nonzero((src[:,:,3]!=final[:,:,3])&~allowed)),
+"b60_alpha_nonzero_inside_source_eight_bboxes":int(np.count_nonzero(clean[:,:,3]&allowed)),
+"rows":observed,
+"machine_status":"EXACT_CLEAN_PROVENANCE_CHECKED",
+"visual_C":"PENDING_CONTROLLER_REVIEW","C3":"NOT_PERFORMED","RUNTIME_VALIDATION":"UNTESTED"}
+(p/"C287_Q154_AUTHORED_CLEAN_MACHINE.json").write_text(json.dumps(machine,ensure_ascii=False,indent=2)+"\n")
+print("C287_clean_diff_C141",machine["b60_vs_c141_rgba_differing_pixels"],
+      "C284",machine["b60_vs_c284_rgba_differing_pixels"],
+      "clean_outside",machine["clean_vs_source_changed_outside_eight_bboxes"],
+      "candidate_outside",machine["current_vs_source_changed_outside_eight_bboxes"])
