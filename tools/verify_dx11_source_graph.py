@@ -11593,6 +11593,41 @@ def main() -> None:
 
 
 
+    r313_programmable_source_mapping_handoff_analyzer_bridge = [
+        ("VR DX11 R273 sourceMappingHandoff",
+         RUNTIME_CENSUS, "R313 consumes existing R273 source mapping handoff"),
+        ("R273_SOURCE_MAPPING_HANDOFF_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R313 parses R273 exact/snapshot telemetry"),
+        ("pending_source_mapping_handoffs",
+         DX11_CENSUS_ANALYZER, "R313 tracks unnumbered R273 per log and epoch"),
+        ("source_mapping_handoffs[signature_key]",
+         DX11_CENSUS_ANALYZER, "R313 correlates R273 to following R276"),
+        ('"register_mapping_plan_correlated":',
+         DX11_CENSUS_ANALYZER, "R313 checks R272 prerequisite"),
+        ('"identity_link_strength": "ORDER_AND_NONZERO_ONLY"',
+         DX11_CENSUS_ANALYZER, "R313 does not infer unlogged hash equality"),
+        ('"SourceMappingHandoff": source_mapping_handoff',
+         DX11_CENSUS_ANALYZER, "R313 exposes diagnostic-only evidence"),
+        ("r313_good = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R313 exact ordered handoff regression"),
+        ("check_r313_inexact(",
+         DX11_CENSUS_ANALYZER_TEST, "R313 negative handoff regressions"),
+        ('r313_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R313 cannot activate a native draw"),
+    ]
+    missing_r313_programmable_source_mapping_handoff_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r313_programmable_source_mapping_handoff_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r313_programmable_source_mapping_handoff_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R313 source mapping handoff analyzer drift: "
+            + ", ".join(
+                missing_r313_programmable_source_mapping_handoff_analyzer_bridge
+            )
+        )
+
     r311_programmable_register_mapping_plan_analyzer_bridge = [
         ("VR DX11 R272 registerMappingPlan",
          RUNTIME_CENSUS, "R311 consumes the existing R272 register mapping plan"),

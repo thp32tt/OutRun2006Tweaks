@@ -2435,6 +2435,81 @@ def main() -> int:
     ] is False
     assert r312_stale_register_mapping["NativeDrawPathActivationAllowed"] is False
 
+    # R313: consume the existing R273 diagnostic in producer order; none
+    # of these analyzer receipts promotes NativeDrawPath or a Draw* call.
+    r313_handoff_line = (
+        "VR DX11 R273 sourceMappingHandoff: "
+        "exact=1 snapshot=0xDEADBEEF00000001\\n"
+    )
+    r313_support = r311_register_mapping_support.replace(
+        "VR DX11 R276 semanticTranslationPlan signature#1:",
+        r313_handoff_line
+        + "VR DX11 R276 semanticTranslationPlan signature#1:",
+    )
+    r313_good = run_case(r313_support + r306_signature_tail)
+    r313_inventory = r313_good["ActivationEvidence"]["ProgrammableShaderInventory"]
+    assert r313_inventory["SourceMappingHandoffEvidenceSignatures"] == 1
+    assert r313_inventory["SourceMappingHandoffExactSignatures"] == 1
+    assert r313_inventory["SourceMappingHandoffFailClosedSignatures"] == 1
+    assert r313_inventory["SourceMappingHandoffEvidenceCoverageComplete"] is True
+    r313_evidence = r313_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "SourceMappingHandoff"
+    ]
+    assert r313_evidence["producer_order_valid"] is True
+    assert r313_evidence["snapshot"] == 0xDEADBEEF00000001
+    assert r313_evidence["summary_correlation_exact"] is True
+    assert r313_evidence["identity_link_strength"] == "ORDER_AND_NONZERO_ONLY"
+    assert r313_evidence["diagnostic_only"] is True
+    assert r313_evidence["activation_proof"] is False
+    assert r313_good["NativeDrawPathActivationAllowed"] is False
+
+    def check_r313_inexact(log: str, missing: bool = False) -> None:
+        case = run_case(log + r306_signature_tail)
+        inventory = case["ActivationEvidence"]["ProgrammableShaderInventory"]
+        ref = {"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}
+        evidence = inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+            "SourceMappingHandoff"
+        ]
+        if missing:
+            assert evidence is None
+            assert inventory["SourceMappingHandoffEvidenceMissingSignatures"] == [ref]
+        else:
+            assert evidence is not None
+            assert evidence["summary_correlation_exact"] is False
+            assert evidence["fail_closed"] is False
+            assert inventory["SourceMappingHandoffCorrelationInexactSignatures"] == [ref]
+        assert inventory["SourceMappingHandoffEvidenceCoverageComplete"] is False
+        assert case["NativeDrawPathActivationAllowed"] is False
+
+    check_r313_inexact(r313_support.replace(r313_handoff_line, ""), missing=True)
+    check_r313_inexact(
+        r313_support.replace(r313_handoff_line, r313_handoff_line * 2)
+    )
+    check_r313_inexact(
+        r313_support.replace(
+            "0xDEADBEEF00000001", "0x0000000000000000"
+        )
+    )
+    # New R271 invalidates the handoff and R272; a later R276 cannot
+    # consume stale evidence even when the signature ordinal is identical.
+    check_r313_inexact(
+        r313_support.replace(
+            "VR DX11 R276 semanticTranslationPlan signature#1:",
+            r312_source + "VR DX11 R276 semanticTranslationPlan signature#1:",
+        ),
+        missing=True,
+    )
+    # A second R272 invalidates the previous R273 handoff.
+    check_r313_inexact(
+        r313_support.replace(
+            "VR DX11 R276 semanticTranslationPlan signature#1:",
+            r312_mapping + "VR DX11 R276 semanticTranslationPlan signature#1:",
+        ),
+        missing=True,
+    )
+    # R273 without R272 is recorded, never treated as an exact producer.
+    check_r313_inexact(r312_source + r313_handoff_line + r312_plan)
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "

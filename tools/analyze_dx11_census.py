@@ -161,6 +161,10 @@ R272_REGISTER_MAPPING_PLAN_RE = re.compile(
     r"planRevision=0x(?P<planRevision>[0-9A-Fa-f]+) "
     r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
 )
+R273_SOURCE_MAPPING_HANDOFF_RE = re.compile(
+    r"VR DX11 R273 sourceMappingHandoff: exact=(?P<exact>[01]) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R276_SEMANTIC_PLAN_RE = re.compile(
     r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
@@ -582,6 +586,8 @@ def summarize_programmable_shader_inventory(
     source_semantic_pair_missing: list[dict] = []
     source_semantic_pair_correlation_inexact: list[dict] = []
     register_mapping_plan_missing: list[dict] = []
+    source_mapping_handoff_missing: list[dict] = []
+    source_mapping_handoff_correlation_inexact: list[dict] = []
     register_mapping_plan_correlation_inexact: list[dict] = []
     semantic_plan_missing: list[dict] = []
     semantic_receipt_missing: list[dict] = []
@@ -609,6 +615,9 @@ def summarize_programmable_shader_inventory(
     source_semantic_pair_exact_signatures = 0
     source_semantic_pair_fail_closed_signatures = 0
     register_mapping_plan_evidence_signatures = 0
+    source_mapping_handoff_evidence_signatures = 0
+    source_mapping_handoff_exact_signatures = 0
+    source_mapping_handoff_fail_closed_signatures = 0
     register_mapping_plan_exact_signatures = 0
     register_mapping_plan_fail_closed_signatures = 0
     semantic_plan_exact_signatures = 0
@@ -685,6 +694,7 @@ def summarize_programmable_shader_inventory(
         )
         source_semantic_pair = signature.get("source_semantic_pair")
         register_mapping_plan = signature.get("register_mapping_plan")
+        source_mapping_handoff = signature.get("source_mapping_handoff")
         plan = signature.get("semantic_translation_plan")
         object_prerequisite = signature.get("translation_object_prerequisite")
         object_creation_handoff = signature.get("object_creation_handoff")
@@ -730,6 +740,17 @@ def summarize_programmable_shader_inventory(
                 register_mapping_plan_exact_signatures += 1
             if register_mapping_plan["fail_closed"]:
                 register_mapping_plan_fail_closed_signatures += 1
+
+        if source_mapping_handoff is None:
+            source_mapping_handoff_missing.append(ref)
+        else:
+            source_mapping_handoff_evidence_signatures += 1
+            if not source_mapping_handoff["summary_correlation_exact"]:
+                source_mapping_handoff_correlation_inexact.append(ref)
+            if source_mapping_handoff["exact"]:
+                source_mapping_handoff_exact_signatures += 1
+            if source_mapping_handoff["fail_closed"]:
+                source_mapping_handoff_fail_closed_signatures += 1
 
         if plan is None:
             semantic_plan_missing.append(ref)
@@ -919,6 +940,7 @@ def summarize_programmable_shader_inventory(
                 "SignatureRef": ref,
                 "SourceSemanticPair": source_semantic_pair,
                 "RegisterMappingPlan": register_mapping_plan,
+                "SourceMappingHandoff": source_mapping_handoff,
                 "Plan": plan,
                 "ObjectOwnershipPrerequisite": object_prerequisite,
                 "ObjectCreationHandoff": object_creation_handoff,
@@ -955,6 +977,12 @@ def summarize_programmable_shader_inventory(
         and programmable_signatures > 0
         and not register_mapping_plan_missing
         and not register_mapping_plan_correlation_inexact
+    )
+    source_mapping_handoff_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not source_mapping_handoff_missing
+        and not source_mapping_handoff_correlation_inexact
     )
     semantic_evidence_coverage_complete = bool(
         evidence_coverage_complete
@@ -1022,6 +1050,18 @@ def summarize_programmable_shader_inventory(
             register_mapping_plan_fail_closed_signatures,
         "RegisterMappingPlanEvidenceCoverageComplete":
             register_mapping_plan_evidence_coverage_complete,
+        "SourceMappingHandoffEvidenceMissingSignatures":
+            source_mapping_handoff_missing,
+        "SourceMappingHandoffCorrelationInexactSignatures":
+            source_mapping_handoff_correlation_inexact,
+        "SourceMappingHandoffEvidenceSignatures":
+            source_mapping_handoff_evidence_signatures,
+        "SourceMappingHandoffExactSignatures":
+            source_mapping_handoff_exact_signatures,
+        "SourceMappingHandoffFailClosedSignatures":
+            source_mapping_handoff_fail_closed_signatures,
+        "SourceMappingHandoffEvidenceCoverageComplete":
+            source_mapping_handoff_evidence_coverage_complete,
         "SemanticPlanEvidenceMissingSignatures": semantic_plan_missing,
         "SemanticPlanInexactSignatures": semantic_plan_inexact,
         "ObjectOwnershipPrerequisiteEvidenceMissingSignatures":
@@ -1140,6 +1180,8 @@ def main() -> int:
     pending_source_semantic_pairs: dict[tuple[str, int], dict] = {}
     register_mapping_plans: dict[SignatureKey, dict] = {}
     pending_register_mapping_plans: dict[tuple[str, int], dict] = {}
+    source_mapping_handoffs: dict[SignatureKey, dict] = {}
+    pending_source_mapping_handoffs: dict[tuple[str, int], dict] = {}
     semantic_translation_plans: dict[SignatureKey, dict] = {}
     translation_object_prerequisites: dict[SignatureKey, dict] = {}
     object_creation_handoffs: dict[SignatureKey, dict] = {}
@@ -1250,6 +1292,9 @@ def main() -> int:
                 # A new R271 producer invalidates any earlier R272 in this epoch.
                 # Otherwise a stale mapping can attach to the next R276 signature.
                 pending_register_mapping_plans.pop((source_log, startup_epoch), None)
+                pending_source_mapping_handoffs.pop(
+                    (source_log, startup_epoch), None
+                )
                 data = match.groupdict()
                 pending_source_semantic_pairs[(source_log, startup_epoch)] = {
                     "exact": bool(int(data["exact"])),
@@ -1276,6 +1321,9 @@ def main() -> int:
 
             match = R272_REGISTER_MAPPING_PLAN_RE.search(line)
             if match:
+                pending_source_mapping_handoffs.pop(
+                    (source_log, startup_epoch), None
+                )
                 # R272 must follow a unique R271 producer before R276. Do not
                 # silently replace duplicate or orphan mapping evidence.
                 producer_key = (source_log, startup_epoch)
@@ -1301,6 +1349,28 @@ def main() -> int:
                     "semantic_contract_hash": int(data["contract"], 16),
                     "semantic_contract_hash_hex":
                         "0x" + data["contract"].upper(),
+                }
+                continue
+
+            match = R273_SOURCE_MAPPING_HANDOFF_RE.search(line)
+            if match:
+                # R273 has no signature ordinal: only one ordered R271/R272
+                # producer chain can hand off to the following R276 in this
+                # log/startup epoch. Duplicate/orphan records are diagnostic.
+                producer_key = (source_log, startup_epoch)
+                mapping = pending_register_mapping_plans.get(producer_key)
+                producer_order_valid = bool(
+                    producer_key in pending_source_semantic_pairs
+                    and mapping is not None
+                    and mapping["producer_order_valid"]
+                    and producer_key not in pending_source_mapping_handoffs
+                )
+                data = match.groupdict()
+                pending_source_mapping_handoffs[producer_key] = {
+                    "producer_order_valid": producer_order_valid,
+                    "exact": bool(int(data["exact"])),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
                 }
                 continue
 
@@ -1335,6 +1405,15 @@ def main() -> int:
                 if pending_register_mapping_plan is not None:
                     register_mapping_plans[signature_key] = (
                         pending_register_mapping_plan
+                    )
+                pending_source_mapping_handoff = (
+                    pending_source_mapping_handoffs.pop(
+                        (source_log, startup_epoch), None
+                    )
+                )
+                if pending_source_mapping_handoff is not None:
+                    source_mapping_handoffs[signature_key] = (
+                        pending_source_mapping_handoff
                     )
                 continue
 
@@ -2199,6 +2278,47 @@ def main() -> int:
                 "activation_proof": False,
             })
         signature["register_mapping_plan"] = register_mapping_plan
+        source_mapping_handoff = source_mapping_handoffs.get(signature_key)
+        if source_mapping_handoff is not None:
+            semantic_plan = semantic_translation_plans.get(signature_key)
+            source_pair_correlated = bool(
+                source_semantic_pair is not None
+                and source_semantic_pair["exact"]
+                and source_semantic_pair["summary_correlation_exact"]
+            )
+            mapping_correlated = bool(
+                register_mapping_plan is not None
+                and register_mapping_plan["exact"]
+                and register_mapping_plan["summary_correlation_exact"]
+            )
+            semantic_plan_correlated = bool(
+                semantic_plan is not None
+                and semantic_plan["exact"]
+                and semantic_plan["snapshot"] != 0
+            )
+            summary_correlation_exact = bool(
+                source_mapping_handoff["producer_order_valid"]
+                and source_mapping_handoff["snapshot"] != 0
+                and source_pair_correlated
+                and mapping_correlated
+                and semantic_plan_correlated
+            )
+            # R273 emits only exact/snapshot, not the mapping hashes: order
+            # and nonzero identity are checked, not unlogged hash equality.
+            source_mapping_handoff.update({
+                "source_semantic_pair_correlated": source_pair_correlated,
+                "register_mapping_plan_correlated": mapping_correlated,
+                "semantic_plan_correlated": semantic_plan_correlated,
+                "summary_correlation_exact": summary_correlation_exact,
+                "fail_closed": bool(
+                    summary_correlation_exact
+                    and source_mapping_handoff["exact"]
+                ),
+                "identity_link_strength": "ORDER_AND_NONZERO_ONLY",
+                "diagnostic_only": True,
+                "activation_proof": False,
+            })
+        signature["source_mapping_handoff"] = source_mapping_handoff
         signature["semantic_translation_plan"] = (
             semantic_translation_plans.get(signature_key)
         )
