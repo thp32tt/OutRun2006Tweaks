@@ -129,15 +129,16 @@ if "ScreenHud" in rival_body or "ScreenOverlay2D" in rival_body:
 
 glyph_body = function_body(uiscale, "static int __cdecl TextGlyph_putSprite(")
 glyph_markers = [
+    "tailsBefore",
     "Module::exe_ptr(0x2CFE0)",
     "original(args, priority)",
-    "if (node && node != tailBefore)",
-    "OutRunVR::GameSemantic::RegisterSpriteNodeScope(",
-    "node, OutRunVR::GameSemantic::RenderScope::ScreenHud",
+    "TagAppendedNodes(tailsBefore,",
+    "OutRunVR::GameSemantic::RenderScope::ScreenHud",
+    "OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite",
 ]
 glyph_pos = [glyph_body.find(m) for m in glyph_markers]
 if min(glyph_pos) < 0 or glyph_pos != sorted(glyph_pos):
-    fail("exact text glyph producer must tag only the newly appended node as ScreenHud")
+    fail("exact Sumo_Printf result glyph producer must tag all appended nodes as ScreenHud")
 
 right_clip = function_body(uiscale, "static int __cdecl ExactScreenHudRight_putClipSprite(")
 if "AddSpriteSpacing(&x, false);" not in right_clip or "ExactScreenHud_putClipSprite(" not in right_clip:
