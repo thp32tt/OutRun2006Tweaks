@@ -2529,6 +2529,89 @@ def main() -> int:
     # R273 without R272 is recorded, never treated as an exact producer.
     check_r313_inexact(r312_source + r313_handoff_line + r312_plan)
 
+
+    # R315: independently computed from native R276 FNV literals + u64 mixer.
+    # R313/R314's earlier made-up R276 identity never counted as source proof.
+    r315_verified_plan = (
+        "VR DX11 R276 semanticTranslationPlan signature#1: "
+        "exact=1 snapshot=0x3EBF2A2588EB078C "
+        "targetVS=0x85964F52DCEA7047 targetPS=0xF799FE0110D02702 "
+        "revision=0x780383EB93D997F4 contract=0x19283E27A12954B5\n"
+    )
+    r315_original_plan = r312_plan
+    r315_good_support = r313_support.replace(
+        r315_original_plan, r315_verified_plan, 1
+    )
+
+    def r315_plan_evidence(log: str) -> tuple[dict, dict]:
+        report = run_case(log + r306_signature_tail)
+        inventory = report["ActivationEvidence"]["ProgrammableShaderInventory"]
+        plan = inventory["Pairs"][0]["SemanticTranslationEvidence"][0]["Plan"]
+        return report, plan
+
+    r315_good, r315_plan = r315_plan_evidence(r315_good_support)
+    assert r315_plan["producer_chain_exact"] is True
+    assert r315_plan["scalar_identity_matches_producer"] is True
+    assert r315_plan["expected_target_vertex_semantic_hash"] == 0x85964F52DCEA7047
+    assert r315_plan["expected_target_pixel_semantic_hash"] == 0xF799FE0110D02702
+    assert r315_plan["expected_translator_revision_hash"] == 0x780383EB93D997F4
+    assert r315_plan["expected_semantic_contract_hash"] == 0x19283E27A12954B5
+    assert r315_plan["expected_snapshot"] == 0x3EBF2A2588EB078C
+    assert r315_plan["summary_correlation_exact"] is True
+    assert r315_plan["fail_closed"] is True
+    assert r315_plan["diagnostic_only"] is True
+    assert r315_plan["activation_proof"] is False
+    assert r315_good["NativeDrawPathActivationAllowed"] is False
+
+    def r315_reject(log: str) -> None:
+        report, plan = r315_plan_evidence(log)
+        assert plan["summary_correlation_exact"] is False
+        assert plan["fail_closed"] is False
+        assert plan["activation_proof"] is False
+        assert report["NativeDrawPathActivationAllowed"] is False
+
+    # R276 counterfeit output, otherwise credible source producers.
+    for source, forged in [
+        ("0x3EBF2A2588EB078C", "0x3EBF2A2588EB078D"),
+        ("0x85964F52DCEA7047", "0x85964F52DCEA7046"),
+        ("0xF799FE0110D02702", "0xF799FE0110D02703"),
+        ("0x780383EB93D997F4", "0x780383EB93D997F5"),
+        ("0x19283E27A12954B5", "0x19283E27A12954B4"),
+    ]:
+        r315_reject(r315_good_support.replace(source, forged, 1))
+
+    # Correct-looking R276 is not enough if source, mapping, handoff or
+    # readiness identity is altered, missing or out of order.
+    r315_reject(r315_good_support.replace(
+        "pairHash=0x1111111111111111",
+        "pairHash=0x1111111111111112", 1,
+    ))
+    r315_reject(r315_good_support.replace(
+        "constantHash=0x1212121212121212",
+        "constantHash=0x1212121212121213", 1,
+    ))
+    r315_reject(r315_good_support.replace(
+        "R273 sourceMappingHandoff: exact=1",
+        "R273 sourceMappingHandoff: exact=0", 1,
+    ))
+    r315_reject(r315_good_support.replace(
+        "R276 semanticTranslationPlan signature#1: exact=1",
+        "R276 semanticTranslationPlan signature#1: exact=0", 1,
+    ))
+    r315_reject(r315_good_support.replace(r313_handoff_line, "", 1))
+    r315_reject(r315_good_support.replace(
+        r315_verified_plan, r313_handoff_line + r315_verified_plan, 1,
+    ))
+    # Even a forged R275 readiness receipt cannot grant native draw authority.
+    r315_receipt, r315_plan = r315_plan_evidence(
+        r315_good_support
+        + "VR DX11 R275 translatedSemanticReceipt signature#1: "
+          "exact=1 objectReady=1 snapshot=0xDEADBEEF00000001\n"
+    )
+    assert r315_plan["summary_correlation_exact"] is True
+    assert r315_plan["activation_proof"] is False
+    assert r315_receipt["NativeDrawPathActivationAllowed"] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
