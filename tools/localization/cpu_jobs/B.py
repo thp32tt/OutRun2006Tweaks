@@ -1,135 +1,115 @@
 #!/usr/bin/env python3
-"""B297 q060 Stage material+stroke profile P0 trial. Preserves q060 B296 white fix.
-
-English Stage face is white outer/navy separation/solid gold core; its old
-Korean glyph was metallic line-like thin outline. Reconstruct existing slanted
-Korean sprite's material and source-referenced native rim, not rerender font.
-This writes an evidence trial ONLY; no automatic promotion.
+"""B298 q154 C311-rejected three gray glyphs: native source-stroke reconstruction TRIAL.
+No automatic candidate promotion; controller must review exact saved DDS first.
 """
-import os,io,json,hashlib,tempfile,urllib.request,subprocess
+import os,io,json,hashlib,tempfile,urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image
-from scipy.ndimage import distance_transform_edt, binary_dilation
+from scipy.ndimage import maximum_filter
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-P=G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-OUT=G/"role_B/20261009-B297-Q060-P0-STAGE-SOURCE-FAMILY-PIXEL-MATERIAL";OUT.mkdir(parents=True,exist_ok=True)
+ASSET=G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+OUT=G/"role_B/20261009-B298-Q154-GRAY-STROKE-SOURCE-FAMILY-TRIAL";OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
-CURRENT="d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2"
-SRC="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
-current=P.read_bytes();assert sha(current)==CURRENT,("q060 concurrent stage state drift",sha(current))
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-with tempfile.TemporaryDirectory(prefix="b297_") as tmp:
- p=Path(tmp)/"english.dds";urllib.request.urlretrieve(url,p);en=p.read_bytes()
-assert sha(en)==SRC and en[:128]==current[:128] and len(en)==len(current)==128+4096*2048*4
-def dec(b):return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-english=dec(en);old=dec(current)
-assert english.shape==old.shape==(2048,4096,4)
-# Exact C315 English Stage cell; no crops across ranking/rank HUD.
-cell=(455,245,690,350)
-l,t,r,b=cell
-orig=english[t:b,l:r]
-prior=old[t:b,l:r]
-def sample_face(tile,name):
- rgb=tile[:,:,:3].astype(np.int16)
- a=tile[:,:,3]
- if name=="yellow":valid=(a>180)&(rgb[:,:,0]>170)&(rgb[:,:,1]>120)&(rgb[:,:,2]<125)
- if name=="navy":valid=(a>180)&(rgb[:,:,0]<55)&(rgb[:,:,1]<65)&(rgb[:,:,2]>28)&(rgb[:,:,2]<120)
- if name=="white":valid=(a>180)&(rgb.min(axis=2)>200)
- vals=rgb[valid]
- assert len(vals)>350,(name,len(vals))
- return np.rint(np.median(vals,axis=0)).astype(np.uint8),int(valid.sum())
-gold,gold_count=sample_face(orig,"yellow")
-navy,navy_count=sample_face(orig,"navy")
-white,white_count=sample_face(orig,"white")
-# Preserve native Korean slant/shape, only expand its filled glyph silhouette
-# by a source-constrained one-pixel radius, creating no rectangular transfers.
-m=prior[:,:,3]>=24
-assert int(m.sum())>3000,int(m.sum())
-# Guard the sprite's original effect boundary. Even 1 pixel escapes => FAIL.
-expanded=binary_dilation(m,iterations=1)
-assert np.count_nonzero(expanded[0])==0 and np.count_nonzero(expanded[-1])==0
-assert np.count_nonzero(expanded[:,0])==0 and np.count_nonzero(expanded[:,-1])==0
-dist=distance_transform_edt(expanded)
-source_total_coverage=int((orig[:,:,3]>24).sum())
-new=old.copy()
-# Semantic pixel material: outer white rim, inner navy surround, filled gold.
-# Calibrate three coats from the exact Stage source pixels. No font redraw.
-tile=np.zeros_like(prior)
-inner=expanded&(dist>4.0)
-contour=expanded&(dist>2.0)&(dist<=4.0)
-rim=expanded&(dist<=2.0)
-tile[inner,:3]=gold
-tile[contour,:3]=navy
-tile[rim,:3]=white
-# Preserve native anti-alias alpha on the original silhouette and softly add
-# only the 1px exterior coverage, never an opaque box.
-tile[:,:,3]=np.maximum(prior[:,:,3],(expanded&(~m)).astype(np.uint8)*160)
-# Source-specific slight front shading; keep gold full fill instead of hollow.
-new[t:b,l:r]=tile
-changed=np.any(new!=old,axis=2)
-allowed=np.zeros((2048,4096),bool);allowed[t:b,l:r]=True
-outside=int((changed&~allowed).sum())
-assert outside==0
-assert np.all(old[~allowed]==new[~allowed])
-# The newly created effect must remain smaller than original English bbox;
-# 1px overlap with adjacent ranking/rank is not acceptable.
-ys,xs=np.nonzero(new[t:b,l:r,3]>18)
-bb=[l+int(xs.min()),t+int(ys.min()),l+int(xs.max()+1),t+int(ys.max()+1)]
-assert bb[0]>l and bb[1]>t and bb[2]<r and bb[3]<b,bb
-# Native source-only transparency is the plate restoration for this sprite;
-# pixel identity outside Stage means no protected art was reconstructed.
-clean=english.copy();clean[t:b,l:r,:]=0
-assert np.all(clean[t:b,l:r,3]==0)
-assert np.array_equal(clean[~allowed],english[~allowed])
-trial=current[:128]+np.flipud(new).copy().tobytes()
-assert trial[:128]==current[:128] and len(trial)==len(current)
-persist=dec(trial)
-assert np.array_equal(persist,new)
-assert sha(trial)!=CURRENT
-def comp(arr,bg):
- canvas=Image.new("RGBA",(arr.shape[1],arr.shape[0]),bg)
- canvas.alpha_composite(Image.fromarray(arr,"RGBA"))
- return canvas.convert("RGB")
-crop=(420,227,902,397)
-L,T,R,B=crop
-views=[("SOURCE",english),("CLEAN_STAGE",clean),("CURRENT_B296",old),("B297_TRIAL",persist)]
-for scale in (100,75,50):
- for bgname,bg in [("GRAY",(77,77,77,255)),("BLACK",(0,0,0,255)),("WHITE",(255,255,255,255))]:
-  parts=[]
-  for name,arr in views:
-   p=comp(arr[T:B,L:R],bg)
-   if scale!=100:p=p.resize((max(1,int(p.width*scale/100)),max(1,int(p.height*scale/100))),Image.Resampling.LANCZOS)
-   parts.append(p)
-  sheet=Image.new("RGB",(sum(x.width for x in parts)+3*5,max(x.height for x in parts)),(77,77,77))
-  xx=0
-  for p in parts:sheet.paste(p,(xx,0));xx+=p.width+5
-  sheet.save(OUT/f"SOURCE_CLEAN_OLD_TRIAL_{bgname}_{scale}pct.png")
-parts=[comp(np.flipud(arr[T:B,L:R]),(77,77,77,255)) for _,arr in views]
-sheet=Image.new("RGB",(sum(p.width for p in parts)+15,max(p.height for p in parts)),(77,77,77))
-xx=0
-for p in parts:sheet.paste(p,(xx,0));xx+=p.width+5
-sheet.save(OUT/"SOURCE_CLEAN_OLD_TRIAL_RAW.png")
-Image.fromarray((expanded.astype(np.uint8)*255),"L").save(OUT/"STAGE_EFFECT_GLYPH_MASK.png")
-Image.fromarray((changed[t:b,l:r].astype(np.uint8)*255),"L").save(OUT/"STAGE_CHANGED_MASK.png")
-ddspath=OUT/"A064FDFC_B297_TRIAL_NOT_PROMOTED.dds";ddspath.write_bytes(trial)
-report=dict(role="B",run="B297",run_key="OUTRUN-KOR-B297-Q060-IGR044-STAGE-NATIVE-FACE-20261009",
- asset_index=60,priority="P0",regression="IGR-044_OPEN_USER_INGAME_FAIL",
- source_sha256=SRC,current_candidate_sha256=CURRENT,trial_sha256=sha(trial),
- source_box=[l,t,r,b],localized_effect_bbox=bb,
- source_face_palette={"yellow":gold.tolist(),"navy":navy.tolist(),"white":white.tolist()},
- source_face_palette_counts={"yellow":gold_count,"navy":navy_count,"white":white_count},
- prior_korean_silhouette_pixels=int(m.sum()),source_english_effect_coverage=source_total_coverage,
- changed_pixels=int(changed.sum()),outside_changed_pixels=outside,
- new_alpha_only_within_stage_bbox=True,source_clean_stage_alpha_remaining=0,
- source_clean_protected_outside_exact=True,decoded_dds_roundtrip_exact=True,
- source_header_exact=True,dd_format="RGBA32_MIP1",raw_orientation="mirror_y",native=[4096,2048],
- new_production_dds=0,trial_dds=1,
- affected="STAGE_ONLY",unchanged=["RANKING","RANK","OUTRUN_MILES_WHITE_B296","OUTRUN_MILES_GOLD"],
- producer_visual="PENDING_DIRECT_PIXELS_FIRST_SOURCE_CLEAN_AND_NATIVE",
- C="NOT_RUN",C3="NOT_RUN",APPROVAL=False,USER_IN_GAME="OPEN_USER_INGAME_FAIL",
- RUNTIME_VALIDATION="UNTESTED",execution_backend="GITHUB_ACTIONS",
- excluded_domains=["VR","FFB","DX11","DXVK"])
-(OUT/"B297_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B297","sha":sha(trial),"pixels":int(changed.sum()),"bbox":bb}))
+OLD_SHA="94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+SRC_SHA="15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf"
+p=ASSET.read_bytes();assert sha(p)==OLD_SHA,("concurrent candidate drift",sha(p))
+url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+with tempfile.TemporaryDirectory(prefix="b298_q154_") as tmp:
+ f=Path(tmp)/"source.dds";urllib.request.urlretrieve(url,f);s=f.read_bytes()
+assert sha(s)==SRC_SHA and s[:128]==p[:128],("canonical source mismatch",sha(s))
+def dec(b): return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+source,old=dec(s),dec(p)
+assert old.shape==source.shape==(1024,4096,4) and len(p)==128+4096*1024*4
+# The original B60-authored clean plate was independently proven by C305/C311:
+# no alpha in the eight exact source cells and no source-to-clean change outside.
+c305=json.loads((G/"role_C/20261008-C305-C2-Q154-AUTHORED-CLEAN-BGW/C305_Q154_CONTROLLER_C_HOLD.json").read_text())
+cells=[tuple(r["source_bbox"]) for r in c305["per_region"]]
+assert len(cells)==8
+allowed8=np.zeros(old.shape[:2],bool)
+for l,t,r,b in cells:allowed8[t:b,l:r]=1
+assert np.count_nonzero(np.any(source!=old,axis=2)&~allowed8)==0
+clean=source.copy()
+for l,t,r,b in cells:clean[t:b,l:r]=0
+assert np.count_nonzero(clean[:,:,3]&allowed8)==0
+# q154 source has upright flat gray face and no user-approved stroke/outset.
+# Expand the CURRENT Korean alpha support by exactly one native pixel, using
+# source face RGB without adding a dark box/shadow or altering untouched red art.
+boxes=[
+ ("06_single_player_gray",(1610,286,2197,350)),
+ ("07_showroom_gray",(2674,288,3094,350)),
+ ("08_multiplayer_gray",(2566,952,3086,1014)),
+]
+out=old.copy(); masks={}; regionstats=[]
+for name,(l,t,r,b) in boxes:
+ src=source[t:b,l:r]; before=old[t:b,l:r]
+ gray=(src[:,:,3]>=245)&(np.max(abs(src[:,:,:3].astype(np.int16)-np.array([78,96,100])),axis=2)<=3)
+ assert int(gray.sum())>1500,(name,gray.sum())
+ opaque=np.array([78,96,100],dtype=np.uint8)
+ # Preserve decoded fine alpha; one-pixel native expanded stroke yields a
+ # materially heavier source-family core without arbitrary width stretching.
+ oldalpha=before[:,:,3]; dilated=maximum_filter(oldalpha,size=3,mode="constant")
+ # Strict margin guard: not a single effect pixel may touch the original bbox edge
+ assert not np.any(dilated[[0,-1],:]) and not np.any(dilated[:,[0,-1]]),(name,"source ceiling")
+ added=(dilated>oldalpha)
+ after=before.copy();after[:,:,3]=dilated
+ after[added,:3]=opaque
+ out[t:b,l:r]=after
+ assert np.count_nonzero(np.any(out[t:b,l:r]!=before,axis=2))>0
+ yy,xx=np.nonzero(dilated>128)
+ bb=[l+int(xx.min()),t+int(yy.min()),l+int(xx.max()+1),t+int(yy.max()+1)]
+ assert bb[0]>l and bb[1]>t and bb[2]<r and bb[3]<b,(name,bb)
+ masks[name]=(l,t,r,b)
+ regionstats.append({"id":name,"source_box":[l,t,r,b],"candidate_bbox":bb,
+ "new_native_stroke_pixels":int(added.sum()),"source_face_rgb":opaque.tolist(),
+ "source_vs_clean_alpha":0,"changed_outside_region":0})
+changed=np.any(out!=old,axis=2)
+allowed3=np.zeros(old.shape[:2],bool)
+for l,t,r,b in [v for _,v in boxes]:allowed3[t:b,l:r]=1
+assert int(np.count_nonzero(changed&~allowed3))==0
+assert np.array_equal(out[~allowed3],old[~allowed3])
+raw= p[:128]+np.flipud(out).copy().tobytes()
+assert len(raw)==len(p) and raw[:128]==p[:128]
+persist=dec(raw)
+assert np.array_equal(persist,out)
+assert sha(raw)!=sha(p)
+def bgcomp(im,bg):
+ layer=Image.new("RGBA",(im.shape[1],im.shape[0]),bg)
+ layer.alpha_composite(Image.fromarray(im,"RGBA"))
+ return layer.convert("RGB")
+for name,(l,t,r,b) in boxes:
+ # Unscaled lossless native region comparisons are the primary evidence.
+ for kind,arr in [("SOURCE",source),("CLEAN",clean),("OLD",old),("TRIAL",persist)]:
+  for bgname,bg in [("WHITE",(255,255,255,255)),("BLACK",(0,0,0,255)),("GRAY",(110,110,110,255))]:
+   panel=bgcomp(arr[t:b,l:r],bg)
+   panel.save(OUT/f"{name}_{kind}_{bgname}_NATIVE.png")
+ for scale in (100,75,50):
+  frames=[bgcomp(arr[t:b,l:r],(225,225,225,255)) for arr in (source,clean,old,persist)]
+  if scale!=100:
+   frames=[im.resize((int(im.width*scale/100),max(1,int(im.height*scale/100))),Image.Resampling.LANCZOS) for im in frames]
+  w=sum(x.width for x in frames)+12
+  sheet=Image.new("RGB",(w,max(x.height for x in frames)),(170,170,170))
+  xpos=0
+  for im in frames:sheet.paste(im,(xpos,0));xpos+=im.width+4
+  sheet.save(OUT/f"{name}_SOURCE_CLEAN_OLD_TRIAL_{scale}pct.png")
+ rawviews=[bgcomp(np.flipud(arr[t:b,l:r]),(110,110,110,255)) for arr in (source,clean,old,persist)]
+ rawsheet=Image.new("RGB",(sum(x.width for x in rawviews)+12,max(x.height for x in rawviews)),(120,120,120))
+ xpos=0
+ for im in rawviews:rawsheet.paste(im,(xpos,0));xpos+=im.width+4
+ rawsheet.save(OUT/f"{name}_RAW_NATIVE.png")
+(OUT/"Q154_B298_TRIAL_NOT_PROMOTED.dds").write_bytes(raw)
+report={"run":"B298","role":"B","queue_index":154,
+ "root_cause":"C311_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+ "source_sha256":sha(s),"previous_candidate_sha256":sha(p),"trial_sha256":sha(raw),
+ "source_bbox_ceiling":"PASS_3_OF_3","source_clean_8_cells_zero_alpha":True,
+ "source_clean_outside_original_8":"ZERO_DELTA",
+ "candidate_outside_3_zero":True,"protected_red5_exact":True,
+ "decoded_persisted_dds":"BYTE_EXACT","header_raw_mip1":"EXACT",
+ "native":"4096x1024 RGBA32 MIRROR_Y", "region_results":regionstats,
+ "trial_dds":1,"production_dds":0,"visual":"PENDING_CONTROLLER_PIXELS_FIRST",
+ "C2":"NOT_RUN","C3":"NOT_RUN","APPROVAL":False,
+ "RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_ACTIONS_FALLBACK_UNAVAILABLE_GPT_DNS",
+ "excluded":["VR","FFB","DX11","DXVK"]}
+(OUT/"B298_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B298","trial_sha":sha(raw),"changed_pixels":int(changed.sum()),"regions":regionstats},ensure_ascii=False))
