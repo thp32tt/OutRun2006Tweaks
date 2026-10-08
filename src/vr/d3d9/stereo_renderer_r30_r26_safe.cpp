@@ -2108,6 +2108,304 @@ namespace OutRunVRStereo
             return true;
         }
 
+
+        // The pinned Dear ImGui DX9 backend uses a null VS and fixed-function
+        // XYZ|DIFFUSE|TEX1 with an orthographic projection, NOT XYZRHW. Only
+        // the explicit F11 external overlay may enter this path. The normal
+        // game/selector XYZ geometry remains owned by R26/R23.
+        std::uint64_t R30ExternalImGuiStereoDraws = 0;
+        bool R30ExternalImGuiIdentity(const D3DMATRIX& m) noexcept
+        {
+            if (!MatrixFinite(m))
+                return false;
+            constexpr float identity[16]{
+                1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1
+            };
+            const float* v = reinterpret_cast<const float*>(&m);
+            for (int i = 0; i < 16; ++i)
+                if (std::fabs(v[i] - identity[i]) > 1.0e-4f)
+                    return false;
+            return true;
+        }
+
+        bool R30PrepareExternalImGuiProjection(
+            IDirect3DDevice9* device, R30XyzrhwState& state,
+            D3DMATRIX& stockProjection, D3DMATRIX eyes[2],
+            RECT& stockScissor, RECT eyeScissors[2]) noexcept
+        {
+            if (!device || !R30SafeStereoBase(device) ||
+                !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 ||
+                OutRunVR::GameSemantic::CurrentScope !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire))
+                return false;
+
+            IDirect3DVertexShader9* shader = nullptr;
+            if (FAILED(device->GetVertexShader(&shader)))
+                return false;
+            if (shader)
+            {
+                shader->Release();
+                return false;
+            }
+            DWORD fvf = 0;
+            if (FAILED(device->GetFVF(&fvf)) ||
+                (fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZ ||
+                (fvf & D3DFVF_DIFFUSE) == 0 ||
+                (fvf & D3DFVF_TEXCOUNT_MASK) != D3DFVF_TEX1)
+                return false;
+
+            D3DMATRIX world{}, view{};
+            DWORD zEnable = D3DZB_TRUE, scissorEnabled = FALSE;
+            if (FAILED(device->GetTransform(D3DTS_WORLD, &world)) ||
+                FAILED(device->GetTransform(D3DTS_VIEW, &view)) ||
+                FAILED(device->GetTransform(D3DTS_PROJECTION,
+                    &stockProjection)) ||
+                !R30ExternalImGuiIdentity(world) ||
+                !R30ExternalImGuiIdentity(view) ||
+                !MatrixFinite(stockProjection) ||
+                std::fabs(stockProjection._34) > 1.0e-5f ||
+                std::fabs(stockProjection._44 - 1.0f) > 1.0e-4f ||
+                std::fabs(stockProjection._11) < 1.0e-6f ||
+                std::fabs(stockProjection._22) < 1.0e-6f ||
+                FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
+                zEnable != D3DZB_FALSE ||
+                FAILED(device->GetRenderState(D3DRS_SCISSORTESTENABLE,
+                    &scissorEnabled)) || scissorEnabled == FALSE ||
+                FAILED(device->GetScissorRect(&stockScissor)) ||
+                FAILED(device->GetViewport(&state.viewport)) ||
+                !state.viewport.Width || !state.viewport.Height)
+                return false;
+
+            float baseRaw[16]{};
+            if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
+                return false;
+            std::memcpy(&state.baseProjection, baseRaw,
+                sizeof(state.baseProjection));
+            if (!MatrixFinite(state.baseProjection) ||
+                !OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
+                !state.stereo.poseSequence ||
+                (FrameStereoPoseSequence &&
+                 FrameStereoPoseSequence != state.stereo.poseSequence))
+                return false;
+
+            float headRaw[16]{};
+            std::uint32_t headSequence = 0;
+            if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                    headRaw, headSequence) ||
+                headSequence != state.stereo.poseSequence)
+                return false;
+            D3DMATRIX headInverse{};
+            std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+            if (!MatrixFinite(headInverse))
+                return false;
+
+            const float centre[3]{
+                0.5f * (state.stereo.eyeOffset[0][0] +
+                        state.stereo.eyeOffset[1][0]),
+                0.5f * (state.stereo.eyeOffset[0][1] +
+                        state.stereo.eyeOffset[1][1]),
+                0.5f * (state.stereo.eyeOffset[0][2] +
+                        state.stereo.eyeOffset[1][2])
+            };
+            constexpr float noRotation[4]{0,0,0,1};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relative[3]{
+                    state.stereo.eyeOffset[eye][0] - centre[0],
+                    state.stereo.eyeOffset[eye][1] - centre[1],
+                    state.stereo.eyeOffset[eye][2] - centre[2]
+                };
+                const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(
+                    noRotation, relative,
+                    Settings::VRWorldScale * Settings::VRStereoDepth);
+                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                const D3DMATRIX eyeProjection = ProjectionFromFov(
+                    state.baseProjection, state.stereo.eyeFov[eye]);
+                state.hudViewProjection[eye] = MultiplyMatrix(
+                    MultiplyMatrix(headInverse, eyeInverse), eyeProjection);
+                if (!MatrixFinite(state.hudViewProjection[eye]))
+                    return false;
+            }
+            if (!R30BuildHudPlaneCoefficients(state))
+                return false;
+
+            // Compose the stock orthographic pixel->NDC projection with the
+            // existing finite, recentered R30 HUD plane. z=0.5*w keeps this
+            // depth-disabled ImGui draw within D3D9 clipping bounds.
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                D3DMATRIX projected{};
+                for (int row = 0; row < 4; ++row)
+                {
+                    const float ndcX = stockProjection.m[row][0];
+                    const float ndcY = stockProjection.m[row][1];
+                    const float w = stockProjection.m[row][3];
+                    projected.m[row][0] =
+                        ndcX * state.hudClipX[eye][0] +
+                        ndcY * state.hudClipX[eye][1] +
+                        w * state.hudClipX[eye][2];
+                    projected.m[row][1] =
+                        ndcX * state.hudClipY[eye][0] +
+                        ndcY * state.hudClipY[eye][1] +
+                        w * state.hudClipY[eye][2];
+                    projected.m[row][3] =
+                        ndcX * state.hudClipW[eye][0] +
+                        ndcY * state.hudClipW[eye][1] +
+                        w * state.hudClipW[eye][2];
+                    projected.m[row][2] = 0.5f * projected.m[row][3];
+                }
+                if (!MatrixFinite(projected))
+                    return false;
+                eyes[eye] = projected;
+
+                // Dear ImGui sets one scissor per command. Its original
+                // pixel rectangle must follow the transformed eye content;
+                // leaving the stock scissor in place clips shifted glyphs.
+                float minX = 1.0e30f, minY = 1.0e30f;
+                float maxX = -1.0e30f, maxY = -1.0e30f;
+                for (int corner = 0; corner < 4; ++corner)
+                {
+                    const float x = static_cast<float>(
+                        (corner & 1) ? stockScissor.right : stockScissor.left);
+                    const float y = static_cast<float>(
+                        (corner & 2) ? stockScissor.bottom : stockScissor.top);
+                    const float clipX = x * projected._11 +
+                        y * projected._21 + projected._41;
+                    const float clipY = x * projected._12 +
+                        y * projected._22 + projected._42;
+                    const float clipW = x * projected._14 +
+                        y * projected._24 + projected._44;
+                    if (!std::isfinite(clipX) ||
+                        !std::isfinite(clipY) ||
+                        !std::isfinite(clipW) || clipW <= 1.0e-5f)
+                        return false;
+                    const float px = state.viewport.X +
+                        (clipX / clipW + 1.0f) * 0.5f *
+                        state.viewport.Width;
+                    const float py = state.viewport.Y +
+                        (1.0f - clipY / clipW) * 0.5f *
+                        state.viewport.Height;
+                    if (!std::isfinite(px) || !std::isfinite(py))
+                        return false;
+                    minX = std::min(minX, px);
+                    minY = std::min(minY, py);
+                    maxX = std::max(maxX, px);
+                    maxY = std::max(maxY, py);
+                }
+                const float xMin = static_cast<float>(state.viewport.X);
+                const float yMin = static_cast<float>(state.viewport.Y);
+                const float xMax = xMin + state.viewport.Width;
+                const float yMax = yMin + state.viewport.Height;
+                eyeScissors[eye] = {
+                    static_cast<LONG>(std::floor(std::clamp(minX, xMin, xMax))),
+                    static_cast<LONG>(std::floor(std::clamp(minY, yMin, yMax))),
+                    static_cast<LONG>(std::ceil(std::clamp(maxX, xMin, xMax))),
+                    static_cast<LONG>(std::ceil(std::clamp(maxY, yMin, yMax)))
+                };
+                if (eyeScissors[eye].right <= eyeScissors[eye].left ||
+                    eyeScissors[eye].bottom <= eyeScissors[eye].top)
+                    return false;
+            }
+            return true;
+        }
+
+        template <typename ActualDraw>
+        HRESULT R30TryExternalImGuiIndexed(
+            IDirect3DDevice9* device, ActualDraw&& draw)
+        {
+            R30XyzrhwState state{};
+            D3DMATRIX stockProjection{}, eyeProjection[2]{};
+            RECT stockScissor{}, eyeScissors[2]{};
+            if (!R30PrepareExternalImGuiProjection(device, state,
+                    stockProjection, eyeProjection, stockScissor, eyeScissors))
+                return E_NOTIMPL;
+
+            R30CaptureSkyGlowSceneBeforeHud(device);
+            auto setEye = [&](int eye) {
+                InternalPassScope guard;
+                return SUCCEEDED(device->SetTransform(
+                           D3DTS_PROJECTION, &eyeProjection[eye])) &&
+                       SUCCEEDED(device->SetScissorRect(&eyeScissors[eye]));
+            };
+            auto restoreRaster = [&]() {
+                InternalPassScope guard;
+                const bool proj = SUCCEEDED(device->SetTransform(
+                    D3DTS_PROJECTION, &stockProjection));
+                const bool scissors = SUCCEEDED(
+                    device->SetScissorRect(&stockScissor));
+                return proj && scissors;
+            };
+            if (!setEye(0))
+            {
+                if (!restoreRaster())
+                {
+                    NoteRestoreFailure("R30/F11 initial projection");
+                    R30ArmSafeFallback();
+                }
+                return E_NOTIMPL;
+            }
+
+            R9NoteStereoDrawWithoutMonoBackup();
+            const HRESULT leftHr = draw();
+            if (FAILED(leftHr))
+            {
+                if (!restoreRaster())
+                    NoteRestoreFailure("R30/F11 left projection");
+                R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                    "R30/F11 ImGui-left", leftHr);
+                R30ArmSafeFallback();
+                return leftHr;
+            }
+
+            IDirect3DSurface9* const savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* const savedDepth = TrackedDepthStencil;
+            HRESULT rightHr = D3D_OK;
+            OutRunVR::StereoFailureReason rightReason =
+                OutRunVR::StereoFailureRightStateFailed;
+            bool restored = true;
+            {
+                InternalPassScope guard;
+                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
+                    device, 0u, RightEyeSurface);
+                if (SUCCEEDED(rightHr))
+                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                        device, savedDepth ? RightEyeDepth : nullptr);
+                if (SUCCEEDED(rightHr))
+                    rightHr = device->SetViewport(&state.viewport);
+                if (SUCCEEDED(rightHr) && !setEye(1))
+                    rightHr = E_FAIL;
+                if (SUCCEEDED(rightHr))
+                {
+                    rightReason = OutRunVR::StereoFailureRightDrawFailed;
+                    rightHr = draw();
+                }
+                restored = RestoreRightPassState(device,
+                    savedRt, savedDepth, state.viewport, nullptr, false);
+            }
+            restored = restoreRaster() && restored;
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            ++NonWorldDuplicatedDraws;
+            ++R30SafeTwoEyeDraws;
+            ++R30ExternalImGuiStereoDraws;
+            if (FAILED(rightHr))
+            {
+                FrameRightDrawFailed = true;
+                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                R9Poison(rightReason, "R30/F11 ImGui-right", rightHr);
+                R30ArmSafeFallback();
+            }
+            if (!restored)
+            {
+                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                NoteRestoreFailure("R30/F11 stereo projection/scissor");
+                R30ArmSafeFallback();
+            }
+            return leftHr;
+        }
+
         bool R30ConfigureXyzrhwWorldEffect(
             IDirect3DDevice9* device, const void* source,
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
@@ -3953,6 +4251,17 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            // F11 external ImGui uses fixed-function XYZ+orthographic
+            // DrawIndexedPrimitive, never XYZRHW or a vertex shader.
+            const HRESULT externalImGui = R30TryExternalImGuiIndexed(
+                device, [&]() {
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                        device, type, baseVertexIndex, minVertexIndex,
+                        numVertices, startIndex, primitiveCount);
+                });
+            if (externalImGui != E_NOTIMPL)
+                return externalImGui;
+
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
