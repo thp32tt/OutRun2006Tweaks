@@ -7468,5 +7468,42 @@
     "restoration_commit": "aba7568d8d4e2157c9eb74dbd6e979f63277b996",
     "post_task_cleanup": "github ephemeral scratch discarded; N100 not used",
     "forbidden_domains_touched": []
+  },
+  "c292_c1_q217_a189_native_evidence_hold": {
+    "run": "20261008-C292-C1-Q217-A189-NATIVE-HOLD",
+    "run_key": "OUTRUN-KOR-C292-C1-Q217-A189-NATIVE-HOLD-20261008-1640",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 217,
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "superseded_prior_rejected_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+    "triage": "EVIDENCE_ONLY_HOLD",
+    "machine_verified_source_current_exact_sha": true,
+    "format": "BGRA32",
+    "decoded_dimensions": [
+      2048,
+      2048
+    ],
+    "changed_rgba_total": 3940,
+    "changed_rgba_outside_original_badges": 0,
+    "changed_alpha_outside_original_badges": 0,
+    "evidence_png_count": 9,
+    "visual_current_better_than_prior_rejected": true,
+    "source_width_not_a_forced_quota": true,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "PRE_INGAME": "BLOCKED",
+    "approval_created": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "candidate_dds_changed": false,
+    "machine": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_Q217_MACHINE.json",
+    "qa": "localization/graphics/role_C/20261008-C292-C1-Q217-A189-NATIVE-HOLD/C292_CONTROLLER_QA.json",
+    "pending_evidence": [
+      "independently authenticated authored native clean plate",
+      "qualified blind defect calibration",
+      "per-glyph readable source/candidate measured right slant",
+      "distinct C3 strict audit"
+    ]
   }
 }
