@@ -641,10 +641,14 @@ for label, old, bad in (
     ('original WVP age unbounded', 'currentDraw - writeDrawSerial <= R30ExactHudRawWvpDrawWindow',
      'currentDraw - writeDrawSerial <= UINT64_MAX'),
 ):
-    if old not in r30:
+    start = r30.index('bool R30GetRecentRawWvpForQueueSprite(')
+    stop = r30.index('bool R30ExactSceneEffectScope()', start)
+    scoped = r30[start:stop]
+    if old not in scoped:
         raise SystemExit('P0 queue WVP negative setup missing ' + label)
+    mutated = r30[:start] + scoped.replace(old, bad, 1) + r30[stop:]
     try:
-        check_original_queue_wvp(r30.replace(old, bad, 1))
+        check_original_queue_wvp(mutated)
     except SystemExit:
         pass
     else:
