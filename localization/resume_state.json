@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A193 A odd q225 E3C455FA nine native text labels newly re-rendered from pinned English a0c8c67f... using actual NotoSansCJK-Black.ttc (previous A95R often regular fallback, C1 found thin). Candidate old 37b8236f... to new f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333, 2048x1024 RGBA32 mip1 raw mirror-y; nine source bbox/positive margin machine PASS, outside/alpha/protected/overlap/source-residue zero, persisted DDS roundtrip. Controller inspected English SOURCE/CLEAN/FINAL native and practical 50 plus RAW, significantly restored dark heavy condensed family hierarchy; C1 calibrated blind native exact-byte and C3 still pending, PRE_INGAME/user JPG/real game unapproved RUNTIME_VALIDATION=UNTESTED. GitHub Actions 37760839622 SUCCESS; QA localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CONTROLLER_SELF_QA.json.",
     "C298 TEMP_BACKLOG_RELIEF=C2 SHARD=EVEN q154 pinned original 15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf / current 94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f eight-label native/50% alpha-composited glyph silhouette evidence actual SHA verified: all8 clean/source alpha zero and candidate positive margins, outside RGBA/alpha 0, RAW flip-Y byte-exact; projection column run top/bottom not true semantic glyph slant. Current C remains HOLD_STRICT_RECHECK; required pixels-first C + true stem anchors/source-family, distinct C3/APPROVALS/PRE_INGAME/user/actual game absent, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261008-C298-C2-Q154-ALL8-GLYPH-ANCHOR-PROFILE/C298_CONTROLLER_QA.json",
     "C297 current q119 A192R persisted exact b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907 hard halo cutoff corrected and independent DDS pixel evidence saved, HOLD missing qualified blind calibration, per-glyph slant-source-family/CLEAN profile + separate C3 before PRE_INGAME/user/actual-game. No same DDS rerender; QA localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/C297_CONTROLLER_QA.json. RUNTIME_VALIDATION=UNTESTED.",
     "B264 q172 6C9B3611 new method candidate 91732059f1356f3ceda1c3e0d245b799ad4929f9a8f475a8c6b29fc0a73ad5d4 was produced and MACHINE PASS; controller native 7x / 50% / RAW visual FAIL (cream beveled right-italic source-family not reconstructed, GOAL horizontal pale slab). Restored prior B263 812373b0... in Git, C295 REWORK and METHOD_CHANGE_REQUIRED remain. Next B must use independent manual/vector source-letterform reconstruction rather than same type gradient; do not blindly rerender. QA localization/graphics/role_B/20261008-B264-Q172-PER-SYLLABLE-CREAM-EMBOSS/B264_CONTROLLER_SELF_QA.json. RUNTIME_VALIDATION=UNTESTED.",
@@ -11668,5 +11669,17 @@
     "machine": "localization/graphics/role_C/20261008-C297-C1-Q119-A192R-NATIVE-EVIDENCE-20261008-1840/C297_Q119_INDEPENDENT_PIXEL_QA.json",
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": false
+  },
+  "a193_q225_true_black_family": {
+    "role": "A",
+    "queue_index": 225,
+    "asset": "E3C455FA",
+    "old_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+    "new_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "producer": "SELF_QA_PASS_PENDING_INDEPENDENT_C1",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "evidence": "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CONTROLLER_SELF_QA.json"
   }
 }
