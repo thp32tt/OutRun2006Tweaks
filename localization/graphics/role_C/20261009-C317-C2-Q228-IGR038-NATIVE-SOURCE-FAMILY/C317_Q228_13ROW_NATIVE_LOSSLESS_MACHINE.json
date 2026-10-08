@@ -1,0 +1,995 @@
+{
+  "schema_version": 2,
+  "run": "C317-C2",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "index": 228,
+  "ingame": "IGR-038",
+  "priority": "P1",
+  "canonical_source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "dds_header_equal": true,
+  "raw_flip_y_validated": true,
+  "outside_13_original_bboxes_rgba": 0,
+  "outside_13_original_bboxes_alpha": 0,
+  "C": "EVIDENCE_ONLY_NO_PASS",
+  "C3": "BLOCKED",
+  "USER_INGAME": "OPEN_USER_INGAME_FAIL",
+  "authored_clean": "NOT_AVAILABLE_IN_THIS_RUN; no plate-only PASS or CLEAN-vs-FINAL assumption",
+  "current_approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "rows": [
+    {
+      "i": 0,
+      "key": "coast 2 coast",
+      "source_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "candidate_bbox": [
+        9,
+        30,
+        1048,
+        141
+      ],
+      "margins": [
+        4,
+        408,
+        4,
+        4
+      ],
+      "source_size": [
+        1451,
+        119
+      ],
+      "candidate_size": [
+        1039,
+        111
+      ],
+      "files": [
+        "00_coast_2_coast_SOURCE_RGBA.png",
+        "00_coast_2_coast_CURRENT_RGBA.png",
+        "00_coast_2_coast_GRAY_100pct.png",
+        "00_coast_2_coast_GRAY_75pct.png",
+        "00_coast_2_coast_GRAY_50pct.png",
+        "00_coast_2_coast_WHITE_NATIVE.png",
+        "00_coast_2_coast_RAW.png"
+      ]
+    },
+    {
+      "i": 1,
+      "key": "car select",
+      "source_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "candidate_bbox": [
+        9,
+        186,
+        522,
+        297
+      ],
+      "margins": [
+        4,
+        602,
+        4,
+        4
+      ],
+      "source_size": [
+        1119,
+        119
+      ],
+      "candidate_size": [
+        513,
+        111
+      ],
+      "files": [
+        "01_car_select_SOURCE_RGBA.png",
+        "01_car_select_CURRENT_RGBA.png",
+        "01_car_select_GRAY_100pct.png",
+        "01_car_select_GRAY_75pct.png",
+        "01_car_select_GRAY_50pct.png",
+        "01_car_select_WHITE_NATIVE.png",
+        "01_car_select_RAW.png"
+      ]
+    },
+    {
+      "i": 2,
+      "key": "license select",
+      "source_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "candidate_bbox": [
+        10,
+        342,
+        756,
+        452
+      ],
+      "margins": [
+        4,
+        744,
+        4,
+        5
+      ],
+      "source_size": [
+        1494,
+        119
+      ],
+      "candidate_size": [
+        746,
+        110
+      ],
+      "files": [
+        "02_license_select_SOURCE_RGBA.png",
+        "02_license_select_CURRENT_RGBA.png",
+        "02_license_select_GRAY_100pct.png",
+        "02_license_select_GRAY_75pct.png",
+        "02_license_select_GRAY_50pct.png",
+        "02_license_select_WHITE_NATIVE.png",
+        "02_license_select_RAW.png"
+      ]
+    },
+    {
+      "i": 3,
+      "key": "game lobby",
+      "source_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "candidate_bbox": [
+        11,
+        498,
+        666,
+        640
+      ],
+      "margins": [
+        4,
+        466,
+        4,
+        4
+      ],
+      "source_size": [
+        1125,
+        150
+      ],
+      "candidate_size": [
+        655,
+        142
+      ],
+      "files": [
+        "03_game_lobby_SOURCE_RGBA.png",
+        "03_game_lobby_CURRENT_RGBA.png",
+        "03_game_lobby_GRAY_100pct.png",
+        "03_game_lobby_GRAY_75pct.png",
+        "03_game_lobby_GRAY_50pct.png",
+        "03_game_lobby_WHITE_NATIVE.png",
+        "03_game_lobby_RAW.png"
+      ]
+    },
+    {
+      "i": 4,
+      "key": "main menu",
+      "source_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "candidate_bbox": [
+        10,
+        648,
+        550,
+        765
+      ],
+      "margins": [
+        4,
+        557,
+        4,
+        4
+      ],
+      "source_size": [
+        1101,
+        125
+      ],
+      "candidate_size": [
+        540,
+        117
+      ],
+      "files": [
+        "04_main_menu_SOURCE_RGBA.png",
+        "04_main_menu_CURRENT_RGBA.png",
+        "04_main_menu_GRAY_100pct.png",
+        "04_main_menu_GRAY_75pct.png",
+        "04_main_menu_GRAY_50pct.png",
+        "04_main_menu_WHITE_NATIVE.png",
+        "04_main_menu_RAW.png"
+      ]
+    },
+    {
+      "i": 5,
+      "key": "multiplayer",
+      "source_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "candidate_bbox": [
+        10,
+        810,
+        778,
+        952
+      ],
+      "margins": [
+        4,
+        417,
+        4,
+        4
+      ],
+      "source_size": [
+        1189,
+        150
+      ],
+      "candidate_size": [
+        768,
+        142
+      ],
+      "files": [
+        "05_multiplayer_SOURCE_RGBA.png",
+        "05_multiplayer_CURRENT_RGBA.png",
+        "05_multiplayer_GRAY_100pct.png",
+        "05_multiplayer_GRAY_75pct.png",
+        "05_multiplayer_GRAY_50pct.png",
+        "05_multiplayer_WHITE_NATIVE.png",
+        "05_multiplayer_RAW.png"
+      ]
+    },
+    {
+      "i": 6,
+      "key": "music select",
+      "source_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "candidate_bbox": [
+        10,
+        960,
+        529,
+        1073
+      ],
+      "margins": [
+        4,
+        747,
+        4,
+        4
+      ],
+      "source_size": [
+        1270,
+        121
+      ],
+      "candidate_size": [
+        519,
+        113
+      ],
+      "files": [
+        "06_music_select_SOURCE_RGBA.png",
+        "06_music_select_CURRENT_RGBA.png",
+        "06_music_select_GRAY_100pct.png",
+        "06_music_select_GRAY_75pct.png",
+        "06_music_select_GRAY_50pct.png",
+        "06_music_select_WHITE_NATIVE.png",
+        "06_music_select_RAW.png"
+      ]
+    },
+    {
+      "i": 7,
+      "key": "options",
+      "source_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "candidate_bbox": [
+        10,
+        1118,
+        318,
+        1261
+      ],
+      "margins": [
+        4,
+        430,
+        4,
+        4
+      ],
+      "source_size": [
+        742,
+        151
+      ],
+      "candidate_size": [
+        308,
+        143
+      ],
+      "files": [
+        "07_options_SOURCE_RGBA.png",
+        "07_options_CURRENT_RGBA.png",
+        "07_options_GRAY_100pct.png",
+        "07_options_GRAY_75pct.png",
+        "07_options_GRAY_50pct.png",
+        "07_options_WHITE_NATIVE.png",
+        "07_options_RAW.png"
+      ]
+    },
+    {
+      "i": 8,
+      "key": "network",
+      "source_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "candidate_bbox": [
+        10,
+        1278,
+        633,
+        1420
+      ],
+      "margins": [
+        4,
+        183,
+        4,
+        4
+      ],
+      "source_size": [
+        810,
+        150
+      ],
+      "candidate_size": [
+        623,
+        142
+      ],
+      "files": [
+        "08_network_SOURCE_RGBA.png",
+        "08_network_CURRENT_RGBA.png",
+        "08_network_GRAY_100pct.png",
+        "08_network_GRAY_75pct.png",
+        "08_network_GRAY_50pct.png",
+        "08_network_WHITE_NATIVE.png",
+        "08_network_RAW.png"
+      ]
+    },
+    {
+      "i": 9,
+      "key": "rankings",
+      "source_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "candidate_bbox": [
+        10,
+        1428,
+        313,
+        1576
+      ],
+      "margins": [
+        4,
+        479,
+        4,
+        4
+      ],
+      "source_size": [
+        786,
+        156
+      ],
+      "candidate_size": [
+        303,
+        148
+      ],
+      "files": [
+        "09_rankings_SOURCE_RGBA.png",
+        "09_rankings_CURRENT_RGBA.png",
+        "09_rankings_GRAY_100pct.png",
+        "09_rankings_GRAY_75pct.png",
+        "09_rankings_GRAY_50pct.png",
+        "09_rankings_WHITE_NATIVE.png",
+        "09_rankings_RAW.png"
+      ]
+    },
+    {
+      "i": 10,
+      "key": "game select",
+      "source_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "candidate_bbox": [
+        7,
+        1584,
+        701,
+        1732
+      ],
+      "margins": [
+        4,
+        535,
+        4,
+        4
+      ],
+      "source_size": [
+        1233,
+        156
+      ],
+      "candidate_size": [
+        694,
+        148
+      ],
+      "files": [
+        "10_game_select_SOURCE_RGBA.png",
+        "10_game_select_CURRENT_RGBA.png",
+        "10_game_select_GRAY_100pct.png",
+        "10_game_select_GRAY_75pct.png",
+        "10_game_select_GRAY_50pct.png",
+        "10_game_select_WHITE_NATIVE.png",
+        "10_game_select_RAW.png"
+      ]
+    },
+    {
+      "i": 11,
+      "key": "mode select",
+      "source_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "candidate_bbox": [
+        6,
+        1740,
+        549,
+        1857
+      ],
+      "margins": [
+        4,
+        703,
+        4,
+        4
+      ],
+      "source_size": [
+        1250,
+        125
+      ],
+      "candidate_size": [
+        543,
+        117
+      ],
+      "files": [
+        "11_mode_select_SOURCE_RGBA.png",
+        "11_mode_select_CURRENT_RGBA.png",
+        "11_mode_select_GRAY_100pct.png",
+        "11_mode_select_GRAY_75pct.png",
+        "11_mode_select_GRAY_50pct.png",
+        "11_mode_select_WHITE_NATIVE.png",
+        "11_mode_select_RAW.png"
+      ]
+    },
+    {
+      "i": 12,
+      "key": "race select",
+      "source_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "candidate_bbox": [
+        10,
+        1902,
+        641,
+        2013
+      ],
+      "margins": [
+        4,
+        603,
+        4,
+        4
+      ],
+      "source_size": [
+        1238,
+        119
+      ],
+      "candidate_size": [
+        631,
+        111
+      ],
+      "files": [
+        "12_race_select_SOURCE_RGBA.png",
+        "12_race_select_CURRENT_RGBA.png",
+        "12_race_select_GRAY_100pct.png",
+        "12_race_select_GRAY_75pct.png",
+        "12_race_select_GRAY_50pct.png",
+        "12_race_select_WHITE_NATIVE.png",
+        "12_race_select_RAW.png"
+      ]
+    }
+  ],
+  "lossless_pngs": 91,
+  "manifest": [
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_SOURCE_RGBA.png",
+      "sha256": "7a614fa31f0c3992807e4f7b933a1de2a2529bd3e7b2d7ef495a830cd6649388",
+      "bytes": 54963
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_CURRENT_RGBA.png",
+      "sha256": "0dd127c7c343b8ac0cef3b471fc6fb5b9a1ea97314337c0ff2ce7fcd7ba5c465",
+      "bytes": 39447
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_GRAY_100pct.png",
+      "sha256": "df2c25fb364f6c59e4d5e110065dba8751f3e61c69418654210f3f350e3db22f",
+      "bytes": 73820
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_GRAY_75pct.png",
+      "sha256": "ec6d5a4f9089a57286b7382f282dcc62a2462868173ffedf88ce92b888f5ee0d",
+      "bytes": 66933
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_GRAY_50pct.png",
+      "sha256": "ba9a13befa1951e9d0504e21c562a4be041e89b131318f7f5910ceea6be5c4b7",
+      "bytes": 33865
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_WHITE_NATIVE.png",
+      "sha256": "4d2ca6c1bcb3917908525289e4d712471d849050d6c272c46677818775383a30",
+      "bytes": 78035
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/00_coast_2_coast_RAW.png",
+      "sha256": "7257dfbad69d3d0abf6374610ad6ae5c4d838a8a8d9bfc752deb625d5af62eab",
+      "bytes": 73101
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_SOURCE_RGBA.png",
+      "sha256": "39485681aad842b4d65be73974ee32c2912b47ba66517ef70a7c995bc02bfb40",
+      "bytes": 54366
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_CURRENT_RGBA.png",
+      "sha256": "b9942d3c7bf0d439a5919cbd556faf7a0ead3c96fbce08aed3802605072a0d03",
+      "bytes": 36123
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_GRAY_100pct.png",
+      "sha256": "98d49ec97becdad3cbe793cba66132a03478ce3f2bfa272d6e3fe19df4fb92aa",
+      "bytes": 69789
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_GRAY_75pct.png",
+      "sha256": "7d439f26cb50698e53cccb4f2b330dfd5e1a43ac8e4b4eed76f4a10b65ae724b",
+      "bytes": 53936
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_GRAY_50pct.png",
+      "sha256": "48fd2016795a34fb1caf9cee89ba6f4bb2894e07d1645a080d03fe391a27d00c",
+      "bytes": 29910
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_WHITE_NATIVE.png",
+      "sha256": "c56af319a00eeb9283c06fd43e3e736d9c9cf942f97988ddc2dfcb80456b7e20",
+      "bytes": 73564
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/01_car_select_RAW.png",
+      "sha256": "7fc492915480bf20acc14ca2333da43d366a667233aff2cba9916a0ecd51e74f",
+      "bytes": 68109
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_SOURCE_RGBA.png",
+      "sha256": "68d5e94b3b83169cc54d1b5fe86d2d248aefcce733146404dff6d52e17672ce1",
+      "bytes": 69178
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_CURRENT_RGBA.png",
+      "sha256": "1edfb47f863d4e78d1c3b0e46c4b00e1efbb05df432ba77510db0e73b42562c6",
+      "bytes": 48387
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_GRAY_100pct.png",
+      "sha256": "f6433ff94f516b954e710c6cd0b3cbebd7461d521272ab593687eec2cd85a696",
+      "bytes": 91508
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_GRAY_75pct.png",
+      "sha256": "d4817dfb7f489c5bf92f7279b9532c944f6531b703da3382950a58206f89ef8c",
+      "bytes": 72927
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_GRAY_50pct.png",
+      "sha256": "8986150448b1471f0020bb8b7b7f7ce6ebd9d039da8a0365f3a9706143dca133",
+      "bytes": 38944
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_WHITE_NATIVE.png",
+      "sha256": "8063d0098c4d6e0004978c69bafd8cfd769facec196fae1faae6f2d2cf07c215",
+      "bytes": 97222
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/02_license_select_RAW.png",
+      "sha256": "b9fdbc1c655fa35750256fc32c39c20542eb88bbb98770842ed2daaa13b53733",
+      "bytes": 89804
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_SOURCE_RGBA.png",
+      "sha256": "f3297aa046ea89ad3a0c5de7f01cfd84171009d22945fdc29dbbe577dfd88e1a",
+      "bytes": 65236
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_CURRENT_RGBA.png",
+      "sha256": "551773d740de4b70d62148f4f998e976c4a1a9f7bab3a476101f9f20c48b8e56",
+      "bytes": 40452
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_GRAY_100pct.png",
+      "sha256": "6a4b7c54aabab480148424a5ad1599434478a5232bdbb5003c13a6c696550746",
+      "bytes": 83168
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_GRAY_75pct.png",
+      "sha256": "ab4942e59284797053c519b52dd664561ae3494bbc54566109f5406359087384",
+      "bytes": 63063
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_GRAY_50pct.png",
+      "sha256": "5307171a8eaf3424b386d1d9ec77e3426dfb861b7da7501ef229bc33e55cb217",
+      "bytes": 35930
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_WHITE_NATIVE.png",
+      "sha256": "8b22e9b9fee921a64d9b198bb0f31e071d46ca0aac35048688e603599a0267b6",
+      "bytes": 88396
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/03_game_lobby_RAW.png",
+      "sha256": "b81fb680e87c3d21e6b7e39a4c8ba0ec06b93f36db9c11273159d56d9bbc1e19",
+      "bytes": 81477
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_SOURCE_RGBA.png",
+      "sha256": "c1c1a8fd6fdb5419e560ff1648a0b60d9279990d9aa972a6d38f59587a3277a2",
+      "bytes": 41670
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_CURRENT_RGBA.png",
+      "sha256": "b609787246cbe0e7579f639834279b3d816edd458745977928d84b5eb622bb2a",
+      "bytes": 34355
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_GRAY_100pct.png",
+      "sha256": "760cbec74c429201c9a576743da36b6dccb97200908ee82c2828ef48ad99c61f",
+      "bytes": 63515
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_GRAY_75pct.png",
+      "sha256": "7bb1f084587aaeff984bf415b048e53d4b11d97d17f38583b88bc038b5ddf722",
+      "bytes": 51428
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_GRAY_50pct.png",
+      "sha256": "84a191ba4c85ec430a50fd61b95cbcfe661302171e75175622e5eb5041228461",
+      "bytes": 29369
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_WHITE_NATIVE.png",
+      "sha256": "dfae1058e29ec8b89e94f85ade74f31c7f49a9ac3a87799e34f291e76a6f828e",
+      "bytes": 67073
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/04_main_menu_RAW.png",
+      "sha256": "7d1b145ee5da6480df4f0d2ff870ad85b3bc05d7e1920c3f11f297b3fc9b7e8e",
+      "bytes": 60944
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_SOURCE_RGBA.png",
+      "sha256": "73f424a51cf23735338a3ac6127891d85357da3ad724aeb6056fc090a42d694c",
+      "bytes": 68857
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_CURRENT_RGBA.png",
+      "sha256": "4244642799cbd65e942f11aa68638eb982f561f7433fafae3692e38985a64259",
+      "bytes": 48048
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_GRAY_100pct.png",
+      "sha256": "5eddb07ce0f54841c511bbb5e82e832276e6bb74c479d16d0f26ae56b9e8512e",
+      "bytes": 90260
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_GRAY_75pct.png",
+      "sha256": "628c5f01e59340d5dadd0d478615c87361ca5e6baf7eaa71fd7eab66a7d6d7ee",
+      "bytes": 69405
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_GRAY_50pct.png",
+      "sha256": "02ead89f87eeef0bb4ef66f0a9e21596b5482c7b79682883e15f319e6425dd39",
+      "bytes": 39927
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_WHITE_NATIVE.png",
+      "sha256": "daccdb9310596c8c72294e7c8104189e51d26f0b9ce93ed7ab4e474d94db39a1",
+      "bytes": 96076
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/05_multiplayer_RAW.png",
+      "sha256": "e69b54a0e448c0c36c113b7ed4dcf3e962e888f7f412498e7e63094af4d0cc32",
+      "bytes": 87855
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_SOURCE_RGBA.png",
+      "sha256": "fbca62d691e1c0152879688a11bb1f8080f1798a542db89dda72ffb34675a2c5",
+      "bytes": 65425
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_CURRENT_RGBA.png",
+      "sha256": "a8d39794d22f3fca7e50f1ff1557f9b8bdf4c3f527ef5bd9dda6ce890de2cd1a",
+      "bytes": 35317
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_GRAY_100pct.png",
+      "sha256": "d2095f1121d0aa80b89d11bc33f0239f0f971741ab7fcc0262adf1d8bdfda638",
+      "bytes": 75905
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_GRAY_75pct.png",
+      "sha256": "6834e3963d3b703fecf6e7ab633ef8d869354dc9add8dd842d28f4347525b5f9",
+      "bytes": 60055
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_GRAY_50pct.png",
+      "sha256": "7722ad792cf11a6ae6e834f2594d04f8f55566d4d60bc4a89975fddd05fa34eb",
+      "bytes": 32521
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_WHITE_NATIVE.png",
+      "sha256": "5e73afbde67991848b97d11e62afea8a0e1db2223a33303361355f0f47433fb1",
+      "bytes": 80235
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/06_music_select_RAW.png",
+      "sha256": "cf16fa4961f228699dea3b8c6d6244ae22b7cb5fc4b22369563821577c5e03cb",
+      "bytes": 74711
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_SOURCE_RGBA.png",
+      "sha256": "883309414361861117d811131ad0295ba8b148cd9ee0198077c83639bac4bd8d",
+      "bytes": 46726
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_CURRENT_RGBA.png",
+      "sha256": "0542709ebdc33e0134841279a7001f237d5a0f031ce58ef56d6f83621e4bde12",
+      "bytes": 23587
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_GRAY_100pct.png",
+      "sha256": "584d8893b16414dd2c9c86e5c278089db4dcfb42615902b487a25a7e1b546da7",
+      "bytes": 53881
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_GRAY_75pct.png",
+      "sha256": "e1f438dabcb075966a321478dee8b3c43303198520ed79bfb681248ac7429ecf",
+      "bytes": 41020
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_GRAY_50pct.png",
+      "sha256": "f4acd4887685c3012ee6640667109b013f2ca06c1a3ad4c794ad21af5a5c12d4",
+      "bytes": 23578
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_WHITE_NATIVE.png",
+      "sha256": "1f510cd3c0855beabb0e5cdd01cfe846ba36b3738fb94e87aa8bedaca8d85f34",
+      "bytes": 56605
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/07_options_RAW.png",
+      "sha256": "645cfb0435c572c0888efb20fd6511607b3dae72e7ec7a33087d699b440ab0b2",
+      "bytes": 53285
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_SOURCE_RGBA.png",
+      "sha256": "348748e370c15865fb9eee7f67bfb8e1d64bfd8d580ba2189c94ffe6aedb222f",
+      "bytes": 49186
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_CURRENT_RGBA.png",
+      "sha256": "b656dbbfb8d68ffb7e67b2941dc37f1e56005594c708fcf8f271903efea76e28",
+      "bytes": 33038
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_GRAY_100pct.png",
+      "sha256": "a146afa82a2d2975641b40afd7f94d2b94b55278c143aab1e98e3639b2a39698",
+      "bytes": 64327
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_GRAY_75pct.png",
+      "sha256": "079f1528cc1afd7b5236242a811f8c0fd77062070bfa6e522f7497ec7d7c928d",
+      "bytes": 49461
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_GRAY_50pct.png",
+      "sha256": "145458f431d3962530afffbe6ea54c03413b5106e9b5db3830086fca9e171740",
+      "bytes": 28040
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_WHITE_NATIVE.png",
+      "sha256": "bfd0835d98956ebe18fa8524f59c183ac635cceb47cf90b411245090c597c7b7",
+      "bytes": 68829
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/08_network_RAW.png",
+      "sha256": "f337d59b93ca571d6b8d5d3cfd23c424d70d2ca472ae035f1058fc4c7114588c",
+      "bytes": 62517
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_SOURCE_RGBA.png",
+      "sha256": "d8f0cce9d7d22599f502f2dfb24e7c207f6d65b52cd6bafe2e483c6d71076d44",
+      "bytes": 51064
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_CURRENT_RGBA.png",
+      "sha256": "f8a48f4d2470184b715a3f7a777052dbf898aab9085b5b6d7ddce2a8503353a3",
+      "bytes": 28483
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_GRAY_100pct.png",
+      "sha256": "b4d653601131d48f3ecddcb848189f49bd0030ad459bfad413a8ea1ec1332d28",
+      "bytes": 62602
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_GRAY_75pct.png",
+      "sha256": "b7e5602ab26f331faa3f14e38bc5df48ce8c8914a3e8a2ac57d86b44c6e84a0c",
+      "bytes": 49323
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_GRAY_50pct.png",
+      "sha256": "ddf219289c0f103e1b22b577669192d7a6c9eaad4ac2f6c100fc91f7b6e39697",
+      "bytes": 27539
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_WHITE_NATIVE.png",
+      "sha256": "0d8c5b5983777434aa63ac5df3d4254807dc55a258165cdb13488d950c091c0d",
+      "bytes": 65725
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/09_rankings_RAW.png",
+      "sha256": "546ed0e681269d20be11cd3fbbf9ad8711bcb9a19b9ddfb56eb886f38ef26540",
+      "bytes": 62480
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_SOURCE_RGBA.png",
+      "sha256": "ba7ad1ff5e0bcfcbbada3c5258bd94f57de5c0793625e686b784f8cd2ec18415",
+      "bytes": 68840
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_CURRENT_RGBA.png",
+      "sha256": "440e5caaaf087c89cb041864cdde0e7c79806b31369a1556e05e4aad6d84e5be",
+      "bytes": 49639
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_GRAY_100pct.png",
+      "sha256": "3d03c5f5411c823fb68e5ab185468903dad5c85548acf79512b77ad430a7e8cd",
+      "bytes": 91514
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_GRAY_75pct.png",
+      "sha256": "e903af9a7f9d8b052b3b3e9a4bbdf96c3abff0dcae9035ecb53c3d0e09daf3a8",
+      "bytes": 70534
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_GRAY_50pct.png",
+      "sha256": "c6a8593632f1c015565d022f937ad62b16699bb3443da2611e4ab2b86e8ffe75",
+      "bytes": 39059
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_WHITE_NATIVE.png",
+      "sha256": "fabc1348f3aefb5cc9cb7d60864ad7583f2f7e83194aaa976a7c267011841fc0",
+      "bytes": 97238
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/10_game_select_RAW.png",
+      "sha256": "c2af0bcee7143f358a5f3b4df3bea20edf7347cb5442bf0551e7c816421db5fc",
+      "bytes": 89412
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_SOURCE_RGBA.png",
+      "sha256": "0d6309cc523fdf737b9d815377e5af383a2f9286c85e7b580a16f63dc118b90d",
+      "bytes": 60307
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_CURRENT_RGBA.png",
+      "sha256": "02c9a020a909996295ed5fa83a2696ff8a434fb2040d0e6d2a34308c853c429b",
+      "bytes": 28217
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_GRAY_100pct.png",
+      "sha256": "c664c12918a5319a72e3050ba3fb2dafad2d6f1b114b52084279d9b8a12518ae",
+      "bytes": 66761
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_GRAY_75pct.png",
+      "sha256": "01ef156e64a85296827fb4522087fc4b16dc019e4476d59a3926d58b070bf36d",
+      "bytes": 52620
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_GRAY_50pct.png",
+      "sha256": "721992c8925168b5d5b1ca0aaa2bff3534fe1e9635e7581f9ef522e421a4df9b",
+      "bytes": 27439
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_WHITE_NATIVE.png",
+      "sha256": "ace9af052eb3276ec1239e4de36d27b2920c6fbf450a449ff5112d95d704288a",
+      "bytes": 70444
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/11_mode_select_RAW.png",
+      "sha256": "08311fba91839b082dff05cda272aa73c3e9e99706f8c84c7c073e5382516fd5",
+      "bytes": 65179
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_SOURCE_RGBA.png",
+      "sha256": "1535dcc6fe6836be73521798674295543968eb6a7dad0678ce825ba03bf3810a",
+      "bytes": 60526
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_CURRENT_RGBA.png",
+      "sha256": "0a4fa4c7162efb59ff25559e9c733f7040ba38df9ed3efd56c8491bdca72965f",
+      "bytes": 42789
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_GRAY_100pct.png",
+      "sha256": "30891375a20642fa6c40e89f9ddd5d6e7d95b95a9cfe2131eb9d78fd08b37833",
+      "bytes": 79431
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_GRAY_75pct.png",
+      "sha256": "aec3cac6af884df17d962da877ddcc99344bd6db7a93bb64b97a7a85734b8e8d",
+      "bytes": 62355
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_GRAY_50pct.png",
+      "sha256": "78479f9b54e78999655f4c29a49a2793b3e24dddab876cebec506951342d62cb",
+      "bytes": 33938
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_WHITE_NATIVE.png",
+      "sha256": "7425cbbed6835ea65446d82e9b6ea71fe05ead9c05ecd430ef03ad00c7fb2a8a",
+      "bytes": 83911
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/12_race_select_RAW.png",
+      "sha256": "6a4d87cb836d9036cfe8d19ebdb99a7edf547e693c7a66781fc85bf7f96e04b2",
+      "bytes": 77805
+    }
+  ],
+  "new_dds": 0
+}
