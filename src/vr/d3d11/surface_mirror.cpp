@@ -354,7 +354,10 @@ namespace outrun::vr::dx11
         const NativeSurfaceMirror& color,
         const NativeSurfaceMirror& depth) const noexcept
     {
+        // Deferred contexts record command lists instead of immediately
+        // binding the game producer's live OM state. Never promote them.
         if (!ready() || !context ||
+            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
             !validate_surface_pair_snapshot(
                 device_.Get(), color, depth, surface_pair_snapshot_token_) ||
             color.render_target_view() != rtv_.Get() ||
@@ -385,7 +388,9 @@ namespace outrun::vr::dx11
         NativeSurfacePairBindingReadiness out{};
         out.surfacePairSnapshotToken = surface_pair_snapshot_token_;
         out.inputValid =
-            context != nullptr && surface_pair_snapshot_token_ != 0;
+            context != nullptr &&
+            context->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE &&
+            surface_pair_snapshot_token_ != 0;
         out.ownerReady = ready();
         if (!out.inputValid || !out.ownerReady)
             return out;

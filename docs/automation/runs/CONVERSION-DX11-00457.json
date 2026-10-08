@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00457",
+  "production_id": "CONVERSION-DX11-00457",
+  "event_id": "CONVERSION-DX11-00457-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R149_NATIVE_SURFACE_IMMEDIATE_CONTEXT_OWNERSHIP",
+  "work_key": "DX11:SURFACE_PAIR:IMMEDIATE_CONTEXT_ONLY:src/vr/d3d11/surface_mirror.cpp",
+  "conflict_keys": [
+    "DX11_NATIVE_SURFACE_PAIR",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_surface_mirror_probe.cpp"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00457",
+  "lease_epoch": 1,
+  "base_sha": "5d13f7351f8ee808be1ab54669b67ad4290e607e",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAITING_FOR_CI",
+  "summary": "Fail closed on same-device deferred D3D11 contexts in native surface-pair OM apply/readiness; add WARP live immediate-vs-deferred ownership regression.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_surface_mirror_probe.cpp"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PASS: one scoped JS source/test anchor and invariant check before commit; Windows behavior awaits exact-SHA CI",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD, AGENTS, review index, lane state and queue controller contract checked; 00457 record absent, 00456 COMPLETE",
+    "C1_REVIEW": "PASS: same-device deferred context currently passes D3D11 GetDevice equality but must not qualify live OM readiness",
+    "C2_IMPLEMENT": "PASS: native C++ immediate-only OM binding/readiness and WARP deferred-context negative regression",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate and DX11 readiness smoke; single scoped static source invariant PASS",
+    "C4_COMMIT": "PENDING: this material GitHub commit [AUTO:CONVERSION-DX11-00457]",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD deploy or runtime-ready native Draw activation",
+    "C6_STATE": "PENDING: exact result SHA and CI receipts after Gate"
+  },
+  "evidence": {
+    "static_source_invariant": "PASS_ONE_SCOPED_CHECK",
+    "ci_gate": "PENDING_EXACT_SHA",
+    "runtime": "Quest3/VDXR NOT RUN"
+  },
+  "next_action": "After exact-SHA GitHub Gate success, seal run record and Issue #14 ledger; next independent native resource/shader ownership fix, no runtime promotion.",
+  "state_persisted": false,
+  "recorded_at_kst": "2026-10-09 02:06+",
+  "last_real_activity_at": "2026-10-09T02:06:00+09:00",
+  "last_activity_evidence": "C2 source/test code generated; CAS material commit pending",
+  "blockers": [
+    "Quest3/VDXR runtime untested; native Draw activation remains gated"
+  ]
+}

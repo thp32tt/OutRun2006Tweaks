@@ -134,6 +134,27 @@ int main()
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
         return fail("R145 live OM target binding seals exact RTV DSV identity");
 
+    // R149: a deferred context can belong to this same device but cannot
+    // constitute the live immediate OM binding required for native draw.
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> deferredContext;
+    if (FAILED(device->CreateDeferredContext(
+            0, deferredContext.ReleaseAndGetAddressOf())) ||
+        !deferredContext ||
+        deferredContext->GetType() != D3D11_DEVICE_CONTEXT_DEFERRED)
+        return fail("R149 deferred context WARP setup failed");
+    if (binding.apply(deferredContext.Get(), color, depth))
+        return fail("R149 deferred context incorrectly accepted live OM apply");
+    const auto deferredBinding =
+        binding.binding_readiness(deferredContext.Get(), color, depth);
+    if (deferredBinding.inputValid || deferredBinding.ready ||
+        deferredBinding.snapshotToken != 0 ||
+        binding.validate_binding_snapshot(
+            deferredContext.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R149 deferred context incorrectly promoted live OM readiness");
+    if (!binding.validate_binding_snapshot(
+            context.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R149 deferred rejection mutated immediate OM state");
+
     NativeSurfaceMirror extraColor;
     if (!extraColor.initialize(
             device.Get(),
