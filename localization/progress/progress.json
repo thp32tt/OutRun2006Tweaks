@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08 18:03 KST",
+  "updated_at_kst": "2026-10-08T18:10:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7577,5 +7577,18 @@
     "producer_dds_unchanged": true,
     "approval": false,
     "runtime_validation": "UNTESTED"
+  },
+  "a192r_q119_padded_halo_material": {
+    "queue_index": 119,
+    "new_material_candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "machine_static_qa": "PASS",
+    "producer_visual": "HOLD_PENDING_FRESH_INDEPENDENT_C1_SOURCE_STYLE",
+    "C3": "NOT_DONE",
+    "PRE_INGAME": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "graphics_output_delta": 1,
+    "artifact": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CONTROLLER_SELF_QA.json",
+    "runner": 37754217530
   }
 }
