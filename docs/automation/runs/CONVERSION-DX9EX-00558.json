@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00558",
+  "production_id": "CONVERSION-DX9EX-00558",
+  "event_id": "CONVERSION-DX9EX-00558-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "b90859a4e582e18496e8364fc84c2ce93c7109d7",
+  "material_result_sha": "b14901f8b70b1b6fda8a9aded1e340147a453e68",
+  "validation_bearing_result_sha": "b14901f8b70b1b6fda8a9aded1e340147a453e68",
+  "result_sha": "b14901f8b70b1b6fda8a9aded1e340147a453e68",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00558]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "work_key": "DX9EX-P0-PROJECTED-MARKER-BEHIND-EYE-CLIP",
+  "conflict_keys": [
+    "DX9EX:src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:R57ProjectViewPoint",
+    "DX9EX:tools/verify_vr_projected_marker_anchor.py"
+  ],
+  "summary": "Reject negative or near-zero clip W from exact Calc3D2D rank/rival anchor before R57 per-eye projection, preserving R44 positive front-facing spatial-billboard contract. No global HUD/world semantic promotion or stereo tuning.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_projected_marker_anchor.py"
+  ],
+  "static_contract": {
+    "name": "tools/verify_vr_projected_marker_anchor.py",
+    "positive": "PASS",
+    "intentional_mutation_rejections": 2,
+    "source_local_precheck": "PASS",
+    "repeat_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 37752619285,
+    "hud_inspector": 37752619496,
+    "domain_isolation": 37752619334,
+    "full_source_impact": 37752619267
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact_host": "SUCCESS",
+    "full_source_impact_game": "SUCCESS",
+    "full_source_impact_source_cross_domain": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11538619117,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-b14901f8b70b1b6fda8a9aded1e340147a453e68",
+    "artifact_digest": "sha256:6085109d2fb0664d4e6cd645d1cf72b2b21e20a5910580c4ddf4e4eeadb75ad1"
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_claim": "NO_QUEST3_VDXR_RUNTIME_PASS_CLAIM",
+  "production_ledger": {
+    "issue": 14,
+    "comment_id": 6056306742
+  },
+  "scoreboard": {
+    "ai": "AI2",
+    "prior_confirmed": 1228,
+    "change": 1,
+    "cumulative": 1229,
+    "commit": "e14a81ec175e648db09463bd1444f54adc928032",
+    "run_key": "CONVERSION-DX9EX-00558-E001"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote latest HEAD, queue/state/AGENTS/issue13+14/upstream and work-key checks",
+    "C1_REVIEW": "PASS original producer+R44 front-facing perspective evidence, distinct R57 behind-eye clip W defect",
+    "C2_IMPLEMENT": "PASS real C++ change and focused verifier with two mutation tests",
+    "C3_VALIDATE": "PASS exact-SHA policy, HUD Inspector, Domain Isolation, source impact, game/host/full-chain/package",
+    "C4_COMMIT": "PASS material commit b14901f8b70b1b6fda8a9aded1e340147a453e68 includes required marker and no CI-skip",
+    "C5_PACKAGE": "PASS exact-SHA CI package artifact 11538619117; not HMD approved",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; runtime UNTESTED; no duplicate scoring"
+  },
+  "next_action": "Do not retry same TASK_ID. Continue independent DX9Ex visual-composition source work on current HEAD without changing DX11/DXVK/localization; Quest3 verification required before claiming visual fix or backend promotion.",
+  "parallel_policy": "DX11 Native A ACTIVE + DX9Ex C ACTIVE; DXVK B FROZEN"
+}
