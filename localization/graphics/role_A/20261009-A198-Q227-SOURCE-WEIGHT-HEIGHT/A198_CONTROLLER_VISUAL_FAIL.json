@@ -1,0 +1,12 @@
+{
+  "role": "A",
+  "time_kst": "2026-10-09 01:20 KST",
+  "queue_index": 227,
+  "sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+  "decision": "PRODUCER_VISUAL_FAIL",
+  "reason": "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+  "finding": "NotoSansCJK-Black with MaxFilter dilation occluded Hangul counters in 프로 and 플래그맨 despite numeric zero-overlap. Rejected, replaced by A198R.",
+  "reference": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_QA_REPRESENTATIVE_TRIPTYCH.jpg",
+  "replacement_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 01:19 KST",
+  "updated_at_kst": "2026-10-09 01:20 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8369,5 +8369,21 @@
     "current_policy_approval": false,
     "qa": "localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_CONTROLLER_C1_REWORK.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a198r_q227_source_weight_height": {
+    "time_kst": "2026-10-09 01:20 KST",
+    "run_key": "OUTRUN-KOR-A198R-Q227-COUNTER-REPAIR-20261009-0118",
+    "queue_index": 227,
+    "current_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+    "rejected_trial_sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+    "new_dds": 1,
+    "verified_regions": 16,
+    "producer": "SELF_QA_PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
+    "failed_trial": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_CONTROLLER_VISUAL_FAIL.json"
   }
 }

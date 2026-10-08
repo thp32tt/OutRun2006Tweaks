@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A198R q227 E596B7AC new DDS 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 supersedes A198 visual-failed 502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69; native NotoSansCJK-Bold without dilation, 16/16 source bbox PASS, PROFESSIONAL→프로 height 51→72 of 75px. Source CLEAN removed 531382 px, protected/alpha/source residue/box/composite/overlap outside0, persisted DDS roundtrip, raw/readable and 50/75/100 controller visual SELF_QA PASS. Fresh C1/C3/current evidence approval/user JPG/real game pending, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
     "C311 C2 EVEN q154 newly confirmed 3-gray SOURCE_FAMILY_STROKE_UNDERWEIGHT native DDS style defect: current SHA unchanged 94678124..., new 6 stroke-core lossless mapped source/final 100/200; median ridge core 6.32/6.40/7px English vs 3/3/4px Hangul, visually too weak. C REWORK_REQUIRED, B owner reconstruct three gray labels only with source-derived thick condensed-family strokes and preserved counter/correct RGB [78,96,100]; protect other five red and B60 CLEAN, source bbox ceiling/RAW, fresh C2/C3 after actual new DDS, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C311-C2-Q154-GRAY-STROKE-ANCHORS/C311_Q154_CONTROLLER_C2_REWORK.json",
     "C310 C2 EVEN new q098 B279 candidate rejected after independent exact DDS native first C: source-family thick diffuse navy outline vs candidate overly thin sharp navy and white-face dominance (source white/navy support ratio 0.413; candidate 2.018, proxy not sole cause). Prior stripe repair remains. C REWORK_REQUIRED; B needs source-conditioned face navy halo and independent clean/compound profile, not more same-method whitening. 13 new PNG, SHA pinned, atlas outside=0, runtime UNTESTED. localization/graphics/role_C/20261009-C310-C2-Q098-B279-FRESH-NATIVE/C310_Q098_CONTROLLER_C2_REWORK.json",
     "A197 q103 new DDS 9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed source original390x72 vs Korean349x64 (old196x40), source-clean source removed7439px, native right italic olive gray, changed outside/alpha/protected/English remnant/foreign box=0, saved DDS roundtrip, RAW/100/75/50 producer visual PASS; C1/C3/user/actual game pending; localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CONTROLLER_SELF_QA_FINAL.json",
@@ -12386,5 +12387,21 @@
     "C3": "BLOCKED",
     "APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a198r_q227_source_weight_height": {
+    "time_kst": "2026-10-09 01:20 KST",
+    "run_key": "OUTRUN-KOR-A198R-Q227-COUNTER-REPAIR-20261009-0118",
+    "queue_index": 227,
+    "current_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+    "rejected_trial_sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+    "new_dds": 1,
+    "verified_regions": 16,
+    "producer": "SELF_QA_PASS",
+    "C1": "PENDING",
+    "C3": "PENDING",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json",
+    "failed_trial": "localization/graphics/role_A/20261009-A198-Q227-SOURCE-WEIGHT-HEIGHT/A198_CONTROLLER_VISUAL_FAIL.json"
   }
 }

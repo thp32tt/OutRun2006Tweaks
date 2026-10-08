@@ -3138,3 +3138,6 @@ TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). q035 Total Rank label wid
 
 ### 2026-10-09 01:19 KST — C314 C1 q161 native glyph-pinhole REWORK
 - `TEMP_BACKLOG_RELIEF=C1`, `SHARD=ODD(+UNINDEXED_SPECIAL)`. 38 region current A157 source/current decoded-DXT5 proofs **190 new lossless PNGs** from Actions `37807237283` SUCCESS. Source-bbox-union outside changed RGBA/alpha0. Native source-to-Korean visual confirms pixel holes/irregular fill in PISCES→물고기자리 and LEO→사자자리; LEO Korean artificially condensed horizontally to factor0.5682. `C=REWORK_REQUIRED` over numeric PASS, C3/current approval/export BLOCKED, new DDS0, `RUNTIME_VALIDATION=UNTESTED`. QA `localization/graphics/role_C/20261009-C314-C1-Q161-38REGION-NATIVE-PROOF/C314_Q161_CONTROLLER_C1_REWORK.json`.
+
+### 2026-10-09 01:20 KST — A198R q227
+- RUN_KEY=OUTRUN-KOR-A198R-Q227-COUNTER-REPAIR-20261009-0118. Material DDS `83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595`, 16/16 native Korean counter-safe rows; rejected A198 `502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69` visually overbold despite machine pass. PROFESSIONAL height51→72/75px, zero outside/ghost/artwork/overlap, persisted RAW/50% producer PASS. Fresh C1/C3/evidence user/game pending, UNTESTED. QA `localization/graphics/role_A/20261009-A198R-Q227-COUNTER-REPAIR/A198R_CONTROLLER_SELF_QA_FINAL.json`.

@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "task_id": "OUTRUN-KOR-A198R-Q227-COUNTER-REPAIR-20261009-0118",
+  "time_kst": "2026-10-09 01:20 KST",
+  "queue_index": 227,
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "rejected_visual_trial_sha256": "502bc3ba19e32647c3a429c43064f5f8a9d43925c7366191d1de19275d866b69",
+  "worker_run": 37807100084,
+  "rows": [
+    {
+      "key": "intermediate",
+      "source_bbox": [
+        7,
+        421,
+        676,
+        493
+      ],
+      "candidate_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "before_height": 61,
+      "after_height": 69,
+      "margins": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "density": 0.4666
+    },
+    {
+      "key": "outrun",
+      "source_bbox": [
+        5,
+        512,
+        362,
+        586
+      ],
+      "candidate_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "before_height": 64,
+      "after_height": 71,
+      "margins": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "density": 0.3871
+    },
+    {
+      "key": "professional",
+      "source_bbox": [
+        3,
+        611,
+        675,
+        686
+      ],
+      "candidate_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "before_height": 51,
+      "after_height": 72,
+      "margins": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "density": 0.4809
+    },
+    {
+      "key": "alpine",
+      "source_bbox": [
+        2,
+        701,
+        346,
+        777
+      ],
+      "candidate_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "before_height": 64,
+      "after_height": 73,
+      "margins": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "density": 0.4213
+    },
+    {
+      "key": "ancient_ruins",
+      "source_bbox": [
+        2,
+        795,
+        707,
+        875
+      ],
+      "candidate_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "before_height": 64,
+      "after_height": 77,
+      "margins": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "density": 0.3575
+    },
+    {
+      "key": "cape_way",
+      "source_bbox": [
+        8,
+        891,
+        473,
+        971
+      ],
+      "candidate_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "before_height": 64,
+      "after_height": 77,
+      "margins": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "density": 0.3732
+    },
+    {
+      "key": "castle_wall",
+      "source_bbox": [
+        8,
+        987,
+        634,
+        1067
+      ],
+      "candidate_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "before_height": 65,
+      "after_height": 77,
+      "margins": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "density": 0.4204
+    },
+    {
+      "key": "cloudy_highland",
+      "source_bbox": [
+        1,
+        1083,
+        835,
+        1163
+      ],
+      "candidate_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "before_height": 64,
+      "after_height": 77,
+      "margins": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "density": 0.3545
+    },
+    {
+      "key": "coniferous_forest",
+      "source_bbox": [
+        1,
+        1179,
+        933,
+        1259
+      ],
+      "candidate_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "before_height": 64,
+      "after_height": 77,
+      "margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "density": 0.3238
+    },
+    {
+      "key": "deep_lake",
+      "source_bbox": [
+        1,
+        1277,
+        491,
+        1353
+      ],
+      "candidate_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "before_height": 64,
+      "after_height": 73,
+      "margins": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "density": 0.3544
+    },
+    {
+      "key": "desert",
+      "source_bbox": [
+        1,
+        1371,
+        348,
+        1451
+      ],
+      "candidate_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "before_height": 64,
+      "after_height": 77,
+      "margins": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "density": 0.3777
+    },
+    {
+      "key": "bay_area",
+      "source_bbox": [
+        3,
+        1469,
+        436,
+        1545
+      ],
+      "candidate_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "before_height": 64,
+      "after_height": 73,
+      "margins": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "density": 0.3734
+    },
+    {
+      "key": "flagman1",
+      "source_bbox": [
+        8,
+        1565,
+        963,
+        1716
+      ],
+      "candidate_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "before_height": 136,
+      "after_height": 148,
+      "margins": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "density": 0.3908
+    },
+    {
+      "key": "flagman2",
+      "source_bbox": [
+        8,
+        1722,
+        994,
+        1880
+      ],
+      "candidate_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "before_height": 136,
+      "after_height": 155,
+      "margins": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "density": 0.3931
+    },
+    {
+      "key": "flagman3",
+      "source_bbox": [
+        8,
+        1889,
+        993,
+        2047
+      ],
+      "candidate_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "before_height": 136,
+      "after_height": 155,
+      "margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "density": 0.3938
+    },
+    {
+      "key": "novice",
+      "source_bbox": [
+        1041,
+        1640,
+        1374,
+        1714
+      ],
+      "candidate_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "before_height": 63,
+      "after_height": 71,
+      "margins": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "density": 0.4017
+    }
+  ],
+  "method": "Native NotoSansCJK-Bold with zero synthetic stroke/dilation; English source flat gray and red, authored A96R CLEAN",
+  "gate_10": [
+    "source hash DDS header format/mips verified",
+    "16 source segments & protected bbox checked",
+    "A96R CLEAN source glyph removal",
+    "SOURCE vs CLEAN plate native inspection",
+    "English-family style profile flat gray/red",
+    "native Korean glyphs and strict bbox",
+    "transparent glyph-only layering",
+    "CLEAN vs FINAL glyph-only changes",
+    "persisted DDS decoded/RAW/50-75-100 evidence",
+    "producer handoff only; fresh C1/C3 pending"
+  ],
+  "visual_8": [
+    "no obvious English ghosts/plate residue",
+    "upright source/final, RAW mirror-Y preserved",
+    "PROFESSIONAL 51→72px within source75px",
+    "A198 overstroke corrected; open Hangul counters",
+    "no visible clipping",
+    "zero protected-art changes",
+    "RAW and readable view verified",
+    "legible at native/practical50; not in-game validated"
+  ],
+  "machine": {
+    "source_clean_removed_pixels": 531382,
+    "source_clean_changed_outside_source_bboxes": 0,
+    "source_final_changed_outside_source_bboxes": 0,
+    "source_final_alpha_changed_outside": 0,
+    "clean_final_changed_outside_Korean_glyphs": 0,
+    "source_script_exact_residue_outside_final_glyphs": 0,
+    "protected_art_changed": 0,
+    "localized_overlap_pairs": 0,
+    "glyph_original_bbox_failures": 0
+  },
+  "persisted_dds_roundtrip": "PASS",
+  "representative_images": [
+    "A198R_QA_REPRESENTATIVE_TRIPTYCH.jpg",
+    "A198R_READABLE_SOURCE_FINAL.jpg",
+    "A198R_RAW_SOURCE_FINAL.jpg",
+    "A198R_professional_TRIPLE_50.jpg",
+    "A198R_flagman1_TRIPLE_50.jpg",
+    "A198R_coniferous_forest_TRIPLE_50.jpg"
+  ],
+  "producer_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "APPROVAL": false,
+  "USER_REVIEW": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "caveat": "No independent C first-look/calibration, complete BGW per-region approval, or actual game test"
+}
