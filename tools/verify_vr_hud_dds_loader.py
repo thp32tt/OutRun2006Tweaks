@@ -48,7 +48,33 @@ def verify(text):
         raise ValueError("unconditional DISCARD lock")
     if "memcpy(lockedRect.pBits, srcData, mipSize)" in loader:
         raise ValueError("unpitched bulk copy returned")
-    return len(guards)
+    # The optional fast decoder is not feature-equivalent to legacy D3DX.
+    # Preserve the original Ex trampoline and the exact original arguments
+    # when the fast DDS path cannot decode a menu/car-selection texture.
+    ui=body(text,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(")
+    orig=body(text,"static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(")
+    strip=lambda s: re.sub(r"\\s+","",re.sub(r"//[^\\n]*","",s))
+    ui_clean=strip(ui)
+    orig_clean=strip(orig)
+    fast=(
+        "const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom("
+        "pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
+        "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);"
+    )
+    gated=(
+        "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)"
+        "return fastResult;"
+    )
+    legacy=(
+        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
+        "pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
+        "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);"
+    )
+    if not ui_clean.endswith(strip(fast+gated+legacy)):
+        raise ValueError("fast UI DDS failure must route to guarded legacy Ex decoder")
+    if not orig_clean.endswith(strip(legacy)):
+        raise ValueError("legacy UI DDS fallback differs from Orig_dest trampoline")
+    return len(guards) + 2
 
 def negatives(text):
     needles=[
@@ -60,6 +86,8 @@ def negatives(text):
         "srcRow = srcData + static_cast<size_t>(row) * rowBytes",
         "*pSrcDataSize < sizeof(DDS_FILE)",
         "firstMipSize <= size - sizeof(DDS_FILE)",
+        "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)",
+        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
     ]
     for token in needles:
         mutant=text.replace(token,"__DDS_BAD_CONTRACT__",1)
@@ -80,4 +108,4 @@ if __name__=="__main__":
         count=negatives(text) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("VR HUD DDS loader gate FAIL: "+str(exc))
-    print("VR HUD DDS fast loader PASS: %d source obligations; %d/8 deliberate defects rejected; runtime UNTESTED"%(n,count))
+    print("VR HUD DDS fast loader PASS: %d source obligations; %d/10 deliberate defects rejected; runtime UNTESTED"%(n,count))

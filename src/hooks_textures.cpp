@@ -997,7 +997,15 @@ class TextureReplacement : public Hook
 
 		// Call D3DXCreateTextureFromFileInMemoryEx instead of D3DXCreateTextureFromFileInMemory, so we can specify no mipmaps
 		// Should prevent D3D from trying to generate mipmaps, reducing load times of non-mipped UI textures quite a bit
-		return D3DXCreateTextureFromFileInMemoryEx_Custom(pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);
+		// Fast DDS is intentionally format-limited. Preserve the legacy D3DX UI
+		// decoder on failure instead of leaving menus/car-selection blank.
+		// The Ex trampoline is the same one used by the existing Orig_dest path.
+		const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom(
+			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
+			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);
+		if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)
+			return fastResult;
+		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
