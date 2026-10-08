@@ -1,107 +1,114 @@
 #!/usr/bin/env python3
-"""B290 q060 white-banner material-fix promotion with canonical CLEAN evidence.
-ONLY the white OUTRUN MILES glyph material is touched; Stage/gold remain REWORK.
-Run on hosted GitHub because native sandbox cannot download source binary.
+"""B291 P0 q060 white banner genuine plate reconstruction: source DDS+
+pinned native source-text mask, then retain only previously rendered Korean
+glyph pixels. Trial only until direct SOURCE/CLEAN/FINAL visual acceptance.
 """
-import hashlib, io, json, os, tempfile, urllib.request
+import os,sys,io,json,hashlib,tempfile,urllib.request,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
+from scipy.ndimage import binary_dilation
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 P=G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-TRIAL=G/"role_B/20261009-B289-Q060-P0-WHITE-FACE-PIXEL-MATERIAL/A064FDFC_B289_TRIAL_NOT_PROMOTED.dds"
-OLD="457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2"
-NEW="068b4f5795e85b960493efad832f9060984387c978c4936f9708133e6227fb85"
-EN="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
-CLEAN_SHA="e4befa3f25ab2a90173224d7c4cd6ef2184b6c5a43ba4a307b321724870ed089"
-CL=G/"role_B/20261004-B-RECOVERY09/A064FDFC_SELECTED_CLEAN_PLATE.png"
-OUT=G/"role_B/20261009-B290-Q060-P0-WHITE-MATERIAL-PARTIAL-PROMOTION";OUT.mkdir(parents=True,exist_ok=True)
-sha=lambda b:hashlib.sha256(b).hexdigest()
-old=P.read_bytes();new=TRIAL.read_bytes();assert sha(old)==OLD and sha(new)==NEW
-assert old[:128]==new[:128] and len(old)==len(new)
-cleanbytes=CL.read_bytes();assert sha(cleanbytes)==CLEAN_SHA
+F=G/"role_B/20261009-B289-Q060-P0-WHITE-FACE-PIXEL-MATERIAL/A064FDFC_B289_TRIAL_NOT_PROMOTED.dds"
+MASK=G/"role_B/20261004-B-RECOVERY02/A064FDFC_SOURCE_TEXT_MASK.png"
+OUT=G/"role_B/20261009-B291-Q060-P0-SOURCE-CLEAN-GLYPH-PLATE";OUT.mkdir(parents=True,exist_ok=True)
+E="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+O="457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2"
+B289="068b4f5795e85b960493efad832f9060984387c978c4936f9708133e6227fb85"
+M="d7aa1ceff89e15bcfeae221b5eac0f7720d063913dec4f1a3220517c64ffb2a1"
+sha=lambda x:hashlib.sha256(x).hexdigest()
+prior=P.read_bytes();material=F.read_bytes();mask_b=MASK.read_bytes()
+assert sha(prior)==O and sha(material)==B289 and sha(mask_b)==M
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-with tempfile.TemporaryDirectory(prefix="b290_") as tmp:
- ep=Path(tmp)/"source.dds";urllib.request.urlretrieve(url,ep);sourcebytes=ep.read_bytes()
-assert sha(sourcebytes)==EN and sourcebytes[:128]==old[:128]
-def decode(b):return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-english=decode(sourcebytes);a=decode(old);b=decode(new);clean=np.array(Image.open(CL).convert("RGBA"))
-assert english.shape==a.shape==b.shape==clean.shape==(2048,4096,4)
-assert np.array_equal(a[:,:,3],b[:,:,3])
-# Exact previously authored source text/candidate glyph bounds from C315/A167.
-source_box=(1090,245,1930,385);loc_box=(1096,256,1816,374)
-l,t,r,bt=loc_box;sl,st,sr,sb=source_box
-changed=np.any(a!=b,axis=2)
-allowed=np.zeros((2048,4096),bool);allowed[t:bt,l:r]=True
-assert changed.any()
-assert int(np.count_nonzero(changed&~allowed))==0
-assert int(np.count_nonzero((a[:,:,3]!=b[:,:,3])))==0
-# Independently check source-family English white text has been erased in the
-# B_RECOVERY09 canonical plate on the isolated upper 70px unaffected by lower
-# neighboring sprites. Preserve the native unrelated overlap below.
-s=english[st:sb,sl:sr];c=clean[st:sb,sl:sr]
-original_white=(s[:,:,:3].min(axis=2)>=190)&(s[:,:,3]>=80)
-assert int(original_white.sum())>6000
-upper=np.zeros(original_white.shape,bool);upper[:73,:]=True
-upper_white=original_white&upper
-residual_alpha=int(np.count_nonzero((c[:,:,3]>24)&upper_white))
-residual_core=int(np.count_nonzero((c[:,:,:3].min(axis=2)>180)&(c[:,:,3]>90)&upper_white))
-print("B290_PLATE_ALPHA_REMAINING_UPPER",residual_alpha,"of",int(upper_white.sum()))
-# Permit any independently protected pixels to cause a HOLD instead of lying.
-assert residual_alpha==0 and residual_core==0,("CLEAN_PLATE_SOURCE_RESIDUE_BLOCK",residual_alpha,residual_core)
-# Check local unchanged nonlettered core and zero-added alpha/hard rectangle.
-assert int(np.count_nonzero(changed[t:bt,l:r]))<int((r-l)*(bt-t)*0.75),"material correction exceeds isolated existing glyph region"
-def composite(ar,bg=(80,80,80,255)):
- img=Image.new("RGBA",(ar.shape[1],ar.shape[0]),bg)
- img.alpha_composite(Image.fromarray(ar,"RGBA"))
- return img.convert("RGB")
+with tempfile.TemporaryDirectory(prefix="b291_") as tmp:
+ e=Path(tmp)/"source.dds";urllib.request.urlretrieve(url,e);eb=e.read_bytes()
+assert sha(eb)==E and prior[:128]==material[:128]==eb[:128]
+def decode(data):return np.array(Image.open(io.BytesIO(data)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+src=decode(eb);old=decode(prior);painted=decode(material)
+m=np.array(Image.open(MASK).convert("L"))>127
+assert src.shape==old.shape==painted.shape==(2048,4096,4) and m.shape==(2048,4096)
+assert np.array_equal(old[:,:,3],painted[:,:,3])
+# Independent English source face only (native upper band) and original
+# side-line/miles below preserved. Mask file is source-derived pre-2026-10-09.
+yy=np.arange(2048)[:,None];xx=np.arange(4096)[None,:]
+upper=(yy>=245)&(yy<333)&(xx>=1090)&(xx<1930)
+english_ink=m&upper
+assert int(english_ink.sum())>=30000
+# Only expand a single AA fringe while retaining the neighboring second row.
+english_fx=binary_dilation(english_ink,iterations=1)&upper
+clean=src.copy()
+clean[english_fx]=0
+assert int((clean[english_fx,3]>0).sum())==0
+assert np.array_equal(src[~english_fx],clean[~english_fx]),"SOURCE_NON-TEXT_MISMATCH"
+# Korean mask reconstructed from B289's pixel-material-only diff, rather
+# than selecting an opaque rectangle or original English contour.
+changed_material=np.any(painted!=old,axis=2)
+assert int(changed_material.sum())>=40000
+localized_zone=(yy>=256)&(yy<374)&(xx>=1096)&(xx<1816)
+glyph=binary_dilation(changed_material,iterations=5)&localized_zone&(painted[:,:,3]>12)
+assert int(glyph.sum())>30000
+# Only the upper 88px text row is reconstructed; below stays preserved
+# current B289 to avoid touching the independently protected lower title.
+result=painted.copy()
+result[upper]=clean[upper]
+retain=glyph&upper
+result[retain]=painted[retain]
+# Lower/non-target atlas stays pixel exact; no source text/opaque plate survives
+# outside the glyph in the reconstructed SOURCE_WHITE zone.
+assert np.array_equal(result[~upper],painted[~upper])
+plate_no_english=int(np.count_nonzero(clean[english_fx,3]));assert plate_no_english==0
+# Debug leftover English ink in FINAL allowed only where Korean glyph replaces
+# old English; no self-claimed under-glyph source ghost.
+not_korean=english_fx&(~retain)
+assert int(np.count_nonzero(result[not_korean,3]))==0
+# Changes vs preexisting candidate restricted to source-white upper band.
+ch=np.any(result!=old,axis=2); allowed=(yy>=245)&(yy<385)&(xx>=1090)&(xx<1930)
+assert int(ch[~allowed].sum())==0
+assert not np.array_equal(result,old)
+import struct
+assert struct.unpack_from("<4I",prior,92)==(255,65280,16711680,4278190080)
+outdds=prior[:128]+np.flipud(result).copy().tobytes()
+assert len(outdds)==len(prior) and np.array_equal(decode(outdds),result)
+def plate(ar,background=(74,74,74,255)):
+ x=Image.new("RGBA",(ar.shape[1],ar.shape[0]),background)
+ x.alpha_composite(Image.fromarray(ar,"RGBA"))
+ return x.convert("RGB")
 L,T,R,B=(1075,236,1950,399)
-views=[("EN",english),("CLEAN",clean),("CURRENT",a),("B290",b)]
-for scale in (100,75,50):
- imgs=[]
- for name,ar in views:
-  im=composite(ar[T:B,L:R])
-  if scale!=100:im=im.resize((max(1,im.width*scale//100),max(1,im.height*scale//100)),Image.Resampling.LANCZOS)
-  im.save(OUT/f"{name}_GRAY_{scale}pct.png")
-  imgs.append(im)
- sheet=Image.new("RGB",(sum(x.width for x in imgs)+12,max(x.height for x in imgs)),(80,80,80))
- x=0
- for im in imgs:sheet.paste(im,(x,0));x+=im.width+4
- sheet.save(OUT/f"B290_SOURCE_CLEAN_CURRENT_FINAL_{scale}pct.png")
- # RAW orientation reviewed separately, mirror-Y persisted bytes.
-raws=[composite(np.flipud(ar[T:B,L:R])) for _,ar in views]
-rs=Image.new("RGB",(sum(x.width for x in raws)+12,max(x.height for x in raws)),(80,80,80))
-x=0
-for im in raws:rs.paste(im,(x,0));x+=im.width+4
-rs.save(OUT/"B290_SOURCE_CLEAN_CURRENT_FINAL_RAW.png")
-assert np.array_equal(decode(new),b)
-# Promote ONLY after fixed-bbox/clean/source/alpha native checks; no claim
-# that q060 total asset is C/USER approved (Stage and yellow remain defects).
-P.write_bytes(new)
-assert sha(P.read_bytes())==NEW
-report={
- "schema_version":2,"role":"B","run":"B290","run_key":"OUTRUN-KOR-B290-Q060-IGR044-WHITE-MATERIAL-20261009",
- "index":60,"priority":"P0","regression":"IGR-044 OPEN_USER_INGAME_FAIL",
- "source_sha256":EN,"source_url":url,"canonical_white_clean_png_sha256":CLEAN_SHA,
- "old_candidate_sha256":OLD,"new_candidate_sha256":NEW,
- "candidate_path":str(P),"modified_region":"outrun_miles_white_ONLY",
- "other_failed_regions":["stage","outrun_miles_gold"],
- "changes_vs_previous":int(changed.sum()),"changes_outside_current_white_bbox":0,
- "alpha_changed_pixels_full_atlas":0,"dds_header_exact":True,"native":[4096,2048],
- "mips":1,"format":"RGBA32","RAW":"mirror_y","persisted_roundtrip":"PASS",
- "source_clean_white_upper_mask_pixels":int(upper_white.sum()),
- "clean_residual_source_alpha_upper":residual_alpha,
- "clean_residual_source_face_upper":residual_core,
- "plate_only":"PASS_WHITE_UPPER_REGION_ONLY; lower 67px preserve overlapping artwork; no full asset clean claim",
- "composite_only":"PASS_WHITE_MATERIAL_GLYPH_ONLY_OUTSIDE_ZERO",
- "producer_visual":"B289_SOURCE_CURRENT_TRIAL_100p_DIRECT_CONTROLLER_IMPROVED_WHITE_FACE_AND_RIGHT_LEAN; followup independent review pending",
- "producer_rework_status":"PARTIAL_PASS_WHITE_ONLY_STAGE_GOLD_REWORK_REQUIRED",
- "C":"PENDING_FRESH_C2","C3":"PENDING_AFTER_COMPLETE_ASSET",
- "USER_INGAME":"OPEN_USER_INGAME_FAIL","APPROVAL":False,"RUNTIME_VALIDATION":"UNTESTED",
- "new_material_production_dds":1,
- "execution_backend":"GITHUB_RUNNER_BCAUSE_LOCAL_SANDBOX_SOURCE_NETWORK_DNS_UNAVAILABLE",
- "excluded":["VR","FFB","DX11","DXVK"]
-}
-(OUT/"B290_PRODUCER_SELF_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"q":60,"candidate":NEW,"changed":int(changed.sum()),"plate_alpha":residual_alpha},ensure_ascii=False))
+views=[("ENGLISH",src),("SOURCE_CLEAN",clean),("CURRENT",old),("B289_MATERIAL",painted),("B291_FINAL",result)]
+for ratio in (100,75,50):
+ cs=[]
+ for key,ar in views:
+  p=plate(ar[T:B,L:R])
+  if ratio!=100:p=p.resize((p.width*ratio//100,p.height*ratio//100),Image.Resampling.LANCZOS)
+  p.save(OUT/f"{key}_{ratio}pct_GRAY.png");cs.append(p)
+ sh=Image.new("RGB",(sum(c.width for c in cs)+len(cs)*4,max(c.height for c in cs)),(74,74,74))
+ cx=0
+ for c in cs:sh.paste(c,(cx,0));cx+=c.width+4
+ sh.save(OUT/f"B291_SOURCE_CLEAN_OLD_MATERIAL_FINAL_{ratio}pct.png")
+raws=[plate(np.flipud(ar[T:B,L:R])) for _,ar in views]
+sh=Image.new("RGB",(sum(c.width for c in raws)+len(raws)*4,max(c.height for c in raws)),(74,74,74))
+cx=0
+for c in raws:sh.paste(c,(cx,0));cx+=c.width+4
+sh.save(OUT/"B291_SOURCE_CLEAN_FINAL_RAW.png")
+Image.fromarray(english_fx[T:B,L:R].astype("uint8")*255,"L").save(OUT/"SOURCE_WHITE_REMOVAL_MASK.png")
+Image.fromarray(retain[T:B,L:R].astype("uint8")*255,"L").save(OUT/"KOREAN_GLYPH_RESTORE_MASK.png")
+outpath=OUT/"A064FDFC_B291_TRIAL_NOT_PROMOTED.dds";outpath.write_bytes(outdds)
+qa={"schema_version":2,"role":"B","run":"B291","index":60,"priority":"P0","regression":"IGR-044",
+"source_sha256":E,"old_sha256":O,"material_trial_sha256":B289,"new_trial_sha256":sha(outdds),
+"source_mask_sha256":M,"plate_method":"SOURCE_ALPHA_NATIVE_ENGLISH_MASK_ZEROED_WITH_1PX_FRINGE",
+"glyph_method":"RESTORE_ONLY_PREEXISTING_KOREAN_ALPHA_CONNECTED_TO_B289_FACE",
+"changed_pix":int(ch.sum()),"changed_outside_original_white_bbox":int(ch[~allowed].sum()),
+"source_clean_english_effect_removed":int(english_fx.sum()),"source_clean_english_alpha_remaining":plate_no_english,
+"source_clean_untouched_protected_outside_mask":True,
+"source_clean_final_english_ghost_outside_korean":0,
+"native":[4096,2048],"codec":"RGBA32_MIP1","header_exact":True,"RAW":"mirror_y",
+"persisted_decode_exact":True,"stage_gold_unchanged_from_B289":True,"new_production_dds":0,
+"producer_visual":"PENDING_CONTROLLER_SOURCE_CLEAN_AND_FINAL_NATIVE_100_75_50_RAW",
+"C":"NOT_RUN","C3":"NOT_RUN","USER_INGAME":"OPEN_USER_INGAME_FAIL",
+"APPROVAL":False,"RUNTIME_VALIDATION":"UNTESTED",
+"backend":"GITHUB_ACTIONS_NO_BINARY_SOURCE_IN_CHATGPT_LOCAL",
+"exclusions":["VR","FFB","DX11","DXVK"]}
+(OUT/"B291_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B291","sha":sha(outdds),"changed":int(ch.sum()),"retained":int(retain.sum())}))
