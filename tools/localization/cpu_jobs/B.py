@@ -1,193 +1,131 @@
 #!/usr/bin/env python3
-"""B300 q098: new dual-alpha/diffuse navy glow approach (C310 rework).
-TRIAL ONLY. Must be inspected on actual persisted BC3 before promotion.
+"""B300R q098: preserve exact B279 BC3-alpha; source-conditioned inner navy band.
+This retries the *same task* after visual failure of B300 alpha re-encode.
 """
-import hashlib,io,json,os,struct,sys,tempfile,urllib.request,subprocess
+import hashlib,io,json,os,struct,subprocess,sys,urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw
-from scipy.ndimage import distance_transform_edt, gaussian_filter
-assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
+from scipy.ndimage import distance_transform_edt
+from PIL import Image
+assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-REL="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
-ASSET=G/"hd_candidates"/REL
-DIR=G/"role_B/20261009-B300-Q098-ALPHA-GLOW-SOURCE-PROFILE"
+DIR=G/"role_B/20261009-B300R-Q098-ALPHA-PRESERVED-NAVY-DEPTH"
 DIR.mkdir(parents=True,exist_ok=True)
+R="textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
+O_SHA="192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b"
+S_SHA="3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59"
+C_SHA="b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8"
 sha=lambda b:hashlib.sha256(b).hexdigest()
-PREV="192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b"
-SRC="3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59"
-CLEAN_SHA="b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8"
-b=ASSET.read_bytes()
-assert sha(b)==PREV,("concurrent q098 changed",sha(b))
-t=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","98","--require-safe-rerender"],capture_output=True,text=True,check=True)
-tri=json.loads(t.stdout)["assets"][0]
-assert tri["next_action"]=="MATERIAL_REWORK",tri
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
-with urllib.request.urlopen(url,timeout=160) as f: sourcebytes=f.read()
-assert sha(sourcebytes)==SRC and sourcebytes[:128]==b[:128]
-assert b[84:88]==b"DXT5" and len(b)==262272
-h,w=128,2048
-def dec(bytes_):
- return np.asarray(Image.open(io.BytesIO(bytes_)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-S=dec(sourcebytes);P=dec(b)
-cpath=G/"role_B/20261005-B-PRODUCTION40/42E618FD_CLEAN_PLATE.png"
-mpath=G/"role_B/20261005-B-PRODUCTION40/42E618FD_TARGET_TEXT_MASK.png"
-sm=G/"role_B/20261005-B-PRODUCTION40/42E618FD_SOURCE_TEXT_MASK.png"
-assert sha(cpath.read_bytes())==CLEAN_SHA
-C=np.asarray(Image.open(cpath).convert("RGBA"))
-mask=np.asarray(Image.open(mpath).convert("L"))
-sourcemask=np.asarray(Image.open(sm).convert("L"))
+d=(G/"hd_candidates"/R).read_bytes()
+assert sha(d)==O_SHA
+tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","98","--require-safe-rerender"],capture_output=True,text=True,check=True)
+assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
+with urllib.request.urlopen("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",timeout=160) as f:sen=f.read()
+assert sha(sen)==S_SHA and sen[:128]==d[:128]
+cleanpath=G/"role_B/20261005-B-PRODUCTION40/42E618FD_CLEAN_PLATE.png"
+assert sha(cleanpath.read_bytes())==C_SHA
+def dec(by):
+ return np.asarray(Image.open(io.BytesIO(by)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+S=dec(sen);P=dec(d);C=np.asarray(Image.open(cleanpath).convert("RGBA"))
 assert S.shape==P.shape==C.shape==(128,2048,4)
-srcbox=(431,6,1674,123); targetbox=(580,11,1524,116)
-yy,xx=np.ogrid[:h,:w]
-source_scope=(xx>=srcbox[0])&(xx<srcbox[2])&(yy>=srcbox[1])&(yy<srcbox[3])
-assert not np.any(np.any(S!=C,axis=2)&~source_scope)
-assert np.count_nonzero(C[:,:,3][source_scope&(sourcemask>80)]>16)==0
-# Genuine material method change vs B279: alter stored BC3 alpha support
-# for source-derived diffuse glow *and* rebalance the white face/narrow
-# sharp keyline in one pass. No flat/shear/width scaling and no raster upscale.
-# SOURCE profile: bright italic white core plus thick, softened navy perimeter.
-sRgb=S[:,:,:3]; sa=S[:,:,3]
-swhite=(np.min(sRgb,axis=2)>=230)&(sa>160)&source_scope
-snavy=(sRgb[:,:,0]<55)&(sRgb[:,:,1]<78)&(sRgb[:,:,2]>sRgb[:,:,0]+12)&(sa>45)&source_scope
-assert swhite.sum()>10000 and snavy.sum()>20000
-WHITE=np.percentile(sRgb[swhite],90,axis=0).round().astype(np.uint8)
-NAVY=np.percentile(sRgb[snavy],35,axis=0).round().astype(np.uint8)
-assert WHITE.min()>210 and NAVY[2]>NAVY[0]+15,(WHITE,NAVY)
-prgb=P[:,:,:3]
-alpha=P[:,:,3].astype(np.float32)
-# Treat the existing persisted nonzero alpha as retained glyph silhouette;
-# avoid solid dark fill of entire Korean syllables.
-strong=alpha>=170
-wh=(prgb.min(axis=2)>=211)&strong
-dist_white=distance_transform_edt(wh)
-# Inner navy depth on a portion of the too-wide solid white face.
-# Source original has much more substantial navy support than B279.
-inner_ring=wh&(dist_white<=2.2)
-# Expand the stored alpha by up to 3px with smooth falloff; respect source
-# effect bbox and positive >=2px separation in both axes. This is a separate
-# alpha effect from previous B279 color-only recolors.
-glyph=alpha>=32
-outside_dist=distance_transform_edt(~glyph)
-halo=(outside_dist>0)&(outside_dist<=3.1)
-valid=(xx>=576)&(xx<1528)&(yy>=8)&(yy<120)&source_scope
-halo&=valid
-newalpha=alpha.copy()
-potential=115.0*np.exp(-0.5*(outside_dist/2.0)**2)
-newalpha[halo]=np.maximum(newalpha[halo],potential[halo])
-newalpha=np.uint8(np.clip(np.rint(newalpha),0,255))
-# Recolor white edge within existing glyph and tint newly revealed halo
-# with exact source-family navy. Retain core white and original Hangul shapes.
-wantRGB=P[:,:,:3].copy()
-wantRGB[inner_ring]=NAVY
-wantRGB[halo]=NAVY
-assert halo.sum()>1000 and inner_ring.sum()>1000,(halo.sum(),inner_ring.sum())
-def rgb565(p):
- r,g,bl=[int(x) for x in p];return (((r*31+127)//255)<<11)|(((g*63+127)//255)<<5)|((bl*31+127)//255)
-def exp565(v):
+src=(431,6,1674,123)
+xx,yy=np.meshgrid(np.arange(2048),np.arange(128))
+source_region=(xx>=src[0])&(xx<src[2])&(yy>=src[1])&(yy<src[3])
+assert int(np.count_nonzero(np.any(S!=C,axis=2)&~source_region))==0
+assert int(np.count_nonzero(C[:,:,3]&source_region))==0
+# B300 failed because re-encoding native BC3 alpha caused lost small Hangul
+# counters + horizontal colored artifacts. This method never writes an alpha
+# byte. It changes only 2-bit color indices of well-supported INNER WHITE
+# edge pixels, preserving untouched already-encoded white/navy/antialias.
+W=(P[:,:,:3].min(axis=2)>=215)&(P[:,:,3]>=170)
+dist=distance_transform_edt(W)
+band=W&(dist<=2.5)
+# Exact original source limits with at least 2px positive margins.
+safe=(xx>=580)&(xx<1524)&(yy>=9)&(yy<120)&source_region
+band&=safe
+assert band.sum()>3000,band.sum()
+def rgb(v):
  return np.array([(((v>>11)&31)*255+15)//31,(((v>>5)&63)*255+31)//63,((v&31)*255+15)//31],dtype=np.int16)
-w565,n565=rgb565(WHITE),rgb565(NAVY)
-assert w565>n565
-a,bcol=exp565(w565),exp565(n565)
-pal=np.array([a,bcol,(2*a+bcol+1)//3,(a+2*bcol+1)//3],dtype=np.int16)
-def alpha_palette(a0,a1):
- if a0>a1:return np.array([a0,a1,(6*a0+a1)//7,(5*a0+2*a1)//7,(4*a0+3*a1)//7,(3*a0+4*a1)//7,(2*a0+5*a1)//7,(a0+6*a1)//7],dtype=np.int16)
- return np.array([a0,a1,(4*a0+a1)//5,(3*a0+2*a1)//5,(2*a0+3*a1)//5,(a0+4*a1)//5,0,255],dtype=np.int16)
-output=bytearray(b)
-blocks=0
-for y in range(8,120,4):
- for x in range(576,1528,4):
-  x2,y2=x+4,y+4
-  relevant=(halo[y:y2,x:x2]|inner_ring[y:y2,x:x2])
-  if not relevant.any():continue
-  # Fully enclosed within original source effect bbox, no protected art.
-  assert x>=srcbox[0] and x2<=srcbox[2] and y>=srcbox[1] and y2<=srcbox[3]
-  al=newalpha[y:y2,x:x2].astype(np.int16)
-  assert al.shape==(4,4)
-  oldalpha=alpha[y:y2,x:x2]
-  desired=wantRGB[y:y2,x:x2].astype(np.int16)
-  nearest=np.sum((desired[:,:,None,:]-pal[None,None,:,:])**2,axis=3).argmin(axis=2)
-  alpha_changed=not np.array_equal(al,oldalpha)
-  offset=128+(((h-y2)//4)*(w//4)+(x//4))*16
-  if alpha_changed:
-   a0,a1=int(np.max(al)),int(np.min(al))
-   if a0==a1:
-    a0,a1=255,0
-   apa=alpha_palette(a0,a1)
-   inds=np.abs(al[:,:,None]-apa[None,None,:]).argmin(axis=2)
-   abits=0
-   for iy in range(4):
-    for ix in range(4):
-     abits|=int(inds[iy,ix])<<(3*((3-iy)*4+ix))
-   output[offset:offset+8]=bytes([a0,a1])+abits.to_bytes(6,"little")
-  bits=0
-  for iy in range(4):
-   for ix in range(4):
-    bits|=int(nearest[iy,ix])<<(2*((3-iy)*4+ix))
-  struct.pack_into("<HHI",output,offset+8,w565,n565,bits)
-  blocks+=1
-assert blocks>700,blocks
-trial=bytes(output)
-assert trial[:128]==b[:128] and len(trial)==len(b)
+data=bytearray(d)
+changed=0;blocks=set();no_dark=0
+for y,x in zip(*np.where(band)):
+ block_y=(127-int(y))//4
+ block_x=int(x)//4
+ addr=128+(block_y*512+block_x)*16
+ e0,e1=struct.unpack_from("<HH",data,addr+8)
+ if e0<=e1:
+  no_dark+=1
+  continue
+ p0,p1=rgb(e0),rgb(e1)
+ palette=np.array([p0,p1,(2*p0+p1+1)//3,(p0+2*p1+1)//3],dtype=np.int16)
+ # Retain the source-derived navy family, reject non-navy/white unrelated blocks.
+ desired=np.array([0,12,57],dtype=np.int16)
+ near=np.sum((palette-desired)**2,axis=1).argmin()
+ if near not in (1,3) or np.linalg.norm(palette[near]-desired)>90:
+  no_dark+=1;continue
+ raw_row=(127-int(y))%4
+ q=(raw_row*4+(int(x)%4))*2
+ bits=struct.unpack_from("<I",data,addr+12)[0]
+ oldidx=(bits>>q)&3
+ if oldidx==int(near):continue
+ # Only replace pixels that independently decoded as filled white.
+ bits=(bits &~(3<<q))|(int(near)<<q)
+ struct.pack_into("<I",data,addr+12,bits)
+ changed+=1;blocks.add((block_x,block_y))
+trial=bytes(data)
+assert trial[:128]==d[:128] and len(trial)==len(d) and changed>3000,(changed,no_dark)
 D=dec(trial)
-assert sha(trial)!=sha(b), "no material image change"
-diff=np.any(D!=P,axis=2)
-alpha_diff=D[:,:,3]!=P[:,:,3]
-assert not np.any(diff&~source_scope),("outside source changed",int(np.sum(diff&~source_scope)))
-assert not np.any(diff&~valid),("outside selected render zone",int(np.sum(diff&~valid)))
-assert not np.any(alpha_diff&~valid)
-assert np.count_nonzero((D[:,:,3]>8)&~source_scope)==np.count_nonzero((P[:,:,3]>8)&~source_scope)
-# Formal exact original effect-bbox: no introduced alpha at or beyond edges.
-newglyph=(D[:,:,3]>16)&valid
-ys,xs=np.nonzero(newglyph)
+assert np.array_equal(P[:,:,3],D[:,:,3]),"ALPHA MUST BE BYTE-IDENTICAL"
+# Entire BC3 alpha plane cannot have changed because only the color index
+# offset+12..+15 was written. Verify decoded visual outside protected scope.
+diff=np.any(P!=D,axis=2)
+assert not np.any(diff&~safe),("color changed outside safe",int((diff&~safe).sum()))
+assert not np.any(diff&~source_region)
+assert D[:,:,3].max()==P[:,:,3].max()
+pixels=D[:,:,3]>16
+ys,xs=np.where(pixels&safe)
 bbox=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-assert bbox[0]>srcbox[0] and bbox[1]>srcbox[1] and bbox[2]<srcbox[2] and bbox[3]<srcbox[3],bbox
-# Verify the trial from the actual persisted bytes rather than desired arrays.
-path=DIR/"Q098_B300_TRIAL_NOT_PROMOTED.dds"
+assert bbox[0]>src[0] and bbox[1]>src[1] and bbox[2]<src[2] and bbox[3]<src[3]
+path=DIR/"B300R_Q098_TRIAL_NOT_PROMOTED.dds"
 path.write_bytes(trial)
 assert sha(path.read_bytes())==sha(trial) and np.array_equal(dec(path.read_bytes()),D)
-# Quantities are descriptive only; no threshold can supersede visual source match.
-def ratios(v):
- rgb=v[:,:,:3];alp=v[:,:,3]
- white=(rgb.min(axis=2)>220)&(alp>120)&source_scope
- navy=(rgb[:,:,0]<55)&(rgb[:,:,1]<80)&(rgb[:,:,2]>rgb[:,:,0]+12)&(alp>80)&source_scope
- return {"white":int(white.sum()),"navy":int(navy.sum()),"white_navy":round(float(white.sum()/max(1,navy.sum())),3)}
-def compose(arr,bg):
- im=Image.fromarray(arr,"RGBA")
- canvas=Image.new("RGBA",(w,h),bg)
- canvas.alpha_composite(im)
- return canvas.convert("RGB")
-evidence=[]
-for orientation in ("READABLE","RAW"):
- seq=(S,C,P,D) if orientation=="READABLE" else tuple(np.flipud(z).copy() for z in (S,C,P,D))
- for bgname,bg in [("GRAY",(116,116,116,255)),("WHITE",(255,255,255,255)),("BLACK",(0,0,0,255))]:
-  for scale in (100,75,50):
-   chunks=[compose(z,bg) for z in seq]
-   if scale<100:
-    chunks=[z.resize((round(w*scale/100),round(h*scale/100)),Image.Resampling.LANCZOS) for z in chunks]
-   sheet=Image.new("RGB",(sum(z.width for z in chunks)+12,max(z.height for z in chunks)),(120,120,120))
-   at=0
-   for z in chunks:sheet.paste(z,(at,0));at+=z.width+4
-   fname=f"{orientation}_{bgname}_{scale}_SOURCE_CLEAN_B279_B300.png"
-   sheet.save(DIR/fname)
-   evidence.append(fname)
-for name,a in [("SOURCE",S),("CLEAN",C),("B279",P),("B300",D)]:
- Image.fromarray(a,"RGBA").save(DIR/f"{name}_NATIVE_LOSSLESS.png")
-report={"role":"B","run":"B300","queue_index":98,"asset":REL,
- "triage":"MATERIAL_REWORK","source_sha256":SRC,"clean_sha256":CLEAN_SHA,
- "current_sha256":PREV,"trial_sha256":sha(trial),"trial_dds":1,
- "new_promoted_dds":0,"worker":"GITHUB_ACTIONS", "native":[2048,128],
- "format":"BC3 DXT5 mip1 RAW_FLIPY",
- "new_method":"source-conditioned dual-stage actual BC3 alpha halo (max 3.1px) plus inner navy redistribution 2.2px; distinct from B279 color-only sharp keyline; preserve font silhouette and old white core; no font stretching/upscale",
- "source_profile":{"face":WHITE.tolist(),"navy":NAVY.tolist(),"canonical_ratio":ratios(S)},
- "prior_ratio":ratios(P),"trial_ratio":ratios(D),
- "trial_bbox":bbox, "original_effect_bbox":srcbox,
- "changed_bc3_blocks":blocks,"changed_native_pixels":int(diff.sum()),
- "changed_alpha_native_pixels":int(alpha_diff.sum()),"outside_source_rgba":int((diff&~source_scope).sum()),
- "outside_render_zone_rgba":int((diff&~valid).sum()),"source_clean_outside_rgba":0,
- "clean_text_alpha_residual":0,"header_exact":True,"persisted_decode_exact":True,
- "evidence_comparisons":evidence,"producer_visual":"PENDING_FIRST_LOOK",
- "C2":"NOT_RUN","C3":"NOT_RUN","APPROVAL":False,"RUNTIME_VALIDATION":"UNTESTED",
- "excluded":["VR","FFB","DX11","DXVK"]}
-(DIR/"B300_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print("B300_TRIAL_OK",json.dumps({"sha":sha(trial),"blocks":blocks,"diff":int(diff.sum()),"alpha_change":int(alpha_diff.sum()),"bbox":bbox,"ratios":[ratios(S),ratios(P),ratios(D)]},ensure_ascii=False))
+def count(im):
+ rgb=im[:,:,:3];a=im[:,:,3]
+ white=(rgb.min(axis=2)>220)&(a>120)&source_region
+ navy=(rgb[:,:,0]<55)&(rgb[:,:,1]<80)&(rgb[:,:,2]>rgb[:,:,0]+12)&(a>80)&source_region
+ return {"white":int(white.sum()),"navy":int(navy.sum()),"ratio":round(float(white.sum()/max(1,navy.sum())),3)}
+def compose(im,bg):
+ x=Image.new("RGBA",(2048,128),bg)
+ x.alpha_composite(Image.fromarray(im,"RGBA"))
+ return x.convert("RGB")
+views=[]
+for ori in ("READABLE","RAW"):
+ seq=(S,C,P,D) if ori=="READABLE" else tuple(np.flipud(x).copy() for x in (S,C,P,D))
+ for name,bg in [("GRAY",(120,120,120,255)),("WHITE",(255,255,255,255)),("BLACK",(0,0,0,255))]:
+  for pct in (100,75,50):
+   imgs=[compose(v,bg) for v in seq]
+   if pct!=100:
+    imgs=[im.resize((round(im.width*pct/100),round(im.height*pct/100)),Image.Resampling.LANCZOS) for im in imgs]
+   out=Image.new("RGB",(sum(i.width for i in imgs)+12,max(i.height for i in imgs)),(120,120,120))
+   px=0
+   for im in imgs:out.paste(im,(px,0));px+=im.width+4
+   nm=f"{ori}_{name}_{pct}_SOURCE_CLEAN_B279_B300R.png"
+   out.save(DIR/nm);views.append(nm)
+for name,arr in [("SOURCE",S),("CLEAN",C),("OLD",P),("TRIAL",D)]:
+ Image.fromarray(arr,"RGBA").save(DIR/name+"_NATIVE_LOSSLESS.png")
+report={"role":"B","run":"B300R","queue_index":98,"asset":R,
+ "retry_of":"B300_SOURCE_ALPHA_RECODE_VISUAL_FAIL_NOT_PROMOTED",
+ "triage":"MATERIAL_REWORK","source_sha256":S_SHA,"clean_sha256":C_SHA,
+ "prior_sha256":O_SHA,"trial_sha256":sha(trial),"new_trial_dds":1,"promoted_dds":0,
+ "method":"actual 2-bit DXT5 color-index replacement inside native white 2.5px perimeter, never re-encode/modify any of 8 alpha bytes; source-native navy target, preserve sharp original source-constrained shapes, no prior Korean raster upscale",
+ "source_counts":count(S),"prior_counts":count(P),"trial_counts":count(D),
+ "candidate_bbox":bbox,"source_bbox":src,
+ "changed_native_pixels":int(diff.sum()),"native_color_indices_replaced":changed,
+ "changed_blocks":len(blocks),"blocked_non_navy":no_dark,
+ "outside_source_rgba":0,"outside_safe_rgba":0,"alpha_exact":True,
+ "header_exact":True,"source_clean_residue_alpha":0,"roundtrip_exact":True,
+ "evidence_views":views,"producer_visual":"PENDING_CONTROLLER",
+ "C2":"NOT_RUN","C3":"NOT_RUN","APPROVAL":False,
+ "RUNTIME_VALIDATION":"UNTESTED","excluded":["VR","FFB","DX11","DXVK"]}
+(DIR/"B300R_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print("B300R_TRIAL_OK",json.dumps({"sha":sha(trial),"changed":changed,"blocks":len(blocks),"ratio":count(D),"bbox":bbox},ensure_ascii=False))
