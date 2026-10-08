@@ -156,6 +156,7 @@ def resolve_font():
         raise RuntimeError(("rounded Hangul family not available",spec))
     return path,int(index or 0),family,style
 FONT,FONT_INDEX,FONT_FAMILY,FONT_STYLE=resolve_font()
+FONT_PATTERN=FONT_FAMILY+':'+FONT_STYLE
 
 def tracked_core(text, fs, tracking):
     # 3x supersampled original-size native Hangul; scale down only for AA.
