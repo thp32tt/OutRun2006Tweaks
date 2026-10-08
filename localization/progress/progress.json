@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 02:11 KST",
+  "updated_at_kst": "2026-10-09 02:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8494,5 +8494,21 @@
     "ingame_retest": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A199-P0-Q121-ORIGINAL-WHITE-ITALIC/A199_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c318_c1_q121_a199_fresh": {
+    "task_id": "OUTRUN-KOR-C318-C1-Q121-A199-NEW-SHA-NATIVE-20261009",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 121,
+    "decision": "HOLD_STRICT_RECHECK",
+    "P0_USER_GAME_FAILURE_OPEN": true,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+    "new_png": 45,
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_Q121_A199_CONTROLLER_C1_HOLD.json",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

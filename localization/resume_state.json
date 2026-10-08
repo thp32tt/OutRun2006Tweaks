@@ -6791,7 +6791,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 02:01 KST",
+  "updated_at_kst": "2026-10-09 02:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -12490,5 +12490,21 @@
     "ingame_retest": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A199-P0-Q121-ORIGINAL-WHITE-ITALIC/A199_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c318_c1_q121_a199_fresh": {
+    "task_id": "OUTRUN-KOR-C318-C1-Q121-A199-NEW-SHA-NATIVE-20261009",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "index": 121,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+    "decision": "HOLD_STRICT_RECHECK",
+    "active_user_p0_rework": true,
+    "new_png": 45,
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_Q121_A199_CONTROLLER_C1_HOLD.json",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

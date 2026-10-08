@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "TASK_ID": "OUTRUN-KOR-C318-C1-Q121-A199-NEW-SHA-NATIVE-20261009",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "priority": "P0",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "old_rejected_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "clean_path": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "independent_source": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "machine_proof": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_Q121_A199_INDEPENDENT_MACHINE_PROOF.json",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37815235092",
+  "native_structure": {
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_equal": true
+  },
+  "metrics": {
+    "clean_final_rgba_outside_exact_region_union": 0,
+    "clean_final_alpha_outside_exact_region_union": 0,
+    "clean_final_rgba_inside_exact_region_union": 104723,
+    "source_clean_rgba_outside_exact_region_union": 1934984,
+    "source_final_rgba_outside_exact_region_union": 1934984
+  },
+  "three_rows": [
+    {
+      "id": "select_game_mode",
+      "english": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "source_original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "A199_candidate_bbox": [
+        291,
+        825,
+        1040,
+        948
+      ],
+      "source_size": [
+        1000,
+        154
+      ],
+      "A199_size": [
+        749,
+        123
+      ],
+      "source_relative_width_ratio": 0.749,
+      "source_relative_height_ratio": 0.7987,
+      "positive_margins": [
+        125,
+        126,
+        6,
+        25
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    },
+    {
+      "id": "select_car",
+      "english": "Select your car",
+      "korean": "차량 선택",
+      "source_original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "A199_candidate_bbox": [
+        481,
+        964,
+        917,
+        1072
+      ],
+      "source_size": [
+        913,
+        164
+      ],
+      "A199_size": [
+        436,
+        108
+      ],
+      "source_relative_width_ratio": 0.4775,
+      "source_relative_height_ratio": 0.6585,
+      "positive_margins": [
+        238,
+        239,
+        17,
+        39
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    },
+    {
+      "id": "select_course",
+      "english": "Select Course",
+      "korean": "코스 선택",
+      "source_original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "A199_candidate_bbox": [
+        462,
+        1088,
+        924,
+        1202
+      ],
+      "source_size": [
+        783,
+        151
+      ],
+      "A199_size": [
+        462,
+        114
+      ],
+      "source_relative_width_ratio": 0.59,
+      "source_relative_height_ratio": 0.755,
+      "positive_margins": [
+        160,
+        161,
+        26,
+        11
+      ],
+      "CLEAN_alpha_in_source_box": 0
+    }
+  ],
+  "new_lossless_png": 45,
+  "png_manifest_sha256": "in machine_proof",
+  "per_region_direct_visual": [
+    {
+      "id": "select_game_mode",
+      "observations": "Source WHITE heavy italic with single black lower-right depth; A199 WHITE italic replaces former gray multi-outline. Current 749x123 within 1000x154 source effect bbox and margins [125,126,6,25]; readable dark/gray and 75%. No definite new clipping/ghost. Actual source glyph anchors/blind defect calibration not qualified.",
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_SCF_BLACK_75.png",
+          "sha256": "87e2142879f2199a18d2f28bd9be7cf000cc1cb0d1fa90428f1d81842cdf62de"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_A199_NATIVE.png",
+          "sha256": "192aed45180fa6818783875a41671cd2968421fe6e0e0aef98d042af7a12766f"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_game_mode_A199_RAW.png",
+          "sha256": "836ad7d59b2df4051f002f2e49153171859eb26c4fb4045bd9c1bfab83d9287f"
+        }
+      ]
+    },
+    {
+      "id": "select_car",
+      "observations": "A199 차량 선택 436x108 within English Select your car effect 913x164; source-relative height 0.6585 and width0.4775. White native face and black shadow improved, but not full original scene hierarchy, width ratio alone not a visual FAIL. No conclusive isolated atlas cut or opaque plate; real-game title clipping/small text and Dino model logo mapping unresolved.",
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_GRAY_100.png",
+          "sha256": "f08f11a8eff3db989d0ce89bc189343bbe5763b3eed92ad2b7ebdf477e8cafd1"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_SCF_WHITE_50.png",
+          "sha256": "42e1e972aab6fdbdaae98f15be440a86119565d80f43db2ff048af90d5d154ab"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_CLEAN_NATIVE.png",
+          "sha256": "5e852e72b45dbc2bf88bc388148b33f8e6dbe5203907954b6daeadfad79fecec"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_car_A199_RAW.png",
+          "sha256": "a6957bae4c59d6ffdfbd9a0afd8ea539887697b5e5fffa52fa0b520de71c6ace"
+        }
+      ]
+    },
+    {
+      "id": "select_course",
+      "observations": "A199 코스 선택 462x114 within source 783x151, margins [160,161,26,11]. Native white italic and black shadow restored; practical white background inherently low contrast. No certain glyph breakup/box seam; original style/per-glyph slant still uncalibrated.",
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_WHITE_50.png",
+          "sha256": "4fdc070e48164400066d25e818730b6effa78aca35fc398de6a783dfc7b0a85d"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_SCF_GRAY_100.png",
+          "sha256": "87b81bcd25189490ac16343fb6708aa9db9e92408e4f558d6a66bad81355272a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261009-C318-C1-Q121-A199-P0-NEW-SHA/C318_q121_select_course_A199_RAW.png",
+          "sha256": "70903dce1124e44ced9b9d9950255eaeff9c432837349f29a557eaf47f52bc59"
+        }
+      ]
+    }
+  ],
+  "eight_checks": {
+    "source_removal": "A176 CLEAN target alpha0 verified, no definite English ghost in BGW native",
+    "italic": "visible right lean and English-style white face, per-glyph source anchor not calibrated",
+    "size": "3 positive native margins; car only 436x108 against source 913x164, require scene-composed review",
+    "weight_style": "single black depth now closer than C316 rejected gray multiple outlines",
+    "glyph_integrity": "no definite cropped broken Hangul in native/50 sample",
+    "protected": "CLEAN->FINAL outside source cells RGBA and alpha 0; Dino logo source ID unproven",
+    "placement": "atlas clean; actual game clipping and INFO overlay still OPEN P0",
+    "orientation": "lossless RAW mirror-Y vs readable checked, mip1"
+  },
+  "calibration": {
+    "blind_known_defect_controls": "NOT_RUN",
+    "pixels_before_producer_notes": false,
+    "qualified_source_anchors": false,
+    "explanation": "Producer report and latest queue were reviewed before native C images, so do not invent a blind PASS."
+  },
+  "status": "HOLD_STRICT_RECHECK",
+  "reason": "Current SHA evidence supports style repair without obvious new static clip but fails required independent blind calibration/source anchor and cannot address actual-game P0 report; do not convert numeric success into static or user approval.",
+  "IGR_status": "OPEN_USER_INGAME_FAIL_P0_REWORK_REQUIRED",
+  "C_PASS": false,
+  "C3_PASS": false,
+  "APPROVAL": false,
+  "PRE_INGAME_JPG_REVIEW": "BLOCKED",
+  "USER_RETEST": "REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "backend": "GitHub Actions persisted DDS reproduction required when ChatGPT local raw GitHub DNS fetch unavailable; no N100 heavy processing",
+  "checked_kst": "2026-10-09 02:19"
+}
