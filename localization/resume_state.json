@@ -6814,7 +6814,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 15:16 KST",
+  "updated_at_kst": "2026-10-09 15:21 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13168,7 +13168,7 @@
     "diagnostic_setting": "Localization.KoreanHudLayoutTrace=false",
     "new_dds": 0,
     "implementation": "BOUNDED_NATIVE_HUD_DRAW_LAYOUT_DIAGNOSTIC",
-    "build_status": "IN_PROGRESS",
+    "build_status": "WIN32_RELEASE_AND_KOREAN_TEST_SUCCESS",
     "build_runs": [
       37892438103,
       37892438028
@@ -13177,6 +13177,8 @@
     "new_user_ingame": "NOT_RUN",
     "user_regression": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
-    "qa": "localization/graphics/role_B/20261009-B321-IGR042-HUD-RUNTIME-ATTRIBUTION/B321_RUNTIME_MAPPING_QA.json"
+    "qa": "localization/graphics/role_B/20261009-B321-IGR042-HUD-RUNTIME-ATTRIBUTION/B321_RUNTIME_MAPPING_QA.json",
+    "build_source_ref": "bbb586328bcbed6d4a0ba5124510435038cf5554",
+    "output": "OPT_IN_DIAGNOSTIC_READY_UNTESTED_IN_GAME"
   }
 }
