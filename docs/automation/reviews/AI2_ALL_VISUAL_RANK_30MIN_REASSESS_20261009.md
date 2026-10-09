@@ -110,3 +110,26 @@
 ### Safety and scoring
 - Repeated static HUD 1000/5000 loops are forbidden; all unchanged exact source SHA validations already confirmed on 308bf647. No additional Win32 build/HMD workload needed just to record this source differential.
 - PR #111 based on a **disproven cross-Present raw-c64 hypothesis remains closed without merge**. No DX9Ex material change in review branch. Rival and selector DDS protected. Keep unresolved HMD cases OPEN.
+
+
+## C6 — 09:25 KST final evidence-constrained decision and handoff
+
+### Are the rank and other display defects fixed?
+1. **Yes at source restoration / verified Windows build level only:** current DX9Ex R57 1–3 projected car location, R62 4–5 FVF0x142 real HMD-tested function, R64 6th/6 separate D3DXSprite Draw→Flush, exact original menu arrow and Sumo/GOAL/glyph producer groups, F11 ImGui, cross-game-state projection parity, R14/R15 DDS and XMT return/failclose, and protected scene effects all exist and compiled in material SHA 308bf647211f670974fb53ad7d60d398dea4667c.
+2. **NO matching NEW HMD optical acceptance:** older 5868, f490, 6e800 user-headset runs unequivocally failed ordinal rank and many HUD items. Those were before critical R62/R64 restoration. We cannot deduce that rank1–5/6th/6 now visually follows cars, has one binocular image, responds to HudScale, or that original GOAL time / transient +TIME is repaired until an exact NEW HMD run. Preserve old HMD failure ledger; do not mark DONE on build alone.
+3. **Confirmed protected success only in old user HMD:** OutRun rival car-attached icon and vehicle selector DDS were correct in later older sessions; keep them unchanged. Historic category-specific R57_06 rank1–3, R62 rank4–5, R64 6th/6/HudScale were separately HMD-confirmed in *different* old builds; never invent one all-perfect ZIP.
+4. **Remaining priorities for the next developer:** P0-A rank projected 0 in last old HMD — verify actually installed x86 game module/queue node/Calc3D2D anchor, nonzero projector and R62 fixedfn accepted bilateral draw; P0-B R64 Flush count positive separately for ranks and DispRank, no broad unrelated glyph batching; P0-C finish record+transient +TIME/GOAL time shader/XYZRHW/FVF142 parent-to-eye route, both GOAL helpers preserved; P0-D F11/menu arrows/YES-NO, size/recenter; P1 lens centre dot only and start shadow with real depth/stencil eye output; P1 world FPS/72Hz target/SkyGlow/DDS preservation.
+5. **Do not perform misleading fixes:** Do not delete one of two original GOAL functions; do not suppress intentional multi-part rank4+ glyphs, do not carry over the historic 360-frame generic ScreenHud heuristic, do not force all lens circles to HUD, do not change original extra-time numUpdates, do not alter protected rival/DDS. Cross-Present stale source-WVP premise for closed unmerged PR #111 is disproven by NotifyGamePresent existing invalidation.
+6. **No new game or host production source was modified in this 30-minute verification**; do not characterize the report as a visual correction. Source diff/baseline 308bf647 CI artifact #11586021360 is an **unverified HMD candidate**, not completed deployed proof. One exact new runtime session suffices to discriminate the remaining source families; no repeat 1000/5000 unchanged static validation.
+7. **Machine ledger correction needed only as metadata after integration owner review**: regression key VR-HUD-R64-D3DXSPRITE-DRAW-FLUSH-REMOVED-20261009 still says NEED_WIN32_BUILD despite 308bf exact Win32 game/fullchain all SUCCESS. Desired SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST. Keep current runtime status UNTESTED. Do not trigger redundant unchanged C++ builds just for this stale status.
+
+### Exact authority links
+- Source baseline: https://github.com/thp32tt/OutRun2006Tweaks/commit/308bf647211f670974fb53ad7d60d398dea4667c
+- DX9Ex Active Windows/host/fullchain/package SUCCESS: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37859508332
+- Current packaged ZIP artifact: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37859508332/artifacts/11586021360 (artifact digest sha256:8116d7585d47e9d4b0a519dbd48212cabcd06a316efe6139cd23148442772881)
+- Native EXE HUD Inspector: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37859508345
+- Domain: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37859508246
+- Closed, unmerged unsupported candidate: https://github.com/thp32tt/OutRun2006Tweaks/pull/111
+- Regression log: https://github.com/thp32tt/OutRun2006Tweaks/issues/13
+
+**Concluded ~09:25 KST**. Interactive actual source review/checkpoints C0–C6 were recorded at approximately five-minute intervals, not asynchronous future service. RUNTIME_VALIDATION=UNTESTED.
