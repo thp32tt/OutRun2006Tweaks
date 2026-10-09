@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 03:06 KST",
+  "updated_at_kst": "2026-10-10 03:23 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9779,5 +9779,24 @@
     ],
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_CONTROLLER_VISUAL_QA.json"
+  },
+  "c339_c1_q227_a214_13_exact_persisted": {
+    "run": "C339",
+    "run_key": "OUTRUN-KOR-C339-C1-Q227-A214-13-FRESH-SAVED-PIXEL-20261010-0310",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 227,
+    "current_candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+    "fresh_exact_saved_lossless_regions": 13,
+    "producer_panels_verified_clean_alpha_zero": 13,
+    "independent_saved_alpha_bound_counts_exact_regions": 16,
+    "canonical_source_independent_sha_verified": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "new_DDS": 0,
+    "USER_GAME": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_C1_CONTROLLER_HOLD.json"
   }
 }
