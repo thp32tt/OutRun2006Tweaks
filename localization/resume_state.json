@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A215 q121 P0 IGR030/031/040: exact pinned source/CLEAN/current saved DDS 4096x4096, GitHub Actions #37970761977 SUCCESS; thirty newly published native lossless source/clean/final component triplets + RAW first12, source→CLEAN 2,134,661 RGBA pixels and CLEAN→FINAL 133,085. These non-title changes include existing Korean translations, not automatically protected-art damage. Inspect remaining 149/179 semantic components and full protected/edit masks, blinded C1 slant and source-family, C3, consumer map, new real-game retest. Candidate 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844 unchanged, DDS0, C335 HOLD and user ingame OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A215-Q121-30-REGION-SOURCE-CLEAN-PERSISTED-20261010-0300",
     "C338 C1 odd q205 new B306 exact saved pixel delta vs historical B303 native 4096x2048 RGBA32: header same, 25,528 RGBA changed/23,123 alpha changed ALL within 2 source titles, 0 outside; current original-box alpha margins 6px each, SOURCE/CLEAN canonical not independent, 21 unaffected regions not visually reviewed -> HOLD_STRICT_RECHECK C3/approval blocked, IGR026/027/028 OPEN, RUNTIME_VALIDATION=UNTESTED; 0 new DDS. localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/C338_C1_CONTROLLER_HOLD.json RUN_KEY=OUTRUN-KOR-C338-C1-Q205-B306-EXACT-DDS-PIXEL-DIFF-20261010-0250",
     "B340 2026-10-10 02:36 KST B q214 B339 trial alpha-topology producer direct native/RAW inspection: trial SHA d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8 mechanically exact persisted BC3/alpha-core1.0/outside0, but GOAL→골 still pale stacked bars/poor counters at FLIPY 100 and RAW50 (recurs from B338). SOURCE-family legibility FAIL overrides machine PASS; do not promote B339 or repeat same mask/donor. Current promoted candidate ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 unchanged, C2/C3/approval/user blocked, DDS0, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B340-Q214-B339-ALPHA-VISUAL-REVIEW/B340_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B340-Q214-B339-ALPHA-PRODUCER-VISUAL-REJECT-20261010-0230.",
     "C337 C1 odd q137 B320 current exact DDS cdd4a34879b7 native saved SHA, BGRA32/2048x1024/mip1 alpha bbox verified, FLIP-Y/RAW gray100/50 reviewed; exact source/CLEAN, calibrated family and whole atlas not independently verified => HOLD_STRICT_RECHECK. IGR041 OPEN, C3/export/game blocked. QA localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json RUN_KEY=OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
@@ -6850,7 +6851,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 22:50 KST",
+  "updated_at_kst": "2026-10-10 03:06 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13979,5 +13980,32 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_DDS": 0,
     "report": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/C338_C1_CONTROLLER_HOLD.json"
+  },
+  "a215_q121_source_components": {
+    "run": "A215",
+    "run_key": "OUTRUN-KOR-A215-Q121-30-REGION-SOURCE-CLEAN-PERSISTED-20261010-0300",
+    "role": "A",
+    "priority": "P0",
+    "queue_index": 121,
+    "worker_run_id": 37970761977,
+    "worker_conclusion": "SUCCESS",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "clean_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+    "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "new_component_proof_regions": 30,
+    "total_A213_source_change_components": 179,
+    "source_to_clean_changed_rgba": 2134661,
+    "clean_to_candidate_changed_rgba": 133085,
+    "new_dds": 0,
+    "current_candidate_changed": false,
+    "visual_producer": "SCOPED_NATIVE_13_REGION_FIRSTLOOK_HOLD",
+    "independent_c": "C335_HOLD_STRICT_RECHECK",
+    "user_ingame": [
+      "IGR-030_OPEN",
+      "IGR-031_OPEN",
+      "IGR-040_OPEN"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_CONTROLLER_VISUAL_QA.json"
   }
 }
