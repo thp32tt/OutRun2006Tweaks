@@ -3280,6 +3280,16 @@ namespace OutRunVRStereo
         return R9StereoBaselineSeeded();
     }
 
+    std::uint64_t R30SupportMainDepthGeneration() noexcept
+    {
+        return R9MainDepthGenerationValue();
+    }
+
+    bool R30SupportMainDepthHasStencil() noexcept
+    {
+        return R9TrackedMainDepthHasStencil();
+    }
+
     bool R30SupportTargetIsBackBuffer() noexcept
     {
         return TargetIsBackBuffer();

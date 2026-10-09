@@ -148,6 +148,41 @@ for label, altered_owner, altered_consumer in (
     elif r29_effect_boundary_ok(r30_support_api, altered_owner, altered_consumer):
         errors.append("R29 effect/stereo negative mutation survived: " + label)
 
+# R84 R9 depth/stencil metadata must remain read-only and owned by R30.
+# A missing generation or invented stencil flag would poison R33's depth cache.
+def r9_main_depth_boundary_ok(api, producer, consumer):
+    decls = (
+        "std::uint64_t R30SupportMainDepthGeneration() noexcept;",
+        "bool R30SupportMainDepthHasStencil() noexcept;",
+    )
+    owners = (
+        "std::uint64_t R30SupportMainDepthGeneration() noexcept\n    {\n        return R9MainDepthGenerationValue();\n    }",
+        "bool R30SupportMainDepthHasStencil() noexcept\n    {\n        return R9TrackedMainDepthHasStencil();\n    }",
+    )
+    callers = (
+        "R32ReviewMainDepthGeneration() noexcept { return R30SupportMainDepthGeneration(); }",
+        "R32ReviewMainDepthHasStencil() noexcept { return R30SupportMainDepthHasStencil(); }",
+    )
+    return (all(x in api for x in decls) and
+            all(x in producer for x in owners) and
+            all(x in consumer for x in callers))
+
+if not r9_main_depth_boundary_ok(r30_support_api, r30, r32):
+    errors.append("R30/R32 R9 main depth generation/stencil read-only facade missing")
+for label, mutated_owner, mutated_consumer in (
+    ("generation zeroed", r30.replace(
+        "return R9MainDepthGenerationValue();", "return 0;", 1), r32),
+    ("stencil forced true", r30.replace(
+        "return R9TrackedMainDepthHasStencil();", "return true;", 1), r32),
+    ("R32 generation bypass", r30, r32.replace(
+        "return R30SupportMainDepthGeneration();",
+        "return R9MainDepthGenerationValue();", 1)),
+):
+    if mutated_owner == r30 and mutated_consumer == r32:
+        errors.append("R9 depth owner mutation not applied: " + label)
+    elif r9_main_depth_boundary_ok(r30_support_api, mutated_owner, mutated_consumer):
+        errors.append("R9 depth owner mutation survived: " + label)
+
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
 # SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.

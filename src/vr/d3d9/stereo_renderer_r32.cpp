@@ -867,8 +867,8 @@ namespace OutRunVRStereo
         return draw(drawCtx);
     }
 
-    std::uint64_t R32ReviewMainDepthGeneration() noexcept { return R9MainDepthGenerationValue(); }
-    bool R32ReviewMainDepthHasStencil() noexcept { return R9TrackedMainDepthHasStencil(); }
+    std::uint64_t R32ReviewMainDepthGeneration() noexcept { return R30SupportMainDepthGeneration(); }
+    bool R32ReviewMainDepthHasStencil() noexcept { return R30SupportMainDepthHasStencil(); }
     bool R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteDepth(d); }
     bool R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteStencil(d); }
     void R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R9InvalidateRightDepthStencilSync(d, s); }

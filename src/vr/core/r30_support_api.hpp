@@ -30,6 +30,9 @@ namespace OutRunVRStereo
     std::uint64_t R30SupportPresentEpoch() noexcept;
     bool R30SupportStereoWanted() noexcept;
     bool R30SupportStereoBaselineSeeded() noexcept;
+    // R9 depth-generation/stencil metadata remains lower-owned and read-only.
+    std::uint64_t R30SupportMainDepthGeneration() noexcept;
+    bool R30SupportMainDepthHasStencil() noexcept;
     bool R30SupportTargetIsBackBuffer() noexcept;
     bool R30SupportAnyAuxRenderTargetActive() noexcept;
     bool R30SupportTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept;
