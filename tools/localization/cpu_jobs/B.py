@@ -29,7 +29,7 @@ trial=(G/"role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_UNAPPROVED_Q212_TWO_AN
 assert sha(q)==oldsha and sha(trial)==trialsha
 subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212"],check=True,capture_output=True)
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
-    "3da79726739ac631d8e2703a65330dbb0c310770/"
+    "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/"
     "Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds")
 with urllib.request.urlopen(url,timeout=100) as r: raw=r.read()
 assert sha(raw)==sourcesha,(len(raw),sha(raw))
