@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C338 C1 odd q205 new B306 exact saved pixel delta vs historical B303 native 4096x2048 RGBA32: header same, 25,528 RGBA changed/23,123 alpha changed ALL within 2 source titles, 0 outside; current original-box alpha margins 6px each, SOURCE/CLEAN canonical not independent, 21 unaffected regions not visually reviewed -> HOLD_STRICT_RECHECK C3/approval blocked, IGR026/027/028 OPEN, RUNTIME_VALIDATION=UNTESTED; 0 new DDS. localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/C338_C1_CONTROLLER_HOLD.json RUN_KEY=OUTRUN-KOR-C338-C1-Q205-B306-EXACT-DDS-PIXEL-DIFF-20261010-0250",
     "B340 2026-10-10 02:36 KST B q214 B339 trial alpha-topology producer direct native/RAW inspection: trial SHA d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8 mechanically exact persisted BC3/alpha-core1.0/outside0, but GOAL→골 still pale stacked bars/poor counters at FLIPY 100 and RAW50 (recurs from B338). SOURCE-family legibility FAIL overrides machine PASS; do not promote B339 or repeat same mask/donor. Current promoted candidate ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 unchanged, C2/C3/approval/user blocked, DDS0, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B340-Q214-B339-ALPHA-VISUAL-REVIEW/B340_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B340-Q214-B339-ALPHA-PRODUCER-VISUAL-REJECT-20261010-0230.",
     "C337 C1 odd q137 B320 current exact DDS cdd4a34879b7 native saved SHA, BGRA32/2048x1024/mip1 alpha bbox verified, FLIP-Y/RAW gray100/50 reviewed; exact source/CLEAN, calibrated family and whole atlas not independently verified => HOLD_STRICT_RECHECK. IGR041 OPEN, C3/export/game blocked. QA localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json RUN_KEY=OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
     "A214 q227 P1 GitHub Actions 37963658586 rerun job 113937285379 SUCCESS, 13 previously uncovered C320 cells SOURCE/CLEAN/FINAL native RGBA, BGW 100/75/50, RAW new evidence published and direct producer visual 13/13 inspected. All 16 original cells machine-checked zero English alpha ghosts, changed outside source original text union RGBA/alpha zero, native persisted exact SHA 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 UNCHANGED, NEW DDS=0. A producer scoped evidence only; C320 C1 HOLD, blinded per-stroke style, full C3 and new IGR034/035/036 user in-game retest pending, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_CONTROLLER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200.",
@@ -13957,5 +13958,26 @@
     "USER_GAME": "IGR041_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json"
+  },
+  "c338_c1_q205_b306_independent_delta": {
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 205,
+    "run": "C338",
+    "run_key": "OUTRUN-KOR-C338-C1-Q205-B306-EXACT-DDS-PIXEL-DIFF-20261010-0250",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "previous_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+    "changed_rgba_pixels": 25528,
+    "changed_alpha_pixels": 23123,
+    "changed_outside_2_source_regions": 0,
+    "other_21_regions_previous_current_exact": true,
+    "source_clean_independent_proof": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_IGR_026_027_028": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "report": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/C338_C1_CONTROLLER_HOLD.json"
   }
 }
