@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-STEREO-DEPTH-READINESS-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "controller_terminal": true,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "attempt": 1,
+  "base_sha": "460239afca51be74db6b6deac2d8a855555ed37b",
+  "material_result_sha": "70a426586276245788fba5140f9ab202ff64d4dc",
+  "validation_bearing_result_sha": "70a426586276245788fba5140f9ab202ff64d4dc",
+  "result_sha": "70a426586276245788fba5140f9ab202ff64d4dc",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "Behavior-neutral R32 resource/depth readiness owner extraction: forward EnsureStereoResources, TryBootstrapRightDepthFromRecentClear, DepthTestActive and StencilTestActive through explicit R30 support APIs, preserving original D3D9 device, success/failure and side effects. Nine fail-closed negative mutations reject inappropriate success, bootstrap suppression, mixed predicates and each bypass.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/automation/reviews/DX9EX_R84_SESSION_20261009_1945.md"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37919729449,
+      "head_sha": "70a426586276245788fba5140f9ab202ff64d4dc",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113784484386,
+        "game": 113784615878,
+        "host": 113784615740,
+        "full-chain-compile": 113784615748,
+        "package": 113786267374
+      }
+    },
+    "domain": {
+      "run_id": 37919729560,
+      "head_sha": "70a426586276245788fba5140f9ab202ff64d4dc",
+      "conclusion": "success"
+    },
+    "package_artifact": {
+      "id": 11610579786,
+      "digest": "sha256:57ce1f60190f17747168c1d8f51b2d0b2c9c70be6efa551cf90188ec4c446900"
+    },
+    "issue14_comment_id": 6079359036
+  },
+  "pipeline": {
+    "C0": "Current authenticated branch HEAD and queue restored",
+    "C1": "Four real R32 lower dependencies inspected",
+    "C2": "Four R30 support APIs and nine negative tests committed",
+    "C3": "Exact-SHA GitHub Windows policy/game/host/full-chain/package and Domain SUCCESS",
+    "C4": "Material source committed",
+    "C5": "Exact-SHA package artifact SHA256 verified",
+    "C6": "Terminal record sealed"
+  },
+  "next_action": "New independent bounded R32 RT/DS original hook forwarding owner seam; then staged R32/R31 separate-TU/CMake cleanup, preserving currently green baseline. RUNTIME_VALIDATION remains UNTESTED."
+}
