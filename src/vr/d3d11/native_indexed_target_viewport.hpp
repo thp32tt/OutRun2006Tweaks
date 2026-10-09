@@ -17,10 +17,21 @@ namespace outrun::vr::dx11 {
             generation, vbVersion, ibVersion))
         return false;
 
+    // An indexed eye draw must not broadcast pixels to a stale second-eye
+    // RTV. OMGetRenderTargets(1) cannot reveal extra bound MRT slots.
+    ID3D11RenderTargetView* outputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, outputs, nullptr);
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> target;
-    context->OMGetRenderTargets(1, target.GetAddressOf(), nullptr);
-    // Equal-sized eye targets are not interchangeable: require the owned RTV.
-    if (!target || target.Get() != expectedTarget) return false;
+    target.Attach(outputs[0]); // Adopt the reference returned by OMGetRenderTargets.
+    bool hasExtraOutput = false;
+    for (UINT slot = 1; slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++slot) {
+        if (outputs[slot]) {
+            hasExtraOutput = true;
+            outputs[slot]->Release(); // Query added one reference per occupied slot.
+        }
+    }
+    // Equal-sized eye targets are not interchangeable: require a sole owned RTV.
+    if (hasExtraOutput || !target || target.Get() != expectedTarget) return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     target->GetDesc(&view);
     if (view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D ||

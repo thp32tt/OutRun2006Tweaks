@@ -96,6 +96,13 @@ int main() {
     require(!ready(), "reject same-sized different RTV");
     ctx->OMSetRenderTargets(1,&raw,nullptr);
     require(ready(), "restore original owned RTV");
+    // R204: slot 0 is correct, but a stale opposite-eye MRT in slot 1
+    // would still receive DrawIndexed unless every OM output is owned.
+    ID3D11RenderTargetView* twoEyes[]={raw,wrongRaw};
+    ctx->OMSetRenderTargets(2,twoEyes,nullptr);
+    require(!ready(), "reject stale second-eye indexed RTV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(), "restore sole indexed RTV after MRT");
     require(!ready(41,40), "reject wrong target width");
     require(!ready(40,40,DXGI_FORMAT_R8G8B8A8_UNORM_SRGB), "reject wrong view format");
     ctx->RSSetViewports(0,nullptr);
