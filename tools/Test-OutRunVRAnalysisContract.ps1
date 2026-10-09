@@ -26,6 +26,12 @@ function Invoke-Fixture {
     "installedMatchesSelected=$DllMatched" |
         Set-Content (Join-Path $dir 'GAME_DLL_IDENTITY.txt') -Encoding UTF8
 
+    # Only the rank-specific callback proves the ordinal producer ran.
+    # The aggregate projected count also includes the working rival icon.
+    if ($Projected -gt 0 -and $Name -ne 'rival-projects-rank-unobserved') {
+        'VR R57 rank Calc3D2D: ordinal capture valid=1 inputFinite=1 screenZ=-1 sourceZ=-1' |
+            Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
+    }
     if ($Name -eq 'r28-present-over-budget') {
         'VR R28 PERF: lower-Present avgMs=6.124 maxMs=28.557 drawsPerPresent=1164.8' |
             Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
@@ -54,6 +60,11 @@ function Invoke-Fixture {
         $result.Flags -contains 'NO_AUTOMATIC_RED_FLAG') {
         throw "$Name gave a false no-red-flag verdict"
     }
+    if ($Name -eq 'rival-projects-rank-unobserved' -and
+        ($result.RankExactCalcObserved -or
+         $result.Flags -notcontains 'HUD_RANK_CALC_CAPTURE_UNOBSERVED')) {
+        throw "$Name masked missing rank capture behind a valid rival marker"
+    }
     if ($Name -eq 'r28-present-over-budget' -and
         ($result.R28PresentOverBudgetWindows -ne 1 -or
          $result.R28PresentMaxMs -ne 28.557 -or
@@ -70,6 +81,7 @@ try {
     Invoke-Fixture 'real-user-rank-projected-zero' 0 'True' 'HUD_RANK_PROJECTED_PATH_ZERO'
     Invoke-Fixture 'stale-installed-dll' 5 'False' 'GAME_DLL_SHA256_MISMATCH'
     Invoke-Fixture 'healthy-telemetry-only' 5 'True' 'OK'
+    Invoke-Fixture 'rival-projects-rank-unobserved' 5 'True' 'HUD_RANK_CALC_CAPTURE_UNOBSERVED'
     Invoke-Fixture 'r28-present-over-budget' 5 'True' 'PERFORMANCE_WARNING'
 } finally {
     Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
