@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00465",
+  "production_id": "CONVERSION-DX11-00465",
+  "event_id": "CONVERSION-DX11-00465-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "8f91d202f0ea7563704b0ec341dbe7b7a75e63ac",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00465",
+  "lease_epoch": 1,
+  "work_key": "DX11:R157:OFFSCREEN_NATIVE_INDEXED_DRAW:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:prepare_fixed_function_indexed_direct_draw_probe",
+    "src/vr/d3d11/native_backend.hpp:R157",
+    "tools/dx11_constant_buffer_probe.cpp:R157"
+  ],
+  "selected_work_item": "DX11_R157_NATIVE_INDEXED_DRAW_WARP_OFFSCREEN_EXECUTION",
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "Add native indexed DrawIndexed offscreen preflight using current managed VB/IB shadow, D3D9 source-index-value lineage and live immediate IA/OM; test actual WARP GPU indexed triangles without gameplay native activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact branch base 8f91d202f0ea7563704b0ec341dbe7b7a75e63ac; 00464 terminal and 00465 absent",
+    "C1_REVIEW": "PASS: distinct R157 WARP indexed DrawIndexed, R147/R150/R152/R153 indexed lineage",
+    "C2_IMPLEMENT": "PASS: C++ indexed preflight and WARP DrawIndexed execution regression",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate after material commit",
+    "C4_COMMIT": "PENDING: atomically published source + test commit; result SHA tracked by GitHub",
+    "C5_PACKAGE": "NOT_REQUIRED: WARP-only isolated diagnostic, no deployable game candidate",
+    "C6_STATE": "PENDING: exact-SHA Gate and issue ledger"
+  },
+  "last_real_activity_at": "2026-10-09T00:06:46.528Z",
+  "last_activity_evidence": "source+test write",
+  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "next_action": "Inspect exact-SHA Backend Conversion Gate; correct failure on same TASK_ID or finalize run and lane state after PASS.",
+  "blockers": [
+    "Quest3/VDXR game runtime HMD verification pending; no native gameplay Draw activation"
+  ],
+  "native_draw_path_activation_changed": false,
+  "state_persisted": false
+}

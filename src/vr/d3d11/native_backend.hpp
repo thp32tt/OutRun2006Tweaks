@@ -4612,6 +4612,26 @@ compose_fixed_function_indexed_source_live_binding_readiness(
     const NativeManagedBufferShadow& indexBuffer,
     std::uint64_t snapshotToken) noexcept;
 
+// R157 offscreen WARP-only indexed DrawIndexed preflight. Revalidates the
+// complete R147/R150/R152/R153 indexed source shadow + live IA chain at
+// submission time. It never calls DrawIndexed or activates gameplay Draw.
+[[nodiscard]] bool prepare_fixed_function_indexed_direct_draw_probe(
+    ID3D11DeviceContext* context,
+    ID3D11RenderTargetView* expectedProbeTarget,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeManagedBufferShadow& vertexBuffer,
+    const NativeManagedBufferShadow& indexBuffer,
+    D3DPRIMITIVETYPE primitive, UINT primitiveCount,
+    UINT startIndexLocation, INT baseVertexLocation) noexcept;
+
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
 // the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
 // not issue DrawIndexed or enable NativeDrawPathActive.

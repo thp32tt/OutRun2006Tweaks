@@ -14517,6 +14517,112 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
     return true;
 }
 
+// R157: isolated WARP DrawIndexed GPU proof. Validate copied packet fields
+// before recomputing the entire indexed lineage and live IA binding.
+// Actual GPU draw is deliberately restricted to the WARP test executable.
+bool prepare_fixed_function_indexed_direct_draw_probe(
+    ID3D11DeviceContext* context,
+    ID3D11RenderTargetView* expectedProbeTarget,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeManagedBufferShadow& vertexBuffer,
+    const NativeManagedBufferShadow& indexBuffer,
+    D3DPRIMITIVETYPE primitive, UINT primitiveCount,
+    UINT startIndexLocation, INT baseVertexLocation) noexcept {
+    UINT elements = 0;
+    const auto topology = translate_primitive(primitive);
+    if (!context || !expectedProbeTarget ||
+        context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+        !direct_draw_element_count(primitive, primitiveCount, elements) ||
+        elements == 0u || !topology.exact ||
+        !dispatch.ready || !dispatch.indexed || dispatch.snapshotToken == 0 ||
+        dispatch.topology != topology.value ||
+        dispatch.elementCount != elements ||
+        dispatch.primitiveCount != primitiveCount ||
+        dispatch.startVertexLocation != 0u ||
+        dispatch.startIndexLocation != startIndexLocation ||
+        dispatch.baseVertexLocation != baseVertexLocation ||
+        dispatch.renderTargetBoundDrawSnapshotToken != boundDraw.snapshotToken ||
+        dispatch.drawSnapshotToken != draw.snapshotToken ||
+        dispatch.geometrySnapshotToken != geometry.snapshotToken ||
+        !dispatch.bufferRangeExact || !dispatch.dispatchArgumentsExact ||
+        !dispatch.pointRasterSemanticsExact || !dispatch.lineRasterSemanticsExact ||
+        !sourceRange.ready || sourceRange.primitiveCount != primitiveCount ||
+        sourceRange.elementCount != elements ||
+        sourceRange.startIndex != startIndexLocation ||
+        sourceRange.baseVertexIndex != baseVertexLocation ||
+        !sourceValues.ready || sourceValues.startIndex != startIndexLocation ||
+        sourceValues.indexCount != elements ||
+        !indexedLineage.ready || !sourceValueLineage.ready ||
+        !sourceBinding.ready || !geometry.indexBufferRequired ||
+        !validate_fixed_function_direct_draw_dispatch_snapshot(
+            boundDraw, draw, geometry, primitive, primitiveCount,
+            true, 0u, startIndexLocation, baseVertexLocation,
+            dispatch.snapshotToken) ||
+        !validate_fixed_function_indexed_direct_dispatch_snapshot(
+            dispatch, sourceRange, boundDraw, indexedLineage.snapshotToken) ||
+        !validate_fixed_function_indexed_source_value_snapshot(
+            dispatch, indexedLineage, sourceRange, geometry, sourceValues,
+            sourceValueLineage.snapshotToken) ||
+        !validate_fixed_function_indexed_source_binding_snapshot(
+            sourceValueLineage, dispatch, indexedLineage, sourceRange,
+            geometry, sourceValues, boundDraw, sourceBinding.snapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    Microsoft::WRL::ComPtr<ID3D11Device> targetDevice;
+    context->GetDevice(device.ReleaseAndGetAddressOf());
+    expectedProbeTarget->GetDevice(targetDevice.ReleaseAndGetAddressOf());
+    if (!device || device.Get() != targetDevice.Get() ||
+        vertexBuffer.mirror_device() != device.Get() ||
+        indexBuffer.mirror_device() != device.Get())
+        return false;
+    const auto currentVertex = vertexBuffer.mirror_readiness(device.Get());
+    const auto currentIndex = indexBuffer.mirror_readiness(device.Get());
+    if (!currentVertex.ready || !currentIndex.ready ||
+        currentVertex.snapshotToken != geometry.vertexBufferSnapshotToken ||
+        currentIndex.snapshotToken != sourceValues.mirrorSnapshotToken ||
+        !indexBuffer.validate_index_range_readiness_snapshot(
+            currentIndex, sourceValues.sourceIndexFormat,
+            startIndexLocation, elements, sourceRange.minVertexIndex,
+            sourceRange.maxVertexIndex, sourceValues.snapshotToken))
+        return false;
+    const auto liveSource =
+        compose_fixed_function_indexed_source_live_binding_readiness(
+            sourceBinding, sourceValueLineage, dispatch, indexedLineage,
+            sourceRange, geometry, sourceValues, boundDraw, context,
+            indexBuffer);
+    if (!liveSource.ready || liveSource.snapshotToken == 0 ||
+        liveSource.observedIndexOffset != 0u)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveTarget;
+    context->OMGetRenderTargets(1, liveTarget.ReleaseAndGetAddressOf(), nullptr);
+    Microsoft::WRL::ComPtr<ID3D11Buffer> liveVertex;
+    UINT stride = 0u, offset = 0u;
+    context->IAGetVertexBuffers(
+        0, 1, liveVertex.ReleaseAndGetAddressOf(), &stride, &offset);
+    D3D11_PRIMITIVE_TOPOLOGY liveTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    context->IAGetPrimitiveTopology(&liveTopology);
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> liveVS;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
+    context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(livePS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    return liveTarget.Get() == expectedProbeTarget &&
+        liveVertex.Get() == vertexBuffer.mirror_buffer() &&
+        stride == boundDraw.vertexStride &&
+        offset == boundDraw.vertexOffset &&
+        liveTopology == dispatch.topology && liveVS && livePS;
+}
+
 NativeFixedFunctionFanDrawDispatchReadiness
 compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
     const NativeFixedFunctionDrawReadiness& draw,

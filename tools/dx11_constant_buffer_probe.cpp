@@ -11260,6 +11260,87 @@ VSOutput main(VSInput input)
                 indexedSourceLiveBinding.snapshotToken,
             "R153 live source binding restores deterministic IA identity");
 
+
+        // R157 offscreen WARP indexed submission: revalidate CPU source-index
+        // values and the immediate live IA/OM/VS/PS binding before DrawIndexed.
+        auto r157Probe = [&](ID3D11DeviceContext* context,
+                             ID3D11RenderTargetView* target,
+                             const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
+            return outrun::vr::dx11::
+                prepare_fixed_function_indexed_direct_draw_probe(
+                    context, target, renderTargetBoundDraw,
+                    multiStageDrawReady, indexedGeometryReady, packet,
+                    indexedDirectLineage, indexedSourceRange,
+                    indexedSourceValues, indexedSourceValueLineage,
+                    indexedSourceBinding, managedVertexBuffer,
+                    managedIndexBuffer, D3DPT_TRIANGLELIST, 2u, 0u, 0);
+        };
+        require(
+            !r157Probe(d3d.context, nullptr, indexedDirectDispatch),
+            "R157 rejects missing offscreen target");
+        ID3D11DeviceContext* r157Deferred = nullptr;
+        require(
+            SUCCEEDED(d3d.device->CreateDeferredContext(0, &r157Deferred)) &&
+            r157Deferred != nullptr,
+            "R157 deferred context negative prerequisite");
+        require(
+            !r157Probe(r157Deferred, outputColorSurface.render_target_view(),
+                       indexedDirectDispatch),
+            "R157 rejects deferred DrawIndexed recording");
+        r157Deferred->Release();
+        auto r157Forged = indexedDirectDispatch;
+        r157Forged.elementCount += 1u;
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       r157Forged),
+            "R157 rejects copied packet with forged index count");
+        r157Forged = indexedDirectDispatch;
+        r157Forged.startIndexLocation += 1u;
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       r157Forged),
+            "R157 rejects stale StartIndexLocation");
+        d3d.context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       indexedDirectDispatch),
+            "R157 rejects removed IA index owner");
+        d3d.context->IASetIndexBuffer(
+            managedIndexBuffer.mirror_buffer(), DXGI_FORMAT_R16_UINT, 0u);
+        require(
+            r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                      indexedDirectDispatch),
+            "R157 revalidates exact WARP indexed IA/OM/VS/PS and shadow");
+        ID3D11Query* r157Stats = nullptr;
+        D3D11_QUERY_DESC r157StatsDesc{};
+        r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
+        require(
+            SUCCEEDED(d3d.device->CreateQuery(&r157StatsDesc, &r157Stats)) &&
+            r157Stats != nullptr,
+            "R157 pipeline statistics query prerequisite");
+        d3d.context->Begin(r157Stats);
+        // Production game path remains dormant. Only the isolated WARP test
+        // is allowed to issue this native DrawIndexed.
+        d3d.context->DrawIndexed(
+            indexedDirectDispatch.elementCount,
+            indexedDirectDispatch.startIndexLocation,
+            indexedDirectDispatch.baseVertexLocation);
+        d3d.context->End(r157Stats);
+        d3d.context->Flush();
+        D3D11_QUERY_DATA_PIPELINE_STATISTICS r157Counters{};
+        HRESULT r157Result = S_FALSE;
+        for (unsigned spin = 0; spin < 2048u; ++spin) {
+            r157Result = d3d.context->GetData(
+                r157Stats, &r157Counters, sizeof(r157Counters), 0u);
+            if (r157Result != S_FALSE)
+                break;
+        }
+        require(
+            r157Result == S_OK && r157Counters.IAPrimitives == 2u &&
+            r157Counters.IAVertices == 6u,
+            "R157 WARP executes two actual indexed triangles (six IA indices)");
+        r157Stats->Release();
+
         const auto indexedSourceValuesOutOfRange =
             managedIndexBuffer.index_range_readiness(
                 managedIndexReady, D3DFMT_INDEX16, 0u, 6u, 1u, 3u);
