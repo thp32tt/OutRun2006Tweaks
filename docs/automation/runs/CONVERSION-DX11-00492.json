@@ -18,24 +18,24 @@
     "cmake.toml:R190"
   ],
   "base_sha": "a417dd1db819e542afcc21fbae8e9242863412cb",
-  "material_result_sha": "PENDING_CURRENT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_CURRENT_COMMIT_SHA",
-  "result_sha": "PENDING_CURRENT_COMMIT_SHA",
-  "status": "WAITING_FOR_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "material_result_sha": "1859f2ec209c847877de677bf9e2ff67856a021e",
+  "validation_bearing_result_sha": "1859f2ec209c847877de677bf9e2ff67856a021e",
+  "result_sha": "1859f2ec209c847877de677bf9e2ff67856a021e",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
-  "summary": "R190 exact owned native indexed OM alpha blend state (object/same device/factors/sample mask/write mask) with real Win32 WARP DrawIndexed purple-on-blue pixel proof; native game draw stays dormant.",
+  "summary": "R190 dormant native indexed exact OM alpha-blend ownership + four negative source mutations + Win32 WARP real GPU DrawIndexed alpha pixels PASS. Required whole Backend Conversion Gate exact material SHA FAIL solely at unchanged separate R175 TEXCOORD6 varying BGRA mismatch; native game Draw remains dormant and Quest3/VDXR untested.",
   "pipeline": {
     "C0_RECOVER": "PASS current GitHub HEAD; 00492 unclaimed; 00491 sealed R189 scoped WARP PASS but inherited R175 whole Gate failure.",
     "C1_REVIEW": "PASS R186/R187/R188/R189 DrawIndexed preflights omit OM blend state owner; independent path chosen; avoid R175 ownership and DX9Ex/DXVK.",
     "C2_IMPLEMENT": "PASS new native indexed blend OM guard plus actual WARP indexed GPU alpha pixels probe, four source mutations, build and Gate wiring.",
-    "C3_VALIDATE": "R190 scoped source contract and actual WARP pixels to be executed in exact SHA GitHub CI; inherited R175 still separate blocker.",
-    "C4_COMMIT": "Current actual material result commit carries exact AUTO marker, no CI skip.",
-    "C5_PACKAGE": "NOT_REQUIRED: dormant native game Draw; no Quest3/VDXR evidence, no runtime package.",
-    "C6_STATE": "PENDING exact material SHA CI and follow-up state sealing."
+    "C3_VALIDATE": "R190 scoped PASS on material 1859f2ec209c847877de677bf9e2ff67856a021e: new Python source contract/4 negative mutations, MSVC Win32 WARP C++ build, real DrawIndexed RGBA purple-on-blue pixel readback. Validate job 113963898656 SUCCESS. Whole exact-SHA Backend Conversion Gate 37972934528 FAIL in DX11 readiness smoke job 113966078218 at inherited R175 COLOR0 TEXCOORD6 [128,0,16,255] != [224,128,32,255], separate owner 00477. Never claim whole Gate PASS.",
+    "C4_COMMIT": "PASS real material sha 1859f2ec209c847877de677bf9e2ff67856a021e with [AUTO:CONVERSION-DX11-00492] and no CI skip; exact material Gate 37972934528 completed FAILURE. C6 checkpoint commit is separate [skip ci] and must not override validation-bearing result.",
+    "C5_PACKAGE": "NOT_REQUIRED: native gameplay Draw dormant, no native backend promotion, no Quest3/VDXR HMD runtime proof.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE: R190 scoped exact-SHA static/Win32/actual WARP alpha GPU pixels PASS; full Gate FAIL separately owned R175. Preserve material result identity, no duplicate retry or score. Runtime UNTESTED."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_blend_binding.hpp",
@@ -49,12 +49,43 @@
     "previous_gate_00491": 37971106770,
     "inherited_upstream_00477_failure": "R175_GENERIC_VARYING_MISMATCH",
     "new_r190_static_mutants": 4,
-    "material_gate": "PENDING"
+    "material_gate": "FAIL_UPSTREAM_R175",
+    "run_id": 37972934528,
+    "gate_event": "push",
+    "head_sha": "1859f2ec209c847877de677bf9e2ff67856a021e",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113963898656,
+    "validate_conclusion": "success",
+    "smoke_job_id": 113966078218,
+    "smoke_conclusion": "failure",
+    "r190_source_contract": "PASS",
+    "r190_negative_mutations": 4,
+    "r190_win32_warp_build": "PASS",
+    "r190_actual_alpha_drawindexed_pixel_readback": "PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_owner": "CONVERSION-DX11-00477",
+    "inherited_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "issue14_production_comment_id": 6086817423
   },
   "blockers": [
-    "Inherited R175 generic TEXCOORD6 BGRA mismatch under separate owner 00477.",
-    "No Quest3/VDXR HMD or game runtime test."
+    "Whole exact-SHA Backend Conversion Gate fails existing 00477-owned R175 TEXCOORD6 varying mismatch; do not weaken gate or edit competing owner files.",
+    "Quest 3 / VDXR game visual, native runtime and OpenXR pacing not tested."
   ],
-  "next_action": "Inspect exact-SHA Backend Conversion Gate on current material commit; verify R190 GPU pixels and distinguish inherited R175. Seal C6; append issue #14.",
-  "score_change": 0
+  "next_action": "Do not repeat R190 unchanged or score retry. Independently owned R175 (00477) requires repair to clear whole Gate. Controller may dispatch another disjoint DX11 source work_key only with claim/CAS. No DXVK/DX9Ex edits; Quest3/VDXR stays UNTESTED.",
+  "score_change": 0,
+  "scoped_automation_validation": "PASS_R190_STATIC_WIN32_WARP_GPU_PIXELS",
+  "score_reason": "New scoped R190 C++/GPU proof PASS but mandatory entire exact-SHA Gate FAIL due previously recorded R175 owner 00477. Do not award terminal completion point; AI2 remains 1283."
 }
