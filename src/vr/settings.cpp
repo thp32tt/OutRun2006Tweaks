@@ -30,7 +30,15 @@ namespace Settings
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
-	Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", false,
+	// Optional explicit internal render resolution independent of the PC monitor.
+    // Auto (0/0) retains the original desktop-sized behavior. The x64 host
+    // starts later than GameDefaultConfigOverride, so do NOT mistake a desktop
+    // resolution for OpenXR's per-eye recommended image size.
+    Setting<int> VRRenderWidth{ "VR", "RenderWidth", 0,
+        "Optional game/eye render width. 0 = use original desktop default; set with RenderHeight. Higher resolution increases GPU load.", Range<int>{ 0, 8192 } };
+    Setting<int> VRRenderHeight{ "VR", "RenderHeight", 0,
+        "Optional game/eye render height. 0 = use original desktop default; set with RenderWidth. Not an OpenXR runtime autodetection.", Range<int>{ 0, 8192 } };
+    Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", false,
 		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
