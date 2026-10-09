@@ -1,0 +1,1196 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C340",
+  "timestamp_kst": "2026-10-10T04:02:07+09:00",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "queue_index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "candidate_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "source_authentication": "Downloaded exact canonical ORIGINAL source DDS from Sonic-TV/OR2006Sprites pinned commit 3ce344e7; independently verified SHA. Copyrighted source only in ephemeral scratch, not committed.",
+  "clean_authentication": "Opened existing exact B80 CLEAN_PLATE PNG and independently sha256 verified its SHA, decoded RGBA and zero alpha inside all14; it is an authored plate, not a separately extracted original game plate.",
+  "persisted_candidate_authentication": "Independently opened current branch HD candidate from disk; exact SHA; 2048² RGBA32 DDS mip1, matching source DDS 128-byte header.",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/C340_Q236_EXACT_MACHINE.json",
+    "sha256": "b4f1c8ab664243444567b8ff9c5df72e000eddb32974c8883931b0ad88c970b3"
+  },
+  "source_clean_final_new_proofs": {
+    "png_count": 86,
+    "full_montage": [
+      {
+        "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/C340_ALL14_CONTACT_00_06_50.png",
+        "sha256": "ac814e9b07d660f4f3cf80f19cadd98928533e1c83f26ea08bc0cf1094c07709"
+      },
+      {
+        "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/C340_ALL14_CONTACT_07_13_50.png",
+        "sha256": "a49565405ff4c7936f292167b0a9e520176f388c9e4a5e4fdb5437c5722b0f87"
+      }
+    ],
+    "source_clean_outside_rgba_alpha": [
+      0,
+      0
+    ],
+    "clean_current_outside_rgba_alpha": [
+      0,
+      0
+    ],
+    "source_current_outside_rgba_alpha": [
+      0,
+      0
+    ],
+    "min_source_bbox_margin": 4,
+    "clean_nonzero_alpha_inside_any_row": 0,
+    "outside_union_protected_source_alpha_pixels_preserved": true
+  },
+  "review_procedure": "Actual persisted DDS and exact source bytes independently decoded to RAW+FLIP-Y; all 14 source/CLEAN/current native+practical 75/50 gray; black/white native; RAW each; reviewed complete two 50% 14-row montages and sampled native source-family contacts. Existing producer prose was already consulted during selection; do not claim blinded first-look.",
+  "per_region_eight_checks": {
+    "row00": {
+      "english": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "source_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "candidate_bbox_rel": [
+        335,
+        4,
+        1103,
+        83
+      ],
+      "margins": [
+        335,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row00_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "60963c09875204e5f4288fae2ffa5f05d873de8113a1b54b467029dcd94bbfa3",
+          "bytes": 27423
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row00_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b0ee5e239993cf9a43c061d6a264bcea307dc17d68b0096a9ecf60a1cceec3ea",
+          "bytes": 37740
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row00_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "958ff15b3f2810b708687f4a2075209c4ab4fe5b5e994c2fdce657cf3c1b5fc7",
+          "bytes": 26072
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row00_RAW_SOURCE_FINAL.png",
+          "sha256": "d9fe2f57e50f03aaacb77d482d19aaf8f78b10785191bed947b7d32054f44725",
+          "bytes": 26109
+        }
+      ]
+    },
+    "row01": {
+      "english": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "candidate_bbox_rel": [
+        388,
+        4,
+        713,
+        91
+      ],
+      "margins": [
+        388,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row01_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1cf03ac7c99e809eb7eb5246d715d7d49fefd6a8ec949f3ed93220e65d720910",
+          "bytes": 15930
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row01_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4d3faffaa6912b12dd18dd3208d77b81c6e7467576b9cee79a7cebee3a4dd225",
+          "bytes": 24518
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row01_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b20597f58d3af9e5b7ed9b8243dad3fca8eb65beea19b382ada64e5614d768cc",
+          "bytes": 17114
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row01_RAW_SOURCE_FINAL.png",
+          "sha256": "e3e3b891090dc22fa97440e89a5f06bcc83c9fede6dbff8acb814b05ebdd93f1",
+          "bytes": 15003
+        }
+      ]
+    },
+    "row02": {
+      "english": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "source_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "candidate_bbox_rel": [
+        447,
+        4,
+        789,
+        90
+      ],
+      "margins": [
+        447,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row02_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1e19615bf59c6e7631f2a68a8024396a2829d1d6db46d2a3548a9e3fad00bd64",
+          "bytes": 12605
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row02_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2a86794e1a181cd771d8e2d7cfb4f0420badbdcbf6d250ff69d9855957137b6f",
+          "bytes": 21079
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row02_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7fb0574b1928ef88a0654a0fed136bdb35f56127b3a770df6a6b2af4bde84a22",
+          "bytes": 14425
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row02_RAW_SOURCE_FINAL.png",
+          "sha256": "8aeb4e694ad1a9c0444af206c9760cd6a99e5f06663251717c8b0dcbe27ecccf",
+          "bytes": 12055
+        }
+      ]
+    },
+    "row03": {
+      "english": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "source_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "candidate_bbox_rel": [
+        434,
+        4,
+        776,
+        91
+      ],
+      "margins": [
+        434,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row03_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2eb958c2fe19555d9e0eba5c754aeca8877cdf125391cc3e97878370a0181ad4",
+          "bytes": 16498
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row03_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e777a399736d82fc71c4078582391809dfa1dc9c5656e89d28a35d318b88ee64",
+          "bytes": 23701
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row03_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e3f1ed789ca2ef3d16fa39128971b447c4e857fc9cf00f8a29207f3a22b9c0d8",
+          "bytes": 15685
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row03_RAW_SOURCE_FINAL.png",
+          "sha256": "daa2817c0bf56d9f720077ec8b1b3177cde04e977af1bc809a274efabf70e74e",
+          "bytes": 15543
+        }
+      ]
+    },
+    "row04": {
+      "english": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "source_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "candidate_bbox_rel": [
+        499,
+        4,
+        924,
+        91
+      ],
+      "margins": [
+        499,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row04_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f77e41435db1fce92a350792ee519386703aa3694b9cd32bbee8bf84e47f15ae",
+          "bytes": 21654
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row04_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b648e14d251b3afc78750349e6dbfd0f4c77856c33572b0d0db866362fbe1492",
+          "bytes": 32034
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row04_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "6b9df52f8cd4d6d84831cb799ca9481af113f28c196c78834f53bc8bd630e017",
+          "bytes": 21043
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row04_RAW_SOURCE_FINAL.png",
+          "sha256": "f768e0cb3e6df36c94721f2f01e223e8ae964b3df3c85cfcb0a3a93654a30a1d",
+          "bytes": 20347
+        }
+      ]
+    },
+    "row05": {
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "source_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "candidate_bbox_rel": [
+        58,
+        4,
+        797,
+        91
+      ],
+      "margins": [
+        58,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row05_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "f10732d4f0eb58817f2700d8ebb4ff00f2e5107162342b4e68c6012b27191010",
+          "bytes": 21966
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row05_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "072b2819c67bcc717546e4551d22472a9fc11c09618add0da0a3c9e42f4cba52",
+          "bytes": 39066
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row05_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "38f5dd1f016b90ae2809f2f22a43778931258eaa03e5cafc3ce04d154d80ab67",
+          "bytes": 26185
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row05_RAW_SOURCE_FINAL.png",
+          "sha256": "c0f6533faf674808d3054678c12cba99a53023104c6580ff921b7c6fcbf21bb5",
+          "bytes": 20761
+        }
+      ]
+    },
+    "row06": {
+      "english": "PALM BEACH",
+      "korean": "팜 비치",
+      "source_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "candidate_bbox_rel": [
+        446,
+        4,
+        702,
+        90
+      ],
+      "margins": [
+        446,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row06_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "11c9b77a4f9a6c17df5c2f642c7a1843795ca7a9e466f73ad7d86d6a2f9672fb",
+          "bytes": 12562
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row06_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "93258582bb74d7e36702d14d423710d18f3c0a09b38d83fc6bdf46b9b9662fe6",
+          "bytes": 19723
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row06_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4f8043aa1e199af6b231a08e9dcf7227535b2d2825867a03ab89a59fc465f65f",
+          "bytes": 13471
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row06_RAW_SOURCE_FINAL.png",
+          "sha256": "9551a2ae776af9c50081e94181dc97c390dbc22c8b19d7bc7c43dbefc7dff7b9",
+          "bytes": 12053
+        }
+      ]
+    },
+    "row07": {
+      "english": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "source_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "candidate_bbox_rel": [
+        444,
+        4,
+        861,
+        89
+      ],
+      "margins": [
+        444,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row07_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ec0982f0e380e935b74287d9a7e32022f5b73c50bfec41e01130d24499782a5e",
+          "bytes": 18249
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row07_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "877267b728c896ec68f4b57be14c68b7fa4c8d8fbdf967379ec0427e89b768ca",
+          "bytes": 28206
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row07_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1efdfb3d468a4c06bd724c5b37c650179f15c2ccd058b572f0a2557724a9e080",
+          "bytes": 18386
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row07_RAW_SOURCE_FINAL.png",
+          "sha256": "dc5a115b15c4e6716c7c13b572232c8c129decc8077986a116fa403668ce25a8",
+          "bytes": 17070
+        }
+      ]
+    },
+    "row08": {
+      "english": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "source_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "candidate_bbox_rel": [
+        310,
+        4,
+        624,
+        85
+      ],
+      "margins": [
+        310,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row08_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "750fdf25fb8b79b5294ab174d6cdc2a15203b211b41754eb63ad5d0411113f16",
+          "bytes": 14849
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row08_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ca474e39b11378735bfa56050f90ad3861f11d2129a47bef1c6d6afbbdf54159",
+          "bytes": 22090
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row08_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9e74708178d7c31e0531fd9022de23bed4f7b537fdb78a7273726b4e68260863",
+          "bytes": 14427
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row08_RAW_SOURCE_FINAL.png",
+          "sha256": "f03bbb0a2eec42979468b8f0577265f3e2cd54fa5ee62be7e4f7e771a5c86e5a",
+          "bytes": 14217
+        }
+      ]
+    },
+    "row09": {
+      "english": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "source_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "candidate_bbox_rel": [
+        217,
+        4,
+        706,
+        91
+      ],
+      "margins": [
+        217,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row09_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1e5d2908ac3a680c629c913a1331fe0256cc2397dae57bb1ba0f81bb149d8fd5",
+          "bytes": 13863
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row09_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "bd970480a2a7420ca95324bbf772831f24977734a5686bbb88c6eadca224a2f3",
+          "bytes": 22888
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row09_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "eccc96e0b66dde280c4fec0cd0a049f85503e6ed8a81d088150c5c553975ffe9",
+          "bytes": 16147
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row09_RAW_SOURCE_FINAL.png",
+          "sha256": "6ea8aced00391f442f5f4419a94ec7d4b55b85c3ce126d6285dc5049e5c89418",
+          "bytes": 12955
+        }
+      ]
+    },
+    "row10": {
+      "english": "LOST CITY",
+      "korean": "로스트 시티",
+      "source_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "candidate_bbox_rel": [
+        102,
+        4,
+        530,
+        91
+      ],
+      "margins": [
+        102,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row10_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "dacdde2eb08256e2a939173281197948db73b80bfc650d29f13a93266830fa8e",
+          "bytes": 11251
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row10_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4b64cc51dd6a937f418b36e62d6975f7daa74d0fae788f211444eeb3e12489cb",
+          "bytes": 17655
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row10_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "777c45478caa8ef79ab2866cfa9e1fd24282d717596a0c306248b530c4b8de78",
+          "bytes": 12306
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row10_RAW_SOURCE_FINAL.png",
+          "sha256": "b97502a159861a8018fb9ba96db5f0a3187dd0ab5789f4868efa650338f91a81",
+          "bytes": 10686
+        }
+      ]
+    },
+    "row11": {
+      "english": "LEGEND",
+      "korean": "레전드",
+      "source_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "candidate_bbox_rel": [
+        181,
+        4,
+        419,
+        90
+      ],
+      "margins": [
+        181,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row11_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "2ef48dad8fbb3ec9064691058e68ae031ef6d6f37cb41047afa116532e49c298",
+          "bytes": 6393
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row11_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "83794df627bc456e9cc105b780149805e7eae4acb343bdc7d038e703b8ea64c0",
+          "bytes": 10508
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row11_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9a93bbc5ea27c18538e660480fadb8a0d2cc0311de9c475c7f26b065d5b9e9e5",
+          "bytes": 7512
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row11_RAW_SOURCE_FINAL.png",
+          "sha256": "8405101da4b6f69f18880fdd7c6404bc5a9ffb85698eb3163fdacb247f4753b1",
+          "bytes": 5972
+        }
+      ]
+    },
+    "row12": {
+      "english": "JUNGLE",
+      "korean": "정글",
+      "source_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "candidate_bbox_rel": [
+        255,
+        4,
+        416,
+        90
+      ],
+      "margins": [
+        255,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row12_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a7077c6dfff32e8ec75693955782c42e95d2f97eac253fb3889c367bde4e72a5",
+          "bytes": 7378
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row12_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "994d96484904e21327347bc0293dc64a57c128df63e89bd80733713bcedbeea8",
+          "bytes": 11629
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row12_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "477aeb1e3f20a0a58e16b3a0627a2013e81cd280271110c155ac1cce4406df98",
+          "bytes": 8100
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row12_RAW_SOURCE_FINAL.png",
+          "sha256": "13cf65094e7b45575a20558e8d526f1573077117f70b28be38325b438daaba17",
+          "bytes": 6828
+        }
+      ]
+    },
+    "row13": {
+      "english": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "source_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "candidate_bbox_rel": [
+        432,
+        4,
+        1006,
+        88
+      ],
+      "margins": [
+        432,
+        4,
+        4,
+        4
+      ],
+      "source_clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact SHA-qualified original SOURCE and B80 authored CLEAN native RGBA: CLEAN has zero alpha in this source ROI; full atlas outside all 14 unchanged. Exact authored plate is not separately certified as game-composited screenshot."
+      },
+      "clean_final_composite": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Exact candidate DDS readable decoded vs B80 CLEAN; entire atlas outside 14 source-bbox union has 0 changed RGBA and 0 alpha, no independently detected confirmed plate residue in current reviewed contact."
+      },
+      "slant": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source/candidate visible direction broadly upright; source-derived top-bottom glyph stem anchor pairs NOT fully measured blind."
+      },
+      "style": {
+        "result": "HOLD_CALIBRATION",
+        "observation": "Source heavy condensed dark face and final Korean dark weight/baseline reviewed in native and 50% composites; strict matched glyph-core, counter-space blind family calibration incomplete."
+      },
+      "readability": {
+        "result": "SCOPED_VISIBLE",
+        "observation": "Current native/p50 Hangul appears readable on inspected neutral gray contact; not evidence of actual game UV/UI scale."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_FAIL",
+        "observation": "No confirmed missing syllable, torn glyph, obvious cut in current full 14-row gray 50% and sampled 100% views; pixel and antialias-specific blind test incomplete."
+      },
+      "protected_art": {
+        "result": "MECHANICAL_PASS_ONLY",
+        "observation": "All 3 exact comparisons source/CLEAN/current zero pixel changes outside source-bbox union; 14 candidate visible bboxes strictly internal with >=4px margins."
+      },
+      "placement": {
+        "result": "SOURCE_BBOX_CONTAINED_ONLY",
+        "observation": "All 14 current text bboxes remain within canonical source region; actual game alignment or origin-specific left/right anchor parity not resolved."
+      },
+      "orientation": {
+        "result": "RAW_FLIPY_SCOPED_PASS",
+        "observation": "Actual RAW persisted DDS stored upside down and FLIP-Y readability consistent with canonical source; RAW source/current for every row available."
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row13_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1538b0015b1eed69e33627184e249d7f713a83ca13e66146e48c214a4ddd8d47",
+          "bytes": 17517
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row13_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5b529e65e9719833a24b24474512d674dd614e9898ffc7b34c02bd7495b99ac3",
+          "bytes": 29441
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row13_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "edfd9bee4a211acb7794fa463799347a727aaa61731ef97d59a4d8b2591f584d",
+          "bytes": 18424
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/row13_RAW_SOURCE_FINAL.png",
+          "sha256": "341d8b43a65b991fc0fc8d092bec0583d19bd127f77b4faa327cbd6717e2a3ac",
+          "bytes": 16459
+        }
+      ]
+    }
+  },
+  "new_definite_visual_hard_fail": false,
+  "blind_calibration": "NOT_QUALIFIED: missing separately recorded known-good vs known opposite-slant/residue/weight/clipped-stroke first look without answer key; PASS blocked.",
+  "decision": "HOLD_STRICT_RECHECK",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED_NOT_RUN",
+  "APPROVAL": false,
+  "PRE_INGAME_EXPORT": "BLOCKED",
+  "USER_ACCEPTANCE": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "remaining_blocks": [
+    "Independent blind source-family glyph-core/counter-space and measured slant anchor calibration all 14",
+    "Source/CLEAN compositing visual mask source-removal effect certification not externally calibrated",
+    "Distinct C3 audit on same SHA after C qualification",
+    "User native game screenshot/retest and preview acceptance"
+  ],
+  "new_dds": 0,
+  "new_lossless_png": 86,
+  "not_approval_on_same_SHA": true,
+  "forbidden_domains_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
