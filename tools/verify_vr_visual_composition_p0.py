@@ -1691,6 +1691,41 @@ if not re.search(
     lens_draw, re.S,
 ):
     raise SystemExit('P0 visual composition drift: lens draw escaped projection-scoped RAII owner')
+# Central flare is one of 4-5 original draw objects, not permission to
+# change all of them. Preserve actual DrawObjectAlpha invocation once and
+# a telemetry-only, bounded source-object ID observation.
+def verify_lens_child_producer_trace(graphics_source):
+    lens_body = function_body(
+        graphics_source, 'static void __cdecl DrawObjectAlphaProjected(')
+    for marker in (
+        'Settings::VRTelemetry', 'flareCalls.fetch_add(',
+        'hit <= 24 || (hit & (hit - 1)) == 0',
+        'VR P0 FLARE OBJECT:', 'objectId, alpha,',
+        'ScopedRenderSemantic semantic(',
+        'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
+    ):
+        require(marker, lens_body, 'exact flare child source tracing')
+    if lens_body.count('Game::DrawObjectAlpha_Internal(') != 1:
+        raise SystemExit('P0 centre lens trace duplicated original draws')
+    require_order(lens_body, 'lens object source before unchanged original',
+                  'VR P0 FLARE OBJECT:', 'ScopedRenderSemantic semantic(',
+                  'Game::DrawObjectAlpha_Internal(')
+verify_lens_child_producer_trace(graphics)
+for label, altered in (
+    ('lost flare-object ID source', graphics.replace(
+        'VR P0 FLARE OBJECT:', 'VR P0 FLARE UNSOURCED:', 1)),
+    ('flare telemetry no longer bounded', graphics.replace(
+        'hit <= 24 || (hit & (hit - 1)) == 0',
+        'hit > 0', 1)),
+):
+    if altered == graphics:
+        raise SystemExit('P0 flare negative mutation was not applied: ' + label)
+    try:
+        verify_lens_child_producer_trace(altered)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 flare negative mutation escaped: ' + label)
 require('semanticProjectedScreen', r30, 'exact lens scope classifier')
 require('CorroboratesProjectedScreenEffect', r30, 'exact lens WVP ownership guard')
 require('exactSceneEffect', r30, 'SceneEffect/lens ownership admission')
