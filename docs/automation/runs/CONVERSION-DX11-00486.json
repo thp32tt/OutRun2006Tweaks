@@ -18,12 +18,12 @@
     ".github/workflows/backend-conversion-gate.yml:R184"
   ],
   "base_sha": "a989ffde526f9d0dfba35dab74d7b7a2d1ac22a8",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "status": "VALIDATING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "material_result_sha": "d303f0841afb234b9a91b9d2ce3c1cafb509a93d",
+  "validation_bearing_result_sha": "d303f0841afb234b9a91b9d2ce3c1cafb509a93d",
+  "result_sha": "d303f0841afb234b9a91b9d2ce3c1cafb509a93d",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "native_draw_path_activation_changed": false,
   "selected_work_item": "Conservative index window and full-buffer sealed extrema, live VB/IB IA snapshot and base vertex range fail-closed preflight",
@@ -31,11 +31,11 @@
   "pipeline": {
     "C0_RECOVER": "GitHub a989ffde; no 00486 run or commits; 00485 scoped R183 PASS/full R175 fail, 00477 retains R175 owner",
     "C1_REVIEW": "Independent R184 preflight; existing R183 has no vertex/index extent guard",
-    "C2_IMPLEMENT": "Header, actual WARP probe negative controls, 3 static mutants, GitHub Actions step",
-    "C3_VALIDATE": "PENDING exact material SHA CI",
-    "C4_COMMIT": "PENDING CAS publication",
-    "C5_PACKAGE": "NOT_REQUIRED dormant gameplay Draw",
-    "C6_STATE": "PENDING exact CI"
+    "C2_IMPLEMENT": "PASS: R184 sealed index extrema metadata, live same-device IA + independent version/offset/count/BaseVertex range gate; WARP positive and 8 fail-closed checks; 3 static mutants.",
+    "C3_VALIDATE": "R184 scoped PASS: exact-SHA Gate 37956226252 Win32 validate 113907308311 SUCCESS; smoke 113909623707 R183 & R184 source, 3 mutants, WARP actual VB/IB GPU DrawIndexed PASS; full Gate failed only at pre-existing 00477-owned R175 TEXCOORD6 color mismatch.",
+    "C4_COMMIT": "PASS: GitHub material d303f0841afb234b9a91b9d2ce3c1cafb509a93d [AUTO:CONVERSION-DX11-00486], checked exact diff & remote HEAD.",
+    "C5_PACKAGE": "NOT_REQUIRED: native/game Draw inactive, WARP isolated, no HMD test/build promoted.",
+    "C6_STATE": "SEALED: exact SHA R184 implementation plus scoped WARP GPU proof PASS; inherited R175 full Gate FAIL, runtime UNTESTED, no score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_linear_buffer_mirror.hpp",
@@ -48,9 +48,72 @@
     "Inherited 00477-owned R175 TEXCOORD6 WARP color mismatch expected [224,128,32,255], got [128,0,16,255]",
     "No Quest3/VDXR native game runtime test"
   ],
-  "resume_cursor": "WAIT_R184_EXACT_SHA_BACKEND_GATE",
-  "next_action": "Inspect exact-SHA R184 Win32 and WARP smoke; if only inherited R175 fails seal scoped PASS/full FAIL, no draw promotion or score.",
+  "resume_cursor": "BLOCKED_UPSTREAM_R175_AFTER_R184_SCOPED_VERIFIED",
+  "next_action": "Do not repeat unchanged R184 WARP/Win32 and do not edit 00477-owned R175. Resume full-Gate promotion only after independently owner-validated R175 fix with new exact source SHA; future assigned DX11 work must use a disjoint work_key.",
   "score_change": 0,
   "runtime_test_performed": false,
-  "state_persisted": true
+  "state_persisted": true,
+  "scoped_automation_validation": "PASS_R184_STATIC_MUTANTS_AND_WARP_GPU_DRAWINDEXED",
+  "validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37956226252,
+    "gate_head_sha": "d303f0841afb234b9a91b9d2ce3c1cafb509a93d",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "win32_validate_job_id": 113907308311,
+    "win32_validate_result": "success",
+    "smoke_job_id": 113909623707,
+    "smoke_result": "failure",
+    "r183_source_contract": "PASS",
+    "r184_source_contract": "PASS",
+    "r184_static_mutants": "3_OF_3_REJECTED",
+    "r184_native_range_negative_cases": 8,
+    "r184_warp_build": "PASS",
+    "r184_gpu_drawindexed_pixel_readback": "PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_paths_modified": false,
+    "r175_direct_vs_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_generated_vs_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_constant_vs_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_solid_ps_bgra": [
+      0,
+      0,
+      255,
+      255
+    ]
+  },
+  "validation_run_id": 37956226252,
+  "validation_job_id": 113907308311,
+  "readiness_smoke_job_id": 113909623707,
+  "last_real_activity_at": "2026-10-10T01:11:43+09:00",
+  "score_reason": "Scoped new R184 implementation passed but required full exact-SHA Gate inherited 00477 R175 failure; rollover remains 1/3 and incomplete end-to-end task earns 0."
 }
