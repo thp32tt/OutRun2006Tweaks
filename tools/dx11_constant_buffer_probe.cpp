@@ -559,6 +559,25 @@ float4 main() : SV_Target {
         const auto r172PsPrototype =
             generate_fixed_function_pixel_shader_prototype(
                 r172Stages, true, 0u, 0u, r170TextureTypes);
+        // R172 WARP-only hypothesis: preserve the production COLOR0 VS/PS
+        // contract and independently test an alternate internal interpolator.
+        // This diagnostic remap MUST NOT authorize gameplay Draw promotion.
+        std::string r172VsSource = r172VsPrototype.source;
+        std::string r172PsSource = r172PsPrototype.source;
+        const std::string r172ColorDecl = "float4 diffuse : COLOR0;";
+        const auto r172VsInput = r172VsSource.find(r172ColorDecl);
+        const auto r172VsOutput = r172VsSource.rfind(r172ColorDecl);
+        const auto r172PsInput = r172PsSource.find(r172ColorDecl);
+        require(r172VsInput != std::string::npos &&
+                    r172VsOutput != std::string::npos &&
+                    r172VsOutput != r172VsInput &&
+                    r172PsInput != std::string::npos,
+                "R172 source-accurate FVF COLOR0 with separable VS/PS varying");
+        r172VsSource.replace(r172VsOutput, r172ColorDecl.size(),
+                             "float4 diffuse : TEXCOORD8;");
+        r172PsSource.replace(r172PsInput, r172ColorDecl.size(),
+                             "float4 diffuse : TEXCOORD8;");
+
         require(r172Layout.exact && r172Layout.fvfPath &&
                     r172Layout.elementCount == 2u &&
                     r172Layout.elements[1].Format ==
@@ -571,11 +590,11 @@ float4 main() : SV_Target {
                     r172PsPrototype.source.find("input.diffuse") !=
                         std::string::npos,
                 "R172 real D3D9 packed DIFFUSE FVF/VS/PS contract");
-        ID3DBlob* r172VsCode = compile_vertex_shader(r172VsPrototype.source);
+        ID3DBlob* r172VsCode = compile_vertex_shader(r172VsSource);
         ID3DBlob* r172PsCode = nullptr;
         ID3DBlob* r172Errors = nullptr;
         const HRESULT r172Result = D3DCompile(
-            r172PsPrototype.source.data(), r172PsPrototype.source.size(),
+            r172PsSource.data(), r172PsSource.size(),
             "R172Diffuse", nullptr, nullptr, "main", "ps_4_0",
             D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
             0u, &r172PsCode, &r172Errors);
