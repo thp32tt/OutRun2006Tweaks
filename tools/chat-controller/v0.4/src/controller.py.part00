@@ -72,7 +72,9 @@ LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
-CHAT_SLOTS = 3
+SLOT_NAMES = ("A", "B", "C1", "C2") if CONTROLLER_MODE == "localization" else ("A", "B", "C")
+QA_LANES = ("C1", "C2")
+CHAT_SLOTS = len(SLOT_NAMES)
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
@@ -230,7 +232,7 @@ LOCALIZATION_BRANCH = "korean-localization-clean"
 ASSET_QUEUE_PATH = "localization/graphics/asset_queue.csv"
 ARTIFACT_ROOT = "localization/graphics/controller_assets"
 QA_ROOT = "localization/graphics/controller_qa"
-MAX_ACTIVE_LANES = 2 if CONTROLLER_MODE == "localization" else 3
+MAX_ACTIVE_LANES = 4 if CONTROLLER_MODE == "localization" else 3
 registry_lock = threading.RLock()
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
@@ -271,7 +273,7 @@ def publish_lane(active: dict):
 
 def new_registry(now: datetime) -> Registry:
     return Registry(now.date().isoformat(), 0,
-                    [Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)])
+                    [Slot(name=name) for name in SLOT_NAMES])
 
 
 def load_registry(now: datetime) -> Registry:
@@ -288,6 +290,8 @@ def load_registry(now: datetime) -> Registry:
             # Retain browser sessions and all previous files, but do not execute
             # old queue entries. Reconstruct work from GitHub assets and SHAs.
             by_name = {s.get("name"): s for s in raw.get("slots", [])}
+            if CONTROLLER_MODE == "localization" and "C1" not in by_name and "C" in by_name:
+                by_name["C1"] = {**by_name["C"], "name": "C1"}
             allowed = {f.name for f in fields(Slot)}
             reg.slots = [Slot(**{k: v for k, v in by_name.get(s.name, asdict(s)).items()
                                  if k in allowed}) for s in reg.slots]
@@ -297,12 +301,37 @@ def load_registry(now: datetime) -> Registry:
         values["slots"] = [Slot(**s) for s in raw["slots"]]
         reg = Registry(**values)
         # Asset ownership survives midnight, process restart and container rebuild.
-        expected_slots = {chr(ord('A') + i) for i in range(CHAT_SLOTS)}
+        expected_slots = set(SLOT_NAMES)
         current_slots = {s.name for s in reg.slots}
-        if CONTROLLER_MODE == "conversion" and current_slots == {"A", "B"} and expected_slots == {"A", "B", "C"}:
+        if CONTROLLER_MODE == "conversion" and current_slots == {"A", "B"}:
             reg.slots.append(Slot(name="C"))
             log.info("migrated conversion registry slots A/B -> A/B/C for DX9Ex lane")
-        elif current_slots != expected_slots:
+        elif CONTROLLER_MODE == "localization":
+            # In-place v1 three-tab -> four-tab migration; all existing
+            # producer/QA URLs, in-flight candidate SHA and counters survive.
+            changed = False
+            if "C" in reg.active_lanes:
+                if "C1" in reg.active_lanes:
+                    raise ValueError("Conflicting C and C1 active QA ownership")
+                reg.active_lanes["C1"] = reg.active_lanes.pop("C")
+                reg.active_lanes["C1"]["lane"] = "C1"
+                changed = True
+            legacy_c = next((slot for slot in reg.slots if slot.name == "C"), None)
+            if legacy_c is not None:
+                if "C1" in current_slots:
+                    raise ValueError("Conflicting C and C1 slot identities")
+                legacy_c.name = "C1"
+                changed = True
+            for name in SLOT_NAMES:
+                if not any(slot.name == name for slot in reg.slots):
+                    reg.slots.append(Slot(name=name))
+                    changed = True
+            # Preserve existing tab order and all per-lane metadata.
+            if changed:
+                log.info("migrated localization A/B/C slots to A/B/C1/C2 without discarding QA state")
+                save_registry(reg)
+        current_slots = {s.name for s in reg.slots}
+        if current_slots != expected_slots or len(reg.slots) != len(SLOT_NAMES):
             raise ValueError("Registry belongs to another controller mode; use its isolated volume")
         return reg
 
