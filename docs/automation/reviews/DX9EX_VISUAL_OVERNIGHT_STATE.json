@@ -20,8 +20,8 @@
   ],
   "RUNTIME_VALIDATION": "UNTESTED",
   "initial_contract": "PASS",
-  "last_tick": "2026-10-10 07:52:52 KST",
-  "last_status": "SOURCE_CONTRACT_OK",
+  "last_tick": "2026-10-10 07:57:52 KST",
+  "last_status": "NO_SOURCE_CHANGE",
   "completed": {
     "0": "d790e047a4ca9bbfa7715fccda37e102b96bee90c2ccee83653971d55f14e756",
     "1": "abf5745dc78049b260996cee7bf509a8954596159dce067c61f4e881103c6a42",
