@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A217 q219 P1 newly produced actual persisted 16,777,344-byte trial SHA 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d after 2 same-task 14px extrusion boundary holds. Corrected 9px source-conditioned metal face, outside original source bbox RGBA/alpha0, 7/940/2/1 positive margins and exact RAW/FLIPY persisted roundtrip. Direct producer gray100 black50 white75 source/CLEAN/prior/trial visual REJECT: fragmented bands and insufficient welded rounded source-family style despite readable Hangul. Current official q219 candidate 8310a1e6 unchanged, 0 promoted DDS, 1 new rejected trial. C280 REWORK/C3/user IGR025 OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500.",
     "C342 C2 q060 verified exact native/source persisted DDS, source orange BEST TIME visibly remains behind overlapping Korean 최고 기록 in FLIP-Y/RAW despite B335 P1 guard. C2 REWORK_REQUIRED, asset index60 only (EVEN). Source SHA 6a33c730..., saved candidate d81d0d14... unchanged, report localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json. B fix sprite ownership/complete original removal WITHOUT deleting separately protected orange region. C3/current approvals/export blocked, IGR044 remains OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-C342-C2-Q060-SAVED-ORANGE-OVERLAP-20261010-0500",
     "B342 2026-10-10 04:45 KST q212 exact SOURCE provenance blocker resolved: original Sonic-TV source revision 3da797... failed expected sha; B329 actual canonical revision 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 independently downloaded, 16777344 bytes RGB32 2048x2048 mip1 SHA256 f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61 PASS. GitHub cpu B.py corrected 2f0d452...; corrected Actions 37982259716 QUEUED/PENDING; SOURCE/CLEAN 12-region new machine and P3 pending, current e22ad5c4 unchanged, B341 trial fa0acb56 unchanged, new promoted DDS0, C338 REWORK/C2/C3/IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json RUN_KEY=OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445.",
     "A216 q175 P1 new hand-contour SHOWROOM source-chrome material trial a5e921ab... (GitHub worker #37977929319) decoded pixel 0 outside exact source, bbox [56,400,866,527], 810/950 width. Controller native100 black50 white75 VISUAL FAIL: '쇼룸' syllable morphology becomes roof/posts + stacked rails, not original rounded welded chrome; DO NOT promote or repeat rail/stretched glyph. Existing promoted b9f60b45... unchanged, C1/C3/approval/user game IGR032 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
@@ -6857,7 +6858,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 04:15 KST",
+  "updated_at_kst": "2026-10-10 05:12 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14105,5 +14106,45 @@
     "new_promoted_dds": 0,
     "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a217_q219_source_metal_depth_pilot": {
+    "run": "A217",
+    "run_key": "OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500",
+    "owner_lane": "A",
+    "queue_index": 219,
+    "priority": "P1",
+    "asset": "D263B3F1_512x512.dds",
+    "english_source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+    "promoted_unmodified_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+    "new_trial_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+    "worker_run_id": 37985025669,
+    "source_box": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "trial_box": [
+      13,
+      1013,
+      533,
+      1128
+    ],
+    "margins": [
+      7,
+      940,
+      2,
+      1
+    ],
+    "outside_changes_px": 0,
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "producer_visual": "REJECT_SOURCE_FAMILY_AND_CHROME_FACE_BANDING",
+    "independent_C1": "C280_REWORK_REQUIRED_UNCHANGED",
+    "C3": "BLOCKED",
+    "IGR025": "OPEN_SOURCE_CONSUMER_MAPPING_AND_USER_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_CONTROLLER_VISUAL_REJECT.json"
   }
 }
