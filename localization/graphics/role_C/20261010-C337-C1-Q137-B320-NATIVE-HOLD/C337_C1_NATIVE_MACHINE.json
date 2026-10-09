@@ -1,0 +1,69 @@
+{
+  "asset": "q137",
+  "sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+  "header": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "bytes": 8388736,
+    "fourcc": "00000000",
+    "pixel_masks": [
+      16711680,
+      65280,
+      255,
+      4278190080
+    ]
+  },
+  "source_region": [
+    1288,
+    96,
+    1569,
+    128
+  ],
+  "reported_localized_bbox": [
+    1340,
+    99,
+    1516,
+    125
+  ],
+  "independent_alpha_bbox_in_source_region": [
+    1340,
+    99,
+    1516,
+    125
+  ],
+  "bbox_matches_producer": true,
+  "proof_contact": {
+    "flipy_size": [
+      1136,
+      32
+    ],
+    "raw_size": [
+      856,
+      24
+    ]
+  },
+  "outputs": [
+    "q137_exact_RAW_100.png",
+    "q137_exact_RAW_75.png",
+    "q137_exact_RAW_50.png",
+    "q137_exact_RAW_BLACK.png",
+    "q137_exact_RAW_WHITE.png",
+    "q137_exact_FLIPY_100.png",
+    "q137_exact_FLIPY_75.png",
+    "q137_exact_FLIPY_50.png",
+    "q137_exact_FLIPY_zoom4.png",
+    "q137_exact_FLIPY_BLACK.png",
+    "q137_exact_FLIPY_WHITE.png"
+  ],
+  "verification": {
+    "native_dds_redecoded": true,
+    "canonical_source_dds_available": false,
+    "clean_plate_exact_sha_verified": false,
+    "source_style_native_direct_review": "BLOCKED_MISSING_CANONICAL_SOURCE",
+    "c3": "NOT_RUN",
+    "user_ingame": "UNTESTED"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "C1-independent-native-HOLD-v1",
+  "role": "C1",
+  "shard": "ODD",
+  "run": "C337",
+  "run_key": "OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
+  "date_kst": "2026-10-10",
+  "queue_index": 137,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+  "producer_source_sha256": "11c90e063e83e485d15da16a157a7f4c99144b0ee9004205ef4ee724d21cc",
+  "producer_clean_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "verified_independent": {
+    "source_byte_identity": false,
+    "clean_plate_byte_identity": false,
+    "persisted_candidate_sha": true,
+    "persisted_header": true,
+    "persisted_alpha_bbox": true,
+    "raw_and_readable_inspected": true,
+    "gray_native_and_50_inspected": true,
+    "black_white_inspected": true,
+    "calibration_completed": false,
+    "whole_atlas_six_regions": false
+  },
+  "machine": {
+    "size": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "bytes": 8388736,
+    "format": "BGRA32 native mirrored Y",
+    "reported_bbox": [
+      1340,
+      99,
+      1516,
+      125
+    ],
+    "independent_alpha_bbox": [
+      1340,
+      99,
+      1516,
+      125
+    ],
+    "match": true
+  },
+  "image_proofs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/q137_exact_FLIPY_100.png",
+      "git_blob_sha": "6ceb4cda43cf869406b41d64d4238ee5e35c973c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/q137_exact_FLIPY_50.png",
+      "git_blob_sha": "c9f2e1292b24a96db131ea03aedf70ba909adf35"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/q137_exact_RAW_100.png",
+      "git_blob_sha": "b1c50cc42105cbdbbafc357301da53a3c0276be4"
+    }
+  ],
+  "producer_comparison_images": [
+    "localization/graphics/role_B/20261009-B320-Q137-P0-SMALL-MODE-HIERARCHY/transmission_small_FLIPY_GRAY_100_SOURCE_CLEAN_B319_B320.png",
+    "localization/graphics/role_B/20261009-B320-Q137-P0-SMALL-MODE-HIERARCHY/transmission_small_RAW_BLACK_75_SOURCE_CLEAN_B319_B320.png"
+  ],
+  "observed": [
+    "Actual persisted B320 Korean 변속기 유형 선택 has no clear missing syllable/clip at region native zoom and gray, and survives gray 50% reduction",
+    "RAW is Y-inverted versus readable FLIP-Y",
+    "Black background retains strokes; translucent light gray strokes have poor contrast on white—needs original scene assessment",
+    "English source appears wider in producer contact; independent exact native English source, clean plate, family/style/slant controls not materialized, so cannot infer approval or definite style FAIL",
+    "Other five atlas regions were not independently reviewed. Producer numeric zero/outside claims NOT copied as independent evidence."
+  ],
+  "firstlook_before_producer_verdict": false,
+  "reason_codes": [
+    "CANONICAL_SOURCE_DDS_UNVERIFIED",
+    "CLEAN_PLATE_UNVERIFIED",
+    "BLIND_FAMILY_CALIBRATION_MISSING",
+    "OTHER_5_ATLAS_REGIONS_NOT_VERIFIED"
+  ],
+  "result": "HOLD_STRICT_RECHECK",
+  "C1_PASS": false,
+  "C3_STRICT_PASS": false,
+  "APPROVAL": false,
+  "USER_REVIEW": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "IGR_041": "OPEN_USER_INGAME_FAIL",
+  "needed_next": "Materialize exact native canonical source and clean plate; independently compare six atlas regions source/clean/final and protected masks, run known-defect calibration, per-region 100/75/50 BGW RAW/FLIP-Y native and authored mips, then separate C3. Do not redraw unchanged candidate on evidence-only HOLD.",
+  "candidate_rewritten": false,
+  "new_DDS": 0,
+  "backend": "GitHub SSOT / N100 MCP lightweight native Python because ChatGPT local DNS unavailable"
+}
