@@ -1804,6 +1804,57 @@ for label, altered in (
         pass
     else:
         raise SystemExit('P0 flare negative mutation escaped: ' + label)
+# Canonical 0xD3A0 mov eax,0x570002 then 0xD3A5 -> sub_40C980
+# is a separate central sun from the outer 0xD5F5..0xD796 ->
+# sub_40C9A0 discs. Never remap the entire 0xCAE0 effect to World.
+def verify_centre_only_lens_owner(source, analyzer):
+    body = function_body(source, 'static void LensCentreEnter(')
+    leave = function_body(source, 'static void LensCentreLeave(')
+    for needle in (
+        'Settings::VREnabled', 'LensCentreSavedScope',
+        'RenderScope::WorldBillboard',
+    ):
+        require(needle, body, 'central sun owner')
+    for needle in (
+        'LensCentreDepth', 'CurrentScope = LensCentreSavedScope',
+    ):
+        require(needle, leave, 'central sun scope restore')
+    owner = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
+    for needle in (
+        'Module::exe_ptr(0xD3A5), LensCentreEnter',
+        'Module::exe_ptr(0xD3AA), LensCentreLeave',
+        'if (!LensCentreEnterHook || !LensCentreLeaveHook)',
+        'LensCentreEnterHook = {};',
+        'LensCentreLeaveHook = {};',
+        'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected',
+    ):
+        require(needle, owner, 'exact central sun hook or rollback')
+    for needle in (
+        'LensPrimaryCentre_vs_OuterChildren_0xD300',
+        '0x0000D3A5: 0x0000C980',
+        '0x0000D5F5: 0x0000C9A0',
+    ):
+        require(needle, analyzer, 'original central-vs-outer x86 call targets')
+verify_centre_only_lens_owner(graphics, read('tools/analyze_outrun_exe.py'))
+for label, mutant in (
+    ('central hook widen 0xD3A5 to outer D5F5', graphics.replace(
+        'Module::exe_ptr(0xD3A5), LensCentreEnter',
+        'Module::exe_ptr(0xD5F5), LensCentreEnter', 1)),
+    ('central leave hook lost', graphics.replace(
+        'Module::exe_ptr(0xD3AA), LensCentreLeave',
+        'Module::exe_ptr(0xD3A9), LensCentreLeave', 1)),
+    ('world scope lost', graphics.replace(
+        'RenderScope::WorldBillboard;', 'RenderScope::ScreenHud;', 1)),
+):
+    if mutant == graphics:
+        raise SystemExit('centre-only lens negative mutation not applied')
+    try:
+        verify_centre_only_lens_owner(
+            mutant, read('tools/analyze_outrun_exe.py'))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('centre-only lens negative mutation escaped: ' + label)
 require('semanticProjectedScreen', r30, 'exact lens scope classifier')
 require('CorroboratesProjectedScreenEffect', r30, 'exact lens WVP ownership guard')
 require('exactSceneEffect', r30, 'SceneEffect/lens ownership admission')
