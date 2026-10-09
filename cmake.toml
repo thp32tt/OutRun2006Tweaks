@@ -625,3 +625,16 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+
+# R194: dormant indexed cull-mode/front-face ownership and actual WARP pixel proof.
+[target.dx11_cull_indexed_probe_r194]
+type = "executable"
+sources = [
+    "tools/dx11_cull_indexed_probe_r194.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

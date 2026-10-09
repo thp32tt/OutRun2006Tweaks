@@ -456,6 +456,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R193 clipped indexed WARP probe failed: $LASTEXITCODE" }
 
+      # R194: independent winding/cull polarity on an owned dormant indexed GPU path.
+      - name: Verify R194 native raster cull ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_cull_indexed_r194.py
+
+      - name: Build R194 cull indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_cull_indexed_probe_r194
+
+      - name: Run R194 cull indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_indexed_probe_r194.exe | Select-Object -First 1
+          if (-not $probe) { throw "R194 cull indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R194 cull indexed WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
