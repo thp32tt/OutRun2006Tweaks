@@ -264,6 +264,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
 
 
+      # R182 native guarded dispatch contract is verified once per changed source.
+      - name: Verify R182 guarded native DrawIndexed
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_dormant_fan_draw_r182.py
+
       # R181 independently verifies real WARP DrawIndexed before inherited R175.
       - name: Build DX11 triangle-fan generated index-buffer probe
         run: cmake --build build-auto --config Release --target dx11_triangle_fan_index_buffer_probe

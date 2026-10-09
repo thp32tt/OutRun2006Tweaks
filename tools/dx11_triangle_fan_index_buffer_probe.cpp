@@ -181,7 +181,33 @@ void prove_fan_gpu_pixels(ID3D11Device* device, ID3D11DeviceContext* context,
         context->ClearRenderTargetView(rtv.Get(), black);
         require(owner.bind(context) && owner.index_count() == 6,
                 "R181 native fan owner IA bind");
-        context->DrawIndexed(owner.index_count(), 0, 0);
+        const auto live = owner.binding_readiness(context);
+        require(live.ready && live.snapshotToken != 0,
+                "R182 live IA snapshot");
+        require(!owner.draw_indexed_dormant(context, 0, rtv.Get()),
+                "R182 zero IA token must reject");
+        context->PSSetShader(nullptr, nullptr, 0);
+        require(!owner.draw_indexed_dormant(
+                    context, live.snapshotToken, rtv.Get()),
+                "R182 missing PS must reject");
+        context->PSSetShader(ps.Get(), nullptr, 0);
+        context->OMSetRenderTargets(0, nullptr, nullptr);
+        require(!owner.draw_indexed_dormant(
+                    context, live.snapshotToken, rtv.Get()),
+                "R182 missing OM target must reject");
+        context->OMSetRenderTargets(1, &rawRTV, nullptr);
+        ID3D11Buffer* nullVB = nullptr;
+        context->IASetVertexBuffers(0, 1, &nullVB, &stride, &offset);
+        require(!owner.draw_indexed_dormant(
+                    context, live.snapshotToken, rtv.Get()),
+                "R182 missing VB must reject");
+        context->IASetVertexBuffers(0, 1, &rawVB, &stride, &offset);
+        require(!owner.draw_indexed_dormant(
+                    context, live.snapshotToken, nullptr),
+                "R182 missing expected RTV must reject");
+        require(owner.draw_indexed_dormant(
+                    context, live.snapshotToken, rtv.Get()),
+                "R182 guarded native DrawIndexed dispatch");
         context->CopyResource(staging.Get(), target.Get());
         D3D11_MAPPED_SUBRESOURCE m{};
         require(SUCCEEDED(context->Map(staging.Get(), 0, D3D11_MAP_READ,

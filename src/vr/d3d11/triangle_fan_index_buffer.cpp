@@ -2,6 +2,8 @@
 
 #include "state_translation.hpp"
 
+#include <array>
+
 #include <limits>
 #include <utility>
 #include <vector>
@@ -316,6 +318,54 @@ bool NativeTriangleFanIndexBuffer::bind(
     context->IASetIndexBuffer(buffer_.Get(), DXGI_FORMAT_R32_UINT, 0);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     return binding_readiness(context).ready;
+}
+
+bool NativeTriangleFanIndexBuffer::draw_indexed_dormant(
+    ID3D11DeviceContext* context,
+    std::uint64_t bindingSnapshotToken,
+    ID3D11RenderTargetView* expectedColorTarget,
+    INT baseVertexLocation) const noexcept {
+    // R182: fail closed on changed live ownership, without game-hook routing.
+    if (!context || !expectedColorTarget || bindingSnapshotToken == 0 ||
+        (!indexed_source_ && baseVertexLocation != 0) ||
+        !validate_binding_snapshot(context, bindingSnapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+    context->IAGetInputLayout(inputLayout.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+    UINT vertexStride = 0;
+    UINT vertexOffset = 0;
+    context->IAGetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(),
+                                &vertexStride, &vertexOffset);
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+    context->VSGetShader(vertexShader.GetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(pixelShader.GetAddressOf(), nullptr, nullptr);
+
+    // Reject wrong output target and all extra MRTs; release Get refs.
+    std::array<ID3D11RenderTargetView*,
+               D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT> targets{};
+    context->OMGetRenderTargets(
+        static_cast<UINT>(targets.size()), targets.data(), nullptr);
+    bool outputExact = targets[0] == expectedColorTarget;
+    for (std::size_t i = 0; i < targets.size(); ++i) {
+        if (i != 0 && targets[i] != nullptr)
+            outputExact = false;
+        if (targets[i] != nullptr)
+            targets[i]->Release();
+    }
+    UINT viewportCount = 1;
+    D3D11_VIEWPORT viewport{};
+    context->RSGetViewports(&viewportCount, &viewport);
+    if (!inputLayout || !vertexBuffer || vertexStride == 0 ||
+        !vertexShader || !pixelShader || !outputExact ||
+        viewportCount != 1 || viewport.Width <= 0.0f ||
+        viewport.Height <= 0.0f)
+        return false;
+
+    context->DrawIndexed(index_count_, 0u, baseVertexLocation);
+    return true;
 }
 
 void NativeTriangleFanIndexBuffer::shutdown() noexcept {

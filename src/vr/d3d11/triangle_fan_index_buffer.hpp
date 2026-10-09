@@ -74,6 +74,14 @@ public:
         UINT sourceIndexCount,
         std::uint64_t sourceIndexSnapshotToken) noexcept;
 
+    // R182: isolated guarded D3D11 DrawIndexed, never a gameplay D3D9 hook.
+    // True means the D3D11 command was issued, not successful GPU/HMD output.
+    [[nodiscard]] bool draw_indexed_dormant(
+        ID3D11DeviceContext* context,
+        std::uint64_t bindingSnapshotToken,
+        ID3D11RenderTargetView* expectedColorTarget,
+        INT baseVertexLocation = 0) const noexcept;
+
     // Dormant binding primitive for hosted validation/future native callers.
     // It rejects foreign-device contexts and always binds R32_UINT offset 0
     // plus TRIANGLELIST topology.

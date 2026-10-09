@@ -16,7 +16,7 @@ def exact(source: str) -> bool:
         "owner.initialize_nonindexed(device, 2, 0)",
         "owner.initialize_indexed(device, 2, D3DFMT_INDEX16, 1",
         "owner.bind(context)",
-        "context->DrawIndexed(owner.index_count(), 0, 0)",
+        "require(owner.draw_indexed_dormant(\n                    context, live.snapshotToken, rtv.Get())",
         "context->CopyResource(staging.Get(), target.Get())",
         "center[0] == 255", "corner[0] == 0",
     ))
@@ -33,7 +33,7 @@ def main() -> None:
     if gate.index("Run DX11 triangle-fan generated index-buffer probe") >= gate.index("Build DX11 constant buffer probe"):
         raise SystemExit("R181 must run before unrelated R175 blocker")
     for before, after in (
-        ("context->DrawIndexed(owner.index_count(), 0, 0)", "/* removed */"),
+        ("require(owner.draw_indexed_dormant(\n                    context, live.snapshotToken, rtv.Get())", "/* removed */"),
         ("center[0] == 255", "center[0] == 0"),
         ("owner.initialize_indexed(device, 2, D3DFMT_INDEX16, 1", "owner.initialize_nonindexed(device, 2, 0"),
     ):
