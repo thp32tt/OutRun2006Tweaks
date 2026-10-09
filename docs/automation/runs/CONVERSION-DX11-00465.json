@@ -17,12 +17,12 @@
     "tools/dx11_constant_buffer_probe.cpp:R157"
   ],
   "selected_work_item": "DX11_R157_NATIVE_INDEXED_DRAW_WARP_OFFSCREEN_EXECUTION",
-  "status": "WAITING_FOR_CI",
-  "checkpoint": "C4_COMMIT",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "feca188885ab3a0770149826ce4fa15dc258d1ca",
+  "material_result_sha": "feca188885ab3a0770149826ce4fa15dc258d1ca",
+  "validation_bearing_result_sha": "feca188885ab3a0770149826ce4fa15dc258d1ca",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "summary": "Add native indexed DrawIndexed offscreen preflight using current managed VB/IB shadow, D3D9 source-index-value lineage and live immediate IA/OM; test actual WARP GPU indexed triangles without gameplay native activation.",
   "changed_paths": [
@@ -34,18 +34,25 @@
     "C0_RECOVER": "PASS: exact branch base 8f91d202f0ea7563704b0ec341dbe7b7a75e63ac; 00464 terminal and 00465 absent",
     "C1_REVIEW": "PASS: distinct R157 WARP indexed DrawIndexed, R147/R150/R152/R153 indexed lineage",
     "C2_IMPLEMENT": "PASS: C++ indexed preflight and WARP DrawIndexed execution regression",
-    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate after material commit",
-    "C4_COMMIT": "PENDING: atomically published source + test commit; result SHA tracked by GitHub",
-    "C5_PACKAGE": "NOT_REQUIRED: WARP-only isolated diagnostic, no deployable game candidate",
-    "C6_STATE": "PENDING: exact-SHA Gate and issue ledger"
+    "C3_VALIDATE": "PASS: exact-SHA feca188885ab3a0770149826ce4fa15dc258d1ca Backend Conversion Gate 37863093607; Win32 validate job 113603272209 SUCCESS and DX11 readiness smoke job 113604769109 SUCCESS, including R157 indexed WARP DrawIndexed query; artifact 11586886977 digest sha256:5fcfb796622bfa83588e414686a68ba29932fc4dd57f2ba35872a8958a0ba751",
+    "C4_COMMIT": "PASS: real C++/WARP indexed DrawIndexed material commit feca188885ab3a0770149826ce4fa15dc258d1ca [AUTO:CONVERSION-DX11-00465]",
+    "C5_PACKAGE": "NOT_REQUIRED: WARP diagnostic offscreen DrawIndexed only; gameplay native Draw dormant, no deployable candidate",
+    "C6_STATE": "PASS: exact material SHA gate and Issue #14 validated, task/lane durable state recorded without superseding validation-bearing material SHA; runtime UNTESTED"
   },
-  "last_real_activity_at": "2026-10-09T00:06:46.528Z",
-  "last_activity_evidence": "source+test write",
-  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
-  "next_action": "Inspect exact-SHA Backend Conversion Gate; correct failure on same TASK_ID or finalize run and lane state after PASS.",
+  "last_real_activity_at": "2026-10-09T00:16:01.519Z",
+  "last_activity_evidence": "Exact material GitHub Gate SUCCESS 37863093607 + two jobs, Issue14 6071609575, final C6 checkpoint",
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "next_action": "00465 terminal PASS; do not rerun or re-score. Assign next independent DX11 native work_key only after verified atomic ownership/lease; Quest3/VDXR exact-build HMD evidence required before native gameplay Draw/DrawIndexed activation.",
   "blockers": [
     "Quest3/VDXR game runtime HMD verification pending; no native gameplay Draw activation"
   ],
   "native_draw_path_activation_changed": false,
-  "state_persisted": false
+  "state_persisted": true,
+  "validation_run_id": 37863093607,
+  "validation_job_id": 113603272209,
+  "readiness_smoke_job_id": 113604769109,
+  "artifact_id": 11586886977,
+  "artifact_digest": "sha256:5fcfb796622bfa83588e414686a68ba29932fc4dd57f2ba35872a8958a0ba751",
+  "issue14_comment_id": 6071515735,
+  "validation_issue14_comment_id": 6071609575
 }
