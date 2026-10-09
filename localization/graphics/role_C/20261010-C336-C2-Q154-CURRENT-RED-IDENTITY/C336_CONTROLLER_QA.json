@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "role": "C2",
+  "run": "C336",
+  "run_key": "OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150",
+  "time_kst": "2026-10-10 01:50 KST",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "shard": "EVEN",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "priority": "CURRENT_PENDING_C_EVIDENCE",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "fresh_scope": "Five red labels on current B298 saved DDS vs C292 prior independent persisted-DDS proof (previous C323 new grey-only proof)",
+  "mechanical_proof": "5/5 red SOURCE-region exact RGBA under FLIP-Y, zero mismatches, current current SHA hash externally verified",
+  "observations": [
+    {
+      "id": "01_create_new_license",
+      "evidence": "Saved current candidate matches prior C292 source-rect PNG byte-for-byte as pixels",
+      "raw_mismatch_pixels": 239547,
+      "readable_flipy_mismatch_pixels": 0,
+      "visual_note": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop."
+    },
+    {
+      "id": "02_select_license",
+      "evidence": "Saved current candidate matches prior C292 source-rect PNG byte-for-byte as pixels",
+      "raw_mismatch_pixels": 190691,
+      "readable_flipy_mismatch_pixels": 0,
+      "visual_note": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop."
+    },
+    {
+      "id": "03_single_player",
+      "evidence": "Saved current candidate matches prior C292 source-rect PNG byte-for-byte as pixels",
+      "raw_mismatch_pixels": 167464,
+      "readable_flipy_mismatch_pixels": 0,
+      "visual_note": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop."
+    },
+    {
+      "id": "04_default_license",
+      "evidence": "Saved current candidate matches prior C292 source-rect PNG byte-for-byte as pixels",
+      "raw_mismatch_pixels": 180659,
+      "readable_flipy_mismatch_pixels": 0,
+      "visual_note": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop."
+    },
+    {
+      "id": "05_multiplayer",
+      "evidence": "Saved current candidate matches prior C292 source-rect PNG byte-for-byte as pixels",
+      "raw_mismatch_pixels": 196206,
+      "readable_flipy_mismatch_pixels": 0,
+      "visual_note": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop."
+    }
+  ],
+  "current_source_unchanged_separator_verified": true,
+  "decision": "HOLD_STRICT_RECHECK",
+  "per_region_quality_axes": {
+    "source_clean_plate": "C292 historical original CLEAN proof but not fresh all8 independent",
+    "readable_slant": "Red family appears upright at visible source scale; no measured glyph-stroke paired anchors",
+    "font_weight_effect": "No novel regression versus C292; historical condensed English vs Korean regular style needs calibrated independent review",
+    "practical_scale": "Five exact current PNG gray native shown; 75/50 current comparisons byte-equivalent to C292 but not newly rerendered",
+    "glyph_integrity": "No confirmed new defect in five alpha-composited current crops",
+    "protected_art": "First red cell preserved bottom separator 7860 visible-alpha pixels identical to canonical original evidence; full atlas independent mask not done",
+    "raw_flipY": "Current stored RAW mismatch expected; FLIPY pixel-exact 5/5",
+    "translation_coverage": "Five red Korean labels verified visible; grey three covered by prior C323, not fresh current C-pass"
+  },
+  "red_regions_scoped_decision": "PASS_UNCHANGED_PIXELS_NO_NEW_REGRESSION",
+  "full_independent_C2_PASS": false,
+  "C3": "PENDING",
+  "approval": "NOT_ISSUED",
+  "pre_ingame_export": "NO_CHANGE",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_material_dds": 0,
+  "new_independent_evidence_items": 1,
+  "machine_report": "localization/graphics/role_C/20261010-C336-C2-Q154-CURRENT-RED-IDENTITY/C336_Q154_MACHINE_EXACT.json",
+  "previous_references": [
+    "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/C292_CONTROLLER_QA.json",
+    "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json"
+  ],
+  "next": "Independently complete eight-region SOURCE/CLEAN/FINAL current exact-byte protected-mask/typography and blind family calibration, then distinct C3 and real-game review.",
+  "domains_excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
