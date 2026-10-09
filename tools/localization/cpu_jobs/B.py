@@ -64,7 +64,7 @@ out=P.copy();report=[]
 residual_only=np.zeros(P.shape[:2],bool)
 for entry in specs[:4]:
  ll,tt,rr,bb=entry[3]
- large_only[tt:bb,ll:rr]=True
+ residual_only[tt:bb,ll:rr]=True
 def letter_master(word,font_px,targetw,sourceh):
  ft=ImageFont.truetype(font,font_px,index=1)
  # Build each syllable as an independent native outline. Unlike a broad word
