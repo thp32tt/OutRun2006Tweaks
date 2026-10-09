@@ -1,6 +1,7 @@
 // R183: actual WARP DrawIndexed consumes production-owned VB and IB objects.
 // No game draw hook, backend activation or Quest 3 runtime claim.
 #include "vr/d3d11/native_linear_buffer_mirror.hpp"
+#include "vr/d3d11/native_linear_draw_submit.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <d3dcompiler.h>
@@ -167,6 +168,48 @@ int main() {
         corner[0]==0 && corner[1]==0 && corner[2]==0;
     ctx->Unmap(staging.Get(),0);
     require(pixels,"real VB/IB DrawIndexed GPU pixel readback");
+
+    // R185: this new dormant entrypoint submits an actual *non-indexed* Draw
+    // only after native IA/pipeline and source lifetime preflight. It never
+    // enables the game's D3D9 -> D3D11 dispatch.
+    using outrun::vr::dx11::submit_verified_linear_draw;
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,0,generation,version),
+            "linear Draw zero count rejected");
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,4,generation,version),
+            "linear Draw vertex extent rejected");
+    require(!submit_verified_linear_draw(vb,ctx.Get(),1,3,generation,version),
+            "linear Draw start offset overrun rejected");
+    require(!submit_verified_linear_draw(vb,otherCtx.Get(),0,3,generation,version),
+            "linear Draw foreign device rejected");
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version+1),
+            "linear Draw stale snapshot rejected");
+    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+            "linear Draw foreign topology rejected");
+    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ctx->PSSetShader(nullptr,nullptr,0);
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+            "linear Draw missing PS rejected");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    ctx->OMSetRenderTargets(0,nullptr,nullptr);
+    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+            "linear Draw missing RT rejected");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    require(submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+            "R185 dormant native linear GPU Draw submitted");
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE linearMapped{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&linearMapped)) &&
+            linearMapped.pData, "R185 linear GPU staging readback");
+    const auto* linearPixels=static_cast<const unsigned char*>(linearMapped.pData);
+    const auto* linearCenter=linearPixels+16*linearMapped.RowPitch+16*4;
+    const auto* linearCorner=linearPixels+1*linearMapped.RowPitch+1*4;
+    const bool linearOk=linearCenter[0]==255 && linearCenter[1]==0 &&
+        linearCenter[2]==0 && linearCenter[3]==255 &&
+        linearCorner[0]==0 && linearCorner[1]==0 && linearCorner[2]==0;
+    ctx->Unmap(staging.Get(),0);
+    require(linearOk,"linear Draw GPU pixel readback");
     ib.shutdown();
     require(!ib.binding_exact(ctx.Get(),generation,version),
             "retired index owner cannot validate stale IA object");

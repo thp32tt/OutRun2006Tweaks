@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00487",
+  "production_id": "CONVERSION-DX11-00487",
+  "event_id": "CONVERSION-DX11-00487-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00487",
+  "lease_epoch": 1,
+  "work_key": "DX11:R185:DORMANT_NATIVE_NONINDEXED_DRAW_IDENTITY_BOUNDS_SHADER_OM",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R185",
+    ".github/workflows/backend-conversion-gate.yml:R185"
+  ],
+  "base_sha": "73ae302e7eef89db5024e68f9a6adee30ec88e61",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "selected_work_item": "Dormant real DX11 non-indexed Draw after exact DEFAULT VB snapshot, native IA, trianglelist VS/PS/layout/RTV ownership",
+  "summary": "R185 introduces fail-closed standalone native Draw helper (no game hookup) and actual Windows WARP Draw+GPU pixel-readback probe; R175 owned color mismatch untouched.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 73ae302e7eef89db5024e68f9a6adee30ec88e61; 00486 C6 upstream blocked, no existing 00487 run/checkpoint",
+    "C1_REVIEW": "R183/184 handle IB DrawIndexed; independent nonindexed R185 owner/OM path; R175 excluded",
+    "C2_IMPLEMENT": "R185 production header, WARP positive/negative source, 3-mutant static contract",
+    "C3_VALIDATE": "PENDING exact-SHA Backend Conversion Gate; in-memory one-shot 3 negative mutations PASS",
+    "C4_COMMIT": "SUBMITTING exact branch CAS",
+    "C5_PACKAGE": "NOT_REQUIRED pending, no game activation",
+    "C6_STATE": "PENDING_GITHUB_GATE"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00487.json"
+  ],
+  "blockers": [
+    "Existing 00477-owned R175 TEXCOORD6 COLOR0 WARP BGRA mismatch may fail full Gate",
+    "No Quest3/VDXR runtime evidence"
+  ],
+  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_GATE",
+  "next_action": "Check exact-SHA GitHub Backend Conversion Gate and record job results; never equate WARP with Quest 3 runtime."
+}
