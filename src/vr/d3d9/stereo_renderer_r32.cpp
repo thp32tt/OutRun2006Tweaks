@@ -892,7 +892,7 @@ namespace OutRunVRStereo
 
     std::uintptr_t R32ReviewCurrentVertexShaderIdentity() noexcept { return R30SupportCurrentVertexShaderIdentity(); }
     bool R32ReviewLiveVertexShaderMatches(IDirect3DDevice9* d, std::uintptr_t e) noexcept { return OutRunVR::D3D9::LiveVertexShaderMatches(d,e); }
-    std::uint32_t R32ReviewFrameStereoPoseSequence() noexcept { return FrameStereoPoseSequence; }
+    std::uint32_t R32ReviewFrameStereoPoseSequence() noexcept { return R30SupportFrameStereoPoseSequence(); }
 
     void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
     {

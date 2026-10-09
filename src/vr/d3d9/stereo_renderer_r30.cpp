@@ -3422,6 +3422,11 @@ namespace OutRunVRStereo
         return RightEyeSurface;
     }
 
+    std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
+    {
+        return FrameStereoPoseSequence;
+    }
+
     void R30SupportReleaseDirectAckState() noexcept
     {
         R13ReleaseAckState();
