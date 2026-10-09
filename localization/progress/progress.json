@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 04:15 KST",
+  "updated_at_kst": "2026-10-10 04:45 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9869,4 +9869,17 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json"
   }
+,
+  "b342_q212_canonical_source_identity": {
+  "run_key": "OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445",
+  "queue_index": 212,
+  "canonical_revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "source_verified": true,
+  "cpu_runner_corrected_id": 37982259716,
+  "worker_status": "PENDING",
+  "new_promoted_dds": 0,
+  "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
 }
