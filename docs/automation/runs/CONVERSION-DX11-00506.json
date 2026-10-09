@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00506",
+  "production_id": "CONVERSION-DX11-00506",
+  "event_id": "CONVERSION-DX11-00506-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "38f438058bc83f8bda85ce6c2c9879702fa78ecc",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00506",
+  "lease_epoch": 1,
+  "work_key": "DX11:R207:INDEXED_EXACT_PIPELINE_OBJECT_BINDING",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp:R207",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R207",
+    "tools/test_dx11_indexed_pipeline_identity_r207.py",
+    "backend-conversion-gate.yml:R207"
+  ],
+  "status": "RUNNING",
+  "checkpoint": "C1_REVIEW",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "selected_work_item": "R207 dormant DrawIndexed exact expected IA layout/VS/PS/RTV identity gate on same-device shader rebinds, with isolated WARP pixel mismatch control",
+  "pipeline": {
+    "C0_RECOVER": "PASS: 00505 C6 terminal blocked upstream R175; 00506 absent; checkpoint path absent; HEAD and no colliding task claim observed.",
+    "C1_REVIEW": "PASS: R186 base guard verifies same device but not expected shader/layout/RTV object identity; R175 independent owner untouched."
+  },
+  "resume_cursor": "C2_IMPLEMENT",
+  "next_action": "Implement small R207 guard, WARP same-device alien PS pixel negative, scoped test and CI hook; exact-SHA Gate required.",
+  "last_real_activity_at": "2026-10-10T08:42:00+09:00",
+  "last_activity_evidence": "Initial branch head/C0 contract and R186 source review verified; remote CAS claim.",
+  "state_persisted": true
+}
