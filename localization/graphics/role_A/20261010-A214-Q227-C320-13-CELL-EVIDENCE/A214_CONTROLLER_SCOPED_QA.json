@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A214",
+  "run_key": "OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200",
+  "queue_index": 227,
+  "priority": "P1",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "clean_sha256": "a6c8b4a921654e144e9580057c391fedc8cfc84e24e16a50a4697b971b76f984",
+  "new_candidate_DDS": 0,
+  "new_trial_DDS": 0,
+  "worker_actions_run": 37963658586,
+  "first_attempt": {
+    "job": 113932490703,
+    "status": "FAILED_INFRA_SETUP_NO_SCRIPT_RUN",
+    "details": "Github Actions Set up job concluded failure; no A214 outputs published, original job had no usable log blob"
+  },
+  "retry": {
+    "job": 113937285379,
+    "job_result": "SUCCESS",
+    "method": "GitHub rerun_workflow_job (same run; not new task nor double credit)",
+    "published_worker_HEAD": "a442f226863a9ebe25a3e764bab464940346623d"
+  },
+  "production_scope": "EVIDENCE_ONLY_NO_DDS_REWRITE",
+  "native_header": "2048x2048 RGBA32 8192 pitch, 1 mip RAW mirror-Y",
+  "evidence": {
+    "new_persisted_native_cell_count": 13,
+    "prior_C320_independent_lossless_samples": 3,
+    "total_original_cells_mechanically_checked": 16,
+    "source_title_clean_alpha_nonzero_count_all_16": 0,
+    "source_clean_RGBA_changed_outside_all_16_original_bboxes": 0,
+    "source_final_RGBA_changed_outside_all_16_original_bboxes": 0,
+    "clean_final_RGBA_changed_outside_all_16_original_bboxes": 0,
+    "source_clean_alpha_changed_outside_all_16_original_bboxes": 0,
+    "clean_final_alpha_changed_outside_all_16_original_bboxes": 0,
+    "candidate_positive_margins_all_16": "PASS (minimum 1px; high-risk C3 source edge)",
+    "lossless_native_PROOF": "A214_{id}_SOURCE_CLEAN_FINAL_NATIVE_RGBA.png 13 new",
+    "black_gray_white_100_75_50": "A214_{id}_{BLACK|GRAY|WHITE}_{100|75|50}.jpg 13 new * 9 views",
+    "readable_RAW_source_clean_final": "A214_{id}_{SOURCE|CLEAN|PERSISTED_FINAL}_RAW_NATIVE.png 13 new *3"
+  },
+  "controller_first_hand_visual": {
+    "reviewed_new_native_regions_13": [
+      "intermediate",
+      "outrun",
+      "ancient_ruins",
+      "cape_way",
+      "castle_wall",
+      "cloudy_highland",
+      "coniferous_forest",
+      "deep_lake",
+      "desert",
+      "bay_area",
+      "flagman2",
+      "flagman3",
+      "novice"
+    ],
+    "first_hand_views": "All 13 new 50pct gray images, plus native intermediate gray100, coniferous black50, flagman2 gray75 and novice white100",
+    "source_to_clean": "SCOPED_NO_VISIBLE_ENGLISH_RESIDUE in all 13 compared area, CLEAN appears correctly transparent on gray/black/white sample; machine 16/16 alpha0. Transparent RGB without alpha is not a double-draw defect",
+    "clean_to_final": "SCOPED_NO_NEW_OPAQUE_RECTANGLE OR FOREGROUND GHOST visible in viewed cells; only text layer appears",
+    "font_and_color": "Gray family Korean appears legible with heavy condensed flat gray, FLAGMAN2/3 red family renders readable; source title relative width differs inherently because transliterated Korean has different syllable count, do not claim fully matched hierarchy without blind C1",
+    "practical_50": "SCOPED_VISIBLE_AND_UNCLIPPED all thirteen samples; some gray text muted on gray background similarly to English, game composition untested",
+    "alpha_proof": "exact persisted-source and current SHA pinned; 0 alpha change outside original authorized 16 text bboxes",
+    "raw": "new RAW native PNG for 13; C1 independently audit RAW orientation before PASS",
+    "protected": "0 source-vs-final edits outside UNION of 16 source text original bboxes, not a consumer-chain/full multi-screen validation"
+  },
+  "eight_visual_rules": {
+    "source_removal": "PRODUCER_SCOPED_PASS_16_SOURCE_ALPHA_ZERO",
+    "lean_direction": "HOLD_MATCHED_GLYPH_STROKE_ANCHORS_NOT_INDEPENDENTLY_CALIBRATED",
+    "readable_scale": "SCOPED_PASS_50_PERCENT_VISUAL_BUT_SOURCE_HIERARCHY_C_RECHECK",
+    "weight_effect": "SCOPED_FIRSTLOOK_SOURCE_FAMILY_SIMILAR_BUT_BLIND_C1_REQUIRED",
+    "clipping": "SCOPED_PASS_MECHANICAL_POSITIVE_MARGINS",
+    "protected": "MECHANICAL_16_BOXES_OUTSIDE_SOURCE_ZERO",
+    "raw_flipY": "PERSISTED_MIRROR_Y_AND_NATIVE_RAW_PROOFS_PRODUCED_C_TO_REVIEW",
+    "readability": "SCOPED_PASS_13_50_PERCENT_SAMPLES_GAME_UNTESTED"
+  },
+  "decision": "A_PRODUCER_SCOPED_NATIVE_EVIDENCE_COMPLETED_C1_RECHECK_REQUIRED",
+  "independent_C1": "C320_HOLD_STRICT_RECHECK_NOT_SUPERSEDED",
+  "C3": "BLOCKED_UNTIL_C1",
+  "approvals": "NOT_GRANTED",
+  "ingame_issues": [
+    "IGR-034",
+    "IGR-035",
+    "IGR-036"
+  ],
+  "ingame_status": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "C1 independent decoded exact SHA, blinded source-family and per-cell lean/weight calibration, inspect full 16 lossless evidence + RAW, verify shared atlas consumer; separate C3 and user real-game retest if later approved",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
