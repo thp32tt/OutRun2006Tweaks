@@ -62,6 +62,9 @@ namespace OutRunVR::GameSemantic
         // EXE 0x97xxx CALLs -> sub_4B9200; unlike the progress bar
         // calls, these print elapsed record/stage text.
         ResultTextB9200,
+        // Three exact 0x989xx sprani producers in original gameplay
+        // extension-time transition (NOT 0x97xxx final GOAL result).
+        StageExtensionTime,
         GoalTimeHelper,
         OutRunHudText,
         DispRankFirst,
@@ -114,6 +117,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::OutRunStagePrintf: return "OUTRUN_STAGE_PRINT";
         case ProducerToken::ResultProgress: return "OUTRUN_RESULT_PROGRESS";
         case ProducerToken::ResultTextB9200: return "OUTRUN_RESULT_TEXT_B9200";
+        case ProducerToken::StageExtensionTime: return "OUTRUN_STAGE_EXTENSION_TIME";
         case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
         case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
