@@ -566,6 +566,60 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
         raise SystemExit('result text HUD parent may not change game draw/state')
 
 verify_goal_b9200_source(ui, sem, read('tools/analyze_outrun_exe.py'))
+
+# The in-game course-extension transient lives in the distinct 0x989xx
+# original sprani animation, not the GOAL 0x97xxx record/percentage.
+# Exactly three canonical E8 parents may tag their queued children.
+def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
+    begin = ui_source.index('static constexpr int StageExtensionSpraniCalls[]')
+    end = ui_source.index('};', begin)
+    allowed = ui_source[begin:end]
+    for rva in (0x9898E, 0x98A36, 0x98AC6):
+        require(f'0x{rva:X}', allowed, 'lost exact stage-extension E8')
+        require(f'0x{rva:08X}: 0x00029530', analyzer,
+                'stage extension E8 original EXE target not proven')
+    for word in ('StageExtensionTime,', 'OUTRUN_STAGE_EXTENSION_TIME'):
+        require(word, sem_source, 'extension sprite owner not independent')
+    enter = function_body(ui_source, 'static void StageExtensionEnter(')
+    leave = function_body(ui_source, 'static void StageExtensionLeave(')
+    require('StageExtensionBefore[p] = root ? root->tail_4 : nullptr;',
+            enter, 'extension queue origin snapshot')
+    require_order(leave, 'extension original sprites must remain intact',
+                  'TagAppendedNodes(StageExtensionBefore,',
+                  'RenderScope::ScreenHud',
+                  'ProducerToken::StageExtensionTime',
+                  'StageExtensionBefore = {};')
+    apply = function_body(ui_source, 'bool apply() override')
+    require_order(apply, 'extension 3 E8 enter/leave are atomic',
+                  'StageExtensionEnterHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(rva), StageExtensionEnter',
+                  'StageExtensionLeaveHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(rva + 5), StageExtensionLeave',
+                  'if (!stageExtensionOk)')
+    if any(x in leave for x in ('SetRenderState(', 'Game::fn43FA10(',
+                               'SetTransform(')):
+        raise SystemExit('no gameplay time or GPU state manipulation allowed')
+
+verify_exact_time_extension_parent(
+    ui, sem, read('tools/analyze_outrun_exe.py'))
+for label, bad in (
+    ('lost source parent', ui.replace(
+        '0x9898E, 0x98A36, 0x98AC6',
+        '0x9898E, 0x98A36, 0x98AC7', 1)),
+    ('missing exact child owner', ui.replace(
+        'TagAppendedNodes(StageExtensionBefore,',
+        'TagAppendedNodes(StageExtensionIncorrectBefore,', 1)),
+):
+    if bad == ui:
+        raise SystemExit('source mutation not applied: '+label)
+    try:
+        verify_exact_time_extension_parent(
+            bad, sem, read('tools/analyze_outrun_exe.py'))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('stage +TIME fault injection escaped: '+label)
+
 for label, mutant in (
     ('missing one result E8', ui.replace(
         '0x97E47, 0x97E6D', '0x97E47, 0x97E6E', 1)),
