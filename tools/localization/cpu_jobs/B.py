@@ -121,7 +121,14 @@ else:
  mode="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 dds=old[:128]+body
 assert len(dds)==len(old) and sha(dds) not in (OLD,B322)
-assert np.array_equal(dec(dds),out),"saved native DDS exact roundtrip FAILED"
+D=dec(dds)
+bad=np.any(D!=out,axis=2)
+if np.any(bad):
+ ys,xs=np.where(bad)
+ sample=[(int(y),int(x),D[y,x].tolist(),out[y,x].tolist()) for y,x in list(zip(ys,xs))[:8]]
+ print("ROUNDTRIP_DIFF",int(bad.sum()),sample, "source/raw equality",np.array_equal(raw[::-1],S),flush=True)
+ assert False,"saved native DDS exact roundtrip FAILED"
+assert np.array_equal(D,out)
 (OUT/"B323_TRIAL_NOT_PROMOTED.dds").write_bytes(dds)
 def flatten(v,bg):
  bgimg=Image.new("RGBA",(v.shape[1],v.shape[0]),(*bg,255))
