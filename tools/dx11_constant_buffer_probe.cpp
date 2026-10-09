@@ -519,6 +519,16 @@ float4 main() : SV_Target {
         warp.context->UpdateSubresource(
             r170Wvp, 0u, nullptr,
             r170Onscreen.worldViewProjection.data(), 0u, 0u);
+        // R170 A/B discriminator: keep real translated FVF IA/VS/WVP
+        // identical while binding the already-proven R169 constant-red PS.
+        // Failure here implicates translation/geometry/OM, not the generated
+        // fixed-function pixel shader; success localizes the color mismatch
+        // to the generated VS->PS color/linkage or PS contract.
+        warp.context->PSSetShader(ps, nullptr, 0u);
+        warp.context->DrawIndexed(3u, 0u, 0);
+        verify(true);
+        warp.context->PSSetShader(r170Ps, nullptr, 0u);
+        warp.context->ClearRenderTargetView(target, clear);
         warp.context->DrawIndexed(3u, 0u, 0);
         r170Pixel(true);
         ID3D11Buffer* r170NullWvp = nullptr;
