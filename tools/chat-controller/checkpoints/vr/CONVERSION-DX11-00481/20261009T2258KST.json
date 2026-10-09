@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00481",
+  "event_id": "CONVERSION-DX11-00481-E001",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAITING_EXACT_SHA_RUN_DISCOVERY",
+  "branch": "vr-dx11-native-r71",
+  "material_result_sha": "835c72946a505e4d0a08c3a128a4b891ddc17eab",
+  "prior_material_sha": "322e24160cb0ea9c09e2791deb0a9375523f2f72",
+  "prior_gate_run_id": 37938745654,
+  "prior_validate": "SUCCESS",
+  "prior_smoke": "FAIL_R175_GENERIC_VARYING_MISMATCH",
+  "new_gate_run_id": null,
+  "lookup": "Actions list and head_sha filter both returned zero; do not classify this as failed or duplicate.",
+  "scoped_static": "R179_PASS_ON_OLD_SHA",
+  "scoped_cpp_warp": "PENDING_ON_NEW_SHA",
+  "runtime_validation": "UNTESTED",
+  "owner_isolation": "R175 owner 00477 untouched",
+  "next_action": "Recover Backend Conversion Gate for exact 835c7294 SHA and test reordered R179 WARP probe before inherited R175, then C6 branch run status. No additional material edit or new TASK_ID.",
+  "score_delta": 0,
+  "observed_at_kst": "2026-10-09T22:57:45+09:00"
+}
