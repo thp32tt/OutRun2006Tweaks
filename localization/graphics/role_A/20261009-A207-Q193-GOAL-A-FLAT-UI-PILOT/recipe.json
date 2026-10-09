@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "family": "small dark flat Goal rank menu labels",
+  "run": "20261009-A207-Q193-GOAL-A-FLAT-UI-PILOT",
+  "source": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
+  },
+  "source_atlas_labels": [
+    "WELCOME TO THE",
+    "MULTIPLAYER",
+    "3x ranking help",
+    "Goal A",
+    "Goal B",
+    "Goal C",
+    "Goal D",
+    "Goal E",
+    "15 Cont.",
+    "ONLINE",
+    "OUTRUN SHOWROOM"
+  ],
+  "protected": [
+    "TESTAROSSA title",
+    "large red OUTRUN2SP artwork",
+    "every remaining translated/title/help label outside Goal A"
+  ],
+  "source_semantics": "Goal A",
+  "canonical_korean": "골 A",
+  "font": {
+    "source_url": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Korean/NotoSansCJKkr-Black.otf",
+    "git_blob": "b5b67bf293310a3648468a21ac829d6f2d58b2d5",
+    "license": "SIL-OFL-1.1",
+    "name": "NotoSansCJKkr-Black",
+    "native_size": 46,
+    "missing_fallback_not_allowed": true,
+    "glyph_coverage": "verified render nonempty, separate formal cmap pending"
+  },
+  "renderer": "Pillow ImageDraw native RGBA, no shear/stretch/extrusion/downsample, one mip",
+  "source_rgb_median": [
+    46,
+    53,
+    57
+  ],
+  "flat_effects": {
+    "outline_px": 0,
+    "shadow_px": 0,
+    "slant_dx_top_minus_bottom": 0
+  },
+  "readable_to_RAW": "single FLIP_TOP_BOTTOM at saved DDS writer only",
+  "source_cell": [
+    930,
+    206,
+    1142,
+    292
+  ],
+  "source_bbox": [
+    950,
+    221,
+    1115,
+    268
+  ],
+  "candidate_bbox": [
+    953,
+    223,
+    1036,
+    265
+  ],
+  "mask_files": [
+    "A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png",
+    "A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png",
+    "A207_MASK_SOURCE_PROTECTED_RAW.png",
+    "A207_MASK_NEW_GLYPH_EFFECT_RAW.png"
+  ],
+  "prior_failure": "English Goal label underlaid by thin/stretched Korean glyph in whole atlas; q193 A205/A206 only six other labels redrawn",
+  "method_changed": "First dedicated SMALL Goal A native flat font-family pilot; source-derived removal; exact protected source checks",
+  "pilot_status": "NOT_YET_INDEPENDENT_C_QUALIFIED_DO_NOT_MULTIPLY_INTO_GOAL_B-E"
+}
