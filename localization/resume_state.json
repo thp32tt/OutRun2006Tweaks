@@ -6814,7 +6814,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 14:44 KST",
+  "updated_at_kst": "2026-10-09 15:16 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13155,5 +13155,28 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "backend": "GITHUB_ACTIONS",
     "qa": "localization/graphics/role_B/20261009-B320-Q137-P0-SMALL-MODE-HIERARCHY/B320_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "b321_igr042_hud_trace": {
+    "run_key": "OUTRUN-KOR-B321-IGR042-RUNTIME-HUD-LAYOUT-PROBE-20261009",
+    "role": "B",
+    "priority": "P0",
+    "ingame_id": "IGR-042",
+    "domain": "RUNTIME_TEXT_PLUS_HUD_DDS_UNRESOLVED",
+    "source_file": "src/hooks_localization.cpp",
+    "source_commit": "c1e591740a892b70c4b5506371480b8d444f561b",
+    "config_commit": "bbb586328bcbed6d4a0ba5124510435038cf5554",
+    "diagnostic_setting": "Localization.KoreanHudLayoutTrace=false",
+    "new_dds": 0,
+    "implementation": "BOUNDED_NATIVE_HUD_DRAW_LAYOUT_DIAGNOSTIC",
+    "build_status": "IN_PROGRESS",
+    "build_runs": [
+      37892438103,
+      37892438028
+    ],
+    "independent_static_C": "NOT_RUN",
+    "new_user_ingame": "NOT_RUN",
+    "user_regression": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B321-IGR042-HUD-RUNTIME-ATTRIBUTION/B321_RUNTIME_MAPPING_QA.json"
   }
 }
