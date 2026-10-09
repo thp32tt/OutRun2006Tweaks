@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B310",
+  "run_key": "OUTRUN-KOR-B310-Q060-P0-STAGE-GOLD-20261009-1140",
+  "queue_index": 60,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "user_regression": "IGR-044",
+  "user_regression_status": "OPEN_USER_INGAME_FAIL",
+  "candidate_promoted": true,
+  "new_material_dds": 1,
+  "producer_decision": "SELF_QA_PASS_SCOPED_STAGE_ONLY",
+  "whole_asset_status": "PARTIAL_REWORK_REQUIRED_GOLD_OUTRUN_MILES",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_candidate_sha256": "d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2",
+  "new_candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "promoted_git_blob_sha": "39535c4475abf8fc2961611613534a8454b9b143",
+  "promote_commit": "99ea0dae0ade99883e53ea82f389a41e983e1111",
+  "changed_region": "STAGE",
+  "source_effect_bbox": [
+    455,
+    245,
+    690,
+    350
+  ],
+  "new_effect_bbox": [
+    465,
+    250,
+    679,
+    344
+  ],
+  "margins": [
+    10,
+    11,
+    5,
+    6
+  ],
+  "source_family_palette": {
+    "gold": [
+      245,
+      204,
+      12
+    ],
+    "navy": [
+      0,
+      10,
+      65
+    ],
+    "white": [
+      255,
+      255,
+      255
+    ]
+  },
+  "method_change": "New native NotoSansCJK Black filled gold syllable master with separate source-derived navy separation, white rim and dark fringe; unlike rejected B297 narrow recolor/pixel dilation.",
+  "machine_qa": {
+    "native_dimensions": [
+      4096,
+      2048
+    ],
+    "pixel_order": "RGBA",
+    "mip_levels": 1,
+    "dds_header_exact": true,
+    "persisted_dds_decode": "PASS_EXACT",
+    "changed_rgba_outside_stage": 0,
+    "changed_alpha_outside_stage": 0,
+    "protected_atlas_outside_stage": "EXACT_UNCHANGED",
+    "clean_plate_source_cell_alpha": 0,
+    "original_effect_bbox_and_positive_margins": "PASS"
+  },
+  "producer_visual": {
+    "source_clean": "PASS_SCOPED_TRANSPARENT_STAGE",
+    "clean_final": "PASS_NO_VISIBLE_RECTANGULAR_COMPOSITE_TRACE_IN_INSPECTED_STAGE",
+    "source_final": "PASS_SCOPED_FAMILY_FILLED_FACE",
+    "glyph_integrity": "PASS_IN_INSPECTED_NATIVE_AND_50_PERCENT",
+    "source_relative_lean": "PASS_SCOPED_READABLE",
+    "source_bbox": "PASS",
+    "protected_art": "PASS_UNCHANGED_OUTSIDE_STAGE",
+    "readable_raw": "PASS_INSPECTED",
+    "practical_100_75_50": "PASS_SCOPED_BG_WHITE_BLACK_GRAY"
+  },
+  "evidence": [
+    "localization/graphics/role_B/20261009-B309-Q060-P0-NATIVE-FILLED-GOLD-MASTER/B309_MACHINE_AND_METHOD.json",
+    "localization/graphics/role_B/20261009-B310-Q060-BGW-STRICT-NATIVE-REVIEW/B310_MACHINE_QA.json"
+  ],
+  "actions_runs": [
+    37876487786,
+    37877008622
+  ],
+  "backend": "GitHub Actions ubuntu-latest / controller native visual",
+  "remaining_rework": [
+    "Gold OUTRUN MILES source-family face/depth material reconstruction",
+    "Fresh independent exact-SHA C2 all q60 cells",
+    "Separate C3 and current-policy approval",
+    "New actual in-game screenshot retest IGR-044"
+  ],
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "cleanup": "GitHub Actions ephemeral workspace, no N100 scratch/worktree"
+}
