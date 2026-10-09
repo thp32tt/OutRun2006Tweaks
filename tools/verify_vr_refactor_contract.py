@@ -256,6 +256,46 @@ for label, changed_r30, changed_r32 in (
         errors.append("R9 right-sync mutation survived: " + label)
 
 
+# R84 R9 left-draw depth/stencil write eligibility must remain independent.
+# False flags incorrectly preserve stale right-eye depth; true flags can force
+# unnecessary invalidation. The R30 owner forwards the exact original queries.
+def r9_left_write_eligibility_owner_ok(api, producer, consumer):
+    return all((
+        "bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;" in api,
+        "bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;" in api,
+        bool(re.search(
+            r"bool R30SupportLeftDrawMayWriteDepth\(IDirect3DDevice9\* device\) noexcept"
+            r"\s*\{\s*return LeftDrawMayWriteDepth\(device\);\s*\}", producer)),
+        bool(re.search(
+            r"bool R30SupportLeftDrawMayWriteStencil\(IDirect3DDevice9\* device\) noexcept"
+            r"\s*\{\s*return LeftDrawMayWriteStencil\(device\);\s*\}", producer)),
+        "R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteDepth(d); }" in consumer,
+        "R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteStencil(d); }" in consumer,
+    ))
+
+if not r9_left_write_eligibility_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 left-draw depth/stencil write eligibility must delegate via R30")
+for label, changed_r30, changed_r32 in (
+    ("depth falsely always writeable", r30.replace(
+        "return LeftDrawMayWriteDepth(device);", "return true;", 1), r32),
+    ("stencil falsely never writeable", r30.replace(
+        "return LeftDrawMayWriteStencil(device);", "return false;", 1), r32),
+    ("depth/stencil swapped", r30.replace(
+        "return LeftDrawMayWriteDepth(device);",
+        "return LeftDrawMayWriteStencil(device);", 1), r32),
+    ("R32 depth bypasses R30", r30, r32.replace(
+        "return R30SupportLeftDrawMayWriteDepth(d);",
+        "return LeftDrawMayWriteDepth(d);", 1)),
+    ("R32 stencil bypasses R30", r30, r32.replace(
+        "return R30SupportLeftDrawMayWriteStencil(d);",
+        "return LeftDrawMayWriteStencil(d);", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R84 write-eligibility negative mutation not applied: " + label)
+    elif r9_left_write_eligibility_owner_ok(
+            r30_support_api, changed_r30, changed_r32):
+        errors.append("R84 write-eligibility negative mutation survived: " + label)
+
 # The original R9 depth-content write event remains R9-owned. R32's R30
 # boundary is behavior-neutral: one call in, one exact R9 notification out.
 def r9_depth_content_write_boundary_ok(api, producer, consumer):

@@ -33,6 +33,9 @@ namespace OutRunVRStereo
     // R9 depth-generation/stencil metadata remains lower-owned and read-only.
     std::uint64_t R30SupportMainDepthGeneration() noexcept;
     bool R30SupportMainDepthHasStencil() noexcept;
+    // Preserve independent lower R9 depth/stencil write eligibility policy.
+    bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;
+    bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;
     // Exact lower R9 depth-content write notification, without a new epoch.
     void R30SupportNoteMainDepthContentWrite() noexcept;
     // Exact lower R9 right-eye depth/stencil sync query and invalidation owner.
