@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 09:27 KST",
+  "updated_at_kst": "2026-10-09 09:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8882,5 +8882,32 @@
     "dds_created": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json"
+  },
+  "b305_q201_igr037_goals_native": {
+    "time_kst": "2026-10-09 09:47 KST",
+    "run_key": "OUTRUN-KOR-B305-Q201-IGR037-GOALS-NATIVE-20261009-0940",
+    "role": "B",
+    "owner_lane": "B",
+    "queue_index": 201,
+    "ingame": "IGR-037",
+    "new_candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+    "prior_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+    "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+    "original_label": "GOALS",
+    "old_korean": "골",
+    "current_korean": "목표",
+    "promoted_producer_dds": 1,
+    "scoped_visual": "SELF_QA_PASS_AT_NATIVE_50_RAW",
+    "mask_outside": 0,
+    "source_bboxes": "1/1_PASS",
+    "protected_other_16": "PIXEL_EXACT",
+    "DDS_roundtrip": "EXACT",
+    "independent_C1": "PENDING",
+    "C3": "PENDING",
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "github-actions",
+    "actions_run": 37866268182
   }
 }
