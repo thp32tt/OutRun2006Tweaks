@@ -1,0 +1,70 @@
+{
+  "run_key": "OUTRUN-KOR-C346-C1-Q119-EXACT-SAVED-CLEAN-HALO-20261010",
+  "index": 119,
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "clean_sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "approved": false,
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_black_TRIAD.png",
+      "sha256": "c8f5cfa5c7870baccd1d98b2a53dce7015c8175eb6581d019e135aba9cc60747",
+      "blob_sha": "c0f77922d896580289b866c9a78dc80f57e",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_gray_TRIAD.png",
+      "sha256": "e49968dc8b7d0835c5007dc3ee4896496d07c28c68331a07ac7de2c56d3d87b6",
+      "blob_sha": "4be5ed3c0feacd7c55aecec667eb4223732cc19b",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_white_TRIAD.png",
+      "sha256": "be62a34269a0ffc13a23d5c73e28fcfc8dbff0bed5401ebd493b7a06c02eeb45",
+      "blob_sha": "a7c59c549c0c368d10afc96e36d2f11f79f647cf",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_black_TRIAD.png",
+      "sha256": "fc9734fc856a7c0bc64f617aa65c2ac2780677758761d22b5d3bd126bf8d62a3",
+      "blob_sha": "1f49c8b9246b553fb7855f7d4ffd46180c834723",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_gray_TRIAD.png",
+      "sha256": "784519ae983692e818679c909298f435970a53c1c639af7bf35681b67c774db4",
+      "blob_sha": "75951568c1851571f10feede9758fa2ebbedcef8",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_white_TRIAD.png",
+      "sha256": "841de228e5354f6c3d82b3305a3c782056d4e1df1bb7a9b456fbe0ef48abdda0",
+      "blob_sha": "d85dd7ab025811b9aecba400595418d3aba86a3d",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/PRACTICAL_75.png",
+      "sha256": "fa7bf7fe8c08f7602e7fe548ce41b246c0d5cb411e74082208b61d16e27a2be5",
+      "blob_sha": "baa90911743cb74bfffb05149b39a23e1daa0089",
+      "description": "Downsampled practical side-by-side source/CLEAN/final"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/PRACTICAL_50.png",
+      "sha256": "0bceb5c5b095a9443c947f7c9448f380844935a884ea8a795740ea1e1f725830",
+      "blob_sha": "0cdb7a4aa6bc8bf0573363dae364d3dc9ce8e7a3",
+      "description": "Downsampled practical side-by-side source/CLEAN/final"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/SOURCE_gray_ZOOM2.png",
+      "sha256": "834ec5f9c38d51ad19c7e7bc43a656daf82a774327b390504c704c73d947d6c5",
+      "blob_sha": "46e27c4ea5df86ad726a94bdc6659cd59c149df7",
+      "description": "Lossless native-pixel nearest 2x high zoom"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/KOREAN_gray_ZOOM2.png",
+      "sha256": "a6b05a1260b8ee6ba8b00462faceb73db45e3ae477acb3d6fb3b23acb61912d6",
+      "blob_sha": "39a8b7f86e459cb819bc30d910c3cfaae01331a4",
+      "description": "Lossless native-pixel nearest 2x high zoom"
+    }
+  ]
+}

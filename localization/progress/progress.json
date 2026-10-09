@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 07:07 KST",
+  "updated_at_kst": "2026-10-10 07:21 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10065,5 +10065,36 @@
       "actual_game"
     ],
     "evidence": "localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_CONTROLLER_PRODUCER_QA.json"
+  },
+  "c346_c1_q119_exact_plate": {
+    "run_key": "OUTRUN-KOR-C346-C1-Q119-EXACT-SAVED-CLEAN-HALO-20261010",
+    "review_id": "C346-C1-Q119-EXACT-PLATE-HALO",
+    "lane": "C1",
+    "queue_index": 119,
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "clean_sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+    "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_to_final_rgba_outside": 0,
+    "source_to_final_alpha_outside": 0,
+    "source_to_clean_outside_rgba_transparent_only": 2484,
+    "source_effect_bbox_raw": [
+      390,
+      56,
+      1632,
+      202
+    ],
+    "source_effect_bbox_readable": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "evidence_png_count": 10,
+    "qa_report": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/C346_Q119_INDEPENDENT_C1_HOLD.json",
+    "new_dds": 0,
+    "current_c3": "BLOCKED",
+    "approval": "BLOCKED",
+    "runtime_validation": "UNTESTED"
   }
 }

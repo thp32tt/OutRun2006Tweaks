@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C346-C1-Q119-EXACT-PLATE-HALO",
+  "run_key": "OUTRUN-KOR-C346-C1-Q119-EXACT-SAVED-CLEAN-HALO-20261010",
+  "reviewed_at_kst": "2026-10-10 07:2x KST (within current invocation; exact minute not certified)",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD_ONLY",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds"
+  },
+  "candidate": {
+    "sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+    "unchanged": true
+  },
+  "authored_clean": {
+    "sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+    "path": "localization/graphics/role_A/20261008-A192R-Q119-PADDED-ITALIC-HALO/A192R_CLEAN_PLATE.png"
+  },
+  "source_and_candidate_same_DDS_header_128": true,
+  "dimensions": [
+    2048,
+    256
+  ],
+  "format": "BC3/DXT5",
+  "mips": 1,
+  "raw_to_readable": "flip_y",
+  "prior_C": "C297 independent current-byte native halo firstlook and original bbox containment, same A192R candidate; this run independently authenticates authored CLEAN and full 3-way mechanical masks. Not a second PASS for unchanged bytes.",
+  "independent_machine_report": {
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "clean_sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+    "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "width_height": [
+      2048,
+      256
+    ],
+    "source_bbox_raw": [
+      390,
+      56,
+      1632,
+      202
+    ],
+    "final_bbox_raw": [
+      710,
+      60,
+      1311,
+      198
+    ],
+    "source_bbox_readable": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "final_bbox_readable": [
+      710,
+      58,
+      1311,
+      196
+    ],
+    "whole_clean_positive_alpha_pixels": 0,
+    "header_equal": true,
+    "pairs": {
+      "source_clean": {
+        "rgba_outside": 2484,
+        "alpha_outside": 0,
+        "rgb_only_outside": 2484,
+        "rgba_inside": 172040
+      },
+      "clean_final": {
+        "rgba_outside": 2484,
+        "alpha_outside": 0,
+        "rgb_only_outside": 2484,
+        "rgba_inside": 73134
+      },
+      "source_final": {
+        "rgba_outside": 0,
+        "alpha_outside": 0,
+        "rgb_only_outside": 0,
+        "rgba_inside": 169922
+      }
+    },
+    "mip_count": 1
+  },
+  "tested_original_effect_bbox": {
+    "raw": [
+      390,
+      56,
+      1632,
+      202
+    ],
+    "readable": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "final_raw": [
+      710,
+      60,
+      1311,
+      198
+    ],
+    "final_readable": [
+      710,
+      58,
+      1311,
+      196
+    ],
+    "note": "A192R producer geometry is readable [390,54,1632,200]; actual RAW effect [390,56,1632,202]. Do not compare RAW pixels to readable boxes."
+  },
+  "plate_only": {
+    "status": "VISIBLE_CLEAN_ALPHA0_WITH_RAW_METADATA_HOLD",
+    "exact_clean_positive_alpha_pixels": 0,
+    "source_to_clean_rgba_changed_outside_original_raw_box": 2484,
+    "source_to_clean_alpha_changed_outside_original_raw_box": 0,
+    "explanation": "All 2,484 beyond-box RGBA differences are fully transparent RGB-only on RAW y=54..55 x=390..1631. Alpha is zero on both canonical SOURCE and authored CLEAN at these positions; FLIP-Y black/gray/white shows no visible source ghost. Raw hidden RGB mismatch is explicit, cannot claim raw-complete byte-equality."
+  },
+  "composite_only": {
+    "status": "NO_VISIBLE_COMPOSITE_DEFECT_IN_INSPECTED_VIEWS",
+    "clean_to_final_rgba_outside_original_box": 2484,
+    "clean_to_final_alpha_outside_original_box": 0,
+    "source_to_final_rgba_outside_original_box": 0,
+    "source_to_final_alpha_outside_original_box": 0,
+    "explanation": "Outside-only CLEAN/FINAL 2484 transparent RGB differs, while canonical SOURCE and decoded final match in all outside raw RGBA and alpha. No visible foreign rectangular plate, clipping or protected-art intrusion in inspected views."
+  },
+  "region_checks": {
+    "time_attack_mode": {
+      "slant": {
+        "status": "HOLD",
+        "observation": "Canonical Time Attack Mode strongly right-italic, Korean 타임 어택 모드 appears right-leaning but its matched per-glyph top-minus-bottom anchored slant magnitude remains uncalibrated."
+      },
+      "clean_plate": {
+        "status": "HOLD",
+        "observation": "Authored PNG alpha=0 full atlas with source-removed visual on BGW; 2484 zero-alpha RGB differences outside raw source box prevent exact source-to-CLEAN raw-RGBA strict declaration."
+      },
+      "style": {
+        "status": "HOLD",
+        "observation": "Original broad rounded orange italic/soft-white halo versus Korean block-sans heavy orange navy keyline: approximate color and halo family visible, but independently calibrated equivalence of italic slope, weight, letter hierarchy and family incomplete."
+      },
+      "readability": {
+        "status": "OBSERVED_NOT_APPROVED",
+        "observation": "Korean legible on black/gray/white FLIP-Y at native-derived comparison, 75% and 50% practical views; game-screen consumer composition untested."
+      },
+      "glyph_integrity": {
+        "status": "NO_NEW_DEFINITE_FAIL",
+        "observation": "Inspected native decoded fill/soft-white halo/2x nearest and practical no obvious new broken Korean pixels or 1px crop; pre/post transform source family validation not independent."
+      },
+      "protected_art": {
+        "status": "MACHINE_SCOPE_PASS_NOT_FINAL",
+        "observation": "SOURCE→FINAL 0 changed RGBA and 0 alpha outside actual source alpha>0 bounding rectangle. Full 2048x256 source is title-only by visible inspection, wider consumer chain untested."
+      },
+      "placement": {
+        "status": "MACHINE_PASS_VISUAL_FAVORABLE",
+        "observation": "Readably centered within English original bbox. Canonical bbox [390,54,1632,200], Korean [710,58,1311,196] => positive margins L320,R321,T4,B4; Korean width naturally shorter, not automatically an error."
+      },
+      "orientation": {
+        "status": "SOURCE_CURRENT_RAW_AND_FLIPY_OBSERVED",
+        "observation": "Both DX5 raw sprites reflect same mirror_y/FLIP-Y; no orientation reversal found."
+      }
+    }
+  },
+  "evidence_pngs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_black_TRIAD.png",
+      "sha256": "c8f5cfa5c7870baccd1d98b2a53dce7015c8175eb6581d019e135aba9cc60747",
+      "blob_sha": "c0f77922d896580289b866c9a78dc80f57e",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_gray_TRIAD.png",
+      "sha256": "e49968dc8b7d0835c5007dc3ee4896496d07c28c68331a07ac7de2c56d3d87b6",
+      "blob_sha": "4be5ed3c0feacd7c55aecec667eb4223732cc19b",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_white_TRIAD.png",
+      "sha256": "be62a34269a0ffc13a23d5c73e28fcfc8dbff0bed5401ebd493b7a06c02eeb45",
+      "blob_sha": "a7c59c549c0c368d10afc96e36d2f11f79f647cf",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_black_TRIAD.png",
+      "sha256": "fc9734fc856a7c0bc64f617aa65c2ac2780677758761d22b5d3bd126bf8d62a3",
+      "blob_sha": "1f49c8b9246b553fb7855f7d4ffd46180c834723",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_gray_TRIAD.png",
+      "sha256": "784519ae983692e818679c909298f435970a53c1c639af7bf35681b67c774db4",
+      "blob_sha": "75951568c1851571f10feede9758fa2ebbedcef8",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_white_TRIAD.png",
+      "sha256": "841de228e5354f6c3d82b3305a3c782056d4e1df1bb7a9b456fbe0ef48abdda0",
+      "blob_sha": "d85dd7ab025811b9aecba400595418d3aba86a3d",
+      "description": "Lossless source/CLEAN/final composite on stated black/gray/white background, native DDS decoded; visual contact resized for display"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/PRACTICAL_75.png",
+      "sha256": "fa7bf7fe8c08f7602e7fe548ce41b246c0d5cb411e74082208b61d16e27a2be5",
+      "blob_sha": "baa90911743cb74bfffb05149b39a23e1daa0089",
+      "description": "Downsampled practical side-by-side source/CLEAN/final"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/PRACTICAL_50.png",
+      "sha256": "0bceb5c5b095a9443c947f7c9448f380844935a884ea8a795740ea1e1f725830",
+      "blob_sha": "0cdb7a4aa6bc8bf0573363dae364d3dc9ce8e7a3",
+      "description": "Downsampled practical side-by-side source/CLEAN/final"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/SOURCE_gray_ZOOM2.png",
+      "sha256": "834ec5f9c38d51ad19c7e7bc43a656daf82a774327b390504c704c73d947d6c5",
+      "blob_sha": "46e27c4ea5df86ad726a94bdc6659cd59c149df7",
+      "description": "Lossless native-pixel nearest 2x high zoom"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/KOREAN_gray_ZOOM2.png",
+      "sha256": "a6b05a1260b8ee6ba8b00462faceb73db45e3ae477acb3d6fb3b23acb61912d6",
+      "blob_sha": "39a8b7f86e459cb819bc30d910c3cfaae01331a4",
+      "description": "Lossless native-pixel nearest 2x high zoom"
+    }
+  ],
+  "calibration": {
+    "blind_known_defect_controls": "NOT_COMPLETED",
+    "pixels_before_producer_verdict": false,
+    "note": "Previous history read for selection; no claim of blind calibrated PASS"
+  },
+  "independent_C": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN_NEW_REVIEW",
+  "approval": "NOT_APPROVED",
+  "JPG_export": "BLOCKED",
+  "user_image_review": "UNTESTED",
+  "user_game_retest": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "producer_handoff": "Keep exact DDS unchanged. C297 halo hard-cut repair is visually supported by current native comparison. Separately qualify source-derived font/italic per-glyph anchors and full policy calibration; C3 independent review afterward. No new DDS, no game PASS.",
+  "new_dds": 0,
+  "source_or_candidate_modified": false,
+  "backend": "GitHub official tree + lightweight N100 MCP DDS pixel decode fallback, no heavy build, no controller TASK_ID, C2 even assets untouched"
+}
