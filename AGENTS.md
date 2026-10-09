@@ -1,3 +1,12 @@
+## 2026-10-10 exact ORIGINAL EXE P0 GOAL/+TIME/central lens material
+
+- Read `docs/automation/reviews/DX9EX_P0_GOAL_EXTTIME_LENS_ORIGINAL_DISASSEMBLY_FIX_20261010.md` and the original ELF/PE-independent x86 artifacts from `tools/disasm_outrun_goal_flare_p0.py` / OutRun EXE HUD Inspector. Verified original SHA `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`; do NOT infer producer identity from alpha, color, or generic queue.
+- **GOAL 0–99% (93% photo)**: separately own 19 verified original `0x97xxx -> 0xB9200` E8 **result/record text** calls with `ProducerToken::ResultTextB9200, ScreenHud`. The `0x97BE4/0x97DEC -> 0x2D200` percent animation is a distinct group. Leave final 100% results and BOTH GOAL helpers `0xBEA5A/0xBEA5F` untouched.
+- **In-game OutRun course-change +TIME** candidate: exact original `0x9898E/0x98A36/0x98AC6 -> 0x29530` with original sprite IDs `0x2C00B4/0x2C00B5/0x2C006C`. `ProducerToken::StageExtensionTime` tags only these newly queued sprites ScreenHud. No time counter/animation suppression; source-target verified but ID-to-user `+TIME` optical proof pending.
+- **Lens CENTRE only** candidate: disasm proves `0xD3A0` object `0x570002`, `0xD3A5 -> 0xC980 -> DrawObjectAlpha_Internal` separate from already-scoped outer discs `0xD5F5..0xD796 -> 0xC9A0 -> 0xCABE`. Change ONLY `0xD3A5..0xD3AA` to exact temporary WorldBillboard and restore. 3–4 outer discs PASS and NEVER remap globally. Preserve upstream mod Clr_SceneEffect temporary 0.05m near clip.
+- Exact-SHA CI source is `36fe4f117213f77863abdf5a061dc6cc5b7bf754`, DX9Ex Active workflow `37959849499`, Inspector `37959849553`; check actual SUCCESS before creating user build. CI build only checks source contract; **all new optics `RUNTIME_VALIDATION=UNTESTED` until one later user HMD test**.
+- Do not undo HMD PASS in 6th/6, menus, car selection, rival icon, final GOAL 100%, outer flare discs, F11, and recenter. Avoid 1000/5000 duplicate loop tests or unattended claims.
+
 ## 2026-10-10 P0 DX9Ex deep research material — source fixes are NOT an HMD pass
 
 - **Read** `docs/automation/reviews/DX9EX_DEEPRESEARCH_P0_20261010.md` and prior `DX9EX_HMD_FEEDBACK_20261009_2348_RANK_TIME_PERF_RESOLUTION.md`. Preserve exact a6f8497 optical successes and distinguish 93%-GOAL animation from completed results.
