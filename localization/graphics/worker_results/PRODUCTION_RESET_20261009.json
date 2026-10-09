@@ -5,7 +5,7 @@
   "attempt": 1,
   "base_head": "24ab93b24d134e3a3873fd8e67922fe2072f2dd3",
   "result_identity": "Git commit containing this report; exact HEAD confirmed after push",
-  "state": "IMPLEMENTED_PRODUCTION_GUARD_CI_PASSED_WORKER_NO_JOB_FIX_PENDING_CI",
+  "state": "COMPLETED_POLICY_AND_MECHANICAL_TOOLING_CI_VERIFIED",
   "changes": [
     "family pilot and pinned recipe production sequence",
     "plate/final native-pixel guard",
@@ -28,7 +28,7 @@
     "CI detection after direct push is not rollback or installed branch protection",
     "already running jobs on older commits do not gain new gates retroactively"
   ],
-  "next_action": "Verify worker no-job fix on GitHub; subsequent producers must provide current final manifest and pass stage/visual gates.",
+  "next_action": "Next A/B production invocation applies the new contract: qualify a family pilot, record exact native stage inputs and visual findings, and run the pixel guard before candidate publication. No asset/game approval is implied.",
   "publication_base_head": "162320cc992c852e20363e22607dcff7a11f958f",
   "material_commit": "fd6917965e2493586e4cdeeb6c067fe42ce85e4a",
   "ci": {
@@ -43,6 +43,18 @@
       "stage": "Select changed role jobs",
       "cause": "Existing grep returns 1 on policy-only commits under pipefail; unit tests passed.",
       "correction": "awk selector returns success with an empty list; no production job runs."
+    },
+    "worker_fixed": {
+      "id": 37931342189,
+      "sha": "f7bf2790eb43162bae3ebf3b656dcc888821ba69",
+      "conclusion": "success",
+      "scope": "21 evidence + 13 production tests and no-role-job selection; no DDS promoted, production step skipped by design"
+    },
+    "rework_triage": {
+      "id": 37931060998,
+      "sha": "fd6917965e2493586e4cdeeb6c067fe42ce85e4a",
+      "conclusion": "success"
     }
-  }
+  },
+  "result_sha": "f7bf2790eb43162bae3ebf3b656dcc888821ba69"
 }
