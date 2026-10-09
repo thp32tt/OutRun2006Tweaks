@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C324 C1 q205 P0 B303 new style-fail 2/2: B lane reconstruct heavy block sans Korean OPTIONS/RANKINGS, do not repeat pointed NotoSerif CJK. localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json",
     "B305 B-owner IGR-037 q201: new native GOALS -> 목표 DDS d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8 from pinned English/B168 CLEAN; producer native/50/RAW 1 cell QA PASS; 16 unrelated regions exact; fresh C1 and C3, USER_GAME retest remain open. localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
     "C323 C2 q154 independent B298 saved DDS SHA and three alpha-bbox RAW/FLIPY proof PASS source containment, 1px producer metadata discrepancy, C HOLD until full atlas/source CLEAN/protected/C3: localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json",
     "B304 q228 IGR-038: actual 1-row source-conditioned silver trial persisted but source-family chrome highlight, depth and glyph geometry visually FAIL at 100/50/RAW; NO promoted DDS, C2/C3 blocked, user game OPEN. Build a different manually source-conditioned vector/extrusion master, rerender all 13 only after representative visual PASS. localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
@@ -12922,5 +12923,42 @@
     "QA": "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "github-actions",
     "actions_run": 37866268182
+  },
+  "c324_c1_q205_b303_original_style": {
+    "time_kst": "2026-10-09 09:59 KST",
+    "run_key": "OUTRUN-KOR-C324-C1-Q205-B303-P0-ORIGINAL-STYLE-REJECT-20261009",
+    "role": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD",
+    "queue_index": 205,
+    "candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+    "producer": "B303",
+    "ingame_reports": [
+      "IGR-026",
+      "IGR-027"
+    ],
+    "source_family_fail": [
+      "OPTIONS",
+      "RANKINGS"
+    ],
+    "reason": "SOURCE_FAMILY_MISMATCH_SAVED_DDS_BLOCK_SANS_VS_TAPERED_SERIF",
+    "candidate_source_bbox_2of2": "PASS",
+    "clean_alpha_2of2": 0,
+    "native_png_proof_created": 14,
+    "raw_views": 2,
+    "practical_sizes": [
+      100,
+      75,
+      50
+    ],
+    "source_sha_from_producer_only": true,
+    "source_dds_rehash": false,
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "approval": false,
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json"
   }
 }

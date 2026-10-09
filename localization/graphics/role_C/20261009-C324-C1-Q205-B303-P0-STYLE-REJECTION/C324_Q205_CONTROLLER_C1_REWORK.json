@@ -1,0 +1,137 @@
+{
+  "run_key": "OUTRUN-KOR-C324-C1-Q205-B303-P0-ORIGINAL-STYLE-REJECT-20261009",
+  "role": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "shard": "ODD",
+  "queue_index": 205,
+  "asset": "ACF61D7C_1024x512.dds",
+  "candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "producer_candidate_b303": true,
+  "original_dds_sha256_producer": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "source_dds_independently_rehashed": false,
+  "source_png_sha256": "86e35333c18392125f27e23181780ecf8e76d2a7d1ab4d5d9b2e3fa50af9a838",
+  "clean_png_sha256": "245c66e49b3b4254b5eb7043b3de1364982414ff76e7dc1c68006951f92effac",
+  "source_and_clean": "Source and CLEAN 4096x2048 RGBA producer atlases SHA-pinned and independently opened; source glyph alpha visible, CLEAN glyph alpha0 in two regions",
+  "current_dds_independent_sha256": true,
+  "dds_format": "4096x2048 RGBA32 1 authored mip RAW mirror_y",
+  "producer_preview_read_before_first_look": true,
+  "calibration_blind_test": false,
+  "priority": "P0_IGR-026_IGR-027",
+  "C": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "visual_rule": "Visual source-family mismatch overrides numeric/source bbox containment PASS",
+  "regions": [
+    {
+      "region": "options",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "source_alpha_pixels": 56371,
+      "source_bbox_fill_fraction": 0.5362,
+      "source_height": 145,
+      "new_alpha_pixels": 12929,
+      "new_bbox_fill_fraction": 0.377,
+      "new_bbox_absolute": [
+        1596,
+        1428,
+        1850,
+        1563
+      ],
+      "source_height_ratio": 0.931,
+      "fill_fraction_ratio": 0.703,
+      "margin_px": [
+        5,
+        466,
+        5,
+        5
+      ],
+      "clean_readable_alpha": 0,
+      "source_bbox_containment": "PASS",
+      "visual_result": "REWORK_REQUIRED",
+      "reason_code": "SOURCE_FAMILY_MISMATCH",
+      "visual_observation": "Source English OPTIONS: heavy block sans all-cap face; saved Korean 옵션: serif/tapered sharp terminals, visually weaker stem/counter and reduced heading dominance at native and 50%. Original hierarchy not reproduced.",
+      "evidence": [
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY100.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY75.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY50.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_FINAL_RAW.png"
+      ]
+    },
+    {
+      "region": "rankings",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "source_alpha_pixels": 68359,
+      "source_bbox_fill_fraction": 0.5329,
+      "source_height": 143,
+      "new_alpha_pixels": 14228,
+      "new_bbox_fill_fraction": 0.4476,
+      "new_bbox_absolute": [
+        38,
+        1250,
+        277,
+        1383
+      ],
+      "source_height_ratio": 0.93,
+      "fill_fraction_ratio": 0.84,
+      "margin_px": [
+        5,
+        653,
+        5,
+        5
+      ],
+      "clean_readable_alpha": 0,
+      "source_bbox_containment": "PASS",
+      "visual_result": "REWORK_REQUIRED",
+      "reason_code": "SOURCE_FAMILY_MISMATCH",
+      "visual_observation": "Source English RANKINGS: very heavy rectangular block sans; saved Korean 랭킹: pointed serif/tapered strokes and different weight/shape category. Visibly different heading treatment at native/50%.",
+      "evidence": [
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY100.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY75.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY50.png",
+        "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_FINAL_RAW.png"
+      ]
+    }
+  ],
+  "all_regions_scoped_by_decision": 2,
+  "checked": "Both affected title regions saved DDS RAW and readable, alpha-composited source/CLEAN/final native/75/50",
+  "not_checked": "English source exact DDS bytes and full atlas non-target protected mask changes; authoring other 6-8 regions and game runtime",
+  "plate_result": "LOCAL_SOURCE_GLYPH_CLEAN_ALPHA_ZERO_BOTH_ONLY; no intrinsic visible box confirmed in scoped crops",
+  "bbox_result": "PASS_2_OF_2, not overall approval",
+  "producer_data_notes": "Previous B303 outside-pixel=0 from producer report, not independently remeasured; no new outside-pixel zeros asserted",
+  "rework_request": "B lane: reconstruct P0 OPTIONS/옵션 and RANKINGS/랭킹 from native English block-SANS family reference (font silhouette, heavy rectilinear strokes/counter shapes, red color, baseline, source dimensions); do not reuse NotoSerifCJK Black taper/serif renderer or uniformly scale/blur the old Korean bitmap. Preserve exact clean plate/protected OutRun title, original source glyph ceiling, all other atlas region bytes, native glyph alpha only; regenerate persisted DDS native/75/50 and RAW/FLIPY and present source/CLEAN/final independently before self-QA. Then independent C1+C3 and new in-game user retest; IGR-028 mixed runtime/subtitle mapping remains unresolved.",
+  "references": [
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_INDEPENDENT_MACHINE_QA.json",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_CLEAN_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_FINAL_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_FINAL_RAW.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY100.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY75.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/options_SOURCE_CLEAN_FINAL_GRAY50.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_CLEAN_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_FINAL_READABLE.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_FINAL_RAW.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY100.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY75.png",
+    "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/rankings_SOURCE_CLEAN_FINAL_GRAY50.png"
+  ],
+  "backend": "GitHub authority; ChatGPT visual controller; N100 MCP fallback exact DDS narrow ROI decode due ChatGPT local network unavailable",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

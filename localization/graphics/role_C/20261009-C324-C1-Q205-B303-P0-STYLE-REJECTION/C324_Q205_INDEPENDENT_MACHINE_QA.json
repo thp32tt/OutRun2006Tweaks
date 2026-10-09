@@ -1,0 +1,193 @@
+{
+  "candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "source_full_atlas_png_sha256": "86e35333c18392125f27e23181780ecf8e76d2a7d1ab4d5d9b2e3fa50af9a838",
+  "clean_full_atlas_png_sha256": "245c66e49b3b4254b5eb7043b3de1364982414ff76e7dc1c68006951f92effac",
+  "dds_size": [
+    4096,
+    2048
+  ],
+  "dds_format": "RGBA32 mip1",
+  "regions": [
+    {
+      "name": "options",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "source_readable": {
+        "alpha_count": 56371,
+        "bbox": [
+          0,
+          0,
+          725,
+          145
+        ],
+        "bbox_fill_fraction": 0.5362,
+        "bbox_height": 145,
+        "bbox_width": 725
+      },
+      "clean_readable": {
+        "alpha_count": 0,
+        "bbox": null,
+        "visible_fraction": 0
+      },
+      "candidate_readable": {
+        "alpha_count": 12929,
+        "bbox": [
+          5,
+          5,
+          259,
+          140
+        ],
+        "bbox_fill_fraction": 0.377,
+        "bbox_height": 135,
+        "bbox_width": 254
+      },
+      "source_direct": {
+        "alpha_count": 56371,
+        "bbox": [
+          0,
+          0,
+          725,
+          145
+        ],
+        "bbox_fill_fraction": 0.5362,
+        "bbox_height": 145,
+        "bbox_width": 725
+      },
+      "source_ceil_containment": true,
+      "height_ratio": 0.931,
+      "candidate_vs_source_bbox_fill_ratio": 0.703
+    },
+    {
+      "name": "rankings",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "source_readable": {
+        "alpha_count": 68359,
+        "bbox": [
+          0,
+          0,
+          897,
+          143
+        ],
+        "bbox_fill_fraction": 0.5329,
+        "bbox_height": 143,
+        "bbox_width": 897
+      },
+      "clean_readable": {
+        "alpha_count": 0,
+        "bbox": null,
+        "visible_fraction": 0
+      },
+      "candidate_readable": {
+        "alpha_count": 14228,
+        "bbox": [
+          5,
+          5,
+          244,
+          138
+        ],
+        "bbox_fill_fraction": 0.4476,
+        "bbox_height": 133,
+        "bbox_width": 239
+      },
+      "source_direct": {
+        "alpha_count": 68359,
+        "bbox": [
+          0,
+          0,
+          897,
+          143
+        ],
+        "bbox_fill_fraction": 0.5329,
+        "bbox_height": 143,
+        "bbox_width": 897
+      },
+      "source_ceil_containment": true,
+      "height_ratio": 0.93,
+      "candidate_vs_source_bbox_fill_ratio": 0.84
+    }
+  ],
+  "evidence": [
+    {
+      "name": "options_SOURCE_READABLE.png",
+      "sha256": "a1974e77c5cd446dc4f39089db9ddeb7f60c9d2fbd89c94b10f4f1a2d5cc3c64",
+      "size": 9399
+    },
+    {
+      "name": "options_CLEAN_READABLE.png",
+      "sha256": "2ef8b6264b518a885614bc5da32e09f7ca5c00ac721b91c2dd81ab65db7cf76b",
+      "size": 794
+    },
+    {
+      "name": "options_FINAL_READABLE.png",
+      "sha256": "63e013794f30c6b19418ae10b8f87d186bde59dcc516db50729b539011d52ee3",
+      "size": 7167
+    },
+    {
+      "name": "options_FINAL_RAW.png",
+      "sha256": "b08619179e74b67a95961e4cd8997b7b5224f39373a483c1e0b1016b00620ec5",
+      "size": 7121
+    },
+    {
+      "name": "options_SOURCE_CLEAN_FINAL_GRAY100.png",
+      "sha256": "b069a97189ebcc678d8caeb081c2f4da6c1d9b0552d8865b4f22752ae5e9c1ef",
+      "size": 21524
+    },
+    {
+      "name": "options_SOURCE_CLEAN_FINAL_GRAY75.png",
+      "sha256": "f38c0989184928916e905c9b9c840bb42433c37b4029e611a9221470ec1a869e",
+      "size": 29437
+    },
+    {
+      "name": "options_SOURCE_CLEAN_FINAL_GRAY50.png",
+      "sha256": "b9854cf31a21c34e0c330803adf1ebaf2580ce13012274ad3ee6ee2a8b43f3b3",
+      "size": 19190
+    },
+    {
+      "name": "rankings_SOURCE_READABLE.png",
+      "sha256": "e92386e7acc6d74e47567db2c5bf81ee0bff1c91b296e37c96906f6c3b17ba56",
+      "size": 12869
+    },
+    {
+      "name": "rankings_CLEAN_READABLE.png",
+      "sha256": "6736366df5e9da13c577cd974221182742f5d30482473d40f2ce8f2403019879",
+      "size": 890
+    },
+    {
+      "name": "rankings_FINAL_READABLE.png",
+      "sha256": "bf2b33e162fd829d2e20d59a2c45d577b9c7d674a9dd9fd95f042ea5aa0be56d",
+      "size": 7972
+    },
+    {
+      "name": "rankings_FINAL_RAW.png",
+      "sha256": "a1263e81b64d2cf96fba282a30d816f3104c56a2f8643596ee0e696f1dae399b",
+      "size": 8146
+    },
+    {
+      "name": "rankings_SOURCE_CLEAN_FINAL_GRAY100.png",
+      "sha256": "21391cfba5a3d58f702247cb38c38c6e8afe03a11e73e46b3a6ff511861a6722",
+      "size": 28167
+    },
+    {
+      "name": "rankings_SOURCE_CLEAN_FINAL_GRAY75.png",
+      "sha256": "d8b90547e41c5de36858d55b2316cf016540044fee6fae95503b66c5455a6c1e",
+      "size": 37270
+    },
+    {
+      "name": "rankings_SOURCE_CLEAN_FINAL_GRAY50.png",
+      "sha256": "5f2e61135c535167eede8c6eb3336970435348423fc872ce2d370fc678c2b6f3",
+      "size": 24287
+    }
+  ],
+  "source_dds_exact_sha_independently_verified": false,
+  "interpretation": "2/2 source bbox containment PASS but 2/2 independent native visual source-family FAIL; source DDS SHA only from B303 provenance, not independently rehashed",
+  "controller_decision": "REWORK_REQUIRED"
+}
