@@ -60,6 +60,9 @@ font_evidence={"expected_path":str(fontpath),"found":fontpath.is_file(),
               "source_family":"B331/B332R Noto Sans CJK Bold","text":"아웃런 마일:"}
 if fontpath.is_file():
     font_evidence["sha256"]=H(fontpath.read_bytes())
+    license_file=Path("/usr/share/doc/fonts-noto-cjk/copyright")
+    font_evidence["installed_package_license_file"]=str(license_file)
+    font_evidence["license_file_sha256"]=H(license_file.read_bytes()) if license_file.is_file() else None
     try:
         from fontTools.ttLib import TTCollection,TTFont
         faces=TTCollection(str(fontpath),lazy=True).fonts
