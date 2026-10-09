@@ -28,7 +28,8 @@ FONT_URL="https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Kor
 SRC_SHA="d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
 OLD_SHA="d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa"
 FONT_BLOB="b5b67bf293310a3648468a21ac829d6f2d58b2d5"
-CELL=(770,167,1085,248)
+CELL=(930,206,1142,292)
+EXPECTED_SOURCE_GOAL_A_BBOX=(950,221,1115,268)
 PROTECTED=[(744,118,1117,169),(0,797,929,1022)]
 TEXT="골 A"
 SOURCE_TEXT="Goal A"
@@ -72,7 +73,7 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
     if mask_source.sum()<100:raise RuntimeError("English Goal A absent from requested cell")
     ys,xs=np.nonzero(mask_source)
     english=(int(xs.min()+x0),int(ys.min()+y0),int(xs.max()+x0+1),int(ys.max()+y0+1))
-    if english[0]<x0+4 or english[1]<y0+2 or english[2]>x1-5 or english[3]>y1-6:
+    if english!=EXPECTED_SOURCE_GOAL_A_BBOX or english[0]<x0+4 or english[1]<y0+2 or english[2]>x1-5 or english[3]>y1-6:
         raise RuntimeError(("SOURCE GOAL A not isolated; protected next row/neighbor might overlap",english,CELL))
     if english[2]-english[0]>275 or english[3]-english[1]>73:raise RuntimeError("Source cell probably contains other art")
     print("A207 measured English source bbox",english,flush=True)
