@@ -11,6 +11,7 @@
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
+    extern Setting<bool> VRTelemetry;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
@@ -611,6 +612,10 @@ class UIScaling : public Hook
 	inline static SafetyHookMid ResultProgressEnterB{};
 	inline static SafetyHookMid ResultProgressLeaveB{};
 	inline static thread_local unsigned ResultProgressDepth = 0;
+    // These are diagnostic counters only. The original E8->0x2D200
+    // result-progress producer remains fully original and every child stays
+    // on its existing exact-node ScreenHud route.
+    inline static thread_local std::uint64_t ResultProgressCompletedCalls = 0;
 	inline static thread_local
 		std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressTailsBefore{};
 	static void ResultProgressEnter(safetyhook::Context&)
@@ -627,9 +632,35 @@ class UIScaling : public Hook
 	{
 		if (!ResultProgressDepth || --ResultProgressDepth != 0)
 			return;
+        // Preserve original producer-before/new-child boundaries, counting
+        // only priorities where the exact call appended at least one node.
+        // The screenshot at result 93% identifies the unfinished animation;
+        // it cannot by itself reveal which E8 made the large record glyph.
+        // This bounded trace distinguishes a live progress producer from an
+        // early generic-screen-overlay fallback without altering pixels.
+        unsigned changedPriorities = 0;
+        if (Settings::VRTelemetry)
+        {
+            for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+            {
+                SpriteNode* root = Game::sprite_prio_root[prio];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                if (after && after != ResultProgressTailsBefore[prio])
+                    ++changedPriorities;
+            }
+        }
 		TagAppendedNodes(ResultProgressTailsBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+        const std::uint64_t hits = ++ResultProgressCompletedCalls;
+        if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)
+        {
+            spdlog::info(
+                "VR P0 RESULT PROGRESS SOURCE: completedCalls={} changedPriorities={} state={} mode={} exactScope=SCREEN_HUD",
+                hits, changedPriorities,
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1);
+        }
 		ResultProgressTailsBefore = {};
 	}
 
