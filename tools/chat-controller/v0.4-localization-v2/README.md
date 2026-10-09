@@ -132,3 +132,44 @@ image and does not inherit this fix automatically.
 ## Four-worker rollout validation
 
 Run `python tools/chat-controller/v0.4/tests/test_event_model_v2.py` and `python tests/test_localization_tab_recovery.py`, then check the exact new image after rebuilding the v2 stack. Status page should display slot names `A,B,C1,C2`, a non-destructive previous C-to-C1 migration, and `tab_count: 4`. The monitor retains separate C1/C2 counters and saved URLs. GitHub Actions passing does not imply Portainer is redeployed. Old standalone controller compose/source files are legacy; use this v2 production stack. Memory limits are a starting guardrail; use container logs/OOMKilled to tune them if failures continue.
+
+## Scheduled Chrome cache reset without re-login
+
+Production v2 (four-worker A/B/C1/C2 stack) enables:
+
+- CHROME_RECYCLE_ENABLED=true
+- CHROME_RECYCLE_INTERVAL_MINUTES=120 (from controller start)
+- CHROME_RECYCLE_BUSY_GRACE_MINUTES=30
+- CHROME_RECYCLE_BUSY_PROBE_SECONDS=8
+
+At the interval, if no worker is generating a response, the controller
+checkpoints /data/state/chat_registry.json and
+/data/state/chrome_recycle.json, then exits with code 75.
+Docker restart: unless-stopped starts a fresh Chrome/controller session
+using the original named volumes. The four workers' saved conversation
+URLs and exact asset/SHA work state are reattached. If any worker is
+generating (or busy state cannot be confirmed), the restart is deferred
+for up to 30 minutes. At the maximum delay, the current in-browser response
+may be interrupted; no duplicate task send is performed.
+
+Before Chrome starts, chrome-cache-clean.sh removes ONLY disposable
+cache directories (Cache, Code Cache, GPUCache, ShaderCache, GrShaderCache,
+DawnCache, Default/Media Cache and Default/Network/Cache). It NEVER deletes
+Network/Cookies, Cookies, Login Data, Preferences, Local Storage,
+IndexedDB, Session Storage, Sessions, Service Worker data, GitHub task
+records, or the full browser-profile volume. The helper refuses symlinked
+profile roots and never cleans a running Chrome process. Persistent files
+are preserved; an expired remote login session can still require login.
+
+Inspect /logs/chrome-recycle.log, /logs/controller.log and
+/data/state/chrome_recycle.json, plus /status fields
+chrome_recycle_status, chrome_recycle_last_at,
+chrome_recycle_next_due_at, chrome_recycle_deferred_slots and
+chrome_recycle_count. Scheduled restart is not a new TASK/attempt.
+
+Regression:
+- python tests/test_localization_chrome_recycle.py
+- bash tools/chat-controller/v0.4/tests/test_chrome_cache_clean.sh
+
+Rebuild/redeploy only the dedicated v2 stack from chat-controller-downloads;
+keep both named volumes. GitHub CI success does not deploy Portainer.
