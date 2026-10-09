@@ -6,16 +6,16 @@ services:
     container_name: outrun-chat-controller-localization-recovery
     restart: unless-stopped
     init: true
-    shm_size: "768m"
-    mem_limit: 3g
+    shm_size: "1g"
+    mem_limit: 4g
     mem_reservation: 1g
-    cpus: 1.5
+    cpus: 2.0
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "${AUTO_SEND:-false}"
       SCHEDULE_MINUTES: "0,10,20,30,40,50"
-      CHAT_SLOTS: "3"
+      CHAT_SLOTS: "4"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
@@ -27,7 +27,19 @@ services:
       RETRY_BUTTON_COOLDOWN_SECONDS: "60"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
+      # Legacy scheduled-send watchdog stays disabled.
       WATCHDOG_ENABLED: "false"
+      # Independent Chrome tab recovery; no prompt resend or new task IDs.
+      TAB_HEALTH_CHECK_SECONDS: "30"
+      TAB_HEALTH_PROBE_TIMEOUT_SECONDS: "6"
+      TAB_HEALTH_FAILURE_THRESHOLD: "3"
+      TAB_ERROR_FAILURE_THRESHOLD: "2"
+      TAB_RECOVERY_COOLDOWN_SECONDS: "60"
+      # Full container/browser recycle; credentials and Git checkpoints kept.
+      CHROME_RECYCLE_ENABLED: "true"
+      CHROME_RECYCLE_INTERVAL_MINUTES: "120"
+      CHROME_RECYCLE_BUSY_GRACE_MINUTES: "30"
+      CHROME_RECYCLE_BUSY_PROBE_SECONDS: "8"
       WATCHDOG_STALL_MINUTES: "15"
       WATCHDOG_BUSY_STALL_MINUTES: "20"
       WATCHDOG_CHECK_SECONDS: "30"
