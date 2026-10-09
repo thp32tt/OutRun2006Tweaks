@@ -17,12 +17,12 @@
     "tools/test_dx11_indexed_pipeline_identity_r207.py",
     "backend-conversion-gate.yml:R207"
   ],
-  "status": "VALIDATING",
-  "checkpoint": "C3_VALIDATE",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "b4e572771c25eef1cd9353d0a0bb43a36864094c",
+  "material_result_sha": "b4e572771c25eef1cd9353d0a0bb43a36864094c",
+  "validation_bearing_result_sha": "b4e572771c25eef1cd9353d0a0bb43a36864094c",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "selected_work_item": "R207 dormant DrawIndexed exact expected IA layout/VS/PS/RTV identity gate on same-device shader rebinds, with isolated WARP pixel mismatch control",
@@ -30,11 +30,14 @@
     "C0_RECOVER": "PASS: 00505 C6 terminal blocked upstream R175; 00506 absent; checkpoint path absent; HEAD and no colliding task claim observed.",
     "C1_REVIEW": "PASS: R186 base guard verifies same device but not expected shader/layout/RTV object identity; R175 independent owner untouched.",
     "C2_IMPLEMENT": "PASS: R207 production opt-in exact IA layout/VS/PS/RTV binding gate, isolated same-device alien PS WARP changed pixel proof, 6-mutation static test, exact Gate hook.",
-    "C3_VALIDATE": "PENDING: scoped changed-input JS contract and six negative mutants passed once locally; Win32 WARP GitHub Actions exact-SHA CI pending."
+    "C3_VALIDATE": "Scoped PASS: R207 Python 6 source-negative mutants and real R186 WARP same-device alien-PS red GPU pixel/restore at exact SHA; Win32 validate 114074735393 SUCCESS. Full exact-SHA Gate 38005974668 FAILURE due pre-existing R175 varying mismatch, smoke 114075694216 failed Run DX11 constant buffer probe (BGRA [128,0,16,255], expected [224,128,32,255]).",
+    "C4_COMMIT": "PASS: GitHub CAS material SHA b4e572771c25eef1cd9353d0a0bb43a36864094c with [AUTO:CONVERSION-DX11-00506], no CI skip; issue #14 comment 6091195300.",
+    "C5_PACKAGE": "NOT_REQUIRED: native gameplay DX11 DrawIndexed activation intentionally dormant; no HMD/Quest3 runtime proof, diagnostic only; no release or backend promotion.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE: scoped R207 new WARP source work PASS; inherited R175 full Gate FAIL, runtime UNTESTED. Material/validation-bearing SHA unchanged, bookkeeping CI-skip only after Gate completion."
   },
-  "resume_cursor": "C2_IMPLEMENT",
-  "next_action": "Publish material GitHub CAS; obtain exact-SHA Backend Conversion Gate, inspect validate/smoke, then seal C6 separate from material.",
-  "last_real_activity_at": "2026-10-10T08:42:00+09:00",
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "next_action": "Do not repeat 00506 or re-score. Independent R175 owner must fix observed TEXCOORD6 BGRA regression for full Gate; then rerun only an authorized exact-SHA candidate. Meanwhile another DISTINCT DX11 task with separate work_key/paths may continue; never promote gameplay native Draw without HMD.",
+  "last_real_activity_at": "2026-10-10T08:54:00+09:00",
   "last_activity_evidence": "Initial branch head/C0 contract and R186 source review verified; remote CAS claim.",
   "state_persisted": true,
   "changed_paths": [
@@ -44,5 +47,35 @@
     "tools/test_dx11_indexed_pipeline_identity_r207.py",
     "docs/automation/runs/CONVERSION-DX11-00506.json"
   ],
-  "last_real_activity_evidence": "R207 substantive C++/WARP test plus changed-input static guard and workflow hook composed; one-shot six negative source mutants PASS."
+  "last_real_activity_evidence": "Exact SHA Gate 38005974668 complete failure at R175; Win32 114074735393 SUCCESS, R207 static/WARP GPU PASS in 114075694216 before independently owned R175 error.",
+  "scoped_automation_validation": "PASS_R207_6_SOURCE_MUTANTS_AND_REAL_WARP_ALIEN_PS_NEGATIVE_AND_RESTORED_PIXEL",
+  "summary": "R207 dormant indexed pipeline object identity guard and same-device alien pixel shader WARP negative/red pixel proof PASS; full required exact-SHA Backend Conversion Gate FAILURE exclusively at pre-existing independently owned R175 TEXCOORD6 varying mismatch. Win32 validate PASS; gameplay DrawIndexed remains dormant. No Quest3/VDXR runtime result.",
+  "evidence": {
+    "initial_branch_head": "38f438058bc83f8bda85ce6c2c9879702fa78ecc",
+    "claim_sha": "14833c2fcfc2ff64a9b216203f05503e7a0b4de2",
+    "issue14_material_comment_id": 6091195300,
+    "exact_sha_gate_run_id": 38005974668,
+    "exact_sha_gate_head_sha": "b4e572771c25eef1cd9353d0a0bb43a36864094c",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "win32_validate_job_id": 114074735393,
+    "win32_validate_conclusion": "success",
+    "readiness_smoke_job_id": 114075694216,
+    "readiness_smoke_conclusion": "failure",
+    "r207_python_static": "PASS 6 source-negative mutants",
+    "r207_warp": "PASS R186 owned GPU DrawIndexed green reference, R207 same-device alien PS real red center GPU pixel counterproof, restored exact original PS",
+    "known_preexisting_failure": "R175_GENERIC_VARYING_MISMATCH TEXCOORD6: observed BGRA=[128,0,16,255], expected=[224,128,32,255]",
+    "upstream_owner_task": "CONVERSION-DX11-00477"
+  },
+  "validation_run_id": 38005974668,
+  "validation_job_id": 114074735393,
+  "readiness_smoke_job_id": 114075694216,
+  "score_change": 0,
+  "score_previous_ai2": 1285,
+  "score_new_ai2": 1285,
+  "score_reason": "Full exact-SHA required Gate did not PASS due independent inherited R175. No score credited; scoped R207 PASS is not full validation PASS.",
+  "blockers": [
+    "Required exact-SHA Backend Conversion Gate blocked at inherited R175_GENERIC_VARYING_MISMATCH; upstream owner CONVERSION-DX11-00477, not this task.",
+    "Quest3/VDXR HMD gameplay verification absent. Native Draw remains dormant."
+  ]
 }
