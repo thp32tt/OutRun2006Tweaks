@@ -942,11 +942,11 @@ namespace OutRunVRStereo
     HRESULT R32ReviewTryXyzrhwPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return R30TryXyzrhwPrimitiveUP(d,t,p,data,st);}
     HRESULT R32ReviewTryXyzrhwIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return R30TryXyzrhwIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);}
 
-    HRESULT R32ReviewCallRawDrawPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);}
-    HRESULT R32ReviewCallRawDrawIndexedPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);}
-    HRESULT R32ReviewCallRawDrawPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);}
-    HRESULT R32ReviewCallRawDrawIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(d,t,m,n,p,idx,f,v,st);}
-    HRESULT R32ReviewCallRawPresent(IDirect3DDevice9* d,const RECT* s,const RECT* dst,HWND w,const RGNDATA* r) noexcept{return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);}
+    HRESULT R32ReviewCallRawDrawPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return R30SupportCallRawDrawPrimitive(d,t,s,p);}
+    HRESULT R32ReviewCallRawDrawIndexedPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);}
+    HRESULT R32ReviewCallRawDrawPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st);}
+    HRESULT R32ReviewCallRawDrawIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);}
+    HRESULT R32ReviewCallRawPresent(IDirect3DDevice9* d,const RECT* s,const RECT* dst,HWND w,const RGNDATA* r) noexcept{return R30SupportCallRawPresent(d,s,dst,w,r);}
 
     HRESULT R32ReviewCallLowerDrawPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return R30CallLowerDrawPrimitive(d,t,s,p);}
     HRESULT R32ReviewCallLowerDrawIndexedPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return R30CallLowerDrawIndexedPrimitive(d,t,b,m,n,s,p);}

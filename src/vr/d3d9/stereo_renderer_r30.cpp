@@ -3305,6 +3305,42 @@ namespace OutRunVRStereo
         R9NoteMainDepthContentWrite();
     }
 
+    HRESULT R30SupportCallRawDrawPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
+    {
+        return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);
+    }
+
+    HRESULT R30SupportCallRawDrawIndexedPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, INT b,
+        UINT m, UINT n, UINT s, UINT p) noexcept
+    {
+        return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);
+    }
+
+    HRESULT R30SupportCallRawDrawPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept
+    {
+        return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);
+    }
+
+    HRESULT R30SupportCallRawDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        UINT m, UINT n, UINT p, const void* idx,
+        D3DFORMAT f, const void* v, UINT st) noexcept
+    {
+        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+            d,t,m,n,p,idx,f,v,st);
+    }
+
+    HRESULT R30SupportCallRawPresent(
+        IDirect3DDevice9* d, const RECT* s, const RECT* dst,
+        HWND w, const RGNDATA* r) noexcept
+    {
+        return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);
+    }
+
     void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept
     {
         R9NoteStereoDrawWithoutMonoBackup();

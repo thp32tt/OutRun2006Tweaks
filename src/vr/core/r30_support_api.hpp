@@ -39,6 +39,23 @@ namespace OutRunVRStereo
     // Exact lower R9 depth-content write notification, without a new epoch.
     void R30SupportNoteMainDepthContentWrite() noexcept;
     // Preserve original R9 mono-backup invalidation and frame poisoning.
+    // Raw D3D9 trampolines preserve original draw/present dispatch and
+    // HRESULT without using higher R30 replay hooks or altering device state.
+    HRESULT R30SupportCallRawDrawPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
+    HRESULT R30SupportCallRawDrawIndexedPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, INT b,
+        UINT m, UINT n, UINT s, UINT p) noexcept;
+    HRESULT R30SupportCallRawDrawPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept;
+    HRESULT R30SupportCallRawDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        UINT m, UINT n, UINT p, const void* idx,
+        D3DFORMAT f, const void* v, UINT st) noexcept;
+    HRESULT R30SupportCallRawPresent(
+        IDirect3DDevice9* d, const RECT* s, const RECT* dst,
+        HWND w, const RGNDATA* r) noexcept;
     void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept;
     void R30SupportReportStereoFailure(
         OutRunVR::StereoFailureReason reason,

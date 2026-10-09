@@ -47,6 +47,77 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
+# R84 raw draw and Present trampoline owner: R30 invokes exact stock hooks,
+# never the higher R30 stereo/hud lower-draw override (double dispatch risk).
+# All arguments and HRESULT must pass unchanged; no zero-count "success".
+def r32_raw_trampoline_owner_ok(api, lower, upper):
+    contracts = (
+        ("DrawPrimitive", "DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p)",
+         "R30SupportCallRawDrawPrimitive(d,t,s,p)"),
+        ("DrawIndexedPrimitive", "DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p)",
+         "R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p)"),
+        ("DrawPrimitiveUP", "DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st)",
+         "R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st)"),
+        ("DrawIndexedPrimitiveUP",
+         "DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st)",
+         "R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st)"),
+        ("Present", "PresentHook.stdcall<HRESULT>(d,s,dst,w,r)",
+         "R30SupportCallRawPresent(d,s,dst,w,r)"),
+    )
+    for suffix, original_hook, delegated_call in contracts:
+        lower_api = "R30SupportCallRaw" + suffix
+        review_api = "R32ReviewCallRaw" + suffix
+        if lower_api + "(" not in api:
+            return False
+        if not re.search(
+            r"HRESULT\s+" + lower_api +
+            r"\([^{};]*\) noexcept\s*\{\s*return " +
+            re.escape(original_hook) + r";\s*\}", lower):
+            return False
+        if not re.search(
+            r"HRESULT\s+" + review_api +
+            r"\([^{};]*\) noexcept\s*\{\s*return " +
+            re.escape(delegated_call) + r";\s*\}", upper):
+            return False
+    return True
+
+if not r32_raw_trampoline_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 raw draw/Present dispatch must forward exact R9 hooks via R30")
+for label, changed_r30, changed_r32 in (
+    ("primitive silently succeeds", r30.replace(
+        "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", "return S_OK;", 1), r32),
+    ("indexed base vertex discarded", r30.replace(
+        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);",
+        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,0,m,n,s,p);", 1), r32),
+    ("primitive UP stride discarded", r30.replace(
+        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);",
+        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,0);", 1), r32),
+    ("indexed UP index format changed", r30.replace(
+        "d,t,m,n,p,idx,f,v,st);", "d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
+    ("Present region dropped", r30.replace(
+        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);",
+        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,nullptr);", 1), r32),
+    ("R32 primitive bypass", r30, r32.replace(
+        "return R30SupportCallRawDrawPrimitive(d,t,s,p);",
+        "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", 1)),
+    ("R32 indexed bypass", r30, r32.replace(
+        "return R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);",
+        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);", 1)),
+    ("R32 UP bypass", r30, r32.replace(
+        "return R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st);",
+        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);", 1)),
+    ("R32 indexed UP bypass", r30, r32.replace(
+        "return R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);",
+        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(d,t,m,n,p,idx,f,v,st);", 1)),
+    ("R32 Present bypass", r30, r32.replace(
+        "return R30SupportCallRawPresent(d,s,dst,w,r);",
+        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R84 raw trampoline mutation not applied: " + label)
+    elif r32_raw_trampoline_owner_ok(r30_support_api, changed_r30, changed_r32):
+        errors.append("R84 raw trampoline negative mutation survived: " + label)
+
 # R84 R32 stereo RT/depth-stencil switch invokes the original lower
 # hook trampolines. R30 must preserve slot index, borrowed surface and HRESULT.
 # An absent DS hook has a DIFFERENT original fallback: call the D3D9 device.
