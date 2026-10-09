@@ -3476,3 +3476,8 @@ New current Korean DDS q154 SHA256 `c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a
 ## 2026-10-10 01:50 KST C336 C2 q154 current red5 HOLD
 
 - C336 C2 q154 B298 SHA c4d6c151... independent saved DDS five red current ROI exact pixel match C292 native lossless 5/5 FLIPY 0 diffs; first red protected separator 7860 original-source-identical pixels; 3 grey remain C323 HOLD. Overall HOLD_STRICT_RECHECK, C3/approval/game UNTESTED. QA localization/graphics/role_C/20261010-C336-C2-Q154-CURRENT-RED-IDENTITY/C336_CONTROLLER_QA.json RUN_KEY=OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150
+
+## 2026-10-10 02:15 KST — A214 q227 native proof worker DISPATCHED, NOT COMPLETE (OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200)
+
+- [GitHub Actions #37963658586](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37963658586) still in progress with no published A214 machine report at last verification. Role A worker code committed `a7ec2b33847c78250aeaaf83e728489b9bb81e0f`. Expected 13 missing C320/16 native transparent PNG + exact RAW and BGW 100/75/50 proof. **New promoted DDS=0; new proof actually verified=0 until output arrives**. Preserve q227 SHA256 `83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595` without rewriting or approval inflation.
+- Pending/next-run dedup checkpoint `localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_DISPATCH_PENDING.json`. The next A run must consume exact existing GH run before retry; check `A214_EVIDENCE_REPORT.json` / `A214_EXECUTION_HOLD.json`, controller pixels-first review and reconcile queue/QA. C320 C1 HOLD, C3 blocked, user IGR034/035/036 OPEN, `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
