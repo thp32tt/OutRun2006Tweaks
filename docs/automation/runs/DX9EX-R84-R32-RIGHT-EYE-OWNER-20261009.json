@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-RIGHT-EYE-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-RIGHT-EYE-OWNER-20261009",
+  "event_id": "DX9EX-R84-R32-RIGHT-EYE-OWNER-20261009-E001",
+  "event_type": "CHAT_DIRECT",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "base_sha": "2e84a92f7d72fe13683b7a27ba648ae4afd4349d",
+  "material_result_sha": "fa914c33b6d53f45750e68b7ee6aea9a35ec1ca6",
+  "validation_bearing_result_sha": "053096b28e4dd1547579cf15b6e6ccf3663bf487",
+  "result_sha": "053096b28e4dd1547579cf15b6e6ccf3663bf487",
+  "source_changes": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "summary": "Extracted the R32 RightEyeSurface borrowed-pointer read through explicit R30SupportBorrowedRightEyeSurface API; preserving pointer identity and ownership (no AddRef/Release), draw, stereo, Reset/Present, DirectGPU, F11 and HUD behavior. Added fail-closed regression contract and corrected verifier raw-regex on validation-bearing source.",
+  "prior_related_work": [
+    ".github/workflows/vr-openxr.yml hardening source guard updated for current R30/R32/R33 facade names at 4d6e7d6b7ed7fe1155c732b5d22c17a3d1278df7",
+    "R84 Gate0 and Inventory already verified; queue reconciled, not repeated"
+  ],
+  "evidence": {
+    "exact_sha_ci": {
+      "dx9ex_active": {
+        "run_id": 37884787934,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37884787934",
+        "head_sha": "053096b28e4dd1547579cf15b6e6ccf3663bf487",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": {
+          "policy": {
+            "id": 113672401265,
+            "conclusion": "success"
+          },
+          "game": {
+            "id": 113672493202,
+            "conclusion": "success"
+          },
+          "host": {
+            "id": 113672493253,
+            "conclusion": "success"
+          },
+          "full-chain-compile": {
+            "id": 113672493256,
+            "conclusion": "success"
+          },
+          "package": {
+            "id": 113673376175,
+            "conclusion": "success"
+          }
+        }
+      },
+      "domain_isolation": {
+        "run_id": 37884787939,
+        "head_sha": "053096b28e4dd1547579cf15b6e6ccf3663bf487",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    "package": {
+      "artifact_id": 11595538630,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-053096b28e4dd1547579cf15b6e6ccf3663bf487",
+      "digest": "sha256:b8184525115bb9a47088149d4e5bb5bca6dcf3d1a28f7b06ee2891a36b23d220"
+    },
+    "verification": {
+      "VR_refactor_contract": "PASS",
+      "R84_inventory_contract": "PASS",
+      "branch_readback": "PASS"
+    },
+    "user_f11_report": "USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED (distinct from CI / new material HMD evidence)"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS latest authenticated focus GitHub and R84 Gate0/Inventory evidence",
+    "C1_REVIEW": "PASS identified remaining private R32 right-eye pointer reference",
+    "C2_IMPLEMENT": "PASS real C++ and source verifier changes",
+    "C3_VALIDATE": "PASS exact-SHA game, host, R33 full-chain, policy, domain and package",
+    "C4_COMMIT": "PASS source and verifier-bearing commits on focus",
+    "C5_PACKAGE": "PASS exact-SHA CI artifact, NOT runtime approved",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED"
+  },
+  "next_action": "Continue independent bounded R32/R31 then R31/R30 textual-TU ownership facades and CMake reconciliation. R84 closeout remains NOT_COMPLETE_PENDING_TU_CMAKE. Protect user reported normal F11. Preserve GOAL/+TIME, rank, flare and other unresolved HMD issues independently. Do not duplicate this task or score on replay.",
+  "scoreboard": {
+    "ai": "AI2",
+    "score_pending_until_ssot_commit": true,
+    "task_once": true
+  }
+}
