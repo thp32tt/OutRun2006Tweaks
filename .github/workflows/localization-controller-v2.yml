@@ -8,6 +8,7 @@ on:
       - 'tools/chat-controller/v0.4/entrypoint.direct.sh'
       - 'tools/chat-controller/v0.4-localization-v2/**'
       - 'tests/test_controller_v2.py'
+      - 'tests/test_localization_tab_recovery.py'
       - '.github/workflows/localization-controller-v2.yml'
   workflow_dispatch:
 permissions:
@@ -24,6 +25,7 @@ jobs:
           python -m py_compile /tmp/controller.py
           python tests/test_controller_v2.py
           python tests/test_localization_execution.py
+          python tests/test_localization_tab_recovery.py
       - name: Compose configuration
         run: docker compose -f tools/chat-controller/v0.4-localization-v2/docker-compose.yml config --quiet
       - name: Build dedicated image
