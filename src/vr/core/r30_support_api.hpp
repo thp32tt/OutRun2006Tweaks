@@ -42,6 +42,11 @@ namespace OutRunVRStereo
     };
     bool R30SupportTryGetEffectTelemetrySnapshot(
         R30SupportEffectTelemetrySnapshot& out) noexcept;
+    // Preserve the lower R29 effect and stereo readiness policy verbatim.
+    bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept;
+    bool R30SupportFragileEffectCached(IDirect3DDevice9* device,
+        bool& fragile) noexcept;
+    void R30SupportNoteStableTwoEyeDraw() noexcept;
 
     struct R30SupportDirectTransportIdentity
     {

@@ -108,6 +108,46 @@ if not re.search(r"R30SupportFrameStereoPoseSequence\(\) noexcept\s*\{\s*return 
 if not re.search(r"R32ReviewFrameStereoPoseSequence\(\) noexcept\s*\{\s*return R30SupportFrameStereoPoseSequence\(\);\s*\}", r32):
     errors.append("R32 bypassed R30 frame pose-sequence owner query")
 
+# R84 R29 effect/stereo boundary is R30-owned, while R32 is hook-free.
+# Exact delegation preserves lower stereo readiness, cached fragile classification,
+# output-by-reference and one-per-stereo-pair telemetry without new policy.
+def r29_effect_boundary_ok(api, producer, consumer):
+    required_header = (
+        "bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept;",
+        "bool R30SupportFragileEffectCached(IDirect3DDevice9* device,\n        bool& fragile) noexcept;",
+        "void R30SupportNoteStableTwoEyeDraw() noexcept;",
+    )
+    required_owner = (
+        "return R29StableStereoBase(device);",
+        "return R29FragileEffectCached(device, fragile);",
+        "R29TelemetryNoteStableTwoEyeDraw();",
+    )
+    required_consumer = (
+        "R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R30SupportStableStereoBase(d); }",
+        "R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R30SupportFragileEffectCached(d,f); }",
+        "R32ReviewNoteStableTwoEyeDraw() noexcept { R30SupportNoteStableTwoEyeDraw(); }",
+    )
+    return (all(x in api for x in required_header) and
+            all(x in producer for x in required_owner) and
+            all(x in consumer for x in required_consumer))
+
+if not r29_effect_boundary_ok(r30_support_api, r30, r32):
+    errors.append("R30/R32 R29-effect owner delegates or API signatures changed")
+for label, altered_owner, altered_consumer in (
+    ("stereo-readiness forced true", r30.replace(
+        "return R29StableStereoBase(device);", "return true;", 1), r32),
+    ("fragile output lost", r30.replace(
+        "return R29FragileEffectCached(device, fragile);", "return true;", 1), r32),
+    ("telemetry omitted", r30.replace(
+        "R29TelemetryNoteStableTwoEyeDraw();", "(void)0;", 1), r32),
+    ("R32 bypassed owner", r30, r32.replace(
+        "return R30SupportStableStereoBase(d);", "return R29StableStereoBase(d);", 1)),
+):
+    if altered_owner == r30 and altered_consumer == r32:
+        errors.append("R29 owner mutation failed to apply: " + label)
+    elif r29_effect_boundary_ok(r30_support_api, altered_owner, altered_consumer):
+        errors.append("R29 effect/stereo negative mutation survived: " + label)
+
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
 # SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.

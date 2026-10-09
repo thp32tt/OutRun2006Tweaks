@@ -902,9 +902,9 @@ namespace OutRunVRStereo
     void R32ReviewRecordHudStereoDuplicate() noexcept { FrameHadDuplicatedDraw = true; ++DuplicatedDraws; ++NonWorldDuplicatedDraws; }
     void R32ReviewMarkFrameRightDrawFailed() noexcept { FrameRightDrawFailed = true; }
 
-    bool R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R29StableStereoBase(d); }
-    bool R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R29FragileEffectCached(d,f); }
-    void R32ReviewNoteStableTwoEyeDraw() noexcept { R29TelemetryNoteStableTwoEyeDraw(); }
+    bool R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R30SupportStableStereoBase(d); }
+    bool R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R30SupportFragileEffectCached(d,f); }
+    void R32ReviewNoteStableTwoEyeDraw() noexcept { R30SupportNoteStableTwoEyeDraw(); }
     void R32ReviewObserveDispatchDraw(IDirect3DDevice9* d) noexcept { R31SupportObserveDraw(d); }
     void R32ReviewDiscardUnreliableDrawCaches() noexcept { R31SupportDiscardUnreliableDrawCaches(); }
     void R32ReviewNoteDispatchFallback() noexcept { R31SupportNoteFallback(); }

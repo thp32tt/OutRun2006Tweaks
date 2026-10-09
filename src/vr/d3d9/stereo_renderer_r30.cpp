@@ -3311,6 +3311,22 @@ namespace OutRunVRStereo
         return true;
     }
 
+    bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept
+    {
+        return R29StableStereoBase(device);
+    }
+
+    bool R30SupportFragileEffectCached(IDirect3DDevice9* device,
+        bool& fragile) noexcept
+    {
+        return R29FragileEffectCached(device, fragile);
+    }
+
+    void R30SupportNoteStableTwoEyeDraw() noexcept
+    {
+        R29TelemetryNoteStableTwoEyeDraw();
+    }
+
     bool R30SupportOverlayReadyForTransport() noexcept
     {
         return R13OverlayReadyForTransport();
