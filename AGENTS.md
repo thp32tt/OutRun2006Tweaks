@@ -1,3 +1,11 @@
+## VR integration of finalized FFB — 2026-10-10 (user-authorized exception)
+
+- FFB development is complete. **Do not edit the original FFB release, its dedicated branch, or its source files as a separate development task.** The approved integration target is `vr-d3d9ex-focus` only.
+- VR must integrate the **completed FFB v0.2 source implementation**, not replace it with stubs, a partial adapter, or documentation-only knowledge transfer. Preserve the exact finalized FFB implementation in VR unless an integration-specific change is demonstrably required; any such change belongs to VR integration and must not propagate back to the FFB original.
+- The existing VR integration commit `1b12a55f2ae277da7c8a545ca37ce8059ba891d1` already copied nine v0.2 files. Continue by resolving build, initialization, input, linkage and runtime integration on VR. Do not revert the imported files solely to satisfy the historical domain guard.
+- The current `tools/verify_domain_isolation.py` forbids FFB-owned file edits on VR. This user-approved **finalized FFB-to-VR integration** is a narrow, auditable exception: permit only exact, pinned release-v0.2 source copies on the VR branch (verify content SHA against release), or documented integration-specific edits, without relaxing restrictions for localization, DX11/DXVK or future independent FFB development. Update the guard with targeted tests; do not disable the guard globally.
+- Maintain protected DX9Ex visual baseline and keep HMD runtime validation `UNTESTED` until actually measured. A CI PASS alone does not prove wheel hardware compatibility.
+
 ## DX9Ex autonomous development allocation override — 2026-10-10
 
 This is the latest user-directed allocation override and supersedes the 2026-09-29 DX9Ex maintenance-only / <=10% allocation restriction and any older P0 freeze that would prohibit authorized new DX9Ex work. This is an engineering-effort target, not a CI scheduling guarantee.
