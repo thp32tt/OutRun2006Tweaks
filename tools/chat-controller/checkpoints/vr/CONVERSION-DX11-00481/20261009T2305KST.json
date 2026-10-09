@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00481",
+  "event_id": "CONVERSION-DX11-00481-E001",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAITING_CI",
+  "branch": "vr-dx11-native-r71",
+  "material_result_sha": "bab15199c09cb4f3c266b3755096da73b22f9243",
+  "validation_bearing_result_sha": "bab15199c09cb4f3c266b3755096da73b22f9243",
+  "ci_run_id": 37941208925,
+  "ci_validate_job_id": 113855747141,
+  "scoped_static": "R179_SUCCESS",
+  "win32_validate": "IN_PROGRESS_CONFIGURE",
+  "scoped_cpp_warp": "PENDING",
+  "previous_gate_37938745654": "VALIDATE_SUCCESS_BUT_R175_FAIL",
+  "second_sha_835c7294": "RUN_NOT_DISCOVERED",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Monitor exact-SHA 37941208925. R179 WARP surface owner should run before inherited R175 constant-buffer WARP error. Once terminal, update docs/automation/runs/CONVERSION-DX11-00481.json on target branch in bookkeeping commit with preserved validation-bearing SHA, then no more scope changes.",
+  "score_delta": 0,
+  "observed_at_kst": "2026-10-09T23:05:00+09:00"
+}
