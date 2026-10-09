@@ -64,6 +64,27 @@
           "finding": "B263 new exact 812373b0... reproduces horizontal gold/brown slab faces and insufficient source right-italic cream-white depth/word hierarchy at native, 8x and 50%; unlike prior B255/first B262 material SHA."
         }
       ]
+    },
+    {
+      "queue_index": 60,
+      "asset_hash": "A064FDFC",
+      "required_method_change": "STOP using source-pixel equality removal (B343), narrow connected-alpha-island cleanup (B344), or successive dilation/threshold patches on an already over-composited official Korean DDS. C342 rejected official English BEST TIME double drawing; C347 independently rejected the attempted B343 partial source-English removal for persistent dark outline slivers. Exact source 6a33c730... -> independently source-verified full English face+outline+halo CLEAN/plate QA -> source-family matched transparent Korean lettering -> clean-only/composite-only/protected-sibling/persisted native+RAW/FLIP-Y+75/50 validations with production_pixel_guard manifests. Reconstruct exact shared-atlas consumer/layer ownership; unresolved source vs protected sibling mapping requires HOLD or manual reconstruction, not promotion. B344 produced zero new DDS and is not a C approval.",
+      "rejections": [
+        {
+          "review_id": "C342",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_RESIDUE_UNDER_KOREAN",
+          "evidence_ref": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json",
+          "finding": "Independent native official DDS C2 visually verified English BEST TIME beneath 최고 기록 and protected art collision; official exact SHA d81d0d144... fails."
+        },
+        {
+          "review_id": "C347",
+          "decision": "REWORK_REQUIRED",
+          "root_cause": "SOURCE_RESIDUE_UNDER_KOREAN",
+          "evidence_ref": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_CONTROLLER_C2_TRIAL_REWORK.json",
+          "finding": "Separate independent C2 scope explicitly rejected B343 unapproved exact 8774e399... retained dark/reddish source outline slivers; scoped trial FAIL is NOT fresh whole-atlas C decision, official remains C342 REWORK_REQUIRED. The needed corrective method differs from B343/B344."
+        }
+      ]
     }
   ]
 }
