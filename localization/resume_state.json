@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C329 C2 EVEN q212 B329 e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea independent exact SHA/header and fresh changed-r43 visual improvement but full 12 masks/RAW/calibration incomplete -> HOLD_STRICT_RECHECK NOT PASS; IGR029 game open. localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json RUN_KEY=OUTRUN-KOR-C329-C2-Q212-B329-EXACT-SHA-SCOPED-HOLD-20261009-1920",
     "C328 C2 q098 B327R persisted DDS SHA256 472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028 REWORK_REQUIRED: original English Cl / ord. survive around Korean in full READABLE and RAW saved image; source removal/full composite fixed DDS and fresh C2/C3/user-game required, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C328-C2-Q098-PERSISTED-ENGLISH-RESIDUE/C328_Q098_CONTROLLER_REWORK.json. RUN_KEY=OUTRUN-KOR-C328-C2-Q098-B327R-PERSISTED-ENGLISH-RESIDUE-20261009-1850",
     "B329 B-even q212 C327 C2 actual visual REWORK of id43 PROFESSIONAL->프로 source638px vs prior 프로120px (18.8%, 513px leading gap). Promoted one NEW native RGBA32 full term 프로페셔널 native316x55 source-leading anchored x5 within original 638x63, unmodified other 11 source regions, source outside selected rgba/alpha0, exact DDS mirror-Y header/mip1 roundtrip. Old exact 209f8358... -> new e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea, Git blob 4e7de482 and binary commit e9165bc8, worker 37914195657 SUCCESS, 18 source/clean/old/new BGW RAW/FLIPY 100/75/50 proofs. Producer scoped visual PASS only; full C2/C3 user actual-game required, IGR029 mapping SUSPECTED and OPEN; RUNTIME_VALIDATION=UNTESTED. B328 initial lexical triage failed, B328R width252 fail, B328R2 right-align rejected; score/performance only one new final DDS. QA localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/B329_CONTROLLER_SELF_QA_FINAL.json",
     "A204 q175 IGR032 new Orbit/source-chrome 3-row native TRIAL GitHub CPU 37912323889 SUCCESS; producer controller visual FAIL angular detached Hangul and source hierarchy underfill despite 0 pixel overflow, DDS 0, current A188 b9f60b45 preserved, manual vector connected/rounded techno needed. localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_CONTROLLER_PRODUCER_VISUAL_REJECT.json; NEW game/C1/C3 OPEN, RUNTIME_VALIDATION=UNTESTED.",
@@ -6824,7 +6825,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 18:57 KST",
+  "updated_at_kst": "2026-10-09 19:31 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13431,6 +13432,14 @@
     "index": 98,
     "candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
     "decision": "REWORK_REQUIRED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c329_c2_q212_b329_scoped_hold": {
+    "run_key": "OUTRUN-KOR-C329-C2-Q212-B329-EXACT-SHA-SCOPED-HOLD-20261009-1920",
+    "queue_index": 212,
+    "candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "decision": "HOLD_STRICT_RECHECK",
+    "qa": "localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

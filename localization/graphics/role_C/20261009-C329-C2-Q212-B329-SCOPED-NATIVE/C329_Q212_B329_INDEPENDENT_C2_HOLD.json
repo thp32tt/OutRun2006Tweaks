@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "review_id": "C329",
+  "run_key": "OUTRUN-KOR-C329-C2-Q212-B329-EXACT-SHA-SCOPED-HOLD-20261009-1920",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "time_kst": "2026-10-09 19:31 KST",
+  "queue_index": 212,
+  "priority": "P1",
+  "user_ingame": "IGR-029_OPEN_USER_INGAME_FAIL_MAPPING_SUSPECTED",
+  "decision": "HOLD_STRICT_RECHECK",
+  "scoped_result": "B329_ID43_VISUAL_IMPROVEMENT_NOT_C_PASS",
+  "candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+  "git_blob_sha": "4e7de48245707823f8d2010b4c91e14053f3cc5c",
+  "current_dds_independent_sha256": "PASS_SHA256_MATCH_EXACT_GITHUB_RAW",
+  "current_dds_header": "PASS_2048x2048_RGBA32_MIP1",
+  "triage": "FRESH_C_REVIEW (executed current rework_triage.py --index 212)",
+  "source_text": "PROFESSIONAL",
+  "old_text": "프로",
+  "new_text": "프로페셔널",
+  "bbox_source": [
+    0,
+    341,
+    638,
+    404
+  ],
+  "bbox_old": [
+    513,
+    346,
+    633,
+    399
+  ],
+  "bbox_new": [
+    5,
+    345,
+    321,
+    400
+  ],
+  "visual_findings": [
+    "FLIPY_BLACK_100 SOURCE/CLEAN/OLD/NEW: previously undersized right-aligned 120px old Korean replaced with source-left 5px new 316px native source-orange heavy glyph; no obvious clipped stroke",
+    "FLIPY_GRAY_50: full Korean phrase readable at half display; tracking spacious but no definite collision",
+    "FLIPY_WHITE_100: color/source upright family approximate, no visible opaque rectangular plate in cropped cell",
+    "RAW_GRAY_75 and RAW_BLACK_100: source and final are both Y-mirrored, and Korean glyphs remain legible in readable orientation",
+    "NEW_NATIVE_RGBA: individual 5 Hangul syllables are visibly present"
+  ],
+  "visual_limits": "Evidence only for B329 newly changed region id43 and crop. Full saved DDS 12 regions not independently compared against canonical full SOURCE/CLEAN/FINAL. Do NOT infer zero original English elsewhere, alpha mask full-coverage, protected art, or other region C PASS from producer machine report. C328 q098 full-frame English ghost demonstrates risk.",
+  "ordered_eight": {
+    "clean": "HOLD_FULL_FRAME",
+    "source_slant": "SCOPED_UPRIGHT_PASS",
+    "size": "SCOPED_IMPROVED_316x55_vs_120x53",
+    "effect": "SCOPED_SOURCE_ORANGE_FAMILY",
+    "broken": "SCOPED_NONE_OBVIOUS",
+    "protection": "HOLD_FULL_ATLAS",
+    "raw_flipy": "SCOPED_VIEWED",
+    "readability": "SCOPED_50_PERCENT_READABLE"
+  },
+  "producer_machine": "B329 claims selected source/CLEAN alpha zero, unchanged other11 and changes outside0; not independently re-measured here",
+  "required_next": "Full exact-candidate independent C2 all 12 SOURCE/CLEAN/FINAL/RAW/FLIPY native/75/50 and blind defect calibration, separate C3 and English-original human JPG, user newer real game mapping retest",
+  "C3": "NOT_RUN",
+  "approval": false,
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "NEW_DDS": 0,
+  "NEW_IMAGES": 0,
+  "evidence": [
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/r43_NEW_NATIVE_RGBA.png",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/B329_CONTROLLER_SELF_QA_FINAL.json",
+    "localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/B329_MACHINE_QA.json"
+  ],
+  "backend": "GitHub-first; ChatGPT visual review; N100 MCP only small image/sha/header/triage",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
