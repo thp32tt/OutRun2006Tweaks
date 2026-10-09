@@ -1,0 +1,282 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C345-Q098-AUTHENTICATED-SOURCE-20261010",
+  "run_key": "OUTRUN-KOR-C345-C2-Q098-INDEPENDENT-CANONICAL-DDS-PLATE-20261010-0620",
+  "queue_index": 98,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "selected_head": "a05733e6248f2f4cae278c6675c846c74c7f0ac6",
+  "source_provenance": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754 Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "canonical_english_dds_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "canonical_source_png_sha256": "6e022ca65d9a9312bbdaa03dae481bd248a5855b3a35a4bd67b9864ad1257ab4",
+  "authored_clean_png_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+  "current_saved_candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+  "status_before": "c337_c2_rework_required_source_italic_weight_family",
+  "decision": "REWORK_REQUIRED_PRESERVED",
+  "result": "NEW_EXACT_CANONICAL_SOURCE_AUTHENTICATION_AND_FULL_ATLAS_ALPHA_BOUNDARY_PROOF",
+  "candidate_updated": false,
+  "queue_status_promoted": false,
+  "current_asset_review_scope": "This QA supplements the previous independent C337 rejection with independently downloaded canonical source DDS and full source/CLEAN/saved pixel comparison at current exact candidate SHA. No previously rejected candidate is newly completed or counted as new approved artwork.",
+  "triage": {
+    "next_action": "MATERIAL_REWORK",
+    "command": "python tools/localization/rework_triage.py --index 98",
+    "current_queue_status": "c337_c2_rework_required_source_italic_weight_family"
+  },
+  "source_authentication": {
+    "exact_git_revision_verified": true,
+    "english_native_dds_bytes": 262272,
+    "headers": {
+      "source": {
+        "magic": "DDS ",
+        "size": 262272,
+        "height": 128,
+        "width": 2048,
+        "mips": 1,
+        "fourcc": "DXT5",
+        "header_sha256": "165e7b9d55ed31004a586729651bc13ce9ed2cea173a5447706b897a70f5f04b"
+      },
+      "saved": {
+        "magic": "DDS ",
+        "size": 262272,
+        "height": 128,
+        "width": 2048,
+        "mips": 1,
+        "fourcc": "DXT5",
+        "header_sha256": "165e7b9d55ed31004a586729651bc13ce9ed2cea173a5447706b897a70f5f04b"
+      }
+    },
+    "source_saved_header_equal": true,
+    "producer_original_png_native_rgba_changed_pixels": 0,
+    "source_png_exact_native_match": true
+  },
+  "english_alpha_true_bbox_raw": [
+    431,
+    5,
+    1674,
+    122
+  ],
+  "previous_producer_bbox_raw": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "source_alpha_fringes_outside_previous_bbox": 14,
+  "missing_fringe_coordinates": [
+    [
+      756,
+      5
+    ],
+    [
+      757,
+      5
+    ],
+    [
+      758,
+      5
+    ],
+    [
+      759,
+      5
+    ],
+    [
+      762,
+      5
+    ],
+    [
+      763,
+      5
+    ],
+    [
+      764,
+      5
+    ],
+    [
+      765,
+      5
+    ],
+    [
+      766,
+      5
+    ],
+    [
+      767,
+      5
+    ],
+    [
+      768,
+      5
+    ],
+    [
+      772,
+      5
+    ],
+    [
+      773,
+      5
+    ],
+    [
+      774,
+      5
+    ]
+  ],
+  "exact_full_atlas_pairwise": {
+    "english_to_clean": {
+      "outside_rgba": 116713,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 92923,
+      "inside_alpha": 92878,
+      "inside_visible": 92878
+    },
+    "clean_to_saved": {
+      "outside_rgba": 116713,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 129763,
+      "inside_alpha": 83972,
+      "inside_visible": 83972
+    },
+    "english_to_saved": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 122412,
+      "inside_alpha": 85069,
+      "inside_visible": 101832
+    }
+  },
+  "scoped_protected_art": "Inside source actual alpha bbox not certified separately as protected sprites; outside true English bbox alpha differences and visible-layer RGBA=0 source/CLEAN/current. Nonzero transparent RGB changes outside are NOT visible damage.",
+  "clean_alpha_nonzero": 0,
+  "clean_authored_plate_exact_png_sha": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+  "direct_visual": {
+    "readable_gray_100": "Directly reviewed SHA-pinned saved source/CLEAN/current native 100% on gray. Original English slanted thin white face with navy diffuse rim; current Korean appears heavier/uprighter, consistent with existing C337 hard rejection.",
+    "readable_white_50": "Directly reviewed readable SOURCE/CLEAN/SAVED at half-size on white; prior optical style divergence remains. No claim of newly found separate glyph defect.",
+    "raw_gray_100": "Directly inspected native RAW source/CLEAN/current for consistent mirror-y; in-game consumer UV remains UNTESTED.",
+    "source_fringe": "Measured and annotated 14 genuine original English alpha pixels at y=5 with x756..774 excluded by old producer y>=6 bbox; pure boundary proof, not an invented protected damage finding.",
+    "source_to_clean": "Confirmed English alpha removal on independently authenticated old B330 CLEAN; transparency RGB nonzero storage deltas at alpha 0 do not imply visible contamination."
+  },
+  "region_inventory": [
+    {
+      "id": "course_record_help",
+      "english": "Challenge the course record.",
+      "korean": "코스 기록에 도전하세요.",
+      "native_size": [
+        2048,
+        128
+      ],
+      "raw_transform": "flip_y",
+      "checks": {
+        "slant": {
+          "result": "FAIL_EXISTING_REWORK",
+          "observation": "Original source rightward italic versus current Korean visibly more upright; source exact DDS now authenticated, no semantic top-minus-bottom anchors invented."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_AUTHENTICATED",
+          "observation": "Original source/CLEAN independently full SHA authenticated, full canonical SOURCE PNG byte-identical RGBA to decoded exact DDS, CLEAN alpha=0; no English glyph residue visible in inspected SOURCE/CLEAN/FNAL on background."
+        },
+        "style": {
+          "result": "FAIL_EXISTING_SOURCE_FAMILY",
+          "observation": "Current Hangul white/navy outline weight and degree of right lean do not match English source; C337 REWORK remains."
+        },
+        "readability": {
+          "result": "PASS_SCOPED_NOT_GAME",
+          "observation": "Korean text decipherable at native and 50% in grayscale/white crop."
+        },
+        "glyph_integrity": {
+          "result": "HOLD_NOT_FULLY_CALIBRATED",
+          "observation": "No unequivocal newly visible broken syllable in reviewed contacts, full blind native pixel calibration not performed."
+        },
+        "protected_art": {
+          "result": "SCOPED_ALPHA_AND_VISIBLE_OUTSIDE_ZERO",
+          "observation": "English complete glyph effect bbox measured [431,5,1674,122] RAW; candidate-vs-source outside true bbox alpha and visible changed pixels0. 14 pixels at y5 missed by previous bbox. No whole-game protected sprite approval inferred."
+        },
+        "placement": {
+          "result": "REWORK_STYLE_ANCHOR",
+          "observation": "Current saved candidate fit within source-alpha true bounding rectangle; semantic lean/baseline and exact in-game scene placement still unqualified."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_MATCH",
+          "observation": "Source and current saved native RAW and readable contacts inspected at matched dimensions; runtime orientation UNTESTED."
+        }
+      }
+    }
+  ],
+  "pngs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_READABLE_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "4432bfd98a3e73723ba61bccb16bd30098ea0402b239b7e1b8c72d979520df40",
+      "bytes": 100004
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_READABLE_gray_75_SOURCE_CLEAN_SAVED.png",
+      "sha256": "5e3bff4624094b39f07707d15251ffaa939c479687c0747a26a20bd0da514f1a",
+      "bytes": 143250
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_READABLE_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "62fcfc1dd01ba93dc25f419fcf4b5fdbd891a4175d7abe8ae59f6375cfd86e54",
+      "bytes": 77421
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_READABLE_white_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "ba65f4f70e8f27552e8494e3aafe7cd9ccfd5ab6cf52a8a92bf2ef1d79ca5f5f",
+      "bytes": 88036
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_READABLE_black_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "b00b11b573581c79326f50252e42de75ac76a504746e331a3dff94c68495eab0",
+      "bytes": 68356
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_RAW_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "bba099806b1ec912daa7a43f458ea50c18658ce8fc152aa01bee9a223179b124",
+      "bytes": 105759
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_RAW_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "86857176d5fc0525604a249b6e3776bf98f24841538fc41abfa9938443e01b00",
+      "bytes": 81607
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_SOURCE_READABLE_NATIVE.png",
+      "sha256": "6ae76ee1be03922c0e7d0ce5ef73d4a9c27bce8257bdb43085ad3f7902ae34ae",
+      "bytes": 78910
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_SAVED_READABLE_NATIVE.png",
+      "sha256": "fc6fb7a5ee794840423b32b30064385d65619f80f19b910a95d07ab788efb259",
+      "bytes": 13214
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_q098_NATIVE_SOURCE_BBOX_TOP_FRINGE_2X.png",
+      "sha256": "a8705a2762e1044cb6e3dc3b04dcb3351c9a12863082b543f32755046b91e8c1",
+      "bytes": 16242
+    }
+  ],
+  "source_clean_final_pixel_proof": {
+    "machine": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_Q098_SOURCE_AUTH_MACHINE.json",
+    "bbox_fringe": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_Q098_TOP_EDGE_ALPHA_PIXEL_PROBE.json",
+    "manifest": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_Q098_PNG_SHA_MANIFEST.json"
+  },
+  "calibration": "HISTORICAL_PRODUCER_NOTES_SEEN; NOT_BLIND; NEVER_CURRENT_PASS",
+  "pixels_before_producer_verdict": false,
+  "C3": "BLOCKED_BY_EXISTING_C2_REWORK",
+  "APPROVAL": "NO",
+  "PRE_INGAME": "BLOCKED",
+  "user_game_retest": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_producer_action": "Source-conditioned right italic white/navy effect rebuild with correct original-English complete y5 boundary, without cropping 14 antialiased fringe pixels. Keep true source effect bbox and 1-pixel protection; ensure previously reported heavy Korean face and reduced italic slant are fixed. Produce new saved DDS bytes/SHA; rerun source/CLEAN/final, RAW and 100/75/50 QA before independent C2/C3 and user test.",
+  "new_dds": 0,
+  "excluded": [
+    "ODD_Q_C1",
+    "UNINDEXED_SPECIAL_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "new controller task/queue engine"
+  ]
+}

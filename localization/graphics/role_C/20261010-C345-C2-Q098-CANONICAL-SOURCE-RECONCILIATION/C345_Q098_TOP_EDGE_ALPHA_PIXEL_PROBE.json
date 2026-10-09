@@ -1,0 +1,79 @@
+{
+  "original_producer_bbox_raw": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "true_original_bbox_raw": [
+    431,
+    5,
+    1674,
+    122
+  ],
+  "english_alpha_pixels_outside_old_bbox": 14,
+  "english_alpha_pixels_missing_at_y5": 14,
+  "missing_alpha_x_span": [
+    756,
+    774
+  ],
+  "missing_pixel_xy_first_30": [
+    [
+      756,
+      5
+    ],
+    [
+      757,
+      5
+    ],
+    [
+      758,
+      5
+    ],
+    [
+      759,
+      5
+    ],
+    [
+      762,
+      5
+    ],
+    [
+      763,
+      5
+    ],
+    [
+      764,
+      5
+    ],
+    [
+      765,
+      5
+    ],
+    [
+      766,
+      5
+    ],
+    [
+      767,
+      5
+    ],
+    [
+      768,
+      5
+    ],
+    [
+      772,
+      5
+    ],
+    [
+      773,
+      5
+    ],
+    [
+      774,
+      5
+    ]
+  ],
+  "saved_alpha_in_missing_effect_pixels": 0
+}
