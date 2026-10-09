@@ -8,13 +8,19 @@
     4,
     5,
     6,
-    7
+    7,
+    8
   ],
-  "issues": [],
+  "issues": [
+    {
+      "batch": 8,
+      "reason": "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md: missing ['93%']"
+    }
+  ],
   "RUNTIME_VALIDATION": "UNTESTED",
   "initial_contract": "PASS",
-  "last_tick": "2026-10-10 07:42:52 KST",
-  "last_status": "SOURCE_CONTRACT_OK",
+  "last_tick": "2026-10-10 07:47:52 KST",
+  "last_status": "REVIEW_FINDING",
   "completed": {
     "0": "d790e047a4ca9bbfa7715fccda37e102b96bee90c2ccee83653971d55f14e756",
     "1": "abf5745dc78049b260996cee7bf509a8954596159dce067c61f4e881103c6a42",
@@ -23,7 +29,8 @@
     "4": "abf5745dc78049b260996cee7bf509a8954596159dce067c61f4e881103c6a42",
     "5": "c5ee47f42b8d7894ebfea639b4deddf3d5fd12b68e387505b1d308e79f0afe1a",
     "6": "eb6ba624de820b24fe032f03e69115496d2ec3044c0675abf5e395d9f611db11",
-    "7": "7376f7932b059f1adff33d3e53d4d54923f04c4a68a39edba45ce5413138f9c8"
+    "7": "7376f7932b059f1adff33d3e53d4d54923f04c4a68a39edba45ce5413138f9c8",
+    "8": "9ce767679acc68984cc18982bc01c3817ae416da9f3f14f2952b21e0765aadfd"
   },
   "verifier_sig": "3fb2771b20b9d51d2fa38ba7c5ea1d7930249a620bcc4f0531139b576ebb2fb9"
 }

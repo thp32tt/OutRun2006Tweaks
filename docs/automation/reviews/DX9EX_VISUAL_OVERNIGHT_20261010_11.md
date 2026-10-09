@@ -16,3 +16,4 @@ Schedule is best-effort, not guaranteed exact. Fixed run deadline: **2026-10-11 
 | 2026-10-10 07:32:52 KST | 04f3dffa3dce | RB07 frame budget / SkyGlow | SOURCE_CONTRACT_OK | docs/automation/reviews/DX9EX_DEEPRESEARCH_P0_20261010.md: 3 source contracts present |
 | 2026-10-10 07:37:52 KST | 04f3dffa3dce | RB08 device lifetime / SceneEffect | SOURCE_CONTRACT_OK | src/hooks_graphics.cpp: 3 source contracts present |
 | 2026-10-10 07:42:52 KST | 152c300c4351 | RB01 repo and DX9Ex isolation | SOURCE_CONTRACT_OK | AGENTS.md: 2 source contracts present |
+| 2026-10-10 07:47:52 KST | 152c300c4351 | RB09 known-good HMD regression | REVIEW_FINDING | docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md: missing ['93%'] |
