@@ -12,12 +12,129 @@
   "p1_plate_clean_exact_protected": true,
   "font_evidence": {
     "expected_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-    "found": false,
+    "found": true,
     "source_family": "B331/B332R Noto Sans CJK Bold",
     "text": "아웃런 마일:",
-    "fonttools_checked": false,
-    "all_chars_covered": null,
-    "reason": "Pinned historical renderer font absent; no fallback substitutions"
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "installed_package_license_file": "/usr/share/doc/fonts-noto-cjk/copyright",
+    "license_file_sha256": "849f4ea9c214fa4ac3593b770c699f387534b11ce671264c1b10d85bdcb5997b",
+    "fonttools_checked": true,
+    "face_count": 10,
+    "required_codepoints": [
+      {
+        "char": " ",
+        "hex": "0x20",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": ":",
+        "hex": "0x3a",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": "런",
+        "hex": "0xb7f0",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": "마",
+        "hex": "0xb9c8",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": "아",
+        "hex": "0xc544",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": "웃",
+        "hex": "0xc6c3",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "char": "일",
+        "hex": "0xc77c",
+        "faces": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "all_chars_covered": true
   },
   "source_gold_face_pixels": 23229,
   "candidate_gold_face_pixels": 26904,
@@ -52,7 +169,7 @@
     "why": "first active pixels at two y bands need not be the corresponding glyph stroke; cannot certify P2 right lean"
   },
   "slant_same_stroke_verified": false,
-  "p2_decision": "HOLD_FONT_COVERAGE_AND_MATCHED_STROKE_ANCHORS",
+  "p2_decision": "HOLD_MATCHED_STROKE_ANCHORS_AND_SOURCE_FONT_STYLE",
   "producer_decision": "NOT_PROMOTED_NO_CHANGED_DDS",
   "new_DDS": 0,
   "source_clean_final_proofs": [
