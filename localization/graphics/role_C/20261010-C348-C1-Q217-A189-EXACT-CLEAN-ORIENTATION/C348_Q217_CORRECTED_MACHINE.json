@@ -1,0 +1,72 @@
+{
+  "sha_verified": true,
+  "alignment": {
+    "dds_raw": "mirror_y",
+    "authored_clean_png_original": "already readable and needs flip_y to align with DDS RAW",
+    "evidence_direction": "same-source readable for all stage images",
+    "identity_rgba_change_unaligned": 2885246,
+    "corrected_source_clean_rgba_change": 3921
+  },
+  "pairs": {
+    "SOURCE_CLEAN": {
+      "total_rgba": 3921,
+      "total_alpha": 0,
+      "outside_declared_glyph_boxes_rgba": 425,
+      "outside_declared_glyph_boxes_alpha": 0,
+      "changed_bbox_raw": [
+        801,
+        1252,
+        1428,
+        1540
+      ],
+      "changed_outside_bbox_raw": [
+        801,
+        1252,
+        1428,
+        1540
+      ],
+      "outside_alpha0_both": 0,
+      "outside_visible_pixels": 425
+    },
+    "CLEAN_FINAL": {
+      "total_rgba": 1141,
+      "total_alpha": 0,
+      "outside_declared_glyph_boxes_rgba": 0,
+      "outside_declared_glyph_boxes_alpha": 0,
+      "changed_bbox_raw": [
+        824,
+        1254,
+        1392,
+        1538
+      ],
+      "changed_outside_bbox_raw": null,
+      "outside_alpha0_both": 0,
+      "outside_visible_pixels": 0
+    },
+    "SOURCE_FINAL": {
+      "total_rgba": 3940,
+      "total_alpha": 0,
+      "outside_declared_glyph_boxes_rgba": 425,
+      "outside_declared_glyph_boxes_alpha": 0,
+      "changed_bbox_raw": [
+        801,
+        1252,
+        1428,
+        1540
+      ],
+      "changed_outside_bbox_raw": [
+        801,
+        1252,
+        1428,
+        1540
+      ],
+      "outside_alpha0_both": 0,
+      "outside_visible_pixels": 425
+    }
+  },
+  "outside_component_top": [
+    {
+      "error": "No module named 'cv2'"
+    }
+  ]
+}

@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C348 C1 q217 first authenticated authored A189 CLEAN SHA f937fbaa; CLEAN stored readable, source/final DDS RAW, corrected aligned SOURCE→CLEAN 3921 RGBA delta not 2885246 false inversion; CLEAN→FINAL 1141, SOURCE→FINAL 3940; changed 425 RGBA outside narrow source glyph boxes but alpha unchanged, needs original halo/fringe vs protected badge classification. New 12 lossless and QA source-clean-final: localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/C348_Q217_CONTROLLER_C1_HOLD.json. Same candidate SHA C292 HOLD, DO NOT count repeat PASS. Blind calibration/C3/user game UNTESTED; OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
     "C347 C2 2026-10-10 07:27 KST EVEN q060: independent physical SHA-verified SOURCE 6a33c730..., official d81d0d144... and unapproved B343 trial 8774e399... 4096x2048 DDS. Native gray/black SOURCE/OFFICIAL/TRIAL controller inspection confirms 19,243 old→trial RGBA pixels cleared to alpha0 within [2090,337,3120,485], outside changed0; original English face region [2188,345,3016,460] source-identical visible official17039→trial84, only a nonsemantic indicator, not all English residue. Source BEST TIME full overlap in official, trial removes main face but retains several tiny reddish/dark outline flecks; P1 CLEAN not visually approved. Official SHA unchanged REWORK_REQUIRED; trial scoped FAIL_INCOMPLETE_CLEAN_PLATE, C3/approval/export/IGR044 user game blocked and runtime UNTESTED. NEW 5 PNG+2 machine JSON+independent report at localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_CONTROLLER_C2_TRIAL_REWORK.json. New promoted DDS0, avoid same-SHA duplicate PASS. OUTRUN-KOR-C347-C2-Q060-B343-INDEPENDENT-SOURCE-GHOST-20261010-0720.",
     "C346 C1 odd q119 actual SOURCE/CLEAN/FINAL saved DDS 2048x256 SHA authentication + 10 native-derived lossless RAW/FLIPY/BGW/practical/2x PNG. SRC→FINAL outside exact RAW original bbox RGBA/alpha 0; authored CLEAN alpha0 all pixels; SRC→CLEAN outside 2484 RGB-only with both alpha0 (RAW y54-55 vs source bbox y56+, no visual plate residue). Blind source-family italic/glyph anchor calibration and separate C3/user actual game untested. HOLD not PASS. QA localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/C346_Q119_INDEPENDENT_C1_HOLD.json; OUTRUN-KOR-C346-C1-Q119-EXACT-SAVED-CLEAN-HALO-20261010",
     "A218 A ODD q161 C344 fixed 11 물병자리/16 대한민국/24 이탈리아 actual persisted DXT5 trial SHA 8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e GitHub CPU 37997128618, 4194432 bytes. Other35 compressed blocks unchanged; exact native SRC/CLEAN/FINAL and BGW100/50 direct producer scoped visual PASS prior dotted glyph-face fixed; glyph alpha/color holes0, outside original region0; current official SHA8ded8565 unchanged. C344 official REWORK retained; C1 new SHA, C3, pixel guard manifest, actual user game UNTESTED. OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
@@ -6868,7 +6869,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 07:21 KST",
+  "updated_at_kst": "2026-10-10",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14308,6 +14309,27 @@
     "qa_report": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/C346_Q119_INDEPENDENT_C1_HOLD.json",
     "new_dds": 0,
     "current_c3": "BLOCKED",
+    "approval": "BLOCKED",
+    "runtime_validation": "UNTESTED"
+  },
+  "c348_c1_q217_authored_clean_orientation": {
+    "run_key": "OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
+    "queue_index": 217,
+    "lane": "C1",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+    "clean_orientation": "READABLE_PNG_NEEDS_FLIP_TO_DDS_RAW",
+    "source_to_clean_rgba_total": 3921,
+    "clean_to_final_rgba_total": 1141,
+    "source_to_final_rgba_total": 3940,
+    "source_to_final_outside_tight_glyph_rgba": 425,
+    "source_to_final_outside_tight_glyph_alpha": 0,
+    "evidence_pngs": 12,
+    "qa_report": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/C348_Q217_CONTROLLER_C1_HOLD.json",
+    "new_dds": 0,
+    "c3": "BLOCKED",
     "approval": "BLOCKED",
     "runtime_validation": "UNTESTED"
   }

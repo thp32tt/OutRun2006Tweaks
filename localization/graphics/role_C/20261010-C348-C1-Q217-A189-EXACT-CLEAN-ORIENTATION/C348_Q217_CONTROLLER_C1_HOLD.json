@@ -1,0 +1,272 @@
+{
+  "run_key": "OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
+  "review_id": "C348-C1-Q217-A189-CLEAN-DIRECTION",
+  "role": "C1",
+  "scope": "ODD_217_ONLY",
+  "queue_index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "authored_clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "authored_clean": "localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_CLEAN_PLATE.png",
+  "source_candidate_DDS": "2048x2048 BGRA32 mip1 header identical",
+  "raw_orientation": "mirror_y",
+  "clean_stored_orientation": "READABLE_ALREADY_FLIPY",
+  "anti_duplicate": "Current candidate SHA equals C292 earlier HOLD, new C348 evidence authenticates CLEAN orientation and independently measures actual 3-way deltas; not new candidate and not repeat PASS",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "orientation_false_positive": "Unaligned SOURCE-CLEAN showed 2885246 changes but after CLEAN FLIPY correct only 3921 changes; never label raw misalignment as contamination",
+  "machine": {
+    "sha_verified": true,
+    "alignment": {
+      "dds_raw": "mirror_y",
+      "authored_clean_png_original": "already readable and needs flip_y to align with DDS RAW",
+      "evidence_direction": "same-source readable for all stage images",
+      "identity_rgba_change_unaligned": 2885246,
+      "corrected_source_clean_rgba_change": 3921
+    },
+    "pairs": {
+      "SOURCE_CLEAN": {
+        "total_rgba": 3921,
+        "total_alpha": 0,
+        "outside_declared_glyph_boxes_rgba": 425,
+        "outside_declared_glyph_boxes_alpha": 0,
+        "changed_bbox_raw": [
+          801,
+          1252,
+          1428,
+          1540
+        ],
+        "changed_outside_bbox_raw": [
+          801,
+          1252,
+          1428,
+          1540
+        ],
+        "outside_alpha0_both": 0,
+        "outside_visible_pixels": 425
+      },
+      "CLEAN_FINAL": {
+        "total_rgba": 1141,
+        "total_alpha": 0,
+        "outside_declared_glyph_boxes_rgba": 0,
+        "outside_declared_glyph_boxes_alpha": 0,
+        "changed_bbox_raw": [
+          824,
+          1254,
+          1392,
+          1538
+        ],
+        "changed_outside_bbox_raw": null,
+        "outside_alpha0_both": 0,
+        "outside_visible_pixels": 0
+      },
+      "SOURCE_FINAL": {
+        "total_rgba": 3940,
+        "total_alpha": 0,
+        "outside_declared_glyph_boxes_rgba": 425,
+        "outside_declared_glyph_boxes_alpha": 0,
+        "changed_bbox_raw": [
+          801,
+          1252,
+          1428,
+          1540
+        ],
+        "changed_outside_bbox_raw": [
+          801,
+          1252,
+          1428,
+          1540
+        ],
+        "outside_alpha0_both": 0,
+        "outside_visible_pixels": 425
+      }
+    },
+    "outside_component_top": [
+      {
+        "error": "No module named 'cv2'"
+      }
+    ]
+  },
+  "findings": {
+    "start": {
+      "english": "START",
+      "korean": "출발",
+      "source_bbox_readable": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "evidence": [
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_GRAY.png",
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_start_RAW.png",
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_start.png"
+      ],
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Source angular right italic versus Korean right leaning; independent per-glyph top-vs-bottom anchor magnitudes and blind reference calibration not completed"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PLATE_CLEAR_BUT_NOT_FULL_APPROVAL",
+          "observation": "Exact authored CLEAN correctly oriented removes English letters and retains red badge; original source effect fringe beyond narrow source glyph box needs classification"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Native x5 orange-cream source style vs Korean flatter gold glyph style; source-family equivalence and weight not independently blind-calibrated"
+        },
+        "readability": {
+          "result": "OBSERVED_STATIC",
+          "observation": "Korean visible at native zoom and 50% practical but no game viewport tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_NEW_FAIL",
+          "observation": "No newly confirmed stroke clipping on visually inspected persisted DDS; not a certified PASS"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "425 source-final altered visible RGB pixels beyond two narrow declared original glyph boxes, alpha unchanged; determine whether source effect fringe or preserved border"
+        },
+        "placement": {
+          "result": "BOUNDED_SCOPED",
+          "observation": "Korean within original red title art; not evidence of actual game-composed layout"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical source/candidate DDS RAW same mirror_y; authored CLEAN already readable, aligned by flip_y for byte-comparison"
+        }
+      }
+    },
+    "goal": {
+      "english": "GOAL",
+      "korean": "골",
+      "source_bbox_readable": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "evidence": [
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_GRAY.png",
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_goal_RAW.png",
+        "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_goal.png"
+      ],
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Source angular right italic versus Korean right leaning; independent per-glyph top-vs-bottom anchor magnitudes and blind reference calibration not completed"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PLATE_CLEAR_BUT_NOT_FULL_APPROVAL",
+          "observation": "Exact authored CLEAN correctly oriented removes English letters and retains red badge; original source effect fringe beyond narrow source glyph box needs classification"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Native x5 orange-cream source style vs Korean flatter gold glyph style; source-family equivalence and weight not independently blind-calibrated"
+        },
+        "readability": {
+          "result": "OBSERVED_STATIC",
+          "observation": "Korean visible at native zoom and 50% practical but no game viewport tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_NEW_FAIL",
+          "observation": "No newly confirmed stroke clipping on visually inspected persisted DDS; not a certified PASS"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "425 source-final altered visible RGB pixels beyond two narrow declared original glyph boxes, alpha unchanged; determine whether source effect fringe or preserved border"
+        },
+        "placement": {
+          "result": "BOUNDED_SCOPED",
+          "observation": "Korean within original red title art; not evidence of actual game-composed layout"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical source/candidate DDS RAW same mirror_y; authored CLEAN already readable, aligned by flip_y for byte-comparison"
+        }
+      }
+    }
+  },
+  "lossless_png_sha256": [
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_GRAY.png",
+      "sha256": "d2d3e7c267fd9592b486b8a99ef2dd045645a058e3735006fa8b0dfd82d616fb",
+      "git_blob_sha": "b26980b372dba6cffc4daaf30088126d073cbcf7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_GRAY.png",
+      "sha256": "b1d92e69eca03c3f8203dc37322a6d80af3a82ed1a130ad1fa5d58f1d1acc377",
+      "git_blob_sha": "6d6117166364e9d1e1e8cd307a4dd05d5e71ff10"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_BLACK.png",
+      "sha256": "9e3f650b9cd637089b0e1d5339cdd239df2bc65cb652383e78a70ac7285c5365",
+      "git_blob_sha": "97b99f40c6b8a0e6619336bb603ccc5192eac272"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_BLACK.png",
+      "sha256": "aeade87ac73bee33c3315e3b14845413c5911764bedab4a2245edca343f63c9a",
+      "git_blob_sha": "315d3a673f91435f53d87284268a12732908088a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_WHITE.png",
+      "sha256": "be95ad6cabff0e03167e4e6b6085928a046f8ef3866594a12e3617b6089efca2",
+      "git_blob_sha": "01ba3b97388199ba69aaefb6a595bc5164490290"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_WHITE.png",
+      "sha256": "6574ffb9a864c15ca0284742bbaa3d49f2aed481244de1ea62a4624a71884d89",
+      "git_blob_sha": "f5db11807ea0bd25c333010ab69c7ae500354654"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_start_RAW.png",
+      "sha256": "93048f4328a87b81780edd9848b54679cdde42e53512cec114331d09f94e1577",
+      "git_blob_sha": "95f85962035f1a2937ba1d070cf9e6ceadf80037"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_goal_RAW.png",
+      "sha256": "04968fce7bad6ef7335d01aa107fb4582ab9b99226356675649c8881cdfbf82f",
+      "git_blob_sha": "9a5145ddd813b3ff47d93b6214c93dffe230e3b0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PRACTICAL_start_50.png",
+      "sha256": "d0c8187fc6e59432ead245f48493803a2cfd71a310afe595cd6c5dae744c39ef",
+      "git_blob_sha": "a41d2cdf315e88ee861a21ebf1673a83278bfa91"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PRACTICAL_goal_50.png",
+      "sha256": "19c7714ba25d8ccef90f3b5ac0f1949855ce971e9a2fab0bf70141686eccfb36",
+      "git_blob_sha": "13b871c93fe8d4c4dcd89b2decc9a0e2e7168cdc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_start.png",
+      "sha256": "17be1e5e650da86b01cee1cc20f0b91cd0058833ea0d78ccbd60dccb72d0129a",
+      "git_blob_sha": "7f9af36bf19b01f963f01eda0681e70336f27bdd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_goal.png",
+      "sha256": "98588c8414d6b994765928eefcebb1f2e7752cb7fd625a5919c522d4df604461",
+      "git_blob_sha": "d8c2899a9eca5eb823bc9beff2c1a8070c6ef2a0"
+    }
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "425 visible changed pixels outside tight glyph boxes unclassified, source-style/blind per-glyph calibration and distinct C3 pending",
+  "C3": "BLOCKED",
+  "approved": false,
+  "export": "BLOCKED",
+  "actual_game": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "new_dds": 0,
+  "dds_modified": false,
+  "exclusions": [
+    "even_indices",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "new_controller_engine"
+  ],
+  "next_action": "Independently map full original START/GOAL glyph glow effect masks and red badge protected art to 425 outside tight declared glyph rectangles, check slant top-bottom anchors, blind controls, separate C3 and game retest; preserve candidate bytes until proven material failure."
+}

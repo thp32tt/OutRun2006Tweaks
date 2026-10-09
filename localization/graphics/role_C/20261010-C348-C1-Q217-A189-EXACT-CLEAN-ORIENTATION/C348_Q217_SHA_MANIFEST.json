@@ -1,0 +1,71 @@
+{
+  "run_key": "OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
+  "sha256": {
+    "source": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "clean": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+    "candidate": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204"
+  },
+  "pngs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_GRAY.png",
+      "sha256": "d2d3e7c267fd9592b486b8a99ef2dd045645a058e3735006fa8b0dfd82d616fb",
+      "git_blob_sha": "b26980b372dba6cffc4daaf30088126d073cbcf7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_GRAY.png",
+      "sha256": "b1d92e69eca03c3f8203dc37322a6d80af3a82ed1a130ad1fa5d58f1d1acc377",
+      "git_blob_sha": "6d6117166364e9d1e1e8cd307a4dd05d5e71ff10"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_BLACK.png",
+      "sha256": "9e3f650b9cd637089b0e1d5339cdd239df2bc65cb652383e78a70ac7285c5365",
+      "git_blob_sha": "97b99f40c6b8a0e6619336bb603ccc5192eac272"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_BLACK.png",
+      "sha256": "aeade87ac73bee33c3315e3b14845413c5911764bedab4a2245edca343f63c9a",
+      "git_blob_sha": "315d3a673f91435f53d87284268a12732908088a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_start_WHITE.png",
+      "sha256": "be95ad6cabff0e03167e4e6b6085928a046f8ef3866594a12e3617b6089efca2",
+      "git_blob_sha": "01ba3b97388199ba69aaefb6a595bc5164490290"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PROOF_goal_WHITE.png",
+      "sha256": "6574ffb9a864c15ca0284742bbaa3d49f2aed481244de1ea62a4624a71884d89",
+      "git_blob_sha": "f5db11807ea0bd25c333010ab69c7ae500354654"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_start_RAW.png",
+      "sha256": "93048f4328a87b81780edd9848b54679cdde42e53512cec114331d09f94e1577",
+      "git_blob_sha": "95f85962035f1a2937ba1d070cf9e6ceadf80037"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/NATIVE_goal_RAW.png",
+      "sha256": "04968fce7bad6ef7335d01aa107fb4582ab9b99226356675649c8881cdfbf82f",
+      "git_blob_sha": "9a5145ddd813b3ff47d93b6214c93dffe230e3b0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PRACTICAL_start_50.png",
+      "sha256": "d0c8187fc6e59432ead245f48493803a2cfd71a310afe595cd6c5dae744c39ef",
+      "git_blob_sha": "a41d2cdf315e88ee861a21ebf1673a83278bfa91"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/PRACTICAL_goal_50.png",
+      "sha256": "19c7714ba25d8ccef90f3b5ac0f1949855ce971e9a2fab0bf70141686eccfb36",
+      "git_blob_sha": "13b871c93fe8d4c4dcd89b2decc9a0e2e7168cdc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_start.png",
+      "sha256": "17be1e5e650da86b01cee1cc20f0b91cd0058833ea0d78ccbd60dccb72d0129a",
+      "git_blob_sha": "7f9af36bf19b01f963f01eda0681e70336f27bdd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/OUTSIDE_GLYPH_MASK_goal.png",
+      "sha256": "98588c8414d6b994765928eefcebb1f2e7752cb7fd625a5919c522d4df604461",
+      "git_blob_sha": "d8c2899a9eca5eb823bc9beff2c1a8070c6ef2a0"
+    }
+  ],
+  "approval": false
+}

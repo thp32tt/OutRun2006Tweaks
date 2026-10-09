@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 07:27 KST",
+  "updated_at_kst": "2026-10-10",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10104,6 +10104,27 @@
     "qa_report": "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/C346_Q119_INDEPENDENT_C1_HOLD.json",
     "new_dds": 0,
     "current_c3": "BLOCKED",
+    "approval": "BLOCKED",
+    "runtime_validation": "UNTESTED"
+  },
+  "c348_c1_q217_authored_clean_orientation": {
+    "run_key": "OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
+    "queue_index": 217,
+    "lane": "C1",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+    "clean_orientation": "READABLE_PNG_NEEDS_FLIP_TO_DDS_RAW",
+    "source_to_clean_rgba_total": 3921,
+    "clean_to_final_rgba_total": 1141,
+    "source_to_final_rgba_total": 3940,
+    "source_to_final_outside_tight_glyph_rgba": 425,
+    "source_to_final_outside_tight_glyph_alpha": 0,
+    "evidence_pngs": 12,
+    "qa_report": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/C348_Q217_CONTROLLER_C1_HOLD.json",
+    "new_dds": 0,
+    "c3": "BLOCKED",
     "approval": "BLOCKED",
     "runtime_validation": "UNTESTED"
   }
