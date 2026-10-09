@@ -452,6 +452,24 @@ compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
 
+# R177: keep this target in cmkr's source manifest. Editing only the generated
+# CMakeLists.txt is lost when Win32 CI regenerates the project files.
+[target.dx11_native_target_resize_probe]
+type = "executable"
+sources = [
+    "tools/dx11_native_target_resize_probe.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/resource_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
 [target.dx11_native_transport_probe]
 type = "executable"
 sources = [
