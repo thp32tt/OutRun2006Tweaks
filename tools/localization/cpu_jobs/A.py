@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A209: q175 source-shaped HAND-AUTHORED connected Hangul vector method pilot.
+"""A210: q175 source-shaped HAND-AUTHORED connected Hangul vector method pilot.
 
 Produces one showroom trial DDS in role_A only. Never changes hd_candidates
 without independent SOURCE/CLEAN/TRIAL pixel inspection and final pixel manifest.
@@ -18,7 +18,7 @@ from scipy.ndimage import gaussian_filter1d, distance_transform_edt
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 R=Path.cwd()
-DIR=R/"localization/graphics/role_A/20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT"
+DIR=R/"localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT"
 DIR.mkdir(parents=True,exist_ok=True)
 BASE=R/"localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY"
 CAND=R/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
@@ -47,22 +47,31 @@ def stroke(d,pts,width=15):
  for x,y in (pts[0],pts[-1]):
   d.ellipse((x-r,y-r,x+r,y+r),fill=255)
 def contour():
- # Source-wide but natural Hangul lettering. Hand-authored near-continuous
- # syllable strokes, no font file, no glyph fallback or resampled old Korean.
- im=Image.new("L",(530,132),0);d=ImageDraw.Draw(im)
- # 쇼 = ㅅ + ㅛ, rounded rail-like terminals.
- stroke(d,[(112,17),(48,66)],17)
- stroke(d,[(112,17),(180,66)],17)
- stroke(d,[(41,103),(191,103)],16)
- stroke(d,[(89,78),(89,101)],15)
- stroke(d,[(144,78),(144,101)],15)
- # 룸 = ㄹ + ㅜ + ㅁ, explicit open counters and rail joins.
- stroke(d,[(275,17),(477,17),(477,42),(300,42),(300,60),(474,60)],16)
- stroke(d,[(272,78),(475,78)],16)
- stroke(d,[(376,78),(376,92)],15)
- stroke(d,[(290,97),(290,119),(458,119),(458,97),(290,97)],14)
- # A font-independent joint connects only *decorative lower rails* without
- # crossing open Hangul counters; preserve >=10px true glyph separation.
+ # A210 topology-first Hangul outlines: separate ㅅ+ㅛ and ㄹ+ㅜ+ㅁ.
+ # Counter-controlled curves supersede rejected A209 generic stroke rails.
+ im=Image.new("L",(540,132),0)
+ d=ImageDraw.Draw(im)
+ def connected(points,width):
+  d.line(points,fill=255,width=width,joint="curve")
+  radius=width//2
+  for x,y in (points[0],points[-1]):
+   d.ellipse((x-radius,y-radius,x+radius,y+radius),fill=255)
+ # 쇼 upper ㅅ; distinct lower ㅛ with two uprights
+ connected([(112,13),(104,22),(63,58)],18)
+ connected([(112,13),(121,22),(166,58)],18)
+ connected([(36,109),(196,109)],15)
+ connected([(85,83),(85,108)],14)
+ connected([(148,83),(148,108)],14)
+ # 룸: connected ㄹ, separated ㅜ, counter-open ㅁ
+ connected([(269,14),(458,14),(458,42),(289,42),(289,65),(458,65)],13)
+ connected([(272,82),(452,82)],12)
+ connected([(362,83),(362,96)],12)
+ connected([(297,98),(297,121),(438,121),(438,98),(297,98)],11)
+ A=np.asarray(im)>0
+ # Compare specific counter/background pixels; preserve true Korean structure
+ if np.any(A[106:114,319:420]):raise RuntimeError("manual ㅁ enclosed counter filled")
+ if not np.any(A[117:122,319:420]):raise RuntimeError("manual ㅁ bottom missing")
+ if np.any(A[73:75,310:425]):raise RuntimeError("ㄹ and ㅜ joined at wrong phoneme")
  return im
 def y_profile(english):
  px=np.asarray(english);a=px[:,:,3]
@@ -80,7 +89,7 @@ try:
     if not CAND.exists() or digest(CAND)!=OLD_SHA:raise RuntimeError("candidate drift; fail closed")
     hdr,old=read(CAND)
     clean=Image.open(BASE/"754F0599_HD_CLEAN_PLATE.png").convert("RGBA")
-    with tempfile.TemporaryDirectory(prefix="outrun_a209_") as tmp:
+    with tempfile.TemporaryDirectory(prefix="outrun_a210_") as tmp:
      src=Path(tmp)/"source.dds";urllib.request.urlretrieve(URL,src)
      if digest(src)!=SOURCE_SHA:raise RuntimeError("canonical English source drift")
      sh,original=read(src)
@@ -99,7 +108,7 @@ try:
      # Native vector strokes, published masks and isolated plate before lettering.
      mask=contour()
      if mask.getbbox() is None:raise RuntimeError("vector empty")
-     gx,gy=x0+12,y0-4
+     gx,gy=x0+12,y0
      if gx+mask.width>=x1-4 or gy+mask.height>=y1+2:
       raise RuntimeError("vector exceeds source sprite")
      m=np.asarray(mask).astype(np.uint8)
@@ -107,9 +116,14 @@ try:
      yaxis=np.clip(np.arange(mask.height)+gy-y0,0,y1-y0-1)
      profile=y_profile(original.crop(BOX))[yaxis][:,None]
      core=distance_transform_edt(alpha)
-     bright=np.clip(profile + 9*np.clip(4-core,0,4)/4,34,255)
-     bevel=np.clip(bright-13*(core<2),32,250).astype("uint8")
-     cols=np.broadcast_to(bevel,m.shape)
+     # Local edge normals reproduce highlight/extrusion volume, not merely
+     # the flat horizontal chrome rails of rejected A209.
+     ny,nx=np.gradient(core.astype(np.float32))
+     upper_left=np.clip(-(ny+nx)*14.0,0,21)
+     lower_right=np.clip((ny+nx)*18.0,0,29)
+     inner_ridge=np.minimum(core,3.0)/3.0
+     yband=np.broadcast_to(profile,m.shape)
+     cols=np.clip(yband+upper_left-lower_right+5*inner_ridge,25,254).astype("uint8")
      ink=np.zeros((mask.height,mask.width,4),dtype=np.uint8)
      ink[:,:,:3]=cols[:,:,None];ink[:,:,3]=m
      layer=Image.fromarray(ink,"RGBA")
@@ -133,33 +147,33 @@ try:
       "source_vs_plate_protected_outside_region_not_a_global_test":outside_old,
      }
      if any(v for k,v in metrics.items() if k!="source_vs_plate_protected_outside_region_not_a_global_test"):
-      raise RuntimeError(("A209 trial mechanical scope FAIL",metrics))
+      raise RuntimeError(("A210 trial mechanical scope FAIL",metrics))
      ey,ex=np.nonzero(union)
      bbox=[int(ex.min()),int(ey.min()),int(ex.max()+1),int(ey.max()+1)]
      if bbox[0]<=x0 or bbox[1]<=y0 or bbox[2]>=x1 or bbox[3]>=y1:
       raise RuntimeError(("vector effect crosses source bbox",bbox))
      # Actual decoded persisted DDS check, but NO production candidate promotion.
-     trial=DIR/"A209_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds"
+     trial=DIR/"A210_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds"
      save(hdr,final,trial)
      dh,decoded=read(trial)
      if dh!=hdr or not np.array_equal(np.asarray(decoded),F):raise RuntimeError("DDS roundtrip FAIL")
      # Isolated RAW/FLIPY source-clean-final and transparent-only proof for first look.
-     original.save(DIR/"A209_SOURCE_READABLE.png")
-     plate.save(DIR/"A209_CLEAN_SHOWROOM_READABLE.png")
-     decoded.save(DIR/"A209_TRIAL_PERSISTED_READABLE.png")
-     decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(DIR/"A209_TRIAL_PERSISTED_RAW.png")
-     mask.save(DIR/"A209_SHO_ROOM_CUSTOM_VECTOR_MASK.png")
+     original.save(DIR/"A210_SOURCE_READABLE.png")
+     plate.save(DIR/"A210_CLEAN_SHOWROOM_READABLE.png")
+     decoded.save(DIR/"A210_TRIAL_PERSISTED_READABLE.png")
+     decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(DIR/"A210_TRIAL_PERSISTED_RAW.png")
+     mask.save(DIR/"A210_SHO_ROOM_CUSTOM_VECTOR_MASK.png")
      for bgname,color in (("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
       crops=[flat(im,color).crop((0,y0-5,x1+10,y1+8)) for im in (original,plate,old,decoded)]
       w,h=crops[0].size
       sheet=Image.new("RGB",(4*w+24,h+28),color)
-      ImageDraw.Draw(sheet).text((8,5),"ENGLISH | CLEAN | A188 REJECT | A209 HAND VECTOR",fill=(255,220,0) if bgname!="WHITE" else (0,0,0))
+      ImageDraw.Draw(sheet).text((8,5),"ENGLISH | CLEAN | A188 REJECT | A210 HAND VECTOR",fill=(255,220,0) if bgname!="WHITE" else (0,0,0))
       for i,c in enumerate(crops):sheet.paste(c,(i*(w+8),28))
       for pct in (100,75,50):
        img=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
-       img.save(DIR/f"A209_SHOWROOM_{bgname}_{pct}.jpg",quality=94)
+       img.save(DIR/f"A210_SHOWROOM_{bgname}_{pct}.jpg",quality=94)
      report={
-      "role":"A","run":"A209","queue_index":175,"priority":"P1","regression":"IGR-032",
+      "role":"A","run":"A210","queue_index":175,"priority":"P1","regression":"IGR-032",
       "status":"MANUAL_VECTOR_METHOD_PILOT_TRIAL_ONLY_PENDING_CONTROLLER_VISUAL",
       "source_sha256":SOURCE_SHA,"prior_promoted_sha256":OLD_SHA,
       "new_trial_sha256":digest(trial),"new_promoted_dds":0,"new_trial_dds":1,
@@ -173,17 +187,17 @@ try:
       "runtime_validation":"UNTESTED","user_game":"OPEN_USER_INGAME_FAIL",
       "consumer_first_unproven_link":"trial->production promotion (not done); preview/game load untested",
      }
-     (DIR/"A209_PILOT_REPORT.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
-     print("A209_VECTOR_TRIAL",json.dumps({"trial_sha":report["new_trial_sha256"],"bbox":bbox,"metrics":metrics}),flush=True)
+     (DIR/"A210_PILOT_REPORT.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+     print("A210_VECTOR_TRIAL",json.dumps({"trial_sha":report["new_trial_sha256"],"bbox":bbox,"metrics":metrics}),flush=True)
 
 except Exception as exc:
  import traceback
- issue={"role":"A","run":"A209","queue_index":175,
+ issue={"role":"A","run":"A210","queue_index":175,
         "status":"EXECUTION_DIAGNOSTIC_ONLY_NOT_CANDIDATE",
         "exception":type(exc).__name__,
         "message":str(exc),
         "traceback":traceback.format_exc(),
         "new_promoted_dds":0,"new_trial_dds":0,
         "runtime_validation":"UNTESTED","candidate_preserved":True}
- (DIR/"A209_EXECUTION_FAIL.json").write_text(json.dumps(issue,ensure_ascii=False,indent=2)+chr(10),encoding="utf8")
- print("A209_WORKER_CAPTURED_FAILURE",issue["exception"],issue["message"],flush=True)
+ (DIR/"A210_EXECUTION_FAIL.json").write_text(json.dumps(issue,ensure_ascii=False,indent=2)+chr(10),encoding="utf8")
+ print("A210_WORKER_CAPTURED_FAILURE",issue["exception"],issue["message"],flush=True)
