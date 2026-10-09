@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "review_id": "C331-C2-Q098-20261009-2020",
+  "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
+  "date_kst": "2026-10-09 20:20 KST",
+  "temp_backlog_relief": "C2",
+  "shard": "EVEN",
+  "role": "C2",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "status": "HOLD_STRICT_RECHECK",
+  "independent_scope_result": "PASS_VISIBLE_PIXEL_ENGLISH_RESIDUE_RECHECK_ONLY",
+  "result": "HOLD_STRICT_RECHECK",
+  "source_sha256_claimed_by_producer": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+  "candidate_git_blob_sha1": "a65f3832289f9366432e3ed3bebe30abf0827001",
+  "candidate_file": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "exact_binary_evidence": {
+    "downloaded_from": "GitHub branch fetch_file(base64), transferred unmodified for lightweight independent read-only decode",
+    "verified_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+    "header_magic_hex": "44445320",
+    "size_bytes": 262272,
+    "decoded_native": [
+      2048,
+      128
+    ],
+    "format": "DXT5_BC3",
+    "independent_tool": "Pillow DDS read and RGBA pixel examination on N100 MCP fallback; GitHub/ChatGPT local had no reachable public clone",
+    "approved_source_provenance": "NOT_INDEPENDENTLY_RECHECKED"
+  },
+  "new_observations": {
+    "alpha_nonzero_bbox_raw": [
+      513,
+      13,
+      1524,
+      115
+    ],
+    "alpha_nonzero_bbox_flip_y": [
+      513,
+      13,
+      1524,
+      115
+    ],
+    "left_english_only_area": [
+      431,
+      0,
+      475,
+      128
+    ],
+    "left_english_only_alpha_nonzero": 0,
+    "right_english_only_area": [
+      1580,
+      0,
+      1674,
+      128
+    ],
+    "right_english_only_alpha_nonzero": 0,
+    "png_sha256": "83786d049058773de6489407e285aca460ab1c00bb22b144c481a397e1bd15f5",
+    "png_fully_matches_persisted_dds_flip_y_rgba": true,
+    "png_flip_y_mismatched_rgba_pixels": 0,
+    "raw_vs_readable_mismatched_rgba_pixels": 96766,
+    "observation": "Direct RGBA PNG preview visibly contains English-looking Cl and ord. in uncomposited RGB, but all pixels within those separated English-only side strips have alpha zero in the exact persisted DXT5 DDS and the producer NEW_READABLE png. These are hidden RGB, not an actual remaining double-draw. This newly resolves previous proof ambiguity without falsely reopening the rebuilt candidate.",
+    "original_source_bbox_from_producer": [
+      431,
+      6,
+      1674,
+      123
+    ],
+    "candidate_visible_alpha_bbox": [
+      513,
+      13,
+      1524,
+      115
+    ],
+    "observed_first_look": "Native/50% gray and white producer contacts and standalone lossless NEW_READABLE compared against English source; new Korean body is visible and old outside fragments are not composited. Full blind source-family slant/style, clean plate, mask/protected art and current-policy calibrated eight-axis review not yet independently established."
+  },
+  "referenced_existing_proofs": [
+    "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/NEW_READABLE_FULL_RGBA.png",
+    "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/FULL_READABLE_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/FULL_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "blockers": [
+    "Exact-English-source/CLEAN identity and independent SOURCE→CLEAN→FINAL proof",
+    "Independent source-family readable slant/style and blind known-defect calibration",
+    "Full native/zoom/75/50/BGW/RAW plus text-mip and all eight per-region checks",
+    "Separate C3 strict audit and current qa_evidence_gate APPROVALS entry",
+    "Fresh actual-game screenshot tied to repaired SHA"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C3": "NOT_APPROVED",
+  "user_review": "PENDING",
+  "ingame_retest": "OPEN",
+  "new_DDS": 0,
+  "new_PNG": 0,
+  "new_approved_assets": 0,
+  "backlog_closure": false,
+  "backend": "GitHub connector; N100 MCP fallback only exact small 262272B persisted DDS+2 existing PNG pixel inspection",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

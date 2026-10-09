@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C331 C2 EVEN q098 current B330 exact saved DDS SHA256 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51 independent visible-alpha/RAW-FLIP pixel check: English Cl/ord. apparent in uncomposited PNG RGB are alpha0; 0 left/right visible English pixels, saved DDS vs FLIP PNG pixel-identical. SCOPED PASS, full C HOLD_STRICT_RECHECK source/CLEAN/blind family/C3 and NEW actual-game. Evidence localization/graphics/role_C/20261009-C331-C2-Q098-B330-INDEPENDENT-VISIBLE-ALPHA/C331_Q098_INDEPENDENT_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020 RUNTIME_VALIDATION=UNTESTED",
     "C330 C2 q236 new exact saved-DDS independent machine alpha scan 14/14 bboxes PASS and two new raw/native visual regions 09+13 scoped no obvious defects. Still HOLD_STRICT_RECHECK pending source/CLEAN/final/protected and blind calibration+full C3/real-game. SHA 9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337 QA localization/graphics/role_C/20261009-C330-C2-Q236-14-NATIVE-ALPHA/C330_Q236_INDEPENDENT_14_REGION_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C330-C2-Q236-PERSISTED-14-ALPHA-20261009-1950 RUNTIME_VALIDATION=UNTESTED",
     "C2 fresh independent native-source/CLEAN/FINAL q098 B330 SHA 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51, then C3/evidence/JPG/actual game; RUNTIME_VALIDATION=UNTESTED.",
     "A205 q193 new native material DDS 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 from e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166 on index193 IGR003/019/033, changed 3 title source rows to source Black/real RGB; 3/3 bbox and 0 outside/alpha/mixed glyph, native/75/50 and RAW scoped QA PASS, 10 legacy inherited cells unchanged/possibly poor; full atlas REWORK_REQUIRED, C1/C3/user new game OPEN; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_CONTROLLER_PRODUCER_SCOPED_QA.json",
@@ -6828,7 +6829,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 19:56 KST",
+  "updated_at_kst": "2026-10-09 20:20 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13486,5 +13487,13 @@
     ],
     "qa": "localization/graphics/role_C/20261009-C330-C2-Q236-14-NATIVE-ALPHA/C330_Q236_INDEPENDENT_14_REGION_ALPHA_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c331_c2_q098_b330_independent_alpha": {
+    "qa": "localization/graphics/role_C/20261009-C331-C2-Q098-B330-INDEPENDENT-VISIBLE-ALPHA/C331_Q098_INDEPENDENT_ALPHA_HOLD.json",
+    "result": "HOLD_STRICT_RECHECK",
+    "scope": "VISIBLE_ENGLISH_RESIDUE_CLEARED",
+    "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+    "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
+    "runtime_validation": "UNTESTED"
   }
 }
