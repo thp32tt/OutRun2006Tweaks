@@ -8,9 +8,9 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "b70f44b9153d74099ca2186abf52385e7cfef5a4",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "7397921fdff0758d8752d6b29f824c9f7294a5ab",
+  "material_result_sha": "7397921fdff0758d8752d6b29f824c9f7294a5ab",
+  "validation_bearing_result_sha": "7397921fdff0758d8752d6b29f824c9f7294a5ab",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00500",
   "lease_epoch": 1,
   "work_key": "DX11:R200:LINEAR_LIVE_BLEND_OM_WARP_PIXEL",
@@ -21,9 +21,9 @@
     "cmake.toml:R200",
     ".github/workflows/backend-conversion-gate.yml:R200"
   ],
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "summary": "R200 fail-closed non-indexed native Draw alpha OM live object/factors/mask/device/write ownership; real WARP alpha purple, unexpected opaque red, restored purple pixel proof; native game Draw remains dormant.",
@@ -39,16 +39,47 @@
     "C0_RECOVER": "PASS authenticated HEAD b70f44b9153d74099ca2186abf52385e7cfef5a4; no 00500 record/checkpoint; R199 terminal and R175 separately owned 00477",
     "C1_REVIEW": "PASS R190 indexed path owns OM alpha while R185/R199 independent linear path lacked live alpha blend owner; R200 independent failure-key selected",
     "C2_IMPLEMENT": "PASS separate native R200 OM live object ownership C++ and WARP real non-indexed Draw purple/opaque red/restore purple; CI target and four source-negative mutants",
-    "C3_VALIDATE": "Scoped JS source negative mutants once; exact-SHA GitHub Win32/SMOKE pending",
-    "C4_COMMIT": "material commit will contain exact [AUTO:CONVERSION-DX11-00500] with no CI-skip",
-    "C5_PACKAGE": "NOT_REQUIRED native gameplay Draw dormant",
-    "C6_STATE": "PENDING exact-SHA CI"
+    "C3_VALIDATE": "GitHub Backend Conversion Gate 37993242533 exact-SHA 7397921fdff0758d8752d6b29f824c9f7294a5ab completed FAILURE: Win32 validate job 114032571423 SUCCESS; smoke job 114034595672 R200 static four mutants SUCCESS, R200 WARP build SUCCESS, real alpha/opaque/restore WARP run SUCCESS; full smoke FAIL only at unrelated R175_COLOR0 `Run DX11 constant buffer probe`, actual BGRA [128,0,16,255] expected [224,128,32,255], R175_GENERIC_VARYING_MISMATCH.",
+    "C4_COMMIT": "PASS validated material source commit 7397921fdff0758d8752d6b29f824c9f7294a5ab [AUTO:CONVERSION-DX11-00500] no CI-skip, parent b70f44b9153d74099ca2186abf52385e7cfef5a4; bookkeeping C6 recorded separately.",
+    "C5_PACKAGE": "NOT_REQUIRED: game-native Draw dormant; no distribution/Quest3/VDXR promotion",
+    "C6_STATE": "SEALED: R200 real Win32 WARP success, full required Gate inherited R175 FAIL, no source rollback or repeat R200. Runtime UNTESTED; 00500 parked."
   },
   "evidence": {
     "negative_source_mutants": 4,
     "upstream_r175_owner": "CONVERSION-DX11-00477",
-    "expected_proof": "alpha red 0.5 over blue produces purple; unexpected opaque blend produces red; restored alpha purple"
+    "expected_proof": "alpha red 0.5 over blue produces purple; unexpected opaque blend produces red; restored alpha purple",
+    "exact_sha_gate_run_id": 37993242533,
+    "exact_sha_gate_sha": "7397921fdff0758d8752d6b29f824c9f7294a5ab",
+    "exact_sha_gate_status": "completed",
+    "exact_sha_gate_conclusion": "failure",
+    "validate_job_id": 114032571423,
+    "validate_conclusion": "success",
+    "smoke_job_id": 114034595672,
+    "smoke_conclusion": "failure",
+    "r200_static_four_mutants": "success",
+    "r200_warp_build": "success",
+    "r200_actual_linear_gpu_alpha_purple_opaque_red_restore": "success",
+    "upstream_failed_step": "Run DX11 constant buffer probe",
+    "upstream_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task_id": "CONVERSION-DX11-00477",
+    "issue14_comment_id": 6089506071
   },
-  "resume_cursor": "C3_EXACT_SHA_GATE_PENDING",
-  "next_action": "Inspect material exact-SHA Backend Conversion Gate Win32 R200 WARP proof and unrelated inherited R175, then seal C6; Quest3/VDXR UNTESTED."
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "next_action": "00500 terminal/parked: do not rerun R200 static or WARP or exact-SHA CI, no repeat score. R175 is independently owned by 00477. Only separately dispatched new independent work_key may progress after fresh branch/claim checks; DXVK remains frozen, DX9Ex protected, Quest3/VDXR UNTESTED.",
+  "scoped_automation_validation": "PASS_R200_WIN32_STATIC_FOUR_MUTANTS_AND_WARP_ALPHA_PURPLE_OPAQUE_RED_RESTORE",
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "Full required exact-SHA Backend Conversion Gate FAIL inherited unrelated R175; R200 scoped GPU PASS is not global Gate PASS."
 }
