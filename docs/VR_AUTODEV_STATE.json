@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-10-07T13:36:00Z",
+  "updatedUtc": "2026-10-09T04:31:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "P0 DX9Ex visual-composition convergence -> exact static/build gate -> Quest3/VDXR candidate -> paused R84 convergence",
-  "checkpoint": "C2_IMPLEMENT",
+  "phase": "R84 selective CMake/translation-unit structural convergence; DX9Ex current-focus baseline protected; remaining HMD visual issues separately open",
+  "checkpoint": "R84_PORT_SEAMS_PENDING",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host on vr-d3d9ex-focus; EXCLUSIVE CURRENT PHASE is P0 visual-composition convergence after 00519 HMD failure.",
     "blockedBackends": [
@@ -16,7 +16,7 @@
     "blockedBackendAction": "Keep DX11 Native and DXVK frozen during DX9Ex stabilization and the Architecture v3 live migration. After ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 handoff, port the proven common contract downstream. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
-    "runtimeTesting": "BLOCKED_BY_P0_STATIC_GATE: no new routine Quest3/VDXR candidate until upstream/fork/disassembly visual evidence is reconciled and the comprehensive static/build gate is green.",
+    "runtimeTesting": "HMD runtime only for hardware-visible acceptance; F11 user reports normal on 2026-10-09 but exact tested material SHA not provided. Remaining visual regressions and structural code changes remain RUNTIME_VALIDATION=UNTESTED until exact-build evidence.",
     "profileModel": {
       "default": "A_CONTROL",
       "profiles": [
@@ -138,14 +138,14 @@
       "precondition": "DX9EX-R84-CONVERGENCE-CLOSEOUT-001 DONE before ARCH-V3-GATE-001 may advance live migration."
     },
     "r84ProductionConvergence": {
-      "status": "ACTIVE_GATE0_00505_RED",
+      "status": "ACTIVE_SEAMS_PENDING_TU_CMAKE_CLOSEOUT",
       "plan": "docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md",
       "canonicalBranch": "vr-d3d9ex-focus",
       "canonicalHeadAtPlan": "bd32098ce0be130aa3a64ca2d507275bf08ab69f",
       "donorBranch": "vr-refactor-r84-2000c-20261001",
       "donorHeadAtPlan": "40e998500fc758dd3b078d9df2ecc2a57a19bc5d",
       "donorMode": "READ_ONLY_REFERENCE",
-      "currentTask": "DX9EX-R84-PORT-GATE0-00505",
+      "currentTask": "DX9EX-R84-PORT-SEAMS-001",
       "donorCycleCountIsProgressMetric": false,
       "wholesaleMergeForbidden": true,
       "portStrategy": "CURRENT_FOCUS_FIRST_SELECTIVE_SEAM_PORT",
@@ -158,7 +158,11 @@
         "LOWER_PRESENT_RESET_DIRECTGPU_FACADES",
         "CMAKE_TEXTUAL_INCLUDE_CLEANUP"
       ],
-      "closeoutState": "SUPERSEDED_BY_DX9EX_FOCUS"
+      "closeoutState": "NOT_COMPLETE_PENDING_TU_CMAKE",
+      "gate0Status": "DONE",
+      "inventoryStatus": "DONE",
+      "gate0ValidationSha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
+      "inventoryValidationSha": "4df538077584ed56c43ff5af0c89ca0c1257674e"
     }
   },
   "runtimeEvidence": {
@@ -182,7 +186,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "External Docker queue controller: fetch latest vr-d3d9ex-focus, repair DX9EX-R84-PORT-GATE0-00505 to exact-SHA green, then execute R84 inventory and selective seam ports from docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md. Do not continue R84 cycle counting or start Architecture v3 live authority first.",
+  "nextAction": "R84 Gate0 and inventory are already green/durable. Finish only remaining bounded R32/R31, R31/R30 and CMake textual TU ownership seams with one exact-SHA Win32 Active Validation and Domain Isolation per material change; do not repeat Gate0/inventory or port donor policy. Complete cleanup and closeout only after actual CI. Preserve user-reported F11 normal and protect the rest of the HMD baseline.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
