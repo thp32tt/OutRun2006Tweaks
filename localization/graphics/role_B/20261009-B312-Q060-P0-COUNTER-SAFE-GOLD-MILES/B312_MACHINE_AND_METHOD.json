@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B312",
+  "queue_index": 60,
+  "priority": "P0",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "trial_sha256": "3cc82c4c9829dd35f167c5ce64d0fc004d2c41306f86a0d7f2b7e55eabe6bb74",
+  "trial_only_dds": 1,
+  "new_production_dds": 0,
+  "trial_promoted": false,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_bbox": [
+    2081,
+    250,
+    2860,
+    370
+  ],
+  "trial_bbox": [
+    2136,
+    260,
+    2804,
+    359
+  ],
+  "margins": [
+    55,
+    56,
+    10,
+    11
+  ],
+  "font": "native NotoSansCJK Black",
+  "font_size": 92,
+  "palette_from_native_source": {
+    "gold": [
+      229,
+      216,
+      159
+    ],
+    "navy": [
+      0,
+      8,
+      57
+    ],
+    "white": [
+      244,
+      239,
+      194
+    ]
+  },
+  "method": "Native individually spaced Hangul Bold-safe face with no morphological face dilation, source-derived cream-gold gradient and reduced navy rim; preserve source counters and B310 Stage",
+  "machine_checks": {
+    "dds_header_exact": true,
+    "format": "RGBA",
+    "mips": 1,
+    "native": [
+      4096,
+      2048
+    ],
+    "roundtrip": "PASS",
+    "changed_outside_gold": 0,
+    "alpha_outside_gold": 0,
+    "protected_outside_gold": "UNCHANGED_EXACT",
+    "source_cell_clean_alpha": 0,
+    "source_size_and_positive_margins": "PASS"
+  },
+  "proofs": [
+    "B312_FLIPY_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_WHITE_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_WHITE_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_WHITE_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_BLACK_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_FLIPY_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_WHITE_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_WHITE_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_WHITE_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_BLACK_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B312_RAW_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png"
+  ],
+  "producer_visual": "PENDING_INDEPENDENT_DIRECT_CONTROLLER_REVIEW",
+  "status": "TRIAL_ONLY_NOT_PROMOTED_NO_QA_PASS",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
