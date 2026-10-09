@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B315 q137 P0 IGR-041: semantic source-family vector master, *trial first*.
+"""B316 q137 P0 IGR-041: four residual header/small source-family native glyphs, *trial first*.
 
 Prior B287/B288 only changed strokes on the same generic narrow Korean.
 This pass changes semantic phrasing and uses per-syllable native condensed
@@ -13,15 +13,15 @@ from PIL import Image,ImageFont,ImageDraw
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
-OUT=G/"role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR"
+OUT=G/"role_B/20261009-B316-Q137-P0-FOUR-REWORK-REGIONS"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SRC="11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
 CLEAN="b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098"
-OLD="1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2"
+OLD="1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68"
 with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
  row=next(r for r in csv.DictReader(f) if r["index"].lstrip("\ufeff")=="137")
-assert "visual_fail" in row["artwork_status"] and "manual" in row["artwork_status"]
+assert "four_rework_required" in row["artwork_status"] and "b315" in row["artwork_status"]
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","137","--require-safe-rerender"],text=True,capture_output=True)
 assert tri.returncode==0,(tri.returncode,tri.stdout,tri.stderr)
 assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
@@ -60,9 +60,9 @@ if not Path(font).exists():
  subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
 assert Path(font).exists()
 out=P.copy();report=[]
-# Source/clean validated on all six but scope changed bytes to two large modes.
-large_only=np.zeros(P.shape[:2],bool)
-for entry in specs[-2:]:
+# Source-clean validated six; current rework is ONLY four previously C-rejected residual labels.
+residual_only=np.zeros(P.shape[:2],bool)
+for entry in specs[:4]:
  ll,tt,rr,bb=entry[3]
  large_only[tt:bb,ll:rr]=True
 def letter_master(word,font_px,targetw,sourceh):
@@ -80,11 +80,11 @@ def letter_master(word,font_px,targetw,sourceh):
   cropped=im.crop(bb)
   # independently narrow the syllable's *vector* contour, retaining vertical
   # height, with a measured source-style full-height heavy condensed profile.
-  ww=max(6,round(cropped.width*0.83))
+  ww=max(6,round(cropped.width*0.92))
   part=cropped.resize((ww,cropped.height),Image.Resampling.LANCZOS)
   parts.append(part)
  height=max(a.height for a in parts)
- gap=max(3,round(font_px*.065))
+ gap=max(4,round(font_px*.09))
  total=sum(a.width for a in parts)+(len(parts)-1)*gap
  # Source original height is the cap, and no suffix may collide with peers.
  assert height<=sourceh-5,(word,height,sourceh)
@@ -93,7 +93,7 @@ def letter_master(word,font_px,targetw,sourceh):
   result.paste(a,(pos,(height-a.height)//2));pos+=a.width+gap
  assert total<=targetw-10,(word,total,targetw)
  return result
-for key,en,ko,(l,t,r,b),size,alpha in specs[-2:]:
+for key,en,ko,(l,t,r,b),size,alpha in specs[:4]:
  # choose native source-like cap height, min 3px margins on each source bbox
  chosen=None
  for sz in range(size,size-16,-1):
@@ -119,7 +119,7 @@ for key,en,ko,(l,t,r,b),size,alpha in specs[-2:]:
  # Alpha-compose onto exact source-clean rather than erase canonical art.
  out[ny:ny+im.height,nx:nx+im.width]=rgba
  report.append(dict(id=key,english=en,korean=ko,source_bbox=[l,t,r,b],effect_bbox=[nx,ny,nx+im.width,ny+im.height],
-  margins=margins,font_px=sz,vector_profile="native per-syllable narrow-stem 0.83; not whole-word stretch",alpha=alpha))
+  margins=margins,font_px=sz,vector_profile="new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",alpha=alpha))
 changed=np.any(P!=out,axis=2)
 assert np.count_nonzero(changed)>1000 and not np.any(changed&~large_only)
 assert not np.any((P[:,:,3]!=out[:,:,3])&~large_only)
@@ -131,7 +131,7 @@ else:
  order="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 data=current[:128]+body;assert len(data)==len(current) and sha(data)!=OLD
 D=decode(data);assert np.array_equal(D,out)
-(OUT/"B315_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
+(OUT/"B316_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
 def onbg(a,bg):
  layer=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
  layer.alpha_composite(Image.fromarray(a,"RGBA"))
@@ -149,17 +149,17 @@ for reg in report:
     sheet=Image.new("RGB",(sum(im.width for im in frames)+12,max(im.height for im in frames)),bg)
     x=0
     for im in frames:sheet.paste(im,(x,0));x+=im.width+4
-    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B315.png"
+    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B316.png"
     sheet.save(OUT/filename,optimize=True);views.append(filename)
-evidence={"role":"B","run":"B315","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
+evidence={"role":"B","run":"B316","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
  "clean_png_sha256":CLEAN,"previous_candidate_sha256":OLD,"trial_sha256":sha(data),
  "new_trial_dds":1,"promoted_dds":0,"source_clean_outside6":0,
- "source_clean_retained_protected_separators":retained,"candidate_changed_outside_two_large":0,
- "alpha_outside_two_large":0,"header_exact":True,"persisted_decode":"EXACT",
+ "source_clean_retained_protected_separators":retained,"candidate_changed_outside_four_residual":0,
+ "alpha_outside_four_residual":0,"header_exact":True,"persisted_decode":"EXACT",
  "raw_orientation":"mirror_y","native":[2048,1024],"dds_codec":order,"mips":1,
- "per_region":report,"proofs":views,"producer_visual":"PENDING_DIRECT_NATIVE_50_RAW",
+ "per_region":report,"proofs":views,"producer_visual":"PENDING_DIRECT_NATIVE_50_RAW_75",
  "C1":"NOT_RUN","C3":"NOT_RUN","user_game":"OPEN_USER_INGAME_FAIL",
  "RUNTIME_VALIDATION":"UNTESTED","backend":"github-actions (local network cannot resolve canonical raw source)",
  "excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B315_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
-print("B315_TRIAL",sha(data),"views",len(views))
+(OUT/"B316_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
+print("B316_TRIAL",sha(data),"views",len(views))
