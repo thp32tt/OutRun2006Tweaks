@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B315",
+  "run_key": "OUTRUN-KOR-B315-Q137-IGR041-TWO-LARGE-MODES-20261009-1310",
+  "owner": "B explicit IGR-041",
+  "queue_index": 137,
+  "priority": "P0",
+  "user_screenshot": "스크린샷(193)(1).png",
+  "user_status": "OPEN_USER_INGAME_FAIL",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "old_candidate_sha256": "1b21b5ecd1229ce48f1e50e14cf6f1097f988362b741c1489aeb852e1ffd2ae2",
+  "new_candidate_sha256": "1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68",
+  "candidate_git_blob": "bee0c700b615a53db0dd85860b4dc6169094d1f2",
+  "promote_commit": "adeac0eb22c2ba6f6ddacf899add7be9712ed994",
+  "promotion": true,
+  "new_dds": 1,
+  "scope": "2 large Korean MANUAL/AUTOMATIC labels only; other 4 candidate text regions and AT/MT/protected unchanged",
+  "changed_regions": [
+    {
+      "id": "manual_large",
+      "english": "MANUAL",
+      "korean": "수동 변속",
+      "source_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "effect_bbox": [
+        74,
+        239,
+        324,
+        311
+      ],
+      "margins": [
+        73,
+        73,
+        4,
+        4
+      ],
+      "source_width": 396,
+      "new_width": 250
+    },
+    {
+      "id": "automatic_large",
+      "english": "AUTOMATIC",
+      "korean": "자동 변속 모드",
+      "source_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "effect_bbox": [
+        1136,
+        237,
+        1528,
+        310
+      ],
+      "margins": [
+        247,
+        247,
+        4,
+        5
+      ],
+      "source_width": 886,
+      "new_width": 392
+    }
+  ],
+  "machine": {
+    "pinned_english_source": true,
+    "pinned_A22_clean": true,
+    "canonical_nontext_plate_preserved_alpha_pixels": 3579,
+    "original_source_to_clean_outside_six_regions": 0,
+    "candidate_changed_outside_large_two_rgba": 0,
+    "candidate_changed_outside_large_two_alpha": 0,
+    "candidate_other_four_labels": "PIXEL_EXACT",
+    "candidate_AT_MT_and_protected": "PIXEL_EXACT",
+    "native": [
+      2048,
+      1024
+    ],
+    "format": "DDS_BGRA32_MIP1",
+    "header": "EXACT",
+    "decoded_persisted_dds": "EXACT",
+    "orientation": "RAW_MIRROR_Y",
+    "source_bbox_coverage": "2_OF_2_POSITIVE_4PX_MARGIN"
+  },
+  "source_family_method": "Material semantic redesign of large labels and independent native per-syllable tall condensed glyph profiles, rather than repeated generic bold stroke/whole word scaling",
+  "producer_visual": {
+    "source_clean": "A22 approved clean plate reused; separator art remains",
+    "native_gray_100": "SCOPED_PASS_LARGE_MODE_GLYPH_INTEGRITY",
+    "raw_black_50": "SCOPED_PASS_READABLE_NO_OVERLAP",
+    "source_relative_hierarchy": "LARGE_MODES_IMPROVED_BUT_INDEPENDENT_C1_STYLE_VERDICT_PENDING",
+    "full_six": "NOT_PASS_other_four_open"
+  },
+  "qa_evidence": [
+    "localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/B315_MACHINE_QA.json",
+    "localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/manual_large_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B315.png",
+    "localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/automatic_large_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B315.png",
+    "localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/manual_large_RAW_BLACK_50_SOURCE_CLEAN_B285_B315.png",
+    "localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/automatic_large_RAW_BLACK_50_SOURCE_CLEAN_B285_B315.png"
+  ],
+  "workflow_run": 37883466673,
+  "workflow_result": "SUCCESS",
+  "next_rework": [
+    "Header SELECT TRANSMISSION remains underfilled/source-family mismatch",
+    "Small transmission/manual/automatic remain current C1-rejected B285; do not claim their approval",
+    "Fresh independent full q137 C1 and separate C3",
+    "User newer actual game screenshot matching repaired build"
+  ],
+  "whole_asset_status": "REWORK_REQUIRED_OTHER_FOUR",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions because canonical DDS unavailable on local DNS",
+  "n100_used": false,
+  "post_task_cleanup": "GitHub-hosted ephemeral runner only, no N100 worktree/scratch",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
