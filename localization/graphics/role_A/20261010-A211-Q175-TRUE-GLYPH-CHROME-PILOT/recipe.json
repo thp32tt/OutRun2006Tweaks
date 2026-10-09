@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "production_role": "A",
+  "run": "A211",
+  "state": "TRIAL_ONLY_REJECTED_NO_CANDIDATE_PROMOTION",
+  "canonical_source": {
+    "path": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
+  },
+  "current_candidate_before": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "mutated": false
+  },
+  "trial": {
+    "path": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_Q175_SHOWROOM_TRUEGLYPH_CHROME_TRIAL.dds",
+    "sha256": "b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446",
+    "format": "BGRA32",
+    "native": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "orientation": "RAW mirrors readble Y",
+    "source_box_readable": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "trial_box_readable": [
+      24,
+      406,
+      246,
+      523
+    ]
+  },
+  "atlas_cells": [
+    {
+      "id": "stage_select",
+      "source_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "state": "PRESERVE_CURRENT_NOT_REPAIRED"
+    },
+    {
+      "id": "showroom",
+      "source_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "english": "showroom",
+      "korean": "쇼룸",
+      "state": "TRIAL_FAIL_NOT_PROMOTED"
+    },
+    {
+      "id": "single_player",
+      "source_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "state": "PRESERVE_CURRENT_NOT_REPAIRED"
+    }
+  ],
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "license": "SIL Open Font License 1.1",
+    "coverage_check": "Both U+C1FC/U+B8F8 in actual CJK cmap",
+    "native_ppem": 123,
+    "antialias": "Pillow standard glyph raster then one gaussian_filter sigma=0.6 at same source-native resolution; no scaling"
+  },
+  "renderer": {
+    "file": "tools/localization/cpu_jobs/A.py",
+    "git_revision": "f3932a7d3b3d92038949f57cda6dcc724cbac04d",
+    "dependencies": [
+      "Pillow",
+      "NumPy",
+      "SciPy",
+      "fonttools"
+    ],
+    "face": "original source row Y percentile 65% sample, native interpolation + derivative-dependent highlight/inner depth",
+    "shadow": "black metal offset (3,4) within source bbox, alpha=0.62 glyph",
+    "source_family_failure": "Source original long connected welded chrome techno, generic real Noto Bold separated; 222 vs 950 hierarchy mismatch"
+  },
+  "composition": {
+    "source_clean": "A188 pinned CLEAN, one transparent source sprite restored before lettering",
+    "letter_mask": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_LETTERING_MASK.png",
+    "native_clean": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_PLATE_ONLY_READABLE.png",
+    "source_protection": "all current candidate pixels outside showroom exact 0-changed",
+    "slant_anchor": "NOT_MEASURED_HOLD; no false source-vs-candidate correspondence claims"
+  },
+  "qa": {
+    "gate": "PRODUCER_VISUAL_FAIL",
+    "native": [
+      100,
+      75,
+      50
+    ],
+    "backgrounds": [
+      "black",
+      "gray",
+      "white"
+    ],
+    "raw": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_PERSISTED_RAW.png",
+    "mechanical": "ZERO_OUTSIDE_RENDER_AND_PLATE_ALPHA; no full original source protected certification",
+    "runtime": "UNTESTED"
+  },
+  "why_this_method_change": "Distinct from rejected A204 Orbit geometric and A209/A210 hand-authored horizontal-rail glyphs; genuine native Hangul topology with source-chrome shading; still insufficient and not accepted",
+  "next": "Manual source-conditioned welded Korean counter-preserving techno face/emboss relief is required, not another generic glyph filter or width tweak"
+}
