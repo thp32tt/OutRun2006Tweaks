@@ -14526,6 +14526,7 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     ID3D11InputLayout* expectedProbeLayout,
     ID3D11VertexShader* expectedProbeVS,
     ID3D11PixelShader* expectedProbePS,
+    const NativeFixedFunctionOutputStateBinding& expectedOutputBinding,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionGeometryReadiness& geometry,
@@ -14623,6 +14624,17 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
     context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
     context->PSGetShader(livePS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    // R162: copied packets cannot authorize a late RS/OM dynamic-state
+    // mutation. Re-observe the R126 owner immediately before WARP DrawIndexed.
+    if (!expectedOutputBinding.ready() ||
+        expectedOutputBinding.snapshot_token() != draw.outputBindingSnapshotToken)
+        return false;
+    const auto liveOutputBinding =
+        expectedOutputBinding.binding_readiness(context);
+    if (!liveOutputBinding.ready || liveOutputBinding.snapshotToken == 0 ||
+        !expectedOutputBinding.validate_binding_snapshot(
+            context, liveOutputBinding.snapshotToken))
+        return false;
     return liveTarget.Get() == expectedProbeTarget &&
         liveVertex.Get() == vertexBuffer.mirror_buffer() &&
         stride == boundDraw.vertexStride &&
