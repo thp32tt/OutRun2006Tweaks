@@ -1,0 +1,64 @@
+{
+  "review_id": "C338",
+  "asset_index": 212,
+  "candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "measurement": "English visible RGB glyph-face horizontal foreground start from C325 SHA-bound SOURCE reference; Korean actual alpha bbox from persisted DDS decode FLIPY; pixel coordinates relative to same source ROI; not English effect-alpha bbox",
+  "regions": [
+    {
+      "region_id": 43,
+      "source_visible_face_color_family": "orange",
+      "source_RGB_mask_rule": "orange R>200 and 80<G<200 and B<120",
+      "source_reference_path": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r43_source_clean_current_100.png",
+      "source_reference_sha256": "863cd8a49f14c36d7c9c972af418f8af8a9686214f6248262a82bd7e8099c940",
+      "source_colored_face_local_bbox": [
+        241,
+        0,
+        636,
+        45
+      ],
+      "source_visible_start_x": 241,
+      "candidate_current_alpha_start_x": 5,
+      "source_relative_horizontal_shift_px": -236,
+      "candidate_region_alpha_bbox_global": [
+        5,
+        345,
+        321,
+        400
+      ],
+      "mask_pixel_count": 8714,
+      "source_SHA256_C325_independently_verified_historical": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C338-C2-Q212-ALL12-CURRENT-PERSISTED/r43_ORIGINAL_VS_CURRENT_X_ANCHOR_MARKED.png",
+        "sha256": "08e60e18e79b36e4722b941176ef16b39a99eed3f6fec8d52a3601c29f6eed58"
+      }
+    },
+    {
+      "region_id": 44,
+      "source_visible_face_color_family": "red",
+      "source_RGB_mask_rule": "red R>130 and G<85 and B<85",
+      "source_reference_path": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r44_source_clean_current_100.png",
+      "source_reference_sha256": "c5eca14d0e010e0cbe27cdb426d99fb4a50fb1887280326a57a7c8ed646b8e8f",
+      "source_colored_face_local_bbox": [
+        1,
+        0,
+        210,
+        45
+      ],
+      "source_visible_start_x": 1,
+      "candidate_current_alpha_start_x": 62,
+      "source_relative_horizontal_shift_px": 61,
+      "candidate_region_alpha_bbox_global": [
+        1688,
+        529,
+        1832,
+        582
+      ],
+      "mask_pixel_count": 5191,
+      "source_SHA256_C325_independently_verified_historical": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C338-C2-Q212-ALL12-CURRENT-PERSISTED/r44_ORIGINAL_VS_CURRENT_X_ANCHOR_MARKED.png",
+        "sha256": "ddb80833404981845a3724786b5a44741ffff058e06d58340daf889241b8529f"
+      }
+    }
+  ]
+}
