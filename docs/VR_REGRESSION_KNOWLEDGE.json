@@ -418,11 +418,11 @@
     {
       "key": "VR-F11-OVERLAY-DIPLOPIA-001",
       "title": "F11 Tweaks ImGui overlay doubles after entering gameplay",
-      "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "status": "USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED",
       "severity": "visual-correctness",
       "firstKnownWindowKst": "2026-10-04",
-      "lastObservedKst": "2026-10-04",
-      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE_BUILD_VERIFIED_FIX_CANDIDATE",
+      "lastObservedKst": "2026-10-09",
+      "evidenceLevel": "USER_DIRECT_RUNTIME_PASS_REPORT__EXACT_PACKAGE_UNPINNED",
       "symptomFingerprint": {
         "primary": "F11 OutRun2006Tweaks overlay is normal/single in menus but becomes two images after entering gameplay",
         "boundary": "front-end/menu rendering is correct; defect begins only when gameplay VR stereo ownership is active"
@@ -470,7 +470,15 @@
         "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
         "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65"
       },
-      "nextAction": "Quest3/VDXR test exact source 338b534b with CORRECTNESS: F11 must remain single in menus and become binocularly single in gameplay. Do not mark DONE until matching user runtime evidence passes."
+      "nextAction": "Protect F11 known-good gameplay/menu overlay. Do not ask for a standalone repeat F11 test, re-open, or modify its render ownership without fresh regression evidence. Opportunistically correlate source/game DLL identity if the user later supplies a broader exact-package Quest3 test. Other HUD/GOAL/+TIME/rank/lens items are independent.",
+      "userAcceptance20261009": {
+        "reported_result": "F11 is now normal",
+        "source": "direct user statement 2026-10-09 KST",
+        "hardware_context": "prior Quest3/VDXR development; exact tested package SHA not provided in this message",
+        "status": "USER_REPORTED_PASS_PROTECT",
+        "exactBuildSha": null,
+        "noSeparateRetestRequest": true
+      }
     },
     {
       "key": "VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001",
@@ -923,7 +931,7 @@
         "e52a793fc0b8570c3bbe88db251ff3ba9540ddeb — cadence restore guard updated to require rank-vs-TimeAttack right-side branch",
         "11d0732fa2b5f8428079bbf7ad7ed8d72aaebbda — detect exact vtable9 Draw target in negative test",
         "docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md — C5 05:02 KST root-cause and CI evidence",
-      "308bf647211f670974fb53ad7d60d398dea4667c — DX9Ex Active 37859508332 game Win32/host x64/R33/package SUCCESS, EXE HUD Inspector 37859508345 SUCCESS, Domain Isolation 37859508246 SUCCESS; source-fix built, matching Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
+        "308bf647211f670974fb53ad7d60d398dea4667c — DX9Ex Active 37859508332 game Win32/host x64/R33/package SUCCESS, EXE HUD Inspector 37859508345 SUCCESS, Domain Isolation 37859508246 SUCCESS; source-fix built, matching Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
       ],
       "riskPaths": [
         "src/hooks_uiscaling.cpp",
