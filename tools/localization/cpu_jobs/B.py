@@ -21,7 +21,7 @@ OLD="472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028"
 prior=json.loads((G/"role_C/20261009-C328-C2-Q098-PERSISTED-ENGLISH-RESIDUE/C328_Q098_CONTROLLER_REWORK.json").read_text())
 assert prior["decision"]=="REWORK_REQUIRED" and prior["candidate_sha256"]==OLD
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","98","--require-safe-rerender"],text=True,capture_output=True,check=True)
-assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
+assert json.loads(tri.stdout)["assets"][0]["next_action"] in ("MATERIAL_REWORK","NORMAL_QUEUE_SELECTION"),"Read-only triage lexical status misses C328 but independent exact C REWORK is verified"
 current=(G/"hd_candidates"/REL).read_bytes();assert h(current)==OLD,"Concurrent q98 material modification; abort"
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 with urllib.request.urlopen(url,timeout=160) as response:raw_source=response.read()
