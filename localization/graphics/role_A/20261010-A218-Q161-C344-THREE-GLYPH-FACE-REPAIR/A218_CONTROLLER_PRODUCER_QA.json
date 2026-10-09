@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "run": "A218",
+  "run_key": "OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
+  "role": "A",
+  "queue_index": 161,
+  "priority": "C344_INDEPENDENT_REWORK",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "C344_original_independent": "localization/graphics/role_C/20261010-C344-C1-Q161-A201-EXACT-PERSISTED-GLYPH-REWORK/C344_Q161_CONTROLLER_C1_REWORK.json",
+  "current_promoted_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "canonical_source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "atlas_source_sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982",
+  "trial_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+  "output_trial": "localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_Q161_C344_THREE_FACE_REWORK_TRIAL.dds",
+  "github_actions_run": 37997128618,
+  "trigger_commit": "6a8177197a144a066951eda27489c1b13485cf41",
+  "producer_step": "A201 exact source/38-cell-BC3 block-preserve corrected selective indices 11/16/24, same real Hangul with pinned original source-flat face palette, no unrelated atlas changes",
+  "trial_bytes": 4194432,
+  "format": "DXT5/BC3 2048x2048 one mip, RAW mirrored Y from readable",
+  "cells": [
+    {
+      "id": 11,
+      "english": "AQUARIUS",
+      "ko": "물병자리",
+      "source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "trial_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "margins": [
+        3,
+        104,
+        1,
+        1
+      ]
+    },
+    {
+      "id": 16,
+      "english": "SOUTH KOREA",
+      "ko": "대한민국",
+      "source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "trial_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "margins": [
+        2,
+        222,
+        1,
+        2
+      ]
+    },
+    {
+      "id": 24,
+      "english": "ITALY",
+      "ko": "이탈리아",
+      "source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "trial_bbox": [
+        8,
+        1227,
+        157,
+        1268
+      ],
+      "margins": [
+        2,
+        3,
+        3,
+        4
+      ]
+    }
+  ],
+  "machine": {
+    "changed_outside_three_bboxes": 0,
+    "alpha_changed_outside_three_bboxes": 0,
+    "other_35_BC3_blocks_unchanged": true,
+    "decoded_alpha_extra": 0,
+    "decoded_alpha_missing": 0,
+    "decoded_bbox_exact_3_of_3": true,
+    "source_residue_pixels": 0,
+    "opaque_face_alpha_pinhole_pixels": 0,
+    "opaque_face_color_mismatch_pixels": 0,
+    "local_glyph_overlap_pairs": 0,
+    "original_dds_header_exact": true,
+    "raw_flipY_available": true
+  },
+  "actual_controller_visual": {
+    "review": [
+      "SOURCE/CLEAN/decoded FINAL gray native 100 and 50 three cells",
+      "SOURCE/CLEAN/decoded FINAL black native 100 three cells",
+      "SOURCE/CLEAN/decoded FINAL white native 100 three cells"
+    ],
+    "prior_defects": "C344 actual saved A201 11/16/24 had light/dark intermittent dotted horizontal strokes and glyph-face holes on multiple backdrops, including RAW",
+    "trial_11": "SCOPED_PASS; readable 물병자리 with continuous gray/black/white strokes, no spotted line within visible 100%, 50%",
+    "trial_16": "SCOPED_PASS; readable 대한민국 with continuous dark flat glyph face, C344 dotted line no longer visible on native BGW",
+    "trial_24": "SCOPED_PASS; readable 이탈리아 with stable dark stroke face, no visible prior dashed runs, source bbox near right edge has 3px positive clearance",
+    "residual_risks": [
+      "Single or two pixel top/bottom margin for 11/16 merits independent high zoom validation",
+      "Current promoted DDS remains C344-rejected SHA until separately guard-promoted",
+      "All 35 unrelated cells preserved but not independently newly C-approved",
+      "No new gameplay-composed screenshot or performance validation"
+    ],
+    "source_family": "SCOPED_PASS flat charcoal original English face and natural Korean glyph geometry; independent C1 must recheck",
+    "plate": "SCOPED_PASS exact selected source-derived CLEAN appears empty before lettering; no box traces in inspected native contacts",
+    "orientation": "RAW rendered mirror of readable; actual game not run"
+  },
+  "decision": "PRODUCER_SCOPED_VISUAL_PASS_TRIAL_ONLY_FRESH_C1_REQUIRED",
+  "new_trial_dds": 1,
+  "new_promoted_candidate_dds": 0,
+  "official_candidate_changed": false,
+  "independent_C1": "FRESH_REVIEW_REQUIRED_NEW_SHA",
+  "C3": "NOT_RUN",
+  "user_approval": "NOT_GRANTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "followup": "Full production pixel guard final manifest, native source/font recipe binding, full C1 evaluation on exact trial SHA then C3 and game validation required. Do not mark current official candidate PASS on trial-only visuals."
+}
