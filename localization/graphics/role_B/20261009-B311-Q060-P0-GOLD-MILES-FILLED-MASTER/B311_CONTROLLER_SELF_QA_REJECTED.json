@@ -1,0 +1,28 @@
+{
+  "role": "B",
+  "run": "B311",
+  "queue_index": 60,
+  "regression": "IGR-044",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "trial_sha256": "db9be2b9bd96acb4aeef2f83179f34b8fc93ce75a75a147240ebc4a7c62df463",
+  "visual_result": "FAIL_NATIVE_COUNTER_SPACE_AND_STROKE_COLLISION",
+  "native_100": "SOURCE gold label open counters vs TRIAL conjoined opaque pale Hangul body; multiple medial strokes and word separators touch",
+  "practical_50": "FAIL_COUNTER_COLLAPSE_AND_READABILITY",
+  "raw": "FAIL_CONJOINED_STROKES_PERSIST",
+  "machine": "PASS_SOURCE_BBOX_AND_OUTSIDE_ZERO",
+  "native_bbox": [
+    2154,
+    255,
+    2787,
+    364
+  ],
+  "candidate_promoted": false,
+  "new_production_dds": 0,
+  "next_method": "Use true native Bold face without 3px dilation, smaller family depth contours, positive counter/separation and source-derived palette; inspect again",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "user_status": "OPEN_USER_INGAME_FAIL"
+}
