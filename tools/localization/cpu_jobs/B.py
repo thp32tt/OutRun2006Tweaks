@@ -1,143 +1,198 @@
 #!/usr/bin/env python3
-"""B308 C325 q212 remaining four original-family gray/orange/red controls.
+"""B309 q060 P0 Stage: new filled native Hangul face master (trial, fail closed).
 
-Source-native gray/orange/red family sampling and preserved recent B307 repairs.
-
-Only remaining independently C325-rejected IDs 30/43/44/53. Prior B307
-25/26/27 and B299 15/28 must be byte-exact. C2/C3/game stay OPEN.
+Reconstruction method intentionally differs from B286/B297's thin silhouette,
+palette recolour and radius-one expansion: a newly rendered continuous Hangul
+master gets separate original-source gold face, navy separation and white rim.
+NEVER promote the trial or call QA PASS without controller visual inspection.
 """
-import csv,hashlib,io,json,os,subprocess,sys,urllib.request
+import csv, hashlib, io, json, os, subprocess, sys, urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageFont,ImageDraw
-assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
-G=Path("localization/graphics");REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=G/"role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS";OUT.mkdir(parents=True,exist_ok=True)
-h=lambda x:hashlib.sha256(x).hexdigest()
-SOURCE="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
-OLD="73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914"
-tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212","--require-safe-rerender"],text=True,capture_output=True,check=True)
-assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
+assert os.environ.get("OUTRUN_CPU_ROLE")=="B"
+G=Path("localization/graphics")
+ASSET="textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+OUT=G/"role_B/20261009-B309-Q060-P0-NATIVE-FILLED-GOLD-MASTER"
+OUT.mkdir(parents=True,exist_ok=True)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+SOURCE_SHA="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+CURRENT_SHA="d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2"
+PBOX=(455,245,690,350)
 with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
- row=next(r for r in csv.DictReader(f) if r["index"].lstrip("\ufeff")=="212")
-assert "rework_required" in row["artwork_status"]
-b=(G/"hd_candidates"/REL).read_bytes()
-assert h(b)==OLD,"concurrent q212 producer changed current candidate; refuse stale edit"
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-with urllib.request.urlopen(url,timeout=160) as response:src=response.read()
-assert h(src)==SOURCE and src[:128]==b[:128]
-def decoded(buf):
- a=np.array(Image.open(io.BytesIO(buf)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),dtype=np.uint8)
- assert a.shape==(2048,2048,4);return a
-S=decoded(src);P=decoded(b)
-C=np.array(Image.open(G/"role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png").convert("RGBA"),dtype=np.uint8)
-assert C.shape==S.shape
-evidence=json.loads((G/"role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_MACHINE_FULL_12.json").read_text())
-assert evidence["source_sha256"]==SOURCE and evidence["candidate_sha256"]=="efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089"
-rows=evidence["regions"];assert len(rows)==12
-assert all(not np.any(C[y:y2,x:x2,3]) for x,y,x2,y2 in (z["bbox"] for z in rows))
-allregions=np.zeros((2048,2048),bool)
-for z in rows:
- x,y,x2,y2=z["bbox"];allregions[y:y2,x:x2]=True
-assert not np.any(np.any(S!=C,axis=2)&~allregions),"source CLEAN mismatch outside allowed union"
+    row=next(x for x in csv.DictReader(f) if x["index"].lstrip("\ufeff")=="60")
+assert "rework_required" in row["artwork_status"],row["artwork_status"]
+tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","60","--require-safe-rerender"],text=True,capture_output=True)
+assert tri.returncode==0,(tri.stdout,tri.stderr)
+assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
+
+candidate=(G/"hd_candidates"/ASSET).read_bytes()
+assert sha(candidate)==CURRENT_SHA,"q060 current changed: do not overwrite or retry stale SHA"
+url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+with urllib.request.urlopen(url,timeout=160) as f: original=f.read()
+assert sha(original)==SOURCE_SHA, "pinned English source provenance not matched"
+assert original[:128]==candidate[:128],"canonical English DDS header mismatch"
+
+def decode(b):
+    return np.asarray(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),dtype=np.uint8)
+S=decode(original)
+P=decode(candidate)
+assert S.shape==P.shape==(2048,4096,4)
+l,t,r,b=PBOX
+source=S[t:b,l:r].copy()
+prior=P[t:b,l:r].copy()
+# The pinned original plate is transparent around the lettering. A clean
+# plate must restore 0 source opacity, not cover English with foreign boxes.
+assert np.count_nonzero(source[:,:,3]>8)>500
+C=P.copy()
+C[t:b,l:r]=0
+assert not np.any(C[t:b,l:r,3])
+# Outside selected source bbox, exactly preserve every current byte/pixel.
+assert np.array_equal(C[:t],P[:t])
+
 font="/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
 if not Path(font).exists():
- subprocess.run(["sudo","apt-get","update","-qq"],check=True)
- subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
-assert Path(font).exists(),"native sans black unavailable"
-ids=[30,43,44,53]
-expect={
- 30:("완료","DONE",[1080,423,1274,496],"gray","left"),
- 43:("프로","PROFESSIONAL",[0,341,638,404],"orange","right"),
- 44:("아웃런","OUTRUN",[1626,524,1837,587],"red","right"),
- 53:("완료","DONE",[4,78,138,122],"gray","left")}
-out=P.copy();allowed=np.zeros((2048,2048),bool);details=[]
-for z in rows:
- n=z["idx"]
- if n not in ids:continue
- ko,en,bb,family,alignment=expect[n];assert z["korean"]==ko and z["label"]==en and z["bbox"]==bb
- l,t,r,b2=bb;allowed[t:b2,l:r]=True
- src_roi=S[t:b2,l:r]
- # Dark source is uniformly flat CJK-control heading family, not metallic.
- face=src_roi[(src_roi[:,:,3]>230)]
- assert len(face)>500,("source face missing",n)
- median=np.median(face,axis=0).round().astype(int).tolist()
- assert median[3]==255
- if family=="gray": assert median[0]<130 and max(median[:3])-min(median[:3])<35,(n,median)
- elif family=="orange": assert median[0]>160 and median[1]>75 and median[2]<150,(n,median)
- elif family=="red": assert median[0]>120 and median[1]<75 and median[2]<75,(n,median)
- # choose native near source height; use heavy sans with source dark gray.
- choice=None
- for size in range(100,24,-1):
-  ft=ImageFont.truetype(font,size,index=1)
-  anchor=ft.getbbox(ko)
-  im=Image.new("RGBA",(anchor[2]-anchor[0]+20,anchor[3]-anchor[1]+20),(0,0,0,0))
-  ImageDraw.Draw(im).text((10-anchor[0],10-anchor[1]),ko,font=ft,fill=tuple(median))
-  bbink=im.getchannel("A").getbbox()
-  if not bbink:continue
-  glyph=im.crop(bbink)
-  if glyph.height <= (b2-t)-10 and glyph.height >= (b2-t)-17 and glyph.width<r-l-10:
-   choice=(size,glyph);break
- assert choice is not None,("cannot fit native target height",n)
- size,glyph=choice
- # Header is left-aligned (native source), preserve original source grouping.
- xx=(r-5-glyph.width) if alignment=="right" else l+5
- yy=t+((b2-t)-glyph.height)//2
- assert min(xx-l,r-xx-glyph.width,yy-t,b2-yy-glyph.height)>=4
- out[t:b2,l:r]=C[t:b2,l:r]
- imarr=np.asarray(glyph,dtype=np.uint8)
- assert not np.any(out[yy:yy+glyph.height,xx:xx+glyph.width,3])
- out[yy:yy+glyph.height,xx:xx+glyph.width]=imarr
- details.append({"region_idx":n,"source":en,"korean":ko,"source_bbox":bb,
-  "new_bbox":[xx,yy,xx+glyph.width,yy+glyph.height],
-  "margin":[xx-l,r-xx-glyph.width,yy-t,b2-yy-glyph.height],
-  "source_face":median,"source_family":family,"alignment":alignment,"font":"NotoSansCJK-Black.ttc","native_px":size,
-  "native_glyph_width":glyph.width,"native_glyph_height":glyph.height})
-changed=np.any(out!=P,axis=2)
-assert np.count_nonzero(changed)>1000
-assert not np.any(changed&~allowed)
-assert not np.any((out[:,:,3]!=P[:,:,3])&~allowed)
-assert np.array_equal(out[~allowed],P[~allowed])
-assert all(r["region_idx"] in ids for r in details)
-native=np.frombuffer(src[128:],dtype=np.uint8).reshape(2048,2048,4)
-if np.array_equal(native[::-1],S):mode="RGBA";body=out[::-1].copy().tobytes()
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
+assert Path(font).is_file()
+
+# Source-derived palette: sample opaque native English gold, navy and white
+# clusters. This is not the old flat recolour of existing narrow Korean glyphs.
+pix=source.reshape(-1,4)
+opaque=pix[:,3]>=210
+gold=pix[opaque & (pix[:,0]>155)&(pix[:,1]>85)&(pix[:,2]<145)]
+navy=pix[opaque & (pix[:,0]<70)&(pix[:,1]<85)&(pix[:,2]<125)]
+white=pix[opaque & (pix[:,0]>208)&(pix[:,1]>208)&(pix[:,2]>195)]
+assert min(len(gold),len(navy),len(white))>20,(len(gold),len(navy),len(white))
+GOLD=tuple(np.median(gold[:,:3],axis=0).round().astype(int))
+NAVY=tuple(np.median(navy[:,:3],axis=0).round().astype(int))
+WHITE=tuple(np.median(white[:,:3],axis=0).round().astype(int))
+assert GOLD[0]>160 and GOLD[2]<145 and NAVY[2]<135 and min(WHITE)>195
+# Native contour master, with source-sized target bbox; no low-res upscale.
+# The 4 Hangul syllables need controlled *whole-glyph* horizontal fitting.
+word="스테이지"
+selected=None
+for font_size in range(110,74,-1):
+    ft=ImageFont.truetype(font,font_size,index=1)
+    bb=ft.getbbox(word)
+    im=Image.new("L",(bb[2]-bb[0]+36,bb[3]-bb[1]+36),0)
+    ImageDraw.Draw(im).text((18-bb[0],18-bb[1]),word,font=ft,fill=255)
+    ib=im.getbbox()
+    if not ib:continue
+    glyph=im.crop(ib)
+    if not (69<=glyph.height<=78):continue
+    width=min(200,max(1,round(glyph.width*0.66)))
+    resized=glyph.resize((width,glyph.height),Image.Resampling.LANCZOS)
+    # Opposite-script slant is forbidden: readable top is moved right.
+    shear=0.18; ext=int(round(shear*resized.height))
+    slanted=resized.transform((width+ext,resized.height),Image.Transform.AFFINE,
+        (1,shear,-shear*(resized.height-1),0,1,0),
+        resample=Image.Resampling.BICUBIC)
+    sb=slanted.getbbox()
+    if not sb:continue
+    slanted=slanted.crop(sb)
+    # Native thick Hangul body, then navy separator and bright white rim.
+    # This materially changes glyph geometry, not the old outline colours.
+    master=slanted.filter(ImageFilter.MaxFilter(3))
+    navy_layer=master.filter(ImageFilter.MaxFilter(9))
+    outer_layer=navy_layer.filter(ImageFilter.MaxFilter(9))
+    if outer_layer.width<=r-l-10 and outer_layer.height<=b-t-10:
+        selected=(font_size,slanted,master,navy_layer,outer_layer);break
+assert selected is not None,"cannot source-fit thick gold face+navy+white rings"
+size,slanted,master,navy_layer,outer_layer=selected
+# MaxFilter does not resize PIL images: pad mask before dilation, otherwise
+# outward source bboxes can be clipped. Build all rings on padded master.
+pad=12
+def padded(img):
+    z=Image.new("L",(img.width+pad*2,img.height+pad*2),0)
+    z.paste(img,(pad,pad))
+    return z
+face=padded(master)
+navy_mask=face.filter(ImageFilter.MaxFilter(11))
+white_mask=navy_mask.filter(ImageFilter.MaxFilter(9))
+dark_mask=white_mask.filter(ImageFilter.MaxFilter(3))
+bbox=dark_mask.getbbox()
+assert bbox
+layers=Image.new("RGBA",face.size,(0,0,0,0))
+def paint(color,mask):
+    layer=Image.new("RGBA",face.size,tuple(color)+(0,))
+    layer.putalpha(mask)
+    layers.alpha_composite(layer)
+paint((13,17,42),dark_mask)
+paint(WHITE,white_mask)
+paint(NAVY,navy_mask)
+paint(GOLD,face)
+layers=layers.crop(bbox)
+xx=l+(r-l-layers.width)//2
+yy=t+(b-t-layers.height)//2
+assert min(xx-l,r-xx-layers.width,yy-t,b-yy-layers.height)>=5
+N=C.copy()
+new=np.asarray(layers,dtype=np.uint8)
+N[yy:yy+layers.height,xx:xx+layers.width]=new
+changed=np.any(P!=N,axis=2)
+allow=np.zeros(P.shape[:2],bool)
+allow[t:b,l:r]=True
+assert np.any(changed&allow) and not np.any(changed&~allow)
+assert not np.any((P[:,:,3]!=N[:,:,3])&~allow)
+assert np.array_equal(N[~allow],P[~allow])
+assert not np.any((N[t:b,l:r,3]>0)&(C[t:b,l:r,3]>0))
+# Persist native DDS in exactly the original format, flip and mip structure.
+raw=np.frombuffer(candidate[128:],dtype=np.uint8).reshape(2048,4096,4)
+if np.array_equal(raw[::-1],P): mode="RGBA";body=N[::-1].copy().tobytes()
 else:
- assert np.array_equal(native[::-1,:,[2,1,0,3]],S)
- mode="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
-data=b[:128]+body;assert h(data)!=OLD and len(data)==len(b)
-D=decoded(data);assert np.array_equal(D,out)
-newpath=G/"hd_candidates"/REL;newpath.write_bytes(data)
-assert h(newpath.read_bytes())==h(data)
-def onbg(a,bg):
- im=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
- im.alpha_composite(Image.fromarray(a,"RGBA"));return im.convert("RGB")
-proof=[]
-for n in ids:
- z=next(r for r in rows if r["idx"]==n)
- l,t,r,b2=z["bbox"];tiles=[a[t:b2,l:r].copy() for a in (S,C,P,D)]
- for orientation in ("FLIPY","RAW"):
-  imgs=[np.flipud(q).copy() for q in tiles] if orientation=="RAW" else tiles
-  for name,bg in (("GRAY",(128,128,128)),("WHITE",(255,255,255)),("BLACK",(0,0,0))):
-   for size in (100,75,50):
-    parts=[onbg(v,bg) for v in imgs]
-    if size!=100:parts=[im.resize((round(im.width*size/100),round(im.height*size/100)),Image.Resampling.LANCZOS) for im in parts]
-    contact=Image.new("RGB",(sum(im.width for im in parts)+12,max(im.height for im in parts)),bg)
-    x=0
-    for part in parts:contact.paste(part,(x,0));x+=part.width+4
-    namefile=f"r{n}_{orientation}_{name}_{size}_SOURCE_CLEAN_OLD_NEW.png"
-    contact.save(OUT/namefile,optimize=True);proof.append(namefile)
- for name,arr in [("SOURCE",S),("CLEAN",C),("OLD",P),("NEW",D)]:
-  Image.fromarray(arr[t:b2,l:r],"RGBA").save(OUT/f"r{n}_{name}_NATIVE_RGBA.png",optimize=True)
- Image.fromarray(np.uint8(changed[t:b2,l:r])*255,"L").save(OUT/f"r{n}_DIFF_MASK.png")
-qa={"role":"B","run":"B308","queue_index":212,"source_sha256":SOURCE,"previous_sha256":OLD,
- "candidate_sha256":h(data),"new_dds":1,"source_clean_outside_all_twelve":0,
- "SOURCE_CLEAN_selected_alpha":"ZERO_4","outside_4_changed_rgba":0,"outside_4_changed_alpha":0,
- "preserved_other_8_source_cells":"EXACT_PERSISTED_RGBA","header_exact":True,
- "dds_native":[2048,2048],"dds_format":mode,"mips":1,"saved_dds_decode":"EXACT",
- "raw_orientation":"mirror_y","regions":details,"proofs":proof,
- "method":"native Noto Black gray/orange/red 4 material families from pinned English faces, source CLEAN glyph-only original-height with original left/right align, no old bitmap upscale",
- "producer_visual":"PENDING_DIRECT_100_75_50_RAW","C2":"NOT_RUN","C3":"NOT_RUN",
- "IGR029":"OPEN_MAPPING_SUSPECTED","RUNTIME_VALIDATION":"UNTESTED",
- "backend":"github-actions","excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B308_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-print("B308_NEW_DDS",json.dumps({"sha":h(data),"details":details,"proofs":len(proof)},ensure_ascii=False))
+    assert np.array_equal(raw[::-1,:,[2,1,0,3]],P),"unrecognized raw pixel order"
+    mode="BGRA";body=N[::-1,:,[2,1,0,3]].copy().tobytes()
+data=candidate[:128]+body
+assert len(data)==len(candidate) and sha(data)!=CURRENT_SHA
+assert np.array_equal(decode(data),N)
+# DO NOT TOUCH hd_candidates UNTIL direct human visual acceptance.
+trial=OUT/"B309_Q060_TRIAL_NOT_PROMOTED.dds"
+trial.write_bytes(data)
+assert sha(trial.read_bytes())==sha(data)
+def tile(a,orient):
+    v=a[t:b,l-50:r+75].copy()
+    return np.flipud(v).copy() if orient=="RAW" else v
+def ongray(a):
+    im=Image.new("RGBA",(a.shape[1],a.shape[0]),(120,120,120,255))
+    im.alpha_composite(Image.fromarray(a,"RGBA"))
+    return im.convert("RGB")
+proofs=[]
+for orient in ("FLIPY","RAW"):
+    for percent in (100,75,50):
+        parts=[]
+        for name,arr in (("ENGLISH",S),("CLEAN",C),("CURRENT",P),("TRIAL",N)):
+            im=ongray(tile(arr,orient))
+            if percent!=100:
+                im=im.resize((round(im.width*percent/100),round(im.height*percent/100)),Image.Resampling.LANCZOS)
+            parts.append(im)
+        contact=Image.new("RGB",(sum(x.width for x in parts)+12,max(x.height for x in parts)),(120,120,120))
+        pos=0
+        for part in parts: contact.paste(part,(pos,0));pos+=part.width+4
+        name=f"B309_{orient}_GRAY_{percent}_SOURCE_CLEAN_CURRENT_TRIAL.png"
+        contact.save(OUT/name,optimize=True);proofs.append(name)
+for name,arr in (("SOURCE",S),("CLEAN",C),("CURRENT",P),("TRIAL",N)):
+    Image.fromarray(arr[t:b,l:r],"RGBA").save(OUT/f"B309_{name}_LOSSLESS.png",optimize=True)
+report={
+"schema_version":2,"role":"B","run":"B309","queue_index":60,"priority":"P0",
+"source_sha256":SOURCE_SHA,"candidate_sha256":CURRENT_SHA,"trial_sha256":sha(data),
+"trial_only_dds":1,"new_production_dds":0,"trial_promoted":False,
+"asset":ASSET,"source_bbox":list(PBOX),
+"trial_bbox":[xx,yy,xx+layers.width,yy+layers.height],
+"margins":[xx-l,r-xx-layers.width,yy-t,b-yy-layers.height],
+"font":"native NotoSansCJK Black",
+"font_size":size,"palette_from_native_source":{"gold":GOLD,"navy":NAVY,"white":WHITE},
+"method":"NEW FILLED Hangul glyph master + separate native source-colour face/navy depth/white rim/dark fringe and readable right slant, not B297 palette dilation",
+"machine_checks":{"dds_header_exact":True,"format":mode,"mips":1,"native":[4096,2048],
+"roundtrip":"PASS","changed_outside_stage":0,"alpha_outside_stage":0,
+"protected_outside_stage":"UNCHANGED_EXACT","source_cell_clean_alpha":0,
+"source_size_and_positive_margins":"PASS"},
+"proofs":proofs,"producer_visual":"PENDING_INDEPENDENT_DIRECT_CONTROLLER_REVIEW",
+"status":"TRIAL_ONLY_NOT_PROMOTED_NO_QA_PASS","IGR044":"OPEN_USER_INGAME_FAIL",
+"C2":"NOT_RUN","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED",
+"backend":"github-actions",
+"excluded":["VR","FFB","DX11","DXVK"]}
+(OUT/"B309_MACHINE_AND_METHOD.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print("B309_TRIAL_ONLY",json.dumps({"sha":sha(data),"bbox":report["trial_bbox"],
+   "palette":report["palette_from_native_source"],"qa":report["status"]},ensure_ascii=False))
