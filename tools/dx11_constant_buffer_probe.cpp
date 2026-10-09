@@ -537,6 +537,129 @@ float4 main() : SV_Target {
         warp.context->ClearRenderTargetView(target, clear);
         warp.context->DrawIndexed(3u, 0u, 0);
         r170Pixel(true);
+        // R172: prove genuine D3D9 FVF DIFFUSE/COLOR0 semantics, unlike
+        // the R170 TFACTOR positive which deliberately bypasses COLOR0.
+        // Keep the native gameplay Draw activation gate unchanged.
+        constexpr DWORD r172Fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+        struct R172Vertex { float x, y, z; D3DCOLOR diffuse; };
+        constexpr D3DCOLOR r172Argb = 0xFF2080E0u;
+        const R172Vertex r172Vertices[3] = {
+            {-0.75f, -0.75f, 0.5f, r172Argb},
+            { 0.75f, -0.75f, 0.5f, r172Argb},
+            { 0.00f,  0.75f, 0.5f, r172Argb}};
+        const UINT r172Stride = sizeof(R172Vertex);
+        const auto r172Layout = translate_vertex_input_layout(
+            nullptr, 0u, r172Fvf, r172Stride);
+        const auto r172VsPrototype =
+            generate_fixed_function_vertex_shader_prototype(
+                r172Fvf, r172Stride);
+        auto r172Stages = r170Stages;
+        r172Stages[0].colorArg1 = D3DTA_DIFFUSE;
+        r172Stages[0].alphaArg1 = D3DTA_DIFFUSE;
+        const auto r172PsPrototype =
+            generate_fixed_function_pixel_shader_prototype(
+                r172Stages, true, 0u, 0u, r170TextureTypes);
+        require(r172Layout.exact && r172Layout.fvfPath &&
+                    r172Layout.elementCount == 2u &&
+                    r172Layout.elements[1].Format ==
+                        DXGI_FORMAT_B8G8R8A8_UNORM &&
+                    r172Layout.elements[1].AlignedByteOffset == 12u &&
+                    r172VsPrototype.generated() &&
+                    r172PsPrototype.generated() &&
+                    r172VsPrototype.source.find("input.diffuse") !=
+                        std::string::npos &&
+                    r172PsPrototype.source.find("input.diffuse") !=
+                        std::string::npos,
+                "R172 real D3D9 packed DIFFUSE FVF/VS/PS contract");
+        ID3DBlob* r172VsCode = compile_vertex_shader(r172VsPrototype.source);
+        ID3DBlob* r172PsCode = nullptr;
+        ID3DBlob* r172Errors = nullptr;
+        const HRESULT r172Result = D3DCompile(
+            r172PsPrototype.source.data(), r172PsPrototype.source.size(),
+            "R172Diffuse", nullptr, nullptr, "main", "ps_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0u, &r172PsCode, &r172Errors);
+        if (r172Errors)
+            r172Errors->Release();
+        require(SUCCEEDED(r172Result) && r172PsCode,
+                "R172 generated DIFFUSE pixel shader compiles");
+        ID3D11VertexShader* r172Vs = nullptr;
+        ID3D11PixelShader* r172Ps = nullptr;
+        ID3D11InputLayout* r172Ia = nullptr;
+        require(SUCCEEDED(warp.device->CreateVertexShader(
+                    r172VsCode->GetBufferPointer(),
+                    r172VsCode->GetBufferSize(), nullptr, &r172Vs)) &&
+                    r172Vs &&
+                SUCCEEDED(warp.device->CreatePixelShader(
+                    r172PsCode->GetBufferPointer(),
+                    r172PsCode->GetBufferSize(), nullptr, &r172Ps)) &&
+                    r172Ps &&
+                SUCCEEDED(warp.device->CreateInputLayout(
+                    r172Layout.elements.data(), r172Layout.elementCount,
+                    r172VsCode->GetBufferPointer(),
+                    r172VsCode->GetBufferSize(), &r172Ia)) &&
+                    r172Ia,
+                "R172 same-device real COLOR0 IA/VS/PS objects");
+        D3D11_BUFFER_DESC r172Desc{};
+        r172Desc.ByteWidth = sizeof(r172Vertices);
+        r172Desc.Usage = D3D11_USAGE_IMMUTABLE;
+        r172Desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA r172Data{};
+        r172Data.pSysMem = r172Vertices;
+        ID3D11Buffer* r172Vb = nullptr;
+        require(SUCCEEDED(warp.device->CreateBuffer(
+                    &r172Desc, &r172Data, &r172Vb)) && r172Vb,
+                "R172 real D3DCOLOR vertex-buffer creation");
+        warp.context->IASetInputLayout(r172Ia);
+        warp.context->IASetVertexBuffers(
+            0u, 1u, &r172Vb, &r172Stride, &offset);
+        warp.context->VSSetShader(r172Vs, nullptr, 0u);
+        warp.context->PSSetShader(r172Ps, nullptr, 0u);
+        // Reuse R170 identity WVP, R169 IA index-buffer, RTV and raster state.
+        warp.context->ClearRenderTargetView(target, clear);
+        const auto r172Pixel = [&](bool expectedDiffuse) {
+            warp.context->CopyResource(readback, color);
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            require(SUCCEEDED(warp.context->Map(
+                        readback, 0u, D3D11_MAP_READ, 0u, &mapped)) &&
+                        mapped.pData && mapped.RowPitch >= 64u,
+                    "R172 BGRA staging map");
+            const auto* p = static_cast<const unsigned char*>(mapped.pData);
+            const auto* center = p + 8u * mapped.RowPitch + 8u * 4u;
+            const unsigned char expect[4] = {
+                static_cast<unsigned char>(expectedDiffuse ? 224u : 0u),
+                static_cast<unsigned char>(expectedDiffuse ? 128u : 0u),
+                static_cast<unsigned char>(expectedDiffuse ? 32u : 0u), 255u};
+            const unsigned char border[4] = {0u, 0u, 0u, 255u};
+            const bool ok = std::memcmp(center, expect, 4u) == 0 &&
+                            std::memcmp(p, border, 4u) == 0;
+            const std::array<unsigned int, 4> actual = {
+                center[0], center[1], center[2], center[3]};
+            warp.context->Unmap(readback, 0u);
+            if (!ok)
+                std::cerr << "R172 COLOR0 center BGRA=["
+                          << actual[0] << "," << actual[1] << ","
+                          << actual[2] << "," << actual[3] << "]\n";
+            require(ok, expectedDiffuse
+                ? "R172 generated DIFFUSE exact BGRA center and clear corner"
+                : "R172 clear-only negative control stays black");
+        };
+        r172Pixel(false);
+        warp.context->DrawIndexed(3u, 0u, 0);
+        r172Pixel(true);
+        warp.context->IASetInputLayout(r170Ia);
+        warp.context->IASetVertexBuffers(
+            0u, 1u, &r170Vb, &r170Stride, &offset);
+        warp.context->VSSetShader(r170Vs, nullptr, 0u);
+        warp.context->PSSetShader(r170Ps, nullptr, 0u);
+        r172Vb->Release();
+        r172Ia->Release();
+        r172Ps->Release();
+        r172Vs->Release();
+        r172PsCode->Release();
+        r172VsCode->Release();
+        std::cout << "DX11 WARP translated real COLOR0 fragment R172: PASS\n";
+
         ID3D11Buffer* r170NullWvp = nullptr;
         warp.context->VSSetConstantBuffers(0u, 1u, &r170NullWvp);
         r170Wvp->Release();
