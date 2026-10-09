@@ -38,7 +38,7 @@ ROWS=[
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def load_dds(path):
     data=Path(path).read_bytes()
-    w,h=struct.unpack_from("<II",data,16)
+    h,w=struct.unpack_from("<II",data,12)
     if data[:4]!=b"DDS " or (w,h)!=(2048,1024) or len(data)!=128+w*h*4:
         raise ValueError("unexpected DDS size/format")
     masks=struct.unpack_from("<IIII",data,92)
