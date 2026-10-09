@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "task_id": "OUTRUN-KOR-A202-P0-Q121-CAR-FOOTPRINT-20261009-1730",
+  "at_kst": "2026-10-09 17:44 KST",
+  "queue_index": 121,
+  "priority": "P0",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "prior_candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "new_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "selection_reason": "Exact P0 car select native title source; A199 previous short phrase 436px was visibly underfilled vs 913px source; C318 A199 C1 HOLD lacked blind anchors, not a PASS. No unrelated P0 assets rerendered.",
+  "method_change": "Restore full source imperative semantics Select your car → 차량을 선택하세요 using natural native source-white italic; NO forced horizontal stretch; preserve two other title cells byte-identical.",
+  "source_style": "Noto Sans CJK Black native 108pt, right lean 0.25 affine, white 250/250/250 and black shadow right+down 5px, original A176 transparent CLEAN",
+  "structure": {
+    "width": 4096,
+    "height": 4096,
+    "mode": "RGBA",
+    "mips": 1,
+    "pitch": 16384,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "raw": "mirror_y"
+  },
+  "scope": {
+    "source_bbox": [
+      243,
+      947,
+      1156,
+      1111
+    ],
+    "vertical_non_touch_band": [
+      959,
+      1077
+    ],
+    "prior_bbox": [
+      481,
+      964,
+      917,
+      1072
+    ],
+    "new_bbox": [
+      287,
+      964,
+      1111,
+      1072
+    ],
+    "old_size": [
+      436,
+      108
+    ],
+    "new_size": [
+      824,
+      108
+    ],
+    "source_size": [
+      913,
+      164
+    ],
+    "margins": [
+      44,
+      45,
+      17,
+      39
+    ],
+    "only_car_corridor_changed": true,
+    "noncar_changes_px": 0,
+    "changed_car_corridor_px": 54161,
+    "other_cells_preserved": [
+      "select_game_mode",
+      "select_course"
+    ]
+  },
+  "machine_qa": {
+    "clean_old_unrelated_diff_outside_original_bboxes": 0,
+    "clean_final_outside_original_bboxes": 0,
+    "clean_final_outside_glyph_masks": 0,
+    "alpha_outside_original_bboxes": 0,
+    "protected_unrelated_changed_pixels": 0,
+    "source_exact_residue_outside_localized_masks": 0,
+    "label_collision_pairs": 0,
+    "header128_exact": true,
+    "native_dds_roundtrip": "PASS"
+  },
+  "producer_10_stages": {
+    "exact_english": "PASS: canonical SHA pin f7847d.../4096×4096 RGBA/mip1",
+    "source_mask_inventory": "PASS: three header regions enumerated, car title only semantically and materially altered",
+    "clean_plate": "PASS: A176 CLEAN alpha=0 in declared source cells; source vs plate inspected separately",
+    "plate_only": "PASS: gray and black SOURCE/CLEAN/FINAL title contact visually shows removed English face with no new rectangle",
+    "style": "PASS producer: source-white italic + black single depth retained; no old low-res glyph reuse",
+    "native_korean": "PASS 824×108 within source913×164 with margins44/45/17/39; correct right lean",
+    "transparent_composition": "PASS: white/black glyph and justified shadow only, no opaque background crop",
+    "composite_contamination": "PASS changed ONLY car corridor; other two Korean title cells and all protected pixels exactly unchanged",
+    "dds_persisted": "PASS encoded actual saved DDS roundtrip/readable RAW mirror-Y; 100/75/50 preview",
+    "handoff": "Producer self-QA only; require new independent C1 and separate C3, full evidence approval, user/game retest"
+  },
+  "ordered_visual_8": [
+    "English source removed within target A176 clean; no new ghost seen in source/plate comparison",
+    "Readable rightward source italic direction preserved, RAW mirror-Y identical to English source",
+    "Semantic natural-length 824px vs prior436px; native height108 source maximum913×164, not width-stretched",
+    "White weight + one flat black depth matches prior English family; no foreign glow/boxes",
+    "No clipped Hangul apparent at original crop/50%; bbox positive margins 44/45/17/39",
+    "Protected model/logo/other cells exact-change outside declared corridor 0px",
+    "FLIP-Y, RAW and one authored mip reviewed",
+    "차량을 선택하세요 native and practical-scale legible; composed game remains UNTESTED"
+  ],
+  "evidence": {
+    "run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37906362368",
+    "producer_report": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_WORKER_REPORT.json",
+    "english_clean_final_gray": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_1_select_car_GRAY_100.jpg",
+    "english_clean_final_black50": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_1_select_car_BLACK_50.jpg",
+    "atlas_readable": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_READABLE_SOURCE_FINAL.jpg",
+    "atlas_raw": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_RAW_SOURCE_FINAL.jpg",
+    "native": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_FINAL_SAVED_NATIVE.png",
+    "original_scope": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_ORIGINAL_BBOX_SCOPE.png",
+    "glyph_mask": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_COMPOSED_GLYPHS_SCOPE.png"
+  },
+  "producer_decision": "PRODUCER_SELF_QA_PASS_PENDING_FRESH_C1",
+  "C1": "PENDING",
+  "C3": "PENDING",
+  "source_family_blind_calibration": "NOT_COMPLETED",
+  "USER_RETEST": "REQUIRED",
+  "IGR030": "OPEN_USER_INGAME_FAIL",
+  "IGR031": "OPEN_USER_INGAME_FAIL",
+  "IGR040": "OPEN_USER_INGAME_FAIL",
+  "dynamic_info_cell_mapping": "OPEN",
+  "dino_logo_source_mapping": "OPEN_UNTOUCHED",
+  "game_composition": "NOT_TESTED",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_material_dds": 1
+}
