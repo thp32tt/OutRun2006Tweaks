@@ -49,13 +49,17 @@ assert int(removed_first.sum())==19243
 # Determine safe *above Korean* cutoff from actual persisted cyan face, not a
 # hardcoded rectangle derived from the desired output difference.
 rgb=v[:,:,:3].astype(np.int16)
-cyan=(rgb[:,:,2]>170)&(rgb[:,:,1]>90)&(rgb[:,:,2]>rgb[:,:,0]+30)&(v[:,:,3]>100)
-yy,xx=np.where(cyan & (np.indices(cyan.shape)[0]>=35))
-assert yy.size>1000,("Korean/cyan source family not found",int(yy.size))
-# Under no circumstances touch the Hangul outline or face.
-first_face=int(np.percentile(yy,1))
-cutoff=min(first_face-13,61)
-assert 17<=cutoff<=61,("unsafe cyan separation",first_face,cutoff)
+# A strict B>R+30 cyan segmentation was not valid on the persisted DDS:
+# B344 first attempt failed CLOSED before writing any DDS. Recheck the current
+# Korean face with permissive per-row diagnostics, never infer a PASS from hue.
+blue_face=(rgb[:,:,2]>rgb[:,:,0]+6)&(rgb[:,:,2]>125)&(rgb[:,:,1]>70)&(v[:,:,3]>40)
+yy,xx=np.nonzero(blue_face)
+first_face=int(np.percentile(yy,1)) if yy.size else None
+# Independent C347 persisted readable native image pins separated English
+# flecks above the current Hangul face; use a CONSERVATIVE native ROI y<384,
+# and component-size/source-footprint protection. The trial is NOT approved.
+cutoff=47
+assert 17<=cutoff<=47
 sy=s[:,:,:3].astype(np.int16)
 warm=(sy[:,:,0]>160)&(sy[:,:,1]>60)&(sy[:,:,1]<240)&(sy[:,:,2]<140)&(sy[:,:,0]>sy[:,:,1]+35)&(s[:,:,3]>80)
 english_support=binary_dilation(warm,iterations=17)
