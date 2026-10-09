@@ -1,0 +1,89 @@
+{
+  "run": "B327",
+  "queue_index": 98,
+  "asset": "42E618FD",
+  "status": "B327R_NATIVE_HALO_TRIAL_PENDING_CONTROLLER_VISUAL",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "mask_sha256": "30b871414d43764e30ffd206caaa4be943d0389450e7749bf61f677f2a1b9370",
+  "previous_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "trial_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+  "method": "NEW_NATIVE_VECTOR_ALPHA_PLUS_SOURCE_FAMILY_DIFFUSE_NAVY_GLOW_RGBA_DXT5_RECONSTRUCTION",
+  "source_family": {
+    "native_size": [
+      2048,
+      128
+    ],
+    "source_face_rgb_90pct": [
+      255,
+      255,
+      255
+    ],
+    "source_keyline_rgb_30pct": [
+      0,
+      12,
+      57
+    ],
+    "face_support": 23914,
+    "navy_support": 38601,
+    "native_keyline_pixels": 59542,
+    "keyline_inner_distance_px": 8.0,
+    "source_white_to_navy_count_ratio": 0.38253219227385427
+  },
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "candidate_bbox": [
+    475,
+    9,
+    1580,
+    120
+  ],
+  "source_white_navy": [
+    24017,
+    83886
+  ],
+  "candidate_white_navy": [
+    24430,
+    83996
+  ],
+  "mipmaps": 1,
+  "format": "DXT5_BC3",
+  "raw_orientation": "MIRROR_Y",
+  "gate_plate_only": {
+    "source_clean_rgba_outside": 0,
+    "source_glyph_alpha_residual": 0,
+    "status": "MACHINE_PASS_VISUAL_PENDING"
+  },
+  "gate_composite_only": {
+    "clean_candidate_rgba_outside": 0,
+    "changed_outside_source": 0,
+    "changed_outside_target": 0,
+    "preserved_visible_outside_mask_changed": 0,
+    "status": "MACHINE_CONTAINMENT_PASS_VISUAL_PENDING"
+  },
+  "machine": {
+    "blocks_rebuilt": 7452,
+    "skipped_boundary_blocks": 304,
+    "pixel_changes": 98897,
+    "authored_white_face_decoded_coverage": 1.0,
+    "new_alpha_pixels": 23941,
+    "alpha_exact_outside_effect": true,
+    "header_exact": true,
+    "persisted_roundtrip_exact": true,
+    "outside_source": 0,
+    "outside_target": 0
+  },
+  "producer_visual": "PENDING_CONTROLLER_SOURCE_CLEAN_OLD_TRIAL_NATIVE_RAW_75_50",
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "candidate_promoted": false,
+  "backend": "GITHUB_ACTIONS_ONLY_SOURCE_DOWNLOAD_GPT_LOCAL_DNS_UNAVAILABLE",
+  "cleanup": "GITHUB_EPHEMERAL_RUNNER",
+  "forbidden_domains_touched": []
+}
