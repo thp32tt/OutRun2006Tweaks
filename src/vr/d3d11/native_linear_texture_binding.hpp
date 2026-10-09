@@ -57,13 +57,20 @@ namespace outrun::vr::dx11 {
         !(desc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
         return false;
 
-    // A shader read of the active render target is undefined. D3D11 may
-    // silently unbind a conflicting SRV: enforce both identity and no alias.
-    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
-    context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    // An eye's native non-indexed Draw owns exactly one OM output.
+    // Even an unrelated stale RTV in slot 1+ would receive this Draw:
+    // reject all extra eye/MRT bindings, not just a slot-0 SRV alias.
+    ID3D11RenderTargetView* liveOutputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, liveOutputs, nullptr);
+    bool singleEyeTarget = liveOutputs[0] == expectedTarget;
+    for (UINT index = 1; index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++index)
+        if (liveOutputs[index]) singleEyeTarget = false;
+    for (auto* boundView : liveOutputs)
+        if (boundView) boundView->Release(); // OMGetRenderTargets added a COM reference.
+    if (!singleEyeTarget) return false;
+    // A shader read of the active output is undefined even for one RTV.
     Microsoft::WRL::ComPtr<ID3D11Resource> output;
-    if (!rtv) return false;
-    rtv->GetResource(output.GetAddressOf());
+    expectedTarget->GetResource(output.GetAddressOf());
     return output && output.Get() != source.Get();
 }
 } // namespace outrun::vr::dx11

@@ -119,6 +119,23 @@ int main() {
     require(!ready(srv.Get(),sampler.Get()), "reject rebound sampler");
     ctx->PSSetSamplers(0,1,&rawSampler);
     require(ready(srv.Get(),sampler.Get()), "restored exact PS texture binding");
+    // R203 retry: a stale second-eye RTV would silently receive the same
+    // non-indexed Draw even though slot 0 retains the correct expected target.
+    D3D11_TEXTURE2D_DESC strayDesc{};
+    strayDesc.Width=40;strayDesc.Height=40;strayDesc.MipLevels=1;
+    strayDesc.ArraySize=1;strayDesc.Format=DXGI_FORMAT_R8G8B8A8_UNORM;
+    strayDesc.SampleDesc.Count=1;strayDesc.BindFlags=D3D11_BIND_RENDER_TARGET;
+    ComPtr<ID3D11Texture2D> staleEye;
+    ComPtr<ID3D11RenderTargetView> staleEyeRtv;
+    require(SUCCEEDED(dev->CreateTexture2D(&strayDesc,nullptr,staleEye.GetAddressOf())),
+        "create stale eye target");
+    require(SUCCEEDED(dev->CreateRenderTargetView(staleEye.Get(),nullptr,
+        staleEyeRtv.GetAddressOf())), "create stale eye RTV");
+    ID3D11RenderTargetView* twoEyes[]={rtv.Get(),staleEyeRtv.Get()};
+    ctx->OMSetRenderTargets(2,twoEyes,nullptr);
+    require(!ready(srv.Get(),sampler.Get()), "reject stray second-eye RTV slot 1");
+    ctx->OMSetRenderTargets(1,&target,nullptr);
+    require(ready(srv.Get(),sampler.Get()), "restore sole eye render target");
     const float clear[]={0,0,0,1};
     ctx->ClearRenderTargetView(rtv.Get(),clear);
     require(ready(srv.Get(),sampler.Get()), "owned red SRV immediately before Draw");
