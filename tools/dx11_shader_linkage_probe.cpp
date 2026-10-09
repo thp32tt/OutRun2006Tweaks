@@ -425,6 +425,122 @@ VSOutput main(float3 position : POSITION0)
             mismatchSawTexcoord0),
         "UINT COLOR0 mismatch did not fail closed");
 
+    // R176 independent signature-level reproduction of the R175 WARP
+    // generic-varying discriminator. This changes neither its raster probe
+    // nor any gameplay Draw path; the existing R175 failing readback remains
+    // authoritative for pixel behavior.
+    constexpr const char* r176VertexShader = R"(
+struct Input { float3 position : POSITION0; float4 color : COLOR0; };
+struct Output { float4 position : SV_Position; float4 payload : TEXCOORD6; };
+Output main(Input input) {
+    Output output;
+    output.position = float4(input.position, 1.0f);
+    output.payload = float4(32.0f/255.0f, 128.0f/255.0f,
+                            224.0f/255.0f, 1.0f);
+    return output;
+}
+)";
+    constexpr const char* r176PixelShader = R"(
+float4 main(float4 payload : TEXCOORD6) : SV_Target { return payload; }
+)";
+    constexpr const char* r176WrongSemanticPixelShader = R"(
+float4 main(float4 payload : TEXCOORD7) : SV_Target { return payload; }
+)";
+    constexpr const char* r176WrongTypePixelShader = R"(
+float4 main(uint4 payload : TEXCOORD6) : SV_Target {
+    return float4(payload);
+}
+)";
+    ID3DBlob* r176Vs = compile_shader(
+        r176VertexShader, std::strlen(r176VertexShader),
+        "OutRunR176Texcoord6VS", "vs_4_0");
+    ID3DBlob* r176Ps = compile_shader(
+        r176PixelShader, std::strlen(r176PixelShader),
+        "OutRunR176Texcoord6PS", "ps_4_0");
+    ID3DBlob* r176WrongSemanticPs = compile_shader(
+        r176WrongSemanticPixelShader,
+        std::strlen(r176WrongSemanticPixelShader),
+        "OutRunR176WrongSemanticPS", "ps_4_0");
+    ID3DBlob* r176WrongTypePs = compile_shader(
+        r176WrongTypePixelShader, std::strlen(r176WrongTypePixelShader),
+        "OutRunR176WrongTypePS", "ps_4_0");
+    ID3D11ShaderReflection* r176VsReflection = reflect_shader(r176Vs);
+    ID3D11ShaderReflection* r176PsReflection = reflect_shader(r176Ps);
+    ID3D11ShaderReflection* r176WrongSemanticReflection =
+        reflect_shader(r176WrongSemanticPs);
+    ID3D11ShaderReflection* r176WrongTypeReflection =
+        reflect_shader(r176WrongTypePs);
+    bool r176SawColor0 = false;
+    bool r176SawTexcoord0 = false;
+    require(interfaces_compatible(
+                r176VsReflection, r176PsReflection,
+                r176SawColor0, r176SawTexcoord0) &&
+                !r176SawColor0 && !r176SawTexcoord0,
+            "R176 TEXCOORD6 compiled VS/PS linkage must be exact");
+    D3D11_SHADER_DESC r176VsDesc{};
+    D3D11_SHADER_DESC r176PsDesc{};
+    require(SUCCEEDED(r176VsReflection->GetDesc(&r176VsDesc)) &&
+                SUCCEEDED(r176PsReflection->GetDesc(&r176PsDesc)),
+            "R176 shader reflection descriptions");
+    bool r176FoundVs = false;
+    bool r176FoundPs = false;
+    UINT r176VsRegister = 0u;
+    UINT r176PsRegister = 0u;
+    for (UINT i = 0; i < r176VsDesc.OutputParameters; ++i)
+    {
+        D3D11_SIGNATURE_PARAMETER_DESC p{};
+        require(SUCCEEDED(r176VsReflection->GetOutputParameterDesc(i, &p)),
+                "R176 VS output signature accessible");
+        if (p.SemanticName && _stricmp(p.SemanticName, "TEXCOORD") == 0 &&
+            p.SemanticIndex == 6u)
+        {
+            require(!r176FoundVs && p.ComponentType ==
+                        D3D_REGISTER_COMPONENT_FLOAT32 && p.Mask == 0xFu,
+                    "R176 VS TEXCOORD6 float4 output signature");
+            r176FoundVs = true;
+            r176VsRegister = p.Register;
+        }
+    }
+    for (UINT i = 0; i < r176PsDesc.InputParameters; ++i)
+    {
+        D3D11_SIGNATURE_PARAMETER_DESC p{};
+        require(SUCCEEDED(r176PsReflection->GetInputParameterDesc(i, &p)),
+                "R176 PS input signature accessible");
+        if (p.SemanticName && _stricmp(p.SemanticName, "TEXCOORD") == 0 &&
+            p.SemanticIndex == 6u)
+        {
+            require(!r176FoundPs && p.ComponentType ==
+                        D3D_REGISTER_COMPONENT_FLOAT32 && p.Mask == 0xFu,
+                    "R176 PS TEXCOORD6 float4 input signature");
+            r176FoundPs = true;
+            r176PsRegister = p.Register;
+        }
+    }
+    require(r176FoundVs && r176FoundPs,
+            "R176 dedicated TEXCOORD6 must survive DXBC signatures");
+    bool r176NegativeColor = false;
+    bool r176NegativeTexcoord = false;
+    require(!interfaces_compatible(
+                r176VsReflection, r176WrongSemanticReflection,
+                r176NegativeColor, r176NegativeTexcoord),
+            "R176 mismatched TEXCOORD7 must fail closed");
+    require(!interfaces_compatible(
+                r176VsReflection, r176WrongTypeReflection,
+                r176NegativeColor, r176NegativeTexcoord),
+            "R176 mismatched uint4 TEXCOORD6 must fail closed");
+    std::cout << "DX11 R176 TEXCOORD6 DXBC signature: MATCH float4"
+              << " VS_register=" << r176VsRegister
+              << " PS_register=" << r176PsRegister
+              << " negative_semantic=REJECT negative_type=REJECT\n";
+    r176WrongTypeReflection->Release();
+    r176WrongSemanticReflection->Release();
+    r176PsReflection->Release();
+    r176VsReflection->Release();
+    r176WrongTypePs->Release();
+    r176WrongSemanticPs->Release();
+    r176Ps->Release();
+    r176Vs->Release();
+
     specularVertexReflection->Release();
     specularPixelReflection->Release();
     mismatchedVertexReflection->Release();
