@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-HUD-NIGHT-GOAL-TRACE-AND-PACKAGE-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
+  "controller_terminal": true,
+  "status": "COMPLETE_BUILD_VERIFIED_DIAGNOSTIC_VISUAL_HMD_OPEN",
+  "attempt": 3,
+  "initial_sha": "fe428cb8de0fc7027c20f66111c6ed75962155e2",
+  "material_result_sha": "94b4984aab299bec0e0876dfc15b95599ca4d5b3",
+  "validation_bearing_result_sha": "94b4984aab299bec0e0876dfc15b95599ca4d5b3",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "scope": "HUD night test diagnostics and package manifest integrity. Optical GOAL/+TIME/lens pixel fixes not claimed.",
+  "changes": [
+    "GOAL/TIMEUP/LINK_TIMEUP source/route telemetry bitmasks now rearm only on state transition (fix process-wide one-shot evidence loss)",
+    "Four deliberate GOAL trace negative mutation checks and updated legacy verifier contracts",
+    "HUD_SCREEN, HUD_MENU, HUD_WORLD advertised in packaged manifest with recommended B_HUD and C_FLARE paths",
+    "HUD night guide bundled and zip validator checks inclusion"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_visual_composition_p0.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_HUD_NIGHT_TEST_20261009.md",
+    "docs/automation/reviews/DX9EX_HUD_NIGHT_BUILD_20261009.md"
+  ],
+  "evidence": {
+    "active": {
+      "run": 37931813668,
+      "head_sha": "94b4984aab299bec0e0876dfc15b95599ca4d5b3",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113824115503,
+        "game": 113824344623,
+        "host": 113824344624,
+        "full-chain-compile": 113824344549,
+        "package": 113826142953
+      }
+    },
+    "hud_inspector": {
+      "run": 37931813626,
+      "conclusion": "success",
+      "jobs": {
+        "original_exe": 113824115275,
+        "win32_hud_build": 113824115620
+      }
+    },
+    "domain": {
+      "run": 37931813756,
+      "conclusion": "success",
+      "job": 113824115611
+    },
+    "full_source_impact": {
+      "run": 37931813766,
+      "conclusion": "success"
+    },
+    "artifact": {
+      "id": 11617186671,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-94b4984aab299bec0e0876dfc15b95599ca4d5b3",
+      "digest": "sha256:daf30705449017b19f0040bd75ca8acfdca4d14499adfe8550db4ca17cf69975"
+    },
+    "extracted_test_package_sha256": "47f32e204bcafd0f7c5d7103e866f0d6ff76113d30faa956f3f44dac1f56ed66"
+  },
+  "open_runtime": [
+    "Pre-restart GOAL white timer/course label two-eye alignment",
+    "Checkpoint transient +TIME",
+    "Lens flare centre and start shadow",
+    "Menu arrows/YES-NO if regression",
+    "Quest3 4th/5th and 6th/6 known-good confirmation"
+  ],
+  "next_action": "User downloads HUD-night ZIP, selects B_HUD then optionally C_FLARE, reports exact visual errors and uploads OutRun2_VR_ANALYZE_*.zip for source-route-specific optical repair. Do not score CI reruns, C6 or unchanged reports twice."
+}
