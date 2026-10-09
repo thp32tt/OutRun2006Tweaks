@@ -90,6 +90,14 @@ public:
         return has_error_.load(std::memory_order_acquire);
     }
 
+    // Status transitions share one publication path for synchronous and
+    // asynchronous hook installers; no extra allocation or worker required.
+    void publish_status(bool active) noexcept
+    {
+        has_error_.store(!active, std::memory_order_release);
+        is_active_.store(active, std::memory_order_release);
+    }
+
 private:
     std::atomic<bool> is_active_{false};
     std::atomic<bool> has_error_{false};
