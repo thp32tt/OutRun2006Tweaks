@@ -61,6 +61,14 @@ int main() {
     require(SUCCEEDED(dev->CreateRenderTargetView(color.Get(),nullptr,rtv.GetAddressOf())), "RTV");
     ID3D11RenderTargetView* raw=rtv.Get();
     ctx->OMSetRenderTargets(1,&raw,nullptr);
+    // Deliberately allocate a second fully valid same-size/format target.
+    // The old geometry-only guard accepted this stale/wrong-eye binding.
+    ComPtr<ID3D11Texture2D> wrongColor;
+    ComPtr<ID3D11RenderTargetView> wrongRtv;
+    require(SUCCEEDED(dev->CreateTexture2D(&td,nullptr,wrongColor.GetAddressOf())),
+        "wrong-eye color");
+    require(SUCCEEDED(dev->CreateRenderTargetView(wrongColor.Get(),nullptr,
+        wrongRtv.GetAddressOf())), "wrong-eye RTV");
     td.Usage=D3D11_USAGE_STAGING; td.BindFlags=0; td.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
     ComPtr<ID3D11Texture2D> staging;
     require(SUCCEEDED(dev->CreateTexture2D(&td,nullptr,staging.GetAddressOf())), "staging");
@@ -77,9 +85,17 @@ int main() {
     const auto ready=[&](UINT w=40,UINT h=40,
                          DXGI_FORMAT f=DXGI_FORMAT_R8G8B8A8_UNORM) {
         return verified_indexed_full_target_draw_ready(
-            vb,ib,ctx.Get(),0,3,0,gen,vv,iv,w,h,f);
+            vb,ib,ctx.Get(),0,3,0,gen,vv,iv,w,h,f,rtv.Get());
     };
     require(ready(), "baseline native indexed viewport ready");
+    require(!verified_indexed_full_target_draw_ready(
+        vb,ib,ctx.Get(),0,3,0,gen,vv,iv,40,40,
+        DXGI_FORMAT_R8G8B8A8_UNORM,nullptr), "reject null expected RTV");
+    ID3D11RenderTargetView* wrongRaw=wrongRtv.Get();
+    ctx->OMSetRenderTargets(1,&wrongRaw,nullptr);
+    require(!ready(), "reject same-sized different RTV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(), "restore original owned RTV");
     require(!ready(41,40), "reject wrong target width");
     require(!ready(40,40,DXGI_FORMAT_R8G8B8A8_UNORM_SRGB), "reject wrong view format");
     ctx->RSSetViewports(0,nullptr);

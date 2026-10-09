@@ -9,8 +9,9 @@ namespace outrun::vr::dx11 {
     ID3D11DeviceContext* context, UINT startIndex, UINT indexCount,
     INT baseVertex, std::uint64_t generation, std::uint64_t vbVersion,
     std::uint64_t ibVersion, UINT width, UINT height,
-    DXGI_FORMAT format) noexcept {
-    if (!width || !height || format == DXGI_FORMAT_UNKNOWN ||
+    DXGI_FORMAT format, ID3D11RenderTargetView* expectedTarget) noexcept {
+    if (!width || !height || !expectedTarget ||
+        format == DXGI_FORMAT_UNKNOWN ||
         !verified_indexed_linear_draw_ready(
             vb, ib, context, startIndex, indexCount, baseVertex,
             generation, vbVersion, ibVersion))
@@ -18,7 +19,8 @@ namespace outrun::vr::dx11 {
 
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> target;
     context->OMGetRenderTargets(1, target.GetAddressOf(), nullptr);
-    if (!target) return false;
+    // Equal-sized eye targets are not interchangeable: require the owned RTV.
+    if (!target || target.Get() != expectedTarget) return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     target->GetDesc(&view);
     if (view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D ||
