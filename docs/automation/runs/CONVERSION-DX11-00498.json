@@ -30,8 +30,8 @@
   "pipeline": {
     "C0_RECOVER": "PASS owner/checkpoint absent, exact HEAD 2caf8ceee3154d8e8e7dca9f1d75b9b7b0d41a1d; previous R196 00497 terminal; 00477 R175 separately BLOCKED",
     "C1_REVIEW": "PASS independent non-indexed Draw R185 lacks R196 GS/HS/DS guard; no DXVK or DX9Ex files edited",
-    "C2_IMPLEMENT": "PASS native linear stage fail-closed + real GS-interference and recovery Draw WARP probe + 4 negative mutations + CI wiring",
-    "C3_VALIDATE": "Scoped source contract pre-commit PASS; await exact-SHA Windows Gate",
+    "C2_IMPLEMENT": "PASS native linear stage fail-closed + real GS-interference and recovery Draw WARP probe + 4 negative mutations + CI wiring; corrected R197 real GS HLSL syntax after first WARP compile negative evidence",
+    "C3_VALIDATE": "First material SHA 0ea53159a5a5414a9dd6f9ce6d8fe4d4eaa306d5 Backend Gate 37988436289 validate SUCCESS, R197 static PASS, R183 actual WARP FAIL at R197 compile interfering GS due to HLSL missing struct semicolon. Repair adds semicolon and static HLSL declaration source contract; new exact SHA Gate PENDING.",
     "C4_COMMIT": "Material commit [AUTO:CONVERSION-DX11-00498] no CI skip; immutable material SHA taken from commit message/API",
     "C5_PACKAGE": "NOT_REQUIRED: native game draw dormant",
     "C6_STATE": "PENDING exact-SHA Gate"
@@ -47,9 +47,19 @@
     "predecessor": "CONVERSION-DX11-00497",
     "known_unrelated_failure": "CONVERSION-DX11-00477 R175_GENERIC_VARYING_MISMATCH",
     "scoped_static_negative_mutants": 4,
-    "exact_sha_gate": null
+    "exact_sha_gate": null,
+    "first_material_sha": "0ea53159a5a5414a9dd6f9ce6d8fe4d4eaa306d5",
+    "first_gate_id": 37988436289,
+    "first_validate_job_id": 114016186996,
+    "first_validate_result": "success",
+    "first_smoke_job_id": 114018264603,
+    "first_smoke_result": "failure",
+    "first_smoke_error": "R183 WARP failure: R197 compile interfering GS",
+    "first_qualified_r197_static": "PASS",
+    "repair_root_cause": "HLSL Geometry Shader struct V missing final semicolon (must be };)",
+    "repair_attempt": 1
   },
-  "next_action": "Await exact-SHA Backend Conversion Gate; inspect R197 WARP result, preserve inherited R175 failure if any",
+  "next_action": "Exact-SHA Gate on repaired material commit; inspect hosted R197 WARP pixel evidence and R175 independent full Gate",
   "resume_cursor": "C3_EXACT_SHA_CI_PENDING",
   "score_change": 0
 }

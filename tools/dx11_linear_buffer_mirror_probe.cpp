@@ -206,7 +206,7 @@ int main() {
     // R197: a retained Geometry Shader moves the actual non-indexed
     // triangle outside clip space while IA/VS/PS/RTV stay unchanged.
     constexpr char interferingGeometry[] =
-        "struct V {float4 p:SV_Position;}"
+        "struct V {float4 p:SV_Position;};"
         "[maxvertexcount(3)]"
         "void gs(triangle V tri[3],inout TriangleStream<V> stream){"
         "for(uint i=0;i<3;++i){V v=tri[i];v.p.xy=float2(2,2);stream.Append(v);}}";

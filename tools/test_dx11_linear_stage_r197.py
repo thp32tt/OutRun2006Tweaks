@@ -29,6 +29,7 @@ markers = (
     '"linear Draw GPU pixel readback"',
 )
 assert all(x in probe for x in markers), "R197 negative/positive GPU proof missing"
+assert '"struct V {float4 p:SV_Position;};"' in probe, "R197 GS HLSL struct must end with semicolon"
 assert probe.index('"R197 reject unexpected non-indexed GS"') < probe.index(
     '"R197 GS changes actual WARP Draw pixels"') < probe.index(
     '"R197 restore pure VS/PS native Draw"') < probe.index(
