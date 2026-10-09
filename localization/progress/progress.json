@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 08:57 KST",
+  "updated_at_kst": "2026-10-09 09:20 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8839,5 +8839,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
     "backend": "GitHub + N100 tiny image access"
+  },
+  "b304_q228_chrome_representative_visual_reject": {
+    "time_kst": "2026-10-09 09:20 KST",
+    "run_key": "OUTRUN-KOR-B304-Q228-IGR038-SOURCE-CHROME-REPRESENTATIVE-20261009-0910",
+    "role": "B",
+    "queue_index": 228,
+    "report": "IGR-038",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "existing_dds_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+    "trial_dds_sha256": "b2bfdc45190dcd43481339c67f1a845780ed10b3b97ee0be0d627a742de50033",
+    "trial_only_dds": 1,
+    "promoted_dds": 0,
+    "all_13_producer_pass": false,
+    "machine": "PASS_EXACT_HEADER_RAW_DECODE_ZERO_OUTSIDE",
+    "producer_visual": "FAIL_SOURCE_CHROME_DEPTH_HIGHLIGHT_FAMILY",
+    "C2": "BLOCKED",
+    "C3": "BLOCKED",
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
+    "github_actions_run": 37863968417
   }
 }
