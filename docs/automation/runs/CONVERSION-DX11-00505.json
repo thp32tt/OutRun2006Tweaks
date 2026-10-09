@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00505",
+  "production_id": "CONVERSION-DX11-00505",
+  "event_id": "CONVERSION-DX11-00505-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "2309d91241a890bc37a67f57d578c94c7cf2e910",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00505",
+  "lease_epoch": 1,
+  "work_key": "DX11:R205:INDEXED_COLOR_ONLY_DSV_FAIL_CLOSED_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R205",
+    "tools/dx11_viewport_draw_probe_r187.cpp:R205",
+    "tools/test_dx11_viewport_draw_r187.py:R205"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R205 D3D11 OM DSV check on isolated color-only indexed target path, deny foreign DSV even with correct sole RTV, verify separate actual WARP DSV negative then restore original GPU DrawIndexed green/black pixels. R189 depth-enabled owner separate.",
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "tools/test_dx11_viewport_draw_r187.py",
+    "docs/automation/runs/CONVERSION-DX11-00505.json"
+  ],
+  "native_draw_path_activation_changed": false,
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 2309d91241a890bc37a67f57d578c94c7cf2e910; 00505 absent, 00504 blocked upstream R175, R175 independently owned by 00477.",
+    "C1_REVIEW": "PASS indexed viewport sole-RTV preflight does not check retained foreign OM depth-stencil binding.",
+    "C2_IMPLEMENT": "PASS R205 C++ fail-closed DSV check, WARP DSV-negative/restore coverage; targeted 9 negative static mutation checks.",
+    "C3_VALIDATE": "PENDING GitHub exact-SHA Backend Conversion Gate; static targeted check passed locally before commit.",
+    "C4_COMMIT": "PENDING return material commit SHA; marker [AUTO:CONVERSION-DX11-00505], no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED dormant native game Draw; Quest3/VDXR promotion NEED_HMD_TEST.",
+    "C6_STATE": "PENDING after canonical exact-SHA Gate complete."
+  },
+  "evidence": {
+    "source_static": "PASS precommit nine source mutation negatives",
+    "gpu_negative": "foreign DSV must be rejected",
+    "gpu_positive": "DSV detach restores green center/black corner WARP indexed GPU pixels",
+    "prior_gate": "00504 38002195192 failure R175_GENERIC_VARYING_MISMATCH",
+    "upstream_owner": "CONVERSION-DX11-00477",
+    "exact_sha_gate_run_id": null
+  },
+  "resume_cursor": "POLL_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "next_action": "Collect exact-SHA validate and smoke; separate scoped R205 pass from inherited R175 fail; seal C6 in bookkeeping-only separate commit.",
+  "state_persisted": true,
+  "updated_at_kst": "2026-10-10"
+}

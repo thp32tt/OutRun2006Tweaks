@@ -103,6 +103,23 @@ int main() {
     require(!ready(), "reject stale second-eye indexed RTV");
     ctx->OMSetRenderTargets(1,&raw,nullptr);
     require(ready(), "restore sole indexed RTV after MRT");
+    // R205: foreign depth can silently clip the indexed color-only eye draw.
+    D3D11_TEXTURE2D_DESC depthDesc{};
+    depthDesc.Width=40; depthDesc.Height=40;
+    depthDesc.MipLevels=1; depthDesc.ArraySize=1;
+    depthDesc.Format=DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthDesc.SampleDesc.Count=1; depthDesc.Usage=D3D11_USAGE_DEFAULT;
+    depthDesc.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> foreignDepth;
+    ComPtr<ID3D11DepthStencilView> foreignDsv;
+    require(SUCCEEDED(dev->CreateTexture2D(&depthDesc,nullptr,
+        foreignDepth.GetAddressOf())), "create foreign indexed depth");
+    require(SUCCEEDED(dev->CreateDepthStencilView(foreignDepth.Get(),nullptr,
+        foreignDsv.GetAddressOf())), "create foreign indexed DSV");
+    ctx->OMSetRenderTargets(1,&raw,foreignDsv.Get());
+    require(!ready(), "reject unowned indexed DSV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(), "restore no-depth indexed owner after DSV");
     require(!ready(41,40), "reject wrong target width");
     require(!ready(40,40,DXGI_FORMAT_R8G8B8A8_UNORM_SRGB), "reject wrong view format");
     ctx->RSSetViewports(0,nullptr);
