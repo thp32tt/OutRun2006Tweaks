@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 07:00 KST",
+  "updated_at_kst": "2026-10-10 07:07 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -268,7 +268,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A217 q219 P1 newly produced actual persisted 16,777,344-byte trial SHA 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d after 2 same-task 14px extrusion boundary holds. Corrected 9px source-conditioned metal face, outside original source bbox RGBA/alpha0, 7/940/2/1 positive margins and exact RAW/FLIPY persisted roundtrip. Direct producer gray100 black50 white75 source/CLEAN/prior/trial visual REJECT: fragmented bands and insufficient welded rounded source-family style despite readable Hangul. Current official q219 candidate 8310a1e6 unchanged, 0 promoted DDS, 1 new rejected trial. C280 REWORK/C3/user IGR025 OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500. A216 q175 hand vector trial recorded (persisted exact source outside=0), visually FAIL and NOT promoted; manual source-conditioned legible Korean glyph reconstruction required. q121 P0 semantic source-masks/C1 and q49 runtime mapping also remain open. A215 q121 P0 source attribution: source/CLEAN/current exact 30 regions published 2026-10-10, 149 other ranked source-component classifications beyond inspected, semantic text/protected mask calibration pending; C335 HOLD and IGR030/031/040 OPEN, new DDS0, real-game UNTESTED. C334 q060 original source identity independently verified; whole atlas/typography/C3 and IGR044 game pending. C333 q060 B332R exact same-source orange restore 8892/8892 verified with 0 mismatches, current C overall HOLD full atlas/calibration/C3/user real game; q060 C332 confirmed protected orange sibling lost in source CLEAN/current; new B repair required. C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
+  "next_checkpoint": "A218 A ODD q161 C344 fixed 11 물병자리/16 대한민국/24 이탈리아 actual persisted DXT5 trial SHA 8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e GitHub CPU 37997128618, 4194432 bytes. Other35 compressed blocks unchanged; exact native SRC/CLEAN/FINAL and BGW100/50 direct producer scoped visual PASS prior dotted glyph-face fixed; glyph alpha/color holes0, outside original region0; current official SHA8ded8565 unchanged. C344 official REWORK retained; C1 new SHA, C3, pixel guard manifest, actual user game UNTESTED. OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700 A217 q219 P1 newly produced actual persisted 16,777,344-byte trial SHA 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d after 2 same-task 14px extrusion boundary holds. Corrected 9px source-conditioned metal face, outside original source bbox RGBA/alpha0, 7/940/2/1 positive margins and exact RAW/FLIPY persisted roundtrip. Direct producer gray100 black50 white75 source/CLEAN/prior/trial visual REJECT: fragmented bands and insufficient welded rounded source-family style despite readable Hangul. Current official q219 candidate 8310a1e6 unchanged, 0 promoted DDS, 1 new rejected trial. C280 REWORK/C3/user IGR025 OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500. A216 q175 hand vector trial recorded (persisted exact source outside=0), visually FAIL and NOT promoted; manual source-conditioned legible Korean glyph reconstruction required. q121 P0 semantic source-masks/C1 and q49 runtime mapping also remain open. A215 q121 P0 source attribution: source/CLEAN/current exact 30 regions published 2026-10-10, 149 other ranked source-component classifications beyond inspected, semantic text/protected mask calibration pending; C335 HOLD and IGR030/031/040 OPEN, new DDS0, real-game UNTESTED. C334 q060 original source identity independently verified; whole atlas/typography/C3 and IGR044 game pending. C333 q060 B332R exact same-source orange restore 8892/8892 verified with 0 mismatches, current C overall HOLD full atlas/calibration/C3/user real game; q060 C332 confirmed protected orange sibling lost in source CLEAN/current; new B repair required. C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -10029,5 +10029,41 @@
     "c3": "BLOCKED",
     "approval": "BLOCKED",
     "runtime_validation": "UNTESTED"
+  },
+  "a218_q161_c344_three_glpyhs": {
+    "run": "A218",
+    "run_key": "OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
+    "role": "A",
+    "queue_index": 161,
+    "worker_run_id": 37997128618,
+    "source_SHA256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "current_official_SHA256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "new_trial_SHA256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+    "trial_bytes": 4194432,
+    "modified_existing_official_DDS": false,
+    "targets": [
+      11,
+      16,
+      24
+    ],
+    "other_35_blocks_preserved": true,
+    "changed_outside_original_regions_rgba": 0,
+    "alpha_extra_or_missing": 0,
+    "core_pinhole_pixels": 0,
+    "core_color_mismatch_pixels": 0,
+    "native_FLIPY_RAW": true,
+    "controller": "PRODUCER_SCOPED_VISUAL_PASS_NEW_TRIAL_ONLY",
+    "independent_C1": "C344_OLD_SHA_REWORK_CURRENT; FRESH_C1_NEW_SHA_REQUIRED",
+    "C3": "BLOCKED",
+    "user_ingame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "remainder": [
+      "font_sha_and_recipe_pin",
+      "full_current_policy_pixel_guard_final_manifest",
+      "independent_C1_new_SHA_full_38",
+      "C3",
+      "actual_game"
+    ],
+    "evidence": "localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_CONTROLLER_PRODUCER_QA.json"
   }
 }
