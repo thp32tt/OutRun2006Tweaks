@@ -268,8 +268,8 @@ VSOutput main(float3 position : POSITION0)
         specularVertexPrototype.source.find(
             "float4 specular : COLOR1;") != std::string::npos &&
         specularVertexPrototype.source.find(
-            "output.specular = input.specular;") != std::string::npos,
-        "R198 SPECULAR FVF COLOR1 passthrough drift");
+            "output.specular = input.specular.bgra;") != std::string::npos,
+        "R198 SPECULAR FVF COLOR1 packed BGRA swizzle drift");
 
     const auto defaultSpecularVertexPrototype =
         generate_fixed_function_vertex_shader_prototype(
