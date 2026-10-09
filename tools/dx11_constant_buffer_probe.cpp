@@ -11268,8 +11268,10 @@ VSOutput main(VSInput input)
                              const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
             return outrun::vr::dx11::
                 prepare_fixed_function_indexed_direct_draw_probe(
-                    context, target, renderTargetBoundDraw,
-                    multiStageDrawReady, indexedGeometryReady, packet,
+                    context, target, pipelineBundle.input_layout(),
+                    pipelineBundle.vertex_shader(), pipelineBundle.pixel_shader(),
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, packet,
                     indexedDirectLineage, indexedSourceRange,
                     indexedSourceValues, indexedSourceValueLineage,
                     indexedSourceBinding, managedVertexBuffer,
@@ -11311,6 +11313,31 @@ VSOutput main(VSInput input)
             r157Probe(d3d.context, outputColorSurface.render_target_view(),
                       indexedDirectDispatch),
             "R157 revalidates exact WARP indexed IA/OM/VS/PS and shadow");
+        // R161: a valid R157 snapshot cannot survive late IA/VS/PS rebinds.
+        d3d.context->IASetInputLayout(nullptr);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                        indexedDirectDispatch),
+            "R161 rejects live indexed IA input-layout detach");
+        d3d.context->IASetInputLayout(pipelineBundle.input_layout());
+        require(vertexShader != pipelineBundle.vertex_shader(),
+                "R161 distinct foreign vertex shader fixture");
+        d3d.context->VSSetShader(vertexShader, nullptr, 0);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                        indexedDirectDispatch),
+            "R161 rejects substituted indexed VS");
+        d3d.context->VSSetShader(pipelineBundle.vertex_shader(), nullptr, 0);
+        d3d.context->PSSetShader(nullptr, nullptr, 0);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                        indexedDirectDispatch),
+            "R161 rejects detached indexed PS");
+        d3d.context->PSSetShader(pipelineBundle.pixel_shader(), nullptr, 0);
+        require(
+            r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                      indexedDirectDispatch),
+            "R161 exact IA/VS/PS restore permits indexed DrawIndexed probe");
         ID3D11Query* r157Stats = nullptr;
         D3D11_QUERY_DESC r157StatsDesc{};
         r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;

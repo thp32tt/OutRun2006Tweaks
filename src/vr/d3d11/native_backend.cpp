@@ -14523,6 +14523,9 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
 bool prepare_fixed_function_indexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
+    ID3D11InputLayout* expectedProbeLayout,
+    ID3D11VertexShader* expectedProbeVS,
+    ID3D11PixelShader* expectedProbePS,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionGeometryReadiness& geometry,
@@ -14538,7 +14541,8 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     UINT startIndexLocation, INT baseVertexLocation) noexcept {
     UINT elements = 0;
     const auto topology = translate_primitive(primitive);
-    if (!context || !expectedProbeTarget ||
+    if (!context || !expectedProbeTarget || !expectedProbeLayout ||
+        !expectedProbeVS || !expectedProbePS ||
         context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
         !direct_draw_element_count(primitive, primitiveCount, elements) ||
         elements == 0u || !topology.exact ||
@@ -14612,6 +14616,9 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     D3D11_PRIMITIVE_TOPOLOGY liveTopology =
         D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     context->IAGetPrimitiveTopology(&liveTopology);
+    // R161: copied packets cannot authorize post-snapshot IA/shader drift.
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> liveLayout;
+    context->IAGetInputLayout(liveLayout.ReleaseAndGetAddressOf());
     Microsoft::WRL::ComPtr<ID3D11VertexShader> liveVS;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
     context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
@@ -14620,7 +14627,10 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
         liveVertex.Get() == vertexBuffer.mirror_buffer() &&
         stride == boundDraw.vertexStride &&
         offset == boundDraw.vertexOffset &&
-        liveTopology == dispatch.topology && liveVS && livePS;
+        liveTopology == dispatch.topology &&
+        liveLayout.Get() == expectedProbeLayout &&
+        liveVS.Get() == expectedProbeVS &&
+        livePS.Get() == expectedProbePS;
 }
 
 NativeFixedFunctionFanDrawDispatchReadiness
