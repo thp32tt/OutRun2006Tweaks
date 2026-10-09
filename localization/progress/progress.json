@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 16:52 KST",
+  "updated_at_kst": "2026-10-09 17:22 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9102,5 +9102,35 @@
     "igame": "UNTESTED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CONTROLLER_PLATE_QA.json"
+  },
+  "b326_q214_native_source_material_visual_fail": {
+    "run_key": "OUTRUN-KOR-B326-Q214-SOURCE-BLOCK-TRIAL-FAIL-20261009",
+    "role": "B",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "status": "MATERIAL_SOURCE_BLOCK_TRIALS_FAILED_CONTROLLER_VISUAL_REWORK",
+    "unmodified_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "b325_trial_sha256": "eb5017ba4bc4919f7a34b26345e6f766c0d5f8f1b26b9aab5a80c83bb16c8b22",
+    "b326_trial_sha256": "e714053ccb51b7722b8c4b1c1de6c244810e3a13c30bc8e7dfa10cb3578a44eb",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+    "source_outside_original_box_rgba": 0,
+    "source_outside_original_box_alpha": 0,
+    "new_lossless_contacts": 72,
+    "persisted_trial_DDS": 2,
+    "promoted_DDS": 0,
+    "production_visual": "FAIL_GOAL_HORIZONTAL_SLAB_AND_SOURCE_BEVEL_MISMATCH",
+    "C2": "BLOCKED_REWORK",
+    "C3": "BLOCKED_REWORK",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "trial_workflows": [
+      37903716224,
+      37904119145
+    ],
+    "qa": [
+      "localization/graphics/role_B/20261009-B325-Q214-SOURCE-BLOCK-METALLIC-TRANSFER/B325_CONTROLLER_VISUAL_REJECT.json",
+      "localization/graphics/role_B/20261009-B326-Q214-SOURCE-BLOCK-METALLIC-TRANSFER/B326_CONTROLLER_VISUAL_REJECT.json"
+    ],
+    "remaining": "MANUAL_VECTOR_NATIVE_SOURCE_PROFILE_SCAFFOLD_BC3_SAFE_FACE_NOT_SDF_PALETTE_RETRY"
   }
 }
