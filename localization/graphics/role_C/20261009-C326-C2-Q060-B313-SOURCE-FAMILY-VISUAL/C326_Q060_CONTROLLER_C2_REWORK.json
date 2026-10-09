@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "review_id": "C326",
+  "run_key": "OUTRUN-KOR-C326-C2-Q060-B313-SOURCE-FAMILY-20261009-1750",
+  "role": "C2",
+  "batch_lane": "TEMP_BACKLOG_RELIEF=C2",
+  "shard": "EVEN",
+  "queue_index": 60,
+  "priority": "P0",
+  "user_report": "IGR-044",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "base_branch": "korean-localization-recovery-20260928",
+  "review_time_kst": "2026-10-09 17:56 KST",
+  "execution_backend": "ChatGPT visual inspection of GitHub-persisted lossless contacts transferred through N100 MCP; GitHub for publication; N100 no heavy decode/render",
+  "producer_run": "B313",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+  "candidate_git_blob_sha": "a1ffca95dd1ff5efe38c0ef050e69b947842e792",
+  "candidate_bytes": "PROMOTED_B313_CURRENT",
+  "previous_candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "outcome": "REWORK_REQUIRED",
+  "reason_codes": [
+    "SOURCE_FAMILY_MISMATCH",
+    "ITALIC_UNDERLEAN",
+    "SOURCE_RELATIVE_STROKE_SILHOUETTE_MISMATCH"
+  ],
+  "first_look_before_producer_notes": "FAIL: in four-column exact-source/clean/prior/current comparison, promoted B313 GOLD label is markedly less slanted and its glyph morphology more wide/rounded/block-like than English narrow racing italic. The immediately previous gold variant is visibly more slanted; numerical bounds do not validate the source style.",
+  "independent_visual_observations": [
+    {
+      "view": "FLIPY_BLACK_100",
+      "decision": "FAIL",
+      "observation": "Canonical English OUTRUN MILES: source is strong right-leaned/condensed cream-white face with navy depth; B313 last column is more upright, heavier block-like Hangul and has different stroke family even with source-matched gold palette."
+    },
+    {
+      "view": "FLIPY_BLACK_50",
+      "decision": "FAIL",
+      "observation": "Mismatch in slant and condensed hierarchy persists at 50-percent display size; legibility alone insufficient."
+    },
+    {
+      "view": "RAW_BLACK_100",
+      "decision": "FAIL",
+      "observation": "Mirrored orientation agrees with atlas Y transform, but corresponding readable-direction italic/profile mismatch remains."
+    }
+  ],
+  "reviewed_regions": [
+    {
+      "region": "gold_outrun_miles",
+      "source_bbox": [
+        2081,
+        250,
+        2860,
+        370
+      ],
+      "producer_candidate_bbox": [
+        2132,
+        257,
+        2808,
+        362
+      ],
+      "producer_reported_margins": [
+        51,
+        52,
+        7,
+        8
+      ],
+      "eight_checks": {
+        "clean_plate": "HOLD_scoped_transparent_contact_only_no_full_clean_gate",
+        "source_slant": "FAIL_inadequate_readable_right_lean",
+        "source_relative_size": "HOLD_numerical_ceiling_reported_but_style_underfill",
+        "effect_weight": "FAIL_source_family_depth_and_stroke_morphology",
+        "glyph_integrity": "NO_OBVIOUS_CLIP_IN_DISPLAYED_CONTACTS_NOT_FULL_PIXEL_QA",
+        "protected_art": "HOLD_unreviewed_full_atlas",
+        "raw_flipy": "VIEWED_both_not_approval",
+        "immediate_readability": "READABLE_but_source_fidelity_fail"
+      }
+    }
+  ],
+  "other_atlas_regions": "NOT_ADJUDICATED: B310 Stage and B296 white Miles remain unchanged per producer; no C whole-atlas PASS claimed",
+  "machine_qa": "Producer B313 reported persisted DDS roundtrip/header/bbox/0 outside PASS; not repeated independent machine checks. Numeric cannot override visual FAIL.",
+  "clean_final_composite": "HOLD whole candidate SOURCE/CLEAN/FINAL mask/alpha recheck not independently completed",
+  "blind_calibration": "NOT_COMPLETED: blocking positive PASS, not blocking directly evidenced rejection",
+  "evidence_files": [
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_FLIPY_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_FLIPY_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_RAW_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_CONTROLLER_SELF_QA_FINAL.json"
+  ],
+  "evidence_order": "SOURCE / CLEAN / B310 PREVIOUS / B313 NEW (trial promoted as SHA be8aff...); before publication trial_sha256 in B313_MACHINE_AND_METHOD equals promoted candidate_sha256 in B313_CONTROLLER_SELF_QA_FINAL",
+  "triage_before_review": "NORMAL_QUEUE_SELECTION (rework_triage.py --index 60 on refreshed queue, read-only, no prior visual inference)",
+  "recommended_correction": "B must establish source-family top/bottom readable anchors, narrow italic geometry and true cream/gold/navy extrusion, reconstruct native glyph contours rather than retrying unchanged near-upright NotoSans shear or width-only stretch; complete source/clean/final/protected/RAW/native/75/50 evidence for ALL q60 relevant labels before re-requesting C2.",
+  "C3": "BLOCKED",
+  "qa_evidence_gate": "NOT_APPROVED",
+  "pre_ingame_export": "EXCLUDED_DUE_TO_OPEN_USER_INGAME_FAIL",
+  "user_ingame_status": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "new_png": 0,
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

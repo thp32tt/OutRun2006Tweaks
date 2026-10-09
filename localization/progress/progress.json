@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 17:44 KST",
+  "updated_at_kst": "2026-10-09 17:56 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
+  "next_checkpoint": "C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -9147,5 +9147,17 @@
     "user_IGR030_031_040": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "c326_c2_q060_b313_source_family_rework": {
+    "run_key": "OUTRUN-KOR-C326-C2-Q060-B313-SOURCE-FAMILY-20261009-1750",
+    "queue_index": 60,
+    "priority": "P0",
+    "outcome": "REWORK_REQUIRED",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "candidate_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+    "evidence": "localization/graphics/role_C/20261009-C326-C2-Q060-B313-SOURCE-FAMILY-VISUAL/C326_Q060_CONTROLLER_C2_REWORK.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "user_report_open": true
   }
 }
