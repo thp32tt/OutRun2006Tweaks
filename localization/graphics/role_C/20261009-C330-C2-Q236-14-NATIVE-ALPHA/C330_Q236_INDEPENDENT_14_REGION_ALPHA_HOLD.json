@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "review_id": "C330",
+  "run_key": "OUTRUN-KOR-C330-C2-Q236-PERSISTED-14-ALPHA-20261009-1950",
+  "at_kst": "2026-10-09 19:56 KST",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "queue_index": 236,
+  "source_sha256_producer_reported": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256_producer_reported": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "candidate_sha256_independently_verified": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "direct_binary_verification": {
+    "source": "GitHub exact branch raw saved candidate checked by expected SHA256, N100 MCP light hash+inspect",
+    "sha256_verified": true,
+    "width": 2048,
+    "height": 2048,
+    "pixel_format": "RGB32/BGRA_masks",
+    "rgb_mask": 16711680,
+    "green_mask": 65280,
+    "blue_mask": 255,
+    "alpha_mask": 4278190080,
+    "mips": 1,
+    "file_size": 16777344,
+    "orientation": "RAW_MIRROR_Y"
+  },
+  "independent_alpha_check": {
+    "method": "Read exact persisted DDS BGRA 8-bit alpha per pixel, scan 14 producer SOURCE bounding boxes using readable y=height-1-RAW_y. Compute nonzero alpha bbox and compare against 14 B302 logged new bboxes; actual candidate bytes, not reusing machine output.",
+    "rows": [
+      {
+        "row": 0,
+        "name": "INDUSTRIAL COMPLEX",
+        "pixels": 29010,
+        "observed": [
+          389,
+          1941,
+          1157,
+          2020
+        ],
+        "expected": [
+          389,
+          1941,
+          1157,
+          2020
+        ],
+        "matches": true,
+        "margins": [
+          335,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 1,
+        "name": "WATERFALLS",
+        "pixels": 14059,
+        "observed": [
+          709,
+          1808,
+          1034,
+          1895
+        ],
+        "expected": [
+          709,
+          1808,
+          1034,
+          1895
+        ],
+        "matches": true,
+        "margins": [
+          388,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 2,
+        "name": "TULIP GARDEN",
+        "pixels": 14983,
+        "observed": [
+          710,
+          1698,
+          1052,
+          1784
+        ],
+        "expected": [
+          710,
+          1698,
+          1052,
+          1784
+        ],
+        "matches": true,
+        "margins": [
+          447,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 3,
+        "name": "SUNNY BEACH",
+        "pixels": 12256,
+        "observed": [
+          717,
+          1584,
+          1059,
+          1671
+        ],
+        "expected": [
+          717,
+          1584,
+          1059,
+          1671
+        ],
+        "matches": true,
+        "margins": [
+          434,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 4,
+        "name": "SNOW MOUNTAIN",
+        "pixels": 15592,
+        "observed": [
+          605,
+          1468,
+          1030,
+          1555
+        ],
+        "expected": [
+          605,
+          1468,
+          1030,
+          1555
+        ],
+        "matches": true,
+        "margins": [
+          499,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 5,
+        "name": "SKYSCRAPERS",
+        "pixels": 27393,
+        "observed": [
+          313,
+          1360,
+          1052,
+          1447
+        ],
+        "expected": [
+          313,
+          1360,
+          1052,
+          1447
+        ],
+        "matches": true,
+        "margins": [
+          58,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 6,
+        "name": "PALM BEACH",
+        "pixels": 10820,
+        "observed": [
+          797,
+          1245,
+          1053,
+          1331
+        ],
+        "expected": [
+          797,
+          1245,
+          1053,
+          1331
+        ],
+        "matches": true,
+        "margins": [
+          446,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 7,
+        "name": "NATIONAL PARK",
+        "pixels": 16948,
+        "observed": [
+          635,
+          1138,
+          1052,
+          1223
+        ],
+        "expected": [
+          635,
+          1138,
+          1052,
+          1223
+        ],
+        "matches": true,
+        "margins": [
+          444,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 8,
+        "name": "MILKY WAY",
+        "pixels": 13102,
+        "observed": [
+          733,
+          1027,
+          1047,
+          1108
+        ],
+        "expected": [
+          733,
+          1027,
+          1047,
+          1108
+        ],
+        "matches": true,
+        "margins": [
+          310,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 9,
+        "name": "METROPOLIS",
+        "pixels": 21518,
+        "observed": [
+          564,
+          912,
+          1053,
+          999
+        ],
+        "expected": [
+          564,
+          912,
+          1053,
+          999
+        ],
+        "matches": true,
+        "margins": [
+          217,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 10,
+        "name": "LOST CITY",
+        "pixels": 15571,
+        "observed": [
+          618,
+          799,
+          1046,
+          886
+        ],
+        "expected": [
+          618,
+          799,
+          1046,
+          886
+        ],
+        "matches": true,
+        "margins": [
+          102,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 11,
+        "name": "LEGEND",
+        "pixels": 10178,
+        "observed": [
+          813,
+          685,
+          1051,
+          771
+        ],
+        "expected": [
+          813,
+          685,
+          1051,
+          771
+        ],
+        "matches": true,
+        "margins": [
+          181,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 12,
+        "name": "JUNGLE",
+        "pixels": 7929,
+        "observed": [
+          878,
+          577,
+          1039,
+          663
+        ],
+        "expected": [
+          878,
+          577,
+          1039,
+          663
+        ],
+        "matches": true,
+        "margins": [
+          255,
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "row": 13,
+        "name": "IMPERIAL AVENUE",
+        "pixels": 24796,
+        "observed": [
+          468,
+          471,
+          1042,
+          555
+        ],
+        "expected": [
+          468,
+          471,
+          1042,
+          555
+        ],
+        "matches": true,
+        "margins": [
+          432,
+          4,
+          4,
+          4
+        ]
+      }
+    ],
+    "total": 14,
+    "bbox_matches": 14,
+    "minimum_source_margin_px": 4,
+    "positive_bbox_margin_regions": 14,
+    "alpha_presence_regions": 14,
+    "zero_unexpected_alpha_within_14_source_bboxes": "NOT_CLAIMED: bbox containment alone cannot detect background source ghost in target regions"
+  },
+  "new_independent_visual": [
+    {
+      "row": 9,
+      "english": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "checked": [
+        "row09_READABLE_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png",
+        "row09_READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+        "row09_RAW_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png"
+      ],
+      "finding": "Native and 50%-scale Hangul weight appears closer to original dark family than prior candidate, RAW mirror-Y readable through expected inverse; no obvious torn glyph/foreign opaque box in these three saved producer contacts, but these crops cannot prove entire source removal.",
+      "decision": "SCOPED_VISUAL_NO_CONFIRMED_DEFECT"
+    },
+    {
+      "row": 13,
+      "english": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "checked": [
+        "row13_READABLE_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png",
+        "row13_READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+        "row13_RAW_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png"
+      ],
+      "finding": "Black100/gray50 and RAW100 newly reviewed: Korean text dark filled, immediately readable, source-family heavy upright style broadly consistent; no demonstrated truncation or opaque plate within cropped evidence. Crops are not independently re-decoded SOURCE or CLEAN.",
+      "decision": "SCOPED_VISUAL_NO_CONFIRMED_DEFECT"
+    }
+  ],
+  "previous_c322_gap_closed": [
+    "Persisted candidate exact SHA independently verified",
+    "Persisted native header and BGRA channel masks independently verified",
+    "All 14 current nonzero alpha bounding boxes remeasured from exact saved DDS rather than producer declarations",
+    "Read RAW100 and READABLE100 + 50 for 2 previously RAW-unreviewed regions 09 and 13"
+  ],
+  "remaining_blockers": [
+    "Independent exact SHA of canonical English SOURCE and authored CLEAN file",
+    "Independent SOURCE versus CLEAN removal and CLEAN versus FINAL full plate compositing all14 and protected art outside source ROIs",
+    "Per-region blind calibration, full 8-axis C observations and native RAW/75/50 background variants for all 14",
+    "Separate C3_STRICT_AUDIT and evidence gate, user JPG and in-game screenshot retest"
+  ],
+  "triage": "tools/localization/rework_triage.py --index 236 on latest queue => EVIDENCE_ONLY_HOLD. No material rerender.",
+  "decision": "HOLD_STRICT_RECHECK",
+  "C_PASS": false,
+  "C3": "BLOCKED",
+  "approval": false,
+  "pre_ingame": "BLOCKED",
+  "new_dds": 0,
+  "new_images": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "evidence": [
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/B302_CONTROLLER_SELF_QA_FINAL.json",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/B302_MACHINE_QA.json",
+    "localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row09_READABLE_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row09_READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row09_RAW_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row13_READABLE_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row13_READABLE_GRAY_50_SOURCE_CLEAN_PREV_TRIAL.png",
+    "localization/graphics/role_B/20261009-B302-Q236-NATIVE-BLACK-FAMILY-RECONSTRUCTION/row13_RAW_BLACK_100_SOURCE_CLEAN_PREV_TRIAL.png"
+  ]
+}
