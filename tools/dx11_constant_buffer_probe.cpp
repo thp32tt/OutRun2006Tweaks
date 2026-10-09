@@ -11369,6 +11369,21 @@ VSOutput main(VSInput input)
             r157Probe(d3d.context, outputColorSurface.render_target_view(),
                       indexedDirectDispatch),
             "R162 restores exact viewport/scissor RS/OM ownership");
+        // R163: a foreign GS can change the topology/output despite an
+        // unchanged indexed dispatch packet and exact IA/VS/PS/RS/OM owners.
+        // Keep the proof restricted to this isolated WARP executable.
+        require(isolationGeometryShader != nullptr,
+                "R163 distinct geometry shader negative fixture");
+        d3d.context->GSSetShader(isolationGeometryShader, nullptr, 0u);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       indexedDirectDispatch),
+            "R163 rejects late geometry shader injection");
+        d3d.context->GSSetShader(nullptr, nullptr, 0u);
+        require(
+            r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                      indexedDirectDispatch),
+            "R163 restores fixed-function indexed stage isolation");
         ID3D11Query* r157Stats = nullptr;
         D3D11_QUERY_DESC r157StatsDesc{};
         r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
