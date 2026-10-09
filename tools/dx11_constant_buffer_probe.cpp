@@ -379,6 +379,10 @@ float4 main() : SV_Target {
             generate_fixed_function_vertex_shader_prototype(
                 r170Fvf, r170Stride);
         std::array<FixedFunctionStageState, 8> r170Stages{};
+        // The D3D9 fixed-function stage requires valid min/mag sampler
+        // defaults even when SELECTARG1 consumes only vertex DIFFUSE.
+        // Default-constructed NONE min/mag fails translate readiness.
+        r170Stages[0] = active_stage();
         r170Stages[0].colorOp = D3DTOP_SELECTARG1;
         r170Stages[0].colorArg1 = D3DTA_DIFFUSE;
         r170Stages[0].alphaOp = D3DTOP_SELECTARG1;
@@ -389,10 +393,12 @@ float4 main() : SV_Target {
             generate_fixed_function_pixel_shader_prototype(
                 r170Stages, true, 0u, 0u, r170TextureTypes);
         require(r170Layout.exact && r170Layout.fvfPath &&
-                    r170Layout.elementCount == 1u &&
-                    r170VsPrototype.generated() &&
-                    r170PsPrototype.generated(),
-                "R170 real FVF / fixed-function VS+PS generation");
+                    r170Layout.elementCount == 1u,
+                "R170 real D3D9 XYZ FVF descriptor translation");
+        require(r170VsPrototype.generated(),
+                "R170 generated fixed-function VS source");
+        require(r170PsPrototype.generated(),
+                "R170 generated fixed-function diffuse-select PS source");
         ID3DBlob* r170VsCode =
             compile_vertex_shader(r170VsPrototype.source);
         ID3DBlob* r170PsCode = nullptr;
@@ -497,7 +503,8 @@ float4 main() : SV_Target {
             r170Onscreen.worldViewProjection.data(), 0u, 0u);
         warp.context->DrawIndexed(3u, 0u, 0);
         r170Pixel(true);
-        warp.context->VSSetConstantBuffers(0u, 0u, nullptr);
+        ID3D11Buffer* r170NullWvp = nullptr;
+        warp.context->VSSetConstantBuffers(0u, 1u, &r170NullWvp);
         r170Wvp->Release();
         r170Vb->Release();
         r170Ia->Release();
