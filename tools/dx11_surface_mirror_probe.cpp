@@ -168,6 +168,15 @@ int main()
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
         return fail("R145 live OM target binding seals exact RTV DSV identity");
 
+    // R180 positive control: an exclusive immediate RTV/DSV pair remains
+    // eligible for the existing diagnostic staging copy.
+    ID3D11Texture2D* stagedRaw = nullptr;
+    if (!color.copy_color_depth_pair_to_staging(
+            context.Get(), depth, &stagedRaw) || !stagedRaw)
+        return fail("R180 exclusive color/depth WARP staging was rejected");
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> stagedValid;
+    stagedValid.Attach(stagedRaw);
+
     // R149: a deferred context can belong to this same device but cannot
     // constitute the live immediate OM binding required for native draw.
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> deferredContext;
@@ -224,6 +233,13 @@ int main()
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
         return fail("R145 live OM target binding rejects extra RTV slot");
 
+    // R180 negative: live slot 0 and DSV still match, but a second RTV
+    // must prevent direct staging and leave the output pointer untouched.
+    stagedRaw = nullptr;
+    if (color.copy_color_depth_pair_to_staging(
+            context.Get(), depth, &stagedRaw) || stagedRaw)
+        return fail("R180 extra RTV incorrectly allowed pair staging");
+
     if (featureLevel >= D3D_FEATURE_LEVEL_11_0) {
         D3D11_BUFFER_DESC uavBufferDesc{};
         uavBufferDesc.ByteWidth = 16;
@@ -272,6 +288,13 @@ int main()
             binding.validate_binding_snapshot(
                 context.Get(), color, depth, liveTargetBinding.snapshotToken))
             return fail("R146 live OM target binding rejects unexpected UAV");
+
+        // R180 negative: an unexpected OM UAV must likewise reject direct
+        // diagnostic readback even when slot-0 RTV and DSV still match.
+        stagedRaw = nullptr;
+        if (color.copy_color_depth_pair_to_staging(
+                context.Get(), depth, &stagedRaw) || stagedRaw)
+            return fail("R180 OM UAV incorrectly allowed pair staging");
 
         if (!binding.apply(context.Get(), color, depth))
             return fail("R146 live OM target apply did not clear unexpected UAV");

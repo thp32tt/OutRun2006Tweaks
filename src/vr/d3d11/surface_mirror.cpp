@@ -280,12 +280,44 @@ namespace outrun::vr::dx11
         // R167: R166 proved only the color RTV. A late DSV detach or an
         // equivalent-descriptor DSV substitution must never pass as a valid
         // color/depth draw-pair readback. OMGetRenderTargets AddRefs both views.
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> observedColor;
+        // R180: a slot-0 RTV/DSV match is insufficient: other live color
+        // attachments or OM UAVs can change the producer's write identity.
+        // Refuse direct pair staging as well as the receipt-validated wrapper.
+        std::array<
+            ID3D11RenderTargetView*,
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT> observedRtvs{};
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> observedDepth;
         context->OMGetRenderTargets(
-            1u, observedColor.GetAddressOf(), observedDepth.GetAddressOf());
-        if (observedColor.Get() != render_target_view() ||
-            observedDepth.Get() != depth.depth_stencil_view())
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+            observedRtvs.data(), observedDepth.GetAddressOf());
+        bool exactOm = observedRtvs[0] == render_target_view() &&
+            observedDepth.Get() == depth.depth_stencil_view();
+        for (UINT slot = 1; slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++slot)
+        {
+            if (observedRtvs[slot] != nullptr)
+                exactOm = false;
+        }
+        for (auto* observedRtv : observedRtvs)
+        {
+            if (observedRtv)
+                observedRtv->Release();
+        }
+
+        std::array<
+            ID3D11UnorderedAccessView*,
+            D3D11_PS_CS_UAV_REGISTER_COUNT - 1> observedUavs{};
+        context->OMGetRenderTargetsAndUnorderedAccessViews(
+            0, nullptr, nullptr, 1,
+            static_cast<UINT>(observedUavs.size()), observedUavs.data());
+        for (auto* observedUav : observedUavs)
+        {
+            if (observedUav != nullptr)
+            {
+                exactOm = false;
+                observedUav->Release();
+            }
+        }
+        if (!exactOm)
             return false;
 
         // R166 reobserves the live color RTV immediately before copying.

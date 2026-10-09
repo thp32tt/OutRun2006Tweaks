@@ -81,6 +81,11 @@ jobs:
           }
           exit 0
 
+      - name: Verify exclusive DX11 pair staging R180
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_surface_pair_readback_r180.py
+
       - name: Verify DX11 resource format role isolation R179
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

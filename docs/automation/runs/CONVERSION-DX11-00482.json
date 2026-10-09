@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00482",
+  "production_id": "CONVERSION-DX11-00482",
+  "event_id": "CONVERSION-DX11-00482-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00482",
+  "lease_epoch": 1,
+  "work_key": "DX11:R180:EXCLUSIVE_COLOR_DEPTH_PAIR_STAGING_OM",
+  "conflict_keys": [
+    "src/vr/d3d11/surface_mirror.cpp:R180",
+    "tools/dx11_surface_mirror_probe.cpp:R180",
+    "tools/test_dx11_surface_pair_readback_r180.py:R180",
+    ".github/workflows/backend-conversion-gate.yml:R180"
+  ],
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "base_sha": "123e5f68041c7a54e8dff6169c876001fd19f76b",
+  "material_result_sha": "PENDING_COMMIT_OBJECT",
+  "validation_bearing_result_sha": "PENDING_COMMIT_OBJECT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "selected_work_item": "R180 direct color/depth WARP diagnostic staging must reject auxiliary OM RTV and UAV bindings, not only slot-0 RTV/DSV identity",
+  "summary": "Fail-closed exclusivity enforcement for direct color/depth pair staging; WARP positive/extra-RTV/UAV negative regressions plus static negative mutants and exact-SHA CI wiring. R175 owned shader source untouched.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_surface_mirror_probe.cpp",
+    "tools/test_dx11_surface_pair_readback_r180.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub branch HEAD and 00481 C6, older 00477 R175 failure checked; 00482 record/commits absent.",
+    "C1_REVIEW": "PASS: R167 direct diagnostic pair staging accepted live slot0 RTV/DSV while ignoring extra RTV/UAV, unlike receipt-based R168; R175 ownership isolated.",
+    "C2_IMPLEMENT": "PASS: actual C++ OM exclusivity proof, compiled WARP 3 controls, source contract/3 negative mutations and workflow registration.",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate after material push; local Windows/HMD runtime not available.",
+    "C4_COMMIT": "PENDING: material commit CAS to target branch.",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant diagnostic-only DX11 source change, no native gameplay Draw activation or user release.",
+    "C6_STATE": "PENDING: persist final CI evidence and next action after material SHA workflow result."
+  },
+  "blockers": [
+    "Inherited R175 programmable VS/PS COLOR0 BGRA mismatch may fail whole smoke independently; owned by 00477.",
+    "Quest3/VDXR not run."
+  ],
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "Pending exact-SHA full CI; rollover itself never scores.",
+  "resume_cursor": "READ_EXACT_SHA_GATE_AFTER_R180_MATERIAL_PUSH",
+  "next_action": "Check material-SHA Backend Conversion Gate validate + R180 WARP probe; isolate pre-existing R175 smoke failure; persist C6 without claiming HMD proof."
+}
