@@ -25,7 +25,7 @@ with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
     row=next(x for x in csv.DictReader(f) if x["index"].lstrip("\ufeff")=="60")
 assert "rework_required" in row["artwork_status"],row["artwork_status"]
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","60","--require-safe-rerender"],text=True,capture_output=True)
-assert tri.returncode==0,(tri.stdout,tri.stderr)
+assert tri.returncode==0,(tri.stdout,tri.stderr) # explicit gold-only material rework, not Stage re-QA
 assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
 
 candidate=(G/"hd_candidates"/ASSET).read_bytes()
