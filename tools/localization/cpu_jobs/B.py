@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B327 q098: separate full-face source-family white/navy BC3 reconstruction.
+"""B327R q098: separate full-face source-family white/navy BC3 reconstruction.
 
 Experiment is QA-gated: do NOT replace the hd_candidates DDS until a human
 controller inspects the source/CLEAN/trial's persisted bytes.
@@ -16,7 +16,7 @@ root = Path.cwd()
 gfx = root / "localization/graphics"
 relative = "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds"
 target = gfx / "hd_candidates" / relative
-run = gfx / "role_B/20261009-B327-Q098-NATIVE-NAVY-HALO-REBUILD"
+run = gfx / "role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD"
 run.mkdir(parents=True, exist_ok=True)
 def SHA(x): return hashlib.sha256(x).hexdigest()
 old_sha = "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b"
@@ -46,7 +46,7 @@ sourcemask=np.asarray(Image.open(srcmaskpath).convert("L"),dtype=np.uint8)
 assert source.shape==previous.shape==clean.shape==(height,width,4)
 assert targetmask.shape==sourcemask.shape==(height,width)
 bbox=(431,6,1674,123)
-targetbox=(580,11,1524,116)
+targetbox=(475,9,1580,120)
 yy,xx=np.ogrid[:height,:width]
 source_region=(xx>=bbox[0])&(xx<bbox[2])&(yy>=bbox[1])&(yy<bbox[3])
 allowed=(xx>=targetbox[0])&(xx<targetbox[2])&(yy>=targetbox[1])&(yy<targetbox[3])
@@ -80,14 +80,14 @@ crop=stamp.getbbox()
 assert crop, "empty native lettering"
 # Original vector at 330 px is supersampled into a 2048-native 850x72
 # composition. This is NOT an old / upscaled low-resolution Korean raster.
-native=stamp.crop(crop).resize((850,72),Image.Resampling.LANCZOS)
+native=stamp.crop(crop).resize((980,72),Image.Resampling.LANCZOS)
 # Source title is forward-leaning; measured English comparison remains C's task.
-native=native.transform((866,72),Image.Transform.AFFINE,
+native=native.transform((996,72),Image.Transform.AFFINE,
   (1,14/71,-14,0,1,0),resample=Image.Resampling.BICUBIC)
 ink=np.asarray(native,dtype=np.uint8)
 core=np.zeros((height,width),np.uint8)
 left=(width-native.width)//2;top=(height-native.height)//2
-core[top:top+72,left:left+866]=ink
+core[top:top+72,left:left+996]=ink
 native_face=core>=150
 distance=distance_transform_edt(~native_face)
 # Blue/navy edge is geometric, not compressed RGBA palette painting. The
@@ -177,7 +177,7 @@ damage_to_preserved=int(np.count_nonzero((candidate[:,:,3]>16)&clean_protected))
 composite_outside=int(np.any(candidate!=clean,axis=2)[~source_region].sum())
 assert composite_outside==0
 source_extra=0
-testpath=run/"42E618FD_B327_EXPERIMENT_NOT_APPROVED.dds"
+testpath=run/"42E618FD_B327R_EXPERIMENT_NOT_APPROVED.dds"
 testpath.write_bytes(trial)
 assert SHA(testpath.read_bytes())==SHA(trial)
 assert np.array_equal(decode(testpath.read_bytes()),candidate)
@@ -204,12 +204,12 @@ for orientation in ("READABLE","RAW"):
             for z in chunks:frame.paste(z,(pos,0));pos+=z.width+4
             frame.save(run/f"{orientation}_{bgname}_{percent}_SOURCE_CLEAN_OLD_B327.png",optimize=True)
 # Preserve actual full-resolution individual decoded clean/trial as proof.
-Image.fromarray(candidate,"RGBA").save(run/"B327_PERSISTED_DECODE_READABLE.png")
-Image.fromarray(np.flipud(candidate),"RGBA").save(run/"B327_PERSISTED_DECODE_RAW.png")
-Image.fromarray(clean,"RGBA").save(run/"B327_AUTHORED_CLEAN_PLATE.png")
+Image.fromarray(candidate,"RGBA").save(run/"B327R_PERSISTED_DECODE_READABLE.png")
+Image.fromarray(np.flipud(candidate),"RGBA").save(run/"B327R_PERSISTED_DECODE_RAW.png")
+Image.fromarray(clean,"RGBA").save(run/"B327R_AUTHORED_CLEAN_PLATE.png")
 report={
  "run":"B327","queue_index":98,"asset":"42E618FD",
- "status":"B327_NATIVE_HALO_TRIAL_PENDING_CONTROLLER_VISUAL",
+ "status":"B327R_NATIVE_HALO_TRIAL_PENDING_CONTROLLER_VISUAL",
  "source_sha256":source_sha,"clean_sha256":SHA(cleanpath.read_bytes()),"mask_sha256":SHA(maskpath.read_bytes()),
  "previous_sha256":old_sha,"trial_sha256":SHA(trial),
  "method":"NEW_NATIVE_VECTOR_ALPHA_PLUS_SOURCE_FAMILY_DIFFUSE_NAVY_GLOW_RGBA_DXT5_RECONSTRUCTION",
@@ -226,5 +226,5 @@ report={
  "cleanup":"GITHUB_EPHEMERAL_RUNNER",
  "forbidden_domains_touched":[]
 }
-(run/"B327_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(run/"B327R_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"trial_sha256":SHA(trial),"blocks":changed_blocks,"changed":int(change.sum()),"nonletter_visible_delta":damage_to_preserved,"outside":outside_target},ensure_ascii=False))
