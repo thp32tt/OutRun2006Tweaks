@@ -58,6 +58,14 @@ namespace Settings
         "their English glyph output, and redraws Korean UTF-8 text through the existing "
         "D3D9 ImGui overlay. Requires Overlay.Enabled=true."
     };
+    Setting<bool> KoreanHudLayoutTrace{
+        "Localization",
+        "KoreanHudLayoutTrace",
+        false,
+        "IGR-042 opt-in HUD time/heart Korean text layout diagnosis. Logs bounded text IDs, "
+        "stock coordinates, screen-space dimensions and compact keyline eligibility; "
+        "does not change rendering, text selection or any DDS. Requires KoreanTextOverlayTest."
+    };
 }
 
 
@@ -91,6 +99,10 @@ namespace KoreanRuntime
     inline static std::bitset<TextEntryCount> FormatMismatchLogged{};
     inline static std::mutex StateMutex{};
     inline static std::vector<DrawCommand> DrawQueue{};
+    // IGR-042: bound opt-in log cardinality across repeated HUD frames/animation.
+    // Only the render thread inserts keys; normal gameplay never enters the probe.
+    inline static std::unordered_set<std::string> HudLayoutTraceSeen{};
+    static constexpr size_t MaxHudLayoutTraceKeys = 96;
 
     // Korean player-name storage must not replace the game's 16-byte legacy
     // field with UTF-8. Fixed-width ranking/network/save consumers proven by
@@ -1862,6 +1874,33 @@ namespace KoreanRuntime
                     x -= size.x * 0.5f;
                 else
                     x -= size.x;
+            }
+
+            // IGR-042 has unresolved source attribution: actual HUD text may
+            // originate here, in a baked DDS, or both. Trace only matching
+            // translated draw commands when explicitly opted in, without
+            // changing their rendering order, glyph pixels or stock layout.
+            if (Settings::KoreanHudLayoutTrace &&
+                cmd.textId < TextEntryCount &&
+                (cmd.text.find("하트") != std::string::npos ||
+                 cmd.text.find("시간") != std::string::npos))
+            {
+                std::ostringstream key;
+                key << cmd.textId << ':' << cmd.x << ':' << cmd.y << ':'
+                    << cmd.cellHeight << ':' << cmd.scaleY << ':'
+                    << cmd.flags << ':' << cmd.color;
+                if (HudLayoutTraceSeen.size() < MaxHudLayoutTraceKeys &&
+                    HudLayoutTraceSeen.insert(key.str()).second)
+                {
+                    spdlog::info(
+                        "KoreanHudLayoutTrace: id={} source_xy=({}, {}) source_cell_h={} "
+                        "scale_y={} flags=0x{:X} color_argb=0x{:08X} "
+                        "screen_bbox=({:.2f},{:.2f},{:.2f},{:.2f}) "
+                        "font_px={:.2f} compact_keyline={} translated='{}'",
+                        cmd.textId, cmd.x, cmd.y, cmd.cellHeight, cmd.scaleY,
+                        cmd.flags, cmd.color, x, y, size.x, size.y, fontSize,
+                        NeedsCompactReadabilityStroke(cmd), cmd.text);
+                }
             }
 
             if (NeedsCompactReadabilityStroke(cmd))
