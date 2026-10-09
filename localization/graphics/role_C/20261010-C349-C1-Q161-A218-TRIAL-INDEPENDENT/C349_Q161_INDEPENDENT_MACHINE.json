@@ -1,0 +1,133 @@
+{
+  "schema": "C349 scoped independent exact DDS 2026-10-10",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "current_official_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "new_unpromoted_trial_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+  "dds_dimensions": {
+    "source": [
+      2048,
+      2048
+    ],
+    "current": [
+      2048,
+      2048
+    ],
+    "trial": [
+      2048,
+      2048
+    ]
+  },
+  "dds_bytes": {
+    "source": 4194432,
+    "current": 4194432,
+    "trial": 4194432
+  },
+  "headers_identical": true,
+  "changed_rgba_pixels": 18098,
+  "changed_alpha_pixels": 2726,
+  "changed_outside_3_source_bbox_rgba": 0,
+  "changed_outside_3_source_bbox_alpha": 0,
+  "regions": [
+    {
+      "id": 11,
+      "english": "AQUARIUS",
+      "korean": "물병자리",
+      "source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "trial_nonzero_alpha_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "original_source_bbox_margins": [
+        3,
+        104,
+        1,
+        1
+      ],
+      "changed_rgba_pixels": 6983,
+      "changed_alpha_pixels": 0,
+      "opaque_alpha_coverage": 0.28109,
+      "core_median_rgb": [
+        57.0,
+        69.0,
+        74.0
+      ]
+    },
+    {
+      "id": 16,
+      "english": "SOUTH KOREA",
+      "korean": "대한민국",
+      "source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "trial_nonzero_alpha_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "original_source_bbox_margins": [
+        2,
+        222,
+        1,
+        2
+      ],
+      "changed_rgba_pixels": 6046,
+      "changed_alpha_pixels": 0,
+      "opaque_alpha_coverage": 0.17779,
+      "core_median_rgb": [
+        57.0,
+        69.0,
+        74.0
+      ]
+    },
+    {
+      "id": 24,
+      "english": "ITALY",
+      "korean": "이탈리아",
+      "source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "trial_nonzero_alpha_bbox": [
+        8,
+        1227,
+        157,
+        1268
+      ],
+      "original_source_bbox_margins": [
+        2,
+        3,
+        3,
+        4
+      ],
+      "changed_rgba_pixels": 5069,
+      "changed_alpha_pixels": 2726,
+      "opaque_alpha_coverage": 0.32535,
+      "core_median_rgb": [
+        57.0,
+        69.0,
+        74.0
+      ]
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "changed_bc3_blocks": 1224,
+  "changed_bc3_blocks_outside_3_aligned_region": 0,
+  "unmodified_bc3_blocks": 260920,
+  "machine_scoped_verdict": "PASS_WITHIN_THREE_BBOXES_ONLY",
+  "alpha_note": "2,726 alpha changed pixels are inside the approved q161 R24 bbox; intended glyph-alpha shape changes are not a FAIL by themselves. Zero outside bbox. Alpha extra/missing relative to a separately verified glyph mask has NOT been independently established.",
+  "independent_clean_plate_verified": false,
+  "full_38_region_independent_review": false
+}

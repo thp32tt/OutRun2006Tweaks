@@ -10128,5 +10128,22 @@
     "c3": "BLOCKED",
     "approval": "BLOCKED",
     "runtime_validation": "UNTESTED"
+  },
+  "c349_c1_q161_a218_unpromoted": {
+    "run_key": "OUTRUN-KOR-C349-C1-Q161-A218-UNPROMOTED-TRIAL-EXACT-SAVED-20261010",
+    "lane": "C1",
+    "index": 161,
+    "shard": "ODD",
+    "trial_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+    "official_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "independent_machine_scope": "3_REGION_PASS",
+    "independent_visual_scope": "REPAIR_OBSERVED",
+    "whole_atlas": "HOLD_STRICT_RECHECK",
+    "official": "C344_REWORK_REQUIRED",
+    "evidence_png": 18,
+    "new_promoted_dds": 0,
+    "report": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_CONTROLLER_C1_HOLD.json",
+    "c3": "NOT_RUN",
+    "runtime_validation": "UNTESTED"
   }
 }

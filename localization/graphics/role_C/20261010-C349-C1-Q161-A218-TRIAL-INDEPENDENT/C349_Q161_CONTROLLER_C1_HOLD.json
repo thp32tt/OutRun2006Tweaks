@@ -1,0 +1,182 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C349",
+  "run_key": "OUTRUN-KOR-C349-C1-Q161-A218-UNPROMOTED-TRIAL-EXACT-SAVED-20261010",
+  "review_id": "C349-C1-Q161-EXACT-A218-TRIAL-38ATLAS-SCOPED-HOLD",
+  "role": "C",
+  "lane": "C1",
+  "ownership": "ODD_NUMERIC_INDEX_ONLY",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "execution_backend": "N100_MCP_AUX_BINARY_DOWNLOAD_AND_PIXEL_INSPECTION;GITHUB_SSOT_COMMIT",
+  "baseline_current_official_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "reviewed_unpromoted_trial_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+  "canonical_english_source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "old_C_verdict": "C344_REWORK_REQUIRED applies solely to OFFICIAL SHA 8ded8565...",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "asset_path": "Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
+  },
+  "exact_hashes_verified_directly": true,
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 161",
+    "on_current_git_queue": "MATERIAL_REWORK",
+    "read_only": true
+  },
+  "dds_machine": {
+    "report": {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_INDEPENDENT_MACHINE.json",
+      "sha256": "b44e73d6fb581facf4d22f1b1c0422dc51410b1fc12fdf159be7fe709cbd2959"
+    },
+    "codec": "BC3/DXT5",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mip_count": 1,
+    "header_exact": true,
+    "trial_vs_official_changed_rgba_pixels": 18098,
+    "alpha_changed_total_within_allowed_source_bboxes": 2726,
+    "changed_pixels_outside_3_source_bboxes": 0,
+    "alpha_changed_outside_3_source_bboxes": 0,
+    "changed_BC3_blocks": 1224,
+    "BC3_blocks_changed_outside_3_roi": 0,
+    "BC3_blocks_unmodified": 260920,
+    "note": "No numerical assessment of glyph family, guaranteed alpha-mask alignment or calibration is inferred from these values."
+  },
+  "pixels_before_producer_verdict": false,
+  "image_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_GRAY_100.png",
+      "sha256": "4f97743818208377f7a248656d534dd15d917d6871f2d74063a662a5b2d8517f",
+      "bytes": 11844
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_GRAY_75.png",
+      "sha256": "3178e66839fe5a53a863d1717066ba356b1bac8cbecb7a6920ea307b227af3cb",
+      "bytes": 19132
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_GRAY_50.png",
+      "sha256": "7e28771030a7660f510cd025dd0f5931da7bb193a0a5ab8e35023db162ec9a70",
+      "bytes": 12713
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_BLACK_100.png",
+      "sha256": "f30d0fce7e55fab663a1fc72af9a3cf72ba9e16a768f1283d4818a0bf3bb5005",
+      "bytes": 11810
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_WHITE_100.png",
+      "sha256": "3f8a31b9bd995cfd0bfaad7dc9b11b788c25031bae33b358a0d006cac947570e",
+      "bytes": 12597
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R11_RAW_CURRENT_TRIAL.png",
+      "sha256": "7d14c51f033ea87b47e41da7e43dc79aef61ae932a89e07fb93a4c3d83993106",
+      "bytes": 6361
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_GRAY_100.png",
+      "sha256": "fc97de011f1b500bbcd3261044c792e456ea4388d35dfc6cb203da4b58f2c573",
+      "bytes": 10560
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_GRAY_75.png",
+      "sha256": "16d4e32d31f3cd50c12ab5a9b918bd9cf6e72de1ededa83a4ead3105250ba971",
+      "bytes": 19589
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_GRAY_50.png",
+      "sha256": "df2ae1e0b58864d413a9541799a1936763ef6649a63afe2be88e9e81186361e5",
+      "bytes": 12614
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_BLACK_100.png",
+      "sha256": "d964f9d0ea367701421aed9466d2bbb49b51158e6dadec671d93e553f579de5a",
+      "bytes": 10487
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_WHITE_100.png",
+      "sha256": "51baf3d8aae45180027a485c05574a956af9c0fc7ec9f36b642a23fce49249d8",
+      "bytes": 11049
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R16_RAW_CURRENT_TRIAL.png",
+      "sha256": "de52dffb10d4681892401c35fa00d24c9642e34b5f93418e571e2eb36fecd162",
+      "bytes": 5281
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_GRAY_100.png",
+      "sha256": "ac1af1645576c97a96f5ac4aa11e54d86b68afc18484dbd1bd5309d1ef29877e",
+      "bytes": 7132
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_GRAY_75.png",
+      "sha256": "67c98dd5ee2bd68d7a084df490bb11c69d2d6068035271918a87fdc17ad1fa4a",
+      "bytes": 13077
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_GRAY_50.png",
+      "sha256": "46b04fb25547e28956d0a54701812148975a4209eebf817c51ed981ba6d992bc",
+      "bytes": 8781
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_BLACK_100.png",
+      "sha256": "bd3a6712a82b5de9099c7d9823beb2482398e656d441ededa8f0520951605848",
+      "bytes": 6976
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_WHITE_100.png",
+      "sha256": "c705ac8fea20fc5dd1009d089e0593cddc01b6df641411fc892524f61ec5b2cc",
+      "bytes": 7295
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_R24_RAW_CURRENT_TRIAL.png",
+      "sha256": "c54543efa4d807ce35e0b3d64137434b6417f72f8be3524c9f490138655e3a22",
+      "bytes": 5552
+    }
+  ],
+  "independent_first_visual_observations": {
+    "11": {
+      "readable": "물병자리, official had intermittent cutout speckles; trial has continuous strokes on gray/black/white at 100 and gray 50. Reading orientation correct. 189px wide vs 296px English source (63.85%); top/bottom margin 1px each; not a full atlas font-family clearance.",
+      "issue": "SOURCE_RELATIVE_WIDTH_UNDERFILL_NEEDS_FAMILY_CALIBRATION; tight 1px vertical margins"
+    },
+    "16": {
+      "readable": "대한민국, dotted broken face in official is no longer visible in trial at full/50% decoded displayed contacts, source shape is broad 401px English vs trial 177px Hangul (44.14%); height 48 vs source 51.",
+      "issue": "SOURCE_RELATIVE_WIDTH_UNDERFILL_NEEDS_FAMILY_CALIBRATION; cannot equate width alone with visual FAIL"
+    },
+    "24": {
+      "readable": "이탈리아, old dotted fragments on native+RAW visibly improved, trial 149px vs English 154px, positive 2/3/3/4px source margins.",
+      "issue": "Alpha delta in target 2726 is expected composition-change candidate; independent mask construction/source CLEAN not provided"
+    }
+  },
+  "summary": "Fresh exact-byte C1 scoped inspection of A218 trial SHA (not previous C344 official); 3 corrected cells visibly remove earlier stored BC3 dotted face symptom in native BGW and practical views, with RAW mirror-Y corresponding. q16/source-family width/hierarchy and r11 tight vertical margins remain uncalibrated. Exact independent SOURCE-vs-CLEAN and CLEAN-vs-FINAL pixel-mask proofs plus remaining 35 rows not assessed here. Keep official DDS C344 REWORK; do not promote trial or assert C/C3/APPROVAL success.",
+  "decision": "HOLD_STRICT_RECHECK_SCOPED_TRIAL_VISUAL_REPAIR_OBSERVED",
+  "official_queue_status_remains": "c344_c1_rework_required_persisted_glyph_face_speckles",
+  "candidate_promotion": false,
+  "C_FULL_ATLAS": "NOT_PASSED",
+  "C3_STRICT_AUDIT": "NOT_RUN",
+  "APPROVALS_q161": "NOT_AUTHORIZED",
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_steps": [
+    "A/B native SOURCE/CLEAN/FINAL proof and family calibration, source-relative width/spacing slant/face of cells 11/16/24",
+    "Independent all 38 labels against exact trial persisted byte and exact current source, multi-background MIPs and orientation",
+    "Producer pixel guard + candidate promotion decision only after independent review",
+    "C3 strict separate audit and source-to-screen game retest by user"
+  ],
+  "scope_exclusions": [
+    "EVEN_SHARD_C2",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "new_promoted_dds": 0,
+  "new_trial_dds_generated_by_C": 0,
+  "independent_new_sha_trial_measurement": true
+}
