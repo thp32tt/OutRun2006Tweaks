@@ -485,7 +485,25 @@ float4 main() : SV_Target {
                 mapped.pData);
             const bool borderOk = border[0] == 0u && border[1] == 0u &&
                 border[2] == 0u && border[3] == 255u;
+            // Preserve the observed bytes before Unmap. A failed white
+            // control must show whether geometry missed the center or the
+            // generated VS/PS produced the wrong channel/alpha value.
+            const std::array<unsigned int, 4> centerBytes = {
+                pixel[0], pixel[1], pixel[2], pixel[3]};
+            const std::array<unsigned int, 4> borderBytes = {
+                border[0], border[1], border[2], border[3]};
             warp.context->Unmap(readback, 0u);
+            if (!centerOk || !borderOk)
+            {
+                std::cerr << "R170 WARP translated FVF readback "
+                          << (expectedWhite ? "positive" : "offscreen")
+                          << " center BGRA=["
+                          << centerBytes[0] << "," << centerBytes[1] << ","
+                          << centerBytes[2] << "," << centerBytes[3]
+                          << "] border BGRA=[" << borderBytes[0] << ","
+                          << borderBytes[1] << "," << borderBytes[2] << ","
+                          << borderBytes[3] << "]\n";
+            }
             require(centerOk && borderOk,
                     expectedWhite
                         ? "R170 translated FVF+WVP white interior / clear border"
