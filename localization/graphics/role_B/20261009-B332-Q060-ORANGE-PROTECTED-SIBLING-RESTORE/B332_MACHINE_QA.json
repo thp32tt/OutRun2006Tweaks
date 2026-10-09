@@ -8,7 +8,7 @@
   "user_igr": "IGR044_OPEN_USER_INGAME_FAIL",
   "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
   "previous_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
-  "trial_sha256": "dc2e5a6e7d288c6fc1b58c1822ef71c35d7c72a137d30984e397da59fd2cf6ec",
+  "trial_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
   "trial_promoted": false,
   "unapproved_trial_dds_count": 1,
   "approved_dds_count": 0,
@@ -26,19 +26,19 @@
   ],
   "new_gold_region": [
     2133,
-    251,
+    235,
     2807,
-    331
+    332
   ],
   "source_gold_bbox": [
     2081,
-    250,
+    230,
     2860,
     370
   ],
   "full_comparison_window": [
     2081,
-    230,
+    210,
     2860,
     400
   ],
