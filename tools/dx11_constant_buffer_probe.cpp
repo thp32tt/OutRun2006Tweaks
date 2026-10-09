@@ -207,6 +207,181 @@ void main(point GSIn input[1], inout PointStream<GSOut> outputStream)
         return buffer;
     }
 
+
+    // R169 WARP-only positive fragment control. The production translated VB
+    // contains arbitrary shadow bytes, so its R157 IA statistics cannot prove
+    // raster coverage. Use a separate device/known clip-space triangle to
+    // prove that BGRA staging distinguishes a real PS write from clear-only.
+    // This is NOT a native game Draw or an HMD/stereo acceptance test.
+    void verify_r169_warp_fragment_coverage()
+    {
+        DevicePair warp = create_warp_device();
+        D3D11_TEXTURE2D_DESC colorDesc{};
+        colorDesc.Width = 16u;
+        colorDesc.Height = 16u;
+        colorDesc.MipLevels = 1u;
+        colorDesc.ArraySize = 1u;
+        colorDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        colorDesc.SampleDesc.Count = 1u;
+        colorDesc.Usage = D3D11_USAGE_DEFAULT;
+        colorDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+        ID3D11Texture2D* color = nullptr;
+        require(SUCCEEDED(warp.device->CreateTexture2D(
+                    &colorDesc, nullptr, &color)) && color != nullptr,
+                "R169 WARP 16x16 BGRA color target");
+        ID3D11RenderTargetView* target = nullptr;
+        require(SUCCEEDED(warp.device->CreateRenderTargetView(
+                    color, nullptr, &target)) && target != nullptr,
+                "R169 WARP RTV");
+        D3D11_TEXTURE2D_DESC readDesc = colorDesc;
+        readDesc.Usage = D3D11_USAGE_STAGING;
+        readDesc.BindFlags = 0u;
+        readDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        ID3D11Texture2D* readback = nullptr;
+        require(SUCCEEDED(warp.device->CreateTexture2D(
+                    &readDesc, nullptr, &readback)) && readback != nullptr,
+                "R169 read-only staging texture");
+
+        static const std::string vsSource = R"(
+struct V { float2 xy : POSITION; };
+float4 main(V input) : SV_Position {
+    return float4(input.xy, 0.5, 1.0);
+}
+)";
+        static const char psSource[] = R"(
+float4 main() : SV_Target {
+    return float4(1.0, 0.0, 0.0, 1.0);
+}
+)";
+        ID3DBlob* vertexCode = compile_vertex_shader(vsSource);
+        ID3DBlob* pixelCode = nullptr;
+        ID3DBlob* errors = nullptr;
+        const HRESULT psResult = D3DCompile(
+            psSource, sizeof(psSource) - 1u, "R169PixelCoverage",
+            nullptr, nullptr, "main", "ps_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0u, &pixelCode, &errors);
+        if (errors)
+            errors->Release();
+        require(SUCCEEDED(psResult) && pixelCode != nullptr,
+                "R169 solid-red PS compile");
+        ID3D11VertexShader* vs = nullptr;
+        ID3D11PixelShader* ps = nullptr;
+        require(SUCCEEDED(warp.device->CreateVertexShader(
+                    vertexCode->GetBufferPointer(), vertexCode->GetBufferSize(),
+                    nullptr, &vs)) && vs != nullptr,
+                "R169 VS creation");
+        require(SUCCEEDED(warp.device->CreatePixelShader(
+                    pixelCode->GetBufferPointer(), pixelCode->GetBufferSize(),
+                    nullptr, &ps)) && ps != nullptr,
+                "R169 PS creation");
+        D3D11_INPUT_ELEMENT_DESC element{};
+        element.SemanticName = "POSITION";
+        element.Format = DXGI_FORMAT_R32G32_FLOAT;
+        element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        ID3D11InputLayout* layout = nullptr;
+        require(SUCCEEDED(warp.device->CreateInputLayout(
+                    &element, 1u, vertexCode->GetBufferPointer(),
+                    vertexCode->GetBufferSize(), &layout)) && layout != nullptr,
+                "R169 known XY vertex layout");
+        struct Vertex { float x, y; };
+        const Vertex vertices[3] = {
+            {-0.75f, -0.75f}, {0.75f, -0.75f}, {0.0f, 0.75f}};
+        const unsigned short indices[3] = {0u, 1u, 2u};
+        D3D11_BUFFER_DESC vbDesc{};
+        vbDesc.ByteWidth = sizeof(vertices);
+        vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+        vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA vbData{};
+        vbData.pSysMem = vertices;
+        ID3D11Buffer* vb = nullptr;
+        require(SUCCEEDED(warp.device->CreateBuffer(
+                    &vbDesc, &vbData, &vb)) && vb != nullptr,
+                "R169 deterministic clip-space triangle VB");
+        D3D11_BUFFER_DESC ibDesc{};
+        ibDesc.ByteWidth = sizeof(indices);
+        ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
+        ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA ibData{};
+        ibData.pSysMem = indices;
+        ID3D11Buffer* ib = nullptr;
+        require(SUCCEEDED(warp.device->CreateBuffer(
+                    &ibDesc, &ibData, &ib)) && ib != nullptr,
+                "R169 deterministic triangle index buffer");
+
+        D3D11_RASTERIZER_DESC rasterDesc{};
+        rasterDesc.FillMode = D3D11_FILL_SOLID;
+        rasterDesc.CullMode = D3D11_CULL_NONE;
+        rasterDesc.DepthClipEnable = TRUE;
+        ID3D11RasterizerState* raster = nullptr;
+        require(SUCCEEDED(warp.device->CreateRasterizerState(
+                    &rasterDesc, &raster)) && raster != nullptr,
+                "R169 explicit non-culled rasterizer");
+        warp.context->RSSetState(raster);
+        D3D11_VIEWPORT viewport{};
+        viewport.Width = 16.0f;
+        viewport.Height = 16.0f;
+        viewport.MaxDepth = 1.0f;
+        warp.context->RSSetViewports(1u, &viewport);
+        warp.context->OMSetRenderTargets(1u, &target, nullptr);
+        warp.context->IASetInputLayout(layout);
+        const UINT stride = sizeof(Vertex);
+        const UINT offset = 0u;
+        warp.context->IASetVertexBuffers(0u, 1u, &vb, &stride, &offset);
+        warp.context->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0u);
+        warp.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        warp.context->VSSetShader(vs, nullptr, 0u);
+        warp.context->PSSetShader(ps, nullptr, 0u);
+        warp.context->GSSetShader(nullptr, nullptr, 0u);
+        const FLOAT clear[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+        warp.context->ClearRenderTargetView(target, clear);
+
+        const auto verify = [&](bool expectRed) {
+            warp.context->CopyResource(readback, color);
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            require(SUCCEEDED(warp.context->Map(
+                        readback, 0u, D3D11_MAP_READ, 0u, &mapped)) &&
+                        mapped.pData != nullptr && mapped.RowPitch >= 64u,
+                    "R169 WARP BGRA staging map");
+            const auto matches = [&](UINT x, UINT y, bool red) {
+                const auto* pixel = static_cast<const unsigned char*>(
+                    mapped.pData) + static_cast<std::size_t>(y) *
+                    mapped.RowPitch + 4u * x;
+                const unsigned char expected[4] =
+                    {0u, 0u, static_cast<unsigned char>(red ? 255u : 0u), 255u};
+                return std::memcmp(pixel, expected, sizeof(expected)) == 0;
+            };
+            const bool pass = matches(8u, 8u, expectRed) &&
+                matches(0u, 0u, false) &&
+                matches(15u, 0u, false) &&
+                matches(0u, 15u, false) &&
+                matches(15u, 15u, false);
+            warp.context->Unmap(readback, 0u);
+            require(pass, expectRed
+                ? "R169 indexed fragment writes red interior; borders stay clear"
+                : "R169 negative control: clear-only center/borders stay black");
+        };
+        verify(false); // Counterfactual: clearing alone cannot satisfy coverage.
+        warp.context->DrawIndexed(3u, 0u, 0);
+        verify(true); // Deterministic interior PS coverage on WARP.
+
+        warp.context->OMSetRenderTargets(0u, nullptr, nullptr);
+        raster->Release();
+        ib->Release();
+        vb->Release();
+        layout->Release();
+        ps->Release();
+        vs->Release();
+        pixelCode->Release();
+        vertexCode->Release();
+        readback->Release();
+        target->Release();
+        color->Release();
+        warp.context->ClearState();
+        warp.context->Release();
+        warp.device->Release();
+    }
+
 }
 
 int main()
@@ -11619,6 +11794,7 @@ VSOutput main(VSInput input)
         }
         d3d.context->Unmap(r165Readback, 0u);
         r165Readback->Release();
+        verify_r169_warp_fragment_coverage();
 
         const auto indexedSourceValuesOutOfRange =
             managedIndexBuffer.index_range_readiness(
@@ -13301,6 +13477,7 @@ VSOutput main(VSInput input)
     std::cout << "DX11 indexed fan declared VB capacity R160: PASS\n";
     std::cout << "DX11 resource A2B10G10R10 exact mapping: PASS\n";
     std::cout << "DX11 direct line raster semantics R157: PASS\n";
+    std::cout << "DX11 WARP fragment coverage R169: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
