@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A215",
+  "run_key": "OUTRUN-KOR-A215-Q121-30-REGION-SOURCE-CLEAN-PERSISTED-20261010-0300",
+  "priority": "P0",
+  "queue_index": 121,
+  "owner_lane": "A",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "ingame_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "clean_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+  "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "producer_worker_run": 37970761977,
+  "worker_conclusion": "SUCCESS",
+  "worker_report": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_COMPONENT_QA.json",
+  "new_lossless_component_regions": 30,
+  "new_promoted_dds": 0,
+  "saved_candidate_changed": false,
+  "machine_counts": {
+    "source_to_clean_RGBA_changed_pixels": 2134661,
+    "clean_to_final_RGBA_changed_pixels": 133085,
+    "previous_A213_outside_three_title_source_to_clean": 1934984
+  },
+  "controller_views": {
+    "reviewed_ranked_components": [
+      1,
+      2,
+      3,
+      5,
+      7,
+      10,
+      12,
+      16,
+      19,
+      21,
+      25,
+      28,
+      30
+    ],
+    "matching_view": "SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+    "native_alpha_reviewed": [
+      "A215_component_19_SOURCE_NATIVE_RGBA.png",
+      "A215_component_19_CLEAN_NATIVE_RGBA.png",
+      "A215_component_19_FINAL_NATIVE_RGBA.png"
+    ],
+    "full_atlas_prior_controller_review": "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_ATLAS_SOURCE_CLEAN_FINAL_GRAY_25PCT.jpg",
+    "observed": "Selected 50% contacts visibly contain prior Korean translations in A176 CLEAN outside the three title boxes; they are NOT clean plate for the full atlas. Most source-to-CLEAN delta therefore cannot be called protected-art loss without semantic masks. Cropped black/white fragments and alpha-zero RGB require native alpha examination before defect classification.",
+    "scoped_details": {
+      "1": "Source selection-caption English replaced by existing Korean in CLEAN/FINAL, wide two-line atlas area; current FINAL close to CLEAN; not a new DDS repair.",
+      "2": "Several translated Korean white/red descriptions coexist with black silhouettes; source-to-CLEAN includes multi-label language replacement. Original source itself contains dark silhouette cells; do not guess damaged protected art.",
+      "3": "Music/transmission prompts had Korean already in prior CLEAN; no producer claim of all other cells verified.",
+      "5": "Music random-selection description translated; song-title artwork elsewhere on atlas is preserved by policy and must not be erased.",
+      "16": "Yellow More Engine Sound art differs in typography from Korean replacement; family slant/effect parity needs calibrated independent visual review before approval.",
+      "19": "Tiny GOAL fragment crop has apparent dark/hidden pixel content; alpha-zero RGB cannot be judged from a single transparent PNG preview. Inspect source/plate exact alpha masks before alleging English ghost.",
+      "25": "Very narrow connected-component crop cuts through neighboring syllables; fragment by itself is not a full text segment.",
+      "28": "Black native source/clean/final fragments can be protected or masked text; classification remains unresolved."
+    }
+  },
+  "triage": "P0 user regression active but current A202 candidate bytes held by C335; evidence-only work, no safe same-method rerender or false producer PASS.",
+  "evidence_gate": "HOLD_UNTIL_SEMANTIC_FULL_ATLAS_EDIT_MASK_AND_SOURCE_PROTECTED_ART_VERIFIED",
+  "pending": [
+    "ALL_179_REGION_OR_SEMANTIC_TEXT_CELL_CLASSIFICATION",
+    "EXACT_FULL_SOURCE_DERIVED_EDIT_MASK_AND_PROTECTED_ART_MASK",
+    "MATCHED_GLYPH_SOURCE_VS_KOREAN_LEAN_AND_FAMILY_CALIBRATION",
+    "C1_INDEPENDENT_FIRST_LOOK_AND_C3",
+    "MULTISCREEN_CONSUMER_CHAIN_AND_NEW_REAL_GAME_RETEST"
+  ],
+  "no_claims": [
+    "FULL_ATLAS_PLATE_PASS",
+    "FULL_ATLAS_PROTECTED_ART_PASS",
+    "C1_PASS",
+    "C3_PASS",
+    "USER_GAME_RETEST"
+  ],
+  "current_asset_queue_status_to_preserve": "c335_c1_hold_a202_native_alpha_calibration_pending_igr_open",
+  "user_ingame_status": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub-hosted cpu-worker; ChatGPT connector controller SHA and visual examination; N100 heavy not used",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
