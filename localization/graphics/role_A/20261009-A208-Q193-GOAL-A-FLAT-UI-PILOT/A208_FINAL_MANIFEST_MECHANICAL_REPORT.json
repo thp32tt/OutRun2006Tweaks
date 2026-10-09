@@ -1,0 +1,25 @@
+{
+  "version": "production-pixels-v1-20261009",
+  "stage": "final",
+  "candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "counts": {
+    "removal_outside_edit": 0,
+    "removal_over_protected": 0,
+    "restore_outside_protected_edit": 0,
+    "clean_changed_outside_removal_or_restore": 0,
+    "clean_protected_diff_from_source": 0,
+    "transparent_plate_residue": 0,
+    "transparent_outside_removal": 0,
+    "effect_outside_edit": 0,
+    "lettering_outside_effect": 0,
+    "lettering_over_protected": 0,
+    "final_protected_diff_from_source": 0,
+    "final_changed_outside_edit": 0,
+    "final_changed_outside_effect": 0
+  },
+  "errors": [],
+  "result": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "limitations": "Mask semantics, opaque plate residue, typography, full segment coverage, mip aesthetics and actual game appearance require independent visual review."
+}

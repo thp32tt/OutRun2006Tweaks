@@ -1,0 +1,83 @@
+{
+  "version": "production-pixels-v1-20261009",
+  "coordinates": "native_raw",
+  "stage": "final",
+  "inputs": {
+    "source": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_SOURCE_CANONICAL_RGBA32.dds",
+      "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
+    },
+    "baseline": {
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+      "git_revision": "fa838e2178959fb3ccf7ac408ba9132139b101aa"
+    },
+    "clean": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_CLEAN_NATIVE_RAW.png",
+      "sha256": "58bdbea0b2f55860606a66fc4b94c50d2421f487dac34b878524bc0f13d547e2"
+    },
+    "lettering": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_LETTER_ONLY_NATIVE_RAW.png",
+      "sha256": "80d12c65b068749f2b8508f3de6c41dc458dc4656070ba7c58cf9d7b820e71b1"
+    },
+    "candidate": {
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3"
+    }
+  },
+  "masks": {
+    "removal": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png",
+      "sha256": "a3a37a68c9d80b4fbc8114649a8ed4793bdde65c7c306d97efa2366734560f61"
+    },
+    "protected": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_SOURCE_PROTECTED_RAW.png",
+      "sha256": "b2287f65ea134cf4e4b0c2bdea4749e1b799fe7fd8c7e48780bd003d5ee1b166"
+    },
+    "edit": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_SOURCE_BOUNDED_EDIT_RAW.png",
+      "sha256": "7058727f1e32824de03ee84b70f53e8917027d95a0c3b21a53bf21deb65401b1"
+    },
+    "transparent": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_TRANSPARENT_PLATE_RAW.png",
+      "sha256": "a3a37a68c9d80b4fbc8114649a8ed4793bdde65c7c306d97efa2366734560f61"
+    },
+    "restore": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_NONE_RAW.png",
+      "sha256": "d6873b9e1728fdc4137760e6d4d9e1bf382448fb46e7367dfde344fb17809ce0"
+    },
+    "effect": {
+      "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_MASK_NEW_GLYPH_EFFECT_RAW.png",
+      "sha256": "91fe5ac0fea79195316aeb195bb3065037d9cb65d573e2b3ac9401f4e6eb03b4"
+    }
+  },
+  "regions": [
+    {
+      "id": "Goal A / 골 A, shared actual Latin A outer left edge",
+      "source_anchors": {
+        "top": [
+          1088,
+          229
+        ],
+        "bottom": [
+          1080,
+          258
+        ]
+      },
+      "candidate_anchors": {
+        "top": [
+          1053,
+          231
+        ],
+        "bottom": [
+          1046,
+          254
+        ]
+      },
+      "anchor_evidence": {
+        "path": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_SOURCE_AND_KOREAN_LATIN_A_ANCHORS.png",
+        "sha256": "d7dba9e5b9d9e5fae633372f3274ec7d6db28562f9f5b553483f2690a8a3e215"
+      }
+    }
+  ]
+}

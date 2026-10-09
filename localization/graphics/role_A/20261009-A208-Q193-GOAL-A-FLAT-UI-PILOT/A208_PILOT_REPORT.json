@@ -1,0 +1,121 @@
+{
+  "role": "A",
+  "run": "20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT",
+  "queue_index": 193,
+  "status": "A208_NEW_PROMOTED_GOAL_A_SOURCE_PROTECTED_SCOPED_PRODUCER_PASS_PENDING_FRESH_C1",
+  "english": "Goal A",
+  "korean": "목표 A",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "baseline_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+  "trial_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+  "source_cell": [
+    930,
+    206,
+    1142,
+    292
+  ],
+  "source_bbox": [
+    950,
+    221,
+    1115,
+    268
+  ],
+  "candidate_bbox": [
+    953,
+    223,
+    1075,
+    265
+  ],
+  "source_rgb": [
+    46,
+    53,
+    57
+  ],
+  "font_size": 45,
+  "font_blob_sha": "b5b67bf293310a3648468a21ac829d6f2d58b2d5",
+  "qa_numeric": {
+    "source_protected_vs_previous": 0,
+    "source_protected_vs_clean": 0,
+    "source_protected_vs_final": 0,
+    "prior_vs_new_outside_edit": 0,
+    "clean_changed_outside_removal": 0,
+    "clean_to_final_outside_letter_alpha": 0,
+    "transparent_clean_nonzero_alpha": 0
+  },
+  "original_protected_art_rects": [
+    [
+      744,
+      118,
+      1117,
+      169
+    ],
+    [
+      0,
+      797,
+      929,
+      1022
+    ]
+  ],
+  "original_protected_nonzero_pixels": 72967,
+  "original_english_bbox_size": [
+    165,
+    47
+  ],
+  "candidate_natural_size": [
+    122,
+    42
+  ],
+  "new_dds_trial": 1,
+  "promoted_candidate": 1,
+  "runtime_validation": "UNTESTED",
+  "consumer_first_unproven_link": "promoted candidate/preview manifest->game atlas load->Goal A focus state; not game tested",
+  "baseline_git_revision": "fa838e2178959fb3ccf7ac408ba9132139b101aa",
+  "anchor_source": {
+    "top": [
+      1088,
+      229
+    ],
+    "bottom": [
+      1080,
+      258
+    ]
+  },
+  "anchor_candidate": {
+    "top": [
+      1053,
+      231
+    ],
+    "bottom": [
+      1046,
+      254
+    ]
+  },
+  "source_dx": 8,
+  "candidate_dx": 7,
+  "production_pixel_guard": {
+    "version": "production-pixels-v1-20261009",
+    "stage": "final",
+    "candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "counts": {
+      "removal_outside_edit": 0,
+      "removal_over_protected": 0,
+      "restore_outside_protected_edit": 0,
+      "clean_changed_outside_removal_or_restore": 0,
+      "clean_protected_diff_from_source": 0,
+      "transparent_plate_residue": 0,
+      "transparent_outside_removal": 0,
+      "effect_outside_edit": 0,
+      "lettering_outside_effect": 0,
+      "lettering_over_protected": 0,
+      "final_protected_diff_from_source": 0,
+      "final_changed_outside_edit": 0,
+      "final_changed_outside_effect": 0
+    },
+    "errors": [],
+    "result": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "limitations": "Mask semantics, opaque plate residue, typography, full segment coverage, mip aesthetics and actual game appearance require independent visual review."
+  },
+  "final_manifest": "localization/graphics/worker_results/production_manifests/9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3.json"
+}
