@@ -144,6 +144,13 @@ namespace OutRunVRStereo
         const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;
     void R30SupportRecordHudStereoDuplicate() noexcept;
     void R30SupportMarkFrameRightDrawFailed() noexcept;
+    // Borrowed original lower hook target addresses. Do not change resolver
+    // identity, hook ownership, device pointer or acquire-load semantics.
+    void* R30SupportResetTarget() noexcept;
+    void* R30SupportPresentTarget() noexcept;
+    void* R30SupportDirectTransportTarget() noexcept;
+    void* R30SupportSetRenderStateTarget() noexcept;
+    IDirect3DDevice9* R30SupportInstalledDevice() noexcept;
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;

@@ -47,6 +47,74 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
+# R84 R32 lower target pointer and installed-device ownership preflight.
+# Returning the wrong target replaces a physical hook and is a hard fail.
+# The installed device is borrowed via the original atomic acquire load.
+def r32_target_address_owner_ok(api, lower, upper):
+    contracts = (
+        ("ResetTarget", "ResetDestR22"),
+        ("PresentTarget", "PresentDestR13"),
+        ("DirectTransportTarget", "ResolveDirectTransportR13"),
+        ("SetRenderStateTarget", "SetRenderStateDestR29"),
+    )
+    for suffix, original in contracts:
+        if ("void* R30Support" + suffix + "() noexcept;") not in api:
+            return False
+        if not re.search(
+            r"void\* R30Support" + suffix +
+            r"\(\) noexcept\s*\{\s*return reinterpret_cast<void\*>\(&" +
+            original + r"\);\s*\}", lower):
+            return False
+        if ("void* R32Review" + suffix +
+            "() noexcept{return R30Support" + suffix + "();}") not in upper:
+            return False
+    return all((
+        "IDirect3DDevice9* R30SupportInstalledDevice() noexcept;" in api,
+        bool(re.search(
+            r"IDirect3DDevice9\* R30SupportInstalledDevice\(\) noexcept"
+            r"\s*\{\s*return StereoInstalledDevice.load\("
+            r"std::memory_order_acquire\);\s*\}", lower)),
+        "IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return R30SupportInstalledDevice();}" in upper,
+    ))
+
+if not r32_target_address_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 hook targets or installed-device original acquire owner lost")
+for label, edited_lower, edited_upper in (
+    ("Reset target replaced with present", r30.replace(
+        "return reinterpret_cast<void*>(&ResetDestR22);",
+        "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
+    ("Present target replaced with Reset", r30.replace(
+        "return reinterpret_cast<void*>(&PresentDestR13);",
+        "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
+    ("Direct transport target replaced", r30.replace(
+        "return reinterpret_cast<void*>(&ResolveDirectTransportR13);",
+        "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
+    ("render state target replaced", r30.replace(
+        "return reinterpret_cast<void*>(&SetRenderStateDestR29);",
+        "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
+    ("installed device relaxed load", r30.replace(
+        "return StereoInstalledDevice.load(std::memory_order_acquire);",
+        "return StereoInstalledDevice.load(std::memory_order_relaxed);", 1), r32),
+    ("installed device fabricated null", r30.replace(
+        "return StereoInstalledDevice.load(std::memory_order_acquire);",
+        "return nullptr;", 1), r32),
+    ("R32 bypasses Reset owner", r30, r32.replace(
+        "R30SupportResetTarget();", "reinterpret_cast<void*>(&ResetDestR22);", 1)),
+    ("R32 bypasses Present owner", r30, r32.replace(
+        "R30SupportPresentTarget();", "reinterpret_cast<void*>(&PresentDestR13);", 1)),
+    ("R32 bypasses transport owner", r30, r32.replace(
+        "R30SupportDirectTransportTarget();", "reinterpret_cast<void*>(&ResolveDirectTransportR13);", 1)),
+    ("R32 bypasses renderstate owner", r30, r32.replace(
+        "R30SupportSetRenderStateTarget();", "reinterpret_cast<void*>(&SetRenderStateDestR29);", 1)),
+    ("R32 bypasses device owner", r30, r32.replace(
+        "R30SupportInstalledDevice();",
+        "StereoInstalledDevice.load(std::memory_order_acquire);", 1)),
+):
+    if edited_lower == r30 and edited_upper == r32:
+        errors.append("R84 lower target negative mutation not applied: " + label)
+    elif r32_target_address_owner_ok(r30_support_api, edited_lower, edited_upper):
+        errors.append("R84 lower target negative mutation survived: " + label)
+
 # R84: R32 no longer directly mutates R9 frame stereo accounting.
 # The old source wrote the four world flags/counters before latching pose only
 # when 0, the HUD path increments its own counter, and right failure is sticky.

@@ -3595,6 +3595,31 @@ namespace OutRunVRStereo
         FrameRightDrawFailed = true;
     }
 
+    void* R30SupportResetTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&ResetDestR22);
+    }
+
+    void* R30SupportPresentTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&PresentDestR13);
+    }
+
+    void* R30SupportDirectTransportTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&ResolveDirectTransportR13);
+    }
+
+    void* R30SupportSetRenderStateTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&SetRenderStateDestR29);
+    }
+
+    IDirect3DDevice9* R30SupportInstalledDevice() noexcept
+    {
+        return StereoInstalledDevice.load(std::memory_order_acquire);
+    }
+
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
         return FrameStereoPoseSequence;

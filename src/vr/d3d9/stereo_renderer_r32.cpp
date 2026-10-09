@@ -960,14 +960,14 @@ namespace OutRunVRStereo
         if(a==State::Ready&&b==State::Ready&&c==R13InstallStatusValue::Ready) return State::Ready;
         return State::Pending;
     }
-    void* R32ReviewResetTarget() noexcept{return reinterpret_cast<void*>(&ResetDestR22);}
-    void* R32ReviewPresentTarget() noexcept{return reinterpret_cast<void*>(&PresentDestR13);}
-    void* R32ReviewDirectTransportTarget() noexcept{return reinterpret_cast<void*>(&ResolveDirectTransportR13);}
-    void* R32ReviewSetRenderStateTarget() noexcept{return reinterpret_cast<void*>(&SetRenderStateDestR29);}
+    void* R32ReviewResetTarget() noexcept{return R30SupportResetTarget();}
+    void* R32ReviewPresentTarget() noexcept{return R30SupportPresentTarget();}
+    void* R32ReviewDirectTransportTarget() noexcept{return R30SupportDirectTransportTarget();}
+    void* R32ReviewSetRenderStateTarget() noexcept{return R30SupportSetRenderStateTarget();}
     void* R32ReviewDrawPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveDestR30);}
     void* R32ReviewDrawIndexedPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30);}
     void* R32ReviewDrawPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveUPDestR30);}
     void* R32ReviewDrawIndexedPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30);}
-    IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return StereoInstalledDevice.load(std::memory_order_acquire);}
+    IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return R30SupportInstalledDevice();}
 
 }
