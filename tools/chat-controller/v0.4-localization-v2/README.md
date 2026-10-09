@@ -88,16 +88,16 @@ The image builds from `v0.4/src` and uses A/B/C localization prompts. VR control
 
 ## Chrome tab recovery (2026-10-10)
 
-The production image builds the shared \`v0.4/src/controller.py.part*\`
-controller (NOT the older \`localization/src\` fork). This release has three
+The production image builds the shared `v0.4/src/controller.py.part*`
+controller (NOT the older `localization/src` fork). This release has three
 **worker** tabs by design: producer A, producer B, QA C. A fourth tab is
 not an independent worker and is not created automatically.
 
 The A/B/C tab-health task runs independently of slow queue operations,
 defaulting to one pass every 30 seconds. It detects:
 - a missing/closed tab;
-- Playwright renderer \`crash\` events;
-- Chromium "Aw, Snap!", \`chrome-error://\`, and related error pages;
+- Playwright renderer `crash` events;
+- Chromium "Aw, Snap!", `chrome-error://`, and related error pages;
 - a renderer that fails the probe three consecutive times;
 - a failed prior recovery navigation.
 
@@ -108,21 +108,21 @@ never sends or retries prompts; it does not change production IDs, queue
 phases, attempts, or saved progress. Already-running healthy tabs are not
 recycled. Failed page replacement is logged and retried after cooldown.
 
-Configurable environment values in \`docker-compose.yml\`:
-\`TAB_HEALTH_CHECK_SECONDS=30\`, \`TAB_HEALTH_PROBE_TIMEOUT_SECONDS=6\`,
-\`TAB_HEALTH_FAILURE_THRESHOLD=3\`, \`TAB_ERROR_FAILURE_THRESHOLD=2\`,
-\`TAB_RECOVERY_COOLDOWN_SECONDS=60\`.
+Configurable environment values in `docker-compose.yml`:
+`TAB_HEALTH_CHECK_SECONDS=30`, `TAB_HEALTH_PROBE_TIMEOUT_SECONDS=6`,
+`TAB_HEALTH_FAILURE_THRESHOLD=3`, `TAB_ERROR_FAILURE_THRESHOLD=2`,
+`TAB_RECOVERY_COOLDOWN_SECONDS=60`.
 
-Inspect \`/logs/controller.log\`, \`/logs/chrome.log\`,
-\`/logs/ui-watchdog.log\`, \`/logs/tab-recovery/\` screenshots, and
-\`/data/state/runtime_status.json\` for
-\`tab_recovery_count\`, \`tab_recovery_last_slot\`,
-\`tab_recovery_last_reason\`, \`tab_recovery_error\`.
-For repeated failures, check Docker \`OOMKilled\` and container memory
-usage against \`mem_limit: 3g\` (cause unverified until live logs are read).
+Inspect `/logs/controller.log`, `/logs/chrome.log`,
+`/logs/ui-watchdog.log`, `/logs/tab-recovery/` screenshots, and
+`/data/state/runtime_status.json` for
+`tab_recovery_count`, `tab_recovery_last_slot`,
+`tab_recovery_last_reason`, `tab_recovery_error`.
+For repeated failures, check Docker `OOMKilled` and container memory
+usage against `mem_limit: 3g` (cause unverified until live logs are read).
 
-Run \`python tests/test_localization_tab_recovery.py\` to verify isolated
+Run `python tests/test_localization_tab_recovery.py` to verify isolated
 recovery before redeployment. Rebuild/redeploy the **v2** stack to apply
 the code; preserve the named data and log volumes. The older standalone
-\`tools/chat-controller/localization/\` image is not the v2 production
+`tools/chat-controller/localization/` image is not the v2 production
 image and does not inherit this fix automatically.
