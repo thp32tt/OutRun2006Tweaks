@@ -1,0 +1,103 @@
+{
+  "run_key": "RUN_KEY=OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
+  "previous_C_failure": "C326 B313 SOURCE_FAMILY_MISMATCH ITALIC_UNDERLEAN",
+  "material_method_change": "NotoCJK BOLD instead of BLACK; tighter glyph tracking; native x-slant 0.65 in readable orientation; more highlight and thinner stroke silhouette; source original exact",
+  "schema_version": 2,
+  "role": "B",
+  "run": "B331",
+  "queue_index": 60,
+  "priority": "P0",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+  "trial_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "trial_only_dds": 1,
+  "new_production_dds": 0,
+  "trial_promoted": false,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_bbox": [
+    2081,
+    250,
+    2860,
+    370
+  ],
+  "trial_bbox": [
+    2133,
+    256,
+    2807,
+    363
+  ],
+  "margins": [
+    52,
+    53,
+    6,
+    7
+  ],
+  "font": "native NotoSansCJK Bold with individual tracking and source-conditioned 0.65 readable-right forward-lean geometry",
+  "font_size": 94,
+  "palette_from_native_source": {
+    "gold": [
+      229,
+      216,
+      159
+    ],
+    "navy": [
+      0,
+      8,
+      57
+    ],
+    "white": [
+      244,
+      239,
+      194
+    ]
+  },
+  "method": "Native individually spaced glyph masters with intact counters; +0.28 source-relative readable italic slant, source-derived cream/gold face gradient and soft offset navy depth/rim, no foreign box, B310 Stage preserved",
+  "machine_checks": {
+    "dds_header_exact": true,
+    "format": "RGBA",
+    "mips": 1,
+    "native": [
+      4096,
+      2048
+    ],
+    "roundtrip": "PASS",
+    "changed_outside_gold": 0,
+    "alpha_outside_gold": 0,
+    "protected_outside_gold": "UNCHANGED_EXACT",
+    "source_cell_clean_alpha": 0,
+    "source_size_and_positive_margins": "PASS"
+  },
+  "proofs": [
+    "B331_FLIPY_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_WHITE_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_WHITE_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_WHITE_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_BLACK_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_FLIPY_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_WHITE_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_WHITE_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_WHITE_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_BLACK_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B331_RAW_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png"
+  ],
+  "producer_visual": "PENDING_DIRECT_CONTROLLER_VISUAL_REVIEW",
+  "status": "TRIAL_ONLY_NOT_PROMOTED_NO_QA_PASS",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
