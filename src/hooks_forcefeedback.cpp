@@ -117,6 +117,14 @@ public:
 
         GamePlCar_Ctrl = safetyhook::create_inline(Module::exe_ptr(GamePlCar_Ctrl_Addr), GamePlCar_Ctrl_Hook);
 
+        // The finalized wheel FFB samples physics through this trampoline.
+        // Do not report successful installation when the hook is absent:
+        // otherwise VR boots with a silently disconnected wheel update path.
+        if (!GamePlCar_Ctrl)
+        {
+            spdlog::error("Vibration: GamePlCar_Ctrl hook installation failed; wheel FFB physics callback unavailable");
+            return false;
+        }
         return true;
     }
 
