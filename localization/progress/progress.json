@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 01:18 KST",
+  "updated_at_kst": "2026-10-10 01:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9659,6 +9659,20 @@
     "C3": "PENDING",
     "runtime": "IGR030_IGR031_IGR040_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c336_c2_q154_red5_current_exact": {
+    "role": "C2",
+    "run": "C336",
+    "run_key": "OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150",
+    "queue_index": 154,
+    "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "new_verified_red5_exact_byte": 5,
+    "prior_C323_gray3_hold": true,
+    "decision": "HOLD_STRICT_RECHECK",
+    "new_DDS": 0,
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_C/20261010-C336-C2-Q154-CURRENT-RED-IDENTITY/C336_CONTROLLER_QA.json"
   }
-
 }
