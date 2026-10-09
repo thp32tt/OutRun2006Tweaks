@@ -142,20 +142,43 @@ class UIScaling : public Hook
 	{
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
 
-		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+		// D3DX allows optional 2D scaling/translation inputs. During resolution
+		// or device reset the game scale may also be invalid. Preserve input
+		// values and forward the original call when reprojection is unsafe.
+		if ((mode == ScalingMode::KeepCentered ||
+		     mode == ScalingMode::OnlineArcade) &&
+		    pScaling && pTranslation &&
+		    Game::screen_scale && Game::screen_resolution)
 		{
-			// Multiply by the smallest scale factor
-			float scale = min(Game::screen_scale->x, Game::screen_scale->y);
-
-			pScaling->x = (pScaling->x / Game::screen_scale->x) * scale;
-			pScaling->y = (pScaling->y / Game::screen_scale->y) * scale;
-
-			float origX = (pTranslation->x / Game::screen_scale->x);
-
-			// Reposition sprite to be centered
-			float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
-			pTranslation->x = (origX * scale) + centering;
-			pTranslation->y = (pTranslation->y / Game::screen_scale->y) * scale;
+			const float sx = Game::screen_scale->x;
+			const float sy = Game::screen_scale->y;
+			if (std::isfinite(sx) && std::isfinite(sy) &&
+			    sx > 1.0e-6f && sy > 1.0e-6f &&
+			    std::isfinite(pScaling->x) &&
+			    std::isfinite(pScaling->y) &&
+			    std::isfinite(pTranslation->x) &&
+			    std::isfinite(pTranslation->y) &&
+			    std::isfinite(Game::screen_resolution->x) &&
+			    std::isfinite(Game::original_resolution.x))
+			{
+				const float scale = min(sx, sy);
+				const float xScale = (pScaling->x / sx) * scale;
+				const float yScale = (pScaling->y / sy) * scale;
+				const float centeredX =
+				    (pTranslation->x / sx) * scale +
+				    (Game::screen_resolution->x -
+				     Game::original_resolution.x * scale) / 2;
+				const float centeredY = (pTranslation->y / sy) * scale;
+				// Complete the finite check before mutating any in/out argument.
+				if (std::isfinite(xScale) && std::isfinite(yScale) &&
+				    std::isfinite(centeredX) && std::isfinite(centeredY))
+				{
+					pScaling->x = xScale;
+					pScaling->y = yScale;
+					pTranslation->x = centeredX;
+					pTranslation->y = centeredY;
+				}
+			}
 		}
 
 		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation, pScaling, pRotationCenter, Rotation, pTranslation);

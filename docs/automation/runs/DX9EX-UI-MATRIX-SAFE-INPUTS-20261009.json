@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-UI-MATRIX-SAFE-INPUTS-20261009",
+  "production_id": "DX9EX-UI-MATRIX-SAFE-INPUTS-20261009",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "385e0ad3825eaa76cebb1b8374aeef33e98fdd78",
+  "event_type": "new_independent_task_after_00558_complete",
+  "status": "CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "work_key": "DX9EX:UI:D3DX_MATRIX_OPTIONAL_INPUT_SCALE",
+  "conflict_keys": [
+    "src/hooks_uiscaling.cpp:D3DXMatrixTransformation2D_dest"
+  ],
+  "summary": "Preserve original D3DX trampoline and screen-space normal path while guarding optional scaling/translation pointers, zero/nonfinite reset-time screen scale and atomic transform outputs.",
+  "paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_ui_matrix_safety.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "one_pass": true,
+    "negative_mutants": 3
+  },
+  "origin_00558": {
+    "material_sha": "b14901f8b70b1b6fda8a9aded1e340147a453e68",
+    "ci": "PASS_EXACT_SHA",
+    "cause_of_E003": "bookkeeping E002 SHA 385e0ad did not trigger src-path workflow; no gate failure",
+    "runtime": "UNTESTED"
+  },
+  "score_change_pending": 0,
+  "next_action": "Read GitHub Actions exact material SHA and update record only after completion."
+}

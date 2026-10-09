@@ -60,6 +60,7 @@ on:
       - 'docs/automation/r84-port/**'
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'tools/verify_vr_hud_cadence_restore.py'
+      - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_cross_thread_semantic_registry.py'
       - 'tools/verify_vr_projected_marker_anchor.py'
@@ -158,6 +159,7 @@ jobs:
             'tools/verify_vr_producer_provenance.py',
             'tools/verify_vr_cross_thread_semantic_registry.py',
             'tools/verify_vr_projected_marker_anchor.py',
+            'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_projected_marker_telemetry.py',
             'tools/verify_vr_visual_composition_p0.py',
             'tools/audit_vr_result_full_source.py',
