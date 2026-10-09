@@ -54,7 +54,10 @@
   "build": {
     "Win32_Release_workflow": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37892438103",
     "Korean_Test_Build_workflow": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37892438028",
-    "status": "IN_PROGRESS_PENDING_LOG_VERIFICATION"
+    "status": "PASS",
+    "Win32_Release_conclusion": "SUCCESS",
+    "Korean_Test_Build_conclusion": "SUCCESS",
+    "source_validation_ref": "bbb586328bcbed6d4a0ba5124510435038cf5554"
   },
   "retest_procedure": [
     "Set KoreanHudLayoutTrace=true under [Localization], retain KoreanTextOverlayTest=true and [Overlay] Enabled=true",
@@ -63,7 +66,7 @@
     "If no matching runtime record appears, inspect exact original HUD DDS/atlas; do not invent runtime or DDS fix",
     "Only after proving graphics-versus-runtime defect, modify the exact failing source, rerun Win32 build + independent C and newer real-game validation"
   ],
-  "QA": "STATIC_PROBE_IMPLEMENTED_BUILD_RUNNING",
+  "QA": "DIAGNOSTIC_BUILD_PASS_MAPPING_AND_REAL_GAME_PENDING",
   "C1": "NOT_RUN",
   "C3": "NOT_APPLICABLE_UNTIL_DDS",
   "actual_game": "NOT_RUN",
