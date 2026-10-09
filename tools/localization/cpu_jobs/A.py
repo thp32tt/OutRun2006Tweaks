@@ -76,101 +76,114 @@ def y_profile(english):
  if len(have)<30:raise RuntimeError("English source chrome face insufficient")
  v=np.interp(np.arange(len(nums)),have,nums[have])
  return np.clip(gaussian_filter1d(v,1.5),35,250)
-if not CAND.exists() or digest(CAND)!=OLD_SHA:raise RuntimeError("candidate drift; fail closed")
-hdr,old=read(CAND)
-clean=Image.open(BASE/"754F0599_HD_CLEAN_PLATE.png").convert("RGBA")
-with tempfile.TemporaryDirectory(prefix="outrun_a209_") as tmp:
- src=Path(tmp)/"source.dds";urllib.request.urlretrieve(URL,src)
- if digest(src)!=SOURCE_SHA:raise RuntimeError("canonical English source drift")
- sh,original=read(src)
- if hdr!=sh or original.size!=old.size or clean.size!=old.size:raise RuntimeError("DDS/CLEAN dimension/header drift")
- x0,y0,x1,y1=BOX
- S=np.array(original);B=np.array(old);C=np.array(clean)
- allowed=np.zeros((1024,2048),bool);allowed[y0:y1,x0:x1]=True
- # Source is canonical proof, not the prior already damaged candidate.
- outside_old=int(np.count_nonzero(np.any(S!=B,axis=2)&~allowed))
- # Other two headers are existing localized regions. Check only old->trial outside.
- plate=old.copy()
- plate.paste(clean.crop(BOX),BOX[:2])
- P=np.asarray(plate).copy()
- if np.count_nonzero(np.any(B!=P,axis=2)&~allowed):raise RuntimeError("plate changed protected other region")
- if np.any(P[y0:y1,x0:x1,3]):raise RuntimeError("source glyph residue in CLEAN")
- # Native vector strokes, published masks and isolated plate before lettering.
- mask=contour()
- if mask.getbbox() is None:raise RuntimeError("vector empty")
- gx,gy=x0+12,y0+1
- if gx+mask.width>=x1-4 or gy+mask.height>=y1+2:
-  raise RuntimeError("vector exceeds source sprite")
- m=np.asarray(mask).astype(np.uint8)
- alpha=m>0
- yaxis=np.clip(np.arange(mask.height)+gy-y0,0,y1-y0-1)
- profile=y_profile(original.crop(BOX))[yaxis][:,None]
- core=distance_transform_edt(alpha)
- bright=np.clip(profile + 9*np.clip(4-core,0,4)/4,34,255)
- bevel=np.clip(bright-13*(core<2),32,250).astype("uint8")
- cols=np.broadcast_to(bevel,m.shape)
- ink=np.zeros((mask.height,mask.width,4),dtype=np.uint8)
- ink[:,:,:3]=cols[:,:,None];ink[:,:,3]=m
- layer=Image.fromarray(ink,"RGBA")
- depth=Image.new("RGBA",mask.size,(20,22,28,0))
- depth.putalpha(Image.fromarray((m.astype(np.float32)*0.69).astype("uint8"),"L"))
- final=plate.copy()
- final.alpha_composite(depth,(gx+4,gy+5))
- final.alpha_composite(layer,(gx,gy))
- F=np.asarray(final)
- union=np.zeros((1024,2048),bool)
- union[gy:gy+mask.height,gx:gx+mask.width]|=alpha
- union[gy+5:gy+5+mask.height,gx+4:gx+4+mask.width]|=alpha
- changed=np.any(F!=B,axis=2)
- effect=np.any(F!=P,axis=2)
- metrics={
-  "previous_vs_trial_changed_outside_showroom":int(np.sum(changed&~allowed)),
-  "previous_vs_trial_alpha_changed_outside_showroom":int(np.sum((F[:,:,3]!=B[:,:,3])&~allowed)),
-  "source_vs_trial_change_in_untouched_headers":int(np.sum(np.any(F!=B,axis=2)&~allowed)),
-  "source_derived_plate_alpha_in_showroom":int(np.count_nonzero(P[y0:y1,x0:x1,3])),
-  "clean_vs_trial_changed_outside_glyph_and_depth":int(np.sum(effect&~union)),
-  "source_vs_plate_protected_outside_region_not_a_global_test":outside_old,
- }
- if any(v for k,v in metrics.items() if k!="source_vs_plate_protected_outside_region_not_a_global_test"):
-  raise RuntimeError(("A209 trial mechanical scope FAIL",metrics))
- ey,ex=np.nonzero(union)
- bbox=[int(ex.min()),int(ey.min()),int(ex.max()+1),int(ey.max()+1)]
- if bbox[0]<=x0 or bbox[1]<=y0 or bbox[2]>=x1 or bbox[3]>=y1:
-  raise RuntimeError(("vector effect crosses source bbox",bbox))
- # Actual decoded persisted DDS check, but NO production candidate promotion.
- trial=DIR/"A209_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds"
- save(hdr,final,trial)
- dh,decoded=read(trial)
- if dh!=hdr or not np.array_equal(np.asarray(decoded),F):raise RuntimeError("DDS roundtrip FAIL")
- # Isolated RAW/FLIPY source-clean-final and transparent-only proof for first look.
- original.save(DIR/"A209_SOURCE_READABLE.png")
- plate.save(DIR/"A209_CLEAN_SHOWROOM_READABLE.png")
- decoded.save(DIR/"A209_TRIAL_PERSISTED_READABLE.png")
- decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(DIR/"A209_TRIAL_PERSISTED_RAW.png")
- mask.save(DIR/"A209_SHO_ROOM_CUSTOM_VECTOR_MASK.png")
- for bgname,color in (("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
-  crops=[flat(im,color).crop((0,y0-5,x1+10,y1+8)) for im in (original,plate,old,decoded)]
-  w,h=crops[0].size
-  sheet=Image.new("RGB",(4*w+24,h+28),color)
-  ImageDraw.Draw(sheet).text((8,5),"ENGLISH | CLEAN | A188 REJECT | A209 HAND VECTOR",fill=(255,220,0) if bgname!="WHITE" else (0,0,0))
-  for i,c in enumerate(crops):sheet.paste(c,(i*(w+8),28))
-  for pct in (100,75,50):
-   img=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
-   img.save(DIR/f"A209_SHOWROOM_{bgname}_{pct}.jpg",quality=94)
- report={
-  "role":"A","run":"A209","queue_index":175,"priority":"P1","regression":"IGR-032",
-  "status":"MANUAL_VECTOR_METHOD_PILOT_TRIAL_ONLY_PENDING_CONTROLLER_VISUAL",
-  "source_sha256":SOURCE_SHA,"prior_promoted_sha256":OLD_SHA,
-  "new_trial_sha256":digest(trial),"new_promoted_dds":0,"new_trial_dds":1,
-  "source_bbox":list(BOX),"trial_bbox":bbox,
-  "source_size":[x1-x0,y1-y0],"trial_size":[bbox[2]-bbox[0],bbox[3]-bbox[1]],
-  "recipe":"Hand-authored rounded Hangul stroke skeleton 쇼룸 (no Orbit/generic Noto); source English row chromatic chrome + bevel + in-cell shadow, custom rail joins, no raster text resize",
-  "construction":"SOURCE→clean copied from pinned A188→source-derived custom vector layer→DDS encode/decode→source/protected exact scope, BGW 100/75/50, RAW",
-  "machine":metrics,"source_alpha_cleared_in_full_sprite":True,
-  "independent_C1":"BLOCKED_UNTIL_PRODUCER_VISUAL","C3":"BLOCKED",
-  "other_titles":"PRESERVED_EXACT_PRIOR_DDS_PIXELS_NOT_REPAIRED",
-  "runtime_validation":"UNTESTED","user_game":"OPEN_USER_INGAME_FAIL",
-  "consumer_first_unproven_link":"trial->production promotion (not done); preview/game load untested",
- }
- (DIR/"A209_PILOT_REPORT.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
- print("A209_VECTOR_TRIAL",json.dumps({"trial_sha":report["new_trial_sha256"],"bbox":bbox,"metrics":metrics}),flush=True)
+try:
+    if not CAND.exists() or digest(CAND)!=OLD_SHA:raise RuntimeError("candidate drift; fail closed")
+    hdr,old=read(CAND)
+    clean=Image.open(BASE/"754F0599_HD_CLEAN_PLATE.png").convert("RGBA")
+    with tempfile.TemporaryDirectory(prefix="outrun_a209_") as tmp:
+     src=Path(tmp)/"source.dds";urllib.request.urlretrieve(URL,src)
+     if digest(src)!=SOURCE_SHA:raise RuntimeError("canonical English source drift")
+     sh,original=read(src)
+     if hdr!=sh or original.size!=old.size or clean.size!=old.size:raise RuntimeError("DDS/CLEAN dimension/header drift")
+     x0,y0,x1,y1=BOX
+     S=np.array(original);B=np.array(old);C=np.array(clean)
+     allowed=np.zeros((1024,2048),bool);allowed[y0:y1,x0:x1]=True
+     # Source is canonical proof, not the prior already damaged candidate.
+     outside_old=int(np.count_nonzero(np.any(S!=B,axis=2)&~allowed))
+     # Other two headers are existing localized regions. Check only old->trial outside.
+     plate=old.copy()
+     plate.paste(clean.crop(BOX),BOX[:2])
+     P=np.asarray(plate).copy()
+     if np.count_nonzero(np.any(B!=P,axis=2)&~allowed):raise RuntimeError("plate changed protected other region")
+     if np.any(P[y0:y1,x0:x1,3]):raise RuntimeError("source glyph residue in CLEAN")
+     # Native vector strokes, published masks and isolated plate before lettering.
+     mask=contour()
+     if mask.getbbox() is None:raise RuntimeError("vector empty")
+     gx,gy=x0+12,y0+1
+     if gx+mask.width>=x1-4 or gy+mask.height>=y1+2:
+      raise RuntimeError("vector exceeds source sprite")
+     m=np.asarray(mask).astype(np.uint8)
+     alpha=m>0
+     yaxis=np.clip(np.arange(mask.height)+gy-y0,0,y1-y0-1)
+     profile=y_profile(original.crop(BOX))[yaxis][:,None]
+     core=distance_transform_edt(alpha)
+     bright=np.clip(profile + 9*np.clip(4-core,0,4)/4,34,255)
+     bevel=np.clip(bright-13*(core<2),32,250).astype("uint8")
+     cols=np.broadcast_to(bevel,m.shape)
+     ink=np.zeros((mask.height,mask.width,4),dtype=np.uint8)
+     ink[:,:,:3]=cols[:,:,None];ink[:,:,3]=m
+     layer=Image.fromarray(ink,"RGBA")
+     depth=Image.new("RGBA",mask.size,(20,22,28,0))
+     depth.putalpha(Image.fromarray((m.astype(np.float32)*0.69).astype("uint8"),"L"))
+     final=plate.copy()
+     final.alpha_composite(depth,(gx+4,gy+5))
+     final.alpha_composite(layer,(gx,gy))
+     F=np.asarray(final)
+     union=np.zeros((1024,2048),bool)
+     union[gy:gy+mask.height,gx:gx+mask.width]|=alpha
+     union[gy+5:gy+5+mask.height,gx+4:gx+4+mask.width]|=alpha
+     changed=np.any(F!=B,axis=2)
+     effect=np.any(F!=P,axis=2)
+     metrics={
+      "previous_vs_trial_changed_outside_showroom":int(np.sum(changed&~allowed)),
+      "previous_vs_trial_alpha_changed_outside_showroom":int(np.sum((F[:,:,3]!=B[:,:,3])&~allowed)),
+      "source_vs_trial_change_in_untouched_headers":int(np.sum(np.any(F!=B,axis=2)&~allowed)),
+      "source_derived_plate_alpha_in_showroom":int(np.count_nonzero(P[y0:y1,x0:x1,3])),
+      "clean_vs_trial_changed_outside_glyph_and_depth":int(np.sum(effect&~union)),
+      "source_vs_plate_protected_outside_region_not_a_global_test":outside_old,
+     }
+     if any(v for k,v in metrics.items() if k!="source_vs_plate_protected_outside_region_not_a_global_test"):
+      raise RuntimeError(("A209 trial mechanical scope FAIL",metrics))
+     ey,ex=np.nonzero(union)
+     bbox=[int(ex.min()),int(ey.min()),int(ex.max()+1),int(ey.max()+1)]
+     if bbox[0]<=x0 or bbox[1]<=y0 or bbox[2]>=x1 or bbox[3]>=y1:
+      raise RuntimeError(("vector effect crosses source bbox",bbox))
+     # Actual decoded persisted DDS check, but NO production candidate promotion.
+     trial=DIR/"A209_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds"
+     save(hdr,final,trial)
+     dh,decoded=read(trial)
+     if dh!=hdr or not np.array_equal(np.asarray(decoded),F):raise RuntimeError("DDS roundtrip FAIL")
+     # Isolated RAW/FLIPY source-clean-final and transparent-only proof for first look.
+     original.save(DIR/"A209_SOURCE_READABLE.png")
+     plate.save(DIR/"A209_CLEAN_SHOWROOM_READABLE.png")
+     decoded.save(DIR/"A209_TRIAL_PERSISTED_READABLE.png")
+     decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(DIR/"A209_TRIAL_PERSISTED_RAW.png")
+     mask.save(DIR/"A209_SHO_ROOM_CUSTOM_VECTOR_MASK.png")
+     for bgname,color in (("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
+      crops=[flat(im,color).crop((0,y0-5,x1+10,y1+8)) for im in (original,plate,old,decoded)]
+      w,h=crops[0].size
+      sheet=Image.new("RGB",(4*w+24,h+28),color)
+      ImageDraw.Draw(sheet).text((8,5),"ENGLISH | CLEAN | A188 REJECT | A209 HAND VECTOR",fill=(255,220,0) if bgname!="WHITE" else (0,0,0))
+      for i,c in enumerate(crops):sheet.paste(c,(i*(w+8),28))
+      for pct in (100,75,50):
+       img=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
+       img.save(DIR/f"A209_SHOWROOM_{bgname}_{pct}.jpg",quality=94)
+     report={
+      "role":"A","run":"A209","queue_index":175,"priority":"P1","regression":"IGR-032",
+      "status":"MANUAL_VECTOR_METHOD_PILOT_TRIAL_ONLY_PENDING_CONTROLLER_VISUAL",
+      "source_sha256":SOURCE_SHA,"prior_promoted_sha256":OLD_SHA,
+      "new_trial_sha256":digest(trial),"new_promoted_dds":0,"new_trial_dds":1,
+      "source_bbox":list(BOX),"trial_bbox":bbox,
+      "source_size":[x1-x0,y1-y0],"trial_size":[bbox[2]-bbox[0],bbox[3]-bbox[1]],
+      "recipe":"Hand-authored rounded Hangul stroke skeleton 쇼룸 (no Orbit/generic Noto); source English row chromatic chrome + bevel + in-cell shadow, custom rail joins, no raster text resize",
+      "construction":"SOURCE→clean copied from pinned A188→source-derived custom vector layer→DDS encode/decode→source/protected exact scope, BGW 100/75/50, RAW",
+      "machine":metrics,"source_alpha_cleared_in_full_sprite":True,
+      "independent_C1":"BLOCKED_UNTIL_PRODUCER_VISUAL","C3":"BLOCKED",
+      "other_titles":"PRESERVED_EXACT_PRIOR_DDS_PIXELS_NOT_REPAIRED",
+      "runtime_validation":"UNTESTED","user_game":"OPEN_USER_INGAME_FAIL",
+      "consumer_first_unproven_link":"trial->production promotion (not done); preview/game load untested",
+     }
+     (DIR/"A209_PILOT_REPORT.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+     print("A209_VECTOR_TRIAL",json.dumps({"trial_sha":report["new_trial_sha256"],"bbox":bbox,"metrics":metrics}),flush=True)
+
+except Exception as exc:
+ import traceback
+ issue={"role":"A","run":"A209","queue_index":175,
+        "status":"EXECUTION_DIAGNOSTIC_ONLY_NOT_CANDIDATE",
+        "exception":type(exc).__name__,
+        "message":str(exc),
+        "traceback":traceback.format_exc(),
+        "new_promoted_dds":0,"new_trial_dds":0,
+        "runtime_validation":"UNTESTED","candidate_preserved":True}
+ (DIR/"A209_EXECUTION_FAIL.json").write_text(json.dumps(issue,ensure_ascii=False,indent=2)+"\\n",encoding="utf8")
+ print("A209_WORKER_CAPTURED_FAILURE",issue["exception"],issue["message"],flush=True)
