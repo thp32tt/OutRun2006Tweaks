@@ -303,6 +303,25 @@ int main()
             ring.activation_ready(),
             "fresh allocation accepts next generation");
 
+    // R178 regression: an acquired slot can already have queued GPU writes
+    // even when signal_producer_fence() has not been called. Invalidation must
+    // not permit cancellation followed by a new-generation reuse.
+    std::uint32_t staleAcquiredSlot = 99;
+    require(ring.try_acquire_slot(
+                d3d.context, 13, nullptr, staleAcquiredSlot),
+            "R178 acquire frame before invalidation");
+    const HANDLE staleLeftHandle = ring.shared_handle(staleAcquiredSlot, 0);
+    require(staleLeftHandle != nullptr, "R178 original eye handle exists");
+    ring.invalidate_lifetime();
+    require(!ring.cancel_acquired_slot(staleAcquiredSlot, 13) &&
+            ring.slot_state(staleAcquiredSlot) == SharedEyeSlotState::Acquired &&
+            ring.slot_frame_id(staleAcquiredSlot) == 13 &&
+            ring.shared_handle(staleAcquiredSlot, 0) == staleLeftHandle,
+            "R178 invalidated acquired slot cannot be cancelled or recycled");
+    require(!ring.bind_lifetime(1001, 2002, 7, 12) &&
+            ring.slot_state(staleAcquiredSlot) == SharedEyeSlotState::Acquired,
+            "R178 invalidated acquired slot blocks generation retag");
+
     ring.shutdown();
     foreign.context->Release();
     foreign.device->Release();

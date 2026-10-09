@@ -288,7 +288,11 @@ namespace outrun::vr::dx11
         std::uint32_t slot,
         std::uint64_t frame_id) noexcept
     {
-        if (slot >= slots_.size())
+        // R178: an invalidated identity or failed producer fence may still
+        // have GPU writes recorded against this acquired slot. Cancel is safe
+        // only while the original live transport generation is authoritative.
+        // Otherwise preserve the slot as busy until hard retirement.
+        if (!activation_ready() || slot >= slots_.size())
             return false;
         auto& entry = slots_[slot];
         if (entry.state != SharedEyeSlotState::Acquired ||

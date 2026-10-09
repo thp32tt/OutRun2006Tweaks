@@ -213,6 +213,32 @@ def main() -> None:
             )
     if ring_cpp.count("!same_producer_context(context)") != 4:
         raise SystemExit("DX11 native ring must check all four context-bearing paths")
+
+    # R178: the acquired slot must remain quarantined after invalidation.
+    # This path does not query a GPU fence, so an invalidated generation
+    # cannot safely cancel and reuse it.
+    cancel_start = ring_cpp.find("bool NativeSharedEyeRing::cancel_acquired_slot(")
+    signal_start = ring_cpp.find(
+        "bool NativeSharedEyeRing::signal_producer_fence(", cancel_start)
+    if cancel_start < 0 or signal_start <= cancel_start:
+        raise SystemExit("DX11 R178 cancel/producer fence boundary missing")
+    cancel_body = ring_cpp[cancel_start:signal_start]
+    lifetime_guard = "if (!activation_ready() || slot >= slots_.size())"
+    if lifetime_guard not in cancel_body or (
+        cancel_body.index(lifetime_guard) >
+        cancel_body.index("reset_slot_lifetime(entry);")
+    ):
+        raise SystemExit("DX11 R178 invalidated acquired slot may be recycled")
+    probe_cpp = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
+        encoding="utf-8"
+    )
+    for needle in [
+        "R178 invalidated acquired slot cannot be cancelled or recycled",
+        "R178 invalidated acquired slot blocks generation retag",
+    ]:
+        if needle not in probe_cpp:
+            raise SystemExit(f"DX11 R178 WARP negative control missing: {needle}")
+    print("DX11 R178 invalidated acquired-slot cancel guard: OK")
     print("DX11 native transport lifetime contract: OK")
 
 
