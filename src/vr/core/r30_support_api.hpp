@@ -76,6 +76,8 @@ namespace OutRunVRStereo
     };
     bool R30SupportTryGetDirectTransportSourceSurfaces(
         R30SupportDirectTransportSourceSurfaces& out) noexcept;
+    // Borrowed, no AddRef: preserve the former R32 direct right-eye lookup.
+    IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;
     bool R30SupportTryGetDirectTransportIdentity(

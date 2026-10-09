@@ -43,8 +43,23 @@ r23_runtime_hardening = text("vrhost/src/runtime/r23_runtime_hardening.hpp")
 sbs_capture_override = text("vrhost/src/runtime/sbs_capture_override.hpp")
 overlay_hooks = text("src/overlay/hooks_overlay.cpp")
 render_semantics = text("src/vr/game/render_semantics.hpp")
+r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
+
+# R84 R32/R31 compile-ownership follow-up: borrowed right-eye surface reads
+# must stay in the R30/lower owner, not R32's private textual include chain.
+# The API preserves raw pointer identity and lifetime (no AddRef/release).
+if "IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;" not in r30_support_api:
+    errors.append("R30 right-eye borrowed surface owner declaration missing")
+if not re.search(
+    r"IDirect3DSurface9\\* R30SupportBorrowedRightEyeSurface\\(\\) noexcept"
+    r"\\s*\\{\\s*return RightEyeSurface;\\s*\\}", r30):
+    errors.append("R30 borrowed right-eye surface owner must return original lower pointer")
+if not re.search(
+    r"IDirect3DSurface9\\* R32ReviewRightEyeSurface\\(\\) noexcept"
+    r"\\s*\\{\\s*return R30SupportBorrowedRightEyeSurface\\(\\);\\s*\\}", r32):
+    errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
 
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven

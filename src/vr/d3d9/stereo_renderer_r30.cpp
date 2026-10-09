@@ -3407,6 +3407,11 @@ namespace OutRunVRStereo
         return out.left != nullptr && out.right != nullptr;
     }
 
+    IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept
+    {
+        return RightEyeSurface;
+    }
+
     void R30SupportReleaseDirectAckState() noexcept
     {
         R13ReleaseAckState();
