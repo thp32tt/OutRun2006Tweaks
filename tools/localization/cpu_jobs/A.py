@@ -1,256 +1,191 @@
 #!/usr/bin/env python3
-"""A202 P0 q121 new native white-italic car/mode/course headers.
-No VR, FFB, DX11, DXVK. CPU-heavy work on GitHub-hosted runner only.
-"""
-import os, json, struct, hashlib, glob, subprocess, urllib.request
-from pathlib import Path
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageFilter
+"""A204 q175 independent source-chrome / geometric Hangul REPRESENTATIVE trial.
 
-if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
-    raise SystemExit("A202 requires GitHub Actions CPU role A")
-root=Path.cwd()
-run="20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT"
-out=root/"localization/graphics/role_A"/run
-out.mkdir(parents=True,exist_ok=True)
-worker=root/"localization/graphics/worker_results"
-worker.mkdir(parents=True,exist_ok=True)
-asset="textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-candidate=root/"localization/graphics/hd_candidates"/asset
-oldsha="4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8"
-originalsha="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-baseline=root/"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE"
-def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-def load(path):
-    bb=Path(path).read_bytes()
-    if bb[:4]!=b"DDS ":raise RuntimeError("Invalid DDS")
-    h,w=struct.unpack_from("<II",bb,12)
-    pitch=struct.unpack_from("<I",bb,20)[0]
-    mips=struct.unpack_from("<I",bb,28)[0]
-    bpp=struct.unpack_from("<I",bb,88)[0]
-    fmt=bb[84:88]
-    masks=struct.unpack_from("<IIII",bb,92)
-    mode={(255,65280,16711680,4278190080):"RGBA",(16711680,65280,255,4278190080):"BGRA"}.get(masks)
-    if not mode or bpp!=32 or mips!=1 or fmt!=bytes(4) or len(bb)!=128+w*h*4:raise RuntimeError(("DDS changed",w,h,bpp,mips,mode))
-    image=Image.frombytes("RGBA",(w,h),bb[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    return bb[:128],image,{"width":w,"height":h,"mode":mode,"mips":mips,"pitch":pitch,"masks":list(masks),"raw":"mirror_y"}
-def write(header,image,mode):
-    binary=header+image.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw",mode)
-    candidate.write_bytes(binary)
-    return hashlib.sha256(binary).hexdigest()
-def bb(mask):
-    ys,xs=np.nonzero(mask)
-    if len(xs)==0:raise RuntimeError("No visible title")
-    return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-def font():
-    p=glob.glob("/usr/share/fonts/**/NotoSansCJK-Black.ttc",recursive=True)
-    if not p:
-        subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-        subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
-        p=glob.glob("/usr/share/fonts/**/NotoSansCJK-Black.ttc",recursive=True)
-    if not p:raise RuntimeError("CJK original-style Black font missing")
-    return p[0]
-def glyph(text,size,shear):
-    f=ImageFont.truetype(FONT,size,index=1)
-    tmp=Image.new("L",(2800,370),0)
-    dr=ImageDraw.Draw(tmp)
-    dr.text((40,35),text,font=f,fill=255)
-    b=tmp.getbbox()
-    if b is None or b[0]<=2 or b[1]<=2 or b[2]>=tmp.width-2 or b[3]>=tmp.height-2:
-        raise RuntimeError(("Clipped source glyph render",text,size,b))
-    im=tmp.crop(b)
-    d=int(np.ceil(shear*im.height))+8
-    # x_src=x_dst+shear*y-shear*height+4 means upper glyph leans RIGHT.
-    result=im.transform((im.width+d,im.height),Image.Transform.AFFINE,
-       (1,shear,-shear*im.height+4,0,1,0),resample=Image.Resampling.BICUBIC,fillcolor=0)
-    bounds=result.getbbox()
-    if not bounds:raise RuntimeError("Slant transform empty")
-    return result.crop(bounds)
-def rgb(im,color):
-    back=Image.new("RGBA",im.size,(*color,255))
-    back.alpha_composite(im)
-    return back.convert("RGB")
-if not candidate.exists() or sha(candidate)!=oldsha:
-    raise RuntimeError(("P0 q121 concurrent newer work, fail closed",sha(candidate) if candidate.exists() else "missing"))
-triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","121","--require-safe-rerender"],
-                      capture_output=True,text=True)
-print("A202_TRIAGE",triage.stdout,flush=True)
-if triage.returncode!=0 or '"MATERIAL_REWORK"' not in triage.stdout:
-    raise RuntimeError(("P0 rerender blocked",triage.stderr,triage.stdout))
-original=Path("/tmp/a199_q121_canonical.dds")
-urllib.request.urlretrieve(url,original)
-if sha(original)!=originalsha:raise RuntimeError(("canonical English source mismatch",sha(original)))
-header,source,meta=load(original)
-prior_header,prior,prior_meta=load(candidate)
-if header!=prior_header or meta!=prior_meta or (meta["width"],meta["height"],meta["mode"])!=(4096,4096,"RGBA"):
-    raise RuntimeError("Candidate/source format incompatible")
-clean=Image.open(baseline/"A176_Q121_CLEAN.png").convert("RGBA")
-if clean.size!=source.size:raise RuntimeError("Authored clean size changed")
-a176=json.loads((baseline/"A176_Q121_REPORT.json").read_text(encoding="utf-8"))
-if a176["source_sha256"]!=originalsha or a176["candidate_sha256"]!="d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27":raise RuntimeError("A176 provenance drift")
-regions=[
-  {"key":"select_game_mode","english":"Select Game Mode","korean":"게임 모드 선택","source_bbox":[166,819,1166,973],"old_bbox":[341,846,990,945],"band":[820,953],"min_height":118},
-  {"key":"select_car","english":"Select your car","korean":"차량을 선택하세요","source_bbox":[243,947,1156,1111],"old_bbox":[481,964,917,1072],"band":[959,1077],"min_height":95},
-  {"key":"select_course","english":"Select Course","korean":"코스 선택","source_bbox":[302,1062,1085,1213],"old_bbox":[478,1088,908,1187],"band":[1083,1207],"min_height":110}
+Read-only candidate preview, fail-closed before DDS promotion. The script
+uses a geometrically distinct Hangul contour family and takes chrome bands
+from the original English DDS pixels, not a generic blur/stretch/bevel.
+"""
+import hashlib
+import json
+import os
+import struct
+import tempfile
+import urllib.request
+from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+from scipy.ndimage import gaussian_filter1d, grey_closing, distance_transform_edt
+
+assert os.environ.get("OUTRUN_CPU_WORKER") == "github-actions"
+assert os.environ.get("OUTRUN_CPU_ROLE") == "A"
+ROOT=Path.cwd()
+RUN="20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL"
+OUT=ROOT/"localization/graphics/role_A"/RUN
+OUT.mkdir(parents=True,exist_ok=True)
+BASE=ROOT/"localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY"
+CAND=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+SRC_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+SRC_SHA="9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
+OLD_SHA="b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73"
+FONT_URL="https://raw.githubusercontent.com/JAMO-TYPEFACE/Orbit/main/Fonts/ttf/Orbit-Regular.ttf"
+FONT_GIT_BLOB="5f7f97f84a88e2fa34c4afdc3ba69b08f13d0783"
+ROWS=[
+ ("stage_select","stage select","스테이지 선택",(6,254,1372,397)),
+ ("showroom","showroom","쇼룸",(6,397,956,529)),
+ ("single_player","single player","싱글 플레이",(2,566,1386,717))
 ]
-# Exact A176 authored CLEAN preserves previously localized non-title sprites.
-src=np.asarray(source)
-ca=np.asarray(clean)
-priorpix=np.asarray(prior)
-allowed=np.zeros((4096,4096),dtype=bool)
-for row in regions:
-    x0,y0,x1,y1=row["source_bbox"]
-    allowed[y0:y1,x0:x1]=True
-    if np.any(ca[y0:y1,x0:x1,3]):raise RuntimeError(("old-source-clean not transparent",row["key"]))
-preexisting_out=int(np.logical_and(np.any(ca!=priorpix,axis=2),~allowed).sum())
-if preexisting_out:raise RuntimeError(("A176 CLEAN/current unrelated asset drift",preexisting_out))
-FONT=font()
-final=clean.copy()
-glyph_masks=[]
-result=[]
-for row in regions:
-    x0,y0,x1,y1=row["source_bbox"]
-    by0,by1=row["band"]
-    # Source bbox envelopes overlap in Y; explicit non-touch vertical
-    # corridors avoid STAGE/selector header layer overlap after enlarged type.
-    if by0<y0 or by1>y1:raise RuntimeError("Vertical title corridor not source-contained")
-    availh=by1-by0
-    availw=x1-x0
-    picked=None
-    for size in range(160,80,-1):
-        white=glyph(row["korean"],size,0.25)
-        # 5px right+5px down SINGLE flat black original-like depth only.
-        if white.width+11<=availw-6 and white.height+11<=availh-4:
-            picked=(size,white)
-            break
-    if not picked:raise RuntimeError(("No style-preserving native size fits",row["key"]))
-    pt,face=picked
-    if face.height<row["min_height"]-6:
-        raise RuntimeError(("Insufficient source-height hierarchy",row["key"],face.size))
-    gx=x0+(availw-face.width-5)//2
-    gy=by0+(availh-face.height-5)//2
-    if gx-x0<=2 or gx+face.width+5>=x1-2 or gy<=by0+1 or gy+face.height+5>=by1-1:
-        raise RuntimeError(("Original bbox/vertical band with shadow fail",row["key"],face.size,(gx,gy)))
-    fg=Image.new("L",source.size,0)
-    fg.paste(face,(gx,gy))
-    bg=Image.new("L",source.size,0)
-    bg.paste(face,(gx+5,gy+5))
-    union=(np.asarray(fg)>0)|(np.asarray(bg)>0)
-    for former in glyph_masks:
-        if np.any(union & former):raise RuntimeError(("Label collision",row["key"]))
-    if np.any(union & ~allowed):raise RuntimeError(("Protected source pixel intrusion",row["key"]))
-    # RGBA flat right/lower black shadow and clean white original-like face.
-    black=Image.new("RGBA",source.size,(0,0,0,0))
-    black.putalpha(bg)
-    white=Image.new("RGBA",source.size,(250,250,250,0))
-    white.putalpha(fg)
-    final.alpha_composite(black)
-    final.alpha_composite(white)
-    glyph_masks.append(union)
-    b=bb(union)
-    oldb=row["old_bbox"]
-    result.append({
-       "key":row["key"],"english":row["english"],"korean":row["korean"],
-       "source_bbox":row["source_bbox"],"old_bbox":oldb,"new_bbox":b,
-       "old_size":[oldb[2]-oldb[0],oldb[3]-oldb[1]],
-       "new_size":[b[2]-b[0],b[3]-b[1]],"face_size":list(face.size),
-       "source_size":[x1-x0,y1-y0],"positive_margins":[b[0]-x0,x1-b[2],b[1]-y0,y1-b[3]],
-       "band":row["band"],"point_size":pt,"shear":0.25,"shadow_delta":[5,5],
-       "face_rgb":[250,250,250],"shadow_rgb":[0,0,0]
-    })
-fa=np.asarray(final)
-newglyph=np.zeros_like(allowed)
-for m in glyph_masks:newglyph|=m
-changed=np.any(ca!=fa,axis=2)
-clean_final_outside=int(np.logical_and(changed,~allowed).sum())
-clean_final_nonglyph=int(np.logical_and(changed,~newglyph).sum())
-alpha_changed_outside=int(np.logical_and(fa[:,:,3]!=ca[:,:,3],~allowed).sum())
-protected_changed=int(np.logical_and(fa!=priorpix,~allowed[:,:,None]).sum())
-source_remainder=0
-for r in regions:
-    x0,y0,x1,y1=r["source_bbox"]
-    # English source has alpha; clean is genuinely transparent here.
-    source_remainder+=int(np.logical_and(src[y0:y1,x0:x1,3]>0,
-                  np.logical_and(np.all(fa[y0:y1,x0:x1]==src[y0:y1,x0:x1],axis=2),
-                                 ~newglyph[y0:y1,x0:x1])).sum())
-if any((clean_final_outside,clean_final_nonglyph,alpha_changed_outside,protected_changed,source_remainder)):
-    raise RuntimeError(("source-clean composite-protected fail",
-                        clean_final_outside,clean_final_nonglyph,alpha_changed_outside,protected_changed,source_remainder))
-if len(result)!=3: raise RuntimeError("title inventory changed")
-car=next(x for x in result if x["key"]=="select_car")
-# This is a material SEMANTIC+FOOTPRINT reconstruction, not horizontal font scaling.
-# All non-car labels, background / art and bytes must remain identical to A199.
-if car["korean"]!="차량을 선택하세요" or car["new_size"][0]<580 or car["new_size"][1]<90:
-    raise RuntimeError(("P0 car title remains source-underfilled",car["new_size"]))
-corridor=np.zeros((4096,4096),dtype=bool)
-corridor[959:1077,243:1156]=True
-delta_prev=np.any(fa!=priorpix,axis=2)
-noncar_changes=int(np.logical_and(delta_prev,~corridor).sum())
-if noncar_changes:
-    raise RuntimeError(("A202 changed unrelated title rows or protected artwork",noncar_changes))
-changed_car=int(np.logical_and(delta_prev,corridor).sum())
-if changed_car<15000:raise RuntimeError(("No meaningful car title replacement",changed_car))
-print("A202_ISOLATION",{"car_bbox":car["new_bbox"],"car_size":car["new_size"],"unchanged_other":noncar_changes,"changed_car":changed_car},flush=True)
-newsha=write(header,final,meta["mode"])
-hh,encoded,mm=load(candidate)
-if hh!=header or mm!=meta or ImageChops.difference(encoded,final).getbbox():
-    raise RuntimeError("actual persisted DDS bytes roundtrip failed")
-source.save(out/"A202_SOURCE_NATIVE.png")
-clean.save(out/"A202_CLEAN_NATIVE.png")
-encoded.save(out/"A202_FINAL_SAVED_NATIVE.png")
-Image.fromarray((allowed*255).astype("uint8"),"L").save(out/"A202_ORIGINAL_BBOX_SCOPE.png")
-Image.fromarray((newglyph*255).astype("uint8"),"L").save(out/"A202_COMPOSED_GLYPHS_SCOPE.png")
-proof=[]
-for i,r in enumerate(regions):
-    x0,y0,x1,y1=r["source_bbox"]
-    crop=(max(0,x0-16),max(0,y0-20),min(4096,x1+16),min(4096,y1+20))
-    for k,im in (("SOURCE",source),("CLEAN",clean),("FINAL",encoded)):
-        im.crop(crop).save(out/f"A202_{i}_{r['key']}_{k}_NATIVE.png")
-    for bgname,bgc in (("BLACK",(0,0,0)),("GRAY",(128,128,128)),("WHITE",(255,255,255))):
-        images=[rgb(im,bgc).crop(crop) for im in (source,clean,encoded)]
-        w,h=images[0].size
-        sheet=Image.new("RGB",(3*w+14,h+30),"white")
-        ImageDraw.Draw(sheet).text((2,4),f"A202 {r['key']} SOURCE | CLEAN | SAVED FINAL {bgname}",fill="black")
-        for j,im in enumerate(images):sheet.paste(im,(j*(w+7),30))
-        for scale in (100,75,50):
-            if scale<100:
-                view=sheet.resize((sheet.width*scale//100,sheet.height*scale//100),Image.Resampling.LANCZOS)
-            else:view=sheet
-            name=f"A202_{i}_{r['key']}_{bgname}_{scale}.jpg"
-            view.save(out/name,quality=95)
-            proof.append(name)
-for orientation,imgs in (("READABLE",(source,encoded)),
-                         ("RAW",(source.transpose(Image.Transpose.FLIP_TOP_BOTTOM),
-                                 encoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM)))):
-    a,b=[rgb(im,(200,200,200)) for im in imgs]
-    a.thumbnail((1100,1100));b.thumbnail((1100,1100))
-    sheet=Image.new("RGB",(a.width+b.width+10,max(a.height,b.height)+30),"white")
-    ImageDraw.Draw(sheet).text((3,5),f"English exact SOURCE / Korean saved DDS {orientation}",fill="black")
-    sheet.paste(a,(0,30));sheet.paste(b,(a.width+10,30))
-    sheet.save(out/f"A202_{orientation}_SOURCE_FINAL.jpg",quality=95)
-qa={
- "schema_version":1,"role":"A","run":run,"priority":"P0","queue_index":121,
- "affected_screenshots":["181","182","192"],"ingame_rows":["IGR-030","IGR-031","IGR-040"],
- "asset":asset,"canonical_source_sha256":originalsha,"superseded_sha256":oldsha,"candidate_sha256":newsha,
- "source_clean":"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
- "source_style":"original heavy WHITE italic face with simple RIGHT-DOWN 5px BLACK depth, not multi hard gray outlines",
- "rows":result,"machine_qa":{"clean_old_unrelated_diff_outside_original_bboxes":preexisting_out,
- "clean_final_outside_original_bboxes":clean_final_outside,"clean_final_outside_glyph_masks":clean_final_nonglyph,
- "alpha_outside_original_bboxes":alpha_changed_outside,"protected_unrelated_changed_pixels":protected_changed,
- "source_exact_residue_outside_localized_masks":source_remainder,"label_collision_pairs":0,
- "header128_exact":True,"native_dds_roundtrip":"PASS"},
- "native_structure":meta,"artifacts":proof,"header_alpha_preserved":True,
- "C1":"PENDING","C3":"PENDING","user_game_retest":"REQUIRED","RUNTIME_VALIDATION":"UNTESTED",
- "new_method":"source semantic imperative restoration: Select your car -> 차량을 선택하세요, NO width stretch; preserve other two A199 title cells byte-identical", "only_car_corridor_changed":True, "noncar_changes":noncar_changes, "car_changed_pixels":changed_car,
- "producer_decision":"MACHINE_PASS_CONTROLLER_VISUAL_PENDING",
- "known_limitations":["In-game car header clip may also involve runtime/title-layer mapping","No protected Dino logo source established: left untouched","In-game English small info cells are separate mixed source mapping","No actual-game test or C1 slant calibration: HOLD until independently validated"]
-}
-(out/"A202_WORKER_REPORT.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(worker/"A202_Q121.json").write_text(json.dumps({
- "run":run,"index":121,"candidate_sha256":newsha,
- "source_sha256":originalsha,"regions":result,"machine_qa":qa["machine_qa"],
- "status":"MACHINE_PASS_CONTROLLER_VISUAL_PENDING","RUNTIME_VALIDATION":"UNTESTED",
- "report":str((out/"A202_WORKER_REPORT.json").relative_to(root))
-},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("A202_MACHINE_DONE",newsha,[(r["key"],r["old_size"],r["new_size"],r["positive_margins"]) for r in result],flush=True)
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def load_dds(path):
+    data=Path(path).read_bytes()
+    w,h=struct.unpack_from("<II",data,16)
+    if data[:4]!=b"DDS " or (w,h)!=(2048,1024) or len(data)!=128+w*h*4:
+        raise ValueError("unexpected DDS size/format")
+    masks=struct.unpack_from("<IIII",data,92)
+    if masks!=(16711680,65280,255,4278190080) or struct.unpack_from("<I",data,88)[0]!=32:
+        raise ValueError("DDS is not expected BGRA32")
+    if struct.unpack_from("<I",data,28)[0]!=1:
+        raise ValueError("DDS mips unexpectedly changed")
+    return data[:128],Image.frombytes("RGBA",(w,h),data[128:],"raw","BGRA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+def gitblob(p):
+    b=Path(p).read_bytes()
+    return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+def rgba_on_gray(im,color=(100,100,100)):
+    bg=Image.new("RGBA",im.size,(*color,255))
+    bg.alpha_composite(im)
+    return bg.convert("RGB")
+def make_font_mask(text, font, maxw, maxh):
+    # Make Hangul from Orbit outlines at native 2048 resolution.
+    # The original English techno geometry has long horizontal connections;
+    # preserve geometric, distinct syllable counters; never enlarge a low-res raster.
+    for sz in range(156,85,-1):
+        f=ImageFont.truetype(str(font),sz)
+        canvas=Image.new("L",(1900,260),0)
+        dr=ImageDraw.Draw(canvas)
+        dr.text((30,8),text,font=f,fill=255,stroke_width=3,stroke_fill=255)
+        bbox=canvas.getbbox()
+        if bbox is None:continue
+        crop=canvas.crop(bbox)
+        # Source-derived horizontal connection, very short (not across letters).
+        array=np.array(crop)
+        shaped=grey_closing(array,size=(1,4))
+        out=Image.fromarray(shaped.astype(np.uint8),"L")
+        if out.width <= maxw and out.height <= maxh and out.height >= maxh*0.78:
+            return out,sz
+    raise ValueError("no native geometric font fits original box")
+def chrome_profile(source_box):
+    pix=np.asarray(source_box.convert("RGBA"))
+    al=pix[:,:,3]
+    h=pix.shape[0]
+    samples=[]
+    for y in range(h):
+        lum=pix[y,:,:3].astype(np.float32).mean(axis=1)
+        good=al[y]>160
+        samples.append(float(np.percentile(lum[good],55)) if good.sum()>20 else np.nan)
+    samples=np.array(samples,dtype=np.float32)
+    good=np.flatnonzero(np.isfinite(samples))
+    if len(good)<25:raise ValueError("source color family missing")
+    profile=np.interp(np.arange(h),good,samples[good])
+    return np.clip(gaussian_filter1d(profile,1.6),38,252)
+if not CAND.exists() or sha(CAND)!=OLD_SHA:
+    raise RuntimeError("q175 current DDS SHA drift; do not retry prior bytes")
+oldhead,old=load_dds(CAND)
+clean=Image.open(BASE/"754F0599_HD_CLEAN_PLATE.png").convert("RGBA")
+with tempfile.TemporaryDirectory(prefix="outrun_a204_") as t:
+    srcp=Path(t)/"english.dds"
+    fontp=Path(t)/"Orbit-Regular.ttf"
+    urllib.request.urlretrieve(SRC_URL,srcp)
+    urllib.request.urlretrieve(FONT_URL,fontp)
+    if sha(srcp)!=SRC_SHA or gitblob(fontp)!=FONT_GIT_BLOB:
+        raise RuntimeError("pinned source or licensed font drift")
+    srch,source=load_dds(srcp)
+    if srch!=oldhead or clean.size!=source.size or source.size!=old.size:
+        raise RuntimeError("source/CLEAN/current structure drift")
+    sa=np.asarray(source).copy()
+    ca=np.asarray(clean).copy()
+    previous=np.asarray(old).copy()
+    allowed=np.zeros((1024,2048),dtype=bool)
+    for _,_,_,(x0,y0,x1,y1) in ROWS:
+        allowed[y0:y1,x0:x1]=True
+    source_clean_out=int(np.count_nonzero(np.any(sa!=ca,axis=2)&~allowed))
+    prior_current_out=int(np.count_nonzero(np.any(previous!=ca,axis=2)&~allowed))
+    if source_clean_out or prior_current_out:
+        raise RuntimeError(("plate/rework outside exact source",source_clean_out,prior_current_out))
+    final=clean.copy()
+    masks=[]
+    rec=[]
+    for key,english,korean,(x0,y0,x1,y1) in ROWS:
+        h=y1-y0
+        w=x1-x0
+        glyph,size=make_font_mask(korean,fontp,w-18,h-16)
+        gx=x0+8
+        gy=y0+(h-glyph.height)//2
+        ga=np.array(glyph,dtype=np.uint8)
+        lum=chrome_profile(source.crop((x0,y0,x1,y1)))
+        # Transfer metallic bands at source-normalized y; local 3px signed
+        # contour bevel is clipped *inside* the Hangul glyph, never an added box.
+        yy=np.clip((np.arange(ga.shape[0])+gy-y0),0,len(lum)-1)
+        luma=lum[yy][:,None]
+        d=distance_transform_edt(ga>=24)
+        upper=np.clip(5-d,0,5)/5
+        band=np.broadcast_to(luma,ga.shape)
+        mapped=np.clip(band+14*upper-5*(d<2),25,252).astype(np.uint8)
+        face=np.zeros((ga.shape[0],ga.shape[1],4),dtype=np.uint8)
+        face[:,:,:3]=mapped[:,:,None]
+        face[:,:,3]=ga
+        # Shadow only within the previously source-measured effect box.
+        fg=Image.fromarray(face,"RGBA")
+        shad=Image.new("RGBA",fg.size,(28,28,33,0))
+        shad.putalpha(Image.fromarray((ga.astype(np.uint16)*0.7).astype(np.uint8),"L"))
+        for overlay,shift in ((shad,(3,5)),(fg,(0,0))):
+            px,py=gx+shift[0],gy+shift[1]
+            if px+overlay.width>=x1-1 or py+overlay.height>=y1-1:
+                raise RuntimeError(("source bbox edge",key))
+            final.alpha_composite(overlay,(px,py))
+        scope=np.zeros((1024,2048),dtype=bool)
+        scope[gy:gy+glyph.height,gx:gx+glyph.width]|=ga>0
+        scope[gy+5:gy+5+glyph.height,gx+3:gx+3+glyph.width]|=ga>0
+        for prev in masks:
+            if (prev&scope).any():raise RuntimeError("title collision")
+        masks.append(scope)
+        by,bx=np.nonzero(scope)
+        bbox=[int(bx.min()),int(by.min()),int(bx.max()+1),int(by.max()+1)]
+        margins=[bbox[0]-x0,x1-bbox[2],bbox[1]-y0,y1-bbox[3]]
+        if any(x<=0 for x in margins):raise RuntimeError(("bbox overflow",key,bbox))
+        rec.append({"key":key,"english":english,"korean":korean,"source_bbox":[x0,y0,x1,y1],
+                    "trial_bbox":bbox,"size":[bbox[2]-bbox[0],bbox[3]-bbox[1]],"source_size":[w,h],
+                    "margins":margins,"font_size":size,"profile_sample":[float(lum[i]) for i in (10,len(lum)//2,len(lum)-10)]})
+    fa=np.asarray(final)
+    changed=np.any(ca!=fa,axis=2)
+    union=np.logical_or.reduce(masks)
+    metrics={"clean_to_trial_changed_outside_source":int((changed&~allowed).sum()),
+             "clean_to_trial_changed_outside_glyph":int((changed&~union).sum()),
+             "clean_to_trial_alpha_changed_outside_source":int(((ca[:,:,3]!=fa[:,:,3])&~allowed).sum()),
+             "old_to_trial_changed_outside_source":int((np.any(previous!=fa,axis=2)&~allowed).sum()),
+             "source_to_clean_changed_outside_source":source_clean_out}
+    if any(metrics.values()):raise RuntimeError(("pre-DDS preview mask fail",metrics))
+    for idx,(key,eng,kor,bb) in enumerate(ROWS):
+        x0,y0,x1,y1=bb
+        bb2=(max(0,x0-4),max(0,y0-5),min(2048,x1+8),min(1024,y1+8))
+        crops=[rgba_on_gray(im).crop(bb2) for im in (source,clean,old,final)]
+        w,h=crops[0].size
+        sheet=Image.new("RGB",(w*4+24,h+32),"white")
+        ImageDraw.Draw(sheet).text((3,5),f"A204 q175 {key}: ENGLISH | CLEAN | REJECTED A188 | NEW GEOMETRIC TRIAL",fill="black")
+        for i,im in enumerate(crops):sheet.paste(im,(i*(w+8),32))
+        for percent in (100,75,50):
+            view=sheet if percent==100 else sheet.resize((sheet.width*percent//100,sheet.height*percent//100),Image.Resampling.LANCZOS)
+            view.save(OUT/f"A204_{idx}_{key}_{percent}.jpg",quality=94)
+    source.save(OUT/"A204_SOURCE_READABLE.png")
+    final.save(OUT/"A204_TRIAL_FINAL_READABLE.png")
+    clean.save(OUT/"A204_CLEAN_READABLE.png")
+    raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    raw.resize((1024,512),Image.Resampling.LANCZOS).save(OUT/"A204_TRIAL_RAW_50.png")
+    report={"role":"A","task":"A204","queue_index":175,"priority":"P1","user_report":"IGR-032",
+        "status":"TRIAL_ONLY_PENDING_CONTROLLER_VISUAL_NOT_PROMOTED","source_sha256":SRC_SHA,
+        "prior_exact_dds_sha256":OLD_SHA,"trial_method":"OFL Orbit geometric native Hangul outline plus measured English chrome y-band transfer + local inside-contour bevel; not stretched prior DDS",
+        "font_origin":"JAMO-TYPEFACE/Orbit (OFL-1.1)","font_blob_sha1":FONT_GIT_BLOB,
+        "rows":rec,"qa_preview":metrics,"dds_produced":0,"dds_replaced":False,
+        "runtime_validation":"UNTESTED",
+        "next_gate":"Controller SOURCE/CLEAN/OLD/TRIAL native+RAW+50 before any DDS promotion; reject if still unlike connected English techno letterform; then 10-stage persisted DDS QA and independent C1/C3"}
+    (OUT/"A204_TRIAL_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print("A204_TRIAL_PROOF",json.dumps({"source":SRC_SHA[:16],"rows":rec,"qa":metrics,"trial":"NOT_DDS"},ensure_ascii=False),flush=True)
