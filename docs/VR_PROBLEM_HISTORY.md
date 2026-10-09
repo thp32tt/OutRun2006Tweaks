@@ -1,5 +1,13 @@
 # VR Runtime Problem / Regression History
 
+## 2026-10-09 F11 gameplay overlay user acceptance
+
+- Stable regression key: `VR-F11-OVERLAY-DIPLOPIA-001`; user explicitly reports **F11 normal** (2026-10-09 KST).
+- Evidence class: `USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED` — source/package/DLL fingerprint was not supplied with this latest feedback. Do not invent a user-tested SHA or downgrade the feedback into an ongoing F11 defect.
+- Preserve exact external ImGui semantic scoping, independent right-eye and scissor/projection restoration, and the distinct R62 game-sprite dispatcher. Regression reopen requires a newly observed failure.
+- Other unresolved GOAL/+TIME, rank, lens and start-shadow visual observations are independent.
+- R84 structural convergence resumes after already green Gate0/Inventory; further R32/R31 compile ownership and CMake seams remain open. Do not conflate `RUNTIME_VALIDATION=UNTESTED` for new material with F11's user-reported acceptance.
+
 GitHub event ledger: Issue #13 — **[VR] Runtime Problem / Regression Ledger**
 
 This document is the human-readable companion to `docs/VR_REGRESSION_KNOWLEDGE.json`. The JSON file is the machine-readable source of truth used by autonomous review/fix/integration work.
