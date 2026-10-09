@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00494",
+  "production_id": "CONVERSION-DX11-00494",
+  "event_id": "CONVERSION-DX11-00494-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00494",
+  "lease_epoch": 1,
+  "work_key": "DX11:R192:NATIVE_IMMUTABLE_PS_B0_GPU_PIXEL_SNAPSHOT_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_ps_constant.hpp:R192",
+    "tools/dx11_ps_constant_indexed_probe_r192.cpp:R192",
+    "tools/test_dx11_ps_constant_indexed_r192.py:R192",
+    "cmake.toml:R192",
+    ".github/workflows/backend-conversion-gate.yml:R192"
+  ],
+  "base_sha": "ba4a472e8608f6334a7ef29d14b0b9e86e55d9cc",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R192 independent dormant PS immutable b0 identity/generation/version snapshot + actual WARP DrawIndexed red->blue GPU pixel proof; no native gameplay activation. Exact-SHA Gate pending.",
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub head and 00493 sealed; 00494 absent; controller checkpoint absent",
+    "C1_REVIEW": "PASS R192 independent PS b0 snapshot selected; R175 00477-owned blocker intentionally untouched",
+    "C2_IMPLEMENT": "PASS new PS immutable snapshot and two-pass WARP indexed pixel probe; 4 negative static mutants",
+    "C3_VALIDATE": "PENDING required exact SHA Gate; one-pass precommit static assertion succeeded",
+    "C4_COMMIT": "MATERIAL_PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED dormant draw and untested Quest3",
+    "C6_STATE": "PENDING CI result"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_ps_constant.hpp",
+    "tools/dx11_ps_constant_indexed_probe_r192.cpp",
+    "tools/test_dx11_ps_constant_indexed_r192.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00494.json"
+  ],
+  "evidence": {
+    "scoped_static_preflight": "PASS_ONE_RUN_4_NEGATIVE_MUTATIONS",
+    "prior_r175_failed_gate": 37977433121,
+    "exact_sha_gate": "PENDING"
+  },
+  "blockers": [
+    "Existing R175 TEXCOORD6 BGRA mismatch under 00477 likely blocks whole Gate; verify exact R192 material result first",
+    "Quest3/VDXR game/HMD runtime not exercised"
+  ],
+  "next_action": "Observe exact-SHA Gate then seal C6 while preserving validation-bearing material SHA",
+  "score_change": 0
+}

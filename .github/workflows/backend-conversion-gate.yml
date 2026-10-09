@@ -419,6 +419,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R191 VS indexed constant WARP probe failed: $LASTEXITCODE" }
 
+      # R192: immutable PS b0 source version, identity, and actual indexed GPU colors.
+      - name: Verify R192 PS constant indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_ps_constant_indexed_r192.py
+
+      - name: Build R192 PS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_ps_constant_indexed_probe_r192
+
+      - name: Run R192 PS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_ps_constant_indexed_probe_r192.exe | Select-Object -First 1
+          if (-not $probe) { throw "R192 PS b0 indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R192 PS b0 indexed WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
