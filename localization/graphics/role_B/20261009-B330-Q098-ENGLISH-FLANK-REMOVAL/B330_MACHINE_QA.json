@@ -4,7 +4,7 @@
   "queue_index": 98,
   "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
   "old_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
-  "new_trial_sha256": "5d56426b5c8eb54931198f5fbc6a8e864a61be2f2b41d6cd807d8271e23ad298",
+  "new_trial_sha256": "fbc143a931e6ae7739765be10ceb8aa09722b6de54862297310c6bd487895ef4",
   "candidate_promoted": false,
   "trial_only": true,
   "English_source_alpha_bounds_actual": [
@@ -16,10 +16,11 @@
   "source_vs_true_empty_clean": "ONE_TEXT_ONLY_NO_PROTECTED_ILLUSTRATION",
   "source_removal": "CLEAN_PLATE_REBUILT_FROM_FULL_CANVAS_NOT_NARROW_OLD_MASK",
   "old_English_leftover_alpha_pixels": 63,
-  "erased_original_BC3_blocks": 19,
+  "erased_original_BC3_blocks_rgb_and_alpha": 1405,
   "new_oldEnglish_unwritten_blocks_alpha": 0,
   "original_korean_BC3_written_blocks": "BYTE_EXACT",
-  "all_DDS_RGB": "PIXEL_EXACT",
+  "unwritten_source_RGB": "CLEARED_WITH_ALPHA",
+  "korean_BC3_blocks": "BYTE_EXACT",
   "cleared_prior_candidate_residue_not_in_stock_glyph_mask": 63,
   "saved_DDS_decode": "EXACT",
   "DDS_dimensions": [
