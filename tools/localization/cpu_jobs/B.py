@@ -15,7 +15,7 @@ assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 ASSET="textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-OUT=G/"role_B/20261009-B312-Q060-P0-COUNTER-SAFE-GOLD-MILES"
+OUT=G/"role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SOURCE_SHA="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
@@ -90,7 +90,7 @@ for font_size in range(119,85,-1):
     width=min(690,max(655,round(glyph.width*1.05)))
     resized=glyph.resize((width,glyph.height),Image.Resampling.LANCZOS)
     # Opposite-script slant is forbidden: readable top is moved right.
-    shear=0.16; ext=int(round(shear*resized.height))
+    shear=0.28; ext=int(round(shear*resized.height))
     slanted=resized.transform((width+ext,resized.height),Image.Transform.AFFINE,
         (1,shear,-shear*(resized.height-1),0,1,0),
         resample=Image.Resampling.BICUBIC)
@@ -117,13 +117,18 @@ face=padded(master)
 navy_mask=face.filter(ImageFilter.MaxFilter(5))
 white_mask=navy_mask.filter(ImageFilter.MaxFilter(5))
 dark_mask=white_mask.filter(ImageFilter.MaxFilter(3))
-bbox=dark_mask.getbbox()
+soft_shadow=dark_mask.filter(ImageFilter.GaussianBlur(1.5))
+shifted=Image.new("L",face.size,0)
+shifted.paste(soft_shadow,(2,3))
+from PIL import ImageChops
+bbox=ImageChops.lighter(dark_mask,shifted).getbbox()
 assert bbox
 layers=Image.new("RGBA",face.size,(0,0,0,0))
 def paint(color,mask):
     layer=Image.new("RGBA",face.size,tuple(color)+(0,))
     layer.putalpha(mask)
     layers.alpha_composite(layer)
+paint((5,11,49),shifted)
 paint((13,17,42),dark_mask)
 paint(NAVY,white_mask)
 paint(WHITE,navy_mask)
@@ -159,7 +164,7 @@ data=candidate[:128]+body
 assert len(data)==len(candidate) and sha(data)!=CURRENT_SHA
 assert np.array_equal(decode(data),N)
 # DO NOT TOUCH hd_candidates UNTIL direct human visual acceptance.
-trial=OUT/"B312_Q060_TRIAL_NOT_PROMOTED.dds"
+trial=OUT/"B313_Q060_TRIAL_NOT_PROMOTED.dds"
 trial.write_bytes(data)
 assert sha(trial.read_bytes())==sha(data)
 def tile(a,orient):
@@ -182,12 +187,12 @@ for orient in ("FLIPY","RAW"):
             contact=Image.new("RGB",(sum(x.width for x in parts)+12,max(x.height for x in parts)),bg)
             pos=0
             for part in parts:contact.paste(part,(pos,0));pos+=part.width+4
-            name=f"B312_{orient}_{color}_{percent}_SOURCE_CLEAN_CURRENT_TRIAL.png"
+            name=f"B313_{orient}_{color}_{percent}_SOURCE_CLEAN_CURRENT_TRIAL.png"
             contact.save(OUT/name,optimize=True);proofs.append(name)
 for name,arr in (("SOURCE",S),("CLEAN",C),("CURRENT",P),("TRIAL",N)):
-    Image.fromarray(arr[t:b,l:r],"RGBA").save(OUT/f"B312_{name}_LOSSLESS.png",optimize=True)
+    Image.fromarray(arr[t:b,l:r],"RGBA").save(OUT/f"B313_{name}_LOSSLESS.png",optimize=True)
 report={
-"schema_version":2,"role":"B","run":"B312","queue_index":60,"priority":"P0",
+"schema_version":2,"role":"B","run":"B313","queue_index":60,"priority":"P0",
 "source_sha256":SOURCE_SHA,"candidate_sha256":CURRENT_SHA,"trial_sha256":sha(data),
 "trial_only_dds":1,"new_production_dds":0,"trial_promoted":False,
 "asset":ASSET,"source_bbox":list(PBOX),
@@ -195,7 +200,7 @@ report={
 "margins":[xx-l,r-xx-layers.width,yy-t,b-yy-layers.height],
 "font":"native NotoSansCJK Black",
 "font_size":size,"palette_from_native_source":{"gold":GOLD,"navy":NAVY,"white":WHITE},
-"method":"Native individually spaced Hangul Bold-safe face with no morphological face dilation, source-derived cream-gold gradient and reduced navy rim; preserve source counters and B310 Stage",
+"method":"Native individually spaced glyph masters with intact counters; +0.28 source-relative readable italic slant, source-derived cream/gold face gradient and soft offset navy depth/rim, no foreign box, B310 Stage preserved",
 "machine_checks":{"dds_header_exact":True,"format":mode,"mips":1,"native":[4096,2048],
 "roundtrip":"PASS","changed_outside_gold":0,"alpha_outside_gold":0,
 "protected_outside_gold":"UNCHANGED_EXACT","source_cell_clean_alpha":0,
@@ -205,5 +210,5 @@ report={
 "C2":"NOT_RUN","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED",
 "backend":"github-actions",
 "excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B312_MACHINE_AND_METHOD.json").write_text(json.dumps(report,ensure_ascii=False,indent=2,default=lambda x: x.item() if hasattr(x,'item') else str(x))+"\n")
-print("B312_TRIAL_ONLY",sha(data),"bbox",report["trial_bbox"],"status",report["status"])
+(OUT/"B313_MACHINE_AND_METHOD.json").write_text(json.dumps(report,ensure_ascii=False,indent=2,default=lambda x: x.item() if hasattr(x,'item') else str(x))+"\n")
+print("B313_TRIAL_ONLY",sha(data),"bbox",report["trial_bbox"],"status",report["status"])
