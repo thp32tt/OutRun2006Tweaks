@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 10:36 KST",
+  "updated_at_kst": "2026-10-09 10:49 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9014,5 +9014,43 @@
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json"
+  },
+  "b307_q212_three_select_repair": {
+    "time_kst": "2026-10-09 10:49 KST",
+    "run_key": "OUTRUN-KOR-B307-Q212-C325-THREE-SELECT-NATIVE-20261009-1040",
+    "role": "B",
+    "queue_index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "previous_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+    "new_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+    "new_producer_dds": 1,
+    "repaired_region_ids": [
+      25,
+      26,
+      27
+    ],
+    "remaining_C325_REWORK": [
+      30,
+      43,
+      44,
+      53
+    ],
+    "changed_outside_repaired_bbox": 0,
+    "preserved_other_9": "EXACT",
+    "source_derived_flat_gray": [
+      63,
+      71,
+      74,
+      255
+    ],
+    "producer_visual": "SCOPED_PASS_NATIVE_50_RAW",
+    "independent_C2": "PENDING_NEW_SHA",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR029": "OPEN_SUSPECTED_MAPPING",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B307-Q212-C325-THREE-NATIVE-SELECT-HEADINGS/B307_CONTROLLER_SELF_QA_FINAL.json",
+    "actions_run_id": 37871305365,
+    "backend": "GITHUB_ACTIONS"
   }
 }
