@@ -9,5 +9,5 @@ COPY src/controller.py.part* /tmp/controller-parts/
 RUN cat /tmp/controller-parts/controller.py.part* > app/controller.py && python -m py_compile app/controller.py && rm -rf /tmp/controller-parts
 COPY localization_A.md localization_B.md localization_C.md /opt/outrun/prompts/
 COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
-RUN chmod +x /opt/outrun/entrypoint.sh && printf '%s\n' '#!/bin/sh' 'set -eu' '[ "${CONTROLLER_MODE:-localization}" = localization ] || { echo "Localization-only image" >&2; exit 64; }' 'export CONTROLLER_MODE=localization QUEUE_MODE=true LOCALIZATION_PARALLEL=true CHAT_SLOTS=3' 'exec /opt/outrun/entrypoint.sh' > /opt/outrun/localization-only.sh && chmod +x /opt/outrun/localization-only.sh
+RUN chmod +x /opt/outrun/entrypoint.sh && printf '%s\n' '#!/bin/sh' 'set -eu' '[ "${CONTROLLER_MODE:-localization}" = localization ] || { echo "Localization-only image" >&2; exit 64; }' 'export CONTROLLER_MODE=localization QUEUE_MODE=true LOCALIZATION_PARALLEL=true CHAT_SLOTS=4' 'exec /opt/outrun/entrypoint.sh' > /opt/outrun/localization-only.sh && chmod +x /opt/outrun/localization-only.sh
 ENTRYPOINT ["/usr/bin/tini", "--", "/opt/outrun/localization-only.sh"]
