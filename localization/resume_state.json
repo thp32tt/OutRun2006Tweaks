@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C335 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD P0 q121 A202 SHA256 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844; first-hand SOURCE|CLEAN|FINAL producer contact gray100 black50 plus RAW/FLIPY atlas and two masks viewed. Improved natural phrase/width, no definite clip/alien box visible in inspected scopes; no independent exact saved 4096x4096 DDS/native alpha/plate delta/true calibration, so C1 HOLD_STRICT_RECHECK, NOT PASS. C318 old SHA not reused; DDS0; C3/APPROVAL/JPG/game BLOCKED, IGR-030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json RUN_KEY=OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020.",
     "A211 P1 q175 new true Noto Hangul glyph (not A209/A210 hand-rails) with canonical English chrome band + per-pixel relief native trial DDS SHA256 b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446, original 9314372585..., current promoted unchanged b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73. Real source-CLEAN-original-vs-trial native/BGW100/75/50 producer VISUAL FAIL ordinary narrow separated Hangul + insufficient depth: trial 222x117 vs source 950x132. Source clean alpha0, outside region RGBA/alpha0, saved DDS decoded exact; no promoted new DDS, family still REWORK, C1/C3 blocked, IGR032 user gameplay OPEN, RUNTIME_VALIDATION=UNTESTED. Need source-conditioned welded rounded chrome Korean vector, not generic font/rail/width tweaks. QA role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005.",
     "B336 P0 q060 B335 P1 source-derived CLEAN plus runner Noto CJK Bold SHA and Hangul 7/7 coverage verified; same-stroke source-vs-localized slant/font-style anchors not verified, so P2 HOLD, C334 C2 HOLD and IGR044 OPEN. Existing B332R DDS preserved; new DDS 0. QA localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json RUN_KEY=OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340 RUNTIME_VALIDATION=UNTESTED.",
     "A210 P1 q175 showroom counter-topology + local-normal chrome native DDS TRIAL SHA 93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded; worker 37945610280 SUCCESS, first denied 0px bottom margin corrected to 1px. NEW trial DDS1, NEW PROMOTED DDS0. Exact source 9314372585b830..., old promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 unchanged; 0 outside/alpha/CLEAN effect; original source 950x132, trial 440x128 native BGW100/75/50/RAW. Improved 룸 counter yet visually fails original joined chrome depth and title hierarchy. IGR-032 OPEN, C1/C3/game blocked RUNTIME_VALIDATION=UNTESTED. Stop width/shear/flat rail tweaks, use authentic source-informed counter/bevel design. QA localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335.",
@@ -13801,6 +13802,29 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa_report": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
     "worker_run": 37949025173
+  },
+  "c335_c1_q121_a202_scoped_firstlook": {
+    "run": "C335",
+    "run_key": "OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 121,
+    "priority": "P0",
+    "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "decision": "HOLD_STRICT_RECHECK",
+    "scope": "SCOPED_FIRSTHAND_PRODUCER_IMAGE_VISUAL_ONLY",
+    "new_dds": 0,
+    "need_independent_native_dds_pixel_validation": true,
+    "need_blind_calibration": true,
+    "need_full_atlas_consumer_proof": true,
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "user_reports_open": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "qa_path": "localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json"
   }
-
 }
