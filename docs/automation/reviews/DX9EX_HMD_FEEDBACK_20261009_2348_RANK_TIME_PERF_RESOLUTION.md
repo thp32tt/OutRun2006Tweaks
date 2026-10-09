@@ -1,4 +1,4 @@
-# 2026-10-09 23:48 UTC / 23:58 KST onward — one-session Quest 3 / VDXR DX9Ex visual feedback
+# 2026-10-09 23:48 KST session / 23:58 KST feedback — one-session Quest 3 / VDXR DX9Ex visual feedback
 
 ## Exact user-tested source and evidence
 
