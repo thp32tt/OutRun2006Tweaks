@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "review_id": "C328",
+  "run_key": "OUTRUN-KOR-C328-C2-Q098-B327R-PERSISTED-ENGLISH-RESIDUE-20261009-1850",
+  "role": "C2",
+  "temporary_backlog_relief": "C2",
+  "shard": "EVEN",
+  "date_kst": "2026-10-09 18:57 KST",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "producer_run": "B327R",
+  "decision": "REWORK_REQUIRED",
+  "reason_codes": [
+    "SOURCE_RESIDUE_UNDER_KOREAN",
+    "PERSISTED_DDS_ENGLISH_GLYPHS_LEFT_AND_RIGHT",
+    "COMPOSITE_SOURCE_REMOVAL_FALSE_NEGATIVE"
+  ],
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "source_provenance": "canonical English native source per B327R saved producer QA",
+  "authored_clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+  "candidate_git_blob_sha": "0739969967986f8a0b37d17f2a14038184ccc10b",
+  "independent_current_binary_sha256_check": "PASS: GitHub current branch raw binary downloaded via N100 MCP with expected SHA-256; 2048x128 DXT5 BC3 mip1 DDS independently inspected",
+  "prior_candidate_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "prior_independent_rejection": "C310 previous SHA 192d... NAVY_GLOW_UNDERWEIGHT. New B327R materially changed candidate SHA; fresh C2 review is not a repeat.",
+  "selection_triage": "FRESH_C_REVIEW via read-only tools/localization/rework_triage.py --index 98 on current Git queue",
+  "first_look": "SOURCE / CLEAN / PRIOR / NEW in cropped BGW native/75/50 readable/RAW shows improved Korean middle but cannot prove full canvas. Uncropped 'B327R_PERSISTED_DECODE_READABLE.png' visibly shows English original 'Cl' at left and 'ord.' at right interleaved with '코스 기록에 도전하세요.'. Confirmed in saved-persisted RAW preview. This is a direct user-visible full-frame artifact rather than artificial markup.",
+  "checks": [
+    {
+      "view": "PERSISTED_DECODE_READABLE",
+      "result": "FAIL",
+      "observation": "Source English 'Cl' (Challenge) and trailing 'ord.' (record.) are still visible around Korean, violating 0-residue and no-double-render in exact saved image."
+    },
+    {
+      "view": "PERSISTED_DECODE_RAW",
+      "result": "FAIL",
+      "observation": "Same original English fragments remain in source-mirrored RAW DDS view."
+    },
+    {
+      "view": "READABLE_BLACK_100_BG_SOURCE_CLEAN_PRIOR_NEW",
+      "result": "SCOPED_ONLY",
+      "observation": "Native central crop looks improved but does not show discarded original glyph flanks; cannot certify entire atlas."
+    },
+    {
+      "view": "READABLE_GRAY_50_BG_SOURCE_CLEAN_PRIOR_NEW",
+      "result": "SCOPED_ONLY",
+      "observation": "50%-scale center readable; English contamination elsewhere outranks numeric/visual middle PASS."
+    },
+    {
+      "view": "READABLE_WHITE_100_BG_SOURCE_CLEAN_PRIOR_NEW",
+      "result": "SCOPED_ONLY",
+      "observation": "Updated navy rim visible; no material final approval due to failed full persisted composite."
+    },
+    {
+      "view": "RAW_GRAY_75_BG_SOURCE_CLEAN_PRIOR_NEW",
+      "result": "SCOPED_ONLY",
+      "observation": "RAW cropped contacts alone also miss original English at both ends."
+    }
+  ],
+  "machine_false_negative": "B327R producer reported source glyph alpha residual=0 on CLEAN, changed outside source region=0, DXT5 roundtrip/header PASS, near equal source/candidate navy face support. These metrics miss surviving *unchanged* source English in the persisted composite beyond Korean edit footprint. Do not claim independent whole-DDS per-pixel QA performed.",
+  "root_cause_uncertainty": "Cannot yet distinguish an incomplete encoded clean-plate merge, too-short erase mask, or composite overwrite order; B must prove SOURCE vs CLEAN and CLEAN vs persisted FINAL at exact native full source glyph/effect footprint.",
+  "required_rework": "Remove English original on all pixels including both terminal fragments of full English effect bbox; rebuild clean and transparent Korean-only lettering; inspect entire native decoded saved BC3 DDS not merely center cutouts, BGW readable100/75/50 & RAW100/75/50; prove 0 residual under/alongside Hangul, preserved art 0 changes, and per source bbox 1px ceiling.",
+  "evidence": [
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_PERSISTED_DECODE_READABLE.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_PERSISTED_DECODE_RAW.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/READABLE_BLACK_100_SOURCE_CLEAN_OLD_B327.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/READABLE_GRAY_50_SOURCE_CLEAN_OLD_B327.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/READABLE_WHITE_100_SOURCE_CLEAN_OLD_B327.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/RAW_GRAY_75_SOURCE_CLEAN_OLD_B327.png",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_CONTROLLER_SELF_QA_FINAL.json",
+    "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_MACHINE_QA.json"
+  ],
+  "source_bbox_reported": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "korean_bbox_reported": [
+    475,
+    9,
+    1580,
+    120
+  ],
+  "C3": "BLOCKED",
+  "approval": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_in_game": "NOT_RUN",
+  "new_produced_dds": 0,
+  "new_images": 0,
+  "backend": "ChatGPT direct visual review of persisted GitHub lossless proofs; GitHub first; N100 MCP lightweight proof download, DDS SHA and header only; no N100 heavy processing",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
