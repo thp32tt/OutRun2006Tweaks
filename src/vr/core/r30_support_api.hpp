@@ -137,6 +137,13 @@ namespace OutRunVRStereo
     HRESULT R30SupportCallOriginalSetDepthStencilSurface(
         IDirect3DDevice9* device,
         IDirect3DSurface9* surface) noexcept;
+    // Preserve the exact original R9 frame accounting, ordering and the
+    // first-pose-sequence metadata latch. No new frame state or stereo policy.
+    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;
+    void R30SupportRecordHudStereoDuplicate() noexcept;
+    void R30SupportMarkFrameRightDrawFailed() noexcept;
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;

@@ -3568,6 +3568,33 @@ namespace OutRunVRStereo
             : device->SetDepthStencilSurface(surface);
     }
 
+    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+
+    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        ++NonWorldDuplicatedDraws;
+    }
+
+    void R30SupportMarkFrameRightDrawFailed() noexcept
+    {
+        FrameRightDrawFailed = true;
+    }
+
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
         return FrameStereoPoseSequence;

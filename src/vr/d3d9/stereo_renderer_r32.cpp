@@ -896,11 +896,10 @@ namespace OutRunVRStereo
 
     void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
     {
-        FrameHadDuplicatedDraw = true; FrameHadWorldStereo = true; ++DuplicatedDraws; ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0) { FrameStereoPoseSequence = p; FrameStereoMetadata = s; }
+        R30SupportRecordWorldStereoDuplicate(p, s);
     }
-    void R32ReviewRecordHudStereoDuplicate() noexcept { FrameHadDuplicatedDraw = true; ++DuplicatedDraws; ++NonWorldDuplicatedDraws; }
-    void R32ReviewMarkFrameRightDrawFailed() noexcept { FrameRightDrawFailed = true; }
+    void R32ReviewRecordHudStereoDuplicate() noexcept { R30SupportRecordHudStereoDuplicate(); }
+    void R32ReviewMarkFrameRightDrawFailed() noexcept { R30SupportMarkFrameRightDrawFailed(); }
 
     bool R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R30SupportStableStereoBase(d); }
     bool R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R30SupportFragileEffectCached(d,f); }

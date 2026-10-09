@@ -47,6 +47,270 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
+# R84: R32 no longer directly mutates R9 frame stereo accounting.
+# The old source wrote the four world flags/counters before latching pose only
+# when 0, the HUD path increments its own counter, and right failure is sticky.
+# Preserve that exact order/condition, with no new WVP, shader or HUD policy.
+def r32_frame_duplicate_lower_owner_ok(api, r30_impl, r32_impl):
+    expected_world = """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+"""
+    expected_hud = """    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        ++NonWorldDuplicatedDraws;
+    }
+"""
+    expected_fail = """    void R30SupportMarkFrameRightDrawFailed() noexcept
+    {
+        FrameRightDrawFailed = true;
+    }
+"""
+    return all((
+        "void R30SupportRecordWorldStereoDuplicate(" in api,
+        "const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;" in api,
+        "void R30SupportRecordHudStereoDuplicate() noexcept;" in api,
+        "void R30SupportMarkFrameRightDrawFailed() noexcept;" in api,
+        expected_world in r30_impl,
+        expected_hud in r30_impl,
+        expected_fail in r30_impl,
+        """    void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
+    {
+        R30SupportRecordWorldStereoDuplicate(p, s);
+    }
+    void R32ReviewRecordHudStereoDuplicate() noexcept { R30SupportRecordHudStereoDuplicate(); }
+    void R32ReviewMarkFrameRightDrawFailed() noexcept { R30SupportMarkFrameRightDrawFailed(); }
+""" in r32_impl,
+    ))
+
+if not r32_frame_duplicate_lower_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 R9 frame duplicate owner lost flags/counters/first pose latch")
+for label, mutated_r30, mutated_r32 in (
+    ("world duplicate flag lost", r30.replace(
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""",
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = false;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""", 1), r32),
+    ("world stereo flag lost", r30.replace(
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""",
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = false;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""", 1), r32),
+    ("world increment lost", r30.replace(
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""",
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        (void)0;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""", 1), r32),
+    ("pose first write only broken", r30.replace(
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""",
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence != 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""", 1), r32),
+    ("world pose metadata lost", r30.replace(
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+""",
+        """    void R30SupportRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            (void)stereo;
+        }
+    }
+""", 1), r32),
+    ("HUD duplicate count lost", r30.replace(
+        """    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        ++NonWorldDuplicatedDraws;
+    }
+""",
+        """    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        (void)0;
+        ++NonWorldDuplicatedDraws;
+    }
+""", 1), r32),
+    ("HUD nonworld count lost", r30.replace(
+        """    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        ++NonWorldDuplicatedDraws;
+    }
+""",
+        """    void R30SupportRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        (void)0;
+    }
+""", 1), r32),
+    ("right draw failure flag lost", r30.replace(
+        """    void R30SupportMarkFrameRightDrawFailed() noexcept
+    {
+        FrameRightDrawFailed = true;
+    }
+""",
+        """    void R30SupportMarkFrameRightDrawFailed() noexcept
+    {
+        FrameRightDrawFailed = false;
+    }
+""", 1), r32),
+    ("R32 direct world frame write restored", r30, r32.replace(
+        "R30SupportRecordWorldStereoDuplicate(p, s);",
+        "FrameHadWorldStereo = true;", 1)),
+    ("R32 HUD owner bypass", r30, r32.replace(
+        "R30SupportRecordHudStereoDuplicate();",
+        "++NonWorldDuplicatedDraws;", 1)),
+    ("R32 right failure owner bypass", r30, r32.replace(
+        "R30SupportMarkFrameRightDrawFailed();",
+        "FrameRightDrawFailed = true;", 1)),
+):
+    if mutated_r30 == r30 and mutated_r32 == r32:
+        errors.append("R84 frame owner negative mutation not applied: " + label)
+    elif r32_frame_duplicate_lower_owner_ok(
+            r30_support_api, mutated_r30, mutated_r32):
+        errors.append("R84 frame owner negative mutation survived: " + label)
+
 # R84 raw draw and Present trampoline owner: R30 invokes exact stock hooks,
 # never the higher R30 stereo/hud lower-draw override (double dispatch risk).
 # All arguments and HRESULT must pass unchanged; no zero-count "success".
