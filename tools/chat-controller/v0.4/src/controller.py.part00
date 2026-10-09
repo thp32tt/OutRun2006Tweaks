@@ -78,6 +78,13 @@ CHAT_SLOTS = len(SLOT_NAMES)
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
+# The v2 localization controller rotates Chrome by exiting cleanly after a
+# durable checkpoint; Docker restart recreates Chrome and reattaches A/B/C1/C2.
+# Conversion/VR modes are intentionally unaffected.
+CHROME_RECYCLE_ENABLED = CONTROLLER_MODE == "localization" and os.getenv("CHROME_RECYCLE_ENABLED", "false").lower() == "true"
+CHROME_RECYCLE_INTERVAL_SECONDS = max(1800, int(os.getenv("CHROME_RECYCLE_INTERVAL_MINUTES", "120")) * 60)
+CHROME_RECYCLE_BUSY_GRACE_SECONDS = max(0, int(os.getenv("CHROME_RECYCLE_BUSY_GRACE_MINUTES", "30")) * 60)
+CHROME_RECYCLE_BUSY_PROBE_SECONDS = max(2, int(os.getenv("CHROME_RECYCLE_BUSY_PROBE_SECONDS", "8")))
 WATCHDOG_STALL_MINUTES = int(os.getenv("WATCHDOG_STALL_MINUTES", "12"))
 WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20"))
 WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
