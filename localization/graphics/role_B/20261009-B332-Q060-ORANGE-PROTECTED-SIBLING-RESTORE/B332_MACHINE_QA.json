@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "run": "B332",
+  "run_key": "OUTRUN-KOR-B332-Q060-C332-ORANGE-PROTECTED-ART-20261009-2110",
+  "role": "B",
+  "queue_index": 60,
+  "priority": "P0",
+  "user_igr": "IGR044_OPEN_USER_INGAME_FAIL",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "trial_sha256": "dc2e5a6e7d288c6fc1b58c1822ef71c35d7c72a137d30984e397da59fd2cf6ec",
+  "trial_promoted": false,
+  "unapproved_trial_dds_count": 1,
+  "approved_dds_count": 0,
+  "method": "canonical source orange component + 12px expansion, exact original protected pixels restored within gold source ROI; relocate and downsize native B331 racing italic to upper lane",
+  "protected_original_orange_exact_pixels": 8892,
+  "protected_original_orange_rgba_diff": 0,
+  "protected_dilated_rgba_diff": 0,
+  "outside_gold_rgba_diff": 0,
+  "outside_gold_alpha_diff": 0,
+  "prior_candidate_native_region": [
+    2133,
+    256,
+    2807,
+    363
+  ],
+  "new_gold_region": [
+    2133,
+    251,
+    2807,
+    331
+  ],
+  "source_gold_bbox": [
+    2081,
+    250,
+    2860,
+    370
+  ],
+  "full_comparison_window": [
+    2081,
+    230,
+    2860,
+    400
+  ],
+  "protected_overlap_with_new_gold_ink": 0,
+  "DDS_header": "EXACT",
+  "DDS_native": [
+    4096,
+    2048
+  ],
+  "DDS_mode": "RGBA",
+  "mips": 1,
+  "persisted_decode": "EXACT",
+  "raw_orientation": "MIRROR_Y",
+  "proofs": [
+    "B332_FLIPY_BLACK_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_BLACK_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_BLACK_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_GRAY_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_GRAY_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_GRAY_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_WHITE_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_WHITE_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_FLIPY_WHITE_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_BLACK_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_BLACK_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_BLACK_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_GRAY_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_GRAY_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_GRAY_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_WHITE_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_WHITE_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "B332_RAW_WHITE_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "controller_visual": "PENDING_DIRECT_NATIVE_AND_RAW_SIBLING_REVIEW",
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
