@@ -520,6 +520,70 @@ def check_result_parent_provenance(ui_source, semantics_source):
         raise SystemExit("Sumo no-tick replay loses exact result producer")
 
 check_result_parent_provenance(ui, sem)
+# Original-game 93% GOAL source x86 disassembly proves 19 E8 calls to
+# sub_4B9200 that print record and stage text, separately from 0x2D200
+# progress/percentage. Only these exact 0x97... game result parents may
+# force finite ScreenHud ownership, and all queued siblings must be tagged.
+def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
+    expected = (
+        0x973AF, 0x97422, 0x974D0, 0x97544,
+        0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
+        0x9784F, 0x9787D, 0x9788E, 0x978B4, 0x978C8, 0x978EC,
+        0x97C31, 0x97C57, 0x97E47, 0x97E6D,
+    )
+    if len(expected) != 19:
+        raise SystemExit('wrong original B9200 source CALL count')
+    allow_start = ui_source.index('static constexpr int ResultTextB9200Calls[]')
+    allow_end = ui_source.index('};', allow_start)
+    allow = ui_source[allow_start:allow_end]
+    for callsite in expected:
+        require(f'0x{callsite:X}', allow, 'missing original B9200 CALL allowlist')
+        require(f'0x{callsite:08X}: 0x000B9200', disasm_source,
+                'missing original EXE 4B9200 direct E8 target fingerprint')
+    for marker in (
+        'ResultTextB9200,', 'OUTRUN_RESULT_TEXT_B9200',
+    ):
+        require(marker, semantic_source, 'B9200 exact producer identity')
+    enter = function_body(ui_source, 'static void ResultTextEnter(')
+    leave = function_body(ui_source, 'static void ResultTextLeave(')
+    require('ResultTextBefore[p] = root ? root->tail_4 : nullptr;',
+            enter, 'exact parent must snapshot full sprite queue')
+    require_order(leave, 'result text must tag ALL actual queued siblings',
+                  'TagAppendedNodes(ResultTextBefore,',
+                  'RenderScope::ScreenHud',
+                  'ProducerToken::ResultTextB9200',
+                  'ResultTextBefore = {};')
+    apply = function_body(ui_source, 'bool apply() override')
+    require_order(apply, 'exact original result E8 source enter/leave',
+                  'ResultTextEnterHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(rva), ResultTextEnter',
+                  'ResultTextLeaveHooks[i] = safetyhook::create_mid(',
+                  'Module::exe_ptr(rva + 5), ResultTextLeave',
+                  'if (!resultTextOk)')
+    if any(bad in leave for bad in (
+        'SetRenderState(', 'SetTransform(', 'SuppressSprite',
+    )):
+        raise SystemExit('result text HUD parent may not change game draw/state')
+
+verify_goal_b9200_source(ui, sem, read('tools/analyze_outrun_exe.py'))
+for label, mutant in (
+    ('missing one result E8', ui.replace(
+        '0x97E47, 0x97E6D', '0x97E47, 0x97E6E', 1)),
+    ('missing result child provenance', ui.replace(
+        'TagAppendedNodes(ResultTextBefore,',
+        'TagAppendedNodes(UnsupportedResultBefore,', 1)),
+    ('unknown HUD parent token', sem.replace(
+        'OUTRUN_RESULT_TEXT_B9200', 'UNVERIFIED_GENERIC_TEXT', 1)),
+):
+    try:
+        verify_goal_b9200_source(
+            mutant if 'token' not in label else ui,
+            mutant if 'token' in label else sem,
+            read('tools/analyze_outrun_exe.py'))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('unprotected GOAL text original source: ' + label)
 # The 93%-progress screenshot is a separate GOAL visual phase, not proof that
 # the final completed-result HUD is also broken. Preserve exact progress E8
 # node registration and add bounded *read-only* source evidence: never turn
