@@ -121,7 +121,21 @@ class UIScaling : public Hook
 	static constexpr int OutRunStagePrintfCalls[] = {
 		0x975EE, 0x97727, 0x977FB
 	};
-	static constexpr int ResultProgressCallA = 0x97BE4;
+	// Canonical EXE original 0x97xxx source disassembly identified
+    // 19 distinct E8 direct calls to sub_4B9200. The 93% GOAL screenshot
+    // displays oversized result digits while the separate progress-bar E8
+    // calls remain 0x97BE4/0x97DEC -> 0x2D200. Restore the MISSING exact
+    // sibling HUD owner at source, never by promoting all generic 2D draws.
+    // This group is wholly inside the original 0x97000..0x98000 result
+    // presentation code, not world decals or the final static GOAL helpers.
+    static constexpr int ResultTextB9200Calls[] = {
+        0x973AF, 0x97422, 0x974D0, 0x97544,
+        0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
+        0x9784F, 0x9787D, 0x9788E, 0x978B4, 0x978C8, 0x978EC,
+        0x97C31, 0x97C57, 0x97E47, 0x97E6D
+    };
+
+    static constexpr int ResultProgressCallA = 0x97BE4;
 	static constexpr int ResultProgressCallB = 0x97DEC;
 	// The GOAL time panel also calls two sprite-producing helpers directly.
 	static constexpr int GoalTimeHelperCallA = 0xBEA5A;
@@ -696,6 +710,48 @@ class UIScaling : public Hook
         }
 		ResultProgressTailsBefore = {};
 	}
+
+    // The original GOAL animations print the large white record and
+    // intermediate stage text through *19* EXE 0x97xxx E8 calls into
+    // sub_4B9200, not just the two 0x2D200 progress percentage calls.
+    // No shared-function detour: bracket ONLY the exact original E8
+    // parents, so a completed GOAL or another screen cannot inherit tags.
+    inline static SafetyHookMid ResultTextEnterHooks[
+        std::size(ResultTextB9200Calls)]{};
+    inline static SafetyHookMid ResultTextLeaveHooks[
+        std::size(ResultTextB9200Calls)]{};
+    inline static thread_local unsigned ResultTextDepth = 0;
+    inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
+        ResultTextBefore{};
+    inline static thread_local std::uint64_t ResultTextCompleted = 0;
+
+    static void ResultTextEnter(safetyhook::Context&)
+    {
+        if (ResultTextDepth++ != 0)
+            return;
+        for (int p = 0; p < Game::SpritePriorityCount; ++p)
+        {
+            SpriteNode* root = Game::sprite_prio_root[p];
+            ResultTextBefore[p] = root ? root->tail_4 : nullptr;
+        }
+    }
+
+    static void ResultTextLeave(safetyhook::Context&)
+    {
+        if (!ResultTextDepth || --ResultTextDepth != 0)
+            return;
+        TagAppendedNodes(ResultTextBefore,
+            OutRunVR::GameSemantic::RenderScope::ScreenHud,
+            OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+        const auto hit = ++ResultTextCompleted;
+        if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
+            spdlog::info(
+                "VR P0 RESULT TEXT B9200: calls={} state={} mode={} exactScope=SCREEN_HUD",
+                hit,
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1);
+        ResultTextBefore = {};
+    }
 
 	// R74 original GOAL helpers have the verified zero-argument void ABI.
 	// Preserve the original call, then tag all its newly queued siblings.
@@ -1428,6 +1484,34 @@ public:
 			spdlog::error(
 				"VR P0 RESULT: exact R74 producer midhooks incomplete; all rolled back");
 		}
+        // Inline E8 parent hooks are installed atomically; a partially
+        // bracketed result print sequence could tag only half the large
+        // record digits and cause an eye-to-eye double image.
+        bool resultTextOk = true;
+        for (unsigned i = 0; i < std::size(ResultTextB9200Calls); ++i)
+        {
+            const int rva = ResultTextB9200Calls[i];
+            ResultTextEnterHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva), ResultTextEnter);
+            ResultTextLeaveHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva + 5), ResultTextLeave);
+            resultTextOk = resultTextOk &&
+                ResultTextEnterHooks[i] && ResultTextLeaveHooks[i];
+        }
+        if (!resultTextOk)
+        {
+            for (unsigned i = 0; i < std::size(ResultTextB9200Calls); ++i)
+            {
+                ResultTextEnterHooks[i] = {};
+                ResultTextLeaveHooks[i] = {};
+            }
+            spdlog::error(
+                "VR P0 RESULT TEXT: exact B9200 print parent midhooks incomplete; rolled back");
+        }
+        else
+            spdlog::info(
+                "VR P0 RESULT TEXT: 19 original result/stage B9200 parent CALLs -> SCREEN_HUD");
+
 		// The two GOAL CALLs are adjacent, so preserve the original function
 		// signatures and redirect only their individually proven E8 edges.
 		Memory::VP::InjectHook(Module::exe_ptr(GoalTimeHelperCallA),
