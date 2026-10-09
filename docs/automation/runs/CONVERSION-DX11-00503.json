@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00503",
+  "production_id": "CONVERSION-DX11-00503",
+  "event_id": "CONVERSION-DX11-00503-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "02bda350b4e29e8ff8b194a9c8fa9ba3a8db1b7e",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00503",
+  "lease_epoch": 1,
+  "work_key": "DX11:R203:LINEAR_PS_TEXTURE_SAMPLER_WARP_RED_BLUE_RESTORE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp:R203",
+    "tools/dx11_textured_linear_probe_r203.cpp:R203",
+    "tools/test_dx11_textured_linear_r203.py:R203",
+    "cmake.toml:R203",
+    ".github/workflows/backend-conversion-gate.yml:R203"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R203 fail-closed non-indexed PS SRV/sampler live device and active RTV read/write hazard ownership with real WARP Draw GPU pixels proving red -> rebound blue -> restored red.",
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00503.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS authenticated GitHub HEAD 02bda350b4e29e8ff8b194a9c8fa9ba3a8db1b7e; 00503 run/checkpoint absent, latest 00502 sealed; 00477 owns blocked R175 independently.",
+    "C1_REVIEW": "R188 indexed PS SRV/sampler verified, R185/R199/R200/R201/R202 non-indexed pipeline lacks PS texture owner + real sampled color; disjoint R203 selected.",
+    "C2_IMPLEMENT": "New C++ native non-indexed exact SRV+sampler bound PS slot, texture format/device/RTV hazard guard; isolated WARP PS textured Draw red vs wrong blue vs red restore pixel proof; dedicated CMake probe, four mutants, CI.",
+    "C3_VALIDATE": "One scoped source contract + four negative mutants authored; exact-SHA Windows build/WARP pending.",
+    "C4_COMMIT": "Actual native material commit must carry [AUTO:CONVERSION-DX11-00503] without CI skip; GitHub material SHA owns Gate.",
+    "C5_PACKAGE": "NOT_REQUIRED game-native Draw dormant; no HMD/backend promotion.",
+    "C6_STATE": "PENDING exact-SHA Gate"
+  },
+  "evidence": {
+    "static_negative_mutants": 4,
+    "expected_pixels": "real GPU red center/black corner -> blue rebound -> red restored",
+    "indexed_r188_reference": "untouched",
+    "independent_r175_owner": "CONVERSION-DX11-00477"
+  },
+  "resume_cursor": "C3_EXACT_SHA_GATE_PENDING",
+  "next_action": "Read exact SHA Backend Conversion Gate Win32 validate R203 static/WARP and inherited R175 results; finish separate C6 after Gate. Quest3/VDXR UNTESTED."
+}

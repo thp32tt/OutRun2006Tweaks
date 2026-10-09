@@ -366,6 +366,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R187 indexed viewport WARP probe failed: $LASTEXITCODE" }
 
+      # R203: non-indexed Draw live PS SRV/sampler object ownership and red/blue/red pixels.
+      - name: Verify R203 native linear PS texture ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_textured_linear_r203.py
+
+      - name: Build R203 textured linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_textured_linear_probe_r203
+
+      - name: Run R203 textured linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_linear_probe_r203.exe | Select-Object -First 1
+          if (-not $probe) { throw "R203 textured linear WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R203 textured linear WARP probe failed: $LASTEXITCODE" }
+
       # R188: verify PS SRV/sampler object identity, texture descriptor and read/write hazard.
       - name: Verify R188 native indexed PS texture binding
         if: github.ref_name == 'vr-dx11-native-r71'
