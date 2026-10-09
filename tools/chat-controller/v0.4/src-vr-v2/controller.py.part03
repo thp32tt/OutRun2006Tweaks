@@ -180,7 +180,11 @@ def queue_rollover_prompt(active: dict) -> str:
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
         "CHECKPOINT_BRANCH=" + VR_CHECKPOINT_BRANCH,
         "CHECKPOINT_PATH=" + str(active.get("vr_checkpoint_last_path") or ""),
-        "먼저 해당 5분 체크포인트를 읽고 게임 브랜치의 material commit 및 docs/automation/runs 기록과 대조해. 체크포인트에 없는 미커밋 추론은 저장되었다고 가정하지 마.",
+        "CHECKPOINT_MODE=" + str(active.get("vr_checkpoint_fallback") or "GITHUB_VERIFIED"),
+        "CHECKPOINT_HTTP_STATUS=" + str(active.get("vr_checkpoint_http_status") or ""),
+        "BASE_SHA=" + str(active.get("base_sha") or ""),
+        "GitHub 체크포인트가 검증됐다면 해당 기록을 읽어. CHECKPOINT_MODE=LOCAL_ONLY_AFTER_40M이면 원격 체크포인트 파일이 없을 수 있으니 해당 파일을 요구하거나 기다리지 말고 게임 브랜치 HEAD/커밋 및 docs/automation/runs 기록으로 즉시 복구해.",
+        "GitHub 기록과 대조하여 기존 작업의 미완료 범위만 수행하고, 이전 채팅의 미확정 실행과 소스 소유권이 충돌하지 않는지 확인해. 미커밋 내부 사고는 복구된 것으로 간주하지 마.",
         source_policy,
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
@@ -285,6 +289,29 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
     }
 
 
+def vr_checkpoint_http_error_details(exc: Exception) -> tuple[Optional[int], str]:
+    """Expose safe GitHub error metadata, never request headers, tokens or private URLs."""
+    if isinstance(exc, urllib.error.HTTPError):
+        status = int(exc.code)
+        # GitHub's structured message explains 401/403/404/409/422 without
+        # printing the request, credential or arbitrary untrusted response body.
+        message = str(getattr(exc, "reason", "") or "HTTP request rejected")
+        try:
+            response = json.loads(exc.read(2048).decode("utf-8", "replace"))
+            if isinstance(response, dict) and isinstance(response.get("message"), str):
+                message = response["message"]
+        except Exception:
+            pass
+        message = re.sub(r"https?://[^\\s]+", "[URL_REDACTED]", message, flags=re.I)
+        message = re.sub(r"(?i)(token|secret|password|authorization)(\\s*[:=]\\s*)[^\\s,;]+",
+                         r"\\1\\2[REDACTED]", message)
+        message = re.sub(r"[A-Za-z0-9_\\-]{48,}", "[IDENTIFIER_REDACTED]", message)
+        return status, message[:180]
+    if isinstance(exc, urllib.error.URLError):
+        return None, "GitHub network request failed: " + type(exc.reason).__name__
+    return None, type(exc).__name__
+
+
 def github_write_vr_checkpoint(path: str, data: dict) -> bool:
     """Append-only, idempotent GitHub file creation on controller branch."""
     if not GITHUB_TOKEN:
@@ -346,20 +373,44 @@ async def vr_persist_checkpoint(q: dict, active: dict, now: datetime, purpose: s
         payload = vr_checkpoint_payload(active, now, purpose, branch_head)
         await asyncio.to_thread(github_write_vr_checkpoint, path, payload)
     except Exception as exc:
-        log.warning("VR checkpoint failed task=%s purpose=%s kind=%s", active["task_id"], purpose, type(exc).__name__)
+        http_code, safe_reason = vr_checkpoint_http_error_details(exc)
+        log.warning(
+            "VR checkpoint failed task=%s purpose=%s kind=%s status=%s reason=%s",
+            active["task_id"], purpose, type(exc).__name__, http_code, safe_reason,
+        )
         active["vr_checkpoint_last_error"] = type(exc).__name__
+        active["vr_checkpoint_http_status"] = http_code
+        active["vr_checkpoint_error_reason"] = safe_reason
+        active["vr_checkpoint_error_at"] = datetime.now(TZ).isoformat()
         save_queue_state(q)
-        write_runtime(vr_checkpoint_status="FAILED_RETRY", vr_checkpoint_error=type(exc).__name__,
-                      vr_checkpoint_task=active["task_id"])
+        write_runtime(
+            vr_checkpoint_status="FAILED_RETRY", vr_checkpoint_error=type(exc).__name__,
+            vr_checkpoint_http_status=http_code, vr_checkpoint_error_reason=safe_reason,
+            vr_checkpoint_error_at=active["vr_checkpoint_error_at"],
+            vr_checkpoint_task=active["task_id"],
+        )
         return False
     active["vr_checkpoint_last_path"] = path
     active["vr_checkpoint_last_at"] = now.isoformat()
     active["vr_checkpoint_last_error"] = None
+    active["vr_checkpoint_http_status"] = None
+    active["vr_checkpoint_error_reason"] = None
     active["vr_checkpoint_verified_paths"] = (active.get("vr_checkpoint_verified_paths", []) + [path])[-8:]
     save_queue_state(q)
     write_runtime(vr_checkpoint_status="SAVED", vr_checkpoint_last_at=now.isoformat(),
                   vr_checkpoint_path=path, vr_checkpoint_task=active["task_id"])
     return True
+
+
+def vr_unconditional_resume_due(active: dict, now: datetime) -> bool:
+    """Hard 40-minute chat ceiling even without a terminal/stop confirmation."""
+    if CONTROLLER_MODE != "conversion" or not VR_UNCONDITIONAL_RESUME_SECONDS:
+        return False
+    if active.get("phase") != "WAIT_CHAT":
+        return False
+    anchor = (_parse_iso(active.get("last_rollover_at")) or
+              _parse_iso(active.get("sent_at")))
+    return bool(anchor and (now - anchor).total_seconds() >= VR_UNCONDITIONAL_RESUME_SECONDS)
 
 
 def vr_forced_rollover_due(active: dict, now: datetime) -> bool:
@@ -374,14 +425,35 @@ def vr_forced_rollover_due(active: dict, now: datetime) -> bool:
 
 async def vr_checkpoint_and_rollover(context: BrowserContext, pages: dict, q: dict, active: dict, now: datetime) -> bool:
     """Return True if rollover processing consumed this lane poll."""
-    if vr_forced_rollover_due(active, now):
-        # No new chat unless the previous state is safely persisted remotely.
-        if not await vr_persist_checkpoint(q, active, now, "pre_rollover"):
-            write_runtime(status="vr_rollover_wait_checkpoint",
-                          last_action=f"{active['task_id']} 30m rollover pending verified GitHub checkpoint")
+    if vr_forced_rollover_due(active, now) or vr_unconditional_resume_due(active, now):
+        # Prefer remote checkpoint at 30m; after 40m the local atomic queue
+        # checkpoint wins over indefinite WAIT_CHAT even if GitHub PUT is denied.
+        remote_saved = await vr_persist_checkpoint(q, active, now, "pre_rollover")
+        hard_due = vr_unconditional_resume_due(active, datetime.now(TZ))
+        if not remote_saved and not hard_due:
+            write_runtime(
+                status="vr_rollover_wait_checkpoint",
+                last_action=f"{active['task_id']} awaiting remote checkpoint before 40m ceiling",
+            )
             return True
-        await queue_rollover_chat(context, pages, active, "VR_FORCED_30_MINUTE_ROLLOVER")
+        if not remote_saved:
+            active["vr_checkpoint_fallback"] = "LOCAL_ONLY_AFTER_40M"
+            active["vr_checkpoint_fallback_at"] = datetime.now(TZ).isoformat()
+            active["vr_checkpoint_fallback_base_sha"] = active.get("base_sha")
+            save_queue_state(q)
+            write_runtime(
+                status="vr_40m_local_fallback",
+                last_action=f"{active['task_id']} local queue saved; GitHub checkpoint failed, forcing fresh chat at 40m",
+                vr_rollover_data_loss_risk="Uncommitted model reasoning may be lost",
+                vr_checkpoint_status="FAILED_LOCAL_FALLBACK",
+            )
+        else:
+            active.pop("vr_checkpoint_fallback", None)
+        reason = "VR_FORCED_40_MINUTE_RESUME" if hard_due else "VR_FORCED_30_MINUTE_ROLLOVER"
+        sent = await queue_rollover_chat(context, pages, active, reason)
         save_queue_state(q)
+        if not sent:
+            write_runtime(vr_resume_pending=True, vr_resume_failed_task=active["task_id"])
         return True
     if VR_CHECKPOINT_ENABLED and active.get("phase") == "WAIT_CHAT":
         bucket_path = vr_checkpoint_path(active, now)
@@ -408,7 +480,10 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     """Rollover on confirmed UI failure or a VR 30-minute forced interval."""
     if not CONVERSATION_ROLLOVER_ENABLED:
         return False
-    vr_forced = CONTROLLER_MODE == "conversion" and reason == "VR_FORCED_30_MINUTE_ROLLOVER"
+    vr_forced = CONTROLLER_MODE == "conversion" and reason in {
+        "VR_FORCED_30_MINUTE_ROLLOVER", "VR_FORCED_40_MINUTE_RESUME",
+    }
+    hard_40m = CONTROLLER_MODE == "conversion" and reason == "VR_FORCED_40_MINUTE_RESUME"
     if not vr_forced and not rollover_has_confirmed_ui_failure(reason):
         write_runtime(
             status="conversation_rollover_held",
@@ -478,9 +553,15 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     runtime["queue_wave_id"] = active.get("wave_id")
     runtime["queue_failure_context"] = active.get("failure_context", "")
 
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+    thinking_verified = await ensure_thinking_level(page)
+    if not thinking_verified and STRICT_THINKING_LEVEL and not hard_40m:
         write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
         return False
+    if not thinking_verified and hard_40m:
+        write_runtime(
+            vr_resume_thinking_unverified=True,
+            last_action=f"{active['task_id']}: 40m forced resume proceeds despite unverified thinking selector",
+        )
 
     active["last_rollover_reason"] = reason
     previous_event_id = active.get("event_id")
