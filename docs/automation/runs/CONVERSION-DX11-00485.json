@@ -19,23 +19,23 @@
     "CMakeLists.txt:R183"
   ],
   "base_sha": "48b28827bbcff90589b98f3dabc042c3451a4452",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "status": "VALIDATING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "9c12229b650e8609bf40ee8bb74dc96a6fdab249",
+  "material_result_sha": "9c12229b650e8609bf40ee8bb74dc96a6fdab249",
+  "validation_bearing_result_sha": "9c12229b650e8609bf40ee8bb74dc96a6fdab249",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "selected_work_item": "Dormant D3D9 DEFAULT VB/IB snapshot -> live same-device D3D11 owner, IA binding and actual WARP DrawIndexed pixel proof",
-  "summary": "R183 new source-usable owner creates real default D3D11 VB/IB from a proven D3D9 DEFAULT snapshot, rejects stale version/generation and wrong/deferred device; isolated GPU DrawIndexed+pixel staging proof. Does not implement subsequent D3D9 Lock hooks or activate native gameplay draw.",
+  "summary": "R183 real default D3D11 VB/IB source-snapshot owner, COM device identity, generation/version fenced live IA bind and actual offscreen WARP GPU DrawIndexed readback implemented. Exact-SHA 9c12229b source/static+Win32 and R183 WARP all PASS; full Gate FAILED solely at inherited 00477-owned R175 TEXCOORD6 BGRA pixel mismatch. No in-game native Draw enabled.",
   "pipeline": {
-    "C0_RECOVER": "PASS GitHub exact HEAD, AGENTS, review index, queue contract, 00484/00477 ownership, 00485 absent, checkpoint absent",
-    "C1_REVIEW": "PASS disjoint new R183 owner path; R175 and R182 unmodified",
-    "C2_IMPLEMENT": "COMMITTED pending exact SHA reference",
-    "C3_VALIDATE": "PENDING source and WARP Windows CI",
-    "C4_COMMIT": "PENDING material SHA",
-    "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only no HMD release",
-    "C6_STATE": "PENDING"
+    "C0_RECOVER": "PASS: authenticated GitHub HEAD 48b28827; AGENTS.md, 100-review index, controller contract, queue state, 00484/00477 records, no 00485 checkpoint",
+    "C1_REVIEW": "PASS: new independent R183 D3D9 DEFAULT VB/IB snapshot owner; 00477-owned constant-buffer/translator and R182 fan code untouched",
+    "C2_IMPLEMENT": "PASS: production source NativeLinearBufferMirror and WARP GPU DrawIndexed probe, fail-closed generation/version, device/descriptor guards, two substantive test repairs",
+    "C3_VALIDATE": "SCOPED PASS / FULL GATE FAIL: exact SHA 9c12229b Gate 37953835906 Win32 validate 113899175911 SUCCESS, R183 3 mutants PASS, real WARP VB/IB DrawIndexed staging pixels PASS (smoke 113901537619); smoke fails later inherited 00477 R175 TEXCOORD6 BGRA [128,0,16,255] != expected [224,128,32,255]. Earlier ddd6e9fd superseded Gate; 8ea993c1 smoke failed R183 generation negative-mutant test, repaired by final 9c12229b.",
+    "C4_COMMIT": "PASS: GitHub material ddd6e9fdee5825d90bed67c24e59f5f774fa1295 -> 8ea993c1808b273e987bc0d5b9fb27737d16dc99 -> final 9c12229b650e8609bf40ee8bb74dc96a6fdab249, each [AUTO:CONVERSION-DX11-00485]; Issue14 comments 6084049223/6084227653.",
+    "C5_PACKAGE": "NOT_REQUIRED: no gameplay Draw activation, no Quest3/VDXR package/promotion",
+    "C6_STATE": "SEALED: final exact material/Gate SHA 9c12229b; scoped real GPU PASS; inherited full Gate FAIL. RUNTIME_VALIDATION=UNTESTED; no task score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_linear_buffer_mirror.hpp",
@@ -46,11 +46,54 @@
     ".github/workflows/backend-conversion-gate.yml",
     "docs/automation/runs/CONVERSION-DX11-00485.json"
   ],
-  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
-  "next_action": "Capture exact SHA Win32 WARP result and full Gate (inherited R175 blocker), then seal C6 without HMD claim",
+  "resume_cursor": "BLOCKED_UPSTREAM_R175_AFTER_SCOPED_R183_PROVEN",
+  "next_action": "Do not repeat R183 material/CI on unchanged input, do not edit 00477 R175 owner; wait for independently owner-validated R175 repair. Next assigned disjoint DX11 implementation may proceed under a different fenced work_key; game/HMD activation remains blocked.",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
   "score_change": 0,
-  "score_reason": "Pending exact-SHA full Gate; no scoring before completion",
-  "last_real_activity_at": "2026-10-10T00:27:00+09:00"
+  "score_reason": "Required full exact-SHA Backend Conversion Gate failure is inherited R175; scoped R183 PASS does not establish terminal full validation and cannot earn duplicate/unfinished score.",
+  "last_real_activity_at": "2026-10-10T00:52:08+09:00",
+  "scoped_automation_validation": "PASS_R183_STATIC_3_NEGATIVES_AND_COMPILED_WARP_GPU_DRAWINDEXED",
+  "validation_evidence": {
+    "validation_bearing_sha": "9c12229b650e8609bf40ee8bb74dc96a6fdab249",
+    "gate_run_id": 37953835906,
+    "gate_name": "Backend Conversion Gate",
+    "gate_event": "push",
+    "gate_head_sha": "9c12229b650e8609bf40ee8bb74dc96a6fdab249",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113899175911,
+    "validate_job_result": "success",
+    "smoke_job_id": 113901537619,
+    "smoke_job_result": "failure",
+    "r183_source_contract": "PASS",
+    "r183_mutations": "3_OF_3_REJECTED",
+    "r183_warp_build": "PASS",
+    "r183_gpu_drawindexed_pixels": "PASS",
+    "smoke_failure_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_files_untouched": true,
+    "earlier_r183_failed_gate": 37952490807
+  },
+  "validation_run_id": 37953835906,
+  "validation_job_id": 113899175911,
+  "readiness_smoke_job_id": 113901537619,
+  "blockers": [
+    "Exact-SHA Gate 37953835906 full FAILURE at separately owned 00477 R175 TEXCOORD6; R183 static+actual WARP PASS.",
+    "Quest 3/VDXR not run, native game Draw remains dormant."
+  ],
+  "state_persisted": true
 }
