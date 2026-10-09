@@ -1,0 +1,496 @@
+{
+  "run": "A214",
+  "role": "A",
+  "queue_index": 227,
+  "priority": "P1",
+  "run_key": "OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200",
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "clean_png_sha256": "a6c8b4a921654e144e9580057c391fedc8cfc84e24e16a50a4697b971b76f984",
+  "new_promoted_dds": 0,
+  "current_candidate_changed": false,
+  "native_format": "2048x2048 RGBA32 pitch8192 mip1 readable mirror-Y",
+  "regions_total": 16,
+  "region_producer_native_new": 13,
+  "region_prior_C320_native_done": 3,
+  "rows": [
+    {
+      "id": "intermediate",
+      "source": "INTERMEDIATE",
+      "korean": "중급",
+      "family": "gray_main",
+      "source_bbox": [
+        7,
+        421,
+        676,
+        493
+      ],
+      "candidate_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "margins": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 27476,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 4891,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "outrun",
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "family": "gray_main",
+      "source_bbox": [
+        5,
+        512,
+        362,
+        586
+      ],
+      "candidate_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "margins": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 14573,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 6249,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "professional",
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "family": "gray_main",
+      "source_bbox": [
+        3,
+        611,
+        675,
+        686
+      ],
+      "candidate_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "margins": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 26827,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 6007,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": false
+    },
+    {
+      "id": "alpine",
+      "source": "ALPINE",
+      "korean": "알파인",
+      "family": "gray_main",
+      "source_bbox": [
+        2,
+        701,
+        346,
+        777
+      ],
+      "candidate_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "margins": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 14475,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 6907,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": false
+    },
+    {
+      "id": "ancient_ruins",
+      "source": "ANCIENT RUINS",
+      "korean": "에인션트 루인스",
+      "family": "gray_main",
+      "source_bbox": [
+        2,
+        795,
+        707,
+        875
+      ],
+      "candidate_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "margins": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 30946,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 16625,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "cape_way",
+      "source": "CAPE WAY",
+      "korean": "케이프 웨이",
+      "family": "gray_main",
+      "source_bbox": [
+        8,
+        891,
+        473,
+        971
+      ],
+      "candidate_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "margins": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 18972,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 12284,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "castle_wall",
+      "source": "CASTLE WALL",
+      "korean": "캐슬 월",
+      "family": "gray_main",
+      "source_bbox": [
+        8,
+        987,
+        634,
+        1067
+      ],
+      "candidate_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "margins": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 24295,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 8615,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "cloudy_highland",
+      "source": "CLOUDY HIGHLAND",
+      "korean": "클라우디 하이랜드",
+      "family": "gray_main",
+      "source_bbox": [
+        1,
+        1083,
+        835,
+        1163
+      ],
+      "candidate_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "margins": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 36242,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 18685,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "coniferous_forest",
+      "source": "CONIFEROUS FOREST",
+      "korean": "코니퍼러스 포레스트",
+      "family": "gray_main",
+      "source_bbox": [
+        1,
+        1179,
+        933,
+        1259
+      ],
+      "candidate_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 42175,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 19176,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "deep_lake",
+      "source": "DEEP LAKE",
+      "korean": "딥 레이크",
+      "family": "gray_main",
+      "source_bbox": [
+        1,
+        1277,
+        491,
+        1353
+      ],
+      "candidate_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "margins": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 21201,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 8604,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "desert",
+      "source": "DESERT",
+      "korean": "데저트",
+      "family": "gray_main",
+      "source_bbox": [
+        1,
+        1371,
+        348,
+        1451
+      ],
+      "candidate_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "margins": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 16313,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 7130,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "bay_area",
+      "source": "BAY AREA",
+      "korean": "베이 에어리어",
+      "family": "gray_main",
+      "source_bbox": [
+        3,
+        1469,
+        436,
+        1545
+      ],
+      "candidate_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "margins": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 18856,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 13514,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "flagman1",
+      "source": "FLAGMAN 1",
+      "korean": "플래그맨 1",
+      "family": "red_flag",
+      "source_bbox": [
+        8,
+        1565,
+        963,
+        1716
+      ],
+      "candidate_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "margins": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 72996,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 42213,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": false
+    },
+    {
+      "id": "flagman2",
+      "source": "FLAGMAN 2",
+      "korean": "플래그맨 2",
+      "family": "red_flag",
+      "source_bbox": [
+        8,
+        1722,
+        994,
+        1880
+      ],
+      "candidate_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "margins": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 76607,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 46968,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "flagman3",
+      "source": "FLAGMAN 3",
+      "korean": "플래그맨 3",
+      "family": "red_flag",
+      "source_bbox": [
+        8,
+        1889,
+        993,
+        2047
+      ],
+      "candidate_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 76096,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 47131,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    },
+    {
+      "id": "novice",
+      "source": "NOVICE",
+      "korean": "초급",
+      "family": "gray_novice",
+      "source_bbox": [
+        1041,
+        1640,
+        1374,
+        1714
+      ],
+      "candidate_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "margins": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "source_alpha_nonzero": 13332,
+      "clean_alpha_nonzero": 0,
+      "persisted_candidate_alpha_nonzero": 4363,
+      "old_transparent_RGB_warning": "RGB bytes beneath alpha=0 are not rendered pixels",
+      "new_lossless_native_proof": true
+    }
+  ],
+  "global_machine": {
+    "source_to_clean_changed_OUTSIDE_16_TEXT_BOXES": 0,
+    "source_to_final_changed_OUTSIDE_16_TEXT_BOXES": 0,
+    "clean_to_final_changed_OUTSIDE_16_TEXT_BOXES": 0,
+    "source_to_clean_alpha_changed_OUTSIDE_16_TEXT_BOXES": 0,
+    "clean_to_final_alpha_changed_OUTSIDE_16_TEXT_BOXES": 0
+  },
+  "global_machine_failures": {},
+  "mechanical": "PASS_SCOPED_16_BOXES",
+  "producer_visual": "PENDING_FIRST_HAND_COMPOSITE_REVIEW",
+  "independent_C1": "C320_HOLD_STRICT_RECHECK_NOT_REPLACED",
+  "independent_C3": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "qa_scope": "Producer native transparent PNG and black/white/gray 100/75/50 source/CLEAN/final, exact RAW for thirteen previously uncovered. Independent C must re-hash and judge all 16 plus same-stroke source hierarchy"
+}
