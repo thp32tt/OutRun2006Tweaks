@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A205 q193 new native material DDS 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 from e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166 on index193 IGR003/019/033, changed 3 title source rows to source Black/real RGB; 3/3 bbox and 0 outside/alpha/mixed glyph, native/75/50 and RAW scoped QA PASS, 10 legacy inherited cells unchanged/possibly poor; full atlas REWORK_REQUIRED, C1/C3/user new game OPEN; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "C329 C2 EVEN q212 B329 e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea independent exact SHA/header and fresh changed-r43 visual improvement but full 12 masks/RAW/calibration incomplete -> HOLD_STRICT_RECHECK NOT PASS; IGR029 game open. localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json RUN_KEY=OUTRUN-KOR-C329-C2-Q212-B329-EXACT-SHA-SCOPED-HOLD-20261009-1920",
     "C328 C2 q098 B327R persisted DDS SHA256 472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028 REWORK_REQUIRED: original English Cl / ord. survive around Korean in full READABLE and RAW saved image; source removal/full composite fixed DDS and fresh C2/C3/user-game required, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C328-C2-Q098-PERSISTED-ENGLISH-RESIDUE/C328_Q098_CONTROLLER_REWORK.json. RUN_KEY=OUTRUN-KOR-C328-C2-Q098-B327R-PERSISTED-ENGLISH-RESIDUE-20261009-1850",
     "B329 B-even q212 C327 C2 actual visual REWORK of id43 PROFESSIONAL->프로 source638px vs prior 프로120px (18.8%, 513px leading gap). Promoted one NEW native RGBA32 full term 프로페셔널 native316x55 source-leading anchored x5 within original 638x63, unmodified other 11 source regions, source outside selected rgba/alpha0, exact DDS mirror-Y header/mip1 roundtrip. Old exact 209f8358... -> new e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea, Git blob 4e7de482 and binary commit e9165bc8, worker 37914195657 SUCCESS, 18 source/clean/old/new BGW RAW/FLIPY 100/75/50 proofs. Producer scoped visual PASS only; full C2/C3 user actual-game required, IGR029 mapping SUSPECTED and OPEN; RUNTIME_VALIDATION=UNTESTED. B328 initial lexical triage failed, B328R width252 fail, B328R2 right-align rejected; score/performance only one new final DDS. QA localization/graphics/role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR/B329_CONTROLLER_SELF_QA_FINAL.json",
@@ -13441,5 +13442,16 @@
     "decision": "HOLD_STRICT_RECHECK",
     "qa": "localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a205_q193": {
+    "previous_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+    "new_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "new_dds": 1,
+    "scoped_rows": 3,
+    "remaining_unreviewed_rows": 10,
+    "scoped_qa": "PASS",
+    "whole_atlas": "REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED"
   }
 }

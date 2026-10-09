@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261009-A205-Q193-SOURCE-WEIGHT-REWORK",
+  "run_key": "OUTRUN-KOR-A205-Q193-3TITLE-NATIVE-20261009-1948",
+  "queue_index": 193,
+  "priority": "P1",
+  "user_game_reports": [
+    "IGR-003",
+    "IGR-019",
+    "IGR-033"
+  ],
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "previous_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+  "persisted_dds_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+  "persisted_dds_git_blob": "4b9c71f190ebef1ccb0ed1172cc0f0c6e848af19",
+  "format": "native RGBA32 R mask 0xff",
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "mips": 1,
+  "raw": "mirrorY",
+  "worker_id": 37919114543,
+  "worker_result": "SUCCESS",
+  "new_material_dds": 1,
+  "changed_original_source_regions": 3,
+  "total_atlas_segments": 13,
+  "legacy_source_diff_pixels_preserved": 115610,
+  "rows": [
+    [
+      "WELCOME TO THE",
+      "환영합니다",
+      [
+        3,
+        148,
+        476,
+        195
+      ],
+      [
+        5,
+        150,
+        202,
+        193
+      ]
+    ],
+    [
+      "MULTIPLAYER",
+      "멀티플레이어",
+      [
+        8,
+        297,
+        540,
+        359
+      ],
+      [
+        10,
+        299,
+        327,
+        357
+      ]
+    ],
+    [
+      "SHOWROOM",
+      "쇼룸",
+      [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      [
+        1207,
+        959,
+        1302,
+        1009
+      ]
+    ]
+  ],
+  "machine": {
+    "inherited_source_to_current_outside_three_bboxes": 115610,
+    "current_old_vs_clean_outside": 0,
+    "clean_to_final_changed_outside": 0,
+    "clean_to_final_changed_outside_glyphs": 0,
+    "clean_to_final_alpha_outside": 0,
+    "prior_to_final_changed_outside": 0,
+    "protected_art_changed": 0
+  },
+  "controller_qa": {
+    "changed_titles": "PASS_SOURCE_BOLD_RGB_READABLE_100_75_50_RAW",
+    "plate_only": "PASS_3",
+    "composite_only": "PASS_3",
+    "preserved_inherited_rows": "UNCHANGED_NOT_REWORKED",
+    "whole_atlas": "REWORK_REQUIRED_LEGACY_SMALL_TEXT"
+  },
+  "ten_stage": [
+    "SOURCE_PIN_PASS",
+    "INVENTORY_3OF13_ONLY",
+    "CLEAN_PLATE_3_PASS",
+    "PLATE_ONLY_3_PASS",
+    "SOURCE_STYLE_PROFILE_3_PASS",
+    "NATIVE_GLYPHS_3_PASS",
+    "GLYPH_ONLY_3_PASS",
+    "COMPOSITE_3_PASS",
+    "DDS_PERSISTED_3_PASS",
+    "INDEPENDENT_C_C3_GAME_PENDING"
+  ],
+  "ordered_eight": [
+    "ENGLISH_SOURCE_REMOVAL_3_PASS",
+    "SLANT_FLAT_3_PASS",
+    "SIZE_3_PASS_BUT_LEGACY_HOLD",
+    "WEIGHT_SOURCE_3_PASS",
+    "CLIP_ZERO_3_PASS",
+    "PROTECTED_ZERO_3_PASS",
+    "RAW_FLIPY_3_PASS",
+    "READABILITY_3_PASS_LEGACY_HOLD"
+  ],
+  "scope_producer": "PASS_3_OF_13",
+  "whole_asset": "REWORK_REQUIRED",
+  "c1": "PENDING",
+  "c3": "PENDING",
+  "preview_approval": "BLOCKED",
+  "user_game": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "proofs": [
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_0_welcome_100.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_0_welcome_50.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_1_multiplayer_100.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_1_multiplayer_50.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_2_showroom_100.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_2_showroom_50.jpg",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_FULL_TRIAL_RAW.png",
+    "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_FULL_TRIAL_FLIPY_100.jpg"
+  ]
+}

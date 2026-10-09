@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 19:31 KST",
+  "updated_at_kst": "2026-10-09 19:48 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9272,5 +9272,16 @@
     "qa": "localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json",
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0
+  },
+  "a205_q193": {
+    "new_dds": 1,
+    "old_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+    "new_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+    "modified_rows": 3,
+    "whole_asset": "REWORK_REQUIRED",
+    "c1": "PENDING",
+    "c3": "PENDING",
+    "ingame": "OPEN",
+    "runtime_validation": "UNTESTED"
   }
 }
