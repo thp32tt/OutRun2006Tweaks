@@ -58,6 +58,10 @@ namespace OutRunVR::GameSemantic
         TextGlyphPutSprite,
         OutRunStagePrintf,
         ResultProgress,
+        // Original GOAL stage/result print parent at 19 exact
+        // EXE 0x97xxx CALLs -> sub_4B9200; unlike the progress bar
+        // calls, these print elapsed record/stage text.
+        ResultTextB9200,
         GoalTimeHelper,
         OutRunHudText,
         DispRankFirst,
@@ -109,6 +113,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::TextGlyphPutSprite: return "TEXT_GLYPH_PUTSPRITE";
         case ProducerToken::OutRunStagePrintf: return "OUTRUN_STAGE_PRINT";
         case ProducerToken::ResultProgress: return "OUTRUN_RESULT_PROGRESS";
+        case ProducerToken::ResultTextB9200: return "OUTRUN_RESULT_TEXT_B9200";
         case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
         case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
