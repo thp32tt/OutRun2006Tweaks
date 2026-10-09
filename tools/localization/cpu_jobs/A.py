@@ -30,9 +30,9 @@ EXPECTED_SOURCE="d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d026645
 EXPECTED_OLD="1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6"
 EXPECTED_FONT_BLOB="b5b67bf293310a3648468a21ac829d6f2d58b2d5"
 ROWS=[
- {"key":"online_rank_help","source":"View the online multiplayer rankings!","ko":"온라인 멀티플레이어 랭킹 보기!", "cell":[0,372,1160,452]},
- {"key":"outrun2sp_rank_help","source":"View OutRun2SP arcade rankings!","ko":"OutRun2SP 아케이드 랭킹 보기!", "cell":[0,534,1105,619]},
- {"key":"outrun_rank_help","source":"View OutRun single player rankings!","ko":"OutRun 싱글 플레이 랭킹 보기!", "cell":[0,694,1120,781]}
+ {"key":"online_rank_help","source":"View the online multiplayer rankings!","ko":"온라인 멀티플레이어 랭킹 보기!", "cell":[0,372,1160,465]},
+ {"key":"outrun2sp_rank_help","source":"View OutRun2SP arcade rankings!","ko":"OutRun2SP 아케이드 랭킹 보기!", "cell":[0,534,1105,633]},
+ {"key":"outrun_rank_help","source":"View OutRun single player rankings!","ko":"OutRun 싱글 플레이 랭킹 보기!", "cell":[0,694,1120,792]}
 ]
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def blob(p):
