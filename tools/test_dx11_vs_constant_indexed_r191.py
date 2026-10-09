@@ -17,7 +17,7 @@ guards=(
 def passes(src): return all(g in src for g in guards)
 assert passes(h), "R191 missing actual VS b0 resource/lifetime/IA/RTV guards"
 for g in guards[:4]:
-    assert not passes(h.replace(g,"",1)), "R191 negative mutation survived "+g
+    # A guard appears in both bind and binding_exact; remove all matching\n    # occurrences for this negative mutant, not only the first copy.\n    assert not passes(h.replace(g,"")), "R191 negative mutation survived "+g
 assert "->DrawIndexed(" not in h and "->Draw(" not in h, "no production draw activation"
 for phrase in (
     "ctx->VSSetConstantBuffers(0,1,&nullBuffer)",

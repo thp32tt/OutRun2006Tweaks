@@ -17,11 +17,11 @@
     "cmake.toml:R191",
     ".github/workflows/backend-conversion-gate.yml:R191"
   ],
-  "base_sha": "d5d8ede392a64907867893325a0e47adc9ca16a5",
-  "result_sha": "PENDING_EXACT_COMMIT",
-  "material_result_sha": "PENDING_EXACT_COMMIT",
-  "validation_bearing_result_sha": "PENDING_EXACT_COMMIT",
-  "status": "WAITING_FOR_EXACT_SHA_GATE",
+  "base_sha": "962414d0b654e86453b6ad4315a16cdc226cca00",
+  "result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
+  "material_result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
+  "validation_bearing_result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
+  "status": "WAITING_FOR_CORRECTED_EXACT_SHA_GATE",
   "checkpoint": "C4_COMMIT",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -32,10 +32,10 @@
     "C0_RECOVER": "PASS: latest GitHub HEAD d5d8ede392a64907867893325a0e47adc9ca16a5; 00493 run and controller checkpoint absent; 00492 R190 C6 is BLOCKED_UPSTREAM_R175_FULL_GATE.",
     "C1_REVIEW": "PASS: AGENTS.md, 100 review index, queue contract, branch state, R183/R186/R187/R190 source, visual regression history. R175 belongs to 00477; no shared source ownership. R191 develops native VS b0 resource and actual shader transform while dormant.",
     "C2_IMPLEMENT": "PASS: real C++ immutable VS constant buffer snapshot creation/replacement, exact same immediate-device b0 binding, revision/descriptor guards, WARP DrawIndexed center-to-right translated pixels + 4 mutation source contract; CMake and GitHub Gate wired.",
-    "C3_VALIDATE": "PENDING scoped static source once and Win32 WARP real pixel validation on exact material SHA.",
-    "C4_COMMIT": "Material result commit with [AUTO:CONVERSION-DX11-00493], no CI skip; exact-SHA Gate pending.",
+    "C3_VALIDATE": "Initial exact-SHA gate 37975147028: Win32 validate SUCCESS, R191 negative mutant static FAIL because two intentionally present version guards were mutated with replace(...,1) leaving another copy; no C++ WARP run yet. E001 repair tests aggregate guard removal; corrected exact-SHA Gate PENDING.",
+    "C4_COMMIT": "Initial C++ material SHA 962414d0... retained. E001 bounded test-harness correction committed as new material with [AUTO:CONVERSION-DX11-00493] and no CI skip; next exact-SHA Gate required.",
     "C5_PACKAGE": "NOT_REQUIRED: native game Draw still dormant; no Quest3/VDXR evidence or backend promotion.",
-    "C6_STATE": "PENDING exact material SHA Gate; preserve runtime UNTESTED and inherited R175 blocker separately."
+    "C6_STATE": "PENDING corrected exact-SHA validation. No premature PASS or score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_vs_constant.hpp",
@@ -50,12 +50,19 @@
     "upstream_owner_task": "CONVERSION-DX11-00477",
     "new_r191_negative_mutants": 4,
     "gate": "PENDING",
-    "manual_hmd": false
+    "manual_hmd": false,
+    "initial_gate_run_id": 37975147028,
+    "initial_gate_head_sha": "962414d0b654e86453b6ad4315a16cdc226cca00",
+    "initial_validate": "SUCCESS",
+    "initial_smoke": "FAIL_R191_NEGATIVE_MUTATION_TEST",
+    "initial_failure": "R191 negative mutation survived generation != generation_ || version != version_",
+    "fix": "Remove all occurrences of the identical guard when constructing one mutation, not only the first; resource readiness remains unchanged.",
+    "corrected_gate": "PENDING"
   },
   "blockers": [
     "Existing unrelated R175 TEXCOORD6 generic varying mismatch owned by 00477 blocks whole Gate.",
     "No user Quest3/VDXR headset/game runtime verification."
   ],
-  "next_action": "Verify exact-SHA Backend Conversion Gate R191 Win32/WARP real b0 shader-transform pixels; inspect failure if any; seal C6 separately from material result without replacing SHA.",
+  "next_action": "Check new exact-SHA Backend Conversion Gate; verify corrected R191 static and actual WARP shifted DrawIndexed, separate upstream R175 and seal C6.",
   "score_change": 0
 }
