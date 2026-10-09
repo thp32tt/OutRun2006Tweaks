@@ -6814,7 +6814,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 08:52 KST",
+  "updated_at_kst": "2026-10-09 14:17 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13107,5 +13107,31 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json",
     "actions_id": 37873410100
+  },
+  "b319_q137_top_title": {
+    "run_key": "OUTRUN-KOR-B319-Q137-P0-LONGFORM-TOP-TITLE-20261009",
+    "queue_index": 137,
+    "priority": "P0",
+    "role": "B",
+    "owner_override": "IGR-041",
+    "previous_candidate_sha256": "b9366dd4a66a015ce98e30cab29e92b92aa60aed2c5445fc6b35d4410671ec14",
+    "new_candidate_sha256": "0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "clean_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+    "material_regions": [
+      "select_transmission"
+    ],
+    "new_dds": 1,
+    "completed_producer_regions": 5,
+    "remaining_rework_regions": [
+      "transmission_small"
+    ],
+    "producer_self_qa": "PASS_SCOPED_TOP_ONLY",
+    "independent_C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_ingame": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GitHub Actions",
+    "qa": "localization/graphics/role_B/20261009-B319-Q137-P0-LONGFORM-TOP-TITLE/B319_CONTROLLER_SELF_QA_FINAL.json"
   }
 }

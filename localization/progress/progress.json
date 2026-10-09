@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 13:57 KST",
+  "updated_at_kst": "2026-10-09 14:17 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C283 q175 A187 native+50% bright face versus overdark navy extrusion 3-row source-family visual REWORK_REQUIRED; do not redo exact SHA. A material re-render then separate C1/C3. q195 producer candidate pending C, q219 C280 REWORK, q59 C279 HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B319 q137 P0 IGR041 new source-conditioned long-form native upper SELECT TRANSMISSION candidate SHA 0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22; five regions producer scoped PASS, remaining tiny TRANSMISSION REWORK_REQUIRED; independent fresh C1/C3 and user's NEW game screenshot pending. Other B owned P0 user regressions remain OPEN. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

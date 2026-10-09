@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B319",
+  "run_key": "OUTRUN-KOR-B319-Q137-P0-LONGFORM-TOP-TITLE-20261009",
+  "timestamp_kst": "2026-10-09 14:17 KST",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "priority": "P0",
+  "owner_lane": "B (IGR-041 override)",
+  "user_status": "OPEN_USER_INGAME_FAIL",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_plate_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "previous_candidate_sha256": "b9366dd4a66a015ce98e30cab29e92b92aa60aed2c5445fc6b35d4410671ec14",
+  "promoted_candidate_sha256": "0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22",
+  "trial_git_blob_sha": "a255a2145c098d62b53d0dbac5c191122165dcba",
+  "new_production_dds": 1,
+  "scope": [
+    "select_transmission"
+  ],
+  "other_five_regions": "PIXEL_EXACT",
+  "rework_remaining": [
+    "transmission_small"
+  ],
+  "top_source_bbox": [
+    5,
+    67,
+    868,
+    130
+  ],
+  "top_localized_bbox": [
+    168,
+    71,
+    704,
+    126
+  ],
+  "bbox_deltas": {
+    "left": 163,
+    "top": 4,
+    "right": 164,
+    "bottom": 4
+  },
+  "containment": "PASS_SCOPED",
+  "source_size_ceiling": "PASS_SCOPED",
+  "source_clean_plate": "PASS_SCOPED_SOURCE_ALPHA_ZERO_NAKED_CLEAN_VISUAL",
+  "clean_final_composite": "PASS_SCOPED_NATIVE_GLYPH_ONLY_NO_FOREIGN_BOX_VISIBLE",
+  "source_final_style": "PASS_SCOPED_NATIVE_50_RAW_SOURCE_WEIGHT_IMPROVED",
+  "native_persisted_decode": "EXACT_ROUNDTRIP",
+  "codec": "BGRA32",
+  "native": [
+    2048,
+    1024
+  ],
+  "mips": 1,
+  "raw": "MIRROR_Y_EXACT",
+  "changed_rgba_outside_selected": 0,
+  "changed_alpha_outside_selected": 0,
+  "protected_plate_pixels": 3579,
+  "original_face": "flat bright white bold condensed sans",
+  "new_face": "Noto Sans CJK KR Black true native 56px, flat white, extended imperative; no old Korean upscale",
+  "native_region_ratio": {
+    "height": 0.873015873015873,
+    "width": 0.6210892236384704
+  },
+  "visual_inspection": {
+    "flipy_gray_100": "PASS_SCOPED_CONTROLLER",
+    "flipy_gray_50": "PASS_SCOPED_CONTROLLER",
+    "raw_black_75": "PASS_SCOPED_CONTROLLER",
+    "white_black_full_mip": "EVIDENCE_PRESENT_NOT_ALL_CONTROLLER_INSPECTED",
+    "composite_plate": "NO_DEFINITE_BOX_OR_GHOST_IN_DIRECTLY_VIEWED_CROPS"
+  },
+  "source_oriented_slant": "UPRIGHT_EQUALS_SOURCE",
+  "QA": "PRODUCER_PARTIAL_PASS_ONE_TITLE",
+  "whole_asset": "REWORK_REQUIRED_ONE_UPPER_SMALL",
+  "independent_C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "USER_GAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "workflow_run_id": 37887573842,
+  "workflow": "SUCCESS",
+  "evidence_machine": "localization/graphics/role_B/20261009-B319-Q137-P0-LONGFORM-TOP-TITLE/B319_MACHINE_QA.json",
+  "preview": "localization/graphics/role_B/20261009-B319-Q137-P0-LONGFORM-TOP-TITLE/select_transmission_FLIPY_GRAY_100_SOURCE_CLEAN_B318_B319.png",
+  "execution_backend": "GITHUB_ACTIONS_SOURCE_AND_DDS_INPUT_ONLY_REPO_NON_LOCAL",
+  "cleanup": "GITHUB_EPHEMERAL_WORKSPACE_DISCARDED",
+  "N100_used": false,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
