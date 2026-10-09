@@ -520,6 +520,52 @@ def check_result_parent_provenance(ui_source, semantics_source):
         raise SystemExit("Sumo no-tick replay loses exact result producer")
 
 check_result_parent_provenance(ui, sem)
+# The 93%-progress screenshot is a separate GOAL visual phase, not proof that
+# the final completed-result HUD is also broken. Preserve exact progress E8
+# node registration and add bounded *read-only* source evidence: never turn
+# this diagnostic into blanket ScreenOverlay2D=>ScreenHud remapping.
+def verify_result_progress_source_trace(source):
+    body = function_body(source, 'static void ResultProgressLeave(')
+    for needle in (
+        'Settings::VRTelemetry', 'changedPriorities',
+        'after != ResultProgressTailsBefore[prio]',
+        'TagAppendedNodes(ResultProgressTailsBefore,',
+        'RenderScope::ScreenHud',
+        'ProducerToken::ResultProgress',
+        '++ResultProgressCompletedCalls',
+        '(hits & (hits - 1u)) == 0',
+        'VR P0 RESULT PROGRESS SOURCE:',
+    ):
+        require(needle, body, 'bounded GOAL progress origin telemetry')
+    require_order(body, 'result E8 ownership must precede bounded trace',
+                  'TagAppendedNodes(ResultProgressTailsBefore,',
+                  '++ResultProgressCompletedCalls',
+                  'VR P0 RESULT PROGRESS SOURCE:',
+                  'ResultProgressTailsBefore = {};')
+    for forbidden in ('SetRenderState(', 'SetTransform(',
+                      'SetVertexShaderConstantF(', 'Game::put_clip_sprite(',
+                      'Game::sprani_play_ae_auth_alpha('):
+        if forbidden in body:
+            raise SystemExit('result progress diagnostic must not alter pixels')
+
+verify_result_progress_source_trace(ui)
+for label, corrupted in (
+    ('remove bounded exact progress source trace', ui.replace(
+        'VR P0 RESULT PROGRESS SOURCE:',
+        'VR P0 RESULT PROGRESS NOT_RECORDED:', 1)),
+    ('drop original progress sibling classification', ui.replace(
+        'TagAppendedNodes(ResultProgressTailsBefore,',
+        'TagAppendedNodes(ResultProgressWrongBefore,', 1)),
+):
+    if corrupted == ui:
+        raise SystemExit('result progress P0 fault injection failed: ' + label)
+    try:
+        verify_result_progress_source_trace(corrupted)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('result progress P0 fault survived: ' + label)
+
 # Shader and R62 fixed-function both need the exact originating family in
 # telemetry; without this, +TIME vs final-result ambiguity returns.
 for marker in (
