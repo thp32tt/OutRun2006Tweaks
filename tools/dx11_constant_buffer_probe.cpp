@@ -11270,7 +11270,7 @@ VSOutput main(VSInput input)
                 prepare_fixed_function_indexed_direct_draw_probe(
                     context, target, pipelineBundle.input_layout(),
                     pipelineBundle.vertex_shader(), pipelineBundle.pixel_shader(),
-                    renderTargetBoundDraw, multiStageDrawReady,
+                    outputStateBinding, renderTargetBoundDraw, multiStageDrawReady,
                     indexedGeometryReady, packet,
                     indexedDirectLineage, indexedSourceRange,
                     indexedSourceValues, indexedSourceValueLineage,
@@ -11338,6 +11338,37 @@ VSOutput main(VSInput input)
             r157Probe(d3d.context, outputColorSurface.render_target_view(),
                       indexedDirectDispatch),
             "R161 exact IA/VS/PS restore permits indexed DrawIndexed probe");
+        // R162 negative controls: the sealed packet survives, but live
+        // output-state identity must fail closed until restored.
+        D3D11_VIEWPORT r162Viewport{};
+        UINT r162ViewportCount = 1u;
+        d3d.context->RSGetViewports(&r162ViewportCount, &r162Viewport);
+        require(r162ViewportCount == 1u,
+                "R162 exactly one viewport before indexed GPU probe");
+        d3d.context->RSSetViewports(0u, nullptr);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       indexedDirectDispatch),
+            "R162 rejects late missing indexed viewport");
+        d3d.context->RSSetViewports(1u, &r162Viewport);
+        D3D11_RECT r162Scissor{};
+        UINT r162ScissorCount = 1u;
+        d3d.context->RSGetScissorRects(&r162ScissorCount, &r162Scissor);
+        require(r162ScissorCount == 1u &&
+                    r162Scissor.right > r162Scissor.left + 1,
+                "R162 valid scissor before indexed GPU probe");
+        D3D11_RECT r162DriftScissor = r162Scissor;
+        --r162DriftScissor.right;
+        d3d.context->RSSetScissorRects(1u, &r162DriftScissor);
+        require(
+            !r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                       indexedDirectDispatch),
+            "R162 rejects post-snapshot indexed scissor drift");
+        d3d.context->RSSetScissorRects(1u, &r162Scissor);
+        require(
+            r157Probe(d3d.context, outputColorSurface.render_target_view(),
+                      indexedDirectDispatch),
+            "R162 restores exact viewport/scissor RS/OM ownership");
         ID3D11Query* r157Stats = nullptr;
         D3D11_QUERY_DESC r157StatsDesc{};
         r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
