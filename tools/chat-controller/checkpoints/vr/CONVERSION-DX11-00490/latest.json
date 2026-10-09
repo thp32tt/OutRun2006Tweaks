@@ -13,8 +13,8 @@
     "status": "IN_PROGRESS"
   },
   "staged_files": {
-    "src/vr/d3d11/native_indexed_texture_binding.hpp": "d0da7ad8ff36caf7c83d32602c0f0e086d53596d",
-    "tools/dx11_textured_indexed_probe_r188.cpp": "cd829dd2c20caa8438dcb0666171abc9f6399651",
+    "src/vr/d3d11/native_indexed_texture_binding.hpp": "e4407d7ee04b2be956ac5d540448fd7bcdb9dd85",
+    "tools/dx11_textured_indexed_probe_r188.cpp": "acd5d268294d741d8ca5494ba667408675ede678",
     "tools/test_dx11_textured_indexed_r188.py": "a795b7f0934ecfe2df9697eb03ffa7292d4f9560",
     "cmake.toml": "d630bd32aac57e728fd4b0699417b8f7db9660b4",
     ".github/workflows/backend-conversion-gate.yml": "c1e6d438d08a99569fb79dc5bd863e4394efed53",
@@ -24,5 +24,6 @@
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
-  "next_action": "Do not cancel 00489 Gate. Recheck target HEAD, 00489 Gate and work key, rebase staged manifest/workflow on latest HEAD if changed, use target material commit with required marker, exact-SHA Gate then seal C6."
+  "next_action": "Do not cancel 00489 Gate. Recheck target HEAD, 00489 Gate and work key, rebase staged manifest/workflow on latest HEAD if changed, use target material commit with required marker, exact-SHA Gate then seal C6.",
+  "dependency_reconciled": "R187 signature introduced expectedTarget in 576048f0; R188 now forwards exact RTV identity"
 }
