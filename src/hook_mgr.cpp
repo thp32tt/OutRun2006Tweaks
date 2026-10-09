@@ -52,8 +52,7 @@ void HookManager::ApplyHooks()
         if (hook->validate())
         {
             const bool active = hook->apply();
-            hook->is_active_.store(active, std::memory_order_release);
-            hook->has_error_.store(!active, std::memory_order_release);
+            hook->publish_status(active);
 
             const auto desc = hook->description();
             if (!desc.empty())
@@ -74,8 +73,7 @@ void HookManager::ReportAsyncResult(std::string_view description, bool active)
     {
         if (!hook || hook->description() != description)
             continue;
-        hook->is_active_.store(active, std::memory_order_release);
-        hook->has_error_.store(!active, std::memory_order_release);
+        hook->publish_status(active);
         spdlog::log(active ? spdlog::level::info : spdlog::level::err,
             "{}: async installer {}", description,
             active ? "ready" : "failed");
