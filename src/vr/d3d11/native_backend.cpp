@@ -14523,6 +14523,7 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
 bool prepare_fixed_function_indexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
+    ID3D11DepthStencilView* expectedProbeDepth,
     ID3D11InputLayout* expectedProbeLayout,
     ID3D11VertexShader* expectedProbeVS,
     ID3D11PixelShader* expectedProbePS,
@@ -14542,7 +14543,8 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     UINT startIndexLocation, INT baseVertexLocation) noexcept {
     UINT elements = 0;
     const auto topology = translate_primitive(primitive);
-    if (!context || !expectedProbeTarget || !expectedProbeLayout ||
+    if (!context || !expectedProbeTarget || !expectedProbeDepth ||
+        !expectedProbeLayout ||
         !expectedProbeVS || !expectedProbePS ||
         context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
         !direct_draw_element_count(primitive, primitiveCount, elements) ||
@@ -14583,9 +14585,12 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
 
     Microsoft::WRL::ComPtr<ID3D11Device> device;
     Microsoft::WRL::ComPtr<ID3D11Device> targetDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device> depthDevice;
     context->GetDevice(device.ReleaseAndGetAddressOf());
     expectedProbeTarget->GetDevice(targetDevice.ReleaseAndGetAddressOf());
+    expectedProbeDepth->GetDevice(depthDevice.ReleaseAndGetAddressOf());
     if (!device || device.Get() != targetDevice.Get() ||
+        device.Get() != depthDevice.Get() ||
         vertexBuffer.mirror_device() != device.Get() ||
         indexBuffer.mirror_device() != device.Get())
         return false;
@@ -14609,7 +14614,11 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
         return false;
 
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveTarget;
-    context->OMGetRenderTargets(1, liveTarget.ReleaseAndGetAddressOf(), nullptr);
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> liveDepth;
+    // R164: an unchanged RTV and sealed output-state packet cannot authorize
+    // DrawIndexed if the live OM DSV was detached or replaced after sealing.
+    context->OMGetRenderTargets(1, liveTarget.ReleaseAndGetAddressOf(),
+                                liveDepth.ReleaseAndGetAddressOf());
     Microsoft::WRL::ComPtr<ID3D11Buffer> liveVertex;
     UINT stride = 0u, offset = 0u;
     context->IAGetVertexBuffers(
@@ -14647,6 +14656,7 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
             context, liveOutputBinding.snapshotToken))
         return false;
     return liveTarget.Get() == expectedProbeTarget &&
+        liveDepth.Get() == expectedProbeDepth &&
         liveVertex.Get() == vertexBuffer.mirror_buffer() &&
         stride == boundDraw.vertexStride &&
         offset == boundDraw.vertexOffset &&
