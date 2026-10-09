@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B317 q137 P0 IGR-041: three small header/small source-family native glyphs, *trial first*.
+"""B318 q137 P0 IGR-041: two small header/small source-family native glyphs, *trial first*.
 
 Prior B287/B288 only changed strokes on the same generic narrow Korean.
 This pass changes semantic phrasing and uses per-syllable native condensed
@@ -13,7 +13,7 @@ from PIL import Image,ImageFont,ImageDraw
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
-OUT=G/"role_B/20261009-B317-Q137-P0-THREE-SMALL-MODE-REGIONS"
+OUT=G/"role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SRC="11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
@@ -62,7 +62,7 @@ assert Path(font).exists()
 out=P.copy();report=[]
 # Source-clean validated six; current rework is ONLY four previously C-rejected residual labels.
 residual_only=np.zeros(P.shape[:2],bool)
-for entry in specs[1:4]:
+for entry in specs[2:4]:
  ll,tt,rr,bb=entry[3]
  residual_only[tt:bb,ll:rr]=True
 def letter_master(word,font_px,targetw,sourceh):
@@ -93,7 +93,7 @@ def letter_master(word,font_px,targetw,sourceh):
   result.paste(a,(pos,(height-a.height)//2));pos+=a.width+gap
  assert total<=targetw-10,(word,total,targetw)
  return result
-for key,en,ko,(l,t,r,b),size,alpha in specs[1:4]:
+for key,en,ko,(l,t,r,b),size,alpha in specs[2:4]:
  # choose native source-like cap height, min 3px margins on each source bbox
  chosen=None
  for sz in range(size,size-16,-1):
@@ -131,7 +131,7 @@ else:
  order="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 data=current[:128]+body;assert len(data)==len(current) and sha(data)!=OLD
 D=decode(data);assert np.array_equal(D,out)
-(OUT/"B317_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
+(OUT/"B318_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
 def onbg(a,bg):
  layer=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
  layer.alpha_composite(Image.fromarray(a,"RGBA"))
@@ -149,17 +149,17 @@ for reg in report:
     sheet=Image.new("RGB",(sum(im.width for im in frames)+12,max(im.height for im in frames)),bg)
     x=0
     for im in frames:sheet.paste(im,(x,0));x+=im.width+4
-    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B317.png"
+    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B318.png"
     sheet.save(OUT/filename,optimize=True);views.append(filename)
-evidence={"role":"B","run":"B317","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
+evidence={"role":"B","run":"B318","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
  "clean_png_sha256":CLEAN,"previous_candidate_sha256":OLD,"trial_sha256":sha(data),
  "new_trial_dds":1,"promoted_dds":0,"source_clean_outside6":0,
- "source_clean_retained_protected_separators":retained,"candidate_changed_outside_three_small":0,
- "alpha_outside_three_small":0,"header_exact":True,"persisted_decode":"EXACT",
+ "source_clean_retained_protected_separators":retained,"candidate_changed_outside_two_small":0,
+ "alpha_outside_two_small":0,"header_exact":True,"persisted_decode":"EXACT",
  "raw_orientation":"mirror_y","native":[2048,1024],"dds_codec":order,"mips":1,
  "per_region":report,"proofs":views,"producer_visual":"PENDING_DIRECT_NATIVE_50_RAW_75",
  "C1":"NOT_RUN","C3":"NOT_RUN","user_game":"OPEN_USER_INGAME_FAIL",
  "RUNTIME_VALIDATION":"UNTESTED","backend":"github-actions (local network cannot resolve canonical raw source)",
  "excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B317_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
-print("B317_TRIAL",sha(data),"views",len(views))
+(OUT/"B318_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
+print("B318_TRIAL",sha(data),"views",len(views))
