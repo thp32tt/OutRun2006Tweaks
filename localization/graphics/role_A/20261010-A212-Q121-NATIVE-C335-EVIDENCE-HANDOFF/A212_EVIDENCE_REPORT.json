@@ -1,0 +1,91 @@
+{
+  "role": "A",
+  "run": "A212",
+  "queue_index": 121,
+  "priority": "P0",
+  "IGR": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "type": "NEW_NATIVE_SOURCE_CLEAN_PERSISTED_DDS_EVIDENCE_ONLY_NO_NEW_DDS",
+  "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_clean": "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png",
+  "clean_png_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+  "current_dds_changed": false,
+  "produced_dds": 0,
+  "native_4096x4096_RGBA32_mip1": true,
+  "raw_flipY": "PREVIEWED_FROM_SAVED_BYTES_NO_GAME_VALIDATION",
+  "outside_three_bboxes": {
+    "source_to_clean_changed_outside_three_original_regions": 1934984,
+    "clean_to_final_changed_outside_three_original_regions": 0,
+    "source_to_final_changed_outside_three_original_regions": 1934984,
+    "source_to_clean_alpha_changed_outside_three_original_regions": 1638112,
+    "clean_to_final_alpha_changed_outside_three_original_regions": 0
+  },
+  "regions": {
+    "select_game_mode": {
+      "source_pixel_sha256": "1e0765a350be6adbffe2aa77a68e81bf8095bb5d59ef140ee34e07e2ab8e54a6",
+      "plate_pixel_sha256": "f99a79dc4850c50d121867793ad4c3b77e895fca9c02004a20b2f3f1d6b7663b",
+      "final_pixel_sha256": "b74709056cd26310a6874c8f905c1110380a5924985dcd1aa7e3b9b4fab569b3",
+      "plate_alpha_nonzero_original_rect": 0,
+      "new_region_positive_margins": [
+        125,
+        126,
+        6,
+        25
+      ],
+      "source_alpha_nonzero": 66831,
+      "final_alpha_nonzero": 52382,
+      "visual_comparison_png": "A212_select_game_mode_SOURCE_CLEAN_FINAL_NATIVE.png"
+    },
+    "select_car": {
+      "source_pixel_sha256": "3844f112a20671fad9dfd872e98343abcd7f51ed2d5365fb9af47dafe7f4ff54",
+      "plate_pixel_sha256": "7b4c6a7d2d8e394e87c7b0f4b838aab8617f82041547544e3a1baabde05ec97b",
+      "final_pixel_sha256": "a25ea599adcccc82b7e3bab7e966b138e8df2f410dc525829a88a24a2774d66c",
+      "plate_alpha_nonzero_original_rect": 0,
+      "new_region_positive_margins": [
+        44,
+        45,
+        17,
+        39
+      ],
+      "source_alpha_nonzero": 54234,
+      "final_alpha_nonzero": 60683,
+      "visual_comparison_png": "A212_select_car_SOURCE_CLEAN_FINAL_NATIVE.png"
+    },
+    "select_course": {
+      "source_pixel_sha256": "34b17d98e09ee67c44d390f315b7382f09f943ecd19af6850ad87e0f3e805127",
+      "plate_pixel_sha256": "85d4cb82b351fa9558d32b89eb197520e3b1fb90a2d4ce04874442afa559ca77",
+      "final_pixel_sha256": "ffb3341467cea11bba6addae2cb3a64a92d1d4c5e43c4cda102a4816cd53f73f",
+      "plate_alpha_nonzero_original_rect": 0,
+      "new_region_positive_margins": [
+        160,
+        161,
+        26,
+        11
+      ],
+      "source_alpha_nonzero": 52813,
+      "final_alpha_nonzero": 29680,
+      "visual_comparison_png": "A212_select_course_SOURCE_CLEAN_FINAL_NATIVE.png"
+    }
+  },
+  "mechanical": "FAIL_SCOPED",
+  "fails": [
+    "source_to_clean_changed_outside_three_original_regions:1934984",
+    "source_to_final_changed_outside_three_original_regions:1934984",
+    "source_to_clean_alpha_changed_outside_three_original_regions:1638112"
+  ],
+  "visual_status": "PENDING_CONTROLLER_NATIVE_PIXELS_FIRST_HAND",
+  "independent_C1": "PENDING_FRESH_INDEPENDENT_C1_RECHECK_C335_HOLD_NOT_SUPERSEDED",
+  "actual_game": "IGR030_031_040_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_claims": [
+    "full atlas independent C certified",
+    "matched source-Hangul slant-anchor equivalence",
+    "Dino logo and dynamic info mapping",
+    "game compositing/consumer chain"
+  ]
+}
