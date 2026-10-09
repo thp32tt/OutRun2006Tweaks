@@ -283,6 +283,38 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertEqual(ns['save_queue_state'].call_count, 2)
         self.assertEqual(active['attempt'], 1)
 
+
+    def test_vr_five_minute_checkpoint_and_30_minute_rollover_contract(self):
+        from zoneinfo import ZoneInfo
+        tree = ast.parse(SOURCE)
+        wanted = {'vr_checkpoint_path', 'vr_checkpoint_payload', 'vr_forced_rollover_due'}
+        functions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in wanted]
+        self.assertEqual({node.name for node in functions}, wanted)
+        ns = {'datetime': datetime, 're': re, 'CONTROLLER_MODE': 'conversion',
+              'VR_FORCE_ROLLOVER_SECONDS': 1800, 'VR_CHECKPOINT_BRANCH': 'chat-controller-downloads',
+              '_parse_iso': datetime.fromisoformat}
+        exec(compile(ast.Module(body=functions, type_ignores=[]), '<checkpoint>', 'exec'), ns)
+        now = datetime(2026, 10, 9, 19, 30, tzinfo=ZoneInfo('Asia/Seoul'))
+        task = {'task_id': 'CONVERSION-DX11-00478', 'branch': 'vr-dx11-native-r71',
+                'lane': 'DX11', 'phase': 'WAIT_CHAT', 'attempt': 1,
+                'sent_at': datetime(2026, 10, 9, 19, 0, tzinfo=ZoneInfo('Asia/Seoul')).isoformat(),
+                'chat_rollovers': 0, 'active_chat_url': 'private-chat-url'}
+        self.assertTrue(ns['vr_forced_rollover_due'](task, now))
+        self.assertFalse(ns['vr_forced_rollover_due'](task, now.replace(minute=29)))
+        periodic = ns['vr_checkpoint_path'](task, now)
+        pre = ns['vr_checkpoint_path'](task, now, 'pre_rollover')
+        self.assertIn('20261009T1930-periodic.json', periodic)
+        self.assertIn('20261009T1930-pre-rollover-0001.json', pre)
+        self.assertNotEqual(pre, periodic)
+        info = ns['vr_checkpoint_payload'](task, now, 'periodic', 'a' * 40)
+        self.assertEqual(info['record']['task_id'], task['task_id'])
+        self.assertNotIn('private-chat-url', str(info))
+        self.assertTrue(info['recovery']['do_not_duplicate'])
+        coroutine = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef) and n.name == 'vr_checkpoint_and_rollover')
+        body = ast.get_source_segment(SOURCE, coroutine)
+        self.assertLess(body.index('await vr_persist_checkpoint'), body.index('await queue_rollover_chat'))
+        self.assertIn('save_queue_state(q)', body)
+
     def test_serial_and_parallel_chat_grace_fail_closed(self):
         tree = ast.parse(SOURCE)
         for fn_name in ('queue_cycle', 'conversion_process_lane'):
@@ -297,7 +329,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         rollover = next(n for n in tree.body
                         if isinstance(n, ast.AsyncFunctionDef) and n.name == 'queue_rollover_chat')
         body = ast.get_source_segment(SOURCE, rollover)
-        self.assertIn('if not rollover_has_confirmed_ui_failure(reason):', body)
+        self.assertIn('if not vr_forced and not rollover_has_confirmed_ui_failure(reason):', body)
         self.assertIn('status="conversation_rollover_held"', body)
 
     def test_c6_terminal_verdict_guards_release_and_sha(self):
@@ -429,8 +461,10 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn("실기 HMD/게임 화면 테스트가 없다는 이유로", SOURCE)
         self.assertIn("1000/5000회 반복", SOURCE)
         self.assertIn("실기 테스트가 필요한 항목은", (ROOT / "conversion_dx11.md").read_text())
-        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "3600"', compose)
-        self.assertIn('MAX_CHAT_ROLLOVERS_PER_TASK: "1"', compose)
+        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "1800"', compose)
+        self.assertIn('VR_FORCE_ROLLOVER_SECONDS: "1800"', compose)
+        self.assertIn('VR_CHECKPOINT_ENABLED: "true"', compose)
+        self.assertIn('MAX_CHAT_ROLLOVERS_PER_TASK: "0"', compose)
         self.assertIn('CHAT_ROTATE_COMPLETED_TASKS: "5"', compose)
         self.assertIn('TASK_EVENT_MODEL: "v2"', compose)
         self.assertIn('PRODUCTION_COUNTER_MODE: "lane"', compose)
