@@ -1,0 +1,9 @@
+{
+  "run": "A212",
+  "queue_index": 121,
+  "status": "HOLD_INPUT_OR_SOURCE_PIXEL_PROOF_FAILED",
+  "reason": "UnboundLocalError:cannot access local variable 'P' where it is not associated with a value",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 132, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 44, in main\n    if not P.is_file() or sha(P)!=TARGET_SHA:raise RuntimeError(\"q121 exact candidate drift\")\n           ^\nUnboundLocalError: cannot access local variable 'P' where it is not associated with a value\n",
+  "produced_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
