@@ -14624,6 +14624,17 @@ bool prepare_fixed_function_indexed_direct_draw_probe(
     Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
     context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
     context->PSGetShader(livePS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    // R163: a stale programmable geometry/tessellation stage can silently
+    // transform or discard otherwise sealed fixed-function indexed geometry.
+    // R157's isolated WARP DrawIndexed must run with these stages unbound.
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader> liveGS;
+    Microsoft::WRL::ComPtr<ID3D11HullShader> liveHS;
+    Microsoft::WRL::ComPtr<ID3D11DomainShader> liveDS;
+    context->GSGetShader(liveGS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->HSGetShader(liveHS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->DSGetShader(liveDS.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    if (liveGS || liveHS || liveDS)
+        return false;
     // R162: copied packets cannot authorize a late RS/OM dynamic-state
     // mutation. Re-observe the R126 owner immediately before WARP DrawIndexed.
     if (!expectedOutputBinding.ready() ||
