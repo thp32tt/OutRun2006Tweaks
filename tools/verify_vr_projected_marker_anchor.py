@@ -354,6 +354,61 @@ for marker in (
     if marker not in replay:
         fail(f"Sumo replay restore missing projected payload: {marker}")
 
+# No-tick Sumo replay does not share the original SpriteNode address:
+# semantic owner, identity AND 3D view anchor all have to survive the
+# capture/requeue pair for car-relative rank instead of turning into a flat HUD.
+# Keep this independent of the existing front-facing clip-W admission check.
+def verify_exact_sumo_requeue_payload(src: str) -> None:
+    capture_fn = function_body(src, "static void capture()")
+    replay_fn = function_body(src, "static void replay()")
+    snapshots = (
+        "entry.vrScope =",
+        "OutRunVR::GameSemantic::PeekSpriteNodeScope(",
+        "&entry.vrProducer, &entry.vrProjectedMarker",
+    )
+    snapshot_positions = [capture_fn.find(x) for x in snapshots]
+    if min(snapshot_positions) < 0 or snapshot_positions != sorted(snapshot_positions):
+        fail("Sumo capture lost coherent original scope+producer+view-anchor snapshot")
+    for snippet in (
+        "if (entry.vrScope !=",
+        "OutRunVR::GameSemantic::RenderScope::None",
+        "OutRunVR::GameSemantic::RegisterSpriteNodeScope(",
+        "node, entry.vrScope, entry.vrProducer,",
+        "entry.vrProjectedMarker.valid",
+        "? &entry.vrProjectedMarker : nullptr",
+    ):
+        if snippet not in replay_fn:
+            fail("Sumo replay lost exact projected marker payload: " + snippet)
+    if replay_fn.count("RegisterSpriteNodeScope(") != 1:
+        fail("Sumo replay unexpected additional semantic owner")
+    reg = replay_fn.index("OutRunVR::GameSemantic::RegisterSpriteNodeScope(")
+    if replay_fn.find("if (entry.vrScope !=", 0, reg) < 0:
+        fail("unverified Sumo frame promoted untagged node to rank/HUD")
+
+verify_exact_sumo_requeue_payload(framerate)
+for label, changed in (
+    ("capture projected anchor lost", framerate.replace(
+        "&entry.vrProducer, &entry.vrProjectedMarker",
+        "&entry.vrProducer, nullptr", 1)),
+    ("replay projected anchor lost", framerate.replace(
+        "? &entry.vrProjectedMarker : nullptr",
+        "? nullptr : nullptr", 1)),
+    ("replay producer identity lost", framerate.replace(
+        "node, entry.vrScope, entry.vrProducer,",
+        "node, entry.vrScope, OutRunVR::GameSemantic::ProducerToken::None,", 1)),
+    ("replay missing validity gate", framerate.replace(
+        "entry.vrProjectedMarker.valid",
+        "true", 1)),
+):
+    if changed == framerate:
+        fail("invalid independent Sumo mutation: " + label)
+    try:
+        verify_exact_sumo_requeue_payload(changed)
+    except SystemExit:
+        pass
+    else:
+        fail("Sumo projected-marker semantic negative control escaped: " + label)
+
 # Exact projected world markers must only project points in front of the
 # camera. R44's spatial-billboard gate already uses positive clip W. The
 # historical fabs(W) condition accepted negative/behind-eye coordinates.
