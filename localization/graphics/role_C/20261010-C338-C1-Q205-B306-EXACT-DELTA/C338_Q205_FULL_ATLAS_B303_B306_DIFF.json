@@ -1,0 +1,32 @@
+{
+  "source_provenance": "GitHub history previous commit 2d0e05782bb1fac34b3ad043a6bd9e2eb9d240ab",
+  "before_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "after_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+  "header_byte_exact": true,
+  "raw_rgba_changed_pixels": 25528,
+  "raw_alpha_changed_pixels": 23123,
+  "raw_rgba_changed_outside_two_original_source_bboxes": 0,
+  "raw_alpha_changed_outside_two_original_source_bboxes": 0,
+  "per_region": {
+    "options": {
+      "rgba_changed": 11676,
+      "alpha_changed": 10215,
+      "change_bbox_readable": [
+        1596,
+        1428,
+        1850,
+        1563
+      ]
+    },
+    "rankings": {
+      "rgba_changed": 13852,
+      "alpha_changed": 12908,
+      "change_bbox_readable": [
+        38,
+        1250,
+        277,
+        1383
+      ]
+    }
+  }
+}

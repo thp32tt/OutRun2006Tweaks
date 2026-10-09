@@ -1,0 +1,306 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "shard": "ODD_ONLY",
+  "run": "C338",
+  "run_key": "OUTRUN-KOR-C338-C1-Q205-B306-EXACT-DDS-PIXEL-DIFF-20261010-0250",
+  "review_time_kst": "2026-10-10 02:50 KST",
+  "asset_index": 205,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+  "producer_report": "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
+  "source_sha256_reported_not_independently_verified": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "previous_candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "previous_candidate_git_revision": "2d0e05782bb1fac34b3ad043a6bd9e2eb9d240ab",
+  "candidate_source": "GitHub exact branch persisted hd_candidates DDS downloaded SHA checked",
+  "previous_source": "GitHub pinned historical commit hd_candidates downloaded and SHA checked",
+  "observations_sequence": "Contract and B306 producer notes seen before direct candidate; pixels_before_producer_verdict=false. The new independent full-atlas previous/current measurement is actual saved DDS, not producer zeroes.",
+  "independent_machine": {
+    "dds_header": {
+      "width": 4096,
+      "height": 2048,
+      "mips": 1,
+      "bytes": 33554560,
+      "fourcc": "00000000",
+      "channels_masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "source_bound_regions": {
+      "options": {
+        "source_bbox_readable": [
+          1591,
+          1423,
+          2316,
+          1568
+        ],
+        "persisted_nonzero_alpha_bbox": [
+          1597,
+          1429,
+          1843,
+          1562
+        ],
+        "positive_margins": [
+          6,
+          473,
+          6,
+          6
+        ],
+        "source_bbox_contained": true,
+        "alpha_positive_pixels": 18084,
+        "alpha_sum": 4415583
+      },
+      "rankings": {
+        "source_bbox_readable": [
+          33,
+          1245,
+          930,
+          1388
+        ],
+        "persisted_nonzero_alpha_bbox": [
+          39,
+          1251,
+          271,
+          1382
+        ],
+        "positive_margins": [
+          6,
+          659,
+          6,
+          6
+        ],
+        "source_bbox_contained": true,
+        "alpha_positive_pixels": 18221,
+        "alpha_sum": 4389857
+      }
+    },
+    "previous_current_full_atlas_diff": {
+      "source_provenance": "GitHub history previous commit 2d0e05782bb1fac34b3ad043a6bd9e2eb9d240ab",
+      "before_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+      "after_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+      "header_byte_exact": true,
+      "raw_rgba_changed_pixels": 25528,
+      "raw_alpha_changed_pixels": 23123,
+      "raw_rgba_changed_outside_two_original_source_bboxes": 0,
+      "raw_alpha_changed_outside_two_original_source_bboxes": 0,
+      "per_region": {
+        "options": {
+          "rgba_changed": 11676,
+          "alpha_changed": 10215,
+          "change_bbox_readable": [
+            1596,
+            1428,
+            1850,
+            1563
+          ]
+        },
+        "rankings": {
+          "rgba_changed": 13852,
+          "alpha_changed": 12908,
+          "change_bbox_readable": [
+            38,
+            1250,
+            277,
+            1383
+          ]
+        }
+      }
+    }
+  },
+  "lossless_proof_refs": {
+    "q205_options_B303_vs_B306_persisted.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_options_B303_vs_B306_persisted.png",
+      "git_blob_sha": "c00c43d7f66287fc114c24f2b666259158446aed"
+    },
+    "q205_rankings_B303_vs_B306_persisted.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_rankings_B303_vs_B306_persisted.png",
+      "git_blob_sha": "d853189dc1ba0014c017b3e1501f69827e3730c8"
+    },
+    "q205_options_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_options_FLIPY_GRAY_100.png",
+      "git_blob_sha": "acb346b8b2a539f675b8bc3fe9c5710ef9dfa66b"
+    },
+    "q205_rankings_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_rankings_FLIPY_GRAY_100.png",
+      "git_blob_sha": "99253cd48701aa932297e5f119ea0def533b3a96"
+    },
+    "q205_options_FLIPY_GRAY_50.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_options_FLIPY_GRAY_50.png",
+      "git_blob_sha": "679ebd37eb5deb62a7a4536b0b3552da19925eb0"
+    },
+    "q205_rankings_FLIPY_GRAY_50.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_rankings_FLIPY_GRAY_50.png",
+      "git_blob_sha": "bd07b95c63d6c15b5f79e8d8b70b8e2a16a2a518"
+    },
+    "q205_options_RAW_GRAY_75.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_options_RAW_GRAY_75.png",
+      "git_blob_sha": "20626d0dbc8800c9dd0f93faaa3ac85b4af7cd85"
+    },
+    "q205_rankings_RAW_GRAY_75.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_rankings_RAW_GRAY_75.png",
+      "git_blob_sha": "0c7af160ba341753591c9f2ef59d2cf608ff3932"
+    },
+    "q205_options_persisted_changed_mask.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_options_persisted_changed_mask.png",
+      "git_blob_sha": "553be5f2f7689f2fdd64cb727df220cc1b45cd00"
+    },
+    "q205_rankings_persisted_changed_mask.png": {
+      "path": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/q205_rankings_persisted_changed_mask.png",
+      "git_blob_sha": "a2b58312f8957adeca53a3b09c27198368fd951b"
+    }
+  },
+  "regions": [
+    {
+      "id": "options",
+      "source_bbox_readable": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "current_bbox": [
+        1597,
+        1429,
+        1843,
+        1562
+      ],
+      "source_bbox_positive_margins": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Canonical native English source slant anchors unavailable; source family comparison uses B306 producer contact only"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Native English source/CLEAN independent exact byte verification unavailable"
+        },
+        "style": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Independently decoded old B303 tapered serif against B306 heavy straight-stem sans; latter visually closer to producer source heavy red block sans"
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Current red Hangul readable on gray at native/50, and on black and white at native"
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No obvious chopped Hangul stroke/blank inner counters or pixel clipping in directly inspected B306 native/50 changed title regions"
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS_PRIOR_DELTA_ONLY",
+          "observation": "Entire exact old/current DDS differs 0 RGBA and alpha pixels outside two source bboxes; this is not canonical-source protected-art approval"
+        },
+        "placement": {
+          "result": "SCOPED_PASS_MECHANICAL",
+          "observation": "Current saved alpha bbox entirely within producer-pinned original title footprint; all four boundaries at least 6px"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_PIXELS",
+          "observation": "Native readable FLIP-Y and deliberately upside-down RAW manually examined; composed scene not tested"
+        }
+      }
+    },
+    {
+      "id": "rankings",
+      "source_bbox_readable": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "current_bbox": [
+        39,
+        1251,
+        271,
+        1382
+      ],
+      "source_bbox_positive_margins": [
+        6,
+        659,
+        6,
+        6
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Canonical native English source slant anchors unavailable; source family comparison uses B306 producer contact only"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Native English source/CLEAN independent exact byte verification unavailable"
+        },
+        "style": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Independently decoded old B303 tapered serif against B306 heavy straight-stem sans; latter visually closer to producer source heavy red block sans"
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Current red Hangul readable on gray at native/50, and on black and white at native"
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No obvious chopped Hangul stroke/blank inner counters or pixel clipping in directly inspected B306 native/50 changed title regions"
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS_PRIOR_DELTA_ONLY",
+          "observation": "Entire exact old/current DDS differs 0 RGBA and alpha pixels outside two source bboxes; this is not canonical-source protected-art approval"
+        },
+        "placement": {
+          "result": "SCOPED_PASS_MECHANICAL",
+          "observation": "Current saved alpha bbox entirely within producer-pinned original title footprint; all four boundaries at least 6px"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_PIXELS",
+          "observation": "Native readable FLIP-Y and deliberately upside-down RAW manually examined; composed scene not tested"
+        }
+      }
+    }
+  ],
+  "source_style_reference_limit": "English source and CLEAN panels visible in producer B306 two-region CONTACT PNG, but independent canonical English DDS bytes and original/CLEAN masks not present: producer composites cannot serve as independent source/CLEAN byte proofs",
+  "source_visual_references": [
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/options_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/rankings_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png"
+  ],
+  "first_verified_link": "GitHub current B306 and historical B303 persisted DDS exact bytes + full-atlas before/after pixel comparison",
+  "first_unverified_link": "canonical English DDS native bytes and authored CLEAN source identity / source-to-CLEAN pixel proof",
+  "shared_consumer_mapping": {
+    "static": "P0 IGR-026 OPTIONS and IGR-027 RANKINGS exact shared menu atlas title regions",
+    "mixed": "IGR-028 menu body/subtitle static/runtime mapping UNRESOLVED; no arbitrary DDS attribution",
+    "other_atlas": "Remaining 21 localized atlas segments not independently inspected in this run; previous/current 0 differences outside two title bboxes"
+  },
+  "reason_codes": [
+    "MISSING_CANONICAL_ENGLISH_SOURCE_BYTES",
+    "MISSING_INDEPENDENT_CLEAN_PLATE_PROOF",
+    "BLIND_DEFECT_CALIBRATION_NOT_COMPLETED",
+    "OTHER_21_SEGMENTS_NOT_INDEPENDENTLY_REVIEWED"
+  ],
+  "result": "HOLD_STRICT_RECHECK",
+  "scoped_outcome": "TWO_RED_TITLE_REGIONS_INDEPENDENT_CURRENT_PIXELS_SCOPED_VISUAL_ACCEPTANCE_ONLY",
+  "candidate_modified": false,
+  "new_DDS": 0,
+  "C1_PASS": false,
+  "C3_STRICT_PASS": false,
+  "APPROVAL": false,
+  "PRE_INGAME_APPROVAL": false,
+  "INGAME_RETEST": "NOT_DONE",
+  "IGR026": "OPEN_USER_INGAME_FAIL",
+  "IGR027": "OPEN_USER_INGAME_FAIL",
+  "IGR028": "OPEN_UNRESOLVED_MIXED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "Bind canonical English DDS and exact CLEAN hash, verify full 23-region source/clean/current, independently visually calibrate known normal/opposite-slant/clipped-stroke/residue/excessive-weight controls, inspect each RAW/FLIP-Y/mip/full/practical/BGW region then separate C3. Do not regenerate B306 merely to fill evidence.",
+  "execution_backend": "GitHub connector SSOT and publish; ChatGPT local git DNS failed; N100 MCP only to retrieve and inspect two 32MiB exact DDS and render lossless crops",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

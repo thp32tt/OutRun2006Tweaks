@@ -1,0 +1,91 @@
+{
+  "asset": "q205",
+  "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+  "header": {
+    "width": 4096,
+    "height": 2048,
+    "mips": 1,
+    "bytes": 33554560,
+    "fourcc": "00000000",
+    "channels_masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ]
+  },
+  "regions": {
+    "options": {
+      "source_bbox_readable": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "persisted_nonzero_alpha_bbox": [
+        1597,
+        1429,
+        1843,
+        1562
+      ],
+      "positive_margins": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "source_bbox_contained": true,
+      "alpha_positive_pixels": 18084,
+      "alpha_sum": 4415583
+    },
+    "rankings": {
+      "source_bbox_readable": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "persisted_nonzero_alpha_bbox": [
+        39,
+        1251,
+        271,
+        1382
+      ],
+      "positive_margins": [
+        6,
+        659,
+        6,
+        6
+      ],
+      "source_bbox_contained": true,
+      "alpha_positive_pixels": 18221,
+      "alpha_sum": 4389857
+    }
+  },
+  "evidence": [
+    "q205_options_FLIPY_GRAY_100.png",
+    "q205_options_FLIPY_GRAY_75.png",
+    "q205_options_FLIPY_GRAY_50.png",
+    "q205_options_FLIPY_BLACK_100.png",
+    "q205_options_FLIPY_WHITE_100.png",
+    "q205_options_RAW_GRAY_100.png",
+    "q205_options_RAW_GRAY_75.png",
+    "q205_options_RAW_GRAY_50.png",
+    "q205_options_persisted_zoom2.png",
+    "q205_rankings_FLIPY_GRAY_100.png",
+    "q205_rankings_FLIPY_GRAY_75.png",
+    "q205_rankings_FLIPY_GRAY_50.png",
+    "q205_rankings_FLIPY_BLACK_100.png",
+    "q205_rankings_FLIPY_WHITE_100.png",
+    "q205_rankings_RAW_GRAY_100.png",
+    "q205_rankings_RAW_GRAY_75.png",
+    "q205_rankings_RAW_GRAY_50.png",
+    "q205_rankings_persisted_zoom2.png"
+  ],
+  "limitations": [
+    "Canonical source DDS hash not independently available",
+    "Authentic CLEAN plate not independently decoded",
+    "Only two changed title regions assessed; 21 other regions and calibration not verified",
+    "Persisted DDS measurements do not substitute for actual game"
+  ]
+}
