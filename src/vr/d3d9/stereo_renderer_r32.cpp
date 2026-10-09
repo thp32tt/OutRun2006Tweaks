@@ -879,8 +879,8 @@ namespace OutRunVRStereo
     void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R9Poison(r,s,hr); }
     void R32ReviewNoteRestoreFailure(const char* what) noexcept { NoteRestoreFailure(what); }
 
-    IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return TrackedRenderTarget; }
-    IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return TrackedDepthStencil; }
+    IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return R30SupportBorrowedTrackedRenderTarget(); }
+    IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return R30SupportBorrowedTrackedDepthStencil(); }
     IDirect3DSurface9* R32ReviewRightEyeSurface() noexcept { return R30SupportBorrowedRightEyeSurface(); }
     IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept { return RightEyeDepth; }
     bool R32ReviewEnsureStereoResources(IDirect3DDevice9* d) noexcept { return EnsureStereoResources(d); }

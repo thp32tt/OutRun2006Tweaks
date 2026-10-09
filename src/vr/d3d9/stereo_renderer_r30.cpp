@@ -3407,6 +3407,16 @@ namespace OutRunVRStereo
         return out.left != nullptr && out.right != nullptr;
     }
 
+    IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept
+    {
+        return TrackedRenderTarget;
+    }
+
+    IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept
+    {
+        return TrackedDepthStencil;
+    }
+
     IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept
     {
         return RightEyeSurface;

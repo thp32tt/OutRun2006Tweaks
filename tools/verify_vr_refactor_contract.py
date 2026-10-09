@@ -61,6 +61,45 @@ if not re.search(
     r"\s*\{\s*return R30SupportBorrowedRightEyeSurface\(\);\s*\}", r32):
     errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
 
+# R84 borrowed tracked RT/depth owner seam. These are two reads from the same
+# tracked-surface ownership domain, never COM AddRef/release or value copies.
+def check_r32_tracked_surface_borrow(source_h, source_r30, source_r32):
+    for suffix, raw in (
+        ("TrackedRenderTarget", "TrackedRenderTarget"),
+        ("TrackedDepthStencil", "TrackedDepthStencil"),
+    ):
+        owner = "R30SupportBorrowed" + suffix
+        consumer = "R32Review" + suffix
+        if f"IDirect3DSurface9* {owner}() noexcept;" not in source_h:
+            return False
+        if not re.search(
+            r"IDirect3DSurface9\*\s+" + owner +
+            r"\(\) noexcept\s*\{\s*return " + raw + r";\s*\}",
+            source_r30):
+            return False
+        if not re.search(
+            r"IDirect3DSurface9\*\s+" + consumer +
+            r"\(\) noexcept\s*\{\s*return " + owner + r"\(\);\s*\}",
+            source_r32):
+            return False
+    return True
+
+if not check_r32_tracked_surface_borrow(r30_support_api, r30, r32):
+    errors.append("R32 tracked RT/depth borrowed owner facade is missing, swapped or bypassed")
+for label, altered_r30, altered_r32 in (
+    ("direct R32 tracked RT bypass", r30,
+     r32.replace("return R30SupportBorrowedTrackedRenderTarget();",
+                 "return TrackedRenderTarget;", 1)),
+    ("wrong tracked depth owner", r30.replace(
+        "return TrackedDepthStencil;", "return TrackedRenderTarget;", 1), r32),
+    ("wrong tracked RT owner", r30.replace(
+        "return TrackedRenderTarget;", "return TrackedDepthStencil;", 1), r32),
+):
+    if altered_r30 == r30 and altered_r32 == r32:
+        errors.append("R84 tracked surface test mutation not applied: " + label)
+    elif check_r32_tracked_surface_borrow(r30_support_api, altered_r30, altered_r32):
+        errors.append("R84 tracked surface regression mutation survived: " + label)
+
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
 # SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.
