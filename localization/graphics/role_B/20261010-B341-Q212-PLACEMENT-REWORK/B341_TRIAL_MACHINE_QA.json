@@ -1,0 +1,82 @@
+{
+  "run": "B341",
+  "queue_index": 212,
+  "producer_decision": "TRIAL_PENDING_DIRECT_VISUAL",
+  "source_historical_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "prior_candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "regions": [
+    {
+      "id": 43,
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "old_bbox": [
+        5,
+        345,
+        321,
+        400
+      ],
+      "new_bbox": [
+        241,
+        345,
+        557,
+        400
+      ],
+      "x_shift": 236
+    },
+    {
+      "id": 44,
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "old_bbox": [
+        1688,
+        529,
+        1832,
+        582
+      ],
+      "new_bbox": [
+        1627,
+        529,
+        1771,
+        582
+      ],
+      "x_shift": -61
+    }
+  ],
+  "other10_regions_exact": true,
+  "changed_outside_two_source_rois": 0,
+  "decoded_dds_roundtrip": "EXACT",
+  "source_png_provenance": "C338_SHA_PINNED",
+  "native": [
+    2048,
+    2048
+  ],
+  "views": [
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_FLIPY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_FLIPY_75_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_FLIPY_50_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_RAW_100_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_RAW_75_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_RAW_50_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_FLIPY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_FLIPY_75_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_FLIPY_50_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_RAW_100_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_RAW_75_SOURCE_CLEAN_OLD_TRIAL.png",
+    "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_RAW_50_SOURCE_CLEAN_OLD_TRIAL.png"
+  ],
+  "first_look": "PENDING",
+  "promoted_dds": 0,
+  "C2": "PENDING",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
