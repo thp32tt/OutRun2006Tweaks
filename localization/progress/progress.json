@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 05:12 KST",
+  "updated_at_kst": "2026-10-10 05:21 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9929,5 +9929,34 @@
     "IGR025": "OPEN_SOURCE_CONSUMER_MAPPING_AND_USER_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_CONTROLLER_VISUAL_REJECT.json"
+  },
+  "c341_c1_q193_a208_exact_source_pilot": {
+    "run": "C341",
+    "run_key": "OUTRUN-KOR-C341-C1-Q193-A208-EXACT-SOURCE-PILOT-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 193,
+    "current_candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "canonical_source_sha256_independently_verified": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "producer_clean_png_sha256_verified": "1da47a8eb868383d76bdc6590b2b9bd377e20a17e33972ad9553cf2f86648dba",
+    "previous_candidate_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+    "changed_rgba_pixels": 4948,
+    "changed_outside_original_goal_box": 0,
+    "current_text_bbox": [
+      953,
+      223,
+      1075,
+      265
+    ],
+    "C1": "HOLD_STRICT_RECHECK",
+    "SCOPED": "Goal A source+CLEAN+current exact physical proof obtained",
+    "inherited_rework_labels": 6,
+    "prior_producer_rebuilt_labels": 7,
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "user_game": "IGR003_IGR019_IGR033_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "report": "localization/graphics/role_C/20261010-C341-C1-Q193-A208-EXACT-SOURCE-PILOT/C341_C1_CONTROLLER_HOLD.json"
   }
 }
