@@ -1888,6 +1888,8 @@ def verify_centre_only_lens_owner(source, analyzer):
         'LensCentreDepth', 'CurrentScope = LensCentreSavedScope',
     ):
         require(needle, leave, 'central sun scope restore')
+    if 'Settings::VREnabled' in leave:
+        raise SystemExit('central lens exit must restore active scope even after VR toggle')
     owner = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
     for needle in (
         'Module::exe_ptr(0xD3A5), LensCentreEnter',
@@ -1912,6 +1914,9 @@ for label, mutant in (
     ('central leave hook lost', graphics.replace(
         'Module::exe_ptr(0xD3AA), LensCentreLeave',
         'Module::exe_ptr(0xD3A9), LensCentreLeave', 1)),
+    ('VR toggled off before central leave', graphics.replace(
+        'if (!LensCentreDepth || --LensCentreDepth != 0)',
+        'if (!Settings::VREnabled || !LensCentreDepth || --LensCentreDepth != 0)', 1)),
     ('world scope lost', graphics.replace(
         'RenderScope::WorldBillboard;', 'RenderScope::ScreenHud;', 1)),
 ):

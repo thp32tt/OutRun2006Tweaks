@@ -327,8 +327,10 @@ class VRLensFlareProjected2D : public Hook
 
     static void LensCentreLeave(safetyhook::Context&)
     {
-        if (!Settings::VREnabled || !LensCentreDepth ||
-            --LensCentreDepth != 0)
+        // A captured render scope must be restored even if VR is disabled
+        // during the original draw; gating exit on the current VR setting
+        // would leak the central WorldBillboard semantic into later effects.
+        if (!LensCentreDepth || --LensCentreDepth != 0)
             return;
         OutRunVR::GameSemantic::CurrentScope = LensCentreSavedScope;
         LensCentreSavedScope =
