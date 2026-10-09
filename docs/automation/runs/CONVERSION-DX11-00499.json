@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00499",
+  "production_id": "CONVERSION-DX11-00499",
+  "event_id": "CONVERSION-DX11-00499-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "a2f584645130b5c26e872409dac37a22559297e4",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00499",
+  "lease_epoch": 1,
+  "work_key": "DX11:R199:LINEAR_LIVE_RTV_VIEWPORT_SCISSOR_AND_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp:R199",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R199",
+    ".github/workflows/backend-conversion-gate.yml:R199",
+    "tools/test_dx11_linear_target_r199.py:R199"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R199 dormant non-indexed D3D11 Draw exact RTV identity, RT descriptor, full viewport and scissor safety; real WARP half-viewport black center negative and full viewport red recovery. Indexed R187 and R197 preserved; no game-native Draw activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_target_r199.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00499.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest GitHub HEAD a2f584645130b5c26e872409dac37a22559297e4; no 00499 run/checkpoint; 00498 terminal R197; R175 00477 independent BLOCKED",
+    "C1_REVIEW": "PASS R187 indexed target/viewport fence present, R185/R197 linear did not verify live RTV/viewport; non-overlapping work_key R199",
+    "C2_IMPLEMENT": "PASS new native linear target/viewport preflight, independent actual Win32 WARP half viewport negative+recovery Draw and identity negatives; static source mutant test and CI wiring",
+    "C3_VALIDATE": "Scoped source contract review ready; Windows exact-SHA Backend Conversion Gate pending",
+    "C4_COMMIT": "material commit contains exact [AUTO:CONVERSION-DX11-00499] no CI-skip; C6 will preserve final SHA",
+    "C5_PACKAGE": "NOT_REQUIRED dormant native non-indexed game Draw, no deployment",
+    "C6_STATE": "PENDING exact-SHA CI"
+  },
+  "evidence": {
+    "static_mutants": 4,
+    "known_upstream_r175_owner": "CONVERSION-DX11-00477",
+    "known_upstream_r175_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "first_gate_run_id": null
+  },
+  "resume_cursor": "C3_EXACT_SHA_CI_PENDING",
+  "next_action": "Consume exact material SHA Backend Conversion Gate, inspect R199 Windows WARP pixel and inherited R175 signature; persist C6 separately, runtime UNTESTED."
+}

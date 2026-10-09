@@ -1,7 +1,7 @@
 // R183: actual WARP DrawIndexed consumes production-owned VB and IB objects.
 // No game draw hook, backend activation or Quest 3 runtime claim.
 #include "vr/d3d11/native_linear_buffer_mirror.hpp"
-#include "vr/d3d11/native_linear_draw_submit.hpp"
+#include "vr/d3d11/native_linear_target_viewport.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <d3dcompiler.h>
@@ -203,6 +203,83 @@ int main() {
     ctx->ClearRenderTargetView(rtv.Get(),clear);
     require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "R185 dormant native linear Draw IA/pipeline ready");
+    // R199 independent non-indexed RTV/viewport ownership contract.
+    const auto fullTargetReady = [&] {
+        return outrun::vr::dx11::verified_linear_full_target_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get());
+    };
+    require(fullTargetReady(), "R199 owned full linear target ready");
+    require(!outrun::vr::dx11::verified_linear_full_target_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,nullptr),
+            "R199 reject null expected target");
+    require(!outrun::vr::dx11::verified_linear_full_target_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,33,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get()),
+            "R199 reject wrong target width");
+    require(!outrun::vr::dx11::verified_linear_full_target_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,rtv.Get()),
+            "R199 reject wrong target format");
+
+    // Same device, same dimensions and format: only RTV identity differs.
+    D3D11_TEXTURE2D_DESC wrongDesc{};
+    color->GetDesc(&wrongDesc);
+    ComPtr<ID3D11Texture2D> wrongEyeColor;
+    ComPtr<ID3D11RenderTargetView> wrongEyeRtv;
+    require(SUCCEEDED(dev->CreateTexture2D(&wrongDesc,nullptr,
+            wrongEyeColor.GetAddressOf())), "R199 create alternate-eye target");
+    require(SUCCEEDED(dev->CreateRenderTargetView(wrongEyeColor.Get(),nullptr,
+            wrongEyeRtv.GetAddressOf())), "R199 create alternate-eye RTV");
+    ID3D11RenderTargetView* wrongEyeRaw=wrongEyeRtv.Get();
+    ctx->OMSetRenderTargets(1,&wrongEyeRaw,nullptr);
+    require(!fullTargetReady(), "R199 reject different-eye RTV");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    require(fullTargetReady(), "R199 recover original eye RTV");
+
+    ctx->RSSetViewports(0,nullptr);
+    require(!fullTargetReady(), "R199 reject missing viewport");
+    const D3D11_VIEWPORT doubleViewports[]={vp,vp};
+    ctx->RSSetViewports(2,doubleViewports);
+    require(!fullTargetReady(), "R199 reject extra viewport");
+
+    // The raw Draw incorrectly passed R185 readiness with a half viewport.
+    // Real WARP output must now be black at the full eye's center.
+    D3D11_VIEWPORT halfVp=vp;
+    halfVp.Width=16.f;
+    ctx->RSSetViewports(1,&halfVp);
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R199 negative: old IA/pipeline alone accepts half viewport");
+    require(!fullTargetReady(), "R199 reject half viewport");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE halfMap{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&halfMap))
+            && halfMap.pData, "R199 map half-viewport WARP pixels");
+    const auto* halfCenter=static_cast<const unsigned char*>(halfMap.pData)
+        +16*halfMap.RowPitch+16*4;
+    const bool halfCenterBlack=halfCenter[0]==0 && halfCenter[1]==0 &&
+        halfCenter[2]==0 && halfCenter[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(halfCenterBlack, "R199 half viewport suppresses WARP center pixel");
+    ctx->RSSetViewports(1,&vp);
+    require(fullTargetReady(), "R199 restore full viewport");
+
+    D3D11_RASTERIZER_DESC scissorDesc{};
+    rs->GetDesc(&scissorDesc);
+    scissorDesc.ScissorEnable=TRUE;
+    ComPtr<ID3D11RasterizerState> scissorState;
+    require(SUCCEEDED(dev->CreateRasterizerState(
+            &scissorDesc,scissorState.GetAddressOf())),
+            "R199 create scissor rasterizer");
+    ctx->RSSetState(scissorState.Get());
+    require(!fullTargetReady(), "R199 reject scissor-enabled rasterizer");
+    ctx->RSSetState(rs.Get());
+    require(fullTargetReady(), "R199 restore full RTV/viewport/scissor");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+
     // R197: a retained Geometry Shader moves the actual non-indexed
     // triangle outside clip space while IA/VS/PS/RTV stay unchanged.
     constexpr char interferingGeometry[] =
@@ -238,6 +315,7 @@ int main() {
     ctx->GSSetShader(nullptr,nullptr,0);
     require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "R197 restore pure VS/PS native Draw");
+    require(fullTargetReady(), "R199 final owned linear full target ready");
     ctx->ClearRenderTargetView(rtv.Get(),clear);
     // The one actual native Draw remains isolated outside production DX11.
     ctx->Draw(3,0);

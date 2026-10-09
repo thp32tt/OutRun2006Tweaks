@@ -292,6 +292,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_linear_buffer_range_r184.py
 
+      # R199: independent non-indexed native Draw exact RTV/viewport/scissor owner.
+      - name: Verify R199 native linear target and viewport fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_target_r199.py
+
       # R197: reject retained GS/HS/DS for the independent non-indexed Draw path.
       - name: Verify R197 native linear shader stage fence
         if: github.ref_name == 'vr-dx11-native-r71'
