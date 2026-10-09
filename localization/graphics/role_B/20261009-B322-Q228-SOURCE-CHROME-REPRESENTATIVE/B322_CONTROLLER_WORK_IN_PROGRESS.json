@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B322",
+  "run_key": "OUTRUN-KOR-B322-Q228-FILLED-CHROME-FAMILY-20261009",
+  "priority": "P1",
+  "user_regression": "IGR-038",
+  "screenshot": "스크린샷(190)(1).png",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "incumbent_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "previous_rejected_trial_sha256": "b2bfdc45190dcd43481339c67f1a845780ed10b3b97ee0be0d627a742de50033",
+  "changed_construct": "source-sampled seven-stop gradient solid opaque chrome body on all glyph face pixels, black source-depth shadow and one-pixel outline, contrasting bright upper and dark lower contour bevel; no old hollow-mask/no flat monochrome face",
+  "scope": "single representative COAST 2 COAST bbox [5,26,1456,145], 12 other q228 rows protected and unmodified",
+  "status": "PROCESS_RUNNING_NO_PRODUCTION_APPROVAL",
+  "previous_workflow_run": {
+    "id": 37894986079,
+    "conclusion": "FAILURE",
+    "gate": "native transparent 5px plate edge violation; alpha from extruded glyph shadow exceeded original effect-box inset",
+    "action": "clip shadow and outline strictly inside source inset; fail-closed no output promoted"
+  },
+  "current_workflow_run": {
+    "id": 37895233639,
+    "status": "IN_PROGRESS",
+    "script_commit": "b74401af0544654b5dc54f85f32a9e0732b72a38",
+    "worker": ".github/workflows/localization-cpu-worker.yml"
+  },
+  "source_family_criteria": [
+    "inspect authentic English original against CLEAN plate before Korean glyph",
+    "outer bitmap exactly original source box, zero changed alpha/RGBA outside",
+    "native source-like metallic fill and legible Korean contours",
+    "source-matching width-height hierarchy and original right/vertical geometry",
+    "RAW/FLIPY 100/75/50 silver face, no bright-line artificial slab or rectangular box",
+    "all 13 rows only after representative fully source-like"
+  ],
+  "promotion": false,
+  "new_promoted_dds": 0,
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "user_real_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "note": "This interim fail-closed report is not B self-QA PASS; replace with exact new-SHA controller visual decision only after worker publishes original-vs-clean-vs-current-vs-trial screenshots."
+}
