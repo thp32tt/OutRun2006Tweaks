@@ -1,0 +1,385 @@
+{
+  "role": "A",
+  "run": "A213",
+  "queue_index": 121,
+  "priority": "P0",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "current_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "source_plate_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+  "atlas_pixels": 16777216,
+  "outside_three_source_title_bbox_RGBA_changed": 1934984,
+  "outside_three_source_title_bbox_source_alpha_lost_to_final": 982705,
+  "outside_three_source_title_bbox_source_alpha_added_in_final": 537912,
+  "outside_three_source_title_bbox_source_alpha_lost_to_clean": 982705,
+  "changed_components_count": 179,
+  "ranked_components": [
+    {
+      "rank": 1,
+      "changed_pixels": 373094,
+      "bbox_readable": [
+        63,
+        1199,
+        2113,
+        1484
+      ],
+      "alpha_disappeared": 177041,
+      "alpha_appeared": 117929
+    },
+    {
+      "rank": 2,
+      "changed_pixels": 325307,
+      "bbox_readable": [
+        3008,
+        1304,
+        4034,
+        1995
+      ],
+      "alpha_disappeared": 117023,
+      "alpha_appeared": 125763
+    },
+    {
+      "rank": 3,
+      "changed_pixels": 205063,
+      "bbox_readable": [
+        1563,
+        755,
+        2589,
+        1092
+      ],
+      "alpha_disappeared": 110428,
+      "alpha_appeared": 52728
+    },
+    {
+      "rank": 4,
+      "changed_pixels": 147453,
+      "bbox_readable": [
+        1907,
+        602,
+        3338,
+        752
+      ],
+      "alpha_disappeared": 118944,
+      "alpha_appeared": 13643
+    },
+    {
+      "rank": 5,
+      "changed_pixels": 127763,
+      "bbox_readable": [
+        1764,
+        2360,
+        2720,
+        2573
+      ],
+      "alpha_disappeared": 64716,
+      "alpha_appeared": 27422
+    },
+    {
+      "rank": 6,
+      "changed_pixels": 113151,
+      "bbox_readable": [
+        0,
+        499,
+        1370,
+        632
+      ],
+      "alpha_disappeared": 67800,
+      "alpha_appeared": 25516
+    },
+    {
+      "rank": 7,
+      "changed_pixels": 88034,
+      "bbox_readable": [
+        2226,
+        1263,
+        2946,
+        1486
+      ],
+      "alpha_disappeared": 45474,
+      "alpha_appeared": 23512
+    },
+    {
+      "rank": 8,
+      "changed_pixels": 72000,
+      "bbox_readable": [
+        415,
+        631,
+        1371,
+        730
+      ],
+      "alpha_disappeared": 24996,
+      "alpha_appeared": 27096
+    },
+    {
+      "rank": 9,
+      "changed_pixels": 69373,
+      "bbox_readable": [
+        1680,
+        1097,
+        2611,
+        1213
+      ],
+      "alpha_disappeared": 35775,
+      "alpha_appeared": 21807
+    },
+    {
+      "rank": 10,
+      "changed_pixels": 69138,
+      "bbox_readable": [
+        2816,
+        1183,
+        3394,
+        1367
+      ],
+      "alpha_disappeared": 20139,
+      "alpha_appeared": 36952
+    },
+    {
+      "rank": 11,
+      "changed_pixels": 58101,
+      "bbox_readable": [
+        2613,
+        755,
+        3285,
+        864
+      ],
+      "alpha_disappeared": 44501,
+      "alpha_appeared": 1116
+    },
+    {
+      "rank": 12,
+      "changed_pixels": 37505,
+      "bbox_readable": [
+        3525,
+        517,
+        3893,
+        730
+      ],
+      "alpha_disappeared": 14523,
+      "alpha_appeared": 19949
+    },
+    {
+      "rank": 13,
+      "changed_pixels": 35485,
+      "bbox_readable": [
+        1151,
+        374,
+        1678,
+        449
+      ],
+      "alpha_disappeared": 15811,
+      "alpha_appeared": 1355
+    },
+    {
+      "rank": 14,
+      "changed_pixels": 30590,
+      "bbox_readable": [
+        1776,
+        374,
+        2232,
+        449
+      ],
+      "alpha_disappeared": 13502,
+      "alpha_appeared": 1243
+    },
+    {
+      "rank": 15,
+      "changed_pixels": 28279,
+      "bbox_readable": [
+        1365,
+        614,
+        1773,
+        736
+      ],
+      "alpha_disappeared": 11660,
+      "alpha_appeared": 9658
+    },
+    {
+      "rank": 16,
+      "changed_pixels": 28198,
+      "bbox_readable": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "alpha_disappeared": 18965,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 17,
+      "changed_pixels": 21710,
+      "bbox_readable": [
+        98,
+        631,
+        419,
+        730
+      ],
+      "alpha_disappeared": 10237,
+      "alpha_appeared": 6997
+    },
+    {
+      "rank": 18,
+      "changed_pixels": 15834,
+      "bbox_readable": [
+        1326,
+        748,
+        1611,
+        843
+      ],
+      "alpha_disappeared": 6635,
+      "alpha_appeared": 6403
+    },
+    {
+      "rank": 19,
+      "changed_pixels": 9415,
+      "bbox_readable": [
+        3196,
+        663,
+        3379,
+        744
+      ],
+      "alpha_disappeared": 9415,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 20,
+      "changed_pixels": 8413,
+      "bbox_readable": [
+        3490,
+        391,
+        3722,
+        440
+      ],
+      "alpha_disappeared": 2930,
+      "alpha_appeared": 2345
+    },
+    {
+      "rank": 21,
+      "changed_pixels": 7575,
+      "bbox_readable": [
+        1683,
+        657,
+        1849,
+        724
+      ],
+      "alpha_disappeared": 7575,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 22,
+      "changed_pixels": 7131,
+      "bbox_readable": [
+        3702,
+        637,
+        3830,
+        730
+      ],
+      "alpha_disappeared": 2151,
+      "alpha_appeared": 4550
+    },
+    {
+      "rank": 23,
+      "changed_pixels": 6889,
+      "bbox_readable": [
+        3200,
+        378,
+        3334,
+        445
+      ],
+      "alpha_disappeared": 5300,
+      "alpha_appeared": 225
+    },
+    {
+      "rank": 24,
+      "changed_pixels": 6648,
+      "bbox_readable": [
+        3068,
+        663,
+        3193,
+        731
+      ],
+      "alpha_disappeared": 6648,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 25,
+      "changed_pixels": 5869,
+      "bbox_readable": [
+        3537,
+        1822,
+        3660,
+        1889
+      ],
+      "alpha_disappeared": 0,
+      "alpha_appeared": 5869
+    },
+    {
+      "rank": 26,
+      "changed_pixels": 4213,
+      "bbox_readable": [
+        14,
+        659,
+        101,
+        724
+      ],
+      "alpha_disappeared": 4213,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 27,
+      "changed_pixels": 3519,
+      "bbox_readable": [
+        3001,
+        872,
+        3171,
+        896
+      ],
+      "alpha_disappeared": 3519,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 28,
+      "changed_pixels": 3514,
+      "bbox_readable": [
+        3296,
+        800,
+        3354,
+        868
+      ],
+      "alpha_disappeared": 3514,
+      "alpha_appeared": 0
+    },
+    {
+      "rank": 29,
+      "changed_pixels": 2964,
+      "bbox_readable": [
+        3801,
+        632,
+        3882,
+        730
+      ],
+      "alpha_disappeared": 1593,
+      "alpha_appeared": 1284
+    },
+    {
+      "rank": 30,
+      "changed_pixels": 2309,
+      "bbox_readable": [
+        1602,
+        748,
+        1654,
+        843
+      ],
+      "alpha_disappeared": 956,
+      "alpha_appeared": 824
+    }
+  ],
+  "diagnosis": "CANONICAL_PIXEL_CHANGED_OUTSIDE_KNOWN_THREE_TITLE_BOXES; UNKNOWN_IF_OTHER_LOCALIZED_TEXT_OR_PROTECTED_ART_UNTIL_DIRECT_VISUAL",
+  "candidate_written": false,
+  "new_DDS": 0,
+  "qa": "HOLD_SOURCE_ART_PROVENANCE_VISUAL_MAPPING_REQUIRED",
+  "C1": "HOLD_STRICT_RECHECK_NO_INDEPENDENT_PASS",
+  "actual_game": "IGR030_IGR031_IGR040_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "Map pixels in ranked component boxes to text vs protected icon/vehicle/logo from native source; if truly protected, restore losslessly before lettering; do not blanket copy English text back over localized cells."
+}
