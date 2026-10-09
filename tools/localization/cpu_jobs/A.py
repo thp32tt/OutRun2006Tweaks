@@ -103,7 +103,7 @@ def execute():
         # Neither arbitrary font stretch nor flat RGB rectangle.
         dist=distance_transform_edt(face>120)
         dy,dx=np.gradient(dist.astype(np.float32))
-        x,y=x0+22,y0+5
+        x,y=x0+22,y0+1
         rows=np.clip(np.arange(face.shape[0])+y-y0,0,y1-y0-1)
         row_brightness=source_bands(source.crop(ORIGINAL))[rows][:,None]
         delta=21*np.clip(-dy-0.65*dx,-1,1)+8*np.clip(dist/7,0,1)-22*np.clip(dy+0.55*dx,-1,1)
