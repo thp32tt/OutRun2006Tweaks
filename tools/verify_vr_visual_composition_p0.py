@@ -217,7 +217,7 @@ def verify_goal_pre_candidate_gate(source):
         'HostRenderEligible()',
         'FrameStereoIncomplete', 'TargetIsBackBuffer()',
         'R9DeferredDepth', 'AnyAuxRenderTargetActive()',
-        'VR P0 GOAL EARLY_GATE', 'firstByMethodState[index].fetch_or(',
+        'VR P0 GOAL EARLY_GATE', 'R30GoalTraceEarlyMask[index].fetch_or(',
     ):
         require(key, helper, 'GOAL early admission source proof')
     if ('SetRenderState(' in helper or
