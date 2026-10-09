@@ -1,138 +1,98 @@
 #!/usr/bin/env python3
-"""A212 q121 P0 provenance handoff to independent C1; NO material DDS write.
+"""A213: map A212 q121 canonical-source vs clean/current unexpected pixels.
 
-New exact-byte original/CLEAN/final native RGBA32 scope and readable/RAW
-contacts address C335 HOLD on native/alpha evidence. C1 must review independently.
+Read-only P0 original-art attribution probe, not a production DDS edit.
 """
-import os, tempfile, struct, json, hashlib, urllib.request, traceback
+import os,json,hashlib,struct,tempfile,urllib.request,traceback
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image,ImageDraw
+from scipy import ndimage
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
-ROOT=Path.cwd()
-OUT=ROOT/"localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF"
+R=Path.cwd(); OUT=R/"localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE"
 OUT.mkdir(parents=True,exist_ok=True)
-CAND=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-CLEAN=ROOT/"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png"
-SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-SOURCE_SHA="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-TARGET_SHA="38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844"
-ATLAS_REGIONS=[
- {"key":"select_game_mode","source_bbox":[166,819,1166,973],"candidate_bbox":[291,825,1040,948]},
- {"key":"select_car","source_bbox":[243,947,1156,1111],"candidate_bbox":[287,964,1111,1072]},
- {"key":"select_course","source_bbox":[302,1062,1085,1213],"candidate_bbox":[462,1088,924,1202]},
-]
-def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-def read_dds(path):
- d=Path(path).read_bytes()
- if d[:4]!=b"DDS " or len(d)!=128+4096*4096*4:raise RuntimeError("DDS header/bytes mismatch")
- height,width=struct.unpack_from("<II",d,12)
- pitch=struct.unpack_from("<I",d,20)[0]
- mips=struct.unpack_from("<I",d,28)[0]
- masks=struct.unpack_from("<IIII",d,92)
- if (width,height,pitch,mips,masks)!=(4096,4096,16384,1,(255,65280,16711680,4278190080)):
-  raise RuntimeError(f"dds format not pinned: {width,height,pitch,mips,masks}")
- img=Image.frombytes("RGBA",(width,height),d[128:],"raw","RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
- return d[:128],img
-def roi_hash(array):return hashlib.sha256(np.ascontiguousarray(array).tobytes()).hexdigest()
-def flat_crop(im,rgb,box):
- p=im.crop(box)
- bg=Image.new("RGBA",p.size,(*rgb,255));bg.alpha_composite(p)
- return bg.convert("RGB")
-def main():
- if not CAND.is_file() or sha(CAND)!=TARGET_SHA:raise RuntimeError("q121 exact candidate drift")
- if not CLEAN.is_file():raise RuntimeError("A176 source plate missing")
- header,final=read_dds(CAND)
- with tempfile.TemporaryDirectory(prefix="outrun_A212_") as td:
-  src=Path(td)/"source.dds"
-  urllib.request.urlretrieve(SOURCE_URL,src)
-  if sha(src)!=SOURCE_SHA:raise RuntimeError("canonical pinned q121 HD source sha drift")
-  sh,original=read_dds(src)
-  if sh!=header:raise RuntimeError("exact DDS header of canonical and final differs")
-  clean=Image.open(CLEAN).convert("RGBA")
-  if clean.size!=original.size:raise RuntimeError("native plate size drift")
-  S=np.asarray(original);P=np.asarray(clean);F=np.asarray(final)
-  affected=np.zeros((4096,4096),dtype=bool)
-  for r in ATLAS_REGIONS:
-   x0,y0,x1,y1=r["source_bbox"]
-   affected[y0:y1,x0:x1]=True
-  d0=np.any(S!=P,axis=2)
-  d1=np.any(P!=F,axis=2)
-  d2=np.any(S!=F,axis=2)
-  base={
-   "source_to_clean_changed_outside_three_original_regions":int(np.count_nonzero(d0&~affected)),
-   "clean_to_final_changed_outside_three_original_regions":int(np.count_nonzero(d1&~affected)),
-   "source_to_final_changed_outside_three_original_regions":int(np.count_nonzero(d2&~affected)),
-   "source_to_clean_alpha_changed_outside_three_original_regions":int(np.count_nonzero((S[:,:,3]!=P[:,:,3])&~affected)),
-   "clean_to_final_alpha_changed_outside_three_original_regions":int(np.count_nonzero((P[:,:,3]!=F[:,:,3])&~affected)),
-  }
-  # This source is a transparency-only sprite atlas: every source title
-  # footprint must be clear in CLEAN; never apply this to colored plates.
-  sample={}
-  for r in ATLAS_REGIONS:
-   x0,y0,x1,y1=r["source_bbox"]
-   sr=S[y0:y1,x0:x1];pl=P[y0:y1,x0:x1];fn=F[y0:y1,x0:x1]
-   x2,y2,x3,y3=r["candidate_bbox"]
-   sample[r["key"]]={
-    "source_pixel_sha256":roi_hash(sr),
-    "plate_pixel_sha256":roi_hash(pl),
-    "final_pixel_sha256":roi_hash(fn),
-    "plate_alpha_nonzero_original_rect":int(np.count_nonzero(pl[:,:,3])),
-    "new_region_positive_margins":[x2-x0,x1-x3,y2-y0,y1-y3],
-    "source_alpha_nonzero":int(np.count_nonzero(sr[:,:,3])),
-    "final_alpha_nonzero":int(np.count_nonzero(fn[:,:,3])),
-    "visual_comparison_png":"A212_"+r["key"]+"_SOURCE_CLEAN_FINAL_NATIVE.png",
-   }
-   if min(sample[r["key"]]["new_region_positive_margins"])<1:raise RuntimeError("candidate geometry touches original")
-   # Three native RGBA pixel layers, not a JPEG with opaque background.
-   native=Image.new("RGBA",((x1-x0)*3+24,y1-y0),(0,0,0,0))
-   for i,im in enumerate((original,clean,final)):
-    native.paste(im.crop((x0,y0,x1,y1)),(i*(x1-x0+12),0))
-   native.save(OUT/sample[r["key"]]["visual_comparison_png"])
-   # Practical 100/75/50 on white, gray, black from exactly saved DDS
-   for bgname,rgb in (("GRAY",(103,103,103)),("WHITE",(255,255,255)),("BLACK",(0,0,0))):
-    crops=[flat_crop(im,rgb,(x0,y0,x1,y1)) for im in (original,clean,final)]
-    w,h=crops[0].size
-    panel=Image.new("RGB",(3*w+24,h+25),rgb)
-    ImageDraw.Draw(panel).text((5,6),"SOURCE     CLEAN       FINAL (native DDS)",fill=(220,210,10) if bgname!="WHITE" else (0,0,0))
-    for i,img in enumerate(crops):panel.paste(img,(i*(w+12),25))
-    for pct in (100,75,50):
-     im=panel if pct==100 else panel.resize((panel.width*pct//100,panel.height*pct//100),Image.Resampling.LANCZOS)
-     im.save(OUT/f"A212_{r['key']}_{bgname}_{pct}.jpg",quality=92)
-  # Pixel-identical RAW↔FLIPY certificate derived from persisted DDS, no
-  # in-game claim and no unmeasured source-to-Hangul same-stroke anchors.
-  car=ATLAS_REGIONS[1]["source_bbox"]
-  for ident,im in (("SOURCE",original),("CLEAN",clean),("FINAL",final)):
-   im.crop((150,780,1200,1250)).save(OUT/f"A212_{ident}_READABLE_NATIVE.png")
-   im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).crop((150,4096-1250,1200,4096-780)).save(OUT/f"A212_{ident}_RAW_NATIVE.png")
-  fail=[]
-  for k,v in base.items():
-   if v:fail.append(k+":"+str(v))
-  for k,v in sample.items():
-   if v["plate_alpha_nonzero_original_rect"]:fail.append("CLEAN_GHOST_"+k+":"+str(v["plate_alpha_nonzero_original_rect"]))
+SRC="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+C=R/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+P=R/"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png"
+SH="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+CH="38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844"
+BOXES=[(166,819,1166,973),(243,947,1156,1111),(302,1062,1085,1213)]
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def load(p):
+ v=Path(p).read_bytes()
+ if v[:4]!=b"DDS " or len(v)!=128+4096*4096*4:raise ValueError("wrong DDS")
+ if struct.unpack_from("<II",v,12)!=(4096,4096):raise ValueError("wrong size")
+ return Image.frombytes("RGBA",(4096,4096),v[128:],"raw","RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+def run():
+ if digest(C)!=CH:raise RuntimeError("q121 CURRENT SHA changed")
+ with tempfile.TemporaryDirectory(prefix="outrun_a213_") as td:
+  src=Path(td)/"original.dds"
+  urllib.request.urlretrieve(SRC,src)
+  if digest(src)!=SH:raise RuntimeError("q121 SOURCE hash drift")
+  original=load(src)
+  plate=Image.open(P).convert("RGBA")
+  final=load(C)
+  S=np.asarray(original);Q=np.asarray(plate);F=np.asarray(final)
+  affected=np.zeros((4096,4096),np.bool_)
+  for x0,y0,x1,y1 in BOXES:affected[y0:y1,x0:x1]=True
+  mismatched=np.any(S!=F,axis=2)&~affected
+  alpha_missing=(S[:,:,3]>0)&(F[:,:,3]==0)&~affected
+  alpha_added=(S[:,:,3]==0)&(F[:,:,3]>0)&~affected
+  plate_missing=(S[:,:,3]>0)&(Q[:,:,3]==0)&~affected
+  # 8-connected components of changed pixels, rank major regions by size.
+  comps,n=ndimage.label(mismatched,structure=np.ones((3,3),dtype=np.uint8))
+  sizes=np.bincount(comps.ravel());sizes[0]=0
+  order=np.argsort(sizes)[-30:][::-1]
+  regions=[]
+  for ix in order:
+   if sizes[ix]<20:continue
+   ys,xs=np.where(comps==ix)
+   bbox=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+   reg=(slice(bbox[1],bbox[3]),slice(bbox[0],bbox[2]))
+   count=int(sizes[ix])
+   lost=int(np.count_nonzero(alpha_missing[reg]&(comps[reg]==ix)))
+   new=int(np.count_nonzero(alpha_added[reg]&(comps[reg]==ix)))
+   regions.append({"rank":len(regions)+1,"changed_pixels":count,"bbox_readable":bbox,"alpha_disappeared":lost,"alpha_appeared":new})
+  # Full atlas NEAREST-neighbor view to retain glyph layout, no C/game claims.
+  imgs=[original,plate,final]
+  small=[im.resize((1024,1024),Image.Resampling.LANCZOS) for im in imgs]
+  for bgname,background in (("GRAY",(100,100,100)),("BLACK",(0,0,0))):
+   out=Image.new("RGB",(3*1024+24,1060),background)
+   d=ImageDraw.Draw(out)
+   for i,img in enumerate(small):
+    pix=Image.new("RGBA",img.size,(*background,255));pix.alpha_composite(img)
+    out.paste(pix.convert("RGB"),(i*(1024+12),28))
+   d.text((5,5),"CANONICAL ENGLISH SOURCE     A176 CLEAN PLATE     CURRENT A202 KOREAN DDS",fill=(240,240,0))
+   out.save(OUT/f"A213_ATLAS_SOURCE_CLEAN_FINAL_{bgname}_25PCT.jpg",quality=91)
+  def heat(mask,label):
+   thumb=Image.fromarray((mask.astype(np.uint8)*255),"L")
+   thumb.resize((1024,1024),Image.Resampling.NEAREST).save(OUT/f"A213_{label}_DIFFMASK_25PCT.png")
+  heat(mismatched,"OUTSIDE_THREE_SOURCE_TEXT_BBOXES")
+  heat(alpha_missing,"CANONICAL_ALPHA_LOST")
+  heat(plate_missing,"SOURCE_TO_CLEAN_ALPHA_LOST")
   report={
-   "role":"A","run":"A212","queue_index":121,"priority":"P0","IGR":["IGR-030","IGR-031","IGR-040"],
-   "type":"NEW_NATIVE_SOURCE_CLEAN_PERSISTED_DDS_EVIDENCE_ONLY_NO_NEW_DDS",
-   "candidate_sha256":TARGET_SHA,"source_sha256":SOURCE_SHA,
-   "source_url":SOURCE_URL,"source_clean":str(CLEAN.relative_to(ROOT)),
-   "clean_png_sha256":sha(CLEAN),
-   "current_dds_changed":False,"produced_dds":0,
-   "native_4096x4096_RGBA32_mip1":True,
-   "raw_flipY":"PREVIEWED_FROM_SAVED_BYTES_NO_GAME_VALIDATION",
-   "outside_three_bboxes":base,"regions":sample,
-   "mechanical":"PASS_SCOPED" if not fail else "FAIL_SCOPED",
-   "fails":fail,"visual_status":"PENDING_CONTROLLER_NATIVE_PIXELS_FIRST_HAND",
-   "independent_C1":"PENDING_FRESH_INDEPENDENT_C1_RECHECK_C335_HOLD_NOT_SUPERSEDED",
-   "actual_game":"IGR030_031_040_OPEN","RUNTIME_VALIDATION":"UNTESTED",
-   "no_claims":["full atlas independent C certified","matched source-Hangul slant-anchor equivalence","Dino logo and dynamic info mapping","game compositing/consumer chain"],
+   "role":"A","run":"A213","queue_index":121,"priority":"P0",
+   "source_sha256":SH,"current_candidate_sha256":CH,
+   "source_plate_sha256":digest(P),"atlas_pixels":4096*4096,
+   "outside_three_source_title_bbox_RGBA_changed":int(np.count_nonzero(mismatched)),
+   "outside_three_source_title_bbox_source_alpha_lost_to_final":int(np.count_nonzero(alpha_missing)),
+   "outside_three_source_title_bbox_source_alpha_added_in_final":int(np.count_nonzero(alpha_added)),
+   "outside_three_source_title_bbox_source_alpha_lost_to_clean":int(np.count_nonzero(plate_missing)),
+   "changed_components_count":int(n),
+   "ranked_components":regions,
+   "diagnosis":"CANONICAL_PIXEL_CHANGED_OUTSIDE_KNOWN_THREE_TITLE_BOXES; UNKNOWN_IF_OTHER_LOCALIZED_TEXT_OR_PROTECTED_ART_UNTIL_DIRECT_VISUAL",
+   "candidate_written":False,"new_DDS":0,
+   "qa":"HOLD_SOURCE_ART_PROVENANCE_VISUAL_MAPPING_REQUIRED",
+   "C1":"HOLD_STRICT_RECHECK_NO_INDEPENDENT_PASS",
+   "actual_game":"IGR030_IGR031_IGR040_OPEN",
+   "RUNTIME_VALIDATION":"UNTESTED",
+   "next":"Map pixels in ranked component boxes to text vs protected icon/vehicle/logo from native source; if truly protected, restore losslessly before lettering; do not blanket copy English text back over localized cells.",
   }
-  (OUT/"A212_EVIDENCE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-  print("A212_NATIVE_PROOF",json.dumps({"scope":base,"regions":{k:v["plate_alpha_nonzero_original_rect"] for k,v in sample.items()},"fail":fail},ensure_ascii=False),flush=True)
-try:main()
+  (OUT/"A213_P0_ROOT_CAUSE.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+  print("A213_SOURCE_PIXEL_AUDIT",json.dumps({k:report[k] for k in ["outside_three_source_title_bbox_RGBA_changed","outside_three_source_title_bbox_source_alpha_lost_to_final","changed_components_count"]}))
+try:run()
 except Exception as e:
- failure={"run":"A212","queue_index":121,"status":"HOLD_INPUT_OR_SOURCE_PIXEL_PROOF_FAILED",
- "reason":type(e).__name__+":"+str(e),"traceback":traceback.format_exc(),
- "produced_dds":0,"RUNTIME_VALIDATION":"UNTESTED"}
- (OUT/"A212_EXECUTION_HOLD.json").write_text(json.dumps(failure,ensure_ascii=False,indent=2)+"\n")
- print("A212_HOLD",failure["reason"],flush=True)
+ report={"run":"A213","status":"FAIL_CLOSED_EVIDENCE_NOT_VERIFIED","error":repr(e),"traceback":traceback.format_exc(),"new_DDS":0,"RUNTIME_VALIDATION":"UNTESTED"}
+ (OUT/"A213_EXECUTION_HOLD.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ print("A213_HOLD",repr(e))
