@@ -34,3 +34,11 @@
 - Current results separation: ordinal rank C++ **candidate fix**; SkyGlow perf settings **actual material improvement without HMD benchmark**; progress/+TIME and central flare **instrumentation pending exact producer evidence**; XR auto-size **design incomplete**. All newly changed runtime behavior: `RUNTIME_VALIDATION=UNTESTED`.
 
 **No unrelated branches, localization, DX11/DXVK source, game clocks, FFB, texture packages or user hardware state were changed.**
+
+## Exact new candidate build verified after research — 2026-10-10 KST
+
+- **Material/BUILD_INPUTS/SOURCE_SHA** `646c243eabc05196c76031292311bbe1188f03fc`; later commits are nonmaterial review/AGENTS. GitHub DX9Ex Active Validation [run 37955374766](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37955374766) **SUCCESS**: exact-SHA policy, x86 active game DLL, x64 OpenXR host, R33 final chain compile, and package jobs SUCCESS.
+- GitHub exact-SHA package artifact `OutRun2-VR-DX9EX-ACTIVE-646c243eabc05196c76031292311bbe1188f03fc`, **artifact ID 11627523372**, outer ZIP digest `sha256:bdad83a41517db5c731ac640289f1836de32e113c888e48178e764f859c63ad9`. Outer ZIP contains `OutRun2_VR_DX9EX_ACTIVE_646c243eabc0.zip` (the actual game-folder deployment ZIP). Extracted inner file digest `sha256:a564cec2bed038ec981751bb13e6fd8ed4a2e2da5823f1bbef0445fd5b0d664b`; both CRC passes. Inside are Win32 `backends/d3d9/dinput8.dll`, host, slot CMD/PS1, profile/collector/settings. **Only** `OutRunVR-Slot-Selector.cmd` should launch.
+- Verified inner profile bytes include **`SkyGlowFactor=4`** in both `OutRunVR-TestProfiles.ps1` and `Run-OutRunVRTest.ps1`; legacy `=1` override absent, `BUILD_INPUTS.json UserRuntimeVerified=false`. This is an exact material package, not a claim of full Quest3 visual pass.
+- `OutRun EXE HUD Inspector CI` on same source SHA had static+Win32 inspector SUCCESS; Domain Isolation Guard SUCCESS. The separate `DX9Ex Full Source Impact Review` may still be running and is not required to mistake for HMD acceptance.
+- Actual Quest3 status for this **new** package: `RUNTIME_VALIDATION=UNTESTED`. Do not reuse earlier a6f8497 optical results as new pass. Protected old optical feedback still stands.
