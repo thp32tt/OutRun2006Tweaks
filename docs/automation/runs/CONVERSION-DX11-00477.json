@@ -88,7 +88,7 @@
   "continuation": {
     "event_id": "CONVERSION-DX11-00477-CONTINUE-20261009-1853",
     "status": "RUNNING",
-    "checkpoint": "C3_VALIDATE",
+    "checkpoint": "C2_IMPLEMENT",
     "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
     "lease_epoch": 2,
     "work_key": "DX11:R173:COLOR0_GENERATED_VS_TO_DIRECT_PS_DIAGNOSTIC",
@@ -99,12 +99,13 @@
     "material_result_sha": "a0a13c887d3278250168828f49743d0226da7e09",
     "validation_bearing_result_sha": "a0a13c887d3278250168828f49743d0226da7e09",
     "ci_run_id": 37925304067,
-    "resume_cursor": "WAIT_EXACT_SHA_GATE_37925304067_THEN_CLASSIFY_R173_DIRECT_GENERATED_BGRA",
+    "resume_cursor": "R173_TWO_SIDED_MISMATCH_ADD_CONSTANT_COLOR_VS_AND_SOLID_PS_DIAGNOSTIC",
     "runtime_validation": "UNTESTED",
-    "automation_validation": "IN_PROGRESS",
+    "automation_validation": "FAIL_EXACT_SHA_DX11_SMOKE",
     "reason": "R173 first direct-VS fail lacked actual BGRA readback. Source commit a0a13c8 now logs both direct/generated data prior to fail-closed checks; exact-SHA CI started. Retain same TASK_ID 00477 for continuation and do not claim success or rescore.",
     "prior_blocked_material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-    "last_real_activity_at": "2026-10-09T20:41:35+09:00"
+    "last_real_activity_at": "2026-10-09T20:51:24+09:00",
+    "evidence": "Exact-SHA Gate 37925304067 validate SUCCESS, DX11 smoke 113804628002 FAILURE. Direct VS BGRA [128,0,16,255]; generated VS BGRA [128,0,16,255]; expected [224,128,32,255]. Same mismatch in both branches; cannot attribute to generated VS alone."
   },
   "direct_chat_checkpoints": [
     {
@@ -134,6 +135,36 @@
       "test_status": "PENDING_EXACT_SHA",
       "runtime_validation": "UNTESTED",
       "next_action": "Collect R173 two-path BGRA readbacks from exact-SHA DX11 smoke once the Windows validation job finishes; do not mark PASS before both gates."
+    },
+    {
+      "checkpoint_id": "DX11-00477-CHAT-20261009-2051",
+      "at_kst": "2026-10-09T20:51:24+09:00",
+      "material_sha": "a0a13c887d3278250168828f49743d0226da7e09",
+      "gate_run_id": 37925304067,
+      "validation_job_id": 113802691366,
+      "validation": "SUCCESS",
+      "smoke_job_id": 113804628002,
+      "smoke": "FAIL",
+      "observed_direct_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "observed_generated_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "runtime_validation": "UNTESTED",
+      "next_action": "Add independent constant-color VS and constant PS raster controls, distinguish IA vertex channel from VS-to-PS/OM output without native gameplay activation."
     }
   ]
 }
