@@ -384,6 +384,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R188 textured indexed WARP probe failed: $LASTEXITCODE" }
 
+      # R202: non-indexed live DSV/depth-state and real near/far GPU occlusion.
+      - name: Verify R202 native linear depth ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_depth_linear_r202.py
+
+      - name: Build R202 depth linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_depth_linear_probe_r202
+
+      - name: Run R202 depth linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_depth_linear_probe_r202.exe | Select-Object -First 1
+          if (-not $probe) { throw "R202 linear depth WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R202 linear depth WARP probe failed: $LASTEXITCODE" }
+
       # R189: verify same-device exact DSV, depth state, and real GPU depth occlusion.
       - name: Verify R189 native indexed depth ownership
         if: github.ref_name == 'vr-dx11-native-r71'

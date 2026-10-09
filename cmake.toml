@@ -566,6 +566,18 @@ compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
 
+# R202: exact native linear Draw DSV/depth state and real WARP near/far occlusion.
+[target.dx11_depth_linear_probe_r202]
+type = "executable"
+sources = [
+    "tools/dx11_depth_linear_probe_r202.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
 # R189: separate owned DSV/depth-state native indexed Draw; real WARP depth occlusion.
 [target.dx11_depth_indexed_probe_r189]
 type = "executable"

@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00502",
+  "production_id": "CONVERSION-DX11-00502",
+  "event_id": "CONVERSION-DX11-00502-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "59d4167c86c926ea4d6f950a9ab43c05bb087290",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00502",
+  "lease_epoch": 1,
+  "work_key": "DX11:R202:LINEAR_LIVE_DSV_DEPTH_STATE_WARP_OCCLUSION",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_depth_binding.hpp:R202",
+    "tools/dx11_depth_linear_probe_r202.cpp:R202",
+    "tools/test_dx11_depth_linear_r202.py:R202",
+    "cmake.toml:R202",
+    ".github/workflows/backend-conversion-gate.yml:R202"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R202 fail-closed non-indexed Draw exact native DSV/depth-state owner with WARP GPU near-green/far-red occlusion proof; no gameplay-native Draw activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_depth_binding.hpp",
+    "tools/dx11_depth_linear_probe_r202.cpp",
+    "tools/test_dx11_depth_linear_r202.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00502.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest remote HEAD 59d4167c86c926ea4d6f950a9ab43c05bb087290; 00502 checkpoint and run absent; independent R175 00477 blocked, R201 00501 C6 parked",
+    "C1_REVIEW": "PASS R189 indexed DSV depth ownership isolated WARP GPU green-near/red-far while R185/R199 linear native Draw has no counterpart; select R202 independent non-indexed path",
+    "C2_IMPLEMENT": "C++ non-indexed exact live DSV+DS state+same device+depth compare ownership; isolated WARP two sequential Draw near-green/far-red actual depth pixel occlusion; 4 negative static mutants; dedicated Win32 CMake and CI steps",
+    "C3_VALIDATE": "One scoped source/mutant validation PASS before material commit; exact SHA Win32 WARP pending",
+    "C4_COMMIT": "Actual material commit [AUTO:CONVERSION-DX11-00502] without CI skip; validation-bearing commit SHA identified from committed change",
+    "C5_PACKAGE": "NOT_REQUIRED no gameplay Draw activation, no Quest3/VDXR deployment",
+    "C6_STATE": "PENDING exact-SHA Gate"
+  },
+  "evidence": {
+    "negative_source_mutants": 4,
+    "r189_indexed_reference": "untouched",
+    "r175_owner": "CONVERSION-DX11-00477",
+    "expected_warp": "near .2 green triangle must occlude far .8 red triangle; center green, corner black"
+  },
+  "resume_cursor": "C3_EXACT_SHA_GATE_PENDING",
+  "next_action": "Inspect exact-SHA Backend Conversion Gate R202 scoped WARP and inherited independent R175; then C6 without replacing material result SHA. Quest3 UNTESTED."
+}
