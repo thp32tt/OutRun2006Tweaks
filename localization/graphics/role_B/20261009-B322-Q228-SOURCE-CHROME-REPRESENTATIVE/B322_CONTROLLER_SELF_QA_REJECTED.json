@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "run": "B322",
+  "role": "B",
+  "index": 228,
+  "regression": "IGR-038",
+  "priority": "P1",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "prior_candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "trial_sha256": "ffb982af70aadf36a2f954d1de29bb045385ec0524ab5763a1ae363de370a2dd",
+  "worker_run": 37895233639,
+  "worker_status": "SUCCESS",
+  "producer_decision": "REWORK_REQUIRED_VISUAL_FAIL",
+  "reason": [
+    "Source English is rounded brushed silver with organic contour-and-shadow highlights, but current trial Hangul remains blocky with hard multi-row horizontal white/gray bands",
+    "Korean displayed width 822px within source region 1451px; native hierarchy visibly underfilled",
+    "Numeric source-plate-clean, header and outside-zero PASS insufficient to override source-relative styling visual mismatch"
+  ],
+  "inspected_contact_views": [
+    "COAST2COAST_FLIPY_128_100_SOURCE_CLEAN_OLD_TRIAL.png",
+    "COAST2COAST_FLIPY_128_50_SOURCE_CLEAN_OLD_TRIAL.png",
+    "COAST2COAST_RAW_0_75_SOURCE_CLEAN_OLD_TRIAL.png"
+  ],
+  "retry_method": "For B323, transfer continuous local diffuse source silver-metal reflectance (weighted SOURCE RGBA gaussian-normalized sampling) to previously constructed NATIVE source-bounded Korean glyph silhouette with soft contour bevel. NO font bitmap resize, no whole-word stretch, no new opaque plate.",
+  "promotion": false,
+  "new_DDS_promoted": 0,
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
