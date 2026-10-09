@@ -18,12 +18,12 @@
     "tools/test_dx11_triangle_fan_gpu_draw_r181.py"
   ],
   "base_sha": "d6a6d6f1e78acb5b1c5b8355daee42074e6c0cc0",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "status": "MATERIAL_C3_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING",
+  "material_result_sha": "b9ce29f0dbed0912331c37f013a35553d41b9ba6",
+  "validation_bearing_result_sha": "b9ce29f0dbed0912331c37f013a35553d41b9ba6",
+  "result_sha": "b9ce29f0dbed0912331c37f013a35553d41b9ba6",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
@@ -39,18 +39,59 @@
     "C0_RECOVER": "PASS: branch HEAD d6a6d6f1; 00482 R180 scoped PASS but inherited R175 full Gate fail. No 00483 run or conflicting claim. Checkpoint path 404; direct GitHub HEAD/runs authoritative.",
     "C1_REVIEW": "PASS: triangle-fan generated IB existed with IA binding but without isolated DrawIndexed WARP GPU pixel proof. 00482 earlier review made no fan commit; 00483 independent R181 scope.",
     "C2_IMPLEMENT": "PASS: actual WARP offscreen DrawIndexed for nonindexed and source-indexed triangle fan, staged pixel assertions, static three negative mutants and cmkr + workflow integration.",
-    "C3_VALIDATE": "PENDING: exact material-SHA Backend Conversion Gate after GitHub push.",
-    "C4_COMMIT": "PENDING: CAS material commit to target branch.",
+    "C3_VALIDATE": "SCOPED PASS / FULL GATE FAIL: exact-SHA Gate 37946616098 validate 113874406708 SUCCESS (Win32 compile + artifact); R181 static and 3 mutants SUCCESS; smoke 113876777636 actual D3D11 WARP generated R32_UINT fan DrawIndexed nonindexed + source-indexed pixel readbacks PASS. Full smoke fails later at inherited R175 COLOR0/TEXCOORD6 BGRA varying mismatch expected [224,128,32,255], observed [128,0,16,255].",
+    "C4_COMMIT": "PASS: substantive R181 WARP GPU draw proof C++/CMake/CI commit b9ce29f0dbed0912331c37f013a35553d41b9ba6 [AUTO:CONVERSION-DX11-00483] remote fast-forward CAS verified. Production Issue #14 event 6083244055.",
     "C5_PACKAGE": "NOT_REQUIRED: isolated WARP proof only, no game native Draw activation/HMD release.",
-    "C6_STATE": "PENDING: exact-SHA CI proof and final next action."
+    "C6_STATE": "SEALED: exact material and validation-bearing SHA b9ce29f0, scoped GPU/Windows PASS but inherited R175 full Gate FAIL, runtime UNTESTED, no backend promotion or double credit."
   },
   "blockers": [
-    "R175 inherited constant-buffer probe COLOR0/TEXCOORD6 mismatch may fail full smoke downstream of R181.",
-    "No user Quest3/VDXR runtime evidence; UNTESTED."
+    "Inherited 00477-owned R175_GENERIC_VARYING_MISMATCH at constant-buffer probe prevents full exact-SHA Gate success after R181 WARP completed.",
+    "Quest3/VDXR actual game runtime not tested; native gameplay Draw remains dormant."
   ],
   "state_persisted": true,
   "score_change": 0,
-  "score_reason": "Await exact-SHA full automation validation; no point on dispatch.",
-  "resume_cursor": "READ_R181_EXACT_SHA_GATE",
-  "next_action": "Check exact-SHA Backend Conversion Gate validate and R181 WARP DrawIndexed pixel proof; distinguish inherited R175 failure; preserve exact material result SHA."
+  "score_reason": "New scoped R181 implementation and WARP GPU pixels passed, but required full exact-SHA Gate remains FAIL from inherited R175. No complete validated task score; avoid double credit for 00482, 00483.",
+  "resume_cursor": "BLOCKED_UPSTREAM_R175_ONLY_AFTER_00477_FIX",
+  "next_action": "Do not rerun R181 unchanged GPU probe or edit owned R175 shader files. On a future independent 00477 fix, rerun exact-SHA full Gate and reconcile R181; meanwhile next separately assigned independent DX11 source item may proceed. Keep native gameplay Draw dormant and Quest3/VDXR UNTESTED.",
+  "scoped_automation_validation": "PASS_R181_STATIC_GPU_DRAWINDEXED_WARP",
+  "validation_evidence": {
+    "material_sha": "b9ce29f0dbed0912331c37f013a35553d41b9ba6",
+    "gate_run_id": 37946616098,
+    "gate_name": "Backend Conversion Gate",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "win32_validate_job_id": 113874406708,
+    "win32_validate_result": "success",
+    "r181_static": "PASS",
+    "r181_negative_mutations": "3/3_REJECTED",
+    "r181_warp_target": "dx11_triangle_fan_index_buffer_probe",
+    "r181_warp_compile": "PASS",
+    "r181_gpu_drawindex_nonindexed": "PASS",
+    "r181_gpu_drawindex_source_indexed": "PASS",
+    "r181_gpu_pixel_readback": "PASS",
+    "smoke_job_id": 113876777636,
+    "smoke_result": "failure",
+    "failing_step": "Run DX11 constant buffer probe",
+    "failure_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_owner_paths_untouched": true,
+    "artifact_id": 11623842822,
+    "artifact_digest": "sha256:11ea4d4b2e926e11ef02d87800061a89d3ff8fede464845d8c173f6cb38208f3"
+  },
+  "validation_run_id": 37946616098,
+  "validation_job_id": 113874406708,
+  "readiness_smoke_job_id": 113876777636,
+  "last_real_activity_at": "2026-10-09T23:55:00+09:00"
 }
