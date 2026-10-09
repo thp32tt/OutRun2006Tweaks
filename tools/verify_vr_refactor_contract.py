@@ -47,6 +47,60 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
+# R84 R32 stereo RT/depth-stencil switch invokes the original lower
+# hook trampolines. R30 must preserve slot index, borrowed surface and HRESULT.
+# An absent DS hook has a DIFFERENT original fallback: call the D3D9 device.
+def r32_original_target_hooks_ok(api, lower, upper):
+    return all((
+        "HRESULT R30SupportCallOriginalSetRenderTarget(\n        IDirect3DDevice9* device, DWORD index,\n        IDirect3DSurface9* surface) noexcept;" in api,
+        "HRESULT R30SupportCallOriginalSetDepthStencilSurface(\n        IDirect3DDevice9* device,\n        IDirect3DSurface9* surface) noexcept;" in api,
+        bool(re.search(
+            r"HRESULT R30SupportCallOriginalSetRenderTarget\(\s*"
+            r"IDirect3DDevice9\* device, DWORD index,\s*IDirect3DSurface9\* surface\)"
+            r" noexcept\s*\{\s*return SetRenderTargetHook.stdcall<HRESULT>"
+            r"\(device, index, surface\);\s*\}", lower)),
+        bool(re.search(
+            r"HRESULT R30SupportCallOriginalSetDepthStencilSurface\(\s*"
+            r"IDirect3DDevice9\* device,\s*IDirect3DSurface9\* surface\)"
+            r" noexcept\s*\{\s*return SetDepthStencilSurfaceHook\s*\?"
+            r"\s*SetDepthStencilSurfaceHook.stdcall<HRESULT>\(device, surface\)"
+            r"\s*:\s*device->SetDepthStencilSurface\(surface\);\s*\}", lower)),
+        "R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetRenderTarget(d,i,s); }" in upper,
+        "R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetDepthStencilSurface(d,s); }" in upper,
+    ))
+
+if not r32_original_target_hooks_ok(r30_support_api, r30, r32):
+    errors.append("R32 target/depth-stencil original hooks or fallback lost R30 lower owner")
+for label, changed_r30, changed_r32 in (
+    ("RT original hook bypass", r30.replace(
+        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+        "return device->SetRenderTarget(index, surface);", 1), r32),
+    ("RT index zeroed", r30.replace(
+        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+        "return SetRenderTargetHook.stdcall<HRESULT>(device, 0u, surface);", 1), r32),
+    ("RT surface erased", r30.replace(
+        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, nullptr);", 1), r32),
+    ("DS absent-hook fallback removed", r30.replace(
+        "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
+        "            : device->SetDepthStencilSurface(surface);",
+        "return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);", 1), r32),
+    ("DS hook bypass", r30.replace(
+        "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
+        "            : device->SetDepthStencilSurface(surface);",
+        "return device->SetDepthStencilSurface(surface);", 1), r32),
+    ("R32 RT direct-owner bypass", r30, r32.replace(
+        "return R30SupportCallOriginalSetRenderTarget(d,i,s);",
+        "return SetRenderTargetHook.stdcall<HRESULT>(d,i,s);", 1)),
+    ("R32 DS direct-owner bypass", r30, r32.replace(
+        "return R30SupportCallOriginalSetDepthStencilSurface(d,s);",
+        "return d->SetDepthStencilSurface(s);", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R84 original target-hook negative mutation not applied: " + label)
+    elif r32_original_target_hooks_ok(r30_support_api, changed_r30, changed_r32):
+        errors.append("R84 original target-hook negative mutation survived: " + label)
+
 # R84 R32 resource/depth readiness: keep lower allocation, recent-clear depth
 # bootstrap and independent depth/stencil live D3D9 state predicates. A forced
 # success could expose an incomplete right eye; swapped predicates suppress

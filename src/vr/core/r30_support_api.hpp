@@ -112,6 +112,14 @@ namespace OutRunVRStereo
     bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
     bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept;
     bool R30SupportStencilTestActive(IDirect3DDevice9* device) noexcept;
+    // Raw lower-hook dispatch for R32 stereo target switches. The original
+    // depth-hook absence fallback remains a direct D3D9 device call.
+    HRESULT R30SupportCallOriginalSetRenderTarget(
+        IDirect3DDevice9* device, DWORD index,
+        IDirect3DSurface9* surface) noexcept;
+    HRESULT R30SupportCallOriginalSetDepthStencilSurface(
+        IDirect3DDevice9* device,
+        IDirect3DSurface9* surface) noexcept;
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;

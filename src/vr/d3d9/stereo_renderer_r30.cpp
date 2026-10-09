@@ -3516,6 +3516,22 @@ namespace OutRunVRStereo
         return StencilTestActive(device);
     }
 
+    HRESULT R30SupportCallOriginalSetRenderTarget(
+        IDirect3DDevice9* device, DWORD index,
+        IDirect3DSurface9* surface) noexcept
+    {
+        return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);
+    }
+
+    HRESULT R30SupportCallOriginalSetDepthStencilSurface(
+        IDirect3DDevice9* device,
+        IDirect3DSurface9* surface) noexcept
+    {
+        return SetDepthStencilSurfaceHook
+            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)
+            : device->SetDepthStencilSurface(surface);
+    }
+
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
         return FrameStereoPoseSequence;

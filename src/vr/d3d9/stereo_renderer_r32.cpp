@@ -887,8 +887,8 @@ namespace OutRunVRStereo
     bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* d) noexcept { return R30SupportTryBootstrapRightDepth(d); }
     bool R32ReviewDepthTestActive(IDirect3DDevice9* d) noexcept { return R30SupportDepthTestActive(d); }
     bool R32ReviewStencilTestActive(IDirect3DDevice9* d) noexcept { return R30SupportStencilTestActive(d); }
-    HRESULT R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return SetRenderTargetHook.stdcall<HRESULT>(d,i,s); }
-    HRESULT R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return SetDepthStencilSurfaceHook ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(d,s) : d->SetDepthStencilSurface(s); }
+    HRESULT R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetRenderTarget(d,i,s); }
+    HRESULT R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetDepthStencilSurface(d,s); }
 
     std::uintptr_t R32ReviewCurrentVertexShaderIdentity() noexcept { return R30SupportCurrentVertexShaderIdentity(); }
     bool R32ReviewLiveVertexShaderMatches(IDirect3DDevice9* d, std::uintptr_t e) noexcept { return OutRunVR::D3D9::LiveVertexShaderMatches(d,e); }
