@@ -699,9 +699,11 @@ require(
     "R32ReviewDrawIndexedPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30);}",
     "R32ReviewDrawPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveUPDestR30);}",
     "R32ReviewDrawIndexedPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30);}",
-    "R32ReviewResetTarget() noexcept{return reinterpret_cast<void*>(&ResetDestR22);}",
-    "R32ReviewPresentTarget() noexcept{return reinterpret_cast<void*>(&PresentDestR13);}",
-    "R32ReviewDirectTransportTarget() noexcept{return reinterpret_cast<void*>(&ResolveDirectTransportR13);}",
+    "R32ReviewResetTarget() noexcept{return R30SupportResetTarget();}",
+    "R32ReviewPresentTarget() noexcept{return R30SupportPresentTarget();}",
+    # R30 support now owns the same physical lower target addresses.
+    # A separate fail-closed owner verifier protects the exact R22/R13 identities.
+    "R32ReviewDirectTransportTarget() noexcept{return R30SupportDirectTransportTarget();}",
 )
 
 r33_install = function_body(r33, "DWORD WINAPI R33InstallThread(void*)")
