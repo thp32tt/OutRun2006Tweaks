@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A213 q121 P0 native SHA-pinned SOURCE/CLEAN/A202 current saved DDS across full 4096x4096 established three title plates alpha0 and no CLEAN→FINAL edits outside those three title rectangles, but SOURCE→FINAL differs 1,934,984px outside those boxes because many other pre-existing UI strings legitimately localized. Source old alpha disappeared 982,705 and Korean new alpha appeared 537,912: NOT standalone protected artwork loss. Need full atlas localized edit union and independent C335 first-hand blind source-lean/protected-art calibration; no new DDS, IGR030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
     "B338 B q214 explicit hand drawn 출발/골 native vector BC3 trial b7c0dd8b9f8c4e62cb3b9e2fce88c3d44eb7c2e43d8dae9c3f7bfef84690facd only; saved DDS machine +0 outside PASS but controller GOAL stacked-horizontal pale bars SOURCE family FAIL; existing candidate ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 preserved, promoted 0, C2 REWORK. Next change BC3 per-block alpha+vertical stroke/counter topology, not another Noto/palette resize. QA localization/graphics/role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B338-Q214-MANUAL-HANGUL-PATH-SOURCE-BC3-PILOT-20261010-0040 RUNTIME_VALIDATION=UNTESTED.",
     "B q228 B337/B337R two exact-native chrome trials failed producer visual despite saved DDS mechanical gate; no promoted DDS. Stop Noto reflection/blur/bevel tuning, rebuild source-shaped connected rounded Hangul manually; C327 REWORK and IGR038 OPEN. See localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B337-Q228-NATIVE-SOURCE-CHROME-TWO-TRIAL-REJECT-20261010",
     "C335 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD P0 q121 A202 SHA256 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844; first-hand SOURCE|CLEAN|FINAL producer contact gray100 black50 plus RAW/FLIPY atlas and two masks viewed. Improved natural phrase/width, no definite clip/alien box visible in inspected scopes; no independent exact saved 4096x4096 DDS/native alpha/plate delta/true calibration, so C1 HOLD_STRICT_RECHECK, NOT PASS. C318 old SHA not reused; DDS0; C3/APPROVAL/JPG/game BLOCKED, IGR-030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json RUN_KEY=OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020.",
@@ -13867,5 +13868,32 @@
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json"
+  },
+  "a213_q121_P0_native_all_atlas_scope_hold": {
+    "run": "A212+A213",
+    "run_key": "OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "production_dds_new": 0,
+    "trial_dds_new": 0,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "current_candidate_unchanged_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "pinned_clean_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+    "original_three_title_regions_alpha_clean_nonzero": 0,
+    "clean_vs_final_RGBA_changed_outside_three_title_regions": 0,
+    "original_vs_final_RGBA_changed_outside_three_title_regions": 1934984,
+    "canonical_old_alpha_disappeared_outside_three_title_regions": 982705,
+    "canonical_new_alpha_appeared_outside_three_title_regions": 537912,
+    "explanation": "Previous check only used three English heading rectangles. Actual atlas contains many independently translated English-to-Korean cells. Outside-three old/new pixel differences cannot certify true protected art loss or source preservation without full semantic edit/protected masks.",
+    "new_native_pixel_artifacts": "localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF/A212_EVIDENCE_REPORT.json",
+    "new_full_atlas_diagnostic": "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_P0_ROOT_CAUSE.json",
+    "controller_qa": "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_CONTROLLER_NATIVE_SCOPE_QA.json",
+    "C335": "HOLD_STRICT_RECHECK_NOT_CLOSED",
+    "C1": "REQUIRES_C_INDEPENDENT_NATIVE_SLANT_ALPHA_PROOF",
+    "C3": "PENDING",
+    "runtime": "IGR030_IGR031_IGR040_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
+
 }
