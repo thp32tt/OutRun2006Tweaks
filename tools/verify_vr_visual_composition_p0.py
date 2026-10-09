@@ -444,9 +444,9 @@ def verify_goal_night_trace_epoch(source):
     form = function_body(source, 'void R30TracePreRestartHudDrawForm(')
     early = function_body(source, 'void R30TracePreRestartHudEligibility(')
     for marker in ('R30GoalTraceObservedState.exchange(',
-                   'GameState::STATE_GOAL',
-                   'GameState::STATE_TIMEUP',
-                   'GameState::STATE_LINK_TIMEUP',
+                   'state != static_cast<int>(GameState::STATE_GOAL)',
+                   'state != static_cast<int>(GameState::STATE_TIMEUP)',
+                   'state != static_cast<int>(GameState::STATE_LINK_TIMEUP)',
                    'if (old == state ||',
                    'R30GoalTraceFormMask',
                    'R30GoalTraceEarlyMask',
