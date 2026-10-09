@@ -18,25 +18,25 @@
     ".github/workflows/backend-conversion-gate.yml:R193"
   ],
   "base_sha": "52a98cebbf1b5e461ccb916b85d5e2b6f7c3b331",
-  "result_sha": "PENDING_MATERIAL_COMMIT_CAS",
-  "material_result_sha": "PENDING_MATERIAL_COMMIT_CAS",
-  "validation_bearing_result_sha": "PENDING_MATERIAL_COMMIT_CAS",
-  "status": "WAITING_FOR_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "7097d0f832f0a0751fefbc08f1f1067153fa2187",
+  "material_result_sha": "7097d0f832f0a0751fefbc08f1f1067153fa2187",
+  "validation_bearing_result_sha": "7097d0f832f0a0751fefbc08f1f1067153fa2187",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
   "selected_work_item": "R193 distinct dormant owned D3D11 scissor raster/RTV/viewport preflight and WARP clipped DrawIndexed pixel probe, leaving R187 deny-by-default unchanged",
-  "summary": "Implemented R193 isolated scissor-enabled native indexed draw readiness and actual clipped indexed GPU WARP red-left / blue-right readback. Existing R187 reject-scissor gate unchanged. Full exact SHA CI pending; inherited R175 failure still separately owned.",
+  "summary": "R193 native D3D11 scissor/RTV/viewport ownership preflight and genuine WARP DrawIndexed clip proof succeeded; unchanged upstream R175 generic TEXCOORD6 varying mismatch fails full exact-SHA Gate. No native game Draw activation; runtime UNTESTED.",
   "pipeline": {
     "C0_RECOVER": "PASS: HEAD 52a98cebbf1b5e461ccb916b85d5e2b6f7c3b331; 00494 sealed R192 / inherited R175 failure; no 00495 record or controller checkpoint",
     "C1_REVIEW": "PASS: new scissor-specific owned object and clip provenance; no R187 safety gate change; R175 separately owned",
     "C2_IMPLEMENT": "PASS source header + WARP probe + 4-negative static mutant contract + build/CI wiring",
-    "C3_VALIDATE": "SCOPED SOURCE PREFLIGHT PASS, exact-SHA Windows/WARP and full Gate PENDING",
-    "C4_COMMIT": "PENDING publishing exact material SHA [AUTO:CONVERSION-DX11-00495]",
-    "C5_PACKAGE": "NOT_REQUIRED: dormant isolated GPU proof; no game backend/HMD distribution candidate",
-    "C6_STATE": "PENDING exact-SHA Gate, source change ledger and final checkpoint"
+    "C3_VALIDATE": "R193 scoped PASS (4 negative source mutants; MSVC Win32 build; live WARP clipped red-left/blue-right DrawIndexed pixels). Whole exact material SHA Gate 37981426663 FAIL: validate job 113992640891 SUCCESS; DX11 smoke 113994081865 FAIL on existing 00477 R175 TEXCOORD6 BGRA mismatch [128,0,16,255] vs [224,128,32,255].",
+    "C4_COMMIT": "PASS: material 7097d0f832f0a0751fefbc08f1f1067153fa2187 with [AUTO:CONVERSION-DX11-00495] and no CI-skip; exact-SHA run complete; C6 bookkeeping separate.",
+    "C5_PACKAGE": "NOT_REQUIRED: no DX11 game-native activation, HMD promotion or distribution candidate.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE: R193 scoped independent implementation PASS, whole required gate FAIL unchanged owner 00477; preserve material and validation-bearing SHA, runtime UNTESTED; no success point."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_scissor_binding.hpp",
@@ -48,13 +48,49 @@
   ],
   "evidence": {
     "scoped_source_contract": "PASS_ONE_SOURCE_PREFLIGHT_4_NEGATIVE_MUTATIONS",
-    "exact_sha_gate": "PENDING",
-    "known_inherited_blocker": "CONVERSION-DX11-00477:R175_PIXEL_BGRA_128_0_16_255"
+    "exact_sha_gate": 37981426663,
+    "known_inherited_blocker": "CONVERSION-DX11-00477:R175_PIXEL_BGRA_128_0_16_255",
+    "gate_name": "Backend Conversion Gate",
+    "gate_event": "push",
+    "gate_head_sha": "7097d0f832f0a0751fefbc08f1f1067153fa2187",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113992640891,
+    "validate_conclusion": "success",
+    "smoke_job_id": 113994081865,
+    "smoke_conclusion": "failure",
+    "r193_static_negative_mutants": 4,
+    "r193_static": "PASS",
+    "r193_win32_warp_build": "PASS",
+    "r193_actual_scissored_gpu_pixels": "PASS",
+    "r193_static_log": "R193 scoped native scissor/target ownership, 4 mutations and GPU test wiring: PASS",
+    "r193_warp_log": "R193 live WARP scissored indexed pixels: PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_owner_task": "CONVERSION-DX11-00477",
+    "inherited_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "issue14_material_comment_id": 6087949697
   },
   "blockers": [
-    "Preexisting R175 full gate failure owned by 00477; R193 cannot claim whole-Gate PASS until resolved",
-    "No Quest3/VDXR runtime test"
+    "Inherited independently-owned R175 generic varying mismatch: actual BGRA [128,0,16,255] expected [224,128,32,255], fails exact-SHA Gate 37981426663; do not weaken Gate or retake 00477-owned work.",
+    "No Quest3/VDXR actual game/HMD test; gameplay-native DX11 activation remains dormant."
   ],
-  "last_real_activity_at": "2026-10-10T04:33:00+09:00",
-  "next_action": "Check exact SHA Backend Conversion Gate for this material commit; if R193 probe PASS but inherited R175 fails, seal C6 BLOCKED_UPSTREAM_R175; do not claim runtime or scoring success."
+  "last_real_activity_at": "2026-10-10T04:44:00+09:00",
+  "next_action": "R193 is scoped-PASS; no rerun, score or release. Separately verify 00477 owner fencing then fix inherited R175 TEXCOORD6 varying issue. For next distinct DX11 lane assignment choose an independent native implementation area not overlapping R193/00477. Quest3/VDXR runtime required only for promotion.",
+  "scoped_automation_validation": "PASS_R193_STATIC_MSVC_WIN32_WARP_GPU_PIXELS",
+  "score_change": 0,
+  "score_reason": "Independent R193 static, Win32 and real WARP DrawIndexed pixel checks PASS, but mandatory entire exact-SHA Gate fails inherited R175 owned by 00477; no complete Gate achievement or retry credit.",
+  "state_persisted": true,
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_NEW_DISJOINT_WORK"
 }
