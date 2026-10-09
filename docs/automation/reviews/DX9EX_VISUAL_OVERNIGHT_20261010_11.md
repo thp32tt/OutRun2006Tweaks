@@ -10,3 +10,4 @@ Schedule is best-effort, not guaranteed exact. Fixed run deadline: **2026-10-11 
 | 2026-10-10 07:02:52 KST | 7bc3262df00c | RB03 +TIME six source edges | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
 | 2026-10-10 07:07:52 KST | 74c1e98f5944 | RB02 progressive GOAL text | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
 | 2026-10-10 07:12:52 KST | 397ffbb3ddde | RB03 +TIME six source edges | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
+| 2026-10-10 07:17:52 KST | 397ffbb3ddde | RB04 central lens and outer halos | SOURCE_CONTRACT_OK | src/hooks_graphics.cpp: 7 source contracts present |
