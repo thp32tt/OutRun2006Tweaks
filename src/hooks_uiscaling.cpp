@@ -605,13 +605,34 @@ class UIScaling : public Hook
 			OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;
 		}
 	}
+    inline static thread_local std::uint64_t OutRunStagePrintfCompleted = 0;
 	static void OutRunStagePrintfLeave(safetyhook::Context&)
 	{
 		if (!OutRunStagePrintfDepth || --OutRunStagePrintfDepth != 0)
 			return;
+        unsigned changedPriorities = 0;
+        if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                if (after && after != OutRunStagePrintfBefore[p])
+                    ++changedPriorities;
+            }
+        }
 		TagAppendedNodes(OutRunStagePrintfBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+        const auto hit = ++OutRunStagePrintfCompleted;
+        if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
+        {
+            spdlog::info(
+                "VR P0 STAGE PRINT SOURCE: calls={} priorities={} gameState={} mode={} exactScope=SCREEN_HUD",
+                hit, changedPriorities,
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1);
+        }
 		OutRunStagePrintfBefore = {};
 	}
 
