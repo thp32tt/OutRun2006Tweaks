@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B324",
+  "run_key": "OUTRUN-KOR-B324-Q214-CLEAN-BOUNDARY-20261009",
+  "time_kst": "2026-10-09 16:51 KST",
+  "queue_index": 214,
+  "asset": "BF229CF4_512x512.dds",
+  "status": "NEW_SOURCE_PINNED_PLATE_BOUNDARY_REPAIR_HOLD_MANUAL_VECTOR_DDS",
+  "priority": "B_OWNED_REWORK",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "old_authored_clean_sha256": "b2a8fd17033efd4ff471b48e1f9289dadfab872cb92ea4bbb2fc6de14762255d",
+  "new_clean_png_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "saved_dds_sha256_unchanged": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "method_guard": "METHOD_CHANGE_REQUIRED, SAFE_RERENDER_RETURNED_2",
+  "native": [
+    2048,
+    2048
+  ],
+  "format": "DXT5_BC3",
+  "source_outside_original_edit_rgba_pixels": 394,
+  "source_outside_new_clean_edit_rgba_pixels": 0,
+  "source_outside_new_clean_alpha_diff": 0,
+  "new_clean_inside_original_bboxes": "BYTE_EXACT_SAME_AS_ARCHIVED_B194",
+  "protected_art_outside": "SOURCE_PIXEL_EXACT",
+  "per_label": [
+    {
+      "id": "START",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "archived_near_edge_changed": 103,
+      "repaired_near_edge_changed": 0
+    },
+    {
+      "id": "GOAL",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "archived_near_edge_changed": 60,
+      "repaired_near_edge_changed": 0
+    }
+  ],
+  "direct_controller_visual": {
+    "inspected": [
+      "START_FLIPY_GRAY_100_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png",
+      "GOAL_FLIPY_GRAY_100_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png",
+      "GOAL_FLIPY_GRAY_50_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png",
+      "START_RAW_BLACK_75_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png",
+      "GOAL_RAW_WHITE_75_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png",
+      "START_FLIPY_WHITE_50_SOURCE_OLD_CLEAN_REPAIRED_CURRENT.png"
+    ],
+    "plate_only": "NO_DEFINITE_UNAUTHORIZED_BOX_OR_ENGLISH_TEXT_STROKE_IN_REVIEWED_CROPS",
+    "plate_boundary": "NO_DEFINITE_COLOR_SEAM_IN_REVIEWED_CROPS_AFTER_SOURCE_OUTSIDE_RESTORE",
+    "raw": "MATCHES_ORIGINAL_MIRROR_Y_ORIENTATION_IN_REVIEWED_CROPS",
+    "limitations": "Only six representative BGW/RAW/scale crops directly controller-reviewed. Repaired CLEAN not approved for subsequent lettering until complete full-alpha and true scene-composed QA; finite source-color proxy cannot prove complete plate clean."
+  },
+  "machine_json": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CANONICAL_PLATE_MACHINE.json",
+  "lossless_clean_png": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CANONICAL_BOUNDARY_CLEAN_PLATE_LOSSLESS.png",
+  "lossless_contact_count": 36,
+  "actions_run": 37901026870,
+  "actions_result": "SUCCESS",
+  "worker_commit": "b58aff67483581e16b8afcc20440f165ffe74f51",
+  "remaining_rework": "Manual source-derived per-Hangul vector metallic cream/gold bevel + BC3-aware encoded new candidate still required; prior B260/B261 SDF/color trial is prohibited.",
+  "new_promoted_dds": 0,
+  "producer_DDS_QA": "NOT_RUN",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS",
+  "N100": "ONLY_SHORT_METADATA_WORKFLOW_STATUS_CHECK_NO_IMAGE_CPU",
+  "forbidden_domains_touched": []
+}
