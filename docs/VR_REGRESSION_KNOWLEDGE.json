@@ -896,7 +896,7 @@
     {
       "key": "VR-HUD-R64-D3DXSPRITE-DRAW-FLUSH-REMOVED-20261009",
       "title": "R84 refactor removed HMD-proven R64 D3DXSprite per-DispRank/projection Draw->Flush batch isolation",
-      "status": "SOURCE_RESTORED_EXACT_SOURCE_CI_POLICY_SUCCESS_NEED_WIN32_BUILD_AND_HMD",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
       "testLevel": 3,
       "recurrenceCount": 1,
       "evidenceLevel": "DIRECT_USER_R64_6TH_PASS_AND_SOURCE_PROVEN_DELETED_FUNCTION_RUNTIME_NEW_HMD_UNTESTED",
@@ -922,7 +922,8 @@
         "666e6546322b3279e1c4f9151f0032a5f1b266e3 — exact 71 HUD binary CALL contract supports selective 8-RVA rank hook",
         "e52a793fc0b8570c3bbe88db251ff3ba9540ddeb — cadence restore guard updated to require rank-vs-TimeAttack right-side branch",
         "11d0732fa2b5f8428079bbf7ad7ed8d72aaebbda — detect exact vtable9 Draw target in negative test",
-        "docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md — C5 05:02 KST root-cause and CI evidence"
+        "docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md — C5 05:02 KST root-cause and CI evidence",
+      "308bf647211f670974fb53ad7d60d398dea4667c — DX9Ex Active 37859508332 game Win32/host x64/R33/package SUCCESS, EXE HUD Inspector 37859508345 SUCCESS, Domain Isolation 37859508246 SUCCESS; source-fix built, matching Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
       ],
       "riskPaths": [
         "src/hooks_uiscaling.cpp",
