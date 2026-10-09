@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C337",
+  "review_datetime_kst": "2026-10-10T02:33:46+09:00",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 98,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "decision": "REWORK_REQUIRED",
+  "review_scope": "independent entire 2048x128 persisted BC3 level-0 + producer-saved source/clean/final comparators; full current-policy PASS was not attempted",
+  "reason_code": "SOURCE_FAMILY_ITALIC_WEIGHT_MISMATCH",
+  "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+  "candidate_bytes": 262272,
+  "candidate_source": "independently decoded current persisted DDS at branch HEAD",
+  "source_sha256_claimed_by_producer": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "source_provenance_independent": "UNVERIFIED: exact canonical source DDS was not found in the reachable current Git file history. Matched source visual via producer-saved SOURCE_RAW_FULL_RGBA.png with pinned PNG SHA; no current-policy source approval.",
+  "source_png": {
+    "path": "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/SOURCE_RAW_FULL_RGBA.png",
+    "sha256": "6e022ca65d9a9312bbdaa03dae481bd248a5855b3a35a4bd67b9864ad1257ab4"
+  },
+  "clean_png": {
+    "path": "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/CLEAN_RAW_FULL_RGBA.png",
+    "sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e"
+  },
+  "machine": {
+    "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/C337_Q098_INDEPENDENT_MACHINE.json",
+    "sha256": "52f65f8b331befadd5e440d70ef7a0b8d05f701d02c2dc4c4dc0076d052871ee"
+  },
+  "visual_first_look": "Controller directly reviewed the newly generated three-row SOURCE/CLEAN/FINAL contacts at native and 50% plus original B330 100/50 and RAW gray. Independently decoded final pixels were used; producer verdict prose had been seen before this review, so no false blind first-look PASS.",
+  "new_visual_hard_failure": {
+    "source": "The English Challenge the course record. uses conspicuously forward/right-italic, relatively slim white faces with shaped navy outline and shadow.",
+    "persisted_final": "The Korean 코스 기록에 도전하세요. is visibly much more upright, blocky and stroke-heavy than that original family at native and half-size. Despite readable spelling, slant and visual weight do not reproduce the source-facing italic font/style hierarchy.",
+    "rationale": "Visual font/slant/style mismatch is a hard FAIL independently of 0 candidate-alpha-outside. This was not an in-game test and does not diagnose gameplay layout.",
+    "reason_codes": [
+      "SOURCE_FAMILY_ITALIC_WEIGHT_MISMATCH",
+      "SOURCE_ITALIC_LEAN_UNDERMATCH",
+      "SOURCE_WEIGHT_COUNTER_SPACE_DRIFT"
+    ],
+    "views": [
+      {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_1.00_65.png",
+        "sha256": "26f6cf8839e3b18d7f4d3d018c4354e9d6442a8bb37c282c4e685624622d54fd"
+      },
+      {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_0.50_65.png",
+        "sha256": "83b8c036eba9244f55b19319a9edb759bf4c070398874f988ccd59bfd54cc3cd"
+      },
+      {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_raw_1.00_65.png",
+        "sha256": "db022db38e04a8a9cfe219df6c50396834cd3e8cd37f0e9a34096520c7c4fc46"
+      }
+    ]
+  },
+  "independent_mechanical_facts": {
+    "persisted_dds_size": [
+      2048,
+      128
+    ],
+    "format": "BC3/DXT5",
+    "mip_count": 1,
+    "saved_candidate_vs_producer_native_png_rgba_delta": [
+      0,
+      0
+    ],
+    "saved_candidate_flipy_vs_producer_readable_rgba_delta": [
+      0,
+      0
+    ],
+    "source_png_declared_bbox_raw": [
+      431,
+      6,
+      1674,
+      123
+    ],
+    "source_png_measured_nonzero_alpha_bbox_raw": [
+      431,
+      5,
+      1674,
+      122
+    ],
+    "candidate_measured_nonzero_alpha_bbox_raw": [
+      513,
+      13,
+      1524,
+      115
+    ],
+    "candidate_alpha_nonzero_outside_declared_bbox": 0,
+    "source_final_outside_declared_bbox_rgba": 14,
+    "source_final_outside_declared_bbox_alpha": 14,
+    "bbox_14_source_alpha_pixels": "Source producer PNG has 14 alpha-bearing pixels at y=5 just outside producer bbox top=6, absent from candidate. This invalidates using that bbox as exact complete English-effect region without remeasuring source; does not alone prove protected-art damage.",
+    "source_clean_outside_declared_bbox_rgba": 115502,
+    "source_clean_outside_declared_bbox_alpha": 14,
+    "transparent_rgb_caveat": "Most source->CLEAN RGB differences beyond declared bbox are alpha-zero storage and are not treated as visible plate defects. Exact canonical source/segment mask still missing."
+  },
+  "eight_axis_observations": {
+    "slant": {
+      "result": "FAIL",
+      "observation": "English visually strong right italic vs Korean materially more upright/blocky; anchors not inventively assigned",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_1.00_65.png",
+        "sha256": "26f6cf8839e3b18d7f4d3d018c4354e9d6442a8bb37c282c4e685624622d54fd"
+      }
+    },
+    "clean_plate": {
+      "result": "HOLD",
+      "observation": "Saved CLEAN composite appears visibly blank without glyphs on gray, but exact canonical DDS and full effect mask remain unauthenticated; no PASS inferred",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_1.00_65.png",
+        "sha256": "26f6cf8839e3b18d7f4d3d018c4354e9d6442a8bb37c282c4e685624622d54fd"
+      }
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Face weight, slope, family contour and source italic hierarchy diverge visibly at native and practical 50%",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_0.50_65.png",
+        "sha256": "83b8c036eba9244f55b19319a9edb759bf4c070398874f988ccd59bfd54cc3cd"
+      }
+    },
+    "readability": {
+      "result": "PASS_SCOPED",
+      "observation": "Korean wording is readable at native and practical 50%, which does not override style FAIL",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_0.50_65.png",
+        "sha256": "83b8c036eba9244f55b19319a9edb759bf4c070398874f988ccd59bfd54cc3cd"
+      }
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "No obvious tofu/large clipped strokes in the viewed decoded level-0 contact, but native per-stroke/compression proof and full calibrated review incomplete",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_1.00_255.png",
+        "sha256": "3c18739093d0c711af8669bbc11a2e00b1839d7578803e09b4156f248e5598b6"
+      }
+    },
+    "protected_art": {
+      "result": "HOLD",
+      "observation": "Candidate alpha entirely inside producer reported bbox; the source PNG itself has 14 antialiased pixels beyond that declared top edge; original source/mask exactness unresolved",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_saved_dds_raw_RGBA.png",
+        "sha256": "70fb6d080021f6a02eaaaac4fbcc64e24ed60463e13e375127ca67b0323d66c6"
+      }
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "Visible line is inside texture and isolated in saved preview but source style/anchor matching fails and no game-composited alignment exists",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_flip_y_1.00_0.png",
+        "sha256": "4d82c5208d1a33ce91272d89f1489ed43dcb31758d13f8c3bedcdd3f77b7b4ca"
+      }
+    },
+    "orientation": {
+      "result": "PASS_SCOPED",
+      "observation": "Full persisted decoded RAW and FLIP-Y match producer saved full PNG views byte-for-byte, 0 RGBA differences; game UV untested",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C337-C2-Q098-PERSISTED-PLATE-AUDIT/q098_raw_1.00_65.png",
+        "sha256": "db022db38e04a8a9cfe219df6c50396834cd3e8cd37f0e9a34096520c7c4fc46"
+      }
+    }
+  },
+  "calibration": "NOT_QUALIFIED_FOR_PASS: known-good normal/known-defect blind full set not newly completed; current inspection is fail-closed",
+  "stage_C": "VISUAL_FAIL_REWORK_REQUIRED",
+  "stage_C3": "NOT_RUN_BLOCKED_BY_C_FAIL",
+  "approval": false,
+  "export": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "next_producer_action": "B owns even-index production repair. Reconstruct the native Korean glyph family from verified canonical English source with matching right-forward italic/outline/weight/counters. Regenerate exact source and clean-plate provenance incl 14 top-edge alpha pixels and protected masks; preserve BC3 header, mips, no 1px protected overflow. Producer P1/P2/P3 -> new candidate SHA -> fresh pixels-first C2 -> distinct C3 -> user JPG -> actual-game retest. Do not re-use rejected SHA as a new completion.",
+  "new_dds": 0,
+  "new_lossless_png": 7,
+  "user_acceptance": false,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

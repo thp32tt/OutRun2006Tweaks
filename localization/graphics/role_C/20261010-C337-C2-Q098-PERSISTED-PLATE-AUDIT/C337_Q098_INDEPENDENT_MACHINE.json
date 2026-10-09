@@ -1,0 +1,88 @@
+{
+  "review_id": "C337",
+  "index": 98,
+  "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+  "persisted_bytes": 262272,
+  "native_size": [
+    2048,
+    128
+  ],
+  "source_png_sha256": "6e022ca65d9a9312bbdaa03dae481bd248a5855b3a35a4bd67b9864ad1257ab4",
+  "clean_png_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+  "source_dds_sha256": "NOT_INDEPENDENTLY_RECOVERED",
+  "candidate_vs_saved_producer_png_diff": [
+    0,
+    0
+  ],
+  "candidate_readable_vs_saved_png_diff": [
+    0,
+    0
+  ],
+  "source_clean_outside_bbox": {
+    "rgba_pixels": 115502,
+    "alpha_pixels": 14,
+    "in_bbox_rgba_pixels": 94134,
+    "in_bbox_alpha_pixels": 92864
+  },
+  "clean_final_outside_bbox": {
+    "rgba_pixels": 115502,
+    "alpha_pixels": 0,
+    "in_bbox_rgba_pixels": 130974,
+    "in_bbox_alpha_pixels": 83972
+  },
+  "source_final_outside_bbox": {
+    "rgba_pixels": 14,
+    "alpha_pixels": 14,
+    "in_bbox_rgba_pixels": 122398,
+    "in_bbox_alpha_pixels": 85055
+  },
+  "source_alpha_bbox_full": [
+    431,
+    5,
+    1674,
+    122
+  ],
+  "candidate_alpha_bbox_full": [
+    513,
+    13,
+    1524,
+    115
+  ],
+  "decoded_raw_flipy_nonidentical_pixels": [
+    96766,
+    63490
+  ],
+  "candidate_alpha_nonzero_outside_original_bbox": 0,
+  "candidate_opaque_alpha_outside_original_bbox": 0,
+  "decoded_source_components_not_authenticated": true,
+  "generated_evidence": {
+    "q098_flip_y_1.00_255.png": {
+      "sha256": "3c18739093d0c711af8669bbc11a2e00b1839d7578803e09b4156f248e5598b6",
+      "bytes": 109845
+    },
+    "q098_raw_1.00_65.png": {
+      "sha256": "db022db38e04a8a9cfe219df6c50396834cd3e8cd37f0e9a34096520c7c4fc46",
+      "bytes": 96560
+    },
+    "q098_flip_y_1.00_65.png": {
+      "sha256": "26f6cf8839e3b18d7f4d3d018c4354e9d6442a8bb37c282c4e685624622d54fd",
+      "bytes": 91883
+    },
+    "q098_flip_y_0.50_65.png": {
+      "sha256": "83b8c036eba9244f55b19319a9edb759bf4c070398874f988ccd59bfd54cc3cd",
+      "bytes": 74694
+    },
+    "q098_saved_dds_readable_RGBA.png": {
+      "sha256": "ea59d5f34bb4276b888da75e23b93eb6391db4ffe8009387dfdf3c34e88fad62",
+      "bytes": 26080
+    },
+    "q098_flip_y_1.00_0.png": {
+      "sha256": "4d82c5208d1a33ce91272d89f1489ed43dcb31758d13f8c3bedcdd3f77b7b4ca",
+      "bytes": 84927
+    },
+    "q098_saved_dds_raw_RGBA.png": {
+      "sha256": "70fb6d080021f6a02eaaaac4fbcc64e24ed60463e13e375127ca67b0323d66c6",
+      "bytes": 27882
+    }
+  }
+}
