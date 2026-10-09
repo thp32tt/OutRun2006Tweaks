@@ -11467,6 +11467,41 @@ VSOutput main(VSInput input)
             "R165 rejects deferred context staging copy");
         r165DeferredContext->Release();
 
+        // R166 WARP-only provenance regression: BGRA staging must not
+        // accept a former color surface after live OM detach or substitution.
+        // Restore the R145 target pair without activating gameplay Draw.
+        ID3D11Texture2D* r166Rejected = nullptr;
+        d3d.context->OMSetRenderTargets(0u, nullptr, nullptr);
+        require(
+            !outputColorSurface.copy_color_to_staging(
+                d3d.context, &r166Rejected) && r166Rejected == nullptr,
+            "R166 rejects post-indexed OM color target detach");
+        outrun::vr::dx11::NativeSurfaceMirror r166SubstituteColor;
+        require(
+            r166SubstituteColor.initialize(
+                d3d.device, ResourceRole::Color, 64u, 32u,
+                D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DUSAGE_RENDERTARGET,
+                D3DMULTISAMPLE_NONE, 0u),
+            "R166 same-device matching-descriptor substitute prerequisite");
+        ID3D11RenderTargetView* r166SubstituteRtv =
+            r166SubstituteColor.render_target_view();
+        d3d.context->OMSetRenderTargets(
+            1u, &r166SubstituteRtv,
+            outputDepthSurface.depth_stencil_view());
+        require(
+            !outputColorSurface.copy_color_to_staging(
+                d3d.context, &r166Rejected) && r166Rejected == nullptr,
+            "R166 rejects same-device foreign RTV despite identical descriptor");
+        require(
+            surfaceTargetBinding.apply(
+                d3d.context, outputColorSurface, outputDepthSurface) &&
+            r157Probe(d3d.context, r164Color, indexedDirectDispatch),
+            "R166 restores exact OM RTV/DSV for valid post-draw readback");
+        require(
+            !r166SubstituteColor.copy_color_to_staging(
+                d3d.context, &r166Rejected) && r166Rejected == nullptr,
+            "R166 rejects unbound substitute mirror readback");
+
         ID3D11Texture2D* r165Readback = nullptr;
         require(
             outputColorSurface.copy_color_to_staging(

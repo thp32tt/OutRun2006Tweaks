@@ -42,6 +42,8 @@ namespace outrun::vr::dx11
 
         // R165 diagnostic-only: copy the current non-MSAA color mirror to a
         // CPU-readable staging texture on its own immediate D3D11 context.
+        // R166 requires this exact color view to remain bound in OM slot 0;
+        // a copied stale/off-target surface is not evidence of a live draw.
         // Never exposes a game Draw path or changes the active OM binding.
         [[nodiscard]] bool copy_color_to_staging(
             ID3D11DeviceContext* context,

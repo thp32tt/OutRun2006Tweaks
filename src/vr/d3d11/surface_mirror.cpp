@@ -224,6 +224,15 @@ namespace outrun::vr::dx11
         if (!contextDevice || contextDevice.Get() != device_.Get())
             return false;
 
+        // R166: same-device and immediate-context ownership alone does not
+        // prove that the surface copied was the live OM color target. Fail
+        // closed on post-draw detach/substitution instead of returning a
+        // plausible but stale BGRA readback from another render target.
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> observedRtv;
+        context->OMGetRenderTargets(1u, observedRtv.GetAddressOf(), nullptr);
+        if (observedRtv.Get() != rtv_.Get())
+            return false;
+
         D3D11_TEXTURE2D_DESC sourceDesc{};
         texture_->GetDesc(&sourceDesc);
         if (sourceDesc.MipLevels != 1 || sourceDesc.ArraySize != 1 ||
