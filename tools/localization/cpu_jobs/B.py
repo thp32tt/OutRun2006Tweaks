@@ -82,7 +82,7 @@ for font_size in range(119,85,-1):
     ib=im.getbbox()
     if not ib:continue
     glyph=im.crop(ib)
-    if not (82<=glyph.height<=94):continue
+    if not (82<=glyph.height<=89):continue
     width=min(690,max(610,round(glyph.width*1.05)))
     resized=glyph.resize((width,glyph.height),Image.Resampling.LANCZOS)
     # Opposite-script slant is forbidden: readable top is moved right.
