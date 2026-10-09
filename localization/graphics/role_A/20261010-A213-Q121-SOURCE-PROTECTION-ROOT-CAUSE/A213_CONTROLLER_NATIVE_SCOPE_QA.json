@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "run": "A212+A213",
+  "run_key": "OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
+  "owner_lane": "A",
+  "role": "A",
+  "priority": "P0",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "current_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "canonical_english_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "A176_clean_png_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+  "no_new_production_dds": true,
+  "no_new_trial_dds": true,
+  "candidate_changed": false,
+  "new_producer_QA_evidence": true,
+  "prior_independent_review": "C335 HOLD_STRICT_RECHECK",
+  "machine_native": {
+    "canonical_source_and_candidate": "SHA256_MATCH_READABLE_RGBA4096x4096_1MIP",
+    "source_alpha_in_three_title_clean_bboxes": [
+      0,
+      0,
+      0
+    ],
+    "candidate_positive_title_bbox_margins": [
+      [
+        125,
+        126,
+        6,
+        25
+      ],
+      [
+        44,
+        45,
+        17,
+        39
+      ],
+      [
+        160,
+        161,
+        26,
+        11
+      ]
+    ],
+    "clean_to_final_change_outside_three_source_titles": 0,
+    "clean_to_final_alpha_change_outside_three_source_titles": 0,
+    "source_to_clean_changed_outside_three_title_bboxes": 1934984,
+    "source_to_final_changed_outside_three_title_bboxes": 1934984,
+    "source_to_clean_alpha_changed_outside_three_title_bboxes": 1638112,
+    "source_to_final_alpha_disappeared_outside_three_title_bboxes": 982705,
+    "source_to_final_alpha_appeared_outside_three_title_bboxes": 0
+  },
+  "reviewed_images": [
+    "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_ATLAS_SOURCE_CLEAN_FINAL_GRAY_25PCT.jpg",
+    "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_ATLAS_SOURCE_CLEAN_FINAL_BLACK_25PCT.jpg",
+    "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_OUTSIDE_THREE_SOURCE_TEXT_BBOXES_DIFFMASK_25PCT.png",
+    "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_CANONICAL_ALPHA_LOST_DIFFMASK_25PCT.png",
+    "localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF/A212_select_car_GRAY_100.jpg",
+    "localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF/A212_select_game_mode_BLACK_50.jpg"
+  ],
+  "visual_findings": {
+    "q121_source_vs_clean_atlas": "ORIGINAL has many English UI texts OUTSIDE the three title boxes; A176 CLEAN and current A202 have Korean equivalents at those areas. Therefore whole-atlas English-vs-Korean difference outside ONLY three title bboxes is expected in multi-segment localized atlas.",
+    "alpha_loss_interpretation": "An English glyph removed/replaced by Korean will lose source alpha at old glyph pixels and gain final alpha at new glyph pixels; counting every removed-alpha pixel as lost protected art without full edited-text mask is invalid.",
+    "all_original_art_preserved": "NOT CERTIFIED at 25% contact or by the three-title-only geometry; full per-cell edit masks and source-protected artwork mask required.",
+    "protected_visible_neighbors": "Orange selector frame, route-choice miniatures, metallic top banners, music-title blue labels, car icons and equalizer sprites remain visually present in compared 25% panels; no per-pixel all-source protective certification.",
+    "bad_box_interpretation": "Several black silhouette panels are visible IN THE ENGLISH SOURCE as well as CLEAN/FINAL; do not infer they're new rectangular composite defects from marked game screenshots.",
+    "car_title_native": "Source and A202 car title are visible and readable; no approval of full game layout or source slant correspondence until blinded C1 native matched strokes."
+  },
+  "correct_scope": "Before asserting pixel 0 outside authorized edits, union ALL legitimate pre-existing translated text cells, independently distinguish protected source artwork and text removed/added in each. Preserve all unchanged graphics and songs. The A212 check of only three titles is deliberately narrower than the existing full-atlas translation footprint and mechanically FAILS for expected language replacements.",
+  "remaining_C335_holds": [
+    "BLINDED_INDEPENDENT_EXACT_SAVED_DDS_QA_NOT_YET_REPRODUCED_BY_C1",
+    "TRUE_SOURCE_TO_KOREAN_MATCHED_STROKE_SLANT_CALIBRATION_MISSING",
+    "ALL_ORIGINAL_PROTECTED_ART_AND_OTHER_ATLAS_CELL_MASK_CERTIFICATION_MISSING",
+    "MULTI_SCREEN_REAL_GAME_CONSUMER_PROOF_MISSING"
+  ],
+  "decision": "PRODUCER_SCOPED_NATIVE_EVIDENCE_READY_C1_HOLD_NOT_CLOSED",
+  "independent_C1": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN",
+  "approval": "NOT_ISSUED",
+  "ingame": "IGR030_031_040_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "worker_outputs": [
+    "A212 native source/clean/exact persisted DDS pixel/alpha proof under 20261010-A212",
+    "A213 full atlas diff components and readable source/clean/final contact under 20261010-A213"
+  ],
+  "source_provenance": "Sonic-TV/OR2006Sprites 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 raw DDS, SHA verified in GitHub runner",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
