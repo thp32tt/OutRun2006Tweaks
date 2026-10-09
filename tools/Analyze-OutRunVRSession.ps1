@@ -106,6 +106,48 @@ if($perfSpikeCount -gt 0){
     $perfSpikeRows|Export-Csv (Join-Path $SessionDir 'PERFORMANCE_SPIKES.csv') -NoTypeInformation -Encoding UTF8
 }
 
+# R32 spike samples are optional and do not cover all D3D9Ex lower-Present
+# stalls. The 2026-10-09 HMD log reported 28.557 ms lower-Present yet emitted
+# zero R32 FRAME SPIKE rows. Compare R28's observed per-window max against
+# the headset's reported refresh budget; do not mistake zero R32 samples for
+# zero real render stalls.
+$presentLatencyRows=@()
+$xrBudgetMs=16.6667
+$reportedXrHz=0.0
+$reportedHzMatch=Get-LastRegexMatch $hostLog 'actualXrHz=([0-9]+(?:\.[0-9]+)?)'
+if($reportedHzMatch){
+    [double]::TryParse($reportedHzMatch.Groups[1].Value,
+        [Globalization.NumberStyles]::Float,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [ref]$reportedXrHz)|Out-Null
+}
+if($reportedXrHz -ge 60.0 -and $reportedXrHz -le 144.0){
+    $xrBudgetMs=1000.0/$reportedXrHz
+}
+foreach($present in [regex]::Matches($gameLog,
+    'VR R28 PERF: lower-Present avgMs=([0-9.]+) maxMs=([0-9.]+) drawsPerPresent=([0-9.]+)')){
+    $maxMs=0.0
+    if([double]::TryParse($present.Groups[2].Value,
+        [Globalization.NumberStyles]::Float,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [ref]$maxMs) -and $maxMs -gt 0){
+        $presentLatencyRows+= $maxMs
+    }
+}
+$presentLatencyMaxMs=0.0
+$presentOverBudgetWindows=0
+if($presentLatencyRows.Count -gt 0){
+    $presentLatencyMaxMs=($presentLatencyRows|Measure-Object -Maximum).Maximum
+    $presentOverBudgetWindows=@($presentLatencyRows|Where-Object{$_ -gt $xrBudgetMs}).Count
+}
+$gameDefaultWidth=0
+$gameDefaultHeight=0
+$resolutionMatch=Get-LastRegexMatch $gameLog 'GameDefaultConfigOverride: default resolution set to (\d+)x(\d+)'
+if($resolutionMatch){
+    $gameDefaultWidth=[int]$resolutionMatch.Groups[1].Value
+    $gameDefaultHeight=[int]$resolutionMatch.Groups[2].Value
+}
+
 # The original rank CALLs can run without any actual R57 projected draw.
 # A no-red-flag verdict is false in that case; report the missing ownership.
 $rankTrace=Read-AllText 'HUD_TRACE_SUMMARY.txt'
@@ -126,6 +168,7 @@ if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTI
 if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
 if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
 if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
+if($presentOverBudgetWindows -gt 0){$flags+='D3D9EX_PRESENT_LATENCY_OVER_XR_BUDGET'}
 if($rankProjectionNotReached){$flags+='HUD_RANK_PROJECTED_PATH_ZERO'}
 if($gameDllMismatch){$flags+='GAME_DLL_SHA256_MISMATCH'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
@@ -141,6 +184,7 @@ elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
 elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
 elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
+elseif($presentOverBudgetWindows -gt 0){$status='PERFORMANCE_WARNING'}
 
 $result=[ordered]@{
     SchemaVersion=1
@@ -162,6 +206,12 @@ $result=[ordered]@{
     DriverSeatCameraActivationCount=$driverSeatCount
     ApproxAverageXrFrameMs=$avgFrameMs
     ApproxAverageXrHz=$approxHz
+    GameDefaultWidth=$gameDefaultWidth
+    GameDefaultHeight=$gameDefaultHeight
+    XrRefreshBudgetMs=$xrBudgetMs
+    R28PresentSampleWindows=$presentLatencyRows.Count
+    R28PresentOverBudgetWindows=$presentOverBudgetWindows
+    R28PresentMaxMs=$presentLatencyMaxMs
     PerfSpikeCount=$perfSpikeCount
     PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
     PerfSpikeMaxDraws=$perfSpikeMaxDraws
@@ -193,6 +243,11 @@ $lines=@(
     "driverSeatCameraActivationCount=$driverSeatCount"
     ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
+    "gameDefaultResolution=${gameDefaultWidth}x${gameDefaultHeight}"
+    ("xrRefreshBudgetMs="+('{0:F3}' -f $xrBudgetMs))
+    "r28PresentSampleWindows=$($presentLatencyRows.Count)"
+    "r28PresentOverBudgetWindows=$presentOverBudgetWindows"
+    ("r28PresentMaxMs="+('{0:F3}' -f $presentLatencyMaxMs))
     "perfSpikeCount=$perfSpikeCount"
     "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
     "perfSpikeMaxDraws=$perfSpikeMaxDraws"
