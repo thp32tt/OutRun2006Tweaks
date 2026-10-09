@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A206 q193 P1 IGR003/019/033 REAL new material DDS d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa old 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 original English d308bf0558...; 3 rank-help source English ghost/overlaid Korean cleaned to transparent and rerendered native/source bold. All original alpha footprints 3/3 source margins2+, old/clean/final alpha outside0, clean/final changed outside Hangul0, RAW/FLIPY and BGW 100/75/50 producer scoped PASS. Previous A205 three titles unchanged, cumulative 6/13 atlas labels rewritten; Goal A-E/15 Cont./ONLINE remain inherited visually broken => whole asset REWORK_REQUIRED, C1/C3/new user in-game OPEN; consumer build/cache/selection NOT_TESTED; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL/A206_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "C332 2026-10-09 20:50 KST OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050 TEMP_BACKLOG_RELIEF=C2 EVEN q060 B331 exact saved SHA 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 4096x2048 native decoded; saved ROI exact B331 trial RGBA (0 mismatches). New C2 confirmed original orange BEST... adjacent protected source art in gold bbox: 8892 source orange pixels, 0 saved and CLEAN, 6917 original pixels become transparent in new candidate. Producer zero outside-gold bbox misses this protected sibling overlapping edited rectangle. REWORK_REQUIRED PROTECTED_ART_LOSS/INCOMPLETE_CLEAN_PLATE; B must restore original orange neighbor and remake gold masked candidate, then fresh C2/C3 + user actual game IGR044. No DDS produced, six QA PNG recorded localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_CONTROLLER_C2_REWORK.json RUNTIME_VALIDATION=UNTESTED.",
     "B331 q060 source-lean new native DDS 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 fresh C2 source-family exact-sha then C3 + NEW user IGR044 in-game screen 203; RUNTIME_VALIDATION=UNTESTED.",
     "C331 C2 EVEN q098 current B330 exact saved DDS SHA256 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51 independent visible-alpha/RAW-FLIP pixel check: English Cl/ord. apparent in uncomposited PNG RGB are alpha0; 0 left/right visible English pixels, saved DDS vs FLIP PNG pixel-identical. SCOPED PASS, full C HOLD_STRICT_RECHECK source/CLEAN/blind family/C3 and NEW actual-game. Evidence localization/graphics/role_C/20261009-C331-C2-Q098-B330-INDEPENDENT-VISIBLE-ALPHA/C331_Q098_INDEPENDENT_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020 RUNTIME_VALIDATION=UNTESTED",
@@ -13519,5 +13520,19 @@
     "source_orange": 8892,
     "saved_orange": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a206_q193": {
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "previous_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+    "new_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+    "material_dds": 1,
+    "new_rows": 3,
+    "materially_reworked_so_far": 6,
+    "unchanged_legacy_rows": 7,
+    "producer": "PASS_SCOPED_3",
+    "full_asset": "REWORK_REQUIRED",
+    "game": "OPEN_NOT_TESTED",
+    "runtime_validation": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL/A206_CONTROLLER_PRODUCER_SCOPED_QA.json"
   }
 }

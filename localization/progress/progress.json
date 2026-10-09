@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 20:56 KST",
+  "updated_at_kst": "2026-10-09 21:13 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9342,5 +9342,21 @@
     "new_DDS": 0,
     "new_proof_png": 6,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a206_q193": {
+    "new_material_dds": 1,
+    "new_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+    "previous_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+    "source_rows_rebuilt_this_run": 3,
+    "source_rows_rebuilt_cumulative": 6,
+    "outstanding_source_rows": 7,
+    "producer_scoped": "PASS",
+    "whole_atlas": "REWORK_REQUIRED",
+    "C1": "PENDING",
+    "C3": "BLOCKED",
+    "user_game": "OPEN",
+    "consumer_chain": "SOURCE_THROUGH_PERSISTED_BYTES_PROVEN_BUILD_AND_ACTUAL_LOAD_UNTESTED",
+    "runtime_validation": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL/A206_CONTROLLER_PRODUCER_SCOPED_QA.json"
   }
 }
