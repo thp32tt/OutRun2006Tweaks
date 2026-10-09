@@ -1,0 +1,966 @@
+{
+  "run": "A215",
+  "run_key": "OUTRUN-KOR-A215-Q121-30-REGION-SOURCE-CLEAN-PERSISTED-20261010-0300",
+  "role": "A",
+  "priority": "P0",
+  "queue_index": 121,
+  "ingame_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "clean_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "native": "4096x4096 RGBA32 mip1; persisted FLIP-Y and RAW",
+  "A213_components_total": 179,
+  "ranked_components_lossless_new": 30,
+  "new_promoted_dds": 0,
+  "new_trial_dds": 0,
+  "candidate_changed": false,
+  "all_atlas_source_clean_RGBA_changed_pixels": 2134661,
+  "all_atlas_source_final_RGBA_changed_pixels": 2179361,
+  "all_atlas_clean_final_RGBA_changed_pixels": 133085,
+  "all_atlas_source_clean_alpha_changed_pixels": 1778208,
+  "regions": [
+    {
+      "rank": 1,
+      "bbox_readable": [
+        63,
+        1199,
+        2113,
+        1484
+      ],
+      "expanded_crop_readable": [
+        51,
+        1187,
+        2125,
+        1496
+      ],
+      "A213_component_changed_pixels": 373094,
+      "source_clean_RGBA_changes_in_bbox": 384246,
+      "source_final_RGBA_changes_in_bbox": 384244,
+      "clean_final_RGBA_changes_in_bbox": 134,
+      "source_clean_alpha_changes_in_bbox": 316865,
+      "source_alpha_disappeared_in_bbox": 186001,
+      "source_alpha_appeared_in_bbox": 118428,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_01_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_01_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 2,
+      "bbox_readable": [
+        3008,
+        1304,
+        4034,
+        1995
+      ],
+      "expanded_crop_readable": [
+        2996,
+        1292,
+        4046,
+        2007
+      ],
+      "A213_component_changed_pixels": 325307,
+      "source_clean_RGBA_changes_in_bbox": 348372,
+      "source_final_RGBA_changes_in_bbox": 348372,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 296732,
+      "source_alpha_disappeared_in_bbox": 127443,
+      "source_alpha_appeared_in_bbox": 134851,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_02_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_02_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 3,
+      "bbox_readable": [
+        1563,
+        755,
+        2589,
+        1092
+      ],
+      "expanded_crop_readable": [
+        1551,
+        743,
+        2601,
+        1104
+      ],
+      "A213_component_changed_pixels": 205063,
+      "source_clean_RGBA_changes_in_bbox": 214981,
+      "source_final_RGBA_changes_in_bbox": 214981,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 186685,
+      "source_alpha_disappeared_in_bbox": 117172,
+      "source_alpha_appeared_in_bbox": 55077,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_03_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_03_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 4,
+      "bbox_readable": [
+        1907,
+        602,
+        3338,
+        752
+      ],
+      "expanded_crop_readable": [
+        1895,
+        590,
+        3350,
+        764
+      ],
+      "A213_component_changed_pixels": 147453,
+      "source_clean_RGBA_changes_in_bbox": 161462,
+      "source_final_RGBA_changes_in_bbox": 161462,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 151888,
+      "source_alpha_disappeared_in_bbox": 132953,
+      "source_alpha_appeared_in_bbox": 13643,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_04_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_04_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 5,
+      "bbox_readable": [
+        1764,
+        2360,
+        2720,
+        2573
+      ],
+      "expanded_crop_readable": [
+        1752,
+        2348,
+        2732,
+        2585
+      ],
+      "A213_component_changed_pixels": 127763,
+      "source_clean_RGBA_changes_in_bbox": 127815,
+      "source_final_RGBA_changes_in_bbox": 127815,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 102366,
+      "source_alpha_disappeared_in_bbox": 64716,
+      "source_alpha_appeared_in_bbox": 27474,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_05_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_05_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 6,
+      "bbox_readable": [
+        0,
+        499,
+        1370,
+        632
+      ],
+      "expanded_crop_readable": [
+        0,
+        487,
+        1382,
+        644
+      ],
+      "A213_component_changed_pixels": 113151,
+      "source_clean_RGBA_changes_in_bbox": 113734,
+      "source_final_RGBA_changes_in_bbox": 113734,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 97348,
+      "source_alpha_disappeared_in_bbox": 68268,
+      "source_alpha_appeared_in_bbox": 25631,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_06_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_06_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 7,
+      "bbox_readable": [
+        2226,
+        1263,
+        2946,
+        1486
+      ],
+      "expanded_crop_readable": [
+        2214,
+        1251,
+        2958,
+        1498
+      ],
+      "A213_component_changed_pixels": 88034,
+      "source_clean_RGBA_changes_in_bbox": 96676,
+      "source_final_RGBA_changes_in_bbox": 96676,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 77625,
+      "source_alpha_disappeared_in_bbox": 47388,
+      "source_alpha_appeared_in_bbox": 26750,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_07_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_07_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 8,
+      "bbox_readable": [
+        415,
+        631,
+        1371,
+        730
+      ],
+      "expanded_crop_readable": [
+        403,
+        619,
+        1383,
+        742
+      ],
+      "A213_component_changed_pixels": 72000,
+      "source_clean_RGBA_changes_in_bbox": 72174,
+      "source_final_RGBA_changes_in_bbox": 72174,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 55325,
+      "source_alpha_disappeared_in_bbox": 25133,
+      "source_alpha_appeared_in_bbox": 27104,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_08_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_08_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 9,
+      "bbox_readable": [
+        1680,
+        1097,
+        2611,
+        1213
+      ],
+      "expanded_crop_readable": [
+        1668,
+        1085,
+        2623,
+        1225
+      ],
+      "A213_component_changed_pixels": 69373,
+      "source_clean_RGBA_changes_in_bbox": 69506,
+      "source_final_RGBA_changes_in_bbox": 69506,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 62723,
+      "source_alpha_disappeared_in_bbox": 35775,
+      "source_alpha_appeared_in_bbox": 21940,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_09_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_09_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 10,
+      "bbox_readable": [
+        2816,
+        1183,
+        3394,
+        1367
+      ],
+      "expanded_crop_readable": [
+        2804,
+        1171,
+        3406,
+        1379
+      ],
+      "A213_component_changed_pixels": 69138,
+      "source_clean_RGBA_changes_in_bbox": 69242,
+      "source_final_RGBA_changes_in_bbox": 69242,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 61666,
+      "source_alpha_disappeared_in_bbox": 20149,
+      "source_alpha_appeared_in_bbox": 37046,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_10_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_10_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 11,
+      "bbox_readable": [
+        2613,
+        755,
+        3285,
+        864
+      ],
+      "expanded_crop_readable": [
+        2601,
+        743,
+        3297,
+        876
+      ],
+      "A213_component_changed_pixels": 58101,
+      "source_clean_RGBA_changes_in_bbox": 58101,
+      "source_final_RGBA_changes_in_bbox": 58101,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 48305,
+      "source_alpha_disappeared_in_bbox": 44501,
+      "source_alpha_appeared_in_bbox": 1116,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_11_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_11_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 12,
+      "bbox_readable": [
+        3525,
+        517,
+        3893,
+        730
+      ],
+      "expanded_crop_readable": [
+        3513,
+        505,
+        3905,
+        742
+      ],
+      "A213_component_changed_pixels": 37505,
+      "source_clean_RGBA_changes_in_bbox": 48671,
+      "source_final_RGBA_changes_in_bbox": 48671,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 46860,
+      "source_alpha_disappeared_in_bbox": 19338,
+      "source_alpha_appeared_in_bbox": 25783,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_12_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_12_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": true
+    },
+    {
+      "rank": 13,
+      "bbox_readable": [
+        1151,
+        374,
+        1678,
+        449
+      ],
+      "expanded_crop_readable": [
+        1139,
+        362,
+        1690,
+        461
+      ],
+      "A213_component_changed_pixels": 35485,
+      "source_clean_RGBA_changes_in_bbox": 35485,
+      "source_final_RGBA_changes_in_bbox": 35485,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 23328,
+      "source_alpha_disappeared_in_bbox": 15811,
+      "source_alpha_appeared_in_bbox": 1355,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_13_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_13_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 14,
+      "bbox_readable": [
+        1776,
+        374,
+        2232,
+        449
+      ],
+      "expanded_crop_readable": [
+        1764,
+        362,
+        2244,
+        461
+      ],
+      "A213_component_changed_pixels": 30590,
+      "source_clean_RGBA_changes_in_bbox": 30590,
+      "source_final_RGBA_changes_in_bbox": 30590,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 20389,
+      "source_alpha_disappeared_in_bbox": 13502,
+      "source_alpha_appeared_in_bbox": 1243,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_14_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_14_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 15,
+      "bbox_readable": [
+        1365,
+        614,
+        1773,
+        736
+      ],
+      "expanded_crop_readable": [
+        1353,
+        602,
+        1785,
+        748
+      ],
+      "A213_component_changed_pixels": 28279,
+      "source_clean_RGBA_changes_in_bbox": 32635,
+      "source_final_RGBA_changes_in_bbox": 32635,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 26986,
+      "source_alpha_disappeared_in_bbox": 15774,
+      "source_alpha_appeared_in_bbox": 9839,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_15_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_15_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 16,
+      "bbox_readable": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "expanded_crop_readable": [
+        2760,
+        364,
+        3199,
+        460
+      ],
+      "A213_component_changed_pixels": 28198,
+      "source_clean_RGBA_changes_in_bbox": 28198,
+      "source_final_RGBA_changes_in_bbox": 28198,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 20254,
+      "source_alpha_disappeared_in_bbox": 18965,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_16_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_16_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 17,
+      "bbox_readable": [
+        98,
+        631,
+        419,
+        730
+      ],
+      "expanded_crop_readable": [
+        86,
+        619,
+        431,
+        742
+      ],
+      "A213_component_changed_pixels": 21710,
+      "source_clean_RGBA_changes_in_bbox": 21862,
+      "source_final_RGBA_changes_in_bbox": 21862,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 18220,
+      "source_alpha_disappeared_in_bbox": 10294,
+      "source_alpha_appeared_in_bbox": 7092,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_17_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_17_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 18,
+      "bbox_readable": [
+        1326,
+        748,
+        1611,
+        843
+      ],
+      "expanded_crop_readable": [
+        1314,
+        736,
+        1623,
+        855
+      ],
+      "A213_component_changed_pixels": 15834,
+      "source_clean_RGBA_changes_in_bbox": 16284,
+      "source_final_RGBA_changes_in_bbox": 16284,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 15042,
+      "source_alpha_disappeared_in_bbox": 7081,
+      "source_alpha_appeared_in_bbox": 6407,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_18_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_18_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 19,
+      "bbox_readable": [
+        3196,
+        663,
+        3379,
+        744
+      ],
+      "expanded_crop_readable": [
+        3184,
+        651,
+        3391,
+        756
+      ],
+      "A213_component_changed_pixels": 9415,
+      "source_clean_RGBA_changes_in_bbox": 9415,
+      "source_final_RGBA_changes_in_bbox": 9415,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 9415,
+      "source_alpha_disappeared_in_bbox": 9415,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_19_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_19_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 20,
+      "bbox_readable": [
+        3490,
+        391,
+        3722,
+        440
+      ],
+      "expanded_crop_readable": [
+        3478,
+        379,
+        3734,
+        452
+      ],
+      "A213_component_changed_pixels": 8413,
+      "source_clean_RGBA_changes_in_bbox": 8429,
+      "source_final_RGBA_changes_in_bbox": 8429,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 7550,
+      "source_alpha_disappeared_in_bbox": 2930,
+      "source_alpha_appeared_in_bbox": 2361,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_20_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_20_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 21,
+      "bbox_readable": [
+        1683,
+        657,
+        1849,
+        724
+      ],
+      "expanded_crop_readable": [
+        1671,
+        645,
+        1861,
+        736
+      ],
+      "A213_component_changed_pixels": 7575,
+      "source_clean_RGBA_changes_in_bbox": 7722,
+      "source_final_RGBA_changes_in_bbox": 7722,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 7722,
+      "source_alpha_disappeared_in_bbox": 7646,
+      "source_alpha_appeared_in_bbox": 76,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_21_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_21_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 22,
+      "bbox_readable": [
+        3702,
+        637,
+        3830,
+        730
+      ],
+      "expanded_crop_readable": [
+        3690,
+        625,
+        3842,
+        742
+      ],
+      "A213_component_changed_pixels": 7131,
+      "source_clean_RGBA_changes_in_bbox": 7670,
+      "source_final_RGBA_changes_in_bbox": 7670,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 7453,
+      "source_alpha_disappeared_in_bbox": 2690,
+      "source_alpha_appeared_in_bbox": 4550,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_22_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_22_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 23,
+      "bbox_readable": [
+        3200,
+        378,
+        3334,
+        445
+      ],
+      "expanded_crop_readable": [
+        3188,
+        366,
+        3346,
+        457
+      ],
+      "A213_component_changed_pixels": 6889,
+      "source_clean_RGBA_changes_in_bbox": 6890,
+      "source_final_RGBA_changes_in_bbox": 6890,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 6076,
+      "source_alpha_disappeared_in_bbox": 5300,
+      "source_alpha_appeared_in_bbox": 226,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_23_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_23_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 24,
+      "bbox_readable": [
+        3068,
+        663,
+        3193,
+        731
+      ],
+      "expanded_crop_readable": [
+        3056,
+        651,
+        3205,
+        743
+      ],
+      "A213_component_changed_pixels": 6648,
+      "source_clean_RGBA_changes_in_bbox": 6648,
+      "source_final_RGBA_changes_in_bbox": 6648,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 6648,
+      "source_alpha_disappeared_in_bbox": 6648,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_24_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_24_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 25,
+      "bbox_readable": [
+        3537,
+        1822,
+        3660,
+        1889
+      ],
+      "expanded_crop_readable": [
+        3525,
+        1810,
+        3672,
+        1901
+      ],
+      "A213_component_changed_pixels": 5869,
+      "source_clean_RGBA_changes_in_bbox": 5921,
+      "source_final_RGBA_changes_in_bbox": 5921,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 5921,
+      "source_alpha_disappeared_in_bbox": 0,
+      "source_alpha_appeared_in_bbox": 5921,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_25_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_25_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 26,
+      "bbox_readable": [
+        14,
+        659,
+        101,
+        724
+      ],
+      "expanded_crop_readable": [
+        2,
+        647,
+        113,
+        736
+      ],
+      "A213_component_changed_pixels": 4213,
+      "source_clean_RGBA_changes_in_bbox": 4230,
+      "source_final_RGBA_changes_in_bbox": 4230,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 4230,
+      "source_alpha_disappeared_in_bbox": 4230,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_26_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_26_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 27,
+      "bbox_readable": [
+        3001,
+        872,
+        3171,
+        896
+      ],
+      "expanded_crop_readable": [
+        2989,
+        860,
+        3183,
+        908
+      ],
+      "A213_component_changed_pixels": 3519,
+      "source_clean_RGBA_changes_in_bbox": 3519,
+      "source_final_RGBA_changes_in_bbox": 3519,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 3519,
+      "source_alpha_disappeared_in_bbox": 3519,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_27_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_27_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 28,
+      "bbox_readable": [
+        3296,
+        800,
+        3354,
+        868
+      ],
+      "expanded_crop_readable": [
+        3284,
+        788,
+        3366,
+        880
+      ],
+      "A213_component_changed_pixels": 3514,
+      "source_clean_RGBA_changes_in_bbox": 3514,
+      "source_final_RGBA_changes_in_bbox": 3514,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 3514,
+      "source_alpha_disappeared_in_bbox": 3514,
+      "source_alpha_appeared_in_bbox": 0,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_28_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_28_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 29,
+      "bbox_readable": [
+        3801,
+        632,
+        3882,
+        730
+      ],
+      "expanded_crop_readable": [
+        3789,
+        620,
+        3894,
+        742
+      ],
+      "A213_component_changed_pixels": 2964,
+      "source_clean_RGBA_changes_in_bbox": 4209,
+      "source_final_RGBA_changes_in_bbox": 4209,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 4143,
+      "source_alpha_disappeared_in_bbox": 1700,
+      "source_alpha_appeared_in_bbox": 2394,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_29_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_29_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    },
+    {
+      "rank": 30,
+      "bbox_readable": [
+        1602,
+        748,
+        1654,
+        843
+      ],
+      "expanded_crop_readable": [
+        1590,
+        736,
+        1666,
+        855
+      ],
+      "A213_component_changed_pixels": 2309,
+      "source_clean_RGBA_changes_in_bbox": 2549,
+      "source_final_RGBA_changes_in_bbox": 2549,
+      "clean_final_RGBA_changes_in_bbox": 0,
+      "source_clean_alpha_changes_in_bbox": 2262,
+      "source_alpha_disappeared_in_bbox": 1145,
+      "source_alpha_appeared_in_bbox": 875,
+      "semantic_classification": "UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
+      "lossless": [
+        "SOURCE_NATIVE_RGBA.png",
+        "CLEAN_NATIVE_RGBA.png",
+        "FINAL_NATIVE_RGBA.png"
+      ],
+      "gray100": "A215_component_30_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
+      "gray50": "A215_component_30_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
+      "raw_native": false
+    }
+  ],
+  "interpretation": "Components are measured from canonical source and CLEAN diff; actual localized segments and protected artwork MUST still be identified manually. Diff-derived boxes do not authorize an edit mask or imply original artwork is protected. This is a producer-native evidence handoff, not material DDS production.",
+  "visual_status": "CONTROLLER_NATIVE_REVIEW_PENDING",
+  "C1": "C335_HOLD_STRICT_RECHECK_UNCHANGED",
+  "C3": "NOT_RUN",
+  "approval": "NOT_ISSUED",
+  "real_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "VR_FFB_DX11_DXVK": "EXCLUDED"
+}
