@@ -70,6 +70,26 @@ int main() {
             ib.binding_exact(ctx.Get(), generation, version),
         "GetVertexBuffers/GetIndexBuffer object identity");
 
+    // R184: dormant DrawIndexed range attestations run before live GPU proof.
+    require(vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,0,
+            generation,version,version), "valid complete index slice");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,0,0,
+            generation,version,version), "empty indexed draw rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),1,3,0,
+            generation,version,version), "index window overrun rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,1,
+            generation,version,version), "positive base vertex overrun rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,-1,
+            generation,version,version), "negative base vertex underrun rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,otherCtx.Get(),0,3,0,
+            generation,version,version), "foreign IA state rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,0,
+            generation,version+1,version), "stale VB snapshot rejected");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,0,
+            generation,version,version+1), "stale IB snapshot rejected");
+    require(!ib.indexed_draw_bounds_exact(vb,ctx.Get(),0,3,0,
+            generation,version,version), "swapped buffer roles rejected");
+
     const char hlsl[] =
         "float4 vs(float2 p:POSITION):SV_Position{return float4(p,0,1);}"
         "float4 ps():SV_Target{return float4(1,0,0,1);}";
@@ -132,6 +152,8 @@ int main() {
     require(vb.binding_exact(ctx.Get(),generation,version) &&
             ib.binding_exact(ctx.Get(),generation,version),
             "VB and IB ready immediately before GPU DrawIndexed");
+    require(vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,0,
+            generation,version,version), "R184 range and live IA ready before GPU");
     ctx->DrawIndexed(3,0,0);
     ctx->CopyResource(staging.Get(),color.Get());
     D3D11_MAPPED_SUBRESOURCE mapped{};

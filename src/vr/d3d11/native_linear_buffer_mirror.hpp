@@ -3,6 +3,8 @@
 // A successful snapshot never authorizes game-native Draw or future Lock updates.
 #include "resource_translation.hpp"
 #include <cstdint>
+#include <cstring>
+#include <limits>
 #include <utility>
 #include <wrl/client.h>
 
@@ -45,6 +47,24 @@ public:
                 return false;
         }
 
+        // R184: seal complete DEFAULT index-snapshot extrema at upload time.
+        // This is metadata, not a mutable D3D9 Lock shadow. Full-buffer bounds
+        // deliberately reject some legal partial draws rather than claim unsafe
+        // parity before a future per-slice ownership implementation exists.
+        UINT sealedIndexCount = 0, sealedMin = 0, sealedMax = 0;
+        if (role == ResourceRole::Index) {
+            const UINT width = format == DXGI_FORMAT_R16_UINT ? 2u : 4u;
+            sealedIndexCount = byteWidth / width;
+            sealedMin = (std::numeric_limits<UINT>::max)();
+            const auto* bytes = static_cast<const std::uint8_t*>(sourceBytes);
+            for (UINT i = 0; i < sealedIndexCount; ++i) {
+                UINT value = 0;
+                std::memcpy(&value, bytes + static_cast<std::size_t>(i) * width, width);
+                if (value < sealedMin) sealedMin = value;
+                if (value > sealedMax) sealedMax = value;
+            }
+        }
+
         const UINT requiredBind = role == ResourceRole::Vertex
             ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
         if (behavior.bindFlags != requiredBind)
@@ -68,6 +88,9 @@ public:
         stride_ = vertexStride;
         generation_ = deviceGeneration;
         source_version_ = sourceSnapshotVersion;
+        index_count_ = sealedIndexCount;
+        index_min_ = sealedMin;
+        index_max_ = sealedMax;
         if (!descriptor_exact()) {
             shutdown();
             return false;
@@ -135,6 +158,35 @@ public:
             liveFormat == format_ && offset == 0;
     }
 
+    // R184: conservative dormant preflight before any indexed draw. It proves
+    // actual same-device IA objects, both independent source versions, index
+    // slice bounds, and entire sealed IB's possible vertex extent. Because
+    // only full-buffer extrema are retained, false means NOT PROVEN (not that
+    // an isolated sub-range is necessarily invalid). No draw is issued here.
+    [[nodiscard]] bool indexed_draw_bounds_exact(
+        const NativeLinearBufferMirror& index,
+        ID3D11DeviceContext* context,
+        UINT startIndex, UINT indexCount, INT baseVertexLocation,
+        std::uint64_t currentGeneration,
+        std::uint64_t currentVertexSnapshotVersion,
+        std::uint64_t currentIndexSnapshotVersion) const noexcept {
+        if (role_ != ResourceRole::Vertex ||
+            index.role_ != ResourceRole::Index ||
+            !indexCount || !stride_ || !index.index_count_ ||
+            device_.Get() != index.device_.Get() ||
+            !binding_exact(context, currentGeneration, currentVertexSnapshotVersion) ||
+            !index.binding_exact(context, currentGeneration, currentIndexSnapshotVersion) ||
+            startIndex >= index.index_count_ ||
+            indexCount > index.index_count_ - startIndex)
+            return false;
+        const std::int64_t low = static_cast<std::int64_t>(baseVertexLocation)
+            + static_cast<std::int64_t>(index.index_min_);
+        const std::int64_t high = static_cast<std::int64_t>(baseVertexLocation)
+            + static_cast<std::int64_t>(index.index_max_);
+        const std::int64_t vertices = static_cast<std::int64_t>(byte_width_ / stride_);
+        return low >= 0 && high >= low && high < vertices;
+    }
+
     void shutdown() noexcept {
         buffer_.Reset();
         device_.Reset();
@@ -142,6 +194,7 @@ public:
         format_ = DXGI_FORMAT_UNKNOWN;
         byte_width_ = stride_ = 0;
         generation_ = source_version_ = 0;
+        index_count_ = index_min_ = index_max_ = 0;
     }
 
     [[nodiscard]] ID3D11Buffer* buffer() const noexcept { return buffer_.Get(); }
@@ -162,5 +215,8 @@ private:
     UINT stride_ = 0;
     std::uint64_t generation_ = 0;
     std::uint64_t source_version_ = 0;
+    UINT index_count_ = 0;
+    UINT index_min_ = 0;
+    UINT index_max_ = 0;
 };
 } // namespace outrun::vr::dx11

@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00486",
+  "production_id": "CONVERSION-DX11-00486",
+  "event_id": "CONVERSION-DX11-00486-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00486",
+  "lease_epoch": 1,
+  "work_key": "DX11:R184:DEFAULT_VB_IB_DORMANT_DRAWINDEXED_BOUNDS_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp:R184",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R184",
+    "tools/test_dx11_linear_buffer_range_r184.py:R184",
+    ".github/workflows/backend-conversion-gate.yml:R184"
+  ],
+  "base_sha": "a989ffde526f9d0dfba35dab74d7b7a2d1ac22a8",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "status": "VALIDATING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "native_draw_path_activation_changed": false,
+  "selected_work_item": "Conservative index window and full-buffer sealed extrema, live VB/IB IA snapshot and base vertex range fail-closed preflight",
+  "summary": "New R184 bounds preflight rejects index count overflow, unsafe positive/negative BaseVertex, retired or foreign devices and independent stale VB/IB versions. Fails conservatively on legal subranges when other indices in the same buffer fall outside the VB. No game Draw activation.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub a989ffde; no 00486 run or commits; 00485 scoped R183 PASS/full R175 fail, 00477 retains R175 owner",
+    "C1_REVIEW": "Independent R184 preflight; existing R183 has no vertex/index extent guard",
+    "C2_IMPLEMENT": "Header, actual WARP probe negative controls, 3 static mutants, GitHub Actions step",
+    "C3_VALIDATE": "PENDING exact material SHA CI",
+    "C4_COMMIT": "PENDING CAS publication",
+    "C5_PACKAGE": "NOT_REQUIRED dormant gameplay Draw",
+    "C6_STATE": "PENDING exact CI"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_buffer_range_r184.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00486.json"
+  ],
+  "blockers": [
+    "Inherited 00477-owned R175 TEXCOORD6 WARP color mismatch expected [224,128,32,255], got [128,0,16,255]",
+    "No Quest3/VDXR native game runtime test"
+  ],
+  "resume_cursor": "WAIT_R184_EXACT_SHA_BACKEND_GATE",
+  "next_action": "Inspect exact-SHA R184 Win32 and WARP smoke; if only inherited R175 fails seal scoped PASS/full FAIL, no draw promotion or score.",
+  "score_change": 0,
+  "runtime_test_performed": false,
+  "state_persisted": true
+}

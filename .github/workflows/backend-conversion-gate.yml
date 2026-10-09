@@ -287,6 +287,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_linear_buffer_owner_r183.py
 
+      # R184: source-accurate, conservative DrawIndexed VB/IB bounds fence.
+      - name: Verify DX11 native VB/IB R184 indexed bounds contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_buffer_range_r184.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
