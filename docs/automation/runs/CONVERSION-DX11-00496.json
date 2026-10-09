@@ -19,21 +19,21 @@
     ".github/workflows/backend-conversion-gate.yml:R194"
   ],
   "base_sha": "e47ce7ee3aa085d591f6a28a48e3558a9af8bac0",
-  "material_result_sha": "372b661cde8e96166f1870069150be2647bce107",
-  "status": "C3_PENDING_R195_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
+  "material_result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
-  "summary": "R194 independently adds dormant native indexed exact raster front-face/cull object provenance and a real WARP reverse-winding DrawIndexed pixel oracle. R175 separately owned and not modified; full Gate may remain blocked by R175.",
+  "summary": "R194 independent native indexed CullBack winding ownership/WARP pixels PASS; E003 R195 native indexed immutable per-IB-slice O(logN) min/max implementation, four-negative static source and real WARP DrawIndexed pixels PASS. Whole exact-SHA Backend Conversion Gate 37985048007 FAIL only on separately owned 00477 R175 TEXCOORD6 BGRA mismatch. No gameplay-native draw activation or Quest3/VDXR runtime claim.",
   "pipeline": {
-    "C0_RECOVER": "PASS exact GitHub branch HEAD, 00495 C6 and 00477 ownership; no 00496 record; stale controller checkpoint ignored",
-    "C1_REVIEW": "PASS R194 culling/front-facing is disjoint from R193 scissor, R189 depth, and 00477 R175 texture-color varying bug",
-    "C2_IMPLEMENT": "R194 header/real WARP triangle polarity probe/4-negative source contract + target CI wiring",
-    "C3_VALIDATE": "R194 exact SHA 372b661c Gate 37983464893 validate 113999484628 SUCCESS and R194 WARP PASS; smoke 114001315922 FAIL inherited R175. R195 new exact-SHA C3 pending.",
-    "C4_COMMIT": "PASS: exact material 372b661cde8e96166f1870069150be2647bce107 with [AUTO:CONVERSION-DX11-00496] verified as GitHub branch HEAD before C6 checkpoint.",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PARTIAL: durable exact-SHA CI resume cursor; no full Gate success or gameplay/native activation claim."
+    "C0_RECOVER": "PASS GitHub HEAD and 00496 R194 exact SHA Gate 37983464893; read AGENTS, conversion lane state, queue contract, 100-review index; 00477 owns unchanged R175.",
+    "C1_REVIEW": "PASS distinct R195 incomplete R184 full-IB extrema for valid DrawIndexed sub-slice; independent from owned 00477 and R194.",
+    "C2_IMPLEMENT": "PASS R195 immutable segment tree of source index extrema, selected-slice bounds in O(log N), changed WARP VB/IB fixture with invalid unused tail, four negative source mutations, CI wiring.",
+    "C3_VALIDATE": "R194 exact SHA 372b661c Gate 37983464893 validate SUCCESS; actual WARP PASS; full Gate FAIL inherited R175. R195 exact SHA e03378a8 Gate 37985048007 validate 114004830838 SUCCESS, R195 static four mutants PASS, R183/R184 + R194 regressions PASS, R195 real WARP DrawIndexed GPU pixel PASS; full smoke 114006957956 FAIL only preexisting R175 BGRA 128,0,16,255 vs 224,128,32,255.",
+    "C4_COMMIT": "PASS: R194 material 372b661c and R195 validation-bearing material e03378a804faa43ceca9566956e06191f8d03507 each [AUTO:CONVERSION-DX11-00496] without CI-skip. C6 bookkeeping separate.",
+    "C5_PACKAGE": "NOT_REQUIRED: DX11 native gameplay draw remains dormant; Quest3/VDXR runtime not tested.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE; scoped R194/R195 WARP PASS; full mandatory exact-SHA Gate FAIL outside 00496 ownership; RUNTIME_VALIDATION=UNTESTED; no success score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_cull_binding.hpp",
@@ -47,11 +47,11 @@
     "Inherited 00477 R175 TEXCOORD6 WARP BGRA mismatch, must not alter unrelated owner or bypass whole Gate",
     "No Quest 3/VDXR hardware runtime test"
   ],
-  "next_action": "Classify new R195 exact-SHA CI after push; inherited 00477 R175 remains out of scope; preserve runtime UNTESTED.",
+  "next_action": "Do not repeat R194/R195 code or CI. Preserve different 00477 R175 owner's source and ongoing separate 00497 R196 Gate; when R175 is owner-verified fixed reassess new exact-SHA Gate. Controller may independently assign new DX11 implementation TASK only with verified no conflict. No DXVK. Runtime UNTESTED.",
   "score_change": 0,
-  "score_reason": "R194 scoped GPU gate not yet completed and whole Gate may still fail inherited R175; do not double-score rollover.",
-  "result_sha": "372b661cde8e96166f1870069150be2647bce107",
-  "validation_bearing_result_sha": "372b661cde8e96166f1870069150be2647bce107",
+  "score_reason": "Same TASK_ID retry E003. Both scoped native implementations demonstrably PASS, mandatory exact-SHA full Gate fails 00477-owned R175; no retry/rollover success point.",
+  "result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+  "validation_bearing_result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
   "evidence": {
     "material_commit": "372b661cde8e96166f1870069150be2647bce107",
     "gate_name": "Backend Conversion Gate",
@@ -68,11 +68,16 @@
     "production_ledger_issue14_comment_id": 6088227683,
     "gate_conclusion": "failure",
     "smoke_job_id": 114001315922,
-    "inherited_r175_failure": "BGRA actual [128,0,16,255] expected [224,128,32,255]"
+    "inherited_r175_failure": "BGRA actual [128,0,16,255] expected [224,128,32,255]",
+    "final_material_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+    "final_gate_id": 37985048007,
+    "final_gate_conclusion": "failure",
+    "final_failed_step": "Run DX11 constant buffer probe",
+    "final_scoped_r195": "PASS"
   },
-  "resume_cursor": "WAIT_R195_EXACT_SHA_GATE",
-  "last_real_activity_at": "2026-10-10T04:57:00+09:00",
-  "automation_validation": "PENDING",
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_R194_AND_R195_SCOPED_PASS",
+  "last_real_activity_at": "2026-10-10T05:22:07+09:00",
+  "automation_validation": "FAIL",
   "continuation": {
     "work_key": "DX11:R195:IMMUTABLE_IB_SUBSLICE_EXTREMA_TREE",
     "base_sha": "c09aa76f44ecadd57c0d0542e4617c6e2e115f74",
@@ -82,10 +87,49 @@
       "tools/test_dx11_index_slice_r195.py:R195",
       ".github/workflows/backend-conversion-gate.yml:R195"
     ],
-    "material_result_sha": "COMMIT_PENDING",
-    "validation_bearing_result_sha": "COMMIT_PENDING",
-    "status": "WAIT_EXACT_SHA_GATE",
+    "material_result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+    "validation_bearing_result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+    "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
     "runtime_validation": "UNTESTED",
-    "summary": "R195 exact O(log N) immutable index slice extrema instead of whole-IB extrema false-negative; actual WARP VB/IB DrawIndexed test still isolated from game path."
-  }
+    "summary": "R195 exact O(log N) immutable index slice extrema instead of whole-IB extrema false-negative; actual WARP VB/IB DrawIndexed test still isolated from game path.",
+    "result_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+    "automation_validation": "FAIL",
+    "scoped_automation_validation": "PASS_R195_STATIC_FOUR_MUTANTS_WIN32_AND_WARP_GPU_PIXELS",
+    "evidence": {
+      "gate_run_id": 37985048007,
+      "head_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+      "gate_status": "completed",
+      "gate_conclusion": "failure",
+      "validate_job_id": 114004830838,
+      "validate_result": "success",
+      "smoke_job_id": 114006957956,
+      "smoke_result": "failure",
+      "r195_static": "PASS",
+      "r195_negative_mutants": 4,
+      "r195_msbuild": "PASS",
+      "r195_actual_gpu_indexed_readback": "PASS",
+      "r183_r184_regression": "PASS",
+      "r194_raster_warp_regression": "PASS",
+      "failed_step": "Run DX11 constant buffer probe",
+      "upstream_owner_task": "CONVERSION-DX11-00477",
+      "upstream_signature": "R175_GENERIC_VARYING_MISMATCH",
+      "actual_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "artifact_id": 11643685100,
+      "artifact_digest": "sha256:2ed746c5fef61409430aca1a1deeb356c5efd2cf3f6a1642c3497b569207f538",
+      "ledger_issue14_comment_id": 6088604181
+    }
+  },
+  "scoped_automation_validation": "PASS_R194_AND_R195_STATIC_MSVC_AND_ACTUAL_WARP_GPU",
+  "state_persisted": true
 }
