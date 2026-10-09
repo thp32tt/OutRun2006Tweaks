@@ -3,15 +3,10 @@
   "task_id": "CONVERSION-DX11-00490",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "stage": "C2_IMPLEMENT_STAGED",
+  "stage": "C3_WAITING_EXACT_SHA_GATE",
   "work_key": "DX11:R188:NATIVE_INDEXED_PS_TEXTURE_SAMPLER_IDENTITY_WARP",
   "last_verified_target_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
-  "in_flight_blocker": {
-    "task_id": "CONVERSION-DX11-00489",
-    "gate_id": 37966364768,
-    "head_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
-    "status": "IN_PROGRESS"
-  },
+  "in_flight_blocker": null,
   "staged_files": {
     "src/vr/d3d11/native_indexed_texture_binding.hpp": "e4407d7ee04b2be956ac5d540448fd7bcdb9dd85",
     "tools/dx11_textured_indexed_probe_r188.cpp": "acd5d268294d741d8ca5494ba667408675ede678",
@@ -20,10 +15,13 @@
     ".github/workflows/backend-conversion-gate.yml": "c1e6d438d08a99569fb79dc5bd863e4394efed53",
     "docs/automation/runs/CONVERSION-DX11-00490.json": "260ef5bdba9b5790c597a5f957a980aad0bcc5a8"
   },
-  "material_commit_created": false,
+  "material_commit_created": true,
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
-  "next_action": "Do not cancel 00489 Gate. Recheck target HEAD, 00489 Gate and work key, rebase staged manifest/workflow on latest HEAD if changed, use target material commit with required marker, exact-SHA Gate then seal C6.",
-  "dependency_reconciled": "R187 signature introduced expectedTarget in 576048f0; R188 now forwards exact RTV identity"
+  "next_action": "Fetch Gate 37967667135 matching head SHA c5c62...; do not push bookkeeping before completed; seal run record and preserve material exact-SHA regardless inherited R175 status.",
+  "dependency_reconciled": "R187 signature introduced expectedTarget in 576048f0; R188 now forwards exact RTV identity",
+  "material_result_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+  "validation_bearing_result_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+  "exact_sha_gate_run_id": 37967667135
 }
