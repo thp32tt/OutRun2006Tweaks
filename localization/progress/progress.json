@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 21:58 KST",
+  "updated_at_kst": "2026-10-09 22:44 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9424,5 +9424,27 @@
     "new_DDS": 0,
     "new_QA_PNG": 4,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a208_q193_goal_a_source_family_pilot": {
+    "run_key": "OUTRUN-KOR-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION-20261009-2230",
+    "role": "A",
+    "queue_index": 193,
+    "exact_candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "new_material_dds": 1,
+    "producer_scope": "GOAL_A_1_REGION_SCOPED_PASS",
+    "source_size": "165x47",
+    "new_size": "122x42",
+    "active_total_regions": 13,
+    "region_rebuilt_count": 7,
+    "remaining_legacy_regions": 6,
+    "mechanical_pixel_guard": "PASS_VISUAL_REQUIRED",
+    "current_C1": "PENDING",
+    "C3": "PENDING",
+    "user_in_game": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 37938333213,
+    "report": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT/A208_CONTROLLER_PRODUCER_SCOPED_QA.json"
   }
+
 }
