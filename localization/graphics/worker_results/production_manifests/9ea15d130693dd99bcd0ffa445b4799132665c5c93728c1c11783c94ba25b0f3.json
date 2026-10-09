@@ -53,7 +53,7 @@
   },
   "regions": [
     {
-      "id": "Goal A / 골 A, shared actual Latin A outer left edge",
+      "id": "Goal A → 목표 A; corresponding Latin A left-stem anchors",
       "source_anchors": {
         "top": [
           1088,
