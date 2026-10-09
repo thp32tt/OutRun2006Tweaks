@@ -114,6 +114,16 @@ $projectedSemantic=-1
 $projectedSummary=Get-LastRegexMatch $gameLog 'projected\[semantic=(\d+),missingPayload='
 if($projectedSummary){$projectedSemantic=[int64]$projectedSummary.Groups[1].Value}
 $rankProjectionNotReached=($rankProducerObserved -and $projectedSemantic -eq 0)
+# Actual rank/DispRank/GOAL eye and D3DXSprite outcomes must not be
+# confused with an attempted original producer or an R57 projection build.
+# New outcome evidence is opt-in: older ZIPs without these logs stay UNKNOWN,
+# not retrospectively marked HMD success or failure.
+$exactHudProducer='(?:RANK_MARKER_SPRANI|RANK_MARKER_CLIP|DISPLAY_RANK_FIRST|DISPRANK_KIND0_CLIP|GOAL_TIME_HELPER_020|GOAL_TIME_HELPER_150|OUTRUN_RESULT_PROGRESS|OUTRUN_STAGE_PRINT)'
+$hudStereoEyeRejected=[regex]::IsMatch($gameLog,
+    'VR R62 FIXEDFN KIND0:[^\r\n]*producer='+$exactHudProducer+'[^\r\n]*stereoAccepted=0(?:\s|$)')
+$hudD3dxFlushFailed=[regex]::IsMatch($gameLog,
+    'VR R64 D3DX ISOLATE RESTORED:[^\r\n]*producer='+$exactHudProducer+'[^\r\n]*flushSucceeded=0(?:\s|$)')
+
 
 $gameDllIdentity=Read-AllText 'GAME_DLL_IDENTITY.txt'
 $gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*$')
@@ -127,6 +137,8 @@ if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
 if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
 if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
 if($rankProjectionNotReached){$flags+='HUD_RANK_PROJECTED_PATH_ZERO'}
+if($hudStereoEyeRejected){$flags+='HUD_STEREO_EYE_REJECTED'}
+if($hudD3dxFlushFailed){$flags+='HUD_D3DX_FLUSH_FAILED'}
 if($gameDllMismatch){$flags+='GAME_DLL_SHA256_MISMATCH'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
@@ -141,6 +153,8 @@ elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
 elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
 elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
+elseif($hudStereoEyeRejected){$status='HUD_STEREO_EYE_REJECTED'}
+elseif($hudD3dxFlushFailed){$status='HUD_D3DX_FLUSH_FAILED'}
 
 $result=[ordered]@{
     SchemaVersion=1
@@ -155,6 +169,8 @@ $result=[ordered]@{
     SharedD3D9ExProbeFailed=$sharedProbeFailed
     RankProducerObserved=$rankProducerObserved
     ProjectedMarkerSemanticCount=$projectedSemantic
+    HudStereoEyeRejected=$hudStereoEyeRejected
+    HudD3dxFlushFailed=$hudD3dxFlushFailed
     GameDllIdentityMismatch=$gameDllMismatch
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
@@ -186,6 +202,8 @@ $lines=@(
     "sharedD3D9ExProbeFailed=$sharedProbeFailed"
     "rankProducerObserved=$rankProducerObserved"
     "projectedMarkerSemanticCount=$projectedSemantic"
+    "hudStereoEyeRejected=$hudStereoEyeRejected"
+    "hudD3dxFlushFailed=$hudD3dxFlushFailed"
     "gameDllIdentityMismatch=$gameDllMismatch"
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
