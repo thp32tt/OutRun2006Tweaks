@@ -1,0 +1,20 @@
+{
+  "role": "B",
+  "run": "B312",
+  "queue_index": 60,
+  "regression": "IGR-044",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "current_candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "trial_sha256": "3cc82c4c9829dd35f167c5ce64d0fc004d2c41306f86a0d7f2b7e55eabe6bb74",
+  "machine_gates": "PASS_PERSISTED_DDS_ORIGINAL_BBOX_55_56_10_11_AND_OUTSIDE_ZERO",
+  "direct_visual": "HOLD_SOURCE_FAMILY_FINISH",
+  "positive_observations": "B311 failed connected syllable cores corrected; fully readable native/50 RAW with counters intact",
+  "unresolved": "Original gold English source leans further right and has softer, deeper navy separation/extrusion than current B312 trial",
+  "follow_up": "B313 source-relative slant and soft navy depth before producer promotion",
+  "promoted": false,
+  "new_production_dds": 0,
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_game": "OPEN_USER_INGAME_FAIL"
+}
