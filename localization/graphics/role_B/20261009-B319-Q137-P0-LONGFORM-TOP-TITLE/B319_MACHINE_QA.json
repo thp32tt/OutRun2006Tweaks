@@ -1,0 +1,86 @@
+{
+  "role": "B",
+  "run": "B319",
+  "queue_index": 137,
+  "regression": "IGR-041",
+  "production_status": "TRIAL_PENDING_DIRECT_VISUAL",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "old_candidate_sha256": "b9366dd4a66a015ce98e30cab29e92b92aa60aed2c5445fc6b35d4410671ec14",
+  "trial_sha256": "0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22",
+  "promoted_dds": 0,
+  "source_clean_outside_six": 0,
+  "plate_protected_pixels": 3579,
+  "changed_outside_title_rgba": 0,
+  "changed_outside_title_alpha": 0,
+  "preserved_other_five_regions": "PIXEL_EXACT",
+  "original_bbox": [
+    5,
+    67,
+    868,
+    130
+  ],
+  "trial_bbox": [
+    168,
+    71,
+    704,
+    126
+  ],
+  "positive_margins": [
+    163,
+    164,
+    4,
+    4
+  ],
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "dds_format": "BGRA",
+  "mips": 1,
+  "saved_decoded_equals_trial": true,
+  "header_exact": true,
+  "raw_mirror_y": true,
+  "semantic_change": "SELECT TRANSMISSION -> 변속 방식을 선택하세요 (full imperative) versus abbreviated underfilled title",
+  "font": "Native Noto Sans CJK KR Black, source flat white without foreign outline/background",
+  "font_px": 56,
+  "glyph_size": [
+    536,
+    55
+  ],
+  "glyph_width_fraction_source": 0.6211,
+  "glyph_height_fraction_source": 0.873,
+  "contacts": [
+    "select_transmission_FLIPY_GRAY_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_GRAY_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_GRAY_50_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_BLACK_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_BLACK_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_BLACK_50_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_WHITE_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_WHITE_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_FLIPY_WHITE_50_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_GRAY_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_GRAY_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_GRAY_50_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_BLACK_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_BLACK_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_BLACK_50_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_WHITE_100_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_WHITE_75_SOURCE_CLEAN_B318_B319.png",
+    "select_transmission_RAW_WHITE_50_SOURCE_CLEAN_B318_B319.png"
+  ],
+  "producer_visual": "HOLD_PENDING_CONTROLLER_DIRECT_REVIEW",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions (GitHub-sourced pinned DDS unavailable in disconnected local sandbox)",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
