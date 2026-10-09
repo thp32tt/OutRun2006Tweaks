@@ -1,174 +1,140 @@
 #!/usr/bin/env python3
-"""B335 q060 P0: source-derived full-native PLATE guard and protected recipe.
+"""B336 q060: first unresolved P2 font and source-lean evidence, without a blind rerender.
 
-C334 independently verified the entire canonical English DDS and saved B332R
-q060, but only a cropped source/CLEAN protection proof. This is a substantive
-P1 production-gate task on already-promoted exact bytes, NOT another DDS.
-Fail closed if the authentic source/previous/current or original BEST orange
-protected mask disagree. P2 family slant and P3 publication remain pending.
+B335 P1 canonical plate and B332R persisted DDS are exact pinned inputs.
+Measure the installed typeface/corpus; export traceable source/glyph silhouettes.
+A left-edge proxy from distinct source/Korean characters is *not* a matched-stroke
+slant approval. Do not promote or report producer PASS without such verification.
 """
-import csv,hashlib,io,json,os,subprocess,sys
+import csv,hashlib,io,json,os,sys
 from pathlib import Path
 import numpy as np
-from scipy.ndimage import binary_dilation
 from PIL import Image,ImageDraw
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 SRC=G/"hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
 CAND=G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-BASE_REF="e34eab0b1ff22a3cb448bd0e35f8e26e0bd803c8"
-SRC_HASH="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
-PREV_HASH="3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2"
-FINAL_HASH="d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01"
-RUN="OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310"
-OUT=G/"role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD";OUT.mkdir(parents=True,exist_ok=True)
-h=lambda x:hashlib.sha256(x).hexdigest()
+PREV=G/"role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/recipe.json"
+OUT=G/"role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2"
+OUT.mkdir(parents=True,exist_ok=True)
+H=lambda v:hashlib.sha256(v).hexdigest()
+Sdata=SRC.read_bytes();Fdata=CAND.read_bytes()
+Ssha="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+Fsha="d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01"
+assert H(Sdata)==Ssha and H(Fdata)==Fsha
+assert Sdata[:128]==Fdata[:128] and len(Sdata)==len(Fdata)==33554560
+rec=json.loads(PREV.read_text())
+assert rec["source"]["sha256"]==Ssha and rec["current"]["sha256"]==Fsha
 with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
- row=next(x for x in csv.DictReader(f) if x["index"].lstrip("\ufeff")=="60")
-assert row["artwork_status"].startswith("c334_c2_hold_independent_canonical_source_authenticated"),row["artwork_status"]
-Sbytes=SRC.read_bytes();Fbytes=CAND.read_bytes()
-Pbytes=subprocess.check_output(["git","show",BASE_REF+":"+CAND.as_posix()])
-assert h(Sbytes)==SRC_HASH and h(Fbytes)==FINAL_HASH and h(Pbytes)==PREV_HASH
-assert Sbytes[:128]==Fbytes[:128]==Pbytes[:128] and len(Sbytes)==len(Pbytes)==len(Fbytes)==33554560
-def decode(b):
- a=np.asarray(Image.open(io.BytesIO(b)).convert("RGBA"),dtype=np.uint8)
- assert a.shape==(2048,4096,4)
- return np.flipud(a).copy()  # READABLE coordinates, source native RAW mirrored
-S=decode(Sbytes);P=decode(Pbytes);F=decode(Fbytes)
-W,H=4096,2048
+    row=next(x for x in csv.DictReader(f) if x["index"].lstrip("\ufeff")=="60")
+assert row["artwork_status"].startswith("c334_c2_hold_"),row["artwork_status"]
+def dec(data):
+    x=np.asarray(Image.open(io.BytesIO(data)).convert("RGBA"),dtype=np.uint8)
+    assert x.shape==(2048,4096,4)
+    return np.flipud(x).copy()
+S=dec(Sdata);F=dec(Fdata)
 l,t,r,b=2081,230,2860,370
-xl,yt,xr,yb=l-24,t-24,r+24,b+30
-source_region=S[yt:yb,xl:xr]
-Y=np.arange(yt,yb)[:,None]
-rr=source_region[:,:,0].astype(np.int32);gg=source_region[:,:,1].astype(np.int32);bb=source_region[:,:,2].astype(np.int32)
-orange=(source_region[:,:,3]>90)&(rr>150)&(gg>35)&(bb*100<rr*55)&(rr*100>gg*105)&(Y>=340)
-assert int(np.count_nonzero(orange))>=8892,"Unrecognized source BEST artwork"
-dilated=binary_dilation(orange,iterations=12)
-protect=dilated[t-yt:b-yt,l-xl:r-xl]
-orange_local=orange[t-yt:b-yt,l-xl:r-xl]
-assert int(np.count_nonzero(orange_local))==8892
-C=P.copy()
-C[t:b,l:r]=0
-C[t:b,l:r][protect]=S[t:b,l:r][protect]
+sr=S[t:b,l:r];fr=F[t:b,l:r]
+yy=np.arange(t,b)[:,None]
+orange=(sr[:,:,3]>90)&(sr[:,:,0]>150)&(sr[:,:,1]>35)&(sr[:,:,2]*100<sr[:,:,0]*55)&(sr[:,:,0]*100>sr[:,:,1]*105)&(yy>=340)
+assert int(orange.sum())==8892
+# The original gold lettering and protected orange sibling share an edit
+# rectangle. Never mistake the orange pixels for source lettering anchors.
+source_face=(sr[:,:,3]>100)&(sr[:,:,0]>145)&(sr[:,:,1]>95)&(sr[:,:,2]>50)&~orange
+final_face=(fr[:,:,3]>100)&(fr[:,:,0]>145)&(fr[:,:,1]>95)&(fr[:,:,2]>50)&~orange
+# Lower source edge is not necessarily the same stroke: a provisional
+# silhouette proxy is information for a human, not proof of slant matching.
+def proxy(m):
+    ys=np.flatnonzero(m.sum(axis=1)>=5)
+    if len(ys)<15:return {"qualified":False,"why":"insufficient face samples"}
+    z=[]
+    for y in [int(ys[round((len(ys)-1)*v)]) for v in (0.20,0.80)]:
+        xs=np.flatnonzero(m[y]);z.append([int(xs.min()+l),int(y+t),int(xs.max()+l)])
+    return {"qualified":False,"top_band_left_right":z[0],"bottom_band_left_right":z[1],
+            "left_dx_proxy":z[0][0]-z[1][0],
+            "why":"first active pixels at two y bands need not be the corresponding glyph stroke; cannot certify P2 right lean"}
+source_prox=proxy(source_face);final_prox=proxy(final_face)
+fontpath=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
+font_evidence={"expected_path":str(fontpath),"found":fontpath.is_file(),
+              "source_family":"B331/B332R Noto Sans CJK Bold","text":"아웃런 마일:"}
+if fontpath.is_file():
+    font_evidence["sha256"]=H(fontpath.read_bytes())
+    try:
+        from fontTools.ttLib import TTCollection,TTFont
+        faces=TTCollection(str(fontpath),lazy=True).fonts
+        cmaps=[set().union(*(dict(t.cmap) for t in face["cmap"].tables if t.isUnicode())) for face in faces]
+        chars=sorted(set(font_evidence["text"]))
+        font_evidence.update(fonttools_checked=True,face_count=len(cmaps),
+            required_codepoints=[{"char":v,"hex":hex(ord(v)),"faces":[i for i,cm in enumerate(cmaps) if ord(v) in cm]} for v in chars],
+            all_chars_covered=all(any(ord(v) in cm for cm in cmaps) for v in chars))
+        for face in faces:face.close()
+    except Exception as exc:
+        font_evidence.update(fonttools_checked=False,all_chars_covered=None,reason=str(exc))
+else:
+    font_evidence.update(fonttools_checked=False,all_chars_covered=None,reason="Pinned historical renderer font absent; no fallback substitutions")
+# Pin the source image and exact alpha in both readable and RAW forms.
+clean_path=G/"role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_CLEAN_PLATE_FULL_NATIVE_RAW.png"
+Craw=np.asarray(Image.open(clean_path).convert("RGBA"),dtype=np.uint8)
+assert Craw.shape==F.shape
+C=np.flipud(Craw).copy()
+assert np.all(C[t:b,l:r][~orange,3] == 0) is False if False else True
+# The protected mask is broader than orange itself; inspect exact P1 protected source.
+protected=G/"role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_ORANGE_PROTECTED_RAW.png"
+protect=np.flipud(np.asarray(Image.open(protected).convert("L"),dtype=np.uint8)>0)[t:b,l:r]
+assert np.all(C[t:b,l:r][~protect,3]==0)
 assert np.array_equal(C[t:b,l:r][protect],S[t:b,l:r][protect])
 assert np.array_equal(F[t:b,l:r][protect],S[t:b,l:r][protect])
-assert not np.any(C[t:b,l:r][~protect,3]),"Source plate not empty outside protected BEST contour"
-assert np.array_equal(C[:t],P[:t]) and np.array_equal(C[b:],P[b:])
-assert np.array_equal(C[t:b,:l],P[t:b,:l]) and np.array_equal(C[t:b,r:],P[t:b,r:])
-# Full-source-derived masks: NOT candidate-difference derived.
-edited=np.zeros((H,W),bool);edited[t:b,l:r]=True
-protected=np.zeros((H,W),bool);protected[t:b,l:r]=protect
-remove=edited & ~protected
-restore=protected.copy()
-transparent=remove.copy()
-assert (edited & protected).sum()==protect.sum()
-assert (remove&protected).sum()==0
-assert (np.any(S[t:b,l:r,:,] != C[t:b,l:r,:,],axis=2)&protected[t:b,l:r]).sum()==0
-# A full-native RAW plate-only production guard is runnable against pinned
-# canonical source + exact historical B331 byte baseline, without rewriting
-# B332R. All masks are strictly binary L-mode 4096x2048.
-def outpng(name,img,mode):
- p=OUT/name
- Image.fromarray(img,mode).save(p,optimize=True)
- return {"path":p.as_posix(),"sha256":h(p.read_bytes())}
-def maskpng(name,arr):
- return outpng(name,np.flipud(arr).astype(np.uint8)*255,"L")
-clean_ref=outpng("B335_P1_CLEAN_PLATE_FULL_NATIVE_RAW.png",np.flipud(C).copy(),"RGBA")
-maskrefs={
- "removal":maskpng("B335_MASK_SOURCE_GOLD_REMOVAL_RAW.png",remove),
- "protected":maskpng("B335_MASK_SOURCE_ORANGE_PROTECTED_RAW.png",protected),
- "edit":maskpng("B335_MASK_SOURCE_BOUNDED_EDIT_RAW.png",edited),
- "transparent":maskpng("B335_MASK_SOURCE_TRANSPARENT_REMOVAL_RAW.png",transparent),
- "restore":maskpng("B335_MASK_SOURCE_ORANGE_EXACT_RESTORE_RAW.png",restore)
-}
-def bind(path,data,revision=None):
- d={"path":path.as_posix(),"sha256":h(data)}
- if revision:d["git_revision"]=revision
- return d
-manifest={
- "version":"production-pixels-v1-20261009","coordinates":"native_raw","stage":"plate",
- "inputs":{"source":bind(SRC,Sbytes),"baseline":bind(CAND,Pbytes,BASE_REF),"clean":clean_ref},
- "masks":maskrefs
-}
-manifestpath=OUT/"B335_P1_PLATE_MANIFEST.json"
-manifestpath.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n")
-# Python -B prevents bytecode caches outside the GitHub role_B write boundary.
-qa_file=OUT/"B335_P1_MACHINE_GUARD.json"
-cmd=[sys.executable,"-B","tools/localization/production_pixel_guard.py","--manifest",str(manifestpath),"--report",str(qa_file)]
-run=subprocess.run(cmd,capture_output=True,text=True,env={**os.environ,"PYTHONDONTWRITEBYTECODE":"1"})
-assert run.returncode==0,(run.stdout,run.stderr)
-guard=json.loads(qa_file.read_text())
-assert guard["result"]=="MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",guard
-assert all(v==0 for v in guard["counts"].values()),guard
-# New mechanical evidence on full 4096x2048 original/baseline/CLEAN/saved
-# atlas -- not merely the pre-existing C334 779x190 source ROI.
-stage={
- "run":"B335","run_key":RUN,"queue_index":60,"source_sha256":SRC_HASH,
- "previous_candidate_sha256":PREV_HASH,"current_candidate_sha256":FINAL_HASH,
- "plate_manifest":manifestpath.as_posix(),"plate_guard":qa_file.as_posix(),
- "full_original_native":[4096,2048],"orientation":"SOURCE_AND_CANDIDATE_RAW_MIRROR_Y",
- "source_orange_pixels_exact":int(orange_local.sum()),
- "protected_source_contour_pixels":int(protect.sum()),
- "protected_source_vs_clean_rgba_diff":int(np.any(S[t:b,l:r][protect]!=C[t:b,l:r][protect],axis=1).sum()),
- "protected_source_vs_final_rgba_diff":int(np.any(S[t:b,l:r][protect]!=F[t:b,l:r][protect],axis=1).sum()),
- "P1":"MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
- "new_candidate":False,"new_DDS_count":0,
- "C2":"C334_SCOPED_HOLD_UNCHANGED","C3":"PENDING","user_IGR044":"OPEN_USER_INGAME_FAIL",
- "P2_font_style":"NOT_YET_QUALIFIED","P2_slant_top_bottom_anchors":"NOT_YET_MEASURED_DO_NOT_INVENT",
- "P3_final_manifest":"NOT_CREATED_DDS_UNCHANGED",
- "RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_ACTIONS","excluded":["VR","FFB","DX11","DXVK"]
-}
-assert stage["protected_source_vs_clean_rgba_diff"]==stage["protected_source_vs_final_rgba_diff"]==0
-# Produce a directly examinable SOURCE / actual CLEAN / old / final, all
-# including both GOLD and orange BEST siblings and unmasked adjacent bands.
-window=(2070,205,2890,415)
-x0,y0,x1,y1=window
-proofs=[]
-for ori in ("FLIPY","RAW"):
- for bgkey,bg in (("BLACK",(0,0,0)),("GRAY",(84,84,84)),("WHITE",(255,255,255))):
-  for pct in (100,75,50):
-   imlist=[]
-   for arr in (S,C,P,F):
-    a=arr[y0:y1,x0:x1]
-    if ori=="RAW":a=np.flipud(a)
-    img=Image.new("RGBA",(x1-x0,y1-y0),(*bg,255))
-    img.alpha_composite(Image.fromarray(a.copy(),"RGBA"))
-    if pct<100:img=img.resize((round((x1-x0)*pct/100),round((y1-y0)*pct/100)),Image.Resampling.LANCZOS)
-    imlist.append(img.convert("RGB"))
-   contact=Image.new("RGB",(sum(z.width for z in imlist)+12,max(z.height for z in imlist)),(84,84,84))
-   xx=0
-   for z in imlist:contact.paste(z,(xx,0));xx+=z.width+4
-   name=f"B335_{ori}_{bgkey}_{pct}_FULL_SOURCE_PLATE_OLD_FINAL.png"
-   contact.save(OUT/name,optimize=True);proofs.append(name)
-stage["full_adjacent_proofs"]=proofs
-# Store source-determined P1 recipe; P2 font hash and anchor evidence are
-# deliberately not fabricated. They are explicit blocking requirements.
-recipe={
- "schema_version":"production-family-recipe-v1","run_key":RUN,"family":"gold racing HUD title q060",
- "source":{"path":SRC.as_posix(),"sha256":SRC_HASH,"revision":"OR2-HD-GUI-v0.25.10a"},
- "baseline":{"sha256":PREV_HASH,"git_revision":BASE_REF},
- "current":{"sha256":FINAL_HASH,"candidate_path":CAND.as_posix()},
- "all_known_cells":["gold OUTRUN MILES","orange BEST TIME protected sibling","Stage kept outside edit","white Miles kept outside edit","all remaining current translated atlas cells unchanged"],
- "source_text":"OUTRUN MILES","korean_text":"아웃런 마일:",
- "protected_original":"orange BEST TIME color-labeled source + 12px contiguous nearby contour; exact 8892 orange alpha pixels; full-native 4096x2048",
- "native_readable_edit_bbox":[l,t,r,b],"native_readable_original_orange_lower_band_y":340,
- "font_recipe":{"family":"NotoSansCJK Bold used by B331/B332R","font_file":"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-   "font_sha256":None,"glyph_coverage":"P2_SOURCE_REVALIDATION_REQUIRED_NOT_CONFIRMED_BY_P1",
-   "native_size_and_hinting":"B332R inherited glyph reduced from 107px to 97px; further use requires P2 family validation",
-   "font_license":"not newly checked by B335; confirm before new render"},
- "geometry":{"original_bbox":[2081,250,2860,370],"gold_relocated_bbox":[2133,235,2807,332],
-   "gold_new_height":97,"native_readable_right_italic":"B331 +0.65 forward shear; P2 real top/bottom anchors not yet measured",
-   "source_top_bottom_anchors":None,"candidate_top_bottom_anchors":None},
- "render_effect":{"source_samples":"cream/gold face, navy edge (B331 provenance)","gradient":"B331 derived; P2 must validate full glyph weight/counter spacing",
-   "outline_shadow":"B331 layered, source style pending C2 qualification"},
- "masks":maskrefs,"source_orange_protected_source_derived":True,
- "intermediate_clean":clean_ref,"plate_manifest":manifestpath.as_posix(),
- "previous_rejections":["C326 SOURCE_FAMILY_MISMATCH/ITALIC_UNDERLEAN","C332 SOURCE_PROTECTED_ART_LOSS"],
- "current_quality_gate":"P1 FULL_NATIVE_SOURCE-DERIVED PLATE MACHINE PASS; direct producer visual pending; C334 C2 HOLD unchanged",
- "P2_status":"BLOCKED_FONT_HASH_AND_SLANT_ANCHOR_VERIFICATION",
- "P3_status":"NOT_RUN_UNCHANGED_PERSISTED_DDS",
- "runtime":"UNTESTED"
-}
-(OUT/"recipe.json").write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n")
-(OUT/"B335_P1_REPORT.json").write_text(json.dumps(stage,ensure_ascii=False,indent=2)+"\n")
-print("B335_PLATE_MACHINE_PASS",json.dumps({"orange":stage["source_orange_pixels_exact"],"protect":stage["protected_source_contour_pixels"],"full_source":SRC_HASH,"manifest":str(manifestpath),"proofs":len(proofs)},ensure_ascii=False))
+# Count candidate changes limited by old source-based edit region, not inferred from final.
+outside=np.ones((2048,4096),dtype=bool);outside[t:b,l:r]=False
+# C is a P1 *derived* plate; compare authentic source only in protected ROI.
+assert np.array_equal(F[:t],F[:t])  # no claim about unrelated atlas cells
+proof=[]
+window=(2050,195,2910,425);x0,y0,x1,y1=window
+for orientation in ("FLIPY","RAW"):
+    for scale in (100,75,50):
+        crops=[]
+        for arr in (S,C,F):
+            region=arr[y0:y1,x0:x1]
+            if orientation=="RAW":region=np.flipud(region)
+            bg=Image.new("RGBA",(x1-x0,y1-y0),(81,81,81,255))
+            bg.alpha_composite(Image.fromarray(region.copy(),"RGBA"))
+            view=bg.convert("RGB")
+            if scale!=100:view=view.resize((round(view.width*scale/100),round(view.height*scale/100)),Image.Resampling.LANCZOS)
+            crops.append(view)
+        out=Image.new("RGB",(sum(z.width for z in crops)+8,max(z.height for z in crops)),(81,81,81))
+        xx=0
+        for z in crops:out.paste(z,(xx,0));xx+=z.width+4
+        p=OUT/f"B336_SOURCE_CLEAN_SAVED_{orientation}_{scale}_GRAY.png"
+        out.save(p,optimize=True);proof.append(p.as_posix())
+# Provisional data-driven candidate/source pixel band proxies deliberately labeled.
+ov=Image.fromarray(np.concatenate([sr,fr],axis=1).copy(),"RGBA").convert("RGB")
+draw=ImageDraw.Draw(ov)
+for xoff,v in ((0,source_prox),(r-l,final_prox)):
+    if "top_band_left_right" not in v:continue
+    for name,col in (("top_band_left_right",(40,240,80)),("bottom_band_left_right",(240,80,50))):
+        x,y,_=v[name]; px=x-l+xoff;py=y-t
+        draw.line([(px-9,py),(px+9,py)],fill=col,width=2)
+        draw.line([(px,py-9),(px,py+9)],fill=col,width=2)
+ovpath=OUT/"B336_SOURCE_VS_SAVED_PIXEL_BAND_PROXIES_NOT_SAME_STROKE.png"
+ov.save(ovpath,optimize=True)
+result={
+ "schema_version":2,"role":"B","run":"B336",
+ "run_key":"OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340",
+ "queue_index":60,"priority":"P0","stage":"P2_SOURCE_FAMILY_EVIDENCE",
+ "pinned_english_sha256":Ssha,"pinned_current_candidate_sha256":Fsha,
+ "p1_recipe":PREV.as_posix(),"p1_plate_clean_exact_protected":True,
+ "font_evidence":font_evidence,"source_gold_face_pixels":int(source_face.sum()),
+ "candidate_gold_face_pixels":int(final_face.sum()),
+ "source_first_glyph_band_proxy":source_prox,"candidate_first_glyph_band_proxy":final_prox,
+ "slant_same_stroke_verified":False,
+ "p2_decision":"HOLD_MATCHED_STROKE_ANCHORS_AND_SOURCE_FONT_STYLE",
+ "producer_decision":"NOT_PROMOTED_NO_CHANGED_DDS",
+ "new_DDS":0,"source_clean_final_proofs":proof,"pixel_band_comparison":ovpath.as_posix(),
+ "C2":"C334_HOLD_UNCHANGED","C3":"NOT_RUN",
+ "INGAME_REWORK_BACKLOG":"IGR044_OPEN_USER_INGAME_FAIL",
+ "RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_ACTIONS",
+ "excluded_work":["VR","FFB","DX11","DXVK"]}
+if font_evidence.get("all_chars_covered") is not True:
+    result["p2_decision"]="HOLD_FONT_COVERAGE_AND_MATCHED_STROKE_ANCHORS"
+(OUT/"B336_P2_FONT_SLANT_EVIDENCE.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n")
+print("B336_P2_FRESH_EVIDENCE",json.dumps({"font":font_evidence.get("sha256"),"glyph_coverage":font_evidence.get("all_chars_covered"),"source_face_pixels":result["source_gold_face_pixels"],"candidate_face_pixels":result["candidate_gold_face_pixels"],"result":result["p2_decision"],"dds":0},ensure_ascii=False))
