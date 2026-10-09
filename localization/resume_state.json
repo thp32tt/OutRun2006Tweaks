@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B308 q212 C325 last 4 native panels 30 DONE large/43 PRO orange/44 OUTRUN red/53 DONE small created new DDS sha 209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e. B307+308 cover original 7 C325 defects, but independent new SHA C2 ALL12, separate C3 and actual-game q212 IGR029 screenshot mapping still required. localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json",
     "B307 q212 C325 seven visual defects: 3 newly repaired native SELECT regions 25/26/27, new DDS 73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914. Four region 30/43/44/53 still confirmed C325 REWORK. Current candidate pending new exact-SHA C2/C3/user game; IGR029 mapping suspected OPEN. localization/graphics/role_B/20261009-B307-Q212-C325-THREE-NATIVE-SELECT-HEADINGS/B307_CONTROLLER_SELF_QA_FINAL.json",
     "C325 C2 q212: 7 exact native low-res/source-family visual failures region25/26/27/30/43/44/53 from 10 previous-unreviewed. Full 12 source-clean-current mask outside0, source bounds 12 PASS, yet visual outranks. B targeted repair, preserve showroom/name. localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json",
     "B306 q205 fresh heavy block-sans P0 OPTIONS/옵션 RANKINGS/랭킹 new persisted SHA d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70 from source-clean, B native/50/RAW QA scoped PASS. Fresh C1 odd, distinct C3 & newer user actual game retest needed. IGR026/027 OPEN, mixed IGR028 unchanged. localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
@@ -13069,5 +13070,38 @@
     "qa": "localization/graphics/role_B/20261009-B307-Q212-C325-THREE-NATIVE-SELECT-HEADINGS/B307_CONTROLLER_SELF_QA_FINAL.json",
     "actions_run_id": 37871305365,
     "backend": "GITHUB_ACTIONS"
+  },
+  "b308_q212_last_four_c325_producer_rework": {
+    "time_kst": "2026-10-09 11:16 KST",
+    "run_key": "OUTRUN-KOR-B308-Q212-C325-FOUR-NATIVE-CONTROLS-20261009-1110",
+    "role": "B",
+    "queue_index": 212,
+    "english_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "previous_candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+    "new_candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+    "new_dds": 1,
+    "repaired_regions": [
+      30,
+      43,
+      44,
+      53
+    ],
+    "earlier_B307_repaired_regions": [
+      25,
+      26,
+      27
+    ],
+    "C325_confirmed_remaining_producer_rework": [],
+    "unrelated_eight_regions": "PIXEL_EXACT",
+    "zero_outside_bbox": 0,
+    "persisted_DDS": "HEADER_RAW_FLIPY_MIP1_ROUNDTRIP_EXACT",
+    "producer_visual": "SCOPED_PASS_4_NATIVE_50_SMALL_75_RAW_RED",
+    "independent_C2": "PENDING_NEW_SHA_ALL_12",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR029": "SUSPECTED_BINDING_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json",
+    "actions_id": 37873410100
   }
 }
