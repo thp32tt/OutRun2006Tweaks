@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A216 q175 P1 new hand-contour SHOWROOM source-chrome material trial a5e921ab... (GitHub worker #37977929319) decoded pixel 0 outside exact source, bbox [56,400,866,527], 810/950 width. Controller native100 black50 white75 VISUAL FAIL: '쇼룸' syllable morphology becomes roof/posts + stacked rails, not original rounded welded chrome; DO NOT promote or repeat rail/stretched glyph. Existing promoted b9f60b45... unchanged, C1/C3/approval/user game IGR032 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
     "C340 C1 q201 fresh B305 saved DDS persisted exact native delta 2505 RGBA/1912 alpha all within GOALS (other UI no changes). Missing canonical source and independently CLEAN, blind QA calibration/C3 => HOLD. IGR037 OPEN; OUTRUN-KOR-C340-C1-Q201-B305-EXACT-NATIVE-DELTA-20261010",
     "B341 2026-10-10 03:41 KST: SOURCE-anchored C338 r43/r44 real material trial DDS fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7 SHA; +236px PROFESSIONAL Korean and -61px OUTRUN Korean. Confirmed 2048 RGBA32 saved roundtrip, other10 exact, source bbox outside 0; FLIPY native/50 and RAW50 direct producer SCOPED visual improvement. Trial ONLY: current promoted e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea unchanged; no final pixel manifest/independent C2/C3, IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_CONTROLLER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-B341-Q212-TWO-ANCHORED-MATERIAL-TRIAL-20261010-0341.",
     "C339 C1 q227 current SHA 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 independently saved-DDS verified: 13/13 new A214 FLIP-Y FINAL exact RGBA delta0; new CLEAN panels visible alpha0 13/13; all16 actual current alpha bboxes/counts exact, minimum bbox margin1px. Canonical SOURCE/CLEAN independent byte SHA and blind family calibration absent => C1 HOLD, C3/APPROVAL blocked, IGR034/035/036 OPEN, DDS0, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_C1_CONTROLLER_HOLD.json; RUN_KEY=OUTRUN-KOR-C339-C1-Q227-A214-13-FRESH-SAVED-PIXEL-20261010-0310",
@@ -6854,7 +6855,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 03:06 KST",
+  "updated_at_kst": "2026-10-10 04:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14065,5 +14066,30 @@
     "IGR037": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_C1_CONTROLLER_HOLD.json"
+  },
+  "a216_q175_manual_glyph_trial": {
+    "run": "A216",
+    "run_key": "OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
+    "priority": "P1",
+    "queue_index": 175,
+    "worker_runs": [
+      37977673378,
+      37977929319
+    ],
+    "first_attempt": "P3_PROTECTED_PIXEL_ESCAPE_22_2PX_BOTTOM_REJECT",
+    "retry": "CORRECTED_TRIAL_ONLY_SAVED_SUCCESS",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "promoted_current_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "trial_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+    "outside_source_pixels": 0,
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "direct_producer_visual": "FAIL_HANGUL_UNREADABLE_MORPHOLOGY_AND_SOURCE_CHROME_MISMATCH",
+    "c1": "BLOCKED",
+    "c3": "BLOCKED",
+    "qa_approval": false,
+    "igaming": "IGR032_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json"
   }
 }
