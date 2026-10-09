@@ -684,6 +684,47 @@ for label, changed_r30, changed_ui in (
     else:
         raise SystemExit('stereo outcome defect undetected: ' + label)
 
+# Historical original GOAL helpers are distinct. Trace D3DX batching but
+# NEVER widen post-Draw Flush to GOAL just because these tags are present.
+def check_goal_d3dx_queue_trace(ui_source):
+    tracer = function_body(
+        ui_source, 'static void R64TraceGoalD3dxQueued(')
+    for token in (
+        'Settings::VRTelemetry',
+        'GameState::STATE_GOAL',
+        'GameState::STATE_TIMEUP',
+        'GameState::STATE_LINK_TIMEUP',
+        'CorroboratesHud(scope)',
+        'ProducerToken::GoalTime020',
+        'ProducerToken::GoalTime150',
+        'VR P0 GOAL D3DX DRAW QUEUED:',
+    ):
+        require(token, tracer, 'exact GOAL D3DX queued-trace gate')
+    draw = function_body(ui_source,
+                         'static HRESULT __stdcall DrawDest(')
+    require('R64TraceGoalD3dxQueued(scope, source);', draw,
+            'R64 queued GOAL diagnostic invocation')
+    require('if (!projectedRank && !dispRankHud)', draw,
+            'R64 must still exclude GOAL from Flush policy')
+
+check_goal_d3dx_queue_trace(ui)
+for label, bad in (
+    ('GOAL 150 not traced',
+     ui.replace('source != OutRunVR::GameSemantic::ProducerToken::GoalTime150)',
+                'source != OutRunVR::GameSemantic::ProducerToken::None)', 1)),
+    ('GOAL Draw tracer not invoked',
+     ui.replace('R64TraceGoalD3dxQueued(scope, source);',
+                '(void)scope;', 1)),
+):
+    if bad == ui:
+        raise SystemExit('GOAL D3DX negative mutation not applied: ' + label)
+    try:
+        check_goal_d3dx_queue_trace(bad)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL D3DX diagnostic defect escaped: ' + label)
+
 # XMT loader: a corrupt/late XPR0 pointer must not read outside the XMT
 # system-memory block or overflow on pointer addition. This is a source
 # bounds fix; it cannot prove missing car/selector DDS pixels are resolved.
