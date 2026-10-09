@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B318",
+  "run_key": "OUTRUN-KOR-B318-Q137-IGR041-LOWER-MODE-TEXT-20261009",
+  "queue_index": 137,
+  "priority": "P0",
+  "owner": "B assigned active P0 IGR-041 override for odd index",
+  "english_source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "prior_candidate_sha256": "1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68",
+  "candidate_sha256": "b9366dd4a66a015ce98e30cab29e92b92aa60aed2c5445fc6b35d4410671ec14",
+  "new_git_blob_sha": "89557d5698754482e36cf7b741e94a46c6466fa5",
+  "promote_commit": "a09864e893d7c4ffbb03d571bcf78758e3a99ff2",
+  "new_production_dds": 1,
+  "candidate_promoted": true,
+  "scope": "only small MANUAL/AUTOMATIC gray glyphs, prior B315 large buttons and title/transmission-small/source panel fully preserved",
+  "regions": [
+    {
+      "id": "manual_small",
+      "english": "MANUAL",
+      "korean": "수동 변속",
+      "source_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "candidate_bbox": [
+        74,
+        152,
+        279,
+        206
+      ],
+      "margins": [
+        60,
+        60,
+        4,
+        4
+      ],
+      "alpha": 170
+    },
+    {
+      "id": "automatic_small",
+      "english": "AUTOMATIC",
+      "korean": "자동 변속",
+      "source_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "candidate_bbox": [
+        982,
+        151,
+        1216,
+        212
+      ],
+      "margins": [
+        160,
+        160,
+        4,
+        4
+      ],
+      "alpha": 170
+    }
+  ],
+  "source_family": "Native individually rasterized per-syllable uprights with measured original 170 gray alpha, 0.92 stem condensation and independent letter tracking; expanded semantic labels rather than flat stroke retries or bitmap upscaling",
+  "machine": {
+    "native": [
+      2048,
+      1024
+    ],
+    "format": "BGRA32",
+    "mips": 1,
+    "orientation": "RAW_MIRROR_Y",
+    "persisted_decode": "EXACT",
+    "header": "EXACT",
+    "source_sha_pinned": true,
+    "clean_plate_sha_pinned": true,
+    "protected_A22_plate_pixels": 3579,
+    "source_clean_changed_outside_original_six": 0,
+    "changed_rgba_outside_two": 0,
+    "changed_alpha_outside_two": 0,
+    "B315_large_and_all_other_assets": "PIXEL_EXACT",
+    "source_bbox_min_positive_margin_px": 4
+  },
+  "producer_visual": {
+    "source_clean": "A22 native English-free plate reused and protected panel graphic retained",
+    "native_GRAY_100": "PASS_SCOPED_TWO_SMALL_LINES",
+    "RAW_BLACK_50": "PASS_SCOPED_READABLE_NO_STROKE_COLLISION",
+    "source_relative_hierarchy": "SOURCE_GRAY_OPACITY_MATCH; C1 STYLE INDEPENDENT NOT RUN",
+    "uninspected_proofs": "24 persisted lossless views recorded, not all directly inspected"
+  },
+  "evidence": [
+    "localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/B318_MACHINE_QA.json",
+    "localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/manual_small_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B318.png",
+    "localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/automatic_small_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B318.png",
+    "localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/manual_small_RAW_BLACK_50_SOURCE_CLEAN_B285_B318.png",
+    "localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/automatic_small_RAW_BLACK_50_SOURCE_CLEAN_B285_B318.png"
+  ],
+  "rejected_not_promoted": [
+    "B316 top title underfilled original-family source; B316_CONTROLLER_VISUAL_HOLD.json",
+    "B317 small TRANSMISSION title still tiny practical scale; B317_CONTROLLER_VISUAL_HOLD.json"
+  ],
+  "outstanding": [
+    "SELECT TRANSMISSION still source-family/size material rework",
+    "small TRANSMISSION still tiny source-family rework",
+    "independent full new-SHA C1, strict C3 and game retest"
+  ],
+  "whole_asset": "REWORK_REQUIRED_TWO_UPPER",
+  "independent_C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "IGR041": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "workflow_run": 37886011092,
+  "workflow_status": "SUCCESS",
+  "backend": "GitHub Actions because repo source/DDS are already available at worker and local not equipped with pinned raw source",
+  "N100_used": false,
+  "cleanup": "ephemeral GitHub runner discarded after success; no local/N100 temporary workspace created",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
