@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 15:16 KST",
+  "updated_at_kst": "2026-10-09 15:21 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B321 IGR-042 P0 Korean runtime HUD time/heart source attribution opt-in probe published (no pixel change), Win32 Release/Korean Test Build in progress; capture actual screenshot(197)(1) HUD runtime log + unchanged DDS source before material remapping. IGR042 OPEN, RUNTIME_VALIDATION=UNTESTED. B q137/q205/q60 current producer DDS pending independent C, do not rerender same SHA.",
+  "next_checkpoint": "B321 IGR-042 opt-in bounded HUD time/heart drawing trace source+INI built: Win32 Release 37892438103 SUCCESS and Korean test 37892438028 SUCCESS. Next: actual HUD screenshot(197)(1) and KoreanHudLayoutTrace log to attribute the runtime text vs DDS border/artwork; no guessed visual fix, IGR042 OPEN_USER_INGAME_FAIL and RUNTIME_VALIDATION=UNTESTED. Other B queue q137/q205/q60 candidates pending independent C; no same-SHA regeneration.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
