@@ -1,0 +1,193 @@
+{
+  "role": "B",
+  "run": "B316",
+  "queue_index": 137,
+  "regression": "IGR-041",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "previous_candidate_sha256": "1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68",
+  "trial_sha256": "d7ee94998688e26273f7bddaf679c56ae762235bc16509af26f4f8707a26f659",
+  "new_trial_dds": 1,
+  "promoted_dds": 0,
+  "source_clean_outside6": 0,
+  "source_clean_retained_protected_separators": 3579,
+  "candidate_changed_outside_four_residual": 0,
+  "alpha_outside_four_residual": 0,
+  "header_exact": true,
+  "persisted_decode": "EXACT",
+  "raw_orientation": "mirror_y",
+  "native": [
+    2048,
+    1024
+  ],
+  "dds_codec": "BGRA",
+  "mips": 1,
+  "per_region": [
+    {
+      "id": "select_transmission",
+      "english": "SELECT TRANSMISSION",
+      "korean": "변속 방식 선택",
+      "source_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "effect_bbox": [
+        280,
+        71,
+        592,
+        126
+      ],
+      "margins": [
+        275,
+        276,
+        4,
+        4
+      ],
+      "font_px": 56,
+      "vector_profile": "new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",
+      "alpha": 255
+    },
+    {
+      "id": "transmission_small",
+      "english": "TRANSMISSION",
+      "korean": "변속 방식",
+      "source_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "effect_bbox": [
+        1378,
+        100,
+        1479,
+        124
+      ],
+      "margins": [
+        90,
+        90,
+        4,
+        4
+      ],
+      "font_px": 24,
+      "vector_profile": "new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",
+      "alpha": 170
+    },
+    {
+      "id": "manual_small",
+      "english": "MANUAL",
+      "korean": "수동 변속",
+      "source_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "effect_bbox": [
+        74,
+        152,
+        279,
+        206
+      ],
+      "margins": [
+        60,
+        60,
+        4,
+        4
+      ],
+      "font_px": 56,
+      "vector_profile": "new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",
+      "alpha": 170
+    },
+    {
+      "id": "automatic_small",
+      "english": "AUTOMATIC",
+      "korean": "자동 변속",
+      "source_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "effect_bbox": [
+        982,
+        151,
+        1216,
+        212
+      ],
+      "margins": [
+        160,
+        160,
+        4,
+        4
+      ],
+      "font_px": 63,
+      "vector_profile": "new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",
+      "alpha": 170
+    }
+  ],
+  "proofs": [
+    "select_transmission_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_FLIPY_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_FLIPY_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_FLIPY_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_FLIPY_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_FLIPY_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "select_transmission_RAW_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_FLIPY_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "transmission_small_RAW_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_FLIPY_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "manual_small_RAW_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_FLIPY_WHITE_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_GRAY_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_GRAY_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_BLACK_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_BLACK_50_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_WHITE_100_SOURCE_CLEAN_B285_B316.png",
+    "automatic_small_RAW_WHITE_50_SOURCE_CLEAN_B285_B316.png"
+  ],
+  "producer_visual": "PENDING_DIRECT_NATIVE_50_RAW_75",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions (local network cannot resolve canonical raw source)",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
