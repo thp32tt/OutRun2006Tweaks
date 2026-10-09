@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import datetime as dt, json, os, pathlib, subprocess, tempfile
+          import datetime as dt, hashlib, json, os, pathlib, subprocess, tempfile
           now = dt.datetime.now(dt.timezone.utc)
           until = dt.datetime(2026, 10, 10, 23, 0, tzinfo=dt.timezone.utc)
           if now >= until:
@@ -61,21 +61,35 @@ jobs:
               ('RB09 known-good HMD regression',lambda: require('docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md','93%','6th/6','F11','0xBEA5A','0xBEA5F')),
               ('RB10 negative/failure-path contract',lambda: require('tools/verify_vr_visual_composition_p0.py','ResultTextB9200','StageExtension','LensCentre')),
           ]
+          deps=[
+              ['AGENTS.md'],['src/hooks_uiscaling.cpp'],['src/hooks_uiscaling.cpp','tools/analyze_outrun_exe.py'],
+              ['src/hooks_graphics.cpp'],['src/hooks_uiscaling.cpp'],
+              ['src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'],
+              ['docs/automation/reviews/DX9EX_DEEPRESEARCH_P0_20261010.md'],
+              ['src/hooks_graphics.cpp'],['docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md'],
+              ['tools/verify_vr_visual_composition_p0.py']]
+          sigs=[hashlib.sha256(''.join((ROOT/p).read_text(encoding='utf-8') for p in paths).encode()).hexdigest() for paths in deps]
+          verifier_sig=hashlib.sha256(''.join(sigs[i] for i in (1,2,3,4,5,7,9)).encode()).hexdigest()
           run('git','fetch','--no-tags','origin',f'refs/heads/{logref}')
           with tempfile.TemporaryDirectory() as folder:
               work=pathlib.Path(folder)/'audit'
               run('git','worktree','add','--detach',str(work),'FETCH_HEAD')
               statefile=work/statepath
               state=json.loads(statefile.read_text()) if statefile.exists() else {}
-              if state.get('source_sha')!=sha:
-                  state={'source_sha':sha,'reviewed':[],'issues':[],'RUNTIME_VALIDATION':'UNTESTED'}
-                  # Exactly ONE bounded adversarial source verifier per input SHA.
+              if not state:
+                  state={'source_sha':sha,'completed':{},'issues':[],'RUNTIME_VALIDATION':'UNTESTED'}
+              if 'completed' not in state:
+                  state['completed']={str(i):sigs[i] for i in state.get('reviewed',[]) if state.get('source_sha')==sha}
+              state['source_sha']=sha
+              if state.get('verifier_sig')!=verifier_sig:
+                  # Exactly ONE bounded adversarial source verifier per changed input set.
                   try:
                       v=subprocess.run(['python3','tools/verify_vr_visual_composition_p0.py'],cwd=ROOT,
                                        text=True,capture_output=True,timeout=95)
                       state['initial_contract']='PASS' if v.returncode==0 else 'FAIL: '+(v.stderr+v.stdout)[-400:]
                   except Exception as e: state['initial_contract']='ERROR: '+str(e)[:200]
-              todo=[i for i in range(len(reviews)) if i not in state['reviewed']]
+                  state['verifier_sig']=verifier_sig
+              todo=[i for i in range(len(reviews)) if state['completed'].get(str(i))!=sigs[i]]
               label='HEAD-only monitor'; status='NO_SOURCE_CHANGE'; evidence='Ten different review lenses already completed; no duplicated static loops'
               if todo:
                   idx=todo[0]; label=reviews[idx][0]
@@ -83,9 +97,10 @@ jobs:
                   except Exception as e:
                       status='REVIEW_FINDING'; evidence=str(e)[:500].replace('|','/').replace('\n',' ')
                       state['issues'].append({'batch':idx,'reason':evidence})
-                  state['reviewed'].append(idx)
+                  state['completed'][str(idx)]=sigs[idx]
               kst=now.astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M:%S KST')
               state['last_tick']=kst; state['last_status']=status
+              state['reviewed']=[i for i in range(len(reviews)) if state['completed'].get(str(i))==sigs[i]]
               statefile.parent.mkdir(parents=True,exist_ok=True)
               statefile.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
               logfile=work/logpath
