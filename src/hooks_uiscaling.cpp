@@ -136,6 +136,15 @@ class UIScaling : public Hook
     static constexpr int StageExtensionSpraniCalls[] = {
         0x9898E, 0x98A36, 0x98AC6
     };
+    // Full original 0x98000 disassembly (SHA-pinned), beyond the sprani:
+    // the FIRST original time-extension path calls 0x4973C0 twice and
+    // 0x4974E0 once at these precise E8 parents. These are reused text/
+    // number print helpers, not the sprani animation itself. If unowned,
+    // they can render +TIME as generic head-locked overlay even while
+    // the three sprite decorations above are correct.
+    static constexpr int StageExtensionPrintCalls[] = {
+        0x989AD, 0x98A10, 0x98A89
+    };
     static constexpr int ResultTextB9200Calls[] = {
         0x973AF, 0x97422, 0x974D0, 0x97544,
         0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
@@ -723,6 +732,10 @@ class UIScaling : public Hook
         std::size(StageExtensionSpraniCalls)]{};
     inline static SafetyHookMid StageExtensionLeaveHooks[
         std::size(StageExtensionSpraniCalls)]{};
+    inline static SafetyHookMid StageExtensionPrintEnterHooks[
+        std::size(StageExtensionPrintCalls)]{};
+    inline static SafetyHookMid StageExtensionPrintLeaveHooks[
+        std::size(StageExtensionPrintCalls)]{};
     inline static thread_local unsigned StageExtensionDepth = 0;
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionBefore{};
@@ -749,7 +762,7 @@ class UIScaling : public Hook
         const auto hit = ++StageExtensionCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
-                "VR P0 STAGE EXTENSION SPRANI: calls={} gameState={} mode={} exactScope=SCREEN_HUD",
+                "VR P0 STAGE EXTENSION SOURCES: calls={} gameState={} mode={} exactScope=SCREEN_HUD",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1);
@@ -1529,9 +1542,10 @@ public:
 			spdlog::error(
 				"VR P0 RESULT: exact R74 producer midhooks incomplete; all rolled back");
 		}
-        // +TIME extension belongs to 0x989xx original sprani parents,
-        // NOT the 0x97xxx final GOAL progress/record animation.
-        // Install all three exact E8 boundaries or retain vanilla draws.
+        // The original +TIME transition emits BOTH decorated sprani AND
+        // its 0x973C0/0x974E0 number/text helpers, each from a distinct
+        // canonical 0x989xx E8. Atomic install/rollback across ALL SIX
+        // original source parents; tag only the newly queued siblings.
         bool stageExtensionOk = true;
         for (unsigned i = 0; i < std::size(StageExtensionSpraniCalls); ++i)
         {
@@ -1543,6 +1557,17 @@ public:
             stageExtensionOk = stageExtensionOk &&
                 StageExtensionEnterHooks[i] && StageExtensionLeaveHooks[i];
         }
+        for (unsigned i = 0; i < std::size(StageExtensionPrintCalls); ++i)
+        {
+            const int rva = StageExtensionPrintCalls[i];
+            StageExtensionPrintEnterHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva), StageExtensionEnter);
+            StageExtensionPrintLeaveHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva + 5), StageExtensionLeave);
+            stageExtensionOk = stageExtensionOk &&
+                StageExtensionPrintEnterHooks[i] &&
+                StageExtensionPrintLeaveHooks[i];
+        }
         if (!stageExtensionOk)
         {
             for (unsigned i = 0; i < std::size(StageExtensionSpraniCalls); ++i)
@@ -1550,12 +1575,17 @@ public:
                 StageExtensionEnterHooks[i] = {};
                 StageExtensionLeaveHooks[i] = {};
             }
+            for (unsigned i = 0; i < std::size(StageExtensionPrintCalls); ++i)
+            {
+                StageExtensionPrintEnterHooks[i] = {};
+                StageExtensionPrintLeaveHooks[i] = {};
+            }
             spdlog::warn(
-                "VR P0 +TIME: original 0x989xx sprani parent hook partially installed; rollback to game original");
+                "VR P0 +TIME: incomplete 0x989xx sprani/print parent hook; rolled back all six");
         }
         else
             spdlog::info(
-                "VR P0 +TIME: exact 0x989xx sprani parents -> SCREEN_HUD (original animation retained)");
+                "VR P0 +TIME: 3 original sprani + 3 print E8 parents -> SCREEN_HUD (game animation unchanged)");
 
         // Inline E8 parent hooks are installed atomically; a partially
         // bracketed result print sequence could tag only half the large
