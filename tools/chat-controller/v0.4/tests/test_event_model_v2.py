@@ -69,7 +69,7 @@ class LaneAssetTests(unittest.TestCase):
             self.reg.artifact_records[PATH] = dict(state=state)
             self.assertIsNone(m.choose_asset(rows, 'A', self.reg))
         self.reg.artifact_records.clear()
-        self.reg.active_lanes['C'] = {'asset_path': PATH}
+        self.reg.active_lanes['C1'] = {'asset_path': PATH}
         self.assertIsNone(m.choose_asset(rows, 'A', self.reg))
 
     def test_rework_priority_and_preserve_exclusion(self):
@@ -178,22 +178,22 @@ class LaneAssetTests(unittest.TestCase):
     def test_gate_success_releases_only_exact_candidate(self):
         self.reg.artifact_records[PATH] = self.candidate()
         m.enqueue_candidate(self.reg, self.candidate())
-        active = {**self.candidate(), 'lane':'C', 'disposition':'PASS', 'result_sha':HEAD}
-        self.reg.active_lanes['C'] = active
+        active = {**self.candidate(), 'lane':'C1', 'disposition':'PASS', 'result_sha':HEAD}
+        self.reg.active_lanes['C1'] = active
         m.finish_qa(self.reg, active)
         self.assertEqual(self.reg.artifact_records[PATH]['state'], 'PASS')
         self.assertEqual(self.reg.qa_queue, [])
 
     def test_late_pass_cannot_approve_newer_candidate(self):
         self.reg.artifact_records[PATH] = {**self.candidate(), 'candidate_sha':HEAD}
-        active = {**self.candidate(), 'lane':'C', 'disposition':'PASS', 'result_sha':HEAD}
+        active = {**self.candidate(), 'lane':'C1', 'disposition':'PASS', 'result_sha':HEAD}
         m.finish_qa(self.reg, active)
         self.assertEqual(self.reg.artifact_records[PATH]['state'], 'QA_PENDING')
 
     def test_rework_returns_to_correct_shard(self):
         self.reg.artifact_records[PATH] = self.candidate()
         m.enqueue_candidate(self.reg, self.candidate())
-        m.finish_qa(self.reg, {**self.candidate(), 'lane':'C', 'disposition':'REWORK_REQUIRED', 'result_sha':HEAD})
+        m.finish_qa(self.reg, {**self.candidate(), 'lane':'C1', 'disposition':'REWORK_REQUIRED', 'result_sha':HEAD})
         rows = [dict(index='26', path=PATH, action='localize_text', artwork_status='pending_artwork')]
         self.assertIsNotNone(m.choose_asset(rows, 'A', self.reg))
         self.assertIsNone(m.choose_asset(rows, 'B', self.reg))
@@ -230,9 +230,9 @@ class LaneAssetTests(unittest.TestCase):
              patch.object(m,'reconcile_assets'), patch.object(m,'read_qa_result',return_value=None), \
              patch.object(m,'load_asset_rows',return_value=[]), patch.object(m,'dispatch_lane',side_effect=send) as dispatch:
             asyncio.run(m.localization_cycle(None, {}, self.reg))
-            self.assertEqual(dispatch.call_args.args[3]['lane'], 'C')
+            self.assertEqual(dispatch.call_args.args[3]['lane'], 'C1')
 
-    def test_max_two_concurrent_lanes_including_c(self):
+    def test_all_three_available_lanes_start_without_two_worker_cap(self):
         self.reg.artifact_records[PATH] = self.candidate()
         m.enqueue_candidate(self.reg, self.candidate())
         rows = [dict(index=str(i),path=f'{i}.dds',action='localize_text',artwork_status='pending_artwork') for i in (26,27)]
@@ -243,7 +243,88 @@ class LaneAssetTests(unittest.TestCase):
              patch.object(m,'reconcile_assets'), patch.object(m,'read_qa_result',return_value=None), \
              patch.object(m,'load_asset_rows',return_value=rows), patch.object(m,'dispatch_lane',side_effect=send):
             asyncio.run(m.localization_cycle(None, {}, self.reg))
-            self.assertEqual(set(self.reg.active_lanes), {'A','C'})
+            self.assertEqual(set(self.reg.active_lanes), {'A','B','C1'})
+
+    def test_four_logical_worker_slots_and_distinct_qa_assignments(self):
+        self.assertEqual([slot.name for slot in self.reg.slots], ["A", "B", "C1", "C2"])
+        self.assertEqual(m.MAX_ACTIVE_LANES, 4)
+        second_path = "textures/load/test/y.dds"
+        second = {**self.candidate(), "asset_path": second_path,
+                  "candidate_sha": HEAD, "artifact_sha": "d" * 40}
+        self.reg.artifact_records[PATH] = self.candidate()
+        self.reg.artifact_records[second_path] = second
+        m.enqueue_candidate(self.reg, self.candidate())
+        m.enqueue_candidate(self.reg, second)
+        rows = [dict(index=str(i),path=f"{i}.dds",
+                     action="localize_text",artwork_status="pending_artwork")
+                for i in (26, 27)]
+        async def send(context, pages, reg, active):
+            reg.active_lanes[active["lane"]] = active
+            return True
+        with patch.object(m,"AUTO_SEND",True), \
+             patch.object(m,"github_branch_head",return_value=HEAD), \
+             patch.object(m,"reconcile_assets"), \
+             patch.object(m,"read_qa_result",return_value=None), \
+             patch.object(m,"load_asset_rows",return_value=rows), \
+             patch.object(m,"dispatch_lane",side_effect=send) as dispatch:
+            asyncio.run(m.localization_cycle(None, {}, self.reg))
+        self.assertEqual(set(self.reg.active_lanes), {"A", "B", "C1", "C2"})
+        self.assertEqual(self.reg.active_lanes["C1"]["asset_path"], PATH)
+        self.assertEqual(self.reg.active_lanes["C2"]["asset_path"], second_path)
+        self.assertEqual(dispatch.call_count, 4)
+
+    def test_qa_two_workers_do_not_claim_single_candidate_twice(self):
+        self.reg.artifact_records[PATH] = self.candidate()
+        m.enqueue_candidate(self.reg, self.candidate())
+        async def send(context, pages, reg, active):
+            reg.active_lanes[active["lane"]] = active
+            return True
+        with patch.object(m,"AUTO_SEND",True), \
+             patch.object(m,"github_branch_head",return_value=HEAD), \
+             patch.object(m,"reconcile_assets"), \
+             patch.object(m,"read_qa_result",return_value=None), \
+             patch.object(m,"load_asset_rows",return_value=[]), \
+             patch.object(m,"dispatch_lane",side_effect=send) as dispatch:
+            asyncio.run(m.localization_cycle(None, {}, self.reg))
+        self.assertEqual(set(self.reg.active_lanes), {"C1"})
+        self.assertEqual(dispatch.call_count, 1)
+
+    def test_legacy_c_progress_and_chat_url_migrate_to_c1(self):
+        previous_url = "https://chatgpt.com/g/g-p-test/c/old"
+        old = m.new_registry(m.datetime.now(m.TZ))
+        old.slots = [m.Slot(name="A"), m.Slot(name="B"),
+                     m.Slot(name="C", url=previous_url, runs=17)]
+        old.active_lanes["C"] = {**self.candidate(), "lane":"C", "state":"VERIFYING",
+                                 "chat_url":previous_url, "base_sha":HEAD}
+        m.save_registry(old)
+        migrated = m.load_registry(m.datetime.now(m.TZ))
+        self.assertEqual([slot.name for slot in migrated.slots], ["A", "B", "C1", "C2"])
+        self.assertEqual(migrated.slots[2].url, previous_url)
+        self.assertEqual(migrated.slots[2].runs, 17)
+        self.assertEqual(migrated.active_lanes["C1"]["chat_url"], previous_url)
+        self.assertEqual(migrated.active_lanes["C1"]["lane"], "C1")
+        self.assertNotIn("C", migrated.active_lanes)
+        persisted = m.load_registry(m.datetime.now(m.TZ))
+        self.assertEqual(persisted.active_lanes, migrated.active_lanes)
+
+    def test_c2_qa_result_releases_only_owned_candidate(self):
+        second_path = "textures/load/test/y.dds"
+        one = self.candidate()
+        two = {**self.candidate(), "asset_path":second_path,
+               "candidate_sha":HEAD, "artifact_sha":"d" * 40}
+        self.reg.artifact_records[PATH] = one
+        self.reg.artifact_records[second_path] = two
+        m.enqueue_candidate(self.reg, one)
+        m.enqueue_candidate(self.reg, two)
+        self.reg.active_lanes["C1"] = {**one, "lane":"C1", "state":"VERIFYING"}
+        worker_two = {**two, "lane":"C2", "state":"WAIT_GATE",
+                      "disposition":"PASS", "result_sha":HEAD}
+        self.reg.active_lanes["C2"] = worker_two
+        m.finish_qa(self.reg, worker_two)
+        self.assertEqual(self.reg.artifact_records[second_path]["state"], "PASS")
+        self.assertEqual(self.reg.artifact_records[PATH]["state"], "QA_PENDING")
+        self.assertEqual(set(self.reg.active_lanes), {"C1"})
+        self.assertEqual([item["asset_path"] for item in self.reg.qa_queue], [PATH])
 
     def test_restart_adopts_existing_qa_before_sending(self):
         self.reg.artifact_records[PATH] = self.candidate()
@@ -254,12 +335,12 @@ class LaneAssetTests(unittest.TestCase):
              patch.object(m,'dispatch_lane',new_callable=AsyncMock) as send:
             asyncio.run(m.localization_cycle(None, {}, self.reg))
             send.assert_not_awaited()
-            self.assertEqual(self.reg.active_lanes['C']['state'], 'WAIT_GATE')
+            self.assertEqual(self.reg.active_lanes['C1']['state'], 'WAIT_GATE')
 
     def test_failed_or_absent_gate_never_passes(self):
         self.reg.artifact_records[PATH] = self.candidate()
         now = m.datetime.now(m.TZ).isoformat()
-        active = {**self.candidate(), 'lane':'C', 'state':'WAIT_GATE', 'disposition':'PASS',
+        active = {**self.candidate(), 'lane':'C1', 'state':'WAIT_GATE', 'disposition':'PASS',
                   'branch':m.LOCALIZATION_BRANCH, 'workflow':'Localization Automation Gate','gate_started_at':now}
         with patch.object(m,'github_gate_run',return_value={'id':1,'status':'completed','conclusion':'failure'}):
             asyncio.run(m.poll_gate(self.reg, active))
