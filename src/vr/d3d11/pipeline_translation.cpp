@@ -954,14 +954,14 @@ namespace outrun::vr::dx11
             if ((fvf & D3DFVF_DIFFUSE) != 0 &&
                 !append_fvf_element(
                     out, "COLOR", 0,
-                    DXGI_FORMAT_B8G8R8A8_UNORM, 4,
+                    DXGI_FORMAT_R8G8B8A8_UNORM, 4,
                     offset, stream0Stride))
                 return false;
 
             if ((fvf & D3DFVF_SPECULAR) != 0 &&
                 !append_fvf_element(
                     out, "COLOR", 1,
-                    DXGI_FORMAT_B8G8R8A8_UNORM, 4,
+                    DXGI_FORMAT_R8G8B8A8_UNORM, 4,
                     offset, stream0Stride))
                 return false;
 
@@ -3013,10 +3013,10 @@ namespace outrun::vr::dx11
         if (out.hasNormal)
             shader += "    output.normal = input.normal;\n";
         shader += out.hasDiffuse
-            ? "    output.diffuse = input.diffuse;\n"
+            ? "    output.diffuse = input.diffuse.bgra;\n"
             : "    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";
         shader += out.hasSpecular
-            ? "    output.specular = input.specular;\n"
+            ? "    output.specular = input.specular.bgra;\n"
             : "    output.specular = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";
 
         for (UINT index = 0; index < 8; ++index)

@@ -556,9 +556,25 @@ float4 main() : SV_Target {
         require(r173Layout.exact && r173Layout.elementCount == 2u &&
                     r173Layout.elements[1].AlignedByteOffset == 12u &&
                     r173Layout.elements[1].Format ==
-                        DXGI_FORMAT_B8G8R8A8_UNORM &&
+                        DXGI_FORMAT_R8G8B8A8_UNORM &&
                     r173Prototype.generated(),
                 "R173 source packed COLOR0 FVF and generated VS");
+        // Probe actual WARP input-assembler support, not texture support.
+        UINT r173BgraSupport = 0u;
+        UINT r173RgbaSupport = 0u;
+        const HRESULT r173BgraQuery = warp.device->CheckFormatSupport(
+            DXGI_FORMAT_B8G8R8A8_UNORM, &r173BgraSupport);
+        const HRESULT r173RgbaQuery = warp.device->CheckFormatSupport(
+            DXGI_FORMAT_R8G8B8A8_UNORM, &r173RgbaSupport);
+        require(SUCCEEDED(r173RgbaQuery) &&
+                    (r173RgbaSupport &
+                        D3D11_FORMAT_SUPPORT_IA_VERTEX_BUFFER) != 0u,
+                "R173 vertex color input requires supported RGBA IA format");
+        std::cout << "DX11 R173 WARP IA_FORMAT BGRA="
+                  << (SUCCEEDED(r173BgraQuery) &&
+                      (r173BgraSupport &
+                          D3D11_FORMAT_SUPPORT_IA_VERTEX_BUFFER) != 0u)
+                  << " RGBA=1\n";
         D3D11_BUFFER_DESC r173Desc{};
         r173Desc.ByteWidth = sizeof(r173Verts);
         r173Desc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -573,7 +589,7 @@ float4 main() : SV_Target {
 struct I {float3 position : POSITION0; float4 color : COLOR0;};
 struct O {float4 position : SV_Position; float4 color : COLOR0;};
 O main(I i) {O o; o.position=float4(i.position,1.0f);
-              o.color=i.color; return o;}
+              o.color=i.color.bgra; return o;}
 )";
         static const char directPS[] = R"(
 float4 main(float4 color : COLOR0) : SV_Target {return color;}
