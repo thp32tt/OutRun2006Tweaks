@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B305 B-owner IGR-037 q201: new native GOALS -> 목표 DDS d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8 from pinned English/B168 CLEAN; producer native/50/RAW 1 cell QA PASS; 16 unrelated regions exact; fresh C1 and C3, USER_GAME retest remain open. localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
     "C323 C2 q154 independent B298 saved DDS SHA and three alpha-bbox RAW/FLIPY proof PASS source containment, 1px producer metadata discrepancy, C HOLD until full atlas/source CLEAN/protected/C3: localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json",
     "B304 q228 IGR-038: actual 1-row source-conditioned silver trial persisted but source-family chrome highlight, depth and glyph geometry visually FAIL at 100/50/RAW; NO promoted DDS, C2/C3 blocked, user game OPEN. Build a different manually source-conditioned vector/extrusion master, rerender all 13 only after representative visual PASS. localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
     "C322 C2 q236 B302 scoped visual: 14/14 50%-gray rows, native 00/05/11, RAW75 row00 inspected, no obvious broken glyph; independent full exact DDS decode/masks/native/RAW and calibration NOT done. HOLD_STRICT_RECHECK, no current approval/C3, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
@@ -12894,5 +12895,32 @@
     "dds_created": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json"
+  },
+  "b305_q201_igr037_goals_native": {
+    "time_kst": "2026-10-09 09:47 KST",
+    "run_key": "OUTRUN-KOR-B305-Q201-IGR037-GOALS-NATIVE-20261009-0940",
+    "role": "B",
+    "owner_lane": "B",
+    "queue_index": 201,
+    "ingame": "IGR-037",
+    "new_candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+    "prior_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+    "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+    "original_label": "GOALS",
+    "old_korean": "골",
+    "current_korean": "목표",
+    "promoted_producer_dds": 1,
+    "scoped_visual": "SELF_QA_PASS_AT_NATIVE_50_RAW",
+    "mask_outside": 0,
+    "source_bboxes": "1/1_PASS",
+    "protected_other_16": "PIXEL_EXACT",
+    "DDS_roundtrip": "EXACT",
+    "independent_C1": "PENDING",
+    "C3": "PENDING",
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "github-actions",
+    "actions_run": 37866268182
   }
 }
