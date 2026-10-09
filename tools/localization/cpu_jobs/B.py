@@ -80,8 +80,13 @@ for z in rows:
  for size in range(100,24,-1):
   ft=ImageFont.truetype(font,size,index=1)
   anchor=ft.getbbox(ko)
-  im=Image.new("RGBA",(anchor[2]-anchor[0]+20,anchor[3]-anchor[1]+20),(0,0,0,0))
-  ImageDraw.Draw(im).text((10-anchor[0],10-anchor[1]),ko,font=ft,fill=tuple(median))
+  track=16 if n==43 else 0  # Original PROFESSIONAL source spans 638px in uppercase.
+  im=Image.new("RGBA",(anchor[2]-anchor[0]+20+track*max(0,len(ko)-1),anchor[3]-anchor[1]+20),(0,0,0,0))
+  pen=ImageDraw.Draw(im)
+  px=float(10-anchor[0])
+  for ch in ko:
+   pen.text((round(px),10-anchor[1]),ch,font=ft,fill=tuple(median))
+   px+=ft.getlength(ch)+track
   bbink=im.getchannel("A").getbbox()
   if not bbink:continue
   glyph=im.crop(bbink)
@@ -102,7 +107,7 @@ for z in rows:
   "new_bbox":[xx,yy,xx+glyph.width,yy+glyph.height],
   "margin":[xx-l,r-xx-glyph.width,yy-t,b2-yy-glyph.height],
   "source_face":median,"source_family":family,"alignment":alignment,"font":"NotoSansCJK-Black.ttc","native_px":size,
-  "native_glyph_width":glyph.width,"native_glyph_height":glyph.height})
+  "native_glyph_width":glyph.width,"native_glyph_height":glyph.height,"source_derived_uppercase_tracking_px":(16 if n==43 else 0)})
 changed=np.any(out!=P,axis=2)
 assert np.count_nonzero(changed)>1000
 assert not np.any(changed&~allowed)
