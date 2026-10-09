@@ -13,3 +13,10 @@ Task context: `DX9EX-R84-PORT-SEAMS-001`; source authority `thp32tt/OutRun2006Tw
 - Four paths: `src/vr/core/r30_support_api.hpp`, `src/vr/d3d9/stereo_renderer_r30.cpp`, `src/vr/d3d9/stereo_renderer_r32.cpp`, `tools/verify_vr_refactor_contract.py`. One full direct R9 call is replaced by one forwarding call, without new policy, duplicating notification, adding epochs, changing HUD or adjusting resource/pose lifetime.
 - Fail-closed verifier requires exact forwarding and detects both erased lower notification and R32 bypass. C3 hosted DX9Ex/Domain results **PENDING** until exact material SHA workflows finish. `RUNTIME_VALIDATION=UNTESTED`; no Quest 3/VDXR inference.
 - Next checkpoint: log only actual CI results or source repair, not fabricated time intervals or a repeated unchanged-source verifier run.
+
+## ~18:30 C3 repair checkpoint — source result remains unvalidated until hosted gates complete
+- First material `937abe494990ab97d42c9312b7803c46d142064d`: source/hook/EXE checks reached `verify_vr_refactor_contract.py` but policy failed on the *legacy* assertion requiring the retired direct `R32 -> R9` call (DX9Ex Active 37911334070); Domain Isolation 37911334353 passed.
+- Inspected the exact log error `R32 split facade must delegate main-depth accounting to the R9 owner API`. This was a stale structural verifier contract, not an observed R9 rendering/runtime failure.
+- Repair `81e4146956f730033f5a7a4f49577ec7ff37b50a` updates only that legacy assertion to require `R32 -> R30Support`, retaining the new separately negative-tested `R30Support -> R9` ownership and no HUD/runtime changes.
+- Repair exact-SHA DX9Ex Active 37911539598 policy SUCCESS; Win32 game, x64 host and full-chain still running at the checkpoint; Domain Isolation 37911539688 pending. Do not score or claim complete while pending.
+- Existing interactive five-minute source checkpoint convention preserved. No unchanged-source 1000/5000 validation repetition, no claimed autonomous Docker progress, `RUNTIME_VALIDATION=UNTESTED`.
