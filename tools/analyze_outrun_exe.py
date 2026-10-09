@@ -74,6 +74,26 @@ PRODUCER_WINDOWS = (
         "expected_direct_targets": {0x0000CF4E: 0x049940},
     },
     {
+        # The primary central solar disc is NOT emitted through the same
+        # producer as the outer lens circles. 0xD3A0 loads object 0x570002;
+        # 0xD3A5 -> 0xC980 -> DrawObjectAlpha_Internal; outer discs
+        # use 0xD5F5..0xD796 -> 0xC9A0 -> 0xCABE.
+        "name": "LensPrimaryCentre_vs_OuterChildren_0xD300",
+        "start_rva": 0x0000D300,
+        "end_rva": 0x0000D800,
+        "anchors": (
+            0x0000D3A0, 0x0000D3A5,
+            0x0000D5F5, 0x0000D624,
+            0x0000D796,
+        ),
+        "expected_direct_targets": {
+            0x0000D3A5: 0x0000C980,
+            0x0000D5F5: 0x0000C9A0,
+            0x0000D624: 0x0000C9A0,
+            0x0000D796: 0x0000C9A0,
+        },
+    },
+    {
         "name": "OutRunStageResultHud_0x97000",
         "start_rva": 0x00097000,
         "end_rva": 0x00098000,
