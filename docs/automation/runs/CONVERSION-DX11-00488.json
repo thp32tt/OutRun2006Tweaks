@@ -6,7 +6,7 @@
   "event_type": "dispatch",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00488",
   "lease_epoch": 1,
   "work_key": "DX11:R186:DORMANT_NATIVE_INDEXED_DRAW_PIPELINE_IA_WARP",
@@ -15,10 +15,11 @@
     "tools/dx11_indexed_draw_probe_r186.cpp:R186",
     "tools/test_dx11_indexed_draw_r186.py:R186",
     "CMakeLists.txt:R186",
-    ".github/workflows/backend-conversion-gate.yml:R186"
+    ".github/workflows/backend-conversion-gate.yml:R186",
+    "cmake.toml:R186"
   ],
   "base_sha": "ccee9300630b4b52bea346f60b9dc7c5d63f8704",
-  "result_sha": "PENDING_C4_MATERIAL_SHA",
+  "result_sha": "PENDING_REPAIR_MATERIAL_SHA",
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "status": "WAITING_CI",
@@ -31,9 +32,9 @@
   "pipeline": {
     "C0_RECOVER": "PASS: branch base ccee9300630b4b52bea346f60b9dc7c5d63f8704; 00488 run not found; 00487 R185 material ff1ef3f3 scoped PASS/full R175 fail; no task checkpoint and no conflicting active work_key found",
     "C1_REVIEW": "PASS: five lenses ownership, draw extent/topology, shader/RT device identities, activation isolation, WARP GPU/CI priority; change distinct from R175/R183/R184/R185",
-    "C2_IMPLEMENT": "PASS: new production readiness helper, WARP GPU indexed Draw proof, static mutants and CMake/CI wiring",
-    "C3_VALIDATE": "PENDING exact-SHA Gate",
-    "C4_COMMIT": "PENDING remote result SHA",
+    "C2_IMPLEMENT": "PASS: new production readiness helper, WARP GPU indexed Draw proof, static mutants and CMake/CI wiring; repair authoritative cmkr manifest (first candidate used generated CMakeLists only).",
+    "C3_VALIDATE": "First exact-SHA Gate 37961213301 on a02a38dd: validate SUCCESS, smoke FAILED at R186 manifest contract BEFORE WARP; cmkr regenerates CMakeLists from cmake.toml; repair adds authoritative cmkr target and strengthened contract; revalidation PENDING.",
+    "C4_COMMIT": "Initial material a02a38dd4b984be9958fd638b17bd106b534501c; repair material SHA PENDING.",
     "C5_PACKAGE": "NOT_REQUIRED: no game draw activation/Quest 3 test",
     "C6_STATE": "PENDING CI evidence"
   },
@@ -43,12 +44,23 @@
     "tools/test_dx11_indexed_draw_r186.py",
     "CMakeLists.txt",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00488.json"
+    "docs/automation/runs/CONVERSION-DX11-00488.json",
+    "cmake.toml"
   ],
   "blockers": [
     "pre-existing R175 TEXCOORD6 GPU color mismatch under task 00477",
     "Quest3/VDXR runtime untested"
   ],
-  "next_action": "Confirm material SHA and exact-SHA Backend Conversion Gate before any checkpoint commit. Full Gate may inherit unchanged R175 failure.",
-  "score_change": 0
+  "next_action": "Verify new exact-SHA Gate, R186 WARP compile/readback. Do not promote gameplay Draw. Runtime remains UNTESTED.",
+  "score_change": 0,
+  "previous_candidate": {
+    "sha": "a02a38dd4b984be9958fd638b17bd106b534501c",
+    "gate_id": 37961213301,
+    "validate_job_id": 113924218679,
+    "validate_result": "success",
+    "smoke_job_id": 113926439736,
+    "smoke_result": "failure",
+    "failed_step": "Verify R186 native indexed Draw ownership",
+    "root_cause": "cmkr regenerated CMakeLists.txt from cmake.toml, missing authoritative R186 target"
+  }
 }

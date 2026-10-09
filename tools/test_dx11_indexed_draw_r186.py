@@ -25,6 +25,9 @@ for t in ("context->DrawIndexed(3,0,0);",
           "reject missing PS", "reject missing RTV", "reject retired IB owner",
           "actual DrawIndexed green center / black corner pixels"):
     assert t in p, "missing WARP behavior evidence: "+t
+manifest=(root/"cmake.toml").read_text(encoding="utf-8")
+assert "[target.dx11_indexed_draw_probe_r186]" in manifest
+assert '"tools/dx11_indexed_draw_probe_r186.cpp"' in manifest
 assert "add_executable(dx11_indexed_draw_probe_r186)" in c
 assert "python tools/test_dx11_indexed_draw_r186.py" in w
 assert w.index("Verify R186 native indexed Draw ownership") < w.index("Build DX11 constant buffer probe")

@@ -529,3 +529,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R186 is a real cmkr target, not just generated CMakeLists.txt text.
+[target.dx11_indexed_draw_probe_r186]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
