@@ -335,6 +335,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_indexed_draw_r186.py
 
+      # R207: exact same-device IA layout/VS/PS/RTV provenance and WARP alien-PS pixels.
+      - name: Verify R207 native indexed exact pipeline identity
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_pipeline_identity_r207.py
+
       - name: Build R186 owned indexed Draw WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186

@@ -17,8 +17,8 @@
     "tools/test_dx11_indexed_pipeline_identity_r207.py",
     "backend-conversion-gate.yml:R207"
   ],
-  "status": "RUNNING",
-  "checkpoint": "C1_REVIEW",
+  "status": "VALIDATING",
+  "checkpoint": "C3_VALIDATE",
   "result_sha": null,
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
@@ -28,11 +28,21 @@
   "selected_work_item": "R207 dormant DrawIndexed exact expected IA layout/VS/PS/RTV identity gate on same-device shader rebinds, with isolated WARP pixel mismatch control",
   "pipeline": {
     "C0_RECOVER": "PASS: 00505 C6 terminal blocked upstream R175; 00506 absent; checkpoint path absent; HEAD and no colliding task claim observed.",
-    "C1_REVIEW": "PASS: R186 base guard verifies same device but not expected shader/layout/RTV object identity; R175 independent owner untouched."
+    "C1_REVIEW": "PASS: R186 base guard verifies same device but not expected shader/layout/RTV object identity; R175 independent owner untouched.",
+    "C2_IMPLEMENT": "PASS: R207 production opt-in exact IA layout/VS/PS/RTV binding gate, isolated same-device alien PS WARP changed pixel proof, 6-mutation static test, exact Gate hook.",
+    "C3_VALIDATE": "PENDING: scoped changed-input JS contract and six negative mutants passed once locally; Win32 WARP GitHub Actions exact-SHA CI pending."
   },
   "resume_cursor": "C2_IMPLEMENT",
-  "next_action": "Implement small R207 guard, WARP same-device alien PS pixel negative, scoped test and CI hook; exact-SHA Gate required.",
+  "next_action": "Publish material GitHub CAS; obtain exact-SHA Backend Conversion Gate, inspect validate/smoke, then seal C6 separate from material.",
   "last_real_activity_at": "2026-10-10T08:42:00+09:00",
   "last_activity_evidence": "Initial branch head/C0 contract and R186 source review verified; remote CAS claim.",
-  "state_persisted": true
+  "state_persisted": true,
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_pipeline_identity_r207.py",
+    "docs/automation/runs/CONVERSION-DX11-00506.json"
+  ],
+  "last_real_activity_evidence": "R207 substantive C++/WARP test plus changed-input static guard and workflow hook composed; one-shot six negative source mutants PASS."
 }

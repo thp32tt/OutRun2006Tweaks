@@ -65,4 +65,43 @@ namespace outrun::vr::dx11 {
     // Activation is intentionally out of scope: no DrawIndexed dispatch here.
     return true;
 }
+
+ 
+// R207: stronger, opt-in object provenance for a *specific* indexed pipeline.
+// R186 checks same-device ownership but cannot distinguish a different shader
+// or render target created by that very same device. A native caller must
+// supply all four exact expected objects before treating a snapshot as ready.
+// No gameplay DrawIndexed dispatch or backend activation is performed here.
+[[nodiscard]] inline bool verified_indexed_pipeline_identity_ready(
+    const NativeLinearBufferMirror& vertexOwner,
+    const NativeLinearBufferMirror& indexOwner,
+    ID3D11DeviceContext* context,
+    UINT startIndex, UINT indexCount, INT baseVertexLocation,
+    std::uint64_t deviceGeneration,
+    std::uint64_t vertexSnapshotVersion,
+    std::uint64_t indexSnapshotVersion,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv) noexcept {
+    if (!expectedLayout || !expectedVs || !expectedPs || !expectedRtv ||
+        !verified_indexed_linear_draw_ready(
+            vertexOwner, indexOwner, context, startIndex, indexCount,
+            baseVertexLocation, deviceGeneration, vertexSnapshotVersion,
+            indexSnapshotVersion))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
+    context->IAGetInputLayout(layout.GetAddressOf());
+    context->VSGetShader(vs.GetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(ps.GetAddressOf(), nullptr, nullptr);
+    context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    return layout.Get() == expectedLayout &&
+           vs.Get() == expectedVs &&
+           ps.Get() == expectedPs &&
+           rtv.Get() == expectedRtv;
+}
+
 } // namespace outrun::vr::dx11

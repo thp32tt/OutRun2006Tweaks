@@ -93,6 +93,44 @@ int main() {
         return verified_indexed_linear_draw_ready(
             vb,ib,c,start,count,base,gen,vVersion,iVersion);
     };
+    // R207: the old same-device preflight admits a replacement PS, which
+    // actually paints a different WARP pixel. Exact expected identity must fail.
+    const auto exactReady=[&]() {
+        return outrun::vr::dx11::verified_indexed_pipeline_identity_ready(
+            vb, ib, context.Get(), 0, 3, 0, generation, vbVersion,
+            ibVersion, layout.Get(), vs.Get(), ps.Get(), rtv.Get());
+    };
+    require(exactReady(), "R207 exact indexed pipeline initial objects");
+    constexpr char alienShader[] =
+        "float4 ps():SV_Target{return float4(1,0,0,1);}";
+    ComPtr<ID3DBlob> alienCode;
+    require(SUCCEEDED(D3DCompile(alienShader,sizeof(alienShader)-1,nullptr,
+        nullptr,nullptr,"ps","ps_4_0",0,0,alienCode.GetAddressOf(),nullptr)),
+        "R207 compile same-device alien PS");
+    ComPtr<ID3D11PixelShader> alienPS;
+    require(SUCCEEDED(device->CreatePixelShader(alienCode->GetBufferPointer(),
+        alienCode->GetBufferSize(),nullptr,alienPS.GetAddressOf())),
+        "R207 create same-device alien PS");
+    context->PSSetShader(alienPS.Get(),nullptr,0);
+    require(ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
+        "R207 same-device base guard cannot identify alien PS");
+    require(!exactReady(), "R207 reject same-device alien PS identity");
+    const float r207clear[] = {0,0,0,1};
+    context->ClearRenderTargetView(rtv.Get(),r207clear);
+    context->DrawIndexed(3,0,0);
+    context->CopyResource(readback.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE alienMap{};
+    require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,0,&alienMap))
+        && alienMap.pData, "R207 map alien PS GPU pixel");
+    const auto* alienPixel=static_cast<const unsigned char*>(alienMap.pData)
+        +16*alienMap.RowPitch+16*4;
+    const bool alienRed=alienPixel[0]==255 && alienPixel[1]==0 &&
+        alienPixel[2]==0 && alienPixel[3]==255;
+    context->Unmap(readback.Get(),0);
+    require(alienRed, "R207 alien PS changes real WARP indexed pixel to red");
+    context->PSSetShader(ps.Get(),nullptr,0);
+    require(exactReady(), "R207 restore exact expected PS");
+
     require(!ready(context.Get(),0,0,0,generation,vbVersion,ibVersion), "reject zero indices");
     require(!ready(context.Get(),0,2,0,generation,vbVersion,ibVersion), "reject partial triangle");
     require(!ready(context.Get(),1,3,0,generation,vbVersion,ibVersion), "reject IB overrun");
