@@ -103,9 +103,9 @@ for label, altered_r30, altered_r32 in (
 # R32 reads the same latched pose sequence through the R30 owner boundary.
 if "std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;" not in r30_support_api:
     errors.append("R30 missing frame stereo pose sequence owner declaration")
-if not re.search(r"R30SupportFrameStereoPoseSequence\\(\\) noexcept\\s*\\{\\s*return FrameStereoPoseSequence;\\s*\\}", r30):
+if not re.search(r"R30SupportFrameStereoPoseSequence\(\) noexcept\s*\{\s*return FrameStereoPoseSequence;\s*\}", r30):
     errors.append("R30 frame pose-sequence query lost exact original value")
-if not re.search(r"R32ReviewFrameStereoPoseSequence\\(\\) noexcept\\s*\\{\\s*return R30SupportFrameStereoPoseSequence\\(\\);\\s*\\}", r32):
+if not re.search(r"R32ReviewFrameStereoPoseSequence\(\) noexcept\s*\{\s*return R30SupportFrameStereoPoseSequence\(\);\s*\}", r32):
     errors.append("R32 bypassed R30 frame pose-sequence owner query")
 
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
