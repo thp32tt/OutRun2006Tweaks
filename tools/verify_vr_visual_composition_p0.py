@@ -1259,6 +1259,18 @@ def check_outrun_stage_printf_owner(src, contract):
                   'TagAppendedNodes(OutRunStagePrintfBefore,',
                   'RenderScope::ScreenHud',
                   'OutRunStagePrintfBefore = {};')
+    for marker in (
+        'Settings::VRTelemetry',
+        'after != OutRunStagePrintfBefore[p]',
+        'TagAppendedNodes(OutRunStagePrintfBefore,',
+        '++OutRunStagePrintfCompleted',
+        '(hit & (hit - 1u)) == 0',
+        'VR P0 STAGE PRINT SOURCE:',
+    ):
+        require(marker, leave, 'bounded +TIME exact parent evidence')
+    if any(k in leave for k in ('SetTransform(', 'SetRenderState(',
+                                    'Game::put_sprite_ex(')):
+        raise SystemExit('P0 +TIME logging may not modify game rendering')
     apply = function_body(src, 'bool apply() override')
     require_order(apply, 'R71 exact installed parent CALL plus 5 cleanup',
                   'OutRunStagePrintfEnterHooks[i] = safetyhook::create_mid(',
@@ -1271,6 +1283,8 @@ def check_outrun_stage_printf_owner(src, contract):
 
 check_outrun_stage_printf_owner(ui, json.loads(binary_contract)['contracts'])
 for label, old, bad in (
+    ('R71 exact stage evidence lost', 'VR P0 STAGE PRINT SOURCE:',
+     'VR P0 STAGE PRINT UNVERIFIED:'),
     ('R71 result children lost', 'TagAppendedNodes(OutRunStagePrintfBefore,',
      'TagAppendedNodes(OutRunStageIncorrectBefore,'),
     ('R71 midhook wrong return', 'Module::exe_ptr(OutRunStagePrintfCalls[i] + 5)',
