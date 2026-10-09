@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""B338 q214: HAND-DRAWN separated Hangul jamo source-badge BC3 glyphs.
+"""B339 q214: HAND-DRAWN separated Hangul jamo source-badge BC3 glyphs.
 
 Manual multi-jamo stroke paths replace the resampled-font B325/B326 mask. Original English
 metallic material from SHA-pinned DXT5 blocks and reassigns it to a NEW native
 Hangul mask (face / beveled edge / warm extrusion), with per-block donor matching.
-A controlled trial only; exact persisted BC3 is visually judged before promotion.
+B339 additionally REBUILDS BC3 ALPHA endpoint/index for the NEW jamo strokes; B338 recycled older alpha masks. A controlled trial only; exact persisted BC3 must visually pass before promotion.
 """
 import io,os,sys,json,hashlib,struct,urllib.request,subprocess
 from pathlib import Path
@@ -13,7 +13,7 @@ from PIL import Image,ImageDraw,ImageFont
 from scipy.ndimage import binary_dilation,gaussian_filter,distance_transform_edt
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-P=G/"role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT"
+P=G/"role_B/20261010-B339-Q214-MANUAL-JAMO-VECTOR-PILOT"
 P.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 srcsha="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
@@ -147,6 +147,26 @@ def bc_indices(block):
 def pack_index(block,ind):
  z=sum((int(ind[i])&3)<<(2*i) for i in range(16))
  return block[:12]+z.to_bytes(4,"little")
+# DXT5/BC3 alpha block: two endpoints plus sixteen 3-bit indices.
+# B338 only wrote COLOR indices and copied old B259 alpha bytes, letting old
+# Hangul geometry punch holes through freshly handwritten vertical strokes.
+# B339 creates an independent alpha topology for every changed 4x4 block.
+def encode_bc3_alpha(a):
+ a=np.asarray(a,dtype=np.uint8)
+ assert a.shape==(4,4)
+ # Use a0>a1 so the 8 levels are 255,0,219,182,146,109,73,36.
+ levels=np.array([255,0,219,182,146,109,73,36],dtype=np.int16)
+ dist=np.abs(a.reshape(-1,1).astype(np.int16)-levels[None,:])
+ inds=np.argmin(dist,axis=1)
+ bits=sum(int(inds[i])<<(3*i) for i in range(16))
+ return bytes((255,0))+bits.to_bytes(6,"little")
+def decode_bc3_alpha(block):
+ assert len(block)==16
+ a0,a1=block[0],block[1]
+ assert a0>a1,"selected alpha palette must be eight levels"
+ vals=np.array([a0,a1]+[((7-k)*a0+k*a1)//7 for k in range(1,7)],dtype=np.int16)
+ bits=int.from_bytes(block[2:8],"little")
+ return np.array([vals[(bits>>(3*i))&7] for i in range(16)],dtype=np.uint8).reshape(4,4)
 bw=W//4;bh=H//4
 # A donor is a truly encoded *original English* BC3 block with cream-white
 # source face plus red badge backing. Select using English material, block
@@ -220,7 +240,16 @@ for r in regions:
       red_idxs=[int(i) for i,v in enumerate(pp) if v[0]>v[1]+30 and v[0]>v[2]+25]
       if not red_idxs:red_idxs=list(range(4))
       ind[ky,kx]=min(red_idxs,key=lambda i:float(np.sum((pp[i]-bg)**2)))
-   output=pack_index(prior[:8]+block[8:12]+prior[12:16],ind.reshape(-1))
+   # The glyph and CLEAN plate now own alpha; old candidate alpha must NOT
+   # survive inside a changed BC3 block. Face opacity matters especially for
+   # GOAL's 1-2px vertical stroke/counter under compression.
+   alpha=Craw[yy:yy+4,xx:xx+4,3].copy()
+   alpha[patch==1]=np.maximum(alpha[patch==1],np.uint8(200))
+   alpha[patch==2]=np.maximum(alpha[patch==2],np.uint8(230))
+   alpha[patch==3]=255
+   ablock=encode_bc3_alpha(alpha)
+   assert np.count_nonzero(decode_bc3_alpha(ablock)[patch==3]<246)==0
+   output=pack_index(ablock+block[8:12]+prior[12:16],ind.reshape(-1))
    encoded[off:off+16]=output
    touched+=1
    donorchoices.append([r["name"],bx,by,bx0,by0,coverage,non])
@@ -245,13 +274,26 @@ for r in regions:
  stats.append(dict(id=r["name"],source_bbox=r["bbox"],new_bbox=r["final_bbox"],
     margins=r["margins"],new_source_native_core=r["core_count"],
     BC3_source_donor_face_bright_retention=round(ratio,5),material_donor_blocks=r["donor_count"]))
+# New B339 saved-DDS checks: the exact decoded alpha must cover nearly
+# all hand-authored glyph-core pixels; B338 never enforced this condition.
+alpha_core_coverage={}
+for r in regions:
+ l,t,rr,b=r["bbox"]
+ mask=(kind[t:b,l:rr]==3)
+ assert int(mask.sum())>110
+ observed=D[t:b,l:rr,3]
+ coverage=float(np.mean(observed[mask]>=246))
+ alpha_core_coverage[r["name"]]=round(coverage,6)
+ assert coverage>=0.98,(r["name"],"persisted glyph alpha lost",coverage)
+# The non-text region must remain bit-exact as before. Separate diagnostics
+# do not imply font/style producer PASS.
 # Save trial evidence, no stale candidate can be promoted until controller QA.
-trial=P/"B338_UNAPPROVED_MANUAL_JAMO_CHROME_TRIAL.dds"
+trial=P/"B339_UNAPPROVED_MANUAL_JAMO_CHROME_TRIAL.dds"
 trial.write_bytes(dst)
 assert dec(trial.read_bytes()).shape==(H,W,4)
 # Save lossless full clean and actual decoded proof, including game RAW.
-Image.fromarray(D,"RGBA").save(P/"B338_PERSISTED_DECODE_READABLE.png")
-Image.fromarray(np.flipud(D).copy(),"RGBA").save(P/"B338_PERSISTED_DECODE_RAW.png")
+Image.fromarray(D,"RGBA").save(P/"B339_PERSISTED_DECODE_READABLE.png")
+Image.fromarray(np.flipud(D).copy(),"RGBA").save(P/"B339_PERSISTED_DECODE_RAW.png")
 def flatten(z,bg):
  canvas=Image.new("RGBA",(z.shape[1],z.shape[0]),(*bg,255))
  canvas.alpha_composite(Image.fromarray(z,"RGBA"))
@@ -269,8 +311,8 @@ for r in regions:
     panel=Image.new("RGB",(sum(x.width for x in ims)+12,max(x.height for x in ims)),bg)
     x=0
     for im in ims:panel.paste(im,(x,0));x+=im.width+4
-    fn=f"{r['name']}_{ori}_{bg_name}_{pc}_SOURCE_CLEAN_OLD_B338.png"
+    fn=f"{r['name']}_{ori}_{bg_name}_{pc}_SOURCE_CLEAN_OLD_B339.png"
     panel.save(P/fn,optimize=True);views.append(fn)
-meta=dict(run="B338",role="B",index=214,method="HAND_DRAWN_JAMO_STROKE_VECTOR_SOURCE_ORIGINAL_DXT5_PALETTE",triage="METHOD_CHANGE_REQUIRED",older_trial_family="B260_B261_FLAT_SDF_PALETTE_REJECTED",source_sha256=srcsha,clean_sha256=cleansha,old_candidate_sha256=oldsha,trial_sha256=sha(dst),manual_vector_paths={k:[{"path":z[0],"stroke":z[1]} for z in v] for k,v in GLYPHS.items()},native=[W,H],dds_format="BC3/DXT5",mips=1,dds_header="EXACT",raw_mirror_y="EXACT",saved_roundtrip="PASS",outside_canonical_source_rgba=outside,outside_canonical_source_alpha=alphaout,outside_prior_candidate_rgba=oldoutside,source_donor_blocks=touched,glyphs=stats,render_english_source_vs_clean="B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",clean_final_protection="SOURCE_OUTSIDE_ZERO",authored_lossless_contacts=len(views),views=views,output="UNAPPROVED_TRIAL_NOT_PROMOTED",producer_visual="NOT_YET_REVIEWED",fresh_C2="NOT_RUN",C3="NOT_RUN",user_game="UNTESTED",RUNTIME_VALIDATION="UNTESTED",backend="GITHUB_ACTIONS",forbidden_domains_touched=[])
-(P/"B338_MACHINE_TRIAL_QA.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2)+"\n")
-print("B338_TRIAL_BUILT",meta["trial_sha256"],"source_donor_blocks",touched,"retention",stats,flush=True)
+meta=dict(run="B339",role="B",index=214,method="HAND_DRAWN_JAMO_STROKE_VECTOR_SOURCE_ORIGINAL_DXT5_PALETTE",triage="METHOD_CHANGE_REQUIRED",older_trial_family="B260_B261_FLAT_SDF_PALETTE_REJECTED",source_sha256=srcsha,clean_sha256=cleansha,old_candidate_sha256=oldsha,trial_sha256=sha(dst),manual_vector_paths={k:[{"path":z[0],"stroke":z[1]} for z in v] for k,v in GLYPHS.items()},native=[W,H],dds_format="BC3/DXT5",mips=1,dds_header="EXACT",raw_mirror_y="EXACT",saved_roundtrip="PASS",outside_canonical_source_rgba=outside,outside_canonical_source_alpha=alphaout,outside_prior_candidate_rgba=oldoutside,source_donor_blocks=touched,glyphs=stats,decoded_alpha_core_coverage=alpha_core_coverage,bc3_alpha_method="REBUILT_255_0_EIGHT_LEVEL_3BIT_GLREMOVED_PRIOR_MASK",render_english_source_vs_clean="B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",clean_final_protection="SOURCE_OUTSIDE_ZERO",authored_lossless_contacts=len(views),views=views,output="UNAPPROVED_TRIAL_NOT_PROMOTED",producer_visual="NOT_YET_REVIEWED",fresh_C2="NOT_RUN",C3="NOT_RUN",user_game="UNTESTED",RUNTIME_VALIDATION="UNTESTED",backend="GITHUB_ACTIONS",forbidden_domains_touched=[])
+(P/"B339_MACHINE_TRIAL_QA.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2)+"\n")
+print("B339_TRIAL_BUILT",meta["trial_sha256"],"source_donor_blocks",touched,"retention",stats,flush=True)
