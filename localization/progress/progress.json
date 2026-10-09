@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 16:27 KST",
+  "updated_at_kst": "2026-10-09 16:52 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9085,5 +9085,22 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json",
     "actions_id": 37873410100
+  },
+  "b324_q214_canonical_clean": {
+    "run_key": "OUTRUN-KOR-B324-Q214-CLEAN-BOUNDARY-20261009",
+    "queue_index": 214,
+    "stage": "PRE_RENDER_CLEAN_PLATE_RECONSTRUCTION",
+    "original_clean_outside_bbox_rgba": 394,
+    "repaired_clean_outside_bbox_rgba": 0,
+    "protected_pixel_drift": 0,
+    "corrected_lossless_plate_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+    "new_lossless_proof_png": 36,
+    "new_candidate_dds": 0,
+    "independent_C2": "PENDING",
+    "C3": "BLOCKED",
+    "approval": false,
+    "igame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CONTROLLER_PLATE_QA.json"
   }
 }
