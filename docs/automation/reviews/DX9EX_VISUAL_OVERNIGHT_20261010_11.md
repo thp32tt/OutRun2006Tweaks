@@ -12,3 +12,4 @@ Schedule is best-effort, not guaranteed exact. Fixed run deadline: **2026-10-11 
 | 2026-10-10 07:12:52 KST | 397ffbb3ddde | RB03 +TIME six source edges | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
 | 2026-10-10 07:17:52 KST | 397ffbb3ddde | RB04 central lens and outer halos | SOURCE_CONTRACT_OK | src/hooks_graphics.cpp: 7 source contracts present |
 | 2026-10-10 07:22:52 KST | 31b079772057 | RB05 car-relative rank owner | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 4 source contracts present |
+| 2026-10-10 07:27:52 KST | d57bf60809e9 | RB06 shader / FVF routes | SOURCE_CONTRACT_OK | src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp: 4 source contracts present |
