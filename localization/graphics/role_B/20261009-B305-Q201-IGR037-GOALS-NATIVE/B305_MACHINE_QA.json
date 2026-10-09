@@ -1,0 +1,87 @@
+{
+  "role": "B",
+  "run": "B305",
+  "queue_index": 201,
+  "ingame_report": "IGR-037",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "previous_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+  "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "source": "GOALS",
+  "old_korean": "골",
+  "new_korean": "목표",
+  "source_effect_bbox": [
+    1079,
+    1734,
+    1255,
+    1785
+  ],
+  "old_visible_bbox": [
+    1084,
+    1738,
+    1124,
+    1781
+  ],
+  "new_visible_bbox": [
+    1084,
+    1739,
+    1160,
+    1780
+  ],
+  "delta_margins": [
+    5,
+    95,
+    5,
+    5
+  ],
+  "native_typeface": "NotoSansCJK-Black.ttc",
+  "font_size": 41,
+  "native_glyph_upscale": 1,
+  "source_qa_clean_alpha_in_region": 0,
+  "source_vs_clean_outside_17_source_bboxes": 0,
+  "new_vs_previous_changed_pixels_outside_selected": 0,
+  "new_vs_previous_alpha_changed_outside_selected": 0,
+  "other_16_rows_and_preserved_artwork": "PIXEL_EXACT_UNCHANGED",
+  "pixel_changed_inside": 2505,
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "DDS_header_exact": true,
+  "mips": 1,
+  "DDS_format": "BGRA",
+  "raw_orientation": "mirror_y",
+  "saved_DDS_decoded_exact": "PASS",
+  "proof": [
+    "B305_GOALS_FLIP_Y_READABLE_128_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_128_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_128_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_255_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_255_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_255_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_0_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_0_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_FLIP_Y_READABLE_0_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_128_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_128_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_128_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_255_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_255_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_255_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_0_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_0_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B305_GOALS_RAW_0_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "producer_visual": "PENDING_DIRECT_100_75_50_RAW",
+  "independent_C1": "PENDING",
+  "C3": "PENDING",
+  "USER_INGAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
