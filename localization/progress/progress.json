@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 06:28 KST",
+  "updated_at_kst": "2026-10-10 07:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -61,12 +61,12 @@
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1,
       "latest_c2_independent_finding": {
-        "index": 154,
-        "asset": "4D38BBB0_1024x256.dds",
-        "result": "HOLD_STRICT_RECHECK",
-        "scope_result": "EXACT_8_REGION_CLEAN_PLATE_ALPHA0_FULL_ATLAS_OUTSIDE0",
-        "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
-        "qa_report": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_CONTROLLER_C2_HOLD.json",
+        "index": 212,
+        "asset": "BA0147DA_512x512.dds",
+        "result": "REWORK_REQUIRED_UNCHANGED",
+        "evidence_gap_closed": "INDEPENDENT_CANONICAL_SOURCE_C158_CLEAN_SHA_AND_FULL_ATLAS_12REGION",
+        "candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+        "qa_report": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/C346_Q212_CONTROLLER_C2_REWORK_EVIDENCE.json",
         "runtime_validation": "UNTESTED",
         "new_dds": 0
       },

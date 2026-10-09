@@ -1,0 +1,458 @@
+{
+  "sha256": {
+    "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "clean": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "candidate": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
+  },
+  "size": {
+    "dds": 16777344,
+    "native": [
+      2048,
+      2048
+    ],
+    "mips": 1
+  },
+  "source_current_header_equal": true,
+  "full_atlas": {
+    "source_clean": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 447850
+    },
+    "clean_candidate": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 587672
+    },
+    "source_candidate": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 730405
+    }
+  },
+  "region_inventory": {
+    "14": {
+      "bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "source_alpha_count": 92371,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 71222,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        1759,
+        158
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        2,
+        908,
+        156
+      ]
+    },
+    "15": {
+      "bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "source_alpha_count": 84586,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 39724,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        1746,
+        148
+      ],
+      "candidate_local_alpha_bbox": [
+        4,
+        4,
+        716,
+        144
+      ]
+    },
+    "16": {
+      "bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "source_alpha_count": 94012,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 69548,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        1760,
+        160
+      ],
+      "candidate_local_alpha_bbox": [
+        91,
+        2,
+        1344,
+        156
+      ]
+    },
+    "17": {
+      "bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "source_alpha_count": 55723,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 28880,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        718,
+        148
+      ],
+      "candidate_local_alpha_bbox": [
+        4,
+        4,
+        376,
+        144
+      ]
+    },
+    "25": {
+      "bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "source_alpha_count": 23756,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 9491,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        726,
+        72
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        5,
+        305,
+        67
+      ]
+    },
+    "26": {
+      "bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "source_alpha_count": 18724,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 5757,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        566,
+        66
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        5,
+        223,
+        61
+      ]
+    },
+    "27": {
+      "bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "source_alpha_count": 27032,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 5892,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        844,
+        66
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        5,
+        221,
+        61
+      ]
+    },
+    "28": {
+      "bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "source_alpha_count": 22736,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 8366,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        1081,
+        76
+      ],
+      "candidate_local_alpha_bbox": [
+        4,
+        4,
+        270,
+        72
+      ]
+    },
+    "30": {
+      "bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "source_alpha_count": 5734,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 4214,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        194,
+        73
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        5,
+        123,
+        68
+      ]
+    },
+    "43": {
+      "bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_alpha_count": 13766,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 7490,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        638,
+        63
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        4,
+        321,
+        59
+      ],
+      "source_color_face_bbox": [
+        0,
+        0,
+        638,
+        63
+      ],
+      "source_color_face_count": 13766,
+      "actual_visual_start_versus_korean_alpha_start": 5,
+      "source_visible_face_mask_alpha_over32_bbox": [
+        240,
+        0,
+        637,
+        45
+      ],
+      "source_visible_face_mask_alpha_over200_bbox": [
+        241,
+        1,
+        636,
+        45
+      ],
+      "candidate_alpha_over32_bbox": [
+        5,
+        4,
+        321,
+        59
+      ],
+      "source_relative_face_start_delta_at_alpha_over32": -235,
+      "threshold_note": "Use alpha>32 or >200 to isolate visible face; alpha>0 has low-alpha entire-rectangle noise and is not valid for original face placement."
+    },
+    "44": {
+      "bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_alpha_count": 5822,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 3948,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        211,
+        63
+      ],
+      "candidate_local_alpha_bbox": [
+        62,
+        5,
+        206,
+        58
+      ],
+      "source_color_face_bbox": [
+        0,
+        0,
+        211,
+        63
+      ],
+      "source_color_face_count": 5822,
+      "actual_visual_start_versus_korean_alpha_start": 62,
+      "source_visible_face_mask_alpha_over32_bbox": [
+        0,
+        0,
+        211,
+        45
+      ],
+      "source_visible_face_mask_alpha_over200_bbox": [
+        1,
+        1,
+        210,
+        45
+      ],
+      "candidate_alpha_over32_bbox": [
+        63,
+        5,
+        206,
+        57
+      ],
+      "source_relative_face_start_delta_at_alpha_over32": 63,
+      "threshold_note": "Use alpha>32 or >200 to isolate visible face; alpha>0 has low-alpha entire-rectangle noise and is not valid for original face placement."
+    },
+    "53": {
+      "bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "source_alpha_count": 3588,
+      "clean_alpha_count": 0,
+      "candidate_alpha_count": 1257,
+      "source_local_alpha_bbox": [
+        0,
+        0,
+        134,
+        44
+      ],
+      "candidate_local_alpha_bbox": [
+        5,
+        5,
+        67,
+        39
+      ]
+    }
+  },
+  "c338_prior_anchor_method": "Source orange/red visible face color mask compared to candidate alpha footprint; matching source alpha bbox is separately reported, neither infers in-game anchor.",
+  "new_dds": 0,
+  "manifest": [
+    {
+      "file": "C346_q212_r43_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "04116747a042f4e362ed239300e204cfb63fa3617abe594ba06071f80b8bb12c",
+      "bytes": 11611
+    },
+    {
+      "file": "C346_q212_r43_black_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "9eae82ac798b4e632fe6f44e04cbc5e4597ac128a3163221461589a36af72393",
+      "bytes": 12150
+    },
+    {
+      "file": "C346_q212_r43_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "83f00d76318c7f6dc9d78b4c864bddfcbdb4f7904c6459c797901ead9fa47766",
+      "bytes": 13297
+    },
+    {
+      "file": "C346_q212_r43_black_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "5c2e0e6d48d5b6e9b366f7fd62720c1f3ad93062d2daf4ce09013b576b7b9c63",
+      "bytes": 13975
+    },
+    {
+      "file": "C346_q212_r43_RAW_SOURCE_SAVED.png",
+      "sha256": "74fbaa326f080f6b459ce3bb2ed769808cd6077fcff1a68f3a084161ddf27075",
+      "bytes": 10006
+    },
+    {
+      "file": "C346_q212_r44_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "f8177a85753f309dba9795d3e2f2e8ff71c9ead9602389c498f87230294e8246",
+      "bytes": 8716
+    },
+    {
+      "file": "C346_q212_r44_black_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "a15898ce47904d950c5ccb5bfd4f4348032e098f362e7cc5413fb0c54179dd4e",
+      "bytes": 6780
+    },
+    {
+      "file": "C346_q212_r44_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "b1fa87aee86d9d4dc3f7c1eaf221fe04fc9c4467cb122763126182013c40fffd",
+      "bytes": 8300
+    },
+    {
+      "file": "C346_q212_r44_black_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "eaf796d48978c7c5cfda3b765a04569ccfde4e76b23192701f40123b17de6f6b",
+      "bytes": 6105
+    },
+    {
+      "file": "C346_q212_r44_RAW_SOURCE_SAVED.png",
+      "sha256": "c887bb69b8ffb3ddb13f369a55b21b512b529ee0397292ee65ed95fa072dedc5",
+      "bytes": 7554
+    }
+  ],
+  "source_anchor_provenance": "Canonical source independently downloaded SHA verified, 2048² native DDS; actual source face color+alpha>32 versus current saved Korean alpha>32. Both compared in matching FLIP-Y source ROI. This is static art alignment, not game UV positioning.",
+  "face_threshold_metrics": "C346_Q212_FACE_ALPHA_THRESHOLD_DIAGNOSTIC.json",
+  "selected_published_evidence": [
+    {
+      "name": "C346_q212_r43_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "04116747a042f4e362ed239300e204cfb63fa3617abe594ba06071f80b8bb12c",
+      "bytes": 11611
+    },
+    {
+      "name": "C346_q212_r43_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "83f00d76318c7f6dc9d78b4c864bddfcbdb4f7904c6459c797901ead9fa47766",
+      "bytes": 13297
+    },
+    {
+      "name": "C346_q212_r44_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "f8177a85753f309dba9795d3e2f2e8ff71c9ead9602389c498f87230294e8246",
+      "bytes": 8716
+    },
+    {
+      "name": "C346_q212_r44_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "b1fa87aee86d9d4dc3f7c1eaf221fe04fc9c4467cb122763126182013c40fffd",
+      "bytes": 8300
+    },
+    {
+      "name": "C346_q212_r43_RAW_SOURCE_SAVED.png",
+      "sha256": "74fbaa326f080f6b459ce3bb2ed769808cd6077fcff1a68f3a084161ddf27075",
+      "bytes": 10006
+    },
+    {
+      "name": "C346_q212_r44_RAW_SOURCE_SAVED.png",
+      "sha256": "c887bb69b8ffb3ddb13f369a55b21b512b529ee0397292ee65ed95fa072dedc5",
+      "bytes": 7554
+    }
+  ]
+}

@@ -1,0 +1,455 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C346-Q212-CANONICAL-SOURCE",
+  "role": "C2",
+  "shard": "EVEN",
+  "index": 212,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "date_kst": "2026-10-10 06:59 KST",
+  "base_remote_head": "4f6a17060d4903262d8b2c767ad7b9cdf8c8c6e8",
+  "run_key": "OUTRUN-KOR-C346-C2-Q212-EXACT-CANONICAL-SOURCE-CLEAN-ANCHOR-20261010-0659",
+  "triage": "MATERIAL_REWORK",
+  "previous_current_status": "c338_c2_rework_required_r43_r44_original_anchor_shift",
+  "candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "decision": "REWORK_REQUIRED_UNCHANGED_NEW_INDEPENDENT_SOURCE_EVIDENCE",
+  "new_approval": false,
+  "new_dds": 0,
+  "authenticity": "Source original English DDS 2048x2048 RGBA32 one mip independently downloaded with expected full SHA256; C158 full authored CLEAN and exact persisted Korean DDS likewise downloaded and verified. C338 only used historical source contact; this run closes exact canonical source authentication gap and checks full source/CLEAN/current across 12 existing source effect bboxes.",
+  "source_candidate_header_equal": true,
+  "all12_source_clean_final_full_atlas_outside_rgba_alpha": {
+    "source_clean": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 447850
+    },
+    "clean_candidate": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 587672
+    },
+    "source_candidate": {
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "outside_visible": 0,
+      "inside_rgba": 730405
+    }
+  },
+  "regions": [
+    {
+      "id": 43,
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_face_bbox_alpha32": [
+        240,
+        0,
+        637,
+        45
+      ],
+      "korean_alpha_bbox_alpha32": [
+        5,
+        4,
+        321,
+        59
+      ],
+      "source_relative_placement_dx": -235,
+      "source_alpha_pixels": 13766,
+      "clean_alpha_pixels": 0,
+      "korean_alpha_pixels": 7490,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No matched English/Hangul stem-anchor lean calibration in this inspection; no inferred slope from rectangle positions."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Authenticated C158 CLEAN PNG compared directly against newly independently SHA-pinned canonical English DDS; zero alpha inside source region and entire 12-region outside unchanged."
+        },
+        "style": {
+          "result": "HOLD_NOT_REQUALIFIED",
+          "observation": "English orange/red effect and Korean appearance compared at exact 100% and 50%; source-conditioned family profile remains unqualified."
+        },
+        "readability": {
+          "result": "READABLE_SCOPED",
+          "observation": "Korean legible in the reviewed neutral-background native/50 crops, not actual game."
+        },
+        "glyph_integrity": {
+          "result": "NO_CLEAR_NEW_TEAR",
+          "observation": "No new confirmed broken glyph in the two reviewed exact saved DDS region crops; other region glyphs not visually re-approved."
+        },
+        "protected_art": {
+          "result": "SCOPED_ZERO_OUTSIDE_UNION",
+          "observation": "All three source/CLEAN/candidate comparisons show outside full 12 region union RGBA=0 and alpha=0; inside-region protected ownership not separately certified."
+        },
+        "placement": {
+          "result": "FAIL_CONFIRMED_CURRENT",
+          "observation": "Canonical PROFESSIONAL visible source orange face begins at x240 within region; current Korean 프로페셔널 starts x5 (alpha>32), -235px displacement. Prior C338 source screenshot finding independently substantiated."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "Native original/current DDS RAW pixel crops and readable FLIP-Y reviewed in separate images; actual game UV untested."
+        }
+      }
+    },
+    {
+      "id": 44,
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_face_bbox_alpha32": [
+        0,
+        0,
+        211,
+        45
+      ],
+      "korean_alpha_bbox_alpha32": [
+        63,
+        5,
+        206,
+        57
+      ],
+      "source_relative_placement_dx": 63,
+      "source_alpha_pixels": 5822,
+      "clean_alpha_pixels": 0,
+      "korean_alpha_pixels": 3948,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No matched English/Hangul stem-anchor lean calibration in this inspection; no inferred slope from rectangle positions."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Authenticated C158 CLEAN PNG compared directly against newly independently SHA-pinned canonical English DDS; zero alpha inside source region and entire 12-region outside unchanged."
+        },
+        "style": {
+          "result": "HOLD_NOT_REQUALIFIED",
+          "observation": "English orange/red effect and Korean appearance compared at exact 100% and 50%; source-conditioned family profile remains unqualified."
+        },
+        "readability": {
+          "result": "READABLE_SCOPED",
+          "observation": "Korean legible in the reviewed neutral-background native/50 crops, not actual game."
+        },
+        "glyph_integrity": {
+          "result": "NO_CLEAR_NEW_TEAR",
+          "observation": "No new confirmed broken glyph in the two reviewed exact saved DDS region crops; other region glyphs not visually re-approved."
+        },
+        "protected_art": {
+          "result": "SCOPED_ZERO_OUTSIDE_UNION",
+          "observation": "All three source/CLEAN/candidate comparisons show outside full 12 region union RGBA=0 and alpha=0; inside-region protected ownership not separately certified."
+        },
+        "placement": {
+          "result": "FAIL_CONFIRMED_CURRENT",
+          "observation": "Canonical OUTRUN visible source red face begins at x0 within region; current Korean 아웃런 starts x63 (alpha>32), +63px displacement. Prior C338 finding independently substantiated."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "Native original/current DDS RAW pixel crops and readable FLIP-Y reviewed in separate images; actual game UV untested."
+        }
+      }
+    }
+  ],
+  "source_color_thresholds": {
+    "43": {
+      "source_masks": {
+        "0": {
+          "count": 13766,
+          "bbox": [
+            0,
+            0,
+            638,
+            63
+          ]
+        },
+        "8": {
+          "count": 10079,
+          "bbox": [
+            0,
+            0,
+            637,
+            62
+          ]
+        },
+        "32": {
+          "count": 9871,
+          "bbox": [
+            240,
+            0,
+            637,
+            45
+          ]
+        },
+        "64": {
+          "count": 9635,
+          "bbox": [
+            240,
+            0,
+            637,
+            45
+          ]
+        },
+        "128": {
+          "count": 9031,
+          "bbox": [
+            240,
+            0,
+            637,
+            45
+          ]
+        },
+        "200": {
+          "count": 8394,
+          "bbox": [
+            241,
+            1,
+            636,
+            45
+          ]
+        }
+      },
+      "candidate_alpha": {
+        "0": {
+          "count": 7490,
+          "bbox": [
+            5,
+            4,
+            321,
+            59
+          ]
+        },
+        "8": {
+          "count": 7443,
+          "bbox": [
+            5,
+            4,
+            321,
+            59
+          ]
+        },
+        "32": {
+          "count": 7246,
+          "bbox": [
+            5,
+            4,
+            321,
+            59
+          ]
+        },
+        "64": {
+          "count": 6967,
+          "bbox": [
+            5,
+            4,
+            321,
+            58
+          ]
+        },
+        "128": {
+          "count": 6676,
+          "bbox": [
+            5,
+            5,
+            320,
+            58
+          ]
+        },
+        "200": {
+          "count": 6257,
+          "bbox": [
+            5,
+            5,
+            320,
+            58
+          ]
+        }
+      }
+    },
+    "44": {
+      "source_masks": {
+        "0": {
+          "count": 5822,
+          "bbox": [
+            0,
+            0,
+            211,
+            63
+          ]
+        },
+        "8": {
+          "count": 5553,
+          "bbox": [
+            0,
+            0,
+            211,
+            45
+          ]
+        },
+        "32": {
+          "count": 5417,
+          "bbox": [
+            0,
+            0,
+            211,
+            45
+          ]
+        },
+        "64": {
+          "count": 5283,
+          "bbox": [
+            1,
+            0,
+            210,
+            45
+          ]
+        },
+        "128": {
+          "count": 4839,
+          "bbox": [
+            1,
+            0,
+            210,
+            45
+          ]
+        },
+        "200": {
+          "count": 4639,
+          "bbox": [
+            1,
+            1,
+            210,
+            45
+          ]
+        }
+      },
+      "candidate_alpha": {
+        "0": {
+          "count": 3948,
+          "bbox": [
+            62,
+            5,
+            206,
+            58
+          ]
+        },
+        "8": {
+          "count": 3907,
+          "bbox": [
+            62,
+            5,
+            206,
+            58
+          ]
+        },
+        "32": {
+          "count": 3791,
+          "bbox": [
+            63,
+            5,
+            206,
+            57
+          ]
+        },
+        "64": {
+          "count": 3736,
+          "bbox": [
+            63,
+            5,
+            206,
+            57
+          ]
+        },
+        "128": {
+          "count": 3555,
+          "bbox": [
+            63,
+            6,
+            206,
+            57
+          ]
+        },
+        "200": {
+          "count": 3298,
+          "bbox": [
+            63,
+            6,
+            205,
+            57
+          ]
+        }
+      }
+    }
+  },
+  "visual_first_look": "Original and current source-family history consulted before inspection: not blind; no qualified normal/opposite slant/clipped/residue/weight calibration. Reinspection does not count as second independent QA PASS or newly resolved defect.",
+  "pixels_before_producer_verdict": false,
+  "calibration": "NOT_QUALIFIED_BLOCKS_C_PASS",
+  "new_visual_defect": "NONE_ADDITIONAL; independently verified existing R43/R44 current misanchoring against canonical source",
+  "new_lossless_png_count": 6,
+  "lossless_evidence": [
+    {
+      "name": "C346_q212_r43_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "04116747a042f4e362ed239300e204cfb63fa3617abe594ba06071f80b8bb12c",
+      "bytes": 11611,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    },
+    {
+      "name": "C346_q212_r43_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "83f00d76318c7f6dc9d78b4c864bddfcbdb4f7904c6459c797901ead9fa47766",
+      "bytes": 13297,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    },
+    {
+      "name": "C346_q212_r44_gray_100_SOURCE_CLEAN_SAVED.png",
+      "sha256": "f8177a85753f309dba9795d3e2f2e8ff71c9ead9602389c498f87230294e8246",
+      "bytes": 8716,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    },
+    {
+      "name": "C346_q212_r44_gray_50_SOURCE_CLEAN_SAVED.png",
+      "sha256": "b1fa87aee86d9d4dc3f7c1eaf221fe04fc9c4467cb122763126182013c40fffd",
+      "bytes": 8300,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    },
+    {
+      "name": "C346_q212_r43_RAW_SOURCE_SAVED.png",
+      "sha256": "74fbaa326f080f6b459ce3bb2ed769808cd6077fcff1a68f3a084161ddf27075",
+      "bytes": 10006,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    },
+    {
+      "name": "C346_q212_r44_RAW_SOURCE_SAVED.png",
+      "sha256": "c887bb69b8ffb3ddb13f369a55b21b512b529ee0397292ee65ed95fa072dedc5",
+      "bytes": 7554,
+      "path": "localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/undefined"
+    }
+  ],
+  "source_faithful_placement_r43_minus235_px": "Source face alpha>32 x240, current Korean alpha>32 x5 within exact same native crop",
+  "source_faithful_placement_r44_plus63_px": "Source face alpha>32 x0, current Korean alpha>32 x63 within exact same native crop",
+  "note_threshold": "At alpha>0, low-alpha rectangle noise extends beyond visible letters; use alpha>32 and source color mask to avoid incorrectly reporting both original faces start at x0.",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "C3": "BLOCKED_BY_C2_REWORK",
+  "approval": "NONE",
+  "PRE_INGAME": "EXCLUDED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_game_retest": "NOT_RUN",
+  "next_producer_action": "B must repair both anchors against authenticated source; B341 unpromoted trial does not replace current candidate. Complete source family profile, CLEAN/FINAL opacity/mask and game consumer coverage; publish a NEW actual DDS SHA first, then fresh independent C2, distinct C3, user actual-game rerun. Do not reaccept unchanged SHA.",
+  "backend": "GitHub SSOT + N100 MCP for SHA-verified 16MB DDS download and local native/RAW decode as fallback because ChatGPT container public raw GitHub network access failed",
+  "excluded": [
+    "odd/unindexed_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "separate controller queue engine"
+  ]
+}
