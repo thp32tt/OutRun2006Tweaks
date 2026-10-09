@@ -1,0 +1,156 @@
+{
+  "role": "B",
+  "run": "B306",
+  "queue_index": 205,
+  "priority": "P0",
+  "IGR": [
+    "IGR-026",
+    "IGR-027"
+  ],
+  "canonical_source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "previous_candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "new_candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+  "new_dds": 1,
+  "promoted_dds": 1,
+  "source_vs_clean_outside_source_union": 0,
+  "source_clean_alpha_selected": "ZERO_BOTH",
+  "changed_rgba_outside_two_bboxes": 0,
+  "changed_alpha_outside_two_bboxes": 0,
+  "other_atlas_bytes": "PIXEL_EXACT",
+  "persisted_dds_roundtrip": "EXACT",
+  "header_byte_exact": true,
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "format": "RGBA",
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "method": "Native heavy block sans directly at source resolution, original measured red; replaces independently rejected tapered NotoSerif Black",
+  "regions": [
+    {
+      "key": "options",
+      "source": "OPTIONS",
+      "korean": "옵션",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "final_bbox": [
+        1597,
+        1429,
+        1843,
+        1562
+      ],
+      "positive_margins_px": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "source_red_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font": "NotoSansCJK Black native CJK sans",
+      "native_font_size": 141,
+      "serif": false,
+      "scale": 1.0,
+      "slope": 0,
+      "original_source_height": 145,
+      "new_height": 133,
+      "source_alpha_pixels": 55968
+    },
+    {
+      "key": "rankings",
+      "source": "RANKINGS",
+      "korean": "랭킹",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "final_bbox": [
+        39,
+        1251,
+        271,
+        1382
+      ],
+      "positive_margins_px": [
+        6,
+        659,
+        6,
+        6
+      ],
+      "source_red_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font": "NotoSansCJK Black native CJK sans",
+      "native_font_size": 138,
+      "serif": false,
+      "scale": 1.0,
+      "slope": 0,
+      "original_source_height": 143,
+      "new_height": 131,
+      "source_alpha_pixels": 67670
+    }
+  ],
+  "lossless_proof_files": [
+    "options_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_GRAY_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_WHITE_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_WHITE_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_WHITE_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_BLACK_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_BLACK_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "options_RAW_BLACK_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_GRAY_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_WHITE_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_WHITE_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_WHITE_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_BLACK_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_BLACK_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "rankings_RAW_BLACK_50_SOURCE_CLEAN_OLD_FINAL.png"
+  ],
+  "producer_visual": "PENDING_DIRECT_REVIEW_NATIVE_75_50_RAW",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
