@@ -178,7 +178,7 @@
     {
       "id": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
       "priority": 100,
-      "status": "IMPLEMENT_NEXT",
+      "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "P0 visual-composition convergence: original mod + fork R65-R74/R73-era evidence + canonical disassembly -> menu textures, all HUD families, projected rank/rival markers, arrows/YES-NO, +TIME/results, lens flare/SceneEffect -> complete static gate before HMD.",
       "testLevel": "LEVEL0",
@@ -196,7 +196,9 @@
         "asset analyzer packaged",
         "DX9Ex Active + Domain Isolation + HUD Inspector green"
       ],
-      "nextAction": "Run visual-composition verifier RED, implement one root-cause unit at a time, keep HMD packaging blocked until exact-SHA static/build closure."
+      "nextAction": "After R84 structural closure, resume independent P0 visual GOAL/+TIME/lens/marker work. Do not confuse F11 user PASS or source-only CI with complete visual acceptance.",
+      "blockedBy": "USER_PRIORITIZED_R84_PRODUCTION_CONVERGENCE",
+      "blockReason": "2026-10-09 user explicitly prioritized finishing R84 structural improvements. Existing P0 visual defects are preserved in regression ledger; not resolved or deleted."
     },
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
