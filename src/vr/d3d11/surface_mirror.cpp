@@ -206,6 +206,49 @@ namespace outrun::vr::dx11
             viewDesc.Texture2D.MipSlice == 0;
     }
 
+    bool NativeSurfaceMirror::copy_color_to_staging(
+        ID3D11DeviceContext* context,
+        ID3D11Texture2D** stagingOutput) const noexcept
+    {
+        if (!stagingOutput)
+            return false;
+        *stagingOutput = nullptr;
+        if (!context ||
+            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+            role_ != ResourceRole::Color || !device_ ||
+            !descriptor_exact(device_.Get()) || !texture_ || !rtv_)
+            return false;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+        if (!contextDevice || contextDevice.Get() != device_.Get())
+            return false;
+
+        D3D11_TEXTURE2D_DESC sourceDesc{};
+        texture_->GetDesc(&sourceDesc);
+        if (sourceDesc.MipLevels != 1 || sourceDesc.ArraySize != 1 ||
+            sourceDesc.SampleDesc.Count != 1 ||
+            sourceDesc.SampleDesc.Quality != 0 ||
+            sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
+            sourceDesc.BindFlags != D3D11_BIND_RENDER_TARGET ||
+            sourceDesc.CPUAccessFlags != 0 || sourceDesc.MiscFlags != 0)
+            return false;
+
+        D3D11_TEXTURE2D_DESC readbackDesc = sourceDesc;
+        readbackDesc.Usage = D3D11_USAGE_STAGING;
+        readbackDesc.BindFlags = 0;
+        readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> readback;
+        if (FAILED(device_->CreateTexture2D(
+                &readbackDesc, nullptr, readback.ReleaseAndGetAddressOf())) ||
+            !readback)
+            return false;
+
+        context->CopyResource(readback.Get(), texture_.Get());
+        *stagingOutput = readback.Detach();
+        return true;
+    }
+
     void NativeSurfaceMirror::observe_device_reset() noexcept
     {
         release_mirror();

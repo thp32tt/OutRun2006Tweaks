@@ -11402,6 +11402,16 @@ VSOutput main(VSInput input)
                 d3d.context, outputColorSurface, outputDepthSurface) &&
             r157Probe(d3d.context, r164Color, indexedDirectDispatch),
             "R164 exact RTV/DSV restoration permits indexed WARP draw");
+        // R165 WARP-only readback: clear a deterministic color outside the
+        // translated viewport/scissor, then execute the already-sealed draw.
+        // The border pixel proves that the exact offscreen color mirror is
+        // copyable and readable after DrawIndexed; the R157 query separately
+        // proves two primitives reached IA (not full pixel-shader coverage).
+        const FLOAT r165ClearColor[4] = {0.125f, 0.25f, 0.375f, 1.0f};
+        d3d.context->ClearRenderTargetView(r164Color, r165ClearColor);
+        d3d.context->ClearDepthStencilView(
+            outputDepthSurface.depth_stencil_view(),
+            D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         ID3D11Query* r157Stats = nullptr;
         D3D11_QUERY_DESC r157StatsDesc{};
         r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
@@ -11431,6 +11441,73 @@ VSOutput main(VSInput input)
             r157Counters.IAVertices == 6u,
             "R157 WARP executes two actual indexed triangles (six IA indices)");
         r157Stats->Release();
+
+        ID3D11Texture2D* r165Rejected = nullptr;
+        require(
+            !outputDepthSurface.copy_color_to_staging(
+                d3d.context, &r165Rejected) && r165Rejected == nullptr,
+            "R165 rejects depth mirror readback through color-only owner");
+        DevicePair r165ForeignDevice = create_warp_device();
+        require(
+            !outputColorSurface.copy_color_to_staging(
+                r165ForeignDevice.context, &r165Rejected) &&
+            r165Rejected == nullptr,
+            "R165 rejects foreign D3D11 context readback");
+        r165ForeignDevice.context->Release();
+        r165ForeignDevice.device->Release();
+        ID3D11DeviceContext* r165DeferredContext = nullptr;
+        require(
+            SUCCEEDED(d3d.device->CreateDeferredContext(
+                0u, &r165DeferredContext)) && r165DeferredContext != nullptr,
+            "R165 deferred readback negative fixture");
+        require(
+            !outputColorSurface.copy_color_to_staging(
+                r165DeferredContext, &r165Rejected) &&
+            r165Rejected == nullptr,
+            "R165 rejects deferred context staging copy");
+        r165DeferredContext->Release();
+
+        ID3D11Texture2D* r165Readback = nullptr;
+        require(
+            outputColorSurface.copy_color_to_staging(
+                d3d.context, &r165Readback) && r165Readback != nullptr,
+            "R165 exact color mirror staging copy after indexed WARP draw");
+        D3D11_TEXTURE2D_DESC r165Desc{};
+        r165Readback->GetDesc(&r165Desc);
+        require(
+            r165Desc.Width == 64u && r165Desc.Height == 32u &&
+            r165Desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM &&
+            r165Desc.Usage == D3D11_USAGE_STAGING &&
+            r165Desc.BindFlags == 0u &&
+            r165Desc.CPUAccessFlags == D3D11_CPU_ACCESS_READ &&
+            r165Desc.SampleDesc.Count == 1u,
+            "R165 staging resource has exact 64x32 BGRA8 read-only descriptor");
+        D3D11_MAPPED_SUBRESOURCE r165Mapped{};
+        require(
+            SUCCEEDED(d3d.context->Map(
+                r165Readback, 0u, D3D11_MAP_READ, 0u, &r165Mapped)) &&
+            r165Mapped.pData != nullptr && r165Mapped.RowPitch >= 64u * 4u,
+            "R165 readback map waits for offscreen WARP copy");
+        constexpr unsigned char r165ExpectedBgra[4] = {96u, 64u, 32u, 255u};
+        for (const UINT row : {0u, 31u}) {
+            for (const UINT column : {0u, 63u}) {
+                const auto* pixel =
+                    static_cast<const unsigned char*>(r165Mapped.pData) +
+                    static_cast<std::size_t>(row) * r165Mapped.RowPitch +
+                    static_cast<std::size_t>(column) * 4u;
+                bool matches = true;
+                for (UINT channel = 0; channel < 4u; ++channel) {
+                    const int delta = static_cast<int>(pixel[channel]) -
+                        static_cast<int>(r165ExpectedBgra[channel]);
+                    if (delta < -1 || delta > 1)
+                        matches = false;
+                }
+                require(matches,
+                    "R165 off-viewport border retains exact BGRA clear color");
+            }
+        }
+        d3d.context->Unmap(r165Readback, 0u);
+        r165Readback->Release();
 
         const auto indexedSourceValuesOutOfRange =
             managedIndexBuffer.index_range_readiness(

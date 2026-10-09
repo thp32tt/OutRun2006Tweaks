@@ -40,6 +40,13 @@ namespace outrun::vr::dx11
         [[nodiscard]] bool descriptor_exact(
             ID3D11Device* expectedDevice) const noexcept;
 
+        // R165 diagnostic-only: copy the current non-MSAA color mirror to a
+        // CPU-readable staging texture on its own immediate D3D11 context.
+        // Never exposes a game Draw path or changes the active OM binding.
+        [[nodiscard]] bool copy_color_to_staging(
+            ID3D11DeviceContext* context,
+            ID3D11Texture2D** stagingOutput) const noexcept;
+
         [[nodiscard]] ResourceRole role() const noexcept { return role_; }
         [[nodiscard]] UINT width() const noexcept { return width_; }
         [[nodiscard]] UINT height() const noexcept { return height_; }

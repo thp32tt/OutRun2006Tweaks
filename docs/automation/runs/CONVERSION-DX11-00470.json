@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00470",
+  "production_id": "CONVERSION-DX11-00470",
+  "event_id": "CONVERSION-DX11-00470-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00470",
+  "lease_epoch": 1,
+  "work_key": "DX11:R165:OFFSCREEN_INDEXED_COLOR_READBACK:src/vr/d3d11/surface_mirror.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/surface_mirror.hpp:R165",
+    "src/vr/d3d11/surface_mirror.cpp:R165",
+    "tools/dx11_constant_buffer_probe.cpp:R165"
+  ],
+  "selected_work_item": "DX11_R165_INDEXED_OFFSCREEN_WARP_COLOR_READBACK",
+  "status": "VALIDATING",
+  "checkpoint": "C4_COMMIT",
+  "base_sha": "3eef1eb1015a12e1e1025e2d83fa29f1c327c0cf",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R165 adds generation-bound same-device immediate-context color mirror staging copy and WARP indexed draw post-submit GPU border pixel readback/negative controls. Native game Draw remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.hpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "static_validation": "PASS: R165 changed-source contract single pass (8 checks); Windows WARP execution requires exact-SHA CI",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "pipeline": {
+    "C0_RECOVER": "PASS: initial HEAD 3eef1eb, 00469 completed, no 00470 record",
+    "C1_REVIEW": "PASS: R157 primitive statistics lack observable offscreen color mirror readback",
+    "C2_IMPLEMENT": "PASS: changed surface owner/header and WARP probe",
+    "C3_VALIDATE": "PENDING exact-SHA Backend Conversion Gate",
+    "C4_COMMIT": "PENDING remote CAS",
+    "C5_PACKAGE": "NOT_REQUIRED: offscreen WARP-only diagnostic",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Run exact-SHA Backend Conversion Gate, then complete C6 run record.",
+  "state_persisted": false
+}
