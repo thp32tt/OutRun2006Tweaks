@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C337 C1 odd q137 B320 current exact DDS cdd4a34879b7 native saved SHA, BGRA32/2048x1024/mip1 alpha bbox verified, FLIP-Y/RAW gray100/50 reviewed; exact source/CLEAN, calibrated family and whole atlas not independently verified => HOLD_STRICT_RECHECK. IGR041 OPEN, C3/export/game blocked. QA localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json RUN_KEY=OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
     "A214 q227 P1 GitHub Actions 37963658586 rerun job 113937285379 SUCCESS, 13 previously uncovered C320 cells SOURCE/CLEAN/FINAL native RGBA, BGW 100/75/50, RAW new evidence published and direct producer visual 13/13 inspected. All 16 original cells machine-checked zero English alpha ghosts, changed outside source original text union RGBA/alpha zero, native persisted exact SHA 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 UNCHANGED, NEW DDS=0. A producer scoped evidence only; C320 C1 HOLD, blinded per-stroke style, full C3 and new IGR034/035/036 user in-game retest pending, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_CONTROLLER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200.",
     "C336 C2 q154 B298 SHA c4d6c151... independent saved DDS five red current ROI exact pixel match C292 native lossless 5/5 FLIPY 0 diffs; first red protected separator 7860 original-source-identical pixels; 3 grey remain C323 HOLD. Overall HOLD_STRICT_RECHECK, C3/approval/game UNTESTED. QA localization/graphics/role_C/20261010-C336-C2-Q154-CURRENT-RED-IDENTITY/C336_CONTROLLER_QA.json RUN_KEY=OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150",
     "A213 q121 P0 native SHA-pinned SOURCE/CLEAN/A202 current saved DDS across full 4096x4096 established three title plates alpha0 and no CLEAN→FINAL edits outside those three title rectangles, but SOURCE→FINAL differs 1,934,984px outside those boxes because many other pre-existing UI strings legitimately localized. Source old alpha disappeared 982,705 and Korean new alpha appeared 537,912: NOT standalone protected artwork loss. Need full atlas localized edit union and independent C335 first-hand blind source-lean/protected-art calibration; no new DDS, IGR030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
@@ -13933,6 +13934,27 @@
     "user_game": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "next": "A214 successfully published proof. Do not rerun. C1 reverify exact q227 DDS and source/CLEAN/final all 16 native plus 1px margins and blind font calibration before C PASS. IGR034/035/036 still open."
+  },
+  "c337_c1_q137_b320_current_native_hold": {
+    "run": "C337",
+    "run_key": "OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 137,
+    "exact_candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+    "new_DDS": 0,
+    "independent_native_alpha_bbox": [
+      1340,
+      99,
+      1516,
+      125
+    ],
+    "source_and_clean_independently_verified": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_GAME": "IGR041_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json"
   }
-
 }
