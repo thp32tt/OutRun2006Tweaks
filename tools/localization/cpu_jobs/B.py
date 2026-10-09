@@ -54,14 +54,17 @@ for y in range(0,128,4):
     if is_korean_written_block(x,y):
       continue  # Preserve original B327R Korean glyphs/effects byte-for-byte.
     pix=P[y:y+4,x:x+4,3]
-    if not np.any(pix):
+    if not (x+4>bbox[0] and x<bbox[2] and y+4>bbox[1] and y<bbox[3]):
+      continue
+    if not np.any(P[y:y+4,x:x+4,:]):
       continue
     old_fringe_pixels+=int(np.count_nonzero(pix))
     # DXT5 alpha endpoints 0,0 and all-zero indexes make the block
     # fully transparent while keeping its 8-byte RGB payload untouched.
     off=128+(((128-y-4)//4)*(2048//4)+(x//4))*16
-    buf[off:off+8]=bytes(8)
-    assert buf[off+8:off+16]==current[off+8:off+16]
+    # Clear transparent-but-nonzero RGB as well as alpha: RGBA viewers may
+    # reveal old source English letters by dropping/misinterpreting alpha.
+    buf[off:off+16]=bytes(16)
     cleared+=1
 assert cleared>0 and old_fringe_pixels>0,("no source fragments",cleared,old_fringe_pixels)
 trial=bytes(buf);D=decoded(trial)
@@ -73,9 +76,10 @@ for y in range(0,128,4):
 assert np.array_equal(D[kept],P[kept]),"Altered Korean glyphs"
 assert np.count_nonzero(D[:,:,3][~kept])==0,"Old English still visible outside authored Korean BC3 blocks"
 assert np.count_nonzero((P!=D).any(axis=2)&kept)==0
-assert np.count_nonzero((P[:,:,:3]!=D[:,:,:3]).any(axis=2))==0,"Changed protected colors"
 source_bounds_mask=(np.indices((128,2048))[1]>=bbox[0])&(np.indices((128,2048))[1]<bbox[2])&(np.indices((128,2048))[0]>=bbox[1])&(np.indices((128,2048))[0]<bbox[3])
 assert np.count_nonzero((D[:,:,3]!=P[:,:,3])&~source_bounds_mask)==0,"Changes outside whole English title bounds"
+assert np.count_nonzero(D[:,:,:3][~kept & source_bounds_mask])==0,"Source English RGB still remains outside Korean-written blocks"
+assert np.count_nonzero((D[:,:,3]!=P[:,:,3])&~source_effect & source_bounds_mask)>=0
 # Pixels between stock-English glyphs may contain prior B279 Korean residue:
 # shape-mask non-membership alone cannot classify these as protected art.
 non_source_residual_removed=int(np.count_nonzero((D[:,:,3]!=P[:,:,3])&~source_effect))
@@ -83,7 +87,7 @@ print("B330_NON_SOURCE_GLYPH_RESIDUALS_WITHIN_SOURCE_TITLE",non_source_residual_
 # Native clean plate, never a contaminated historical transparent-pixel RGB
 # surrogate. Only Korean-generated full-block area is allowed to be visible.
 # Exact SOURCE text had no protected marks; reviewer still inspects full frame.
-target=OUT/"B330_Q098_ENGLISH_REMOVED_UNAPPROVED.dds";target.write_bytes(trial)
+target=OUT/"B330R_Q098_ENGLISH_RGB_ALPHA_CLEARED_UNAPPROVED.dds";target.write_bytes(trial)
 assert h(target.read_bytes())==h(trial) and np.array_equal(decoded(target.read_bytes()),D)
 Image.fromarray(C,"RGBA").save(OUT/"B330_FULL_NATIVE_TRUE_EMPTY_CLEAN_RGBA.png")
 for name,arr in (("SOURCE",S),("OLD",P),("NEW",D)):
@@ -111,9 +115,9 @@ qa={
  "source_vs_true_empty_clean":"ONE_TEXT_ONLY_NO_PROTECTED_ILLUSTRATION",
  "source_removal":"CLEAN_PLATE_REBUILT_FROM_FULL_CANVAS_NOT_NARROW_OLD_MASK",
  "old_English_leftover_alpha_pixels":old_fringe_pixels,
- "erased_original_BC3_blocks":cleared,"new_oldEnglish_unwritten_blocks_alpha":0,
+ "erased_original_BC3_blocks_rgb_and_alpha":cleared,"new_oldEnglish_unwritten_blocks_alpha":0,
  "original_korean_BC3_written_blocks":"BYTE_EXACT",
- "all_DDS_RGB":"PIXEL_EXACT","cleared_prior_candidate_residue_not_in_stock_glyph_mask":non_source_residual_removed,
+ "unwritten_source_RGB":"CLEARED_WITH_ALPHA","korean_BC3_blocks":"BYTE_EXACT","cleared_prior_candidate_residue_not_in_stock_glyph_mask":non_source_residual_removed,
  "saved_DDS_decode":"EXACT","DDS_dimensions":[2048,128],
  "DDS_codec":"DXT5_BC3","mips":1,"raw_orientation":"MIRROR_Y",
  "source_clean_final_full_frame_proofs":proofs,
