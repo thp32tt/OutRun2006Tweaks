@@ -1,0 +1,139 @@
+// R186: isolated WARP GPU DrawIndexed proves production-owned VB/IB +
+// pipeline readiness and actual framebuffer pixels. No gameplay activation.
+#include "vr/d3d11/native_indexed_draw_submit.hpp"
+#include <cstdint>
+#include <cstdlib>
+#include <d3dcompiler.h>
+#include <iostream>
+#include <wrl/client.h>
+
+using Microsoft::WRL::ComPtr;
+using outrun::vr::dx11::NativeLinearBufferMirror;
+using outrun::vr::dx11::ResourceRole;
+using outrun::vr::dx11::verified_indexed_linear_draw_ready;
+
+static void require(bool valid, const char* label) {
+    if (!valid) { std::cerr << "R186 WARP failed: " << label << '\n'; std::exit(1); }
+}
+int main() {
+    ComPtr<ID3D11Device> device, otherDevice;
+    ComPtr<ID3D11DeviceContext> context, otherContext;
+    require(SUCCEEDED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP,
+        nullptr, 0, nullptr, 0, D3D11_SDK_VERSION,
+        device.GetAddressOf(), nullptr, context.GetAddressOf())), "create WARP");
+    require(SUCCEEDED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP,
+        nullptr, 0, nullptr, 0, D3D11_SDK_VERSION,
+        otherDevice.GetAddressOf(), nullptr, otherContext.GetAddressOf())), "create other WARP");
+
+    struct Vertex { float x, y; };
+    const Vertex vertices[] = {{-.8f,-.8f},{0.f,.8f},{.8f,-.8f}};
+    const std::uint16_t indices[] = {0,1,2};
+    constexpr std::uint64_t generation=186, vbVersion=72, ibVersion=73;
+    NativeLinearBufferMirror vb, ib;
+    require(vb.initialize(device.Get(), ResourceRole::Vertex,
+        D3DPOOL_DEFAULT, D3DUSAGE_WRITEONLY, D3DFMT_UNKNOWN,
+        vertices, sizeof(vertices), sizeof(Vertex), generation, vbVersion), "own VB");
+    require(ib.initialize(device.Get(), ResourceRole::Index,
+        D3DPOOL_DEFAULT, D3DUSAGE_WRITEONLY, D3DFMT_INDEX16,
+        indices, sizeof(indices), 0, generation, ibVersion), "own IB");
+    require(vb.bind(context.Get(),generation,vbVersion) &&
+            ib.bind(context.Get(),generation,ibVersion), "bind owned IA");
+
+    constexpr char shader[] =
+        "float4 vs(float2 p:POSITION):SV_Position{return float4(p,0,1);}"
+        "float4 ps():SV_Target{return float4(0,1,0,1);}";
+    ComPtr<ID3DBlob> vsCode, psCode;
+    require(SUCCEEDED(D3DCompile(shader,sizeof(shader)-1,nullptr,
+        nullptr,nullptr,"vs","vs_4_0",0,0,vsCode.GetAddressOf(),nullptr)), "compile VS");
+    require(SUCCEEDED(D3DCompile(shader,sizeof(shader)-1,nullptr,
+        nullptr,nullptr,"ps","ps_4_0",0,0,psCode.GetAddressOf(),nullptr)), "compile PS");
+    ComPtr<ID3D11VertexShader> vs;
+    ComPtr<ID3D11PixelShader> ps;
+    require(SUCCEEDED(device->CreateVertexShader(vsCode->GetBufferPointer(),
+        vsCode->GetBufferSize(),nullptr,vs.GetAddressOf())), "create VS");
+    require(SUCCEEDED(device->CreatePixelShader(psCode->GetBufferPointer(),
+        psCode->GetBufferSize(),nullptr,ps.GetAddressOf())), "create PS");
+    const D3D11_INPUT_ELEMENT_DESC element = {
+        "POSITION",0,DXGI_FORMAT_R32G32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0};
+    ComPtr<ID3D11InputLayout> layout;
+    require(SUCCEEDED(device->CreateInputLayout(&element,1,vsCode->GetBufferPointer(),
+        vsCode->GetBufferSize(),layout.GetAddressOf())), "create layout");
+
+    D3D11_TEXTURE2D_DESC td{};
+    td.Width=td.Height=32; td.MipLevels=td.ArraySize=1;
+    td.Format=DXGI_FORMAT_R8G8B8A8_UNORM; td.SampleDesc.Count=1;
+    td.Usage=D3D11_USAGE_DEFAULT; td.BindFlags=D3D11_BIND_RENDER_TARGET;
+    ComPtr<ID3D11Texture2D> color;
+    ComPtr<ID3D11RenderTargetView> rtv;
+    require(SUCCEEDED(device->CreateTexture2D(&td,nullptr,color.GetAddressOf())), "color");
+    require(SUCCEEDED(device->CreateRenderTargetView(color.Get(),nullptr,rtv.GetAddressOf())), "RTV");
+    td.Usage=D3D11_USAGE_STAGING; td.BindFlags=0;
+    td.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
+    ComPtr<ID3D11Texture2D> readback;
+    require(SUCCEEDED(device->CreateTexture2D(&td,nullptr,readback.GetAddressOf())), "staging");
+
+    D3D11_RASTERIZER_DESC raster{};
+    raster.FillMode=D3D11_FILL_SOLID; raster.CullMode=D3D11_CULL_NONE;
+    raster.DepthClipEnable=TRUE;
+    ComPtr<ID3D11RasterizerState> rs;
+    require(SUCCEEDED(device->CreateRasterizerState(&raster,rs.GetAddressOf())), "rasterizer");
+    const D3D11_VIEWPORT vp{0,0,32,32,0,1};
+    context->RSSetViewports(1,&vp);
+    context->RSSetState(rs.Get());
+    context->IASetInputLayout(layout.Get());
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->VSSetShader(vs.Get(),nullptr,0);
+    context->PSSetShader(ps.Get(),nullptr,0);
+    ID3D11RenderTargetView* rawTarget=rtv.Get();
+    context->OMSetRenderTargets(1,&rawTarget,nullptr);
+
+    const auto ready=[&](ID3D11DeviceContext* c, UINT start, UINT count,
+                         INT base, std::uint64_t gen,
+                         std::uint64_t vVersion, std::uint64_t iVersion) {
+        return verified_indexed_linear_draw_ready(
+            vb,ib,c,start,count,base,gen,vVersion,iVersion);
+    };
+    require(!ready(context.Get(),0,0,0,generation,vbVersion,ibVersion), "reject zero indices");
+    require(!ready(context.Get(),0,2,0,generation,vbVersion,ibVersion), "reject partial triangle");
+    require(!ready(context.Get(),1,3,0,generation,vbVersion,ibVersion), "reject IB overrun");
+    require(!ready(context.Get(),0,3,1,generation,vbVersion,ibVersion), "reject VB overrun");
+    require(!ready(context.Get(),0,3,-1,generation,vbVersion,ibVersion), "reject negative VB");
+    require(!ready(context.Get(),0,3,0,generation+1,vbVersion,ibVersion), "reject generation");
+    require(!ready(context.Get(),0,3,0,generation,vbVersion+1,ibVersion), "reject stale VB");
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion+1), "reject stale IB");
+    require(!ready(otherContext.Get(),0,3,0,generation,vbVersion,ibVersion), "reject other device");
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion), "reject wrong topology");
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->IASetInputLayout(nullptr);
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion), "reject missing layout");
+    context->IASetInputLayout(layout.Get());
+    context->PSSetShader(nullptr,nullptr,0);
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion), "reject missing PS");
+    context->PSSetShader(ps.Get(),nullptr,0);
+    context->OMSetRenderTargets(0,nullptr,nullptr);
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion), "reject missing RTV");
+    context->OMSetRenderTargets(1,&rawTarget,nullptr);
+
+    require(ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
+            "owned indexed IA + pipeline readiness");
+    const float clear[] = {0,0,0,1};
+    context->ClearRenderTargetView(rtv.Get(),clear);
+    // Only tools/ owns actual DrawIndexed dispatch; production helper has none.
+    context->DrawIndexed(3,0,0);
+    context->CopyResource(readback.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,0,&mapped)) &&
+            mapped.pData, "GPU readback map");
+    const auto* pixels=static_cast<const unsigned char*>(mapped.pData);
+    const auto* center=pixels+16*mapped.RowPitch+16*4;
+    const auto* corner=pixels+1*mapped.RowPitch+1*4;
+    const bool correct=center[0]==0 && center[1]==255 && center[2]==0 &&
+        center[3]==255 && corner[0]==0 && corner[1]==0 && corner[2]==0;
+    context->Unmap(readback.Get(),0);
+    require(correct, "R186 actual DrawIndexed green center / black corner pixels");
+    ib.shutdown();
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
+            "reject retired IB owner");
+    std::cout << "R186 owned indexed DrawIndexed WARP pixels and fail-closed states: PASS\n";
+}

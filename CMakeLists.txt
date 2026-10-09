@@ -1119,3 +1119,14 @@ target_compile_features(dx11_linear_buffer_mirror_probe PUBLIC cxx_std_20)
 target_compile_options(dx11_linear_buffer_mirror_probe PUBLIC "/GS" "/utf-8")
 target_include_directories(dx11_linear_buffer_mirror_probe PUBLIC "src/" "shared/" "include/")
 target_link_libraries(dx11_linear_buffer_mirror_probe PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R186: independent dormant indexed Draw readiness; test GPU dispatch stays isolated.
+add_executable(dx11_indexed_draw_probe_r186)
+target_sources(dx11_indexed_draw_probe_r186 PRIVATE
+    "tools/dx11_indexed_draw_probe_r186.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_draw_probe_r186 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_draw_probe_r186 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_draw_probe_r186 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_draw_probe_r186 PUBLIC d3dcompiler.lib d3d11.lib)

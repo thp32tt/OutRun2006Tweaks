@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00488",
+  "production_id": "CONVERSION-DX11-00488",
+  "event_id": "CONVERSION-DX11-00488-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00488",
+  "lease_epoch": 1,
+  "work_key": "DX11:R186:DORMANT_NATIVE_INDEXED_DRAW_PIPELINE_IA_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp:R186",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R186",
+    "tools/test_dx11_indexed_draw_r186.py:R186",
+    "CMakeLists.txt:R186",
+    ".github/workflows/backend-conversion-gate.yml:R186"
+  ],
+  "base_sha": "ccee9300630b4b52bea346f60b9dc7c5d63f8704",
+  "result_sha": "PENDING_C4_MATERIAL_SHA",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R186 new native indexed triangle-list ready gate attests live same-device DEFAULT VB/IB, index/base bounds, IA topology/layout, VS/PS and RTV; actual DrawIndexed and GPU-pixel readback remain in isolated WARP probe. 3 mutants and negative lifetime/state cases. R175 upstream fail remains separately owned.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch base ccee9300630b4b52bea346f60b9dc7c5d63f8704; 00488 run not found; 00487 R185 material ff1ef3f3 scoped PASS/full R175 fail; no task checkpoint and no conflicting active work_key found",
+    "C1_REVIEW": "PASS: five lenses ownership, draw extent/topology, shader/RT device identities, activation isolation, WARP GPU/CI priority; change distinct from R175/R183/R184/R185",
+    "C2_IMPLEMENT": "PASS: new production readiness helper, WARP GPU indexed Draw proof, static mutants and CMake/CI wiring",
+    "C3_VALIDATE": "PENDING exact-SHA Gate",
+    "C4_COMMIT": "PENDING remote result SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: no game draw activation/Quest 3 test",
+    "C6_STATE": "PENDING CI evidence"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_draw_r186.py",
+    "CMakeLists.txt",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00488.json"
+  ],
+  "blockers": [
+    "pre-existing R175 TEXCOORD6 GPU color mismatch under task 00477",
+    "Quest3/VDXR runtime untested"
+  ],
+  "next_action": "Confirm material SHA and exact-SHA Backend Conversion Gate before any checkpoint commit. Full Gate may inherit unchanged R175 failure.",
+  "score_change": 0
+}
