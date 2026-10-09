@@ -1,0 +1,12 @@
+{
+  "run": "A217",
+  "run_key": "OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500",
+  "role": "A",
+  "queue_index": 219,
+  "status": "EXECUTION_HOLD_PROMOTED_DDS_UNCHANGED",
+  "exception": "ValueError",
+  "reason": "protected source escape or clipping (0, 0, 0, [7, 937, 0, 0])",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 160, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 133, in main\n    out,layer,box,margins,gates=make_trial(source,prior,clean,header,raw)\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 118, in make_trial\n    raise ValueError(\"protected source escape or clipping \"+str((source_changed,current_changed,alpha_changed,margins)))\nValueError: protected source escape or clipping (0, 0, 0, [7, 937, 0, 0])\n",
+  "new_promoted_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
