@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A217",
+  "run_key": "OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500",
+  "at_kst": "2026-10-10 05:11 KST",
+  "priority": "P1",
+  "owner_lane": "A",
+  "queue_index": 219,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "ingame_report": "IGR-025",
+  "status": "METHOD_CHANGE_REQUIRED_REWORK_STILL_ACTIVE",
+  "canonical_source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "current_promoted_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "clean_plate_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+  "inherited_native_glyph_mask_sha256": "8026a0234e2350df5bce6533f1101bfb591921d52fab3862cfe747887e8a370a",
+  "new_trial_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+  "trial_path": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_Q219_SOURCE_CHROME_DEPTH_TRIAL.dds",
+  "worker_success_run": 37985025669,
+  "first_blocking_run": 37984435734,
+  "second_blocking_run": 37984752697,
+  "first_fail": "P3 exact source bbox top/bottom zero margin; no protected pixel escape",
+  "second_fail": "full Korean base mask 103px tall cannot safely carry 14px extrusion in 118px source box without resizing/cropping",
+  "root_cause_corrective": "Actual bright-face native 103px extracted from exact older Korean mask; max 9px true extrusion within 118px original bbox; source row brightness material, no glyph shrink or stretching",
+  "published_new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "material_trial_new_vs_A186R": true,
+  "native_persisted": {
+    "size_bytes": 16777344,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "color": "32bit RGBA native",
+    "mips": 1,
+    "source_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "trial_bbox": [
+      13,
+      1013,
+      533,
+      1128
+    ],
+    "positive_margins": [
+      7,
+      940,
+      2,
+      1
+    ],
+    "source_to_trial_rgba_outside_bbox": 0,
+    "previous_promoted_to_trial_rgba_outside_bbox": 0,
+    "previous_promoted_to_trial_alpha_outside_bbox": 0,
+    "clean_plate_alpha_in_bbox": 0,
+    "exact_encoded_decoder_roundtrip": true,
+    "readable_and_RAW_lossless_saved": true
+  },
+  "reviewed_images": [
+    "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_GRAY_100.jpg",
+    "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_BLACK_50.jpg",
+    "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_WHITE_75.jpg"
+  ],
+  "controller_first_hand": {
+    "source_vs_clean": "SCOPED_PASS native transparent region looks clean on gray, black, white; machine CLEAN alpha inside title 0",
+    "clean_to_trial": "SCOPED_PASS no visible pasted rectangle/opaque plate in targeted title; other source DDS atlas sprites outside original bbox unchanged",
+    "style": "FAIL original English broad welded rounded low futuristic continuous chrome vs Korean preserved separated glyph silhouette; new source-profile extrusion and specular layer stronger, but high-contrast fragmented horizontal banding and relatively square upright Korean contours still source-family mismatch",
+    "slant": "HOLD no matched top/bottom isolated equivalent source/Korean stroke anchors; must not assert source lean pass from composite edges",
+    "scale": "HOLD original title width 1467px, Korean natural 520px; no arbitrary forced width to counterfeit hierarchy",
+    "readability": "SCOPED_PASS_50pct '코스 선택' remains recognizable; does not overcome source-style FAIL",
+    "glyph_integrity": "SCOPED_NO_DEFINITE_BROKEN_HANGUL; high contrast internal bevel seam needs revision",
+    "protection": "SCOPED_PASS 0 outside original box, no external protected sprite modification; within original box semantic art assumption remains source title only",
+    "raw": "SAVED_BYTES_FLIPY_AND_RAW_AVAILABLE; independent C and game rendering not done"
+  },
+  "producer_decision": "PRODUCER_VISUAL_REJECT_SOURCE_CHROME_FAMILY_AND_MATERIAL_BANDING",
+  "C1": "NOT_APPROVED",
+  "C3": "NOT_RUN",
+  "user_approval": "NOT_GRANTED",
+  "runtime_validation": "UNTESTED",
+  "ingame_issue_state": "IGR025_OPEN_MAPPING_AND_NEW_USER_INGAME_RETEST",
+  "no_claims": [
+    "independent C1/C3 pass",
+    "game screenshot retest",
+    "shared atlas consumption verified",
+    "new promoted DDS"
+  ],
+  "next": "Do not simply deepen existing glyph bevel or stretch Korean to English width. Reconstruct rounded connected source-conditioned Korean counters/outline and face material together at native size as new family pilot. Remain METHOD_CHANGE_REQUIRED until accurate source-family contour and isolated lean anchors pass producer visual; then separate C1/C3 and actual-game mapping.",
+  "tools": "GitHub Actions CPU worker; controller direct actual source/CLEAN/old/trial visual examination",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
