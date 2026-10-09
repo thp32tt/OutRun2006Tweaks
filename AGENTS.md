@@ -1,3 +1,17 @@
+## DX9Ex autonomous development allocation override — 2026-10-10
+
+This is the latest user-directed allocation override and supersedes the 2026-09-29 DX9Ex maintenance-only / <=10% allocation restriction and any older P0 freeze that would prohibit authorized new DX9Ex work. This is an engineering-effort target, not a CI scheduling guarantee.
+
+- **DX9Ex autonomous development allocation: 50%** of VR backend engineering effort. DX9Ex is ACTIVE, not maintenance/reference-only. Other backend lanes remain isolated; rebalance remaining effort without silently disabling DX11/DXVK or localization.
+- Freeze the latest user-accepted DX9Ex build as a protected rollback/visual-regression baseline; new development must occur as forward commits on `vr-d3d9ex-focus` without silently overwriting or claiming a new HMD-accepted baseline.
+- **P0:** Port the latest released wheel FFB implementation, preserving existing VR input and isolating FFB changes. Confirm release provenance and interfaces before modifying.
+- **P1:** Finish DX9Ex structural optimization/refactor, preserving proven HUD, stereo, device-reset and lifecycle behavior.
+- **P2:** Follow Virtual Desktop/OpenXR recommended per-eye render resolution safely; handle D3D9Ex reset and resource lifetime. Do not equate desktop resolution with per-eye extent or silently double the backbuffer.
+- **P3:** Optimize frame pacing/performance toward **120 FPS on RTX 4070 with Virtual Desktop High**. This is a measured runtime target, not a source-CI PASS claim; retain scalable settings.
+- Outstanding GOAL/+TIME, rank attachment and central lens visual faults remain tracked regression/P0 safety gates, not grounds to suppress the new development priorities. Preserve user-confirmed visual PASS and do not promote an HMD-UNTESTED candidate as accepted.
+- Each development turn must produce meaningful implementation and focused validation where feasible; never count status-only reviews, repeated same-SHA CI, or bookkeeping commits as feature completion. Preserve `RUNTIME_VALIDATION=UNTESTED` until actual exact-build Quest 3/VDXR testing.
+- GitHub is source of truth; follow existing domain isolation, exact-SHA CI, rollback and N100 storage rules. No repeated 1000/5000 HUD static audits.
+
 ## 2026-10-10 exact ORIGINAL EXE P0 GOAL/+TIME/central lens material
 
 - Read `docs/automation/reviews/DX9EX_P0_GOAL_EXTTIME_LENS_ORIGINAL_DISASSEMBLY_FIX_20261010.md` and the original ELF/PE-independent x86 artifacts from `tools/disasm_outrun_goal_flare_p0.py` / OutRun EXE HUD Inspector. Verified original SHA `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`; do NOT infer producer identity from alpha, color, or generic queue.
@@ -269,7 +283,7 @@ Do not rerun a completed batch unless a relevant input changed. Mark only affect
 
 ## Backend development priority override — 2026-09-29
 
-This section is the current backend-allocation policy and overrides older backend-priority text elsewhere in this repository when the two conflict.
+Historical allocation policy; superseded for DX9Ex by the 2026-10-10 DX9Ex autonomous development allocation override above.
 
 - **DX11 Native is the primary implementation/performance lane** (nominal engineering allocation about 50%).
 - **DXVK is the secondary implementation/performance lane** (nominal engineering allocation about 40%) and remains isolated until exact-build Quest 3/VDXR evidence is available.
