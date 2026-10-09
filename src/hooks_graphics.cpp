@@ -21,6 +21,7 @@ namespace Settings
 	// gets composited into the right eye as a translucent ghost.
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
 	extern Setting<int> VRRenderWidth;
 	extern Setting<int> VRRenderHeight;
@@ -302,6 +303,23 @@ class VRLensFlareProjected2D : public Hook
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
+        // One original 0xCABE call occurs for each source effect object,
+        // rather than each of the 4-5 visible flare discs being one surface.
+        // Capture bounded per-object evidence to identify the centre-only
+        // ghost WITHOUT reclassifying the normal surrounding lens circles.
+        // Object/flag logging must not affect alpha, original call count,
+        // return value, game matrices or shader state.
+        if (Settings::VRTelemetry)
+        {
+            static std::atomic<std::uint64_t> flareCalls{ 0 };
+            const auto hit =
+                flareCalls.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (hit <= 24 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR P0 FLARE OBJECT: id={} alpha={} flags=0x{:X} calls={} gameState={}",
+                    objectId, alpha, static_cast<unsigned>(flags), hit,
+                    Game::current_mode ? static_cast<int>(*Game::current_mode) : -1);
+        }
 		OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
