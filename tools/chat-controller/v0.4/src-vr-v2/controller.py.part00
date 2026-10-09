@@ -92,6 +92,7 @@ CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true
 CONVERSATION_ROLLOVER_MIN_SECONDS = max(0, int(os.getenv("CONVERSATION_ROLLOVER_MIN_SECONDS", "3600")))
 # VR-only guaranteed cadence; localization keeps its own policy.
 VR_FORCE_ROLLOVER_SECONDS = max(300, int(os.getenv("VR_FORCE_ROLLOVER_SECONDS", "1800")))
+VR_UNCONDITIONAL_RESUME_SECONDS = max(VR_FORCE_ROLLOVER_SECONDS, int(os.getenv("VR_UNCONDITIONAL_RESUME_SECONDS", "2400")))
 VR_CHECKPOINT_ENABLED = os.getenv("VR_CHECKPOINT_ENABLED", "true").lower() == "true"
 VR_CHECKPOINT_BRANCH = os.getenv("VR_CHECKPOINT_BRANCH", "chat-controller-downloads").strip()
 
