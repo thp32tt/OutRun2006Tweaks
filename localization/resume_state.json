@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B306 q205 fresh heavy block-sans P0 OPTIONS/옵션 RANKINGS/랭킹 new persisted SHA d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70 from source-clean, B native/50/RAW QA scoped PASS. Fresh C1 odd, distinct C3 & newer user actual game retest needed. IGR026/027 OPEN, mixed IGR028 unchanged. localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
     "C324 C1 q205 P0 B303 new style-fail 2/2: B lane reconstruct heavy block sans Korean OPTIONS/RANKINGS, do not repeat pointed NotoSerif CJK. localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json",
     "B305 B-owner IGR-037 q201: new native GOALS -> 목표 DDS d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8 from pinned English/B168 CLEAN; producer native/50/RAW 1 cell QA PASS; 16 unrelated regions exact; fresh C1 and C3, USER_GAME retest remain open. localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
     "C323 C2 q154 independent B298 saved DDS SHA and three alpha-bbox RAW/FLIPY proof PASS source containment, 1px producer metadata discrepancy, C HOLD until full atlas/source CLEAN/protected/C3: localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json",
@@ -12960,5 +12961,32 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0,
     "qa": "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json"
+  },
+  "b306_q205_p0_block_sans": {
+    "time_kst": "2026-10-09 10:15 KST",
+    "run_key": "OUTRUN-KOR-B306-Q205-P0-BLOCK-SANS-20261009-1010",
+    "role": "B",
+    "queue_index": 205,
+    "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "prior_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "user_report": [
+      "IGR-026",
+      "IGR-027"
+    ],
+    "new_dds": 1,
+    "producer_self_qa": "SCOPED_PASS_SOURCE_FAMILY_BLOCK_SANS_NATIVE_50_RAW",
+    "changed_rgba_outside_bboxes": 0,
+    "changed_alpha_outside_bboxes": 0,
+    "preserved_other_atlas": "PIXEL_EXACT",
+    "C1": "PENDING",
+    "C3": "BLOCKED",
+    "approval": false,
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "IGR028": "MIXED_MAPPING_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "GITHUB_ACTIONS",
+    "workflow_run_id": 37868593802
   }
 }
