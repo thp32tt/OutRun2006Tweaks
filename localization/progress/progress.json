@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 00:50 KST",
+  "updated_at_kst": "2026-10-10 01:18 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9633,5 +9633,32 @@
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json"
+  },
+  "a213_q121_native_text_scope_diagnostic": {
+    "run": "A212+A213",
+    "run_key": "OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "production_dds_new": 0,
+    "trial_dds_new": 0,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "current_candidate_unchanged_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "pinned_clean_sha256": "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80",
+    "original_three_title_regions_alpha_clean_nonzero": 0,
+    "clean_vs_final_RGBA_changed_outside_three_title_regions": 0,
+    "original_vs_final_RGBA_changed_outside_three_title_regions": 1934984,
+    "canonical_old_alpha_disappeared_outside_three_title_regions": 982705,
+    "canonical_new_alpha_appeared_outside_three_title_regions": 537912,
+    "explanation": "Previous check only used three English heading rectangles. Actual atlas contains many independently translated English-to-Korean cells. Outside-three old/new pixel differences cannot certify true protected art loss or source preservation without full semantic edit/protected masks.",
+    "new_native_pixel_artifacts": "localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF/A212_EVIDENCE_REPORT.json",
+    "new_full_atlas_diagnostic": "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_P0_ROOT_CAUSE.json",
+    "controller_qa": "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_CONTROLLER_NATIVE_SCOPE_QA.json",
+    "C335": "HOLD_STRICT_RECHECK_NOT_CLOSED",
+    "C1": "REQUIRES_C_INDEPENDENT_NATIVE_SLANT_ALPHA_PROOF",
+    "C3": "PENDING",
+    "runtime": "IGR030_IGR031_IGR040_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
+
 }
