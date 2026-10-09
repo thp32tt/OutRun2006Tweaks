@@ -44,6 +44,7 @@ OWNED_PATTERNS = {
         "src/hooks_wheel_r3_device_autoselect.hpp",
         "src/hooks_wheel_vehicle_dynamics.hpp",
         "src/wheel_ffb_math.hpp",
+        "src/wheel_ffb_ps2.hpp",
         "src/wheel_profile_store.hpp",
         "src/overlay/wheel_setup_ui.cpp",
         "tools/test_wheel_ffb_current.cpp",
@@ -52,6 +53,20 @@ OWNED_PATTERNS = {
         "tools/reverse/ps2/**",
         ".github/workflows/release-wheel-*",
     ],
+}
+
+# Immutable, user-approved v0.2 FFB payload imported into DX9Ex VR.
+# Only exact release blobs are exempt; edits to FFB-owned files still fail.
+VR_PINNED_FFB_V02_BLOBS = {
+    "src/hooks_wheel_ffb.cpp": "3042d5ef4abafbe71f3f21443175ed68ce6704d3",
+    "src/hooks_wheel_ffb_build.cpp": "713257433cdbf11ace6e99998825c12fe29b95b5",
+    "src/hooks_wheel_vehicle_dynamics.hpp": "5d243b69a9c111e2dffaa0ee2d82cba87b647822",
+    "src/overlay/wheel_setup_ui.cpp": "2e424cae468b9cb1f7acbd671844bd818f3ad1a2",
+    "src/wheel_ffb_math.hpp": "1ab67124c0c931eb29bf7fb00b69d40436682b9c",
+    "src/wheel_ffb_ps2.hpp": "b9773d18db4326f6f43b73933673f137df509ae0",
+    "src/wheel_profile_store.hpp": "0a97c97d568d8dc88212740905efdbb2b0c77d0e",
+    "tools/test_wheel_ffb_current.cpp": "43be2b172d83ef89718180034357809d2a8b5cc1",
+    "tools/verify_wheel_ffb_current.py": "893c531a86e01caba10601dd7fbbcd01e2914353",
 }
 
 SHARED_PREFIX = "docs/shared-knowledge/"
@@ -130,6 +145,15 @@ def main() -> int:
             continue
 
         owner = owner_for(path)
+        if expected == "VR" and owner == "FFB" and path in VR_PINNED_FFB_V02_BLOBS:
+            actual_blob = git("rev-parse", f"{head}:{path}")
+            if actual_blob == VR_PINNED_FFB_V02_BLOBS[path]:
+                continue
+            errors.append(
+                f"VR FFB v0.2 integration blob mismatch: {path} "
+                f"(actual={actual_blob}, pinned={VR_PINNED_FFB_V02_BLOBS[path]})"
+            )
+            continue
         if owner is not None and owner != expected:
             errors.append(
                 f"foreign domain-owned path changed on {branch}: {path} "
