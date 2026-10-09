@@ -34,6 +34,7 @@ namespace Settings
     extern Setting<float> SteeringDeadZone;
     extern Setting<bool> UseNewInput;
     extern Setting<bool> WheelFFBEnable;
+    extern Setting<int> WheelFFBModel;
     extern Setting<bool> WheelAccelerationInvert;
     extern Setting<bool> WheelBrakeInvert;
     extern Setting<std::string> WheelFFBDeviceName;
@@ -41,6 +42,7 @@ namespace Settings
     extern Setting<bool> WheelMenuR3DirectDPad;
     extern Setting<bool> WheelMenuR3DirectAB;
     extern Setting<float> WheelFFBGlobalStrength;
+    extern Setting<float> WheelFFBPS2HostGain;
     extern Setting<float> WheelFFBSpringStrength;
     extern Setting<float> WheelFFBSpringSaturation;
     extern Setting<float> WheelFFBDamperStrength;
@@ -49,6 +51,7 @@ namespace Settings
     extern Setting<float> WheelFFBTrailResponseLead;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
+    extern Setting<float> WheelFFBCountersteerStrength;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
     extern Setting<float> WheelFFBGearShift;
@@ -802,17 +805,19 @@ namespace
         {
             bool valid = false;
             bool enable = true;
+            int model = 0;
             bool physicsSat = true;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
-            bool invertForce = true;
+            bool invertForce = false;
             bool invertSpring = false;
             bool responseCorrection = false;
             bool debugLog = true;
             bool telemetry = false;
             bool engineVibration = false;
             float global = 0.70f;
+            float ps2HostGain = 1.0f;
             float spring = 0.65f;
             float springSaturation = 0.95f;
             float damper = 0.30f;
@@ -820,6 +825,7 @@ namespace
             float mechanical = 0.25f;
             float trailLead = 0.25f;
             float gripLoss = 0.65f;
+            float countersteer = 0.72f;
             float lateralDeadzone = 1.5f;
             float weightTransfer = 0.15f;
             float gearShift = 0.18f;
@@ -837,6 +843,7 @@ namespace
         {
             savedFfb_.valid = true;
             savedFfb_.enable = Settings::WheelFFBEnable;
+            savedFfb_.model = Settings::WheelFFBModel;
             savedFfb_.physicsSat = Settings::WheelFFBPhysicsSat;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
@@ -847,6 +854,7 @@ namespace
             savedFfb_.debugLog = Settings::WheelFFBDebugLog;
             savedFfb_.telemetry = Settings::WheelFFBTelemetry;
             savedFfb_.global = Settings::WheelFFBGlobalStrength;
+            savedFfb_.ps2HostGain = Settings::WheelFFBPS2HostGain;
             savedFfb_.spring = Settings::WheelFFBSpringStrength;
             savedFfb_.springSaturation = Settings::WheelFFBSpringSaturation;
             savedFfb_.damper = Settings::WheelFFBDamperStrength;
@@ -854,6 +862,7 @@ namespace
             savedFfb_.mechanical = Settings::WheelFFBMechanicalTrail;
             savedFfb_.trailLead = Settings::WheelFFBTrailResponseLead;
             savedFfb_.gripLoss = Settings::WheelFFBGripLoss;
+            savedFfb_.countersteer = Settings::WheelFFBCountersteerStrength;
             savedFfb_.lateralDeadzone = Settings::WheelFFBLateralDeadzone;
             savedFfb_.weightTransfer = Settings::WheelFFBWeightTransfer;
             savedFfb_.gearShift = Settings::WheelFFBGearShift;
@@ -872,6 +881,7 @@ namespace
         {
             if (!savedFfb_.valid) return;
             Settings::WheelFFBEnable = savedFfb_.enable;
+            Settings::WheelFFBModel = savedFfb_.model;
             Settings::WheelFFBPhysicsSat = savedFfb_.physicsSat;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
@@ -882,6 +892,7 @@ namespace
             Settings::WheelFFBDebugLog = savedFfb_.debugLog;
             Settings::WheelFFBTelemetry = savedFfb_.telemetry;
             Settings::WheelFFBGlobalStrength = savedFfb_.global;
+            Settings::WheelFFBPS2HostGain = savedFfb_.ps2HostGain;
             Settings::WheelFFBSpringStrength = savedFfb_.spring;
             Settings::WheelFFBSpringSaturation = savedFfb_.springSaturation;
             Settings::WheelFFBDamperStrength = savedFfb_.damper;
@@ -889,6 +900,7 @@ namespace
             Settings::WheelFFBMechanicalTrail = savedFfb_.mechanical;
             Settings::WheelFFBTrailResponseLead = savedFfb_.trailLead;
             Settings::WheelFFBGripLoss = savedFfb_.gripLoss;
+            Settings::WheelFFBCountersteerStrength = savedFfb_.countersteer;
             Settings::WheelFFBLateralDeadzone = savedFfb_.lateralDeadzone;
             Settings::WheelFFBWeightTransfer = savedFfb_.weightTransfer;
             Settings::WheelFFBGearShift = savedFfb_.gearShift;
@@ -1657,18 +1669,153 @@ namespace
                 apply_r3_menu_defaults();
             }
 
-            ImGui::SeparatorText("Simulation FFB");
+            ImGui::SeparatorText("Force Feedback Model");
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
-            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
-            ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; front slip drives a pneumatic + mechanical/caster SAT model, while body/front slip release damping. Centering Spring remains a low-speed stabilizer.");
-            ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
+
+            auto apply_ffb_model_test_baseline = [&](int modelIndex)
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBGlobalStrength = 0.70f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::VibrationMode = 0;
+
+                if (modelIndex == 0)
+                {
+                    // R9 MOZA R3 hardware baseline. The user's physical wheel
+                    // requires both DirectInput polarities reversed for correct
+                    // SAT/centering direction.
+                    Settings::WheelFFBModel = 0;
+                    Settings::WheelFFBPhysicsSat = true;
+                    Settings::WheelFFBSpringStrength = 0.22f;
+                    Settings::WheelFFBSpringSaturation = 0.55f;
+                    Settings::WheelFFBDamperStrength = 0.28f;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBUseHardwareDamper = true;
+                    Settings::WheelFFBSteeringWeight = 1.60f;
+                    Settings::WheelFFBMechanicalTrail = 0.30f;
+                    Settings::WheelFFBTrailResponseLead = 0.40f;
+                    Settings::WheelFFBGripLoss = 0.65f;
+                    Settings::WheelFFBCountersteerStrength = 0.72f;
+                    Settings::WheelFFBWeightTransfer = 0.15f;
+                    Settings::WheelFFBSlewRate = 0.12f;
+                    Settings::WheelFFBReversalReleaseRate = 0.30f;
+                    Settings::WheelFFBRoadTexture = 0.60f;
+                    Settings::WheelFFBTireSlip = 0.04f;
+                    Settings::WheelFFBWallImpact = 0.80f;
+                    Settings::WheelFFBGearShift = 0.60f;
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = true;
+                    Settings::WheelFFBInvertSpring = true;
+                }
+                else if (modelIndex == 1)
+                {
+                    Settings::WheelFFBModel = 1;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBSpringStrength = 0.50f;
+                    Settings::WheelFFBSpringSaturation = 1.00f;
+                    Settings::WheelFFBDamperStrength = 0.0f;
+                    Settings::WheelFFBUseHardwareDamper = false;
+                    Settings::WheelFFBRoadTexture = 1.0f;
+                    Settings::WheelFFBWallImpact = 1.0f;
+                    Settings::WheelFFBGearShift = 1.0f;
+                    // R3 reports GUID_Sine support but the hardware path was
+                    // weak in the supplied run. Keep Arcade timing/waveforms,
+                    // transport them through the audible ConstantForce fallback.
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBInvertSpring = false;
+                }
+                else
+                {
+                    Settings::WheelFFBModel = 3;
+                    Settings::WheelFFBPS2HostGain = 2.0f;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBUseHardwareDamper = true;
+                    Settings::WheelFFBSpringStrength = 0.65f;
+                    Settings::WheelFFBSpringSaturation = 0.775f;
+                    Settings::WheelFFBDamperStrength = 0.30f;
+                    Settings::WheelFFBRoadTexture = 1.0f;
+                    // This controls the R9 shared PC collision tactile assist;
+                    // the unverified retail directional ConstantForce remains off.
+                    Settings::WheelFFBWallImpact = 0.75f;
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBInvertSpring = false;
+                }
+            };
+
+            static constexpr const char* FfbModelNames[] = {
+                "Modern DD Physics",
+                "Arcade Original (Lindbergh-derived)",
+                "PS2 Original topology (Experimental)"
+            };
+            static constexpr int FfbModelValues[] = { 0, 1, 3 };
+            const int rawFfbModel = int(Settings::WheelFFBModel);
+            int selectedFfbModel =
+                rawFfbModel == 1 ? 1 :
+                rawFfbModel == 3 ? 2 : 0; // legacy Hybrid (2) displays as Modern
+            if (ImGui::BeginCombo("FFB Model", FfbModelNames[selectedFfbModel]))
+            {
+                for (int optionIndex = 0; optionIndex < 3; ++optionIndex)
+                {
+                    const bool selected = selectedFfbModel == optionIndex;
+                    if (ImGui::Selectable(FfbModelNames[optionIndex], selected))
+                    {
+                        const int modelIndex = FfbModelValues[optionIndex];
+                        apply_ffb_model_test_baseline(modelIndex);
+                        track_ffb_change(true);
+                        WheelFFB_ResetHeadroomStats();
+                        WheelFFB_RequestSettingsTransition();
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
+                            FfbModelNames[optionIndex] + ". Save Force Feedback to persist it.";
+                    }
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::TextDisabled(
+                "R12: legacy Model=2 is migrated to Modern DD. Model choices are Modern DD, Arcade Original and PS2 Original.");
+            ImGui::TextDisabled(
+                "MOZA R3 model changes apply the tested polarity default automatically; Reverse options below remain manually editable.");
+
+            const int activeFfbModel =
+                rawFfbModel == 2 ? 0 : std::clamp(rawFfbModel, 0, 3);
+            if (activeFfbModel == 0)
+            {
+                ImGui::TextWrapped(
+                    "Modern DD: current front-slip/yaw Physics SAT, mechanical/caster trail, dynamic damping and modern transient shaping.");
+            }
+            else if (activeFfbModel == 1)
+            {
+                ImGui::TextWrapped(
+                    "Arcade Original: Lindbergh-derived drive-board semantics. Uses a condition/spring backbone plus directional wall/rail/surface-transition events and rough-surface vibration. Modern inferred SAT and tire-slip chatter are disabled.");
+                ImGui::TextDisabled(
+                    "Event meanings come from the public OutRun2Real drive-board interception, not an official Sega protocol document.");
+            }
+            else
+            {
+                ImGui::TextWrapped(
+                    "PS2 Original topology (Experimental): uses the verified PS2 Condition/Constant/Periodic effect topology. Exact PS2 effect payload fields and units are not fully decoded yet, so unverified numeric parameters are not claimed as original.");
+            }
+            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID. All models share the same DD safety, focus-loss, slew/cap and device-recovery layer.");
 
             ImGui::SeparatorText("Physics / Structural");
             track_ffb_change(ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"));
+            if (activeFfbModel == 3)
+            {
+                track_ffb_change(ImGui::SliderFloat(
+                    "PS2 Host Gain", Settings::WheelFFBPS2HostGain.ptr(),
+                    1.0f, 2.5f, "%.2fx"));
+                ImGui::TextDisabled(
+                    "1.00x = recovered retail-reference translation; 2.00-2.50x = modern DD host compensation. Retail Spring/Damper/Triangle ratios stay unchanged until the DirectInput safety cap.");
+            }
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
+            const bool modelUsesModernSat =
+                activeFfbModel == 0;
+            if (!modelUsesModernSat) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
@@ -1678,12 +1825,35 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
+                track_ffb_change(ImGui::SliderFloat("Countersteer Strength", Settings::WheelFFBCountersteerStrength.ptr(), 0.0f, 1.50f, "%.2f"));
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Scales only the developed-drift body-slip countersteer target. 0 = off, 0.72 = tuned default, 1.00 = R14 reference. Normal-corner SAT is unchanged.");
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (!modelUsesModernSat) ImGui::EndDisabled();
 
             ImGui::SeparatorText("Steering Feel");
-            track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            const char* springLabel = activeFfbModel == 1
+                ? "Arcade Servo Centering / Resistance"
+                : (activeFfbModel == 3
+                    ? "PS2 Spring Scale"
+                    : "Centering Spring (low speed)");
+            track_ffb_change(ImGui::SliderFloat(
+                springLabel, Settings::WheelFFBSpringStrength.ptr(),
+                0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (activeFfbModel == 1)
+            {
+                ImGui::TextDisabled(
+                    "Arcade reference: 0.50 = OutRun2Real SpringStrength 50. This condition backbone remains active at speed to approximate cabinet-servo centering/resistance; reference Damper is OFF.");
+            }
+            if (activeFfbModel == 3)
+            {
+                ImGui::TextDisabled(
+                    "PS2 baseline: Spring 0.65 = 1.00x retail coefficient 200/255; Dynamic Damping 0.30 = 1.00x retail 10*(1-speed)/255 coefficient.");
+                ImGui::TextDisabled(
+                    "Advanced Spring Saturation 0.775 = 1.00x the retail 15..60/255 dynamic saturation.");
+            }
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()));
@@ -1691,22 +1861,49 @@ namespace
 
             ImGui::SeparatorText("Effects");
             track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+
+            const bool modelUsesModernTireSlip =
+                activeFfbModel == 0;
+            if (!modelUsesModernTireSlip) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
+            if (!modelUsesModernTireSlip) ImGui::EndDisabled();
+
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (activeFfbModel == 3 && ImGui::IsItemHovered())
+                ImGui::SetTooltip("PS2: controls the shared PC/DD collision tactile pulse. Retail directional ConstantForce remains disabled until a non-zero original caller is verified.");
+
+            const bool modelUsesEngineHaptics = activeFfbModel == 0;
+            if (!modelUsesEngineHaptics) ImGui::BeginDisabled();
             track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
             if (!Settings::WheelFFBEngineVibration) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 1.0f, "%.2f"));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Optional estimated-RPM texture. Default OFF. Strength is normalized and internally limited so 0.20 remains subtle.");
+                ImGui::SetTooltip("Optional estimated-RPM texture. Modern DD only. Default OFF.");
             if (!Settings::WheelFFBEngineVibration) ImGui::EndDisabled();
-            track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
+            if (!modelUsesEngineHaptics) ImGui::EndDisabled();
+
+            track_ffb_change(ImGui::Checkbox("Hardware road/slip periodic effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
             {
                 track_ffb_change(ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f"));
+                if (!modelUsesModernSat) ImGui::BeginDisabled();
                 track_ffb_change(ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
+                if (!modelUsesModernSat) ImGui::EndDisabled();
+                if (activeFfbModel == 3) ImGui::BeginDisabled();
                 track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
+                if (activeFfbModel == 3)
+                {
+                    ImGui::EndDisabled();
+                    ImGui::TextDisabled(
+                        "PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.");
+                }
+                else if (activeFfbModel == 1)
+                {
+                    ImGui::TextDisabled(
+                        "Arcade: Road Detail / Collision / Gear Shift at 1.00 preserve reconstructed source amplitude; lower values are PC host scaling.");
+                }
                 track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum normal structural-force build change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
@@ -1718,7 +1915,7 @@ namespace
                 ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
                     (1.0f / buildRate) * (1000.0f / 60.0f),
                     (1.0f / reversalRate) * (1000.0f / 60.0f));
-                if (Settings::WheelFFBPhysicsSat)
+                if (modelUsesModernSat && Settings::WheelFFBPhysicsSat)
                 {
                     ImGui::SeparatorText("Physics SAT transient");
                     track_ffb_change(ImGui::SliderFloat("Pneumatic Trail Response Lead", Settings::WheelFFBTrailResponseLead.ptr(), 0.0f, 0.60f, "%.2f"));
@@ -1766,10 +1963,16 @@ namespace
             }
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
-            track_ffb_change(ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr()));
+            track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
+            const std::string ffbDeviceLower =
+                WheelProfileStore::lower_ascii(Settings::WheelFFBDeviceName.get());
+            const bool r3AutoPolarity =
+                ffbDeviceLower.find("r3 racing wheel") != std::string::npos;
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
+            if (r3AutoPolarity)
+                ImGui::TextDisabled("MOZA R3: model change sets Modern ON/ON and Arcade/PS2 OFF/OFF; manual override is allowed until the next model change.");
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
 
@@ -1799,6 +2002,15 @@ namespace
 
             ImGui::SeparatorText("FFB Headroom / Clipping");
             const WheelFFBHeadroomSnapshot headroom = WheelFFB_GetHeadroomSnapshot();
+            if (!modelUsesModernSat)
+            {
+                ImGui::TextDisabled(
+                    "Headroom recommendation is unavailable for condition-driven Original modes.");
+                ImGui::TextDisabled(
+                    "Hardware Spring/Damper torque is outside the ConstantForce structural histogram.");
+            }
+            else
+            {
             ImGui::Text("Current structural demand: %.0f%%   Peak: %.0f%%",
                 headroom.currentDemand * 100.0f, headroom.peakDemand * 100.0f);
             ImGui::Text("P95: %.0f%%   P99: %.0f%%   samples: %llu (%.1fs)",
@@ -1821,8 +2033,11 @@ namespace
             ImGui::TextDisabled("Collision, gear events, startup/recreate ramps and near-stop frames are excluded from the statistics.");
             if (ImGui::Button("Reset headroom analysis"))
                 WheelFFB_ResetHeadroomStats();
+            }
 
             ImGui::SeparatorText("Recent FFB Pipeline (last 3 seconds of driving)");
+            if (!modelUsesModernSat)
+                ImGui::TextDisabled("Original modes: graph shows ConstantForce/event output; hardware condition torque is not plotted.");
             const WheelFFBGraphSnapshot graph = WheelFFB_GetGraphSnapshot();
             if (graph.count > 1)
             {
@@ -1845,29 +2060,40 @@ namespace
                 WheelFFB_RequestDirectionTest(0);
             ImGui::TextDisabled("Direction tests are hard-capped at 20% and only run during active gameplay.");
 
+            // Runtime relabels this legacy source button to the Universal preset
+            // and intercepts the click in hooks_wheel_ffb_build.cpp. Keep this
+            // fallback body value-for-value synchronized in case that hook is
+            // unavailable during future UI refactoring.
             if (ImGui::Button("Load MOZA R3 Physics SAT"))
             {
                 Settings::WheelFFBEnable = true;
+                Settings::WheelFFBModel = 0;
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBSpringStrength = 0.22f;
+                Settings::WheelFFBSpringSaturation = 0.55f;
                 Settings::WheelFFBDamperStrength = 0.28f;
-                Settings::WheelFFBSteeringWeight = 1.45f;
-                Settings::WheelFFBMechanicalTrail = 0.25f;
-                Settings::WheelFFBTrailResponseLead = 0.25f;
+                Settings::WheelFFBSteeringWeight = 1.60f;
+                Settings::WheelFFBMechanicalTrail = 0.30f;
+                Settings::WheelFFBTrailResponseLead = 0.40f;
                 Settings::WheelFFBGripLoss = 0.65f;
+                Settings::WheelFFBCountersteerStrength = 0.72f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
-                Settings::WheelFFBSlewRate = 0.040f;
-                Settings::WheelFFBReversalReleaseRate = 0.12f;
-                Settings::WheelFFBRoadTexture = 0.30f;
-                Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBSlewRate = 0.12f;
+                Settings::WheelFFBReversalReleaseRate = 0.30f;
+                Settings::WheelFFBRoadTexture = 0.60f;
+                Settings::WheelFFBTireSlip = 0.04f;
+                Settings::WheelFFBWallImpact = 0.80f;
+                Settings::WheelFFBGearShift = 0.60f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBEngineIdle = 0.20f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
-                Settings::WheelFFBUsePeriodicEffects = true;
+                // R3 compatibility default: prefer ConstantForce road/slip
+                // fallback because reported Sine support can be physically weak.
+                Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBInvertForce = true;
-                Settings::WheelFFBInvertSpring = false;
+                Settings::WheelFFBInvertSpring = true;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
@@ -1887,27 +2113,34 @@ namespace
 
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
+                Settings::WheelFFBModel = 0;
                 Settings::WheelFFBPhysicsSat = false;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBSpringStrength = 0.22f;
+                Settings::WheelFFBSpringSaturation = 0.55f;
                 Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBSteeringWeight = 1.75f;
-                Settings::WheelFFBMechanicalTrail = 0.25f;
-                Settings::WheelFFBTrailResponseLead = 0.25f;
+                Settings::WheelFFBMechanicalTrail = 0.30f;
+                Settings::WheelFFBTrailResponseLead = 0.40f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.20f;
-                Settings::WheelFFBSlewRate = 0.045f;
-                Settings::WheelFFBReversalReleaseRate = 0.12f;
-                Settings::WheelFFBRoadTexture = 0.30f;
-                Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBSlewRate = 0.12f;
+                Settings::WheelFFBReversalReleaseRate = 0.30f;
+                Settings::WheelFFBRoadTexture = 0.60f;
+                Settings::WheelFFBTireSlip = 0.04f;
+                Settings::WheelFFBWallImpact = 0.80f;
+                Settings::WheelFFBGearShift = 0.60f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBEngineIdle = 0.20f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
-                Settings::WheelFFBUsePeriodicEffects = true;
+                // R3 compatibility default: prefer ConstantForce road/slip
+                // fallback because reported Sine support can be physically weak.
+                Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBInvertForce = true;
-                Settings::WheelFFBInvertSpring = false;
+                Settings::WheelFFBInvertSpring = true;
+                Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
                 if (Settings::write(Module::UserIniPath))
@@ -1922,6 +2155,9 @@ namespace
                     status_ = "Loaded MOZA R3 Natural SAT for this session, but could not save user.ini.";
                 }
             }
+
+            ImGui::TextDisabled(
+                "Arcade/PS2 no longer require separate shortcut buttons; selecting the model above applies its tested baseline, polarity and tactile transport.");
 
             if (!Settings::UseNewInput)
             {

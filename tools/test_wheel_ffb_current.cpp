@@ -10,6 +10,7 @@ struct D3DMATRIX { float _11=1,_12=0,_13=0,_14=0,_21=0,_22=1,_23=0,_24=0,_31=0,_
 struct EVWORK_CAR { D3DVECTOR position_14, spd_mb_20; D3DMATRIX matrix_70; };
 #include "hooks_wheel_vehicle_dynamics.hpp"
 #include "wheel_ffb_math.hpp"
+#include "wheel_ffb_ps2.hpp"
 static int checks = 0;
 void require(bool b, const char* msg) { ++checks; if (!b) { std::cerr << msg << '\n'; std::exit(1); } }
 void heading(EVWORK_CAR& c, float a) { c.matrix_70._11=std::cos(a);c.matrix_70._13=-std::sin(a);c.matrix_70._31=std::sin(a);c.matrix_70._33=std::cos(a); }
@@ -18,6 +19,90 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 }
 int main() {
  using namespace WheelFFBMath;
+ require(sanitize_model(-10)==Model::ModernDD&&sanitize_model(99)==Model::PS2OriginalExperimental,"FFB model setting clamps");
+ require(sanitize_model(2)==Model::ModernDD,"retired Hybrid model ID folds to Modern DD");
+ require(model_uses_modern_sat(Model::ModernDD),"Modern DD owns inferred SAT");
+ require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
+ require(model_uses_arcade_events(Model::ArcadeOriginal),"Arcade Original owns reconstructed events");
+ require(!model_uses_arcade_events(Model::ModernDD)&&!model_uses_arcade_events(Model::PS2OriginalExperimental),"non-Arcade models do not claim arcade events");
+ require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
+ require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
+ require(frequency_hz_from_period_ms(std::numeric_limits<float>::quiet_NaN())==0.0f,"NaN period is rejected");
+ require(!crash_speed_drop_fallback(.057f,.90f),"normal logged deceleration does not trigger crash fallback");
+ require(!crash_speed_drop_fallback(.12f,.90f),"crash fallback threshold is strict");
+ require(crash_speed_drop_fallback(.121f,.90f),"severe deceleration above threshold triggers fallback");
+ require(!crash_speed_drop_fallback(.36f,.10f),"near-stop speed does not trigger emergency crash fallback");
+ require(std::abs(crash_speed_drop_severity(.12f))<1e-6f,"crash fallback severity starts at zero");
+ require(std::abs(crash_speed_drop_severity(.36f)-1.0f)<1e-6f,"crash fallback severity reaches one at captured large-impact bound");
+ require(crash_speed_drop_severity(std::numeric_limits<float>::quiet_NaN())==0.0f,"crash fallback severity rejects NaN");
+ require(course_collision_timer_edge(30,0),"course collision 0->30 reload is an edge");
+ require(course_collision_timer_edge(29,12),"course collision high reload survives one-tick observation loss");
+ require(!course_collision_timer_edge(30,30),"steady course contact does not retrigger");
+ require(!course_collision_timer_edge(29,30),"countdown is not a new collision");
+ require(!course_collision_timer_edge(27,0),"low timer values are not fresh course impacts");
+ require(std::abs(arcade_gear_sine_force(0,1.0f))<1e-6f,"arcade gear Sine starts at zero phase");
+ require(arcade_gear_sine_force(4,1.0f)>0.09f,"arcade gear Sine reaches positive lobe near quarter cycle");
+ require(arcade_gear_sine_force(11,1.0f)<-0.09f,"arcade gear Sine reaches negative lobe");
+ require(std::abs(arcade_gear_sine_force(4,.5f)-.5f*arcade_gear_sine_force(4,1.0f))<1e-6f,"arcade gear host scaler is linear");
+ require(arcade_gear_sine_force(ArcadeGearEventFrames,1.0f)==0.0f,"arcade gear Sine stops after 240ms event window");
+ require(ArcadeConstantEventFrames==5,"arcade 80ms ConstantForce maps to five 60Hz ticks");
+ require(std::abs(ArcadeConstantEventLengthMs-80.0f)<1e-6f,"arcade reference ConstantForce lifetime remains 80ms");
+ require(std::abs(compose_arcade_directional_surface(-.7f,.7f,true)-.7f)<1e-6f,"arcade right transition overrides opposite sustained force");
+ require(std::abs(compose_arcade_directional_surface(.7f,-.7f,true)+.7f)<1e-6f,"arcade left transition overrides opposite sustained force");
+ require(std::abs(compose_arcade_directional_surface(.4f,-.8f,false)-.4f)<1e-6f,"arcade sustained force remains when no transition is active");
+ require(std::abs(arcade_speed_strength(.10f)-.10f)<1e-6f,"arcade first speed step");
+ require(std::abs(arcade_speed_strength(1.0f)-.90f)<1e-6f,"arcade 430.1..500 normalized band remains 90 percent");
+ require(std::abs(arcade_speed_strength(1.01f)-1.0f)<1e-6f,"arcade >500 normalized band reaches 100 percent");
+ require(std::abs(arcade_speed_strength(1.1197f)-1.0f)<1e-6f,"captured C2C top-speed headroom reaches Arcade 100 percent band");
+ require(std::abs(arcade_speed_strength(.20f)-.20f)<1e-6f,"arcade second speed step");
+ require(std::abs(arcade_speed_strength(.50f)-.50f)<1e-6f,"arcade mid speed step");
+ require(std::abs(arcade_speed_strength(.90f)-.90f)<1e-6f,"arcade upper speed step");
+ require(std::abs(arcade_speed_strength(1.20f)-1.00f)<1e-6f,"arcade top speed step");
+ require(arcade_speed_strength(std::numeric_limits<float>::quiet_NaN())==0.0f,"arcade speed rejects NaN");
+
+ // Retail PS2 translation invariants recovered from SLPM_666.28.
+ require(std::abs(WheelFFBPS2::drive_factor(.875f)-1.0f)<1e-6f,"PS2 retail drive factor reaches one at field_1C4 0.875");
+ require(std::abs(WheelFFBPS2::drive_factor(.4375f)-.5f)<1e-6f,"PS2 retail drive factor midpoint");
+ require(WheelFFBPS2::drive_factor(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 drive factor rejects NaN");
+ require(WheelFFBPS2::spring_saturation_raw(0.0f)==15,"PS2 spring low-speed saturation");
+ require(WheelFFBPS2::spring_saturation_raw(1.0f)==60,"PS2 spring high-speed saturation");
+ require(std::abs(WheelFFBPS2::spring_coefficient_norm()-200.0f/255.0f)<1e-6f,"PS2 spring coefficient 200/255");
+ require(WheelFFBPS2::damper_coefficient_raw(0.0f)==10,"PS2 damper low-speed coefficient");
+ require(WheelFFBPS2::damper_coefficient_raw(1.0f)==0,"PS2 damper fades at retail drive factor one");
+ require(WheelFFBPS2::triangle_period_raw(0.0f)==100,"PS2 Triangle base period field");
+ require(WheelFFBPS2::triangle_period_raw(1.0f)==160,"PS2 Triangle high-speed period field");
+ require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(0.0f)-10.0f)<1e-6f,"PS2 host Triangle 100ms translation");
+ require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(1.0f)-6.25f)<1e-6f,"PS2 host Triangle 160ms translation");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.0f)+1.0f)<1e-6f,"PS2 Triangle starts at negative peak");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.25f)-0.0f)<1e-6f,"PS2 Triangle quarter-cycle zero");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.5f)-1.0f)<1e-6f,"PS2 Triangle half-cycle positive peak");
+ require(std::abs(WheelFFBPS2::triangle_wave(1.25f)-0.0f)<1e-6f,"PS2 Triangle wraps cycles");
+ require(WheelFFBPS2::triangle_wave(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 Triangle rejects NaN");
+ require(std::abs(WheelFFBPS2::constant_magnitude_cap_norm()-220.0f/255.0f)<1e-6f,"PS2 constant cap 220/255");
+ require(std::abs(WheelFFBPS2::surface_speed_factor(.50f)-.50f)<1e-6f,"PS2 periodic surface speed factor");
+ require(WheelFFBPS2::surface_speed_factor(2.0f)==1.0f,"PS2 periodic surface speed factor caps at one");
+ require(WheelFFBPS2::surface_speed_factor(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 periodic surface speed factor rejects NaN");
+ require(WheelFFBPS2::periodic_magnitude_raw(.50f,1.0f,1.0f)==25,"PS2 periodic raw magnitude below threshold");
+ require(WheelFFBPS2::periodic_magnitude_raw(.54f,1.0f,1.0f)==27,"PS2 periodic raw magnitude threshold");
+ require(WheelFFBPS2::periodic_magnitude_raw(.70f,1.0f,1.0f)==35,"PS2 periodic retail magnitude scale 50");
+ require(WheelFFBPS2::periodic_magnitude_norm(.50f,1.0f,1.0f)==0.0f,"PS2 periodic raw values below 27 are suppressed");
+ require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.54f,1.0f,1.0f)-27.0f/255.0f)<1e-6f,"PS2 periodic threshold is inclusive at raw 27");
+ require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.70f,1.0f,1.0f)-35.0f/255.0f)<1e-6f,"PS2 periodic normalized retail magnitude");
+ require(WheelFFBPS2::periodic_magnitude_raw(.90f,.50f,1.0f)==23,"PS2 periodic source includes min(field_1C4,1) speed factor");
+ require(std::abs(WheelFFBPS2::retail_wheel_level_scale(1)-2.0f/11.0f)<1e-6f,"PS2 retail wheel level 1 scale");
+ require(std::abs(WheelFFBPS2::retail_wheel_level_scale(10)-1.0f)<1e-6f,"PS2 retail wheel level 10 scale");
+ require(std::abs(WheelFFBPS2::surface_envelope(.30f,0.0f,0.0f)-.30f)<1e-6f,"PS2 surface boost starts strictly above 0.30");
+ require(std::abs(WheelFFBPS2::surface_envelope(.31f,-.5f,0.0f)-.3875f)<1e-6f,"PS2 surface first car-field predicate boosts by 1.25");
+ require(std::abs(WheelFFBPS2::surface_envelope(.80f,0.0f,.5f)-1.0f)<1e-6f,"PS2 surface second car-field predicate boosts by 1.25");
+ require(std::abs(WheelFFBPS2::surface_envelope(.90f,0.0f,0.0f)-1.125f)<1e-6f,"PS2 surface envelope preserves retail headroom above one");
+ require(std::abs(WheelFFBPS2::surface_envelope(.90f,-.10f,.10f)-.90f)<1e-6f,"PS2 surface envelope stays unboosted when both strict predicates fail");
+ require(WheelFFBPS2::surface_envelope(std::numeric_limits<float>::quiet_NaN(),0.0f,0.0f)==0.0f,"PS2 surface envelope rejects NaN roughness");
+ require(WheelFFBPS2::periodic_magnitude_raw(1.125f,1.0f,1.0f)==56,"PS2 periodic magnitude retains boosted 1.125 envelope");
+ require(WheelFFBPS2::retail_wheel_level_scale(0)==0.0f,"PS2 retail wheel level zero disables feedback");
+ require(WheelFFBPS2::retail_wheel_level_scale(11)==0.0f,"PS2 invalid wheel level is rejected");
+ require(WheelFFBPS2::periodic_magnitude_raw(.90f,1.0f,1.0f,WheelFFBPS2::retail_wheel_level_scale(5))==25,"PS2 periodic accepts recovered wheel-level scaler");
+ require(WheelFFBPS2::periodic_magnitude_raw(std::numeric_limits<float>::quiet_NaN(),1.0f,1.0f)==0,"PS2 periodic magnitude rejects NaN");
+
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
  require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");
  require(engineIdle.frequencyHz>=13.0f&&engineIdle.frequencyHz<16.0f,"engine idle haptic frequency");
@@ -34,12 +119,67 @@ int main() {
  require(pneumatic_sat_shape(.12f)>.90f,"pneumatic SAT strong in normal loaded corner");
  require(pneumatic_sat_shape(.16f)>.98f,"pneumatic SAT peaks near prior 0.16rad region");
  require(pneumatic_sat_shape(.32f)<.50f,"pneumatic trail falls in deep understeer");
+ require(pneumatic_trail_factor(.60f)<.03f,"R13 pneumatic trail collapses to near zero in full sliding");
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
  require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.12f,.25f)-.25f)<1e-6f,"normal-corner caster ratio is unchanged");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.32f,.25f)-.25f)<1e-6f,"R13 mechanical trail remains geometric in deep slip");
+ require(std::abs(deep_slip_mechanical_trail_ratio(-.32f,.25f)-deep_slip_mechanical_trail_ratio(.32f,.25f))<1e-6f,"deep-slip caster boost is symmetric");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.32f,.60f)-.60f)<1e-6f,"R13 mechanical trail keeps configured geometry at cap");
  require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
  require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"total trail preserves deep-slip torque");
- require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
+ require(combined_sat_shape(.60f,0.0f)>pneumatic_sat_shape(.60f),"R13 residual Mz remains separate after pneumatic trail collapse");
+ require(combined_sat_shape(.60f,0.0f)<.12f,"R13 residual Mz stays a small cue rather than a hidden spring");
  require(std::abs(combined_sat_shape(.32f,.25f)-combined_sat_shape(-.32f,.25f))<1e-6f,"SAT shape symmetry");
+ require(std::abs(combined_sat_shape_with_deep_slip_boost(.32f,.32f,.25f)-combined_sat_shape(.32f,.32f,.25f))<1e-6f,"R13 compatibility helper no longer invents deep-slip mechanical boost");
+ require(std::abs(combined_sat_shape_with_deep_slip_boost(.12f,.12f,.25f)-combined_sat_shape(.12f,.12f,.25f))<1e-5f,"deep-slip boost leaves normal corner unchanged");
+ require(impact_direction_from_lateral(0.0f)==0.0f,"head-on impact is neutral");
+ require(impact_direction_from_lateral(.20f)<0.0f&&impact_direction_from_lateral(-.20f)>0.0f,"lateral impact direction remains symmetric");
+ require(proven_primary_rough_road_section(1,419)&&proven_primary_rough_road_section(1,458),"Deep Lake primary rough-road bounds");
+ require(!proven_primary_rough_road_section(1,418)&&!proven_primary_rough_road_section(1,459),"Deep Lake rough-road bounds reject neighbors");
+ require(proven_primary_rough_road_section(10,54)&&proven_primary_rough_road_section(10,70),"Tulip Garden primary rough-road bounds");
+ require(proven_primary_rough_road_section(27,510)&&proven_primary_rough_road_section(27,533),"Floral Village primary rough-road bounds");
+ require(is_proven_primary_rough_road_contact(27,520,PrimaryRoughRoadSurfaceMask),"Floral primary rough material accepted");
+
+ // R9 hardware-log regressions: Imperial Avenue primary asphalt, per-wheel
+ // tactile coverage, and direction-independent collision pulse.
+ std::array<unsigned,4> asphaltMasks={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(primary_asphalt_water_false_positive(14,0,asphaltMasks,0x0f),"Imperial Avenue all-primary false water corrected");
+ require(!primary_asphalt_water_false_positive(13,0,asphaltMasks,0x0f),"water correction is evidence-scoped to stage 14");
+ require(!primary_asphalt_water_false_positive(14,1,asphaltMasks,0x0f),"nonzero collision context preserves water classification");
+ std::array<float,4> road4={.25f,.25f,.25f,.25f};
+ std::array<float,4> curb2={.35f,.35f,.25f,.25f};
+ std::array<float,4> curb4={.35f,.35f,.35f,.35f};
+ const float env0=contact_tactile_envelope(road4,0);
+ const float env2=contact_tactile_envelope(curb2,0);
+ const float env4=contact_tactile_envelope(curb4,0);
+ require(env0==0&&env2>0&&env4>env2,"0/2/4 wheel contact envelopes are distinct");
+ const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
+ const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
+ require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
+ require(collision_tactile_pulse(0,1.0f)>.85f&&collision_tactile_pulse(1,1.0f)<-.65f,"collision tactile is strong and alternates independently of direction");
+ require(collision_tactile_pulse(6,1.0f)==0,"collision tactile is short bounded pulse");
+ std::array<unsigned,4> imperialStone={PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ std::array<unsigned,4> imperialAsphalt={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(imperial_avenue_stone_paving_pattern(14,0,imperialStone),"Imperial mixed 0x2/0x800 stone-road family is recognized");
+ require(imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"Imperial all-0x2 frame remains the same continuous stone road");
+ require(!imperial_avenue_stone_paving_pattern(13,0,imperialAsphalt),"continuous-stone override stays scoped to Imperial Avenue");
+ const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
+ require(stoneAmp>=.049f&&stoneAmp<=.051f,"Imperial stone tactile is a subtle ~0.05 road texture below curb/off-road");
+ const std::array<float,4> imperialNormalizedRough={.35f,.35f,.35f,.35f};
+ const float imperialCommon=common_contact_tactile_amplitude(
+     contact_tactile_envelope(imperialNormalizedRough,0),.70f,.60f,.70f);
+ require(imperialCommon>.20f,"generic 4-wheel contact layer would overpower Imperial stone if not bypassed");
+ require(std::abs(modern_road_tactile_amplitude(true,imperialCommon,stoneAmp)-stoneAmp)<1e-6f,
+     "Imperial stone bypasses generic curb/contact amplitude instead of max-combining with it");
+ require(std::abs(modern_road_tactile_amplitude(false,imperialCommon,stoneAmp)-imperialCommon)<1e-6f,
+     "ordinary Modern contact still uses the generic tactile amplitude");
+ require(road_motion_gate(0.0f)==0.0f,"stationary car has zero road-texture gate");
+ require(road_motion_gate(.08f)>.999f,"road texture reaches full motion authority once clearly moving");
+ require(imperial_avenue_stone_tactile_amplitude(0.0f,.60f,.70f)*road_motion_gate(0.0f)==0.0f,"Imperial stone cannot vibrate while parked");
+ require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
+ require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
+ require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
  require(pneumatic_sat_shape(.20f,.28f)<pneumatic_sat_shape(.20f,.20f),"phase-led growing slip drops pneumatic trail sooner");
  require(pneumatic_sat_shape(.20f,.12f)>pneumatic_sat_shape(.20f,.20f),"phase-led recovering slip restores pneumatic trail sooner");
  for(int i=0;i<=7000;++i) {float a=i*.0001f;float p=pneumatic_sat_shape(a),c=combined_sat_shape(a,.25f);require(std::isfinite(p)&&p>=0&&p<=1.000001f,"pneumatic bounds");require(std::isfinite(c)&&c>=0&&c<=1.000001f,"combined bounds");}
@@ -48,8 +188,32 @@ int main() {
  require(soft_saturate(1.0f)>.90f&&soft_saturate(1.0f)<1.0f,"soft clip late knee");
  require(soft_saturate(2.0f)==1.0f&&soft_saturate(-2.0f)==-1.0f,"soft clip cap");
  float clipPrev=0; for(int i=0;i<=2000;++i){float x=i*.001f,y=soft_saturate(x);require(std::isfinite(y)&&y>=clipPrev-1e-6f&&y<=1.000001f,"soft clip monotonic");clipPrev=y;}
- require(physics_return_relief(.15f,-.08f)==.85f,"countersteer relief");
+ require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
+ require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ require(model_uses_reversed_r3_polarity(Model::ModernDD),"R3 Modern polarity is reversed");
+ require(!model_uses_reversed_r3_polarity(Model::ArcadeOriginal)&&!model_uses_reversed_r3_polarity(Model::PS2OriginalExperimental),"R3 Original/PS2 polarity uses native sign");
+ require(std::abs(SnowIceComfortTextureScale-.22f)<1e-6f,"snow/ice comfort texture remains perceptible");
+ require(drift_countersteer_blend(.70f,-.35f,1.0f)>.99f,"R14 deep drift fully hands torque direction to body slip");
+ require(drift_countersteer_blend(.70f,.35f,1.0f)>.99f,"R14 body-slip authority does not depend on front-slip sign");
+ require(drift_countersteer_blend(.30f,.20f,1.0f)>0.0f&&drift_countersteer_blend(.30f,.20f,1.0f)<1.0f,"moderate drift crossfades instead of snapping");
+ require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
+ require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
+ require(std::abs(DefaultCountersteerStrength-.72f)<1e-6f,"R20 countersteer option default is 20 percent below the R18 0.90 target");
+ require(std::abs(drift_countersteer_blend_state_step(0.0f,1.0f)-0.30f)<1e-6f,"drift countersteer engages promptly");
+ require(std::abs(drift_countersteer_blend_state_step(1.0f,0.0f)-0.94f)<1e-6f,"grip recovery releases drift handoff gradually");
+ require(drift_countersteer_direction_latch(.70f,0.0f,0.0f)<-.99f,"new positive-body-slip drift latches counter direction");
+ require(drift_countersteer_direction_latch(-.70f,-1.0f,.80f)<-.99f,"grip-recovery sign noise cannot flip an active counter direction");
+ require(drift_countersteer_direction_latch(-.70f,-1.0f,.10f)>.99f,"direction may relatch only after the drift handoff is nearly released");
+ const float weakPrimaryTorque=.05f;
+ const float boundedOpposingCue=bound_drift_countersteer_torque(weakPrimaryTorque,-.90f);
+ require(std::abs(boundedOpposingCue+weakPrimaryTorque)<1e-6f,"R13 body-slip cue cannot exceed weak front-slip SAT magnitude");
+ const float deepBodyTarget=-.80f*DefaultCountersteerStrength;
+ const float deepFrontTorque=.30f;
+ const float deepBlend=drift_countersteer_blend(.70f,-.35f,1.0f);
+ const float deepHandoff=deepFrontTorque+(deepBodyTarget-deepFrontTorque)*deepBlend;
+ require(deepHandoff<-.56f&&deepHandoff>-.59f,"R20 developed drift keeps the correct countersteer sign at the 0.72 default strength");
+ require(std::abs(bound_drift_countersteer_torque(-weakPrimaryTorque,.90f)-weakPrimaryTorque)<1e-6f,"R13 drift cue bound is sign symmetric");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");
@@ -73,6 +237,8 @@ int main() {
  WheelVehicleDynamics low; EVWORK_CAR lowCar; low.reset(); for(int i=0;i<80;++i)step(low,lowCar,0,0,0,.15f); step(low,lowCar,.01f,0,.2f,.15f);
  WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
  require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
+ require(low.frontSlipBlend()>=.16f&&low.frontSlipBlend()<.23f,"R13 low-speed front-slip relaxation remains compliant");
+ require(high.frontSlipBlend()>.65f&&high.frontSlipBlend()<=.78f,"R13 high-speed front-slip relaxation follows distance-based response");
 
  // v0.2: a rapid steering reversal must change the Physics SAT tyre proxy on
  // the first valid tick instead of carrying stale opposite torque for several

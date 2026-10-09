@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 5 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -70,15 +70,55 @@ void InputManager_Update();
 
 namespace
 {
-    bool is_snow_or_ice_stage_for_ffb()
+    struct StageSurfaceContext
     {
-        if (!Game::GetNowStageNum || !Game::GetStageUniqueNum)
-            return false;
+        int stageNumber = -1;
+        int uniqueStage = -1;
+        const char* name = "Unknown";
+        bool snowOrIce = false;
+        bool mask2CanMarkWater = false;
+        bool mask400000IsLowRoughness = false;
+    };
 
-        const int stageNumber = Game::GetNowStageNum(8);
-        const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-        return uniqueStage == 4 || uniqueStage == 19 ||
-               uniqueStage == 34 || uniqueStage == 49;
+    StageSurfaceContext sample_stage_surface_context()
+    {
+        StageSurfaceContext result{};
+        if (!Game::GetNowStageNum || !Game::GetStageUniqueNum)
+            return result;
+
+        result.stageNumber = Game::GetNowStageNum(8);
+        result.uniqueStage = Game::GetStageUniqueNum(result.stageNumber);
+        if (result.uniqueStage >= 0 && result.uniqueStage < 66)
+            result.name = Game::StageNames[result.uniqueStage];
+
+        // These IDs are taken from the game's own stage table and the
+        // reconstructed Xbox sub_1149C0 surface LUT.
+        result.snowOrIce =
+            result.uniqueStage == 4 || result.uniqueStage == 19 ||
+            result.uniqueStage == 34 || result.uniqueStage == 49;
+        result.mask2CanMarkWater =
+            result.uniqueStage == 11 || result.uniqueStage == 13 ||
+            result.uniqueStage == 14 || result.uniqueStage == 41 ||
+            result.uniqueStage == 43 || result.uniqueStage == 44;
+        result.mask400000IsLowRoughness =
+            result.uniqueStage == 18 || result.uniqueStage == 48;
+        return result;
+    }
+
+    int lastLoggedUniqueStage = -999;
+
+    void maybe_log_stage_context(const StageSurfaceContext& stage)
+    {
+        if (!Settings::WheelFFBDebugLog || stage.uniqueStage < 0 ||
+            stage.uniqueStage == lastLoggedUniqueStage)
+            return;
+
+        lastLoggedUniqueStage = stage.uniqueStage;
+        spdlog::info(
+            "WheelFFB STAGE: stageNumber={} unique={} name={} snowIce={} mask2CanMarkWater={} mask400000Low={}",
+            stage.stageNumber, stage.uniqueStage, stage.name,
+            stage.snowOrIce, stage.mask2CanMarkWater,
+            stage.mask400000IsLowRoughness);
     }
 
     struct RoadSurfaceProfile
@@ -86,7 +126,15 @@ namespace
         float minimum = 1.0f;
         float maximum = 0.0f;
         float spread = 0.0f;
+        float nonWaterMinimum = 1.0f;
+        float nonWaterMaximum = 0.0f;
+        unsigned int surfaceMask[4]{};
+        float wheelRoughness[4]{};
+        unsigned int validWheelMask = 0;
+        unsigned int waterWheelMask = 0;
         int validSamples = 0;
+        int nonWaterSamples = 0;
+        int collisionContext = 0;
     };
 
     RoadSurfaceProfile sample_surface_profile(EVWORK_CAR* car)
@@ -95,29 +143,95 @@ namespace
         if (!car)
             return result;
 
-        DWORD waterFlag = 0;
+        // Despite the historical EVWORK_CAR member name, water_flag_24C[] is
+        // passed by the original Xbox routine as the per-wheel surface mask.
+        // sub_1149C0 independently reports whether a given sample is one of the
+        // stage-specific water cases through its output flag.
+        result.collisionContext =
+            static_cast<int>(car->OnRoadPlace_5C.loadColiType_0);
+
         for (int i = 0; i < 4; ++i)
         {
+            result.surfaceMask[i] = car->water_flag_24C[i];
+            DWORD wheelWaterFlag = 0;
             const float roughness = static_cast<float>(sub_1149C0(
-                car->water_flag_24C[i],
-                static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                &waterFlag));
+                result.surfaceMask[i], result.collisionContext,
+                &wheelWaterFlag));
+            result.wheelRoughness[i] = roughness;
             if (!std::isfinite(roughness))
                 continue;
 
+            result.validWheelMask |= (1u << i);
             result.minimum = std::min(result.minimum, roughness);
             result.maximum = std::max(result.maximum, roughness);
             ++result.validSamples;
+
+            if ((wheelWaterFlag & 1u) != 0)
+            {
+                result.waterWheelMask |= (1u << i);
+            }
+            else
+            {
+                result.nonWaterMinimum =
+                    std::min(result.nonWaterMinimum, roughness);
+                result.nonWaterMaximum =
+                    std::max(result.nonWaterMaximum, roughness);
+                ++result.nonWaterSamples;
+            }
         }
 
         if (result.validSamples == 0)
         {
             result.minimum = 0.0f;
+            result.nonWaterMinimum = 0.0f;
             return result;
         }
 
+        if (result.nonWaterSamples == 0)
+            result.nonWaterMinimum = 0.0f;
+
         result.spread = std::max(0.0f, result.maximum - result.minimum);
         return result;
+    }
+
+    // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
+    // 0x100000 is PRIMARY road in these exact forward-stage ranges.
+    // Keep them out of generic curb/shoulder classification. Floral Village
+    // R13 hardware-log follow-up: the tested 0.60 attenuation made the
+    // sustained Floral Village stone paving almost disappear on the R3.
+    // Keep a modest stage-scoped comfort reduction while restoring a clearly
+    // tactile road surface; Deep Lake/Tulip keep normal Road Detail.
+    constexpr float FloralVillageRoughPavingScale = 0.40f;
+
+    bool is_proven_primary_rough_road(
+        const StageSurfaceContext& stage,
+        const RoadSurfaceProfile& surface,
+        const EVWORK_CAR* car)
+    {
+        if (!car)
+            return false;
+        const int roadSection =
+            static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8);
+        if (!WheelFFBMath::proven_primary_rough_road_section(
+                stage.uniqueStage, roadSection))
+            return false;
+
+        bool sawRoughRoad = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            const unsigned int bit = 1u << i;
+            if ((surface.validWheelMask & bit) == 0)
+                continue;
+            if ((surface.waterWheelMask & bit) != 0)
+                return false;
+
+            const unsigned int mask = surface.surfaceMask[i];
+            if (mask == WheelFFBMath::PrimaryRoughRoadSurfaceMask)
+                sawRoughRoad = true;
+            else if (mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                return false;
+        }
+        return sawRoughRoad;
     }
 
     // v0.2 snow-curb state. On snow stages a curb can be rougher OR smoother
@@ -146,6 +260,29 @@ namespace
         DWORD now)
     {
         if (!snowStage || surface.validSamples < 2)
+        {
+            clear_snow_curb_latch();
+            return false;
+        }
+
+        // Snowy Mountain contains a proven primary-road transition between
+        // 0x800000 snow and ordinary 0x2 asphalt. Never turn that road-to-road
+        // transition into a curb latch.
+        bool primarySnowAsphaltOnly = true;
+        bool sawSnowMask = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            const unsigned int bit = 1u << i;
+            if ((surface.validWheelMask & bit) == 0 ||
+                (surface.waterWheelMask & bit) != 0)
+                continue;
+            const unsigned int mask = surface.surfaceMask[i];
+            sawSnowMask |= mask == WheelFFBMath::PrimarySnowIceSurfaceMask;
+            if (mask != WheelFFBMath::PrimarySnowIceSurfaceMask &&
+                mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                primarySnowAsphaltOnly = false;
+        }
+        if (sawSnowMask && primarySnowAsphaltOnly)
         {
             clear_snow_curb_latch();
             return false;
@@ -264,6 +401,10 @@ namespace
     void apply_universal_physics_preset()
     {
         Settings::WheelFFBEnable = true;
+        // These helpers replace the original F11 button blocks, so they must
+        // restore the model ID as well as the feel values. Otherwise switching
+        // back from Arcade/PS2 leaves the previous output semantics active.
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = true;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
@@ -273,12 +414,13 @@ namespace
         Settings::WheelFFBMechanicalTrail = 0.30f;
         Settings::WheelFFBTrailResponseLead = 0.40f;
         Settings::WheelFFBGripLoss = 0.65f;
+        Settings::WheelFFBCountersteerStrength = 0.72f;
         Settings::WheelFFBWeightTransfer = 0.15f;
         Settings::WheelFFBSlewRate = 0.12f;
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.38f;
+        Settings::WheelFFBWallImpact = 0.80f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
@@ -286,7 +428,7 @@ namespace
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
         Settings::WheelFFBInvertForce = true;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -294,6 +436,7 @@ namespace
     void apply_universal_natural_preset()
     {
         Settings::WheelFFBEnable = true;
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
@@ -308,7 +451,7 @@ namespace
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.38f;
+        Settings::WheelFFBWallImpact = 0.80f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
@@ -316,7 +459,7 @@ namespace
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
         Settings::WheelFFBInvertForce = true;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -344,13 +487,14 @@ namespace
     }
 
     DWORD lastRoadCompatibilityLogTick = 0;
+    bool lastFloralRoughPavingState = false;
 }
 
-// Road texture and snow/curb tactile handling are deliberately universal.
-// Wheel model names do not select a force model. ConstantForce is the common
-// road/slip transport so a driver claiming GUID_Sine support cannot silently
-// produce a different feel from another wheel. Hardware Spring/Damper remain
-// capability-driven inside the core and retain their software fallbacks.
+// Modern DD snow/curb compatibility shaping lives here, but tactile transport
+// ownership stays in the model-aware core. UsePeriodicEffects is a live user/
+// model setting: Arcade Original/Hybrid can request the observed Sine path and
+// PS2 Original can request its recovered Triangle path. If those hardware
+// effects are unavailable, the core already falls back safely to ConstantForce.
 //
 // During a real surface transition, temporarily unload SAT/damping and normalize
 // RoadTexture so the tactile signal remains audible under sustained corner load.
@@ -360,15 +504,11 @@ namespace
 // lower than the snow scalar.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
-    // Old named profiles or old F11 presets can still restore the v0.1 values.
-    // Recognize only the exact known signatures so arbitrary user tuning remains
-    // untouched, then immediately bring those presets onto the universal tune.
-    normalize_legacy_preset(true);
-
-    // One tactile transport for every wheel. Spring and Damper are still chosen
-    // by DirectInput capability probing; only road/slip sine is standardized.
-    if (Settings::WheelFFBUsePeriodicEffects)
-        Settings::WheelFFBUsePeriodicEffects = false;
+    // Numeric legacy-preset migration is startup-only in WheelFFBFeelRetune.
+    // Running it here every physics tick reclassified the current R3 presets
+    // because their published values overlap the old signatures.
+    // Do not rewrite WheelFFBUsePeriodicEffects here. Transport ownership is
+    // model-aware in the core and the F11 switch is intentionally live.
 
     const float originalRoadTexture =
         static_cast<float>(Settings::WheelFFBRoadTexture);
@@ -383,24 +523,103 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     if (!car)
         clear_snow_curb_latch();
 
+    StageSurfaceContext stage{};
     if (car)
     {
-        const RoadSurfaceProfile surface = sample_surface_profile(car);
+        stage = sample_stage_surface_context();
+        maybe_log_stage_context(stage);
+    }
+
+    const WheelFFBMath::Model ffbModel =
+        WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel));
+
+    // The compatibility wrapper's normalized curb boost belongs to the Modern
+    // DD model only. Arcade/Hybrid/PS2 models own their surface semantics inside
+    // the core and must not be pre-shaped by the Modern DD wrapper.
+    if (car && ffbModel == WheelFFBMath::Model::ModernDD)
+    {
+        RoadSurfaceProfile surface = sample_surface_profile(car);
+        {
+            const std::array<unsigned, 4> masks = {
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3]
+            };
+            if (WheelFFBMath::primary_asphalt_water_false_positive(
+                    stage.uniqueStage, surface.collisionContext,
+                    masks, surface.waterWheelMask))
+            {
+                surface.minimum = 0.25f;
+                surface.maximum = 0.25f;
+                surface.spread = 0.0f;
+                surface.nonWaterMinimum = 0.25f;
+                surface.nonWaterMaximum = 0.25f;
+                surface.waterWheelMask = 0;
+                surface.validSamples = 4;
+                surface.nonWaterSamples = 4;
+                for (int i = 0; i < 4; ++i)
+                    surface.wheelRoughness[i] = 0.25f;
+            }
+        }
+        const std::array<unsigned, 4> currentMasks = {
+            surface.surfaceMask[0], surface.surfaceMask[1],
+            surface.surfaceMask[2], surface.surfaceMask[3]
+        };
+        const bool imperialStoneRoad =
+            WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                stage.uniqueStage, surface.collisionContext, currentMasks);
+        if (imperialStoneRoad)
+        {
+            // The game's stage table marks 0x2 members of this same stone road
+            // as water. Normalize only the local compatibility profile so the
+            // stage is a continuous tactile road instead of a sequence of
+            // one-frame water/stone dropouts.
+            surface.minimum = 0.35f;
+            surface.maximum = 0.35f;
+            surface.spread = 0.0f;
+            surface.nonWaterMinimum = 0.35f;
+            surface.nonWaterMaximum = 0.35f;
+            surface.waterWheelMask = 0;
+            surface.validSamples = 4;
+            surface.nonWaterSamples = 4;
+            for (int i = 0; i < 4; ++i)
+                surface.wheelRoughness[i] = 0.35f;
+        }
+
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
-        const bool genuinelyRough = surface.maximum >= 0.60f;
+
+        // The reconstructed Xbox LUT can mark stage-specific water as a high
+        // roughness value (0.73/0.76/0.79). Keep that signal for the core's
+        // water/splash path, but do not mistake water for a curb and apply the
+        // compatibility layer's SAT/damper unload or fixed curb amplitude.
+        const bool nonWaterRough = surface.nonWaterMaximum >= 0.60f;
+        const bool waterOnlyRough =
+            surface.waterWheelMask != 0 &&
+            surface.maximum >= 0.60f && !nonWaterRough;
+
         // Ordinary route-fork/asphalt material changes (for example 0.25/0.35)
         // are not tactile curbs. A non-snow mixed transition must include a
-        // genuinely rough material before the compatibility boost is allowed.
-        const bool mixedSurface = rawMixedSurface && genuinelyRough;
+        // genuinely rough NON-WATER material before the compatibility boost.
+        const bool mixedSurface = rawMixedSurface && nonWaterRough;
         const bool fullyRough =
-            surface.validSamples >= 2 && surface.minimum >= 0.60f;
+            surface.nonWaterSamples >= 2 &&
+            surface.nonWaterMinimum >= 0.60f;
+
         const DWORD now = GetTickCount();
-        const bool snowStage = is_snow_or_ice_stage_for_ffb();
+        const bool snowStage = stage.snowOrIce;
         const bool snowCurbHeld = update_snow_curb_latch(
             surface, snowStage, rawMixedSurface, now);
-        const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
-        const bool tactileSurface = genuinelyRough || snowCurbHeld;
+        const bool primaryRoughRoad =
+            is_proven_primary_rough_road(stage, surface, car);
+        const bool strongTactile =
+            !primaryRoughRoad &&
+            (mixedSurface || fullyRough || snowCurbHeld);
+        const bool tactileSurface =
+            imperialStoneRoad || nonWaterRough || snowCurbHeld;
+
+        float desiredRoadAmp = 0.0f;
+        float steeringScale = 1.0f;
+        float damperScale = 1.0f;
 
         if (tactileSurface)
         {
@@ -411,20 +630,54 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
 
             // A latched snow curb is already a positively identified surface
-            // transition. Treat it as full texture in the compatibility envelope
-            // even when its LUT scalar is <=0.30; the core receives the matching
-            // temporary roughness floor immediately before its update below.
+            // transition. Otherwise only NON-WATER roughness drives the curb
+            // compatibility envelope; stage water remains owned by the core.
             const float textureRoughness = snowCurbHeld
                 ? 1.0f
-                : std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
+                : std::clamp(
+                    (surface.nonWaterMaximum - 0.30f) / 0.55f,
+                    0.0f, 1.0f);
             const float outputStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
-            const float coreStageScale = snowStage ? 0.04f : 1.0f;
+            bool sawSnowPrimary = false;
+            bool sawSnowDisqualifier = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                const unsigned int bit = 1u << i;
+                if ((surface.validWheelMask & bit) == 0 ||
+                    (surface.waterWheelMask & bit) != 0)
+                    continue;
+                const unsigned int mask = surface.surfaceMask[i];
+                if (mask == WheelFFBMath::PrimarySnowIceSurfaceMask)
+                    sawSnowPrimary = true;
+                else if (mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                    sawSnowDisqualifier = true;
+            }
+            const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
+            const float coreStageScale = snowPrimaryRoad
+                ? WheelFFBMath::SnowIceComfortTextureScale
+                : 1.0f;
 
-            const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
+            desiredRoadAmp = imperialStoneRoad
+                ? 0.05f
+                : (strongTactile ? 0.30f : 0.22f);
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
-            if (envelope > 0.0005f)
+
+            if (imperialStoneRoad)
+            {
+                // Dedicated core stone floor owns amplitude. Do not unload SAT,
+                // damping, or inflate the user RoadTexture setting here.
+            }
+            else if (primaryRoughRoad)
+            {
+                const bool floralComfort = stage.uniqueStage == 27;
+                Settings::WheelFFBRoadTexture = std::clamp(
+                    originalRoadTexture *
+                        (floralComfort ? FloralVillageRoughPavingScale : 1.0f),
+                    0.0f, 120.0f);
+            }
+            else if (envelope > 0.0005f)
             {
                 // This value is temporary for one physics tick and is restored
                 // immediately below. Values above the UI range are intentional:
@@ -438,31 +691,60 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             }
 
             // Only an already-identified snow curb gets the core surface floor.
-            // Normal snow and ordinary asphalt still use the game's exact LUT.
+            // Normal snow, water and ordinary asphalt use the game's exact LUT.
             applyCoreSurfaceFloor = snowCurbHeld;
 
-            // Keep exactly the same SAT/damper relief when the car completes the
-            // transition onto a fully rough or latched snow curb/shoulder.
-            const float steeringScale = strongTactile ? 0.72f : 0.80f;
-            const float damperScale = strongTactile ? 0.55f : 0.70f;
+            // Keep exactly the same SAT/damper relief for genuine tactile
+            // transitions.  The Floral Village primary-road rough paving is a
+            // sustained road surface, not a curb: only its Road Detail is scaled.
+            if (!primaryRoughRoad && !imperialStoneRoad)
+            {
+                steeringScale = strongTactile ? 0.72f : 0.80f;
+                damperScale = strongTactile ? 0.55f : 0.70f;
+            }
             Settings::WheelFFBSteeringWeight =
                 originalSteeringWeight * steeringScale;
             Settings::WheelFFBDamperStrength =
                 originalDamperStrength * damperScale;
             restoreTactileOverrides = true;
+        }
 
-            if (Settings::WheelFFBDebugLog &&
-                now - lastRoadCompatibilityLogTick >= 750)
-            {
-                lastRoadCompatibilityLogTick = now;
-                spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
-                    surface.minimum, surface.maximum, surface.spread,
-                    mixedSurface, fullyRough, snowStage, snowCurbHeld,
-                    snowCurbMaterial, applyCoreSurfaceFloor, desiredRoadAmp,
-                    static_cast<float>(Settings::WheelFFBRoadTexture),
-                    steeringScale, damperScale);
-            }
+        const bool floralRoughPavingNow =
+            primaryRoughRoad && stage.uniqueStage == 27;
+        if (Settings::WheelFFBDebugLog &&
+            floralRoughPavingNow != lastFloralRoughPavingState)
+        {
+            lastFloralRoughPavingState = floralRoughPavingNow;
+            spdlog::info(
+                "WheelFFB ROAD EDGE: floralRoughPaving={} roadSection={} masks={:08X}/{:08X}/{:08X}/{:08X}",
+                floralRoughPavingNow,
+                static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3]);
+        }
+
+        if (Settings::WheelFFBDebugLog &&
+            (tactileSurface || surface.waterWheelMask != 0) &&
+            now - lastRoadCompatibilityLogTick >= 750)
+        {
+            lastRoadCompatibilityLogTick = now;
+            spdlog::info(
+                "WheelFFB ROAD: stage={} roadSection={} primaryRoughRoad={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                stage.uniqueStage,
+                static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
+                primaryRoughRoad,
+                surface.minimum, surface.maximum, surface.spread,
+                surface.nonWaterMinimum, surface.nonWaterMaximum,
+                mixedSurface, fullyRough, snowStage, snowCurbHeld,
+                surface.waterWheelMask, waterOnlyRough,
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3],
+                surface.wheelRoughness[0], surface.wheelRoughness[1],
+                surface.wheelRoughness[2], surface.wheelRoughness[3],
+                surface.collisionContext, applyCoreSurfaceFloor,
+                desiredRoadAmp,
+                static_cast<float>(Settings::WheelFFBRoadTexture),
+                steeringScale, damperScale);
         }
     }
 
@@ -581,15 +863,21 @@ namespace
 
             if (revision < 1)
             {
-                // Baseline feel is universal. Preserve SAT/trail gains, reduce
-                // the low-speed centre spring, make real surface roughness easier
-                // to feel, suppress normal-cornering scrub buzz, and retain an
-                // unmistakable but short gear-change thunk.
-                Settings::WheelFFBSpringStrength = 0.22f;
-                Settings::WheelFFBSpringSaturation = 0.55f;
-                Settings::WheelFFBRoadTexture = 0.60f;
-                Settings::WheelFFBTireSlip = 0.04f;
-                Settings::WheelFFBGearShift = 0.60f;
+                // Revision 1 predates the selectable original-model lanes.
+                // Its retune belongs to Modern DD only. Applying these values
+                // while Arcade/Hybrid/PS2 is already selected would overwrite
+                // their reference Spring/Road/Gear settings before a hardware
+                // test, so original-model state advances the marker unchanged.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
+                {
+                    Settings::WheelFFBSpringStrength = 0.22f;
+                    Settings::WheelFFBSpringSaturation = 0.55f;
+                    Settings::WheelFFBRoadTexture = 0.60f;
+                    Settings::WheelFFBTireSlip = 0.04f;
+                    Settings::WheelFFBGearShift = 0.60f;
+                }
                 Settings::WheelFFBFeelRevision = 1;
                 revision = 1;
                 changed = true;
@@ -597,9 +885,13 @@ namespace
 
             if (revision < 2)
             {
-                // Road/slip tactile transport is standardized across wheel
-                // models. Hardware Spring/Damper remain capability-driven.
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Modern DD defaults to the R3-compatible ConstantForce tactile
+                // transport. Original-model shortcuts own their verified
+                // periodic transports and must not be disabled by migration.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
+                    Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBFeelRevision = 2;
                 revision = 2;
                 changed = true;
@@ -622,21 +914,27 @@ namespace
 
             if (revision < 4)
             {
-                // v0.2 response retune for every wheel. Only values still equal
-                // to v0.1 defaults are migrated; manual tuning is kept.
-                const auto migrate_default = [](auto& setting, float oldValue, float newValue)
+                // v0.2 response retune is a Modern DD migration. Hybrid keeps
+                // its explicit Modern-backbone reference values, while Arcade
+                // Original and PS2 own different condition/effect semantics.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
                 {
-                    const float current = static_cast<float>(setting);
-                    if (std::isfinite(current) &&
-                        std::abs(current - oldValue) <= 0.0005f)
-                        setting = newValue;
-                };
+                    const auto migrate_default = [](auto& setting, float oldValue, float newValue)
+                    {
+                        const float current = static_cast<float>(setting);
+                        if (std::isfinite(current) &&
+                            std::abs(current - oldValue) <= 0.0005f)
+                            setting = newValue;
+                    };
 
-                migrate_default(Settings::WheelFFBSlewRate, 0.06f, 0.12f);
-                migrate_default(Settings::WheelFFBReversalReleaseRate, 0.12f, 0.30f);
-                migrate_default(Settings::WheelFFBTrailResponseLead, 0.25f, 0.40f);
-                migrate_default(Settings::WheelFFBSteeringWeight, 1.45f, 1.60f);
-                migrate_default(Settings::WheelFFBMechanicalTrail, 0.25f, 0.30f);
+                    migrate_default(Settings::WheelFFBSlewRate, 0.06f, 0.12f);
+                    migrate_default(Settings::WheelFFBReversalReleaseRate, 0.12f, 0.30f);
+                    migrate_default(Settings::WheelFFBTrailResponseLead, 0.25f, 0.40f);
+                    migrate_default(Settings::WheelFFBSteeringWeight, 1.45f, 1.60f);
+                    migrate_default(Settings::WheelFFBMechanicalTrail, 0.25f, 0.30f);
+                }
 
                 Settings::WheelFFBFeelRevision = 4;
                 revision = 4;
@@ -645,13 +943,78 @@ namespace
 
             if (revision < 5)
             {
-                // Old F11 presets used a different response envelope and could
-                // undo v0.2 tuning. Migrate only their exact signatures; all
-                // other manual values remain untouched.
-                normalize_legacy_preset(false);
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Old Modern F11 presets used a different response envelope and
+                // could undo v0.2 tuning. Migrate only their exact signatures.
+                // Do not globally force Periodic OFF: Arcade/Hybrid/PS2 modes
+                // deliberately own Sine/Triangle transports.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                const bool migratedLegacyModern =
+                    migrationModel == WheelFFBMath::Model::ModernDD
+                        ? normalize_legacy_preset(false)
+                        : false;
+                if (migratedLegacyModern ||
+                    migrationModel == WheelFFBMath::Model::ModernDD)
+                {
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                }
                 Settings::WheelFFBFeelRevision = 5;
                 revision = 5;
+                changed = true;
+            }
+
+            if (revision < 6)
+            {
+                Settings::WheelFFBFeelRevision = 6;
+                revision = 6;
+                changed = true;
+            }
+
+            if (revision < 7)
+            {
+                // R9 hardware log: the selected force model and its required
+                // DirectInput polarity must not be independent state. Modern on
+                // the tested R3 needs both reversals ON; Arcade/Hybrid/PS2 need
+                // both OFF. Use the ConstantForce tactile carrier by default for
+                // all modes because the R3 hardware periodic path was accepted by
+                // the driver but several expected effects were physically absent.
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                const bool modern = model == WheelFFBMath::Model::ModernDD;
+                Settings::WheelFFBInvertForce = modern;
+                Settings::WheelFFBInvertSpring = modern;
+                Settings::WheelFFBUsePeriodicEffects = false;
+                if (modern &&
+                    nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.38f))
+                    Settings::WheelFFBWallImpact = 0.80f;
+                Settings::WheelFFBFeelRevision = 7;
+                revision = 7;
+                changed = true;
+            }
+
+            if (revision < 8)
+            {
+                // R11 hardware follow-up for already-stamped R10 users.
+                // Retired Hybrid state becomes the complete Modern DD baseline,
+                // while a stock Modern WallImpact=0.55 is lifted to the new
+                // stronger 0.80 baseline. Deliberate custom values are preserved.
+                const int rawModel = static_cast<int>(Settings::WheelFFBModel);
+                if (rawModel == 2)
+                {
+                    apply_universal_physics_preset();
+                    Settings::WheelFFBModel = 0;
+                }
+
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (model == WheelFFBMath::Model::ModernDD &&
+                    nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.55f))
+                {
+                    Settings::WheelFFBWallImpact = 0.80f;
+                }
+
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
                 changed = true;
             }
 
@@ -775,10 +1138,10 @@ namespace
                 return false;
             }
 
-            // The old UI implementation names these presets after R3 and writes
-            // obsolete v0.1 values. Draw universal labels here and apply the
-            // device-independent v0.2 preset directly; returning false prevents
-            // the old caller block from overwriting the new values afterwards.
+            // The source UI retains the historical R3 labels for hook matching,
+            // but its fallback bodies are kept synchronized with these helpers.
+            // Draw universal labels here, apply the canonical preset once, and
+            // return false so the caller does not execute the mirrored body twice.
             if (label && std::strcmp(label, "Load MOZA R3 Physics SAT") == 0)
             {
                 const bool clicked = ButtonHook.ccall<bool>(
@@ -786,7 +1149,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -802,7 +1165,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))

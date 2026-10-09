@@ -39,7 +39,7 @@ public:
         rawFrontSlip_ = 0.0f;
         bodySlipBlend_ = 0.18f;
         yawRateBlend_ = 0.20f;
-        frontSlipBlend_ = 0.24f;
+        frontSlipBlend_ = 0.16f;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         positionStep_ = 0.0f;
@@ -244,7 +244,19 @@ public:
             transientT0 * transientT0 * (3.0f - 2.0f * transientT0);
         bodySlipBlend_ = 0.18f + (0.34f - 0.18f) * transientT;
         yawRateBlend_ = 0.20f + (0.38f - 0.20f) * transientT;
-        frontSlipBlend_ = 0.24f + (0.58f - 0.24f) * transientT;
+
+        // R13 front-tyre relaxation is distance-based rather than a hand-tuned
+        // time-domain blend. OutRun's world units are not proven metres, so the
+        // length is a normalized calibration constant, but the relationship is
+        // still tau ~= L_relax / speed: more distance per 60 Hz tick means the
+        // contact patch reaches the new slip state faster.
+        constexpr float FixedPhysicsDt = 1.0f / 60.0f;
+        constexpr float FrontRelaxationLengthNorm = 0.012f;
+        const float frontTravelPerTick =
+            std::max(speedNorm, 0.0f) * FixedPhysicsDt;
+        const float relaxationBlend = 1.0f - std::exp(
+            -frontTravelPerTick / FrontRelaxationLengthNorm);
+        frontSlipBlend_ = std::clamp(relaxationBlend, 0.16f, 0.78f);
         bodySlip_ += (rawBodySlip_ - bodySlip_) * bodySlipBlend_;
 
         const float heading = std::atan2(forwardX, forwardZ);
@@ -369,7 +381,7 @@ private:
         rawFrontSlip_ = 0.0f;
         bodySlipBlend_ = 0.18f;
         yawRateBlend_ = 0.20f;
-        frontSlipBlend_ = 0.24f;
+        frontSlipBlend_ = 0.16f;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         activationBlend_ = 0.0f;
@@ -429,7 +441,7 @@ private:
     float rawFrontSlip_ = 0.0f;
     float bodySlipBlend_ = 0.18f;
     float yawRateBlend_ = 0.20f;
-    float frontSlipBlend_ = 0.24f;
+    float frontSlipBlend_ = 0.16f;
     float vLong_ = 0.0f;
     float vLat_ = 0.0f;
     float positionStep_ = 0.0f;
