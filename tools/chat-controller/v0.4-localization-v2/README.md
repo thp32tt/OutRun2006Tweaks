@@ -30,9 +30,9 @@ Start with `AUTO_SEND=false`, verify ChatGPT project and GitHub connection, then
 The production controller uses independent parallel lanes:
 
 ```text
-Producer A  ─────┐
-                 ├── Artifact Queue ─── QA Validator C
-Producer B  ─────┘
+Producer A  ─────┐                      ┌── QA Validator C1
+                 ├── Artifact Queue ─────┤
+Producer B  ─────┘                      └── QA Validator C2
 ```
 
 ### Producer lanes
@@ -42,12 +42,13 @@ Producer B  ─────┘
 - A/B production must not stop because unrelated assets are waiting for QA.
 - Every candidate must include the required artifact evidence before entering QA.
 
-### QA lane
+### QA lanes
 
-- C continuously consumes completed A/B artifacts.
-- C validates producer output using the required QA rules.
-- C PASS/REWORK decisions apply to the affected asset only.
-- A QA failure must not block unrelated production assets.
+- C1 and C2 independently consume *different* completed A/B artifacts from one durable QA queue.
+- Candidate path/SHA cannot be assigned twice, including across restarts.
+- Both use the strict QA rules in `localization_C.md`, with distinct lane names and commit markers.
+- PASS/REWORK decisions apply to the affected asset only; producer A/B does not wait for an unrelated QA.
+- The previous C lane's URL, runs and active task are migrated to C1; C2 starts empty.
 
 ## State and source rules
 
@@ -59,12 +60,13 @@ Producer B  ─────┘
 
 ## Slot model
 
-Localization execution uses three logical workers:
+Localization execution uses four logical workers:
 
 ```text
 slot-1 = Producer A
 slot-2 = Producer B
-slot-3 = QA C
+slot-3 = QA C1
+slot-4 = QA C2
 ```
 
 Restarting the controller must preserve this role separation.
@@ -89,11 +91,11 @@ The image builds from `v0.4/src` and uses A/B/C localization prompts. VR control
 ## Chrome tab recovery (2026-10-10)
 
 The production image builds the shared `v0.4/src/controller.py.part*`
-controller (NOT the older `localization/src` fork). This release has three
-**worker** tabs by design: producer A, producer B, QA C. A fourth tab is
-not an independent worker and is not created automatically.
+controller (NOT the older `localization/src` fork). This release has four **worker** tabs by policy: producer A, producer B,
+independent QA C1, independent QA C2. Any older three-worker statement is
+superseded by the four-lane implementation.
 
-The A/B/C tab-health task runs independently of slow queue operations,
+The A/B/C1/C2 tab-health task runs independently of slow queue operations,
 defaulting to one pass every 30 seconds. It detects:
 - a missing/closed tab;
 - Playwright renderer `crash` events;
@@ -119,10 +121,14 @@ Inspect `/logs/controller.log`, `/logs/chrome.log`,
 `tab_recovery_count`, `tab_recovery_last_slot`,
 `tab_recovery_last_reason`, `tab_recovery_error`.
 For repeated failures, check Docker `OOMKilled` and container memory
-usage against `mem_limit: 3g` (cause unverified until live logs are read).
+usage against `mem_limit: 4g` and `shm_size: 1g` (cause unverified until live logs are read).
 
 Run `python tests/test_localization_tab_recovery.py` to verify isolated
 recovery before redeployment. Rebuild/redeploy the **v2** stack to apply
 the code; preserve the named data and log volumes. The older standalone
 `tools/chat-controller/localization/` image is not the v2 production
 image and does not inherit this fix automatically.
+
+## Four-worker rollout validation
+
+Run `python tools/chat-controller/v0.4/tests/test_event_model_v2.py` and `python tests/test_localization_tab_recovery.py`, then check the exact new image after rebuilding the v2 stack. Status page should display slot names `A,B,C1,C2`, a non-destructive previous C-to-C1 migration, and `tab_count: 4`. The monitor retains separate C1/C2 counters and saved URLs. GitHub Actions passing does not imply Portainer is redeployed. Old standalone controller compose/source files are legacy; use this v2 production stack. Memory limits are a starting guardrail; use container logs/OOMKilled to tune them if failures continue.
