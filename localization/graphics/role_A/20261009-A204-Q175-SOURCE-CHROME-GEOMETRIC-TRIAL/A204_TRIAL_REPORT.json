@@ -1,0 +1,137 @@
+{
+  "role": "A",
+  "task": "A204",
+  "queue_index": 175,
+  "priority": "P1",
+  "user_report": "IGR-032",
+  "status": "TRIAL_ONLY_PENDING_CONTROLLER_VISUAL_NOT_PROMOTED",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "prior_exact_dds_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_method": "OFL Orbit geometric native Hangul outline plus measured English chrome y-band transfer + local inside-contour bevel; not stretched prior DDS",
+  "font_origin": "JAMO-TYPEFACE/Orbit (OFL-1.1)",
+  "font_blob_sha1": "5f7f97f84a88e2fa34c4afdc3ba69b08f13d0783",
+  "rows": [
+    {
+      "key": "stage_select",
+      "english": "stage select",
+      "korean": "스테이지 선택",
+      "source_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "trial_bbox": [
+        14,
+        262,
+        808,
+        393
+      ],
+      "size": [
+        794,
+        131
+      ],
+      "source_size": [
+        1366,
+        143
+      ],
+      "margins": [
+        8,
+        564,
+        8,
+        4
+      ],
+      "font_size": 134,
+      "profile_sample": [
+        224.2510315806523,
+        153.14332401720625,
+        98.80516116296458
+      ]
+    },
+    {
+      "key": "showroom",
+      "english": "showroom",
+      "korean": "쇼룸",
+      "source_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "trial_bbox": [
+        14,
+        405,
+        243,
+        526
+      ],
+      "size": [
+        229,
+        121
+      ],
+      "source_size": [
+        950,
+        132
+      ],
+      "margins": [
+        8,
+        713,
+        8,
+        3
+      ],
+      "font_size": 129,
+      "profile_sample": [
+        252.0,
+        165.0571982949255,
+        38.0
+      ]
+    },
+    {
+      "key": "single_player",
+      "english": "single player",
+      "korean": "싱글 플레이",
+      "source_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "trial_bbox": [
+        10,
+        574,
+        725,
+        714
+      ],
+      "size": [
+        715,
+        140
+      ],
+      "source_size": [
+        1384,
+        151
+      ],
+      "margins": [
+        8,
+        661,
+        8,
+        3
+      ],
+      "font_size": 143,
+      "profile_sample": [
+        226.6304640961421,
+        100.51137371958197,
+        38.0
+      ]
+    }
+  ],
+  "qa_preview": {
+    "clean_to_trial_changed_outside_source": 0,
+    "clean_to_trial_changed_outside_glyph": 0,
+    "clean_to_trial_alpha_changed_outside_source": 0,
+    "old_to_trial_changed_outside_source": 0,
+    "source_to_clean_changed_outside_source": 0
+  },
+  "dds_produced": 0,
+  "dds_replaced": false,
+  "runtime_validation": "UNTESTED",
+  "next_gate": "Controller SOURCE/CLEAN/OLD/TRIAL native+RAW+50 before any DDS promotion; reject if still unlike connected English techno letterform; then 10-stage persisted DDS QA and independent C1/C3"
+}
