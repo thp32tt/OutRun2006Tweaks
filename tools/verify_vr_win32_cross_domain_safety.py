@@ -26,9 +26,8 @@ def verify(source):
         "FixFileLoadRace: unable to initialize request-list lock" in source["src/hooks_bugfixes.cpp"]),
        ("network hook checks WSAStartup result", "const int wsaStatus = WSAStartup(0x202, &tmp);" in source["src/hooks_misc.cpp"] and
         "if (wsaStatus != 0)" in source["src/hooks_misc.cpp"]),
-       ("wheel exit hook validates kernel32 handle",
-        'if (HMODULE kernel32 = GetModuleHandleA("kernel32.dll"))' in source["src/hooks_wheel_ffb.cpp"] and
-        'GetProcAddress(kernel32, "ExitProcess")' in source["src/hooks_wheel_ffb.cpp"])
+       ("wheel exit hook retains finalized FFB v0.2 ExitProcess lookup",
+        'GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess")' in source["src/hooks_wheel_ffb.cpp"])
     ]
     for label,ok in checks:
         if not ok:raise ValueError(label)
@@ -52,7 +51,7 @@ def negatives(src):
       ("src/hooks_framerate.cpp","WaitForSingleObject(Timer, waitBudgetMs) != WAIT_OBJECT_0"),
       ("src/hooks_framerate.cpp","std::clamp<INT64>((sleepTicks + 9999) / 10000 + 5, 1, 1000)"),
       ("src/hooks_misc.cpp","if (wsaStatus != 0)"),
-      ("src/hooks_wheel_ffb.cpp",'if (HMODULE kernel32 = GetModuleHandleA("kernel32.dll"))')]
+      ("src/hooks_wheel_ffb.cpp",'GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess")')]
     for path,token in cases:
        copy=dict(src)
        copy[path]=src[path].replace(token,"__FAIL_CROSS_SOURCE_GUARD__",1)
