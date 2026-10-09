@@ -816,6 +816,50 @@ if "R29TelemetryNoteStableTwoEyeDraw()" not in r29:
 if "R30TelemetryNoteScreenSpaceFovDraw()" not in r30:
     errors.append("R30 missing screen-space telemetry owner API")
 
+# R84 R9 mono-backup gap and stereo failure poisoning are fail-closed side effects.
+# R32 must call the original lower owner through R30 without suppressing the
+# counter/gap transition or erasing the reported failure reason/site/HRESULT.
+def r9_mono_failure_owner_ok(api, owner, consumer):
+    return all((
+        "void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept;" in api,
+        "void R30SupportReportStereoFailure(\n        OutRunVR::StereoFailureReason reason,\n        const char* site, HRESULT hr) noexcept;" in api,
+        bool(re.search(r"void R30SupportNoteStereoDrawWithoutMonoBackup\(\) noexcept"
+                       r"\s*\{\s*R9NoteStereoDrawWithoutMonoBackup\(\);\s*\}", owner)),
+        bool(re.search(
+            r"void R30SupportReportStereoFailure\(\s*"
+            r"OutRunVR::StereoFailureReason reason,\s*const char\* site,\s*HRESULT hr\)"
+            r" noexcept\s*\{\s*R9Poison\(reason, site, hr\);\s*\}", owner)),
+        "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }" in consumer,
+        "R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R30SupportReportStereoFailure(r,s,hr); }" in consumer,
+    ))
+
+if not r9_mono_failure_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 R9 mono-backup/failure owner lost exact R30 delegations")
+_mono_body = ("void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept\n"
+              "    {\n        R9NoteStereoDrawWithoutMonoBackup();\n    }")
+for label, changed_r30, changed_r32 in (
+    ("mono backup gap side effect erased", r30.replace(
+        _mono_body, _mono_body.replace(
+            "R9NoteStereoDrawWithoutMonoBackup();", "(void)0;"), 1), r32),
+    ("poison reason discarded", r30.replace(
+        "R9Poison(reason, site, hr);",
+        "R9Poison(OutRunVR::StereoFailureNone, site, hr);", 1), r32),
+    ("poison site discarded", r30.replace(
+        "R9Poison(reason, site, hr);", "R9Poison(reason, nullptr, hr);", 1), r32),
+    ("poison HRESULT discarded", r30.replace(
+        "R9Poison(reason, site, hr);", "R9Poison(reason, site, S_OK);", 1), r32),
+    ("R32 bypasses mono owner", r30, r32.replace(
+        "R30SupportNoteStereoDrawWithoutMonoBackup();",
+        "R9NoteStereoDrawWithoutMonoBackup();", 1)),
+    ("R32 bypasses poison owner", r30, r32.replace(
+        "R30SupportReportStereoFailure(r,s,hr);",
+        "R9Poison(r,s,hr);", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R9 mono failure owner mutation not applied: " + label)
+    elif r9_mono_failure_owner_ok(r30_support_api, changed_r30, changed_r32):
+        errors.append("R9 mono failure owner negative mutation survived: " + label)
+
 # A duplicated stereo draw without a complete independent mono replay has one
 # R9-owned accounting transition: increment draw calls + mark the mono backup
 # incomplete. Upper layers must not reproduce that state pair themselves.
@@ -837,8 +881,10 @@ for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;",
     if banned in r31:
         errors.append(
             f"R31 regained retired stereo-draw accounting: {banned}")
-if "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R9NoteStereoDrawWithoutMonoBackup(); }" not in r32:
-    errors.append("R32 split facade must delegate stereo-draw accounting to the R9 owner API")
+# R32 calls the explicit R30 lower-owner bridge; R30 remains responsible for
+# invoking the original R9 draw-count/mono-backup-gap transition exactly once.
+if "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }" not in r32:
+    errors.append("R32 split facade must delegate stereo-draw accounting via R30 to the R9 owner API")
 if "R9NoteStereoDrawWithoutMonoBackup()" not in r9:
     errors.append("R9 missing stereo-draw accounting owner API")
 

@@ -3305,6 +3305,18 @@ namespace OutRunVRStereo
         R9NoteMainDepthContentWrite();
     }
 
+    void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept
+    {
+        R9NoteStereoDrawWithoutMonoBackup();
+    }
+
+    void R30SupportReportStereoFailure(
+        OutRunVR::StereoFailureReason reason,
+        const char* site, HRESULT hr) noexcept
+    {
+        R9Poison(reason, site, hr);
+    }
+
     void R30SupportInvalidateRightDepthStencilSync(
         bool invalidateDepth, bool invalidateStencil) noexcept
     {

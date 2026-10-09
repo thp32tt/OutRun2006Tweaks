@@ -38,6 +38,11 @@ namespace OutRunVRStereo
     bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;
     // Exact lower R9 depth-content write notification, without a new epoch.
     void R30SupportNoteMainDepthContentWrite() noexcept;
+    // Preserve original R9 mono-backup invalidation and frame poisoning.
+    void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept;
+    void R30SupportReportStereoFailure(
+        OutRunVR::StereoFailureReason reason,
+        const char* site, HRESULT hr) noexcept;
     // Exact lower R9 right-eye depth/stencil sync query and invalidation owner.
     void R30SupportInvalidateRightDepthStencilSync(
         bool invalidateDepth, bool invalidateStencil) noexcept;

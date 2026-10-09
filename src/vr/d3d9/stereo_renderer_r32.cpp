@@ -874,9 +874,9 @@ namespace OutRunVRStereo
     void R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R30SupportInvalidateRightDepthStencilSync(d, s); }
     bool R32ReviewRightDepthInSync() noexcept { return R30SupportRightDepthInSync(); }
     bool R32ReviewRightStencilInSync() noexcept { return R30SupportRightStencilInSync(); }
-    void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R9NoteStereoDrawWithoutMonoBackup(); }
+    void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }
     void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }
-    void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R9Poison(r,s,hr); }
+    void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R30SupportReportStereoFailure(r,s,hr); }
     void R32ReviewNoteRestoreFailure(const char* what) noexcept { NoteRestoreFailure(what); }
 
     IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return R30SupportBorrowedTrackedRenderTarget(); }
