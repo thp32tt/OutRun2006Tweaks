@@ -7,10 +7,10 @@ services:
     networks: [localization_v2]
     restart: unless-stopped
     init: true
-    shm_size: "768m"
-    mem_limit: 3g
+    shm_size: "1g"
+    mem_limit: 4g
     mem_reservation: 1g
-    cpus: 1.5
+    cpus: 2.0
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
@@ -47,7 +47,7 @@ services:
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       SCHEDULE_MINUTES: "0,20,40"
-      CHAT_SLOTS: "3"
+      CHAT_SLOTS: "4"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
