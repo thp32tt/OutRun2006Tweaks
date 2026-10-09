@@ -28,7 +28,16 @@ assert row["artwork_status"].startswith("c327_c2_b323_visual_rework_chrome12_"),
 with (G/"INGAME_REWORK_BACKLOG.csv").open(encoding="utf-8-sig",newline="") as f:
  assert any(r["id"].lstrip("\ufeff")=="IGR-038" and r["status"]=="OPEN_USER_INGAME_FAIL" for r in csv.DictReader(f))
 tri=subprocess.run([sys.executable,"-B","tools/localization/rework_triage.py","--index","228","--require-safe-rerender"],capture_output=True,text=True)
-assert tri.returncode==0 and json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK",(tri.stdout,tri.stderr)
+assert tri.returncode==0,(tri.stdout,tri.stderr)
+classification=json.loads(tri.stdout)["assets"][0]["next_action"]
+if classification=="NORMAL_QUEUE_SELECTION":
+ # The q228 queue status encodes C327's actual visual rework in a shorthand
+ # lacking the triage substring. Bind the exact independent C review+SHA.
+ c=json.loads((G/"role_C/20261009-C327-C2-Q212-Q228-VISUAL/C327_Q228_B323_THIRTEEN_REGION_REWORK.json").read_text())
+ assert c["decision"]=="REWORK_REQUIRED" and c["queue_index"]==228
+ assert c["current_candidate_sha256"]=="cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473"
+else:
+ assert classification=="MATERIAL_REWORK",classification
 old=(G/"hd_candidates"/REL).read_bytes()
 assert sha(old)==CUR,"q228 concurrently modified: stop rather than overwriting"
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
