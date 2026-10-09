@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-B306-Q205-P0-BLOCK-SANS-20261009-1010",
+  "role": "B",
+  "run": "B306",
+  "queue_index": 205,
+  "priority": "P0",
+  "user_regressions": [
+    "IGR-026",
+    "IGR-027"
+  ],
+  "user_ingame_state": "OPEN_USER_INGAME_FAIL",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "prior_candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+  "new_candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+  "source_failure": "C324 C1 exact persisted B303 candidate had tapered CJK serif unlike heavy red English block sans both headings; source bbox machine PASS does not override original-family visual REWORK.",
+  "method_change": "Rebuilt only 2 exact source headings with direct native 141px/138px NotoSansCJK Black glyph alpha, no source serif, no pixel bitmap reuse, no arbitrary horizontal scaling/shear, no ungrounded outline; sampled actual English red RGB [186,0,0]; reconstruct the exact A76 CLEAN atlas per original text bbox before composition.",
+  "source_family_observations": {
+    "english": "Heavy all-uppercase square/sans bold red, rectangular strong vertical stems",
+    "old": "NotoSerif tapered/angular terminals mismatched C324",
+    "new": "Heavier straight-stem sans silhouettes, simplified clean strong body, more consistent with source family but not identical English glyph geometry; English word lengths vs two-syllable Korean widths remain inherently unequal"
+  },
+  "direct_pixel_first_review": [
+    {
+      "name": "options",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "new_bbox": [
+        1597,
+        1429,
+        1843,
+        1562
+      ],
+      "positive_margins": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "source_h": 145,
+      "new_h": 133,
+      "comparison": "SOURCE/CLEAN/PRIOR/NEW native100 gray and RAW75 opened directly",
+      "verdict": "B_SELF_QA_SCOPED_PASS",
+      "observation": "Replaces thin sharp tapered options Hangul with visibly heavier sans outlines; source-aligned red, intact counters, no observed English residue, foreign patch rectangle or clipping"
+    },
+    {
+      "name": "rankings",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "new_bbox": [
+        39,
+        1251,
+        271,
+        1382
+      ],
+      "positive_margins": [
+        6,
+        659,
+        6,
+        6
+      ],
+      "source_h": 143,
+      "new_h": 131,
+      "comparison": "SOURCE/CLEAN/PRIOR/NEW practical50 gray opened directly",
+      "verdict": "B_SELF_QA_SCOPED_PASS",
+      "observation": "Same source heavy sans family direction as OPTIONS; red filled bold Hangul improves prior tapered serif; native font, no observed clipping or extraneous crop contents"
+    }
+  ],
+  "machine": {
+    "source_and_previous_exact_sha": "PASS",
+    "CLEAN_source_union_outside": "PASS_ZERO",
+    "CLEAN_selected_alpha": "PASS_ZERO_2_OF_2",
+    "header_byte_exact": "PASS",
+    "persistent_DDS_native_decode": "EXACT",
+    "dds_dimensions": [
+      4096,
+      2048
+    ],
+    "dds_format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "changed_rgba_outside_2_source_bboxes": 0,
+    "changed_alpha_outside_2_source_bboxes": 0,
+    "non_target_protected": "PIXEL_EXACT",
+    "source_bbox_containment": "PASS_2_OF_2",
+    "minimum_clearance_px": 6
+  },
+  "proof_paths": [
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/options_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/rankings_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/options_RAW_GRAY_75_SOURCE_CLEAN_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_MACHINE_QA.json"
+  ],
+  "qa_gates": {
+    "source_vs_clean": "PASS_SELECTED_ALPHA_ZERO_NO_UNDERLAY",
+    "clean_vs_final": "PASS_COMPOSITE_ONLY_TARGET_CELLS",
+    "source_vs_saved_final": "PASS_SCOPED_IMPROVED_SOURCE_FAMILY",
+    "native_100": "PASS_SCOPED_OPTIONS",
+    "practical_50": "PASS_SCOPED_RANKINGS",
+    "raw_75": "PASS_SCOPED_OPTIONS",
+    "black_white_gray": "PRODUCED_MACHINE_PROOFS_NOT_ALL_DIRECTLY_REVIEWED",
+    "full_atlas_independent_c": "NOT_DONE",
+    "game_composited": "UNTESTED"
+  },
+  "decision": "B_SELF_QA_SCOPED_PASS_PENDING_FRESH_C1",
+  "produced_dds": 1,
+  "trial_only_dds": 0,
+  "workflow_run_id": 37868593802,
+  "workflow_result": "SUCCESS",
+  "backend": "github-actions (local source DDS retrieval blocked)",
+  "C1": "REQUIRES_FRESH_EXACT_BYTES",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "USER_RETEST": "OPEN",
+  "IGR028": "UNMAPPED_MIXED_UNCHANGED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
