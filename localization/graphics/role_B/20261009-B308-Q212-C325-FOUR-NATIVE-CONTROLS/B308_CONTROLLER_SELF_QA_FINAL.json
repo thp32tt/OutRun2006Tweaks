@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B308",
+  "run_key": "OUTRUN-KOR-B308-Q212-C325-FOUR-NATIVE-CONTROLS-20261009-1110",
+  "queue_index": 212,
+  "priority": "P1",
+  "user_report": "IGR-029",
+  "user_report_mapping": "SUSPECTED_NOT_CLOSED",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+  "new_candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+  "selected_C325_failure_ids": [
+    30,
+    43,
+    44,
+    53
+  ],
+  "previous_B307_selected_ids_preserved": [
+    25,
+    26,
+    27
+  ],
+  "previous_B299_ids_preserved": [
+    15,
+    28
+  ],
+  "other_source_region_ids_preserved": [
+    14,
+    16,
+    17
+  ],
+  "new_dds_candidate_count": 1,
+  "method": "True 2048px native glyph-only transparent NotoSansCJK Black, source-measured per-region face and intrinsic right/left alignment. No downscaled old Korean reuse and no opaque crop composition.",
+  "region_results": [
+    {
+      "id": 30,
+      "english": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "new_bbox": [
+        1085,
+        428,
+        1203,
+        491
+      ],
+      "margin": [
+        5,
+        71,
+        5,
+        5
+      ],
+      "source_rgb": [
+        60,
+        71,
+        74
+      ],
+      "font_px": 66,
+      "review": "SOURCE_CLEAN_OLD_NEW_NATIVE100_GRAY",
+      "result": "B_SELF_QA_SCOPED_PASS",
+      "observation": "Solid native dark gray full-height strokes replace jagged old; letter counters distinguishable and source face weight closer"
+    },
+    {
+      "id": 43,
+      "english": "PROFESSIONAL",
+      "korean": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "new_bbox": [
+        513,
+        346,
+        633,
+        399
+      ],
+      "margin": [
+        513,
+        5,
+        5,
+        5
+      ],
+      "source_rgb": [
+        241,
+        147,
+        49
+      ],
+      "font_px": 67,
+      "review": "SOURCE_CLEAN_OLD_NEW_NATIVE100_GRAY",
+      "result": "B_SELF_QA_SCOPED_PASS",
+      "observation": "Orange native stroke weight matches dark-orange original flat family, keeps right alignment, no visible coarse pixel breakup"
+    },
+    {
+      "id": 44,
+      "english": "OUTRUN",
+      "korean": "아웃런",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "new_bbox": [
+        1688,
+        529,
+        1832,
+        582
+      ],
+      "margin": [
+        62,
+        5,
+        5,
+        5
+      ],
+      "source_rgb": [
+        186,
+        0,
+        0
+      ],
+      "font_px": 54,
+      "review": "SOURCE_CLEAN_OLD_NEW_NATIVE100_GRAY_AND_RAW75_GRAY",
+      "result": "B_SELF_QA_SCOPED_PASS",
+      "observation": "New red native Hangul filled edges reduce prior heavy pixellation; right aligned and RAW Y orientation preserved"
+    },
+    {
+      "id": 53,
+      "english": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "new_bbox": [
+        9,
+        83,
+        71,
+        117
+      ],
+      "margin": [
+        5,
+        67,
+        5,
+        5
+      ],
+      "source_rgb": [
+        60,
+        71,
+        74
+      ],
+      "font_px": 35,
+      "review": "SOURCE_CLEAN_OLD_NEW_NATIVE100_GRAY_AND_50_GRAY",
+      "result": "B_SELF_QA_SCOPED_PASS",
+      "observation": "Small DONE becomes native readable 50pct gray from formerly coarse glyph, source bbox and flat face maintained"
+    }
+  ],
+  "machine": {
+    "source_clean_outside_all_12_regions": 0,
+    "clean_alpha_selected_four": 0,
+    "RGBA_changed_outside_selected_four": 0,
+    "alpha_changed_outside_selected_four": 0,
+    "other_eight_source_regions": "PIXEL_EXACT",
+    "protected_artwork": "PIXEL_EXACT_BY_OUTSIDE",
+    "header_original": "EXACT",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA",
+    "mips": 1,
+    "persisted_saved_DDS_decode": "EXACT",
+    "RAW_FLIPY": "PASS",
+    "bbox": "4/4_5px_OR_GREATER"
+  },
+  "eight_ordered": {
+    "original_english_removal": "PASS_SELECTED_ALPHA_ZERO",
+    "source_slant": "PASS_SOURCE_UPRIGHT_SCOPE",
+    "size_source_bbox": "PASS",
+    "weight_style": "PASS_SCOPED_DIRECT_VISUAL",
+    "clipping": "NO_CLIP_SCOPED",
+    "protected": "PIXEL_EXACT_OUTSIDE",
+    "RAW_FLIPY": "PASS",
+    "readability": "PASS_SCOPED_NATIVE_AND_SELECTED_50"
+  },
+  "proof_sample": [
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r30_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r43_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r44_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r53_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r53_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r44_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "all_machine_proofs": "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_MACHINE_QA.json",
+  "new_lossless_contact_images": 72,
+  "overall_producer_decision": "B_SELF_QA_SCOPED_PASS_AWAIT_INDEPENDENT_C2_ALL_12",
+  "independent_C2": "NOT_RUN_NEW_EXACT_SHA",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "USER_REAL_GAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "runner": {
+    "backend": "github-actions",
+    "workflow_run_id": 37873410100,
+    "conclusion": "success"
+  },
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
