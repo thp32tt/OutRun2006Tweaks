@@ -331,7 +331,7 @@ def _watch_slot_page_health(page: Page, slot_name: str, state: dict) -> None:
 async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page], state: dict) -> None:
     """Detect failed tab renderers and reopen persisted chats without sending prompts.
 
-    Never alter TASK_ID, queue phase, registry send counters, or saved chat URLs.
+    Never alter the production identifier, queue phase, registry send counters, or saved chat URLs.
     The normal queue engine alone decides whether further sending is permitted.
     """
     now = datetime.now(TZ)
@@ -410,7 +410,7 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
             failures[slot.name] = TAB_HEALTH_FAILURE_THRESHOLD
             write_runtime(tab_recovery_error=f"{slot.name}:{reason}:{type(exc).__name__}",
                           tab_recovery_error_at=now.isoformat())
-            log.exception("slot=%s recovery navigation failed; saved TASK_ID/chat retained", slot.name)
+            log.exception("slot=%s recovery navigation failed; saved task identity/chat retained", slot.name)
             # A disconnected CDP must restart the whole controller; a transient
             # navigation error must not trigger a duplicate message submission.
             if browser is not None and not browser.is_connected():
