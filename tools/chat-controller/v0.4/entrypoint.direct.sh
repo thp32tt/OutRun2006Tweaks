@@ -25,6 +25,18 @@ start_vnc
 websockify --web=/usr/share/novnc/ 6080 localhost:5900 >/logs/novnc.log 2>&1 &
 
 start_chrome() {
+  # Only localization v2 enables this feature. Chrome must be stopped before
+  # cache deletion; credentials, profile storage and sessions are never removed.
+  if [[ "${CONTROLLER_MODE:-}" == "localization" && "${CHROME_RECYCLE_ENABLED:-false}" == "true" ]]; then
+    if ! pgrep -x chrome >/dev/null 2>&1; then
+      if [[ -f /opt/outrun/chrome-cache-clean.sh ]]; then
+        bash /opt/outrun/chrome-cache-clean.sh >>/logs/chrome-recycle.log 2>&1 || \
+          echo "$(date -Is) cache cleanup failed; keeping profile intact" >>/logs/chrome-recycle.log
+      fi
+    else
+      echo "$(date -Is) cache cleanup skipped: Chrome still running" >>/logs/chrome-recycle.log
+    fi
+  fi
   # A previous Chrome crash/replacement can leave ProcessSingleton files behind.
   # Remove them only immediately before starting a new Chrome process.
   rm -f /data/browser-profile/SingletonLock \
