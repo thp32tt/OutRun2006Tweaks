@@ -27,13 +27,13 @@
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
   "selected_work_item": "Dormant real DX11 non-indexed Draw after exact DEFAULT VB snapshot, native IA, trianglelist VS/PS/layout/RTV ownership",
-  "summary": "R185 introduces fail-closed standalone native Draw helper (no game hookup) and actual Windows WARP Draw+GPU pixel-readback probe; R175 owned color mismatch untouched.",
+  "summary": "R185 fail-closed production IA/pipeline readiness only; isolated WARP probe owns the actual D3D11 Draw, preserving strict activation boundary. First candidate failed activation boundary because production header emitted Draw; corrected without bypass.",
   "pipeline": {
     "C0_RECOVER": "GitHub HEAD 73ae302e7eef89db5024e68f9a6adee30ec88e61; 00486 C6 upstream blocked, no existing 00487 run/checkpoint",
     "C1_REVIEW": "R183/184 handle IB DrawIndexed; independent nonindexed R185 owner/OM path; R175 excluded",
-    "C2_IMPLEMENT": "R185 production header, WARP positive/negative source, 3-mutant static contract",
-    "C3_VALIDATE": "PENDING exact-SHA Backend Conversion Gate; in-memory one-shot 3 negative mutations PASS",
-    "C4_COMMIT": "SUBMITTING exact branch CAS",
+    "C2_IMPLEMENT": "R185 source-guarded production readiness; isolated WARP actual GPU Draw positive/negative; 3-mutant static contract",
+    "C3_VALIDATE": "PENDING exact-SHA rerun; initial SHA 6e2cc9a6fb35995854dac5e1e83c2d64b4b5c835 failed DX11 source graph (production Draw activation boundary), diagnosed and removed, no gate bypass",
+    "C4_COMMIT": "repair material commit pending CAS; initial 6e2cc9a6fb35995854dac5e1e83c2d64b4b5c835 is superseded",
     "C5_PACKAGE": "NOT_REQUIRED pending, no game activation",
     "C6_STATE": "PENDING_GITHUB_GATE"
   },
@@ -45,9 +45,17 @@
     "docs/automation/runs/CONVERSION-DX11-00487.json"
   ],
   "blockers": [
-    "Existing 00477-owned R175 TEXCOORD6 COLOR0 WARP BGRA mismatch may fail full Gate",
-    "No Quest3/VDXR runtime evidence"
+    "00477-owned R175 TEXCOORD6 COLOR0 failure may still fail full Gate",
+    "No Quest3/VDXR HMD runtime evidence"
   ],
-  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_GATE",
-  "next_action": "Check exact-SHA GitHub Backend Conversion Gate and record job results; never equate WARP with Quest 3 runtime."
+  "resume_cursor": "WAIT_REPAIRED_EXACT_SHA_GATE",
+  "next_action": "Check exact-SHA GitHub Backend Conversion Gate and record job results; never equate WARP with Quest 3 runtime.",
+  "previous_candidate": {
+    "sha": "6e2cc9a6fb35995854dac5e1e83c2d64b4b5c835",
+    "gate_id": 37958622134,
+    "validate_job_id": 113915443673,
+    "conclusion": "failure",
+    "failed_step": "Verify DX11 source graph",
+    "signature": "activation boundary crossed by native production Draw"
+  }
 }

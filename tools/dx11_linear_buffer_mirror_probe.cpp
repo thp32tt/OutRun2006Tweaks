@@ -169,35 +169,36 @@ int main() {
     ctx->Unmap(staging.Get(),0);
     require(pixels,"real VB/IB DrawIndexed GPU pixel readback");
 
-    // R185: this new dormant entrypoint submits an actual *non-indexed* Draw
-    // only after native IA/pipeline and source lifetime preflight. It never
-    // enables the game's D3D9 -> D3D11 dispatch.
-    using outrun::vr::dx11::submit_verified_linear_draw;
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,0,generation,version),
+    // R185: production exposes readiness-only, while this isolated WARP tool
+    // submits the actual non-indexed GPU Draw. Game activation stays blocked.
+    using outrun::vr::dx11::verified_linear_draw_ready;
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,0,generation,version),
             "linear Draw zero count rejected");
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,4,generation,version),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,4,generation,version),
             "linear Draw vertex extent rejected");
-    require(!submit_verified_linear_draw(vb,ctx.Get(),1,3,generation,version),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),1,3,generation,version),
             "linear Draw start offset overrun rejected");
-    require(!submit_verified_linear_draw(vb,otherCtx.Get(),0,3,generation,version),
+    require(!verified_linear_draw_ready(vb,otherCtx.Get(),0,3,generation,version),
             "linear Draw foreign device rejected");
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version+1),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version+1),
             "linear Draw stale snapshot rejected");
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "linear Draw foreign topology rejected");
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->PSSetShader(nullptr,nullptr,0);
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "linear Draw missing PS rejected");
     ctx->PSSetShader(ps.Get(),nullptr,0);
     ctx->OMSetRenderTargets(0,nullptr,nullptr);
-    require(!submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "linear Draw missing RT rejected");
     ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
     ctx->ClearRenderTargetView(rtv.Get(),clear);
-    require(submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version),
-            "R185 dormant native linear GPU Draw submitted");
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R185 dormant native linear Draw IA/pipeline ready");
+    // The one actual native Draw remains isolated outside production DX11.
+    ctx->Draw(3,0);
     ctx->CopyResource(staging.Get(),color.Get());
     D3D11_MAPPED_SUBRESOURCE linearMapped{};
     require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&linearMapped)) &&

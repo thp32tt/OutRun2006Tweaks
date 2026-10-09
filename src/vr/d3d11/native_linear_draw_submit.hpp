@@ -1,13 +1,13 @@
 #pragma once
-// R185: dormant native D3D11 non-indexed Draw ownership/IA/pipeline fence.
-// No game hook enables this path. Reject uncertainty instead of drawing
+// R185: dormant native non-indexed Draw readiness/ownership fence.
+// No game hook enables this path. No native Draw call lives here. Reject uncertainty
 // against stale D3D9 DEFAULT snapshots or unrelated D3D11 state.
 #include "native_linear_buffer_mirror.hpp"
 #include <cstdint>
 #include <wrl/client.h>
 
 namespace outrun::vr::dx11 {
-[[nodiscard]] inline bool submit_verified_linear_draw(
+[[nodiscard]] inline bool verified_linear_draw_ready(
     const NativeLinearBufferMirror& vertexOwner,
     ID3D11DeviceContext* context,
     UINT startVertex, UINT vertexCount,
@@ -68,7 +68,9 @@ namespace outrun::vr::dx11 {
     rtv->GetDevice(objectDevice.GetAddressOf());
     if (objectDevice.Get() != device.Get()) return false;
 
-    context->Draw(vertexCount, startVertex);
+    // Deliberately no D3D11 Draw* dispatch in production source. Only an
+    // isolated WARP probe may consume this readiness result until an explicit
+    // game-native activation/runtime review authorizes dispatch.
     return true;
 }
 } // namespace outrun::vr::dx11

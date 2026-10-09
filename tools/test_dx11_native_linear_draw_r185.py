@@ -14,12 +14,13 @@ guards = (
     "vertexCount % 3u != 0",
     "if (!layout || !vs || !ps || !rtv)",
     "objectDevice.Get() != device.Get()",
-    "context->Draw(vertexCount, startVertex);",
+    "return true;",
 )
 def contract(source):
     return all(source.count(token) >= 1 for token in guards)
 
-assert contract(code), "R185 real owner/bounds/pipeline/native Draw contract incomplete"
+assert contract(code), "R185 owner/bounds/pipeline readiness contract incomplete"
+assert "->Draw(" not in code and "->DrawIndexed(" not in code, "native activation boundary crossed"
 for token in (
     "!vertexOwner.binding_exact(",
     "startVertex >= capacity || vertexCount > capacity - startVertex",
@@ -28,11 +29,12 @@ for token in (
     assert not contract(code.replace(token, "", 1)), "negative mutant escaped: " + token
 
 for token in (
-    "submit_verified_linear_draw(vb,ctx.Get(),0,3,generation,version)",
+    "verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version)",
     "linear Draw GPU pixel readback",
+    "ctx->Draw(3,0);",
     "linear Draw stale snapshot rejected",
     "linear Draw missing PS rejected",
     "linear Draw missing RT rejected",
 ):
     assert token in probe, "missing isolated WARP proof: " + token
-print("R185 native linear Draw static contract + 3 negative mutants: PASS")
+print("R185 native linear Draw readiness + 3 mutants + isolated WARP dispatch: PASS")
