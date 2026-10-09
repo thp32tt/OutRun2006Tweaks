@@ -1,79 +1,131 @@
 #!/usr/bin/env python3
-"""B341 q212: material re-anchor of two independently rejected Korean title cells; trial."""
-import os,io,hashlib,json,struct,subprocess,sys
+"""B342 q212 P1: authenticate canonical English atlas and trial source-CLEAN layers.
+
+New source-bound construction evidence for B341 placement-repaired trial.
+Production cannot advance on C338 screenshot RGB alone: verify exact source
+DDS, full region alpha, prior-candidate/clean blast radius, saved DDS and source
+style. Fail closed on any mismatch. Never silently promote a trial.
+"""
+import os,io,sys,hashlib,struct,json,urllib.request,subprocess
 from pathlib import Path
 import numpy as np
 from PIL import Image
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-P=G/"role_B/20261010-B341-Q212-PLACEMENT-REWORK"
+P=G/"role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK"
 P.mkdir(parents=True,exist_ok=True)
-sha=lambda data:hashlib.sha256(data).hexdigest()
-cdir=G/"role_C/20261010-C338-C2-Q212-ALL12-CURRENT-PERSISTED"
-report=json.loads((cdir/"C338_Q212_CONTROLLER_C2_REWORK.json").read_text())
+sha=lambda b:hashlib.sha256(b).hexdigest()
+base=G/"role_C/20261010-C338-C2-Q212-ALL12-CURRENT-PERSISTED"
+rep=json.loads((base/"C338_Q212_CONTROLLER_C2_REWORK.json").read_text())
+machine=json.loads((base/"C338_Q212_MACHINE_ALL12.json").read_text())
 oldsha="e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
-assert report["queue_index"]==212 and report["candidate_sha256"]==oldsha
-tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212"],capture_output=True,text=True,check=True)
-qa_tri=json.loads(tri.stdout)["assets"][0]
-assert qa_tri["index"]==212
-b=(G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds").read_bytes()
-assert sha(b)==oldsha
-W,H=struct.unpack_from("<II",b,16)[0],struct.unpack_from("<I",b,12)[0]
-print("B341_DDS_HEADER",W,H,len(b),tuple(hex(v) for v in struct.unpack_from("<IIII",b,92)),flush=True)
-assert len(b)==128+2048*2048*4
-masks=struct.unpack_from("<IIII",b,92)
-assert masks in ((0x00ff0000,0x0000ff00,0x000000ff,0xff000000),(0x000000ff,0x0000ff00,0x00ff0000,0xff000000)),masks
-def dec(v):return np.array(Image.open(io.BytesIO(v)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-O=dec(b);D=O.copy()
-assert O.shape==(2048,2048,4),O.shape
+trialsha="fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7"
+sourcesha="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
+cleansha="c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
+assert rep["queue_index"]==212 and rep["candidate_sha256"]==oldsha
+assert machine["candidate_sha256"]==oldsha and len(machine["regions"])==12
+q=(G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds").read_bytes()
+trial=(G/"role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_UNAPPROVED_Q212_TWO_ANCHOR_TRIAL.dds").read_bytes()
+assert sha(q)==oldsha and sha(trial)==trialsha
+subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212"],check=True,capture_output=True)
+url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
+    "3da79726739ac631d8e2703a65330dbb0c310770/"
+    "Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds")
+with urllib.request.urlopen(url,timeout=100) as r: raw=r.read()
+assert sha(raw)==sourcesha,(len(raw),sha(raw))
+assert raw[:128]==q[:128]==trial[:128], "Source/native DDS header changed"
+assert len(raw)==len(q)==len(trial)==16777344
+assert struct.unpack_from("<II",raw,12)==(2048,2048)
+def dec(b):
+ return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+S,O,T=map(dec,[raw,q,trial])
 cp=G/"role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png"
-assert sha(cp.read_bytes())=="c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
+assert sha(cp.read_bytes())==cleansha
 C=np.array(Image.open(cp).convert("RGBA"))
-regions=[];scope=np.zeros((H,W),bool)
-for idx,shift in ((43,236),(44,-61)):
- r=next(v for v in report["regions"] if v["id"]==idx)
- assert r["checks"]["placement"]["result"]=="FAIL"
- l,t,right,bottom=r["source_bbox"];x0,y0,x1,y1=r["candidate_alpha_bbox"]
- assert np.count_nonzero(C[t:bottom,l:right,3])==0
- new=(x0+shift,y0,x1+shift,y1)
- assert x0>=l and x1<=right and new[0]>l and new[2]<right
- glyph=O[y0:y1,x0:x1].copy()
- D[t:bottom,l:right]=C[t:bottom,l:right]
- D[y0:y1,new[0]:new[2]]=glyph
- assert np.array_equal(D[y0:y1,new[0]:new[2]],glyph)
- scope[t:bottom,l:right]=True
- regions.append(dict(id=idx,source_bbox=[l,t,right,bottom],old_bbox=[x0,y0,x1,y1],new_bbox=list(new),x_shift=shift))
-assert np.count_nonzero(np.any(O!=D,axis=2)&~scope)==0
-for r in report["regions"]:
- if r["id"] not in (43,44):
-  l,t,right,bottom=r["source_bbox"]
-  assert np.array_equal(D[t:bottom,l:right],O[t:bottom,l:right])
-order=[2,1,0,3] if masks[0]==0x00ff0000 else [0,1,2,3]
-raw=b[:128]+np.flipud(D)[:,:,order].copy().tobytes()
-assert len(raw)==len(b) and raw[:128]==b[:128] and np.array_equal(dec(raw),D)
-(P/"B341_UNAPPROVED_Q212_TWO_ANCHOR_TRIAL.dds").write_bytes(raw)
-def flatten(a,bg):
- im=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
- im.alpha_composite(Image.fromarray(a,"RGBA"))
- return im.convert("RGB")
-views=[]
+assert S.shape==O.shape==T.shape==C.shape==(2048,2048,4)
+# Use all 12 exact C338 source regions. Never substitute per-glyph guessed bboxes.
+regions=machine["regions"];allmask=np.zeros(S.shape[:2],bool)
 for r in regions:
- id=r["id"];l,t,right,bottom=r["source_bbox"]
- src=(cdir/f"r{id}_SOURCE_CLEAN_FINAL_gray_100.png")
- exp=next(v["sha256"] for v in next(z for z in report["regions"] if z["id"]==id)["evidence"] if v["path"].endswith(src.name))
- assert sha(src.read_bytes())==exp
- original=Image.open(src).convert("RGB").crop((0,0,right-l,bottom-t))
- for orientation in ("FLIPY","RAW"):
-  for scale in (100,75,50):
-   bg=(128,128,128)
-   panels=[original,flatten(C[t:bottom,l:right],bg),flatten(O[t:bottom,l:right],bg),flatten(D[t:bottom,l:right],bg)]
-   if orientation=="RAW": panels=[im.transpose(Image.Transpose.FLIP_TOP_BOTTOM) for im in panels]
-   if scale!=100:panels=[im.resize((round(im.width*scale/100),round(im.height*scale/100)),Image.Resampling.LANCZOS) for im in panels]
-   out=Image.new("RGB",(sum(im.width for im in panels)+12,max(im.height for im in panels)),bg)
-   pos=0
-   for im in panels:out.paste(im,(pos,0));pos+=im.width+4
-   name=f"r{id}_{orientation}_{scale}_SOURCE_CLEAN_OLD_TRIAL.png"
-   out.save(P/name,optimize=True);views.append(str(P/name))
-qa=dict(run="B341",queue_index=212,producer_decision="TRIAL_PENDING_DIRECT_VISUAL",source_historical_sha256=report["source_sha256_historical_independent_C325"],clean_sha256=sha(cp.read_bytes()),prior_candidate_sha256=oldsha,trial_sha256=sha(raw),regions=regions,other10_regions_exact=True,changed_outside_two_source_rois=0,decoded_dds_roundtrip="EXACT",source_png_provenance="C338_SHA_PINNED",native=[W,H],views=views,first_look="PENDING",promoted_dds=0,C2="PENDING",C3="BLOCKED",RUNTIME_VALIDATION="UNTESTED")
-(P/"B341_TRIAL_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-print("B341_Q212_TRIAL",qa["trial_sha256"],len(views),flush=True)
+ l,t,rr,bb=r["source_bbox"]
+ assert min(l,t)>=0 and rr<=2048 and bb<=2048
+ assert not np.any(allmask[t:bb,l:rr]),"region overlap"
+ allmask[t:bb,l:rr]=True
+two=np.zeros(S.shape[:2],bool)
+for i in (43,44):
+ r=next(z for z in regions if z["id"]==i)
+ l,t,rr,bb=r["source_bbox"];two[t:bb,l:rr]=True
+count=lambda z:int(np.count_nonzero(z))
+anydiff=lambda x,y:np.any(x!=y,axis=2)
+check={
+ "source_to_clean_outside_12_rgba":count(anydiff(S,C)&~allmask),
+ "current_to_clean_outside_12_rgba":count(anydiff(O,C)&~allmask),
+ "trial_to_source_outside_12_rgba":count(anydiff(T,S)&~allmask),
+ "trial_to_current_outside_r43_r44_rgba":count(anydiff(T,O)&~two),
+ "trial_to_current_outside_r43_r44_alpha":count((T[:,:,3]!=O[:,:,3])&~two),
+ "clean_alpha_inside_12":count((C[:,:,3]>0)&allmask),
+ "trial_changed_inside_two":count(anydiff(T,O)&two),
+}
+assert all(check[k]==0 for k in check if k!="trial_changed_inside_two"),check
+assert check["trial_changed_inside_two"]>0
+stats=[]
+for r in regions:
+ l,t,rr,bb=r["source_bbox"]
+ a=T[t:bb,l:rr,3]
+ yy,xx=np.nonzero(a)
+ if not len(xx): raise AssertionError(("missing candidate label",r["id"]))
+ box=(l+int(xx.min()),t+int(yy.min()),l+int(xx.max())+1,t+int(yy.max())+1)
+ assert box[0]>=l and box[1]>=t and box[2]<=rr and box[3]<=bb
+ assert min(box[0]-l,box[1]-t,rr-box[2],bb-box[3])>=1
+ stats.append({"id":r["id"],"source_bbox":r["source_bbox"],"trial_bbox":list(box),
+  "clean_alpha_nonzero":count(C[t:bb,l:rr,3]>0),"target_source_diff":count(anydiff(S[t:bb,l:rr],T[t:bb,l:rr])),
+  "candidate_changed_from_old":count(anydiff(O[t:bb,l:rr],T[t:bb,l:rr]))})
+# Exact SOURCE vs CLEAN remains 12-cell scoped, not whole-family typography approval.
+def flatten(z,bg):
+ o=Image.new("RGBA",(z.shape[1],z.shape[0]),bg+(255,))
+ o.alpha_composite(Image.fromarray(z,"RGBA"))
+ return o.convert("RGB")
+viewpaths=[]
+for r in regions:
+ l,t,rr,bb=r["source_bbox"]
+ for side in ("FLIPY","RAW"):
+  if r["id"] not in (43,44) and side=="RAW":continue
+  parts=[]
+  for z in (S,C,O,T):
+   rgb=flatten(z[t:bb,l:rr].copy(),(128,128,128))
+   if side=="RAW":rgb=rgb.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+   parts.append(rgb)
+  w=sum(im.width for im in parts)+12;hh=max(im.height for im in parts)
+  out=Image.new("RGB",(w,hh),(128,128,128));dx=0
+  for im in parts:
+   out.paste(im,(dx,0));dx+=im.width+4
+  n=f"q212_r{r['id']}_{side}_native_SOURCE_CLEAN_OLD_B341.png"
+  out.save(P/n,optimize=True);viewpaths.append(str(P/n))
+# Preserve authenticated canonical original bytes for independently reproducible
+# P1 checks and eventual final production-manifest source binding.
+original=P/"B342_EXACT_ENGLISH_SOURCE_2048_RGBA32.dds"
+original.write_bytes(raw)
+assert sha(original.read_bytes())==sourcesha
+# Saved candidate letter layer can contain non-displayed transparent RGB.
+# Determine whether exact clean+alpha composition is representable without
+# changing unrelated historical approved glyph pixels; do not fake P3 PASS.
+letter=T.copy();letter[~allmask]=0
+composed=np.array(Image.alpha_composite(Image.fromarray(C,"RGBA"),Image.fromarray(letter,"RGBA")))
+composite_difference=count(anydiff(composed,T))
+check["full_clean_plus_trial_alpha_composite_rgba_mismatch_pixels"]=composite_difference
+gate="P1_CANONICAL_SOURCE_CLEAN_SCOPED_PASS"
+if composite_difference:gate="P1_PASS_P3_EXACT_COMPOSITE_REQUIRES_HIDDEN_RGB_RECONCILIATION"
+report={
+ "run":"B342","role":"B","index":212,"run_key":"OUTRUN-KOR-B342-Q212-ENGLISH-SOURCE-12-REGION-PLATE-20261010",
+ "status":gate,"source_url":url,"source_sha256":sourcesha,"source_path":str(original),
+ "clean_sha256":cleansha,"old_candidate_sha256":oldsha,"B341_trial_sha256":trialsha,
+ "native":[2048,2048],"format":"RGBA32","mips":1,"exact_header_match":True,
+ "source_clean_saved_trial_all12":stats,"counts":check,
+ "view_files":viewpaths,"canonical_source_newly_verified":True,
+ "source_to_clean_visual_approval":"PENDING_CONTROLLER_VISUAL",
+ "next":"Inspect source/CLEAN/old/trial exact source family and correct any P3 hidden-RGB composition mismatch without changing protected/other 10 cells. P2 anchors, final manifest and changed-since guard required BEFORE promotion.",
+ "promoted_DDS":0,"new_trial_DDS":0,"source_archive_dds":1,
+ "C2":"C338_REWORK_UNCHANGED_SHA","C3":"BLOCKED","IGR029":"OPEN",
+ "RUNTIME_VALIDATION":"UNTESTED","backend":"GITHUB_ACTIONS_REQUIRED_CANONICAL_SOURCE_BYTES"
+}
+(P/"B342_SOURCE_PLATE_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print("B342_Q212",gate,check,flush=True)
