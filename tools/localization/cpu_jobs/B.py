@@ -121,9 +121,9 @@ for key,en,ko,(l,t,r,b),size,alpha in specs[:4]:
  report.append(dict(id=key,english=en,korean=ko,source_bbox=[l,t,r,b],effect_bbox=[nx,ny,nx+im.width,ny+im.height],
   margins=margins,font_px=sz,vector_profile="new per-character native upright-stem 0.92, independent tracking 0.09, expanded semantic small labels; no whole-word skew",alpha=alpha))
 changed=np.any(P!=out,axis=2)
-assert np.count_nonzero(changed)>1000 and not np.any(changed&~large_only)
-assert not np.any((P[:,:,3]!=out[:,:,3])&~large_only)
-assert np.array_equal(out[~large_only],P[~large_only])
+assert np.count_nonzero(changed)>1000 and not np.any(changed&~residual_only)
+assert not np.any((P[:,:,3]!=out[:,:,3])&~residual_only)
+assert np.array_equal(out[~residual_only],P[~residual_only])
 raw=np.frombuffer(current[128:],dtype=np.uint8).reshape(1024,2048,4)
 if np.array_equal(raw[::-1],P):order="RGBA";body=out[::-1].copy().tobytes()
 else:
