@@ -390,21 +390,33 @@ class UIScaling : public Hook
 			info.valid = true;
 		};
 
-		if (returnAddress == Module::exe_ptr(0xBAEE7) &&
-			RankMarkerSubScreenHudDepth == 0)
-		{
-			recoverViewPoint(RankMarkerProjectedInfo, true);
-			static thread_local bool loggedOrdinalCalc = false;
-			if (!loggedOrdinalCalc)
-			{
-				loggedOrdinalCalc = true;
-				spdlog::info(
-					"VR R57 rank Calc3D2D: ordinal capture valid={} inputFinite={} "
-					"screenZ={} sourceZ={}",
-					RankMarkerProjectedInfo.valid, finiteInput,
-					out ? out->z : 0.0f, originalInput.z);
-			}
-		}
+        // The game's callsite 0xBAEE7 is definitive; the exact hooked
+        // sub_4BAD20 lifetime is a second, independently verified authority.
+        // Some x86 inline-hook return-address paths differ even though the
+        // call occurs inside this sole vehicle-rank producer. Previously a
+        // return-site miss silently sent all rank sprites down the detached
+        // WorldBillboard fallback. Never use the parent lifetime for NaviPub
+        // ScreenHud children and never alter the working rival 0xBB6F5 path.
+        const bool ordinalReturnSite =
+            returnAddress == Module::exe_ptr(0xBAEE7);
+        const bool ordinalProducerScope = RankMarkerSubActiveDepth != 0;
+        if ((ordinalReturnSite || ordinalProducerScope) &&
+            RankMarkerSubScreenHudDepth == 0)
+        {
+            recoverViewPoint(RankMarkerProjectedInfo, true);
+            static thread_local bool loggedOrdinalCalc = false;
+            if (!loggedOrdinalCalc)
+            {
+                loggedOrdinalCalc = true;
+                spdlog::info(
+                    "VR R57 rank Calc3D2D: ordinal capture valid={} inputFinite={} "
+                    "screenZ={} sourceZ={} originalSite={} parentScope={}",
+                    RankMarkerProjectedInfo.valid, finiteInput,
+                    out ? out->z : 0.0f, originalInput.z,
+                    ordinalReturnSite ? 1 : 0,
+                    ordinalProducerScope ? 1 : 0);
+            }
+        }
 		else if (returnAddress == Module::exe_ptr(0xBB6F5))
 			recoverViewPoint(RivalMarkerProjectedInfo, false);
 
