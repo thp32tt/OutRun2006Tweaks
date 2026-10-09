@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 02:14 KST",
+  "updated_at_kst": "2026-10-10 02:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9684,18 +9684,18 @@
     "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
     "unchanged_candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
     "new_promoted_dds": 0,
-    "verified_native_new_regions": 0,
+    "verified_native_new_regions": 13,
     "expected_regions_if_worker_succeeds": 13,
     "old_C320_verified_regions": 3,
     "worker_actions_run": 37963658586,
-    "worker_status": "IN_PROGRESS_AS_OF_2026-10-10_0214_KST",
-    "producer_evidence_status": "COMPUTE_PENDING_NO_REPORT_DO_NOT_CLAIM_PASS",
+    "worker_status": "SUCCESS_RERUN_JOB_113937285379_AFTER_INFRA_SETUP_FAILURE",
+    "producer_evidence_status": "A_PRODUCER_SCOPED_13_REGION_LOSSLESS_EVIDENCE_COMPLETE_C1_HOLD",
     "pending_file": "localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_DISPATCH_PENDING.json",
     "C1": "C320_HOLD_STRICT_RECHECK",
     "C3": "BLOCKED",
     "user_game": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
-    "next": "Check exact result A214_EVIDENCE_REPORT.json or A214_EXECUTION_HOLD.json from existing Actions 37963658586 before any rerun; if report published inspect lossless cells and reconcile controller QA."
+    "next": "A214 successfully published proof. Do not rerun. C1 reverify exact q227 DDS and source/CLEAN/final all 16 native plus 1px margins and blind font calibration before C PASS. IGR034/035/036 still open."
   }
 
 }
