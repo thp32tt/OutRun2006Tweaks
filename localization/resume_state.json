@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A211 P1 q175 new true Noto Hangul glyph (not A209/A210 hand-rails) with canonical English chrome band + per-pixel relief native trial DDS SHA256 b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446, original 9314372585..., current promoted unchanged b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73. Real source-CLEAN-original-vs-trial native/BGW100/75/50 producer VISUAL FAIL ordinary narrow separated Hangul + insufficient depth: trial 222x117 vs source 950x132. Source clean alpha0, outside region RGBA/alpha0, saved DDS decoded exact; no promoted new DDS, family still REWORK, C1/C3 blocked, IGR032 user gameplay OPEN, RUNTIME_VALIDATION=UNTESTED. Need source-conditioned welded rounded chrome Korean vector, not generic font/rail/width tweaks. QA role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005.",
     "B336 P0 q060 B335 P1 source-derived CLEAN plus runner Noto CJK Bold SHA and Hangul 7/7 coverage verified; same-stroke source-vs-localized slant/font-style anchors not verified, so P2 HOLD, C334 C2 HOLD and IGR044 OPEN. Existing B332R DDS preserved; new DDS 0. QA localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json RUN_KEY=OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340 RUNTIME_VALIDATION=UNTESTED.",
     "A210 P1 q175 showroom counter-topology + local-normal chrome native DDS TRIAL SHA 93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded; worker 37945610280 SUCCESS, first denied 0px bottom margin corrected to 1px. NEW trial DDS1, NEW PROMOTED DDS0. Exact source 9314372585b830..., old promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 unchanged; 0 outside/alpha/CLEAN effect; original source 950x132, trial 440x128 native BGW100/75/50/RAW. Improved 룸 counter yet visually fails original joined chrome depth and title hierarchy. IGR-032 OPEN, C1/C3/game blocked RUNTIME_VALIDATION=UNTESTED. Stop width/shear/flat rail tweaks, use authentic source-informed counter/bevel design. QA localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335.",
     "q060 B335 new P1 full-native source CLEAN/removal/protected/restore masks machine PASS seven zero counts, no new DDS. C334 C2 HOLD unchanged; B next P2 obtain font hash and measurable source-to-Korean top/bottom anchors before final manifest, C2/C3 and user IGR044 retest. RUN_KEY=OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310 RUNTIME_VALIDATION=UNTESTED",
@@ -13765,5 +13766,41 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "backend": "GITHUB_ACTIONS_37947992059",
     "qa_path": "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json"
+  },
+  "a211_q175_trueglyph_chrome_source_family_failed": {
+    "run": "A211",
+    "run_key": "OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005",
+    "role": "A",
+    "queue_index": 175,
+    "priority": "P1",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "current_promoted_preserved_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "new_trial_sha256": "b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446",
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "source_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "trial_bbox": [
+      24,
+      406,
+      246,
+      523
+    ],
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "font_ppem": 123,
+    "machine": "SAVED_DDS_EXACT_SCOPED_0_OUTSIDE_AND_CLEAN_RESIDUE",
+    "visual": "PRODUCER_FAIL_SOURCE_CHROME_FAMILY_AND_SEVERE_TITLE_UNDERFILL",
+    "next": "MANUAL_RECONSTRUCTION_REQUIRED_SOURCE-CONTOURED_CONNECTED_HANGUL",
+    "C1": "BLOCKED",
+    "C3": "BLOCKED",
+    "user_game": "IGR032_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa_report": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "worker_run": 37949025173
   }
+
 }
