@@ -1,0 +1,77 @@
+{
+  "firstlook": {
+    "SHA256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "size": [
+      2048,
+      1024
+    ],
+    "mip": 1,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "bytes": 8388736,
+    "areas": {
+      "goal_a": {
+        "region": [
+          950,
+          221,
+          1115,
+          268
+        ],
+        "visible_alpha_bbox": [
+          953,
+          223,
+          1075,
+          265
+        ]
+      },
+      "goal_a_wide": {
+        "region": [
+          875,
+          177,
+          1200,
+          325
+        ],
+        "visible_alpha_bbox": [
+          909,
+          177,
+          1194,
+          325
+        ]
+      }
+    }
+  },
+  "pixel_audit": {
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "previous_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+    "current_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "clean_png_sha256": "1da47a8eb868383d76bdc6590b2b9bd377e20a17e33972ad9553cf2f86648dba",
+    "header_old_current_byte_equal": true,
+    "source_clean_changed_all": 171474,
+    "source_clean_changed_goal_region": 3660,
+    "source_clean_changed_outside_goal_region": 167814,
+    "clean_alpha_nonzero_goal": 0,
+    "clean_final_changed_inside_goal": 2472,
+    "clean_final_changed_outside_goal": 0,
+    "previous_current_changed_total": 4948,
+    "previous_current_changed_outside_goal": 0,
+    "previous_current_alpha_changed_outside_goal": 0,
+    "source_goal_alpha": 3660,
+    "final_goal_alpha": 2472,
+    "final_bbox": [
+      953,
+      223,
+      1075,
+      265
+    ],
+    "margins": [
+      3,
+      40,
+      2,
+      3
+    ]
+  }
+}
