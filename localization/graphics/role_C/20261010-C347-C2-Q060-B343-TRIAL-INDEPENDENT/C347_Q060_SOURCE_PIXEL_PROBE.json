@@ -1,0 +1,29 @@
+{
+  "input_sha256": {
+    "SOURCE": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "OFFICIAL": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "TRIAL": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6"
+  },
+  "english_source_face_roi": [
+    2188,
+    345,
+    3016,
+    460
+  ],
+  "overall_readable_crop": [
+    2025,
+    290,
+    3190,
+    540
+  ],
+  "measures": {
+    "source_equal_official": 17039,
+    "source_equal_trial": 84,
+    "source_warm": 0,
+    "source_warm_identical_official": 0,
+    "source_warm_identical_trial": 0,
+    "changed_official_to_trial": 19243
+  },
+  "largest_residual_matching_source_warm_connected_components": [],
+  "caveat": "Pixel-identical to English original within source English face bbox is a source-contamination hint, not a proof of English glyph semantic ownership; original source may contain protected sibling overlays. Visual and consumer mapping are decisive."
+}

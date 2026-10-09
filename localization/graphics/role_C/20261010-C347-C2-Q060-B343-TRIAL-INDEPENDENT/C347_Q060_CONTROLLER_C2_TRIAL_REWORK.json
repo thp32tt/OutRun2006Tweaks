@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "run": "C347",
+  "role": "C2",
+  "shard": "EVEN",
+  "run_key": "OUTRUN-KOR-C347-C2-Q060-B343-INDEPENDENT-SOURCE-GHOST-20261010-0720",
+  "queue_index": 60,
+  "selected_remote_head": "1c614b3e4cbf2defdc26aaacd27e57b7b83bcbfc",
+  "queue_blob_sha": "df8d4a87482c0cf58e5ec0035b6e2fcf8b47227c",
+  "independent_scoped_review": true,
+  "current_C2_approval": false,
+  "policy_version": "visual-evidence-v1-20261008",
+  "input_exact_sha256": {
+    "canonical_english": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "official_saved": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "producer_unapproved_trial": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6"
+  },
+  "dds": {
+    "format": "RGBA32",
+    "width": 4096,
+    "height": 2048,
+    "mips": 1,
+    "each_bytes": 33554560,
+    "verified_sha": true,
+    "raw_flipy_array_flip": true
+  },
+  "measure": {
+    "readable_detection_box": [
+      2090,
+      337,
+      3120,
+      485
+    ],
+    "face_box": [
+      2188,
+      345,
+      3016,
+      460
+    ],
+    "changed_rgba": 19243,
+    "changed_outside_detection_box": 0,
+    "alpha_cleared": 19243,
+    "new_visible_alpha": 0,
+    "source_equal_visible_official": 17039,
+    "source_equal_visible_trial": 84,
+    "count_semantic_caution": "84 source-identical visible pixels are not proof of total source residue; semantic original glyph outline beyond exact equality remains possible"
+  },
+  "firsthand_visual": "Three independently decoded persisted DDS directly examined SOURCE vs OFFICIAL vs B343 TRIAL on black/gray native 100 and practical60. Official has blue/brown English BEST TIME visibly layered behind 최고 기록. Trial removes large English face yet isolated dark/reddish original-outline slivers remain around area; therefore clean plate and full source removal not verified. No missing exact source asserted.",
+  "eight_visual_axes": {
+    "slant": "HOLD_STROKE_ANCHORS_UNCHECKED",
+    "clean_plate": "FAIL_INCOMPLETE_CLEAN_PLATE_TRIAL_SCOPED",
+    "style": "FAIL_DOUBLE_ENGLISH_OFFICIAL_TRIAL_PARTIAL",
+    "readability": "OFFICIAL_FAIL_DOUBLE_LANGUAGE_TRIAL_IMPROVED_NOT_PASS",
+    "glyph_integrity": "HOLD_FULL_ATLAS_UNCHECKED",
+    "protected_art": "HOLD_SHARED_CONSUMER_OWNERSHIP",
+    "placement": "OFFICIAL_FAIL_SOURCE_OVERLAP",
+    "orientation": "RAW_FLIPY_ARRAY_IDENTITY_CHECK_ONLY"
+  },
+  "pixels_before_producer_verdict": false,
+  "blind_calibration": "UNQUALIFIED_DO_NOT_CLAIM_PASS",
+  "source_vs_clean_plate": "NOT_REQUALIFIED",
+  "result": "TRIAL_SCOPED_VISUAL_FAIL_OFFICIAL_C342_REWORK_REQUIRED_UNCHANGED",
+  "user_regression": "IGR044_OPEN",
+  "C3": "BLOCKED",
+  "approval": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_promoted_dds": 0,
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_SOURCE_OFFICIAL_TRIAL_GRAY_100.png",
+      "sha256": "5cae6d6903e03073c299f79438b3d98371f80f0523748b5b5eca2852a49a20fe"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_SOURCE_OFFICIAL_TRIAL_GRAY_60.png",
+      "sha256": "ae84a2f2911ace8b24da5855eec7ce3e510eb23abf4d39aec8962b1f792306ae"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_SOURCE_OFFICIAL_TRIAL_BLACK_100.png",
+      "sha256": "8f522bd101f6eeb3439afc0ce5a2554ca686c08903ebe463c360ac1280c30a2c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_OFFICIAL_TRIAL_GRAY_READABLE_NATIVE.png",
+      "sha256": "b1679801df069c16bb9bd07de174dc14da21f2983a6753ef05eb502bbf380d67"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_REMOVED_PIXEL_MAP.png",
+      "sha256": "42c5fe234030afa80405a9d81bf545416f4ba99ad4553ef9d84054891e8849d8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_MACHINE.json",
+      "sha256": "53cf7702a976c4e7895231bc5c081151161569f4ded588d9ebebba23d9eb0f01"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C347-C2-Q060-B343-TRIAL-INDEPENDENT/C347_Q060_SOURCE_PIXEL_PROBE.json",
+      "sha256": "4becfafa5b6f0dc5a2d362c833e8ebd58dd1a2c8e8c94b6c50d6d0ecdf3ff167"
+    }
+  ],
+  "execution_backend": "GITHUB_GIT_BLOBS_PLUS_N100_MCP_SHA_VERIFIED_DECODE",
+  "excluded": [
+    "ODD_C1",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_QUEUE"
+  ]
+}

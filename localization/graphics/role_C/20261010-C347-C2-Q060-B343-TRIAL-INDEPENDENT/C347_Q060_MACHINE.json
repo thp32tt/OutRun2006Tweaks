@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "task": "C347",
+  "queue_index": 60,
+  "shard": "EVEN",
+  "producer_trial": "UNAPPROVED_NOT_OFFICIAL",
+  "dds": {
+    "official": {
+      "sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+      "size": 33554560,
+      "dimensions": [
+        4096,
+        2048
+      ],
+      "fourcc": "00000000"
+    },
+    "trial": {
+      "sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
+      "size": 33554560,
+      "dimensions": [
+        4096,
+        2048
+      ],
+      "fourcc": "00000000"
+    }
+  },
+  "roi_readable": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "outside_changed_rgba_pixels": 0,
+  "total_changed_rgba_pixels": 19243,
+  "changed_roi": 19243,
+  "official_visible_to_transparent": 19243,
+  "trial_gained_visible": 0,
+  "changes_only_to_transparent": true,
+  "probe_counts": [
+    {
+      "image": "official",
+      "kind": "orange",
+      "count": 0
+    },
+    {
+      "image": "official",
+      "kind": "visible",
+      "count": 72983
+    },
+    {
+      "image": "trial",
+      "kind": "orange",
+      "count": 0
+    },
+    {
+      "image": "trial",
+      "kind": "visible",
+      "count": 53740
+    }
+  ],
+  "unchanged_visible_overlap_in_detection_box": 53740,
+  "largest_unchanged_components": [
+    {
+      "error": "No module named 'scipy'"
+    }
+  ],
+  "raw_readable_flip_verified": true,
+  "limitation": "exact official vs trial byte and source-ROI comparison only, NOT canonical English vs clean plate/whole atlas or final C2 approval"
+}
