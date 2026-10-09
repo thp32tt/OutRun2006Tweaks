@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A209 q175 P1 new trial DDS d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7 hand-authored SHOWROOM rounded vector not promoted: first 169px overbound shadow fixed to 0px, exact saved BGRA roundtrip 0 alpha/outside scope, controller native100 white75 black50 SOURCE/CLEAN/OLD/TRIAL VISUAL FAIL on illegible collapsed 룸 jamo bars, poor chrome relief and 457/950 underfill. Existing promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 untouched, IGR032 OPEN, q175 REWORK_REQUIRED, C1/C3/INGAME blocked RUNTIME_VALIDATION=UNTESTED. Need genuinely different per-jamo counter/chrome vector method, do NOT repeat same A209 skeleton. RUN_KEY=OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300.",
     "C334 C2 EVEN q060: canonical original full DDS SHA independently verified and persisted source/FINAL native ROI matches producer proof; previous source identity blocker cleared. Full atlas typography calibration C3 and real game IGR044 OPEN. localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK/C334_Q060_CONTROLLER_CANONICAL_DDS_HOLD.json OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250 RUNTIME_VALIDATION=UNTESTED.",
     "A208 2026-10-09 22:44 KST q193 A-owned P1 NEW actual DDS Goal A → 목표 A exact SHA256 9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3; source width165,height47, new122x42 native; 0 source-protected/outside/alpha ghosts, persisted RAW/FLIPY/50% SOURCE/CLEAN/OLD/NEW producer SCOPED_PASS, guard mechanical PASS only. q193 7/13 labels rebuilt, 6 still REWORK; fresh independent C1 family-pilot, C3, user JPG/new game retest PENDING; IGR003/033 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION-20261009-2230;",
     "C333 C2 2026-10-09 21:50 KST OUTRUN-KOR-C333-C2-Q060-B332R-PROTECTED-PLATE-PERSISTED-20261009-2150: fresh B332R saved RGBA32 DDS exact SHA256 d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 4096x2048 persisted full gold+neighbor ROI independent Pillow RAW/FLIPY. NEW exact source original-orange area y130..159 restored 8892/8892 orange pixels, 0 RGBA diff; CLEAN pure transparent y20..129; next localized cell y160..189 previous→new 0 changed RGBA; full 779x190 ROI saved vs producer PNG exactly 0 mismatches. C SCOPED source-art and CLEAN pass, HOLD_STRICT_RECHECK canonical original whole-atlas SHA/full mask, calibrated family C3/evidence/user actual-game pending. IGR044 OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_Q060_C2_CONTROLLER_SCOPED_HOLD.json;",
@@ -13637,5 +13638,41 @@
     "new_evidence": "Independent full original source DDS SHA+ROI and saved candidate verified; protected orange exact 8892 and CLEAN alpha0",
     "new_DDS": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a209_q175_manual_vector_visual_reject": {
+    "run": "A209",
+    "run_key": "OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300",
+    "owner_lane": "A",
+    "index": 175,
+    "priority": "P1",
+    "english_source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "promoted_candidate_preserved_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "trial_sha256": "d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7",
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "machine": "TRIAL_PASS_ZERO_OVERFLOW_SOURCE_PROTECTED_SCOPED",
+    "visual": "PRODUCER_VISUAL_FAIL_UNREADABLE_50_PERCENT_AND_CHROME_SOURCE_HIERARCHY",
+    "source_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "trial_bbox": [
+      51,
+      402,
+      508,
+      525
+    ],
+    "first_failed_shadow_pixels": 169,
+    "repaired_shadow_overflow": 0,
+    "worker_success": 37942397381,
+    "qa": "localization/graphics/role_A/20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A209_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "next": "MANUAL_RECONSTRUCTION_REQUIRED_DIFFERENT_PER_JAMO_COUNTER_AND_CHROME_SOURCE_PROFILE",
+    "C1": "BLOCKED",
+    "C3": "BLOCKED",
+    "user_game": "IGR032_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
+
 }
