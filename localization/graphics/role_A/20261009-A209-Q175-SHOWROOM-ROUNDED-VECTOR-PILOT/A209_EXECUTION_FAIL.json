@@ -1,0 +1,13 @@
+{
+  "role": "A",
+  "run": "A209",
+  "queue_index": 175,
+  "status": "EXECUTION_DIAGNOSTIC_ONLY_NOT_CANDIDATE",
+  "exception": "RuntimeError",
+  "message": "('A209 trial mechanical scope FAIL', {'previous_vs_trial_changed_outside_showroom': 169, 'previous_vs_trial_alpha_changed_outside_showroom': 169, 'source_vs_trial_change_in_untouched_headers': 169, 'source_derived_plate_alpha_in_showroom': 0, 'clean_vs_trial_changed_outside_glyph_and_depth': 0, 'source_vs_plate_protected_outside_region_not_a_global_test': 247717})",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 136, in <module>\n    raise RuntimeError((\"A209 trial mechanical scope FAIL\",metrics))\nRuntimeError: ('A209 trial mechanical scope FAIL', {'previous_vs_trial_changed_outside_showroom': 169, 'previous_vs_trial_alpha_changed_outside_showroom': 169, 'source_vs_trial_change_in_untouched_headers': 169, 'source_derived_plate_alpha_in_showroom': 0, 'clean_vs_trial_changed_outside_glyph_and_depth': 0, 'source_vs_plate_protected_outside_region_not_a_global_test': 247717})\n",
+  "new_promoted_dds": 0,
+  "new_trial_dds": 0,
+  "runtime_validation": "UNTESTED",
+  "candidate_preserved": true
+}\n
