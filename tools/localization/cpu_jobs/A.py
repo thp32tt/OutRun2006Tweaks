@@ -44,7 +44,7 @@ def dds(path):
     h,w=struct.unpack_from("<II",b,12)
     if (w,h)!=(2048,1024) or len(b)!=128+w*h*4:raise ValueError(("format/size drift",len(b),w,h))
     if struct.unpack_from("<I",b,88)[0]!=32 or struct.unpack_from("<IIII",b,92)!=(16711680,65280,255,4278190080):
-        raise ValueError("unexpected channels")
+        raise ValueError(f"unexpected channels bpp={struct.unpack_from('<I',b,88)[0]} masks={struct.unpack_from('<IIII',b,92)}")
     if struct.unpack_from("<I",b,28)[0]!=1:raise ValueError("unexpected mip count")
     im=Image.frombytes("RGBA",(w,h),b[128:],"raw","BGRA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     return b[:128],im
