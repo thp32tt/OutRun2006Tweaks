@@ -1,0 +1,275 @@
+{
+  "run": "B342",
+  "role": "B",
+  "index": 212,
+  "run_key": "OUTRUN-KOR-B342-Q212-ENGLISH-SOURCE-12-REGION-PLATE-20261010",
+  "status": "P1_PASS_P3_EXACT_COMPOSITE_REQUIRES_HIDDEN_RGB_RECONCILIATION",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "source_path": "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/B342_EXACT_ENGLISH_SOURCE_2048_RGBA32.dds",
+  "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "old_candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "B341_trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "native": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "exact_header_match": true,
+  "source_clean_saved_trial_all12": [
+    {
+      "id": 14,
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "trial_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 104311,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 15,
+      "source_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "trial_bbox": [
+        18,
+        1152,
+        730,
+        1292
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 239635,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 16,
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "trial_bbox": [
+        91,
+        966,
+        1344,
+        1120
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 111861,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 17,
+      "source_bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "trial_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 61586,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 25,
+      "source_bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "trial_bbox": [
+        5,
+        793,
+        305,
+        855
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 30883,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 26,
+      "source_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "trial_bbox": [
+        5,
+        697,
+        223,
+        753
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 22455,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 27,
+      "source_bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "trial_bbox": [
+        6,
+        609,
+        222,
+        665
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 30523,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 28,
+      "source_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "trial_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 79710,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 30,
+      "source_bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "trial_bbox": [
+        1085,
+        428,
+        1203,
+        491
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 8696,
+      "candidate_changed_from_old": 0
+    },
+    {
+      "id": 43,
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "trial_bbox": [
+        241,
+        345,
+        557,
+        400
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 19818,
+      "candidate_changed_from_old": 28778
+    },
+    {
+      "id": 44,
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "trial_bbox": [
+        1627,
+        529,
+        1771,
+        582
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 8829,
+      "candidate_changed_from_old": 9200
+    },
+    {
+      "id": 53,
+      "source_bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "trial_bbox": [
+        9,
+        83,
+        71,
+        117
+      ],
+      "clean_alpha_nonzero": 0,
+      "target_source_diff": 3948,
+      "candidate_changed_from_old": 0
+    }
+  ],
+  "counts": {
+    "source_to_clean_outside_12_rgba": 0,
+    "current_to_clean_outside_12_rgba": 0,
+    "trial_to_source_outside_12_rgba": 0,
+    "trial_to_current_outside_r43_r44_rgba": 0,
+    "trial_to_current_outside_r43_r44_alpha": 0,
+    "clean_alpha_inside_12": 0,
+    "trial_changed_inside_two": 37978,
+    "full_clean_plus_trial_alpha_composite_rgba_mismatch_pixels": 331883
+  },
+  "view_files": [
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r14_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r15_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r16_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r17_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r25_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r26_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r27_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r28_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r30_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r43_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r43_RAW_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r44_FLIPY_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r44_RAW_native_SOURCE_CLEAN_OLD_B341.png",
+    "localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/q212_r53_FLIPY_native_SOURCE_CLEAN_OLD_B341.png"
+  ],
+  "canonical_source_newly_verified": true,
+  "source_to_clean_visual_approval": "PENDING_CONTROLLER_VISUAL",
+  "next": "Inspect source/CLEAN/old/trial exact source family and correct any P3 hidden-RGB composition mismatch without changing protected/other 10 cells. P2 anchors, final manifest and changed-since guard required BEFORE promotion.",
+  "promoted_DDS": 0,
+  "new_trial_DDS": 0,
+  "source_archive_dds": 1,
+  "C2": "C338_REWORK_UNCHANGED_SHA",
+  "C3": "BLOCKED",
+  "IGR029": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_REQUIRED_CANONICAL_SOURCE_BYTES"
+}
