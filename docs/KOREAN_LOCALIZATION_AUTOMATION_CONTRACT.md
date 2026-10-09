@@ -1,5 +1,9 @@
 # Korean Localization Automation Contract
 
+## External retro-localization skill adoption: consumer-chain and playtest coverage — 2026-10-09
+
+Read and apply `docs/KOREAN_LOCALIZATION_END_TO_END_PLAYTEST_GATE.md` whenever a new/materially revised DDS, font/runtime text, in-game regression, C/C3 review, or user preview build involves an in-game consumer. It requires exact source-to-persisted-byte-to-screen traceability, multi-screen shared-atlas impact checks, explicit untested runtime links, and reproducible user playtest routes. Existing A/B/C/C3 ownership, queue/evidence SSOT, ten-stage visual construction, 1-pixel rules, preview exclusion, and user-only in-game closure remain unchanged. Do not import ROM-console tooling or add new queues.
+
 > Recovery baseline: 2026-09-28 10:12 KST (`11631c5f12037bcd01cda1af57ec9bc564af4bcf`). Keep this branch intentionally small and production-focused. Do not import later controller schemas, event-ID layers, queue engines, or VR/FFB rules unless separately proven necessary.
 
 This is the canonical contract for the A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md, localization/graphics/TRANSLATION_NAMING_POLICY.md and localization/graphics/INGAME_REWORK_BACKLOG.csv. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
