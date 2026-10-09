@@ -223,6 +223,38 @@ for label, changed_r30, changed_r32 in (
     elif r9_right_sync_boundary_ok(r30_support_api, changed_r30, changed_r32):
         errors.append("R9 right-sync mutation survived: " + label)
 
+
+# The original R9 depth-content write event remains R9-owned. R32's R30
+# boundary is behavior-neutral: one call in, one exact R9 notification out.
+def r9_depth_content_write_boundary_ok(api, producer, consumer):
+    signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
+    if api.count(signature + ";") != 1 or producer.count(signature) != 1:
+        return False
+    owned_body = producer.split(signature, 1)[1].split("}", 1)[0]
+    return (
+        "".join(owned_body.split()) == "{R9NoteMainDepthContentWrite();"
+        and consumer.count(
+            "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }"
+        ) == 1
+    )
+
+if not r9_depth_content_write_boundary_ok(r30_support_api, r30, r32):
+    errors.append("R32 main-depth write lost the R30 -> R9 owner notification contract")
+_owner_signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
+_owner_tail = r30.split(_owner_signature, 1)[1].split("}", 1)[0] + "}"
+_owner_block = _owner_signature + _owner_tail
+for label, changed_r30, changed_r32 in (
+    ("R9 depth write side effect erased", r30.replace(
+        _owner_block, _owner_block.replace("R9NoteMainDepthContentWrite();", "(void)0;"), 1), r32),
+    ("R32 bypasses R30 depth write owner", r30, r32.replace(
+        "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }",
+        "void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R9 depth-write negative mutation not applied: " + label)
+    elif r9_depth_content_write_boundary_ok(r30_support_api, changed_r30, changed_r32):
+        errors.append("R9 depth-write negative mutation survived: " + label)
+
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
 # SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.
