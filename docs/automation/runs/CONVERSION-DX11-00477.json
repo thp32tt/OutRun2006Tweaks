@@ -101,10 +101,10 @@
     "ci_run_id": 37926530851,
     "resume_cursor": "WAIT_R174_EXACT_SHA_GATE_THEN_EXAMINE_CONSTANT_VS_SOLID_PS_BGRA",
     "runtime_validation": "UNTESTED",
-    "automation_validation": "IN_PROGRESS",
+    "automation_validation": "VALIDATE_PASS_DX11_SMOKE_IN_PROGRESS",
     "reason": "R173 first direct-VS fail lacked actual BGRA readback. Source commit a0a13c8 now logs both direct/generated data prior to fail-closed checks; exact-SHA CI started. Retain same TASK_ID 00477 for continuation and do not claim success or rescore.",
     "prior_blocked_material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-    "last_real_activity_at": "2026-10-09T20:56:12+09:00",
+    "last_real_activity_at": "2026-10-09T21:01:04+09:00",
     "evidence": "Exact-SHA Gate 37925304067 validate SUCCESS, DX11 smoke 113804628002 FAILURE. Direct VS BGRA [128,0,16,255]; generated VS BGRA [128,0,16,255]; expected [224,128,32,255]. Same mismatch in both branches; cannot attribute to generated VS alone."
   },
   "direct_chat_checkpoints": [
@@ -179,6 +179,18 @@
       "validation_status": "IN_PROGRESS_CONFIGURE_WIN32",
       "runtime_validation": "UNTESTED",
       "next_action": "Read R174 BGRA logs from exact-SHA Gate; retain fail-closed."
+    },
+    {
+      "checkpoint_id": "DX11-00477-CHAT-20261009-2101",
+      "at_kst": "2026-10-09T21:01:04+09:00",
+      "material_sha": "7fc6789c3dc52f7207ba6ed7913c448fdc36d1c6",
+      "gate_run_id": 37926530851,
+      "validation_job_id": 113806696226,
+      "validation": "SUCCESS",
+      "smoke_job_id": 113808586832,
+      "smoke": "IN_PROGRESS_CONFIGURE_WIN32",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Read four R174 BGRA readbacks from DX11 WARP smoke, act on first failing provenance layer."
     }
   ]
 }
