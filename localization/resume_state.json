@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B304 q228 IGR-038: actual 1-row source-conditioned silver trial persisted but source-family chrome highlight, depth and glyph geometry visually FAIL at 100/50/RAW; NO promoted DDS, C2/C3 blocked, user game OPEN. Build a different manually source-conditioned vector/extrusion master, rerender all 13 only after representative visual PASS. localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
     "C322 C2 q236 B302 scoped visual: 14/14 50%-gray rows, native 00/05/11, RAW75 row00 inspected, no obvious broken glyph; independent full exact DDS decode/masks/native/RAW and calibration NOT done. HOLD_STRICT_RECHECK, no current approval/C3, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
     "B303 q205 P0 IGR026/027 exact two header regions newly produced (native source red face) new DDS fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae replaces e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088 with pinned English 58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f + A76 CLEAN alpha0; source bbox 5px margins 2/2, all other atlas pixels exact, native 137px NotoSerif CJK Black, saved DDS/header/RAW exact. GitHub Actions 37861249931 and 40 SOURCE/CLEAN/OLD/NEW BGW/50/75/RAW evidence producer scoped PASS. Fresh independent C2 C3 approval and actual newer game needed; IGR026/027 OPEN, IGR028 mixed/runtime OPEN. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_B/20261009-B303-Q205-P0-RED-HEADING-NATIVE-FAMILY/B303_CONTROLLER_SELF_QA_FINAL.json",
     "A201 q161 55B57CDE material new DXT5 DDS 8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65 repairs C319-native BC3 face pinholes in regions 08 염소자리 / 10 양자리 / 12 태국; previous A200 SHA 2d0fe080682a0dc986436881bc6e12995250ca455c6984e5b75241e789c07d3b with repaired 04/06 and all other 33 unchanged (35 preserved exact BC3 regions). Pinned source sha a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d; 3/3 new exact original bboxes/decoded alpha core zeros, source residue/outside alpha/protected/overlap/changed-block outside=0. Producer persisted DDS/source-CLEAN-final 100/75/50, RAW samples SELF_QA_PASS. Fresh independent C1 all38, distinct C3/current evidence approval/user JPG/actual game pending. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261009-A201-Q161-C319-PRESERVED-FACE-REPAIR/A201_CONTROLLER_SELF_QA_FINAL.json",
@@ -12849,5 +12850,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
     "backend": "GitHub + N100 tiny image access"
+  },
+  "b304_q228_chrome_representative_visual_reject": {
+    "time_kst": "2026-10-09 09:20 KST",
+    "run_key": "OUTRUN-KOR-B304-Q228-IGR038-SOURCE-CHROME-REPRESENTATIVE-20261009-0910",
+    "role": "B",
+    "queue_index": 228,
+    "report": "IGR-038",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "existing_dds_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+    "trial_dds_sha256": "b2bfdc45190dcd43481339c67f1a845780ed10b3b97ee0be0d627a742de50033",
+    "trial_only_dds": 1,
+    "promoted_dds": 0,
+    "all_13_producer_pass": false,
+    "machine": "PASS_EXACT_HEADER_RAW_DECODE_ZERO_OUTSIDE",
+    "producer_visual": "FAIL_SOURCE_CHROME_DEPTH_HIGHLIGHT_FAMILY",
+    "C2": "BLOCKED",
+    "C3": "BLOCKED",
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
+    "github_actions_run": 37863968417
   }
 }
