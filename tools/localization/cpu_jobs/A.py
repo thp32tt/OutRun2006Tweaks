@@ -108,7 +108,7 @@ try:
      # Native vector strokes, published masks and isolated plate before lettering.
      mask=contour()
      if mask.getbbox() is None:raise RuntimeError("vector empty")
-     gx,gy=x0+12,y0
+     gx,gy=x0+12,y0-1
      if gx+mask.width>=x1-4 or gy+mask.height>=y1+2:
       raise RuntimeError("vector exceeds source sprite")
      m=np.asarray(mask).astype(np.uint8)
