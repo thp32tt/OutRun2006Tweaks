@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-RAW-DRAW-PRESENT-OWNER-20261009",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "source_mode": "CHAT_DIRECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "651c1f375de12c46b0947d3622b0b9c60be5a487",
+  "material_result_sha": "837780fb8ba3d5eede7d042d6713febc99df8ad4",
+  "validation_bearing_result_sha": "837780fb8ba3d5eede7d042d6713febc99df8ad4",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 original D3D9 DrawPrimitive, DrawIndexedPrimitive, DrawPrimitiveUP, DrawIndexedPrimitiveUP and Present trampolines delegate via R30 with identical hook targets, args and HRESULT. Ten negative mutation tests.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "validation": {
+    "active_run_id": 37921472914,
+    "domain_run_id": 37921472887,
+    "result": "SUCCESS",
+    "jobs": {
+      "policy": 113790164062,
+      "game": 113790299451,
+      "host": 113790299362,
+      "full-chain-compile": 113790299379,
+      "package": 113792000568
+    }
+  },
+  "package_artifact": {
+    "id": 11612467410,
+    "digest": "sha256:bdd7827ed40faeb44fa859e7d3a5d8e1880e61da37084b678362ffae3484db24"
+  },
+  "issue14_comment_id": 6079614019,
+  "next_action": "R32 frame-stereo accounting and lower Reset/Present/DirectGPU target-owner API seams, then actual independent TU/CMake preflight. No HMD approval."
+}
