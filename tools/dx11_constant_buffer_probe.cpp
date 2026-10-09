@@ -12113,7 +12113,9 @@ VSOutput main(VSInput input)
                              const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
             return outrun::vr::dx11::
                 prepare_fixed_function_nonindexed_direct_draw_probe(
-                    context, target, nonIndexedRenderTargetBoundDraw,
+                    context, target, pipelineBundle.input_layout(),
+                    pipelineBundle.vertex_shader(), pipelineBundle.pixel_shader(),
+                    nonIndexedRenderTargetBoundDraw,
                     nonIndexedDirectDrawReady, nonIndexedGeometryReady,
                     packet, D3DPT_TRIANGLESTRIP, 2u, 1u);
         };
@@ -12148,11 +12150,33 @@ VSOutput main(VSInput input)
             !r156Probe(d3d.context, outputColorSurface.render_target_view(),
                        r156WrongLineage),
             "R156 copied Draw packet cannot borrow a foreign geometry token");
+        // R171: same-device IA/VS/PS mutations must fail closed even when
+        // the prior dispatch token and vertex/topology provenance are intact.
+        d3d.context->IASetInputLayout(nullptr);
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       nonIndexedDirectDispatch),
+            "R171 rejects detached nonindexed IA layout");
+        d3d.context->IASetInputLayout(pipelineBundle.input_layout());
+        require(vertexShader != pipelineBundle.vertex_shader(),
+                "R171 distinct same-device VS substitution prerequisite");
+        d3d.context->VSSetShader(vertexShader, nullptr, 0u);
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       nonIndexedDirectDispatch),
+            "R171 rejects substituted nonindexed live VS");
+        d3d.context->VSSetShader(pipelineBundle.vertex_shader(), nullptr, 0u);
+        d3d.context->PSSetShader(nullptr, nullptr, 0u);
+        require(
+            !r156Probe(d3d.context, outputColorSurface.render_target_view(),
+                       nonIndexedDirectDispatch),
+            "R171 rejects detached nonindexed PS");
+        d3d.context->PSSetShader(pipelineBundle.pixel_shader(), nullptr, 0u);
         d3d.context->Begin(r156Stats);
         require(
             r156Probe(d3d.context, outputColorSurface.render_target_view(),
                       nonIndexedDirectDispatch),
-            "R156 validates native Draw prerequisites on matching WARP state");
+            "R171 exact IA/VS/PS restore permits native nonindexed Draw");
         // The protected native backend never calls Draw*: issue this only
         // inside the isolated WARP regression probe after live preflight.
         d3d.context->Draw(

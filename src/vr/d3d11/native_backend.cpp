@@ -14450,6 +14450,9 @@ bool validate_fixed_function_direct_draw_dispatch_snapshot(
 bool prepare_fixed_function_nonindexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
+    ID3D11InputLayout* expectedProbeLayout,
+    ID3D11VertexShader* expectedProbeVS,
+    ID3D11PixelShader* expectedProbePS,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionGeometryReadiness& geometry,
@@ -14461,7 +14464,8 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
     // dispatch fields. Recheck the exact packet fields before GPU submission.
     UINT expectedElements = 0;
     const auto topology = translate_primitive(primitive);
-    if (!context || !expectedProbeTarget ||
+    if (!context || !expectedProbeTarget || !expectedProbeLayout ||
+        !expectedProbeVS || !expectedProbePS ||
         context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
         dispatch.indexed || !dispatch.ready || dispatch.snapshotToken == 0 ||
         !direct_draw_element_count(primitive, primitiveCount, expectedElements) ||
@@ -14503,11 +14507,19 @@ bool prepare_fixed_function_nonindexed_direct_draw_probe(
     D3D11_PRIMITIVE_TOPOLOGY liveTopology =
         D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     context->IAGetPrimitiveTopology(&liveTopology);
+    // R171: a non-null IA/VS/PS attachment is not identity. A late,
+    // same-device shader or input-layout substitution must invalidate the
+    // sealed nonindexed Draw tuple before any GPU submission.
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> liveLayout;
     Microsoft::WRL::ComPtr<ID3D11VertexShader> liveVS;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> livePS;
+    context->IAGetInputLayout(liveLayout.ReleaseAndGetAddressOf());
     context->VSGetShader(liveVS.ReleaseAndGetAddressOf(), nullptr, nullptr);
     context->PSGetShader(livePS.ReleaseAndGetAddressOf(), nullptr, nullptr);
-    if (!liveVertexBuffer || !liveVS || !livePS ||
+    if (!liveVertexBuffer ||
+        liveLayout.Get() != expectedProbeLayout ||
+        liveVS.Get() != expectedProbeVS ||
+        livePS.Get() != expectedProbePS ||
         liveStride != boundDraw.vertexStride ||
         liveOffset != boundDraw.vertexOffset ||
         liveTopology != dispatch.topology)

@@ -4363,11 +4363,14 @@ compose_fixed_function_direct_draw_dispatch_readiness(
 // dedicated WARP test harness. Gameplay/native draw activation remains dormant.
 // This function never calls Draw; only tools/dx11_constant_buffer_probe.cpp
 // issues the separately reviewed offscreen WARP test Draw.
-// Caller must supply an explicit expected probe RTV; the bridge rechecks live
-// immediate-context OM/IA/VS/PS state and refuses indexed or stale dispatches.
+// Caller supplies the exact expected RTV, input layout and VS/PS objects;
+// live immediate OM/IA/shader substitutions fail closed before Draw.
 [[nodiscard]] bool prepare_fixed_function_nonindexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
+    ID3D11InputLayout* expectedProbeLayout,
+    ID3D11VertexShader* expectedProbeVS,
+    ID3D11PixelShader* expectedProbePS,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionGeometryReadiness& geometry,
