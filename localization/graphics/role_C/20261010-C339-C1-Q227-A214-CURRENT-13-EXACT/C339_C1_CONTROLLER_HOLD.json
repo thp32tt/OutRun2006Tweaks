@@ -1,0 +1,89 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C339",
+  "role": "C1",
+  "shard": "ODD_ONLY",
+  "queue_index": 227,
+  "run_key": "OUTRUN-KOR-C339-C1-Q227-A214-13-FRESH-SAVED-PIXEL-20261010-0310",
+  "scope": "13 newly published A214 native regions PLUS current DDS machine alpha recheck for all 16, not C3/full current-policy PASS",
+  "source_ref": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256_claimed": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "clean_sha256_claimed": "a6c8b4a921654e144e9580057c391fedc8cfc84e24e16a50a4697b971b76f984",
+  "source_and_clean_original_independent_hash_verified": false,
+  "canonical_source_attempt": "Sonic-TV/OR2006Sprites @ pinned commit guessed textures/load path returned HTTP 404; no made-up source bytes. A214 lossless SOURCE/CLEAN panels reviewed only with PROVENANCE LIMIT",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "prior_review": "localization/graphics/role_C/20261009-C320-C1-Q227-OPAQUE-ALPHA-EVIDENCE/C320_Q227_CONTROLLER_C1_HOLD.json",
+  "producer_new_13_report": "localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_EVIDENCE_REPORT.json",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_Q227_INDEPENDENT_MACHINE.json",
+    "git_blob_sha": "5cee29a0d7620ec535d462a8fd7eee6ac8fa1977"
+  },
+  "machine_aggregation": {
+    "candidate_reported_current_sha_exact": true,
+    "all_16_saved_current_alpha_bbox_and_alpha_count_match": 16,
+    "new_13_publish_final_vs_exact_saved_pixel_zero_delta": 13,
+    "new_13_publisher_clean_panels_alpha_zero": 13,
+    "new_13_raw_orientation_differs_from_readable": 13,
+    "new_region_count": 13,
+    "no_independent_canonical_source_dds": true,
+    "consumer_ingame_tested": false,
+    "C1_full_approval": false
+  },
+  "inspection_time_kst": "2026-10-10 approx 03:18-03:24 KST",
+  "pixels_before_producer_verdict": false,
+  "observation": {
+    "saved_native": "Current 16,777,344-byte DDS actually downloaded and SHA-256 checked; 2048x2048 RGBA32 mip1, reported masks 0x000000FF,0x0000FF00,0x00FF0000,0xFF000000.",
+    "new_13_final": "All 13 A214 newly published lossless triple PNG FINAL panels pixel-for-pixel identical (RGBA 0 differences) to independently decoded current saved DDS, native FLIP-Y of each original textbox. Not simply trusting producer PASS prose.",
+    "prior_3": "Independent current saved DDS alpha positive counts/bboxes recomputed for professional, alpine, flagman1, but previous C320 3 SOURCE/CLEAN evidence not revalidated this run.",
+    "native_16": "All 16 actual saved candidate visible alpha bbox and alpha count agree with A214 manifest, minimum margin=1px in each. No source-bbox encroachment found; strict original protected mask not newly independently verified.",
+    "clean_13": "A214 supplied CLEAN panels have alpha=0 in all 13; opaque gray/black contact shows no visible English ghosts in reviewed source regions; this is independent alpha check on provided evidence, NOT independent canonical source/CLEAN generation.",
+    "family": "13 rows source-vs-Korean preview inspected together on gray neutral background, and independent native/source/clean/final panels generated for intermediate, coniferous_forest, flagman2, novice; gray source and Korean mostly similarly muted, red flagman strong, no clearly observed broken glyph/clipping in inspected views. Source family stroke anchors/visual hierarchy not blind calibrated, so HOLD.",
+    "raw": "13 native RAW unflipped ROI differs from legible FLIP-Y as expected; per-asset correct game consumer UV cannot be inferred from this static check.",
+    "named_risk": "Most candidates have just 1px top source-box margin; do not report an intrusion without observed source protection or actual clipping. Short Korean labels (e.g., 중급, 프로) occupy much less width than English: by itself not defect absent matched hierarchy/composed game proof.",
+    "user_issues": "IGR034/035/036 remain OPEN_USER_INGAME_FAIL; screenshot matching car-class/text HUD consumer split not resolved by static texture evidence."
+  },
+  "visual_checks": [
+    "source_removal: SCOPED_CLEAN_PNG_ALPHA_ZERO_ONLY",
+    "slant_direction: HOLD_SOURCE_ANCHOR_UNCALIBRATED",
+    "style_fidelity: HOLD_UNCALIBRATED",
+    "readable_size: SCOPED_ALL13_SHEET_ONLY",
+    "glyph_integrity: SCOPED_VISUAL_NO_CONFIRMED_DEFECT",
+    "protected_art: HOLD_CANONICAL_SOURCE_MASK_UNVERIFIED",
+    "placement: SCOPED_MACHINE_16_POSITIVE_BBOX",
+    "RAW_FLIPY: PASS_STATIC_13_EXACT_MIRROR_CONVENTION"
+  ],
+  "evidence": {
+    "representative_lossless_png": [
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_Q227_intermediate_INDEPENDENT_BG_GRAY_SOURCE_CLEAN_SAVED.png",
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_Q227_coniferous_forest_INDEPENDENT_BG_GRAY_SOURCE_CLEAN_SAVED.png",
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_Q227_flagman2_INDEPENDENT_BG_GRAY_SOURCE_CLEAN_SAVED.png",
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_Q227_novice_INDEPENDENT_BG_GRAY_SOURCE_CLEAN_SAVED.png"
+    ],
+    "overview_jpg_navigation_only": [
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C1_Q227_GRAY_ALL13_SOURCE_FINAL_CLEAN.jpg",
+      "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C1_Q227_BLACK_ALL13_SOURCE_FINAL_CLEAN.jpg"
+    ]
+  },
+  "missing_for_C1_PASS": [
+    "canonical_exact_source_dds_and_independent_clean_plate_hash",
+    "blinded_calibration_normal_opposite_slant_clipped_residue_heavy",
+    "all16_separate_8_observations_native_raw_bg_100_75_50",
+    "authenticated_protected_art_1px_masks",
+    "consumer_ingame_mapping_and_user_retest"
+  ],
+  "result": "HOLD_STRICT_RECHECK",
+  "C1_PASS": false,
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "INGAME_STATUS": "IGR034_IGR035_IGR036_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "backend": "GitHub connector SSOT, N100 MCP lightweight native DDS only; no builds"
+}

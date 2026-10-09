@@ -1,0 +1,544 @@
+{
+  "role": "C1",
+  "asset_index": 227,
+  "source": "GitHub current pinned saved DDS and A214 publisher native 13 source/clean/final proofs",
+  "asset_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "producer_asset_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "asset_bytes": 16777344,
+  "header": {
+    "size": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ]
+  },
+  "region_results": [
+    {
+      "id": "intermediate",
+      "source_bbox": [
+        7,
+        421,
+        676,
+        493
+      ],
+      "producer_current_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "independent_exact_saved_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 4891,
+      "producer_alpha_count": 4891,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 27476,
+      "raw_orientation_pixel_different": 42338,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "outrun",
+      "source_bbox": [
+        5,
+        512,
+        362,
+        586
+      ],
+      "producer_current_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "independent_exact_saved_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 6249,
+      "producer_alpha_count": 6249,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 14573,
+      "raw_orientation_pixel_different": 18231,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "professional",
+      "source_bbox": [
+        3,
+        611,
+        675,
+        686
+      ],
+      "producer_current_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "independent_exact_saved_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 6007,
+      "producer_alpha_count": 6007,
+      "alpha_count_equal": true,
+      "fresh_a214_native": false
+    },
+    {
+      "id": "alpine",
+      "source_bbox": [
+        2,
+        701,
+        346,
+        777
+      ],
+      "producer_current_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "independent_exact_saved_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 6907,
+      "producer_alpha_count": 6907,
+      "alpha_count_equal": true,
+      "fresh_a214_native": false
+    },
+    {
+      "id": "ancient_ruins",
+      "source_bbox": [
+        2,
+        795,
+        707,
+        875
+      ],
+      "producer_current_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "independent_exact_saved_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 16625,
+      "producer_alpha_count": 16625,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 30946,
+      "raw_orientation_pixel_different": 37729,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "cape_way",
+      "source_bbox": [
+        8,
+        891,
+        473,
+        971
+      ],
+      "producer_current_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "independent_exact_saved_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 12284,
+      "producer_alpha_count": 12284,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 18972,
+      "raw_orientation_pixel_different": 26204,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "castle_wall",
+      "source_bbox": [
+        8,
+        987,
+        634,
+        1067
+      ],
+      "producer_current_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "independent_exact_saved_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 8615,
+      "producer_alpha_count": 8615,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 24295,
+      "raw_orientation_pixel_different": 19875,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "cloudy_highland",
+      "source_bbox": [
+        1,
+        1083,
+        835,
+        1163
+      ],
+      "producer_current_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "independent_exact_saved_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 18685,
+      "producer_alpha_count": 18685,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 36242,
+      "raw_orientation_pixel_different": 44674,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "coniferous_forest",
+      "source_bbox": [
+        1,
+        1179,
+        933,
+        1259
+      ],
+      "producer_current_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "independent_exact_saved_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 19176,
+      "producer_alpha_count": 19176,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 42175,
+      "raw_orientation_pixel_different": 47988,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "deep_lake",
+      "source_bbox": [
+        1,
+        1277,
+        491,
+        1353
+      ],
+      "producer_current_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "independent_exact_saved_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 8604,
+      "producer_alpha_count": 8604,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 21201,
+      "raw_orientation_pixel_different": 24655,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "desert",
+      "source_bbox": [
+        1,
+        1371,
+        348,
+        1451
+      ],
+      "producer_current_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "independent_exact_saved_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 7130,
+      "producer_alpha_count": 7130,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 16313,
+      "raw_orientation_pixel_different": 16992,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "bay_area",
+      "source_bbox": [
+        3,
+        1469,
+        436,
+        1545
+      ],
+      "producer_current_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "independent_exact_saved_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 13514,
+      "producer_alpha_count": 13514,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 18856,
+      "raw_orientation_pixel_different": 23180,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "flagman1",
+      "source_bbox": [
+        8,
+        1565,
+        963,
+        1716
+      ],
+      "producer_current_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "independent_exact_saved_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 42213,
+      "producer_alpha_count": 42213,
+      "alpha_count_equal": true,
+      "fresh_a214_native": false
+    },
+    {
+      "id": "flagman2",
+      "source_bbox": [
+        8,
+        1722,
+        994,
+        1880
+      ],
+      "producer_current_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "independent_exact_saved_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 46968,
+      "producer_alpha_count": 46968,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 76607,
+      "raw_orientation_pixel_different": 103396,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "flagman3",
+      "source_bbox": [
+        8,
+        1889,
+        993,
+        2047
+      ],
+      "producer_current_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "independent_exact_saved_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 47131,
+      "producer_alpha_count": 47131,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 76096,
+      "raw_orientation_pixel_different": 103742,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    },
+    {
+      "id": "novice",
+      "source_bbox": [
+        1041,
+        1640,
+        1374,
+        1714
+      ],
+      "producer_current_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "independent_exact_saved_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "bbox_matches_report": true,
+      "min_margin": 1,
+      "persisted_alpha_count": 4363,
+      "producer_alpha_count": 4363,
+      "alpha_count_equal": true,
+      "fresh_a214_native": true,
+      "persisted_final_pixels_different": 0,
+      "persisted_final_alpha_different": 0,
+      "publisher_clean_visible_alpha": 0,
+      "publisher_source_alpha_pixels": 13332,
+      "raw_orientation_pixel_different": 13341,
+      "source_comparison_origin": "producer_A214_native_PNG_not_independently_pinned_canonical_source_DDS"
+    }
+  ],
+  "aggregate": {
+    "candidate_reported_current_sha_exact": true,
+    "all_16_saved_current_alpha_bbox_and_alpha_count_match": 16,
+    "new_13_publish_final_vs_exact_saved_pixel_zero_delta": 13,
+    "new_13_publisher_clean_panels_alpha_zero": 13,
+    "new_13_raw_orientation_differs_from_readable": 13,
+    "new_region_count": 13,
+    "no_independent_canonical_source_dds": true,
+    "consumer_ingame_tested": false,
+    "C1_full_approval": false
+  }
+}
