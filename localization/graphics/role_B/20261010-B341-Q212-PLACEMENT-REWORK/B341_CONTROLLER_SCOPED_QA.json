@@ -1,0 +1,93 @@
+{
+  "run": "B341",
+  "role": "B",
+  "run_key": "OUTRUN-KOR-B341-Q212-TWO-ANCHORED-MATERIAL-TRIAL-20261010-0341",
+  "queue_index": 212,
+  "source_failure": "C338_C2_REWORK_R43_R44_ORIGINAL_X_ANCHOR_SHIFT",
+  "prior_candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "new_trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "trial_dds_path": "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_UNAPPROVED_Q212_TWO_ANCHOR_TRIAL.dds",
+  "machine_report": "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_TRIAL_MACHINE_QA.json",
+  "regions": [
+    {
+      "id": 43,
+      "source": "PROFESSIONAL",
+      "Korean": "프로페셔널",
+      "old_bbox": [
+        5,
+        345,
+        321,
+        400
+      ],
+      "trial_bbox": [
+        241,
+        345,
+        557,
+        400
+      ],
+      "dx": 236
+    },
+    {
+      "id": 44,
+      "source": "OUTRUN",
+      "Korean": "아웃런",
+      "old_bbox": [
+        1688,
+        529,
+        1832,
+        582
+      ],
+      "trial_bbox": [
+        1627,
+        529,
+        1771,
+        582
+      ],
+      "dx": -61
+    }
+  ],
+  "machine": {
+    "format": "DDS_RGBA32",
+    "native": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "decoded_roundtrip": "EXACT",
+    "all10_untouched": true,
+    "changed_outside_declared_source_regions": 0,
+    "clean_source_cell_alpha": 0
+  },
+  "firsthand_visual": {
+    "FLIPY_100_r43": "Native orange Hangul moved to same English-source start x, no clearly broken glyph in inspected source/CLEAN/old/trial.",
+    "FLIPY_50_r43": "Orange Korean retains readability at practical 50%.",
+    "FLIPY_100_r44": "Red 아웃런 source-left aligned; lettering identifiable.",
+    "RAW_50_r44": "Correct vertical mirror in file view; no observed extra plate/residue at selected row.",
+    "observed_files": [
+      "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_FLIPY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+      "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r43_FLIPY_50_SOURCE_CLEAN_OLD_TRIAL.png",
+      "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_FLIPY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+      "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/r44_RAW_50_SOURCE_CLEAN_OLD_TRIAL.png"
+    ]
+  },
+  "decision": "SCOPED_PRODUCER_VISUAL_IMPROVEMENT_TRIAL_ONLY",
+  "limit": "Canonical English DDS and full source-protected mask/plate final manifest not independently verified; other ten regions not newly style-approved. No promotion before complete P1/P2/P3 and changed-since pixel guard.",
+  "new_trial_DDS": 1,
+  "promoted_DDS": 0,
+  "current_candidate_unchanged": true,
+  "independent_C2": "PENDING_NEW_PROMOTED_SHA",
+  "C3": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "user_IGR029": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "workflow_id": 37974641232,
+  "workflow_conclusion": "SUCCESS",
+  "execution_backend": "GITHUB_ACTIONS",
+  "N100_used": false,
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
