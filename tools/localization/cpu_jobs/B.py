@@ -112,10 +112,14 @@ block=C[t:b,l:rr].copy()
 shadow=np.zeros((H,W),bool)
 shadow[3:,2:]=foreground[:-3,:-2]
 shadow= binary_dilation(shadow,iterations=2)
+# Strictly reserve the outer 5px source effect boundary. The previous B322
+# unbounded shadow was correctly stopped by the transparent plate QA gate.
+allowed_roi=np.zeros((H,W),bool);allowed_roi[5:-5,5:-5]=True
+shadow &= allowed_roi
 dark=tuple(int(x) for x in edge_color)
 block[shadow,:3]=np.array(dark,dtype=np.uint8)
 block[shadow,3]=np.maximum(block[shadow,3],np.uint8(185))
-outer=binary_dilation(foreground,iterations=1)
+outer=binary_dilation(foreground,iterations=1)&allowed_roi
 block[outer,:3]=np.array(dark,dtype=np.uint8)
 block[outer,3]=np.maximum(block[outer,3],np.uint8(232))
 # Vertical metallic colour is calibrated from the 7 SOURCE median stops,
@@ -151,7 +155,7 @@ for j in range(H):
 assert np.all(block[foreground,3]>=235), "filled chrome face must be opaque"
 assert np.any(block[foreground,0]>=235) and np.any(block[foreground,0]<=145),"need bright and dark native chrome depth"
 # Transparent pixels remain plate, no opaque rectangular fill.
-allowed_roi=np.zeros((H,W),bool);allowed_roi[4:-5,4:-5]=True
+# Keep the same source effect inset throughout the material and QA checks.
 assert not np.any(block[~allowed_roi,3])
 out[t:b,l:rr]=block
 changed=np.any(P!=out,axis=2)
