@@ -382,6 +382,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R189 indexed depth WARP probe failed: $LASTEXITCODE" }
 
+      # R190: live owned blend state + real alpha GPU DrawIndexed ahead of separate R175.
+      - name: Verify R190 native indexed OM blend ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_blend_indexed_r190.py
+
+      - name: Build R190 blend indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_blend_indexed_probe_r190
+
+      - name: Run R190 blend indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_indexed_probe_r190.exe | Select-Object -First 1
+          if (-not $probe) { throw "R190 indexed alpha blend WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R190 indexed alpha blend WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 

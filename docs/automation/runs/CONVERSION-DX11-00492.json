@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00492",
+  "production_id": "CONVERSION-DX11-00492",
+  "event_id": "CONVERSION-DX11-00492-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00492",
+  "lease_epoch": 1,
+  "work_key": "DX11:R190:NATIVE_INDEXED_BLEND_OM_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_blend_binding.hpp:R190",
+    "tools/dx11_blend_indexed_probe_r190.cpp:R190",
+    "tools/test_dx11_blend_indexed_r190.py:R190",
+    ".github/workflows/backend-conversion-gate.yml:R190",
+    "cmake.toml:R190"
+  ],
+  "base_sha": "a417dd1db819e542afcc21fbae8e9242863412cb",
+  "material_result_sha": "PENDING_CURRENT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_CURRENT_COMMIT_SHA",
+  "result_sha": "PENDING_CURRENT_COMMIT_SHA",
+  "status": "WAITING_FOR_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R190 exact owned native indexed OM alpha blend state (object/same device/factors/sample mask/write mask) with real Win32 WARP DrawIndexed purple-on-blue pixel proof; native game draw stays dormant.",
+  "pipeline": {
+    "C0_RECOVER": "PASS current GitHub HEAD; 00492 unclaimed; 00491 sealed R189 scoped WARP PASS but inherited R175 whole Gate failure.",
+    "C1_REVIEW": "PASS R186/R187/R188/R189 DrawIndexed preflights omit OM blend state owner; independent path chosen; avoid R175 ownership and DX9Ex/DXVK.",
+    "C2_IMPLEMENT": "PASS new native indexed blend OM guard plus actual WARP indexed GPU alpha pixels probe, four source mutations, build and Gate wiring.",
+    "C3_VALIDATE": "R190 scoped source contract and actual WARP pixels to be executed in exact SHA GitHub CI; inherited R175 still separate blocker.",
+    "C4_COMMIT": "Current actual material result commit carries exact AUTO marker, no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant native game Draw; no Quest3/VDXR evidence, no runtime package.",
+    "C6_STATE": "PENDING exact material SHA CI and follow-up state sealing."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_blend_binding.hpp",
+    "tools/dx11_blend_indexed_probe_r190.cpp",
+    "tools/test_dx11_blend_indexed_r190.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00492.json"
+  ],
+  "evidence": {
+    "previous_gate_00491": 37971106770,
+    "inherited_upstream_00477_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "new_r190_static_mutants": 4,
+    "material_gate": "PENDING"
+  },
+  "blockers": [
+    "Inherited R175 generic TEXCOORD6 BGRA mismatch under separate owner 00477.",
+    "No Quest3/VDXR HMD or game runtime test."
+  ],
+  "next_action": "Inspect exact-SHA Backend Conversion Gate on current material commit; verify R190 GPU pixels and distinguish inherited R175. Seal C6; append issue #14.",
+  "score_change": 0
+}
