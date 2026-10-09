@@ -71,13 +71,13 @@
       "tools/dx11_constant_buffer_probe.cpp:R164"
     ],
     "selected_work_item": "DX11_R164_INDEXED_OFFSCREEN_DSV_LIFETIME_GUARD",
-    "status": "IN_PROGRESS",
-    "checkpoint": "C3_VALIDATE",
+    "status": "COMPLETE",
+    "checkpoint": "C6_STATE",
     "base_sha": "baf96a0c2ddea76fbfef945cf11c8e28f34d5729",
     "result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
     "material_result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
     "validation_bearing_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
-    "automation_validation": "PENDING_EXACT_SHA_CI",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
     "summary": "R164 isolated WARP indexed DrawIndexed preflight requires exact live DSV identity and device ownership in addition to the prior RTV/stage/output-state checks. WARP probe detaches and restores DSV; game native draw remains dormant.",
     "changed_paths": [
@@ -94,29 +94,34 @@
       "C0_RECOVER": "PASS: verified branch head baf96a0c2ddea76fbfef945cf11c8e28f34d5729, previous 00468 COMPLETE and 00469 absent; rollover E002 ATTEMPT=1/3 unchanged",
       "C1_REVIEW": "PASS: R157/R161/R162/R163 indexed preflight and regression ledger reveal no exact live OM DSV identity guard",
       "C2_IMPLEMENT": "PASS: native header+implementation and WARP negative DSV-detach/exact restoration regression fixture committed",
-      "C3_VALIDATE": "STATIC_PASS_9_9; Backend Conversion Gate 37868311768 exact material SHA c091e8821e64aa4b0629ccdce303402144e0fe94 PENDING; Win32 validate and DX11 readiness smoke not yet confirmed",
+      "C3_VALIDATE": "PASS: exact material SHA c091e8821e64aa4b0629ccdce303402144e0fe94, Backend Conversion Gate 37868311768 SUCCESS; Win32 validate 113620564741 SUCCESS; DX11 readiness smoke 113621607081 SUCCESS including R164 DSV detach/restore probe; artifact 11589107295 sha256:f5a104698a6038cb6c85cb0559296130c9d1f532f6366ba7cc3f8d609ad0a696",
       "C4_COMMIT": "PASS: three material commits all contain [AUTO:CONVERSION-DX11-00469]",
       "C5_PACKAGE": "NOT_REQUIRED: isolated WARP preflight proof, no deployable candidate, gameplay native Draw dormant",
-      "C6_STATE": "PARTIAL: durable task checkpoint saved, Issue #14 source comment 6072188910; CI completion and final C6 sealing remain required"
+      "C6_STATE": "PASS: task run sealed and lane update follows on authenticated GitHub; Issue14 source comment 6072188910 and validation comment 6072272030; runtime UNTESTED."
     },
     "validation_run_id": 37868311768,
     "issue14_comment_id": 6072188910,
-    "state_persisted": false,
+    "state_persisted": true,
     "native_draw_path_activation_changed": false,
     "draw_dispatch_authorized": false,
-    "resume_cursor": "C3_VALIDATE_EXACT_SHA_CI_PENDING",
-    "next_action": "Fetch Backend Conversion Gate 37868311768, verify exact material SHA Win32 validate+DX11 readiness smoke; repair any failures; then persist C6 and Issue14 validation event, score once only on new verified full result.",
+    "resume_cursor": "TERMINAL_COMPLETE",
+    "next_action": "00469 terminal; do not repeat, retry or rescore. Choose new independent offscreen indexed WARP pixel readback / lifetime proof; gameplay native Draw activation requires exact-build Quest3/VDXR input/stereo/HUD/frame pacing validation.",
     "blockers": [
-      "Quest3/VDXR HMD not tested; gameplay native Draw still unauthorized",
-      "GitHub Actions exact-SHA Backend Conversion Gate still pending"
+      "Quest3/VDXR HMD not tested; native gameplay Draw unauthorized."
     ],
-    "last_activity_evidence": "Source structural assertions 9/9 passed; Issue14 6072188910; material c091e8821e64aa4b0629ccdce303402144e0fe94.",
-    "updated_at_kst": "2026-10-09T10:10:00+09:00",
+    "last_activity_evidence": "Backend Conversion Gate 37868311768 completed SUCCESS exact SHA c091e8821e64aa4b0629ccdce303402144e0fe94; Win32 validate 113620564741 and DX11 readiness smoke 113621607081 SUCCESS; artifact 11589107295; Issue14 6072272030.",
+    "updated_at_kst": "2026-10-09T10:17:23+09:00",
+    "validation_bearing_result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+    "validation_job_id": 113620564741,
+    "readiness_smoke_job_id": 113621607081,
+    "artifact_id": 11589107295,
+    "artifact_digest": "sha256:f5a104698a6038cb6c85cb0559296130c9d1f532f6366ba7cc3f8d609ad0a696",
+    "validation_issue14_comment_id": 6072272030,
     "run_record_path": "docs/automation/runs/CONVERSION-DX11-00469.json"
   },
-  "runtime_blocker": "R164 WARP indexed OM DSV identity probe committed at c091e8821e64aa4b0629ccdce303402144e0fe94; exact-SHA Backend Conversion Gate 37868311768 pending. Game native Draw remains dormant; Quest3/VDXR runtime UNTESTED.",
-  "runtime_next_action": "Quest3/VDXR exact-build in-game input/stereo/HUD/frame-pacing and visual validation required before any gameplay native Draw/DrawIndexed activation.",
-  "independent_static_next_action": "00469 R164 material committed and CI pending: verify exact-SHA Backend Conversion Gate 37868311768, repair if failed, then finalize C6; do not repeat 00468/R163.",
+  "runtime_blocker": "R164 exact live OM DSV identity offscreen WARP probe validated SUCCESS on exact SHA c091e8821e64aa4b0629ccdce303402144e0fe94; Backend Conversion Gate 37868311768, jobs 113620564741/113621607081 SUCCESS. Native game Draw remains dormant, Quest3/VDXR runtime UNTESTED.",
+  "runtime_next_action": "Exact-build Quest3/VDXR gameplay input/stereo/HUD/frame-pacing evidence required before any production native Draw/DrawIndexed activation.",
+  "independent_static_next_action": "00469 complete: do not repeat or rescore R164. Choose new independent bounded DX11 indexed offscreen WARP pixel-output readback or lifetime proof, maintaining dormant native game draw.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -4192,6 +4197,17 @@
       "artifact_digest": "sha256:cd461b3a21c9d4b0c452f59ed077916592f5b4e9688698075d3dc79b85ffb54d",
       "issue14_comment_id": 6072023027,
       "validation_issue14_comment_id": 6072124021
+    },
+    {
+      "unit_id": "DX11_INDEXED_OFFSCREEN_DSV_LIVE_IDENTITY_R164",
+      "task_id": "CONVERSION-DX11-00469",
+      "material_result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+      "validation_bearing_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 6072272030
     }
   ],
   "controller_dispatch": {
