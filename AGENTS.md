@@ -1,3 +1,12 @@
+## DX9Ex Quest 3 2026-10-09 user HMD acceptance — authoritative next-step focus
+
+- Read `docs/automation/reviews/DX9EX_HMD_FEEDBACK_20261009_2348_RANK_TIME_PERF_RESOLUTION.md` before modifying VR ranking, HUD, +TIME, performance or resolution. User tested exact `a6f8497c2fbe83959984275c30fbf43aa6a72d55`.
+- **Preserve USER-REPORTED PASS**: all 1–5 place indicators single/non-headlocked, 6th/6 normal, menu arrows/YES-NO normal, car-selector DDS normal, OutRun rival attached to vehicle, BOTH GOAL stage/course label and record time normal. Do not "repair" or remove those.
+- **Open optical faults**: 1–5 place indicators still do **not follow their cars** (despite stereo fusion); transient OutRun checkpoint/extension `+TIME` remains doubled/headlocked. Rival marker and GOAL panel are **not** broken. Avoid blanket 2D->world remapping and do not delete either original GOAL helper.
+- **Source/runtime evidence**: rank+rival aggregate `projected[semantic=9197,buildOk=9107]` is NOT an ordinal optical PASS. HMD log contains rank producers but *no* rank-only `VR R57 rank Calc3D2D` callback log. First `R62 ... RANK_MARKER_CLIP` was `owner=SCREEN_HUD marker=0`; NaviPub ScreenHud may be legitimate, so establish original producer identity before changing routing.
+- **Perf and resolution**: 88 R28 Present windows, 63 had max over 11.111ms at headset 90Hz; session max 29.917ms, old R32 spike count zero was a diagnostic false-clear. Game default/backbuffer was PC-monitor `3440x1440`. Opt-in `[VR] RenderWidth/RenderHeight` now permits independent internal source size; BOTH=0 deliberately keeps desktop source by default to avoid worsening measured frame drops. This is **not** automatic XR recommended-size selection. Mirror window scaling must not rewrite eye textures.
+- One Quest3 HMD session already completed tonight; no repeated same-SHA optical test. New source CI PASS is not an HMD proof. Avoid duplicated 1000/5000 static verifications.
+
 ## DX9Ex 2026-10-09 deep source review: LINK_TIMEUP/GIVEUP and GOAL time source parity
 
 - Read `docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md` and `docs/automation/reviews/AI2_GOAL_ENDTIME_WHITE_ALPHA_STEREO_CAUSE_REVIEW_20261009.md` before restoring HUD: **race-end GOAL/TIMEUP white time doubles immediately BEFORE restart; restart/TRYAGAIN itself is correct mono 2D; +TIME was the one remaining historically unresolved item after later 6th/6 and car4/5 successes**.
