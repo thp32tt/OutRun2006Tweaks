@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B317",
+  "index": 137,
+  "source_qa": "B317_MACHINE_QA.json",
+  "trial_sha256": "36853966d8809d53ef5ca240666cb70ff02abd59107ccfa0db19767cae9a4648",
+  "previous_candidate_sha256": "1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68",
+  "worker": 37885707824,
+  "worker_result": "SUCCESS",
+  "producer_qa": "HOLD_SCOPED",
+  "source_relative_observations": [
+    {
+      "id": "transmission_small",
+      "decision": "HOLD_UNDERSIZED_AT_50",
+      "observation": "English 281 px native vs new Korean 101 px, 50% render visibly too small; do not promote"
+    },
+    {
+      "id": "manual_small",
+      "decision": "PASS_SCOPED_100_AND_RAW_50",
+      "observation": "Source gray lettering maintained, 205px width vs prior short two-syllable label, no observed collision"
+    },
+    {
+      "id": "automatic_small",
+      "decision": "PASS_SCOPED_100_AND_RAW_50",
+      "observation": "Source gray alpha retained; longer native 234px glyph line no visible collision"
+    }
+  ],
+  "machine": {
+    "persisted_dds_exact": true,
+    "changed_rgba_outside_three": 0,
+    "alpha_outside_three": 0,
+    "other_artwork": "EXACT"
+  },
+  "candidate_promoted": false,
+  "new_production_dds": 0,
+  "next": "B318 only manual/automatic small, retain top and transmission small",
+  "runtime_validation": "UNTESTED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_ingame": "OPEN_USER_INGAME_FAIL"
+}
