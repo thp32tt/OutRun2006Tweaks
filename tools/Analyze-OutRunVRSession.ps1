@@ -148,6 +148,18 @@ if($resolutionMatch){
     $gameDefaultHeight=[int]$resolutionMatch.Groups[2].Value
 }
 
+# A result/GOAL transition can render unowned queue overlays first and
+# exact TEXT_GLYPH ScreenHud later while both are STATE_GOAL. An overall
+# log status=OK does not prove that map/time animation and the completed
+# result share the same per-eye transform. This is *mixed ownership evidence*,
+# NOT a diagnosis that the generic draw is necessarily the offending text.
+$goalGenericPhaseEvidence=($gameLog -match 'VR P0 GOAL EARLY_GATE:.*?producer=NONE scope=SCREEN_OVERLAY_2D')
+$goalExactTextEvidence=($gameLog -match 'VR P0 GOAL EARLY_GATE:.*?producer=TEXT_GLYPH_PUTSPRITE scope=SCREEN_HUD')
+$goalMixedPhaseOwnerEvidence=($goalGenericPhaseEvidence -and $goalExactTextEvidence)
+# The original lens producer hook applies to an entire effect CALL. Logs
+# cannot tell which of the 4-5 discs is the offending central core.
+$lensProducerHookObserved=($gameLog -match 'VR P0 FLARE: exact EXE\+0xCABE producer')
+
 # The original rank CALLs can run without any actual R57 projected draw.
 # A no-red-flag verdict is false in that case; report the missing ownership.
 $rankTrace=Read-AllText 'HUD_TRACE_SUMMARY.txt'
@@ -175,6 +187,7 @@ if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
 if($presentOverBudgetWindows -gt 0){$flags+='D3D9EX_PRESENT_LATENCY_OVER_XR_BUDGET'}
 if($rankProjectionNotReached){$flags+='HUD_RANK_PROJECTED_PATH_ZERO'}
 if($rankExactCalcUnobserved){$flags+='HUD_RANK_CALC_CAPTURE_UNOBSERVED'}
+if($goalMixedPhaseOwnerEvidence){$flags+='GOAL_MIXED_GENERIC_VS_EXACT_HUD_NEEDS_PHASE_REVIEW'}
 if($gameDllMismatch){$flags+='GAME_DLL_SHA256_MISMATCH'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
@@ -191,6 +204,7 @@ elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
 elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
 elseif($rankExactCalcUnobserved){$status='HUD_RANK_CALC_CAPTURE_UNOBSERVED'}
 elseif($presentOverBudgetWindows -gt 0){$status='PERFORMANCE_WARNING'}
+elseif($goalMixedPhaseOwnerEvidence){$status='NEEDS_GOAL_PHASE_VISUAL_REVIEW'}
 
 $result=[ordered]@{
     SchemaVersion=1
@@ -207,6 +221,12 @@ $result=[ordered]@{
     ProjectedMarkerSemanticCount=$projectedSemantic
     RankExactCalcObserved=$rankExactCalcObserved
     GameDllIdentityMismatch=$gameDllMismatch
+    GoalGenericPhaseEvidence=$goalGenericPhaseEvidence
+    GoalExactTextEvidence=$goalExactTextEvidence
+    GoalMixedPhaseOwnerEvidence=$goalMixedPhaseOwnerEvidence
+    LensProducerHookObserved=$lensProducerHookObserved
+    LensCenterOpticalStatus='NOT_INFERABLE_FROM_LOGS'
+    ResultProgressOpticalStatus='NOT_INFERABLE_FROM_LOGS'
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
@@ -245,6 +265,10 @@ $lines=@(
     "projectedMarkerSemanticCount=$projectedSemantic"
     "rankExactCalcObserved=$rankExactCalcObserved"
     "gameDllIdentityMismatch=$gameDllMismatch"
+    "goalMixedPhaseOwnerEvidence=$goalMixedPhaseOwnerEvidence"
+    "lensProducerHookObserved=$lensProducerHookObserved"
+    "lensCenterOpticalStatus=NOT_INFERABLE_FROM_LOGS"
+    "resultProgressOpticalStatus=NOT_INFERABLE_FROM_LOGS"
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"
