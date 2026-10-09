@@ -35,7 +35,12 @@ foreach($profile in @($control,$correctness,$performance)) {
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
     Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
     Assert-True (Has-Argument $profile '-TargetRefreshRateHz=0') "$($profile.Name): refresh must follow OpenXR/VDXR"
-    Assert-True (Has-Argument $profile '-SkyGlowFactor=1') "$($profile.Name): test policy requires SkyGlowFactor=1"
+    # The shipped game default is SkyGlowFactor=4. HMD traces from 2026-10-09
+    # proved test profiles silently replaced it with 1 (full-resolution
+    # postprocessing, roughly 16x source pixel area). Keep the actual visual
+    # effect, but do not force unnecessary full-resolution bloom in CORRECTNESS.
+    Assert-True (Has-Argument $profile '-SkyGlowFactor=4') "$($profile.Name): restored quarter-resolution SkyGlowFactor=4"
+    Assert-True (-not (Has-Argument $profile '-SkyGlowFactor=1')) "$($profile.Name): full-resolution SkyGlow must not silently override game defaults"
     Assert-True ($profile.Environment.OUTRUN_VR_TEST_PROFILE -eq $profile.Name) "$($profile.Name): environment identity mismatch"
 }
 
