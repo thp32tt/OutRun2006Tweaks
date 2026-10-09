@@ -36,7 +36,8 @@ S=dec(Sdata);F=dec(Fdata)
 l,t,r,b=2081,230,2860,370
 sr=S[t:b,l:r];fr=F[t:b,l:r]
 yy=np.arange(t,b)[:,None]
-orange=(sr[:,:,3]>90)&(sr[:,:,0]>150)&(sr[:,:,1]>35)&(sr[:,:,2]*100<sr[:,:,0]*55)&(sr[:,:,0]*100>sr[:,:,1]*105)&(yy>=340)
+r32=sr[:,:,0].astype(np.int32);g32=sr[:,:,1].astype(np.int32);b32=sr[:,:,2].astype(np.int32)
+orange=(sr[:,:,3]>90)&(r32>150)&(g32>35)&(b32*100<r32*55)&(r32*100>g32*105)&(yy>=340)
 assert int(orange.sum())==8892
 # The original gold lettering and protected orange sibling share an edit
 # rectangle. Never mistake the orange pixels for source lettering anchors.
