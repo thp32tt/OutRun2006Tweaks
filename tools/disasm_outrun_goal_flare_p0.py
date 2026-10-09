@@ -16,8 +16,8 @@ from analyze_outrun_exe import parse_pe
 EXPECTED_SHA = "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3"
 WINDOWS = (
     ("goal-result-stage", 0x00097000, 0x00098000),
-    ("goal-record-helpers", 0x000BE000, 0x000BE1A0),
-    ("lens-objects", 0x0000C900, 0x0000D100),
+    ("goal-record-helpers", 0x000BE000, 0x000BEB20),
+    ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
     ("calc3d2d", 0x00049940, 0x00049B20),
 )
