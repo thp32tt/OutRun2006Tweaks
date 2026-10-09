@@ -88,7 +88,7 @@ jobs:
             'src/vr/d3d9/stereo_renderer_r31.cpp' = @(
               'StateBlockTracker::LifecycleHooksReady()',
               'StateBlockTracker::SetEventConsumerReady(true)',
-              'GetR28VerifiedProjection',
+              'R30SupportGetVerifiedProjection(',
               'R31 physical StateBlock fallback retired; fast-path trust remains disabled'
             )
             'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
@@ -97,16 +97,37 @@ jobs:
               'R32ResolveDirectTransport',
               'R32ResetAfterGameReset',
               'R32SetWvpBatch',
-              'R32WaitProducerFence',
-              'R32DrainPendingProducerFence',
-              'R32ProducerFencePending',
+              'R30SupportPollDirectTransportSlotProducer(',
+              'R30SupportMarkDirectTransportSlotPending(',
+              'R30SupportRetireDirectTransportSlotPublication(',
               'draw is forced to stock-WVP zero disparity',
               'R32 is a hook-free functional owner'
             )
+            # Post-R84 support owners: assertions cover both the R32/R31 callers
+            # and the lower implementation, not stale private textual-chain names.
+            'src/vr/d3d9/stereo_renderer_r30.cpp' = @(
+              'R30SupportGetVerifiedProjection(',
+              'OutRunVRRenderer::GetR28VerifiedProjection(',
+              'R30SupportPollDirectTransportSlotProducer(',
+              'target.fence->GetData(nullptr, 0, 0)',
+              'target.producerPending = false;',
+              'R30SupportMarkDirectTransportSlotPending(',
+              'R30SupportRetireDirectTransportSlotPublication('
+            )
+            'src/vr/core/r30_support_api.hpp' = @(
+              'R30SupportGetVerifiedProjection(',
+              'R30SupportPollDirectTransportSlotProducer(',
+              'R30SupportMarkDirectTransportSlotPending(',
+              'R30SupportRetireDirectTransportSlotPublication('
+            )
+            'src/vr/core/r32_review_api.hpp' = @(
+              'struct R32ReviewOwnedResult',
+              'R32ReviewRunLowerFailClosed('
+            )
             'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
-              'R31OwnedResult R33TryFastWorld',
-              'R31OwnedResult R33TryHud',
-              'R32LowerFailClosed',
+              'R32ReviewOwnedResult R33TryFastWorld',
+              'R32ReviewOwnedResult R33TryHud',
+              'R32ReviewRunLowerFailClosed(',
               'R33DrawPrimitiveR30Hook',
               'R33ResetR22Hook.stdcall<HRESULT>',
               'R33PresentR13Hook.stdcall<HRESULT>',
