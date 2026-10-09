@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C345-C1-Q099-EXACT-CLEAN-RAW-SCOPE-20261010",
+  "review_at_kst": "2026-10-10 06:17 KST",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD",
+  "queue_index": 99,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "prior_c": "C285 HOLD (same candidate exact SHA, no independent authored CLEAN proof)",
+  "canonical_source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2"
+  },
+  "authored_clean": {
+    "path": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CLEAN_PLATE.png",
+    "sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb"
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "changed": false
+  },
+  "raw_orientation": "mirror_y",
+  "readable_transform": "flip_y",
+  "format": "2048x256 BC3/DXT5 mip1",
+  "exact_header_equal": true,
+  "machine_report": {
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "dimensions": [
+      2048,
+      256
+    ],
+    "source_raw_effect_bbox": [
+      514,
+      39,
+      1614,
+      219
+    ],
+    "candidate_raw_effect_bbox": [
+      523,
+      46,
+      1135,
+      213
+    ],
+    "source_effect_alpha_pixels": 125135,
+    "candidate_effect_alpha_pixels": 73813,
+    "all_changed_rgba_pixels": 147147,
+    "changed_outside_exact_source_effect_bbox": 0,
+    "changed_alpha_outside_exact_source_effect_bbox": 0,
+    "original_source_alpha_outside_producer_claimed_box": 49,
+    "header_exact": true,
+    "source_effect_bbox_readable": [
+      514,
+      37,
+      1614,
+      217
+    ],
+    "candidate_effect_bbox_readable": [
+      523,
+      43,
+      1135,
+      210
+    ],
+    "source_alpha_1_3_pixels": 4718,
+    "candidate_alpha_1_3_pixels": 2355
+  },
+  "plate_composite_report": {
+    "clean_sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb",
+    "size": [
+      2048,
+      256
+    ],
+    "outside_full_exact_source_effect_region": {
+      "SOURCE_CLEAN": {
+        "rgba_outside": 2200,
+        "alpha_outside": 0,
+        "rgba_inside": 150606
+      },
+      "CLEAN_FINAL": {
+        "rgba_outside": 2200,
+        "alpha_outside": 0,
+        "rgba_inside": 76097
+      },
+      "SOURCE_FINAL": {
+        "rgba_outside": 0,
+        "alpha_outside": 0,
+        "rgba_inside": 147147
+      }
+    },
+    "source_effect_clean_nonzero_alpha": 0,
+    "clean_nonzero_alpha_entire_atlas": 0,
+    "result": "MECHANICAL_SCOPE_ONLY"
+  },
+  "clarified_earlier_fringe": {
+    "previous_C285_claim": "49 source alpha 1..3 pixels found outside producer bbox [514,37,1614,217] on RAW decoded comparison; suspected source glyph bbox undercoverage",
+    "correct_source_raw_effect_bbox": [
+      514,
+      39,
+      1614,
+      219
+    ],
+    "correct_source_readable_effect_bbox": [
+      514,
+      37,
+      1614,
+      217
+    ],
+    "original_producer_A119R_bbox_is_readable": true,
+    "fringe_49_was_inconsistent_coordinate_basis": true,
+    "candidate_raw_bbox": [
+      523,
+      46,
+      1135,
+      213
+    ],
+    "candidate_readable_bbox": [
+      523,
+      43,
+      1135,
+      210
+    ],
+    "bbox_margins_readable": {
+      "left": 9,
+      "right": 479,
+      "top": 6,
+      "bottom": 7
+    },
+    "confirmed_current_candidate_bbox_overflow": false
+  },
+  "exact_plate_and_composite": {
+    "plate_only": "Exact authored CLEAN loaded and independently inspected versus source at full persisted DDS pixels. Authored CLEAN alpha=0 across whole 2048x256. SOURCE->CLEAN diff outside actual source RAW effect bbox: 2200 RGBA RGB-only with source and CLEAN alpha=0, located y37:39 RAW at x514..1613. Not visible plate residue; raw hidden RGB preservation remains an approval gate discrepancy, not a confirmed visual defect.",
+    "composite_only": "CLEAN->FINAL 2200 raw RGBA outside true effect bbox (latent RGB restore at alpha=0); final SOURCE->FINAL outside 0 RGBA / 0 alpha. Korean lettering is present only in original effect bounding union. No visible rectangular background on BGW observed.",
+    "style_and_orientation": "Native RAW/FLIPY English/Korean and two rows manually inspected black/gray/white plus 75/50%; no new certain clipping, reversal or protected-art intrusion observed. Calibrated per-glyph readable slant-source family not performed; cannot PASS.",
+    "authoring_unqualified": "CLEAN exact alpha-only zeros verified; exported shader/glyph pre/post mask not independently SHA-bound. 2200 hidden RGB differences prevent claiming complete strict raw RGBA source-clean equality."
+  },
+  "regions": [
+    {
+      "id": "line1",
+      "english": "Drive against the Ghost Car",
+      "korean": "고스트 카와 달리며",
+      "findings": {
+        "slant": "HOLD calibrated top-minus-bottom stroke anchors not completed",
+        "clean_plate": "ALPHA0_EXACT_VERIFIED + SOURCE_CLEAN 2200 OUTSIDE RAW RGB-ONLY SHARED-ATLAS DELTA",
+        "style": "HOLD source English italic vs condensed Korean optical equivalence not independently calibrated",
+        "readability": "OBSERVED native + 75/50 image readable, game composed test missing",
+        "glyph_integrity": "NO_NEW_FAIL_IDENTIFIED native preview, not full pre/post font integrity approval",
+        "protected_art": "SOURCE_FINAL_RBGA_OUTSIDE0; broader consumer mask not certified",
+        "placement": "bounded by source effect union and two-line spacing visibly distinct",
+        "orientation": "SOURCE/CANDIDATE SAME MIRROR_Y/FLIPY; no reversal observed"
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_1.png",
+        "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_gray_TRIAD.png"
+      ]
+    },
+    {
+      "id": "line2",
+      "english": "and challenge for the course record!!",
+      "korean": "코스 기록에 도전하세요!",
+      "findings": {
+        "slant": "HOLD same anchor limitation",
+        "clean_plate": "alpha zero true, hidden RGB source-clean outside remains",
+        "style": "HOLD no calibrated optical weight/lean",
+        "readability": "OBSERVED native and 75/50; not in-game",
+        "glyph_integrity": "NO_NEW_FAIL_IDENTIFIED not PASS",
+        "protected_art": "SOURCE_FINAL outside0, possible partial atlas consumer effects unresolved",
+        "placement": "second row retained within source effect union, not overlapping row1",
+        "orientation": "RAW/FLIPY comparative control visually same transform"
+      },
+      "evidence": [
+        "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_2.png",
+        "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_black_TRIAD.png"
+      ]
+    }
+  ],
+  "image_manifest": [
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_black_TRIAD.png",
+      "sha256": "bad3a0fc7d250eac01569ad0bcf85b2b59079b04e01713ba195479caede7bf06",
+      "git_blob_sha": "b2c73b925a17265e72a6680cc67c4fd7bd0a9a9e"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_gray_TRIAD.png",
+      "sha256": "71a1765504a349171de1bc489280a44a6ad73d08d4b3651dc28bd6a27088a1e8",
+      "git_blob_sha": "80b33f7bd175aeaeebe47a30aa6080fbcfb97b4a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_white_TRIAD.png",
+      "sha256": "bb7a8296f2a5c8f7246eb3e7b54cf08a1b434f19355467fff82023896f49b2eb",
+      "git_blob_sha": "b480881bd6f3cadeb94175aeff33c8ff4070cb0c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_black_TRIAD.png",
+      "sha256": "47a493a80eb90d17d5c57203a8eaa755bee20a6e23f4f6b926987b451c5a031f",
+      "git_blob_sha": "4db5ad21cad7ff0ed4fbf31d77dbfb82b92cab56"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_gray_TRIAD.png",
+      "sha256": "acf60f3eac4567967ed5505f5bc0a87506ca006c0090efd1a2058afb64209a95",
+      "git_blob_sha": "cdc2cbb0441ce7f2e3cdc6364f6e80bf2504fcc6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_white_TRIAD.png",
+      "sha256": "f4f2d73f8ea2a9811eb1940d0784951a46f516e92b823f45d8067ef12f8f72c9",
+      "git_blob_sha": "7dbc650bc4e632c93e8d7174f946fcdb13eb9b29"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/PRACTICAL_75.png",
+      "sha256": "b6900dfbea585a486090cf766b62fbd66220d78f3441965e716bd70e5ed9bb1b",
+      "git_blob_sha": "a046dcda01949a456bcc874034231e29abc245f9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/PRACTICAL_50.png",
+      "sha256": "8f23ece051c76a3cd03477869cf9840c9cb3352db19e6f52a4471d33ac974b24",
+      "git_blob_sha": "07784dc7687c958d23681d2575921fad98c7905f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_1.png",
+      "sha256": "38d247c02f7af67247332f511cd69c20ca33acd8629c34bd872dfdd31bbbd82f",
+      "git_blob_sha": "3b72379ad51eaf5d398e68e1887cd9f1bce282f8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_2.png",
+      "sha256": "bf08905ae4c7fae06c0d68e62bc63c523182b2d3d163d95a635c904d2bbbcf0c",
+      "git_blob_sha": "0aa467f4d77ecf9eea10777abc1b798d62d8c9b8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/HIDDEN_RGB_ONLY_MASK.png",
+      "sha256": "aac0630759117e8da6a47469b794c061054eb9c85edb8c5006a0c5d5ed6ef118",
+      "git_blob_sha": "56d1324d625bab6c7727431ba4d2519c691d3215"
+    }
+  ],
+  "calibration": {
+    "blind_review_completed": false,
+    "reason": "Historical C285 and producer findings were available before first-look; mandatory independent known-defect blind control not performed"
+  },
+  "independent_c_decision": "HOLD_STRICT_RECHECK",
+  "c3_decision": "NOT_STARTED",
+  "final_policy_approval": "BLOCKED",
+  "pre_ingame_export": "BLOCKED",
+  "user_acceptance": "NOT_OBSERVED",
+  "runtime_validation": "UNTESTED",
+  "new_dds": 0,
+  "return_to_producer": "Do not rerender identical source/candidate for previous 49 source-alpha fringe; it was RAW/readable coordinate mismatch. Preserve existing DDS. Document authored CLEAN hidden RGB-only two RAW rows in alpha0, and source-family/per-line slant calibration in independent C/C3 before any new-policy PASS. User in-game retest is separate.",
+  "execution_backend": "GitHub connector SSOT with low-impact N100 MCP Pillow exact DDS decode fallback, no game execution, no Git worktree, no VR/FFB/DX11/DXVK, no new controller."
+}

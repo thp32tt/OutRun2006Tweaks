@@ -1,0 +1,41 @@
+{
+  "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+  "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "source_raw_effect_bbox": [
+    514,
+    39,
+    1614,
+    219
+  ],
+  "candidate_raw_effect_bbox": [
+    523,
+    46,
+    1135,
+    213
+  ],
+  "source_effect_alpha_pixels": 125135,
+  "candidate_effect_alpha_pixels": 73813,
+  "all_changed_rgba_pixels": 147147,
+  "changed_outside_exact_source_effect_bbox": 0,
+  "changed_alpha_outside_exact_source_effect_bbox": 0,
+  "original_source_alpha_outside_producer_claimed_box": 49,
+  "header_exact": true,
+  "source_effect_bbox_readable": [
+    514,
+    37,
+    1614,
+    217
+  ],
+  "candidate_effect_bbox_readable": [
+    523,
+    43,
+    1135,
+    210
+  ],
+  "source_alpha_1_3_pixels": 4718,
+  "candidate_alpha_1_3_pixels": 2355
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 06:04 KST",
+  "updated_at_kst": "2026-10-10 06:22 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9989,5 +9989,35 @@
     "approval": "NOT_APPROVED",
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C344-C1-Q161-A201-EXACT-PERSISTED-GLYPH-REWORK/C344_Q161_CONTROLLER_C1_REWORK.json"
+  },
+  "c345_c1_q099_current_plate": {
+    "run_key": "OUTRUN-KOR-C345-C1-Q099-EXACT-CLEAN-RAW-SCOPE-20261010",
+    "role": "C1",
+    "index": 99,
+    "asset": "4F68708E_512x64.dds",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "clean_sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb",
+    "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "qa_report": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/C345_Q099_C1_CONTROLLER_HOLD.json",
+    "evidence_images": 11,
+    "source_effect_bbox_raw": [
+      514,
+      39,
+      1614,
+      219
+    ],
+    "source_effect_bbox_readable": [
+      514,
+      37,
+      1614,
+      217
+    ],
+    "source_to_final_rgba_outside": 0,
+    "source_to_clean_hidden_rgb_alpha0_outside": 2200,
+    "new_dds": 0,
+    "c3": "BLOCKED",
+    "approval": "BLOCKED",
+    "runtime_validation": "UNTESTED"
   }
 }

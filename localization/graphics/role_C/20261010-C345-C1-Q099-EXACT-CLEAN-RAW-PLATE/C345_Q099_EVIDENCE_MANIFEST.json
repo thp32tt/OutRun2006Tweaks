@@ -1,0 +1,66 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 99,
+  "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+  "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+  "clean_sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb",
+  "report": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/C345_Q099_C1_CONTROLLER_HOLD.json",
+  "image_manifest": [
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_black_TRIAD.png",
+      "sha256": "bad3a0fc7d250eac01569ad0bcf85b2b59079b04e01713ba195479caede7bf06",
+      "git_blob_sha": "b2c73b925a17265e72a6680cc67c4fd7bd0a9a9e"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_gray_TRIAD.png",
+      "sha256": "71a1765504a349171de1bc489280a44a6ad73d08d4b3651dc28bd6a27088a1e8",
+      "git_blob_sha": "80b33f7bd175aeaeebe47a30aa6080fbcfb97b4a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/RAW_white_TRIAD.png",
+      "sha256": "bb7a8296f2a5c8f7246eb3e7b54cf08a1b434f19355467fff82023896f49b2eb",
+      "git_blob_sha": "b480881bd6f3cadeb94175aeff33c8ff4070cb0c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_black_TRIAD.png",
+      "sha256": "47a493a80eb90d17d5c57203a8eaa755bee20a6e23f4f6b926987b451c5a031f",
+      "git_blob_sha": "4db5ad21cad7ff0ed4fbf31d77dbfb82b92cab56"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_gray_TRIAD.png",
+      "sha256": "acf60f3eac4567967ed5505f5bc0a87506ca006c0090efd1a2058afb64209a95",
+      "git_blob_sha": "cdc2cbb0441ce7f2e3cdc6364f6e80bf2504fcc6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/FLIPY_white_TRIAD.png",
+      "sha256": "f4f2d73f8ea2a9811eb1940d0784951a46f516e92b823f45d8067ef12f8f72c9",
+      "git_blob_sha": "7dbc650bc4e632c93e8d7174f946fcdb13eb9b29"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/PRACTICAL_75.png",
+      "sha256": "b6900dfbea585a486090cf766b62fbd66220d78f3441965e716bd70e5ed9bb1b",
+      "git_blob_sha": "a046dcda01949a456bcc874034231e29abc245f9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/PRACTICAL_50.png",
+      "sha256": "8f23ece051c76a3cd03477869cf9840c9cb3352db19e6f52a4471d33ac974b24",
+      "git_blob_sha": "07784dc7687c958d23681d2575921fad98c7905f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_1.png",
+      "sha256": "38d247c02f7af67247332f511cd69c20ca33acd8629c34bd872dfdd31bbbd82f",
+      "git_blob_sha": "3b72379ad51eaf5d398e68e1887cd9f1bce282f8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/LINE_2.png",
+      "sha256": "bf08905ae4c7fae06c0d68e62bc63c523182b2d3d163d95a635c904d2bbbcf0c",
+      "git_blob_sha": "0aa467f4d77ecf9eea10777abc1b798d62d8c9b8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/HIDDEN_RGB_ONLY_MASK.png",
+      "sha256": "aac0630759117e8da6a47469b794c061054eb9c85edb8c5006a0c5d5ed6ef118",
+      "git_blob_sha": "56d1324d625bab6c7727431ba4d2519c691d3215"
+    }
+  ],
+  "not_an_approval": true
+}

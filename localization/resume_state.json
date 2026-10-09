@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C345 C1 q099 original/CLEAN/current SHA-bound: RAW original effect [514,39,1614,219], readable [514,37,1614,217] resolve C285 49 alpha-fringe coordinate confusion; CLEAN whole alpha0, SOURCE->CLEAN outside 2200 RGB-only both alpha0; SOURCE->FINAL outside RGBA/alpha0. 11 new PNG, HOLD calibration/C3/user-game. RUN_KEY=OUTRUN-KOR-C345-C1-Q099-EXACT-CLEAN-RAW-SCOPE-20261010",
     "C344 C2 2026-10-10 06:04 KST q154 independent B60 full exact 4096x1024 authored CLEAN SHA a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380 confirmed with source SHA15a10e6b and official B298 saved SHA c4d6c151. All 8 source-effect boxes CLEAN alpha0, full atlas SRC/CLEAN/FINAL 3 pairwise outside RGBA/alpha0, 18 native 100/75/50, RAW, PLATE/COMPOSITE PNG of 3 gray rows direct inspected. Optical source-family calibration and distinct C3 unqualified; C2 HOLD not PASS, no DDS/approval/game. Evidence localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_CONTROLLER_C2_HOLD.json. RUN_KEY=OUTRUN-KOR-C344-C2-Q154-FULL-CLEAN-EXACT-NATIVE-20261010-0600",
     "B343 B even P0 2026-10-10 05:41 KST: C342 confirmed BEST TIME orange-English residual under Korean 최고 기록 materially reduced by NEW native RGBA32 trial DDS 8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6, source face 29582px bounded, 19243 exact source-identical visible pixels cleared, 118 source-identical visible pixels remain unclassified. Source/current/trial native gray100/black50/RAWgray75 direct producer visual huge orange overlap GONE but tiny dark/navy flecks still detectable; KOREAN changed0, outside detection region0; saved DDS decode/mirror header PASS. Trial-only; official current d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 unchanged, C2 REWORK and C3/APPROVAL/IGR044 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_CONTROLLER_VISUAL_QA.json RUN_KEY=OUTRUN-KOR-B343-Q060-C342-ENGLISH-RESIDUE-NATIVE-TRIAL-20261010-0535.",
     "C343 C2 2026-10-10 05:31 KST q176 75C3586A four original red display names independently compared to persisted current Korean exact 2048² SHA source 8ba40915.../current 494d42c0..., FLIPY native+50 and RAW per four; new edge-run visual measures source heavier solid red than Korean (median horizontal run source 32/32/32/30 vs Korean 25/25/24/24; nonsemantic proxy only). Current C2 VISUAL REWORK_REQUIRED SOURCE_FAMILY_STROKE_UNDERWEIGHT, unlike prior C309 unresolved HOLD. New 16 lossless PNG + complete per-region C2 observation QA at localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_Q176_CONTROLLER_C2_REWORK.json; unchanged DDS, no C/C3 PASS nor APPROVAL, user actual game UNTESTED; perform source-derived red family with matched optical thickness and protected source boxes; RUN_KEY=OUTRUN-KOR-C343-C2-Q176-RED-BLOCK-STROKE-WEIGHT-20261010-0530",
@@ -6862,7 +6863,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 05:51 KST",
+  "updated_at_kst": "2026-10-10 06:22 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14209,5 +14210,33 @@
     "approval": "NOT_APPROVED",
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C344-C1-Q161-A201-EXACT-PERSISTED-GLYPH-REWORK/C344_Q161_CONTROLLER_C1_REWORK.json"
+  },
+  "c345_c1_q099_current_plate": {
+    "run_key": "OUTRUN-KOR-C345-C1-Q099-EXACT-CLEAN-RAW-SCOPE-20261010",
+    "role": "C1",
+    "index": 99,
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "clean_sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb",
+    "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "source_raw_bbox": [
+      514,
+      39,
+      1614,
+      219
+    ],
+    "source_readable_bbox": [
+      514,
+      37,
+      1614,
+      217
+    ],
+    "source_final_rgba_outside": 0,
+    "source_clean_hidden_rgb_only_outside": 2200,
+    "qa_report": "localization/graphics/role_C/20261010-C345-C1-Q099-EXACT-CLEAN-RAW-PLATE/C345_Q099_C1_CONTROLLER_HOLD.json",
+    "c3": "BLOCKED",
+    "approval": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "new_dds": 0
   }
 }

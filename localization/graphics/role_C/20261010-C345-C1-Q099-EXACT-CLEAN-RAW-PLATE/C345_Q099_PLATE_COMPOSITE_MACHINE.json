@@ -1,0 +1,27 @@
+{
+  "clean_sha256": "6a94090cf39eeb37a8da7db9166f091308d76aed4e9a124be2544b78b94aacfb",
+  "size": [
+    2048,
+    256
+  ],
+  "outside_full_exact_source_effect_region": {
+    "SOURCE_CLEAN": {
+      "rgba_outside": 2200,
+      "alpha_outside": 0,
+      "rgba_inside": 150606
+    },
+    "CLEAN_FINAL": {
+      "rgba_outside": 2200,
+      "alpha_outside": 0,
+      "rgba_inside": 76097
+    },
+    "SOURCE_FINAL": {
+      "rgba_outside": 0,
+      "alpha_outside": 0,
+      "rgba_inside": 147147
+    }
+  },
+  "source_effect_clean_nonzero_alpha": 0,
+  "clean_nonzero_alpha_entire_atlas": 0,
+  "result": "MECHANICAL_SCOPE_ONLY"
+}
