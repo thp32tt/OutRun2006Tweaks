@@ -44,6 +44,8 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
             XInputSetState(Settings::VibrationControllerId, &zero);
         }
         wheelOwnedLastCall = true;
+        // Force a fresh disabled-mode stop if wheel ownership is later lost.
+        rumbleDisabledLastCall = false;
         return;
     }
     wheelOwnedLastCall = false;
