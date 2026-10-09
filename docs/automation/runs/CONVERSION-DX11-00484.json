@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00484",
+  "production_id": "CONVERSION-DX11-00484",
+  "event_id": "CONVERSION-DX11-00484-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00484",
+  "lease_epoch": 1,
+  "work_key": "DX11:R182:DORMANT_NATIVE_FAN_DRAWINDEXED_LIVE_IA_SHADER_OM_GUARD",
+  "conflict_keys": [
+    "src/vr/d3d11/triangle_fan_index_buffer.hpp:R182",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp:R182",
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp:R182",
+    "tools/test_dx11_dormant_fan_draw_r182.py",
+    ".github/workflows/backend-conversion-gate.yml:R182"
+  ],
+  "base_sha": "010433f8f70e438fffea4b9824ca37da1784401f",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "RUNNING",
+  "checkpoint": "C2_IMPLEMENT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R182: fail-closed native D3D11 indexed triangle-fan dispatch helper and WARP regression, isolated from D3D9 gameplay hook. Original R181 WARP proof preserved.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated HEAD 010433f8, AGENTS/index/controller contract, 00483 R181 and 00477 R175 blocker read. No existing 00484 record/checkpoint.",
+    "C1_REVIEW": "PASS: R181 issued DrawIndexed only in WARP probe; production NativeTriangleFanIndexBuffer exposes bind but no isolated live-state guarded dispatch; 00477 owns separate shader probe and pipeline translator.",
+    "C2_IMPLEMENT": "IN_PROGRESS",
+    "C3_VALIDATE": "PENDING",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD release, gameplay native activation remains dormant",
+    "C6_STATE": "PENDING"
+  },
+  "resume_cursor": "IMPLEMENT_R182_FAN_GUARDED_NATIVE_DRAW_DISPATCH",
+  "next_action": "Implement guarded native context live IA/VB/VS/PS/OM DrawIndexed and positive/negative WARP probe; one static contract check; commit material result and exact-SHA Gate; preserve R175 inherited blocker.",
+  "last_real_activity_at": "2026-10-10T00:00:00+09:00"
+}
