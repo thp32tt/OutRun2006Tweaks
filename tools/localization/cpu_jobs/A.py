@@ -99,7 +99,7 @@ try:
      # Native vector strokes, published masks and isolated plate before lettering.
      mask=contour()
      if mask.getbbox() is None:raise RuntimeError("vector empty")
-     gx,gy=x0+12,y0+1
+     gx,gy=x0+12,y0-4
      if gx+mask.width>=x1-4 or gy+mask.height>=y1+2:
       raise RuntimeError("vector exceeds source sprite")
      m=np.asarray(mask).astype(np.uint8)
@@ -185,5 +185,5 @@ except Exception as exc:
         "traceback":traceback.format_exc(),
         "new_promoted_dds":0,"new_trial_dds":0,
         "runtime_validation":"UNTESTED","candidate_preserved":True}
- (DIR/"A209_EXECUTION_FAIL.json").write_text(json.dumps(issue,ensure_ascii=False,indent=2)+"\\n",encoding="utf8")
+ (DIR/"A209_EXECUTION_FAIL.json").write_text(json.dumps(issue,ensure_ascii=False,indent=2)+chr(10),encoding="utf8")
  print("A209_WORKER_CAPTURED_FAILURE",issue["exception"],issue["message"],flush=True)
