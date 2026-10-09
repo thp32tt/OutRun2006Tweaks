@@ -19,24 +19,24 @@
     "cmake.toml:R186"
   ],
   "base_sha": "ccee9300630b4b52bea346f60b9dc7c5d63f8704",
-  "result_sha": "PENDING_REPAIR_MATERIAL_SHA",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "a31a915eb9630177f94facfdda7f6ca4174a70d9",
+  "material_result_sha": "a31a915eb9630177f94facfdda7f6ca4174a70d9",
+  "validation_bearing_result_sha": "a31a915eb9630177f94facfdda7f6ca4174a70d9",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
-  "summary": "R186 new native indexed triangle-list ready gate attests live same-device DEFAULT VB/IB, index/base bounds, IA topology/layout, VS/PS and RTV; actual DrawIndexed and GPU-pixel readback remain in isolated WARP probe. 3 mutants and negative lifetime/state cases. R175 upstream fail remains separately owned.",
+  "summary": "R186 real native indexed DrawIndexed readiness now checks owned live VB/IB range/snapshot, pipeline object device and IA topology; isolated WARP GPU indexed Draw readback PASSED. Mandatory exact-SHA overall Gate FAILED only in unchanged R175 TEXCOORD6 owned by 00477; no gameplay activation/Quest3 claim.",
   "pipeline": {
     "C0_RECOVER": "PASS: branch base ccee9300630b4b52bea346f60b9dc7c5d63f8704; 00488 run not found; 00487 R185 material ff1ef3f3 scoped PASS/full R175 fail; no task checkpoint and no conflicting active work_key found",
     "C1_REVIEW": "PASS: five lenses ownership, draw extent/topology, shader/RT device identities, activation isolation, WARP GPU/CI priority; change distinct from R175/R183/R184/R185",
-    "C2_IMPLEMENT": "PASS: new production readiness helper, WARP GPU indexed Draw proof, static mutants and CMake/CI wiring; repair authoritative cmkr manifest (first candidate used generated CMakeLists only).",
-    "C3_VALIDATE": "First exact-SHA Gate 37961213301 on a02a38dd: validate SUCCESS, smoke FAILED at R186 manifest contract BEFORE WARP; cmkr regenerates CMakeLists from cmake.toml; repair adds authoritative cmkr target and strengthened contract; revalidation PENDING.",
-    "C4_COMMIT": "Initial material a02a38dd4b984be9958fd638b17bd106b534501c; repair material SHA PENDING.",
-    "C5_PACKAGE": "NOT_REQUIRED: no game draw activation/Quest 3 test",
-    "C6_STATE": "PENDING CI evidence"
+    "C2_IMPLEMENT": "PASS: native indexed triangle-list readiness header with exact live VB/IB ownership, bounds, IA topology, shader/layout/RTV same-device gates; isolated WARP DrawIndexed framebuffer readback; authoritative cmkr target; static 3 mutants.",
+    "C3_VALIDATE": "SCOPED R186 PASS/FULL GATE FAIL: exact material a31a915eb9630177f94facfdda7f6ca4174a70d9 Backend Conversion Gate 37962414536 validate 113928309957 SUCCESS, smoke 113930567802 failure ONLY on existing upstream owner 00477 R175 TEXCOORD6 varying probe (actual BGRA 128,0,16,255 vs expected 224,128,32,255). R186 static 3 mutants PASS, cmkr build target PASS, WARP actual indexed Draw green center/black corner and fail-closed states PASS. First candidate a02a38dd Gate 37961213301 failed R186 static due cmkr manifest omission, repaired at current material.",
+    "C4_COMMIT": "PASS: initial material a02a38dd4b984be9958fd638b17bd106b534501c then repaired material a31a915eb9630177f94facfdda7f6ca4174a70d9 [AUTO:CONVERSION-DX11-00488], exact remote HEAD/Actions. C6 checkpoint bookkeeping to follow; preserve material identity.",
+    "C5_PACKAGE": "NOT_REQUIRED: no native game Draw activation; no HMD/Quest3/VDXR runtime promotion",
+    "C6_STATE": "SEALED scoped native R186 implementation/WARP pass; whole exact-SHA Gate FAIL inherited R175; RUNTIME_VALIDATION=UNTESTED, score +0, next disjoint DX11 item."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_draw_submit.hpp",
@@ -48,10 +48,10 @@
     "cmake.toml"
   ],
   "blockers": [
-    "pre-existing R175 TEXCOORD6 GPU color mismatch under task 00477",
-    "Quest3/VDXR runtime untested"
+    "R175_GENERIC_VARYING_MISMATCH owned by CONVERSION-DX11-00477 in tools/dx11_constant_buffer_probe.cpp (unchanged)",
+    "Quest 3/VDXR real game test not performed; native game Draw activation stays blocked"
   ],
-  "next_action": "Verify new exact-SHA Gate, R186 WARP compile/readback. Do not promote gameplay Draw. Runtime remains UNTESTED.",
+  "next_action": "Do not repeat verified R186 or retry unchanged 00477 R175 under work_key R186. Keep R186 material a31a915eb9630177f94facfdda7f6ca4174a70d9 for next disjoint DX11 implementation. Owner 00477 must independently fix R175 then rerun exact-SHA Gate; no activation without Quest3/VDXR.",
   "score_change": 0,
   "previous_candidate": {
     "sha": "a02a38dd4b984be9958fd638b17bd106b534501c",
@@ -62,5 +62,44 @@
     "smoke_result": "failure",
     "failed_step": "Verify R186 native indexed Draw ownership",
     "root_cause": "cmkr regenerated CMakeLists.txt from cmake.toml, missing authoritative R186 target"
+  },
+  "scoped_automation_validation": "PASS_R186_STATIC_3_NEGATIVE_MUTANTS_CMKRTARGET_AND_COMPILED_WARP_GPU_DRAWINDEXED_PIXELS",
+  "last_real_activity_at": "2026-10-10T02:03:55+09:00",
+  "score_reason": "New R186 material code plus scoped compiled WARP GPU evidence pass, but required full exact-SHA Backend Conversion Gate blocked by preexisting 00477-owned R175. Full validation is FAIL, score not incremented. Latest SSOT 1282 retained.",
+  "resume_cursor": "BLOCKED_UPSTREAM_R175_AFTER_R186_SCOPED_VERIFIED",
+  "validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37962414536,
+    "gate_head_sha": "a31a915eb9630177f94facfdda7f6ca4174a70d9",
+    "gate_event": "push",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113928309957,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113930567802,
+    "readiness_smoke_conclusion": "failure",
+    "r186_static_contract": "PASS",
+    "r186_negative_mutants": 3,
+    "r186_cmkr_manifest": "PASS",
+    "r186_warp_probe_build": "PASS",
+    "r186_warp_gpu_drawindexed_pixels": "PASS",
+    "r186_unbound_foreign_stale_pipeline_controls": "PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "artifact_id": 11631567849,
+    "artifact_digest": "sha256:25523250ab176125be1bdab7a942d7ba99abb32a28e1bf5d0b0e3d660e78ca76"
   }
 }
