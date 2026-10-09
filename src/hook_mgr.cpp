@@ -38,6 +38,8 @@ void HookManager::ApplyHooks()
     {
         hook->declare_settings();
 
+        // A validation failure is a failed installation, not an idle hook.
+        // Reset stale async state before attempting a fresh installation.
         hook->is_active_.store(false, std::memory_order_release);
         hook->has_error_.store(false, std::memory_order_release);
 
@@ -49,17 +51,20 @@ void HookManager::ApplyHooks()
             continue;
         }
 
-        if (hook->validate())
+        if (!hook->validate())
         {
-            const bool active = hook->apply();
-            hook->publish_status(active);
-
-            const auto desc = hook->description();
+            hook->publish_status(false);
             if (!desc.empty())
-            {
-                spdlog::log(active ? spdlog::level::info : spdlog::level::err,
-                    "{}: apply {}", desc, active ? "successful" : "failed");
-            }
+                spdlog::error("{}: validation failed; hook not installed", desc);
+            continue;
+        }
+
+        const bool active = hook->apply();
+        hook->publish_status(active);
+        if (!desc.empty())
+        {
+            spdlog::log(active ? spdlog::level::info : spdlog::level::err,
+                "{}: apply {}", desc, active ? "successful" : "failed");
         }
     }
 }
