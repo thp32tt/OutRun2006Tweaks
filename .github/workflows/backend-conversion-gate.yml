@@ -224,6 +224,17 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 shader linkage probe failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 native target resize R177 WARP probe
+        run: cmake --build build-auto --config Release --target dx11_native_target_resize_probe
+
+      - name: Run DX11 native target resize R177 WARP probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_native_target_resize_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 native target resize R177 probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 native target resize R177 WARP probe failed with exit code $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 

@@ -963,6 +963,26 @@ target_link_libraries(dx11_constant_buffer_probe PUBLIC
     dxguid.lib
 )
 
+
+# Target: dx11_native_target_resize_probe (R177 live WARP resource lifetime)
+set(dx11_native_target_resize_probe_SOURCES
+    "tools/dx11_native_target_resize_probe.cpp"
+    "src/vr/d3d11/native_backend.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+)
+add_executable(dx11_native_target_resize_probe)
+target_sources(dx11_native_target_resize_probe PRIVATE ${dx11_native_target_resize_probe_SOURCES})
+target_compile_features(dx11_native_target_resize_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_native_target_resize_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_native_target_resize_probe PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_native_target_resize_probe PUBLIC
+    d3dcompiler.lib d3d11.lib dxgi.lib dxguid.lib
+)
+
 # Target: dx11_native_transport_probe
 set(dx11_native_transport_probe_SOURCES
     "tools/dx11_native_transport_probe.cpp"

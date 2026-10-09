@@ -15282,6 +15282,10 @@ bool NativeBackend::resize(std::uint32_t width, std::uint32_t height) noexcept {
     // R177: failed allocation must not destroy the last usable native target.
     // The same-device RTV/SRV trio is committed only after all three succeed.
     if (!ready() || width == 0 || height == 0) return false;
+    // R177 retry: a same-size notification must not orphan a currently
+    // bound RTV/SRV or churn the resource identities for this device epoch.
+    if (config_.width == width && config_.height == height)
+        return true;
     if (!create_color_target(width, height, config_.color_format))
         return false;
     config_.width = width;

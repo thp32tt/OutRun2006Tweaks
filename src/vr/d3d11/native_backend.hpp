@@ -4775,6 +4775,9 @@ validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
 
 
 class NativeBackend final {
+    // White-box WARP fixture validates transactional COM ownership without
+    // enabling a native gameplay Draw or an extra production initialization API.
+    friend struct NativeBackendResizeProbeAccess;
 public:
     NativeBackend() = default;
     ~NativeBackend() = default;

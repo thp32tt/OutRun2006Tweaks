@@ -33,6 +33,9 @@ def check(source: str) -> None:
     )
     for token in expected_resize:
         assert token in resize, "resize lost fail-closed boundary: " + token
+    assert "if (config_.width == width && config_.height == height)" in resize, (
+        "same-size resize must not reallocate or churn live target objects")
+    assert resize.index("config_.width == width") < resize.index("create_color_target")
     assert resize.index("create_color_target") < resize.index("config_.width")
     for forbidden in ("color_srv_.Reset()", "color_rtv_.Reset()",
                       "color_texture_.Reset()"):
