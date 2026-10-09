@@ -117,7 +117,39 @@ int main() {
 
     require(ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
             "owned indexed IA + pipeline readiness");
+    // R196: a retained geometry shader can silently move all original
+    // vertices beyond the clip volume, despite valid owned IA/VS/PS/RTV.
+    constexpr char geometry[] =
+        "struct V {float4 p:SV_Position;};"
+        "[maxvertexcount(3)]"
+        "void gs(triangle V tri[3],inout TriangleStream<V> stream){"
+        "for(uint i=0;i<3;++i){V v=tri[i];v.p.xy=float2(2,2);stream.Append(v);}}";
+    ComPtr<ID3DBlob> gsCode;
+    require(SUCCEEDED(D3DCompile(geometry,sizeof(geometry)-1,nullptr,
+        nullptr,nullptr,"gs","gs_4_0",0,0,gsCode.GetAddressOf(),nullptr)),
+        "compile interfering GS");
+    ComPtr<ID3D11GeometryShader> gs;
+    require(SUCCEEDED(device->CreateGeometryShader(gsCode->GetBufferPointer(),
+        gsCode->GetBufferSize(),nullptr,gs.GetAddressOf())), "create interfering GS");
     const float clear[] = {0,0,0,1};
+    context->GSSetShader(gs.Get(),nullptr,0);
+    require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
+            "reject unexpected live GS");
+    context->ClearRenderTargetView(rtv.Get(),clear);
+    context->DrawIndexed(3,0,0);
+    context->CopyResource(readback.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE hiddenMap{};
+    require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,0,&hiddenMap))
+        && hiddenMap.pData, "map GS-suppressed indexed pixel");
+    const auto* hidden=static_cast<const unsigned char*>(hiddenMap.pData)
+        +16*hiddenMap.RowPitch+16*4;
+    const bool suppressed=hidden[0]==0 && hidden[1]==0 &&
+        hidden[2]==0 && hidden[3]==255;
+    context->Unmap(readback.Get(),0);
+    require(suppressed, "R196 GS must change actual WARP DrawIndexed pixels");
+    context->GSSetShader(nullptr,nullptr,0);
+    require(ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
+            "restore pure VS/PS indexed pipeline");
     context->ClearRenderTargetView(rtv.Get(),clear);
     // Only tools/ owns actual DrawIndexed dispatch; production helper has none.
     context->DrawIndexed(3,0,0);

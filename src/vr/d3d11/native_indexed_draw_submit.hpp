@@ -28,11 +28,21 @@ namespace outrun::vr::dx11 {
     Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+    // R196: D3D9 FVF triangle-list translation has no GS/HS/DS stage.
+    // Unexpected retained shader stages can rewrite/discard geometry even
+    // when VS/PS and owned IA objects match. Fail closed before any Draw.
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader> gs;
+    Microsoft::WRL::ComPtr<ID3D11HullShader> hs;
+    Microsoft::WRL::ComPtr<ID3D11DomainShader> ds;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
     context->IAGetInputLayout(layout.GetAddressOf());
     context->VSGetShader(vs.GetAddressOf(), nullptr, nullptr);
     context->PSGetShader(ps.GetAddressOf(), nullptr, nullptr);
+    context->GSGetShader(gs.GetAddressOf(), nullptr, nullptr);
+    context->HSGetShader(hs.GetAddressOf(), nullptr, nullptr);
+    context->DSGetShader(ds.GetAddressOf(), nullptr, nullptr);
     context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    if (gs || hs || ds) return false;
     if (!layout || !vs || !ps || !rtv)
         return false;
 

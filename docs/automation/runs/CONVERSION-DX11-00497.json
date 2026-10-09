@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00497",
+  "production_id": "CONVERSION-DX11-00497",
+  "event_id": "CONVERSION-DX11-00497-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00497",
+  "lease_epoch": 1,
+  "work_key": "DX11:R196:INDEXED_UNEXPECTED_SHADER_STAGE_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp:R196",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R196",
+    "tools/test_dx11_shader_stage_r196.py:R196",
+    ".github/workflows/backend-conversion-gate.yml:R196"
+  ],
+  "base_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "WAIT_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R196 strictly fails closed when native indexed VS/PS-only triangle pipeline retains D3D11 GS/HS/DS; real WARP triangle GS moves indexed pixels outside target and source contract includes negative mutations. No game draw activation.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 00496 R195 material; predecessor Gate 37985048007 pending; 00497 record absent; external checkpoint absent",
+    "C1_REVIEW": "GS/HS/DS can change native DrawIndexed without invalidating IA VS/PS RTV ownership; R195 and R175 isolated",
+    "C2_IMPLEMENT": "PASS actual C++ native Draw readiness fence + WARP GPU interfering-GS test + source guard",
+    "C3_VALIDATE": "PENDING exact SHA Backend Conversion Gate; no local Windows GPU available",
+    "C4_COMMIT": "Pending validation-bearing material SHA registration",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING canonical Gate result"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_shader_stage_r196.py",
+    "docs/automation/runs/CONVERSION-DX11-00497.json"
+  ],
+  "evidence": {
+    "r195_previous_sha": "e03378a804faa43ceca9566956e06191f8d03507",
+    "r195_predecessor_gate_id": 37985048007,
+    "expected_r196_scoped_static": "PENDING",
+    "expected_r196_warp": "PENDING",
+    "known_unrelated_r175": "CONVERSION-DX11-00477"
+  },
+  "resume_cursor": "WAIT_R196_EXACT_SHA_GATE",
+  "next_action": "After predecessor exact-SHA Gate exits, fast-forward CAS material commit, verify exact SHA Backend Conversion Gate, then persist C6 without canceling pending validation.",
+  "score_change": 0
+}

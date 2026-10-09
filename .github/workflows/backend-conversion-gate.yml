@@ -315,6 +315,11 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R183 WARP probe failed with code $LASTEXITCODE" }
 
+      # R196: disallow retained GS/HS/DS that mutate a native FVF triangle.
+      - name: Verify R196 native indexed shader stage fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_shader_stage_r196.py
+
       # R186: independent indexed-native device/pipeline/IA readiness and real WARP pixels.
       - name: Verify R186 native indexed Draw ownership
         if: github.ref_name == 'vr-dx11-native-r71'
