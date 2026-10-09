@@ -365,6 +365,148 @@ float4 main() : SV_Target {
         warp.context->DrawIndexed(3u, 0u, 0);
         verify(true); // Deterministic interior PS coverage on WARP.
 
+        // R170: unlike R169's synthetic position shader/solid PS, this uses
+        // the real D3D9 FVF descriptor translator and both generated fixed-
+        // function HLSL prototypes. A translated b0 WVP deliberately moves
+        // the same known triangle out of clip space (negative control);
+        // restoring the exact identity WVP must shade its center white.
+        // No real game Draw/DrawIndexed dispatch is enabled by this probe.
+        constexpr DWORD r170Fvf = D3DFVF_XYZ;
+        constexpr UINT r170Stride = 3u * sizeof(float);
+        const auto r170Layout = translate_vertex_input_layout(
+            nullptr, 0u, r170Fvf, r170Stride);
+        const auto r170VsPrototype =
+            generate_fixed_function_vertex_shader_prototype(
+                r170Fvf, r170Stride);
+        std::array<FixedFunctionStageState, 8> r170Stages{};
+        r170Stages[0].colorOp = D3DTOP_SELECTARG1;
+        r170Stages[0].colorArg1 = D3DTA_DIFFUSE;
+        r170Stages[0].alphaOp = D3DTOP_SELECTARG1;
+        r170Stages[0].alphaArg1 = D3DTA_DIFFUSE;
+        std::array<D3DRESOURCETYPE, 8> r170TextureTypes{};
+        r170TextureTypes.fill(D3DRTYPE_TEXTURE);
+        const auto r170PsPrototype =
+            generate_fixed_function_pixel_shader_prototype(
+                r170Stages, true, 0u, 0u, r170TextureTypes);
+        require(r170Layout.exact && r170Layout.fvfPath &&
+                    r170Layout.elementCount == 1u &&
+                    r170VsPrototype.generated() &&
+                    r170PsPrototype.generated(),
+                "R170 real FVF / fixed-function VS+PS generation");
+        ID3DBlob* r170VsCode =
+            compile_vertex_shader(r170VsPrototype.source);
+        ID3DBlob* r170PsCode = nullptr;
+        ID3DBlob* r170Diagnostics = nullptr;
+        const HRESULT r170Compile = D3DCompile(
+            r170PsPrototype.source.data(), r170PsPrototype.source.size(),
+            "R170TranslatedFixedFunctionPixel", nullptr, nullptr, "main",
+            "ps_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0u, &r170PsCode, &r170Diagnostics);
+        if (r170Diagnostics)
+            r170Diagnostics->Release();
+        require(SUCCEEDED(r170Compile) && r170PsCode != nullptr,
+                "R170 generated fixed-function PS compiles");
+        ID3D11VertexShader* r170Vs = nullptr;
+        ID3D11PixelShader* r170Ps = nullptr;
+        ID3D11InputLayout* r170Ia = nullptr;
+        require(SUCCEEDED(warp.device->CreateVertexShader(
+                    r170VsCode->GetBufferPointer(),
+                    r170VsCode->GetBufferSize(), nullptr, &r170Vs)) &&
+                    r170Vs != nullptr &&
+                SUCCEEDED(warp.device->CreatePixelShader(
+                    r170PsCode->GetBufferPointer(),
+                    r170PsCode->GetBufferSize(), nullptr, &r170Ps)) &&
+                    r170Ps != nullptr &&
+                SUCCEEDED(warp.device->CreateInputLayout(
+                    r170Layout.elements.data(), r170Layout.elementCount,
+                    r170VsCode->GetBufferPointer(),
+                    r170VsCode->GetBufferSize(), &r170Ia)) &&
+                    r170Ia != nullptr,
+                "R170 translated fixed-function IA/VS/PS objects");
+        struct R170Vertex { float x, y, z; };
+        const R170Vertex r170Vertices[3] = {
+            {-0.75f, -0.75f, 0.5f},
+            { 0.75f, -0.75f, 0.5f},
+            { 0.00f,  0.75f, 0.5f}};
+        D3D11_BUFFER_DESC r170VbDesc{};
+        r170VbDesc.ByteWidth = sizeof(r170Vertices);
+        r170VbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+        r170VbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA r170VbData{};
+        r170VbData.pSysMem = r170Vertices;
+        ID3D11Buffer* r170Vb = nullptr;
+        require(SUCCEEDED(warp.device->CreateBuffer(
+                    &r170VbDesc, &r170VbData, &r170Vb)) && r170Vb != nullptr,
+                "R170 exact XYZ source-stride vertex buffer");
+        ID3D11Buffer* r170Wvp =
+            create_constant_buffer(warp.device, 16u * sizeof(float));
+        D3DMATRIX r170Identity{};
+        r170Identity._11 = r170Identity._22 =
+            r170Identity._33 = r170Identity._44 = 1.0f;
+        D3DMATRIX r170Clipped = r170Identity;
+        r170Clipped._41 = 4.0f;
+        const auto r170Offscreen =
+            generate_fixed_function_transform_constants(
+                r170Clipped, r170Identity, r170Identity, true);
+        const auto r170Onscreen =
+            generate_fixed_function_transform_constants(
+                r170Identity, r170Identity, r170Identity, true);
+        require(r170Offscreen.exact() && r170Onscreen.exact() &&
+                    r170Offscreen.payloadHash != r170Onscreen.payloadHash,
+                "R170 WVP identity and offscreen fixture identities differ");
+        warp.context->IASetInputLayout(r170Ia);
+        warp.context->IASetVertexBuffers(
+            0u, 1u, &r170Vb, &r170Stride, &offset);
+        warp.context->VSSetShader(r170Vs, nullptr, 0u);
+        warp.context->PSSetShader(r170Ps, nullptr, 0u);
+        warp.context->VSSetConstantBuffers(0u, 1u, &r170Wvp);
+        const auto r170Pixel = [&](bool expectedWhite) {
+            warp.context->CopyResource(readback, color);
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            require(SUCCEEDED(warp.context->Map(
+                        readback, 0u, D3D11_MAP_READ, 0u, &mapped)) &&
+                        mapped.pData != nullptr && mapped.RowPitch >= 64u,
+                    "R170 translated FVF readback map");
+            const auto* pixel =
+                static_cast<const unsigned char*>(mapped.pData) +
+                static_cast<std::size_t>(8u) * mapped.RowPitch + 4u * 8u;
+            const unsigned char wanted = expectedWhite ? 255u : 0u;
+            const bool centerOk = pixel[0] == wanted &&
+                pixel[1] == wanted && pixel[2] == wanted &&
+                pixel[3] == 255u;
+            const auto* border = static_cast<const unsigned char*>(
+                mapped.pData);
+            const bool borderOk = border[0] == 0u && border[1] == 0u &&
+                border[2] == 0u && border[3] == 255u;
+            warp.context->Unmap(readback, 0u);
+            require(centerOk && borderOk,
+                    expectedWhite
+                        ? "R170 translated FVF+WVP white interior / clear border"
+                        : "R170 displaced WVP fails closed to clear center");
+        };
+        warp.context->ClearRenderTargetView(target, clear);
+        warp.context->UpdateSubresource(
+            r170Wvp, 0u, nullptr,
+            r170Offscreen.worldViewProjection.data(), 0u, 0u);
+        warp.context->DrawIndexed(3u, 0u, 0);
+        r170Pixel(false);
+        warp.context->ClearRenderTargetView(target, clear);
+        warp.context->UpdateSubresource(
+            r170Wvp, 0u, nullptr,
+            r170Onscreen.worldViewProjection.data(), 0u, 0u);
+        warp.context->DrawIndexed(3u, 0u, 0);
+        r170Pixel(true);
+        warp.context->VSSetConstantBuffers(0u, 0u, nullptr);
+        r170Wvp->Release();
+        r170Vb->Release();
+        r170Ia->Release();
+        r170Ps->Release();
+        r170Vs->Release();
+        r170PsCode->Release();
+        r170VsCode->Release();
+        std::cout << "DX11 WARP translated FVF fragment provenance R170: PASS\n";
+
         warp.context->OMSetRenderTargets(0u, nullptr, nullptr);
         raster->Release();
         ib->Release();
