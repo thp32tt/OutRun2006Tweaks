@@ -314,6 +314,7 @@ jobs:
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item docs/VR_HUD_NIGHT_TEST_20261009.md (Join-Path $dir 'HUD_NIGHT_TEST_GUIDE.md')
           @(
             'OUTRUN 2006 VR DX9EX - START HERE / 실행 방법'
             ''
@@ -326,6 +327,8 @@ jobs:
             '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
+            '6. For tonight HUD tests, choose B HUD (HUD_SCREEN) in the selector.'
+            '   For the lens centre and projected rank markers choose C FLARE / WORLD.'
             '   게임 종료 후 진단 로그 ZIP이 자동 생성됩니다.'
             ''
             'outrun-vr-host.exe is a helper process, not the user launcher.'
@@ -350,7 +353,9 @@ jobs:
             IntegrationSha = $env:GITHUB_SHA
             VariantId = 'ACTIVE_R26_R43_R44'
             DefaultTestProfile = 'CORRECTNESS'
-            Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
+            Profiles = @('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE')
+            RecommendedHudProfile = 'HUD_SCREEN'
+            RecommendedLensAndMarkerProfile = 'HUD_WORLD'
             UserRuntimeVerified = $false
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
@@ -368,7 +373,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt')) {
+          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.

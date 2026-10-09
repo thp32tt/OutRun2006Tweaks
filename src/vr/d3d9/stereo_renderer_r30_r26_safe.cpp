@@ -75,6 +75,31 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Original one-shot masks exhausted GOAL evidence for later races.
+        // Re-arm on a new race-end state only; never once per draw/present.
+        // Diagnostics-only: game pixels, shader state and HUD routing untouched.
+        std::atomic<int> R30GoalTraceObservedState{ -1 };
+        std::atomic<std::uint32_t> R30GoalTraceFormMask[9]{};
+        std::atomic<std::uint32_t> R30GoalTraceEarlyMask[12]{};
+
+        void R30RearmGoalTraceOnStateChange() noexcept
+        {
+            if (!Game::current_mode)
+                return;
+            const int state = static_cast<int>(*Game::current_mode);
+            const int old = R30GoalTraceObservedState.exchange(
+                state, std::memory_order_relaxed);
+            if (old == state ||
+                (state != static_cast<int>(GameState::STATE_GOAL) &&
+                 state != static_cast<int>(GameState::STATE_TIMEUP) &&
+                 state != static_cast<int>(GameState::STATE_LINK_TIMEUP)))
+                return;
+            for (auto& slot : R30GoalTraceFormMask)
+                slot.store(0u, std::memory_order_relaxed);
+            for (auto& slot : R30GoalTraceEarlyMask)
+                slot.store(0u, std::memory_order_relaxed);
+        }
+
         // GOAL/TIMEUP occurs BEFORE the correctly mono 2D restart menu.
         // The white/translucent finish-time glyph could be VS/c64, XYZRHW
         // or indexed fixed-function FVF 0x142, like historical rank 4/5.
@@ -85,9 +110,10 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, unsigned route) noexcept
         {
             if (!Settings::VRTelemetry || !device ||
-                !Game::current_mode ||
-                !OutRunVR::GameSemantic::QueueRenderActive() ||
-                route >= 3u)
+                !Game::current_mode || route >= 3u)
+                return;
+            R30RearmGoalTraceOnStateChange();
+            if (!OutRunVR::GameSemantic::QueueRenderActive())
                 return;
 
             const auto phase = *Game::current_mode;
@@ -107,10 +133,9 @@ namespace OutRunVRStereo
             if (producerIndex >= 32u)
                 return;
 
-            static std::atomic<std::uint32_t> logged[9]{};
             const unsigned slot = route * 3u + phaseIndex;
             const std::uint32_t bit = 1u << producerIndex;
-            if ((logged[slot].fetch_or(
+            if ((R30GoalTraceFormMask[slot].fetch_or(
                     bit, std::memory_order_relaxed) & bit) != 0u)
                 return;
 
@@ -162,8 +187,10 @@ namespace OutRunVRStereo
         {
             if (!Settings::VRTelemetry || !device ||
                 !Game::current_mode || method >= 4u ||
-                !OutRunVR::GameSemantic::QueueRenderActive() ||
                 !IsGameDevice(device) || InternalStereoPass)
+                return;
+            R30RearmGoalTraceOnStateChange();
+            if (!OutRunVR::GameSemantic::QueueRenderActive())
                 return;
             const auto state = *Game::current_mode;
             unsigned stateIndex = 0;
@@ -180,10 +207,9 @@ namespace OutRunVRStereo
             const unsigned token = static_cast<unsigned>(producer);
             if (token >= 32u)
                 return;
-            static std::atomic<std::uint32_t> firstByMethodState[12]{};
             const unsigned index = method * 3u + stateIndex;
             const std::uint32_t bit = 1u << token;
-            if ((firstByMethodState[index].fetch_or(
+            if ((R30GoalTraceEarlyMask[index].fetch_or(
                     bit, std::memory_order_relaxed) & bit) != 0u)
                 return;
             constexpr const char* kDrawMethods[4] = {

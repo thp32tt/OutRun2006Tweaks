@@ -436,6 +436,56 @@ for name, corrupt in (
     else:
         raise SystemExit('pre-restart route loss undetected: ' + name)
 
+# HUD night: per-process one-shot GOAL bitmasks never traced a second
+# race-end in the same EXE. Require new-state-only rearming, including early
+# gate (before R30SafeStereoBase) and three render forms.
+def verify_goal_night_trace_epoch(source):
+    rearm = function_body(source, 'void R30RearmGoalTraceOnStateChange(')
+    form = function_body(source, 'void R30TracePreRestartHudDrawForm(')
+    early = function_body(source, 'void R30TracePreRestartHudEligibility(')
+    for marker in ('R30GoalTraceObservedState.exchange(',
+                   'GameState::STATE_GOAL',
+                   'GameState::STATE_TIMEUP',
+                   'GameState::STATE_LINK_TIMEUP',
+                   'if (old == state ||',
+                   'R30GoalTraceFormMask',
+                   'R30GoalTraceEarlyMask',
+                   'slot.store(0u, std::memory_order_relaxed);'):
+        require(marker, rearm if marker not in ('R30GoalTraceFormMask', 'R30GoalTraceEarlyMask') else source,
+                'per GOAL state-transition diagnostic reset')
+    for body in (form, early):
+        require('R30RearmGoalTraceOnStateChange();', body,
+                'all GOAL diagnostic paths must see fresh race-end state')
+    require('R30GoalTraceFormMask[slot].fetch_or(', form,
+            'GOAL route per-producer bounded bitmask')
+    require('R30GoalTraceEarlyMask[index].fetch_or(', early,
+            'GOAL early-gate per-producer bounded bitmask')
+    if 'SetRenderState(' in rearm or 'SetTexture(' in rearm:
+        raise SystemExit('GOAL trace rearming changed GPU render state')
+
+verify_goal_night_trace_epoch(r30)
+for label, mutant in (
+    ('GOAL entry reset disabled', r30.replace(
+        'state != static_cast<int>(GameState::STATE_GOAL)',
+        'state == static_cast<int>(GameState::STATE_GOAL)', 1)),
+    ('render-route rearm missing', r30.replace(
+        'R30RearmGoalTraceOnStateChange();', '(void)0;', 1)),
+    ('early-gate rearm missing', r30.replace(
+        'R30RearmGoalTraceOnStateChange();', '(void)0;', 1).replace(
+        'R30RearmGoalTraceOnStateChange();', '(void)0;', 1)),
+    ('early-gate dedup removed', r30.replace(
+        'R30GoalTraceEarlyMask[index].fetch_or(',
+        'R30GoalTraceFormMask[index].fetch_or(', 1)),
+):
+    if mutant == r30:
+        raise SystemExit('night GOAL negative mutation not applied: ' + label)
+    try:
+        verify_goal_night_trace_epoch(mutant)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('night GOAL negative mutation escaped: ' + label)
+
 # P0 result/+TIME/GOAL provenance regression: identify the canonical
 # parent's actual queued glyph/clip node (not merely the 2C808 glyph helper).
 # All five distinct producer families must survive R84 refactor and no-tick
