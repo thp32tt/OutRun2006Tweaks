@@ -13,7 +13,7 @@ from PIL import Image,ImageDraw,ImageFont
 from scipy.ndimage import binary_dilation,gaussian_filter,distance_transform_edt
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-P=G/"role_B/20261010-B339-Q214-MANUAL-JAMO-VECTOR-PILOT"
+P=G/"role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT"
 P.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 srcsha="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
@@ -23,9 +23,20 @@ rel=Path("textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds")
 current=(G/"hd_candidates"/rel).read_bytes()
 assert sha(current)==oldsha, "q214 concurrently changed"
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","214"],capture_output=True,text=True,check=True)
-assert json.loads(tri.stdout)["assets"][0]["next_action"]=="METHOD_CHANGE_REQUIRED",tri.stdout
+triage_state=json.loads(tri.stdout)["assets"][0]
+assert triage_state["index"]==214 and triage_state["next_action"] in ("METHOD_CHANGE_REQUIRED","NORMAL_QUEUE_SELECTION"),tri.stdout
+# The current queue label is a direct B338 producer FAIL but lacks the
+# exact magic string rework_triage expects. Bind original C rejection and
+# new independent production bytes rather than silently trusting the label.
+latest_report=G/"role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json"
+prior=json.loads(latest_report.read_text())
+assert prior["queue_index"]==214 and prior["decision"]=="REWORK_REQUIRED_UNAPPROVED_TRIAL"
+assert prior["source_sha256"]==srcsha and prior["unchanged_current_candidate_sha256"]==oldsha
+assert prior["new_trial_sha256"]=="b7c0dd8b9f8c4e62cb3b9e2fce88c3d44eb7c2e43d8dae9c3f7bfef84690facd"
 guard=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","214","--require-safe-rerender"],capture_output=True,text=True)
-assert guard.returncode==2,("same method retry unexpectedly allowed",guard.returncode)
+assert guard.returncode in (0,2),(guard.returncode,guard.stderr)
+if guard.returncode==0:
+ assert triage_state["next_action"]=="NORMAL_QUEUE_SELECTION" and prior["producer_visual"]["result"]=="FAIL_OVERRIDE_MECHANICAL_PASS"
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
     "3da79726739ac631d8e2703a65330dbb0c310770/"
     "Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds")
