@@ -328,6 +328,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R186 indexed Draw WARP probe failed: $LASTEXITCODE" }
 
+      # R187 isolated owned indexed GPU path: exact RTV and full viewport.
+      - name: Verify R187 native indexed viewport ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_viewport_draw_r187.py
+
+      - name: Build R187 indexed viewport WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_viewport_draw_probe_r187
+
+      - name: Run R187 indexed viewport WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_viewport_draw_probe_r187.exe | Select-Object -First 1
+          if (-not $probe) { throw "R187 indexed viewport WARP probe missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R187 indexed viewport WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 

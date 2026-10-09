@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00489",
+  "production_id": "CONVERSION-DX11-00489",
+  "event_id": "CONVERSION-DX11-00489-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00489",
+  "lease_epoch": 1,
+  "work_key": "DX11:R187:DORMANT_NATIVE_INDEXED_RTV_VIEWPORT_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R187",
+    "tools/dx11_viewport_draw_probe_r187.cpp:R187",
+    "tools/test_dx11_viewport_draw_r187.py:R187",
+    "cmake.toml:R187",
+    ".github/workflows/backend-conversion-gate.yml:R187"
+  ],
+  "base_sha": "9fd3c09a6bb1548792d226b00f7515002ce8f1b0",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R187 independent dormant indexed native RTV/viewport/scissor fail-closed preflight plus isolated WARP DrawIndexed pixel proof; no gameplay activation.",
+  "pipeline": {
+    "C0_RECOVER": "PASS; 00489 absent; HEAD 9fd3c09a6bb1548792d226b00f7515002ce8f1b0; 00488 R186 complete scoped WARP, inherited R175 full Gate fail; 00481 checkpoint directory unrelated",
+    "C1_REVIEW": "PASS; choose independent R187 target/viewport/scissor exactness; avoid 00477 R175 and 00488 R186 owned paths; ownership, identity, geometry, GPU evidence and activation isolation reviewed",
+    "C2_IMPLEMENT": "PASS; production R187 native preflight header, standalone WARP GPU indexed draw, 3-mutant source contract, cmkr target and CI placement before R175",
+    "C3_VALIDATE": "R187 local source contract confirmed; exact-SHA mandatory GitHub Actions pending",
+    "C4_COMMIT": "material commit contains source/probe/test/build/workflow plus initial run record; no CI skip; result SHA to be sealed",
+    "C5_PACKAGE": "NOT_REQUIRED; native Draw activation not authorized and no Quest3/VDXR runtime package",
+    "C6_STATE": "PENDING exact-SHA CI; must seal authoritative SHA/run or inherited blocker"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "tools/test_dx11_viewport_draw_r187.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00489.json"
+  ],
+  "blockers": [
+    "Known unchanged R175 TEXCOORD6 varying WARP mismatch belongs to 00477",
+    "Quest3/VDXR runtime untested"
+  ],
+  "next_action": "Verify exact material SHA Backend Conversion Gate and R187 isolated WARP before R175; seal record without cancelling the Gate.",
+  "last_real_activity_at": "2026-10-09T17:10:21.836Z",
+  "score_change": 0,
+  "static_precommit_checks": {
+    "headerGuards": true,
+    "noProductionDraw": true,
+    "gpuProbe": true,
+    "cmkrManifest": true,
+    "gateOrder": true
+  }
+}
