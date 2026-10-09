@@ -4612,12 +4612,13 @@ compose_fixed_function_indexed_source_live_binding_readiness(
     const NativeManagedBufferShadow& indexBuffer,
     std::uint64_t snapshotToken) noexcept;
 
-// R157/R161/R162 offscreen WARP-only indexed DrawIndexed preflight. Revalidates
-// R147/R150/R152/R153 shadow/source bindings, R161 live IA layout/VS/PS,
-// and R162 exact live RS/OM output-state ownership. No gameplay Draw activation.
+// R157/R161/R162/R163/R164 offscreen WARP-only indexed DrawIndexed preflight.
+// Revalidates indexed source lineage, live IA/VS/PS/GS/HS/DS, exact RS/OM
+// output state, and R164 OM RTV+DSV identity. No gameplay Draw activation.
 [[nodiscard]] bool prepare_fixed_function_indexed_direct_draw_probe(
     ID3D11DeviceContext* context,
     ID3D11RenderTargetView* expectedProbeTarget,
+    ID3D11DepthStencilView* expectedProbeDepth,
     ID3D11InputLayout* expectedProbeLayout,
     ID3D11VertexShader* expectedProbeVS,
     ID3D11PixelShader* expectedProbePS,
