@@ -1,0 +1,400 @@
+{
+  "run": "B338",
+  "role": "B",
+  "index": 214,
+  "method": "HAND_DRAWN_JAMO_STROKE_VECTOR_SOURCE_ORIGINAL_DXT5_PALETTE",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "older_trial_family": "B260_B261_FLAT_SDF_PALETTE_REJECTED",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "old_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "trial_sha256": "b7c0dd8b9f8c4e62cb3b9e2fce88c3d44eb7c2e43d8dae9c3f7bfef84690facd",
+  "manual_vector_paths": {
+    "출": [
+      {
+        "path": [
+          [
+            3,
+            3
+          ],
+          [
+            19,
+            3
+          ]
+        ],
+        "stroke": 1.9
+      },
+      {
+        "path": [
+          [
+            11,
+            2
+          ],
+          [
+            11,
+            5
+          ]
+        ],
+        "stroke": 1.7
+      },
+      {
+        "path": [
+          [
+            11,
+            6
+          ],
+          [
+            3,
+            9
+          ]
+        ],
+        "stroke": 2.2
+      },
+      {
+        "path": [
+          [
+            11,
+            6
+          ],
+          [
+            19,
+            9
+          ]
+        ],
+        "stroke": 2.2
+      },
+      {
+        "path": [
+          [
+            2,
+            11
+          ],
+          [
+            20,
+            11
+          ]
+        ],
+        "stroke": 2.0
+      },
+      {
+        "path": [
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            13
+          ]
+        ],
+        "stroke": 1.8
+      },
+      {
+        "path": [
+          [
+            4,
+            14
+          ],
+          [
+            18,
+            14
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            4,
+            16
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            19,
+            18
+          ]
+        ],
+        "stroke": 2.0
+      }
+    ],
+    "발": [
+      {
+        "path": [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            13,
+            9
+          ],
+          [
+            13,
+            3
+          ]
+        ],
+        "stroke": 2.1
+      },
+      {
+        "path": [
+          [
+            4,
+            6
+          ],
+          [
+            13,
+            6
+          ]
+        ],
+        "stroke": 1.8
+      },
+      {
+        "path": [
+          [
+            18,
+            2
+          ],
+          [
+            18,
+            12
+          ]
+        ],
+        "stroke": 2.0
+      },
+      {
+        "path": [
+          [
+            18,
+            6
+          ],
+          [
+            22,
+            6
+          ]
+        ],
+        "stroke": 1.8
+      },
+      {
+        "path": [
+          [
+            4,
+            13
+          ],
+          [
+            19,
+            13
+          ],
+          [
+            19,
+            15.5
+          ],
+          [
+            4,
+            15.5
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            19,
+            18
+          ]
+        ],
+        "stroke": 2.0
+      }
+    ],
+    "골": [
+      {
+        "path": [
+          [
+            3,
+            3
+          ],
+          [
+            20,
+            3
+          ],
+          [
+            20,
+            9
+          ]
+        ],
+        "stroke": 2.6
+      },
+      {
+        "path": [
+          [
+            11.5,
+            8
+          ],
+          [
+            11.5,
+            12
+          ]
+        ],
+        "stroke": 2.3
+      },
+      {
+        "path": [
+          [
+            2,
+            12
+          ],
+          [
+            22,
+            12
+          ]
+        ],
+        "stroke": 2.4
+      },
+      {
+        "path": [
+          [
+            4,
+            15
+          ],
+          [
+            19,
+            15
+          ],
+          [
+            19,
+            17
+          ],
+          [
+            4,
+            17
+          ],
+          [
+            4,
+            19
+          ],
+          [
+            20,
+            19
+          ]
+        ],
+        "stroke": 2.4
+      }
+    ]
+  },
+  "native": [
+    2048,
+    2048
+  ],
+  "dds_format": "BC3/DXT5",
+  "mips": 1,
+  "dds_header": "EXACT",
+  "raw_mirror_y": "EXACT",
+  "saved_roundtrip": "PASS",
+  "outside_canonical_source_rgba": 0,
+  "outside_canonical_source_alpha": 0,
+  "outside_prior_candidate_rgba": 0,
+  "source_donor_blocks": 114,
+  "glyphs": [
+    {
+      "id": "START",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "new_bbox": [
+        826,
+        497,
+        889,
+        516
+      ],
+      "margins": [
+        11,
+        2,
+        10,
+        1
+      ],
+      "new_source_native_core": 416,
+      "BC3_source_donor_face_bright_retention": 1.0,
+      "material_donor_blocks": 71
+    },
+    {
+      "id": "GOAL",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "new_bbox": [
+        1361,
+        765,
+        1400,
+        784
+      ],
+      "margins": [
+        18,
+        1,
+        17,
+        3
+      ],
+      "new_source_native_core": 327,
+      "BC3_source_donor_face_bright_retention": 1.0,
+      "material_donor_blocks": 68
+    }
+  ],
+  "render_english_source_vs_clean": "B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",
+  "clean_final_protection": "SOURCE_OUTSIDE_ZERO",
+  "authored_lossless_contacts": 36,
+  "views": [
+    "START_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_GRAY_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_GRAY_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_GRAY_50_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_WHITE_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_WHITE_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_WHITE_50_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_BLACK_100_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_BLACK_75_SOURCE_CLEAN_OLD_B338.png",
+    "START_RAW_BLACK_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_GRAY_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_GRAY_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_GRAY_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_WHITE_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_WHITE_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_WHITE_50_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_BLACK_100_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_BLACK_75_SOURCE_CLEAN_OLD_B338.png",
+    "GOAL_RAW_BLACK_50_SOURCE_CLEAN_OLD_B338.png"
+  ],
+  "output": "UNAPPROVED_TRIAL_NOT_PROMOTED",
+  "producer_visual": "NOT_YET_REVIEWED",
+  "fresh_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS",
+  "forbidden_domains_touched": []
+}
