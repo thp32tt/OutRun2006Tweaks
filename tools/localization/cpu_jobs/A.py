@@ -43,13 +43,13 @@ def dds(path):
     if b[:4]!=b"DDS " or len(b)<128:raise ValueError("invalid DDS")
     h,w=struct.unpack_from("<II",b,12)
     if (w,h)!=(2048,1024) or len(b)!=128+w*h*4:raise ValueError(("format/size drift",len(b),w,h))
-    if struct.unpack_from("<I",b,88)[0]!=32 or struct.unpack_from("<IIII",b,92)!=(16711680,65280,255,4278190080):
-        raise ValueError(f"unexpected channels bpp={struct.unpack_from('<I',b,88)[0]} masks={struct.unpack_from('<IIII',b,92)}")
+    if struct.unpack_from("<I",b,88)[0]!=32 or struct.unpack_from("<IIII",b,92)!=(255,65280,16711680,4278190080):
+        raise ValueError(f"unexpected exact source RGBA channels bpp={struct.unpack_from('<I',b,88)[0]} masks={struct.unpack_from('<IIII',b,92)}")
     if struct.unpack_from("<I",b,28)[0]!=1:raise ValueError("unexpected mip count")
-    im=Image.frombytes("RGBA",(w,h),b[128:],"raw","BGRA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    im=Image.frombytes("RGBA",(w,h),b[128:],"raw","RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     return b[:128],im
 def encode(header,im):
-    return header+im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","BGRA")
+    return header+im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","RGBA")
 def render(text,fontpath, maxw,maxh):
     # Font glyph at native 2048-wide texture, no previously Korean raster reuse,
     # no width stretch, no shear, no resampling or font-family guessing.
