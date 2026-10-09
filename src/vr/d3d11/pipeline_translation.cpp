@@ -1210,11 +1210,11 @@ namespace outrun::vr::dx11
             "// R84 diagnostic-only fixed-function pixel-shader prototype\n"
             "struct PSInput\n"
             "{\n"
-            // R172: COLOR0 remains the FVF IA vertex INPUT semantic.\n
-            // The generated VS->PS diffuse varying is disjoint from that\n
-            // vertex attribute, using reserved TEXCOORD8 (TEXCOORD0..7 are\n
-            // the eight D3D9 texture coordinates). Restore only after GPU\n
-            // pixel parity is proven; native game dispatch stays dormant.\n
+            // R172: COLOR0 remains the FVF IA vertex INPUT semantic.
+            // The generated VS->PS diffuse varying is disjoint from that
+            // vertex attribute, using reserved TEXCOORD8 (TEXCOORD0..7 are
+            // the eight D3D9 texture coordinates). Restore only after GPU
+            // pixel parity is proven; native game dispatch stays dormant.
             "    float4 diffuse : TEXCOORD8;\n"
             "    float4 specular : COLOR1;\n";
         for (std::size_t index = 0; index < source.size(); ++index)
@@ -2997,7 +2997,9 @@ namespace outrun::vr::dx11
             "    float4 position : SV_Position;\n";
         if (out.hasNormal)
             shader += "    float3 normal : NORMAL0;\n";
-        // R172: keep source D3D9 FVF VSInput COLOR0 intact; use TEXCOORD8\n        // exclusively for the generated VS->PS diffuse varying.\n        shader +=
+        // R172: keep source D3D9 FVF VSInput COLOR0 intact; use TEXCOORD8
+        // exclusively for the generated VS->PS diffuse varying.
+        shader +=
             "    float4 diffuse : TEXCOORD8;\n"
             "    float4 specular : COLOR1;\n";
         for (UINT index = 0; index < 8; ++index)
