@@ -346,6 +346,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R187 indexed viewport WARP probe failed: $LASTEXITCODE" }
 
+      # R188: verify PS SRV/sampler object identity, texture descriptor and read/write hazard.
+      - name: Verify R188 native indexed PS texture binding
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_textured_indexed_r188.py
+
+      - name: Build R188 textured indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_textured_indexed_probe_r188
+
+      - name: Run R188 textured indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_indexed_probe_r188.exe | Select-Object -First 1
+          if (-not $probe) { throw "R188 textured indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R188 textured indexed WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 

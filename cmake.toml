@@ -553,3 +553,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R188: native indexed PS SRV/sampler ownership; isolated real WARP textured DrawIndexed.
+[target.dx11_textured_indexed_probe_r188]
+type = "executable"
+sources = [
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

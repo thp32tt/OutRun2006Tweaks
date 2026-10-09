@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00490",
+  "production_id": "CONVERSION-DX11-00490",
+  "event_id": "CONVERSION-DX11-00490-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00490",
+  "lease_epoch": 1,
+  "work_key": "DX11:R188:NATIVE_INDEXED_PS_TEXTURE_SAMPLER_IDENTITY_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp:R188",
+    "tools/dx11_textured_indexed_probe_r188.cpp:R188",
+    "tools/test_dx11_textured_indexed_r188.py:R188",
+    "cmake.toml:R188",
+    ".github/workflows/backend-conversion-gate.yml:R188"
+  ],
+  "base_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "STAGED_WAITING_00489_CI",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R188 dormant native indexed DrawIndexed PS SRV/sampler COM identity and resource/RTV alias fail-closed preflight, isolated WARP textured DrawIndexed pixel GPU proof; no game native draw activation.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub 00490 absent; base 2f35de1e moved to 576048f0 from 00489 R187 repair; 00489 Gate 37966364768 running; stop push to preserve run. 00477 owns inherited R175.",
+    "C1_REVIEW": "5 independent lenses: stable TASK/work_key ownership, IA index and generation proof R183-186, target viewport R187, live PS sampler/SRV device/resource alias, actual GPU textured pixels with negative bindings. R188 disjoint from R175 and 00489 R187 owned sources.",
+    "C2_IMPLEMENT": "Prepared dormant R188 indexed PS SRV/sampler/RTV alias C++ preflight, isolated WARP textured DrawIndexed pixel/readback and negative-binding cases, cmkr executable and CI steps. Adjusted for 00489 R187 new required expectedTarget RTV identity.",
+    "C3_VALIDATE": "Scoped static contract/3 negative guard mutations: PASS; R187 signature forward contract: PASS. Windows WARP compiled GPU and exact material SHA Backend Conversion Gate: PENDING. HMD/game not tested.",
+    "C4_COMMIT": "PENDING branch material commit; do not push during running 00489 exact-SHA Gate.",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD runtime activation or package authorized.",
+    "C6_STATE": "PENDING exact-SHA Gate and record sealing."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00490.json"
+  ],
+  "blockers": [
+    "Latest 00489 exact SHA 576048f0 Gate 37966364768 in_progress; preserve running Gate before branch push",
+    "R175 inherited shader varying mismatch belongs to 00477",
+    "Quest3/VDXR runtime untested"
+  ],
+  "next_action": "Once 00489 Gate 37966364768 stops, reconcile remote branch HEAD, ensure no concurrent 00490 claim, publish independent R188 material via GitHub CAS, then verify exact-SHA Gate and seal record C6.",
+  "score_change": 0,
+  "validation_evidence": {
+    "staging_blob_only": true,
+    "existing_gate_run_id": 37966364768,
+    "existing_gate_ownership": "00489_R187",
+    "r188_windowed_own_ci": null
+  },
+  "static_precommit_checks": {
+    "ps_srv_sampler_identity": true,
+    "ps_slot_bounds": true,
+    "rtv_resource_alias_rejection": true,
+    "negative_source_mutants": 3,
+    "cmkr_and_ci_wiring": true,
+    "r187_expected_rtv_forwarding": true,
+    "source_activated_draw": false
+  }
+}
