@@ -31,6 +31,11 @@ if CONTROLLER_MODE not in {"localization", "vr"}:
     raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or vr")
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
 CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
+LOCALIZATION_SLOT_NAMES = ("A", "B", "C1", "C2")
+if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 4:
+    raise ValueError("Recovery localization requires CHAT_SLOTS=4 (A/B/C1/C2)")
+SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",
+                                30: "B", 40: "C1", 50: "C2"}
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
@@ -184,6 +189,7 @@ runtime = {
     "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
     "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
     "chat_recycle_runs": CHAT_RECYCLE_RUNS,
+    "logical_workers": list(LOCALIZATION_SLOT_NAMES) if CONTROLLER_MODE == "localization" else [],
     "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
@@ -204,7 +210,8 @@ def new_registry(now: datetime) -> Registry:
     return Registry(
         logical_date=logical_date(now),
         next_slot=0,
-        slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+        slots=[Slot(name=n) for n in (LOCALIZATION_SLOT_NAMES if CONTROLLER_MODE == "localization"
+                                  else tuple(chr(ord("A") + i) for i in range(CHAT_SLOTS)))],
         rate_limit_attempts=0,
         rate_limit_until=None,
         last_global_send_at=None,
@@ -228,29 +235,41 @@ def load_registry(now: datetime) -> Registry:
             last_global_send_at=raw.get("last_global_send_at"),
         )
     except Exception:
-        log.exception("registry read failed; recreating")
-        reg = new_registry(now)
+        # A malformed checkpoint must never silently destroy prior work URLs.
+        log.exception("registry read failed; preserving file and stopping")
+        raise
+    changed = False
     if reg.logical_date != logical_date(now):
         archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
-        try:
-            if REGISTRY_FILE.exists():
-                archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
-        except Exception:
-            log.exception("registry archive failed")
-        reg = new_registry(now)
-        save_registry(reg)
-        log.info("daily chat generation rolled over: %s", reg.logical_date)
+        if not archive.exists():
+            archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        reg.logical_date = logical_date(now)
+        changed = True
+    if CONTROLLER_MODE == "localization":
+        existing = {slot.name: slot for slot in reg.slots}
+        if "C" in existing:
+            if "C1" in existing:
+                raise ValueError("Conflicting legacy C and C1 checkpoint: preserve for manual review")
+            existing["C"].name = "C1"
+            existing["C1"] = existing.pop("C")
+            changed = True
+        unexpected = set(existing) - set(LOCALIZATION_SLOT_NAMES)
+        if unexpected:
+            raise ValueError(f"Unexpected worker slot(s) {sorted(unexpected)}; do not discard")
+        for name in LOCALIZATION_SLOT_NAMES:
+            if name not in existing:
+                existing[name] = Slot(name=name)
+                changed = True
+        ordered = [existing[name] for name in LOCALIZATION_SLOT_NAMES]
+        if [slot.name for slot in reg.slots] != list(LOCALIZATION_SLOT_NAMES):
+            changed = True
+        reg.slots = ordered
     elif len(reg.slots) != CHAT_SLOTS:
-        # Resize without discarding progress: preserve A..N existing slot state.
-        old_len = len(reg.slots)
-        if CHAT_SLOTS < old_len:
-            reg.slots = reg.slots[:CHAT_SLOTS]
-        else:
-            for i in range(old_len, CHAT_SLOTS):
-                reg.slots.append(Slot(name=chr(ord('A') + i)))
-        reg.next_slot = reg.next_slot % CHAT_SLOTS
+        raise ValueError("Unexpected recovery controller slot count; preserve checkpoint")
+    reg.next_slot %= len(reg.slots)
+    if changed:
         save_registry(reg)
-        log.info("resized chat slots from %s to %s while preserving state", old_len, CHAT_SLOTS)
+        log.info("restored recovery slots %s with saved URLs/runs", [s.name for s in reg.slots])
     return reg
 
 
