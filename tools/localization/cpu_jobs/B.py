@@ -173,7 +173,7 @@ report={"role":"B","run":"B304","queue_index":228,"task":"IGR-038 source conditi
 "source_vs_clean_outside_exact_union":0,"source_clean_alpha":0,
 "clean_vs_trial_outside_representative":0,"trial_vs_previous_outside_representative":0,
 "separate_proofs":views,"producer_visual":"PENDING_CONTROLLER_DIRECT_100_75_50_RAW",
-"new_candidate_promoted":false,"C2":"NOT_RUN","C3":"NOT_RUN",
+"new_candidate_promoted":False,"C2":"NOT_RUN","C3":"NOT_RUN",
 "USER_INGAME":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED",
 "backend":"github-actions","exclusions":["VR","FFB","DX11","DXVK"]}
 (D/"B304_MACHINE_GATE.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
