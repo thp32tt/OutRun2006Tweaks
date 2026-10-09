@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 09:59 KST",
+  "updated_at_kst": "2026-10-09 10:15 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8946,5 +8946,32 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0,
     "qa": "localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json"
+  },
+  "b306_q205_p0_block_sans": {
+    "time_kst": "2026-10-09 10:15 KST",
+    "run_key": "OUTRUN-KOR-B306-Q205-P0-BLOCK-SANS-20261009-1010",
+    "role": "B",
+    "queue_index": 205,
+    "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "prior_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "user_report": [
+      "IGR-026",
+      "IGR-027"
+    ],
+    "new_dds": 1,
+    "producer_self_qa": "SCOPED_PASS_SOURCE_FAMILY_BLOCK_SANS_NATIVE_50_RAW",
+    "changed_rgba_outside_bboxes": 0,
+    "changed_alpha_outside_bboxes": 0,
+    "preserved_other_atlas": "PIXEL_EXACT",
+    "C1": "PENDING",
+    "C3": "BLOCKED",
+    "approval": false,
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "IGR028": "MIXED_MAPPING_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "GITHUB_ACTIONS",
+    "workflow_run_id": 37868593802
   }
 }
