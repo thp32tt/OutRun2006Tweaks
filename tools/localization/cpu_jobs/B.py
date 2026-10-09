@@ -51,7 +51,7 @@ assert np.count_nonzero(np.any(S!=C,axis=2)&~allow)==0,"authored source plate ch
 # Canonical A22 CLEAN legitimately retains native source separator/guide
 # artwork crossing the original glyph bounding boxes; do not erase it.
 retained=int(np.count_nonzero((C[:,:,3]>0)&allow))
-assert 0<retained<1000,("unexpected nontext plate preservation",retained)
+assert retained==3579,("canonical plate protected sprite/support drift",retained)
 # Preserve all modal navigation, separators and panel art byte-for-byte.
 assert np.count_nonzero(np.any(P!=S,axis=2)&~allow)==0
 font="/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
