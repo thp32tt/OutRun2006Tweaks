@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A216",
+  "run_key": "OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
+  "at_kst": "2026-10-10 04:17 KST",
+  "priority": "P1",
+  "queue_index": 175,
+  "issue": "IGR-032",
+  "family": "CHROME_TECHNO_SHOWROOM",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "current_promoted_candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_dds_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+  "output_trial_path": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_Q175_MANUAL_SOURCE_WELDED_CHROME_TRIAL.dds",
+  "output_worker_report": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_WORKER_TRIAL_QA.json",
+  "github_actions_first_run": 37977673378,
+  "first_run": "P3_REJECT_OVERFLOW_22_RGBA_AND_ALPHA_PIXELS_BOTTOM_2PX",
+  "github_actions_corrective_run": 37977929319,
+  "corrective_result": "SUCCESS_TRIAL_PUBLISHED_MECHANICAL_ONLY",
+  "first_trial_attempt": "SOURCE_BBOX_EFFECT_ESCAPE_AT_BOTTOM_2PIXELS; correctable moved native glyph up4px",
+  "second_trial_attempt": "STORED_DDS_ROUNDTRIP_PASS_BUT_CONTROLLER_VISUAL_REJECT",
+  "comparison_native": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_GRAY_100.jpg",
+  "comparison_black_50": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_BLACK_50.jpg",
+  "comparison_white_75": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_WHITE_75.jpg",
+  "first_hand_controller_inspection": [
+    "SOURCE|CLEAN|OLD|NEW readable native gray 100",
+    "SOURCE|CLEAN|OLD|NEW practical black 50",
+    "SOURCE|CLEAN|OLD|NEW white 75"
+  ],
+  "pixel_gates": {
+    "clean_source_alpha_nonzero": 0,
+    "outside_original_RGBA_pixels": 0,
+    "outside_original_alpha_pixels": 0,
+    "clean_final_changed_outside_original_pixels": 0,
+    "source_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "trial_bbox": [
+      56,
+      400,
+      866,
+      527
+    ],
+    "source_size": [
+      950,
+      132
+    ],
+    "trial_size": [
+      810,
+      127
+    ],
+    "left_right_top_bottom_margins": [
+      50,
+      90,
+      3,
+      2
+    ],
+    "width_coverage": 0.8526,
+    "dds_header": "2048x1024 BGRA32 mip1, native persisted RAW mirrorY"
+  },
+  "visual_observations": {
+    "1_SOURCE_REMOVAL": "SCOPED_PLATE_PASS; A188 cleaned native target transparent, old source glyph absent",
+    "2_CLEAN_PLATE": "SCOPED_PASS; retained transparent plate, no new opaque crop",
+    "3_COMPOSITE_ONLY": "SCOPED_PASS; changed glyph and chrome offset inside permitted source area",
+    "4_SOURCE_STYLE": "FAIL; prior A211 222px small and generic, new 810px uses overly long thin manual rails/roof unlike rounded lowercase welded source metal",
+    "5_HANGUL_SYLLABLE_TOPOLOGY": "FAIL; manual SHO looks like roof with hanging posts; ROOM reads as stacked horizontal rails, the word 쇼룸 not immediately decodable at native/50%",
+    "6_LEAN_AND_PERSPECTIVE": "HOLD; cannot provide matched top/bottom true corresponding Hangul-source glyph anchors for dissimilar contour",
+    "7_READABILITY_SIZE": "FAIL; source-width coverage materially improves 23.4%->85.3%, but extreme width per syllable damages Korean word recognition",
+    "8_GLARE_GLYPH_CLIP": "SCOPED_NO_OUTSIDE_OR_CLIP, but vertical bottom 2px clearance high risk for game composition",
+    "9_RAW_FLIPY_MIPS": "PERSISTED_SAVED_RAW_AND_FLIPY available, one native mip; game not run",
+    "10_CONSUMER_CHAIN": "HOLD_NOT_PROVEN_GAME_COMPOSITION, IGR032 OPEN"
+  },
+  "why_not_promoted": "Direct visual FAIL despite persisted mechanical 0 source overflow: Hangul syllable parts are illegible at practical scale and source rounded welded techno contour not recreated. Same rail-based trial must not be simply stretched/recolored or regenerated as another PASS.",
+  "method_change_next": "STOP A209/A210 rail and A211 generic font/manual A216 stretched-roof approaches; derive actual source connected glyph contours and counter geometry, develop an unambiguous pair of Hangul syllable outlines at source-native size before any chrome effects, then source-shaped metallic side extrusion. If no authentic legible design available mark MANUAL_RECONSTRUCTION_REQUIRED and move to different independent family.",
+  "decision": "PRODUCER_VISUAL_FAIL_TRIAL_ONLY_NO_PROMOTION",
+  "produced_trial_dds": 1,
+  "produced_new_approved_candidate_dds": 0,
+  "committed_promoted_dds_changed": false,
+  "C1": "BLOCKED",
+  "C3": "BLOCKED",
+  "QA_APPROVAL": "NOT_GRANTED",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub-hosted CPU; ChatGPT direct source-vs-stored comparison",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
