@@ -282,6 +282,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 triangle-fan generated index-buffer probe failed with exit code $LASTEXITCODE" }
 
+      # R183: source delta once + real WARP VB/IB-owned indexed GPU pixels.
+      - name: Verify DX11 native linear VB/IB R183 source contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_buffer_owner_r183.py
+
+      - name: Build DX11 linear VB/IB mirror R183 WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
+
+      - name: Run DX11 linear VB/IB mirror R183 WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_linear_buffer_mirror_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "R183 WARP VB/IB probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R183 WARP probe failed with code $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 

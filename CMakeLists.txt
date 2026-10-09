@@ -1107,3 +1107,15 @@ target_link_libraries(dx11_fixed_function_pipeline_probe PUBLIC
     d3dcompiler.lib
     d3d11.lib
 )
+
+# R183: isolated real WARP VB/IB owner and DrawIndexed probe; no game hook.
+set(dx11_linear_buffer_mirror_probe_SOURCES
+    "tools/dx11_linear_buffer_mirror_probe.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+add_executable(dx11_linear_buffer_mirror_probe)
+target_sources(dx11_linear_buffer_mirror_probe PRIVATE ${dx11_linear_buffer_mirror_probe_SOURCES})
+target_compile_features(dx11_linear_buffer_mirror_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_linear_buffer_mirror_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_linear_buffer_mirror_probe PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_linear_buffer_mirror_probe PUBLIC d3dcompiler.lib d3d11.lib)
