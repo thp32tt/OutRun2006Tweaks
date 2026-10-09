@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 10:49 KST",
+  "updated_at_kst": "2026-10-09 11:16 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9052,5 +9052,38 @@
     "qa": "localization/graphics/role_B/20261009-B307-Q212-C325-THREE-NATIVE-SELECT-HEADINGS/B307_CONTROLLER_SELF_QA_FINAL.json",
     "actions_run_id": 37871305365,
     "backend": "GITHUB_ACTIONS"
+  },
+  "b308_q212_last_four_c325_producer_rework": {
+    "time_kst": "2026-10-09 11:16 KST",
+    "run_key": "OUTRUN-KOR-B308-Q212-C325-FOUR-NATIVE-CONTROLS-20261009-1110",
+    "role": "B",
+    "queue_index": 212,
+    "english_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "previous_candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+    "new_candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+    "new_dds": 1,
+    "repaired_regions": [
+      30,
+      43,
+      44,
+      53
+    ],
+    "earlier_B307_repaired_regions": [
+      25,
+      26,
+      27
+    ],
+    "C325_confirmed_remaining_producer_rework": [],
+    "unrelated_eight_regions": "PIXEL_EXACT",
+    "zero_outside_bbox": 0,
+    "persisted_DDS": "HEADER_RAW_FLIPY_MIP1_ROUNDTRIP_EXACT",
+    "producer_visual": "SCOPED_PASS_4_NATIVE_50_SMALL_75_RAW_RED",
+    "independent_C2": "PENDING_NEW_SHA_ALL_12",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR029": "SUSPECTED_BINDING_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json",
+    "actions_id": 37873410100
   }
 }
