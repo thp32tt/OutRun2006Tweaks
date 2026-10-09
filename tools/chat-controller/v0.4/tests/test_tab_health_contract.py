@@ -8,9 +8,10 @@ SOURCES = [
     ("localization", ROOT / "src"),
 ]
 class FakePage:
-    def __init__(self, fail_eval=False, closed=False):
+    def __init__(self, fail_eval=False, closed=False, fail_goto=False):
         self.handlers = {}
         self.fail_eval = fail_eval
+        self.fail_goto = fail_goto
         self.closed = closed
         self.visited = None
         self.url = "about:blank"
@@ -21,14 +22,17 @@ class FakePage:
         return 1
     async def screenshot(self, **kwargs): return b"fake screenshot"
     async def close(self, **kwargs): self.closed = True
-    async def goto(self, url, **kwargs): self.url = self.visited = url
+    async def goto(self, url, **kwargs):
+        if self.fail_goto: raise RuntimeError("navigation failed")
+        self.url = self.visited = url
 class FakeBrowser:
     def __init__(self): self.connected = True
     def is_connected(self): return self.connected
 class FakeContext:
-    def __init__(self): self.browser = FakeBrowser(); self.created=[]
+    def __init__(self): self.browser = FakeBrowser(); self.created=[]; self.fail_next_goto=False
     async def new_page(self):
-        page = FakePage()
+        page = FakePage(fail_goto=self.fail_next_goto)
+        self.fail_next_goto=False
         self.created.append(page)
         return page
 class Log:
@@ -72,6 +76,19 @@ async def verify(name, directory):
     assert pages["A"].visited==reg.slots[0].url and globals_["runtime"]["tab_recovery_last_reason"]=="unresponsive"
     stats.append("three-failure debounce")
 
+    # A failed navigation must remain visibly unhealthy and retry, not treat
+    # a responsive about:blank replacement as a repaired ChatGPT conversation.
+    globals_["runtime"].clear();context=FakeContext();context.fail_next_goto=True
+    old=FakePage(closed=True);pages={"A":old};state={}
+    await monitor(context,pages,state)
+    assert globals_["runtime"]["tab_recovery_error"].startswith("A:closed:")
+    assert pages["A"].url=="about:blank" and pages["A"] in state["navigation_failed"]
+    state["last_recovered"]["A"]=0.0
+    await monitor(context,pages,state)
+    assert pages["A"].visited==reg.slots[0].url
+    assert not state["navigation_failed"]
+    stats.append("navigation failure retries")
+
     globals_["runtime"].clear();context=FakeContext();context.browser.connected=False;pages={"A":FakePage()};state={}
     try: await monitor(context,pages,state)
     except RuntimeError as exc: assert "Docker restart" in str(exc)
@@ -87,4 +104,4 @@ async def verify(name, directory):
     print(path.name, "COMPILE+MOCK PASS", ", ".join(stats))
 for name, directory in SOURCES:
     asyncio.run(verify(name, directory))
-print("TOTAL 2/2 combined controllers compiled; 10/10 behavior contracts passed")
+print("TOTAL 2/2 combined controllers compiled; 12/12 behavior contracts passed")
