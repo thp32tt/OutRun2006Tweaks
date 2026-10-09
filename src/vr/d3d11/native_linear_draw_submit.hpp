@@ -43,11 +43,21 @@ namespace outrun::vr::dx11 {
     Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+    // R197: translated D3D9 non-indexed triangle lists have no GS/HS/DS.
+    // A retained stage can alter/discard vertices without changing owned VB
+    // or VS/PS; do not claim safe native Draw until all three are unbound.
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader> gs;
+    Microsoft::WRL::ComPtr<ID3D11HullShader> hs;
+    Microsoft::WRL::ComPtr<ID3D11DomainShader> ds;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
     context->IAGetInputLayout(layout.GetAddressOf());
     context->VSGetShader(vs.GetAddressOf(), nullptr, nullptr);
     context->PSGetShader(ps.GetAddressOf(), nullptr, nullptr);
+    context->GSGetShader(gs.GetAddressOf(), nullptr, nullptr);
+    context->HSGetShader(hs.GetAddressOf(), nullptr, nullptr);
+    context->DSGetShader(ds.GetAddressOf(), nullptr, nullptr);
     context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    if (gs || hs || ds) return false;
     if (!layout || !vs || !ps || !rtv)
         return false;
 

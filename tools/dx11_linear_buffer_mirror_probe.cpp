@@ -203,6 +203,42 @@ int main() {
     ctx->ClearRenderTargetView(rtv.Get(),clear);
     require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "R185 dormant native linear Draw IA/pipeline ready");
+    // R197: a retained Geometry Shader moves the actual non-indexed
+    // triangle outside clip space while IA/VS/PS/RTV stay unchanged.
+    constexpr char interferingGeometry[] =
+        "struct V {float4 p:SV_Position;}"
+        "[maxvertexcount(3)]"
+        "void gs(triangle V tri[3],inout TriangleStream<V> stream){"
+        "for(uint i=0;i<3;++i){V v=tri[i];v.p.xy=float2(2,2);stream.Append(v);}}";
+    ComPtr<ID3DBlob> gsCode;
+    require(SUCCEEDED(D3DCompile(interferingGeometry,
+            sizeof(interferingGeometry)-1, nullptr, nullptr, nullptr,
+            "gs", "gs_4_0", 0, 0, gsCode.GetAddressOf(), nullptr)),
+            "R197 compile interfering GS");
+    ComPtr<ID3D11GeometryShader> interferingGs;
+    require(SUCCEEDED(dev->CreateGeometryShader(gsCode->GetBufferPointer(),
+            gsCode->GetBufferSize(), nullptr, interferingGs.GetAddressOf())),
+            "R197 create interfering GS");
+    ctx->GSSetShader(interferingGs.Get(),nullptr,0);
+    require(!verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R197 reject unexpected non-indexed GS");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    // Isolated negative proof: the same raw GPU Draw now outputs black.
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE gsMapped{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&gsMapped))
+            && gsMapped.pData, "R197 read GS-suppressed WARP pixels");
+    const auto* gsPixels = static_cast<const unsigned char*>(gsMapped.pData)
+        +16*gsMapped.RowPitch+16*4;
+    const bool gsBlack=gsPixels[0]==0 && gsPixels[1]==0 &&
+        gsPixels[2]==0 && gsPixels[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(gsBlack, "R197 GS changes actual WARP Draw pixels");
+    ctx->GSSetShader(nullptr,nullptr,0);
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R197 restore pure VS/PS native Draw");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
     // The one actual native Draw remains isolated outside production DX11.
     ctx->Draw(3,0);
     ctx->CopyResource(staging.Get(),color.Get());

@@ -292,6 +292,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_linear_buffer_range_r184.py
 
+      # R197: reject retained GS/HS/DS for the independent non-indexed Draw path.
+      - name: Verify R197 native linear shader stage fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_stage_r197.py
+
       # R185: new native Draw entrypoint is dormant but genuinely GPU-exercised.
       - name: Verify DX11 native Draw R185 source contract
         if: github.ref_name == 'vr-dx11-native-r71'

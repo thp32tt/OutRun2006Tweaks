@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00498",
+  "production_id": "CONVERSION-DX11-00498",
+  "event_id": "CONVERSION-DX11-00498-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00498",
+  "lease_epoch": 1,
+  "work_key": "DX11:R197:LINEAR_UNEXPECTED_SHADER_STAGE_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp:R197",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R197",
+    "tools/test_dx11_linear_stage_r197.py:R197",
+    ".github/workflows/backend-conversion-gate.yml:R197"
+  ],
+  "base_sha": "2caf8ceee3154d8e8e7dca9f1d75b9b7b0d41a1d",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R197 reject unexpected live GS/HS/DS on dormant non-indexed native Draw readiness; WARP test proves unexpected GS masks real Draw pixels and recovery restores pixels; production gameplay draw remains disabled.",
+  "pipeline": {
+    "C0_RECOVER": "PASS owner/checkpoint absent, exact HEAD 2caf8ceee3154d8e8e7dca9f1d75b9b7b0d41a1d; previous R196 00497 terminal; 00477 R175 separately BLOCKED",
+    "C1_REVIEW": "PASS independent non-indexed Draw R185 lacks R196 GS/HS/DS guard; no DXVK or DX9Ex files edited",
+    "C2_IMPLEMENT": "PASS native linear stage fail-closed + real GS-interference and recovery Draw WARP probe + 4 negative mutations + CI wiring",
+    "C3_VALIDATE": "Scoped source contract pre-commit PASS; await exact-SHA Windows Gate",
+    "C4_COMMIT": "Material commit [AUTO:CONVERSION-DX11-00498] no CI skip; immutable material SHA taken from commit message/API",
+    "C5_PACKAGE": "NOT_REQUIRED: native game draw dormant",
+    "C6_STATE": "PENDING exact-SHA Gate"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_linear_stage_r197.py",
+    "docs/automation/runs/CONVERSION-DX11-00498.json"
+  ],
+  "evidence": {
+    "predecessor": "CONVERSION-DX11-00497",
+    "known_unrelated_failure": "CONVERSION-DX11-00477 R175_GENERIC_VARYING_MISMATCH",
+    "scoped_static_negative_mutants": 4,
+    "exact_sha_gate": null
+  },
+  "next_action": "Await exact-SHA Backend Conversion Gate; inspect R197 WARP result, preserve inherited R175 failure if any",
+  "resume_cursor": "C3_EXACT_SHA_CI_PENDING",
+  "score_change": 0
+}
