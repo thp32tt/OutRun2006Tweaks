@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B336 P0 q060 B335 P1 source-derived CLEAN plus runner Noto CJK Bold SHA and Hangul 7/7 coverage verified; same-stroke source-vs-localized slant/font-style anchors not verified, so P2 HOLD, C334 C2 HOLD and IGR044 OPEN. Existing B332R DDS preserved; new DDS 0. QA localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json RUN_KEY=OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340 RUNTIME_VALIDATION=UNTESTED.",
     "A210 P1 q175 showroom counter-topology + local-normal chrome native DDS TRIAL SHA 93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded; worker 37945610280 SUCCESS, first denied 0px bottom margin corrected to 1px. NEW trial DDS1, NEW PROMOTED DDS0. Exact source 9314372585b830..., old promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 unchanged; 0 outside/alpha/CLEAN effect; original source 950x132, trial 440x128 native BGW100/75/50/RAW. Improved 룸 counter yet visually fails original joined chrome depth and title hierarchy. IGR-032 OPEN, C1/C3/game blocked RUNTIME_VALIDATION=UNTESTED. Stop width/shear/flat rail tweaks, use authentic source-informed counter/bevel design. QA localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335.",
     "q060 B335 new P1 full-native source CLEAN/removal/protected/restore masks machine PASS seven zero counts, no new DDS. C334 C2 HOLD unchanged; B next P2 obtain font hash and measurable source-to-Korean top/bottom anchors before final manifest, C2/C3 and user IGR044 retest. RUN_KEY=OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310 RUNTIME_VALIDATION=UNTESTED",
     "A209 q175 P1 new trial DDS d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7 hand-authored SHOWROOM rounded vector not promoted: first 169px overbound shadow fixed to 0px, exact saved BGRA roundtrip 0 alpha/outside scope, controller native100 white75 black50 SOURCE/CLEAN/OLD/TRIAL VISUAL FAIL on illegible collapsed 룸 jamo bars, poor chrome relief and 457/950 underfill. Existing promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 untouched, IGR032 OPEN, q175 REWORK_REQUIRED, C1/C3/INGAME blocked RUNTIME_VALIDATION=UNTESTED. Need genuinely different per-jamo counter/chrome vector method, do NOT repeat same A209 skeleton. RUN_KEY=OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300.",
@@ -13731,6 +13732,38 @@
     "C3": "BLOCKED",
     "user_game": "IGR-032_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b336_q060_renderer_font_required_corpus": {
+    "run_key": "OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340",
+    "queue_index": 60,
+    "role": "B",
+    "priority": "P0",
+    "stage": "P2_FONT_BINARY_AND_REQUIRED_GLYPH_COVERAGE_VERIFIED",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "previous_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "confirmed_font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "confirmed_font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "license_file_sha256": "849f4ea9c214fa4ac3593b770c699f387534b11ce671264c1b10d85bdcb5997b",
+    "required_text": "아웃런 마일:",
+    "verified_codepoints": [
+      "0x20",
+      "0x3a",
+      "0xb7f0",
+      "0xb9c8",
+      "0xc544",
+      "0xc6c3",
+      "0xc77c"
+    ],
+    "unicode_coverage": "7/7_ALL_REQUIRED_CHARACTERS_PRESENT",
+    "slant_same_stroke_verified": false,
+    "source_family_style": "HOLD_NATIVE_MATCHED_STROKE_ANCHORS",
+    "new_DDS": 0,
+    "current_candidate_unchanged": true,
+    "C2": "C334_HOLD_UNCHANGED",
+    "C3": "NOT_RUN",
+    "user_IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_ACTIONS_37947992059",
+    "qa_path": "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json"
   }
-
 }

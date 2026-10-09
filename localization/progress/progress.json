@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 23:25 KST",
+  "updated_at_kst": "2026-10-10 00:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9517,6 +9517,38 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "worker_run": 37945610280,
     "qa": "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+  },
+  "b336_q060_verified_renderer_font_hangul_corpus": {
+    "run_key": "OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340",
+    "queue_index": 60,
+    "role": "B",
+    "priority": "P0",
+    "stage": "P2_FONT_BINARY_AND_REQUIRED_GLYPH_COVERAGE_VERIFIED",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "previous_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "confirmed_font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "confirmed_font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "license_file_sha256": "849f4ea9c214fa4ac3593b770c699f387534b11ce671264c1b10d85bdcb5997b",
+    "required_text": "아웃런 마일:",
+    "verified_codepoints": [
+      "0x20",
+      "0x3a",
+      "0xb7f0",
+      "0xb9c8",
+      "0xc544",
+      "0xc6c3",
+      "0xc77c"
+    ],
+    "unicode_coverage": "7/7_ALL_REQUIRED_CHARACTERS_PRESENT",
+    "slant_same_stroke_verified": false,
+    "source_family_style": "HOLD_NATIVE_MATCHED_STROKE_ANCHORS",
+    "new_DDS": 0,
+    "current_candidate_unchanged": true,
+    "C2": "C334_HOLD_UNCHANGED",
+    "C3": "NOT_RUN",
+    "user_IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_ACTIONS_37947992059",
+    "qa_path": "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json"
   }
-
 }
