@@ -1,0 +1,252 @@
+{
+  "role": "B",
+  "run": "B308",
+  "queue_index": 212,
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+  "candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+  "new_dds": 1,
+  "source_clean_outside_all_twelve": 0,
+  "SOURCE_CLEAN_selected_alpha": "ZERO_4",
+  "outside_4_changed_rgba": 0,
+  "outside_4_changed_alpha": 0,
+  "preserved_other_8_source_cells": "EXACT_PERSISTED_RGBA",
+  "header_exact": true,
+  "dds_native": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA",
+  "mips": 1,
+  "saved_dds_decode": "EXACT",
+  "raw_orientation": "mirror_y",
+  "regions": [
+    {
+      "region_idx": 30,
+      "source": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "new_bbox": [
+        1085,
+        428,
+        1203,
+        491
+      ],
+      "margin": [
+        5,
+        71,
+        5,
+        5
+      ],
+      "source_face": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "source_family": "gray",
+      "alignment": "left",
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 66,
+      "native_glyph_width": 118,
+      "native_glyph_height": 63
+    },
+    {
+      "region_idx": 43,
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "new_bbox": [
+        513,
+        346,
+        633,
+        399
+      ],
+      "margin": [
+        513,
+        5,
+        5,
+        5
+      ],
+      "source_face": [
+        241,
+        147,
+        49,
+        255
+      ],
+      "source_family": "orange",
+      "alignment": "right",
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 67,
+      "native_glyph_width": 120,
+      "native_glyph_height": 53
+    },
+    {
+      "region_idx": 44,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "new_bbox": [
+        1688,
+        529,
+        1832,
+        582
+      ],
+      "margin": [
+        62,
+        5,
+        5,
+        5
+      ],
+      "source_face": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "source_family": "red",
+      "alignment": "right",
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 54,
+      "native_glyph_width": 144,
+      "native_glyph_height": 53
+    },
+    {
+      "region_idx": 53,
+      "source": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "new_bbox": [
+        9,
+        83,
+        71,
+        117
+      ],
+      "margin": [
+        5,
+        67,
+        5,
+        5
+      ],
+      "source_face": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "source_family": "gray",
+      "alignment": "left",
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 35,
+      "native_glyph_width": 62,
+      "native_glyph_height": 34
+    }
+  ],
+  "proofs": [
+    "r30_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r30_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r44_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r53_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "method": "native Noto Black gray/orange/red 4 material families from pinned English faces, source CLEAN glyph-only original-height with original left/right align, no old bitmap upscale",
+  "producer_visual": "PENDING_DIRECT_100_75_50_RAW",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "IGR029": "OPEN_MAPPING_SUSPECTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
