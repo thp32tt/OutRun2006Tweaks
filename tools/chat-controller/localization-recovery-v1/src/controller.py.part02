@@ -219,7 +219,7 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Select the isolated three-stage prompt set for this controller instance."""
+    """Select the existing compact prompt set, with independent C1/C2 review."""
     if CONTROLLER_MODE == "vr":
         role_prompts = {
             "A": "vr_A.md",
@@ -232,6 +232,8 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "A": "localization_A.md",
             "B": "localization_B.md",
             "C": "localization_C.md",
+            "C1": "localization_C1.md",
+            "C2": "localization_C2.md",
         }
         default_prompt = "localization_A.md"
     return read_prompt(role_prompts.get(slot.name, default_prompt))
@@ -430,12 +432,14 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page], scheduled_m
         )
         return
 
-    # Localization uses fixed lane timing so a skipped/failed run cannot rotate A/B/C out of phase.
-    # :00/:30=A, :10/:40=B, :20/:50=C. Manual --once keeps the registry next_slot behavior.
-    if CONTROLLER_MODE == "localization" and scheduled_minute is not None and len(reg.slots) >= 3:
-        scheduled_slot = {0: 0, 10: 1, 20: 2}.get(scheduled_minute % 30)
-        if scheduled_slot is not None:
-            reg.next_slot = scheduled_slot
+    # Six launches/hour from the recovery localization Git policy: A :00,
+    # C1 :10/:40 (odd), C2 :20/:50 (even), B :30.
+    # No new queue engine, TASK/production-event identifiers or state machine.
+    if CONTROLLER_MODE == "localization" and scheduled_minute is not None:
+        scheduled_name = SCHEDULED_LOCALIZATION_LANES.get(scheduled_minute)
+        if scheduled_name is None:
+            return
+        reg.next_slot = next(i for i, s in enumerate(reg.slots) if s.name == scheduled_name)
 
     slot = reg.slots[reg.next_slot]
     if FRESH_CHAT_EACH_RUN:
