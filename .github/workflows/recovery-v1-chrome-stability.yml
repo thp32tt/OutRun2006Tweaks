@@ -1,0 +1,71 @@
+name: Recovery v1 Chrome Stability
+
+on:
+  push:
+    branches: [localization-controller-recovery-20260928]
+    paths:
+      - 'tools/chat-controller/localization-recovery-v1/**'
+      - '.github/workflows/recovery-v1-chrome-stability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-recovery-v1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile original recovery controller and maintenance
+        run: |
+          cat tools/chat-controller/localization-recovery-v1/src/controller.py.part* >/tmp/recovery-v1-controller.py
+          python -m py_compile /tmp/recovery-v1-controller.py
+          python -m py_compile tools/chat-controller/localization-recovery-v1/chrome_maintenance.py
+          bash -n tools/chat-controller/localization-recovery-v1/entrypoint.sh
+          bash -n tools/chat-controller/localization-recovery-v1/chrome-cache-clean.sh
+      - name: Four-worker, parity, error-tab and recycle regression
+        run: python tools/chat-controller/localization-recovery-v1/tests/test_recovery_maintenance.py
+      - name: Prove Chrome cookies and session files survive cleaning
+        run: bash tools/chat-controller/localization-recovery-v1/tests/test_chrome_cache_clean.sh
+      - name: Check original recovery Compose and exact deployment contract
+        run: |
+          docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
+          python - <<'PY'
+          from pathlib import Path
+          x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
+          assert 'CHAT_SLOTS: "4"' in x
+          assert 'SCHEDULE_MINUTES: "0,10,20,30,40,50"' in x
+          assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
+          assert 'CHAT_RECYCLE_RUNS: "5"' in x
+          assert 'AUTO_SEND: "${AUTO_SEND:-false}"' in x
+          assert '6082:6080' in x and '8788:8787' in x
+          assert 'outrun_chat_localization_recovery_data' in x
+          assert 'outrun_chat_localization_recovery_logs' in x
+          src=''.join(p.read_text() for p in sorted(Path('tools/chat-controller/localization-recovery-v1/src').glob('controller.py.part*')))
+          assert 'next_production_id' not in src and 'task_events' not in src
+          print("PASS original v1 deployment contract, no v2 queue engines")
+          PY
+      - name: Build original recovery v1 image
+        run: docker build -t recovery-v1-chrome:test tools/chat-controller/localization-recovery-v1
+      - name: Container startup and four dedicated slots
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --name recovery-v1-smoke \
+            -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false \
+            -e CHAT_SLOTS=4 \
+            recovery-v1-chrome:test
+          trap 'docker logs recovery-v1-smoke; docker rm -f recovery-v1-smoke >/dev/null 2>&1 || true' EXIT
+          ok=0
+          for i in $(seq 1 55); do
+            if docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/recovery-status.html; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+          test "$ok" = 1
+          grep -q 'Chat Controller' /tmp/recovery-status.html
+          grep -q 'C1' /tmp/recovery-status.html
+          grep -q 'C2' /tmp/recovery-status.html
+          docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:9222/json/version
