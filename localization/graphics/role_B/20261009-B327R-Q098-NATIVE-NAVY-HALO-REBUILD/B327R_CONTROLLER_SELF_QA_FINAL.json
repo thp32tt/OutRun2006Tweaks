@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B327R",
+  "run_key": "OUTRUN-KOR-B327R-Q098-NATIVE-VECTOR-NAVY-ALPHA-REBUILD-20261009",
+  "index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "source_english": "Challenge the course record.",
+  "korean": "코스 기록에 도전하세요.",
+  "prior_independent_C_return": "C310_SOURCE_FAMILY_NAVY_GLOW_UNDERWEIGHT_WHITE_FACE_DOMINANCE",
+  "prior_producer_trial_failures": [
+    "B300_BROKEN_WHITE_HANGUL",
+    "B301_THIN_GLOW"
+  ],
+  "method_change": "Native vector Korean 330px high-resolution source-outline → 2048-native 980x72 CJK typography; dynamically measured clean plate, independently constructed navy+white glyph alpha, per-block DXT5 regenerated alpha and shared SHA-pinned source white/navy RGB565 endpoints. Not B300/B301 pixel palette recolor.",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+  "old_candidate_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+  "new_candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+  "new_candidate_git_blob": "0739969967986f8a0b37d17f2a14038184ccc10b",
+  "promoted_binary_commit": "bbde0b6fd2d456672e2c5eb30d1d39d2ae2d9f77",
+  "dds_promoted_count": 1,
+  "native": [
+    2048,
+    128
+  ],
+  "dds_format": "DXT5_BC3",
+  "mips": 1,
+  "dds_header_exact": true,
+  "persisted_roundtrip": true,
+  "mirror_y": "SOURCE_RAW_MIRROR_Y_MATCH",
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "permitted_candidate_effect_bbox": [
+    475,
+    9,
+    1580,
+    120
+  ],
+  "all_source_region_outside_rgba": 0,
+  "all_source_region_outside_alpha": 0,
+  "previous_candidate_outside_effect_rgba": 0,
+  "source_clean_original_alpha_residual": 0,
+  "lossless_evidence_contacts": 18,
+  "source_threshold_face_navy_count": [
+    24017,
+    83886
+  ],
+  "candidate_threshold_face_navy_count": [
+    24430,
+    83996
+  ],
+  "threshold_note": "Same per-channel threshold for source and persisted candidate, descriptive support only; not automatic perceptual approval.",
+  "qa_producer_10_stage": [
+    "SOURCE_PINNED_PASS",
+    "PLATE_ONLY_QA_PASS",
+    "ORIGINAL_FAMILY_PROFILE_PASS_SCOPED",
+    "NEW_NATIVE_OUTLINE_AND_ALPHA_PASS",
+    "GLYPH_ONLY_COMPOSITE_PASS",
+    "CLEAN_FINAL_OUTSIDE_ZERO",
+    "SAVED_DXT5_ROUNDTRIP_PASS",
+    "BBOX_AND_PROTECTED_ZERO_PASS",
+    "RAW_AND_PRACTICAL_NATIVE_VISUAL_SCOPED_PASS",
+    "INDEPENDENT_C_AND_REAL_GAME_NOT_RUN"
+  ],
+  "eight_ordered_visual": {
+    "english_removed": "PASS_SCOPED_CLEAN_ALPHA0",
+    "readable_slant_direction": "PASS_SCOPED_RIGHT_FORWARD",
+    "size_vs_source": "PASS_SCOPED_NOT_UPSCALED_980_NATIVE_WIDTH",
+    "outline_shadow": "PASS_SCOPED_OLD_THIN_NAVY_GLOW_MATERIALLY_REPAIRED",
+    "clipping": "PASS_SCOPED_NO_OBVIOUS_CLIPPED_GLYPHS",
+    "protected": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+    "raw_flipy": "PASS_SOURCE_EQUIVALENT_TRANSFORM",
+    "practical_readability": "PASS_SCOPED_50_75_100"
+  },
+  "visual_review_direct": [
+    "READABLE_GRAY_100_SOURCE_CLEAN_OLD_B327.png",
+    "READABLE_GRAY_50_SOURCE_CLEAN_OLD_B327.png",
+    "READABLE_WHITE_100_SOURCE_CLEAN_OLD_B327.png",
+    "READABLE_BLACK_50_SOURCE_CLEAN_OLD_B327.png",
+    "READABLE_WHITE_50_SOURCE_CLEAN_OLD_B327.png",
+    "READABLE_GRAY_75_SOURCE_CLEAN_OLD_B327.png",
+    "RAW_BLACK_75_SOURCE_CLEAN_OLD_B327.png"
+  ],
+  "visual_qualifier": "Producer-scope review of actual persisted BC3 bytes: Korean new white face continuous and legible, navy family effect fuller than B279; English source right-italic stroke geometry not independently calibrated and must be judged by blind fresh C2/C3. No user in-game pass claimed.",
+  "QA": "PRODUCER_SCOPED_PASS_PENDING_FRESH_C2_SOURCE_FAMILY",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "PRE_INGAME": "BLOCKED",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "workflow_id": 37907615230,
+  "workflow_status": "SUCCESS",
+  "backend": "GITHUB_ACTIONS_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILED",
+  "N100_used": "ONLY_SHORT_STATUS_AND_DOWNLOAD_FOR_UNNEEDED_FALLBACK;_NO_HEAVY_COMPUTE",
+  "forbidden_domains_touched": []
+}
