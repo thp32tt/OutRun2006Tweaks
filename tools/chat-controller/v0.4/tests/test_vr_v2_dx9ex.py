@@ -366,6 +366,49 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('CHECKPOINT_MODE=', ast.get_source_segment(SOURCE, prompt))
         self.assertIn('LOCAL_ONLY_AFTER_40M', ast.get_source_segment(SOURCE, prompt))
 
+    def test_forty_minute_fallback_dispatches_new_chat_when_remote_write_fails(self):
+        import asyncio
+        from zoneinfo import ZoneInfo
+        from unittest.mock import AsyncMock
+        tree = ast.parse(SOURCE)
+        node = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
+                    and n.name == 'vr_checkpoint_and_rollover')
+        now = datetime(2026, 10, 9, 21, 40, tzinfo=ZoneInfo('Asia/Seoul'))
+        attempts = []
+        changes = []
+        async def failed_checkpoint(q, active, when, purpose):
+            attempts.append((active['task_id'], purpose))
+            return False
+        async def sent_rollover(context, pages, active, reason):
+            changes.append((active['task_id'], active['attempt'], reason))
+            return True
+        saved_states = []
+        env = {
+            'vr_forced_rollover_due': lambda a, t: True,
+            'vr_unconditional_resume_due': lambda a, t: True,
+            'vr_persist_checkpoint': failed_checkpoint,
+            'queue_rollover_chat': sent_rollover,
+            'save_queue_state': lambda q: saved_states.append(q['active_by_lane']['A'].copy()),
+            'write_runtime': lambda **kw: None,
+            'datetime': datetime, 'TZ': ZoneInfo('Asia/Seoul'),
+            'VR_CHECKPOINT_ENABLED': True,
+        }
+        exec(compile(ast.Module(body=[node], type_ignores=[]), '<hard-ceiling>', 'exec'), env)
+        a = {'task_id': 'CONVERSION-DX11-00478', 'attempt': 1, 'phase': 'WAIT_CHAT',
+             'base_sha': 'a' * 40, 'chat_rollovers': 0}
+        queue = {'active_by_lane': {'A': a}}
+        self.assertTrue(asyncio.run(env['vr_checkpoint_and_rollover'](None, {}, queue, a, now)))
+        self.assertEqual(attempts, [('CONVERSION-DX11-00478', 'pre_rollover')])
+        self.assertEqual(changes, [('CONVERSION-DX11-00478', 1, 'VR_FORCED_40_MINUTE_RESUME')])
+        self.assertEqual(a['vr_checkpoint_fallback'], 'LOCAL_ONLY_AFTER_40M')
+        self.assertTrue(saved_states)
+        self.assertEqual(a['task_id'], 'CONVERSION-DX11-00478')
+        changes.clear()
+        env['vr_unconditional_resume_due'] = lambda a, t: False
+        self.assertTrue(asyncio.run(env['vr_checkpoint_and_rollover'](None, {}, queue, a, now)))
+        self.assertEqual(changes, [])
+        self.assertEqual(a['attempt'], 1)
+
     def test_serial_and_parallel_chat_grace_fail_closed(self):
         tree = ast.parse(SOURCE)
         for fn_name in ('queue_cycle', 'conversion_process_lane'):
