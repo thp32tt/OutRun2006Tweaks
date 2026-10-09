@@ -1,5 +1,9 @@
 # Korean Localization Quality Pipeline
 
+## External retro-localization skill adoption: consumer-chain and playtest coverage — 2026-10-09
+
+Read and apply `docs/KOREAN_LOCALIZATION_END_TO_END_PLAYTEST_GATE.md` whenever a new/materially revised DDS, font/runtime text, in-game regression, C/C3 review, or user preview build involves an in-game consumer. It requires exact source-to-persisted-byte-to-screen traceability, multi-screen shared-atlas impact checks, explicit untested runtime links, and reproducible user playtest routes. Existing A/B/C/C3 ownership, queue/evidence SSOT, ten-stage visual construction, 1-pixel rules, preview exclusion, and user-only in-game closure remain unchanged. Do not import ROM-console tooling or add new queues.
+
 This document is a quality-only layer for `korean-localization-recovery-20260928`. It intentionally does not define controller scheduling, retries, rollovers, task IDs or orchestration.
 
 ## User screenshots: 14 hard-stop presentation observations — 2026-10-09
