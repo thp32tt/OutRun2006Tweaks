@@ -48,13 +48,13 @@ def finish_qa(reg: Registry, active: dict):
     current = reg.artifact_records.get(path, {})
     if (current.get("candidate_sha") != active["candidate_sha"] or
             current.get("reason") == "Candidate bytes changed without a new manifest"):
-        reg.active_lanes.pop("C", None)
+        reg.active_lanes.pop(active["lane"], None)
         return
     current.update(state=active["disposition"], qa_sha=active["result_sha"],
                    automation_validation="PASS", runtime_validation="UNTESTED")
     reg.qa_queue = [q for q in reg.qa_queue if qa_key(q) != qa_key(active)]
-    reg.active_lanes.pop("C", None)
-    publish_lane({**current, "lane": "C"})
+    reg.active_lanes.pop(active["lane"], None)
+    publish_lane({**current, "lane": active["lane"]})
     save_registry(reg)
 
 
@@ -73,7 +73,7 @@ async def poll_gate(reg: Registry, active: dict):
     if run["conclusion"] != "success":
         block_lane(reg, active, f"Actions run {run['id']}: {run['conclusion']}")
         return
-    if active["lane"] == "C" and CONTROLLER_MODE == "localization":
+    if active["lane"] in QA_LANES and CONTROLLER_MODE == "localization":
         finish_qa(reg, active)
     else:
         active["state"] = "PASS"
@@ -107,7 +107,7 @@ async def dispatch_lane(context, pages, reg: Registry, active: dict) -> bool:
     if not await ensure_thinking_level(page):
         return False
     prompt = (conversion_prompt(active) if CONTROLLER_MODE == "conversion" else
-              qa_prompt(active) if active["lane"] == "C" else producer_prompt(active))
+              qa_prompt(active) if active["lane"] in QA_LANES else producer_prompt(active))
     # Persist intent BEFORE Enter. An interrupted send must never be silently
     # replayed into another chat after a crash.
     active.update(state="SENDING", sent_at=now.isoformat(), assistant_hash="",
@@ -120,7 +120,7 @@ async def dispatch_lane(context, pages, reg: Registry, active: dict) -> bool:
     if result != "sent":
         block_lane(reg, active, "Send outcome uncertain: " + result)
         return False
-    active["state"] = "VERIFYING" if CONTROLLER_MODE == "localization" and active["lane"] == "C" else "PRODUCING"
+    active["state"] = "VERIFYING" if CONTROLLER_MODE == "localization" and active["lane"] in QA_LANES else "PRODUCING"
     slot.runs += 1
     slot.last_sent_at = now.isoformat()
     note_successful_request(reg, now, slot.name)
@@ -163,7 +163,7 @@ async def reconcile_active(reg: Registry, active: dict, head: str) -> bool:
     current = reg.artifact_records.get(path, {})
     if (current.get("candidate_sha") != active["candidate_sha"] or
             current.get("reason") == "Candidate bytes changed without a new manifest"):
-        reg.active_lanes.pop("C", None)
+        reg.active_lanes.pop(active["lane"], None)
         return True
     result = await asyncio.to_thread(read_qa_result, active, head)
     if result is None:
@@ -247,30 +247,49 @@ async def localization_cycle(context, pages, reg: Registry):
     if not head:
         raise RuntimeError("Cannot resolve authoritative localization HEAD")
     await asyncio.to_thread(reconcile_assets, reg, head)
-    # Resume from asset/SHA evidence before considering new sends.
-    for lane in ("C", "A", "B"):
+    # Finish/determine the exact SHA for both QA workers and both producers
+    # before selecting new work. A restart never duplicates an in-flight task.
+    for lane in (*QA_LANES, "A", "B"):
         active = reg.active_lanes.get(lane)
         if active:
             await observe_lane(context, pages, reg, active, head)
             save_registry(reg)
     if not AUTO_SEND:
         return
-    # C gets the next available slot; it never waits for both producers.
-    if "C" not in reg.active_lanes and len(reg.active_lanes) < MAX_ACTIVE_LANES:
+
+    # Two independent QA workers share one canonical queue. A candidate is
+    # leased by its exact asset path and SHA, and only one worker may own it.
+    # Reserve also within the current pass when a browser send is deferred.
+    reserved = {
+        item.get("asset_path") for lane, item in reg.active_lanes.items()
+        if lane in QA_LANES and item.get("asset_path")
+    }
+    for qa_lane in QA_LANES:
+        if qa_lane in reg.active_lanes or len(reg.active_lanes) >= MAX_ACTIVE_LANES:
+            continue
         for item in reg.qa_queue:
-            current = reg.artifact_records.get(item["asset_path"], {})
-            if current.get("state") == "BLOCKED" and not current.get("reason", "").startswith(("Actions run ", "Exact-SHA Actions")):
+            asset_path = item["asset_path"]
+            if asset_path in reserved:
                 continue
-            active = {**item, "lane": "C", "state": "READY", "base_sha": head,
+            current = reg.artifact_records.get(asset_path, {})
+            if (current.get("candidate_sha") != item["candidate_sha"] or
+                    current.get("state") not in {"QA_PENDING", "WAIT_GATE", "BLOCKED"}):
+                continue
+            if (current.get("state") == "BLOCKED" and not
+                    current.get("reason", "").startswith(("Actions run ", "Exact-SHA Actions"))):
+                continue
+            reserved.add(asset_path)
+            active = {**item, "lane": qa_lane, "state": "READY", "base_sha": head,
                       "result_sha": "", "branch": LOCALIZATION_BRANCH,
                       "workflow": "Localization Automation Gate"}
-            # Existing QA commit is adopted on restart without a second C chat.
+            # An already committed QA result is adopted; no second QA prompt.
             if await reconcile_active(reg, active, head):
                 if active["state"] == "WAIT_GATE":
-                    reg.active_lanes["C"] = active
+                    reg.active_lanes[qa_lane] = active
                 break
             await dispatch_lane(context, pages, reg, active)
             break
+
     rows = await asyncio.to_thread(load_asset_rows, head)
     for lane in ("A", "B"):
         if lane in reg.active_lanes or len(reg.active_lanes) >= MAX_ACTIVE_LANES:
@@ -310,7 +329,7 @@ async def conversion_cycle(context, pages, reg: Registry):
 
 
 # A renderer can crash while Chrome/CDP remains alive. The localization
-# controller restores only the affected A/B/C tab, never re-sends a prompt.
+# controller restores only the affected A/B/C1/C2 tab, never re-sends a prompt.
 TAB_HEALTH_CHECK_SECONDS = max(10, int(os.getenv("TAB_HEALTH_CHECK_SECONDS", "30")))
 TAB_HEALTH_PROBE_TIMEOUT_SECONDS = max(2, int(os.getenv("TAB_HEALTH_PROBE_TIMEOUT_SECONDS", "6")))
 TAB_HEALTH_FAILURE_THRESHOLD = max(2, int(os.getenv("TAB_HEALTH_FAILURE_THRESHOLD", "3")))
