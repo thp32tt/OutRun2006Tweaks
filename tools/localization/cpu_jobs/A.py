@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""A206 q193: remove three inherited English ghosts, rebuild actual native DDS.
+"""A207: source-authored Goal A small-menu *single family pilot*, q193.
 
-Exact source pixel footprints, source-only plate, transparent glyph composite,
-decode persisted DDS and compare RAW/FLIPY. Worker creates trial only until
-controller inspects source/clean/old/new at native/50 on multiple backgrounds.
+Stage P1 SOURCE->CLEAN is completed and saved before any lettering.  Produces
+a non-promoted trial DDS plus auditable native RAW masks/evidence and recipe.
+New production-reset forbids candidate promotion before controller sees pixels,
+and requires the final pixel guard for any later promotion.
 """
 import hashlib
 import json
@@ -12,183 +13,198 @@ import struct
 import tempfile
 import urllib.request
 from pathlib import Path
-
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
-ROOT=Path.cwd()
-NAME="20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL"
-OUT=ROOT/"localization/graphics/role_A"/NAME
+R=Path.cwd()
+OUT=R/"localization/graphics/role_A/20261009-A207-Q193-GOAL-A-FLAT-UI-PILOT"
 OUT.mkdir(parents=True,exist_ok=True)
 ASSET="97E863AD_512x256.dds"
-CAND=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst"/ASSET
+CAND=R/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst"/ASSET
 SRC_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/"+ASSET
 FONT_URL="https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Korean/NotoSansCJKkr-Black.otf"
-EXPECTED_SOURCE="d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
-EXPECTED_OLD="1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6"
-EXPECTED_FONT_BLOB="b5b67bf293310a3648468a21ac829d6f2d58b2d5"
-ROWS=[
- {"key":"online_rank_help","source":"View the online multiplayer rankings!","ko":"온라인 멀티플레이어 랭킹 보기!", "cell":[0,372,1160,465]},
- {"key":"outrun2sp_rank_help","source":"View OutRun2SP arcade rankings!","ko":"OutRun2SP 아케이드 랭킹 보기!", "cell":[0,534,1105,633]},
- {"key":"outrun_rank_help","source":"View OutRun single player rankings!","ko":"OutRun 싱글 플레이 랭킹 보기!", "cell":[0,694,1120,792]}
-]
-def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
-def blob(p):
+SRC_SHA="d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
+OLD_SHA="d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa"
+FONT_BLOB="b5b67bf293310a3648468a21ac829d6f2d58b2d5"
+CELL=(770,167,1085,248)
+PROTECTED=[(744,118,1117,169),(0,797,929,1022)]
+TEXT="골 A"
+SOURCE_TEXT="Goal A"
+def hashfile(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def gitblob(p):
     b=Path(p).read_bytes()
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
-def load_dds(p):
+def load(p):
     b=Path(p).read_bytes()
-    if b[:4]!=b"DDS ":raise RuntimeError("not DDS")
+    if b[:4]!=b"DDS " or len(b)!=(128+2048*1024*4):raise RuntimeError("unexpected DDS header/length")
     h,w=struct.unpack_from("<II",b,12)
-    if (w,h)!=(2048,1024) or len(b)!=(128+w*h*4):raise RuntimeError("unexpected DDS geometry")
-    if struct.unpack_from("<I",b,28)[0]!=1:raise RuntimeError("unexpected DDS mip count")
-    if struct.unpack_from("<I",b,88)[0]!=32 or struct.unpack_from("<IIII",b,92)!=(255,65280,16711680,4278190080):
-        raise RuntimeError("unexpected RGBA channel masks")
-    return b[:128],Image.frombytes("RGBA",(w,h),b[128:],"raw","RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-def save_dds(header,im,p):
-    p.write_bytes(header+im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","RGBA"))
-def flatten(im,bg):
-    out=Image.new("RGBA",im.size,(*bg,255))
-    out.alpha_composite(im)
-    return out.convert("RGB")
-def original_footprint(source,cell):
-    x0,y0,x1,y1=cell
-    rgba=np.asarray(source.crop((x0,y0,x1,y1)))
-    on=rgba[:,:,3]>6
-    if not on.any():raise RuntimeError(("no source glyph",cell))
-    ys,xs=np.nonzero(on)
-    bbox=[int(xs.min()+x0),int(ys.min()+y0),int(xs.max()+x0+1),int(ys.max()+y0+1)]
-    # No source text may touch an arbitrary cell boundary: prove isolation.
-    if bbox[0]<=x0 or bbox[1]<=y0+1 or bbox[2]>=x1-2 or bbox[3]>=y1-2:
-        raise RuntimeError(("source footprint may spill/overlap cell",cell,bbox))
-    return bbox
-def draw_native(ko,fontfile,maxw,maxh,minheight):
-    # Do not stretch compressed Korean pixel art. Keep the source weight/scale.
-    for fontsize in range(100,20,-1):
-        font=ImageFont.truetype(str(fontfile),fontsize)
-        scratch=Image.new("L",(2600,180),0)
-        ImageDraw.Draw(scratch).text((8,0),ko,font=font,fill=255)
-        bb=scratch.getbbox()
+    if (w,h)!=(2048,1024) or struct.unpack_from("<I",b,28)[0]!=1 or struct.unpack_from("<I",b,88)[0]!=32:
+        raise RuntimeError("native dimensions/mips/bitcount changed")
+    if struct.unpack_from("<IIII",b,92)!=(255,65280,16711680,4278190080):raise RuntimeError("q193 is RGBA, not BGRA")
+    readable=Image.frombytes("RGBA",(w,h),b[128:],"raw","RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    return b[:128],readable
+def save(header,readable,p):
+    p.write_bytes(header+readable.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","RGBA"))
+def flatten(im,rgb):
+    a=Image.new("RGBA",im.size,(*rgb,255))
+    a.alpha_composite(im)
+    return a.convert("RGB")
+def showmasks(arr,p):
+    Image.fromarray((arr.astype(np.uint8)*255),"L").transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/p)
+def colored_alpha(im,alpha,p):
+    im.putalpha(Image.fromarray(alpha.astype("uint8"),"L"));im.save(OUT/p)
+if not CAND.exists() or hashfile(CAND)!=OLD_SHA:raise RuntimeError("q193 last promoted exact bytes changed; fail closed")
+header,old=load(CAND)
+with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
+    src=Path(tmp)/ASSET
+    font=Path(tmp)/"NotoSansCJKkr-Black.otf"
+    urllib.request.urlretrieve(SRC_URL,src)
+    urllib.request.urlretrieve(FONT_URL,font)
+    if hashfile(src)!=SRC_SHA or gitblob(font)!=FONT_BLOB:raise RuntimeError("pinned SOURCE/FONT drift")
+    shead,source=load(src)
+    if header!=shead:raise RuntimeError("DDS header source/old unequal")
+    x0,y0,x1,y1=CELL
+    S=np.asarray(source).copy();B=np.asarray(old).copy()
+    segment=S[y0:y1,x0:x1]
+    mask_source=segment[:,:,3]>0
+    if mask_source.sum()<100:raise RuntimeError("English Goal A absent from requested cell")
+    ys,xs=np.nonzero(mask_source)
+    english=(int(xs.min()+x0),int(ys.min()+y0),int(xs.max()+x0+1),int(ys.max()+y0+1))
+    if english[0]<x0+4 or english[1]<y0+2 or english[2]>x1-5 or english[3]>y1-6:
+        raise RuntimeError(("SOURCE GOAL A not isolated; protected next row/neighbor might overlap",english,CELL))
+    if english[2]-english[0]>275 or english[3]-english[1]>73:raise RuntimeError("Source cell probably contains other art")
+    print("A207 measured English source bbox",english,flush=True)
+    allowed=np.zeros((1024,2048),bool)
+    allowed[y0:y1,x0:x1]=True
+    protected=np.zeros((1024,2048),bool)
+    for a,b,c,d in PROTECTED:
+        protected[b:d,a:c]|=S[b:d,a:c,3]>0
+    if (allowed&protected).any():raise RuntimeError("Protected family collision; tighten cell")
+    # Critical: protect SOURCE art (not only previously damaged candidate).
+    protect_delta=int(np.sum(np.any(S!=B,axis=2)&protected))
+    if protect_delta:raise RuntimeError(("SOURCE protected original art is already lost",protect_delta))
+    removal=np.zeros((1024,2048),bool)
+    # pre-lettering mask is derived from English-original and prior visible
+    # alpha in this exact isolated sprite, NOT final changed pixels.
+    removal[y0:y1,x0:x1]|=(S[y0:y1,x0:x1,3]!=0)|(B[y0:y1,x0:x1,3]!=0)
+    if removal.sum()<100:raise RuntimeError("source lettering removal mask empty")
+    transparent=removal.copy()
+    cleanarr=B.copy()
+    cleanarr[removal]=0
+    if np.any(cleanarr[transparent,3]):raise RuntimeError("CLEAN PLATE alpha ghost")
+    if np.any(np.any(cleanarr!=B,axis=2)&~removal):raise RuntimeError("PLATE changed out of removal mask")
+    if np.any(np.any(cleanarr!=S,axis=2)&protected):raise RuntimeError("SOURCE protected art lost in CLEAN")
+    clean=Image.fromarray(cleanarr,"RGBA")
+    raw=source.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    # Publication guard needs a pinned canonical DDS inside Git evidence.
+    (OUT/"A207_SOURCE_CANONICAL_RGBA32.dds").write_bytes(src.read_bytes())
+    clean.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A207_CLEAN_NATIVE_RAW.png")
+    source.save(OUT/"A207_SOURCE_READABLE.png")
+    clean.save(OUT/"A207_CLEAN_READABLE.png")
+    old.save(OUT/"A207_OLD_READABLE.png")
+    showmasks(removal,"A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png")
+    showmasks(allowed,"A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png")
+    showmasks(protected,"A207_MASK_SOURCE_PROTECTED_RAW.png")
+    showmasks(transparent,"A207_MASK_TRANSPARENT_PLATE_RAW.png")
+    showmasks(np.zeros_like(removal),"A207_MASK_NONE_RAW.png")
+    # P1 evidence is saved now, independently of the eventual Korean.
+    for name,bg in [("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+        x2=max(0,x0-15);y2=max(0,y0-10);x3=min(2048,x1+25);y3=min(1024,y1+15)
+        parts=[flatten(im,bg).crop((x2,y2,x3,y3)) for im in (source,old,clean)]
+        w,h=parts[0].size
+        sheet=Image.new("RGB",(3*w+12,h+21),bg)
+        ImageDraw.Draw(sheet).text((3,2),"SOURCE | CURRENT A206 | INDEPENDENT EMPTY CLEAN",fill=(255,200,0) if name!="WHITE" else (0,0,0))
+        for i,v in enumerate(parts):sheet.paste(v,(i*(w+6),21))
+        for pct in (100,75,50):
+            t=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
+            t.save(OUT/f"A207_PLATE_ONLY_{name}_{pct}.jpg",quality=95)
+    # P2 only after SOURCE/CLEAN mechanical stage and plate proof created.
+    ew,eh=english[2]-english[0],english[3]-english[1]
+    glyph=fs=None
+    for size in range(95,17,-1):
+        f=ImageFont.truetype(str(font),size)
+        trial=Image.new("L",(500,170),0)
+        ImageDraw.Draw(trial).text((8,0),TEXT,font=f,fill=255)
+        bb=trial.getbbox()
         if not bb:continue
-        image=scratch.crop(bb)
-        if image.width<=maxw-8 and image.height<=maxh-4 and image.height>=minheight:
-            return image,fontsize
-    raise RuntimeError(("font cannot maintain source readable height in bbox",ko,maxw,maxh))
-if not CAND.exists() or sha(CAND)!=EXPECTED_OLD:
-    raise RuntimeError(("q193 exact candidate SHA changed, fail closed",sha(CAND)))
-previous_header,previous=load_dds(CAND)
-with tempfile.TemporaryDirectory(prefix="a206_") as tmp:
-    sf=Path(tmp)/ASSET
-    ff=Path(tmp)/"NotoSansCJKkr-Black.otf"
-    urllib.request.urlretrieve(SRC_URL,sf)
-    urllib.request.urlretrieve(FONT_URL,ff)
-    if sha(sf)!=EXPECTED_SOURCE or blob(ff)!=EXPECTED_FONT_BLOB:
-        raise RuntimeError("pinned canonical English source or font drift")
-    source_header,source=load_dds(sf)
-    if previous_header!=source_header:
-        raise RuntimeError("source DDS 128byte header differs from candidate")
-    old=np.asarray(previous)
-    before=previous.copy()
-    clean=previous.copy()
-    cellmask=np.zeros((1024,2048),dtype=bool)
-    for r in ROWS:
-        x0,y0,x1,y1=r["cell"]
-        if cellmask[y0:y1,x0:x1].any():raise RuntimeError("source edit cells overlap")
-        cellmask[y0:y1,x0:x1]=True
-        origin=original_footprint(source,r["cell"])
-        r["source_glyph_bbox"]=origin
-        s=np.asarray(source.crop((x0,y0,x1,y1)))
-        rgb=s[:,:,:3][s[:,:,3]>200]
-        if len(rgb)<100:raise RuntimeError("no opaque source text palette")
-        r["source_rgb_median"]=[int(c) for c in np.median(rgb,axis=0)]
-        r["english_height"]=origin[3]-origin[1]
-        r["english_width"]=origin[2]-origin[0]
-        # All English glyph/effects and all prior overlaid Korean/ghost reside
-        # inside this isolated cell. Transparent atlas is the actual plate.
-        clean.paste((0,0,0,0),(x0,y0,x1,y1))
-    # The cleaned plate is a stage *without Korean* and must be evaluated
-    # independently before glyph production, with the current outside intact.
-    cleanpix=np.asarray(clean)
-    if np.any(cleanpix[cellmask,3]):raise RuntimeError("plate still has alpha in source cells")
-    if not np.array_equal(old[~cellmask],cleanpix[~cellmask]):
-        raise RuntimeError("protected translated sprites modified during clean")
-    final=clean.copy()
-    glyphmask=np.zeros((1024,2048),dtype=bool)
-    for i,r in enumerate(ROWS):
-        x0,y0,x1,y1=r["cell"]
-        ox0,oy0,ox1,oy1=r["source_glyph_bbox"]
-        ew,eh=r["english_width"],r["english_height"]
-        glyph,size=draw_native(r["ko"],ff,ew,eh,max(26,int(eh*0.78)))
-        gx=ox0+2
-        gy=oy0+(eh-glyph.height)//2
-        if gx<=x0 or gy<=y0 or gx+glyph.width>=ox1-1 or gy+glyph.height>=oy1-1:
-            raise RuntimeError(("new glyph outside original English source footprint",r["key"],(gx,gy,glyph.size),r["source_glyph_bbox"]))
-        layer=Image.new("RGBA",glyph.size,tuple(r["source_rgb_median"])+(0,))
-        layer.putalpha(glyph)
-        final.alpha_composite(layer,(gx,gy))
-        ga=np.asarray(glyph)
-        gmask=ga>0
-        if glyphmask[gy:gy+glyph.height,gx:gx+glyph.width].any():
-            raise RuntimeError("font glyph overlap other source row")
-        glyphmask[gy:gy+glyph.height,gx:gx+glyph.width]=gmask
-        bbox=[gx,gy,gx+glyph.width,gy+glyph.height]
-        r.update({"font_size":size,"new_bbox":bbox,"new_size":list(glyph.size),
-            "actual_source_bbox_size":[ew,eh],"margin_original_bbox":[gx-ox0,ox1-(gx+glyph.width),gy-oy0,oy1-(gy+glyph.height)],
-            "source_width_coverage":round(glyph.width/ew,4),"native_font":"NotoSansCJKkr-Black"})
-        if min(r["margin_original_bbox"])<1:raise RuntimeError("new glyph touches source edge")
-        # Independent plate-only and composite-only previews with source,
-        # English/previous, clean, final; source top y and edges preserved.
-        cx0=max(0,x0-1);cx1=min(2048,x1+6)
-        cy0=max(0,y0-1);cy1=min(1024,y1+5)
-        for bgname,bg in (("gray",(100,100,100)),("black",(0,0,0)),("white",(255,255,255))):
-            imlist=[flatten(im,bg).crop((cx0,cy0,cx1,cy1)) for im in (source,previous,clean,final)]
-            cw,ch=imlist[0].size
-            contact=Image.new("RGB",(cw*4+18,ch+18),bg)
-            for index,image in enumerate(imlist):contact.paste(image,(index*(cw+6),18))
-            ImageDraw.Draw(contact).text((2,2),"ENGLISH | OLD GHOST | CLEAN PLATE | NEW DDS",fill=(255,255,0) if bgname!="white" else (0,0,0))
-            for factor in (100,75,50):
-                if factor==100:view=contact
-                else:view=contact.resize((contact.width*factor//100,contact.height*factor//100),Image.Resampling.LANCZOS)
-                view.save(OUT/f"A206_{i}_{r['key']}_{bgname}_{factor}.jpg",quality=95,subsampling=0)
-    finpix=np.asarray(final)
-    changed=np.any(finpix!=old,axis=2)
-    composited_changed=np.any(finpix!=cleanpix,axis=2)
+        w=trial.crop(bb)
+        if w.width<ew-8 and w.height<eh-4 and w.height>=0.78*eh:
+            glyph=w;fs=size;break
+    if glyph is None:raise RuntimeError(("font not compatible with English height/width",ew,eh))
+    gx=english[0]+3;gy=english[1]+(eh-glyph.height)//2
+    if gx+glyph.width>=english[2]-2 or gy+glyph.height>=english[3]-1:raise RuntimeError("new glyph violates source bbox")
+    srcpix=S[english[1]:english[3],english[0]:english[2]]
+    rgb=srcpix[:,:,:3][srcpix[:,:,3]>200]
+    if len(rgb)<20:raise RuntimeError("SOURCE foreground insufficient")
+    color=tuple(int(v) for v in np.median(rgb,axis=0))
+    alpha=np.asarray(glyph)
+    letter=Image.new("RGBA",(2048,1024),(0,0,0,0))
+    layer=Image.new("RGBA",glyph.size,(*color,0))
+    layer.putalpha(glyph)
+    letter.alpha_composite(layer,(gx,gy))
+    lraw=letter.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    lraw.save(OUT/"A207_LETTER_ONLY_NATIVE_RAW.png")
+    letter.save(OUT/"A207_LETTER_ONLY_READABLE.png")
+    effect=np.asarray(letter)[:,:,3]>0
+    showmasks(effect,"A207_MASK_NEW_GLYPH_EFFECT_RAW.png")
+    if (effect&protected).any() or (effect&~allowed).any():raise RuntimeError("new lettering enters protected art")
+    final=Image.alpha_composite(clean,letter)
+    saved=OUT/"A207_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
+    save(header,final,saved)
+    head,persist=load(saved)
+    if head!=header or not np.array_equal(np.asarray(persist),np.asarray(final)):
+        raise RuntimeError("saved RGBA DDS differs from expected alpha composite")
+    F=np.asarray(persist)
     metrics={
-        "old_to_clean_changed_outside_source_cells":int(np.sum(np.any(old!=cleanpix,axis=2)&~cellmask)),
-        "old_to_final_changed_outside_source_cells":int(np.sum(changed&~cellmask)),
-        "old_to_final_alpha_changed_outside_source_cells":int(np.sum((old[:,:,3]!=finpix[:,:,3])&~cellmask)),
-        "clean_to_final_changed_outside_new_Hangul":int(np.sum(composited_changed&~glyphmask)),
-        "protected_source_sprites_changed":int(np.sum(changed&~cellmask)),
-        "plate_alpha_nonzero_in_3_source_cells":int(np.count_nonzero(cleanpix[cellmask,3]))
+       "source_protected_vs_previous":protect_delta,
+       "source_protected_vs_clean":int(np.sum(np.any(S!=cleanarr,axis=2)&protected)),
+       "source_protected_vs_final":int(np.sum(np.any(S!=F,axis=2)&protected)),
+       "prior_vs_new_outside_edit":int(np.sum(np.any(B!=F,axis=2)&~allowed)),
+       "clean_changed_outside_removal":int(np.sum(np.any(B!=cleanarr,axis=2)&~removal)),
+       "clean_to_final_outside_letter_alpha":int(np.sum(np.any(F!=cleanarr,axis=2)&~effect)),
+       "transparent_clean_nonzero_alpha":int(np.count_nonzero(cleanarr[transparent,3]))
     }
-    if any(metrics.values()):raise RuntimeError(("DDS edit escaped exact bounds or glyph-only mask",metrics))
-    trial=OUT/"A206_Q193_THREE_RANK_HELP_GHOST_REMOVED_RGBA32.dds"
-    save_dds(previous_header,final,trial)
-    persisted_header,persisted=load_dds(trial)
-    if persisted_header!=previous_header or not np.array_equal(np.asarray(persisted),finpix):
-        raise RuntimeError("actual on-disk DDS RAW/FLIPY byte roundtrip differs")
-    source.save(OUT/"A206_SOURCE_FLIPY.png")
-    before.save(OUT/"A206_OLD_FLIPY.png")
-    clean.save(OUT/"A206_CLEAN_PLATE_FLIPY.png")
-    persisted.save(OUT/"A206_NEW_PERSISTED_FLIPY.png")
-    persisted.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A206_NEW_PERSISTED_RAW.png")
-    for bgname,bg in (("gray",(100,100,100)),("black",(0,0,0)),("white",(255,255,255))):
-        vis=flatten(persisted,bg)
-        vis.save(OUT/f"A206_FULL_FINAL_FLIPY_{bgname}_100.jpg",quality=94)
-        vis.resize((1024,512),Image.Resampling.LANCZOS).save(OUT/f"A206_FULL_FINAL_FLIPY_{bgname}_50.jpg",quality=94)
-    report={"schema_version":2,"role":"A","run":NAME,"index":193,
-        "status":"TRIAL_PENDING_CONTROLLER_VISUAL_NOT_PROMOTED",
-        "source_sha256":EXPECTED_SOURCE,"before_sha256":EXPECTED_OLD,"trial_sha256":sha(trial),
-        "source_provenance":SRC_URL,"font_blob_sha1":EXPECTED_FONT_BLOB,
-        "native_dims":[2048,1024],"source_dds_masks":[255,65280,16711680,4278190080],
-        "mips":1,"raw_orientation":"mirror_y","rows":ROWS,"qa_numeric":metrics,
-        "scope":"3 leftover rank/help English-source ghost overlapped legacy Korean",
-        "source_plate_clean":"transparent alpha 0, before Korean insertion",
-        "saved_dds_roundtrip":True,"new_dds_trial":1,"candidate_promoted":0,
-        "consumer_screen_family":["Multiplayer ranking help","OutRun2SP arcade ranking help","OutRun single-player rankings help"],
-        "first_unproven_consumer_link":"exact persisted candidate not yet entered reviewed patch manifest/build -> actual game load/texture sampling/composited screens",
-        "runtime_validation":"UNTESTED"}
-    (OUT/"A206_Q193_RANK_HELP_TRIAL_REPORT.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
-    print("A206 Q193 THREE NEW GHOST-FREE RANK HELP DDS",json.dumps({"sha":report["trial_sha256"],"rows":ROWS,"qa":metrics},ensure_ascii=False),flush=True)
+    if any(metrics.values()):raise RuntimeError(("P3 mechanical mask fail",metrics))
+    persist.save(OUT/"A207_NEW_PERSISTED_READABLE.png")
+    persist.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A207_NEW_PERSISTED_RAW.png")
+    for name,bg in [("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+        x2=max(0,x0-15);y2=max(0,y0-10);x3=min(2048,x1+25);y3=min(1024,y1+15)
+        parts=[flatten(im,bg).crop((x2,y2,x3,y3)) for im in (source,clean,old,persist)]
+        w,h=parts[0].size
+        sheet=Image.new("RGB",(4*w+18,h+21),bg)
+        ImageDraw.Draw(sheet).text((3,2),"SOURCE | CLEAN | OLD GHOST | NEW NATIVE",fill=(255,200,0) if name!="WHITE" else (0,0,0))
+        for i,v in enumerate(parts):sheet.paste(v,(i*(w+6),21))
+        for pct in (100,75,50):
+            t=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
+            t.save(OUT/f"A207_COMPOSITE_{name}_{pct}.jpg",quality=95)
+    report={"role":"A","run":"20261009-A207-Q193-GOAL-A-FLAT-UI-PILOT","queue_index":193,
+       "status":"SOURCE_DERIVED_PILOT_TRIAL_PENDING_CONTROLLER_VISUAL_AND_C_FAMILY",
+       "english":SOURCE_TEXT,"korean":TEXT,"source_sha256":SRC_SHA,"baseline_sha256":OLD_SHA,
+       "trial_sha256":hashfile(saved),"source_cell":CELL,"source_bbox":english,
+       "candidate_bbox":[gx,gy,gx+glyph.width,gy+glyph.height],"source_rgb":color,
+       "font_size":fs,"font_blob_sha":FONT_BLOB,"qa_numeric":metrics,
+       "original_protected_art_rects":PROTECTED,"original_protected_nonzero_pixels":int(protected.sum()),
+       "original_english_bbox_size":[ew,eh],"candidate_natural_size":list(glyph.size),
+       "new_dds_trial":1,"promoted_candidate":0,"runtime_validation":"UNTESTED",
+       "consumer_first_unproven_link":"promoted candidate/preview manifest->game atlas load->Goal A focus state; not game tested"}
+    (OUT/"A207_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    recipe={
+      "schema_version":1,"family":"small dark flat Goal rank menu labels", "run":report["run"],
+      "source":{"url":SRC_URL,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","sha256":SRC_SHA},
+      "source_atlas_labels":["WELCOME TO THE","MULTIPLAYER","3x ranking help","Goal A","Goal B","Goal C","Goal D","Goal E","15 Cont.","ONLINE","OUTRUN SHOWROOM"],
+      "protected":["TESTAROSSA title","large red OUTRUN2SP artwork","every remaining translated/title/help label outside Goal A"],
+      "source_semantics":SOURCE_TEXT,"canonical_korean":TEXT,
+      "font":{"source_url":FONT_URL,"git_blob":FONT_BLOB,"license":"SIL-OFL-1.1","name":"NotoSansCJKkr-Black","native_size":fs,"missing_fallback_not_allowed":True,"glyph_coverage":"verified render nonempty, separate formal cmap pending"},
+      "renderer":"Pillow ImageDraw native RGBA, no shear/stretch/extrusion/downsample, one mip","source_rgb_median":color,
+      "flat_effects":{"outline_px":0,"shadow_px":0,"slant_dx_top_minus_bottom":0},
+      "readable_to_RAW":"single FLIP_TOP_BOTTOM at saved DDS writer only",
+      "source_cell":CELL,"source_bbox":english,"candidate_bbox":report["candidate_bbox"],
+      "mask_files":["A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png","A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png","A207_MASK_SOURCE_PROTECTED_RAW.png","A207_MASK_NEW_GLYPH_EFFECT_RAW.png"],
+      "prior_failure":"English Goal label underlaid by thin/stretched Korean glyph in whole atlas; q193 A205/A206 only six other labels redrawn",
+      "method_changed":"First dedicated SMALL Goal A native flat font-family pilot; source-derived removal; exact protected source checks",
+      "pilot_status":"NOT_YET_INDEPENDENT_C_QUALIFIED_DO_NOT_MULTIPLY_INTO_GOAL_B-E"
+    }
+    (OUT/"recipe.json").write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print("A207 PILOT_READY_FOR_CONTROLLER",json.dumps({"trial":report["trial_sha256"],"source_bbox":english,"candidate_bbox":report["candidate_bbox"],"protected_pixels":report["original_protected_nonzero_pixels"],"numeric":metrics},ensure_ascii=False),flush=True)
