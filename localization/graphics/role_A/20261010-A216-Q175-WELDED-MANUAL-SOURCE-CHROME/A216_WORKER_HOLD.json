@@ -1,0 +1,9 @@
+{
+  "run": "A216",
+  "run_key": "OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
+  "status": "TRIAL_EXECUTION_FAIL_CURRENT_UNCHANGED",
+  "error": "ValueError:P3 source-pixel and positive-margin gate FAIL {'source_to_clean_alpha_nonzero': 0, 'prior_to_new_rgba_changed_outside_source': 22, 'prior_to_new_alpha_changed_outside_source': 22, 'clean_to_final_rgba_changed_outside_original': 22, 'margins': [50, 90, 7, -2], 'bbox': [56, 404, 866, 531], 'width_relative_source': 0.8526}",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 166, in <module>\n    try:execute()\n        ^^^^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 135, in execute\n    raise ValueError(\"P3 source-pixel and positive-margin gate FAIL \"+repr(gates))\nValueError: P3 source-pixel and positive-margin gate FAIL {'source_to_clean_alpha_nonzero': 0, 'prior_to_new_rgba_changed_outside_source': 22, 'prior_to_new_alpha_changed_outside_source': 22, 'clean_to_final_rgba_changed_outside_original': 22, 'margins': [50, 90, 7, -2], 'bbox': [56, 404, 866, 531], 'width_relative_source': 0.8526}\n",
+  "new_promoted_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
