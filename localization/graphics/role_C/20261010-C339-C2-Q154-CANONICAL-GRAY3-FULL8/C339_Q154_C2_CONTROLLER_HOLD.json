@@ -1,0 +1,602 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C339",
+  "time_kst": "2026-10-10T03:33:00+09:00",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "canonical_source_exact_sha_independently_verified_this_run": true,
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "canonical_source_sha_verified": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "source_bytes_not_committed": "Copyrighted/public canonical source DDS retrieved to local scratch and SHA-verified; not included in QA commit",
+  "scope": "First fresh exact canonical SOURCE-vs-persisted current B298 DDS whole 8-region native RGBA pixel audit, source/clean/final 100/75/50 black/gray/white, RAW, plus three gray menu font-family actual visual contacts. C336 only checked five preserved red exact identity. No same SHA success claim.",
+  "report_machine": {
+    "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/C339_Q154_CURRENT_SOURCE_NATIVE_MACHINE.json",
+    "sha256": "5af1a16fbc44c07cf3d7fd068ed415282626f26a20b5bdf669c53c053ee6afa3"
+  },
+  "independent_full_atlas": {
+    "source_vs_current_changed_rgba_outside_8_source_bboxes": 0,
+    "source_vs_current_changed_alpha_outside_8_source_bboxes": 0,
+    "source_and_current_header_exact": true,
+    "outside_8_source_boxes_protected_alpha_unchanged": true,
+    "inside_union_rgba_diff": 681829,
+    "inside_union_alpha_diff": 674192,
+    "all8_inside_source_positive_margins": true
+  },
+  "regions": [
+    {
+      "id": "01_create_new_license",
+      "source_bbox_native_readable": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        1941,
+        148
+      ],
+      "candidate_alpha_local_bbox": [
+        2,
+        4,
+        1516,
+        144
+      ],
+      "candidate_margins": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/01_create_new_license_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "6f4a8172eee8bd14c715d52aee8cfc7cb7df8baaca91c5b84f0e9c649e42db40"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native original red lettering and current persisted red lettering inspected in previous C292/C336 and newly SHA-bound to exact English source this run; no newly established visual change or defect"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "02_select_license",
+      "source_bbox_native_readable": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        1461,
+        148
+      ],
+      "candidate_alpha_local_bbox": [
+        2,
+        4,
+        1098,
+        144
+      ],
+      "candidate_margins": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/02_select_license_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "0e1c1ec3ab250976f0bb0cc589be0d018bbe7f1659bd37bbe67594fc6e144b9f"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native original red lettering and current persisted red lettering inspected in previous C292/C336 and newly SHA-bound to exact English source this run; no newly established visual change or defect"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "03_single_player_red",
+      "source_bbox_native_readable": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        1376,
+        148
+      ],
+      "candidate_alpha_local_bbox": [
+        2,
+        4,
+        993,
+        144
+      ],
+      "candidate_margins": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/03_single_player_red_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "8a423ad5c9aae4cc7a57d8675f8501b0e269d70630f4d5fe1afcee952aac7c61"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native original red lettering and current persisted red lettering inspected in previous C292/C336 and newly SHA-bound to exact English source this run; no newly established visual change or defect"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "04_default_license",
+      "source_bbox_native_readable": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        1544,
+        148
+      ],
+      "candidate_alpha_local_bbox": [
+        2,
+        4,
+        1145,
+        144
+      ],
+      "candidate_margins": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/04_default_license_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ceed77a5ba8b88532109ec1d79726f895943661d558a5f3c9a7913a0613cd45c"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native original red lettering and current persisted red lettering inspected in previous C292/C336 and newly SHA-bound to exact English source this run; no newly established visual change or defect"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "05_multiplayer_red",
+      "source_bbox_native_readable": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        1220,
+        144
+      ],
+      "candidate_alpha_local_bbox": [
+        2,
+        2,
+        880,
+        142
+      ],
+      "candidate_margins": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/05_multiplayer_red_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "6639597a8166bea16bad36e27349c8302c84b9f58ced372c8cab8263804b8871"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native original red lettering and current persisted red lettering inspected in previous C292/C336 and newly SHA-bound to exact English source this run; no newly established visual change or defect"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "06_single_player_gray",
+      "source_bbox_native_readable": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        587,
+        64
+      ],
+      "candidate_alpha_local_bbox": [
+        1,
+        2,
+        414,
+        62
+      ],
+      "candidate_margins": [
+        1,
+        173,
+        2,
+        2
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/06_single_player_gray_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d0790ccce2b6e3f3511ff8b8b7ce6ab374fba6f176a357b05595deea085be536"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native English original and current Korean persisted DDS directly compared at practical 100/75/50; characters visible with no definite English ghosts, clipping or flipped lean in scoped views"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox_native_readable": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        420,
+        62
+      ],
+      "candidate_alpha_local_bbox": [
+        1,
+        2,
+        213,
+        59
+      ],
+      "candidate_margins": [
+        1,
+        207,
+        2,
+        3
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/07_showroom_gray_gray_100_SOURCE_FINAL_PERSISTED.png",
+          "sha256": "737aeabdfeb7db7bbfd24f146b79893a9c8fe24b3a080f1a3bea9f2cd5e7fe3f"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/07_showroom_gray_RAW_100_SOURCE_FINAL_PERSISTED.png",
+          "sha256": "a1473ec063fd06360770d916c3ff713c57e532f1cb208c36b57ec50ac90fec4a"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native English original and current Korean persisted DDS directly compared at practical 100/75/50; characters visible with no definite English ghosts, clipping or flipped lean in scoped views"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox_native_readable": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_alpha_local_bbox": [
+        0,
+        0,
+        520,
+        62
+      ],
+      "candidate_alpha_local_bbox": [
+        1,
+        1,
+        367,
+        61
+      ],
+      "candidate_margins": [
+        1,
+        153,
+        1,
+        1
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/08_multiplayer_gray_gray_100_SOURCE_FINAL_PERSISTED.png",
+          "sha256": "7250c39d22520bb09578d80182fb667beffb9c555db1ee76adfd7925b27013e2"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C339-C2-Q154-CANONICAL-GRAY3-FULL8/08_multiplayer_gray_RAW_100_SOURCE_FINAL_PERSISTED.png",
+          "sha256": "7cd512f51fb8d8fd3de4e5f161cc1f9e00c872f4cf118bc4ff972ba9dab721e4"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_CALIBRATED",
+          "observation": "source/candidate matching glyph stem top-minus-bottom anchors not marked; no arbitrary 0 or synthetic matched slant"
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_EXACT_CANONICAL",
+          "observation": "source exact SHA verified; B60 red-5 and B298 gray-3 producer CLEAN images used as historical references, not exact full native authenticated CLEAN DDS"
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_HOLD",
+          "observation": "native source-weight/face and current visual source family directly compared, no newly certain defect; independent blinded category/profile calibration remains incomplete"
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_REVIEWED",
+          "observation": "Native English original and current Korean persisted DDS directly compared at practical 100/75/50; characters visible with no definite English ghosts, clipping or flipped lean in scoped views"
+        },
+        "glyph_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "alpha-composited native and practical gray 100/75/50 shows no definite torn glyph; strict per-glyph stem controls unresolved"
+        },
+        "protected_art": {
+          "result": "PASS_OUTSIDE_8_SOURCE_BOXES_ONLY",
+          "observation": "current persisted DDS versus newly authenticated English source: zero outside 8 source boxes RGB(A) and alpha delta"
+        },
+        "placement": {
+          "result": "PASS_CONTAINMENT_ONLY",
+          "observation": "current alpha per box within canonical source bbox with positive margins, correct menu alignment/composed game positioning not authenticated"
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY_VERIFIED",
+          "observation": "canonical source and current persisted DDS decoded as Y mirror in RAW, readable after FLIP-Y, authored mip1"
+        }
+      }
+    }
+  ],
+  "calibration": "NOT_COMPLETED: no fresh blinded normal/known-defect typography case qualification; cannot call strict PASS",
+  "new_independent_observation": "Canonically pinned English actual DDS SHA newly downloaded/re-hashed during C339 and directly compared to exact current DDS across eight regions, including three gray C323 producer-image-only areas. All protected/outside source union exact preserved, all target alpha within original native boxes. No freshly supported pixel damage/reversal found in reviewed crops.",
+  "evidence_gaps": [
+    "Full clean plate must be independently verified from exact authored DDS/PNG identity vs original, including original glyph/effect removal and transparent alpha continuity",
+    "Blinded calibrated source-family + stroke/counter/size/lean anchor qualification for all eight",
+    "Fresh distinct C3 strict audit on current SHA before packaging",
+    "New user real-game screenshot for any outstanding user reports"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "stage_C": "HOLD_STRICT_RECHECK",
+  "stage_C3": "NOT_RUN_BLOCKED",
+  "approval": false,
+  "PRE_INGAME": "BLOCKED",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_lossless_png": 73,
+  "new_json_files": 2,
+  "no_duplicate_samed_SHA_approval": true,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
