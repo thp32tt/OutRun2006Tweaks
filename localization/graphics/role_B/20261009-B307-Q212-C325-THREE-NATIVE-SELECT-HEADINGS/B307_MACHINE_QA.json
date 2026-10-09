@@ -1,0 +1,193 @@
+{
+  "role": "B",
+  "run": "B307",
+  "queue_index": 212,
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+  "new_dds": 1,
+  "source_clean_outside_all_twelve": 0,
+  "SOURCE_CLEAN_selected_alpha": "ZERO_3",
+  "outside_3_changed_rgba": 0,
+  "outside_3_changed_alpha": 0,
+  "preserved_other_9_source_cells": "EXACT_PERSISTED_RGBA",
+  "header_exact": true,
+  "dds_native": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA",
+  "mips": 1,
+  "saved_dds_decode": "EXACT",
+  "raw_orientation": "mirror_y",
+  "regions": [
+    {
+      "region_idx": 25,
+      "source": "SELECT STAR SIGN",
+      "korean": "별자리 선택",
+      "source_bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "new_bbox": [
+        5,
+        793,
+        305,
+        855
+      ],
+      "margin": [
+        5,
+        421,
+        5,
+        5
+      ],
+      "source_face": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 64,
+      "native_glyph_width": 300,
+      "native_glyph_height": 62
+    },
+    {
+      "region_idx": 26,
+      "source": "SELECT PHOTO",
+      "korean": "사진 선택",
+      "source_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "new_bbox": [
+        5,
+        697,
+        223,
+        753
+      ],
+      "margin": [
+        5,
+        343,
+        5,
+        5
+      ],
+      "source_face": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 57,
+      "native_glyph_width": 218,
+      "native_glyph_height": 56
+    },
+    {
+      "region_idx": 27,
+      "source": "SELECT NATIONALITY",
+      "korean": "국적 선택",
+      "source_bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "new_bbox": [
+        6,
+        609,
+        222,
+        665
+      ],
+      "margin": [
+        5,
+        623,
+        5,
+        5
+      ],
+      "source_face": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 57,
+      "native_glyph_width": 216,
+      "native_glyph_height": 56
+    }
+  ],
+  "proofs": [
+    "r25_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r25_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r26_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r27_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "method": "native heavy flat gray Noto Black at actual source height, no old bitmap upscale",
+  "producer_visual": "PENDING_DIRECT_100_75_50_RAW",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "IGR029": "OPEN_MAPPING_SUSPECTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
