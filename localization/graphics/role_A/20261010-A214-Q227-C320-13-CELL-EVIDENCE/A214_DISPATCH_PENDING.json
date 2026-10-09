@@ -12,22 +12,27 @@
   "script_commit": "a7ec2b33847c78250aeaaf83e728489b9bb81e0f",
   "worker_actions_run": 37963658586,
   "worker_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37963658586",
-  "state_as_last_checked": "IN_PROGRESS_OUTPUT_NOT_YET_PUBLISHED",
-  "status": "COMPUTE_PENDING_NO_QA_CLAIM",
+  "state_as_last_checked": "WORKER_RETRY_SUCCESS_OUTPUT_VERIFIED",
+  "status": "PRODUCER_SCOPED_NATIVE_PROOF_COMPLETE_C1_HOLD",
   "new_promoted_dds": 0,
   "expected_new_native_cell_proofs": 13,
-  "verified_new_native_cell_proofs": 0,
+  "verified_new_native_cell_proofs": 13,
   "prior_C320_independent_samples": 3,
   "whole_16_region": "HOLD_STRICT_RECHECK",
   "owner_C1": "C320_HOLD_STRICT_RECHECK",
   "C3": "BLOCKED",
   "game": "IGR034_035_036_OPEN_USER_INGAME_FAIL",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "next_action": "On next A invocation, check whether this worker published exact A214_EVIDENCE_REPORT.json or A214_EXECUTION_HOLD.json. If report exists, inspect actual decoded SOURCE/CLEAN/FINAL proofs and mechanical metrics then update queue, resume, progress and WORKLOG. Do not rerun same work, do not claim completion now.",
+  "next_action": "A214 compute COMPLETED. Do not rerun. C1 owns independent C320 HOLD strict recheck on saved exact q227 DDS, 16/16 native/RAW and source-family calibration. User game IGR034/035/036 OPEN.",
   "scope_exclusions": [
     "VR",
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "initial_setup_failure_job": 113932490703,
+  "retry_success_job": 113937285379,
+  "published_worker_commit": "a442f226863a9ebe25a3e764bab464940346623d",
+  "report_path": "localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_EVIDENCE_REPORT.json",
+  "qa_path": "localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_CONTROLLER_SCOPED_QA.json"
 }
