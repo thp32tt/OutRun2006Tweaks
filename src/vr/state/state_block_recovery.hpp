@@ -29,6 +29,8 @@ namespace OutRunVR::State
         {
             ResynchronizeShaderEpoch().store(nullptr, std::memory_order_release);
             PrimeShadowState().store(nullptr, std::memory_order_release);
+            StateBlockTracker::MarkCoverageLost();
+            StateBlockTracker::RequireResync();
         }
 
         static void FlushPendingResync(IDirect3DDevice9* device) noexcept
@@ -56,6 +58,7 @@ namespace OutRunVR::State
             if (!primeShadowState(device))
             {
                 StateBlockTracker::MarkCoverageLost();
+                StateBlockTracker::RequireResync();
             }
         }
 
