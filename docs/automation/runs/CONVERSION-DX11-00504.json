@@ -8,9 +8,9 @@
   "attempt": "1/3",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "760f935678f07a644d68176e157061c9bcdefff4",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc",
+  "material_result_sha": "4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc",
+  "validation_bearing_result_sha": "4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00504",
   "lease_epoch": 1,
   "work_key": "DX11:R204:INDEXED_SOLE_EYE_OM_MRT_OWNERSHIP",
@@ -19,12 +19,12 @@
     "tools/dx11_viewport_draw_probe_r187.cpp:R204",
     "tools/test_dx11_viewport_draw_r187.py:R204"
   ],
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "summary": "R204 indexed native DrawIndexed fail-closed OM output ownership: reject stale second-eye RTV in slot 1+ even when indexed eye RTV slot0 is correct. Retain dormant gameplay-native Draw boundary.",
+  "summary": "R204 indexed sole-eye OM RTV fail-closed correctness source; GitHub exact-SHA R187 source 7 negative mutations + Win32 WARP probe GPU pixel tests SUCCESS. Entire Backend Conversion Gate FAILED at previously owned independent R175 varying mismatch, not R204. No game-native Draw activation or hardware certification.",
   "changed_paths": [
     "src/vr/d3d11/native_indexed_target_viewport.hpp",
     "tools/dx11_viewport_draw_probe_r187.cpp",
@@ -32,13 +32,13 @@
     "docs/automation/runs/CONVERSION-DX11-00504.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "Authenticated GitHub branch HEAD 760f935678f07a644d68176e157061c9bcdefff4; 00504 run and downloads checkpoint absent. 00503 R203 owns non-indexed texture/MRT; R175 remains 00477-owned. No conflict.",
-    "C1_REVIEW": "Identified R187 indexed native target gate queried OM slot0 only; two RTVs broadcast DrawIndexed to unintended eye.",
-    "C2_IMPLEMENT": "Implemented indexed full-target exact sole RTV check and balanced GetRenderTargets COM references; isolated WARP probe binding 2 RTVs rejects and 1-RTV restoration passes.",
-    "C3_VALIDATE": "Changed-source static contract seven negative mutations PASS; exact-SHA Windows GitHub Actions and real WARP pixels PENDING.",
-    "C4_COMMIT": "Material result with [AUTO:CONVERSION-DX11-00504] pending publication; avoid superseding 00503 in-progress Gate.",
-    "C5_PACKAGE": "NOT_REQUIRED; dormant game-native DrawIndexed remains disabled; no HMD promotion.",
-    "C6_STATE": "PENDING exact-SHA Gate; user runtime UNTESTED."
+    "C0_RECOVER": "PASS authenticated target HEAD 760f935678f07a644d68176e157061c9bcdefff4; 00504 run/checkpoints absent. R203=00503 and R175=00477 are independently owned.",
+    "C1_REVIEW": "PASS R187 indexed target viewport queried OM slot0 only. Retained second-eye OM RTV1 would also receive indexed Draw despite expected RTV0.",
+    "C2_IMPLEMENT": "PASS R204 C++ full OM MRT-slot scan with deterministic COM reference adoption/release; rejected wrong-eye RTV slot1. Updated actual R187 WARP probe two-eye negative -> sole-eye restore -> green-center black-corner DrawIndexed.",
+    "C3_VALIDATE": "Scoped PASS exact-SHA Gate 38002195192: validate 114062657023 SUCCESS, DX11 smoke 114064272229 R187/R204 seven mutants SUCCESS, indexed WARP executable build SUCCESS, actual R187 GPU DrawIndexed pixels SUCCESS. Full Gate FAILED solely at independent R175 constant-buffer probe: TEXCOORD6 actual BGRA [128,0,16,255], expected [224,128,32,255].",
+    "C4_COMMIT": "PASS material commit 4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc on target vr-dx11-native-r71, message [AUTO:CONVERSION-DX11-00504], no CI skip. Published after prior 00503 Gate completed to avoid cancellation.",
+    "C5_PACKAGE": "NOT_REQUIRED. Game-native DX11 DrawIndexed remains dormant; HMD Quest3/VDXR deployment/promote NEED_HMD_TEST.",
+    "C6_STATE": "SEALED exact validation-bearing SHA 4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc; R204 scoped Windows/WARP PASS, required full Gate FAIL at independently owned R175; Quest3/VDXR UNTESTED; post-Gate bookkeeping separate CI-skipped."
   },
   "evidence": {
     "source_static_mutations": 7,
@@ -46,11 +46,40 @@
     "expected_negative": "OM RTV slots0+1 -> readiness false",
     "expected_positive": "restored single RTV -> readiness true, existing WARP green center/black corner pixels",
     "reference_running_gate_sha": "760f935678f07a644d68176e157061c9bcdefff4",
-    "reference_running_gate_id": 38001288330
+    "reference_running_gate_id": 38001288330,
+    "exact_sha_gate_run_id": 38002195192,
+    "exact_sha_gate_sha": "4d7f55ae6c7ae234351a80a429b5ccc9ad97a2cc",
+    "exact_sha_gate_status": "completed",
+    "exact_sha_gate_conclusion": "failure",
+    "validate_job_id": 114062657023,
+    "validate_job_conclusion": "success",
+    "smoke_job_id": 114064272229,
+    "smoke_job_conclusion": "failure",
+    "r204_static_contract": "7 negative mutations PASS",
+    "r204_win32_warp_probe_build": "success",
+    "r204_gpu_indexed_green_center_black_corner": "success",
+    "upstream_failed_step": "Run DX11 constant buffer probe",
+    "upstream_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task_id": "CONVERSION-DX11-00477",
+    "prior_task_00503_gate_id": 38001288330,
+    "prior_task_00503_gate_conclusion": "failure"
   },
-  "resume_cursor": "AWAIT_PRIOR_EXACT_SHA_GATE_THEN_CAS_COMMIT_R204",
-  "next_action": "Do not publish while 00503 exact-SHA Backend Conversion Gate is running; publish prepared R204 source+probe+record via CAS against latest HEAD once prior Gate completes; run exact-SHA Backend Conversion Gate.",
-  "scoped_automation_validation": "PASS_R204_SEVEN_STATIC_NEGATIVE_MUTANTS_CI_WARP_PENDING",
-  "state_persisted": false,
-  "score_change": 0
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "next_action": "R204 material source and exact-SHA scoped WARP success preserved; R175_GENERIC_VARYING_MISMATCH separately owned by CONVERSION-DX11-00477. Do not rerun 00504 or rescore. Next independent task may proceed after claim/HEAD check.",
+  "scoped_automation_validation": "PASS_R204_SEVEN_STATIC_NEGATIVE_MUTANTS_AND_WIN32_ACTUAL_WARP_INDEXED_SOLE_EYE_RTV",
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "Exact-SHA required full Gate failed at independently owned R175; scoped R204 PASS must not be promoted to full automation PASS."
 }
