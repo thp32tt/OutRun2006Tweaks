@@ -2,6 +2,13 @@
 
 **Canonical repository:** thp32tt/OutRun2006Tweaks, branch `vr-d3d9ex-focus`. **Last review:** 2026-10-09 KST. Read this BEFORE altering HUD, renderer, rank markers, gameplay F11, result text, packaging, or initiating another HMD test. Durable companion `docs/VR_REGRESSION_KNOWLEDGE.json`, historical comparison `docs/automation/reviews/AI2_DX9EX_HMD_HISTORICAL_REGRESSION_20261009.md`.
 
+## 2026-10-09 F11 latest user acceptance and refactor boundary
+
+- **F11 is normal now** per the user's direct 2026-10-09 report. Protect the existing dedicated external ImGui `ScopedExternalOverlaySemantic` / R30 per-eye path as a working outcome; stop treating F11 as an active visual defect or a prerequisite for R84 structural work.
+- The user did **not supply the exact tested source/package or installed DLL SHA with this statement**. The regression registry records `USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED`, not an invented source-specific Quest3 PASS. Correlate exact identity opportunistically during any future broader test; do not request F11-only repeated testing.
+- **Structural priority resumes**: R84 Gate0 and donor inventory were already verified at material `cd94b875` / `4df53807` and are marked DONE in the queue. Continue only the unfinished R32/R31 and lower CMake/textual-TU seams. R33/R32 split and multiple R30 lower owner facades have existing exact-SHA CI proofs. Do not claim R84 closeout until final compile, cleanup and validation succeed.
+- Remaining GOAL-before-restart white clock, +TIME, rank/HUD/lens/shadow runtime uncertainty is tracked **separately**; F11 being normal does not establish their acceptance. Do not replay the old HUD 1000/5000 loop.
+
 ## 0. Authoritative user acceptance / correction
 
 **2026-10-09 user correction:** "결과 추가시간 말고는 다 해결된거 였어" — *all prior HUD items other than result/extra-time had been fixed in a historical playable build/lineage*. The present regression is therefore not a brand-new unsolved research project. **Find the historically working implementation, compare it to the current implementation, recover all lost paths, and preserve the evidence.**
