@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B337: native source-conditioned chrome glyph PILOT for q228 CAR SELECT.
+"""B337R: native source-conditioned chrome glyph PILOT for q228 CAR SELECT.
 
 NEW METHOD: draw Korean outlines at final source native pixel grid, then
 construct silver diffuse, edge normals, dark border, extrusion, separately.
@@ -15,13 +15,13 @@ from scipy.ndimage import binary_dilation,gaussian_filter,distance_transform_edt
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds"
-OUT=G/"role_B/20261010-B337-Q228-CAR-SELECT-NATIVE-CHROME-PILOT"
+OUT=G/"role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SRC="3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154"
 CUR="cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473"
 TEXT="차량 선택"
-RUN="OUTRUN-KOR-B337-Q228-CAR-SELECT-SOURCE-NORMAL-CHROME-20261010"
+RUN="OUTRUN-KOR-B337R-Q228-CAR-SELECT-SOURCE-NORMAL-CHROME-20261010"
 with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
  row=next(x for x in csv.DictReader(f) if x["index"].lstrip("\ufeff")=="228")
 assert row["artwork_status"].startswith("c327_c2_b323_visual_rework_chrome12_"),row["artwork_status"]
@@ -123,7 +123,7 @@ good=np.isfinite(profile[:,0])
 assert int(good.sum())>30
 for ch in range(3):
  profile[:,ch]=np.interp(np.arange(h),np.flatnonzero(good),profile[good,ch])
-profile=gaussian_filter(profile,sigma=(3,0),mode="nearest")
+profile=gaussian_filter(profile,sigma=(11,0),mode="nearest")
 # Create *distinct* metallic face, bevel/side and rim from fresh glyph
 # normals. The old hollow Korean bitmap contributes NO glyph pixels.
 left=np.zeros_like(face);left[:,1:]=face[:,:-1]
@@ -150,10 +150,10 @@ block[rim,:3]=[31,32,36];block[rim,3]=np.maximum(block[rim,3],np.uint8(245))
 # The per-row source-glyph reflection is attenuated by native edge-normal
 # field, not flat silver recolor or seven artificial horizontal stripes.
 shade=np.broadcast_to(profile[:,None,:],(h,w,3)).copy()
-shade=np.clip(shade*1.02+4,88,251)
-shade[topzone]=np.clip(shade[topzone]*0.38+np.asarray([254,253,251])*0.62,0,255)
-shade[bottomzone]=np.clip(shade[bottomzone]*0.58+np.asarray([57,60,66])*0.42,0,255)
-shade[rzone]=np.clip(shade[rzone]*0.80+np.asarray([245,245,245])*0.20,0,255)
+shade=np.clip(shade*0.85+24,122,247)
+shade[topzone]=np.clip(shade[topzone]*0.75+np.asarray([250,250,248])*0.25,0,255)
+shade[bottomzone]=np.clip(shade[bottomzone]*0.76+np.asarray([65,67,71])*0.24,0,255)
+shade[rzone]=np.clip(shade[rzone]*0.90+np.asarray([245,245,245])*0.10,0,255)
 block[face,:3]=np.uint8(np.clip(shade[face].round(),0,255))
 block[face,3]=255
 # Subpixel antialias preserved on the face boundary, without crop alpha boxes.
@@ -175,7 +175,7 @@ assert np.array_equal(raw[::-1,:,[2,1,0,3]],S)
 dds=old[:128]+out[::-1,:,[2,1,0,3]].copy().tobytes()
 assert len(dds)==len(old) and sha(dds)!=CUR
 assert np.array_equal(dec(dds),out),"saved DDS roundtrip changed colour/alpha"
-(OUT/"B337_Q228_CAR_SELECT_NOT_PROMOTED.dds").write_bytes(dds)
+(OUT/"B337R_Q228_CAR_SELECT_NOT_PROMOTED.dds").write_bytes(dds)
 def composite(crop,bg):
  img=Image.new("RGBA",(crop.shape[1],crop.shape[0]),(*bg,255))
  img.alpha_composite(Image.fromarray(crop.copy(),"RGBA"))
@@ -194,10 +194,10 @@ for ori in ("FLIPY","RAW"):
    result=Image.new("RGB",(sum(v.width for v in crops)+12,max(v.height for v in crops)),bg)
    xx=0
    for im in crops:result.paste(im,(xx,0));xx+=im.width+4
-   n=f"B337_CAR_SELECT_{ori}_{bgname}_{pct}_SOURCE_CLEAN_OLD_TRIAL.png"
+   n=f"B337R_CAR_SELECT_{ori}_{bgname}_{pct}_SOURCE_CLEAN_OLD_TRIAL.png"
    result.save(OUT/n,optimize=True);views.append(n)
 for key,arr in (("SOURCE",S),("CLEAN",C),("OLD",P),("TRIAL",out)):
- Image.fromarray(arr[t:b,l:r],"RGBA").save(OUT/f"B337_CAR_SELECT_{key}_LOSSLESS.png")
+ Image.fromarray(arr[t:b,l:r],"RGBA").save(OUT/f"B337R_CAR_SELECT_{key}_LOSSLESS.png")
 recipe={"schema":"source-family-v1","run_key":RUN,"source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
  "source_sha256":SRC,"source_original_bbox":[l,t,r,b],"source_effect_sample_count":int(source_metal.sum()),
  "text_source":"CAR SELECT","text_korean":TEXT,"font_path":str(fontpath),"font_sha256":sha(fontdata),
@@ -208,16 +208,16 @@ recipe={"schema":"source-family-v1","run_key":RUN,"source_revision":"Sonic-TV/OR
  "rework_reason":"C317/C327: old Korean was hollow black while English source was filled silver beveled chrome",
  "non_target_regions":12,"trial_only":True,"C_pilot_qualification":"NOT_RUN"}
 (OUT/"recipe.json").write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n")
-qa={"role":"B","run":"B337","run_key":RUN,"queue_index":228,"priority":"P1","user_regression":"IGR-038",
+qa={"role":"B","run":"B337R","run_key":RUN,"queue_index":228,"priority":"P1","user_regression":"IGR-038",
  "new_native_trial_dds":1,"new_promoted_dds":0,"source_sha256":SRC,"current_candidate_sha256":CUR,
  "trial_sha256":sha(dds),"bbox_source":[l,t,r,b],"bbox_trial":glyph_box,"required_margin_px":3,
  "outside_selected_rgba_changes":int((changed&~selected).sum()),"outside_selected_alpha_changes":0,
  "current_other_12_regions_preserved":True,"decoded_persisted_trial_matches_composite":True,
  "font_sha256":sha(fontdata),"source_palette_samples":int(source_metal.sum()),
- "source_clean_alpha_zero":True,"source_family_method":"new native glyph normal-bevel and per-row source silver reflectance",
+ "source_clean_alpha_zero":True,"source_family_method":"second controlled polish: source-reflection smoothed 11px, reduced bevel glints and stronger continuous body",
  "producer_visual":"PENDING_DIRECT_NATIVE_AND_PRACTICAL_REVIEW","independent_C2":"NOT_RUN",
  "C3":"NOT_RUN","approval":"NOT_GRANTED","user_game":"IGR-038_OPEN_USER_INGAME_FAIL",
  "RUNTIME_VALIDATION":"UNTESTED","all_18_views":views,"backend":"GITHUB_ACTIONS",
  "excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B337_MECHANICAL_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-print("B337_NATIVE_CHROME_TRIAL_PERSISTED",json.dumps({k:qa[k] for k in ("trial_sha256","bbox_trial","outside_selected_rgba_changes","source_palette_samples")}),flush=True)
+(OUT/"B337R_MECHANICAL_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+print("B337R_NATIVE_CHROME_TRIAL_PERSISTED",json.dumps({k:qa[k] for k in ("trial_sha256","bbox_trial","outside_selected_rgba_changes","source_palette_samples")}),flush=True)
