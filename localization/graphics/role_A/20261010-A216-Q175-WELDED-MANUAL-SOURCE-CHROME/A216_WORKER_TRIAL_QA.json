@@ -1,0 +1,60 @@
+{
+  "run": "A216",
+  "run_key": "OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
+  "role": "A",
+  "queue_index": 175,
+  "priority": "P1",
+  "status": "TRIAL_ONLY_AWAITING_DIRECT_PRODUCER_VISUAL",
+  "triage": {
+    "index": 175,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "current_status": "c286_rework_required_chrome_glyph_family",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "current_candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+  "trial_path": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_Q175_MANUAL_SOURCE_WELDED_CHROME_TRIAL.dds",
+  "source_bbox": [
+    6,
+    397,
+    956,
+    529
+  ],
+  "trial_bbox": [
+    56,
+    400,
+    866,
+    527
+  ],
+  "numerical": {
+    "source_to_clean_alpha_nonzero": 0,
+    "prior_to_new_rgba_changed_outside_source": 0,
+    "prior_to_new_alpha_changed_outside_source": 0,
+    "clean_to_final_rgba_changed_outside_original": 0,
+    "margins": [
+      50,
+      90,
+      3,
+      2
+    ],
+    "bbox": [
+      56,
+      400,
+      866,
+      527
+    ],
+    "width_relative_source": 0.8526
+  },
+  "construction": "Hand-designed 3x vector paths: ㅅ+ㅛ / ㄹ+ㅜ+ㅁ open contours, broad connected title silhouette at native 860x125, single AA downsample, independently sampled source English chrome color by row and contour-normal bevel/extrusion. Not A211 Noto glyph; not stretching earlier Hangul raster.",
+  "pilot_family_only": true,
+  "new_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "independent_C1": "BLOCKED_UNTIL_PRODUCER_VISUAL",
+  "C3": "NOT_RUN",
+  "user_game": "IGR032_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
