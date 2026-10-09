@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 05:42 KST",
+  "updated_at_kst": "2026-10-10 05:51 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9958,22 +9958,35 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_DDS": 0,
     "report": "localization/graphics/role_C/20261010-C341-C1-Q193-A208-EXACT-SOURCE-PILOT/C341_C1_CONTROLLER_HOLD.json"
-  }
-,
+  },
   "b343_q060_best_time_source_residue_trial": {
-  "run_key": "OUTRUN-KOR-B343-Q060-C342-ENGLISH-RESIDUE-NATIVE-TRIAL-20261010-0535",
-  "index": 60,
-  "priority": "P0",
-  "trial_dds": 1,
-  "promoted_dds": 0,
-  "trial_sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
-  "persisted_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
-  "source_residue_cleared_pixels": 19243,
-  "remaining_contour_approval": "HOLD",
-  "qa": "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_CONTROLLER_VISUAL_QA.json",
-  "C2": "C342_REWORK_REQUIRED",
-  "C3": "BLOCKED",
-  "IGR044": "OPEN",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
+    "run_key": "OUTRUN-KOR-B343-Q060-C342-ENGLISH-RESIDUE-NATIVE-TRIAL-20261010-0535",
+    "index": 60,
+    "priority": "P0",
+    "trial_dds": 1,
+    "promoted_dds": 0,
+    "trial_sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
+    "persisted_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "source_residue_cleared_pixels": 19243,
+    "remaining_contour_approval": "HOLD",
+    "qa": "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_CONTROLLER_VISUAL_QA.json",
+    "C2": "C342_REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "IGR044": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c344_c1_q161_current_persisted_glyph_fail": {
+    "run_key": "OUTRUN-KOR-C344-C1-Q161-A201-PERSISTED-GLYPH-SPECKLE-20261010",
+    "role": "C1",
+    "index": 161,
+    "decision": "REWORK_REQUIRED",
+    "candidate_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "reason": "PERSISTED_GLYPH_FACE_PINHOLES_OR_SPECKLE",
+    "new_dds": 0,
+    "c3": "BLOCKED",
+    "approval": "NOT_APPROVED",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C344-C1-Q161-A201-EXACT-PERSISTED-GLYPH-REWORK/C344_Q161_CONTROLLER_C1_REWORK.json"
+  }
 }

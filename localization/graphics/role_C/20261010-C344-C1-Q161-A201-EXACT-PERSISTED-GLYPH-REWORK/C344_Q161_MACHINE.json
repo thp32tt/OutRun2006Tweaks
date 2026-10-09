@@ -1,0 +1,693 @@
+{
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "candidate_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "regions_count": 38,
+  "changed_outside_source_bbox_union": 0,
+  "alpha_changed_outside_source_bbox_union": 0,
+  "regions": [
+    {
+      "id": "00",
+      "name": "처녀자리",
+      "source_bbox": [
+        1,
+        1991,
+        177,
+        2042
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        1992,
+        176,
+        2040
+      ],
+      "source_visible": 5253,
+      "candidate_visible": 4821
+    },
+    {
+      "id": "01",
+      "name": "황소자리",
+      "source_bbox": [
+        717,
+        1991,
+        948,
+        2042
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1992,
+        895,
+        2040
+      ],
+      "source_visible": 6433,
+      "candidate_visible": 4340
+    },
+    {
+      "id": "02",
+      "name": "전갈자리",
+      "source_bbox": [
+        2,
+        1927,
+        246,
+        1978
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        1928,
+        179,
+        1976
+      ],
+      "source_visible": 7350,
+      "candidate_visible": 4564
+    },
+    {
+      "id": "03",
+      "name": "사수자리",
+      "source_bbox": [
+        717,
+        1927,
+        1089,
+        1978
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1928,
+        896,
+        1976
+      ],
+      "source_visible": 10619,
+      "candidate_visible": 3927
+    },
+    {
+      "id": "04",
+      "name": "물고기자리",
+      "source_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1866,
+        206,
+        1909
+      ],
+      "source_visible": 5895,
+      "candidate_visible": 4249
+    },
+    {
+      "id": "05",
+      "name": "천칭자리",
+      "source_bbox": [
+        717,
+        1864,
+        888,
+        1912
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1865,
+        887,
+        1911
+      ],
+      "source_visible": 4911,
+      "candidate_visible": 4676
+    },
+    {
+      "id": "06",
+      "name": "사자자리",
+      "source_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1800,
+        98,
+        1848
+      ],
+      "source_visible": 3062,
+      "candidate_visible": 1999
+    },
+    {
+      "id": "07",
+      "name": "쌍둥이자리",
+      "source_bbox": [
+        717,
+        1799,
+        924,
+        1850
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1800,
+        923,
+        1848
+      ],
+      "source_visible": 6502,
+      "candidate_visible": 5944
+    },
+    {
+      "id": "08",
+      "name": "염소자리",
+      "source_bbox": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1736,
+        182,
+        1784
+      ],
+      "source_visible": 9668,
+      "candidate_visible": 4266
+    },
+    {
+      "id": "09",
+      "name": "게자리",
+      "source_bbox": [
+        717,
+        1735,
+        952,
+        1786
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1736,
+        851,
+        1784
+      ],
+      "source_visible": 6736,
+      "candidate_visible": 3273
+    },
+    {
+      "id": "10",
+      "name": "양자리",
+      "source_bbox": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        1672,
+        134,
+        1720
+      ],
+      "source_visible": 5084,
+      "candidate_visible": 3356
+    },
+    {
+      "id": "11",
+      "name": "물병자리",
+      "source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "source_visible": 8697,
+      "candidate_visible": 5493
+    },
+    {
+      "id": "12",
+      "name": "태국",
+      "source_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "candidate_alpha_bbox": [
+        1,
+        1609,
+        84,
+        1655
+      ],
+      "source_visible": 7996,
+      "candidate_visible": 2107
+    },
+    {
+      "id": "13",
+      "name": "스위스",
+      "source_bbox": [
+        717,
+        1607,
+        1137,
+        1658
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1608,
+        853,
+        1656
+      ],
+      "source_visible": 11755,
+      "candidate_visible": 2721
+    },
+    {
+      "id": "14",
+      "name": "스웨덴",
+      "source_bbox": [
+        2,
+        1543,
+        251,
+        1594
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        1544,
+        136,
+        1592
+      ],
+      "source_visible": 7374,
+      "candidate_visible": 3473
+    },
+    {
+      "id": "15",
+      "name": "스페인",
+      "source_bbox": [
+        717,
+        1543,
+        884,
+        1594
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1544,
+        851,
+        1592
+      ],
+      "source_visible": 5005,
+      "candidate_visible": 3224
+    },
+    {
+      "id": "16",
+      "name": "대한민국",
+      "source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "source_visible": 11142,
+      "candidate_visible": 4616
+    },
+    {
+      "id": "17",
+      "name": "싱가포르",
+      "source_bbox": [
+        717,
+        1479,
+        1047,
+        1530
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1480,
+        898,
+        1528
+      ],
+      "source_visible": 9734,
+      "candidate_visible": 4153
+    },
+    {
+      "id": "18",
+      "name": "기타",
+      "source_bbox": [
+        5,
+        1415,
+        194,
+        1466
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1416,
+        97,
+        1464
+      ],
+      "source_visible": 5547,
+      "candidate_visible": 1959
+    },
+    {
+      "id": "19",
+      "name": "노르웨이",
+      "source_bbox": [
+        717,
+        1415,
+        964,
+        1466
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1416,
+        895,
+        1464
+      ],
+      "source_visible": 7160,
+      "candidate_visible": 4273
+    },
+    {
+      "id": "20",
+      "name": "북한",
+      "source_bbox": [
+        6,
+        1351,
+        404,
+        1402
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1352,
+        96,
+        1400
+      ],
+      "source_visible": 11397,
+      "candidate_visible": 2422
+    },
+    {
+      "id": "21",
+      "name": "뉴질랜드",
+      "source_bbox": [
+        717,
+        1352,
+        1132,
+        1400
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1353,
+        891,
+        1399
+      ],
+      "source_visible": 11446,
+      "candidate_visible": 4061
+    },
+    {
+      "id": "22",
+      "name": "멕시코",
+      "source_bbox": [
+        6,
+        1287,
+        230,
+        1338
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1288,
+        139,
+        1336
+      ],
+      "source_visible": 6709,
+      "candidate_visible": 3166
+    },
+    {
+      "id": "23",
+      "name": "일본",
+      "source_bbox": [
+        717,
+        1288,
+        898,
+        1338
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1289,
+        807,
+        1336
+      ],
+      "source_visible": 5096,
+      "candidate_visible": 2488
+    },
+    {
+      "id": "24",
+      "name": "이탈리아",
+      "source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "source_visible": 4047,
+      "candidate_visible": 4341
+    },
+    {
+      "id": "25",
+      "name": "홍콩",
+      "source_bbox": [
+        717,
+        1223,
+        1052,
+        1274
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1224,
+        808,
+        1271
+      ],
+      "source_visible": 9649,
+      "candidate_visible": 2638
+    },
+    {
+      "id": "26",
+      "name": "독일",
+      "source_bbox": [
+        5,
+        1159,
+        293,
+        1210
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1160,
+        94,
+        1208
+      ],
+      "source_visible": 8362,
+      "candidate_visible": 2443
+    },
+    {
+      "id": "27",
+      "name": "프랑스",
+      "source_bbox": [
+        717,
+        1159,
+        945,
+        1210
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1160,
+        853,
+        1207
+      ],
+      "source_visible": 6575,
+      "candidate_visible": 3058
+    },
+    {
+      "id": "28",
+      "name": "핀란드",
+      "source_bbox": [
+        5,
+        1096,
+        254,
+        1144
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1097,
+        137,
+        1143
+      ],
+      "source_visible": 7079,
+      "candidate_visible": 3157
+    },
+    {
+      "id": "29",
+      "name": "네덜란드",
+      "source_bbox": [
+        717,
+        1095,
+        1137,
+        1146
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1096,
+        896,
+        1144
+      ],
+      "source_visible": 12028,
+      "candidate_visible": 4545
+    },
+    {
+      "id": "30",
+      "name": "덴마크",
+      "source_bbox": [
+        5,
+        1032,
+        294,
+        1080
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        1033,
+        133,
+        1079
+      ],
+      "source_visible": 8720,
+      "candidate_visible": 3142
+    },
+    {
+      "id": "31",
+      "name": "중국",
+      "source_bbox": [
+        717,
+        1031,
+        899,
+        1082
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        1032,
+        812,
+        1080
+      ],
+      "source_visible": 5199,
+      "candidate_visible": 2438
+    },
+    {
+      "id": "32",
+      "name": "캐나다",
+      "source_bbox": [
+        5,
+        967,
+        241,
+        1018
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        968,
+        142,
+        1016
+      ],
+      "source_visible": 6727,
+      "candidate_visible": 3132
+    },
+    {
+      "id": "33",
+      "name": "영국",
+      "source_bbox": [
+        717,
+        968,
+        944,
+        1016
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        969,
+        803,
+        1015
+      ],
+      "source_visible": 6875,
+      "candidate_visible": 2027
+    },
+    {
+      "id": "34",
+      "name": "벨기에",
+      "source_bbox": [
+        6,
+        903,
+        262,
+        954
+      ],
+      "candidate_alpha_bbox": [
+        8,
+        904,
+        137,
+        952
+      ],
+      "source_visible": 7796,
+      "candidate_visible": 3687
+    },
+    {
+      "id": "35",
+      "name": "오스트리아",
+      "source_bbox": [
+        717,
+        903,
+        970,
+        954
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        904,
+        944,
+        952
+      ],
+      "source_visible": 6977,
+      "candidate_visible": 4927
+    },
+    {
+      "id": "36",
+      "name": "호주",
+      "source_bbox": [
+        1,
+        839,
+        337,
+        890
+      ],
+      "candidate_alpha_bbox": [
+        4,
+        840,
+        92,
+        888
+      ],
+      "source_visible": 8776,
+      "candidate_visible": 2142
+    },
+    {
+      "id": "37",
+      "name": "미국",
+      "source_bbox": [
+        717,
+        839,
+        832,
+        890
+      ],
+      "candidate_alpha_bbox": [
+        720,
+        840,
+        806,
+        888
+      ],
+      "source_visible": 3282,
+      "candidate_visible": 2105
+    }
+  ]
+}
