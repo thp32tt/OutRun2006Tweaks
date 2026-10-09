@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B344",
+  "queue_index": 60,
+  "owner_shard": "EVEN",
+  "run_key": "OUTRUN-KOR-B344-Q060-C347-SOURCE-CONDITIONED-OUTLINE-20261010",
+  "code_commits": {
+    "initial_failed": "5fee5329d036e27fe8a43365fc1d67fab6408e2b",
+    "corrected": "0f3f7220224e29690b77a20bccb49cbba79a3d08"
+  },
+  "workflow_runs": [
+    {
+      "id": 37999916320,
+      "result": "FAIL_CLOSED_PRE_PIXEL_WRITE",
+      "cause": "False hard B>R+30 persisted-cyan assumption detected zero target pixels"
+    },
+    {
+      "id": 38000221135,
+      "result": "SUCCESS_NO_PIXEL_MUTATION",
+      "worker_output_commit": "dc9c1c1cb1b06457b2182fec3ff5a55ed7340800"
+    }
+  ],
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "official_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "preceding_trial_sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
+  "producer_observation": "C347 independent SOURCE/OFFICIAL/B343 persisted native comparisons show remaining dark reddish source-outline slivers. B344 attempted to remove only alpha-disconnected source-conditioned tiny residuals above a conservative native readable cutoff. Exact worker result: zero matched components, zero changed pixels; no new DDS was written. Do NOT report B344 contacts as a material repair or full-plate reconstruction. C347 visual defect remains unresolved.",
+  "quality_stage": {
+    "P1": "FAIL_UNQUALIFIED_SOURCE_REMOVAL",
+    "P2": "HOLD_SOURCE_DERIVED_KOREAN_FAMILY_AND_MATCHED_SLANT_STROKES",
+    "P3": "NOT_RUN_NO_NEW_DDS"
+  },
+  "direct_qa_evidence": "localization/graphics/role_B/20261010-B344-Q060-C347-DARK-OUTLINE-CLEAN/B344_TRIAL_MACHINE_AND_SCOPE.json",
+  "independent_C": {
+    "C342": "REWORK_REQUIRED official d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "C347": "TRIAL_SCOPED_VISUAL_FAIL on 8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6"
+  },
+  "decision": "PRODUCER_FAIL_NO_NEW_DDS_KEEP_OFFICIAL_REWORK_REQUIRED",
+  "same_method_retry": "STOP; identical-pixel and nearby-disconnected-alpha erasers are demonstrated inadequate. Require SOURCE->CLEAN first and genuine multi-layer reconstruction, not another outline-threshold variation.",
+  "source_reconstruction_next": "Rebuild native SOURCE-derived CLEAN with complete original BEST TIME face/outline/glow ownership mask and preserved atlas siblings, visually QA CLEAN alone, then independently render transparent Hangul lettering using matched source slant and font/effect recipe; retain original Korean only if independently extracted and QA-proven. Run plate and final production_pixel_guard manifests, persisted RAW/FLIP-Y/practical-scale visual self-QA before promotion.",
+  "produced_dds": 0,
+  "promoted_dds": 0,
+  "C2": "REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "ODD_A",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "execution_backend": "GITHUB_ACTIONS_AND_CHATGPT_CONTROLLER"
+}
