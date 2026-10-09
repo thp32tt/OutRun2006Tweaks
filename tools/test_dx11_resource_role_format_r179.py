@@ -31,6 +31,8 @@ def safe(source: str, probe: str) -> bool:
         "translate_resource_format(source, ResourceRole::Texture)" in probe,
         "translate_resource_format(source, ResourceRole::Color)" in probe,
         "R179 compressed texture incorrectly qualifies as RTV" in probe,
+        "invalidCompressedTarget.initialize(" in probe,
+        "R179 compressed NativeSurfaceMirror owner accepted RTV" in probe,
         "ResourceRole::Vertex).exact" in probe,
     ))
 

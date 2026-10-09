@@ -48,6 +48,19 @@ int main()
             targetFormat.exact ||
             targetFormat.format != DXGI_FORMAT_UNKNOWN)
             return fail("R179 compressed texture incorrectly qualifies as RTV");
+
+        // Exercise the actual dormant D3D11 texture/RTV owner, not only
+        // the format helper. It must reject all block-compressed color
+        // targets before creating or retaining any GPU resources.
+        NativeSurfaceMirror invalidCompressedTarget;
+        if (invalidCompressedTarget.initialize(
+                device.Get(), ResourceRole::Color, 16, 16,
+                source, D3DPOOL_DEFAULT, D3DUSAGE_RENDERTARGET,
+                D3DMULTISAMPLE_NONE, 0) ||
+            invalidCompressedTarget.ready() ||
+            invalidCompressedTarget.texture() ||
+            invalidCompressedTarget.render_target_view())
+            return fail("R179 compressed NativeSurfaceMirror owner accepted RTV");
     }
     if (translate_resource_format(
             D3DFMT_A8R8G8B8, ResourceRole::Vertex).exact ||
