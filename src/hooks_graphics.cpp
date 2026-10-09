@@ -22,6 +22,8 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRMirrorFitDesktop;
+	extern Setting<int> VRRenderWidth;
+	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
 	extern Setting<int> VRDriverSeatNativeMode;
@@ -1526,7 +1528,14 @@ class WindowedBorderless : public Hook
 		// desktop. Keep that render resolution for the HMD/SBS source, but fit the
 		// borderless mirror window to the current monitor so a 3840x2160 render on
 		// a 3440x1440 display is scaled instead of extending off-screen.
-		if (Settings::VREnabled && Settings::VRMirrorFitDesktop)
+        // Preserve the VR internal eye backbuffer. Only resize the PC mirror
+        // when a valid VR render resolution is explicitly configured.
+        const bool vrInternalOverride = Settings::VRRenderWidth >= 640 &&
+            Settings::VRRenderHeight >= 480 &&
+            static_cast<std::int64_t>(static_cast<int>(Settings::VRRenderWidth)) *
+                static_cast<int>(Settings::VRRenderHeight) <= 16777216LL;
+        if (Settings::VREnabled &&
+            (Settings::VRMirrorFitDesktop || vrInternalOverride))
 		{
 			MONITORINFO monitorInfo{};
 			monitorInfo.cbSize = sizeof(monitorInfo);
