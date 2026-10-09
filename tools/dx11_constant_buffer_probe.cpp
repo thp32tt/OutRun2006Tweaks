@@ -380,13 +380,19 @@ float4 main() : SV_Target {
                 r170Fvf, r170Stride);
         std::array<FixedFunctionStageState, 8> r170Stages{};
         // The D3D9 fixed-function stage requires valid min/mag sampler
-        // defaults even when SELECTARG1 consumes only vertex DIFFUSE.
+        // defaults even when SELECTARG1 does not sample a texture.
         // Default-constructed NONE min/mag fails translate readiness.
+        // Limit R170's pixel provenance to opaque D3DTA_TFACTOR (the
+        // generator's exact 0xFFFFFFFF default). Prior exact-SHA WARP gates
+        // 37876360563 and 37877062280 revealed D3DTA_DIFFUSE COLOR0
+        // mismatch ([B,G,R,A]=[128,0,16,255] instead of opaque white).
+        // Never mistake this controlled factor path for diffuse fidelity:
+        // native gameplay Draw stays off until the color-linkage bug is fixed.
         r170Stages[0] = active_stage();
         r170Stages[0].colorOp = D3DTOP_SELECTARG1;
-        r170Stages[0].colorArg1 = D3DTA_DIFFUSE;
+        r170Stages[0].colorArg1 = D3DTA_TFACTOR;
         r170Stages[0].alphaOp = D3DTOP_SELECTARG1;
-        r170Stages[0].alphaArg1 = D3DTA_DIFFUSE;
+        r170Stages[0].alphaArg1 = D3DTA_TFACTOR;
         std::array<D3DRESOURCETYPE, 8> r170TextureTypes{};
         r170TextureTypes.fill(D3DRTYPE_TEXTURE);
         const auto r170PsPrototype =
@@ -398,7 +404,7 @@ float4 main() : SV_Target {
         require(r170VsPrototype.generated(),
                 "R170 generated fixed-function VS source");
         require(r170PsPrototype.generated(),
-                "R170 generated fixed-function diffuse-select PS source");
+                "R170 generated fixed-function opaque TFACTOR PS source");
         ID3DBlob* r170VsCode =
             compile_vertex_shader(r170VsPrototype.source);
         ID3DBlob* r170PsCode = nullptr;
