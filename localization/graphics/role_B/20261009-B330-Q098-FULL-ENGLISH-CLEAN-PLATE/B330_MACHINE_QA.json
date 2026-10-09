@@ -1,0 +1,81 @@
+{
+  "run": "B330",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "old_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+  "trial_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+  "root_cause": "C328 full-frame original English persisted outside and inside earlier narrow B327R clean/composite construction",
+  "method": "New source-wide truly transparent plate + B327R native Korean vector and source-derived white/navy effect; encode all source BC3 blocks, not center only",
+  "source_alpha_outside_original_bbox": 0,
+  "new_alpha_outside_original_bbox": 0,
+  "new_alpha_outside_candidate_bbox": 0,
+  "persisted_decode": "PASS_EXACT",
+  "changed_rgba_outside_source_bbox": 0,
+  "english_residue_outside_korean_bbox": 0,
+  "source_bbox": [
+    431,
+    6,
+    1674,
+    123
+  ],
+  "candidate_effect_bbox": [
+    475,
+    9,
+    1580,
+    120
+  ],
+  "native": [
+    2048,
+    128
+  ],
+  "dds_format": "DXT5_BC3",
+  "mips": 1,
+  "rewritten_blocks": 5550,
+  "cleared_english_blocks": 19,
+  "white_rgb": [
+    255,
+    255,
+    255
+  ],
+  "navy_rgb": [
+    0,
+    12,
+    57
+  ],
+  "font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "proofs": [
+    "FULL_READABLE_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_READABLE_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "FULL_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "candidate_promoted": false,
+  "new_approved_DDS": 0,
+  "producer_visual": "PENDING_DIRECT_FULL_NATIVE_75_50_RAW_READABLE",
+  "independent_C": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
