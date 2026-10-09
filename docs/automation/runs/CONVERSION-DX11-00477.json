@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00477",
+  "production_id": "CONVERSION-DX11-00477",
+  "event_id": "CONVERSION-DX11-00477-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
+  "lease_epoch": 1,
+  "work_key": "DX11:R172:GENERATED_FVF_DIFFUSE_COLOR0_BGRA_WARP:tools/dx11_constant_buffer_probe.cpp",
+  "conflict_keys": [
+    "tools/dx11_constant_buffer_probe.cpp:R172",
+    "src/vr/d3d11/pipeline_translation.cpp:R172"
+  ],
+  "status": "RUNNING",
+  "checkpoint": "C1_REVIEW",
+  "base_sha": "7972c38de2d7f93c71959985fdb84eff8aac3d50",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "R172 genuine D3D9 FVF XYZ|DIFFUSE COLOR0 input and generated VS/PS WARP BGRA pixel proof, discriminate R170 no-DIFFUSE regression",
+  "summary": "Claim R172 independent COLOR0 linkage; R171 completed Gate SUCCESS, R170 TFACTOR-only quarantine persists.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD 7972c38; 00476 C6 COMPLETE / exact-SHA Gate 37901281938 SUCCESS, 00477 absent",
+    "C1_REVIEW": "IN_PROGRESS: R170 DIFFUSE mismatch requires real FVF COLOR0 source bytes, not synthetic TFACTOR or unpopulated input.",
+    "C2_IMPLEMENT": "PENDING",
+    "C3_VALIDATE": "PENDING",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED: offscreen WARP proof; gameplay Draw dormant",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Implement source-accurate colored FVF+generated VS/PS fixture and WARP pixel compare; exact-SHA CI; persist result",
+  "resume_cursor": "C2_IMPLEMENT",
+  "state_persisted": false,
+  "last_real_activity_at": "2026-10-09T17:01:00+09:00",
+  "last_activity_evidence": "GitHub exact HEAD and 00476 C6 Gate success checked",
+  "blockers": [
+    "Quest3/VDXR HMD/gameplay runtime untested"
+  ]
+}
