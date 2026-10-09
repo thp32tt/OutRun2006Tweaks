@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 16:03 KST",
+  "updated_at_kst": "2026-10-09 16:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B322 B-owner P1 IGR038 q228 source-conditioned solid chrome manual-method representative retry GitHub Actions 37895233639 running after native 5px shadow-safe gate correction; incumbent SHA 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808 preserved; no producer visual PASS or DDS promoted as of 16:03. Complete saved-DDS native/75/50 RAW SOURCE/CLEAN/FINAL controller review before any promotion; C2/C3/user game pending, RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

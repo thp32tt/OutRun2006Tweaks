@@ -6814,7 +6814,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 16:03 KST",
+  "updated_at_kst": "2026-10-09 16:27 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13192,13 +13192,44 @@
     "proposed_method": "source-stopped full silver face, top/light lower/dark bevel, shifted source-edge rim; no hollow letter mask",
     "qa_failure": "First run 37894986079 original 5px shadow alpha inset failed; no output promoted",
     "current_run": 37895233639,
-    "current_run_as_of": "IN_PROGRESS_2026-10-09_16:03_KST",
+    "current_run_as_of": "COMPLETED_SUCCESS_PRODUCER_VISUAL_REJECTED",
     "requires": "Inspect persisted original/CLEAN/OLD/TRIAL native/75/50/RAW, do not promote unless source metallic face truly matches",
     "production_dds": 0,
     "independent_C2": "NOT_RUN",
     "C3": "BLOCKED",
     "IGR038": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
-    "qa": "localization/graphics/role_B/20261009-B322-Q228-SOURCE-CHROME-REPRESENTATIVE/B322_CONTROLLER_WORK_IN_PROGRESS.json"
+    "qa": "localization/graphics/role_B/20261009-B322-Q228-SOURCE-CHROME-REPRESENTATIVE/B322_CONTROLLER_WORK_IN_PROGRESS.json",
+    "producer_qa": "REJECTED_MATERIAL_SOURCE_BANDS"
+  },
+  "b323_q228_continuous_chrome": {
+    "run_key": "OUTRUN-KOR-B323-Q228-CONTINUOUS-SOURCE-CHROME-20261009",
+    "role": "B",
+    "index": 228,
+    "priority": "P1",
+    "user_regression": "IGR-038",
+    "old_candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+    "new_candidate_sha256": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+    "rejected_B322_sha256": "ffb982af70aadf36a2f954d1de29bb045385ec0524ab5763a1ae363de370a2dd",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "new_candidate_dds": 1,
+    "completed_producer_regions": 1,
+    "regions_total": 13,
+    "remaining_unreworked_regions": 12,
+    "source_bbox": [
+      5,
+      26,
+      1456,
+      145
+    ],
+    "producers_scope": "SCOPED_PASS_CHROME_ROW_1_OF_13",
+    "independent_C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "approval": false,
+    "actual_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "workflow_id": 37898688054,
+    "workflow_result": "SUCCESS",
+    "QA": "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/B323_CONTROLLER_SELF_QA_FINAL.json"
   }
 }
