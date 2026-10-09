@@ -20,3 +20,10 @@ Session start: **10:37 KST**. User requested one more hour of active review, not
 2. Compare original per-node queue/parent tags, batch Flush timing and shader raw c64 epoch.
 3. Reconcile old user HMD counters and latest compiled source without extrapolation.
 4. Consider narrow telemetry/guard material only after proving source deficiency, with one targeted negative test and Windows gates.
+
+## C1 — 10:43 KST: independently traced render outcomes
+- Source src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp::R30ExecuteXyzrhwStereo draws L then R with a temporary right-eye RT/depth switch. If right draw fails it sets FrameRightDrawFailed, R9Poison and safe fallback but **returns the left-eye HRESULT**. Likewise, R30/F11 and generic XYZRHW counts increment after the right attempt, not a guarantee of a committed two-eye picture.
+- R62TryFixedFunctionSpriteIndexed increments projectedDraws/hudDraws and logs hits unconditionally after that helper, even if right failed or the original D3D projection restore failed. Thus the existing apparently positive HUD/4–5 count is a false-positive success indicator. The frame is correctly failclosed for host, but the log is ambiguous.
+- src/hooks_uiscaling.cpp::VRProjectedD3DXSpriteIsolationR64 increments Flushes after vtable[10] regardless of HRESULT and only logs at count powers of two. It tracks Failures but does not emit per-producer first-success or first-failure. A 6th/6 glyph batch can thus be present but absent from the logs; a counted flush might be failed.
+- Validated src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp has existing c64 source/draw fingerprints, so adding another generic c64 logger would be duplication. Focus review material only on proven outcome telemetry gaps R62/R64, without changing sprite ownership or matrices.
+- Source code candidate branch vr-d3d9ex-candidate/AI2-R62-R64-EYE-ACCEPTANCE-20261009 created at current focus. Only a code+negative verifier commit and exact Win32 CI should make any new candidate eligible. No Quest3 optical claim.
