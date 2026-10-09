@@ -40,6 +40,13 @@ function Invoke-Fixture {
         'GameDefaultConfigOverride: default resolution set to 3440x1440, windowed enabled' |
             Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
     }
+    if ($Name -eq 'goal-progress-versus-completed-result') {
+        @(
+            'VR P0 GOAL EARLY_GATE: method=DrawPrimitiveUP state=19 producer=NONE scope=SCREEN_OVERLAY_2D queueEpoch=1234550'
+            'VR P0 GOAL EARLY_GATE: method=DrawIndexedPrimitive state=19 producer=TEXT_GLYPH_PUTSPRITE scope=SCREEN_HUD queueEpoch=1249327'
+            'VR P0 FLARE: exact EXE+0xCABE producer -> PROJECTED_SCREEN_EFFECT_2D; placement remains WVP-proven'
+        ) | Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
+    }
     & $analyzer -SessionDir $dir
     $outputPath = Join-Path $dir 'AUTO_ANALYSIS_SUMMARY.json'
     if (-not (Test-Path $outputPath)) {
@@ -65,6 +72,16 @@ function Invoke-Fixture {
          $result.Flags -notcontains 'HUD_RANK_CALC_CAPTURE_UNOBSERVED')) {
         throw "$Name masked missing rank capture behind a valid rival marker"
     }
+    if ($Name -eq 'goal-progress-versus-completed-result' -and (
+        -not $result.GoalMixedPhaseOwnerEvidence -or
+        -not $result.GoalGenericPhaseEvidence -or
+        -not $result.GoalExactTextEvidence -or
+        -not $result.LensProducerHookObserved -or
+        $result.LensCenterOpticalStatus -ne 'NOT_INFERABLE_FROM_LOGS' -or
+        $result.ResultProgressOpticalStatus -ne 'NOT_INFERABLE_FROM_LOGS' -or
+        $result.Flags -notcontains 'GOAL_MIXED_GENERIC_VS_EXACT_HUD_NEEDS_PHASE_REVIEW')) {
+        throw "$Name incorrectly marked result animation or centre flare as optically verified"
+    }
     if ($Name -eq 'r28-present-over-budget' -and
         ($result.R28PresentOverBudgetWindows -ne 1 -or
          $result.R28PresentMaxMs -ne 28.557 -or
@@ -83,6 +100,7 @@ try {
     Invoke-Fixture 'healthy-telemetry-only' 5 'True' 'OK'
     Invoke-Fixture 'rival-projects-rank-unobserved' 5 'True' 'HUD_RANK_CALC_CAPTURE_UNOBSERVED'
     Invoke-Fixture 'r28-present-over-budget' 5 'True' 'PERFORMANCE_WARNING'
+    Invoke-Fixture 'goal-progress-versus-completed-result' 5 'True' 'NEEDS_GOAL_PHASE_VISUAL_REVIEW'
 } finally {
     Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
