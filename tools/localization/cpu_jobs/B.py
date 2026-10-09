@@ -39,7 +39,8 @@ def decode(b):
  a=np.asarray(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),dtype=np.uint8)
  assert a.shape==(H,W,4);return a
 S=decode(src);P=decode(old)
-l,t,r,b=2081,250,2860,370
+l,t,r,b=2081,230,2860,370
+assert np.count_nonzero(S[230:250,l:r,3])>1000,"Original English header top residual not proven"
 ol,ot,orr,ob=2133,256,2807,363
 assert c332["new_pixel_finding"]["source_orange_pixels"]>8000
 # Core shape from exact English source orange pixels, not B331's contaminated
@@ -61,21 +62,21 @@ C[inside]=S[t:b,l:r][inside]
 # pixel-identical, including its transparent shadow and neighbouring art.
 assert np.array_equal(C[source_orange],S[t:b,l:r][source_orange])
 # B331 native Korean lettering gets reduced (never enlarged) into the intact
-# original gold-only upper lane. Source title is highly horizontally condensed;
-# high-quality native reduction changes height from 107 to 80 while retaining
+# original gold upper lane, including English top navy residual. Source title is highly horizontally condensed;
+# high-quality native reduction changes height from 107 to 97 while retaining
 # 674px width, attaining similarly racing/italic proportions.
 old_ink=Image.fromarray(P[ot:ob,ol:orr].copy(),"RGBA")
-new_ink=old_ink.resize((orr-ol,80),Image.Resampling.LANCZOS)
-nx,ny=ol,251
+new_ink=old_ink.resize((orr-ol,97),Image.Resampling.LANCZOS)
+nx,ny=ol,235
 assert nx>=l+1 and nx+new_ink.width<=r-1 and ny>=t+1 and ny+new_ink.height<=b-1
 active=np.asarray(new_ink)[:,:,3]>0
-protect_at_dest=inside[ny-t:ny-t+80,nx-l:nx-l+new_ink.width]
+protect_at_dest=inside[ny-t:ny-t+97,nx-l:nx-l+new_ink.width]
 assert not np.any(active&protect_at_dest),"Condensed gold overlaps protected original orange neighbouring art"
 out=P.copy()
 out[t:b,l:r]=C
-gold_layer=Image.fromarray(out[ny:ny+80,nx:nx+new_ink.width].copy(),"RGBA")
+gold_layer=Image.fromarray(out[ny:ny+97,nx:nx+new_ink.width].copy(),"RGBA")
 gold_layer.alpha_composite(new_ink)
-out[ny:ny+80,nx:nx+new_ink.width]=np.asarray(gold_layer,dtype=np.uint8)
+out[ny:ny+97,nx:nx+new_ink.width]=np.asarray(gold_layer,dtype=np.uint8)
 roi=out[t:b,l:r]; sroi=S[t:b,l:r]
 assert np.array_equal(roi[inside],sroi[inside]),"All protected graphic pixels MUST be restored byte-exact"
 assert np.count_nonzero(roi[:,:,3][source_orange])==int(source_orange.sum()),"Orange lost"
@@ -107,7 +108,7 @@ outpath=OUT/"B332_Q060_ORANGE_PROTECTED_UNAPPROVED.dds";outpath.write_bytes(data
 assert h(outpath.read_bytes())==h(data)
 # Include complete 779x160 window to catch sibling-text loss the previous
 # producer gold-only crop hid. Never use a cropped gold-only view for approval.
-px0,py0,px1,py1=l,230,r,400
+px0,py0,px1,py1=l,210,r,400
 proofs=[]
 view={"SOURCE":S,"CLEAN_PLATE":out*0,"OLD_B331":P,"NEW_B332":final}
 # Clean plate is current saved before lettering stripped in scoped gold region:
@@ -145,7 +146,7 @@ report={
  "protected_dilated_rgba_diff":0,
  "outside_gold_rgba_diff":0,"outside_gold_alpha_diff":0,
  "prior_candidate_native_region":[ol,ot,orr,ob],
- "new_gold_region":[nx,ny,nx+new_ink.width,ny+80],
+ "new_gold_region":[nx,ny,nx+new_ink.width,ny+97],
  "source_gold_bbox":[l,t,r,b],
  "full_comparison_window":[px0,py0,px1,py1],
  "protected_overlap_with_new_gold_ink":0,
