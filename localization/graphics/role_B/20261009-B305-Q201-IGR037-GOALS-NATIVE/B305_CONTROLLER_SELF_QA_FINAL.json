@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-B305-Q201-IGR037-GOALS-NATIVE-20261009-0940",
+  "role": "B",
+  "run": "B305",
+  "queue_index": 201,
+  "user_ingame_report": "IGR-037",
+  "owner_lane": "B",
+  "priority": "P1",
+  "domain": "GRAPHICS",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "specific_user_defect": "GOAL_SELECT_SMALL_HEADER: LOW_RES_FONT|MISALIGNED_LABEL|SOURCE_RESIDUE_SUSPECTED",
+  "canonical_source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "previous_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+  "new_candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "new_persisted_dds": 1,
+  "modified_regions": 1,
+  "unrelated_regions_and_protected_artwork": "16/16 exact same persisted pixel bytes",
+  "source_text": "GOALS",
+  "previous_korean": "골",
+  "current_korean": "목표",
+  "source_bbox": [
+    1079,
+    1734,
+    1255,
+    1785
+  ],
+  "previous_korean_bbox": [
+    1084,
+    1738,
+    1124,
+    1781
+  ],
+  "current_korean_bbox": [
+    1084,
+    1739,
+    1160,
+    1780
+  ],
+  "bbox_deltas": {
+    "left": 5,
+    "right": 95,
+    "top": 5,
+    "bottom": 5
+  },
+  "source_bbox_pixel_ceiling": "PASS",
+  "producer_methods": "Source-pinned English 2048² BGRA mip1 RAW mirror_y, B168 source-verified empty CLEAN. Native NotoSansCJK Black glyphs with 1px source-color perimeter RGB 46,54,57; no 19px x4 enlargement, arbitrary horizontal scaling, outline/shadow box or source glyph reuse. Reconstructed only GOALS source cell and preserved all 14 canonical phonetic stage-name rows, STAGES/Special, English song marks.",
+  "numeric_gates": {
+    "source_clean_outside_17_bboxes": 0,
+    "source_clean_GOALS_remaining_alpha": 0,
+    "old_vs_new_changed_outside_GOALS": 0,
+    "old_vs_new_alpha_changed_outside_GOALS": 0,
+    "source_vs_new_original_bbox": "PASS",
+    "no_1px_protected_intrusion": "PASS",
+    "all_unedited_protected_regions": "PIXEL_EXACT",
+    "DDS_original_header": "EXACT",
+    "DDS_authoritative_roundtrip": "EXACT",
+    "native_size": [
+      2048,
+      2048
+    ],
+    "mips": 1
+  },
+  "producer_direct_visual": {
+    "source_clean": "PASS_SOURCE_ENGLISH_PRESENT_CLEAN_ALPHA_ZERO",
+    "clean_final": "PASS_NO_RECTANGULAR_COMPOSITE_TRACE_IN_GOALS_CROP",
+    "source_final": "PASS_SEMANTIC_UI_LABEL_GOALS_IS_GOAL_CONTROL_NOT_PROPER_STAGE_NAME",
+    "native_gray_100": "PASS_INTact_KOREAN_GLYPHS",
+    "practical_gray_50": "PASS_LEGIBLE_AND_LARGER_THAN_PRIOR_GOL",
+    "raw_gray_75": "PASS_SAME_SOURCE_RAW_MIRROR_Y",
+    "source_family": "PASS_SCOPED_WEIGHT_AND_HEIGHT_ONLY",
+    "game_composited": "UNTESTED",
+    "uninspected_background": "NO_CLAIM"
+  },
+  "preview_evidence": [
+    "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_GOALS_FLIP_Y_READABLE_128_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_GOALS_FLIP_Y_READABLE_128_50_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_GOALS_RAW_128_75_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "all_evidence": "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_MACHINE_QA.json",
+  "workflow_run_id": 37866268182,
+  "workflow_status": "SUCCESS",
+  "execution_backend": "github-actions: locally unavailable exact source and candidate",
+  "N100": "small GitHub metadata check only",
+  "producer_decision": "B_SELF_QA_SCOPED_PASS_FRESH_C1_REQUIRED",
+  "independent_C1": "PENDING",
+  "C3": "PENDING",
+  "approval": false,
+  "user_game_report_status": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
