@@ -500,10 +500,73 @@ async def periodic_slot_tab_health(context: BrowserContext, pages: dict[str, Pag
         await asyncio.sleep(TAB_HEALTH_CHECK_SECONDS)
 
 
+async def check_chrome_recycle(context: BrowserContext, pages: dict[str, Page],
+                               reg: Registry, elapsed_seconds: float) -> bool:
+    """Checkpoint and ask Docker to recycle when due. No task is dispatched.
+
+    Preserve cookies, localStorage, IndexedDB and task state; the entrypoint
+    removes ONLY disposable caches while Chrome is stopped on the next boot.
+    """
+    if not CHROME_RECYCLE_ENABLED or elapsed_seconds < CHROME_RECYCLE_INTERVAL_SECONDS:
+        return False
+    overdue = elapsed_seconds - CHROME_RECYCLE_INTERVAL_SECONDS
+    busy_slots = []
+    for name, page in pages.items():
+        try:
+            if not page.is_closed() and await asyncio.wait_for(
+                    detect_busy(page), timeout=CHROME_RECYCLE_BUSY_PROBE_SECONDS):
+                busy_slots.append(name)
+        except Exception as exc:
+            # An unknown tab condition is treated as busy during grace, not
+            # as a reason to interrupt a possibly in-flight user response.
+            busy_slots.append(name)
+            log.warning("recycle tab busy state unknown slot=%s: %s", name, type(exc).__name__)
+    if busy_slots and overdue < CHROME_RECYCLE_BUSY_GRACE_SECONDS:
+        write_runtime(chrome_recycle_status="deferred_busy",
+                      chrome_recycle_deferred_slots=busy_slots,
+                      chrome_recycle_overdue_seconds=int(overdue))
+        return False
+
+    # Only this controller's thread writes the final checkpoint. A running
+    # ChatGPT response may be interrupted after the bounded grace, but the
+    # existing chat URL and exact asset/SHA are retained and NEVER resent.
+    save_registry(reg)
+    try:
+        prior = json.loads(CHROME_RECYCLE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        prior = {}
+    count = max(0, int(prior.get("count", 0))) + 1
+    record = {"count": count, "requested_at": datetime.now(TZ).isoformat(),
+              "reason": "periodic_cache_recycle",
+              "busy_slots_at_request": busy_slots,
+              "interval_minutes": CHROME_RECYCLE_INTERVAL_SECONDS // 60}
+    atomic_json(CHROME_RECYCLE_FILE, record)
+    write_runtime(status="chrome_recycle_requested",
+                  chrome_recycle_status="restarting",
+                  chrome_recycle_count=count,
+                  chrome_recycle_last_at=record["requested_at"],
+                  chrome_recycle_busy_slots=busy_slots,
+                  last_action="Checkpoint persisted; Docker restarting Chrome, auth profile preserved")
+    log.warning("periodic Chrome recycle requested after %.1fm, busy_slots=%s, count=%s",
+                elapsed_seconds / 60, busy_slots, count)
+    return True
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     reg = load_registry(datetime.now(TZ))
     tab_health_state: dict = {}
     last_tab_health_check = 0.0
+    recycle_started_at = time.monotonic()
+    if CHROME_RECYCLE_ENABLED:
+        try:
+            previous_recycle = json.loads(CHROME_RECYCLE_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            previous_recycle = {}
+        write_runtime(chrome_recycle_count=int(previous_recycle.get("count", 0)),
+                      chrome_recycle_last_at=previous_recycle.get("requested_at"),
+                      chrome_recycle_status="scheduled",
+                      chrome_recycle_next_due_at=(datetime.now(TZ) +
+                          timedelta(seconds=CHROME_RECYCLE_INTERVAL_SECONDS)).isoformat())
     # Localization checks tab health independently of potentially slow queue
     # operations; conversion retains its existing synchronous health checker.
     health_task = (asyncio.create_task(
@@ -518,6 +581,16 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
         elif time.monotonic() - last_tab_health_check >= TAB_HEALTH_CHECK_SECONDS:
             last_tab_health_check = time.monotonic()
             await monitor_slot_tab_health(context, pages, tab_health_state)
+
+        # Decide before starting a new dispatch, not during a prompt send.
+        if not once and await check_chrome_recycle(context, pages, reg,
+                                                  time.monotonic() - recycle_started_at):
+            if health_task is not None:
+                health_task.cancel()
+                await asyncio.gather(health_task, return_exceptions=True)
+            # The restart:unless-stopped policy starts a fresh Chrome process.
+            # A nonzero intentional exit is not a task failure or send retry.
+            raise SystemExit(75)
 
         write_runtime(queue_loop_heartbeat_at=now.isoformat(), status="running" if AUTO_SEND else "manual_mode")
         try:
