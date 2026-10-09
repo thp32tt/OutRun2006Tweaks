@@ -18,24 +18,24 @@
     ".github/workflows/backend-conversion-gate.yml:R187"
   ],
   "base_sha": "9fd3c09a6bb1548792d226b00f7515002ce8f1b0",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+  "material_result_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+  "validation_bearing_result_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
-  "summary": "R187 independent dormant indexed native RTV/viewport/scissor fail-closed preflight plus isolated WARP DrawIndexed pixel proof; no gameplay activation.",
+  "summary": "R187 native indexed RTV/viewport/scissor ownership preflight and real isolated WARP DrawIndexed pixel readback PASS; mandatory exact-SHA full Gate FAIL solely at unchanged 00477-owned R175 TEXCOORD6 varying mismatch. Gameplay activation not changed; Quest3/VDXR untested.",
   "pipeline": {
     "C0_RECOVER": "PASS; 00489 absent; HEAD 9fd3c09a6bb1548792d226b00f7515002ce8f1b0; 00488 R186 complete scoped WARP, inherited R175 full Gate fail; 00481 checkpoint directory unrelated",
     "C1_REVIEW": "PASS; choose independent R187 target/viewport/scissor exactness; avoid 00477 R175 and 00488 R186 owned paths; ownership, identity, geometry, GPU evidence and activation isolation reviewed",
     "C2_IMPLEMENT": "PASS; production R187 native preflight header, standalone WARP GPU indexed draw, 3-mutant source contract, cmkr target and CI placement before R175",
-    "C3_VALIDATE": "R187 local source contract confirmed; exact-SHA mandatory GitHub Actions pending",
-    "C4_COMMIT": "material commit contains source/probe/test/build/workflow plus initial run record; no CI skip; result SHA to be sealed",
-    "C5_PACKAGE": "NOT_REQUIRED; native Draw activation not authorized and no Quest3/VDXR runtime package",
-    "C6_STATE": "PENDING exact-SHA CI; must seal authoritative SHA/run or inherited blocker"
+    "C3_VALIDATE": "R187 scoped PASS: static 3 negative mutants, cmkr Win32 compile and WARP actual DrawIndexed GPU-pixel readback success; exact-SHA Gate 37964422215 validate 113935069208 SUCCESS, readiness smoke 113937424223 FAILURE only R175 TEXCOORD6 varying (owner 00477): actual BGRA 128,0,16,255 vs expected 224,128,32,255.",
+    "C4_COMMIT": "PASS: material 3da8133f81bead43b3700c444062228f5d6861ed [AUTO:CONVERSION-DX11-00489] non-CI-skip; exact push Gate 37964422215 complete. C6 record is bookkeeping commit with [skip ci] after authoritative Gate; keep validation-bearing SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED: no live game Draw activation; no Quest3/VDXR runtime/packaging authority; isolated WARP probe only",
+    "C6_STATE": "SEALED: R187 native independent source and compiled GPU readback PASS, whole exact-SHA Gate FAIL due independent R175; runtime UNTESTED; score +0; resume different work_key and reserve R175 for owner 00477."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_target_viewport.hpp",
@@ -46,11 +46,11 @@
     "docs/automation/runs/CONVERSION-DX11-00489.json"
   ],
   "blockers": [
-    "Known unchanged R175 TEXCOORD6 varying WARP mismatch belongs to 00477",
-    "Quest3/VDXR runtime untested"
+    "R175_GENERIC_VARYING_MISMATCH owned by CONVERSION-DX11-00477, tools/dx11_constant_buffer_probe.cpp unchanged: BGRA actual 128,0,16,255 expected 224,128,32,255",
+    "Quest 3/VDXR actual game runtime not tested. No native game Draw activation."
   ],
-  "next_action": "Verify exact material SHA Backend Conversion Gate and R187 isolated WARP before R175; seal record without cancelling the Gate.",
-  "last_real_activity_at": "2026-10-09T17:10:21.836Z",
+  "next_action": "Preserve R187 material 3da8133f81bead43b3700c444062228f5d6861ed; 00477 owner repairs R175 independently, then full exact-SHA Gate may be rerun on a NEW material SHA only when source actually changes. Resume another disjoint runnable DX11 native source item; no R187 replay or HMD promotion.",
+  "last_real_activity_at": "2026-10-09T17:21:38.309Z",
   "score_change": 0,
   "static_precommit_checks": {
     "headerGuards": true,
@@ -58,5 +58,52 @@
     "gpuProbe": true,
     "cmkrManifest": true,
     "gateOrder": true
+  },
+  "scoped_automation_validation": "PASS_R187_STATIC_3_MUTANTS_COMPILED_WARP_DRAWINDEXED_PIXELS",
+  "resume_cursor": "BLOCKED_UPSTREAM_R175_AFTER_R187_GPU_SCOPED_VERIFIED",
+  "score_reason": "R187 source and WARP proof succeeded, but required exact-SHA Gate failed inherited 00477-owned R175; no finished whole-gate acceptance. AI2 SSOT remains 1282.",
+  "validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37964422215,
+    "gate_head_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+    "gate_event": "push",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113935069208,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113937424223,
+    "readiness_smoke_conclusion": "failure",
+    "r187_static_contract": "PASS",
+    "r187_negative_mutants": 3,
+    "r187_cmkr_build": "PASS",
+    "r187_warp_gpu_drawindexed_pixels": "PASS",
+    "r187_rejects": [
+      "wrong target width",
+      "wrong view format",
+      "missing viewport",
+      "extra viewport",
+      "half viewport",
+      "scissor enabled",
+      "missing bound RTV",
+      "retired IB"
+    ],
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "artifact_id": 11633190719,
+    "artifact_digest": "sha256:1de7cd1aa808b1709a32622322bc8f51cc19009f81cd5bbb4c9b7f41c3bdb973",
+    "ledger_issue_14_preseal_comment_id": 6085649170
   }
 }
