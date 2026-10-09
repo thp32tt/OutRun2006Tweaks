@@ -9550,5 +9550,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "backend": "GITHUB_ACTIONS_37947992059",
     "qa_path": "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json"
+  },
+  "a211_q175_trueglyph_chrome_trial_rejected": {
+    "run_key": "OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005",
+    "role": "A",
+    "queue_index": 175,
+    "priority": "P1",
+    "candidate_preserved_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "canonical_source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "new_trial_sha256": "b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446",
+    "produced_trial_dds": 1,
+    "produced_promoted_dds": 0,
+    "mechanical": "SCOPED_SOURCE_CLEAN_AND_PERSISTED_BGRA32_PASS",
+    "producer_visual": "FAIL_SOURCE_CONNECTED_CHROME_VS_GENERIC_BLOCKY_CJK_FAMILY_AND_222_OF_950_WIDTH",
+    "qa": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "independent_C1": "BLOCKED",
+    "C3": "BLOCKED",
+    "user_acceptance": "PENDING",
+    "actual_game": "IGR032_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 37949025173
   }
+
 }
