@@ -79,6 +79,10 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'UserConfigSha256') 'collector manifest must include user override INI SHA'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'configPrecedence=base_ini,user_ini,command_line') 'collector must preserve base vs user INI precedence'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\[USER_OVERRIDE_INI\]') 'collector must record overrides separately'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'VR_CONFIG_AFTER_RUN_SNAPSHOT.txt') 'collector must capture overlay-changed settings after the game'
 # The next real Quest3 HUD log must preserve rendering settings needed to
 # disambiguate an ignored HUD hook from a too-small/disparity-wrong draw.
 $configWhitelist = ($text['Collect-OutRunVRLogs.ps1'] -split "`n" |
