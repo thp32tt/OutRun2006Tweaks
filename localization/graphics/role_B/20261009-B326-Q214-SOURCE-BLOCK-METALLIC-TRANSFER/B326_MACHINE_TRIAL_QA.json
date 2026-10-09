@@ -1,0 +1,124 @@
+{
+  "run": "B326",
+  "role": "B",
+  "index": 214,
+  "method": "NATIVE_HANGUL_VECTOR_SOURCE_ORIGINAL_DXT5_BLOCK_CHROMATIC_MATERIAL_DONOR_TRANSFER",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "older_trial_family": "B260_B261_FLAT_SDF_PALETTE_REJECTED",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "old_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "trial_sha256": "e714053ccb51b7722b8c4b1c1de6c244810e3a13c30bc8e7dfa10cb3578a44eb",
+  "native": [
+    2048,
+    2048
+  ],
+  "dds_format": "BC3/DXT5",
+  "mips": 1,
+  "dds_header": "EXACT",
+  "raw_mirror_y": "EXACT",
+  "saved_roundtrip": "PASS",
+  "outside_canonical_source_rgba": 0,
+  "outside_canonical_source_alpha": 0,
+  "outside_prior_candidate_rgba": 0,
+  "source_donor_blocks": 124,
+  "glyphs": [
+    {
+      "id": "START",
+      "source_bbox": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "new_bbox": [
+        828,
+        497,
+        886,
+        516
+      ],
+      "margins": [
+        13,
+        2,
+        13,
+        1
+      ],
+      "new_source_native_core": 299,
+      "BC3_source_donor_face_bright_retention": 1.0,
+      "material_donor_blocks": 71
+    },
+    {
+      "id": "GOAL",
+      "source_bbox": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "new_bbox": [
+        1356,
+        765,
+        1404,
+        784
+      ],
+      "margins": [
+        13,
+        1,
+        13,
+        3
+      ],
+      "new_source_native_core": 282,
+      "BC3_source_donor_face_bright_retention": 1.0,
+      "material_donor_blocks": 68
+    }
+  ],
+  "render_english_source_vs_clean": "B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",
+  "clean_final_protection": "SOURCE_OUTSIDE_ZERO",
+  "authored_lossless_contacts": 36,
+  "views": [
+    "START_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_GRAY_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_WHITE_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_WHITE_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_WHITE_50_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_BLACK_100_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_BLACK_75_SOURCE_CLEAN_OLD_B326.png",
+    "START_RAW_BLACK_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_GRAY_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_WHITE_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_WHITE_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_WHITE_50_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_BLACK_100_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_BLACK_75_SOURCE_CLEAN_OLD_B326.png",
+    "GOAL_RAW_BLACK_50_SOURCE_CLEAN_OLD_B326.png"
+  ],
+  "output": "UNAPPROVED_TRIAL_NOT_PROMOTED",
+  "producer_visual": "NOT_YET_REVIEWED",
+  "fresh_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS",
+  "forbidden_domains_touched": []
+}
