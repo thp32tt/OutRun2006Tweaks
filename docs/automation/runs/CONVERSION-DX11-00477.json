@@ -14,31 +14,73 @@
     "tools/dx11_constant_buffer_probe.cpp:R172",
     "src/vr/d3d11/pipeline_translation.cpp:R172"
   ],
-  "status": "RUNNING",
-  "checkpoint": "C1_REVIEW",
+  "status": "BLOCKED",
+  "checkpoint": "C6_STATE",
   "base_sha": "7972c38de2d7f93c71959985fdb84eff8aac3d50",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "automation_validation": "PENDING",
+  "material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
+  "validation_bearing_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
+  "result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "selected_work_item": "R172 genuine D3D9 FVF XYZ|DIFFUSE COLOR0 input and generated VS/PS WARP BGRA pixel proof, discriminate R170 no-DIFFUSE regression",
-  "summary": "Claim R172 independent COLOR0 linkage; R171 completed Gate SUCCESS, R170 TFACTOR-only quarantine persists.",
+  "summary": "R172 source-accurate D3D9 packed DIFFUSE FVF WARP probe exposed stable incorrect BGRA [128,0,16,255] for expected [224,128,32,255]. Distinct global TEXCOORD8 generator remap broke preserved R92 COLOR0 linkage; isolated remap restored R92 but left same BGRA corruption. Backend remains dormant; quarantined unresolved and original R171 proven smoke fixture restored in this blocking C6 commit. No parity or promotion claimed.",
   "pipeline": {
-    "C0_RECOVER": "PASS: HEAD 7972c38; 00476 C6 COMPLETE / exact-SHA Gate 37901281938 SUCCESS, 00477 absent",
-    "C1_REVIEW": "IN_PROGRESS: R170 DIFFUSE mismatch requires real FVF COLOR0 source bytes, not synthetic TFACTOR or unpopulated input.",
-    "C2_IMPLEMENT": "PENDING",
-    "C3_VALIDATE": "PENDING",
-    "C4_COMMIT": "PENDING",
-    "C5_PACKAGE": "NOT_REQUIRED: offscreen WARP proof; gameplay Draw dormant",
-    "C6_STATE": "PENDING"
+    "C0_RECOVER": "PASS: 00476 exact-SHA Gate 37901281938 SUCCESS and C6 COMPLETE; no 00477 record at initial HEAD.",
+    "C1_REVIEW": "PASS: R170 TFACTOR control hides actual COLOR0/D3DTA_DIFFUSE corruption; source-accurate R172 selected.",
+    "C2_IMPLEMENT": "ATTEMPTED: actual packed D3D9 color VB and generated VS/PS WARP indexed pixel readback C++ implemented; controlled interstage COLOR0 remap attempted; both failed pixel parity and were reverted from active test paths.",
+    "C3_VALIDATE": "FAIL: exact-SHA Gates 37902711309 (R172 pixel), 37904053751 (R92 global regression), 37905148948 (R172 pixel) with consistent observed negative evidence.",
+    "C4_COMMIT": "PASS: three non-bookkeeping source/test commits [AUTO:CONVERSION-DX11-00477], all retained in Git history; blocking C6 restores previous proven source fixture.",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic only; no gameplay-native draw activation, runtime package or HMD promotion.",
+    "C6_STATE": "BLOCKED: durable failure ledger sealed and original R171 smoke source restored; no success score."
   },
-  "next_action": "Implement source-accurate colored FVF+generated VS/PS fixture and WARP pixel compare; exact-SHA CI; persist result",
-  "resume_cursor": "C2_IMPLEMENT",
-  "state_persisted": false,
-  "last_real_activity_at": "2026-10-09T17:01:00+09:00",
-  "last_activity_evidence": "GitHub exact HEAD and 00476 C6 Gate success checked",
+  "next_action": "Open a distinct independent task to inspect VS/PS DXBC signatures and live IA/OM/vertex COLOR0 bytes vs PS interpolation (or add a controlled passthrough PS). Do not retry the same R172 TEXCOORD8 substitution or enable gameplay Draw; preserve frozen DXVK and protected DX9Ex.",
+  "resume_cursor": "TERMINAL_BLOCKED_AWAIT_NEW_EVIDENCE",
+  "state_persisted": true,
+  "last_real_activity_at": "2026-10-09T17:37:00+09:00",
+  "last_activity_evidence": "Backend Gate 37905148948 Windows validate SUCCESS; readiness smoke failed with R172 BGRA [128,0,16,255]; source baseline restoration pending Gate.",
   "blockers": [
-    "Quest3/VDXR HMD/gameplay runtime untested"
-  ]
+    "Stable R172 DIFFUSE pixel mismatch uncorrected; native game Draw dormant.",
+    "No Quest3/VDXR HMD test; runtime UNTESTED."
+  ],
+  "evidence": {
+    "old_proven_head": "7972c38de2d7f93c71959985fdb84eff8aac3d50",
+    "old_proven_exact_gate_id": 37901281938,
+    "source_attempts": [
+      "2208c58e1dbe919ed9255db65ded73988cd413fb",
+      "b24aba86e4f326eb850c4e52561cce7c6dbb8fb3",
+      "e054326bb1d25d2f4d264b7b403ad95842de97a1"
+    ],
+    "gates": [
+      {
+        "id": 37902711309,
+        "validation": "PASS",
+        "smoke": "FAIL",
+        "signature": "R172 COLOR0 center BGRA=[128,0,16,255]"
+      },
+      {
+        "id": 37904053751,
+        "validation": "PASS",
+        "smoke": "FAIL",
+        "signature": "R92 shader-linkage probe failure: COLOR0 was not validated"
+      },
+      {
+        "id": 37905148948,
+        "validation": "PASS",
+        "smoke": "FAIL",
+        "signature": "R172 COLOR0 center BGRA=[128,0,16,255]"
+      }
+    ],
+    "issue14_comment_id": 6077044823,
+    "rollback_to_original_probe_blob_sha": "8b98408b1af3e099fdf8d37effcf7ee35f701124"
+  },
+  "changed_paths": [
+    "tools/dx11_constant_buffer_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp"
+  ],
+  "static_validation": "R172 scoped static source contract passed; required exact-SHA CI failed three times with isolated WARP pixel/semantic evidence; protected 00476 source fixture restored by exact blob.",
+  "validation_run_id": 37905148948,
+  "validation_job_id": 113736718179,
+  "readiness_smoke_job_id": 113738591904,
+  "rollback_material_source": "00476 tool blob restored; pipeline translator equals 00476",
+  "rollback_gate_status": "PENDING"
 }
