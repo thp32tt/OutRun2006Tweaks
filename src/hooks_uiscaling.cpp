@@ -1479,7 +1479,10 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 {
 	inline static SafetyHookInline Draw_hk{};
 	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> SuccessfulFlushes{ 0 };
 	inline static std::atomic<std::uint64_t> Failures{ 0 };
+	inline static std::atomic<std::uint32_t> FirstSuccessfulProducerBits{ 0 };
+	inline static std::atomic<std::uint32_t> FirstFailedProducerBits{ 0 };
 
 	static HRESULT __stdcall DrawDest(
 		void* self, IDirect3DTexture9* texture, const RECT* rect,
@@ -1526,14 +1529,30 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 			reinterpret_cast<FlushFn>(vtable[10])(self);
 		const auto count = Flushes.fetch_add(
 			1, std::memory_order_relaxed) + 1;
-		if (FAILED(flushHr))
+		const bool flushSucceeded = SUCCEEDED(flushHr);
+		if (flushSucceeded)
+			SuccessfulFlushes.fetch_add(1, std::memory_order_relaxed);
+		else
 			Failures.fetch_add(1, std::memory_order_relaxed);
-		if ((count & (count - 1)) == 0)
+		const unsigned producerIndex = static_cast<unsigned>(source);
+		bool firstProducerOutcome = false;
+		if (Settings::VRTelemetry && producerIndex < 32u)
+		{
+			auto& seen = flushSucceeded
+				? FirstSuccessfulProducerBits : FirstFailedProducerBits;
+			const std::uint32_t bit = 1u << producerIndex;
+			firstProducerOutcome =
+				(seen.fetch_or(bit, std::memory_order_relaxed) & bit) == 0;
+		}
+		if (Settings::VRTelemetry &&
+			(((count & (count - 1)) == 0) || firstProducerOutcome))
 			spdlog::info(
-				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} failures={} markerValid={}",
+				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} successful={} failures={} flushSucceeded={} markerValid={}",
 				projectedRank ? "projected-rank" : "disprank-hud",
 				OutRunVR::GameSemantic::Name(source),
-				count, Failures.load(std::memory_order_relaxed),
+				count, SuccessfulFlushes.load(std::memory_order_relaxed),
+				Failures.load(std::memory_order_relaxed),
+				flushSucceeded ? 1 : 0,
 				marker && marker->valid ? 1 : 0);
 		return hr;
 	}
