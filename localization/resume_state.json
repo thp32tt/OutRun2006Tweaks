@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B324 B-owned q214 BF229CF4 DXT5 method-change pre-render real CLEAN plate: canonical English source 9a2e428b..; B194 old CLEAN had 394 decoded RGBA edits outside original START/GOAL effect boxes, repaired native 2048px lossless plate 5beb411d.. restores all outside pixels EXACT from source, preserves old plate within source bboxes; 36 new SOURCE/OLD/REPAIRED/CURRENT BGW 100/75/50 RAW/FLIPY proof, 6 direct controller review, Github CPU 37901026870 SUCCESS. Persisted B259 DDS SHA ace42cb3.. unchanged; still C289 REWORK_REQUIRED/METHOD_CHANGE_REQUIRED/manual vector source bevel needed, C2/C3/USER/INGAME not approved. RUNTIME_VALIDATION=UNTESTED, DDS 0. QA localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CONTROLLER_PLATE_QA.json",
     "B318 q137 P0 new saved candidate sha256 b9366dd4a66a015ce98e30cab29e92b92aa60aed2c5445fc6b35d4410671ec14; two small modes repaired, four of six scoped producer-PASS total, top title and TRANSMISSION-small remain REWORK_REQUIRED; new full exact-SHA C1/C3/user IGR-041 actual game retest OPEN; runtime UNTESTED. QA localization/graphics/role_B/20261009-B318-Q137-P0-TWO-SMALL-MODES/B318_CONTROLLER_SELF_QA_FINAL.json",
     "B315 P0 q137 30CF0D new scoped 2-large DDS 1d684aaceeef4487bb6605cf8b4779950683970e6c18e1d5b175a25642409d68; remaining four q137 REWORK; independent C1/C3 and user IGR041 new actual-game retest OPEN, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR/B315_CONTROLLER_SELF_QA_FINAL.json",
     "B313 q060 B-owner P0 IGR044 new gold OUTRUN MILES DDS be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0; Stage B310 preserved, C2/C3 and newer actual-game retest pending, USER_GAME OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_CONTROLLER_SELF_QA_FINAL.json",
@@ -6814,7 +6815,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 16:27 KST",
+  "updated_at_kst": "2026-10-09 16:52 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13231,5 +13232,29 @@
     "workflow_id": 37898688054,
     "workflow_result": "SUCCESS",
     "QA": "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/B323_CONTROLLER_SELF_QA_FINAL.json"
+  },
+  "b324_q214_canonical_clean": {
+    "run_key": "OUTRUN-KOR-B324-Q214-CLEAN-BOUNDARY-20261009",
+    "role": "B",
+    "queue_index": 214,
+    "status": "PLATE_ONLY_REPAIRED_REWORK_REQUIRED",
+    "old_clean_sha256": "b2a8fd17033efd4ff471b48e1f9289dadfab872cb92ea4bbb2fc6de14762255d",
+    "new_clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "old_outside_rgba": 394,
+    "new_outside_rgba": 0,
+    "new_dds": 0,
+    "saved_dds_sha256_unchanged": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "new_lossless_png_contacts": 36,
+    "direct_controller_crops": 6,
+    "worker_commit": "b58aff67483581e16b8afcc20440f165ffe74f51",
+    "workflow_run": 37901026870,
+    "workflow_result": "SUCCESS",
+    "qa": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CONTROLLER_PLATE_QA.json",
+    "remaining": "METHOD_CHANGE_REQUIRED_SOURCE_DERIVED_MANUAL_VECTOR_BEVEL_AND_BC3",
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_game": "OPEN_OR_UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
