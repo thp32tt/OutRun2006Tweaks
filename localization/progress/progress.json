@@ -9456,5 +9456,26 @@
     "new_evidence": "Independent full original source DDS SHA+ROI and saved candidate verified; protected orange exact 8892 and CLEAN alpha0",
     "new_DDS": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a209_q175_chrome_vector_trial_rejected": {
+    "run_key": "OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300",
+    "owner_role": "A",
+    "queue_index": 175,
+    "active_priority": "P1",
+    "trial_DDS_new": 1,
+    "promoted_DDS_new": 0,
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "preserved_current_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "rejected_trial_sha256": "d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7",
+    "machine": "SCOPED_PASS_NATIVE_DDS_ROUNDTRIP_PROTECTED_ZERO_OUTSIDE",
+    "visual": "A_PRODUCER_FAIL_NATIVE_50_HANGUL_COUNTERS_AND_CHROME_HIERARCHY",
+    "whole_asset": "REWORK_REQUIRED",
+    "C1": "BLOCKED",
+    "C3": "BLOCKED",
+    "ingame": "OPEN_USER_INGAME_FAIL_IGR032",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 37942397381,
+    "qa": "localization/graphics/role_A/20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A209_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
   }
+
 }
