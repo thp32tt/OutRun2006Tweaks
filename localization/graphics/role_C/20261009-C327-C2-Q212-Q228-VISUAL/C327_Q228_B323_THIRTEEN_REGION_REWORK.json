@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "run": "C327",
+  "run_key": "OUTRUN-KOR-C327-C2-Q212-Q228-FRESH-VISUAL-20261009-1820",
+  "role": "C2",
+  "lane": "TEMP_BACKLOG_RELIEF=C2",
+  "shard": "EVEN",
+  "review_time_kst": "2026-10-09 18:27 KST",
+  "queue_index": 228,
+  "priority": "P1",
+  "user_report": "IGR-038",
+  "mapping_status": "EXACT_Q228_TOP_TITLE_FROM_IGR013",
+  "decision": "REWORK_REQUIRED",
+  "reason_codes": [
+    "INCOMPLETE_13_REGION_REWORK",
+    "UNCHANGED_PRIOR_C_REJECTED_SOURCE_FAMILY",
+    "SOURCE_CHROME_STYLE_NOT_FULLY_RECONSTRUCTED"
+  ],
+  "current_candidate_sha256": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+  "current_git_blob_sha": "f52ef7f3a94f1e2613c9f1df1bffaf1a120a500e",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "prior_candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "triage": "FRESH_C_REVIEW — read-only rework_triage.py --index 228 from fresh branch",
+  "review_method": "Fresh independent first-look SOURCE/CLEAN/OLD/NEW FLIP-Y native100/50/gray100 and RAW100 representative persisted-image contacts. No claim of independent full saved DDS decode or all-region calibration.",
+  "reviewed_regions": [
+    {
+      "region": "COAST 2 COAST",
+      "source_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "source_width": 1451,
+      "korean_width": 822,
+      "source_text": "Coast 2 Coast",
+      "korean_text": "코스트 2 코스트",
+      "observations": "B323 source-conditioned high-contrast silver face looks materially fuller than prior C317 hollow state, but source broad rounded chrome and deep material hierarchy remains noticeably different; do not approve without independent source-family anchors/C3",
+      "independent_visual_verdict": "HOLD_AS_REPRESENTATIVE_REQUIRES_STYLE_CALIBRATION"
+    }
+  ],
+  "other_region_count": 12,
+  "other_region_provenance": "B323 QA reports exact pixel identity on all 12 other regions to prior candidate 28e814599105..., which independent C317 rejected as SOURCE_FAMILY_METALLIC_FACE_MISSING. Therefore this exact new atlas as a whole fails quality gate without re-auditing unchanged bytes.",
+  "prior_independent_rejection": "localization/graphics/role_C/20261009-C317-C2-Q228-IGR038-NATIVE-SOURCE-FAMILY/C317_Q228_CONTROLLER_C2_REWORK.json",
+  "other_regions_decision": "REWORK_REQUIRED_HISTORY_RETAINS_CURRENT_BYTES",
+  "machine_prior": "Producer B323 reported header/RAW and 0 RGBA+alpha outside representative; no independent new saved binary roundtrip/whole 13 QA",
+  "evidence_files": [
+    "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/COAST2COAST_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B323.png",
+    "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/COAST2COAST_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B323.png",
+    "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/COAST2COAST_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B323.png",
+    "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/COAST2COAST_RAW_BLACK_100_SOURCE_CLEAN_OLD_B323.png",
+    "localization/graphics/role_B/20261009-B323-Q228-CONTINUOUS-CHROME-TRANSFER/B323_CONTROLLER_SELF_QA_FINAL.json"
+  ],
+  "next_action": "B must correct remaining 12 labels using source-conditioned true silver chrome bevel face/outline/glow, then self-QA all 13 against pinned English, clean plate and persisted DDS, followed by new independent C2 and C3; no blind method duplication.",
+  "C3": "BLOCKED",
+  "approval": "NOT_GRANTED",
+  "pre_ingame": "EXCLUDED_DUE_TO_OPEN_USER_INGAME_FAIL",
+  "user_in_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_generated_png": 0,
+  "backend": "ChatGPT direct visual through N100 MCP GitHub PNG transfer; GitHub source/publication",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

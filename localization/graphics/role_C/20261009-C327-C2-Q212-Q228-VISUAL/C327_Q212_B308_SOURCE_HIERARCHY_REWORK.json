@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "run": "C327",
+  "run_key": "OUTRUN-KOR-C327-C2-Q212-Q228-FRESH-VISUAL-20261009-1820",
+  "role": "C2",
+  "lane": "TEMP_BACKLOG_RELIEF=C2",
+  "shard": "EVEN",
+  "review_time_kst": "2026-10-09 18:27 KST",
+  "queue_index": 212,
+  "priority": "P1",
+  "user_report": "IGR-029",
+  "mapping_status": "SUSPECTED_Q212_SHARED_MODE_INTRO_NOT_PROVEN",
+  "decision": "REWORK_REQUIRED",
+  "reason_codes": [
+    "SOURCE_HIERARCHY_UNDERFILL",
+    "SOURCE_RELATIVE_SIZE_MISMATCH",
+    "TRANSLATION_LENGTH_VISUAL_MISMATCH"
+  ],
+  "new_candidate_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+  "candidate_git_blob_sha": "265255fb903e449373e6896bde38b4235e899d83",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "source_provenance": "B308 pinned canonical English HD source",
+  "prior_candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+  "review_method": "First-look, independently inspected lossless contacts of source/clean/old/current produced from source+persisted B308 current; no claim of re-running DDS numerical pixel QA.",
+  "triage": "FRESH_C_REVIEW — read-only rework_triage.py --index 212 from fresh branch",
+  "observed_regions": [
+    {
+      "region_id": 43,
+      "source_text": "PROFESSIONAL",
+      "current_text": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "localized_bbox": [
+        513,
+        346,
+        633,
+        399
+      ],
+      "source_width": 638,
+      "new_width": 120,
+      "source_height": 63,
+      "new_height": 53,
+      "width_ratio": 0.1881,
+      "source_relative_hierarchy": "FAIL; source title spans 638px versus final 120px, same-height treatment insufficient to preserve visual emphasis. 2 syllable abbreviated text leaves 513px leading gap",
+      "font_color": "Orange source and new appear same family at high level but do not remedy extreme text extent",
+      "alpha_or_clipping": "No obvious visible broken strokes on viewed crop, not full 12-region proof",
+      "source_slant": "No opposite italic seen in this upright source scope; no C pass",
+      "RAW_FLIPY": "Both viewed in existing proof",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "region_id": 53,
+      "source_text": "DONE",
+      "current_text": "완료",
+      "observation": "Reviewed FLIPY gray 50 contact, not an independent whole-candidate acceptance; candidate remains blocked by id43",
+      "decision": "NOT_ADJUDICATED"
+    }
+  ],
+  "evidence_files": [
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r43_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r43_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r43_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/r53_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B308-Q212-C325-FOUR-NATIVE-CONTROLS/B308_CONTROLLER_SELF_QA_FINAL.json"
+  ],
+  "producer_machine": "Source bbox and positive margins PASS as producer asserts; independent full DDS pixel/mip/protected/plate calibration not run. Visual failure overrides numeric PASS.",
+  "completeness": "12 source regions: only id43 is freshly visually failed, id53 contact seen; do not claim independent QA of uninspected 10 segments",
+  "next_action": "B: verify policy-canonical translation term; reconstruct fuller original-intent PROFESSIONAL hierarchy with source-derived lettering; never blind horizontal stretch; regenerate and source-clean-final/native/75/50/RAW/alpha QA all regions before new C2.",
+  "C3": "BLOCKED",
+  "approval": "NOT_GRANTED",
+  "pre_ingame": "EXCLUDED_PENDING_FRESH_FULL_C",
+  "user_in_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "new_generated_png": 0,
+  "backend": "ChatGPT direct visual through N100 MCP GitHub PNG transfer; GitHub source/publication",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
