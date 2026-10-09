@@ -68,8 +68,13 @@ if($frameIntervals.Count -gt 0){
 }
 
 $perfSpikeRows=@()
-$perfSpikePattern='VR R32 FRAME SPIKE: frameUs=(\d+) baselineUs=(\d+) presentUs=(\d+).*?draws=(\d+),primitives=(\d+),triangles=(\d+),indexed=(\d+),up=(\d+),alphaBlend=(\d+),alphaBlendPrimitives=(\d+),alphaTest=(\d+),particleLikeDraws=(\d+),particleLikePrimitives=(\d+),effectUnknown=(\d+).*?fenceWaitUs=(\d+),fencePolls=(\d+)'
+# R32's current FRAME SPIKE producer ends the workload record with stereo[...]
+# and does NOT emit fenceWaitUs/fencePolls. Requiring those optional legacy
+# counters silently discarded EVERY current source-side spike sample.
+# Match one log line only and parse legacy fence counters separately.
+$perfSpikePattern='VR R32 FRAME SPIKE: frameUs=(\d+) baselineUs=(\d+) presentUs=(\d+).*?draws=(\d+),primitives=(\d+),triangles=(\d+),indexed=(\d+),up=(\d+),alphaBlend=(\d+),alphaBlendPrimitives=(\d+),alphaTest=(\d+),particleLikeDraws=(\d+),particleLikePrimitives=(\d+),effectUnknown=(\d+)[^\r\n]*'
 foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
+    $fenceMatch=[regex]::Match($spike.Value,'fenceWaitUs=(\d+),fencePolls=(\d+)')
     $perfSpikeRows += [pscustomobject]@{
         FrameUs=[int64]$spike.Groups[1].Value
         BaselineUs=[int64]$spike.Groups[2].Value
@@ -85,8 +90,8 @@ foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
         ParticleLikeDraws=[int64]$spike.Groups[12].Value
         ParticleLikePrimitives=[int64]$spike.Groups[13].Value
         EffectUnknownDraws=[int64]$spike.Groups[14].Value
-        FenceWaitUs=[int64]$spike.Groups[15].Value
-        FencePolls=[int64]$spike.Groups[16].Value
+        FenceWaitUs=$(if($fenceMatch.Success){[int64]$fenceMatch.Groups[1].Value}else{$null})
+        FencePolls=$(if($fenceMatch.Success){[int64]$fenceMatch.Groups[2].Value}else{$null})
     }
 }
 $perfSpikeCount=$perfSpikeRows.Count
@@ -96,13 +101,18 @@ $perfSpikeMaxPrimitives=0
 $perfSpikeMaxParticleLikeDraws=0
 $perfSpikeMaxParticleLikePrimitives=0
 $perfSpikeMaxFenceWaitUs=0
+$perfSpikeFenceTelemetryAvailable=$false
 if($perfSpikeCount -gt 0){
     $perfSpikeMaxFrameUs=($perfSpikeRows|Measure-Object FrameUs -Maximum).Maximum
     $perfSpikeMaxDraws=($perfSpikeRows|Measure-Object Draws -Maximum).Maximum
     $perfSpikeMaxPrimitives=($perfSpikeRows|Measure-Object Primitives -Maximum).Maximum
     $perfSpikeMaxParticleLikeDraws=($perfSpikeRows|Measure-Object ParticleLikeDraws -Maximum).Maximum
     $perfSpikeMaxParticleLikePrimitives=($perfSpikeRows|Measure-Object ParticleLikePrimitives -Maximum).Maximum
-    $perfSpikeMaxFenceWaitUs=($perfSpikeRows|Measure-Object FenceWaitUs -Maximum).Maximum
+    $measuredFenceRows=@($perfSpikeRows|Where-Object{$null -ne $_.FenceWaitUs})
+    if($measuredFenceRows.Count -gt 0){
+        $perfSpikeFenceTelemetryAvailable=$true
+        $perfSpikeMaxFenceWaitUs=($measuredFenceRows|Measure-Object FenceWaitUs -Maximum).Maximum
+    }
     $perfSpikeRows|Export-Csv (Join-Path $SessionDir 'PERFORMANCE_SPIKES.csv') -NoTypeInformation -Encoding UTF8
 }
 
@@ -203,7 +213,7 @@ elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAV
 elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
 elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
 elseif($rankExactCalcUnobserved){$status='HUD_RANK_CALC_CAPTURE_UNOBSERVED'}
-elseif($presentOverBudgetWindows -gt 0){$status='PERFORMANCE_WARNING'}
+elseif($presentOverBudgetWindows -gt 0 -or $perfSpikeCount -gt 0){$status='PERFORMANCE_WARNING'}
 elseif($goalMixedPhaseOwnerEvidence){$status='NEEDS_GOAL_PHASE_VISUAL_REVIEW'}
 
 $result=[ordered]@{
@@ -246,6 +256,7 @@ $result=[ordered]@{
     PerfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws
     PerfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives
     PerfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs
+    PerfSpikeFenceTelemetryAvailable=$perfSpikeFenceTelemetryAvailable
     Flags=$flags
 }
 $result|ConvertTo-Json -Depth 4|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.json') -Encoding UTF8
@@ -287,6 +298,7 @@ $lines=@(
     "perfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws"
     "perfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives"
     "perfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs"
+    "perfSpikeFenceTelemetryAvailable=$perfSpikeFenceTelemetryAvailable"
     "flags=$($flags -join ',')"
 )
 if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
