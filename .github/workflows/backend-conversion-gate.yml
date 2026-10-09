@@ -240,6 +240,20 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 native target resize R177 WARP probe failed with exit code $LASTEXITCODE" }
 
+      # R179 runs the native resource-format/mirror WARP proof before
+      # the independently owned R175 varying probe can block later steps.
+      - name: Build DX11 surface mirror probe
+        run: cmake --build build-auto --config Release --target dx11_surface_mirror_probe
+
+      - name: Run DX11 surface mirror probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_surface_mirror_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 surface mirror probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
+
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
@@ -261,18 +275,6 @@ jobs:
           if (-not $probe) { throw "DX11 native transport probe executable missing" }
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 native transport probe failed with exit code $LASTEXITCODE" }
-
-      - name: Build DX11 surface mirror probe
-        run: cmake --build build-auto --config Release --target dx11_surface_mirror_probe
-
-      - name: Run DX11 surface mirror probe
-        shell: pwsh
-        run: |
-          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_surface_mirror_probe.exe | Select-Object -First 1
-          if (-not $probe) { throw "DX11 surface mirror probe executable missing" }
-          & $probe.FullName
-          if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
-
 
       - name: Build DX11 triangle-fan generated index-buffer probe
         run: cmake --build build-auto --config Release --target dx11_triangle_fan_index_buffer_probe

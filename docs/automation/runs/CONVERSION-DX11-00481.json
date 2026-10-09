@@ -4,7 +4,7 @@
   "production_id": "CONVERSION-DX11-00481",
   "event_id": "CONVERSION-DX11-00481-E001",
   "event_type": "dispatch",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00481",
@@ -36,18 +36,32 @@
   "pipeline": {
     "C0_RECOVER": "PASS: GitHub HEAD/AGENTS/review index/queue contract and 00480 record checked; no 00481 run/checkpoint at start.",
     "C1_REVIEW": "PASS: translate_resource_format returns exact BCn even for Color RTV and exact texture formats for Vertex, violating role-specific binding semantics.",
-    "C2_IMPLEMENT": "PASS: runtime C++ translator role guard and compiled probe plus Python negative mutations and required workflow step.",
-    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate after material commit; upstream R175 may block shared smoke.",
+    "C2_IMPLEMENT": "PASS: runtime C++ translator role guard and compiled probe plus Python negative mutations and required workflow step. Follow-up: reorder independent R179 WARP probe before inherited failing R175.",
+    "C3_VALIDATE": "RETRY_PREPARED: initial exact-SHA Gate 37938745654 validate SUCCESS and R179 static PASS; smoke failed at separately owned R175 before R179 WARP could run. R179 probe reordered ahead of R175 for independent compiled scoped evidence; new SHA Gate pending.",
     "C4_COMMIT": "PENDING: material commit CAS underway.",
     "C5_PACKAGE": "NOT_REQUIRED: dormant DX11 translator and no Quest3/VDXR release.",
-    "C6_STATE": "PENDING: exact-SHA CI result and authoritative SHA reconciliation."
+    "C6_STATE": "PENDING: second exact-SHA Gate scoped WARP result and blocker reconciliation."
   },
   "blockers": [
     "Inherited owner 00477 R175 WARP shader pixel mismatch may fail full smoke.",
     "HMD runtime untested."
   ],
-  "resume_cursor": "READ_EXACT_SHA_BACKEND_GATE_AND_SEAL_SCOPED_RESULT",
-  "next_action": "Reconcile exact-SHA Gate and update this record without replacing validation-bearing SHA.",
-  "last_real_activity_at": "2026-10-09T22:37:00+09:00",
-  "score_change": 0
+  "resume_cursor": "READ_SECOND_EXACT_SHA_BACKEND_GATE_R179_WARP",
+  "next_action": "Read second exact-SHA Gate, inspect R179 compiled WARP probe before inherited R175 failure; preserve dormant activation and C6.",
+  "last_real_activity_at": "2026-10-09T22:52:12+09:00",
+  "score_change": 0,
+  "previous_material_result_sha": "322e24160cb0ea9c09e2791deb0a9375523f2f72",
+  "previous_gate_run_id": 37938745654,
+  "previous_gate_validate_job_id": 113847692348,
+  "previous_gate_smoke_job_id": 113850011177,
+  "previous_gate_result": "VALIDATE_SUCCESS_SMOKE_FAIL_R175_GENERIC_VARYING_MISMATCH",
+  "previous_scoped_static": "R179_PASS",
+  "validation_evidence": {
+    "initial_exact_sha": "322e24160cb0ea9c09e2791deb0a9375523f2f72",
+    "initial_gate": 37938745654,
+    "win32_validate": "success",
+    "r179_static": "success",
+    "r179_compiled_probe": "NOT_RUN_BEHIND_R175",
+    "inherited_r175": "R175_GENERIC_VARYING_MISMATCH observed BGRA=[128,0,16,255], expected=[224,128,32,255]"
+  }
 }
