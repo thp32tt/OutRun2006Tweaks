@@ -36,7 +36,7 @@ def check(source: str) -> None:
     assert "if (config_.width == width && config_.height == height)" in resize, (
         "same-size resize must not reallocate or churn live target objects")
     assert resize.index("config_.width == width") < resize.index("create_color_target")
-    assert resize.index("create_color_target") < resize.index("config_.width")
+    assert resize.index("create_color_target") < resize.index("config_.width = width;")
     for forbidden in ("color_srv_.Reset()", "color_rtv_.Reset()",
                       "color_texture_.Reset()"):
         assert forbidden not in resize, "resize releases previous target early"
