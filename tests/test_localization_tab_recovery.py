@@ -159,6 +159,26 @@ class LocalizationTabRecoveryTests(unittest.TestCase):
         self.assertEqual(pages["A"].goto_calls, [self.saved_url])
         self.assertEqual(self.env["write_runtime"].call_args.kwargs["tab_recovery_last_reason"], "renderer_crash")
 
+    def test_four_worker_c2_crash_is_isolated(self):
+        slots = [
+            SimpleNamespace(name=name, url=f"https://chatgpt.com/g/g-p-test/c/{name.lower()}",
+                            runs=3, last_result="WAIT_CHAT")
+            for name in ("A", "B", "C1", "C2")
+        ]
+        self.env["load_registry"] = lambda now: SimpleNamespace(slots=slots)
+        pages = {slot.name: FakePage(slot.url) for slot in slots}
+        untouched = {name: pages[name] for name in ("A", "B", "C1")}
+        self.monitor(pages)
+        pages["C2"].events["crash"]()
+        self.monitor(pages)
+        self.assertEqual(set(pages), {"A", "B", "C1", "C2"})
+        self.assertEqual(len(self.context.created), 1)
+        self.assertEqual(pages["C2"].goto_calls, [slots[3].url])
+        for name, page in untouched.items():
+            self.assertIs(pages[name], page)
+        self.assertEqual([slot.runs for slot in slots], [3, 3, 3, 3])
+        self.assertEqual(self.env["write_runtime"].call_args.kwargs["tab_recovery_last_slot"], "C2")
+
     def test_other_slots_not_changed(self):
         slot_b = SimpleNamespace(name="B", url="https://chatgpt.com/g/g-p-test/c/b",
                                  runs=9)
