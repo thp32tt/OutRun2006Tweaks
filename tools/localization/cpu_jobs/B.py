@@ -128,8 +128,8 @@ assert np.array_equal(D[~src_region],old_rgba[~src_region]),"Pixels outside orig
 assert np.count_nonzero(D[:,:,3])>15000,"Korean glyph disappeared"
 assert np.count_nonzero(D[:,:,3])<int(src_region.sum()),"Opaque box rather than glyph"
 # 1px envelope and all formerly contaminating visible source pixels gone.
-assert np.count_nonzero(D[:,:,3][(x<475)|(x>=1580)])==0
-assert np.count_nonzero(D[:,:,3][(y<9)|(y>=120)])==0
+assert np.count_nonzero(D[:,:,3][:,np.r_[0:475,1580:2048]])==0
+assert np.count_nonzero(D[:,:,3][np.r_[0:9,120:128],:])==0
 target=OUT/"B330_FULL_SOURCE_CLEAN_UNAPPROVED.dds"
 target.write_bytes(trial)
 assert sha(target.read_bytes())==sha(trial) and np.array_equal(decode(target.read_bytes()),D)
