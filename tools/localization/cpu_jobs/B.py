@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B325 q214: BC3 source-block material transfer, native vector Korean glyphs.
+"""B326 q214: BC3 source-block material transfer, native vector Korean glyphs.
 
 Unlike B260/B261 SDF categorical recolor, this takes actual original English
 metallic material from SHA-pinned DXT5 blocks and reassigns it to a NEW native
@@ -13,7 +13,7 @@ from PIL import Image,ImageDraw,ImageFont
 from scipy.ndimage import binary_dilation,gaussian_filter,distance_transform_edt
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-P=G/"role_B/20261009-B325-Q214-SOURCE-BLOCK-METALLIC-TRANSFER"
+P=G/"role_B/20261009-B326-Q214-SOURCE-BLOCK-METALLIC-TRANSFER"
 P.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 srcsha="9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
@@ -40,8 +40,8 @@ cleanfile=G/"role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CANONICAL_B
 assert sha(cleanfile.read_bytes())==cleansha
 C=np.array(Image.open(cleanfile).convert("RGBA"),dtype=np.uint8)
 assert S.shape==O.shape==C.shape==(2048,2048,4)
-regions=[dict(name="START",text="출발",bbox=(815,495,899,517),size=(57,18),skew=5),
-         dict(name="GOAL",text="골",bbox=(1343,764,1417,787),size=(43,18),skew=4)]
+regions=[dict(name="START",text="출발",bbox=(815,495,899,517),size=(60,19),skew=6),
+         dict(name="GOAL",text="골",bbox=(1343,764,1417,787),size=(51,19),skew=6)]
 allowed=np.zeros((H,W),bool)
 for r in regions:
  l,t,rr,b=r["bbox"];allowed[t:b,l:rr]=True
@@ -177,8 +177,8 @@ for r in regions:
    brightorder=[int(x) for x in ranked[::-1]]
    # Surface: highest source cream, bevel: second warm, shadow: third dark.
    faceindex=brightorder[0]
-   keyindex=brightorder[1]
-   extrindex=brightorder[2]
+   keyindex=brightorder[2]
+   extrindex=brightorder[3]
    # Native red badge must stay near original CLEAN plate appearance.
    ind=np.array(bc_indices(prior),dtype=np.uint8).reshape((4,4))
    for ky in range(4):
@@ -217,12 +217,12 @@ for r in regions:
     margins=r["margins"],new_source_native_core=r["core_count"],
     BC3_source_donor_face_bright_retention=round(ratio,5),material_donor_blocks=r["donor_count"]))
 # Save trial evidence, no stale candidate can be promoted until controller QA.
-trial=P/"B325_UNAPPROVED_SOURCE_BLOCK_METALLIC_TRIAL.dds"
+trial=P/"B326_UNAPPROVED_SOURCE_BLOCK_METALLIC_TRIAL.dds"
 trial.write_bytes(dst)
 assert dec(trial.read_bytes()).shape==(H,W,4)
 # Save lossless full clean and actual decoded proof, including game RAW.
-Image.fromarray(D,"RGBA").save(P/"B325_PERSISTED_DECODE_READABLE.png")
-Image.fromarray(np.flipud(D).copy(),"RGBA").save(P/"B325_PERSISTED_DECODE_RAW.png")
+Image.fromarray(D,"RGBA").save(P/"B326_PERSISTED_DECODE_READABLE.png")
+Image.fromarray(np.flipud(D).copy(),"RGBA").save(P/"B326_PERSISTED_DECODE_RAW.png")
 def flatten(z,bg):
  canvas=Image.new("RGBA",(z.shape[1],z.shape[0]),(*bg,255))
  canvas.alpha_composite(Image.fromarray(z,"RGBA"))
@@ -240,8 +240,8 @@ for r in regions:
     panel=Image.new("RGB",(sum(x.width for x in ims)+12,max(x.height for x in ims)),bg)
     x=0
     for im in ims:panel.paste(im,(x,0));x+=im.width+4
-    fn=f"{r['name']}_{ori}_{bg_name}_{pc}_SOURCE_CLEAN_OLD_B325.png"
+    fn=f"{r['name']}_{ori}_{bg_name}_{pc}_SOURCE_CLEAN_OLD_B326.png"
     panel.save(P/fn,optimize=True);views.append(fn)
-meta=dict(run="B325",role="B",index=214,method="NATIVE_HANGUL_VECTOR_SOURCE_ORIGINAL_DXT5_BLOCK_CHROMATIC_MATERIAL_DONOR_TRANSFER",triage="METHOD_CHANGE_REQUIRED",older_trial_family="B260_B261_FLAT_SDF_PALETTE_REJECTED",source_sha256=srcsha,clean_sha256=cleansha,old_candidate_sha256=oldsha,trial_sha256=sha(dst),native=[W,H],dds_format="BC3/DXT5",mips=1,dds_header="EXACT",raw_mirror_y="EXACT",saved_roundtrip="PASS",outside_canonical_source_rgba=outside,outside_canonical_source_alpha=alphaout,outside_prior_candidate_rgba=oldoutside,source_donor_blocks=touched,glyphs=stats,render_english_source_vs_clean="B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",clean_final_protection="SOURCE_OUTSIDE_ZERO",authored_lossless_contacts=len(views),views=views,output="UNAPPROVED_TRIAL_NOT_PROMOTED",producer_visual="NOT_YET_REVIEWED",fresh_C2="NOT_RUN",C3="NOT_RUN",user_game="UNTESTED",RUNTIME_VALIDATION="UNTESTED",backend="GITHUB_ACTIONS",forbidden_domains_touched=[])
-(P/"B325_MACHINE_TRIAL_QA.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2)+"\n")
-print("B325_TRIAL_BUILT",meta["trial_sha256"],"source_donor_blocks",touched,"retention",stats,flush=True)
+meta=dict(run="B326",role="B",index=214,method="NATIVE_HANGUL_VECTOR_SOURCE_ORIGINAL_DXT5_BLOCK_CHROMATIC_MATERIAL_DONOR_TRANSFER",triage="METHOD_CHANGE_REQUIRED",older_trial_family="B260_B261_FLAT_SDF_PALETTE_REJECTED",source_sha256=srcsha,clean_sha256=cleansha,old_candidate_sha256=oldsha,trial_sha256=sha(dst),native=[W,H],dds_format="BC3/DXT5",mips=1,dds_header="EXACT",raw_mirror_y="EXACT",saved_roundtrip="PASS",outside_canonical_source_rgba=outside,outside_canonical_source_alpha=alphaout,outside_prior_candidate_rgba=oldoutside,source_donor_blocks=touched,glyphs=stats,render_english_source_vs_clean="B324_SOURCE_BOUNDARY_OUTSIDE_ZERO",clean_final_protection="SOURCE_OUTSIDE_ZERO",authored_lossless_contacts=len(views),views=views,output="UNAPPROVED_TRIAL_NOT_PROMOTED",producer_visual="NOT_YET_REVIEWED",fresh_C2="NOT_RUN",C3="NOT_RUN",user_game="UNTESTED",RUNTIME_VALIDATION="UNTESTED",backend="GITHUB_ACTIONS",forbidden_domains_touched=[])
+(P/"B326_MACHINE_TRIAL_QA.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2)+"\n")
+print("B326_TRIAL_BUILT",meta["trial_sha256"],"source_donor_blocks",touched,"retention",stats,flush=True)
