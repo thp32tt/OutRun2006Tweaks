@@ -1,0 +1,96 @@
+{
+  "role": "B",
+  "run": "B328",
+  "queue_index": 212,
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_sha256": "209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e",
+  "candidate_sha256": "7243167b2f891ff351b999382173d33e5c81e2b143d2e93eca21978550e40dea",
+  "new_dds": 0,
+  "unapproved_trial_dds": 1,
+  "source_clean_outside_all_twelve": 0,
+  "SOURCE_CLEAN_selected_alpha": "ZERO_1",
+  "outside_1_changed_rgba": 0,
+  "outside_1_changed_alpha": 0,
+  "preserved_other_11_source_cells": "EXACT_PERSISTED_RGBA",
+  "header_exact": true,
+  "dds_native": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA",
+  "mips": 1,
+  "saved_dds_decode": "EXACT",
+  "raw_orientation": "mirror_y",
+  "regions": [
+    {
+      "region_idx": 43,
+      "source": "PROFESSIONAL",
+      "korean": "프로페셔널",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "new_bbox": [
+        317,
+        345,
+        633,
+        400
+      ],
+      "margin": [
+        317,
+        5,
+        4,
+        4
+      ],
+      "source_face": [
+        241,
+        147,
+        49,
+        255
+      ],
+      "source_family": "orange",
+      "alignment": "right",
+      "font": "NotoSansCJK-Black.ttc",
+      "native_px": 56,
+      "native_glyph_width": 316,
+      "native_glyph_height": 55,
+      "source_derived_uppercase_tracking_px": 16
+    }
+  ],
+  "proofs": [
+    "r43_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "r43_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "method": "original source orange face sampled on native Noto Black full professional transliteration, right-aligned within exact source bbox; no stretch and 11 region exact preservation",
+  "producer_visual": "PENDING_DIRECT_100_75_50_RAW",
+  "initial_state": "TRIAL_NOT_PROMOTED",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "IGR029": "OPEN_MAPPING_SUSPECTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
