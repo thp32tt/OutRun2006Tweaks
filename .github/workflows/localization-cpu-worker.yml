@@ -63,7 +63,7 @@ jobs:
             git show --pretty='' --name-only "$after"
           else
             git diff --name-only "$before" "$after"
-          fi | grep -E '^tools/localization/cpu_jobs/[ABC]\.py$' | while read -r p; do
+          fi | awk '/^tools\/localization\/cpu_jobs\/[ABC]\.py$/' | while read -r p; do
             test -f "$p" && echo "$p"
           done | sort -u > /tmp/localization_cpu_jobs.txt
           if [ -s /tmp/localization_cpu_jobs.txt ]; then

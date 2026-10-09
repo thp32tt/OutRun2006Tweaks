@@ -5,7 +5,7 @@
   "attempt": 1,
   "base_head": "24ab93b24d134e3a3873fd8e67922fe2072f2dd3",
   "result_identity": "Git commit containing this report; exact HEAD confirmed after push",
-  "state": "IMPLEMENTED_LOCAL_TESTS_PASSED_PENDING_REMOTE_CI",
+  "state": "IMPLEMENTED_PRODUCTION_GUARD_CI_PASSED_WORKER_NO_JOB_FIX_PENDING_CI",
   "changes": [
     "family pilot and pinned recipe production sequence",
     "plate/final native-pixel guard",
@@ -28,6 +28,21 @@
     "CI detection after direct push is not rollback or installed branch protection",
     "already running jobs on older commits do not gain new gates retroactively"
   ],
-  "next_action": "Verify published exact-SHA CI; next A/B calls read the new contract and create a qualified family pilot/manifest before candidate promotion.",
-  "publication_base_head": "162320cc992c852e20363e22607dcff7a11f958f"
+  "next_action": "Verify worker no-job fix on GitHub; subsequent producers must provide current final manifest and pass stage/visual gates.",
+  "publication_base_head": "162320cc992c852e20363e22607dcff7a11f958f",
+  "material_commit": "fd6917965e2493586e4cdeeb6c067fe42ce85e4a",
+  "ci": {
+    "production_guard": {
+      "id": 37931061154,
+      "sha": "fd6917965e2493586e4cdeeb6c067fe42ce85e4a",
+      "conclusion": "success"
+    },
+    "initial_worker": {
+      "id": 37931061257,
+      "conclusion": "failure",
+      "stage": "Select changed role jobs",
+      "cause": "Existing grep returns 1 on policy-only commits under pipefail; unit tests passed.",
+      "correction": "awk selector returns success with an empty list; no production job runs."
+    }
+  }
 }
