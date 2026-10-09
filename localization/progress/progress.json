@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 00:20 KST",
+  "updated_at_kst": "2026-10-10 00:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9594,5 +9594,26 @@
       "IGR-040"
     ],
     "qa_path": "localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json"
+  },
+  "b337_q228_two_trial_chrome_producer_reject": {
+    "run_key": "OUTRUN-KOR-B337-Q228-NATIVE-SOURCE-CHROME-TWO-TRIAL-REJECT-20261010",
+    "role": "B",
+    "queue_index": 228,
+    "user_regression": "IGR-038_OPEN_USER_INGAME_FAIL",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "current_promoted_sha256": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+    "trial_sha256": [
+      "3d7b284f23809f8fa5ba8f9061ebafc7a87b6df2b2fc8f3dce8a4bb6a9633f93",
+      "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a"
+    ],
+    "trial_dds_count": 2,
+    "promoted_dds_count": 0,
+    "mech": "PASS_EXACT_DECODE_ZERO_OUTSIDE_12_UNCHANGED",
+    "producer_visual": "FAIL_2_OF_2_SOURCE_CHROME_FAMILY",
+    "next_method": "MANUAL_SOURCE_SHAPED_CONNECTED_ROUNDED_HANGUL_CHROME_REQUIRED",
+    "C2": "C327_REWORK_UNCHANGED",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
   }
 }

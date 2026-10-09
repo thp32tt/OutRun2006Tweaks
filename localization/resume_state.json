@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B q228 B337/B337R two exact-native chrome trials failed producer visual despite saved DDS mechanical gate; no promoted DDS. Stop Noto reflection/blur/bevel tuning, rebuild source-shaped connected rounded Hangul manually; C327 REWORK and IGR038 OPEN. See localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B337-Q228-NATIVE-SOURCE-CHROME-TWO-TRIAL-REJECT-20261010",
     "C335 TEMP_BACKLOG_RELIEF=C1 SHARD=ODD P0 q121 A202 SHA256 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844; first-hand SOURCE|CLEAN|FINAL producer contact gray100 black50 plus RAW/FLIPY atlas and two masks viewed. Improved natural phrase/width, no definite clip/alien box visible in inspected scopes; no independent exact saved 4096x4096 DDS/native alpha/plate delta/true calibration, so C1 HOLD_STRICT_RECHECK, NOT PASS. C318 old SHA not reused; DDS0; C3/APPROVAL/JPG/game BLOCKED, IGR-030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json RUN_KEY=OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020.",
     "A211 P1 q175 new true Noto Hangul glyph (not A209/A210 hand-rails) with canonical English chrome band + per-pixel relief native trial DDS SHA256 b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446, original 9314372585..., current promoted unchanged b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73. Real source-CLEAN-original-vs-trial native/BGW100/75/50 producer VISUAL FAIL ordinary narrow separated Hangul + insufficient depth: trial 222x117 vs source 950x132. Source clean alpha0, outside region RGBA/alpha0, saved DDS decoded exact; no promoted new DDS, family still REWORK, C1/C3 blocked, IGR032 user gameplay OPEN, RUNTIME_VALIDATION=UNTESTED. Need source-conditioned welded rounded chrome Korean vector, not generic font/rail/width tweaks. QA role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005.",
     "B336 P0 q060 B335 P1 source-derived CLEAN plus runner Noto CJK Bold SHA and Hangul 7/7 coverage verified; same-stroke source-vs-localized slant/font-style anchors not verified, so P2 HOLD, C334 C2 HOLD and IGR044 OPEN. Existing B332R DDS preserved; new DDS 0. QA localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_P2_FONT_SLANT_EVIDENCE.json RUN_KEY=OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340 RUNTIME_VALIDATION=UNTESTED.",
@@ -13826,5 +13827,26 @@
       "IGR-040"
     ],
     "qa_path": "localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json"
+  },
+  "b337_q228_two_trial_chrome_producer_reject": {
+    "run_key": "OUTRUN-KOR-B337-Q228-NATIVE-SOURCE-CHROME-TWO-TRIAL-REJECT-20261010",
+    "role": "B",
+    "queue_index": 228,
+    "user_regression": "IGR-038_OPEN_USER_INGAME_FAIL",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "current_promoted_sha256": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+    "trial_sha256": [
+      "3d7b284f23809f8fa5ba8f9061ebafc7a87b6df2b2fc8f3dce8a4bb6a9633f93",
+      "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a"
+    ],
+    "trial_dds_count": 2,
+    "promoted_dds_count": 0,
+    "mech": "PASS_EXACT_DECODE_ZERO_OUTSIDE_12_UNCHANGED",
+    "producer_visual": "FAIL_2_OF_2_SOURCE_CHROME_FAMILY",
+    "next_method": "MANUAL_SOURCE_SHAPED_CONNECTED_ROUNDED_HANGUL_CHROME_REQUIRED",
+    "C2": "C327_REWORK_UNCHANGED",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
   }
 }
