@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B314 q137 P0 IGR-041: semantic source-family vector master, *trial first*.
+"""B315 q137 P0 IGR-041: semantic source-family vector master, *trial first*.
 
 Prior B287/B288 only changed strokes on the same generic narrow Korean.
 This pass changes semantic phrasing and uses per-syllable native condensed
@@ -13,7 +13,7 @@ from PIL import Image,ImageFont,ImageDraw
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
 REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
-OUT=G/"role_B/20261009-B314-Q137-P0-SEMANTIC-FAMILY-VECTOR"
+OUT=G/"role_B/20261009-B315-Q137-P0-SEMANTIC-FAMILY-VECTOR"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SRC="11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
@@ -60,6 +60,11 @@ if not Path(font).exists():
  subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk-extra"],check=True)
 assert Path(font).exists()
 out=P.copy();report=[]
+# Source/clean validated on all six but scope changed bytes to two large modes.
+large_only=np.zeros(P.shape[:2],bool)
+for entry in specs[-2:]:
+ ll,tt,rr,bb=entry[3]
+ large_only[tt:bb,ll:rr]=True
 def letter_master(word,font_px,targetw,sourceh):
  ft=ImageFont.truetype(font,font_px,index=1)
  # Build each syllable as an independent native outline. Unlike a broad word
@@ -88,7 +93,7 @@ def letter_master(word,font_px,targetw,sourceh):
   result.paste(a,(pos,(height-a.height)//2));pos+=a.width+gap
  assert total<=targetw-10,(word,total,targetw)
  return result
-for key,en,ko,(l,t,r,b),size,alpha in specs:
+for key,en,ko,(l,t,r,b),size,alpha in specs[-2:]:
  # choose native source-like cap height, min 3px margins on each source bbox
  chosen=None
  for sz in range(size,size-16,-1):
@@ -116,9 +121,9 @@ for key,en,ko,(l,t,r,b),size,alpha in specs:
  report.append(dict(id=key,english=en,korean=ko,source_bbox=[l,t,r,b],effect_bbox=[nx,ny,nx+im.width,ny+im.height],
   margins=margins,font_px=sz,vector_profile="native per-syllable narrow-stem 0.83; not whole-word stretch",alpha=alpha))
 changed=np.any(P!=out,axis=2)
-assert np.count_nonzero(changed)>1000 and not np.any(changed&~allow)
-assert not np.any((P[:,:,3]!=out[:,:,3])&~allow)
-assert np.array_equal(out[~allow],P[~allow])
+assert np.count_nonzero(changed)>1000 and not np.any(changed&~large_only)
+assert not np.any((P[:,:,3]!=out[:,:,3])&~large_only)
+assert np.array_equal(out[~large_only],P[~large_only])
 raw=np.frombuffer(current[128:],dtype=np.uint8).reshape(1024,2048,4)
 if np.array_equal(raw[::-1],P):order="RGBA";body=out[::-1].copy().tobytes()
 else:
@@ -126,7 +131,7 @@ else:
  order="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 data=current[:128]+body;assert len(data)==len(current) and sha(data)!=OLD
 D=decode(data);assert np.array_equal(D,out)
-(OUT/"B314_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
+(OUT/"B315_TRIAL_NOT_PROMOTED.dds").write_bytes(data)
 def onbg(a,bg):
  layer=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
  layer.alpha_composite(Image.fromarray(a,"RGBA"))
@@ -144,17 +149,17 @@ for reg in report:
     sheet=Image.new("RGB",(sum(im.width for im in frames)+12,max(im.height for im in frames)),bg)
     x=0
     for im in frames:sheet.paste(im,(x,0));x+=im.width+4
-    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B314.png"
+    filename=f"{key}_{orient}_{bgname}_{scale}_SOURCE_CLEAN_B285_B315.png"
     sheet.save(OUT/filename,optimize=True);views.append(filename)
-evidence={"role":"B","run":"B314","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
+evidence={"role":"B","run":"B315","queue_index":137,"regression":"IGR-041","source_sha256":SRC,
  "clean_png_sha256":CLEAN,"previous_candidate_sha256":OLD,"trial_sha256":sha(data),
  "new_trial_dds":1,"promoted_dds":0,"source_clean_outside6":0,
- "source_clean_retained_protected_separators":retained,"candidate_changed_outside6":0,
- "alpha_outside6":0,"header_exact":True,"persisted_decode":"EXACT",
+ "source_clean_retained_protected_separators":retained,"candidate_changed_outside_two_large":0,
+ "alpha_outside_two_large":0,"header_exact":True,"persisted_decode":"EXACT",
  "raw_orientation":"mirror_y","native":[2048,1024],"dds_codec":order,"mips":1,
  "per_region":report,"proofs":views,"producer_visual":"PENDING_DIRECT_NATIVE_50_RAW",
  "C1":"NOT_RUN","C3":"NOT_RUN","user_game":"OPEN_USER_INGAME_FAIL",
  "RUNTIME_VALIDATION":"UNTESTED","backend":"github-actions (local network cannot resolve canonical raw source)",
  "excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B314_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
-print("B314_TRIAL",sha(data),"views",len(views))
+(OUT/"B315_MACHINE_QA.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n")
+print("B315_TRIAL",sha(data),"views",len(views))
