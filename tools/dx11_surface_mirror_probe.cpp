@@ -34,6 +34,27 @@ int main()
 
     using namespace outrun::vr::dx11;
 
+    // R179: compressed texture data may be sampled but never advertised
+    // as an exact native RTV; vertex-buffer roles have no texture format.
+    for (const auto source : {
+             D3DFMT_DXT1, D3DFMT_DXT3, D3DFMT_DXT5 })
+    {
+        const auto textureFormat =
+            translate_resource_format(source, ResourceRole::Texture);
+        const auto targetFormat =
+            translate_resource_format(source, ResourceRole::Color);
+        if (!textureFormat.exact ||
+            textureFormat.format == DXGI_FORMAT_UNKNOWN ||
+            targetFormat.exact ||
+            targetFormat.format != DXGI_FORMAT_UNKNOWN)
+            return fail("R179 compressed texture incorrectly qualifies as RTV");
+    }
+    if (translate_resource_format(
+            D3DFMT_A8R8G8B8, ResourceRole::Vertex).exact ||
+        !translate_resource_format(
+            D3DFMT_A8R8G8B8, ResourceRole::Color).exact)
+        return fail("R179 non-texture role classified as a texture format");
+
     NativeSurfaceMirror color;
     if (!color.initialize(
             device.Get(),

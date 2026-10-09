@@ -86,6 +86,17 @@ namespace outrun::vr::dx11
             }
         }
 
+        // R179: resource-format exactness is role-specific. A vertex buffer
+        // has no DXGI texture format, and block-compressed textures cannot
+        // be created as D3D11 render targets. Never pass those as exact RTVs.
+        if (role != ResourceRole::Color && role != ResourceRole::Texture)
+            return {};
+        if (role == ResourceRole::Color &&
+            (source == D3DFMT_DXT1 ||
+             source == D3DFMT_DXT3 ||
+             source == D3DFMT_DXT5))
+            return {};
+
         switch (source)
         {
         case D3DFMT_A8R8G8B8:

@@ -81,6 +81,11 @@ jobs:
           }
           exit 0
 
+      - name: Verify DX11 resource format role isolation R179
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_resource_role_format_r179.py
+
       - name: Verify DX11 transactional native resize R177
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

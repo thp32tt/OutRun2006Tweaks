@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00481",
+  "production_id": "CONVERSION-DX11-00481",
+  "event_id": "CONVERSION-DX11-00481-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00481",
+  "lease_epoch": 1,
+  "work_key": "DX11:R179:RESOURCE_ROLE_FORMAT_BC_RTV_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/d3d11/resource_translation.cpp:R179",
+    "tools/dx11_surface_mirror_probe.cpp:R179",
+    "tools/test_dx11_resource_role_format_r179.py:R179",
+    ".github/workflows/backend-conversion-gate.yml:R179"
+  ],
+  "status": "VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "base_sha": "021556225eb98611b630f4d3cbf8e85ae49d8e75",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "changed_paths": [
+    "src/vr/d3d11/resource_translation.cpp",
+    "tools/dx11_surface_mirror_probe.cpp",
+    "tools/test_dx11_resource_role_format_r179.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "summary": "R179 fixes erroneous BC1/BC2/BC3 render-target format exactness and vertex role texture-format acceptance in dormant DX11 resource translator; adds compiled WARP negative assertions and scoped source-negative-mutation CI. No native Draw activation.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD/AGENTS/review index/queue contract and 00480 record checked; no 00481 run/checkpoint at start.",
+    "C1_REVIEW": "PASS: translate_resource_format returns exact BCn even for Color RTV and exact texture formats for Vertex, violating role-specific binding semantics.",
+    "C2_IMPLEMENT": "PASS: runtime C++ translator role guard and compiled probe plus Python negative mutations and required workflow step.",
+    "C3_VALIDATE": "PENDING: exact-SHA Backend Conversion Gate after material commit; upstream R175 may block shared smoke.",
+    "C4_COMMIT": "PENDING: material commit CAS underway.",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant DX11 translator and no Quest3/VDXR release.",
+    "C6_STATE": "PENDING: exact-SHA CI result and authoritative SHA reconciliation."
+  },
+  "blockers": [
+    "Inherited owner 00477 R175 WARP shader pixel mismatch may fail full smoke.",
+    "HMD runtime untested."
+  ],
+  "resume_cursor": "READ_EXACT_SHA_BACKEND_GATE_AND_SEAL_SCOPED_RESULT",
+  "next_action": "Reconcile exact-SHA Gate and update this record without replacing validation-bearing SHA.",
+  "last_real_activity_at": "2026-10-09T22:37:00+09:00",
+  "score_change": 0
+}
