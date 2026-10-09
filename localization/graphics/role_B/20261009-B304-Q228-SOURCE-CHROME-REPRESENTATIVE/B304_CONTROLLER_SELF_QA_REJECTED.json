@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B304",
+  "run_key": "OUTRUN-KOR-B304-Q228-IGR038-SOURCE-CHROME-REPRESENTATIVE-20261009-0910",
+  "timestamp_kst": "2026-10-09 09:20 KST",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "user_report": "IGR-038",
+  "user_report_status": "OPEN_USER_INGAME_FAIL",
+  "canonical_source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "preserved_current_candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "experiment_sha256": "b2bfdc45190dcd43481339c67f1a845780ed10b3b97ee0be0d627a742de50033",
+  "experiment_file": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_Q228_REPRESENTATIVE_TRIAL_NOT_PROMOTED.dds",
+  "machine_evidence": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_MACHINE_GATE.json",
+  "backend": "GITHUB_ACTIONS",
+  "workflow_run_id": 37863968417,
+  "workflow_result": "SUCCESS",
+  "representative": "COAST 2 COAST -> 코스트 2 코스트",
+  "representative_bbox": [
+    5,
+    26,
+    1456,
+    145
+  ],
+  "construction_change": "Measured canonical English silver seven-level fill profile and dark edge [10,10,10]; native 126px Noto Sans CJK Black and source-conditioned fill/shadow glyph-only compositor instead of previous hollow flat outline. Single representative, no all-13 propagation.",
+  "machine_checks": {
+    "saved_dds_roundtrip": "PASS",
+    "header_exact": "PASS",
+    "native_resolution": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "source_clean_alpha": "PASS_ZERO",
+    "source_clean_outside_union": "PASS_ZERO",
+    "current_vs_trial_outside_selected": "PASS_ZERO",
+    "changed_alpha_outside_selected": "PASS_ZERO",
+    "protected_other_12": "PRESERVED_EXACT",
+    "raw_flipy_evidence": "PRESENT",
+    "practical_BG_WHITE_BLACK_100_75_50": "PRESENT"
+  },
+  "direct_visual": {
+    "source_clean": "PASS_IN_REPRESENTATIVE_TRANSPARENT_PLATE",
+    "readable_native_100": "FAIL_CHROME_FACE_DEPTH_AND_FUTURISTIC_GEOMETRY",
+    "readable_gray_50": "FAIL_SOURCE_CHROME_HIGHLIGHT_BEVEL",
+    "raw_75": "FAIL_SOURCE_CHROME_DEPTH_AND_FACE_STYLE",
+    "glyph_legibility": "LEGIBLE_BUT_SOURCE_STYLE_MISMATCH",
+    "bbox": "PASS_MACHINE_ONLY",
+    "composite_trace": "NO_DEFINITE_RECTANGLE_OBSERVED_IN_INSPECTED_REGION",
+    "full_13": "NOT_REVIEWED_NOT_REWORKED",
+    "real_game": "NOT_RUN"
+  },
+  "observed_defects": [
+    "SOURCE_FAMILY_METALLIC_FACE_MISSING",
+    "SOURCE_FAMILY_CHROME_BEVEL_UNDERRECONSTRUCTED",
+    "FONT_FAMILY_TECHNO_PROFILE_MISMATCH"
+  ],
+  "controller_decision": "PRODUCER_VISUAL_FAIL_REWORK_REQUIRED",
+  "reasoning": "The persisted trial has visibly flatter, duller silver/gray strokes with a black rim instead of the canonical bright high-relief silver/chrome face, highlight/extrusion and geometry. Machine no-outside PASS cannot overrule this native/50/RAW visual failure. Representative method is NOT approved for propagation.",
+  "next_action": "Keep current q228 asset REWORK_REQUIRED; develop a genuinely different source-conditioned / manually drawn vector and multilevel chrome-extrusion master that passes native/50/RAW against canonical English. Then rerender all 13, saved DDS zero-overlap/plate/composite and fresh independent C2/C3; later user actual game retest only may close IGR-038.",
+  "promoted_dds": 0,
+  "new_production_candidate": 0,
+  "trial_only_dds": 1,
+  "candidate_changed_in_hd_candidates": false,
+  "independent_C2": "BLOCKED_PENDING_MATERIAL_FIX",
+  "C3": "BLOCKED",
+  "user_game": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
