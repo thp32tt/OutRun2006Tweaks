@@ -17,25 +17,25 @@
     "cmake.toml:R191",
     ".github/workflows/backend-conversion-gate.yml:R191"
   ],
-  "base_sha": "83979ea64f34046649096eec53f5b88443c6f854",
-  "result_sha": "PENDING_E001_FINAL_FIX_SHA",
-  "material_result_sha": "PENDING_E001_FINAL_FIX_SHA",
-  "validation_bearing_result_sha": "PENDING_E001_FINAL_FIX_SHA",
-  "status": "WAITING_FOR_THIRD_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "base_sha": "d5d8ede392a64907867893325a0e47adc9ca16a5",
+  "result_sha": "7b7e4f73485a24c9954cc1d53a12949838499f12",
+  "material_result_sha": "7b7e4f73485a24c9954cc1d53a12949838499f12",
+  "validation_bearing_result_sha": "7b7e4f73485a24c9954cc1d53a12949838499f12",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
-  "summary": "R191 independent owned immutable native D3D11 VS b0 snapshot material implementation and real WARP DrawIndexed vertex translation pixel readback; no game-native draw activation.",
+  "summary": "R191 actual C++ native immutable VS b0 source-snapshot resource, same-device immediate-context exact binding and generation/version-lifetime guard; negative mutations plus real WARP two-pass indexed vertices displaced by constant buffer snapshot PASS. Whole required exact-SHA Backend Conversion Gate FAIL because separate pre-existing 00477 R175 TEXCOORD6 BGRA mismatch. No native gameplay activation or HMD proof.",
   "pipeline": {
-    "C0_RECOVER": "PASS: latest GitHub HEAD d5d8ede392a64907867893325a0e47adc9ca16a5; 00493 run and controller checkpoint absent; 00492 R190 C6 is BLOCKED_UPSTREAM_R175_FULL_GATE.",
-    "C1_REVIEW": "PASS: AGENTS.md, 100 review index, queue contract, branch state, R183/R186/R187/R190 source, visual regression history. R175 belongs to 00477; no shared source ownership. R191 develops native VS b0 resource and actual shader transform while dormant.",
-    "C2_IMPLEMENT": "PASS: real C++ immutable VS constant buffer snapshot creation/replacement, exact same immediate-device b0 binding, revision/descriptor guards, WARP DrawIndexed center-to-right translated pixels + 4 mutation source contract; CMake and GitHub Gate wired.",
-    "C3_VALIDATE": "First material SHA 962414d0: Win32 SUCCESS, R191 static negative-mutant failure. Second material SHA 83979ea6: Win32 SUCCESS, R191 Python IndentationError because a literal backslash-n in a comment swallowed the assertion. Third candidate uses actual indented assertion and removes all duplicated occurrences of the targeted version guard. Third exact-SHA Gate PENDING.",
-    "C4_COMMIT": "Third bounded C2 test-harness material fix with [AUTO:CONVERSION-DX11-00493] and no CI-skip; exact-SHA mandatory.",
-    "C5_PACKAGE": "NOT_REQUIRED: native game Draw still dormant; no Quest3/VDXR evidence or backend promotion.",
-    "C6_STATE": "Await third exact-SHA Gate; preserve failure history and runtime UNTESTED."
+    "C0_RECOVER": "PASS GitHub HEAD d5d8ede392a64907867893325a0e47adc9ca16a5; read 100 review, AGENTS.md, branch state, Queue Controller Contract, regression history. 00493 no prior run/claim, checkpoints not found.",
+    "C1_REVIEW": "PASS selected independently owned R191 actual native VS b0 GPU constant-buffer snapshot and indexed vertex translation, avoiding R175 owned by 00477 and DX9Ex/DXVK.",
+    "C2_IMPLEMENT": "PASS new native_indexed_vs_constant.hpp creates immutable b0 D3D11 buffer for exact source version/generation, verifies actual immediate-device VS binding and descriptor; isolated WARP two-pass pixel index draw; source negative mutations+CI/CMake wired. Two bounded repairs corrected Python negative mutation/indentation without altering production resource code.",
+    "C3_VALIDATE": "SCOPED PASS on exact SHA 7b7e4f73485a24c9954cc1d53a12949838499f12: Win32 validate job 113979139941 SUCCESS; DX11 smoke 113981071922 R191 one-pass static 4 negative mutants PASS, MSVC WARP executable build PASS, real indexed GPU VS constant buffer shift pixel proof PASS. Whole Backend Conversion Gate 37977433121 FAIL at unchanged 00477-owned R175_GENERIC_VARYING_MISMATCH (actual BGRA [128,0,16,255], expected [224,128,32,255]). First source SHA 962414d0 Gate 37975147028 failed R191 negative mutation; 83979ea6 Gate 37976308703 failed indentation; both repaired by validation-bearing SHA. No whole Gate PASS claim.",
+    "C4_COMMIT": "PASS 3 real material commits [AUTO:CONVERSION-DX11-00493] in history, final validation-bearing material SHA 7b7e4f73485a24c9954cc1d53a12949838499f12 (NO ci-skip), Gate terminal FAIL; separate C6 documentation commit [skip ci] not substituted for material SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED native game Draw not activated; no Quest 3/VDXR runtime validation or release promotion.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE: R191 scoped native VS resource, correct negative tests, actual GPU index pixel translation PASS, whole exact-SHA Gate failed only unchanged R175 under separate task 00477. Preserve exact SHA and 1283 AI2 points, do not retry unchanged R191 or re-score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_vs_constant.hpp",
@@ -64,12 +64,50 @@
     "second_gate_r191_probe": "NOT_RUN",
     "first_gate_id": 37975147028,
     "third_gate": "PENDING",
-    "third_fix": "Exact Python loop body is an assertion (not comment); replace all equivalent guards for one negative mutant"
+    "third_fix": "Exact Python loop body is an assertion (not comment); replace all equivalent guards for one negative mutant",
+    "initial_source_sha": "962414d0b654e86453b6ad4315a16cdc226cca00",
+    "initial_gate_result": "FAIL_R191_NEGATIVE_MUTATION",
+    "second_gate_run_id": 37976308703,
+    "second_source_sha": "83979ea64f34046649096eec53f5b88443c6f854",
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37977433121,
+    "gate_head_sha": "7b7e4f73485a24c9954cc1d53a12949838499f12",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113979139941,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113981071922,
+    "readiness_smoke_conclusion": "failure",
+    "r191_scoped_python_negative_mutants": 4,
+    "r191_contract": "PASS",
+    "r191_warp_executable_build": "PASS",
+    "r191_warp_indexed_transform_gpu_pixels": "PASS",
+    "r191_game_draw_activated": false,
+    "failing_step": "Run DX11 constant buffer probe",
+    "upstream_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ]
   },
   "blockers": [
-    "Existing unrelated R175 TEXCOORD6 generic varying mismatch owned by 00477 blocks whole Gate.",
-    "No user Quest3/VDXR headset/game runtime verification."
+    "Mandatory whole exact-SHA Backend Conversion Gate fails at separate R175 TEXCOORD6 varying mismatch, owned by CONVERSION-DX11-00477. Do not alter that owner's source files or weaken verification.",
+    "Quest 3/VDXR real game runtime/HMD pixel/pose/input/frame pacing not tested."
   ],
-  "next_action": "Inspect third SHA exact Backend Conversion Gate; require true R191 4 negative mutants + actual WARP translated pixels. If another fail, seal BLOCKED with full evidence; no more blind retry.",
-  "score_change": 0
+  "next_action": "Do not replay R191 under 00493 or count a new point. 00477 owner must repair R175 separately; future controller job may select a different conflict-free DX11 native work_key after CAS claim. Keep DXVK frozen and DX9Ex protected; no HMD promotion.",
+  "score_change": 0,
+  "scoped_automation_validation": "PASS_R191_IMMUTABLE_VS_B0_STATIC_WIN32_WARP_INDEXED_PIXELS",
+  "state_persisted": true,
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175",
+  "last_real_activity_at": "2026-10-10T04:11:36+09:00",
+  "last_activity_evidence": "Exact material SHA 7b7e4f73 Backend Conversion Gate 37977433121 Win32 validate PASS and R191 real WARP shifted DrawIndexed PASS; inherited R175 failure.",
+  "score_reason": "New R191 scoped real source+WARP proof completed, but mandatory full exact-SHA Gate failed at separate R175; preserve pre-existing AI2 1283 and do not count retry/blocked release as success."
 }
