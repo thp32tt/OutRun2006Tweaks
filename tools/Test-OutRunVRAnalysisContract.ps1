@@ -26,6 +26,14 @@ function Invoke-Fixture {
     "installedMatchesSelected=$DllMatched" |
         Set-Content (Join-Path $dir 'GAME_DLL_IDENTITY.txt') -Encoding UTF8
 
+    if ($Name -eq 'r28-present-over-budget') {
+        'VR R28 PERF: lower-Present avgMs=6.124 maxMs=28.557 drawsPerPresent=1164.8' |
+            Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
+        '[R23 pipeline] actualXrHz=90 xrFrameIntervalMs=12.368' |
+            Set-Content (Join-Path $dir 'outrun-vr-host-pipeline.log') -Encoding UTF8
+        'GameDefaultConfigOverride: default resolution set to 3440x1440, windowed enabled' |
+            Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
+    }
     & $analyzer -SessionDir $dir
     $outputPath = Join-Path $dir 'AUTO_ANALYSIS_SUMMARY.json'
     if (-not (Test-Path $outputPath)) {
@@ -46,6 +54,15 @@ function Invoke-Fixture {
         $result.Flags -contains 'NO_AUTOMATIC_RED_FLAG') {
         throw "$Name gave a false no-red-flag verdict"
     }
+    if ($Name -eq 'r28-present-over-budget' -and
+        ($result.R28PresentOverBudgetWindows -ne 1 -or
+         $result.R28PresentMaxMs -ne 28.557 -or
+         $result.GameDefaultWidth -ne 3440 -or
+         $result.XrRefreshBudgetMs -lt 11.1 -or
+         $result.XrRefreshBudgetMs -gt 11.12 -or
+         $result.Flags -notcontains 'D3D9EX_PRESENT_LATENCY_OVER_XR_BUDGET')) {
+        throw "$Name failed real R28/per-eye budget regression"
+    }
     Write-Host "PASS $Name : $($result.Status)"
 }
 
@@ -53,6 +70,7 @@ try {
     Invoke-Fixture 'real-user-rank-projected-zero' 0 'True' 'HUD_RANK_PROJECTED_PATH_ZERO'
     Invoke-Fixture 'stale-installed-dll' 5 'False' 'GAME_DLL_SHA256_MISMATCH'
     Invoke-Fixture 'healthy-telemetry-only' 5 'True' 'OK'
+    Invoke-Fixture 'r28-present-over-budget' 5 'True' 'PERFORMANCE_WARNING'
 } finally {
     Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
