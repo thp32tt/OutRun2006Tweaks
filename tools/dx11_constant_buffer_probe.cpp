@@ -659,8 +659,9 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
                 "R173 clear-only negative control");
         warp.context->DrawIndexed(3u,0u,0);
         const auto directColor = r173Pixel();
-        require(directColor==expected,
-                "R173 direct VS COLOR0 packed-BGRA passthrough control");
+        // R173: finish both VS controls before fail-closed assertions, so
+        // negative evidence always includes both WARP BGRA readbacks.
+        const bool directMatches = directColor == expected;
         warp.context->VSSetShader(r173GeneratedVS,nullptr,0u);
         warp.context->ClearRenderTargetView(target,clear);
         warp.context->DrawIndexed(3u,0u,0);
@@ -672,10 +673,19 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
             <<"] generated VS BGRA=["
             <<generatedColor[0]<<","<<generatedColor[1]<<","
             <<generatedColor[2]<<","<<generatedColor[3]
+            <<"] expected BGRA=["
+            <<expected[0]<<","<<expected[1]<<","
+            <<expected[2]<<","<<expected[3]
             <<"] classification="
-            <<(generatedMatches?"GENERATED_VS_COLOR0_OK"
-                               :"GENERATED_VS_COLOR0_MISMATCH")<<"\n";
-        // A mismatch is diagnostic evidence only, never gameplay approval.
+            <<(!directMatches?"DIRECT_VS_COLOR0_MISMATCH"
+                :(!generatedMatches?"GENERATED_VS_COLOR0_MISMATCH"
+                                   :"BOTH_COLOR0_PATHS_MATCH"))<<"\\n";
+        // An incorrect direct control invalidates generated-VS attribution.
+        // Neither failure can be treated as native gameplay approval.
+        require(directMatches,
+                "R173 direct VS COLOR0 packed-BGRA passthrough control");
+        require(generatedMatches,
+                "R173 generated VS COLOR0 packed-BGRA passthrough control");
         warp.context->IASetInputLayout(r170Ia);
         warp.context->IASetVertexBuffers(
             0u,1u,&r170Vb,&r170Stride,&offset);
