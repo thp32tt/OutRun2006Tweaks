@@ -1,0 +1,240 @@
+{
+  "sha256": {
+    "SOURCE": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "CLEAN": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "FINAL": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524"
+  },
+  "dimensions": [
+    4096,
+    1024
+  ],
+  "mips": 1,
+  "authored_clean_is_png": true,
+  "full_outside_union": {
+    "SOURCE_CLEAN": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 603843
+    },
+    "CLEAN_FINAL": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 439060
+    },
+    "SOURCE_FINAL": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 681829
+    }
+  },
+  "regions": [
+    {
+      "id": "01_create_new_license",
+      "bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 142103,
+      "final_nonzero_alpha": 101090,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 142103,
+          "alpha": 142103
+        },
+        "CLEAN_FINAL": {
+          "rgba": 101090,
+          "alpha": 101090
+        },
+        "SOURCE_FINAL": {
+          "rgba": 158504,
+          "alpha": 156550
+        }
+      }
+    },
+    {
+      "id": "02_select_license",
+      "bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 105320,
+      "final_nonzero_alpha": 72921,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 105320,
+          "alpha": 105320
+        },
+        "CLEAN_FINAL": {
+          "rgba": 72921,
+          "alpha": 72921
+        },
+        "SOURCE_FINAL": {
+          "rgba": 120610,
+          "alpha": 119115
+        }
+      }
+    },
+    {
+      "id": "03_single_player_red",
+      "bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 98927,
+      "final_nonzero_alpha": 77318,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 98927,
+          "alpha": 98927
+        },
+        "CLEAN_FINAL": {
+          "rgba": 77318,
+          "alpha": 77318
+        },
+        "SOURCE_FINAL": {
+          "rgba": 116321,
+          "alpha": 114871
+        }
+      }
+    },
+    {
+      "id": "04_default_license",
+      "bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 115127,
+      "final_nonzero_alpha": 71820,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 115127,
+          "alpha": 115127
+        },
+        "CLEAN_FINAL": {
+          "rgba": 71820,
+          "alpha": 71820
+        },
+        "SOURCE_FINAL": {
+          "rgba": 125898,
+          "alpha": 124617
+        }
+      }
+    },
+    {
+      "id": "05_multiplayer_red",
+      "bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 90633,
+      "final_nonzero_alpha": 73103,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 90633,
+          "alpha": 90633
+        },
+        "CLEAN_FINAL": {
+          "rgba": 73103,
+          "alpha": 73103
+        },
+        "SOURCE_FINAL": {
+          "rgba": 102549,
+          "alpha": 101092
+        }
+      }
+    },
+    {
+      "id": "06_single_player_gray",
+      "bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 19100,
+      "final_nonzero_alpha": 17549,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 19100,
+          "alpha": 19100
+        },
+        "CLEAN_FINAL": {
+          "rgba": 17549,
+          "alpha": 17549
+        },
+        "SOURCE_FINAL": {
+          "rgba": 22001,
+          "alpha": 22001
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 15231,
+      "final_nonzero_alpha": 8579,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 15231,
+          "alpha": 15231
+        },
+        "CLEAN_FINAL": {
+          "rgba": 8579,
+          "alpha": 8579
+        },
+        "SOURCE_FINAL": {
+          "rgba": 15669,
+          "alpha": 15669
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "clean_nonzero_alpha": 0,
+      "source_nonzero_alpha": 17402,
+      "final_nonzero_alpha": 16680,
+      "pairs": {
+        "SOURCE_CLEAN": {
+          "rgba": 17402,
+          "alpha": 17402
+        },
+        "CLEAN_FINAL": {
+          "rgba": 16680,
+          "alpha": 16680
+        },
+        "SOURCE_FINAL": {
+          "rgba": 20277,
+          "alpha": 20277
+        }
+      }
+    }
+  ]
+}

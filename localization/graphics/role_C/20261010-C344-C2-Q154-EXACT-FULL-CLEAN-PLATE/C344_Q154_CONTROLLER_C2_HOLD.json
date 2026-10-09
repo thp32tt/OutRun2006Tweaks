@@ -1,0 +1,681 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C344-Q154-EXACT-FULL-CLEAN",
+  "run_key": "OUTRUN-KOR-C344-C2-Q154-FULL-CLEAN-EXACT-NATIVE-20261010-0600",
+  "date_kst": "2026-10-10 06:00 KST",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "base_remote_head": "cdfafb65929bc633b5b270be3c5839cded179e55",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "current": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524"
+  },
+  "source_and_current_dds_size": 16777344,
+  "authored_clean_png_bytes": 1046184,
+  "native": [
+    4096,
+    1024
+  ],
+  "mips": 1,
+  "raw_orientation": "MIRROR_Y",
+  "decision": "HOLD_STRICT_RECHECK",
+  "new_information": "First C2 independently exact full-native B60 CLEAN plate SHA-authenticated and jointly compared against newly independently downloaded exact original/current DDS across ALL EIGHT effect boxes. C339 had not authenticated full actual CLEAN. Fresh full-atlas delta matrix, clean alpha8/8, direct PLATE and COMPOSITE triptychs and RAW gray rows, 18 new persisted evidence PNG.",
+  "new_dds": 0,
+  "current_sha_not_promoted_or_counted_again": true,
+  "pixels_before_producer_verdict": false,
+  "blind_calibration": "NOT_QUALIFIED_previous_producer_reports_read_during_selection",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_EXACT_FULL_CLEAN_MACHINE.json",
+    "result": "SCOPED_PASS_NOT_FINAL_C_OR_C3"
+  },
+  "full_atlas_pairwise_diff_outside_eight": {
+    "SOURCE_CLEAN": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 603843
+    },
+    "CLEAN_FINAL": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 439060
+    },
+    "SOURCE_FINAL": {
+      "changed_rgba": 0,
+      "changed_alpha": 0,
+      "changed_within": 681829
+    }
+  },
+  "region_reports": [
+    {
+      "id": "01_create_new_license",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "source_alpha_nonzero": 142103,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 101090,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 142103,
+          "alpha": 142103
+        },
+        "CLEAN_FINAL": {
+          "rgba": 101090,
+          "alpha": 101090
+        },
+        "SOURCE_FINAL": {
+          "rgba": 158504,
+          "alpha": 156550
+        }
+      },
+      "views": [],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "02_select_license",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "source_alpha_nonzero": 105320,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 72921,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 105320,
+          "alpha": 105320
+        },
+        "CLEAN_FINAL": {
+          "rgba": 72921,
+          "alpha": 72921
+        },
+        "SOURCE_FINAL": {
+          "rgba": 120610,
+          "alpha": 119115
+        }
+      },
+      "views": [],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "03_single_player_red",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "source_alpha_nonzero": 98927,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 77318,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 98927,
+          "alpha": 98927
+        },
+        "CLEAN_FINAL": {
+          "rgba": 77318,
+          "alpha": 77318
+        },
+        "SOURCE_FINAL": {
+          "rgba": 116321,
+          "alpha": 114871
+        }
+      },
+      "views": [],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "04_default_license",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "source_alpha_nonzero": 115127,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 71820,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 115127,
+          "alpha": 115127
+        },
+        "CLEAN_FINAL": {
+          "rgba": 71820,
+          "alpha": 71820
+        },
+        "SOURCE_FINAL": {
+          "rgba": 125898,
+          "alpha": 124617
+        }
+      },
+      "views": [],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "05_multiplayer_red",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "source_alpha_nonzero": 90633,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 73103,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 90633,
+          "alpha": 90633
+        },
+        "CLEAN_FINAL": {
+          "rgba": 73103,
+          "alpha": 73103
+        },
+        "SOURCE_FINAL": {
+          "rgba": 102549,
+          "alpha": 101092
+        }
+      },
+      "views": [],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "06_single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_alpha_nonzero": 19100,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 17549,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 19100,
+          "alpha": 19100
+        },
+        "CLEAN_FINAL": {
+          "rgba": 17549,
+          "alpha": 17549
+        },
+        "SOURCE_FINAL": {
+          "rgba": 22001,
+          "alpha": 22001
+        }
+      },
+      "views": [
+        {
+          "name": "C344_06_single_player_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e33bc0713b6fb3a3a29cb87d21b33e0cfa5a4ff66c6c53f3ac37afbafec086a3",
+          "size": 12941,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_100_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_06_single_player_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "feb91bf2cbd1dc0407252cd06dca159014a9175a6821b3d3c7dd7af555114f59",
+          "size": 15795,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_75_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_06_single_player_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e469019b4640643fef5a3affdb2262bcedf541402f3a38792f7ad11a63a56860",
+          "size": 10969,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_06_single_player_gray_PLATE_ONLY.png",
+          "sha256": "d626cf395c4b1289da1b9b9020bf596436cde5c9d961a9c65ec6ad15621f1d4e",
+          "size": 7386,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_PLATE_ONLY.png"
+        },
+        {
+          "name": "C344_06_single_player_gray_COMPOSITE_ONLY.png",
+          "sha256": "d7c53d5d037d792e29ad39c3d1a7f000474fc2e8c6a59beadb90a176ce51c3f0",
+          "size": 5176,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_COMPOSITE_ONLY.png"
+        },
+        {
+          "name": "C344_06_single_player_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "c1bd264efeae20bcdf4e17c91411ff24673802de0e041c2750c6750691accd3c",
+          "size": 8937,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_RAW_SOURCE_FINAL.png"
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_alpha_nonzero": 15231,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 8579,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 15231,
+          "alpha": 15231
+        },
+        "CLEAN_FINAL": {
+          "rgba": 8579,
+          "alpha": 8579
+        },
+        "SOURCE_FINAL": {
+          "rgba": 15669,
+          "alpha": 15669
+        }
+      },
+      "views": [
+        {
+          "name": "C344_07_showroom_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5496904c01ef8ea206eddb794fb6173794009f7c35d064c9a9105b2cd0a5b93a",
+          "size": 9505,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_100_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_07_showroom_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3c1db6f3a09707baf8e4c893375e2e2d0fd5450999e210e9b154007783156433",
+          "size": 12823,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_75_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_07_showroom_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4d9e977327938fbdd9ba1972c68cb171664f0478ec83b178679ad77066132143",
+          "size": 8447,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_07_showroom_gray_PLATE_ONLY.png",
+          "sha256": "e992a18af60c3354075cd6f37c5de1faa634b5309958dde358f963b33f60abd1",
+          "size": 6728,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_PLATE_ONLY.png"
+        },
+        {
+          "name": "C344_07_showroom_gray_COMPOSITE_ONLY.png",
+          "sha256": "19b7e5dc5a4be7b2c26535ea9eba0d3dfa0ebf79283cdc58702f87a5542be7b1",
+          "size": 2694,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_COMPOSITE_ONLY.png"
+        },
+        {
+          "name": "C344_07_showroom_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "b2a5b4ac6ebfb5fa91b15339d266dfd3740ac78a581a62efca83103092e5896a",
+          "size": 6926,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_RAW_SOURCE_FINAL.png"
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_alpha_nonzero": 17402,
+      "clean_alpha_nonzero": 0,
+      "candidate_alpha_nonzero": 16680,
+      "pairwise_changed": {
+        "SOURCE_CLEAN": {
+          "rgba": 17402,
+          "alpha": 17402
+        },
+        "CLEAN_FINAL": {
+          "rgba": 16680,
+          "alpha": 16680
+        },
+        "SOURCE_FINAL": {
+          "rgba": 20277,
+          "alpha": 20277
+        }
+      },
+      "views": [
+        {
+          "name": "C344_08_multiplayer_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "faf0b1b1d653ca6c96b0023c5af1d36a716de56d3636bd0a9c5d915d5df8c365",
+          "size": 10103,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_100_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_08_multiplayer_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d48ce6e904e6d5ab7a1eb1060e5a921781198af9056df618cea767d665b1c089",
+          "size": 12511,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_75_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_08_multiplayer_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a6da62bc5a9a2f1d7af321e93b8c3af05bbc506d448f122223623c443f2a6b16",
+          "size": 8897,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_50_SOURCE_CLEAN_FINAL.png"
+        },
+        {
+          "name": "C344_08_multiplayer_gray_PLATE_ONLY.png",
+          "sha256": "797aea3e05c63a53cca8b149a82b598e89e033c5cbed8f7297da74b8deaea9ca",
+          "size": 5975,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_PLATE_ONLY.png"
+        },
+        {
+          "name": "C344_08_multiplayer_gray_COMPOSITE_ONLY.png",
+          "sha256": "3116144695be35b2c9697254fce4686acc9ab0d0d6abbdeb3be72ec772c4e856",
+          "size": 4015,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_COMPOSITE_ONLY.png"
+        },
+        {
+          "name": "C344_08_multiplayer_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "211a65ab53d2922757fcb809c010d112151ae7baf6eda321aad03f8f11792a44",
+          "size": 7149,
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_RAW_SOURCE_FINAL.png"
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Same-source semantic top-minus-bottom glyph stem anchors and blinded control not qualified; source looks largely upright but do not fabricate zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Exact B60 authored CLEAN at canonical full-native 4096x1024 independently SHA verified; alpha is zero throughout this complete source-effect rectangle, source->clean outside all8=0. PLATE_ONLY inspected for 3 gray rows."
+        },
+        "style": {
+          "result": "HOLD_VISUAL_SOURCE_FAMILY_CALIBRATION",
+          "observation": "SOURCE/CLEAN/current actual saved native 100/75/50 cropped RGB/alpha-composited; no definite newly demonstrable font-family defect in gray trio, yet blinded reference family/shape weight anchors unresolved."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_GAME_UNTESTED",
+          "observation": "Three gray labels independently directly viewed at 100 and 50%; legible on neutral gray, game-composed screen not available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CONFIRMED_FAIL",
+          "observation": "No definite fracture/missing Hangul in newly decoded native/50 images for gray trio; no claim for unreviewed historical red family in this run."
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS_OUTSIDE_UNION",
+          "observation": "Across 4096x1024 full atlas exact SOURCE/CLEAN/FINAL all three pairwise changed RGBA and alpha outside eight original effect rectangles = 0; inside-rectangle protected source sublayers not separately fully certified."
+        },
+        "placement": {
+          "result": "SCOPED_INSIDE_ORIGINAL_BBOX",
+          "observation": "Historical C339 eight-positive-margins evidence unchanged candidate SHA; no new game-composed positioning validation."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_FLIPY",
+          "observation": "RAW mirrored-Y source and saved final separately viewed for three gray labels, FLIP-Y readable as original."
+        }
+      }
+    }
+  ],
+  "gray_region_direct_review_ids": [
+    "06_single_player_gray",
+    "07_showroom_gray",
+    "08_multiplayer_gray"
+  ],
+  "observations": {
+    "plate_only": "PASS_SCOPED_GRAY_CLEAN_TRANSPARENT_ZERO",
+    "composite_only": "PASS_SCOPED_CLEAN_FINAL_OUTSIDE_ORIGINAL_BBOX_ZERO",
+    "font_family": "HOLD_NO_QUALIFIED_BLIND_SOURCE_STROKE_CALIBRATION",
+    "source_to_screen": "UNTESTED_GAME_CONSUMER"
+  },
+  "C3": "PENDING_NOT_PASS",
+  "approval": "BLOCKED",
+  "export": "NOT_APPROVED",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "repeat_guard": "No previous C339/C323 same-candidate status reported as additional accepted graphics. This run adds a new exact CLEAN-authenticated SOURCE->CLEAN->FINAL evidence chain only.",
+  "backend": "N100 MCP temporary exact DDS download/decode fallback; GitHub SSOT publishing",
+  "excluded": [
+    "odd_index",
+    "unindexed_special_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "new controller task queue"
+  ]
+}
