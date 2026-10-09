@@ -302,10 +302,10 @@ def vr_checkpoint_http_error_details(exc: Exception) -> tuple[Optional[int], str
                 message = response["message"]
         except Exception:
             pass
-        message = re.sub(r"https?://[^\\s]+", "[URL_REDACTED]", message, flags=re.I)
-        message = re.sub(r"(?i)(token|secret|password|authorization)(\\s*[:=]\\s*)[^\\s,;]+",
-                         r"\\1\\2[REDACTED]", message)
-        message = re.sub(r"[A-Za-z0-9_\\-]{48,}", "[IDENTIFIER_REDACTED]", message)
+        message = re.sub(r"https?://[^\s]+", "[URL_REDACTED]", message, flags=re.I)
+        message = re.sub(r"(?i)(token|secret|password|authorization)(\s*[:=]\s*)[^\s,;]+",
+                         r"\1\2[REDACTED]", message)
+        message = re.sub(r"[A-Za-z0-9_-]{48,}", "[IDENTIFIER_REDACTED]", message)
         return status, message[:180]
     if isinstance(exc, urllib.error.URLError):
         return None, "GitHub network request failed: " + type(exc.reason).__name__
