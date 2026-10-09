@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-R9-RIGHT-SYNC-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-R9-RIGHT-SYNC-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT_RECOVERY",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "base_sha": "23a7555e5442d98c68d769ed97943b776edcea25",
+  "material_result_sha": "77e8a45ea8ea4f05580a78871a8d9931c72a7b76",
+  "validation_bearing_result_sha": "77e8a45ea8ea4f05580a78871a8d9931c72a7b76",
+  "result_sha": "77e8a45ea8ea4f05580a78871a8d9931c72a7b76",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 review right-eye R9 depth/stencil invalidation and synchronization reads delegate through R30Support with original flags and return identities. On 2026-10-09 18:24 KST, resumed stalled post-CI C6 and verified the already completed exact SHA; no new material, retry, score, or CI re-run.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37894349126,
+      "head_sha": "77e8a45ea8ea4f05580a78871a8d9931c72a7b76",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113702154437,
+        "game": 113702265968,
+        "host": 113702265982,
+        "full-chain-compile": 113702266024,
+        "package": 113703314650
+      }
+    },
+    "domain": {
+      "run_id": 37894349056,
+      "head_sha": "77e8a45ea8ea4f05580a78871a8d9931c72a7b76",
+      "conclusion": "success",
+      "job": 113702154056
+    },
+    "artifact": {
+      "id": 11598654704,
+      "digest": "sha256:19159c1b26f9d43898fc1ac8c06d4737dd7b1bdc51971190aa4cbf9e42fbb80f"
+    }
+  },
+  "next_action": "Finish remaining R32/R31 textual-TU/R9 lower-ownership seams without changing HUD behavior; exact SHA CI; retain separate user HMD UNTESTED and five-minute active interactive review checkpoint."
+}
