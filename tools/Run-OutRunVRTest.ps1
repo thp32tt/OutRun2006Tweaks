@@ -98,7 +98,7 @@ if($backend -eq 'd3d9'){
         '-FrameCadenceTargetHz=0',
         '-DisableDesktopVsync=false',
         '-TargetRefreshRateHz=0',
-        '-SkyGlowFactor=1'
+        '-SkyGlowFactor=4'
     )
     $profile=[ordered]@{
         Name=$TestProfile
