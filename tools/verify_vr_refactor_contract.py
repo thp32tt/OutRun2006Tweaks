@@ -53,12 +53,12 @@ text("tools/verify_vr_hook_graph.py")
 if "IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;" not in r30_support_api:
     errors.append("R30 right-eye borrowed surface owner declaration missing")
 if not re.search(
-    r"IDirect3DSurface9\\* R30SupportBorrowedRightEyeSurface\\(\\) noexcept"
-    r"\\s*\\{\\s*return RightEyeSurface;\\s*\\}", r30):
+    r"IDirect3DSurface9\* R30SupportBorrowedRightEyeSurface\(\) noexcept"
+    r"\s*\{\s*return RightEyeSurface;\s*\}", r30):
     errors.append("R30 borrowed right-eye surface owner must return original lower pointer")
 if not re.search(
-    r"IDirect3DSurface9\\* R32ReviewRightEyeSurface\\(\\) noexcept"
-    r"\\s*\\{\\s*return R30SupportBorrowedRightEyeSurface\\(\\);\\s*\\}", r32):
+    r"IDirect3DSurface9\* R32ReviewRightEyeSurface\(\) noexcept"
+    r"\s*\{\s*return R30SupportBorrowedRightEyeSurface\(\);\s*\}", r32):
     errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
 
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
