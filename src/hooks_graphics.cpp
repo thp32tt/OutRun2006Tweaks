@@ -300,6 +300,41 @@ RestoreCarBaseShadow RestoreCarBaseShadow::instance;
 // Do not infer lens ownership from generic alpha state or tune disparity scalars.
 class VRLensFlareProjected2D : public Hook
 {
+    // Original OR2006C2C.EXE SHA 68ceb386... disassembly:
+    // sub_40CAE0 at 0xCF4E projects the light centre (Calc3D2D),
+    // then 0xD3A0 loads object 0x570002 and 0xD3A5 calls sub_40C980,
+    // which directly forwards to DrawObjectAlpha_Internal. The later
+    // outer halo discs use distinct sub_40C9A0 calls at 0xD5F5..0xD796.
+    // Prior 0xCABE hook only covered the OUTER sub_40C9A0 path.
+    // Correct the central SUN object alone: preserve its world matrix
+    // through true per-eye stereo, rather than classifying it as an
+    // already-projected flat ScreenHud. Leave every other flare child and
+    // original display opacity untouched.
+    inline static SafetyHookMid LensCentreEnterHook{};
+    inline static SafetyHookMid LensCentreLeaveHook{};
+    inline static thread_local unsigned LensCentreDepth = 0;
+    inline static thread_local OutRunVR::GameSemantic::RenderScope
+        LensCentreSavedScope = OutRunVR::GameSemantic::RenderScope::None;
+
+    static void LensCentreEnter(safetyhook::Context&)
+    {
+        if (!Settings::VREnabled || LensCentreDepth++ != 0)
+            return;
+        LensCentreSavedScope = OutRunVR::GameSemantic::CurrentScope;
+        OutRunVR::GameSemantic::CurrentScope =
+            OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+    }
+
+    static void LensCentreLeave(safetyhook::Context&)
+    {
+        if (!Settings::VREnabled || !LensCentreDepth ||
+            --LensCentreDepth != 0)
+            return;
+        OutRunVR::GameSemantic::CurrentScope = LensCentreSavedScope;
+        LensCentreSavedScope =
+            OutRunVR::GameSemantic::RenderScope::None;
+    }
+
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
@@ -336,6 +371,24 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
 			Memory::HookType::Call);
+        // Exact E8 source for central 0x570002 object, not the shared
+        // sub_40C980 target. If either enter/leave cannot relocate, retain
+        // the unchanged original lens behavior rather than leaking a world
+        // semantic beyond this sole object.
+        LensCentreEnterHook = safetyhook::create_mid(
+            Module::exe_ptr(0xD3A5), LensCentreEnter);
+        LensCentreLeaveHook = safetyhook::create_mid(
+            Module::exe_ptr(0xD3AA), LensCentreLeave);
+        if (!LensCentreEnterHook || !LensCentreLeaveHook)
+        {
+            LensCentreEnterHook = {};
+            LensCentreLeaveHook = {};
+            spdlog::warn(
+                "VR P0 LENS CENTRE: 0xD3A5/0xD3AA partial hook rolled back; keeping original scene effect");
+        }
+        else
+            spdlog::info(
+                "VR P0 LENS CENTRE: exact 0x570002 object 0xD3A5 -> WORLD_BILLBOARD (other discs unchanged)");
 		spdlog::info(
 			"VR P0 FLARE: exact EXE+0xCABE producer -> PROJECTED_SCREEN_EFFECT_2D; placement remains WVP-proven");
 		return true;
