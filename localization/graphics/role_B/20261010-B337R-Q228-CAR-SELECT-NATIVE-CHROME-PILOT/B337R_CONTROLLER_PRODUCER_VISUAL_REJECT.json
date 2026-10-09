@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "run": "B337+B337R",
+  "run_key": "OUTRUN-KOR-B337-Q228-NATIVE-SOURCE-CHROME-TWO-TRIAL-REJECT-20261010",
+  "role": "B",
+  "queue_index": 228,
+  "user_report": "IGR-038",
+  "producer_decision": "REWORK_REQUIRED",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "current_promoted_sha256": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+  "promoted_dds_count": 0,
+  "trial_dds_count": 2,
+  "tries": [
+    {
+      "run": "B337",
+      "workflow": 37950800448,
+      "sha256": "3d7b284f23809f8fa5ba8f9061ebafc7a87b6df2b2fc8f3dce8a4bb6a9633f93",
+      "visual": "FAIL_FRACTURED_CHROME_FACE",
+      "native_proof": "localization/graphics/role_B/20261010-B337-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337_CAR_SELECT_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+      "practical_proof": "localization/graphics/role_B/20261010-B337-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337_CAR_SELECT_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_TRIAL.png"
+    },
+    {
+      "run": "B337R",
+      "workflow": 37951297448,
+      "sha256": "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a",
+      "visual": "FAIL_STILL_FRACTURED_AND_UNDERFILLED",
+      "native_proof": "localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CAR_SELECT_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_TRIAL.png",
+      "practical_proof": "localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CAR_SELECT_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_TRIAL.png"
+    }
+  ],
+  "original_bbox": [
+    5,
+    182,
+    1124,
+    301
+  ],
+  "trial_visible_bbox": [
+    14,
+    190,
+    426,
+    291
+  ],
+  "source_width_px": 1119,
+  "trial_width_px": 412,
+  "source_clean_alpha_zero": true,
+  "persisted_DDS_decode_header_raw_mirror_y": "PASS_BOTH_TRIALS",
+  "changed_outside_original_and_other_12": 0,
+  "review_method": "Controller directly inspected saved SOURCE,CLEAN,OLD,TRIAL contact at FLIPY gray native100/50 and RAW black75 for both versions; visual defects override machine PASS",
+  "observed_defects": [
+    "Original CAR SELECT is horizontally joined smooth broad silver chrome, while both trials are separated generic Hangul with rough fragmented/specular bevel faces",
+    "B337R reduced top and bottom bevel and smoothed reflection but the same family mismatch persists",
+    "Native translated glyph box width 412px vs original 1119px despite 101px tall glyph, so practical 50% source-relative hierarchy is weak"
+  ],
+  "next_action": "STOP THIS FAMILY METHOD after two producer failures. Require genuinely source-authored connected rounded Hangul contours and independent chrome face/extrusion/vector reconstruction, not another Noto plus blur/bevel/stretch trial. Only one representative before 12 sibling assets. New producer visual QA and independent C/C3 then user exact game retest.",
+  "other_12_regions": "UNMODIFIED_CURRENT_B323_REJECT_HISTORY",
+  "C2": "C327_PREVIOUS_REWORK_STILL_VALID",
+  "C3": "BLOCKED",
+  "PRE_INGAME": "EXCLUDED",
+  "IGR038": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_RENDER_N100_MCP_IMAGE_REVIEW_ONLY",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
