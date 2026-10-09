@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261009-A203-IGR043-STAGE-RANK-TRACE",
+  "at_kst": "2026-10-09 18:00 KST",
+  "priority": "P0",
+  "ingame_report": "IGR-043",
+  "queue_index": 49,
+  "secondary_index": 44,
+  "evidence": {
+    "queue_q49_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+    "queue_q44_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+    "q49_source_strings": [
+      "Rank for this stage",
+      "Rank"
+    ],
+    "q44_source_strings": [
+      "Stage",
+      "Ranking"
+    ],
+    "runtime_source": "src/hooks_localization.cpp",
+    "runtime_draw_queue": "KoreanRuntime::Draw()",
+    "trigger_setting": "Localization.KoreanHudLayoutTrace",
+    "applicable_translations": [
+      "스테이지",
+      "랭크",
+      "순위"
+    ],
+    "fixed_trace_limit": 96,
+    "runtime_pair_limit": 32
+  },
+  "decision": "MAPPING_REQUIRED_NOT_DDS_REWORK_PROVEN",
+  "reason": "No rendered-layer provenance for the user-marked Stage 2/rank overlap; q49 static source has rank text, q44 separate Stage, dynamic runtime overlay could also contribute",
+  "implementation": "Bounded opt-in screen rectangle trace plus runtime Stage-vs-Rank positive-area overlap warning; gameplay unchanged when disabled and always same draw output",
+  "source_type": "STATIC_SOURCE_AND_QUEUE_INSPECTION",
+  "candidate_dds_created": 0,
+  "candidate_dds_changed": false,
+  "producer_visual_qa": "NOT_APPLICABLE_NO_NEW_DDS",
+  "win32_build": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "user_game_report_status": "OPEN_USER_INGAME_FAIL",
+  "close_gate": "Exact new in-game screenshot+trace correlation -> material domain-specific fix -> C+C3 current-byte evidence -> NEW user gameplay retest",
+  "backend": "GitHub connector direct branch commit",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

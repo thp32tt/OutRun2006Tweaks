@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A203 P0 IGR-043: exact art-plan q49 rank glyph vs q44 separate Stage mapped; new opt-in KoreanHudLayoutTrace stage/rank positions + runtime-runtime intersection, no DDS edit and no asserted game fix. NEW real-game log/composed screenshot needed, IGR-043 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A203-IGR043-STAGE-RANK-TRACE/A203_IGR043_SOURCE_ATTRIBUTION.json.",
     "B327R q098 42E618FD new production DDS 472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028 full native vector Korean glow-alpha reconstruction from exact English source 3b3cdd76.../B40 CLEAN b5c9c07a... replacing C310 failed B279 192d6274...; source/CLEAN outside0 and final source-outside0; 18 RAW/FLIPY BGW 100/75/50 new lossless contacts controller producer-scoped visual PASS; GitHub worker 37907615230 SUCCESS; binary commit bbde0b6f; fresh C2/C3/user in-game pending; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_CONTROLLER_SELF_QA_FINAL.json",
     "C326 C2 EVEN q060 P0 IGR-044 fresh independent native/50/RAW visual FAIL B313 promoted DDS sha256 be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0: GOLD OUTRUN MILES visibly too upright, block-like/wide and source racing-italic/extrusion family mismatch, despite numeric bbox/outside PASS. C2 REWORK_REQUIRED; B new native source-conditioned vector profile, separate C2/C3/full evidence, new user real-game retest required. No DDS, no approval, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C326-C2-Q060-B313-SOURCE-FAMILY-VISUAL/C326_Q060_CONTROLLER_C2_REWORK.json",
     "A202 P0 q121 FD90AA9 native replacement SHA256 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844, before 4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8. Exact Select your car → 차량을 선택하세요: 436×108 → 824×108 within 913×164 English source; no forced width stretch, matched white right-italic/black offset. A176 source/CLEAN, saved DDS RAW/FLIP-Y, 50/75/100 preview producer visual PASS. A202 changed 54161 pixels ONLY original car region, other 2 title cells and protected graphic unchanged=0, bbox/source-remnant/alpha/outside/label collision=0, roundtrip PASS. Fresh C1/C3/current gate/user/game OPEN P0 IGR030/031/040, separate info/Dino logo mapping unresolved. RUNTIME_VALIDATION=UNTESTED; QA localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_CONTROLLER_SELF_QA_FINAL.json.",
@@ -13347,5 +13348,15 @@
       "DX11",
       "DXVK"
     ]
+  },
+  "last_a_igr043_trace": {
+    "role": "A",
+    "target": "IGR-043",
+    "queue_index": 49,
+    "secondary_index": 44,
+    "source": "src/hooks_localization.cpp",
+    "decision": "MAPPING_PENDING_NEW_REAL_GAME_CAPTURE",
+    "candidate_dds_created": 0,
+    "runtime_validation": "UNTESTED"
   }
 }

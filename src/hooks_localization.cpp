@@ -62,7 +62,7 @@ namespace Settings
         "Localization",
         "KoreanHudLayoutTrace",
         false,
-        "IGR-042 opt-in HUD time/heart Korean text layout diagnosis. Logs bounded text IDs, "
+        "IGR-042 HUD time/heart plus IGR-043 Stage/Rank text diagnostics. Logs bounded text IDs, 
         "stock coordinates, screen-space dimensions and compact keyline eligibility; "
         "does not change rendering, text selection or any DDS. Requires KoreanTextOverlayTest."
     };
@@ -103,6 +103,11 @@ namespace KoreanRuntime
     // Only the render thread inserts keys; normal gameplay never enters the probe.
     inline static std::unordered_set<std::string> HudLayoutTraceSeen{};
     static constexpr size_t MaxHudLayoutTraceKeys = 96;
+    // A203 IGR-043: log unique translated runtime Stage-vs-Rank collisions only.
+    // This cannot detect a baked q44/q49 DDS-vs-overlay collision: live game
+    // sprite composition evidence is still required before an asset rewrite.
+    inline static std::unordered_set<std::string> StageRankOverlapSeen{};
+    static constexpr size_t MaxStageRankOverlapKeys = 32;
 
     // Korean player-name storage must not replace the game's 16-byte legacy
     // field with UTF-8. Fixed-width ranking/network/save consumers proven by
@@ -1840,6 +1845,17 @@ namespace KoreanRuntime
         const float mapScaleY = uniformUi ? uiScale : sy;
         const float centerX = uniformUi ? (display.x - (640.0f * uiScale)) * 0.5f : 0.0f;
 
+        // A203: opt-in probe has no effect on command order or text pixels.
+        struct StageRankBox
+        {
+            uint32_t id;
+            bool stage;
+            ImVec4 rect;
+        };
+        std::vector<StageRankBox> stageRankBoxes;
+        if (Settings::KoreanHudLayoutTrace)
+            stageRankBoxes.reserve(16);
+
         for (const DrawCommand& cmd : queue)
         {
             if (cmd.text.empty())
@@ -1876,6 +1892,16 @@ namespace KoreanRuntime
                     x -= size.x;
             }
 
+            const bool stageText = cmd.text.find("스테이지") != std::string::npos;
+            const bool rankText = cmd.text.find("랭크") != std::string::npos ||
+                                  cmd.text.find("순위") != std::string::npos;
+            if (Settings::KoreanHudLayoutTrace && cmd.textId < TextEntryCount &&
+                (stageText || rankText))
+            {
+                stageRankBoxes.push_back({cmd.textId, stageText,
+                                          ImVec4(x, y, x + size.x, y + size.y)});
+            }
+
             // IGR-042 has unresolved source attribution: actual HUD text may
             // originate here, in a baked DDS, or both. Trace only matching
             // translated draw commands when explicitly opted in, without
@@ -1883,7 +1909,8 @@ namespace KoreanRuntime
             if (Settings::KoreanHudLayoutTrace &&
                 cmd.textId < TextEntryCount &&
                 (cmd.text.find("하트") != std::string::npos ||
-                 cmd.text.find("시간") != std::string::npos))
+                 cmd.text.find("시간") != std::string::npos ||
+                 stageText || rankText))
             {
                 std::ostringstream key;
                 key << cmd.textId << ':' << cmd.x << ':' << cmd.y << ':'
@@ -1943,6 +1970,40 @@ namespace KoreanRuntime
                 ImVec2(x, y),
                 ConvertColor(cmd.color),
                 cmd.text.c_str());
+        }
+
+        // A203 IGR-043: a strict runtime-runtime overlap is new evidence,
+        // not proof of a q49 DDS defect or a permission to change its pixels.
+        if (Settings::KoreanHudLayoutTrace)
+        {
+            for (size_t i = 0; i < stageRankBoxes.size(); ++i)
+            {
+                for (size_t j = i + 1; j < stageRankBoxes.size(); ++j)
+                {
+                    const auto& a = stageRankBoxes[i];
+                    const auto& b = stageRankBoxes[j];
+                    if (a.stage == b.stage)
+                        continue;
+                    const float left = (std::max)(a.rect.x, b.rect.x);
+                    const float top = (std::max)(a.rect.y, b.rect.y);
+                    const float right = (std::min)(a.rect.z, b.rect.z);
+                    const float bottom = (std::min)(a.rect.w, b.rect.w);
+                    if (left >= right || top >= bottom)
+                        continue;
+                    std::ostringstream key;
+                    key << a.id << ':' << b.id << ':'
+                        << static_cast<int>(left) << ':' << static_cast<int>(top);
+                    if (StageRankOverlapSeen.size() < MaxStageRankOverlapKeys &&
+                        StageRankOverlapSeen.insert(key.str()).second)
+                    {
+                        spdlog::warn(
+                            "KoreanStageRankOverlapTrace: IGR-043 id_pair=({}, {}) "
+                            "intersection=({:.2f},{:.2f},{:.2f},{:.2f}) "
+                            "RUNTIME_TEXT_ONLY DDS_AND_OTHER_LAYERS_UNVERIFIED",
+                            a.id, b.id, left, top, right, bottom);
+                    }
+                }
+            }
         }
     }
 }
