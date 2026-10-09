@@ -16,7 +16,7 @@ namespace outrun::vr::dx11 {
         !verified_indexed_full_target_draw_ready(
             vb, ib, context, startIndex, indexCount, baseVertex,
             generation, vbVersion, ibVersion, targetWidth, targetHeight,
-            targetFormat, expectedRtv))
+            targetFormat, expectedRtv, expectedDsv))
         return false;
 
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveRtv;

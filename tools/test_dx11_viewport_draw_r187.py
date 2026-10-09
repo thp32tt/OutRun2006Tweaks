@@ -17,12 +17,13 @@ guards=(
     "!expectedTarget",
     "Microsoft::WRL::ComPtr<ID3D11DepthStencilView> unownedDepth;",
     "outputs, unownedDepth.GetAddressOf());",
-    "if (unownedDepth || hasExtraOutput || !target || target.Get() != expectedTarget)",
+    "if (unownedDepth.Get() != expectedDepthTarget || hasExtraOutput ||",
     "outputs[slot]->Release();",
+    "ID3D11DepthStencilView* expectedDepthTarget = nullptr",
 )
 def contract(text): return all(g in text for g in guards)
 assert contract(h), "missing native indexed viewport/target protection"
-for g in (guards[0],guards[2],guards[5],guards[6],guards[7],guards[8],guards[9],guards[10],guards[11]):
+for g in (guards[0],guards[2],guards[5],guards[6],guards[7],guards[8],guards[9],guards[10],guards[11],guards[12]):
     assert not contract(h.replace(g,"",1)), "source mutation survived: "+g
 assert "->Draw(" not in h and "->DrawIndexed(" not in h, "game Draw activation prohibited"
 for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
@@ -41,4 +42,4 @@ assert "[target.dx11_viewport_draw_probe_r187]" in manifest
 assert '"tools/dx11_viewport_draw_probe_r187.cpp"' in manifest
 assert "python tools/test_dx11_viewport_draw_r187.py" in workflow
 assert workflow.index("Run R187 indexed viewport WARP probe") < workflow.index("Build DX11 constant buffer probe")
-print("R187/R204/R205 indexed viewport, sole RTV/no foreign DSV, 9 source mutations and WARP contract: PASS")
+print("R187/R204/R205 indexed viewport, sole RTV/no foreign DSV, 10 source mutations and WARP contract: PASS")

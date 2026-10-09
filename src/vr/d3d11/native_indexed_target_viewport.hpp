@@ -9,7 +9,8 @@ namespace outrun::vr::dx11 {
     ID3D11DeviceContext* context, UINT startIndex, UINT indexCount,
     INT baseVertex, std::uint64_t generation, std::uint64_t vbVersion,
     std::uint64_t ibVersion, UINT width, UINT height,
-    DXGI_FORMAT format, ID3D11RenderTargetView* expectedTarget) noexcept {
+    DXGI_FORMAT format, ID3D11RenderTargetView* expectedTarget,
+    ID3D11DepthStencilView* expectedDepthTarget = nullptr) noexcept {
     if (!width || !height || !expectedTarget ||
         format == DXGI_FORMAT_UNKNOWN ||
         !verified_indexed_linear_draw_ready(
@@ -20,8 +21,8 @@ namespace outrun::vr::dx11 {
     // An indexed eye draw must not broadcast pixels to a stale second-eye
     // RTV. OMGetRenderTargets(1) cannot reveal extra bound MRT slots.
     ID3D11RenderTargetView* outputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
-    // R205: this color-only indexed path cannot inherit an unowned DSV.
-    // Depth-enabled indexed draws use the independently validated R189 path.
+    // R205 E002: unowned DSV is forbidden; a depth-enabled caller must pass
+    // an exact expected DSV, then verify depth state/resource through R189.
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> unownedDepth;
     context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
         outputs, unownedDepth.GetAddressOf());
@@ -35,7 +36,8 @@ namespace outrun::vr::dx11 {
         }
     }
     // Equal-sized eye targets are not interchangeable: require a sole owned RTV.
-    if (unownedDepth || hasExtraOutput || !target || target.Get() != expectedTarget)
+    if (unownedDepth.Get() != expectedDepthTarget || hasExtraOutput ||
+        !target || target.Get() != expectedTarget)
         return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     target->GetDesc(&view);
