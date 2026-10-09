@@ -37,14 +37,50 @@ def start_status_server():
     log.info("status server listening on :%s", STATUS_PORT)
 
 
+from app.chrome_maintenance import (
+    CHROME_RECYCLE_ENABLED, CHROME_RECYCLE_INTERVAL_SECONDS,
+    CHROME_RECYCLE_BUSY_GRACE_SECONDS, CHROME_RECYCLE_FILE,
+    periodic_tab_health, request_periodic_recycle,
+)
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     if once:
         await run_cycle(context, pages)
         return
     last_tick = None
     last_watchdog_check = 0.0
-    write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
+    recycle_started = time.monotonic()
+    protected_slots: set[str] = set()
+    health_task = asyncio.create_task(periodic_tab_health(
+        context, pages, lambda: load_registry(datetime.now(TZ)).slots,
+        {}, protected_slots, BASE_URL, write_runtime, is_persistable_chat_url))
+    prior_recycle = {}
+    if CHROME_RECYCLE_FILE.exists():
+        try:
+            prior_recycle = json.loads(CHROME_RECYCLE_FILE.read_text(encoding="utf-8"))
+        except ValueError:
+            pass
+    write_runtime(status="idle",
+                  tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot",
+                  tab_count=len(pages),
+                  chrome_recycle_enabled=CHROME_RECYCLE_ENABLED,
+                  chrome_recycle_interval_minutes=CHROME_RECYCLE_INTERVAL_SECONDS // 60,
+                  chrome_recycle_busy_grace_minutes=CHROME_RECYCLE_BUSY_GRACE_SECONDS // 60,
+                  chrome_recycle_count=prior_recycle.get("count", 0),
+                  chrome_recycle_last_at=prior_recycle.get("requested_at"),
+                  chrome_recycle_next_due_at=(datetime.now(TZ) +
+                      timedelta(seconds=CHROME_RECYCLE_INTERVAL_SECONDS)).isoformat())
     while True:
+        if health_task.done():
+            health_task.result()  # fatal CDP disconnect triggers Docker restart
+        if await request_periodic_recycle(
+                pages, protected_slots, time.monotonic() - recycle_started,
+                detect_busy, write_runtime,
+                lambda: save_registry(load_registry(datetime.now(TZ)))):
+            health_task.cancel()
+            await asyncio.gather(health_task, return_exceptions=True)
+            raise SystemExit(75)
         now = datetime.now(TZ)
         tick = now.strftime("%Y-%m-%dT%H:%M")
         did_scheduled = False
@@ -52,11 +88,17 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             last_tick = tick
             did_scheduled = True
             write_runtime(last_tick=tick, status="running")
+            active_name = SCHEDULED_LOCALIZATION_LANES.get(now.minute) if CONTROLLER_MODE == "localization" else None
+            if active_name:
+                protected_slots.add(active_name)
             try:
                 await run_cycle(context, pages, scheduled_minute=now.minute)
             except Exception as e:
                 log.exception("scheduled cycle failed")
                 write_runtime(status="error", last_error=repr(e))
+            finally:
+                if active_name:
+                    protected_slots.discard(active_name)
         elif not AUTO_SEND:
             if runtime.get("status") not in ("login_required", "manual_mode"):
                 write_runtime(status="manual_mode", last_action="AUTO_SEND=false; waiting for manual login/setup")
