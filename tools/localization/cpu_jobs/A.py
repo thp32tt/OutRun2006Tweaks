@@ -13,7 +13,7 @@ assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 ROOT=Path.cwd()
 OUT=ROOT/"localization/graphics/role_A/20261010-A212-Q121-NATIVE-C335-EVIDENCE-HANDOFF"
 OUT.mkdir(parents=True,exist_ok=True)
-P=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+CAND=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
 CLEAN=ROOT/"localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png"
 SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
 SOURCE_SHA="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
@@ -41,9 +41,9 @@ def flat_crop(im,rgb,box):
  bg=Image.new("RGBA",p.size,(*rgb,255));bg.alpha_composite(p)
  return bg.convert("RGB")
 def main():
- if not P.is_file() or sha(P)!=TARGET_SHA:raise RuntimeError("q121 exact candidate drift")
+ if not CAND.is_file() or sha(CAND)!=TARGET_SHA:raise RuntimeError("q121 exact candidate drift")
  if not CLEAN.is_file():raise RuntimeError("A176 source plate missing")
- header,final=read_dds(P)
+ header,final=read_dds(CAND)
  with tempfile.TemporaryDirectory(prefix="outrun_A212_") as td:
   src=Path(td)/"source.dds"
   urllib.request.urlretrieve(SOURCE_URL,src)
