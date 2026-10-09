@@ -477,7 +477,7 @@ for marker in (
     'OutRunVR::GameSemantic::CurrentQueueProducerToken()',
     'ProducerToken::OutRunStagePrintf',
     'ProducerToken::GoalTime150',
-    '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}"',
+    '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={} stereoAccepted={} accepted={} rejected={}',
 ):
     require(marker, r30, 'result sink provenance / R62 fixedfn telemetry')
 
