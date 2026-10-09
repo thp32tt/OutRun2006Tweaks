@@ -31,8 +31,10 @@ def load_rotation():
         "CHROME_RECYCLE_BUSY_PROBE_SECONDS": 1,
         "detect_busy": AsyncMock(return_value=False),
     }
-    exec(compile(ast.fix_missing_locations(ast.Module(body=nodes, type_ignores=[])),
-                 "<chrome-recycle>", "exec"), env)
+    module = ast.Module(body=[ast.ImportFrom(module="__future__",
+                                            names=[ast.alias(name="annotations")], level=0)] + nodes,
+                        type_ignores=[])
+    exec(compile(ast.fix_missing_locations(module), "<chrome-recycle>", "exec"), env)
     return env
 
 
