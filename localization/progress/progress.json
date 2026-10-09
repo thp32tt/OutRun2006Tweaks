@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 00:00 KST",
+  "updated_at_kst": "2026-10-10 00:20 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9570,6 +9570,29 @@
     "actual_game": "IGR032_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "worker_run": 37949025173
+  },
+  "c335_c1_q121_a202_scoped_firstlook": {
+    "run": "C335",
+    "run_key": "OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 121,
+    "priority": "P0",
+    "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "decision": "HOLD_STRICT_RECHECK",
+    "scope": "SCOPED_FIRSTHAND_PRODUCER_IMAGE_VISUAL_ONLY",
+    "new_dds": 0,
+    "need_independent_native_dds_pixel_validation": true,
+    "need_blind_calibration": true,
+    "need_full_atlas_consumer_proof": true,
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "user_reports_open": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "qa_path": "localization/graphics/role_C/20261010-C335-C1-Q121-A202-FIRSTLOOK/C335_Q121_CONTROLLER_C1_HOLD.json"
   }
-
 }
