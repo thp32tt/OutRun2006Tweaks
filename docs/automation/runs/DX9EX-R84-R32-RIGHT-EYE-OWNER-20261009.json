@@ -89,7 +89,11 @@
   "next_action": "Continue independent bounded R32/R31 then R31/R30 textual-TU ownership facades and CMake reconciliation. R84 closeout remains NOT_COMPLETE_PENDING_TU_CMAKE. Protect user reported normal F11. Preserve GOAL/+TIME, rank, flare and other unresolved HMD issues independently. Do not duplicate this task or score on replay.",
   "scoreboard": {
     "ai": "AI2",
-    "score_pending_until_ssot_commit": true,
-    "task_once": true
+    "prior_confirmed": 1255,
+    "change": 1,
+    "cumulative": 1256,
+    "commit": "c816e4403816769d27575224055c3d76d5c06b86",
+    "run_key": "DX9EX-R84-R32-RIGHT-EYE-OWNER-20261009",
+    "deduplicated": true
   }
 }
