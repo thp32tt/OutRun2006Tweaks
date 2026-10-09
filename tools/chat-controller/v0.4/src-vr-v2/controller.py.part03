@@ -2639,6 +2639,7 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
             continue
         _watch_slot_page_health(page, slot.name, state)
         crashed = state.setdefault("crashed", set())
+        navigation_failed = state.setdefault("navigation_failed", set())
         failures = state.setdefault("failures", {})
         reason = None
         try:
@@ -2649,6 +2650,8 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
             reason = "closed"
         elif page in crashed:
             reason = "renderer_crash"
+        elif page in navigation_failed:
+            reason = "navigation_failed"
         else:
             try:
                 await asyncio.wait_for(
@@ -2689,12 +2692,14 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
             except Exception:
                 log.warning("slot=%s crashed tab could not close; replacing reference", slot.name)
         crashed.discard(page)
+        navigation_failed.discard(page)
         replacement = await context.new_page()
         pages[slot.name] = replacement
         _watch_slot_page_health(replacement, slot.name, state)
         try:
             await replacement.goto(target, wait_until="domcontentloaded", timeout=45000)
         except Exception as exc:
+            navigation_failed.add(replacement)
             failures[slot.name] = TAB_HEALTH_FAILURE_THRESHOLD
             write_runtime(tab_recovery_error=f"{slot.name}:{reason}:{type(exc).__name__}",
                           tab_recovery_error_at=now.isoformat())
@@ -2704,6 +2709,7 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
             if browser is not None and not browser.is_connected():
                 raise RuntimeError("Browser has been closed during tab recovery") from exc
             continue
+        navigation_failed.discard(replacement)
         failures[slot.name] = 0
         count = int(runtime.get("tab_recovery_count") or 0) + 1
         write_runtime(tab_recovery_count=count, tab_recovery_last_at=now.isoformat(),
