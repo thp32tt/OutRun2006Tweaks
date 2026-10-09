@@ -3290,6 +3290,22 @@ namespace OutRunVRStereo
         return R9TrackedMainDepthHasStencil();
     }
 
+    void R30SupportInvalidateRightDepthStencilSync(
+        bool invalidateDepth, bool invalidateStencil) noexcept
+    {
+        R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);
+    }
+
+    bool R30SupportRightDepthInSync() noexcept
+    {
+        return R9IsRightDepthInSync();
+    }
+
+    bool R30SupportRightStencilInSync() noexcept
+    {
+        return R9IsRightStencilInSync();
+    }
+
     bool R30SupportTargetIsBackBuffer() noexcept
     {
         return TargetIsBackBuffer();

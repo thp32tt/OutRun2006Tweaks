@@ -183,6 +183,46 @@ for label, mutated_owner, mutated_consumer in (
     elif r9_main_depth_boundary_ok(r30_support_api, mutated_owner, mutated_consumer):
         errors.append("R9 depth owner mutation survived: " + label)
 
+# R84 R9 right-depth/stencil synchronization remains lower-owned. Both
+# invalidation flags must be forwarded unchanged, and the two readiness
+# queries must never be conflated or forced true.
+def r9_right_sync_boundary_ok(api, producer, consumer):
+    decl = (
+        "void R30SupportInvalidateRightDepthStencilSync(\n        bool invalidateDepth, bool invalidateStencil) noexcept;",
+        "bool R30SupportRightDepthInSync() noexcept;",
+        "bool R30SupportRightStencilInSync() noexcept;",
+    )
+    owner = (
+        "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
+        "return R9IsRightDepthInSync();",
+        "return R9IsRightStencilInSync();",
+    )
+    caller = (
+        "R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R30SupportInvalidateRightDepthStencilSync(d, s); }",
+        "R32ReviewRightDepthInSync() noexcept { return R30SupportRightDepthInSync(); }",
+        "R32ReviewRightStencilInSync() noexcept { return R30SupportRightStencilInSync(); }",
+    )
+    return (all(x in api for x in decl) and all(x in producer for x in owner) and
+            all(x in consumer for x in caller))
+
+if not r9_right_sync_boundary_ok(r30_support_api, r30, r32):
+    errors.append("R30/R32 right depth/stencil sync API no longer preserves lower R9 contract")
+for label, changed_r30, changed_r32 in (
+    ("invalidation flags swapped", r30.replace(
+        "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
+        "R9InvalidateRightDepthStencilSync(invalidateStencil, invalidateDepth);", 1), r32),
+    ("depth falsely in sync", r30.replace(
+        "return R9IsRightDepthInSync();", "return true;", 1), r32),
+    ("stencil falsely in sync", r30.replace(
+        "return R9IsRightStencilInSync();", "return true;", 1), r32),
+    ("R32 bypasses R30", r30, r32.replace(
+        "return R30SupportRightDepthInSync();", "return R9IsRightDepthInSync();", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R9 right-sync mutation not applied: " + label)
+    elif r9_right_sync_boundary_ok(r30_support_api, changed_r30, changed_r32):
+        errors.append("R9 right-sync mutation survived: " + label)
+
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
 # SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.

@@ -871,9 +871,9 @@ namespace OutRunVRStereo
     bool R32ReviewMainDepthHasStencil() noexcept { return R30SupportMainDepthHasStencil(); }
     bool R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteDepth(d); }
     bool R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteStencil(d); }
-    void R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R9InvalidateRightDepthStencilSync(d, s); }
-    bool R32ReviewRightDepthInSync() noexcept { return R9IsRightDepthInSync(); }
-    bool R32ReviewRightStencilInSync() noexcept { return R9IsRightStencilInSync(); }
+    void R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R30SupportInvalidateRightDepthStencilSync(d, s); }
+    bool R32ReviewRightDepthInSync() noexcept { return R30SupportRightDepthInSync(); }
+    bool R32ReviewRightStencilInSync() noexcept { return R30SupportRightStencilInSync(); }
     void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R9NoteStereoDrawWithoutMonoBackup(); }
     void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }
     void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R9Poison(r,s,hr); }
