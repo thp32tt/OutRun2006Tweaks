@@ -48,7 +48,18 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     wheelOwnedLastCall = false;
 
     if (!Settings::VibrationMode)
+    {
+        // Disabling rumble must clear the last command; simply returning
+        // leaves a previously active motor running on some XInput devices.
+        void InputManager_StopVibration();
+        InputManager_StopVibration();
+        if (!Settings::UseNewInput)
+        {
+            XINPUT_VIBRATION zero{};
+            XInputSetState(userId, &zero);
+        }
         return;
+    }
     else if (Settings::VibrationMode == 2) // Swap L/R
     {
         float left = leftMotor;
