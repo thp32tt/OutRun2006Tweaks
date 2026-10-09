@@ -1,0 +1,276 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C341",
+  "queue_index": 230,
+  "shard": "EVEN",
+  "time_kst": "2026-10-10T04:25:16+09:00",
+  "source_pinned_upstream": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "native_size": [
+    2048,
+    1024
+  ],
+  "source_header_equals_persisted_candidate_header": true,
+  "dds_authored_mips": 1,
+  "orientation": "RAW mirror Y, compare source/candidate FLIPY with readable authored CLEAN",
+  "pairwise_full_atlas": {
+    "SOURCE_CLEAN": {
+      "inside_help": {
+        "changed_rgba": 21827,
+        "changed_alpha": 21827,
+        "changed_visible_rgba": 21827
+      },
+      "outside_help": {
+        "changed_rgba": 137224,
+        "changed_alpha": 125019,
+        "changed_visible_rgba": 137224
+      }
+    },
+    "CLEAN_FINAL": {
+      "inside_help": {
+        "changed_rgba": 15398,
+        "changed_alpha": 15398,
+        "changed_visible_rgba": 15398
+      },
+      "outside_help": {
+        "changed_rgba": 0,
+        "changed_alpha": 0,
+        "changed_visible_rgba": 0
+      }
+    },
+    "SOURCE_FINAL": {
+      "inside_help": {
+        "changed_rgba": 26881,
+        "changed_alpha": 26881,
+        "changed_visible_rgba": 26881
+      },
+      "outside_help": {
+        "changed_rgba": 137224,
+        "changed_alpha": 125019,
+        "changed_visible_rgba": 137224
+      }
+    }
+  },
+  "regions": [
+    {
+      "id": "20_unavailable_help",
+      "english": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다",
+      "bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source_local_bbox": [
+        0,
+        0,
+        617,
+        50
+      ],
+      "current_local_bbox": [
+        2,
+        2,
+        464,
+        48
+      ],
+      "current_source_margins": [
+        2,
+        153,
+        2,
+        2
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_clean_local": {
+        "changed_rgba": 11407,
+        "changed_alpha": 11407,
+        "changed_visible_rgba": 11407
+      },
+      "clean_final_local": {
+        "changed_rgba": 8584,
+        "changed_alpha": 8584,
+        "changed_visible_rgba": 8584
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "533ba014fc5400f2d92d316304e2953c06ee2e0ca8a45c3d63ac54a0c4cb72d5",
+          "bytes": 12144
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "7fdcffedc62449e7c5ba24ec9bba226173f88c45fa0ca01ec99f267331fae72d",
+          "bytes": 18870
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "8ca8138890b541019c4551378f5ab8345872931c6200163e167f6facb9c855c9",
+          "bytes": 12104
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_black_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3a85be224bef8675d0e3ceb7203d771b3f02b1c9351a7ce0d544f0af2a14303b",
+          "bytes": 13883
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_black_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "ca4331200608eeeab7fff9edea328f940dc4b7303125bb68ed366f9625131a77",
+          "bytes": 21419
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_black_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "87ec656613443ba921960003761902954081fda2ce26e3ff518722a3a773a1a6",
+          "bytes": 13616
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_white_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "9ae8efd9b3cd85c11c40bb1d27bf6b9a771d2b22970f33667310ba5e893f556a",
+          "bytes": 15383
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_white_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "fcd18e0dceb1a7db637107a01f5645ec41fb974d0c3ba3dee94d5f85288fce97",
+          "bytes": 26125
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_white_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "412495e7f4c4ea1ec936ae26b445f4d9ddc7e7cb21efc7b182f5d1e7f257743b",
+          "bytes": 16570
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/20_unavailable_help_RAW_SOURCE_FINAL.png",
+          "sha256": "a512938b67fe7ac362cea05b42c602ca61e9775d23d344ebaabb7e64cf60c442",
+          "bytes": 11548
+        }
+      ]
+    },
+    {
+      "id": "21_owned_help",
+      "english": "You already own this item",
+      "korean": "이미 보유 중입니다",
+      "bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source_local_bbox": [
+        0,
+        0,
+        555,
+        50
+      ],
+      "current_local_bbox": [
+        2,
+        2,
+        366,
+        48
+      ],
+      "current_source_margins": [
+        2,
+        189,
+        2,
+        2
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_clean_local": {
+        "changed_rgba": 10420,
+        "changed_alpha": 10420,
+        "changed_visible_rgba": 10420
+      },
+      "clean_final_local": {
+        "changed_rgba": 6814,
+        "changed_alpha": 6814,
+        "changed_visible_rgba": 6814
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_gray_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "14138842908d999c3c8c8dbd354eb616775baee0affa00777c7fde9b566811e8",
+          "bytes": 11176
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_gray_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "1f946bbb4cd28f1c2bb6d37ec22a903348deae84c6cc898d1156fc3489035543",
+          "bytes": 16669
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_gray_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "95dd97b580df917c8dc92a45cf43991c444ebc922deb805c7810fe0018db555c",
+          "bytes": 10278
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_black_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "215ff304523979d7edafa7e421765261607036caa5113f200ec044cfdba245ec",
+          "bytes": 12819
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_black_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e5df309502df6a86c0a91033e5cc7359e3dd25cf9cd7a6f88a5aa7cf6f9a9655",
+          "bytes": 18587
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_black_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "b8f4bd5ded1e821791e5d5ccce5110d48d81f4e6c2552cf7bff9f86162b08136",
+          "bytes": 11533
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_white_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e88b6c03494928709818d8ac6df44f5d3eb992a4f4eb31ef7cfce110a14df171",
+          "bytes": 14234
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_white_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "08e0ffc30a26ba5bdfbed202ed3b07bf92fa45eeda37a7df4ce7881105e7261c",
+          "bytes": 22824
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_white_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "52303563471458658a8abbd98c5807f011b693151396ef16a256be242b3cf988",
+          "bytes": 13972
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/21_owned_help_RAW_SOURCE_FINAL.png",
+          "sha256": "7ed08ac784b33b76981aec4626d028352a98f88695bc81e138f15ed979c8c057",
+          "bytes": 10769
+        }
+      ]
+    }
+  ],
+  "atlas_diff_proofs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_SOURCE_CLEAN_DIFF_ALL.png",
+      "sha256": "7097b6613f788fc8a753edeb27ca35a7b76a997f4788ca2b52fbd6535ef4b7ea",
+      "bytes": 20609
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_SOURCE_CLEAN_DIFF_VISIBLE.png",
+      "sha256": "7097b6613f788fc8a753edeb27ca35a7b76a997f4788ca2b52fbd6535ef4b7ea",
+      "bytes": 20609
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_CLEAN_FINAL_DIFF_ALL.png",
+      "sha256": "b7624bcf6b1fc067e7e6fbb3f8f778ba8a2de57d0fa40cfa272e168d006377a4",
+      "bytes": 10456
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_CLEAN_FINAL_DIFF_VISIBLE.png",
+      "sha256": "b7624bcf6b1fc067e7e6fbb3f8f778ba8a2de57d0fa40cfa272e168d006377a4",
+      "bytes": 10456
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_SOURCE_FINAL_DIFF_ALL.png",
+      "sha256": "3053a8726205f56563eb9c822dd47c28836bdaa0d711dbac17e006a6c5e11e0e",
+      "bytes": 22550
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/ATLAS_SOURCE_FINAL_DIFF_VISIBLE.png",
+      "sha256": "3053a8726205f56563eb9c822dd47c28836bdaa0d711dbac17e006a6c5e11e0e",
+      "bytes": 22550
+    }
+  ],
+  "critical_caveat": "SOURCE->CLEAN outside q230 help bboxes includes earlier B73 localized text and is not a newly introduced q230 protected-art regression; CLEAN->current outside two q230 help boxes is authoritative 0/0 comparison.",
+  "machine_conclusion": "SOURCE and exact clean/candidate verified, candidate containment positive; this is not style family/C3 or user actual-game approval"
+}
