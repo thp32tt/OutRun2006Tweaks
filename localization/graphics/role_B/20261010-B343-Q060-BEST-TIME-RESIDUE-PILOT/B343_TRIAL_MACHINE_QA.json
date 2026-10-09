@@ -1,0 +1,57 @@
+{
+  "run": "B343",
+  "role": "B",
+  "index": 60,
+  "reason": "C342_C2_VERIFIED_ENGLISH_BEST_TIME_VISIBLE_BEHIND_HANGUL",
+  "original_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "current_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "trial_sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
+  "source_face_bbox": [
+    2188,
+    345,
+    3016,
+    460
+  ],
+  "source_face_pixels": 29582,
+  "source_matched_visible_english_removed": 19243,
+  "source_equal_before": 19361,
+  "native": [
+    4096,
+    2048
+  ],
+  "dds": "RGBA32",
+  "mips": 1,
+  "raw_mirror_y_roundtrip": "EXACT",
+  "pixel_changes_outside_detection_box": 0,
+  "Korean_pixels_changed": 0,
+  "source_detection_box": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "changed_current_candidates": 0,
+  "new_trial_dds": 1,
+  "machine_scope_only": "NOT FULL SOURCE-FAMILY VALIDATION. A source-equal pixel is not alone semantic proof; direct visual C review of all English residues required.",
+  "views": [
+    "B343_FLIPY_GRAY_100_SOURCE_OLD_TRIAL.png",
+    "B343_FLIPY_GRAY_75_SOURCE_OLD_TRIAL.png",
+    "B343_FLIPY_GRAY_50_SOURCE_OLD_TRIAL.png",
+    "B343_FLIPY_BLACK_100_SOURCE_OLD_TRIAL.png",
+    "B343_FLIPY_BLACK_75_SOURCE_OLD_TRIAL.png",
+    "B343_FLIPY_BLACK_50_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_GRAY_100_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_GRAY_75_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_GRAY_50_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_BLACK_100_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_BLACK_75_SOURCE_OLD_TRIAL.png",
+    "B343_RAW_BLACK_50_SOURCE_OLD_TRIAL.png"
+  ],
+  "producer_visual": "PENDING_DIRECT_REVIEW",
+  "C2": "C342_REWORK_UNCHANGED",
+  "C3": "BLOCKED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_GITHUB_SOURCE_BYTES",
+  "forbidden_domains_touched": []
+}
