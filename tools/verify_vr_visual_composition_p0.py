@@ -578,6 +578,16 @@ def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
         require(f'0x{rva:X}', allowed, 'lost exact stage-extension E8')
         require(f'0x{rva:08X}: 0x00029530', analyzer,
                 'stage extension E8 original EXE target not proven')
+    print_start = ui_source.index('static constexpr int StageExtensionPrintCalls[]')
+    print_end = ui_source.index('};', print_start)
+    print_allow = ui_source[print_start:print_end]
+    for rva, target in ((0x989AD, 0x973C0),
+                        (0x98A10, 0x974E0),
+                        (0x98A89, 0x973C0)):
+        require(f'0x{rva:X}', print_allow,
+                'lost extension numeric-text exact original E8')
+        require(f'0x{rva:08X}: 0x{target:08X}', analyzer,
+                'missing original numeric-text target in EXE contract')
     for word in ('StageExtensionTime,', 'OUTRUN_STAGE_EXTENSION_TIME'):
         require(word, sem_source, 'extension sprite owner not independent')
     enter = function_body(ui_source, 'static void StageExtensionEnter(')
@@ -595,6 +605,8 @@ def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
                   'Module::exe_ptr(rva), StageExtensionEnter',
                   'StageExtensionLeaveHooks[i] = safetyhook::create_mid(',
                   'Module::exe_ptr(rva + 5), StageExtensionLeave',
+                  'StageExtensionPrintEnterHooks[i] = safetyhook::create_mid(',
+                  'StageExtensionPrintLeaveHooks[i] = safetyhook::create_mid(',
                   'if (!stageExtensionOk)')
     if any(x in leave for x in ('SetRenderState(', 'Game::fn43FA10(',
                                'SetTransform(')):
@@ -606,6 +618,9 @@ for label, bad in (
     ('lost source parent', ui.replace(
         '0x9898E, 0x98A36, 0x98AC6',
         '0x9898E, 0x98A36, 0x98AC7', 1)),
+    ('missing numeric helper E8', ui.replace(
+        '0x989AD, 0x98A10, 0x98A89',
+        '0x989AD, 0x98A10, 0x98A8A', 1)),
     ('missing exact child owner', ui.replace(
         'TagAppendedNodes(StageExtensionBefore,',
         'TagAppendedNodes(StageExtensionIncorrectBefore,', 1)),
