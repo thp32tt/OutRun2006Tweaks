@@ -14,3 +14,4 @@ Schedule is best-effort, not guaranteed exact. Fixed run deadline: **2026-10-11 
 | 2026-10-10 07:22:52 KST | 31b079772057 | RB05 car-relative rank owner | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 4 source contracts present |
 | 2026-10-10 07:27:52 KST | d57bf60809e9 | RB06 shader / FVF routes | SOURCE_CONTRACT_OK | src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp: 4 source contracts present |
 | 2026-10-10 07:32:52 KST | 04f3dffa3dce | RB07 frame budget / SkyGlow | SOURCE_CONTRACT_OK | docs/automation/reviews/DX9EX_DEEPRESEARCH_P0_20261010.md: 3 source contracts present |
+| 2026-10-10 07:37:52 KST | 04f3dffa3dce | RB08 device lifetime / SceneEffect | SOURCE_CONTRACT_OK | src/hooks_graphics.cpp: 3 source contracts present |
