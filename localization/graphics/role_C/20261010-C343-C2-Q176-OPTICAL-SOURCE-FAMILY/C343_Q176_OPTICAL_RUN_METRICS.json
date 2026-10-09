@@ -1,0 +1,177 @@
+{
+  "measurement_method": "alpha>200 horizontal/vertical contiguous opaque run lengths, native readable exact DDS; cross-script optical proxy only, not a valid universal glyph-stroke semantic comparator",
+  "rows": [
+    {
+      "id": "jennifer",
+      "bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "scoped_metrics": {
+        "source": {
+          "opaque_alpha_count": 67986,
+          "roi_coverage": 0.513474,
+          "horizontal_runs": {
+            "runs": 1630,
+            "median": 32,
+            "p25": 27,
+            "p75": 46
+          },
+          "vertical_runs": {
+            "runs": 1081,
+            "median": 27,
+            "p25": 27,
+            "p75": 142
+          }
+        },
+        "candidate": {
+          "opaque_alpha_count": 29247,
+          "roi_coverage": 0.220892,
+          "horizontal_runs": {
+            "runs": 994,
+            "median": 25,
+            "p25": 23,
+            "p75": 25
+          },
+          "vertical_runs": {
+            "runs": 457,
+            "median": 22,
+            "p25": 20,
+            "p75": 105
+          }
+        }
+      }
+    },
+    {
+      "id": "clarissa",
+      "bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "scoped_metrics": {
+        "source": {
+          "opaque_alpha_count": 64061,
+          "roi_coverage": 0.476644,
+          "horizontal_runs": {
+            "runs": 1563,
+            "median": 32,
+            "p25": 29,
+            "p75": 46
+          },
+          "vertical_runs": {
+            "runs": 1258,
+            "median": 33,
+            "p25": 27,
+            "p75": 67
+          }
+        },
+        "candidate": {
+          "opaque_alpha_count": 40781,
+          "roi_coverage": 0.30343,
+          "horizontal_runs": {
+            "runs": 955,
+            "median": 25,
+            "p25": 25,
+            "p75": 46.5
+          },
+          "vertical_runs": {
+            "runs": 1127,
+            "median": 20,
+            "p25": 19,
+            "p75": 42
+          }
+        }
+      }
+    },
+    {
+      "id": "holly",
+      "bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "scoped_metrics": {
+        "source": {
+          "opaque_alpha_count": 39018,
+          "roi_coverage": 0.484798,
+          "horizontal_runs": {
+            "runs": 987,
+            "median": 32,
+            "p25": 31,
+            "p75": 32
+          },
+          "vertical_runs": {
+            "runs": 541,
+            "median": 40,
+            "p25": 27,
+            "p75": 142
+          }
+        },
+        "candidate": {
+          "opaque_alpha_count": 20245,
+          "roi_coverage": 0.251544,
+          "horizontal_runs": {
+            "runs": 385,
+            "median": 24,
+            "p25": 24,
+            "p75": 83
+          },
+          "vertical_runs": {
+            "runs": 802,
+            "median": 17,
+            "p25": 16,
+            "p75": 22
+          }
+        }
+      }
+    },
+    {
+      "id": "flagman4",
+      "bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "scoped_metrics": {
+        "source": {
+          "opaque_alpha_count": 71665,
+          "roi_coverage": 0.471791,
+          "horizontal_runs": {
+            "runs": 1966,
+            "median": 30,
+            "p25": 27,
+            "p75": 33
+          },
+          "vertical_runs": {
+            "runs": 1087,
+            "median": 50,
+            "p25": 27,
+            "p75": 103
+          }
+        },
+        "candidate": {
+          "opaque_alpha_count": 46663,
+          "roi_coverage": 0.307196,
+          "horizontal_runs": {
+            "runs": 1116,
+            "median": 24,
+            "p25": 23,
+            "p75": 55
+          },
+          "vertical_runs": {
+            "runs": 1308,
+            "median": 20,
+            "p25": 18,
+            "p75": 41
+          }
+        }
+      }
+    }
+  ]
+}

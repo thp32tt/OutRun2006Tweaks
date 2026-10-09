@@ -1,0 +1,86 @@
+{
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "native": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32 BGRA DDS",
+  "mips": 1,
+  "readable_changed_row_runs": [
+    [
+      49,
+      200
+    ],
+    [
+      203,
+      204
+    ],
+    [
+      213,
+      364
+    ],
+    [
+      372,
+      532
+    ]
+  ],
+  "rows": [
+    {
+      "id": "jennifer",
+      "bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "english": "JENNIFER",
+      "korean": "제니퍼",
+      "source_alpha_positive": 72799,
+      "candidate_alpha_positive": 31464,
+      "source_vs_final_changed_rgba_pixels": 71092
+    },
+    {
+      "id": "clarissa",
+      "bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "english": "CLARISSA",
+      "korean": "클라리사",
+      "source_alpha_positive": 68689,
+      "candidate_alpha_positive": 43528,
+      "source_vs_final_changed_rgba_pixels": 70189
+    },
+    {
+      "id": "holly",
+      "bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "english": "HOLLY",
+      "korean": "홀리",
+      "source_alpha_positive": 41097,
+      "candidate_alpha_positive": 21834,
+      "source_vs_final_changed_rgba_pixels": 37528
+    },
+    {
+      "id": "flagman4",
+      "bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "english": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "source_alpha_positive": 75687,
+      "candidate_alpha_positive": 49663,
+      "source_vs_final_changed_rgba_pixels": 72396
+    }
+  ]
+}

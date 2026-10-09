@@ -1,0 +1,351 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C343-C2",
+  "run_key": "OUTRUN-KOR-C343-C2-Q176-RED-BLOCK-STROKE-WEIGHT-20261010-0530",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 176,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "selected_remote_head": "82954921cab913e3b198642a1e9895cec78d8e75",
+  "review_id": "C343-Q176-FOUR-REGION-OPTICAL-0530",
+  "decision": "REWORK_REQUIRED",
+  "failure_code": "SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "clean_plate_historical_sha256": "0fd5d51864ad9564f33c703140c4cff9ef7b58fabd51ff0d34bcdf299d9fc5cc",
+  "byte_authentication": "Two actual 16,777,344-byte 2048x2048 RGBA32 DDS downloaded via N100 MCP with expected full sha256; decoded saved DDS via Pillow and compared independent native source vs candidate in FLIP-Y and RAW.",
+  "already_rejected_sha": false,
+  "previous_current_same_sha_reviews": [
+    "C299 HOLD",
+    "C309 HOLD"
+  ],
+  "why_new_review_not_duplicate": "New exact persisted original-vs-saved four-region edge and contiguous opaque-run optical-weight measurement, independently observed visual thickness mismatch not declared in prior C299/C309; supersedes prior unresolved HOLD for same SHA with a concrete new visual failure. No repeat PASS or regenerated DDS.",
+  "blind_review_calibration": "NOT_QUALIFIED_prior_queue_prose_seen_during_selection",
+  "pixels_before_producer_verdict": false,
+  "calibration_result": "HOLD_NOT_PASS",
+  "visual_result": "FAIL_DIRECT_4_REGION_SOURCE_FAMILY_OPTICAL_WEIGHT",
+  "measured_regions": [
+    {
+      "id": "jennifer",
+      "readable_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "english": "JENNIFER",
+      "korean": "제니퍼",
+      "source_alpha_positive": 72799,
+      "candidate_alpha_positive": 31464,
+      "source_vs_saved_changed_rgba_pixels": 71092,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_100_FLIPY.png",
+          "sha256": "576d43bf8dda10f17245ff29a5286cf3ff9724eff43dad5e22b877d5fc35fdc8",
+          "size": 14207
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_50_FLIPY.png",
+          "sha256": "816855a39b99c139f2ccb2a9b819a092823925920672435ef87f53730cb8f154",
+          "size": 13125
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_RAW.png",
+          "sha256": "c43fb930a08471a40733e97aa028e33e51fe4bc6462b72ec221652811e5182c9",
+          "size": 12851
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_EDGE_RUN_METRIC.png",
+          "sha256": "f94ac64e1f06c907db7d1f48f7cac1b2c1917302ec10f7135a2213e8704a389a",
+          "size": 15001
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_TRUE_MATCHED_STROKE_ANCHORS",
+          "observation": "Appears upright both; exact corresponding glyph stem anchors not qualified."
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_REOPENED_THIS_RUN",
+          "observation": "Previously SHA-pinned B201 authored CLEAN is not independently redownloaded/decoded now; previous C309 scope proof retained as history, no invented fresh plate PASS."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Verified native red block English family uses thicker, broader solid faces than saved Korean in direct 100%/50% visual; horizontal opaque-run medians 32px source versus 25px Korean. Semantic glyph anatomy differs, so the run proxy corroborates rather than proves optical mismatch."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_NOT_GAME",
+          "observation": "Korean labels individually legible at 100% and 50% neutral gray; source-family weight still fails."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_SCOPED",
+          "observation": "No missing Hangul or cracked stroke clearly visible in examined native and RAW views; not whole-atlas glyph approval."
+        },
+        "protected_art": {
+          "result": "HOLD_CURRENT_OWNED_MASK_UNVERIFIED",
+          "observation": "No new full protected mask reconstructed; historical C309 outside-union zero is not a new whole-atlas approval."
+        },
+        "placement": {
+          "result": "SCOPED_SOURCE_RECTANGLE_ONLY",
+          "observation": "Historical exact-source-bbox margin check not superseded; typography mismatch independently rejects this exact SHA."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_READABLE_MATCH",
+          "observation": "Each of four labels independently viewed in RAW persisted storage orientation and readable FLIP-Y; actual game sampling not run."
+        }
+      }
+    },
+    {
+      "id": "clarissa",
+      "readable_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "english": "CLARISSA",
+      "korean": "클라리사",
+      "source_alpha_positive": 68689,
+      "candidate_alpha_positive": 43528,
+      "source_vs_saved_changed_rgba_pixels": 70189,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_100_FLIPY.png",
+          "sha256": "3e7922b5dccca102cf3465d10a8d15b521ee7a6a4bf0cf53d65a18fe3bf102c8",
+          "size": 25756
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_50_FLIPY.png",
+          "sha256": "8ee98a30c6bd38ce8bbed4fa5c5529aa74fa10badba424afe6e16be6b07cea78",
+          "size": 24827
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_RAW.png",
+          "sha256": "77cd6bd0ced14cbbf4b551fbfeb3dcfc00ac5e28072aea5b065370749d4848a6",
+          "size": 23962
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_EDGE_RUN_METRIC.png",
+          "sha256": "2bf63285ad2d996b23b12b08db56af0b697cf67fe421eb70f848bdd9976d4944",
+          "size": 26985
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_TRUE_MATCHED_STROKE_ANCHORS",
+          "observation": "Appears upright both; exact corresponding glyph stem anchors not qualified."
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_REOPENED_THIS_RUN",
+          "observation": "Previously SHA-pinned B201 authored CLEAN is not independently redownloaded/decoded now; previous C309 scope proof retained as history, no invented fresh plate PASS."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Verified native red block English family uses thicker, broader solid faces than saved Korean in direct 100%/50% visual; horizontal opaque-run medians 32px source versus 25px Korean. Semantic glyph anatomy differs, so the run proxy corroborates rather than proves optical mismatch."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_NOT_GAME",
+          "observation": "Korean labels individually legible at 100% and 50% neutral gray; source-family weight still fails."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_SCOPED",
+          "observation": "No missing Hangul or cracked stroke clearly visible in examined native and RAW views; not whole-atlas glyph approval."
+        },
+        "protected_art": {
+          "result": "HOLD_CURRENT_OWNED_MASK_UNVERIFIED",
+          "observation": "No new full protected mask reconstructed; historical C309 outside-union zero is not a new whole-atlas approval."
+        },
+        "placement": {
+          "result": "SCOPED_SOURCE_RECTANGLE_ONLY",
+          "observation": "Historical exact-source-bbox margin check not superseded; typography mismatch independently rejects this exact SHA."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_READABLE_MATCH",
+          "observation": "Each of four labels independently viewed in RAW persisted storage orientation and readable FLIP-Y; actual game sampling not run."
+        }
+      }
+    },
+    {
+      "id": "holly",
+      "readable_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "english": "HOLLY",
+      "korean": "홀리",
+      "source_alpha_positive": 41097,
+      "candidate_alpha_positive": 21834,
+      "source_vs_saved_changed_rgba_pixels": 37528,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_100_FLIPY.png",
+          "sha256": "cbe315e23061578c4e137d9eed0debb87726b333602960114057d17c1932bcfc",
+          "size": 10469
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_50_FLIPY.png",
+          "sha256": "aee736f440ea069396cb4c5d8ca9f4df7b38b5e7e098431125f3a833b8fc535c",
+          "size": 10288
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_RAW.png",
+          "sha256": "fe2aac10c808e34a807afef4ed95fd6190bba2d01e8c61b4a209eb9d34a20079",
+          "size": 9972
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_EDGE_RUN_METRIC.png",
+          "sha256": "ac71148e3b0d4f2eb1d18a5742e0330e7ddacefe501b08b958a306a10614121c",
+          "size": 11280
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_TRUE_MATCHED_STROKE_ANCHORS",
+          "observation": "Appears upright both; exact corresponding glyph stem anchors not qualified."
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_REOPENED_THIS_RUN",
+          "observation": "Previously SHA-pinned B201 authored CLEAN is not independently redownloaded/decoded now; previous C309 scope proof retained as history, no invented fresh plate PASS."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Verified native red block English family uses thicker, broader solid faces than saved Korean in direct 100%/50% visual; horizontal opaque-run medians 32px source versus 24px Korean. Semantic glyph anatomy differs, so the run proxy corroborates rather than proves optical mismatch."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_NOT_GAME",
+          "observation": "Korean labels individually legible at 100% and 50% neutral gray; source-family weight still fails."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_SCOPED",
+          "observation": "No missing Hangul or cracked stroke clearly visible in examined native and RAW views; not whole-atlas glyph approval."
+        },
+        "protected_art": {
+          "result": "HOLD_CURRENT_OWNED_MASK_UNVERIFIED",
+          "observation": "No new full protected mask reconstructed; historical C309 outside-union zero is not a new whole-atlas approval."
+        },
+        "placement": {
+          "result": "SCOPED_SOURCE_RECTANGLE_ONLY",
+          "observation": "Historical exact-source-bbox margin check not superseded; typography mismatch independently rejects this exact SHA."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_READABLE_MATCH",
+          "observation": "Each of four labels independently viewed in RAW persisted storage orientation and readable FLIP-Y; actual game sampling not run."
+        }
+      }
+    },
+    {
+      "id": "flagman4",
+      "readable_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "english": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "source_alpha_positive": 75687,
+      "candidate_alpha_positive": 49663,
+      "source_vs_saved_changed_rgba_pixels": 72396,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_100_FLIPY.png",
+          "sha256": "d27c6cea0f2d689cf3685560433090ca2f39e7b5f0721091f5fcf377fe4bbc64",
+          "size": 21449
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_50_FLIPY.png",
+          "sha256": "fddcc3343a4af554a004b435827b0c990b61061469663980f626c59fdd373bf3",
+          "size": 20934
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_RAW.png",
+          "sha256": "f8a88858c708b8ef7f32b6a0a7fe38c71b0e8fb0ac9c3c679fd1d20d006c66f3",
+          "size": 20004
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_EDGE_RUN_METRIC.png",
+          "sha256": "c84f13d39fb0be27b2465c460d239257c03458fda471edef646e54f020a5edff",
+          "size": 22820
+        }
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_TRUE_MATCHED_STROKE_ANCHORS",
+          "observation": "Appears upright both; exact corresponding glyph stem anchors not qualified."
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_REOPENED_THIS_RUN",
+          "observation": "Previously SHA-pinned B201 authored CLEAN is not independently redownloaded/decoded now; previous C309 scope proof retained as history, no invented fresh plate PASS."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Verified native red block English family uses thicker, broader solid faces than saved Korean in direct 100%/50% visual; horizontal opaque-run medians 30px source versus 24px Korean. Semantic glyph anatomy differs, so the run proxy corroborates rather than proves optical mismatch."
+        },
+        "readability": {
+          "result": "SCOPED_READABLE_NOT_GAME",
+          "observation": "Korean labels individually legible at 100% and 50% neutral gray; source-family weight still fails."
+        },
+        "glyph_integrity": {
+          "result": "NO_DEFINITE_BREAK_SCOPED",
+          "observation": "No missing Hangul or cracked stroke clearly visible in examined native and RAW views; not whole-atlas glyph approval."
+        },
+        "protected_art": {
+          "result": "HOLD_CURRENT_OWNED_MASK_UNVERIFIED",
+          "observation": "No new full protected mask reconstructed; historical C309 outside-union zero is not a new whole-atlas approval."
+        },
+        "placement": {
+          "result": "SCOPED_SOURCE_RECTANGLE_ONLY",
+          "observation": "Historical exact-source-bbox margin check not superseded; typography mismatch independently rejects this exact SHA."
+        },
+        "orientation": {
+          "result": "SCOPED_RAW_READABLE_MATCH",
+          "observation": "Each of four labels independently viewed in RAW persisted storage orientation and readable FLIP-Y; actual game sampling not run."
+        }
+      }
+    }
+  ],
+  "machine_metrics_reference": {
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_Q176_OPTICAL_RUN_METRICS.json",
+    "method": "alpha>200 horizontal/vertical opaque-run proxy, NOT cross-script semantic stem matching"
+  },
+  "full_atlas_changed_row_runs_readable": [
+    [
+      49,
+      200
+    ],
+    [
+      203,
+      204
+    ],
+    [
+      213,
+      364
+    ],
+    [
+      372,
+      532
+    ]
+  ],
+  "prior_exact_CLEAN_certification": "Historical C309 SOURCE/CLEAN/current all four bboxes outside 0; not repeated as fresh C343 certification.",
+  "required_rework": "Source-conditioned red-block font/glpyh reconstruction with matched heavy solid fill and open Hangul counters. Do not use blind width-only stretch or naive dilation; preserve currently verified source bbox, canonical mapping and original source alpha provenance. Return a new material saved DDS SHA for fresh C2, C3, and user game evidence.",
+  "other_segment_art": "???/route protected; do not modify",
+  "approvals": "NONE",
+  "C3": "BLOCKED_BY_REWORK",
+  "user_review": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_candidate_dds": 0,
+  "execution_backend": "N100 MCP only as download/decode fallback after ChatGPT local GitHub raw network failed; GitHub SSOT blobs and commit",
+  "excluded": [
+    "C1_ODD",
+    "UNINDEXED_SPECIAL",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "separate controller task id or queue engine"
+  ]
+}

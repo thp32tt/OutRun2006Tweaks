@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 05:21 KST",
+  "updated_at_kst": "2026-10-10 05:31 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -61,12 +61,12 @@
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1,
       "latest_c2_independent_finding": {
-        "index": 60,
-        "asset": "A064FDFC_1024x512.dds",
+        "index": 176,
+        "asset": "75C3586A_512x512.dds",
         "result": "REWORK_REQUIRED",
-        "reason": "VISIBLE_ORANGE_BEST_TIME_UNDER_OVERLAPPING_KOREAN",
-        "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
-        "qa_report": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json",
+        "reason": "SOURCE_FAMILY_STROKE_UNDERWEIGHT_CURRENT_PERSISTED_DDS",
+        "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+        "qa_report": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_Q176_CONTROLLER_C2_REWORK.json",
         "runtime_validation": "UNTESTED"
       }
     },

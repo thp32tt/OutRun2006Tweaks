@@ -1,0 +1,98 @@
+[
+  {
+    "name": "C343_jennifer_100_FLIPY.png",
+    "sha256": "576d43bf8dda10f17245ff29a5286cf3ff9724eff43dad5e22b877d5fc35fdc8",
+    "bytes": 14207,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_100_FLIPY.png"
+  },
+  {
+    "name": "C343_jennifer_50_FLIPY.png",
+    "sha256": "816855a39b99c139f2ccb2a9b819a092823925920672435ef87f53730cb8f154",
+    "bytes": 13125,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_50_FLIPY.png"
+  },
+  {
+    "name": "C343_jennifer_RAW.png",
+    "sha256": "c43fb930a08471a40733e97aa028e33e51fe4bc6462b72ec221652811e5182c9",
+    "bytes": 12851,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_RAW.png"
+  },
+  {
+    "name": "C343_jennifer_EDGE_RUN_METRIC.png",
+    "sha256": "f94ac64e1f06c907db7d1f48f7cac1b2c1917302ec10f7135a2213e8704a389a",
+    "bytes": 15001,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_jennifer_EDGE_RUN_METRIC.png"
+  },
+  {
+    "name": "C343_clarissa_100_FLIPY.png",
+    "sha256": "3e7922b5dccca102cf3465d10a8d15b521ee7a6a4bf0cf53d65a18fe3bf102c8",
+    "bytes": 25756,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_100_FLIPY.png"
+  },
+  {
+    "name": "C343_clarissa_50_FLIPY.png",
+    "sha256": "8ee98a30c6bd38ce8bbed4fa5c5529aa74fa10badba424afe6e16be6b07cea78",
+    "bytes": 24827,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_50_FLIPY.png"
+  },
+  {
+    "name": "C343_clarissa_RAW.png",
+    "sha256": "77cd6bd0ced14cbbf4b551fbfeb3dcfc00ac5e28072aea5b065370749d4848a6",
+    "bytes": 23962,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_RAW.png"
+  },
+  {
+    "name": "C343_clarissa_EDGE_RUN_METRIC.png",
+    "sha256": "2bf63285ad2d996b23b12b08db56af0b697cf67fe421eb70f848bdd9976d4944",
+    "bytes": 26985,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_clarissa_EDGE_RUN_METRIC.png"
+  },
+  {
+    "name": "C343_holly_100_FLIPY.png",
+    "sha256": "cbe315e23061578c4e137d9eed0debb87726b333602960114057d17c1932bcfc",
+    "bytes": 10469,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_100_FLIPY.png"
+  },
+  {
+    "name": "C343_holly_50_FLIPY.png",
+    "sha256": "aee736f440ea069396cb4c5d8ca9f4df7b38b5e7e098431125f3a833b8fc535c",
+    "bytes": 10288,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_50_FLIPY.png"
+  },
+  {
+    "name": "C343_holly_RAW.png",
+    "sha256": "fe2aac10c808e34a807afef4ed95fd6190bba2d01e8c61b4a209eb9d34a20079",
+    "bytes": 9972,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_RAW.png"
+  },
+  {
+    "name": "C343_holly_EDGE_RUN_METRIC.png",
+    "sha256": "ac71148e3b0d4f2eb1d18a5742e0330e7ddacefe501b08b958a306a10614121c",
+    "bytes": 11280,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_holly_EDGE_RUN_METRIC.png"
+  },
+  {
+    "name": "C343_flagman4_100_FLIPY.png",
+    "sha256": "d27c6cea0f2d689cf3685560433090ca2f39e7b5f0721091f5fcf377fe4bbc64",
+    "bytes": 21449,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_100_FLIPY.png"
+  },
+  {
+    "name": "C343_flagman4_50_FLIPY.png",
+    "sha256": "fddcc3343a4af554a004b435827b0c990b61061469663980f626c59fdd373bf3",
+    "bytes": 20934,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_50_FLIPY.png"
+  },
+  {
+    "name": "C343_flagman4_RAW.png",
+    "sha256": "f8a88858c708b8ef7f32b6a0a7fe38c71b0e8fb0ac9c3c679fd1d20d006c66f3",
+    "bytes": 20004,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_RAW.png"
+  },
+  {
+    "name": "C343_flagman4_EDGE_RUN_METRIC.png",
+    "sha256": "c84f13d39fb0be27b2465c460d239257c03458fda471edef646e54f020a5edff",
+    "bytes": 22820,
+    "path": "localization/graphics/role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_flagman4_EDGE_RUN_METRIC.png"
+  }
+]
