@@ -8,9 +8,9 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "a2f584645130b5c26e872409dac37a22559297e4",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "8bbc39838cc57b315ccaf6dc4cd3a0f7e66834d6",
+  "material_result_sha": "8bbc39838cc57b315ccaf6dc4cd3a0f7e66834d6",
+  "validation_bearing_result_sha": "8bbc39838cc57b315ccaf6dc4cd3a0f7e66834d6",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00499",
   "lease_epoch": 1,
   "work_key": "DX11:R199:LINEAR_LIVE_RTV_VIEWPORT_SCISSOR_AND_WARP_PIXEL",
@@ -20,9 +20,9 @@
     ".github/workflows/backend-conversion-gate.yml:R199",
     "tools/test_dx11_linear_target_r199.py:R199"
   ],
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "summary": "R199 dormant non-indexed D3D11 Draw exact RTV identity, RT descriptor, full viewport and scissor safety; real WARP half-viewport black center negative and full viewport red recovery. Indexed R187 and R197 preserved; no game-native Draw activation.",
@@ -37,17 +37,50 @@
     "C0_RECOVER": "PASS latest GitHub HEAD a2f584645130b5c26e872409dac37a22559297e4; no 00499 run/checkpoint; 00498 terminal R197; R175 00477 independent BLOCKED",
     "C1_REVIEW": "PASS R187 indexed target/viewport fence present, R185/R197 linear did not verify live RTV/viewport; non-overlapping work_key R199",
     "C2_IMPLEMENT": "PASS new native linear target/viewport preflight, independent actual Win32 WARP half viewport negative+recovery Draw and identity negatives; static source mutant test and CI wiring",
-    "C3_VALIDATE": "Scoped source contract review ready; Windows exact-SHA Backend Conversion Gate pending",
-    "C4_COMMIT": "material commit contains exact [AUTO:CONVERSION-DX11-00499] no CI-skip; C6 will preserve final SHA",
-    "C5_PACKAGE": "NOT_REQUIRED dormant native non-indexed game Draw, no deployment",
-    "C6_STATE": "PENDING exact-SHA CI"
+    "C3_VALIDATE": "Exact-SHA Backend Conversion Gate 37991277257 completed FAILURE: validate job 114025770431 SUCCESS, smoke job 114027786915 R199 static four mutants SUCCESS, R183/R199 live WARP pixel probe build+run SUCCESS. Full smoke FAIL only at unrelated independently owned R175 constant buffer probe: R175_GENERIC_VARYING_MISMATCH actual BGRA [128,0,16,255], expected [224,128,32,255].",
+    "C4_COMMIT": "PASS GitHub actual material/validation-bearing commit 8bbc39838cc57b315ccaf6dc4cd3a0f7e66834d6 [AUTO:CONVERSION-DX11-00499], no CI-skip, parent a2f584645130b5c26e872409dac37a22559297e4; C6 bookkeeping separate.",
+    "C5_PACKAGE": "NOT_REQUIRED: native linear Draw helper still dormant, not authorized for gameplay, no package or Quest3/VDXR promotion",
+    "C6_STATE": "SEALED R199 material implementation + Windows WARP pixel proof PASS; full exact-SHA Gate FAIL due to inherited R175; recorded separately with material SHA preserved. No repeat C2/CI on 00499."
   },
   "evidence": {
     "static_mutants": 4,
     "known_upstream_r175_owner": "CONVERSION-DX11-00477",
     "known_upstream_r175_signature": "R175_GENERIC_VARYING_MISMATCH",
-    "first_gate_run_id": null
+    "first_gate_run_id": null,
+    "exact_sha_gate_run_id": 37991277257,
+    "exact_sha_gate_head_sha": "8bbc39838cc57b315ccaf6dc4cd3a0f7e66834d6",
+    "exact_sha_gate_status": "completed",
+    "exact_sha_gate_conclusion": "failure",
+    "validate_job_id": 114025770431,
+    "validate_conclusion": "success",
+    "smoke_job_id": 114027786915,
+    "smoke_conclusion": "failure",
+    "r199_static_mutants": 4,
+    "r199_static_result": "success",
+    "r199_real_warp_probe_build": "success",
+    "r199_real_warp_probe_run": "success",
+    "r199_half_viewport_black_center_and_full_viewport_red_recovery": "success",
+    "upstream_failed_step": "Run DX11 constant buffer probe",
+    "upstream_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "upstream_bgra_actual": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "upstream_bgra_expected": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task_id": "CONVERSION-DX11-00477",
+    "issue14_production_comment_id": 6089252166
   },
-  "resume_cursor": "C3_EXACT_SHA_CI_PENDING",
-  "next_action": "Consume exact material SHA Backend Conversion Gate, inspect R199 Windows WARP pixel and inherited R175 signature; persist C6 separately, runtime UNTESTED."
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "next_action": "00499 terminal/parked: R199 proven WARP, do not replay static, GPU, or exact-SHA Gate and do not rescore. R175 is independently owned by 00477; only the next separately assigned nonconflicting DX11 task may proceed, after fresh claim/HEAD. Preserve DXVK freeze and DX9Ex baseline; Quest3/VDXR runtime UNTESTED.",
+  "scoped_automation_validation": "PASS_R199_WIN32_STATIC_FOUR_MUTANTS_AND_ACTUAL_HALF_VIEWPORT_WARP_PIXEL_RECOVERY",
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "whole exact-SHA Backend Conversion Gate fails inherited R175; R199 scoped Win32/WARP pass does not authorize whole-Gate PASS or competitive score."
 }
