@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 00:27 KST",
+  "updated_at_kst": "2026-10-10 00:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9615,5 +9615,23 @@
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_B/20261010-B337R-Q228-CAR-SELECT-NATIVE-CHROME-PILOT/B337R_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+  },
+  "b338_q214_hand_drawn_jamo_trial_visual_reject": {
+    "run_key": "OUTRUN-KOR-B338-Q214-MANUAL-HANGUL-PATH-SOURCE-BC3-PILOT-20261010-0040",
+    "queue_index": 214,
+    "method_change": "CUSTOM_VECTOR_GLYPH_PATHS",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+    "unmodified_current_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "trial_sha256": "b7c0dd8b9f8c4e62cb3b9e2fce88c3d44eb7c2e43d8dae9c3f7bfef84690facd",
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "saved_dds_machine": "PASS",
+    "source_outside_rgba": 0,
+    "producer_visual": "REWORK_REQUIRED_GOAL_HORIZ_STROKE_LEGIBILITY",
+    "C2": "C289_EXISTING_REWORK",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json"
   }
 }
