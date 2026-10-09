@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 02:36 KST",
+  "updated_at_kst": "2026-10-10 02:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9727,5 +9727,26 @@
     "decision": "REWORK_REQUIRED_PRODUCER_VISUAL_REJECT",
     "report": "localization/graphics/role_B/20261010-B340-Q214-B339-ALPHA-VISUAL-REVIEW/B340_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c338_c1_q205_b306_independent_delta": {
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 205,
+    "run": "C338",
+    "run_key": "OUTRUN-KOR-C338-C1-Q205-B306-EXACT-DDS-PIXEL-DIFF-20261010-0250",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "previous_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+    "changed_rgba_pixels": 25528,
+    "changed_alpha_pixels": 23123,
+    "changed_outside_2_source_regions": 0,
+    "other_21_regions_previous_current_exact": true,
+    "source_clean_independent_proof": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_IGR_026_027_028": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "report": "localization/graphics/role_C/20261010-C338-C1-Q205-B306-EXACT-DELTA/C338_C1_CONTROLLER_HOLD.json"
   }
 }
