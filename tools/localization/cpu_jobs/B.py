@@ -114,11 +114,12 @@ assert not np.any(changed&~allowed_rework)
 assert not np.any((out[:,:,3]!=P[:,:,3])&~allowed_rework)
 assert np.array_equal(out[~allowed_rework],P[~allowed_rework])
 raw=np.frombuffer(source[128:],dtype=np.uint8).reshape(2048,2048,4)
-if np.array_equal(raw[::-1],S):
- mode="RGBA"; body=out[::-1].copy().tobytes()
-else:
- assert np.array_equal(raw[::-1,:,[2,1,0,3]],S)
- mode="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
+# All-source chrome pixels are grayscale: equality with raw[::-1] is
+# AMBIGUOUS and cannot determine RGBA vs BGRA. New bevel adds 3-channel
+# chromatic gray. The authoritative DDS header specifies BGRA masks.
+assert np.array_equal(raw[::-1,:,[2,1,0,3]],S)
+mode="BGRA"
+body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 dds=old[:128]+body
 assert len(dds)==len(old) and sha(dds) not in (OLD,B322)
 D=dec(dds)
