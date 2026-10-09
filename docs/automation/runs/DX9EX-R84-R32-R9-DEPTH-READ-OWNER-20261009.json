@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-R9-DEPTH-READ-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-R9-DEPTH-READ-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "base_sha": "51ba04b1a0bced7159cf463e9376645826f24c77",
+  "material_result_sha": "4074cab65b99a8712946b1956504565d8a24bb0c",
+  "validation_bearing_result_sha": "4074cab65b99a8712946b1956504565d8a24bb0c",
+  "result_sha": "4074cab65b99a8712946b1956504565d8a24bb0c",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 main-depth generation and tracked stencil read-only queries now pass through two R30 lower-owner APIs that delegate to the exact R9 original queries. R33 cache and stencil semantics preserved. Three deliberate negative mutation controls protect generation, stencil and direct bypass.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37893718755,
+      "head_sha": "4074cab65b99a8712946b1956504565d8a24bb0c",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113700176717,
+        "game": 113700279827,
+        "host": 113700279788,
+        "full-chain-compile": 113700279792,
+        "package": 113701308791
+      }
+    },
+    "domain": {
+      "run_id": 37893718738,
+      "head_sha": "4074cab65b99a8712946b1956504565d8a24bb0c",
+      "conclusion": "success"
+    },
+    "artifact": {
+      "id": 11598894677,
+      "digest": "sha256:d47de70b6d232f7e2ccf0d78ab199079229fe0eeb146eba91af63789ce02cdf1"
+    },
+    "source_impact": {
+      "run_id": 37893718768,
+      "state": "IN_PROGRESS_AT_C6",
+      "not_CI_gate": true
+    }
+  },
+  "pipeline": {
+    "C0": "GitHub recovered",
+    "C1": "R9 lower read-only implementation inspected",
+    "C2": "real C++ facade and R32 consumer patched",
+    "C3": "exact SHA policy/game/host/R33 full-chain/package/Domain success",
+    "C4": "source commit published",
+    "C5": "artifacts verified",
+    "C6": "durable result"
+  },
+  "next_action": "Continue R9 right depth/stencil sync owner boundary as a separate material task; CMake R32/R31 and R31/R30 split and overall R84 closeout pending; Quest3 runtime UNTESTED; preserve user F11 PASS."
+}
