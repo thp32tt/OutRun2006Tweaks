@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00495",
+  "production_id": "CONVERSION-DX11-00495",
+  "event_id": "CONVERSION-DX11-00495-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00495",
+  "lease_epoch": 1,
+  "work_key": "DX11:R193:NATIVE_INDEXED_SCISSOR_STATE_AND_WARP_CLIPPED_PIXELS",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_scissor_binding.hpp:R193",
+    "tools/dx11_scissor_indexed_probe_r193.cpp:R193",
+    "tools/test_dx11_scissor_indexed_r193.py:R193",
+    "cmake.toml:R193",
+    ".github/workflows/backend-conversion-gate.yml:R193"
+  ],
+  "base_sha": "52a98cebbf1b5e461ccb916b85d5e2b6f7c3b331",
+  "result_sha": "PENDING_MATERIAL_COMMIT_CAS",
+  "material_result_sha": "PENDING_MATERIAL_COMMIT_CAS",
+  "validation_bearing_result_sha": "PENDING_MATERIAL_COMMIT_CAS",
+  "status": "WAITING_FOR_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "selected_work_item": "R193 distinct dormant owned D3D11 scissor raster/RTV/viewport preflight and WARP clipped DrawIndexed pixel probe, leaving R187 deny-by-default unchanged",
+  "summary": "Implemented R193 isolated scissor-enabled native indexed draw readiness and actual clipped indexed GPU WARP red-left / blue-right readback. Existing R187 reject-scissor gate unchanged. Full exact SHA CI pending; inherited R175 failure still separately owned.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD 52a98cebbf1b5e461ccb916b85d5e2b6f7c3b331; 00494 sealed R192 / inherited R175 failure; no 00495 record or controller checkpoint",
+    "C1_REVIEW": "PASS: new scissor-specific owned object and clip provenance; no R187 safety gate change; R175 separately owned",
+    "C2_IMPLEMENT": "PASS source header + WARP probe + 4-negative static mutant contract + build/CI wiring",
+    "C3_VALIDATE": "SCOPED SOURCE PREFLIGHT PASS, exact-SHA Windows/WARP and full Gate PENDING",
+    "C4_COMMIT": "PENDING publishing exact material SHA [AUTO:CONVERSION-DX11-00495]",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant isolated GPU proof; no game backend/HMD distribution candidate",
+    "C6_STATE": "PENDING exact-SHA Gate, source change ledger and final checkpoint"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_scissor_binding.hpp",
+    "tools/dx11_scissor_indexed_probe_r193.cpp",
+    "tools/test_dx11_scissor_indexed_r193.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00495.json"
+  ],
+  "evidence": {
+    "scoped_source_contract": "PASS_ONE_SOURCE_PREFLIGHT_4_NEGATIVE_MUTATIONS",
+    "exact_sha_gate": "PENDING",
+    "known_inherited_blocker": "CONVERSION-DX11-00477:R175_PIXEL_BGRA_128_0_16_255"
+  },
+  "blockers": [
+    "Preexisting R175 full gate failure owned by 00477; R193 cannot claim whole-Gate PASS until resolved",
+    "No Quest3/VDXR runtime test"
+  ],
+  "last_real_activity_at": "2026-10-10T04:33:00+09:00",
+  "next_action": "Check exact SHA Backend Conversion Gate for this material commit; if R193 probe PASS but inherited R175 fails, seal C6 BLOCKED_UPSTREAM_R175; do not claim runtime or scoring success."
+}

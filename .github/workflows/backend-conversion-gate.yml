@@ -437,6 +437,25 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R192 PS b0 indexed WARP probe failed: $LASTEXITCODE" }
 
+
+      # R193: owned live scissor, exact RTV and actual clipped indexed WARP pixels.
+      - name: Verify R193 scissor indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_scissor_indexed_r193.py
+
+      - name: Build R193 scissor indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_scissor_indexed_probe_r193
+
+      - name: Run R193 scissor indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_scissor_indexed_probe_r193.exe | Select-Object -First 1
+          if (-not $probe) { throw "R193 clipped indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R193 clipped indexed WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
