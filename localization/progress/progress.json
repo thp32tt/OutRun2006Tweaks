@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 09:20 KST",
+  "updated_at_kst": "2026-10-09 09:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8860,5 +8860,27 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
     "github_actions_run": 37863968417
+  },
+  "c323_c2_q154_b298": {
+    "at_kst": "2026-10-09 09:27 KST",
+    "run_key": "OUTRUN-KOR-C323-C2-Q154-B298-PERSISTED-THREE-NATIVE-20261009-0920",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "shard": "EVEN",
+    "queue_index": 154,
+    "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "independent_saved_dds_sha": true,
+    "independent_three_region_native_raw_flipy": true,
+    "independent_source_bbox_containment": "3/3 PASS",
+    "producer_bbox_left_discrepancy_px": 1,
+    "independent_full_eight": false,
+    "independent_source_clean": false,
+    "blind_calibration": false,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "approval": false,
+    "dds_created": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json"
   }
 }

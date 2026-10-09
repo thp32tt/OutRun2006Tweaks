@@ -1,0 +1,156 @@
+{
+  "run_key": "OUTRUN-KOR-C323-C2-Q154-B298-PERSISTED-THREE-NATIVE-20261009-0920",
+  "at_kst": "2026-10-09 09:27 KST",
+  "role": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "shard": "EVEN",
+  "queue_index": 154,
+  "asset": "4D38BBB0_1024x256.dds",
+  "triage": "FRESH_C_REVIEW",
+  "decision": "HOLD_STRICT_RECHECK",
+  "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "blob_sha": "dad58c95d098f6fecf42b418485ff7f6ee3dc857",
+  "source_sha256_producer_only": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "independent_dds_header": {
+    "width": 4096,
+    "height": 1024,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_mirror_y": true,
+    "size": 16777344,
+    "verified": true
+  },
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "source_bbox_from_producer": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "observed_alpha_bbox": [
+        1611,
+        288,
+        2024,
+        348
+      ],
+      "producer_expected_bbox": [
+        1612,
+        288,
+        2024,
+        348
+      ],
+      "producer_bbox_exact": false,
+      "source_margin": [
+        1,
+        173,
+        2,
+        2
+      ],
+      "within_source_bounds": true,
+      "native_raw": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/06_single_player_gray_current_raw.png",
+      "native_flipy": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/06_single_player_gray_current_flipy.png",
+      "practical_50pct": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/06_single_player_gray_current_flipy_gray_50.png",
+      "visual_observation": "NO_CONFIRMED_VISIBLE_GLYPH_DAMAGE_OR_INTRINSIC_BOX_ON_ALPHA_COMPOSITED_CROPS",
+      "family_vs_prior": "STRONGER_STROKES_SOURCE_FAMILY_CLOSER_AT_100_75_50"
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox_from_producer": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "observed_alpha_bbox": [
+        2675,
+        290,
+        2887,
+        347
+      ],
+      "producer_expected_bbox": [
+        2675,
+        290,
+        2887,
+        347
+      ],
+      "producer_bbox_exact": true,
+      "source_margin": [
+        1,
+        207,
+        2,
+        3
+      ],
+      "within_source_bounds": true,
+      "native_raw": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/07_showroom_gray_current_raw.png",
+      "native_flipy": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/07_showroom_gray_current_flipy.png",
+      "practical_50pct": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/07_showroom_gray_current_flipy_gray_50.png",
+      "visual_observation": "NO_CONFIRMED_VISIBLE_GLYPH_DAMAGE_OR_INTRINSIC_BOX_ON_ALPHA_COMPOSITED_CROPS",
+      "family_vs_prior": "STRONGER_STROKES_SOURCE_FAMILY_CLOSER_AT_100_75_50"
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox_from_producer": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "observed_alpha_bbox": [
+        2567,
+        953,
+        2933,
+        1013
+      ],
+      "producer_expected_bbox": [
+        2567,
+        953,
+        2933,
+        1013
+      ],
+      "producer_bbox_exact": true,
+      "source_margin": [
+        1,
+        153,
+        1,
+        1
+      ],
+      "within_source_bounds": true,
+      "native_raw": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/08_multiplayer_gray_current_raw.png",
+      "native_flipy": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/08_multiplayer_gray_current_flipy.png",
+      "practical_50pct": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/08_multiplayer_gray_current_flipy_gray_50.png",
+      "visual_observation": "NO_CONFIRMED_VISIBLE_GLYPH_DAMAGE_OR_INTRINSIC_BOX_ON_ALPHA_COMPOSITED_CROPS",
+      "family_vs_prior": "STRONGER_STROKES_SOURCE_FAMILY_CLOSER_AT_100_75_50"
+    }
+  ],
+  "producer_machine_discrepancy": "SINGLE PLAYER measured xmin1611 vs producer claimed xmin1612, still inside source xmin1610. This is a machine-report precision discrepancy, not evidence of clipping.",
+  "transparency_note": "Raw RGBA with transparent RGB was mistakenly visually suggestive of an English overlay without alpha compositing. Gray alpha-composited candidates did not show that overlap in inspected regions; not a confirmed visible source residue.",
+  "checks_completed": [
+    "Independent original candidate binary SHA256 against GitHub current DDS",
+    "DDS native header RGB masks/size/mips",
+    "Actual persisted bytes 3x narrow-region RGBA alpha bboxes and positive margins",
+    "3x native RAW and FLIP-Y lossless PNG, 3x 50% gray",
+    "Producer source/CLEAN/old/trial 100/75/50 visual comparisons, per-family stroke readability"
+  ],
+  "checks_missing": [
+    "Independent canonical source DDS SHA/decode and source/CLEAN comparisons",
+    "Full 8-label/preserved five red graphics atlas outside alpha/mask scan",
+    "Independent protected-layer and glyph-only plate/composite blast-radius QA",
+    "Blind calibration plus all eight per-region current-policy C findings",
+    "Separate C3 and exact-SHA approval evidence; user actual game retest"
+  ],
+  "machine_evidence": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_NATIVE_DDS_MACHINE_PROOF.json",
+  "full_c_pass": false,
+  "C3": "BLOCKED",
+  "approval": false,
+  "new_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub + N100 MCP fallback narrow persisted DDS read because GPT native DNS failed",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

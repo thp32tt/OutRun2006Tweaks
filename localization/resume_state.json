@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C323 C2 q154 independent B298 saved DDS SHA and three alpha-bbox RAW/FLIPY proof PASS source containment, 1px producer metadata discrepancy, C HOLD until full atlas/source CLEAN/protected/C3: localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json",
     "B304 q228 IGR-038: actual 1-row source-conditioned silver trial persisted but source-family chrome highlight, depth and glyph geometry visually FAIL at 100/50/RAW; NO promoted DDS, C2/C3 blocked, user game OPEN. Build a different manually source-conditioned vector/extrusion master, rerender all 13 only after representative visual PASS. localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
     "C322 C2 q236 B302 scoped visual: 14/14 50%-gray rows, native 00/05/11, RAW75 row00 inspected, no obvious broken glyph; independent full exact DDS decode/masks/native/RAW and calibration NOT done. HOLD_STRICT_RECHECK, no current approval/C3, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261009-C322-C2-Q236-B302-ROW-VISUAL/C322_Q236_CONTROLLER_C2_HOLD.json",
     "B303 q205 P0 IGR026/027 exact two header regions newly produced (native source red face) new DDS fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae replaces e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088 with pinned English 58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f + A76 CLEAN alpha0; source bbox 5px margins 2/2, all other atlas pixels exact, native 137px NotoSerif CJK Black, saved DDS/header/RAW exact. GitHub Actions 37861249931 and 40 SOURCE/CLEAN/OLD/NEW BGW/50/75/RAW evidence producer scoped PASS. Fresh independent C2 C3 approval and actual newer game needed; IGR026/027 OPEN, IGR028 mixed/runtime OPEN. RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_B/20261009-B303-Q205-P0-RED-HEADING-NATIVE-FAMILY/B303_CONTROLLER_SELF_QA_FINAL.json",
@@ -12871,5 +12872,27 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261009-B304-Q228-SOURCE-CHROME-REPRESENTATIVE/B304_CONTROLLER_SELF_QA_REJECTED.json",
     "github_actions_run": 37863968417
+  },
+  "c323_c2_q154_b298": {
+    "at_kst": "2026-10-09 09:27 KST",
+    "run_key": "OUTRUN-KOR-C323-C2-Q154-B298-PERSISTED-THREE-NATIVE-20261009-0920",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "shard": "EVEN",
+    "queue_index": 154,
+    "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "independent_saved_dds_sha": true,
+    "independent_three_region_native_raw_flipy": true,
+    "independent_source_bbox_containment": "3/3 PASS",
+    "producer_bbox_left_discrepancy_px": 1,
+    "independent_full_eight": false,
+    "independent_source_clean": false,
+    "blind_calibration": false,
+    "C": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "approval": false,
+    "dds_created": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C323-C2-Q154-B298-PERSISTED-NATIVE/C323_CONTROLLER_C2_HOLD.json"
   }
 }

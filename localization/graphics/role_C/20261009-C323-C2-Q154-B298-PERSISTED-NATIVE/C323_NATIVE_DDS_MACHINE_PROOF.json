@@ -1,0 +1,172 @@
+{
+  "role": "C2",
+  "queue_index": 154,
+  "saved_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "dds_file_size": 16777344,
+  "format": "RGBA32",
+  "raw_layout": "mirror_y",
+  "size": [
+    4096,
+    1024
+  ],
+  "mip_count": 1,
+  "header_masks": [
+    255,
+    65280,
+    16711680,
+    4278190080
+  ],
+  "source_producer_only_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "measured_candidate_bbox": [
+        1611,
+        288,
+        2024,
+        348
+      ],
+      "producer_expected_bbox": [
+        1612,
+        288,
+        2024,
+        348
+      ],
+      "bbox_exact_match": false,
+      "width": 413,
+      "height": 60,
+      "margins": [
+        1,
+        173,
+        2,
+        2
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/06_single_player_gray_current_raw.png",
+          "sha256": "8c02dcb29793dcc23cf8a569fae16ba93045a58b2cadc637d3ced6b02c798bed",
+          "size": 6308
+        },
+        {
+          "path": "evidence/06_single_player_gray_current_flipy.png",
+          "sha256": "d9a11dcb4025a77ce568b8d1fed0966757381a0101e194432ae7a6fba875e0e8",
+          "size": 6261
+        },
+        {
+          "path": "evidence/06_single_player_gray_current_flipy_gray_50.png",
+          "sha256": "ac415172de5b8e014aa116cec839ae77536af1863068407ffc9bc108ab07008d",
+          "size": 4614
+        }
+      ]
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "measured_candidate_bbox": [
+        2675,
+        290,
+        2887,
+        347
+      ],
+      "producer_expected_bbox": [
+        2675,
+        290,
+        2887,
+        347
+      ],
+      "bbox_exact_match": true,
+      "width": 212,
+      "height": 57,
+      "margins": [
+        1,
+        207,
+        2,
+        3
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/07_showroom_gray_current_raw.png",
+          "sha256": "c139e293518ed4540cbe746ad79d5743eb983170ec88633b221c0651511e055a",
+          "size": 3222
+        },
+        {
+          "path": "evidence/07_showroom_gray_current_flipy.png",
+          "sha256": "a225e60f7732c4b9da48851f86861767469908f9e0ea6e3b41ae2daacdbb5395",
+          "size": 3210
+        },
+        {
+          "path": "evidence/07_showroom_gray_current_flipy_gray_50.png",
+          "sha256": "a8bc6417fa3aa2da0021d7eb818895d5e32d5742abdbe3001ee6fd5acec9e1af",
+          "size": 2161
+        }
+      ]
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "measured_candidate_bbox": [
+        2567,
+        953,
+        2933,
+        1013
+      ],
+      "producer_expected_bbox": [
+        2567,
+        953,
+        2933,
+        1013
+      ],
+      "bbox_exact_match": true,
+      "width": 366,
+      "height": 60,
+      "margins": [
+        1,
+        153,
+        1,
+        1
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/08_multiplayer_gray_current_raw.png",
+          "sha256": "78b8b51da7d6748c4c79e5b66e8cf7402e279714287ac90593041d4d8e7e027c",
+          "size": 4748
+        },
+        {
+          "path": "evidence/08_multiplayer_gray_current_flipy.png",
+          "sha256": "07642bc672513d377327eb497b2bc72038aad1c857ec5b1d04e713bed0c99614",
+          "size": 4694
+        },
+        {
+          "path": "evidence/08_multiplayer_gray_current_flipy_gray_50.png",
+          "sha256": "a77c5f58aae1b0b0659512b547ac82f386403c50cd45dbd35c5b7194babe705b",
+          "size": 3910
+        }
+      ]
+    }
+  ],
+  "independent_check_scope": "actual persisted candidate DDS header/sha and alpha bboxes, three RAW/FLIPY lossless native crops and 50 percent gray previews only",
+  "independent_source_clean_diff": false,
+  "source_validated_independently": false,
+  "protected_pixels_vs_prior_checked": false,
+  "scope_decision": "PASS_3_OF_3_BBOX_CONTAINMENT_ONLY_NOT_FULL_C",
+  "source_region_independently_verified": false,
+  "full_c_pass": false,
+  "one_pixel_producer_bbox_discrepancy": "06_single_player_gray left x1611 measured vs x1612 producer",
+  "runtime_validation": "UNTESTED"
+}
