@@ -40,6 +40,17 @@ function Invoke-Fixture {
         'GameDefaultConfigOverride: default resolution set to 3440x1440, windowed enabled' |
             Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
     }
+    # The current R32 C++ logger ends with stereo[...], NOT fenceWaitUs.
+    # Legacy builds may append fence metrics; both must be reported, and
+    # no unmeasured GPU fence latency must be invented from a zero field.
+    if ($Name -eq 'r32-spike-current-no-fence' -or
+        $Name -eq 'r32-spike-legacy-with-fence') {
+        $line='VR R32 FRAME SPIKE: frameUs=25000 baselineUs=11000 presentUs=16000 workload[draws=4000,primitives=13000,triangles=12900,indexed=3900,up=100,alphaBlend=500,alphaBlendPrimitives=2100,alphaTest=50,particleLikeDraws=200,particleLikePrimitives=1100,effectUnknown=7] stereo[main=3700,offscreen=60,aux=0,fastWorld=3600,hud=100,fallback=0,fragile=0,unstable=0]'
+        if($Name -eq 'r32-spike-legacy-with-fence'){
+            $line+=' fenceWaitUs=7200,fencePolls=4'
+        }
+        $line | Add-Content (Join-Path $dir 'OutRun2006Tweaks.log') -Encoding UTF8
+    }
     if ($Name -eq 'goal-progress-versus-completed-result') {
         @(
             'VR P0 GOAL EARLY_GATE: method=DrawPrimitiveUP state=19 producer=NONE scope=SCREEN_OVERLAY_2D queueEpoch=1234550'
@@ -91,6 +102,25 @@ function Invoke-Fixture {
          $result.Flags -notcontains 'D3D9EX_PRESENT_LATENCY_OVER_XR_BUDGET')) {
         throw "$Name failed real R28/per-eye budget regression"
     }
+    if($Name -eq 'r32-spike-current-no-fence' -or
+       $Name -eq 'r32-spike-legacy-with-fence'){
+        $hasFence=($Name -eq 'r32-spike-legacy-with-fence')
+        if($result.PerfSpikeCount -ne 1 -or
+           $result.PerfSpikeMaxFrameUs -ne 25000 -or
+           $result.PerfSpikeMaxDraws -ne 4000 -or
+           $result.PerfSpikeMaxParticleLikeDraws -ne 200 -or
+           $result.PerfSpikeFenceTelemetryAvailable -ne $hasFence -or
+           $result.PerfSpikeMaxFenceWaitUs -ne $(if($hasFence){7200}else{0}) -or
+           $result.Flags -notcontains 'DX9EX_FRAME_SPIKES_PRESENT'){
+            throw "$Name failed exact R32 game-logger format / optional-fence contract"
+        }
+        $csvPath=Join-Path $dir 'PERFORMANCE_SPIKES.csv'
+        if(-not(Test-Path $csvPath)){throw "$Name lost R32 spike CSV"}
+        $csv=@(Import-Csv $csvPath)
+        if($csv.Count -ne 1 -or $csv[0].ParticleLikePrimitives -ne '1100'){
+            throw "$Name did not persist particle workload in CSV"
+        }
+    }
     Write-Host "PASS $Name : $($result.Status)"
 }
 
@@ -100,6 +130,8 @@ try {
     Invoke-Fixture 'healthy-telemetry-only' 5 'True' 'OK'
     Invoke-Fixture 'rival-projects-rank-unobserved' 5 'True' 'HUD_RANK_CALC_CAPTURE_UNOBSERVED'
     Invoke-Fixture 'r28-present-over-budget' 5 'True' 'PERFORMANCE_WARNING'
+    Invoke-Fixture 'r32-spike-current-no-fence' 5 'True' 'PERFORMANCE_WARNING'
+    Invoke-Fixture 'r32-spike-legacy-with-fence' 5 'True' 'PERFORMANCE_WARNING'
     Invoke-Fixture 'goal-progress-versus-completed-result' 5 'True' 'NEEDS_GOAL_PHASE_VISUAL_REVIEW'
 } finally {
     Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
