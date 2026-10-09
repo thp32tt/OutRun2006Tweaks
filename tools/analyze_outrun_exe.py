@@ -74,6 +74,21 @@ PRODUCER_WINDOWS = (
         "expected_direct_targets": {0x0000CF4E: 0x049940},
     },
     {
+        # Main OutRun stage-extension transient uses a different original
+        # function from the 0x97xxx GOAL progress/result text. Three direct
+        # original animated sprani producers carry 0x2C00B4/B5 and
+        # 0x2C006C IDs; verify the E8 edges before routing any transient HUD.
+        "name": "OutRunStageExtensionAnimation_0x98800",
+        "start_rva": 0x00098800,
+        "end_rva": 0x00098F00,
+        "anchors": (0x0009898E, 0x00098A36, 0x00098AC6),
+        "expected_direct_targets": {
+            0x0009898E: 0x00029530,
+            0x00098A36: 0x00029530,
+            0x00098AC6: 0x00029530,
+        },
+    },
+    {
         # The primary central solar disc is NOT emitted through the same
         # producer as the outer lens circles. 0xD3A0 loads object 0x570002;
         # 0xD3A5 -> 0xC980 -> DrawObjectAlpha_Internal; outer discs
