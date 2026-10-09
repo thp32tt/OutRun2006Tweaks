@@ -17,11 +17,11 @@
     "cmake.toml:R191",
     ".github/workflows/backend-conversion-gate.yml:R191"
   ],
-  "base_sha": "962414d0b654e86453b6ad4315a16cdc226cca00",
-  "result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
-  "material_result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
-  "validation_bearing_result_sha": "PENDING_E001_FIX_MATERIAL_SHA",
-  "status": "WAITING_FOR_CORRECTED_EXACT_SHA_GATE",
+  "base_sha": "83979ea64f34046649096eec53f5b88443c6f854",
+  "result_sha": "PENDING_E001_FINAL_FIX_SHA",
+  "material_result_sha": "PENDING_E001_FINAL_FIX_SHA",
+  "validation_bearing_result_sha": "PENDING_E001_FINAL_FIX_SHA",
+  "status": "WAITING_FOR_THIRD_EXACT_SHA_GATE",
   "checkpoint": "C4_COMMIT",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -32,10 +32,10 @@
     "C0_RECOVER": "PASS: latest GitHub HEAD d5d8ede392a64907867893325a0e47adc9ca16a5; 00493 run and controller checkpoint absent; 00492 R190 C6 is BLOCKED_UPSTREAM_R175_FULL_GATE.",
     "C1_REVIEW": "PASS: AGENTS.md, 100 review index, queue contract, branch state, R183/R186/R187/R190 source, visual regression history. R175 belongs to 00477; no shared source ownership. R191 develops native VS b0 resource and actual shader transform while dormant.",
     "C2_IMPLEMENT": "PASS: real C++ immutable VS constant buffer snapshot creation/replacement, exact same immediate-device b0 binding, revision/descriptor guards, WARP DrawIndexed center-to-right translated pixels + 4 mutation source contract; CMake and GitHub Gate wired.",
-    "C3_VALIDATE": "Initial exact-SHA gate 37975147028: Win32 validate SUCCESS, R191 negative mutant static FAIL because two intentionally present version guards were mutated with replace(...,1) leaving another copy; no C++ WARP run yet. E001 repair tests aggregate guard removal; corrected exact-SHA Gate PENDING.",
-    "C4_COMMIT": "Initial C++ material SHA 962414d0... retained. E001 bounded test-harness correction committed as new material with [AUTO:CONVERSION-DX11-00493] and no CI skip; next exact-SHA Gate required.",
+    "C3_VALIDATE": "First material SHA 962414d0: Win32 SUCCESS, R191 static negative-mutant failure. Second material SHA 83979ea6: Win32 SUCCESS, R191 Python IndentationError because a literal backslash-n in a comment swallowed the assertion. Third candidate uses actual indented assertion and removes all duplicated occurrences of the targeted version guard. Third exact-SHA Gate PENDING.",
+    "C4_COMMIT": "Third bounded C2 test-harness material fix with [AUTO:CONVERSION-DX11-00493] and no CI-skip; exact-SHA mandatory.",
     "C5_PACKAGE": "NOT_REQUIRED: native game Draw still dormant; no Quest3/VDXR evidence or backend promotion.",
-    "C6_STATE": "PENDING corrected exact-SHA validation. No premature PASS or score."
+    "C6_STATE": "Await third exact-SHA Gate; preserve failure history and runtime UNTESTED."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_vs_constant.hpp",
@@ -57,12 +57,19 @@
     "initial_smoke": "FAIL_R191_NEGATIVE_MUTATION_TEST",
     "initial_failure": "R191 negative mutation survived generation != generation_ || version != version_",
     "fix": "Remove all occurrences of the identical guard when constructing one mutation, not only the first; resource readiness remains unchanged.",
-    "corrected_gate": "PENDING"
+    "corrected_gate": "PENDING",
+    "second_gate_id": 37976308703,
+    "second_gate_result": "FAIL_R191_PYTHON_INDENTATION",
+    "second_gate_validate": "SUCCESS",
+    "second_gate_r191_probe": "NOT_RUN",
+    "first_gate_id": 37975147028,
+    "third_gate": "PENDING",
+    "third_fix": "Exact Python loop body is an assertion (not comment); replace all equivalent guards for one negative mutant"
   },
   "blockers": [
     "Existing unrelated R175 TEXCOORD6 generic varying mismatch owned by 00477 blocks whole Gate.",
     "No user Quest3/VDXR headset/game runtime verification."
   ],
-  "next_action": "Check new exact-SHA Backend Conversion Gate; verify corrected R191 static and actual WARP shifted DrawIndexed, separate upstream R175 and seal C6.",
+  "next_action": "Inspect third SHA exact Backend Conversion Gate; require true R191 4 negative mutants + actual WARP translated pixels. If another fail, seal BLOCKED with full evidence; no more blind retry.",
   "score_change": 0
 }
