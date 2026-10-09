@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200",
+  "role": "A",
+  "queue_index": 227,
+  "priority": "P1",
+  "run": "A214",
+  "purpose": "complete 13 C320-uncovered q227 SOURCE/CLEAN/current persisted DDs native proof; never edit candidate",
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "source_clean": "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_CLEAN_PLATE.png",
+  "script_commit": "a7ec2b33847c78250aeaaf83e728489b9bb81e0f",
+  "worker_actions_run": 37963658586,
+  "worker_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37963658586",
+  "state_as_last_checked": "IN_PROGRESS_OUTPUT_NOT_YET_PUBLISHED",
+  "status": "COMPUTE_PENDING_NO_QA_CLAIM",
+  "new_promoted_dds": 0,
+  "expected_new_native_cell_proofs": 13,
+  "verified_new_native_cell_proofs": 0,
+  "prior_C320_independent_samples": 3,
+  "whole_16_region": "HOLD_STRICT_RECHECK",
+  "owner_C1": "C320_HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED",
+  "game": "IGR034_035_036_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "On next A invocation, check whether this worker published exact A214_EVIDENCE_REPORT.json or A214_EXECUTION_HOLD.json. If report exists, inspect actual decoded SOURCE/CLEAN/FINAL proofs and mechanical metrics then update queue, resume, progress and WORKLOG. Do not rerun same work, do not claim completion now.",
+  "scope_exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
