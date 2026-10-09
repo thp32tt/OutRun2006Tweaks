@@ -11268,8 +11268,9 @@ VSOutput main(VSInput input)
                              const outrun::vr::dx11::NativeFixedFunctionDirectDrawDispatchReadiness& packet) {
             return outrun::vr::dx11::
                 prepare_fixed_function_indexed_direct_draw_probe(
-                    context, target, pipelineBundle.input_layout(),
-                    pipelineBundle.vertex_shader(), pipelineBundle.pixel_shader(),
+                    context, target, outputDepthSurface.depth_stencil_view(),
+                    pipelineBundle.input_layout(), pipelineBundle.vertex_shader(),
+                    pipelineBundle.pixel_shader(),
                     outputStateBinding, renderTargetBoundDraw, multiStageDrawReady,
                     indexedGeometryReady, packet,
                     indexedDirectLineage, indexedSourceRange,
@@ -11384,6 +11385,23 @@ VSOutput main(VSInput input)
             r157Probe(d3d.context, outputColorSurface.render_target_view(),
                       indexedDirectDispatch),
             "R163 restores fixed-function indexed stage isolation");
+        // R164: the same sealed indexed packet must fail closed if the
+        // offscreen depth-stencil attachment is detached after R145/R163.
+        // Rebind the exact R145 surface pair before allowing the WARP draw.
+        ID3D11RenderTargetView* r164Color =
+            outputColorSurface.render_target_view();
+        require(r164Color != nullptr &&
+                    outputDepthSurface.depth_stencil_view() != nullptr,
+                "R164 offscreen RTV/DSV pair fixture prerequisite");
+        d3d.context->OMSetRenderTargets(1u, &r164Color, nullptr);
+        require(
+            !r157Probe(d3d.context, r164Color, indexedDirectDispatch),
+            "R164 rejects late OM depth-stencil detach");
+        require(
+            surfaceTargetBinding.apply(
+                d3d.context, outputColorSurface, outputDepthSurface) &&
+            r157Probe(d3d.context, r164Color, indexedDirectDispatch),
+            "R164 exact RTV/DSV restoration permits indexed WARP draw");
         ID3D11Query* r157Stats = nullptr;
         D3D11_QUERY_DESC r157StatsDesc{};
         r157StatsDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
