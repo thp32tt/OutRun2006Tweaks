@@ -12,7 +12,7 @@ Status: requested activation; controller deployment remains separate.
 0. Port latest *verified released* FFB implementation into DX9Ex, preserving existing VR behavior. Identify upstream release tag/SHA, inspect license and APIs, port in isolated changes, and validate input/FFB regression. Do not confuse untagged HEAD with latest release.
 1. Complete DX9Ex structural optimization/refactoring, resolving remaining TODOs with domain-isolation and hook/device-loss/recenter/HUD regression guards.
 2. Follow Virtual Desktop/OpenXR runtime recommended per-eye render target dimensions (and refresh/resize lifecycle); avoid using desktop monitor pixel size or hardcoded Quest resolution. Handle runtime changes safely with bounds and rollback.
-3. Optimize frame pacing and GPU/CPU performance, targeting stable 72 Hz on Quest 3; capture measured before/after evidence, prioritize dense buildings/sand/particles.
+3. Optimize frame pacing and GPU/CPU performance, targeting **120 FPS / 120 Hz** on **RTX 4070 12 GB**, **Virtual Desktop High streaming quality**, and **Quest 3**. Follow OpenXR-recommended per-eye resolution at VD High (do not substitute a fixed pixel count). Frame budget **8.33 ms**. Measure app-rendered FPS separately from VD display/stream FPS, SSW/reprojection, encode/network/decode latency, and dropped frames. Do not count synthetic/reprojected frames as native 120 FPS. Capture measured before/after evidence, prioritizing dense buildings/sand/particles. Maintain visual quality unless a documented user-approved tradeoff is required.
 
 ## Execution contract
 - DX9Ex lane enabled in controller only after controller config update and redeploy; do not claim activation from this document alone.
