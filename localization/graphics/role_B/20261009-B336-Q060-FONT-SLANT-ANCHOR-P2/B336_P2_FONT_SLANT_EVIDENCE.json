@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B336",
+  "run_key": "OUTRUN-KOR-B336-Q060-SOURCE-FONT-SLANT-P2-20261009-2340",
+  "queue_index": 60,
+  "priority": "P0",
+  "stage": "P2_SOURCE_FAMILY_EVIDENCE",
+  "pinned_english_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "pinned_current_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "p1_recipe": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/recipe.json",
+  "p1_plate_clean_exact_protected": true,
+  "font_evidence": {
+    "expected_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "found": false,
+    "source_family": "B331/B332R Noto Sans CJK Bold",
+    "text": "아웃런 마일:",
+    "fonttools_checked": false,
+    "all_chars_covered": null,
+    "reason": "Pinned historical renderer font absent; no fallback substitutions"
+  },
+  "source_gold_face_pixels": 23229,
+  "candidate_gold_face_pixels": 26904,
+  "source_first_glyph_band_proxy": {
+    "qualified": false,
+    "top_band_left_right": [
+      2102,
+      265,
+      2746
+    ],
+    "bottom_band_left_right": [
+      2454,
+      345,
+      2465
+    ],
+    "left_dx_proxy": -352,
+    "why": "first active pixels at two y bands need not be the corresponding glyph stroke; cannot certify P2 right lean"
+  },
+  "candidate_first_glyph_band_proxy": {
+    "qualified": false,
+    "top_band_left_right": [
+      2160,
+      259,
+      2754
+    ],
+    "bottom_band_left_right": [
+      2182,
+      319,
+      2714
+    ],
+    "left_dx_proxy": -22,
+    "why": "first active pixels at two y bands need not be the corresponding glyph stroke; cannot certify P2 right lean"
+  },
+  "slant_same_stroke_verified": false,
+  "p2_decision": "HOLD_FONT_COVERAGE_AND_MATCHED_STROKE_ANCHORS",
+  "producer_decision": "NOT_PROMOTED_NO_CHANGED_DDS",
+  "new_DDS": 0,
+  "source_clean_final_proofs": [
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_FLIPY_100_GRAY.png",
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_FLIPY_75_GRAY.png",
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_FLIPY_50_GRAY.png",
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_RAW_100_GRAY.png",
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_RAW_75_GRAY.png",
+    "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_CLEAN_SAVED_RAW_50_GRAY.png"
+  ],
+  "pixel_band_comparison": "localization/graphics/role_B/20261009-B336-Q060-FONT-SLANT-ANCHOR-P2/B336_SOURCE_VS_SAVED_PIXEL_BAND_PROXIES_NOT_SAME_STROKE.png",
+  "C2": "C334_HOLD_UNCHANGED",
+  "C3": "NOT_RUN",
+  "INGAME_REWORK_BACKLOG": "IGR044_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS",
+  "excluded_work": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
