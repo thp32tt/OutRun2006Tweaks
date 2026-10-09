@@ -79,6 +79,14 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
+# The next real Quest3 HUD log must preserve rendering settings needed to
+# disambiguate an ignored HUD hook from a too-small/disparity-wrong draw.
+$configWhitelist = ($text['Collect-OutRunVRLogs.ps1'] -split "`n" |
+    Where-Object { $_ -match '\$allowed=' } | Select-Object -First 1)
+Assert-True (-not [string]::IsNullOrWhiteSpace($configWhitelist)) 'collector config whitelist missing'
+foreach ($setting in @('UIScalingMode','UILetterboxing','HudScale','Telemetry','StereoDepth','WorldScale','FrameCadenceMode','FrameCadenceTargetHz')) {
+    Assert-True ($configWhitelist -match ('\b' + [regex]::Escape($setting) + '\b')) ("collector VR HUD config snapshot omits {0}" -f $setting)
+}
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'

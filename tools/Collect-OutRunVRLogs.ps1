@@ -74,7 +74,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc $sourceSha
 
     if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView)\s*='
+        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView|UIScalingMode|UILetterboxing|HudScale|Telemetry|StereoDepth|WorldScale|FrameCadenceMode|FrameCadenceTargetHz)\s*='
         Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
     }
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
