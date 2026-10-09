@@ -1,155 +1,171 @@
 #!/usr/bin/env python3
-"""A215 q121 P0: lossless source-derived atlas change-region evidence, NOT DDS production.
+"""A216 q175 P1: source-conditioned *manual Hangul contours* plus welded chrome.
 
-Unlike A212's three-title-only gate, this measures the larger existing translation
-footprint and creates independent SOURCE / CLEAN / exact persisted FINAL crops.
-The A213 change-component boxes are *inspection aids*, not preapproved text
-masks or protected-art exclusion masks. No C approval is inferred from this run.
+One genuinely different family pilot after A211's small isolated font glyphs.
+No normal font stretch/rails reuse, no production promotion without direct review.
+Source, current promoted DDS, A188 CLEAN are SHA-pinned. Writes role_A only.
 """
-import hashlib, json, os, struct, tempfile, urllib.request
+import hashlib,json,os,struct,subprocess,sys,tempfile,urllib.request,traceback
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw
-
+from PIL import Image,ImageDraw
+from scipy.ndimage import distance_transform_edt, gaussian_filter1d
 assert os.environ.get("OUTRUN_CPU_WORKER") == "github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE") == "A"
-ROOT = Path.cwd()
-BASE = ROOT / "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE"
-OUT = ROOT / "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS"
-CANDIDATE = ROOT / "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-CLEAN = ROOT / "localization/graphics/role_A/20261008-A176-Q121-TRANSPARENT-PLATE/A176_Q121_CLEAN.png"
-SOURCE_URL = "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-SOURCE_SHA = "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-CANDIDATE_SHA = "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844"
-CLEAN_SHA = "88e85995d90b5f590f6ae8da2307cecc90e243da4731850e525ba2c6bbc2eb80"
-RUN_KEY = "OUTRUN-KOR-A215-Q121-30-REGION-SOURCE-CLEAN-PERSISTED-20261010-0300"
+ROOT=Path.cwd()
+OUT=ROOT/"localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME"
+OUT.mkdir(parents=True,exist_ok=True)
+CAND=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+SOURCE_SHA="9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
+PRIOR_SHA="b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73"
+CLEAN=ROOT/"localization/graphics/role_A/20261008-A188-Q175-CHROME-FACE-RECOVERY/754F0599_HD_CLEAN_PLATE.png"
+ORIGINAL=(6,397,956,529)
+KEY="OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400"
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def read_dds(path):
+    b=Path(path).read_bytes()
+    if b[:4]!=b"DDS " or len(b)!=128+2048*1024*4:raise ValueError("DDS signature/length differs")
+    h,w=struct.unpack_from("<II",b,12)
+    masks=struct.unpack_from("<IIII",b,92)
+    if (w,h,masks,struct.unpack_from("<I",b,28)[0])!=(2048,1024,(16711680,65280,255,4278190080),1):
+        raise ValueError("q175 DDS encoding/mips drift")
+    return b[:128],Image.frombytes("RGBA",(w,h),b[128:],"raw","BGRA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+def save_dds(header,im,path):
+    Path(path).write_bytes(header+im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","BGRA"))
+def comp(im,rgb):
+    bg=Image.new("RGBA",im.size,(*rgb,255));bg.alpha_composite(im);return bg.convert("RGB")
+def hand_contour():
+    """Native target: actual Hangul letters ㅅ+ㅛ and ㄹ+ㅜ+ㅁ with open counters.
 
-def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-def dds_read(path):
-    data = Path(path).read_bytes()
-    if data[:4] != b"DDS " or len(data) != 128 + 4096*4096*4:
-        raise ValueError("q121 DDS native header/data length mismatch")
-    h,w = struct.unpack_from("<II",data,12)
-    pitch = struct.unpack_from("<I",data,20)[0]
-    mip = struct.unpack_from("<I",data,28)[0]
-    if (w,h,pitch,mip) != (4096,4096,16384,1):
-        raise ValueError(f"unexpected header {w}x{h}, pitch={pitch}, mips={mip}")
-    im = Image.frombytes("RGBA",(w,h),data[128:],"raw","RGBA")
-    return data[:128], im.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-
-def comp(im, rgb):
-    bg=Image.new("RGBA",im.size,(*rgb,255))
-    bg.alpha_composite(im)
-    return bg.convert("RGB")
-
-def main():
-    if sha(CANDIDATE) != CANDIDATE_SHA or sha(CLEAN) != CLEAN_SHA:
-        raise ValueError("q121 exact persisted candidate or clean plate changed; abort instead of overwriting")
-    old=json.loads((BASE/"A213_P0_ROOT_CAUSE.json").read_text(encoding="utf8"))
-    items=old["ranked_components"]
-    if len(items) != 30 or old["changed_components_count"] != 179:
-        raise ValueError("A213 ranked source component evidence changed")
-    with tempfile.TemporaryDirectory(prefix="outrun_a215_q121_") as tmp:
-        original=Path(tmp)/"pinned_english.dds"
-        urllib.request.urlretrieve(SOURCE_URL, original)
-        if sha(original) != SOURCE_SHA:
-            raise ValueError("canonical English source SHA mismatch")
-        hd, source = dds_read(original)
-        hd2, final = dds_read(CANDIDATE)
-        if hd != hd2:
-            raise ValueError("English DDS and current DDS have mismatched header")
+    Manually constructed wide connected display letters from source proportions,
+    NOT a stretched low-resolution/generic font. 3x vector path AA downsample
+    once. Two syllable counters stay open at native size.
+    """
+    scale=3;w,h=860,125
+    im=Image.new("L",(w*scale,h*scale),0)
+    draw=ImageDraw.Draw(im)
+    def stroke(coords,width):
+        pp=[(int(x*scale),int(y*scale)) for x,y in coords]
+        draw.line(pp,fill=255,width=int(width*scale),joint="curve")
+        rad=int(width*scale)//2
+        for x,y in pp:
+            draw.ellipse((x-rad,y-rad,x+rad,y+rad),fill=255)
+    # SHO: wide, open triangle and two legitimate ㅛ vertical stems.
+    stroke([(55,62),(211,14),(366,62)],18)
+    stroke([(39,83),(381,83)],17)
+    stroke([(151,83),(151,113)],18)
+    stroke([(272,83),(272,113)],18)
+    # ROOM: ㄹ stepped/open enclosure, ㅜ and an independent final ㅁ counter.
+    stroke([(449,15),(824,15),(824,37),(466,37),(466,54),(824,54)],15)
+    stroke([(455,69),(823,69)],14)
+    stroke([(639,69),(639,83)],14)
+    stroke([(463,94),(811,94),(811,114),(463,114),(463,94)],14)
+    return im.resize((w,h),Image.Resampling.LANCZOS)
+def source_bands(image):
+    arr=np.asarray(image);a=arr[:,:,3];rgb=arr[:,:,:3]
+    val=[]
+    for y in range(len(a)):
+        good=a[y]>160
+        val.append(float(np.percentile(rgb[y,good].mean(axis=1),65)) if int(good.sum())>15 else np.nan)
+    v=np.asarray(val,np.float32);g=np.where(np.isfinite(v))[0]
+    if len(g)<30:raise ValueError("no measurable English metallic source profile")
+    return gaussian_filter1d(np.interp(np.arange(len(v)),g,v[g]),1.3)
+def execute():
+    tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","175"],capture_output=True,text=True,check=True)
+    decision=json.loads(tri.stdout)["assets"][0]
+    if decision["next_action"] not in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"):
+        raise ValueError("q175 no longer material rework: "+repr(decision))
+    if sha(CAND)!=PRIOR_SHA:raise ValueError("promoted q175 changed; stop and refresh")
+    header,prior=read_dds(CAND)
+    with tempfile.TemporaryDirectory(prefix="A216_q175_") as temp:
+        srcp=Path(temp)/"source.dds";urllib.request.urlretrieve(SOURCE_URL,srcp)
+        if sha(srcp)!=SOURCE_SHA:raise ValueError("canonical English source hash changed")
+        source_header,source=read_dds(srcp)
+        if source_header!=header:raise ValueError("source/header drift")
         clean=Image.open(CLEAN).convert("RGBA")
-        if clean.size != source.size:
-            raise ValueError("CLEAN native size mismatch")
-        s,c,f=np.asarray(source),np.asarray(clean),np.asarray(final)
-        diff_sc=np.any(s!=c,axis=2)
-        diff_sf=np.any(s!=f,axis=2)
-        diff_cf=np.any(c!=f,axis=2)
-        alpha_sc=s[:,:,3]!=c[:,:,3]
-        # A212 title boxes are deliberately not assumed to cover other translated texts.
-        report=[]
-        OUT.mkdir(parents=True,exist_ok=True)
-        for x in items:
-            rank=int(x["rank"])
-            xa,ya,xb,yb=map(int,x["bbox_readable"])
-            # Record the observed region with 12px contextual margin. DO NOT infer text-vs-art
-            # purely from spatial connected components; source markup remains a manual requirement.
-            box=(max(0,xa-12),max(0,ya-12),min(4096,xb+12),min(4096,yb+12))
-            name=f"A215_component_{rank:02d}"
-            r0,r1,r2=[im.crop(box) for im in (source,clean,final)]
-            for label,im in (("SOURCE",r0),("CLEAN",r1),("FINAL",r2)):
-                im.save(OUT/f"{name}_{label}_NATIVE_RGBA.png",compress_level=7)
-            # A native composited comparison and two practical-scale checks.
-            tiles=[comp(im,(105,105,105)) for im in (r0,r1,r2)]
-            gap=8
-            contact=Image.new("RGB",(tiles[0].width*3+gap*2,tiles[0].height),(105,105,105))
-            for i,t in enumerate(tiles):
-                contact.paste(t,(i*(t.width+gap),0))
-            contact.save(OUT/f"{name}_SOURCE_CLEAN_FINAL_GRAY_100.jpg",quality=88,optimize=True)
-            contact.resize((max(1,contact.width//2),max(1,contact.height//2)),
-                           Image.Resampling.LANCZOS).save(
-                OUT/f"{name}_SOURCE_CLEAN_FINAL_GRAY_50.jpg",quality=90,optimize=True)
-            if rank <= 12:
-                # Separate black/white backdrops catch halo/box artifacts hidden by gray.
-                for bgcolor,rgb in (("BLACK",(0,0,0)),("WHITE",(255,255,255))):
-                    t=[comp(im,rgb) for im in (r0,r1,r2)]
-                    view=Image.new("RGB",(t[0].width*3+16,t[0].height),rgb)
-                    for i,tile in enumerate(t):view.paste(tile,(i*(tile.width+8),0))
-                    view.resize((max(1,view.width//2),max(1,view.height//2)),
-                                Image.Resampling.LANCZOS).save(
-                        OUT/f"{name}_SOURCE_CLEAN_FINAL_{bgcolor}_50.jpg",
-                        quality=88,optimize=True)
-            yy0,yy1=4096-box[3],4096-box[1]
-            if rank <= 12:
-                for label,im in (("SOURCE",source),("CLEAN",clean),("FINAL",final)):
-                    im.transpose(Image.Transpose.FLIP_TOP_BOTTOM).crop(
-                        (box[0],yy0,box[2],yy1)).save(
-                        OUT/f"{name}_{label}_RAW_NATIVE_RGBA.png",compress_level=7)
-            sl=np.s_[ya:yb,xa:xb]
-            machine={
-                "rank":rank,"bbox_readable":list(x["bbox_readable"]),
-                "expanded_crop_readable":list(box),
-                "A213_component_changed_pixels":int(x["changed_pixels"]),
-                "source_clean_RGBA_changes_in_bbox":int(np.count_nonzero(diff_sc[sl])),
-                "source_final_RGBA_changes_in_bbox":int(np.count_nonzero(diff_sf[sl])),
-                "clean_final_RGBA_changes_in_bbox":int(np.count_nonzero(diff_cf[sl])),
-                "source_clean_alpha_changes_in_bbox":int(np.count_nonzero(alpha_sc[sl])),
-                "source_alpha_disappeared_in_bbox":int(np.count_nonzero((s[:,:,3][sl]>0)&(f[:,:,3][sl]==0))),
-                "source_alpha_appeared_in_bbox":int(np.count_nonzero((s[:,:,3][sl]==0)&(f[:,:,3][sl]>0))),
-                "semantic_classification":"UNCLASSIFIED_NEEDS_INDEPENDENT_SOURCE_TEXT_VS_ART_REVIEW",
-                "lossless":["SOURCE_NATIVE_RGBA.png","CLEAN_NATIVE_RGBA.png","FINAL_NATIVE_RGBA.png"],
-                "gray100":f"{name}_SOURCE_CLEAN_FINAL_GRAY_100.jpg",
-                "gray50":f"{name}_SOURCE_CLEAN_FINAL_GRAY_50.jpg",
-                "raw_native":rank<=12
-            }
-            report.append(machine)
-        result={
-            "run":"A215","run_key":RUN_KEY,"role":"A","priority":"P0","queue_index":121,
-            "ingame_reports":["IGR-030","IGR-031","IGR-040"],
-            "source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,"clean_sha256":CLEAN_SHA,
-            "source_url":SOURCE_URL,"native":"4096x4096 RGBA32 mip1; persisted FLIP-Y and RAW",
-            "A213_components_total":179,"ranked_components_lossless_new":len(report),
-            "new_promoted_dds":0,"new_trial_dds":0,"candidate_changed":False,
-            "all_atlas_source_clean_RGBA_changed_pixels":int(np.count_nonzero(diff_sc)),
-            "all_atlas_source_final_RGBA_changed_pixels":int(np.count_nonzero(diff_sf)),
-            "all_atlas_clean_final_RGBA_changed_pixels":int(np.count_nonzero(diff_cf)),
-            "all_atlas_source_clean_alpha_changed_pixels":int(np.count_nonzero(alpha_sc)),
-            "regions":report,
-            "interpretation":"Components are measured from canonical source and CLEAN diff; actual localized segments and protected artwork MUST still be identified manually. Diff-derived boxes do not authorize an edit mask or imply original artwork is protected. This is a producer-native evidence handoff, not material DDS production.",
-            "visual_status":"CONTROLLER_NATIVE_REVIEW_PENDING",
-            "C1":"C335_HOLD_STRICT_RECHECK_UNCHANGED",
-            "C3":"NOT_RUN","approval":"NOT_ISSUED",
-            "real_game":"OPEN_USER_INGAME_FAIL",
-            "RUNTIME_VALIDATION":"UNTESTED",
-            "VR_FFB_DX11_DXVK":"EXCLUDED"
-        }
-        (OUT/"A215_COMPONENT_QA.json").write_text(
-            json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
-        print("A215_SOURCE_PROTECTION_HOLD", json.dumps({
-            "new_lossless_component_regions":len(report),"current_DDS_changed":False,
-            "source_clean_changed":result["all_atlas_source_clean_RGBA_changed_pixels"],
-            "clean_final_changed":result["all_atlas_clean_final_RGBA_changed_pixels"]}),flush=True)
-if __name__=="__main__":
-    main()
+        if clean.size!=source.size:raise ValueError("CLEAN size mismatch")
+        x0,y0,x1,y1=ORIGINAL
+        plate=prior.copy()
+        plate.paste(clean.crop(ORIGINAL),(x0,y0))
+        old=np.asarray(prior)
+        p=np.asarray(plate)
+        allow=np.zeros((1024,2048),np.bool_);allow[y0:y1,x0:x1]=True
+        if np.count_nonzero(p[y0:y1,x0:x1,3]):
+            raise ValueError("P1 failed original-source transparent CLEAN")
+        if np.any(np.any(old!=p,axis=2)&~allow):
+            raise ValueError("P1 outside requested source sprite")
+        plate.save(OUT/"A216_P1_SOURCE_CLEAN_ONLY.png",compress_level=6)
+        lettering=hand_contour()
+        face=np.asarray(lettering,np.float32)
+        if not np.any(face>150):raise ValueError("empty hand contour")
+        # Measured source metal profile + bevel from local contour direction.
+        # Neither arbitrary font stretch nor flat RGB rectangle.
+        dist=distance_transform_edt(face>120)
+        dy,dx=np.gradient(dist.astype(np.float32))
+        x,y=x0+22,y0+5
+        rows=np.clip(np.arange(face.shape[0])+y-y0,0,y1-y0-1)
+        row_brightness=source_bands(source.crop(ORIGINAL))[rows][:,None]
+        delta=21*np.clip(-dy-0.65*dx,-1,1)+8*np.clip(dist/7,0,1)-22*np.clip(dy+0.55*dx,-1,1)
+        intensity=np.clip(row_brightness+delta,36,250)
+        layer=np.zeros((face.shape[0],face.shape[1],4),np.uint8)
+        layer[:,:,:3]=np.clip(np.stack([intensity+2,intensity+1,intensity],axis=2),0,255).astype(np.uint8)
+        layer[:,:,3]=face.astype(np.uint8)
+        face_layer=Image.fromarray(layer,"RGBA")
+        final=plate.copy()
+        shadow=Image.new("RGBA",lettering.size,(9,9,13,0))
+        shadow.putalpha(lettering.point(lambda aa:int(aa*0.88)))
+        final.alpha_composite(shadow,dest=(x+4,y+4))
+        final.alpha_composite(face_layer,dest=(x,y))
+        mask=np.zeros((1024,2048),bool)
+        f=np.asarray(final)
+        changes=np.any(f!=p,axis=2)
+        yy,xx=np.nonzero(changes)
+        if len(xx)==0:raise ValueError("missing changed face pixels")
+        bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+        margins=[bbox[0]-x0,x1-bbox[2],bbox[1]-y0,y1-bbox[3]]
+        mask[y0:y1,x0:x1]=True
+        gates={"source_to_clean_alpha_nonzero":int(np.count_nonzero(p[y0:y1,x0:x1,3])),
+          "prior_to_new_rgba_changed_outside_source":int(np.count_nonzero(np.any(f!=old,axis=2)&~allow)),
+          "prior_to_new_alpha_changed_outside_source":int(np.count_nonzero((f[:,:,3]!=old[:,:,3])&~allow)),
+          "clean_to_final_rgba_changed_outside_original":int(np.count_nonzero(changes&~mask)),
+          "margins":margins,"bbox":bbox,
+          "width_relative_source":round((bbox[2]-bbox[0])/(x1-x0),4)}
+        if min(margins)<2 or any(gates[k] for k in ("source_to_clean_alpha_nonzero","prior_to_new_rgba_changed_outside_source","prior_to_new_alpha_changed_outside_source","clean_to_final_rgba_changed_outside_original")):
+            raise ValueError("P3 source-pixel and positive-margin gate FAIL "+repr(gates))
+        path=OUT/"A216_Q175_MANUAL_SOURCE_WELDED_CHROME_TRIAL.dds"
+        save_dds(header,final,path)
+        h2,decoded=read_dds(path)
+        if h2!=header or not np.array_equal(np.asarray(decoded),f):
+            raise ValueError("persisted DDS encode/decode exact mismatch")
+        decoded.save(OUT/"A216_SAVED_FLIPY_NATIVE.png",compress_level=6)
+        decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A216_SAVED_RAW_NATIVE.png",compress_level=6)
+        lettering.save(OUT/"A216_HAND_VECTOR_MASK_NATIVE.png",compress_level=6)
+        # Requested three separate stages and source vs new at actual scale.
+        crop=(0,y0-10,x1+14,y1+12)
+        for name,bg in (("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
+            imgs=[comp(im,bg).crop(crop) for im in (source,plate,prior,decoded)]
+            w,h=imgs[0].size
+            sheet=Image.new("RGB",(4*w+3*9,h+24),bg)
+            ImageDraw.Draw(sheet).text((7,4),"A216 CANONICAL ENGLISH | CLEAN | OLD | MANUAL KOREAN CHROME",fill=(238,203,8) if name!="WHITE" else (0,0,0))
+            for i,im in enumerate(imgs):sheet.paste(im,(i*(w+9),24))
+            for pct in (100,75,50):
+                pp=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
+                pp.save(OUT/f"A216_{name}_{pct}.jpg",quality=94,optimize=True)
+        report={"run":"A216","run_key":KEY,"role":"A","queue_index":175,"priority":"P1",
+          "status":"TRIAL_ONLY_AWAITING_DIRECT_PRODUCER_VISUAL","triage":decision,
+          "source_sha256":SOURCE_SHA,"current_candidate_sha256":PRIOR_SHA,
+          "trial_sha256":sha(path),"trial_path":str(path.relative_to(ROOT)),
+          "source_bbox":list(ORIGINAL),"trial_bbox":bbox,"numerical":gates,
+          "construction":"Hand-designed 3x vector paths: ㅅ+ㅛ / ㄹ+ㅜ+ㅁ open contours, broad connected title silhouette at native 860x125, single AA downsample, independently sampled source English chrome color by row and contour-normal bevel/extrusion. Not A211 Noto glyph; not stretching earlier Hangul raster.",
+          "pilot_family_only":True,"new_promoted_dds":0,"new_trial_dds":1,
+          "independent_C1":"BLOCKED_UNTIL_PRODUCER_VISUAL",
+          "C3":"NOT_RUN","user_game":"IGR032_OPEN","RUNTIME_VALIDATION":"UNTESTED"}
+        (OUT/"A216_WORKER_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+        print("A216_TRIAL_SHA",report["trial_sha256"],"BBOX",bbox,flush=True)
+try:execute()
+except Exception as e:
+    data={"run":"A216","run_key":KEY,"status":"TRIAL_EXECUTION_FAIL_CURRENT_UNCHANGED",
+          "error":type(e).__name__+":"+str(e),"traceback":traceback.format_exc(),"new_promoted_dds":0,"RUNTIME_VALIDATION":"UNTESTED"}
+    (OUT/"A216_WORKER_HOLD.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
+    print("A216_HOLD",str(e),flush=True)
