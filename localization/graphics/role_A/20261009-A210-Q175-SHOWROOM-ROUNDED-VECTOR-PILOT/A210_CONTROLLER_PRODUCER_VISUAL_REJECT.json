@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "run": "20261009-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL",
+  "run_key": "OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335",
+  "role": "A",
+  "queue_index": 175,
+  "priority": "P1",
+  "report_issue": "IGR-032",
+  "source_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "unchanged_promoted_dds_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "new_trial_dds_sha256": "93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded",
+  "trial_path": "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds",
+  "new_trial_dds_count": 1,
+  "new_promoted_dds_count": 0,
+  "worker": {
+    "rejected_first_run": 37945535957,
+    "first_reason": "bottom glyph/depth touches original effect bbox [47,401,487,529], violates positive margin; fail-closed before trial",
+    "successful_run": 37945610280,
+    "success_worker_head": "826c84fb8bac666843d8289793f271b556dde883"
+  },
+  "method": {
+    "baseline": "A209 hand-rail outline was visually rejected for collapsed 룸 counters and weak chrome",
+    "new": "A210 authored separate true-jamo phonemic contours for ㅅ+ㅛ and ㄹ+ㅜ+ㅁ with explicit closed-counter/gap topology assertions, sampled English y-band chrome, per-pixel inside-glyph normal-direction upper-left highlight and lower-right depth, native BGRA32 persisted DDS; no prior raster resampling",
+    "source_derived_scope": "isolated showroom effect bbox, other two title sprites are byte-exactly preserved against current Korean candidate",
+    "next_after_failure": "Do not inflate width/shear or repeat manual rails. Require a newly authored connected rounded techno Hangul contour system with measured source cap height, relief/extrusion and robust negative-space counters at 50%; qualify one family representative only."
+  },
+  "native": {
+    "source_effect_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "candidate_effect_bbox": [
+      47,
+      400,
+      487,
+      528
+    ],
+    "source_size_px": [
+      950,
+      132
+    ],
+    "candidate_size_px": [
+      440,
+      128
+    ],
+    "width_ratio": 0.4632,
+    "height_ratio": 0.9697,
+    "format": "2048x1024 BGRA32 mip1 RAW mirror_y",
+    "positive_margins": [
+      41,
+      469,
+      3,
+      1
+    ]
+  },
+  "machine": {
+    "prior_vs_trial_changed_outside_showroom_RGBA": 0,
+    "prior_vs_trial_changed_outside_showroom_alpha": 0,
+    "old_candidate_protected_titles_changed": 0,
+    "transparent_clean_showroom_alpha_nonzero": 0,
+    "clean_to_final_outside_glyph_depth_RGBA": 0,
+    "dds_roundtrip": "PASS_EXACT",
+    "bottom_positive_margin_px": 1,
+    "global_source_vs_old_nonlocalized_pixel_difference": 247717,
+    "global_source_vs_old_diff_interpretation": "Previously translated other regions; NOT an allowable blanket claim of full-atlas source art preservation"
+  },
+  "producer_visual": {
+    "plate_before_lettering": "SCOPED_PASS source glyphs cleared in showroom CLEAN; original small separated neighboring art retained",
+    "composite": "SCOPED_PASS no new box/rectangle or outside-effect changes; original title artifacts retained outside edit by design",
+    "glyph_topology": "IMPROVED_VS_A209 distinct 룸 inner ㅁ counter and ㄹ/ㅜ gap, but visible outlines still detached and rail-like versus English joined techno",
+    "style": "FAIL original low-wide connected metallic letter-family vs narrow spaced Korean and thinner highlighted chrome; oversimplified geometry",
+    "source_hierarchy": "FAIL original width950 compared current 440 (~46%); cannot justify same visual weight/hierarchy on source-relative review",
+    "practical_50": "FAIL visibly small and weak segmented chrome relative to immediately legible source title despite intact inner counters",
+    "normal_75_100": "HOLD 100% native/75% readable but not matched source family; no approval",
+    "raw_flip_y": "SCOPED_PASS geometry numerically mirrors source; native RAW lossless saved, no actual game",
+    "protected": "SCOPED_PASS candidate outside target 0; full original-to-candidate protected mask not independently approved"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_SHOWROOM_GRAY_100.jpg",
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_SHOWROOM_WHITE_75.jpg",
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_SHOWROOM_BLACK_50.jpg",
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_TRIAL_PERSISTED_READABLE.png",
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_TRIAL_PERSISTED_RAW.png",
+    "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_SHO_ROOM_CUSTOM_VECTOR_MASK.png"
+  ],
+  "decision": "PRODUCER_VISUAL_REWORK_REQUIRED_TRIAL_NOT_PROMOTED",
+  "reason_codes": [
+    "SOURCE_FAMILY_CONTOUR_MISMATCH",
+    "SOURCE_CHROME_RELIEF_UNDERFILL",
+    "TITLE_HIERARCHY_UNDERFILL"
+  ],
+  "independent_C1": "BLOCKED_PRODUCER_VISUAL_FAIL",
+  "C3": "BLOCKED",
+  "approval": "NOT_GRANTED",
+  "user_game": "IGR-032_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
