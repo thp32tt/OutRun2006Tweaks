@@ -128,6 +128,14 @@ class UIScaling : public Hook
     // sibling HUD owner at source, never by promoting all generic 2D draws.
     // This group is wholly inside the original 0x97000..0x98000 result
     // presentation code, not world decals or the final static GOAL helpers.
+    // The original EXE stage-extension animation uses 0x989xx sprani
+    // E8 calls (two explicit 0x2C00B4/B5 sprite identifiers plus a
+    // 0x2C006C child), NOT the 0x97xxx result-progress print calls.
+    // Own only these three original producers, never general alpha or
+    // the completed GOAL display. Confirmed EXE SHA 68ceb386...
+    static constexpr int StageExtensionSpraniCalls[] = {
+        0x9898E, 0x98A36, 0x98AC6
+    };
     static constexpr int ResultTextB9200Calls[] = {
         0x973AF, 0x97422, 0x974D0, 0x97544,
         0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
@@ -710,6 +718,43 @@ class UIScaling : public Hook
         }
 		ResultProgressTailsBefore = {};
 	}
+
+    inline static SafetyHookMid StageExtensionEnterHooks[
+        std::size(StageExtensionSpraniCalls)]{};
+    inline static SafetyHookMid StageExtensionLeaveHooks[
+        std::size(StageExtensionSpraniCalls)]{};
+    inline static thread_local unsigned StageExtensionDepth = 0;
+    inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
+        StageExtensionBefore{};
+    inline static thread_local std::uint64_t StageExtensionCompleted = 0;
+
+    static void StageExtensionEnter(safetyhook::Context&)
+    {
+        if (StageExtensionDepth++ != 0)
+            return;
+        for (int p = 0; p < Game::SpritePriorityCount; ++p)
+        {
+            SpriteNode* root = Game::sprite_prio_root[p];
+            StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
+        }
+    }
+
+    static void StageExtensionLeave(safetyhook::Context&)
+    {
+        if (!StageExtensionDepth || --StageExtensionDepth != 0)
+            return;
+        TagAppendedNodes(StageExtensionBefore,
+            OutRunVR::GameSemantic::RenderScope::ScreenHud,
+            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+        const auto hit = ++StageExtensionCompleted;
+        if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
+            spdlog::info(
+                "VR P0 STAGE EXTENSION SPRANI: calls={} gameState={} mode={} exactScope=SCREEN_HUD",
+                hit,
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1);
+        StageExtensionBefore = {};
+    }
 
     // The original GOAL animations print the large white record and
     // intermediate stage text through *19* EXE 0x97xxx E8 calls into
@@ -1484,6 +1529,34 @@ public:
 			spdlog::error(
 				"VR P0 RESULT: exact R74 producer midhooks incomplete; all rolled back");
 		}
+        // +TIME extension belongs to 0x989xx original sprani parents,
+        // NOT the 0x97xxx final GOAL progress/record animation.
+        // Install all three exact E8 boundaries or retain vanilla draws.
+        bool stageExtensionOk = true;
+        for (unsigned i = 0; i < std::size(StageExtensionSpraniCalls); ++i)
+        {
+            const int rva = StageExtensionSpraniCalls[i];
+            StageExtensionEnterHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva), StageExtensionEnter);
+            StageExtensionLeaveHooks[i] = safetyhook::create_mid(
+                Module::exe_ptr(rva + 5), StageExtensionLeave);
+            stageExtensionOk = stageExtensionOk &&
+                StageExtensionEnterHooks[i] && StageExtensionLeaveHooks[i];
+        }
+        if (!stageExtensionOk)
+        {
+            for (unsigned i = 0; i < std::size(StageExtensionSpraniCalls); ++i)
+            {
+                StageExtensionEnterHooks[i] = {};
+                StageExtensionLeaveHooks[i] = {};
+            }
+            spdlog::warn(
+                "VR P0 +TIME: original 0x989xx sprani parent hook partially installed; rollback to game original");
+        }
+        else
+            spdlog::info(
+                "VR P0 +TIME: exact 0x989xx sprani parents -> SCREEN_HUD (original animation retained)");
+
         // Inline E8 parent hooks are installed atomically; a partially
         // bracketed result print sequence could tag only half the large
         // record digits and cause an eye-to-eye double image.
