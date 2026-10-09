@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "run": "C342-C2",
+  "run_key": "OUTRUN-KOR-C342-C2-Q060-SAVED-ORANGE-OVERLAP-20261010-0500",
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "selected_remote_head": "0dca22bf8279f8716c84675f515af3c592b54279",
+  "selected_queue_blob": "8278535f1d8c1b1daa9c7d0d26be1858b500dae4",
+  "decision": "REWORK_REQUIRED",
+  "independent_C_result": "VISUAL_FAIL",
+  "first_look_blind_calibration": "NOT_QUALIFIED_PREVIOUS_PRODUCER_RECORD_READ_BEFORE_DIRECT_NATIVE_VISUAL",
+  "pixels_before_producer_verdict": false,
+  "findings": [
+    {
+      "code": "SOURCE_RESIDUE_UNDER_KOREAN",
+      "result": "FAIL",
+      "observation": "Original orange BEST TIME remains visibly readable in a narrow band behind Korean 최고 기록. Same native saved atlas crop and RAW orientation reproduce superimposed lettering; source pixel footprint was not fully removed in the shared consumer area."
+    },
+    {
+      "code": "PROTECTED_ART_OVERLAP",
+      "result": "FAIL",
+      "observation": "Preserved English orange letter segments and the newly drawn navy-edged Korean title occupy the same displayed native pixel zone; B335 orange guard covers only a limited protected strip and falsely suggests no visual collision."
+    },
+    {
+      "code": "BACKGROUND_PATCH_INTRUSION",
+      "result": "FAIL",
+      "observation": "Candidate has large changed transparent/dark composite patches across the BEST TIME plate whereas original has a continuous orange-on-navy title; source/candidate alpha composited onto neutral gray independently inspected."
+    }
+  ],
+  "scoped_machine_observation": {
+    "kind": "nonsemantic_source_orange_color_probe_not_whole_atlas_protected_mask",
+    "readable_crop": [
+      1950,
+      150,
+      3100,
+      500
+    ],
+    "source_orange_rule": "R>160, 60<G<240, B<125, A>100",
+    "source_orange_pixels": 46753,
+    "unchanged_source_orange_pixels": 10699,
+    "erased_source_orange_alpha_zero": 15194,
+    "changed_source_orange_alpha_visible": 20860,
+    "source_candidate_changed_rgba_pixels": 201530,
+    "note": "Probe is supporting evidence; direct visual native/RAW overlap is decisive. These counts are not a claim of whole-atlas zero/overlap certification."
+  },
+  "exact_dds": {
+    "canonical_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "saved_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "source_size": 33554560,
+    "candidate_size": 33554560,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32_BGRA_BYTE_ORDER",
+    "mips": 1,
+    "orientation": "RAW Y mirror (FLIP-Y readable)",
+    "candidate_changed": false
+  },
+  "evidence": {
+    "C342_Q060_SOURCE_FINAL_GRAY_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_SOURCE_FINAL_GRAY_NATIVE.png",
+      "sha256": "21e544c3a05a058944d388a5fb199f8ce4f5b958d5e9c6c4f38e1ef2a6d7657d",
+      "size": 260122
+    },
+    "C342_Q060_SOURCE_FINAL_GRAY_50.png": {
+      "path": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_SOURCE_FINAL_GRAY_50.png",
+      "sha256": "12e4e4ef999926afa0727c2a24b10d2867c3deb82395b1761c111e9df068b62c",
+      "size": 147633
+    },
+    "C342_Q060_SOURCE_FINAL_GRAY_RAW.png": {
+      "path": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_SOURCE_FINAL_GRAY_RAW.png",
+      "sha256": "79554a1aab097513d1d932155146dfdc6dbf69d22518188c3d5d59175f55f025",
+      "size": 282438
+    }
+  },
+  "calibration": "UNQUALIFIED_NO_PASS_CLAIM",
+  "eight_axes": {
+    "slant": "HOLD_NEEDS_MATCHED_SOURCE_KOREAN_STROKE",
+    "clean_plate": "FAIL_INCOMPLETE_SHARED_BEST_TIME_REMOVAL",
+    "style": "FAIL_OVERLAY_DOUBLED_SOURCE_ORANGE",
+    "readability": "FAIL_SUPERIMPOSED_MIXED_LANGUAGE",
+    "glyph_integrity": "HOLD_NOT_WHOLE_ATLAS_CERTIFIED",
+    "protected_art": "FAIL_VISIBLE_SOURCE_ORANGE_AND_LOCALIZED_GLYPH_COLLISION",
+    "placement": "FAIL_ORIGINAL_ORANGE_AND_NEW_KOREAN_OVERLAP",
+    "orientation": "FAIL_REPRODUCES_IN_BOTH_RAW_AND_FLIPY"
+  },
+  "prior_c2": "C334_CANONICAL_SHA_SCOPED_HOLD",
+  "producer_records_reexamined": [
+    "B335 P1 mechanical PASS limited mask",
+    "B336 P2 source-family HOLD"
+  ],
+  "triage": "MATERIAL_REWORK",
+  "producer_next_action": "Identify exact atlas sprite/consumer owner boundaries and source English title removal; preserve truly separate protected sprite art without simultaneous pixels. Remake CLEAN vs SOURCE independently; no opaque rectangle; create exact saved DDS and 100/75/50,RAW evidence, C2 review again.",
+  "C3": "BLOCKED_BY_CURRENT_C2_REWORK",
+  "current_policy_approval": "BLOCKED",
+  "preview_export": "EXCLUDE_OPEN_IGR044",
+  "ingame_regression": "IGR044_OPEN_USER_INGAME_FAIL",
+  "user_game_retest": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds_count": 0,
+  "backend": "GitHub SSOT + N100 MCP SHA-verified DDS exact cropped decode fallback; controller direct visual review",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "odd/unindexed C1 assets",
+    "separate task/queue engines"
+  ]
+}

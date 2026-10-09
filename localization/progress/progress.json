@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 04:45 KST",
+  "updated_at_kst": "2026-10-10 05:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -59,7 +59,16 @@
       "total_artwork_targets": 79,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
-      "reset_to_original_pending_rework": 1
+      "reset_to_original_pending_rework": 1,
+      "latest_c2_independent_finding": {
+        "index": 60,
+        "asset": "A064FDFC_1024x512.dds",
+        "result": "REWORK_REQUIRED",
+        "reason": "VISIBLE_ORANGE_BEST_TIME_UNDER_OVERLAPPING_KOREAN",
+        "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "qa_report": "localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json",
+        "runtime_validation": "UNTESTED"
+      }
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -9868,18 +9877,17 @@
     "user_game": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json"
-  }
-,
+  },
   "b342_q212_canonical_source_identity": {
-  "run_key": "OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445",
-  "queue_index": 212,
-  "canonical_revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
-  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
-  "source_verified": true,
-  "cpu_runner_corrected_id": 37982259716,
-  "worker_status": "PENDING",
-  "new_promoted_dds": 0,
-  "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
+    "run_key": "OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445",
+    "queue_index": 212,
+    "canonical_revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "source_verified": true,
+    "cpu_runner_corrected_id": 37982259716,
+    "worker_status": "PENDING",
+    "new_promoted_dds": 0,
+    "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
 }

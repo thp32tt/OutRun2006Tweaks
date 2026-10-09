@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C342 C2 q060 verified exact native/source persisted DDS, source orange BEST TIME visibly remains behind overlapping Korean 최고 기록 in FLIP-Y/RAW despite B335 P1 guard. C2 REWORK_REQUIRED, asset index60 only (EVEN). Source SHA 6a33c730..., saved candidate d81d0d14... unchanged, report localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json. B fix sprite ownership/complete original removal WITHOUT deleting separately protected orange region. C3/current approvals/export blocked, IGR044 remains OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-C342-C2-Q060-SAVED-ORANGE-OVERLAP-20261010-0500",
     "B342 2026-10-10 04:45 KST q212 exact SOURCE provenance blocker resolved: original Sonic-TV source revision 3da797... failed expected sha; B329 actual canonical revision 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 independently downloaded, 16777344 bytes RGB32 2048x2048 mip1 SHA256 f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61 PASS. GitHub cpu B.py corrected 2f0d452...; corrected Actions 37982259716 QUEUED/PENDING; SOURCE/CLEAN 12-region new machine and P3 pending, current e22ad5c4 unchanged, B341 trial fa0acb56 unchanged, new promoted DDS0, C338 REWORK/C2/C3/IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json RUN_KEY=OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445.",
     "A216 q175 P1 new hand-contour SHOWROOM source-chrome material trial a5e921ab... (GitHub worker #37977929319) decoded pixel 0 outside exact source, bbox [56,400,866,527], 810/950 width. Controller native100 black50 white75 VISUAL FAIL: '쇼룸' syllable morphology becomes roof/posts + stacked rails, not original rounded welded chrome; DO NOT promote or repeat rail/stretched glyph. Existing promoted b9f60b45... unchanged, C1/C3/approval/user game IGR032 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json OUTRUN-KOR-A216-Q175-SOURCE-CONTOUR-WELDED-CHROME-PILOT-20261010-0400",
     "C340 C1 q201 fresh B305 saved DDS persisted exact native delta 2505 RGBA/1912 alpha all within GOALS (other UI no changes). Missing canonical source and independently CLEAN, blind QA calibration/C3 => HOLD. IGR037 OPEN; OUTRUN-KOR-C340-C1-Q201-B305-EXACT-NATIVE-DELTA-20261010",
@@ -14092,18 +14093,17 @@
     "igaming": "IGR032_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_CONTROLLER_VISUAL_REJECT.json"
-  }
-,
+  },
   "b342_q212_canonical_source_identity": {
-  "run_key": "OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445",
-  "queue_index": 212,
-  "canonical_revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
-  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
-  "source_verified": true,
-  "cpu_runner_corrected_id": 37982259716,
-  "worker_status": "PENDING",
-  "new_promoted_dds": 0,
-  "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
+    "run_key": "OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445",
+    "queue_index": 212,
+    "canonical_revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "source_verified": true,
+    "cpu_runner_corrected_id": 37982259716,
+    "worker_status": "PENDING",
+    "new_promoted_dds": 0,
+    "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
 }
