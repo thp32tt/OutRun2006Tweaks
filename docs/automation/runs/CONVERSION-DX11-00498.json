@@ -17,12 +17,12 @@
     ".github/workflows/backend-conversion-gate.yml:R197"
   ],
   "base_sha": "2caf8ceee3154d8e8e7dca9f1d75b9b7b0d41a1d",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "6c2e080b5624259d7397824d6dd592d666ef36a0",
+  "material_result_sha": "6c2e080b5624259d7397824d6dd592d666ef36a0",
+  "validation_bearing_result_sha": "6c2e080b5624259d7397824d6dd592d666ef36a0",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
@@ -30,11 +30,11 @@
   "pipeline": {
     "C0_RECOVER": "PASS owner/checkpoint absent, exact HEAD 2caf8ceee3154d8e8e7dca9f1d75b9b7b0d41a1d; previous R196 00497 terminal; 00477 R175 separately BLOCKED",
     "C1_REVIEW": "PASS independent non-indexed Draw R185 lacks R196 GS/HS/DS guard; no DXVK or DX9Ex files edited",
-    "C2_IMPLEMENT": "PASS native linear stage fail-closed + real GS-interference and recovery Draw WARP probe + 4 negative mutations + CI wiring; corrected R197 real GS HLSL syntax after first WARP compile negative evidence",
-    "C3_VALIDATE": "First material SHA 0ea53159a5a5414a9dd6f9ce6d8fe4d4eaa306d5 Backend Gate 37988436289 validate SUCCESS, R197 static PASS, R183 actual WARP FAIL at R197 compile interfering GS due to HLSL missing struct semicolon. Repair adds semicolon and static HLSL declaration source contract; new exact SHA Gate PENDING.",
-    "C4_COMMIT": "Material commit [AUTO:CONVERSION-DX11-00498] no CI skip; immutable material SHA taken from commit message/API",
-    "C5_PACKAGE": "NOT_REQUIRED: native game draw dormant",
-    "C6_STATE": "PENDING exact-SHA Gate"
+    "C2_IMPLEMENT": "PASS native C++ non-indexed Draw VS/PS-only shader-stage guard + actual WARP GS offscreen negative/clean restore red pixel + 4 negative source mutants; repaired malformed GS struct HLSL in same task and tested revised syntax contract",
+    "C3_VALIDATE": "Exact first SHA 0ea53159a5a5414a9dd6f9ce6d8fe4d4eaa306d5 Gate 37988436289 validate SUCCESS, R197 static PASS, first GS HLSL compile FAIL (missing struct semicolon). Repaired exact SHA 6c2e080b5624259d7397824d6dd592d666ef36a0 Gate 37989460728 validate job 114019618113 SUCCESS, smoke 114021643513 R197 static four mutants PASS and actual native Draw GS-offscreen+restored red WARP PASS; full smoke FAIL inherited R175 TEXCOORD6 BGRA actual [128,0,16,255] expected [224,128,32,255].",
+    "C4_COMMIT": "PASS material source+probe+test+CI at first SHA 0ea53159..., repaired validation-bearing material 6c2e080b5624259d7397824d6dd592d666ef36a0 [AUTO:CONVERSION-DX11-00498], without CI-skip; material commit is exact gate SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: native non-indexed Draw readiness remains dormant; no gameplay routing, HMD promotion or deployable package",
+    "C6_STATE": "SEALED: R197 C++ + static negative controls + actual Win32 WARP PASS, whole exact-SHA Backend Conversion Gate FAIL solely inherited separately owned R175; runtime UNTESTED; C6 docs commit separated with [skip ci] from material commit."
   },
   "changed_paths": [
     "src/vr/d3d11/native_linear_draw_submit.hpp",
@@ -57,9 +57,44 @@
     "first_smoke_error": "R183 WARP failure: R197 compile interfering GS",
     "first_qualified_r197_static": "PASS",
     "repair_root_cause": "HLSL Geometry Shader struct V missing final semicolon (must be };)",
-    "repair_attempt": 1
+    "repair_attempt": 1,
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37989460728,
+    "head_sha": "6c2e080b5624259d7397824d6dd592d666ef36a0",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 114019618113,
+    "validate_result": "success",
+    "smoke_job_id": 114021643513,
+    "smoke_result": "failure",
+    "r197_static": "PASS",
+    "r197_negative_mutants": 4,
+    "r197_win32_build": "PASS",
+    "r197_actual_gpu_gs_suppression": "PASS",
+    "r197_actual_gpu_restored_red_pixels": "PASS",
+    "failed_step": "Run DX11 constant buffer probe",
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "upstream_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "issue14_change_comment_id": 6088907309,
+    "issue14_repair_comment_id": 6089010178
   },
-  "next_action": "Exact-SHA Gate on repaired material commit; inspect hosted R197 WARP pixel evidence and R175 independent full Gate",
-  "resume_cursor": "C3_EXACT_SHA_CI_PENDING",
-  "score_change": 0
+  "next_action": "00498 terminal: do not redo R197 WARP or recalculate score. R175 independently owned by 00477; allow only a separately dispatched distinct work_key and compare current exact HEAD. Quest3/VDXR runtime parity still UNTESTED.",
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "score_change": 0,
+  "scoped_automation_validation": "PASS_R197_WIN32_STATIC_FOUR_NEGATIVE_MUTANTS_AND_ACTUAL_GS_WARP_PIXELS",
+  "score_reason": "R197 scoped material and hosted WARP PASS but required whole exact-SHA Gate FAIL on inherited independently owned R175; no new score or replay increment.",
+  "last_real_activity_at": "2026-10-10T05:59:00+09:00",
+  "state_persisted": true
 }
