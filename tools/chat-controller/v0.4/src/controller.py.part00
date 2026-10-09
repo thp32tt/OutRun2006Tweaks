@@ -106,6 +106,7 @@ STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "t
 PROFILE_DIR = Path("/data/browser-profile")
 STATE_DIR = Path("/data/state")
 REGISTRY_FILE = STATE_DIR / "chat_registry.json"
+CHROME_RECYCLE_FILE = STATE_DIR / "chrome_recycle.json"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
 GAME_MOD_CONTEXT = (
@@ -251,6 +252,9 @@ runtime = {
     "artifact_sha": "",
     "state": "IDLE",
     "runtime_validation": "UNTESTED",
+    "chrome_recycle_enabled": CHROME_RECYCLE_ENABLED,
+    "chrome_recycle_interval_minutes": CHROME_RECYCLE_INTERVAL_SECONDS // 60,
+    "chrome_recycle_busy_grace_minutes": CHROME_RECYCLE_BUSY_GRACE_SECONDS // 60,
 }
 
 
