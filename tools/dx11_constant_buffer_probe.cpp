@@ -11502,11 +11502,47 @@ VSOutput main(VSInput input)
                 d3d.context, &r166Rejected) && r166Rejected == nullptr,
             "R166 rejects unbound substitute mirror readback");
 
+        // R167 color/depth provenance: preserve the exact R145 pair before
+        // staging. A detached or foreign (same-format) depth view is not the
+        // actual offscreen indexed draw's depth attachment.
+        ID3D11Texture2D* r167Rejected = nullptr;
+        d3d.context->OMSetRenderTargets(1u, &r164Color, nullptr);
+        require(
+            !outputColorSurface.copy_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, &r167Rejected) &&
+            r167Rejected == nullptr,
+            "R167 rejects detached live OM DSV after indexed WARP draw");
+        outrun::vr::dx11::NativeSurfaceMirror r167SubstituteDepth;
+        require(
+            r167SubstituteDepth.initialize(
+                d3d.device, ResourceRole::DepthStencil, 64u, 32u,
+                D3DFMT_D24S8, D3DPOOL_DEFAULT, D3DUSAGE_DEPTHSTENCIL,
+                D3DMULTISAMPLE_NONE, 0u),
+            "R167 same-device identical-descriptor DSV fixture");
+        d3d.context->OMSetRenderTargets(
+            1u, &r164Color, r167SubstituteDepth.depth_stencil_view());
+        require(
+            !outputColorSurface.copy_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, &r167Rejected) &&
+            r167Rejected == nullptr,
+            "R167 rejects substituted DSV despite matching descriptor");
+        require(
+            surfaceTargetBinding.apply(
+                d3d.context, outputColorSurface, outputDepthSurface) &&
+            r157Probe(d3d.context, r164Color, indexedDirectDispatch),
+            "R167 restores exact live depth attachment without native game Draw");
+        require(
+            !outputColorSurface.copy_color_depth_pair_to_staging(
+                d3d.context, r166SubstituteColor, &r167Rejected) &&
+            r167Rejected == nullptr,
+            "R167 rejects color-role object as depth mirror");
+
         ID3D11Texture2D* r165Readback = nullptr;
         require(
-            outputColorSurface.copy_color_to_staging(
-                d3d.context, &r165Readback) && r165Readback != nullptr,
-            "R165 exact color mirror staging copy after indexed WARP draw");
+            outputColorSurface.copy_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, &r165Readback) &&
+            r165Readback != nullptr,
+            "R167 exact live RTV/DSV pair staging copy after indexed WARP draw");
         D3D11_TEXTURE2D_DESC r165Desc{};
         r165Readback->GetDesc(&r165Desc);
         require(

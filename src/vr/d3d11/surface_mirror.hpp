@@ -49,6 +49,15 @@ namespace outrun::vr::dx11
             ID3D11DeviceContext* context,
             ID3D11Texture2D** stagingOutput) const noexcept;
 
+        // R167 diagnostic-only: a successful color readback must also prove
+        // that the exact current-generation depth mirror remains bound in OM.
+        // Detached/foreign DSVs cannot establish color/depth draw provenance.
+        // Does not alter OM state or activate a game native Draw path.
+        [[nodiscard]] bool copy_color_depth_pair_to_staging(
+            ID3D11DeviceContext* context,
+            const NativeSurfaceMirror& depth,
+            ID3D11Texture2D** stagingOutput) const noexcept;
+
         [[nodiscard]] ResourceRole role() const noexcept { return role_; }
         [[nodiscard]] UINT width() const noexcept { return width_; }
         [[nodiscard]] UINT height() const noexcept { return height_; }

@@ -258,6 +258,40 @@ namespace outrun::vr::dx11
         return true;
     }
 
+    bool NativeSurfaceMirror::copy_color_depth_pair_to_staging(
+        ID3D11DeviceContext* context,
+        const NativeSurfaceMirror& depth,
+        ID3D11Texture2D** stagingOutput) const noexcept
+    {
+        if (!stagingOutput)
+            return false;
+        *stagingOutput = nullptr;
+        if (!context ||
+            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
+            !device_ ||
+            !compose_surface_pair_readiness(device_.Get(), *this, depth).ready)
+            return false;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+        if (!contextDevice || contextDevice.Get() != device_.Get())
+            return false;
+
+        // R167: R166 proved only the color RTV. A late DSV detach or an
+        // equivalent-descriptor DSV substitution must never pass as a valid
+        // color/depth draw-pair readback. OMGetRenderTargets AddRefs both views.
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> observedColor;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> observedDepth;
+        context->OMGetRenderTargets(
+            1u, observedColor.GetAddressOf(), observedDepth.GetAddressOf());
+        if (observedColor.Get() != render_target_view() ||
+            observedDepth.Get() != depth.depth_stencil_view())
+            return false;
+
+        // R166 reobserves the live color RTV immediately before copying.
+        return copy_color_to_staging(context, stagingOutput);
+    }
+
     void NativeSurfaceMirror::observe_device_reset() noexcept
     {
         release_mirror();
