@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C2 fresh independent native-source/CLEAN/FINAL q098 B330 SHA 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51, then C3/evidence/JPG/actual game; RUNTIME_VALIDATION=UNTESTED.",
     "A205 q193 new native material DDS 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 from e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166 on index193 IGR003/019/033, changed 3 title source rows to source Black/real RGB; 3/3 bbox and 0 outside/alpha/mixed glyph, native/75/50 and RAW scoped QA PASS, 10 legacy inherited cells unchanged/possibly poor; full atlas REWORK_REQUIRED, C1/C3/user new game OPEN; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "C329 C2 EVEN q212 B329 e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea independent exact SHA/header and fresh changed-r43 visual improvement but full 12 masks/RAW/calibration incomplete -> HOLD_STRICT_RECHECK NOT PASS; IGR029 game open. localization/graphics/role_C/20261009-C329-C2-Q212-B329-SCOPED-NATIVE/C329_Q212_B329_INDEPENDENT_C2_HOLD.json RUN_KEY=OUTRUN-KOR-C329-C2-Q212-B329-EXACT-SHA-SCOPED-HOLD-20261009-1920",
     "C328 C2 q098 B327R persisted DDS SHA256 472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028 REWORK_REQUIRED: original English Cl / ord. survive around Korean in full READABLE and RAW saved image; source removal/full composite fixed DDS and fresh C2/C3/user-game required, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C328-C2-Q098-PERSISTED-ENGLISH-RESIDUE/C328_Q098_CONTROLLER_REWORK.json. RUN_KEY=OUTRUN-KOR-C328-C2-Q098-B327R-PERSISTED-ENGLISH-RESIDUE-20261009-1850",
@@ -13453,5 +13454,23 @@
     "scoped_qa": "PASS",
     "whole_atlas": "REWORK_REQUIRED",
     "runtime_validation": "UNTESTED"
+  },
+  "b330_q098_english_clean_plate": {
+    "role": "B",
+    "run": "B330",
+    "date_kst": "2026-10-09 19:50 KST",
+    "queue_index": 98,
+    "asset": "42E618FD_512x32.dds",
+    "previous_candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+    "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+    "produced_new_dds": 1,
+    "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "qa": "PRODUCER_SCOPED_PASS_PENDING_INDEPENDENT_C2_C3",
+    "visual": "READABLE+RAW SOURCE/CLEAN/OLD/NEW native75/50 BGW; old English Cl/ord removed; C328 previously rejected bytes superseded",
+    "source_outside_rgba_changes": 0,
+    "format": "DXT5 BC3 2048x128 1 mip",
+    "runtime_validation": "UNTESTED",
+    "qa_path": "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/B330_CONTROLLER_SELF_QA_FINAL.json",
+    "run_key": "OUTRUN-KOR-B330-Q098-FULL-PLATE-REMOVAL-20261009-1950"
   }
 }

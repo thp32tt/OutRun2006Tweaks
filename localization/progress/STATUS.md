@@ -3366,3 +3366,7 @@ New current Korean DDS q154 SHA256 `c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a
 - GitHub CPU worker 37919114543 SUCCESS after source format and full-asset inherited-row protection check; new exact DDS 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 produced and promoted. Recreated 3 WELCOME→환영합니다, MULTIPLAYER→멀티플레이어, SHOWROOM→쇼룸 source-color Black native rows. All 3 source bbox positive margins and zero changed/protected/alpha/glyph outside; actual saved DDS lossless roundtrip and 100/75/50 SOURCE/CLEAN/OLD/NEW and RAW images examined first-hand, these 3 scoped producer PASS.
 - Existing other 10 atlas segments/115610 source-different inherited source pixels deliberately preserved, whole-atlas low-res/mixed text not repaired => overall REWORK_REQUIRED, C1/C3/unmarked game screenshot pending. IGR003/019/033 OPEN, RUNTIME_VALIDATION=UNTESTED; no VR/FFB/DX11/DXVK.
 - QA localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_CONTROLLER_PRODUCER_SCOPED_QA.json
+
+## 2026-10-09 19:50 KST — B330 q098 new DDS (producer-only)
+
+- RUN_KEY=OUTRUN-KOR-B330-Q098-FULL-PLATE-REMOVAL-20261009-1950 — q098 42E618FD full source CLEAN plate rebuilt and saved BC3 candidate SHA256 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51 committed. C328 original `Cl` / `ord.` remnants removed in native/50/75 RAW+FLIPY visual proof. 1 materially new promoted DDS; 0 independent C2/C3 approvals, 0 actual-game closures; RUNTIME_VALIDATION=UNTESTED. Fresh C2 source-family/clean verification then C3/JPG/user in-game retest required.

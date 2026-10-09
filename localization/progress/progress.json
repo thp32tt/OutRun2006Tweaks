@@ -9283,5 +9283,23 @@
     "c3": "PENDING",
     "ingame": "OPEN",
     "runtime_validation": "UNTESTED"
+  },
+  "b330_q098_english_clean_plate": {
+    "role": "B",
+    "run": "B330",
+    "date_kst": "2026-10-09 19:50 KST",
+    "queue_index": 98,
+    "asset": "42E618FD_512x32.dds",
+    "previous_candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+    "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+    "produced_new_dds": 1,
+    "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "qa": "PRODUCER_SCOPED_PASS_PENDING_INDEPENDENT_C2_C3",
+    "visual": "READABLE+RAW SOURCE/CLEAN/OLD/NEW native75/50 BGW; old English Cl/ord removed; C328 previously rejected bytes superseded",
+    "source_outside_rgba_changes": 0,
+    "format": "DXT5 BC3 2048x128 1 mip",
+    "runtime_validation": "UNTESTED",
+    "qa_path": "localization/graphics/role_B/20261009-B330-Q098-FULL-ENGLISH-CLEAN-PLATE/B330_CONTROLLER_SELF_QA_FINAL.json",
+    "run_key": "OUTRUN-KOR-B330-Q098-FULL-PLATE-REMOVAL-20261009-1950"
   }
 }
