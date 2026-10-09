@@ -19,10 +19,13 @@ assert qa_tri["index"]==212
 b=(G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds").read_bytes()
 assert sha(b)==oldsha
 W,H=struct.unpack_from("<II",b,16)[0],struct.unpack_from("<I",b,12)[0]
-assert (W,H,len(b))==(2048,2048,128+2048*2048)
-assert struct.unpack_from("<IIII",b,92)==(0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
+print("B341_DDS_HEADER",W,H,len(b),tuple(hex(v) for v in struct.unpack_from("<IIII",b,92)),flush=True)
+assert len(b)==128+2048*2048*4
+masks=struct.unpack_from("<IIII",b,92)
+assert masks in ((0x00ff0000,0x0000ff00,0x000000ff,0xff000000),(0x000000ff,0x0000ff00,0x00ff0000,0xff000000)),masks
 def dec(v):return np.array(Image.open(io.BytesIO(v)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
 O=dec(b);D=O.copy()
+assert O.shape==(2048,2048,4),O.shape
 cp=G/"role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png"
 assert sha(cp.read_bytes())=="c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
 C=np.array(Image.open(cp).convert("RGBA"))
@@ -45,7 +48,8 @@ for r in report["regions"]:
  if r["id"] not in (43,44):
   l,t,right,bottom=r["source_bbox"]
   assert np.array_equal(D[t:bottom,l:right],O[t:bottom,l:right])
-raw=b[:128]+np.flipud(D)[:,:,[2,1,0,3]].copy().tobytes()
+order=[2,1,0,3] if masks[0]==0x00ff0000 else [0,1,2,3]
+raw=b[:128]+np.flipud(D)[:,:,order].copy().tobytes()
 assert len(raw)==len(b) and raw[:128]==b[:128] and np.array_equal(dec(raw),D)
 (P/"B341_UNAPPROVED_Q212_TWO_ANCHOR_TRIAL.dds").write_bytes(raw)
 def flatten(a,bg):
