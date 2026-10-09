@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A207: source-authored Goal A small-menu *single family pilot*, q193.
+"""A208: Goal A native-width typography corrective pilot (one family only), q193.
 
 Stage P1 SOURCE->CLEAN is completed and saved before any lettering.  Produces
 a non-promoted trial DDS plus auditable native RAW masks/evidence and recipe.
@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFont
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 R=Path.cwd()
-OUT=R/"localization/graphics/role_A/20261009-A207-Q193-GOAL-A-FLAT-UI-PILOT"
+OUT=R/"localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT"
 OUT.mkdir(parents=True,exist_ok=True)
 ASSET="97E863AD_512x256.dds"
 CAND=R/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst"/ASSET
@@ -31,7 +31,7 @@ FONT_BLOB="b5b67bf293310a3648468a21ac829d6f2d58b2d5"
 CELL=(930,206,1142,292)
 EXPECTED_SOURCE_GOAL_A_BBOX=(950,221,1115,268)
 PROTECTED=[(744,118,1117,169),(0,797,929,1022)]
-TEXT="골 A"
+TEXT="목표 A"
 SOURCE_TEXT="Goal A"
 def hashfile(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def gitblob(p):
@@ -76,7 +76,7 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
     if english!=EXPECTED_SOURCE_GOAL_A_BBOX or english[0]<x0+4 or english[1]<y0+2 or english[2]>x1-5 or english[3]>y1-6:
         raise RuntimeError(("SOURCE GOAL A not isolated; protected next row/neighbor might overlap",english,CELL))
     if english[2]-english[0]>275 or english[3]-english[1]>73:raise RuntimeError("Source cell probably contains other art")
-    print("A207 measured English source bbox",english,flush=True)
+    print("A208 measured English source bbox",english,flush=True)
     allowed=np.zeros((1024,2048),bool)
     allowed[y0:y1,x0:x1]=True
     protected=np.zeros((1024,2048),bool)
@@ -100,16 +100,16 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
     clean=Image.fromarray(cleanarr,"RGBA")
     raw=source.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     # Publication guard needs a pinned canonical DDS inside Git evidence.
-    (OUT/"A207_SOURCE_CANONICAL_RGBA32.dds").write_bytes(src.read_bytes())
-    clean.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A207_CLEAN_NATIVE_RAW.png")
-    source.save(OUT/"A207_SOURCE_READABLE.png")
-    clean.save(OUT/"A207_CLEAN_READABLE.png")
-    old.save(OUT/"A207_OLD_READABLE.png")
-    showmasks(removal,"A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png")
-    showmasks(allowed,"A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png")
-    showmasks(protected,"A207_MASK_SOURCE_PROTECTED_RAW.png")
-    showmasks(transparent,"A207_MASK_TRANSPARENT_PLATE_RAW.png")
-    showmasks(np.zeros_like(removal),"A207_MASK_NONE_RAW.png")
+    (OUT/"A208_SOURCE_CANONICAL_RGBA32.dds").write_bytes(src.read_bytes())
+    clean.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A208_CLEAN_NATIVE_RAW.png")
+    source.save(OUT/"A208_SOURCE_READABLE.png")
+    clean.save(OUT/"A208_CLEAN_READABLE.png")
+    old.save(OUT/"A208_OLD_READABLE.png")
+    showmasks(removal,"A208_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png")
+    showmasks(allowed,"A208_MASK_SOURCE_BOUNDED_EDIT_RAW.png")
+    showmasks(protected,"A208_MASK_SOURCE_PROTECTED_RAW.png")
+    showmasks(transparent,"A208_MASK_TRANSPARENT_PLATE_RAW.png")
+    showmasks(np.zeros_like(removal),"A208_MASK_NONE_RAW.png")
     # P1 evidence is saved now, independently of the eventual Korean.
     for name,bg in [("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
         x2=max(0,x0-15);y2=max(0,y0-10);x3=min(2048,x1+25);y3=min(1024,y1+15)
@@ -120,7 +120,7 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
         for i,v in enumerate(parts):sheet.paste(v,(i*(w+6),21))
         for pct in (100,75,50):
             t=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
-            t.save(OUT/f"A207_PLATE_ONLY_{name}_{pct}.jpg",quality=95)
+            t.save(OUT/f"A208_PLATE_ONLY_{name}_{pct}.jpg",quality=95)
     # P2 only after SOURCE/CLEAN mechanical stage and plate proof created.
     ew,eh=english[2]-english[0],english[3]-english[1]
     glyph=fs=None
@@ -134,6 +134,7 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
         if w.width<ew-8 and w.height<eh-4 and w.height>=0.78*eh:
             glyph=w;fs=size;break
     if glyph is None:raise RuntimeError(("font not compatible with English height/width",ew,eh))
+    if glyph.width / ew < 0.72:raise RuntimeError(("Source-relative phrase width underfill, reject before writing DDS",glyph.width,ew))
     gx=english[0]+3;gy=english[1]+(eh-glyph.height)//2
     if gx+glyph.width>=english[2]-2 or gy+glyph.height>=english[3]-1:raise RuntimeError("new glyph violates source bbox")
     srcpix=S[english[1]:english[3],english[0]:english[2]]
@@ -146,13 +147,13 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
     layer.putalpha(glyph)
     letter.alpha_composite(layer,(gx,gy))
     lraw=letter.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    lraw.save(OUT/"A207_LETTER_ONLY_NATIVE_RAW.png")
-    letter.save(OUT/"A207_LETTER_ONLY_READABLE.png")
+    lraw.save(OUT/"A208_LETTER_ONLY_NATIVE_RAW.png")
+    letter.save(OUT/"A208_LETTER_ONLY_READABLE.png")
     effect=np.asarray(letter)[:,:,3]>0
-    showmasks(effect,"A207_MASK_NEW_GLYPH_EFFECT_RAW.png")
+    showmasks(effect,"A208_MASK_NEW_GLYPH_EFFECT_RAW.png")
     if (effect&protected).any() or (effect&~allowed).any():raise RuntimeError("new lettering enters protected art")
     final=Image.alpha_composite(clean,letter)
-    saved=OUT/"A207_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
+    saved=OUT/"A208_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
     save(header,final,saved)
     head,persist=load(saved)
     if head!=header or not np.array_equal(np.asarray(persist),np.asarray(final)):
@@ -168,8 +169,8 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
        "transparent_clean_nonzero_alpha":int(np.count_nonzero(cleanarr[transparent,3]))
     }
     if any(metrics.values()):raise RuntimeError(("P3 mechanical mask fail",metrics))
-    persist.save(OUT/"A207_NEW_PERSISTED_READABLE.png")
-    persist.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A207_NEW_PERSISTED_RAW.png")
+    persist.save(OUT/"A208_NEW_PERSISTED_READABLE.png")
+    persist.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(OUT/"A208_NEW_PERSISTED_RAW.png")
     for name,bg in [("GRAY",(105,105,105)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
         x2=max(0,x0-15);y2=max(0,y0-10);x3=min(2048,x1+25);y3=min(1024,y1+15)
         parts=[flatten(im,bg).crop((x2,y2,x3,y3)) for im in (source,clean,old,persist)]
@@ -179,8 +180,8 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
         for i,v in enumerate(parts):sheet.paste(v,(i*(w+6),21))
         for pct in (100,75,50):
             t=sheet if pct==100 else sheet.resize((sheet.width*pct//100,sheet.height*pct//100),Image.Resampling.LANCZOS)
-            t.save(OUT/f"A207_COMPOSITE_{name}_{pct}.jpg",quality=95)
-    report={"role":"A","run":"20261009-A207-Q193-GOAL-A-FLAT-UI-PILOT","queue_index":193,
+            t.save(OUT/f"A208_COMPOSITE_{name}_{pct}.jpg",quality=95)
+    report={"role":"A","run":"20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT","queue_index":193,
        "status":"SOURCE_DERIVED_PILOT_TRIAL_PENDING_CONTROLLER_VISUAL_AND_C_FAMILY",
        "english":SOURCE_TEXT,"korean":TEXT,"source_sha256":SRC_SHA,"baseline_sha256":OLD_SHA,
        "trial_sha256":hashfile(saved),"source_cell":CELL,"source_bbox":english,
@@ -190,7 +191,7 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
        "original_english_bbox_size":[ew,eh],"candidate_natural_size":list(glyph.size),
        "new_dds_trial":1,"promoted_candidate":0,"runtime_validation":"UNTESTED",
        "consumer_first_unproven_link":"promoted candidate/preview manifest->game atlas load->Goal A focus state; not game tested"}
-    (OUT/"A207_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (OUT/"A208_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     recipe={
       "schema_version":1,"family":"small dark flat Goal rank menu labels", "run":report["run"],
       "source":{"url":SRC_URL,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","sha256":SRC_SHA},
@@ -202,15 +203,15 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
       "flat_effects":{"outline_px":0,"shadow_px":0,"slant_dx_top_minus_bottom":0},
       "readable_to_RAW":"single FLIP_TOP_BOTTOM at saved DDS writer only",
       "source_cell":CELL,"source_bbox":english,"candidate_bbox":report["candidate_bbox"],
-      "mask_files":["A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png","A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png","A207_MASK_SOURCE_PROTECTED_RAW.png","A207_MASK_NEW_GLYPH_EFFECT_RAW.png"],
+      "mask_files":["A208_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png","A208_MASK_SOURCE_BOUNDED_EDIT_RAW.png","A208_MASK_SOURCE_PROTECTED_RAW.png","A208_MASK_NEW_GLYPH_EFFECT_RAW.png"],
       "prior_failure":"English Goal label underlaid by thin/stretched Korean glyph in whole atlas; q193 A205/A206 only six other labels redrawn",
-      "method_changed":"First dedicated SMALL Goal A native flat font-family pilot; source-derived removal; exact protected source checks",
+      "method_changed":"A208 natural-width goal phrase rebuild, source-derived removal/protected checks; no geometric glyph stretch",
       "pilot_status":"NOT_YET_INDEPENDENT_C_QUALIFIED_DO_NOT_MULTIPLY_INTO_GOAL_B-E"
     }
     (OUT/"recipe.json").write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print("A207 PILOT_READY_FOR_CONTROLLER",json.dumps({"trial":report["trial_sha256"],"source_bbox":english,"candidate_bbox":report["candidate_bbox"],"protected_pixels":report["original_protected_nonzero_pixels"],"numeric":metrics},ensure_ascii=False),flush=True)
+    print("A208 PILOT_READY_FOR_CONTROLLER",json.dumps({"trial":report["trial_sha256"],"source_bbox":english,"candidate_bbox":report["candidate_bbox"],"protected_pixels":report["original_protected_nonzero_pixels"],"numeric":metrics},ensure_ascii=False),flush=True)
 
-# A207 phase 2: controller has inspected SOURCE/CLEAN/OLD/NEW black/gray/white
+# A208 phase 2: producer draft requires SOURCE/CLEAN/OLD/NEW black/gray/white
 # at 100 and 50 plus the isolated plate. Promote ONLY this one qualified
 # material pilot, using the exact saved trial and a strict publisher manifest.
 import sys
@@ -218,10 +219,10 @@ import shutil
 from scipy.ndimage import label
 
 BASELINE_GIT_REVISION="fa838e2178959fb3ccf7ac408ba9132139b101aa"
-TRIAL_SHA="bb18e729bbb50914948231ac92ed87be5492768f34ea2ee822d7bf9380b7860e"
-trial=OUT/"A207_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
-if hashfile(trial)!=TRIAL_SHA:raise RuntimeError("A207 trial SHA drift at promotion")
-if hashfile(CAND)!=OLD_SHA:raise RuntimeError("A207 existing promoted candidate changed")
+TRIAL_SHA=report["trial_sha256"]
+trial=OUT/"A208_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
+if hashfile(trial)!=TRIAL_SHA:raise RuntimeError("A208 trial SHA drift at promotion")
+if hashfile(CAND)!=OLD_SHA:raise RuntimeError("A208 unchanged A206 base drift; reject rather than overwrite unrelated producer")
 # Anchors are independent alpha-measured corresponding ORIGINAL AND REBUILT
 # Latin 'A' outer *left diagonal* strokes, not an invented numeric slant.
 def latin_a_left_stem_alpha_anchors(rgba,coord):
@@ -272,7 +273,7 @@ for k,(im,bbox,anchors,title) in enumerate([
         sy=dst[1]+(a[1]-ey0+5)*scale
         pen.ellipse((sx-5,sy-5,sx+5,sy+5),fill=color,outline=(0,0,0))
     pen.text((dst[0],220),str(anchors),fill=(250,250,250))
-evidence_path=OUT/"A207_SOURCE_AND_KOREAN_LATIN_A_ANCHORS.png"
+evidence_path=OUT/"A208_SOURCE_AND_KOREAN_LATIN_A_ANCHORS.png"
 evidence.save(evidence_path)
 # Publication manifest uses the raw pinned English DDS, correct prior Git bytes
 # and full-native RAW PNG for clean/letter/masks, no screenshot/JPG substitution.
@@ -287,20 +288,20 @@ manifest={
     "coordinates":"native_raw",
     "stage":"final",
     "inputs":{
-        "source":pathsha(OUT/"A207_SOURCE_CANONICAL_RGBA32.dds"),
+        "source":pathsha(OUT/"A208_SOURCE_CANONICAL_RGBA32.dds"),
         "baseline":{"path":target_path,"sha256":OLD_SHA,
                     "git_revision":BASELINE_GIT_REVISION},
-        "clean":pathsha(OUT/"A207_CLEAN_NATIVE_RAW.png"),
-        "lettering":pathsha(OUT/"A207_LETTER_ONLY_NATIVE_RAW.png"),
+        "clean":pathsha(OUT/"A208_CLEAN_NATIVE_RAW.png"),
+        "lettering":pathsha(OUT/"A208_LETTER_ONLY_NATIVE_RAW.png"),
         "candidate":pathsha(CAND)
     },
     "masks":{
-        "removal":masksha("A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png"),
-        "protected":masksha("A207_MASK_SOURCE_PROTECTED_RAW.png"),
-        "edit":masksha("A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png"),
-        "transparent":masksha("A207_MASK_TRANSPARENT_PLATE_RAW.png"),
-        "restore":masksha("A207_MASK_NONE_RAW.png"),
-        "effect":masksha("A207_MASK_NEW_GLYPH_EFFECT_RAW.png")
+        "removal":masksha("A208_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png"),
+        "protected":masksha("A208_MASK_SOURCE_PROTECTED_RAW.png"),
+        "edit":masksha("A208_MASK_SOURCE_BOUNDED_EDIT_RAW.png"),
+        "transparent":masksha("A208_MASK_TRANSPARENT_PLATE_RAW.png"),
+        "restore":masksha("A208_MASK_NONE_RAW.png"),
+        "effect":masksha("A208_MASK_NEW_GLYPH_EFFECT_RAW.png")
     },
     "regions":[{
        "id":"Goal A / 골 A, shared actual Latin A outer left edge",
@@ -314,9 +315,10 @@ manifestdir.mkdir(parents=True,exist_ok=True)
 manifestpath=manifestdir/(TRIAL_SHA+".json")
 manifestpath.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
 sys.path.insert(0,str(R/"tools/localization"))
+sys.dont_write_bytecode=True
 import production_pixel_guard
 guard=production_pixel_guard.verify(R,manifest)
-(OUT/"A207_FINAL_MANIFEST_MECHANICAL_REPORT.json").write_text(json.dumps(guard,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+(OUT/"A208_FINAL_MANIFEST_MECHANICAL_REPORT.json").write_text(json.dumps(guard,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
 if guard["result"]!="MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED" or guard["errors"]:
     raise RuntimeError(("Production reset pixel guard failed, abort publication",guard))
 recipe=json.loads((OUT/"recipe.json").read_text(encoding="utf8"))
@@ -327,7 +329,7 @@ recipe["candidate_actual_slope_anchor"]=ca
 recipe["anchor_evidence"]=str(evidence_path.relative_to(R))
 recipe["state"]="FAMILY_PILOT_SCOPED_PRODUCER_PASS_PENDING_C1_METHOD_QUALIFICATION"
 (OUT/"recipe.json").write_text(json.dumps(recipe,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
-report["status"]="A207_NEW_PROMOTED_GOAL_A_SOURCE_PROTECTED_SCOPED_PRODUCER_PASS_PENDING_FRESH_C1"
+report["status"]="A208_NEW_PROMOTED_GOAL_A_SOURCE_PROTECTED_SCOPED_PRODUCER_PASS_PENDING_FRESH_C1"
 report["promoted_candidate"]=1
 report["baseline_git_revision"]=BASELINE_GIT_REVISION
 report["anchor_source"]=sa
@@ -336,5 +338,5 @@ report["source_dx"]=source_dx
 report["candidate_dx"]=target_dx
 report["production_pixel_guard"]=guard
 report["final_manifest"]=str(manifestpath.relative_to(R))
-(OUT/"A207_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
-print("A207 PRODUCTION_PIXEL_GUARD_GOAL_A",json.dumps({"candidate":TRIAL_SHA,"source_anchor":sa,"new_anchor":ca,"guard":guard["result"],"counts":guard["counts"]},ensure_ascii=False),flush=True)
+(OUT/"A208_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+print("A208 PRODUCTION_PIXEL_GUARD_GOAL_A",json.dumps({"candidate":TRIAL_SHA,"source_anchor":sa,"new_anchor":ca,"guard":guard["result"],"counts":guard["counts"]},ensure_ascii=False),flush=True)
