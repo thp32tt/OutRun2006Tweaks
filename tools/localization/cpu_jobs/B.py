@@ -172,7 +172,7 @@ def encode_bc3_alpha(a):
  bits=sum(int(inds[i])<<(3*i) for i in range(16))
  return bytes((255,0))+bits.to_bytes(6,"little")
 def decode_bc3_alpha(block):
- assert len(block)==16
+ assert len(block) in (8,16),len(block)
  a0,a1=block[0],block[1]
  assert a0>a1,"selected alpha palette must be eight levels"
  vals=np.array([a0,a1]+[((7-k)*a0+k*a1)//7 for k in range(1,7)],dtype=np.int16)
