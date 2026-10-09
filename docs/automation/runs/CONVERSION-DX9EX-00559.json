@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00559",
+  "production_id": "CONVERSION-DX9EX-00559",
+  "event_id": "CONVERSION-DX9EX-00559-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "0e92d6e437bee517811fc33d2240455c19a346dd",
+  "material_result_sha": "PENDING_FROM_MATERIAL_COMMIT",
+  "validation_bearing_result_sha": "PENDING_FROM_MATERIAL_COMMIT",
+  "status": "MATERIAL_COMMIT_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "work_key": "DX9EX:UIScaling:custom_matrix_getleveldesc_reset_guard",
+  "conflict_keys": [
+    "src/hooks_uiscaling.cpp:draw_sprite_custom_matrix_mid",
+    "tools/verify_vr_custom_sprite_descriptor.py"
+  ],
+  "summary": "Guard original per-sprite D3D9 GetLevelDesc HRESULT, null source texture and zero-size texel dimensions before computing half-texel UVs, and fail closed on reset-invalid screen scale without editing world/HUD semantics.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_custom_sprite_descriptor.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "name": "tools/verify_vr_custom_sprite_descriptor.py",
+    "one_changed_source_pass": true,
+    "negative_mutations": 4,
+    "legacy_hud_1000_5000": false
+  },
+  "ci_runs": {},
+  "pipeline": {
+    "C0": "PASS HEAD/AGENTS/queue/history/issue13-14/previous material/recent validation checked",
+    "C1": "PASS custom sprite GetLevelDesc HRESULT ignored, dimension division unguarded, mutable shared stream",
+    "C2": "IMPLEMENTED guarded exact function and dedicated contract + CI insertion",
+    "C3": "PENDING exact-SHA CI",
+    "C4": "material commit pending response",
+    "C5": "PENDING package",
+    "C6": "PENDING final checks"
+  },
+  "parallel_policy": "DX11 A independent ACTIVE, DX9EX C ACTIVE, DXVK B FROZEN; no DX11/DXVK/localization touched",
+  "next_action": "Wait for exact material SHA DX9Ex Active Validation, Domain Isolation, HUD Inspector and impact gates; do not cancel in-progress source CI with bookkeeping pushes."
+}

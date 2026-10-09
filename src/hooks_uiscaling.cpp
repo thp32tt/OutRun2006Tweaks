@@ -192,8 +192,31 @@ class UIScaling : public Hook
 		float* g_spriteVertexStream = Module::exe_ptr<float>(0x58B868);
 		SPRARGS2* a1 = (SPRARGS2*)ctx.ebx;
 
-		D3DSURFACE_DESC v25;
-		a1->d3dtexture_ptr_C->GetLevelDesc(0, &v25);
+		// This midhook owns only the custom sprite draw. During texture
+		// teardown/reset, keep the game's original continuation intact but
+		// never dereference an absent texture or compute UVs from an invalid
+		// mip descriptor. No screen-vertex buffer must be touched on failure.
+		if (!g_spriteVertexStream || !a1 || !a1->d3dtexture_ptr_C ||
+			!Game::screen_scale)
+			return;
+		const float screenScaleX = Game::screen_scale->x;
+		const float screenScaleY = Game::screen_scale->y;
+		if (!std::isfinite(screenScaleX) ||
+			!std::isfinite(screenScaleY) ||
+			screenScaleX <= 0.0f || screenScaleY <= 0.0f)
+			return;
+		if ((mode == ScalingMode::KeepCentered ||
+			 mode == ScalingMode::OnlineArcade) &&
+			(!Game::screen_resolution ||
+			 !std::isfinite(Game::screen_resolution->x) ||
+			 !std::isfinite(Game::original_resolution.x)))
+			return;
+
+		D3DSURFACE_DESC v25{};
+		const HRESULT descHr =
+			a1->d3dtexture_ptr_C->GetLevelDesc(0, &v25);
+		if (FAILED(descHr) || v25.Width == 0 || v25.Height == 0)
+			return;
 		float v21 = 0.50999999 / (double)v25.Width;
 		float v22 = 0.50999999 / (double)v25.Height;
 
@@ -207,11 +230,11 @@ class UIScaling : public Hook
 		D3DXVECTOR4 topRight{ 0 };
 		D3DXVECTOR4 bottomRight{ 0 };
 
-		float scaleY = Game::screen_scale->y;
+		float scaleY = screenScaleY;
 
 		// Multiply by the smallest scale factor
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
-			scaleY = min(Game::screen_scale->x, Game::screen_scale->y);
+			scaleY = min(screenScaleX, screenScaleY);
 
 		// TopLeft
 		vec.x = a1->TopLeft_54.x;
@@ -280,10 +303,10 @@ class UIScaling : public Hook
 		}
 		else // if (mode == Mode::Vanilla)
 		{
-			g_spriteVertexStream[0] = (Game::screen_scale->y * topLeft.x);
-			g_spriteVertexStream[7] = (Game::screen_scale->y * bottomLeft.x);
-			g_spriteVertexStream[0xE] = (Game::screen_scale->y * topRight.x);
-			g_spriteVertexStream[0x15] = (Game::screen_scale->y * bottomRight.x);
+			g_spriteVertexStream[0] = (screenScaleY * topLeft.x);
+			g_spriteVertexStream[7] = (screenScaleY * bottomLeft.x);
+			g_spriteVertexStream[0xE] = (screenScaleY * topRight.x);
+			g_spriteVertexStream[0x15] = (screenScaleY * bottomRight.x);
 		}
 
 		// Game seems to add these, half-pixel offset?
