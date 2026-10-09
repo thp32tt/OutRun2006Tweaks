@@ -1,0 +1,86 @@
+{
+  "role": "B",
+  "run": "B320",
+  "queue_index": 137,
+  "regression": "IGR-041",
+  "production_status": "TRIAL_PENDING_DIRECT_VISUAL",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "clean_png_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+  "old_candidate_sha256": "0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22",
+  "trial_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+  "promoted_dds": 0,
+  "source_clean_outside_six": 0,
+  "plate_protected_pixels": 3579,
+  "changed_outside_small_rgba": 0,
+  "changed_outside_small_alpha": 0,
+  "preserved_other_five_regions": "PIXEL_EXACT",
+  "original_bbox": [
+    1288,
+    96,
+    1569,
+    128
+  ],
+  "trial_bbox": [
+    1340,
+    99,
+    1516,
+    125
+  ],
+  "positive_margins": [
+    52,
+    53,
+    3,
+    3
+  ],
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "dds_format": "BGRA",
+  "mips": 1,
+  "saved_decoded_equals_trial": true,
+  "header_exact": true,
+  "raw_mirror_y": true,
+  "semantic_change": "small TRANSMISSION -> 변속기 유형 선택, expanded native label versus undersized 변속기",
+  "font": "Native Noto Sans CJK KR Black with original gray170 alpha, transparent glyph-only mask, no box or unsupported effects",
+  "font_px": 26,
+  "glyph_size": [
+    176,
+    26
+  ],
+  "glyph_width_fraction_source": 0.6263,
+  "glyph_height_fraction_source": 0.8125,
+  "contacts": [
+    "transmission_small_FLIPY_GRAY_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_GRAY_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_GRAY_50_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_BLACK_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_BLACK_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_BLACK_50_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_WHITE_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_WHITE_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_FLIPY_WHITE_50_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_GRAY_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_GRAY_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_GRAY_50_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_BLACK_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_BLACK_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_BLACK_50_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_WHITE_100_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_WHITE_75_SOURCE_CLEAN_B319_B320.png",
+    "transmission_small_RAW_WHITE_50_SOURCE_CLEAN_B319_B320.png"
+  ],
+  "producer_visual": "HOLD_PENDING_CONTROLLER_DIRECT_REVIEW",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions (GitHub-sourced pinned DDS unavailable in disconnected local sandbox)",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
