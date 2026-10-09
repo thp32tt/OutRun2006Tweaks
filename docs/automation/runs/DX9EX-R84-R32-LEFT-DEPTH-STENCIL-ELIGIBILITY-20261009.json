@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-LEFT-DEPTH-STENCIL-ELIGIBILITY-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "controller_terminal": true,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "attempt": 1,
+  "base_sha": "7d2eb7a0771db07638b64a41c4b4418c25eea027",
+  "material_result_sha": "e4591e47d94cb1d15e2f8dc59892f90041868330",
+  "validation_bearing_result_sha": "e4591e47d94cb1d15e2f8dc59892f90041868330",
+  "result_sha": "e4591e47d94cb1d15e2f8dc59892f90041868330",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 Depth/Stencil left-write eligibility queries delegate separately via R30 support owner to unchanged original functions; preserve write hazards/synchronization policy. Five negative mutation guards reject falsified, swapped and direct-bypassed query results. No gameplay/HUD or DirectGPU behavior changed.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/automation/reviews/DX9EX_R84_SESSION_20261009_1852.md"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37915228266,
+      "head_sha": "e4591e47d94cb1d15e2f8dc59892f90041868330",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113769654329,
+        "game": 113769814392,
+        "host": 113769814399,
+        "full-chain-compile": 113769814367,
+        "package": 113771068505
+      }
+    },
+    "domain": {
+      "run_id": 37915228205,
+      "head_sha": "e4591e47d94cb1d15e2f8dc59892f90041868330",
+      "conclusion": "success"
+    },
+    "package_artifact": {
+      "id": 11609298076,
+      "digest": "sha256:770907980be079fadd0fa83345902ab921c2bdc48ace858c492e336a91dcfaaa"
+    },
+    "issue14_comment_id": 6078726734
+  },
+  "pipeline": {
+    "C0": "GitHub head/queue confirmed",
+    "C1": "original left depth and stencil predicate sites inspected",
+    "C2": "R30 owner api, R32 consumer and negative tests committed",
+    "C3": "Exact SHA policy/game/host/full-chain/package and Domain success",
+    "C4": "source commit published",
+    "C5": "exact SHA package artifact checksum verified",
+    "C6": "terminal durable record"
+  },
+  "next_action": "Next independent lower R9 mono-safety failure reporting seam; then R32/R31 translation unit and CMake staged cleanup. Keep HMD UNTESTED until Quest3/VDXR matching package test. Meaningful five-minute records during interactive bounded session."
+}
