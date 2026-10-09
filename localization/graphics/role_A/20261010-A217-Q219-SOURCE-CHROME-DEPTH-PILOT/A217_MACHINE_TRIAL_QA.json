@@ -1,0 +1,56 @@
+{
+  "run": "A217",
+  "run_key": "OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500",
+  "role": "A",
+  "priority": "P1",
+  "queue_index": 219,
+  "issue": "IGR-025",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "original_source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "old_current_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+  "glyph_topology_sha256": "8026a0234e2350df5bce6533f1101bfb591921d52fab3862cfe747887e8a370a",
+  "trial_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+  "trial_dds_bytes": 16777344,
+  "trial_path": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_Q219_SOURCE_CHROME_DEPTH_TRIAL.dds",
+  "method": "Material method change: source-sampled row metal tone + 9 native pixel extrusion, top-light bevel, dark side wall. Preserve A186R independently readable Korean glyph topology; no width scaling/new font/no silhouette rail drawing. Face native before 9px extrusion, one 0.46px AA pass.",
+  "source_bbox": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "new_bbox": [
+    13,
+    1013,
+    533,
+    1128
+  ],
+  "margins": [
+    7,
+    940,
+    2,
+    1
+  ],
+  "pixel_gates": {
+    "source_to_final_outside_rgba": 0,
+    "prior_to_trial_outside_rgba": 0,
+    "prior_to_trial_outside_alpha": 0,
+    "clean_alpha_in_source_bbox": 0,
+    "effect_pixels": 28219
+  },
+  "new_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "producer_visual": "PENDING_DIRECT_REVIEW",
+  "C1": "BLOCKED_UNTIL_FIRSTHAND_VISUAL",
+  "C3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "actual_game": "IGR025_OPEN",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
