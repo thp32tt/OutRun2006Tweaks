@@ -270,3 +270,40 @@ The controller parks any previously active B/DXVK work in persistent `frozen_lan
 If the Quest 3 HMD is unavailable, park only that runtime/visual confirmation as `UNTESTED`/`NEED_HMD_TEST` and continue independent actual source changes in **both** A and C. Run changed-source targeted static/CI checks; do not repeat unchanged HUD 1000/5000 static passes. Build PASS does not equal runtime PASS. DXVK stays frozen until the user explicitly changes direction.
 
 After deployment verify `/status`: active limit 2, DX11 and DX9Ex enabled, DXVK disabled and frozen, `conversion_only_slot` empty. Confirm A/C progress with separate task IDs and material commits while B produces no new work. GitHub source verification alone does not mean Portainer deployment or Quest3 runtime testing has occurred.
+
+
+## GUI Chrome tab crash recovery (VR and localization)
+
+The Portainer VR and localization stacks **keep visible Google Chrome and noVNC**;
+do not switch to headless Chromium for these deployments. The controller uses
+Playwright's per-page `crash` notification, `page.is_closed()`, and a lightweight
+JavaScript evaluation probe at `TAB_HEALTH_CHECK_SECONDS=30` intervals. An
+unresponsive tab must fail `TAB_HEALTH_FAILURE_THRESHOLD=3` consecutive checks
+before it is replaced; a crash event or closed page can be repaired immediately.
+`TAB_RECOVERY_COOLDOWN_SECONDS=60` limits repeated attempts.
+
+Recovery replaces **only** the broken slot tab, then navigates to its saved
+project-scoped conversation URL (or the configured project home if no saved
+conversation exists). It does **not** send a prompt, allocate a TASK_ID, change
+the queue phase, clear the registry, or mark a GitHub/CI gate successful.
+The existing queue engine owns all send/retry decisions. If the entire
+Chrome/CDP connection fails, the controller exits and Docker's
+`restart: unless-stopped` policy handles process restart.
+
+Inspect `http://<N100>:8787/status` for `tab_recovery_count`,
+`tab_recovery_last_at`, `tab_recovery_last_slot`,
+`tab_recovery_last_reason`, and `tab_recovery_error`.
+When possible, screenshots are saved to
+`/logs/tab-recovery/YYYYMMDDTHHMMSS-SLOT-REASON.png`.
+A crashed renderer may refuse screenshot requests; check the Docker logs
+for `slot tab recovery` in that case. noVNC remains available for direct
+visual checks.
+
+Before updating a running Portainer stack, inspect the actual image/controller
+version and preserve its named `/data` and `/logs` volumes. Redeploy the
+matching GitHub revision only when it is known to contain all current queue
+changes; a source/image mismatch can otherwise roll back newer queue logic.
+After a controlled redeploy, confirm login, saved chat restoration, active
+TASK_ID stability and the runtime recovery counters. The mock regression
+suite is `python tests/test_tab_health_contract.py` from the `v0.4` folder;
+it does **not** replace a real Chrome renderer-crash test.
