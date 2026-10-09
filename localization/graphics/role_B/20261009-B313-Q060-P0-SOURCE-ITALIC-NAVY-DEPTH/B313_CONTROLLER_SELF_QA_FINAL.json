@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B313",
+  "run_key": "OUTRUN-KOR-B313-Q060-IGR044-GOLD-MILES-20261009-1240",
+  "queue_index": 60,
+  "priority": "P0",
+  "user_report": "IGR-044",
+  "user_report_status": "OPEN_USER_INGAME_FAIL",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "old_candidate_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "candidate_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+  "new_git_blob": "a1ffca95dd1ff5efe38c0ef050e69b947842e792",
+  "promotion_commit": "5421dafcb117223a1ab2a2106fbadcac9877290a",
+  "candidate_promoted": true,
+  "new_material_dds": 1,
+  "producer_decision": "SELF_QA_PASS_SCOPED_GOLD_LABEL_PENDING_INDEPENDENT_C2",
+  "source_bbox": [
+    2081,
+    250,
+    2860,
+    370
+  ],
+  "new_bbox": [
+    2132,
+    257,
+    2808,
+    362
+  ],
+  "margins": [
+    51,
+    52,
+    7,
+    8
+  ],
+  "native": [
+    4096,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "orientation": "RAW_MIRROR_Y",
+  "machine_gates": {
+    "persisted_decoded_roundtrip": "PASS_EXACT",
+    "header": "UNCHANGED_EXACT",
+    "source_bbox_ceiling": "PASS",
+    "minimum_margin_px": 7,
+    "changed_outside_gold_rgba": 0,
+    "changed_outside_gold_alpha": 0,
+    "all_other_atlas_pixels": "EXACT_UNCHANGED",
+    "clean_plate_gold_alpha": 0,
+    "protected_B310_stage": "EXACT_UNCHANGED",
+    "protected_B296_white_miles": "EXACT_UNCHANGED"
+  },
+  "producer_visual": {
+    "source_clean": "SCOPED_PASS_TRANSPARENT_TEXT_CELL_NO_GLYPH_GHOST_OBSERVED",
+    "clean_final": "SCOPED_PASS_TRANSPARENT_GLYPH_ONLY",
+    "native_gray_100": "PASS_LEGIBLE_NO_SYLLABLE_COLLISION",
+    "practical_black_50": "PASS_COUNTER_SPACE_READABLE",
+    "raw_white_75": "PASS_MIRROR_Y_AND_EFFECT",
+    "source_relative_style": "SOURCE_CONDITIONED_ITALIC_GOLD_NAVY_APPROXIMATION_PENDING_C2_STYLE_VERDICT",
+    "unreviewed_views": "Other 15 generated comparison variants retained for C review; no claims of direct inspection"
+  },
+  "method": "Original C315 golden English sample palette [229 216 159], navy [0 8 57], face gradient and source-family softened offset navy edge; fresh native individual Hangul glyph masks with positive counter/word separation, shear 0.28; rejected B311 conjoined opaque and B312 under-depth trials were never promoted",
+  "evidence": [
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_MACHINE_AND_METHOD.json",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_FLIPY_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_FLIPY_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B313-Q060-P0-SOURCE-ITALIC-NAVY-DEPTH/B313_RAW_WHITE_75_SOURCE_CLEAN_CURRENT_TRIAL.png"
+  ],
+  "workflow_run_id": 37881553982,
+  "workflow_result": "SUCCESS",
+  "backend": "github-actions",
+  "independent_C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "approval": "NOT_GRANTED",
+  "user_game": "NEW_SCREENSHOT_RETEST_REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "cleanup": "github-hosted ephemeral runner, N100 unused"
+}
