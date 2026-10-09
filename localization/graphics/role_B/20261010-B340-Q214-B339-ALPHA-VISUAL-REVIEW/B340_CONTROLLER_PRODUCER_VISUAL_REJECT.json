@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B340",
+  "run_key": "OUTRUN-KOR-B340-Q214-B339-ALPHA-PRODUCER-VISUAL-REJECT-20261010-0230",
+  "observed_at_kst": "2026-10-10 02:36 KST",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "unchanged_current_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "new_trial_sha256": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+  "source_trial_machine_evidence": "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/B339_MACHINE_TRIAL_QA.json",
+  "method": "B339_SOURCE_NATIVE_HAND_DRAWN_JAMO_WITH_REBUILT_BC3_ALPHA_TOPOLOGY",
+  "independently_observed_views": [
+    "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B339.png",
+    "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/GOAL_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B339.png",
+    "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/START_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B339.png",
+    "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/GOAL_RAW_GRAY_50_SOURCE_CLEAN_OLD_B339.png"
+  ],
+  "observed": {
+    "goal_native": "FAIL. Korean 골 still renders as pale stacked horizontal strokes: final consonant and vertical/connecting strokes are not immediately identifiable at native review size. Source GOAL has four separately readable italic Latin glyphs; readability is visibly degraded despite reconstructed BC3 alpha.",
+    "goal_raw_50": "FAIL. Downscaled RAW proof retains a compressed, visually ambiguous horizontal stack instead of an immediately readable Korean goal label.",
+    "start_native": "SCOPED. 출발 is visually identifiable on inspected native gray contact; this does not qualify source-matched metallic/bevel styling or whole-atlas readiness.",
+    "clean": "B339 uses the previously pinned B324 clean plate; this B340 run did not independently revalidate all plate masks."
+  },
+  "machine_existing": {
+    "saved_bc3_roundtrip": "PASS_IN_B339_REPORT",
+    "outside_original_source_rgba": 0,
+    "outside_original_source_alpha": 0,
+    "source_palette_donor_blocks": 114,
+    "glyph_alpha_core_coverage": {
+      "START": 1,
+      "GOAL": 1
+    }
+  },
+  "reason_codes": [
+    "PERSISTED_GLYPH_LEGIBILITY_FAIL",
+    "SOURCE_STYLE_AND_READABLE_COUNTER_MISMATCH",
+    "NUMERIC_GATE_VISUAL_FALSE_NEGATIVE"
+  ],
+  "decision": "REWORK_REQUIRED_PRODUCER_VISUAL_REJECT",
+  "producer_gate": "FAIL_OVERRIDES_MECHANICAL_PASS",
+  "same_defect_as_previous": "B338 GOAL horizontal-bar effect recurs even after B339 changed BC3 alpha coding. Do not count as resolved; do not repeat the same manual jamo topology or source palette selection.",
+  "required_next": "MANUAL_RECONSTRUCTION_REQUIRED: replace the failing GOAL character construction with a source-proportion legible native glyph/counter design and independently validate at 100/75/50 readable and RAW before any candidate promotion; a semantically different wording must be approved against translation policy. Maintain B339 only as unapproved trial, not hd_candidates.",
+  "new_promoted_DDS": 0,
+  "changed_hd_candidates": 0,
+  "C2": "BLOCKED_OLDER_C289_REWORK_UNCHANGED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "USER_REVIEW": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_CONNECTOR_DIRECT_IMAGE_VISUAL_AND_GIT_ATOMIC_PUBLICATION",
+  "N100_used": false,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

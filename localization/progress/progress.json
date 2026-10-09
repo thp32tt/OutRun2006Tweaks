@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 02:23 KST",
+  "updated_at_kst": "2026-10-10 02:36 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9718,5 +9718,14 @@
     "USER_GAME": "IGR041_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json"
+  },
+  "b340_q214_b339_alpha_producer_visual_fail": {
+    "run_key": "OUTRUN-KOR-B340-Q214-B339-ALPHA-PRODUCER-VISUAL-REJECT-20261010-0230",
+    "queue_index": 214,
+    "trial_sha256": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+    "promoted_DDS": 0,
+    "decision": "REWORK_REQUIRED_PRODUCER_VISUAL_REJECT",
+    "report": "localization/graphics/role_B/20261010-B340-Q214-B339-ALPHA-VISUAL-REVIEW/B340_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
