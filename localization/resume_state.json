@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B331 q060 source-lean new native DDS 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 fresh C2 source-family exact-sha then C3 + NEW user IGR044 in-game screen 203; RUNTIME_VALIDATION=UNTESTED.",
     "C331 C2 EVEN q098 current B330 exact saved DDS SHA256 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51 independent visible-alpha/RAW-FLIP pixel check: English Cl/ord. apparent in uncomposited PNG RGB are alpha0; 0 left/right visible English pixels, saved DDS vs FLIP PNG pixel-identical. SCOPED PASS, full C HOLD_STRICT_RECHECK source/CLEAN/blind family/C3 and NEW actual-game. Evidence localization/graphics/role_C/20261009-C331-C2-Q098-B330-INDEPENDENT-VISIBLE-ALPHA/C331_Q098_INDEPENDENT_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020 RUNTIME_VALIDATION=UNTESTED",
     "C330 C2 q236 new exact saved-DDS independent machine alpha scan 14/14 bboxes PASS and two new raw/native visual regions 09+13 scoped no obvious defects. Still HOLD_STRICT_RECHECK pending source/CLEAN/final/protected and blind calibration+full C3/real-game. SHA 9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337 QA localization/graphics/role_C/20261009-C330-C2-Q236-14-NATIVE-ALPHA/C330_Q236_INDEPENDENT_14_REGION_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C330-C2-Q236-PERSISTED-14-ALPHA-20261009-1950 RUNTIME_VALIDATION=UNTESTED",
     "C2 fresh independent native-source/CLEAN/FINAL q098 B330 SHA 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51, then C3/evidence/JPG/actual game; RUNTIME_VALIDATION=UNTESTED.",
@@ -13495,5 +13496,18 @@
     "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
     "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
     "runtime_validation": "UNTESTED"
+  }
+,
+  "b331_q060_p0_source_italic": {
+    "run_key": "OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
+    "queue_index": 60,
+    "candidate_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "previous_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+    "QA": "PRODUCER_SCOPED_PASS_PENDING_FRESH_C2",
+    "user_ingame": "OPEN_USER_INGAME_FAIL",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "github-actions"
   }
 }

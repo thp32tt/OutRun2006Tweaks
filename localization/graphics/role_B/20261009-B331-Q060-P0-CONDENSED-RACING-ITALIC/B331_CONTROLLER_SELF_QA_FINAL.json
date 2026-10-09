@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B331",
+  "run_key": "OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
+  "queue_index": 60,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "screenshot": "스크린샷(203)(1).png",
+  "consumer_chain": "q060 persisted DXT5? No: native RGBA32 atlas -> OUTRUN MILES HUD sprite -> exact user screenshot 203 OutRun Miles game banner; no runtime glyph fix inferred",
+  "user_report": "IGR-044 OPEN_USER_INGAME_FAIL",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+  "current_candidate_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "current_git_blob": "0e87a9064f2b69dcbcba6dbeb700e666606d5aa9",
+  "native": [
+    4096,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "orientation": "RAW MIRROR_Y",
+  "source_effect_bbox": [
+    2081,
+    250,
+    2860,
+    370
+  ],
+  "new_effect_bbox": [
+    2133,
+    256,
+    2807,
+    363
+  ],
+  "positive_margin_left_right_top_bottom": [
+    52,
+    53,
+    6,
+    7
+  ],
+  "change_reason": "C326 independent C2 SOURCE_FAMILY_MISMATCH and ITALIC_UNDERLEAN",
+  "material_change": "B313 Noto Black near upright +0.28 -> fresh native Noto Bold tightened/tracked +0.65 forward right-leaned individual glyph silhouette and source sampled cream/navy highlights; no low-resolution bitmap upscale",
+  "machine": {
+    "dds_header": "EXACT",
+    "persisted_decode_roundtrip": "PASS",
+    "changes_outside_gold_bbox": 0,
+    "alpha_changes_outside_gold_bbox": 0,
+    "other_atlas": "UNCHANGED_EXACT",
+    "source_clean_alpha_in_gold_cell": 0,
+    "source_size_and_margin": "PASS_POSITIVE"
+  },
+  "producer_ten_stage": {
+    "source_exact": "PASS_SHA",
+    "protected_inventory": "GOLD_TITLE_ONLY_OTHER_ATLAS_PRESERVED",
+    "clean_plate": "PASS_GOLD_SOURCE_OPACITY_REMOVED_BEFORE_LETTERING",
+    "plate_only": "SCOPED_PASS_NATIVE",
+    "source_family_method": "MATERIAL_SOURCE_CONDITIONED_CHANGE",
+    "native_korean": "PASS_FULL_NATIVE_BOLD_VECTOR",
+    "glyph_only": "PASS_TRANSPARENT",
+    "clean_final": "SCOPED_PASS_CHANGED_ONLY_DECLARED_GOLD_BBOX",
+    "dds_decode": "PASS_NATIVE_RAW_MIP1",
+    "independent_c_and_user": "PENDING"
+  },
+  "eight_visual": {
+    "english_removed": "PASS_SCOPED",
+    "slant": "PASS_IMPROVED_READABLE_RIGHT_FORWARD",
+    "size": "PASS_WITHIN_BBOX",
+    "source_style": "IMPROVED_PENDING_C2_CALIBRATION",
+    "glyph_clipping": "PASS_NO_VISIBLE_CROP",
+    "protected_art": "PASS_PIXELS_OUTSIDE_GOLD_EXACT",
+    "raw_flipy": "PASS_SOURCE_EQUIVALENT",
+    "practical_readability": "PASS_NATIVE_AND_50"
+  },
+  "observed_evidence": [
+    "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_FLIPY_BLACK_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_FLIPY_BLACK_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_RAW_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png"
+  ],
+  "backend": "GitHub Actions 37925545922 generated DDS; N100 MCP only read three small preview PNG",
+  "source_family_caveat": "B-scoped visual QA, not independent C2; source contour not an identical original typeface",
+  "producer_qa": "PASS_SCOPED_PENDING_C2",
+  "fresh_C2": "PENDING",
+  "C3": "PENDING",
+  "user_game": "PENDING_NEW_EXACT_SHA_GAME_RETEST",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

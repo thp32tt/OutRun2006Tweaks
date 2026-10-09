@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 20:20 KST",
+  "updated_at_kst": "2026-10-09 20:48 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9321,5 +9321,18 @@
     "visible_alpha_outside_candidate_english_strips": 0,
     "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
     "RUNTIME_VALIDATION": "UNTESTED"
+  }
+,
+  "b331_q060_p0_source_italic": {
+    "run_key": "OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
+    "queue_index": 60,
+    "candidate_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "previous_sha256": "be8afff998310126cf681d302e07a50faae076be0b3dc2ffb41a951c373b72e0",
+    "QA": "PRODUCER_SCOPED_PASS_PENDING_FRESH_C2",
+    "user_ingame": "OPEN_USER_INGAME_FAIL",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_CONTROLLER_SELF_QA_FINAL.json",
+    "backend": "github-actions"
   }
 }
