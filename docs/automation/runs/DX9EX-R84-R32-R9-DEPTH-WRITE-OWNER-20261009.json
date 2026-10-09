@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-R9-DEPTH-WRITE-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-R9-DEPTH-WRITE-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "attempt": 2,
+  "base_sha": "53de6fc3292bb54792535223366b9beacd43feaa",
+  "initial_material_sha": "937abe494990ab97d42c9312b7803c46d142064d",
+  "material_result_sha": "81e4146956f730033f5a7a4f49577ec7ff37b50a",
+  "validation_bearing_result_sha": "81e4146956f730033f5a7a4f49577ec7ff37b50a",
+  "result_sha": "81e4146956f730033f5a7a4f49577ec7ff37b50a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "Refactor R32 main-depth content write notification via the behavior-neutral R30 owner, preserving exactly one original R9 side effect. Add mutation guards. Repair one stale verifier that expected obsolete direct R32->R9 call. Exact-sha Win32 policy/game, x64 host, full-chain compile, package and Domain Isolation all PASS.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "evidence": {
+    "first_attempt": {
+      "sha": "937abe494990ab97d42c9312b7803c46d142064d",
+      "dx9ex_run_id": 37911334070,
+      "conclusion": "failure",
+      "failure": "stale legacy R32 direct R9 verifier assertion"
+    },
+    "dx9ex_active": {
+      "run_id": 37911539598,
+      "head_sha": "81e4146956f730033f5a7a4f49577ec7ff37b50a",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113757615058,
+        "game": 113757750897,
+        "host": 113757750831,
+        "full-chain-compile": 113757750810,
+        "package": 113759075476
+      }
+    },
+    "domain": {
+      "run_id": 37911539688,
+      "head_sha": "81e4146956f730033f5a7a4f49577ec7ff37b50a",
+      "conclusion": "success"
+    },
+    "package_artifact": {
+      "id": 11607331145,
+      "digest": "sha256:5b62b2aaafb6b616e693d5f663d9fc09b2ffe677a4b5b5bc11a5429d849d5cc0"
+    },
+    "production_change_ledger_issue": 14
+  },
+  "checkpoints": {
+    "C0": "GitHub focus branch/queue/AGENTS recovered",
+    "C1": "R9 side-effect and R32 direct lower dependency inspected",
+    "C2": "R30 owner facade implemented; historical verifier repaired",
+    "C3": "Exact material SHA all hosted DX9Ex Active and Domain gate successes",
+    "C4": "material commit 81e4146 published",
+    "C5": "exact-SHA packaged artifact digest verified",
+    "C6": "durable terminal result, no hardware runtime inference"
+  },
+  "next_action": "Proceed with the next independent R32/R31 compile/TU owner boundary and then CMake cleanup; preserve HMD and HUD concerns separately. During interactive work append a meaningful GitHub checkpoint approximately every 5 minutes. Do not redispatch or rescore this completed TASK_ID."
+}
