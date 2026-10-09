@@ -12,7 +12,7 @@ function Get-OutRunVRTestProfile {
         '-DirectGpuOnly=false',
         '-DisableDesktopDuplication=false',
         '-TargetRefreshRateHz=0',
-        '-SkyGlowFactor=1',
+        '-SkyGlowFactor=4',
         '-CullingUnionFov=true',
         '-CullingUnionMarginDegrees=4.0',
         '-NormalizeReflectionRate=true',
