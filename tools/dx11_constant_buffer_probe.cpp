@@ -600,11 +600,34 @@ O main(I i) {O o; o.position=float4(i.position,1.0f);
              o.color=float4(32.0f/255.0f,128.0f/255.0f,
                             224.0f/255.0f,1.0f); return o;}
 )";
+        // R175: separate TEXCOORD6 pair. This does not change the global
+        // R92 COLOR0/TEXCOORD8 generator contract or native game Draw.
+        static const std::string r175VS = R"(
+struct I {float3 position : POSITION0; float4 color : COLOR0;};
+struct O {float4 position : SV_Position; float4 payload : TEXCOORD6;};
+O main(I i) {O o; o.position=float4(i.position,1.0f);
+             o.payload=float4(32.0f/255.0f,128.0f/255.0f,
+                              224.0f/255.0f,1.0f); return o;}
+)";
+        static const char r175PS[] = R"(
+float4 main(float4 payload : TEXCOORD6) : SV_Target {return payload;}
+)";
         static const char directPS[] = R"(
 float4 main(float4 color : COLOR0) : SV_Target {return color;}
 )";
         ID3DBlob* r173DirectCode = compile_vertex_shader(directVS);
         ID3DBlob* r173ConstantCode = compile_vertex_shader(constantVS);
+        ID3DBlob* r175VertexCode = compile_vertex_shader(r175VS);
+        ID3DBlob* r175PixelCode = nullptr;
+        ID3DBlob* r175Errors = nullptr;
+        const HRESULT r175Compile = D3DCompile(
+            r175PS, sizeof(r175PS)-1u, "R175Texcoord6",
+            nullptr,nullptr,"main","ps_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0u,&r175PixelCode,&r175Errors);
+        if (r175Errors) r175Errors->Release();
+        require(SUCCEEDED(r175Compile) && r175PixelCode,
+                "R175 dedicated TEXCOORD6 PS compiled");
         ID3DBlob* r173GeneratedCode =
             compile_vertex_shader(r173Prototype.source);
         ID3DBlob* r173PixelCode = nullptr;
@@ -619,6 +642,8 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
                 "R173 passthrough COLOR0 PS compiled");
         ID3D11VertexShader* r173DirectVS = nullptr;
         ID3D11VertexShader* r173ConstantVS = nullptr;
+        ID3D11VertexShader* r175LinkedVS = nullptr;
+        ID3D11PixelShader* r175LinkedPS = nullptr;
         ID3D11VertexShader* r173GeneratedVS = nullptr;
         ID3D11PixelShader* r173PS = nullptr;
         ID3D11InputLayout* r173IA = nullptr;
@@ -630,6 +655,14 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
                     r173ConstantCode->GetBufferPointer(),
                     r173ConstantCode->GetBufferSize(),nullptr,&r173ConstantVS)) &&
                     r173ConstantVS &&
+                SUCCEEDED(warp.device->CreateVertexShader(
+                    r175VertexCode->GetBufferPointer(),
+                    r175VertexCode->GetBufferSize(),nullptr,&r175LinkedVS)) &&
+                    r175LinkedVS &&
+                SUCCEEDED(warp.device->CreatePixelShader(
+                    r175PixelCode->GetBufferPointer(),
+                    r175PixelCode->GetBufferSize(),nullptr,&r175LinkedPS)) &&
+                    r175LinkedPS &&
                 SUCCEEDED(warp.device->CreateVertexShader(
                     r173GeneratedCode->GetBufferPointer(),
                     r173GeneratedCode->GetBufferSize(),nullptr,&r173GeneratedVS)) &&
@@ -696,6 +729,14 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
         const auto solidPsColor = r173Pixel();
         const std::array<unsigned int,4> expectedRed{0u,0u,255u,255u};
         const bool solidPsMatches = solidPsColor==expectedRed;
+        // Preserve the same RTV, viewport, IA, geometry and index topology;
+        // change ONLY the VS/PS linkage semantic for the R175 control.
+        warp.context->VSSetShader(r175LinkedVS,nullptr,0u);
+        warp.context->PSSetShader(r175LinkedPS,nullptr,0u);
+        warp.context->ClearRenderTargetView(target,clear);
+        warp.context->DrawIndexed(3u,0u,0);
+        const auto r175Color = r173Pixel();
+        const bool r175Matches = r175Color==expected;
         warp.context->PSSetShader(r173PS,nullptr,0u);
         std::cout<<"DX11 R173 COLOR0 direct VS BGRA=["
             <<directColor[0]<<","<<directColor[1]<<","
@@ -709,19 +750,25 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
             <<"] solid PS BGRA=["
             <<solidPsColor[0]<<","<<solidPsColor[1]<<","
             <<solidPsColor[2]<<","<<solidPsColor[3]
+            <<"] R175 TEXCOORD6 BGRA=["
+            <<r175Color[0]<<","<<r175Color[1]<<","
+            <<r175Color[2]<<","<<r175Color[3]
             <<"] expected BGRA=["
             <<expected[0]<<","<<expected[1]<<","
             <<expected[2]<<","<<expected[3]
             <<"] classification="
             <<(!solidPsMatches?"R174_GEOMETRY_OR_OM_MISMATCH"
-                :(!constantMatches?"R174_VS_PS_CONSTANT_MISMATCH"
+                :(!r175Matches?"R175_GENERIC_VARYING_MISMATCH"
+                :(!constantMatches?"R174_COLOR0_VARYING_MISMATCH"
                 :(!directMatches?"R174_IA_VERTEX_COLOR_MISMATCH"
                 :(!generatedMatches?"GENERATED_VS_COLOR0_MISMATCH"
-                                   :"ALL_R174_CONTROLS_MATCH"))))<<std::endl;
+                                   :"ALL_R175_CONTROLS_MATCH")))))<<std::endl;
         // An incorrect direct control invalidates generated-VS attribution.
         // Neither failure can be treated as native gameplay approval.
         require(solidPsMatches,
                 "R174 known-geometry solid PS must cover interior");
+        require(r175Matches,
+                "R175 independent TEXCOORD6 VS/PS varying control");
         require(constantMatches,
                 "R174 constant VS color must survive PS and OM");
         require(directMatches,
@@ -737,10 +784,14 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
         r173VB->Release();
         r173PS->Release();
         r173GeneratedVS->Release();
+        r175LinkedPS->Release();
+        r175LinkedVS->Release();
         r173ConstantVS->Release();
         r173DirectVS->Release();
         r173PixelCode->Release();
         r173GeneratedCode->Release();
+        r175PixelCode->Release();
+        r175VertexCode->Release();
         r173ConstantCode->Release();
         r173DirectCode->Release();
         std::cout<<"DX11 WARP COLOR0 source-linkage isolation R173: PASS\n";
