@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B328 C327 q212 PROFESSIONAL full-term source-hierarchy reconstruction.
+"""B329 C327 q212 PROFESSIONAL full-term source-hierarchy reconstruction.
 
 Source-native gray/orange/red family sampling and preserved recent B307 repairs.
 
@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image,ImageFont,ImageDraw
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics");REL="textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=G/"role_B/20261009-B328-Q212-PROFESSIONAL-HIERARCHY";OUT.mkdir(parents=True,exist_ok=True)
+OUT=G/"role_B/20261009-B329-Q212-PROFESSIONAL-SOURCE-ANCHOR";OUT.mkdir(parents=True,exist_ok=True)
 h=lambda x:hashlib.sha256(x).hexdigest()
 SOURCE="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 OLD="209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e"
@@ -57,7 +57,7 @@ assert Path(font).exists(),"native sans black unavailable"
 ids=[43]
 expect={
  30:("완료","DONE",[1080,423,1274,496],"gray","left"),
- 43:("프로페셔널","PROFESSIONAL",[0,341,638,404],"orange","right"),
+ 43:("프로페셔널","PROFESSIONAL",[0,341,638,404],"orange","left"),
  44:("아웃런","OUTRUN",[1626,524,1837,587],"red","right"),
  53:("완료","DONE",[4,78,138,122],"gray","left")}
 out=P.copy();allowed=np.zeros((2048,2048),bool);details=[]
@@ -95,8 +95,9 @@ for z in rows:
  assert choice is not None,("cannot fit native target height",n)
  size,glyph=choice
  assert n!=43 or glyph.width>=300,("still underfilling source hierarchy",glyph.width)
- # Header is left-aligned (native source), preserve original source grouping.
- xx=(r-5-glyph.width) if alignment=="right" else l+5
+ # C327: original letter bbox starts at x0, so retain source leading anchor.
+ xx=l+5 if n==43 else ((r-5-glyph.width) if alignment=="right" else l+5)
+ assert n!=43 or xx-l==5,("source left-anchor not preserved",xx,l)
  yy=t+((b2-t)-glyph.height)//2
  assert min(xx-l,r-xx-glyph.width,yy-t,b2-yy-glyph.height)>=4
  out[t:b2,l:r]=C[t:b2,l:r]
@@ -121,7 +122,7 @@ else:
  mode="BGRA";body=out[::-1,:,[2,1,0,3]].copy().tobytes()
 data=b[:128]+body;assert h(data)!=OLD and len(data)==len(b)
 D=decoded(data);assert np.array_equal(D,out)
-newpath=OUT/"B328_UNAPPROVED_PROFESSIONAL_HIERARCHY_TRIAL.dds";newpath.write_bytes(data)
+newpath=OUT/"B329_UNAPPROVED_PROFESSIONAL_HIERARCHY_TRIAL.dds";newpath.write_bytes(data)
 assert h(newpath.read_bytes())==h(data)
 def onbg(a,bg):
  im=Image.new("RGBA",(a.shape[1],a.shape[0]),tuple(bg)+(255,))
@@ -144,15 +145,15 @@ for n in ids:
  for name,arr in [("SOURCE",S),("CLEAN",C),("OLD",P),("NEW",D)]:
   Image.fromarray(arr[t:b2,l:r],"RGBA").save(OUT/f"r{n}_{name}_NATIVE_RGBA.png",optimize=True)
  Image.fromarray(np.uint8(changed[t:b2,l:r])*255,"L").save(OUT/f"r{n}_DIFF_MASK.png")
-qa={"role":"B","run":"B328","queue_index":212,"source_sha256":SOURCE,"previous_sha256":OLD,
+qa={"role":"B","run":"B329","queue_index":212,"source_sha256":SOURCE,"previous_sha256":OLD,
  "candidate_sha256":h(data),"new_dds":0,"unapproved_trial_dds":1,"source_clean_outside_all_twelve":0,
  "SOURCE_CLEAN_selected_alpha":"ZERO_1","outside_1_changed_rgba":0,"outside_1_changed_alpha":0,
  "preserved_other_11_source_cells":"EXACT_PERSISTED_RGBA","header_exact":True,
  "dds_native":[2048,2048],"dds_format":mode,"mips":1,"saved_dds_decode":"EXACT",
  "raw_orientation":"mirror_y","regions":details,"proofs":proof,
- "method":"original source orange face sampled on native Noto Black full professional transliteration, right-aligned within exact source bbox; no stretch and 11 region exact preservation",
+ "method":"native full Korean PROFESSIONAL glyph from source orange face, source-leading left anchor matched at x+5, original bbox and other 11 regions strictly pixel exact; no bitmap stretching",
  "producer_visual":"PENDING_DIRECT_100_75_50_RAW","initial_state":"TRIAL_NOT_PROMOTED","C2":"NOT_RUN","C3":"NOT_RUN",
  "IGR029":"OPEN_MAPPING_SUSPECTED","RUNTIME_VALIDATION":"UNTESTED",
  "backend":"github-actions","excluded":["VR","FFB","DX11","DXVK"]}
-(OUT/"B328_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-print("B328_TRIAL_DDS",json.dumps({"sha":h(data),"details":details,"proofs":len(proof)},ensure_ascii=False))
+(OUT/"B329_MACHINE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+print("B329_TRIAL_DDS",json.dumps({"sha":h(data),"details":details,"proofs":len(proof)},ensure_ascii=False))
