@@ -30,16 +30,17 @@ int main() {
         0,gen,iv), "IB resource");
     require(vb.bind(ctx.Get(),gen,vv) && ib.bind(ctx.Get(),gen,iv),
         "bind owned VB/IB");
-    constexpr char shader[]=
+    constexpr char vertexShader[]=
         "cbuffer Transform : register(b0) {float4 tx;};"
         "float4 vs(float2 p:POSITION):SV_Position{"
-        "return float4(p*tx.zw+tx.xy,0,1);}"
-        "cbuffer Tint : register(b0) {float4 tint;};" 
+        "return float4(p*tx.zw+tx.xy,0,1);}";
+    constexpr char pixelShader[]=
+        "cbuffer Tint : register(b0) {float4 tint;};"
         "float4 ps():SV_Target{return tint;}";
     ComPtr<ID3DBlob> vsCode,psCode;
-    require(SUCCEEDED(D3DCompile(shader,sizeof(shader)-1,nullptr,nullptr,nullptr,
+    require(SUCCEEDED(D3DCompile(vertexShader,sizeof(vertexShader)-1,nullptr,nullptr,nullptr,
         "vs","vs_4_0",0,0,vsCode.GetAddressOf(),nullptr)), "VS compilation");
-    require(SUCCEEDED(D3DCompile(shader,sizeof(shader)-1,nullptr,nullptr,nullptr,
+    require(SUCCEEDED(D3DCompile(pixelShader,sizeof(pixelShader)-1,nullptr,nullptr,nullptr,
         "ps","ps_4_0",0,0,psCode.GetAddressOf(),nullptr)), "PS compilation");
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
@@ -86,22 +87,22 @@ int main() {
 
 
     NativeVsConstantSnapshotR191 transform;
-    NativePsConstantSnapshotR192 color, equalBytesWrongOwner;
+    NativePsConstantSnapshotR192 psColor, equalBytesWrongOwner;
     require(transform.initialize(dev.Get(),{0,0,1,1},gen,73) &&
             transform.bind_vs_b0(ctx.Get(),gen,73), "VS b0 indexed transform");
-    require(!color.initialize(dev.Get(),{1.1f,0,0,1},gen,74),
+    require(!psColor.initialize(dev.Get(),{1.1f,0,0,1},gen,74),
             "reject PS color above unity");
-    require(!color.initialize(dev.Get(),{1,0,0,1},0,74),
+    require(!psColor.initialize(dev.Get(),{1,0,0,1},0,74),
             "reject zero source device generation");
-    require(color.initialize(dev.Get(),{1,0,0,1},gen,74),
+    require(psColor.initialize(dev.Get(),{1,0,0,1},gen,74),
             "create immutable red PS b0");
-    require(!color.bind_ps_b0(ctx.Get(),gen,75),
+    require(!psColor.bind_ps_b0(ctx.Get(),gen,75),
             "reject wrong PS source version");
-    require(color.bind_ps_b0(ctx.Get(),gen,74),"bind PS b0 red");
+    require(psColor.bind_ps_b0(ctx.Get(),gen,74),"bind PS b0 red");
 
     const auto ready=[&](std::uint64_t version) {
         return verified_indexed_ps_color_draw_ready(
-            vb,ib,transform,color,ctx.Get(),0,3,0,gen,vv,iv,73,version,
+            vb,ib,transform,psColor,ctx.Get(),0,3,0,gen,vv,iv,73,version,
             40,40,DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get());
     };
     require(ready(74),"initial PS b0 exact indexed draw readiness");
@@ -110,11 +111,11 @@ int main() {
             equalBytesWrongOwner.bind_ps_b0(ctx.Get(),gen,74),
             "bind equal-bytes foreign PS constant");
     require(!ready(74),"reject equal-bytes different PS GPU buffer identity");
-    require(color.bind_ps_b0(ctx.Get(),gen,74),"restore owned PS b0");
+    require(psColor.bind_ps_b0(ctx.Get(),gen,74),"restore owned PS b0");
     ID3D11Buffer* nullBuffer=nullptr;
     ctx->PSSetConstantBuffers(0,1,&nullBuffer);
     require(!ready(74),"reject null-bound PS b0");
-    require(color.bind_ps_b0(ctx.Get(),gen,74),"restore PS b0 red");
+    require(psColor.bind_ps_b0(ctx.Get(),gen,74),"restore PS b0 red");
 
     const float black[]={0,0,0,1};
     const auto pixel=[&](UINT x,UINT y,int expected) {
@@ -138,10 +139,10 @@ int main() {
     require(pixel(20,20,1) && pixel(1,1,0),
             "actual WARP indexed PS b0 red center / black corner");
 
-    require(color.initialize(dev.Get(),{0,0,1,1},gen,75),
+    require(psColor.initialize(dev.Get(),{0,0,1,1},gen,75),
             "recreate immutable blue PS b0 for new source version");
     require(!ready(75),"reject stale bound red GPU color buffer");
-    require(color.bind_ps_b0(ctx.Get(),gen,75),"bind new immutable blue PS");
+    require(psColor.bind_ps_b0(ctx.Get(),gen,75),"bind new immutable blue PS");
     require(!ready(74) && ready(75),"reject retired PS color version");
     ctx->ClearRenderTargetView(rtv.Get(),black);
     require(ready(75),"PS b0 blue preflight");
@@ -149,7 +150,7 @@ int main() {
     ctx->CopyResource(staging.Get(),color.Get());
     require(pixel(20,20,2) && pixel(1,1,0),
             "actual WARP indexed PS b0 blue center / black corner");
-    color.shutdown();
+    psColor.shutdown();
     require(!ready(75),"reject shutdown PS color owner");
     ib.shutdown();
     std::cout << "R192 immutable PS b0 real GPU red-to-blue DrawIndexed pixels: PASS\\n";
