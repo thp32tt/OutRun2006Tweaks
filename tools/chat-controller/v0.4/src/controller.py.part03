@@ -308,10 +308,127 @@ async def conversion_cycle(context, pages, reg: Registry):
     save_registry(reg)
 
 
+
+# A tab renderer can crash without closing the shared Chrome/CDP session.  Keep
+# the visible Chrome/noVNC browser, and heal only the affected per-slot page.
+TAB_HEALTH_CHECK_SECONDS = max(10, int(os.getenv("TAB_HEALTH_CHECK_SECONDS", "30")))
+TAB_HEALTH_PROBE_TIMEOUT_SECONDS = max(2, int(os.getenv("TAB_HEALTH_PROBE_TIMEOUT_SECONDS", "6")))
+TAB_HEALTH_FAILURE_THRESHOLD = max(2, int(os.getenv("TAB_HEALTH_FAILURE_THRESHOLD", "3")))
+TAB_RECOVERY_COOLDOWN_SECONDS = max(15, int(os.getenv("TAB_RECOVERY_COOLDOWN_SECONDS", "60")))
+
+
+def _watch_slot_page_health(page: Page, slot_name: str, state: dict) -> None:
+    tracked = state.setdefault("tracked", {})
+    if tracked.get(slot_name) is page:
+        return
+    tracked[slot_name] = page
+    state.setdefault("failures", {})[slot_name] = 0
+    # Playwright "crash" fires on a renderer crash; "close" is also handled by
+    # is_closed(), but intentional page rotation is not mistaken for a crash.
+    page.on("crash", lambda *_args, observed_page=page: state.setdefault("crashed", set()).add(observed_page))
+
+
+async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page], state: dict) -> None:
+    """Detect failed tab renderers and reopen persisted chats without sending prompts.
+
+    Never alter TASK_ID, queue phase, registry send counters, or saved chat URLs.
+    The normal queue engine alone decides whether further sending is permitted.
+    """
+    now = datetime.now(TZ)
+    browser = context.browser
+    if browser is not None and not browser.is_connected():
+        raise RuntimeError("Browser has been closed; Docker restart must recover CDP")
+    reg = load_registry(now)
+    for slot in reg.slots:
+        page = pages.get(slot.name)
+        if page is None:
+            # Let the existing slot_page() function create missing tabs.
+            continue
+        _watch_slot_page_health(page, slot.name, state)
+        crashed = state.setdefault("crashed", set())
+        failures = state.setdefault("failures", {})
+        reason = None
+        try:
+            closed = page.is_closed()
+        except Exception:
+            closed = True
+        if closed:
+            reason = "closed"
+        elif page in crashed:
+            reason = "renderer_crash"
+        else:
+            try:
+                await asyncio.wait_for(
+                    page.evaluate("() => 1"), timeout=TAB_HEALTH_PROBE_TIMEOUT_SECONDS
+                )
+                failures[slot.name] = 0
+            except Exception as exc:
+                if browser is not None and not browser.is_connected():
+                    raise RuntimeError("Browser has been closed during tab probe") from exc
+                failures[slot.name] = failures.get(slot.name, 0) + 1
+                if failures[slot.name] >= TAB_HEALTH_FAILURE_THRESHOLD:
+                    reason = "unresponsive"
+                else:
+                    log.warning("tab health probe failed slot=%s attempt=%s: %r",
+                                slot.name, failures[slot.name], exc)
+        if reason is None:
+            continue
+
+        last = state.setdefault("last_recovered", {}).get(slot.name, 0.0)
+        if time.monotonic() - last < TAB_RECOVERY_COOLDOWN_SECONDS:
+            continue
+        state["last_recovered"][slot.name] = time.monotonic()
+        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
+        log.error("slot tab recovery slot=%s reason=%s target=%s", slot.name, reason, target)
+        # Preserve a visual diagnostic where Chromium still permits screenshots.
+        if not closed:
+            try:
+                screenshot_dir = Path("/logs/tab-recovery")
+                screenshot_dir.mkdir(parents=True, exist_ok=True)
+                screenshot = screenshot_dir / (
+                    f"{now.strftime('%Y%m%dT%H%M%S')}-{slot.name}-{reason}.png"
+                )
+                await asyncio.wait_for(page.screenshot(path=str(screenshot), timeout=2500), timeout=3)
+            except Exception:
+                log.info("slot=%s could not capture crashed tab screenshot", slot.name)
+            try:
+                await asyncio.wait_for(page.close(run_before_unload=False), timeout=4)
+            except Exception:
+                log.warning("slot=%s crashed tab could not close; replacing reference", slot.name)
+        crashed.discard(page)
+        replacement = await context.new_page()
+        pages[slot.name] = replacement
+        _watch_slot_page_health(replacement, slot.name, state)
+        try:
+            await replacement.goto(target, wait_until="domcontentloaded", timeout=45000)
+        except Exception as exc:
+            failures[slot.name] = TAB_HEALTH_FAILURE_THRESHOLD
+            write_runtime(tab_recovery_error=f"{slot.name}:{reason}:{type(exc).__name__}",
+                          tab_recovery_error_at=now.isoformat())
+            log.exception("slot=%s recovery navigation failed; saved TASK_ID/chat retained", slot.name)
+            # A disconnected CDP must restart the whole controller; a transient
+            # navigation error must not trigger a duplicate message submission.
+            if browser is not None and not browser.is_connected():
+                raise RuntimeError("Browser has been closed during tab recovery") from exc
+            continue
+        failures[slot.name] = 0
+        count = int(runtime.get("tab_recovery_count") or 0) + 1
+        write_runtime(tab_recovery_count=count, tab_recovery_last_at=now.isoformat(),
+                      tab_recovery_last_slot=slot.name, tab_recovery_last_reason=reason,
+                      tab_recovery_error=None)
+        log.warning("recovered slot=%s reason=%s with original conversation URL", slot.name, reason)
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     reg = load_registry(datetime.now(TZ))
+    tab_health_state: dict = {}
+    last_tab_health_check = 0.0
     while True:
         now = datetime.now(TZ)
+        if time.monotonic() - last_tab_health_check >= TAB_HEALTH_CHECK_SECONDS:
+            last_tab_health_check = time.monotonic()
+            await monitor_slot_tab_health(context, pages, tab_health_state)
+
         write_runtime(queue_loop_heartbeat_at=now.isoformat(), status="running" if AUTO_SEND else "manual_mode")
         try:
             if CONTROLLER_MODE == "localization":
