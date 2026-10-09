@@ -53,7 +53,8 @@
     "source_to_final_changed_outside_three_title_bboxes": 1934984,
     "source_to_clean_alpha_changed_outside_three_title_bboxes": 1638112,
     "source_to_final_alpha_disappeared_outside_three_title_bboxes": 982705,
-    "source_to_final_alpha_appeared_outside_three_title_bboxes": 0
+    "source_to_final_alpha_appeared_outside_three_title_bboxes": 537912,
+    "source_to_clean_alpha_disappeared_outside_three_title_bboxes": 982705
   },
   "reviewed_images": [
     "localization/graphics/role_A/20261010-A213-Q121-SOURCE-PROTECTION-ROOT-CAUSE/A213_ATLAS_SOURCE_CLEAN_FINAL_GRAY_25PCT.jpg",
