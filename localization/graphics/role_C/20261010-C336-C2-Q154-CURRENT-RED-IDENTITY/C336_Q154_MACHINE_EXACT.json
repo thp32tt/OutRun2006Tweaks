@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150",
+  "source_branch": "korean-localization-recovery-20260928",
+  "base_head_at_selection": "c91236ec343dce23a3937273b3f78af8d6215add",
+  "selected_queue_index": 154,
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "execution_backend": "GitHub direct exact SHA download + N100 MCP fallback small-region read-only Pillow/NumPy; local network DNS prevented sandbox materialization",
+  "actual_dds_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "known_source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "prior_C292_candidate_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "ddssize": 16777344,
+  "codec": "uncompressed BGRA32",
+  "native_size": [
+    4096,
+    1024
+  ],
+  "authored_mips": 1,
+  "raw_orientation": "vertical_mirror",
+  "comparison_crop_padding_px": 12,
+  "method": "Independently download exact saved current DDS SHA256; decode persisted pixels; crop each of five unchanged red source bboxes with C292 documented +12px padding; compare exact RGBA against historic C292 independent lossless PNG in RAW and FLIP-Y; inspect current composited grey strips visually.",
+  "regions": [
+    {
+      "id": "01_create_new_license",
+      "region": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "prior_png_native": [
+        1965,
+        172
+      ],
+      "raw_pixel_diff": 239547,
+      "flipy_pixel_diff": 0,
+      "max_channels_diff_flipy": 0,
+      "matched_orientation": "FLIPY",
+      "current_png_sha256": "0f87b6767d5b38c515fb13f16c51248248d474d57a852eb0a963ea48d86e63c9",
+      "current_exact_region_matches_prior_c292": true,
+      "prior_C292_png": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/01_create_new_license_CURRENT_PERSISTED_DDS.png",
+      "direct_gray_visible_review": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop.",
+      "bbox_measurement_origin": "C292 preserved bbox, current pixel-exact to C292 source-crop"
+    },
+    {
+      "id": "02_select_license",
+      "region": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "prior_png_native": [
+        1485,
+        172
+      ],
+      "raw_pixel_diff": 190691,
+      "flipy_pixel_diff": 0,
+      "max_channels_diff_flipy": 0,
+      "matched_orientation": "FLIPY",
+      "current_png_sha256": "8bdf26c454836f394997bf81f80cb81ca7c588c2ff37cf7380e6d5be4c44c72e",
+      "current_exact_region_matches_prior_c292": true,
+      "prior_C292_png": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/02_select_license_CURRENT_PERSISTED_DDS.png",
+      "direct_gray_visible_review": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop.",
+      "bbox_measurement_origin": "C292 preserved bbox, current pixel-exact to C292 source-crop"
+    },
+    {
+      "id": "03_single_player",
+      "region": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "prior_png_native": [
+        1400,
+        172
+      ],
+      "raw_pixel_diff": 167464,
+      "flipy_pixel_diff": 0,
+      "max_channels_diff_flipy": 0,
+      "matched_orientation": "FLIPY",
+      "current_png_sha256": "e000fc3552ed33e3977ad358f72e09a58c424c0136c75fa9e0ded9b8060a1d60",
+      "current_exact_region_matches_prior_c292": true,
+      "prior_C292_png": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/03_single_player_CURRENT_PERSISTED_DDS.png",
+      "direct_gray_visible_review": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop.",
+      "bbox_measurement_origin": "C292 preserved bbox, current pixel-exact to C292 source-crop"
+    },
+    {
+      "id": "04_default_license",
+      "region": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "prior_png_native": [
+        1568,
+        172
+      ],
+      "raw_pixel_diff": 180659,
+      "flipy_pixel_diff": 0,
+      "max_channels_diff_flipy": 0,
+      "matched_orientation": "FLIPY",
+      "current_png_sha256": "c4952b22515355457509d59988d201b18f24317b6b751f1f6f7e8c291d2943bd",
+      "current_exact_region_matches_prior_c292": true,
+      "prior_C292_png": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/04_default_license_CURRENT_PERSISTED_DDS.png",
+      "direct_gray_visible_review": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop.",
+      "bbox_measurement_origin": "C292 preserved bbox, current pixel-exact to C292 source-crop"
+    },
+    {
+      "id": "05_multiplayer",
+      "region": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "prior_png_native": [
+        1244,
+        168
+      ],
+      "raw_pixel_diff": 196206,
+      "flipy_pixel_diff": 0,
+      "max_channels_diff_flipy": 0,
+      "matched_orientation": "FLIPY",
+      "current_png_sha256": "14f940efd03d4e708ec8db02bc0736b24b325008a0276bdb839a376cc33c10dc",
+      "current_exact_region_matches_prior_c292": true,
+      "prior_C292_png": "localization/graphics/role_C/20261008-C292-C2-Q154-RED-FIVE-INDEPENDENT/05_multiplayer_CURRENT_PERSISTED_DDS.png",
+      "direct_gray_visible_review": "No definitive visible English source residue, clipped Hangul, foreign opaque box, or broken glyph on submitted exact-current alpha-composite crop.",
+      "bbox_measurement_origin": "C292 preserved bbox, current pixel-exact to C292 source-crop"
+    }
+  ],
+  "red_regions_equal_to_prior_c292": "5/5",
+  "flipy_zero_mismatch_count": 5,
+  "raw_positive_mismatch_count": 5,
+  "total_flipy_rgba_pixel_mismatches": 0,
+  "protected_art_exception": {
+    "asset": "01_create_new_license",
+    "visible_alpha_pixels_outside_korean_candidate_bbox": 7860,
+    "local_xy_bbox": [
+      0,
+      168,
+      1965,
+      172
+    ],
+    "source_vs_current_rgba_mismatch_in_those_pixels": 0,
+    "source_vs_current_alpha_mismatch_in_those_pixels": 0,
+    "explanation": "Bottom four rows are an original preserved red horizontal separator outside the Korean bbox, pixel-identical to exact C292 canonical English source proof; NOT unremoved English source text."
+  },
+  "limitations": [
+    "C292 historical native red geometry is proven byte-equivalent, not a blind new source-family/style approval",
+    "Three revised gray labels from B298 were C323 scoped, not newly audited here",
+    "Full 8-region SOURCE/CLEAN/FINAL protected art and all practical views plus calibrated pixels-first C/C3 are still not complete",
+    "No user actual game run; open status not closed"
+  ],
+  "runtime_validation": "UNTESTED",
+  "new_dds": 0,
+  "qa": "SCOPED_EXACT_SAVED_RED_FIVE_IDENTITY_PASS_NOT_C_PASS"
+}
