@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B335",
+  "run_key": "OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310",
+  "queue_index": 60,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "baseline_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "baseline_git_revision": "e34eab0b1ff22a3cb448bd0e35f8e26e0bd803c8",
+  "persisted_current_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_saved_dds_count": 0,
+  "P1": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+  "native": [
+    4096,
+    2048
+  ],
+  "raw_orientation": "MIRROR_Y",
+  "full_native_mask_protection": 17879,
+  "orange_exact_source_count": 8892,
+  "source_to_clean_orange_mismatch": 0,
+  "source_to_candidate_orange_mismatch": 0,
+  "guard_all_counts_zero": true,
+  "guard_report": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_MACHINE_GUARD.json",
+  "plate_manifest": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_PLATE_MANIFEST.json",
+  "recipe": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/recipe.json",
+  "observed_views": [
+    "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_FLIPY_GRAY_100_FULL_SOURCE_PLATE_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_FLIPY_BLACK_50_FULL_SOURCE_PLATE_OLD_FINAL.png",
+    "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_RAW_WHITE_75_FULL_SOURCE_PLATE_OLD_FINAL.png"
+  ],
+  "controller_observation": "Direct full gold/orange neighbor views show no definite residual English in verified source removal region, correct original BEST orange preservation, saved gold legible; original source adjacent cells not fully audited. P1 mechanical semantics do not certify font/slant/whole atlas.",
+  "P2": "HOLD_UNVERIFIED_FONT_HASH_AND_SOURCE_TO_KOREAN_SLANT_ANCHORS",
+  "P3": "NOT_RUN_NO_CHANGED_DDS",
+  "fresh_independent_C2": "C334_SOURCE_SCOPED_HOLD_UNCHANGED",
+  "C3": "NOT_RUN",
+  "game": "OPEN_USER_INGAME_FAIL_IGR044",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions 37943166709",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

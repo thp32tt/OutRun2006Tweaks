@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "q060 B335 new P1 full-native source CLEAN/removal/protected/restore masks machine PASS seven zero counts, no new DDS. C334 C2 HOLD unchanged; B next P2 obtain font hash and measurable source-to-Korean top/bottom anchors before final manifest, C2/C3 and user IGR044 retest. RUN_KEY=OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310 RUNTIME_VALIDATION=UNTESTED",
     "A209 q175 P1 new trial DDS d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7 hand-authored SHOWROOM rounded vector not promoted: first 169px overbound shadow fixed to 0px, exact saved BGRA roundtrip 0 alpha/outside scope, controller native100 white75 black50 SOURCE/CLEAN/OLD/TRIAL VISUAL FAIL on illegible collapsed 룸 jamo bars, poor chrome relief and 457/950 underfill. Existing promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 untouched, IGR032 OPEN, q175 REWORK_REQUIRED, C1/C3/INGAME blocked RUNTIME_VALIDATION=UNTESTED. Need genuinely different per-jamo counter/chrome vector method, do NOT repeat same A209 skeleton. RUN_KEY=OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300.",
     "C334 C2 EVEN q060: canonical original full DDS SHA independently verified and persisted source/FINAL native ROI matches producer proof; previous source identity blocker cleared. Full atlas typography calibration C3 and real game IGR044 OPEN. localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK/C334_Q060_CONTROLLER_CANONICAL_DDS_HOLD.json OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250 RUNTIME_VALIDATION=UNTESTED.",
     "A208 2026-10-09 22:44 KST q193 A-owned P1 NEW actual DDS Goal A → 목표 A exact SHA256 9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3; source width165,height47, new122x42 native; 0 source-protected/outside/alpha ghosts, persisted RAW/FLIPY/50% SOURCE/CLEAN/OLD/NEW producer SCOPED_PASS, guard mechanical PASS only. q193 7/13 labels rebuilt, 6 still REWORK; fresh independent C1 family-pilot, C3, user JPG/new game retest PENDING; IGR003/033 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION-20261009-2230;",
@@ -13673,6 +13674,26 @@
     "C3": "BLOCKED",
     "user_game": "IGR032_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b335_q060_full_source_plate_p1": {
+    "run": "B335",
+    "run_key": "OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310",
+    "role": "B",
+    "queue_index": 60,
+    "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "new_dds": 0,
+    "new_artifact": "Full-native 4096×2048 source-derived P1 removal/protection/restore masks, CLEAN and executable manifest with machine 7/7 zeros, reusable recipe, 18 proof views",
+    "protected_source_orange_exact": 8892,
+    "protected_source_contour_exact": 17879,
+    "mechanical": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+    "visual": "PRODUCER_P1_SCOPED_PASS_NO_NEW_VISIBLE_GOLD_ENGLISH_OR_ORANGE_LOSS",
+    "P2": "HOLD_FONT_SHA_AND_READABLE_SLANT_ANCHORS",
+    "P3": "NOT_RUN_EXISTING_DDS_UNCHANGED",
+    "C2": "C334_HOLD_UNCHANGED",
+    "C3": "PENDING",
+    "user_igr044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa_path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_CONTROLLER_P1_VISUAL_QA.json"
   }
-
 }

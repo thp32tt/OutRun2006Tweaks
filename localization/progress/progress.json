@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 22:50 KST",
+  "updated_at_kst": "2026-10-09 23:25 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9476,6 +9476,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "worker_run": 37942397381,
     "qa": "localization/graphics/role_A/20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A209_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+  },
+  "b335_q060_full_source_plate_p1": {
+    "run": "B335",
+    "run_key": "OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310",
+    "role": "B",
+    "queue_index": 60,
+    "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "new_dds": 0,
+    "new_artifact": "Full-native 4096×2048 source-derived P1 removal/protection/restore masks, CLEAN and executable manifest with machine 7/7 zeros, reusable recipe, 18 proof views",
+    "protected_source_orange_exact": 8892,
+    "protected_source_contour_exact": 17879,
+    "mechanical": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+    "visual": "PRODUCER_P1_SCOPED_PASS_NO_NEW_VISIBLE_GOLD_ENGLISH_OR_ORANGE_LOSS",
+    "P2": "HOLD_FONT_SHA_AND_READABLE_SLANT_ANCHORS",
+    "P3": "NOT_RUN_EXISTING_DDS_UNCHANGED",
+    "C2": "C334_HOLD_UNCHANGED",
+    "C3": "PENDING",
+    "user_igr044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa_path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_CONTROLLER_P1_VISUAL_QA.json"
   }
-
 }
