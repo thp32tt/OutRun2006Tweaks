@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A218",
+  "state": "TRIAL_PASS_SCOPED_NOT_PRODUCTION_QUALIFIED",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "atlas_sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982"
+  },
+  "baseline_current": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+    "sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "changed": false
+  },
+  "trial": {
+    "path": "localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_Q161_C344_THREE_FACE_REWORK_TRIAL.dds",
+    "sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+    "format": "DDS DXT5/BC3 2048x2048 mip1",
+    "RAW": "readable FLIP_TOP_BOTTOM"
+  },
+  "full_atlas": {
+    "source_cells": 38,
+    "repaired_cells": [
+      11,
+      16,
+      24
+    ],
+    "preserved_original_BC3_blocks_for_cells": 35,
+    "protected": "all BC3 blocks outside three exact source English glyph bboxes"
+  },
+  "cells": [
+    {
+      "index": 11,
+      "english": "AQUARIUS",
+      "korean": "물병자리",
+      "source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "trial_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ]
+    },
+    {
+      "index": 16,
+      "english": "SOUTH KOREA",
+      "korean": "대한민국",
+      "source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "trial_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ]
+    },
+    {
+      "index": 24,
+      "english": "ITALY",
+      "korean": "이탈리아",
+      "source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "trial_bbox": [
+        8,
+        1227,
+        157,
+        1268
+      ]
+    }
+  ],
+  "font": {
+    "family": "Noto Sans CJK KR Black",
+    "discovery": "fc-match -f %{file} Noto Sans CJK KR:style=Black",
+    "license": "SIL Open Font License",
+    "file_sha256": "PENDING_BUILD_REPRODUCIBILITY_EVIDENCE",
+    "glyph_coverage": "USED_IN_ACTUAL_SAVED_TRIAL_BUT_RECHECK_PIN_REQUIRED"
+  },
+  "renderer": {
+    "script": "tools/localization/cpu_jobs/A.py",
+    "git_revision": "6a8177197a144a066951eda27489c1b13485cf41",
+    "native_render": "Pillow direct font render natural CJK aspect, no horizontal squeeze",
+    "BC3": "fixed RGB565 flat 60,71,74 and endpoint alpha 255/0; retain unrelated original blocks"
+  },
+  "editing": {
+    "clean": "source English title bboxes fully cleared to alpha0 in isolated final trial before new letter",
+    "lettering": "RGBA native alpha-only CJK true glyph masks",
+    "source_coord": "readable=vertical_flip(native RAW)",
+    "crop_masks": "source bboxes 11,16,24 from SHA-pinned atlas",
+    "protect_masks": "all other 35 source text cells preserved by compressed block identity",
+    "lean": "upright/no shear; source original flat sans",
+    "source_glyph_anchors": "REQUIRES_C1_EQUIVALENT_STROKE_CHECK"
+  },
+  "QA": {
+    "machine": "PASS 0 changed outside, 0 pinholes, 0 core color mismatch, no new alpha extra/missing; 3 bboxes valid",
+    "producer_visual": "SCOPED_PASS on gray/white/black100 and gray50; C344 11/16/24 visible speckles absent",
+    "C1": "NOT_RUN_NEW_SHA",
+    "C3": "BLOCKED",
+    "game": "UNTESTED"
+  },
+  "promotion_blockers": [
+    "font_sha_pin",
+    "final production_pixel_guard manifest on exact candidate path",
+    "independent C1 pixels-first complete saved 38-cell review",
+    "distinct C3 and USER_GAME_RETEST"
+  ],
+  "prohibited": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
