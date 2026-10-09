@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 21:13 KST",
+  "updated_at_kst": "2026-10-09 21:20 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9358,5 +9358,59 @@
     "consumer_chain": "SOURCE_THROUGH_PERSISTED_BYTES_PROVEN_BUILD_AND_ACTUAL_LOAD_UNTESTED",
     "runtime_validation": "UNTESTED",
     "qa": "localization/graphics/role_A/20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL/A206_CONTROLLER_PRODUCER_SCOPED_QA.json"
+  },
+  "b332r_q060_orange_restore": {
+    "run": "B332R",
+    "run_key": "OUTRUN-KOR-B332-Q060-C332-ORANGE-PROTECTED-ART-20261009-2110",
+    "queue_index": 60,
+    "priority": "P0",
+    "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "user_igr": "IGR-044",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "old_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "candidate_git_blob": "e1e0f27a621762dd69086fc4b0e97f6a2ddcda6f",
+    "type": "MATERIAL_PROTECTED_ART_REPAIR",
+    "produced_dds": 1,
+    "source_orange_exact_pixels_restored": 8892,
+    "protected_orange_rgba_delta": 0,
+    "protected_expanded_rgba_delta": 0,
+    "outside_edit_rgba_delta": 0,
+    "old_title_y": [
+      256,
+      363
+    ],
+    "new_title_y": [
+      235,
+      332
+    ],
+    "source_edit_bbox": [
+      2081,
+      230,
+      2860,
+      370
+    ],
+    "new_title_bbox": [
+      2133,
+      235,
+      2807,
+      332
+    ],
+    "format": "RGBA32_4096x2048_mip1_RAW_MIRRORY",
+    "producer_visual": "SCOPED_PASS_READABLE_NATIVE50_RAW75_SOURCE_CLEAN_PRIOR_NEW",
+    "QA": "B_PRODUCER_SCOPED_PASS_PENDING_FRESH_C2",
+    "C2": "PENDING_FRESH",
+    "C3": "PENDING",
+    "approval": "NOT_GRANTED",
+    "user_game": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "consumer_chain": "exact English source -> q060 shared gold/outside orange sibling -> candidate bytes -> build manifest pending -> exact game HUD compositing pending -> user screenshot203 retest pending",
+    "report": "localization/graphics/role_B/20261009-B332-Q060-ORANGE-PROTECTED-SIBLING-RESTORE/B332R_CONTROLLER_SELF_QA_FINAL.json",
+    "excluded": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
   }
 }

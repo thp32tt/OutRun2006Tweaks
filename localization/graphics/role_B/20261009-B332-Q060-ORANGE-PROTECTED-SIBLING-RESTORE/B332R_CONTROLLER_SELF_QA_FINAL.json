@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B332R",
+  "run_key": "OUTRUN-KOR-B332-Q060-C332-ORANGE-PROTECTED-ART-20261009-2110",
+  "index": 60,
+  "priority": "P0",
+  "user_igr": "IGR-044",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_C": "C332 REWORK_REQUIRED PROTECTED_ART_LOSS orange BEST TIME missing; prior B331 source-clean wipe destroys sibling",
+  "previous_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "material_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "material_git_blob": "e1e0f27a621762dd69086fc4b0e97f6a2ddcda6f",
+  "material_rework": "Use canonical source orange pixels and 12px protected expanded region; clean English gold including top navy residual (edit bbox y230..370), restore 8892 original orange pixels exact; reduce native B331 gold to upper region with zero orange collision.",
+  "full_edit_bbox": [
+    2081,
+    230,
+    2860,
+    370
+  ],
+  "new_letter_bbox": [
+    2133,
+    235,
+    2807,
+    332
+  ],
+  "source_orange_restored_px": 8892,
+  "source_orange_changed_rgba": 0,
+  "source_orange_expanded_changed_rgba": 0,
+  "outside_edit_changed_rgba": 0,
+  "outside_edit_changed_alpha": 0,
+  "new_gold_protected_overlap": 0,
+  "DDS_header": "EXACT",
+  "DDS_mode": "RGBA32",
+  "native": [
+    4096,
+    2048
+  ],
+  "mips": 1,
+  "raw_orientation": "MIRROR_Y",
+  "DDS_persisted_roundtrip": "EXACT",
+  "visual_direct": [
+    "localization/graphics/role_B/20261009-B332-Q060-ORANGE-PROTECTED-SIBLING-RESTORE/B332_FLIPY_GRAY_100_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B332-Q060-ORANGE-PROTECTED-SIBLING-RESTORE/B332_FLIPY_BLACK_50_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png",
+    "localization/graphics/role_B/20261009-B332-Q060-ORANGE-PROTECTED-SIBLING-RESTORE/B332_RAW_WHITE_75_FULL_GOLD_ORANGE_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "visible_observations": {
+    "orange_lower_label": "RESTORED_READABLE_FLIPY_AND_RAW",
+    "gold_korean": "LEGIBLE_UPPER_ORIGINAL_FAMILY_LEAN",
+    "no_top_ghost": "SCOPED_NO_OLD_NAVY_ABOVE_GOLD_IN_WINDOW",
+    "protected_collision": "SCOPED_NO_OVERLAP",
+    "other_rows": "PIXEL_EXACT_OUTSIDE_EDIT",
+    "background": "NO_FOREIGN_BOX_IN_EXAMINED_3_BACKGROUNDS"
+  },
+  "producer_qa": "SCOPED_PASS_AWAIT_FRESH_INDEPENDENT_C2_FULL_ATLAS_SOURCE_PROOF",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "approval": false,
+  "pre_ingame": "BLOCKED_DUE_TO_OPEN_IGR",
+  "user_game": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions 37929215714, source SHA-pin; N100 only small proof viewer",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
