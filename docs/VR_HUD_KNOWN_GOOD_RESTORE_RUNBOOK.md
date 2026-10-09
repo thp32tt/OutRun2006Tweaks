@@ -2,6 +2,19 @@
 
 **Canonical repository:** thp32tt/OutRun2006Tweaks, branch `vr-d3d9ex-focus`. **Last review:** 2026-10-09 KST. Read this BEFORE altering HUD, renderer, rank markers, gameplay F11, result text, packaging, or initiating another HMD test. Durable companion `docs/VR_REGRESSION_KNOWLEDGE.json`, historical comparison `docs/automation/reviews/AI2_DX9EX_HMD_HISTORICAL_REGRESSION_20261009.md`.
 
+## 2026-10-10 user-corrected two-phase result and lens-centre acceptance (latest)
+
+**User-tested source (both supplied sessions):** `a6f8497c2fbe83959984275c30fbf43aa6a72d55`; second log `20261009T150616372Z-f33c5859`. This HMD verdict **supersedes** any statement that all GOAL/result map/time is already fixed:
+
+- **Phase A — result progress moving upward:** map/course title and elapsed/recorded time are **both binocularly doubled and follow the headset**. FAILED. The visible progress animation and final-results name/time rendering are **not interchangeable** even if game state remains `STATE_GOAL`.
+- **Phase B — progress completely finished:** same course/map name and time are correct **single, head-stable HUD**. PASSED. Preserve this output and both canonical GOAL helper functions `0xBEA5A` and `0xBEA5F`; never remove either or globally promote result overlays.
+- **OutRun course-change transient `+TIME`:** doubled/head-following. FAILED independently of phases A/B.
+- **Lens flare:** original image has 4–5 round elements; **central disc only** doubled/head-following (FAILED). All outer discs normal (PASSED). `EXE+0xCABE` producer-scoped tag is not enough to identify the core; isolate original object/draw within the effect before changing ownership. Do not convert all 4–5 discs to 2D HUD.
+- **Evidence:** GOAL runtime state=19 `00:12:10/13` includes `producer=NONE scope=SCREEN_OVERLAY_2D`, at `00:12:16` includes `producer=TEXT_GLYPH_PUTSPRITE scope=SCREEN_HUD` (`FVF 0x144` XYZRHW versus `FVF 0x142` fixed-function). This temporal shift **does not prove a specific map/time glyph's producer**; inspect `0x97BE4/0x97DEC` progress boundaries, `0x975EE/0x97727/0x977FB` stage/title/glyph, `0xBEA5A/0xBEA5F` GOAL helpers, shader/raw-c64/fixed-function sinks and original `0xCABE/0xCF4E` lens XREF.
+- **Evidence policy:** prior session `AUTO_ANALYSIS_SUMMARY status=OK` is NOT a HMD verdict. New analyzer reports `GOAL_MIXED_GENERIC_VS_EXACT_HUD_NEEDS_PHASE_REVIEW` as a diagnostic clue and `LensCenterOpticalStatus=NOT_INFERABLE_FROM_LOGS`. Only the user's actual optical report determines pass/fail. No repeated same-build user HMD session or 1000/5000 static cycles.
+
+Detailed durable evidence: `docs/automation/reviews/DX9EX_HMD_FEEDBACK_20261009_2348_RANK_TIME_PERF_RESOLUTION.md`, section 2026-10-10 second uploaded session.
+
 ## 2026-10-09 F11 latest user acceptance and refactor boundary
 
 - **F11 is normal now** per the user's direct 2026-10-09 report. Protect the existing dedicated external ImGui `ScopedExternalOverlaySemantic` / R30 per-eye path as a working outcome; stop treating F11 as an active visual defect or a prerequisite for R84 structural work.
