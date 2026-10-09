@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C333 C2 2026-10-09 21:50 KST OUTRUN-KOR-C333-C2-Q060-B332R-PROTECTED-PLATE-PERSISTED-20261009-2150: fresh B332R saved RGBA32 DDS exact SHA256 d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 4096x2048 persisted full gold+neighbor ROI independent Pillow RAW/FLIPY. NEW exact source original-orange area y130..159 restored 8892/8892 orange pixels, 0 RGBA diff; CLEAN pure transparent y20..129; next localized cell y160..189 previous→new 0 changed RGBA; full 779x190 ROI saved vs producer PNG exactly 0 mismatches. C SCOPED source-art and CLEAN pass, HOLD_STRICT_RECHECK canonical original whole-atlas SHA/full mask, calibrated family C3/evidence/user actual-game pending. IGR044 OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_Q060_C2_CONTROLLER_SCOPED_HOLD.json;",
     "B332R new q060 SOURCE+BEST neighbor SHA d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 producer protected alpha 8892 restored; independent C2 FULL 1px/whole source masked audit, then C3/export and NEW user's IGR044 real-game screenshot203; RUN_KEY=OUTRUN-KOR-B332-Q060-C332-ORANGE-PROTECTED-ART-20261009-2110 RUNTIME_VALIDATION=UNTESTED.",
     "A206 q193 P1 IGR003/019/033 REAL new material DDS d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa old 1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6 original English d308bf0558...; 3 rank-help source English ghost/overlaid Korean cleaned to transparent and rerendered native/source bold. All original alpha footprints 3/3 source margins2+, old/clean/final alpha outside0, clean/final changed outside Hangul0, RAW/FLIPY and BGW 100/75/50 producer scoped PASS. Previous A205 three titles unchanged, cumulative 6/13 atlas labels rewritten; Goal A-E/15 Cont./ONLINE remain inherited visually broken => whole asset REWORK_REQUIRED, C1/C3/new user in-game OPEN; consumer build/cache/selection NOT_TESTED; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL/A206_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "C332 2026-10-09 20:50 KST OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050 TEMP_BACKLOG_RELIEF=C2 EVEN q060 B331 exact saved SHA 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 4096x2048 native decoded; saved ROI exact B331 trial RGBA (0 mismatches). New C2 confirmed original orange BEST... adjacent protected source art in gold bbox: 8892 source orange pixels, 0 saved and CLEAN, 6917 original pixels become transparent in new candidate. Producer zero outside-gold bbox misses this protected sibling overlapping edited rectangle. REWORK_REQUIRED PROTECTED_ART_LOSS/INCOMPLETE_CLEAN_PLATE; B must restore original orange neighbor and remake gold masked candidate, then fresh C2/C3 + user actual game IGR044. No DDS produced, six QA PNG recorded localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_CONTROLLER_C2_REWORK.json RUNTIME_VALIDATION=UNTESTED.",
@@ -6833,7 +6834,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 20:56 KST",
+  "updated_at_kst": "2026-10-09 21:58 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13589,5 +13590,14 @@
       "DX11",
       "DXVK"
     ]
+  },
+  "c333_c2_q060_b332r_independent_plate": {
+    "qa": "localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_Q060_C2_CONTROLLER_SCOPED_HOLD.json",
+    "run_key": "OUTRUN-KOR-C333-C2-Q060-B332R-PROTECTED-PLATE-PERSISTED-20261009-2150",
+    "result": "HOLD_STRICT_RECHECK",
+    "scope_result": "PASS_PROTECTED_ORANGE_AND_PLATE",
+    "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "new_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

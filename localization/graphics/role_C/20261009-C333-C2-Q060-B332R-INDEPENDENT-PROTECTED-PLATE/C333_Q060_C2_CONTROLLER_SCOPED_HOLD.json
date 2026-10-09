@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "review_id": "C333-C2-Q060-B332R",
+  "run_key": "OUTRUN-KOR-C333-C2-Q060-B332R-PROTECTED-PLATE-PERSISTED-20261009-2150",
+  "date_kst": "2026-10-09 21:50 KST",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 60,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256_producer": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "candidate_git_blob": "e1e0f27a621762dd69086fc4b0e97f6a2ddcda6f",
+  "current_selection": "Fresh B332R new candidate after C332 visual REWORK and preservation repair; not inspecting B331 old SHA again",
+  "triage": "FRESH_C_REVIEW (producer scoped QA PASS pending fresh C2)",
+  "result": "HOLD_STRICT_RECHECK",
+  "scope": "INDEPENDENT_ORANGE_PROTECTED_ART_AND_CLEAN_PLATE_PIXEL_PASS",
+  "independent_backend": "GitHub connector source of truth plus N100 MCP bounded decoder fallback because ChatGPT local HTTP DNS failed and GitHub fetch_file omitted 33MB binary; no new DDS rendered",
+  "saved_dds": {
+    "sha256_verified": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "file_bytes": 33554560,
+    "width": 4096,
+    "height": 2048,
+    "format": "RGBA32",
+    "mips": 1,
+    "readable_transform": "FLIP_Y",
+    "verified_candidate_matches_producer_lossless_png_full_roi": 0,
+    "full_roi_native": [
+      2081,
+      210,
+      2860,
+      400
+    ],
+    "roi_size": [
+      779,
+      190
+    ],
+    "native_crop_readable_sha256": "bee6371b16e708a390fa627085e71b1324865f3aed25070cd25c887c7fc90de7",
+    "native_crop_raw_sha256": "5080c81b61cc4a0ced5d45599ae0159fc40e2318b6bb1116e94ad4d60b628ffc"
+  },
+  "independent_source_producer_binding": "B332_SOURCE_READABLE_ROI.png is producer-provided extracted source crop; canonical original full DDS SHA proof not independently obtained, therefore only cropped scoped C finding",
+  "orange_protection": {
+    "correct_cell_local_bounds": [
+      0,
+      130,
+      779,
+      160
+    ],
+    "source_orange_pixels": 8892,
+    "persisted_candidate_orange_pixels": 8892,
+    "producer_clean_orange_pixels": 8892,
+    "source_orange_exact_rgba_mismatches": 0,
+    "source_orange_mask_bbox_local": "bottom of original gold title cell; includes upper portion of neighboring BEST TIME artwork",
+    "native_orange_guard_pixels_at_actual_source_hue": 8892,
+    "source_to_candidate_3x3_dilated_rgba_diffs_inside_protected_cell": 0,
+    "adjoining_other_cell_prev_to_new_changed_rgba_pixels_y160_to190": 0,
+    "notes": "An unbounded 12px dilation crosses the neighboring separately localized cell y>=160, where source English differs from already-localized prior by design. Scope source art protection to the actual crossing orange region y130..159 and compare next localized cell against prior candidate, not untouched English source. Does NOT claim full atlas exact source protection."
+  },
+  "clean_plate": {
+    "producer_clean_png": "localization/graphics/role_B/20261009-B332-Q060-ORANGE-PROTECTED-SIBLING-RESTORE/B332_CLEAN_PLATE_READABLE_ROI.png",
+    "inspected_editable_title_alpha_count_y20_to130": 0,
+    "protected_source_orange_y130_to160": "PRESERVED",
+    "nearby_other_localized_below_y160_to190": "UNCHANGED_VS_PREVIOUS",
+    "observation": "CLEAN before lettering contains no visible alpha in header gold lettering cell y20..129, while maintaining adjacent orange BEST TIME region. Native/50% and RAW rendered saved-candidate crops reviewed directly; no proven residual English title or rectangle in this ROI."
+  },
+  "saved_byte_geometry": {
+    "gold_bbox_readable": [
+      2133,
+      235,
+      2807,
+      332
+    ],
+    "producer_margin_and_no_gold_collision": "SCOPED_PRODUCER_METRIC_NOT_INDEPENDENT_FULL_MASK",
+    "raw_to_readable_roundtrip": "MATCHES_PRODUCER_SAVED_CROP",
+    "source_italic_hierarchy": "HOLD_FULL_FAMILY_CALIBRATION"
+  },
+  "prior_failure": "C332 identified 8,892 orange pixels lost in B331 saved DDS; independent current B332R persisted ROI shows all 8,892 restored with byte-exact RGBA relative to B332 source crop. No repeated same-SHA recheck.",
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_PERSISTED_READABLE_ROI.png",
+      "blob_sha": "6f74d081f1d4ae6cf5cccff7c254d1f186928530",
+      "sha256": "bee6371b16e708a390fa627085e71b1324865f3aed25070cd25c887c7fc90de7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_PERSISTED_RAW_ROI.png",
+      "blob_sha": "d0ab4593ab6a7f1da8e5dfac6a17aad49837ed80",
+      "sha256": "5080c81b61cc4a0ced5d45599ae0159fc40e2318b6bb1116e94ad4d60b628ffc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_NATIVE_SOURCE_CLEAN_PERSISTED.png",
+      "blob_sha": "e29c779125ea318c8dbc1a9f8a1d23cac57cf7ab",
+      "sha256": "8aef81fe0eabb9ecfe531711fe623ef519f78f82da82219d5b0ba1d02fa84060"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_CLEAN_ONLY_X2.png",
+      "blob_sha": "ed5009faf4d00afa79964ded5b54750159a5ca38",
+      "sha256": "8d63eeccf072f0d9097e546c818ca196101000899ebd63066547964f39b799b3"
+    }
+  ],
+  "blocking": [
+    "Canonical full English original DDS independent SHA/protected entire atlas/source clean check",
+    "Full sprite-family typography baseline, glyph/counter/italic anchor and blinded calibration",
+    "Exact mask-based current-policy full C eight-axis multi-region evidence/C3 and current approvals",
+    "Actual user IGR044 screenshot203 retest against exact built bytes"
+  ],
+  "approval": "NOT_APPROVED",
+  "C3": "NOT_RUN",
+  "PRE_INGAME": "BLOCKED_OPEN_USER_INGAME_FAIL",
+  "ingame_backlog": "IGR-044 OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_in_game_accepted": 0,
+  "new_DDS": 0,
+  "new_lossless_QA_PNG": 4,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
