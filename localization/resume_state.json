@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A210 P1 q175 showroom counter-topology + local-normal chrome native DDS TRIAL SHA 93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded; worker 37945610280 SUCCESS, first denied 0px bottom margin corrected to 1px. NEW trial DDS1, NEW PROMOTED DDS0. Exact source 9314372585b830..., old promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 unchanged; 0 outside/alpha/CLEAN effect; original source 950x132, trial 440x128 native BGW100/75/50/RAW. Improved 룸 counter yet visually fails original joined chrome depth and title hierarchy. IGR-032 OPEN, C1/C3/game blocked RUNTIME_VALIDATION=UNTESTED. Stop width/shear/flat rail tweaks, use authentic source-informed counter/bevel design. QA localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335.",
     "q060 B335 new P1 full-native source CLEAN/removal/protected/restore masks machine PASS seven zero counts, no new DDS. C334 C2 HOLD unchanged; B next P2 obtain font hash and measurable source-to-Korean top/bottom anchors before final manifest, C2/C3 and user IGR044 retest. RUN_KEY=OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310 RUNTIME_VALIDATION=UNTESTED",
     "A209 q175 P1 new trial DDS d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7 hand-authored SHOWROOM rounded vector not promoted: first 169px overbound shadow fixed to 0px, exact saved BGRA roundtrip 0 alpha/outside scope, controller native100 white75 black50 SOURCE/CLEAN/OLD/TRIAL VISUAL FAIL on illegible collapsed 룸 jamo bars, poor chrome relief and 457/950 underfill. Existing promoted b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73 untouched, IGR032 OPEN, q175 REWORK_REQUIRED, C1/C3/INGAME blocked RUNTIME_VALIDATION=UNTESTED. Need genuinely different per-jamo counter/chrome vector method, do NOT repeat same A209 skeleton. RUN_KEY=OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300.",
     "C334 C2 EVEN q060: canonical original full DDS SHA independently verified and persisted source/FINAL native ROI matches producer proof; previous source identity blocker cleared. Full atlas typography calibration C3 and real game IGR044 OPEN. localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK/C334_Q060_CONTROLLER_CANONICAL_DDS_HOLD.json OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250 RUNTIME_VALIDATION=UNTESTED.",
@@ -13695,5 +13696,41 @@
     "user_igr044": "OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa_path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_CONTROLLER_P1_VISUAL_QA.json"
+  },
+  "a210_q175_topology_chrome_trial_visual_reject": {
+    "run": "A210",
+    "run_key": "OUTRUN-KOR-A210-Q175-COUNTER-TOPOLOGY-CHROME-TRIAL-20261009-2335",
+    "role": "A",
+    "queue_index": 175,
+    "priority": "P1",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "promoted_dds_preserved_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "trial_sha256": "93f7a71401075923bbaf7dcbda561fb232846619dfe50c6efc455b06259f9ded",
+    "produced_trial_dds": 1,
+    "produced_promoted_dds": 0,
+    "worker_success_run": 37945610280,
+    "native_source_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "native_trial_bbox": [
+      47,
+      400,
+      487,
+      528
+    ],
+    "machine": "PASS_SCOPED_SOURCE_CLEAN_COMPOSITE_EXACT_RAW_0_OUTSIDE",
+    "producer_visual": "REWORK_REQUIRED_SOURCE_CHROME_FACE_DEPTH_AND_TITLE_HIERARCHY",
+    "qa_report": "localization/graphics/role_A/20261009-A210-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A210_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "first_bounded_failure": "SOURCE_BBOX_BOTTOM_MARGIN_ZERO",
+    "repaired_margin_px": 1,
+    "method_status": "SECOND_NEW_VECTOR_TRIAL_NOT_SOURCE_FAMILY_QUALIFIED",
+    "C1": "BLOCKED_NO_PRODUCER_PASS",
+    "C3": "BLOCKED",
+    "user_game": "IGR-032_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
+
 }
