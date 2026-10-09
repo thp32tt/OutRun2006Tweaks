@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B309",
+  "queue_index": 60,
+  "priority": "P0",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "d938fdd1c92e43bd9fe2f51e3f0ba87c60662c39aaea41e8905e8f850901c2f2",
+  "trial_sha256": "7c05f2fe3f8e9e51a6ca79871e23b35f7bb7e5a1622fa52c69b2a0bf96d14295",
+  "trial_only_dds": 1,
+  "new_production_dds": 0,
+  "trial_promoted": false,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_bbox": [
+    455,
+    245,
+    690,
+    350
+  ],
+  "trial_bbox": [
+    465,
+    250,
+    679,
+    344
+  ],
+  "margins": [
+    10,
+    11,
+    5,
+    6
+  ],
+  "font": "native NotoSansCJK Black",
+  "font_size": 77,
+  "palette_from_native_source": {
+    "gold": [
+      245,
+      204,
+      12
+    ],
+    "navy": [
+      0,
+      10,
+      65
+    ],
+    "white": [
+      255,
+      255,
+      255
+    ]
+  },
+  "method": "NEW FILLED Hangul glyph master + separate native source-colour face/navy depth/white rim/dark fringe and readable right slant, not B297 palette dilation",
+  "machine_checks": {
+    "dds_header_exact": true,
+    "format": "RGBA",
+    "mips": 1,
+    "native": [
+      4096,
+      2048
+    ],
+    "roundtrip": "PASS",
+    "changed_outside_stage": 0,
+    "alpha_outside_stage": 0,
+    "protected_outside_stage": "UNCHANGED_EXACT",
+    "source_cell_clean_alpha": 0,
+    "source_size_and_positive_margins": "PASS"
+  },
+  "proofs": [
+    "B309_FLIPY_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B309_FLIPY_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B309_FLIPY_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B309_RAW_GRAY_100_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B309_RAW_GRAY_75_SOURCE_CLEAN_CURRENT_TRIAL.png",
+    "B309_RAW_GRAY_50_SOURCE_CLEAN_CURRENT_TRIAL.png"
+  ],
+  "producer_visual": "PENDING_INDEPENDENT_DIRECT_CONTROLLER_REVIEW",
+  "status": "TRIAL_ONLY_NOT_PROMOTED_NO_QA_PASS",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "github-actions",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
