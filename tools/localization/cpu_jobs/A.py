@@ -71,9 +71,9 @@ def make_trial(source,prior,clean,source_header,raw):
  selected=None
  for cut,ary in candidates:
   ys,xs=np.nonzero(ary)
-  if ys.max()-ys.min()+1<=97:
+  if ys.max()-ys.min()+1<=105:
    selected=(cut,ary,int(ys.min()),int(ys.max()));break
- if selected is None:raise ValueError("original mask core too tall for 14px chrome depth, cannot crop "+str(bounds))
+ if selected is None:raise ValueError("original mask core too tall for safely bounded 9px chrome depth, cannot crop "+str(bounds))
  cut,raw_core,miny,maxy=selected
  core=np.float32(raw_core)
  # translate the complete extracted face; never clip a glyph or compress Hangul.
@@ -97,17 +97,17 @@ def make_trial(source,prior,clean,source_header,raw):
  # Build extruded metallic wall by sweeping true Korean silhouette DOWN, not
  # skewing the whole title or copying a source background rectangular crop.
  wall=np.zeros_like(solid)
- for dy in range(2,15):wall|=offset(solid,dy,4)
+ for dy in range(2,10):wall|=offset(solid,dy,4)
  bevel_dilate=maximum_filter(solid.astype(np.uint8),size=5)>0
  outline=(maximum_filter(wall.astype(np.uint8),size=3)>0)|bevel_dilate
  h,w=solid.shape
  rgba=np.zeros((h,w,4),dtype=np.uint8)
  rgba[outline,:3]=[12,12,18];rgba[outline,3]=np.uint8(190)
  rgba[wall,:3]=[55,56,62];rgba[wall,3]=240
- for dy in range(14,1,-1):
+ for dy in range(9,1,-1):
   band=offset(solid,dy,4) & ~solid
-  if dy>=10:shade=[34+dy*2,35+dy*2,39+dy*2]
-  elif dy>=5:shade=[88+dy*3,88+dy*3,91+dy*3]
+  if dy>=7:shade=[34+dy*2,35+dy*2,39+dy*2]
+  elif dy>=4:shade=[88+dy*3,88+dy*3,91+dy*3]
   else:shade=[138+dy*4,138+dy*4,140+dy*4]
   rgba[band,:3]=shade;rgba[band,3]=255
  # Native face: source row luminous chrome bands, bright upper ridge, dark lower lip.
@@ -171,7 +171,7 @@ def main():
    "issue":"IGR-025","triage":tri["next_action"],"source_sha256":SOURCE_SHA,"original_source_url":SOURCE_URL,
    "old_current_sha256":CURRENT_SHA,"clean_sha256":sha(CLEAN),"glyph_topology_sha256":sha(GLYPH_MASK),
    "trial_sha256":sha(trial),"trial_dds_bytes":trial.stat().st_size,"trial_path":str(trial.relative_to(ROOT)),
-   "method":"Material method change: source-sampled row metal tone + 14 native pixel extrusion, top-light bevel, dark side wall. Preserve A186R independently readable Korean glyph topology; no width scaling/new font/no silhouette rail drawing. Face -5px before extrusion, one 0.46px AA pass.","source_bbox":BBOX,"new_bbox":box,"margins":margins,"pixel_gates":gates,
+   "method":"Material method change: source-sampled row metal tone + 9 native pixel extrusion, top-light bevel, dark side wall. Preserve A186R independently readable Korean glyph topology; no width scaling/new font/no silhouette rail drawing. Face native before 9px extrusion, one 0.46px AA pass.","source_bbox":BBOX,"new_bbox":box,"margins":margins,"pixel_gates":gates,
    "new_promoted_dds":0,"new_trial_dds":1,"producer_visual":"PENDING_DIRECT_REVIEW","C1":"BLOCKED_UNTIL_FIRSTHAND_VISUAL","C3":"NOT_RUN","runtime_validation":"UNTESTED","actual_game":"IGR025_OPEN","excluded":["VR","FFB","DX11","DXVK"]}
   (OUT/"A217_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
   print("A217_TRIAL_SUCCESS",json.dumps({"sha256":report["trial_sha256"],"bbox":box,"margins":margins}),flush=True)
