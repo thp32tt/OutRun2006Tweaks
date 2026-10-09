@@ -1,0 +1,41 @@
+{
+  "schema": "source-family-v1",
+  "run_key": "OUTRUN-KOR-B337-Q228-CAR-SELECT-SOURCE-NORMAL-CHROME-20261010",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "source_original_bbox": [
+    5,
+    182,
+    1124,
+    301
+  ],
+  "source_effect_sample_count": 38588,
+  "text_source": "CAR SELECT",
+  "text_korean": "차량 선택",
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_face_index": 1,
+  "font_ppem": 106,
+  "glyph_coverage": {
+    " ": "0x20",
+    "량": "0xb7c9",
+    "선": "0xc120",
+    "차": "0xcc28",
+    "택": "0xd0dd"
+  },
+  "renderer": "Pillow_native_mask__scipy_normal_bevel__source_scanline_reflection",
+  "renderer_git_sha": "4a8193edf0708d4558323434538034856050534d",
+  "raw_orientation": "MIRROR_Y",
+  "readable_shear_dx_per_y": 0.11,
+  "glyph_bbox": [
+    14,
+    190,
+    426,
+    291
+  ],
+  "clean_source_path": "localization/graphics/role_B/20261005-B-PRODUCTION68/E7F6_CLEAN_PLATE.png",
+  "rework_reason": "C317/C327: old Korean was hollow black while English source was filled silver beveled chrome",
+  "non_target_regions": 12,
+  "trial_only": true,
+  "C_pilot_qualification": "NOT_RUN"
+}
