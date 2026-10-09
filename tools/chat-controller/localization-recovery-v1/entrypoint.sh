@@ -3,6 +3,13 @@ set -euo pipefail
 
 mkdir -p /data/browser-profile /data/state /logs /tmp/.X11-unix
 
+# Only clean after the previous container's Chrome is gone.
+# Do not delete Cookies, Local Storage, IndexedDB or the saved registry.
+if [[ "${CHROME_RECYCLE_ENABLED:-false}" == "true" ]]; then
+  bash /opt/outrun/chrome-cache-clean.sh >>/logs/chrome-recycle.log 2>&1 || \
+    echo "$(date -Is) cache cleaning failed; auth/profile kept" >>/logs/chrome-recycle.log
+fi
+
 VNC_PASSWORD="${VNC_PASSWORD:-change-me}"
 PASSFILE=/data/.vncpasswd
 x11vnc -storepasswd "$VNC_PASSWORD" "$PASSFILE" >/dev/null
@@ -17,7 +24,20 @@ start_vnc
 websockify --web=/usr/share/novnc/ 6080 localhost:5900 >/logs/novnc.log 2>&1 &
 
 start_chrome() {
-  google-chrome --no-sandbox --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --user-data-dir=/data/browser-profile --no-first-run --no-default-browser-check https://chatgpt.com/ >>/logs/chrome.log 2>&1 &
+  # Prevent profile corruption if an old Chrome process still holds the lock.
+  for _chrome_stop_wait in 1 2 3 4 5; do
+    if ! pgrep -x chrome >/dev/null 2>&1; then break; fi
+    sleep 2
+  done
+  if pgrep -x chrome >/dev/null 2>&1; then
+    echo "$(date -Is) Chrome still alive; refuse concurrent profile reuse" >>/logs/chrome-recycle.log
+    return 0
+  fi
+  rm -f /data/browser-profile/SingletonLock \
+        /data/browser-profile/SingletonCookie \
+        /data/browser-profile/SingletonSocket
+  # /dev/shm is sized to 1 GiB by compose, rather than using /tmp fallback.
+  google-chrome --no-sandbox --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --user-data-dir=/data/browser-profile --no-first-run --no-default-browser-check https://chatgpt.com/ >>/logs/chrome.log 2>&1 &
 }
 
 start_chrome
@@ -47,6 +67,15 @@ for i in $(seq 1 60); do
     break
   fi
   sleep 1
+done
+
+# Refuse to start a controller that cannot attach to Chrome.
+while ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; do
+  echo "$(date -Is) Chrome CDP absent; retrying" >>/logs/ui-watchdog.log
+  pkill -x chrome >/dev/null 2>&1 || true
+  sleep 3
+  start_chrome
+  sleep 7
 done
 
 exec python -m app.controller
