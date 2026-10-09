@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR",
+  "index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "run_key": "OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "0b12c672224ce05acb9470af895bbda335cc5543",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
+  },
+  "atlas_provenance": {
+    "blob_sha1": "70001b44445f3e10b46eb7e3480abdece8eda790",
+    "sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982",
+    "regions": 38
+  },
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "DXT5",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "old_candidate_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+  "candidate_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+  "trial_only": true,
+  "official_promoted_dds_changed": false,
+  "targeted_regions": [
+    {
+      "idx": 11,
+      "source": "AQUARIUS",
+      "korean": "물병자리",
+      "cell": [
+        716,
+        1664,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "source_mask_pixels": 8694,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 53,
+      "block_safe_bbox": [
+        720,
+        1672,
+        1012,
+        1724
+      ],
+      "render_safe_bbox": [
+        720,
+        1672,
+        1012,
+        1724
+      ],
+      "render_method": "NATURAL_CJK_WIDTH_ALPHA_CONTINUOUS_NO_HORIZ_SQUISH",
+      "natural_width_before_condense": 189,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "prior_localized_width": 189,
+      "prior_localized_height": 52,
+      "prior_delta_left": 3,
+      "localized_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "localized_width": 189,
+      "localized_height": 52,
+      "source_width": 296,
+      "source_height": 54,
+      "delta_left": 3,
+      "delta_right": 104,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "decoded_core_interior_pinhole_pixels": 0,
+      "decoded_core_color_mismatch_pixels": 0
+    },
+    {
+      "idx": 16,
+      "source": "SOUTH KOREA",
+      "korean": "대한민국",
+      "cell": [
+        0,
+        1472,
+        716,
+        64
+      ],
+      "original_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "source_mask_pixels": 11140,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1480,
+        400,
+        1528
+      ],
+      "render_safe_bbox": [
+        4,
+        1480,
+        400,
+        1528
+      ],
+      "render_method": "NATURAL_CJK_WIDTH_ALPHA_CONTINUOUS_NO_HORIZ_SQUISH",
+      "natural_width_before_condense": 177,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "prior_localized_width": 177,
+      "prior_localized_height": 48,
+      "prior_delta_left": 2,
+      "localized_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "localized_width": 177,
+      "localized_height": 48,
+      "source_width": 401,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 222,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "decoded_core_interior_pinhole_pixels": 0,
+      "decoded_core_color_mismatch_pixels": 0
+    },
+    {
+      "idx": 24,
+      "source": "ITALY",
+      "korean": "이탈리아",
+      "cell": [
+        0,
+        1216,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "source_mask_pixels": 4047,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1227,
+        157,
+        1268
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 41,
+      "block_safe_bbox": [
+        8,
+        1224,
+        160,
+        1272
+      ],
+      "render_safe_bbox": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "render_method": "NATURAL_CJK_WIDTH_ALPHA_CONTINUOUS_NO_HORIZ_SQUISH",
+      "natural_width_before_condense": 149,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "prior_localized_width": 151,
+      "prior_localized_height": 46,
+      "prior_delta_left": 2,
+      "localized_bbox": [
+        8,
+        1227,
+        157,
+        1268
+      ],
+      "localized_width": 149,
+      "localized_height": 41,
+      "source_width": 154,
+      "source_height": 48,
+      "delta_left": 2,
+      "delta_right": 3,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "decoded_core_interior_pinhole_pixels": 0,
+      "decoded_core_color_mismatch_pixels": 0
+    }
+  ],
+  "repaired_rows": 3,
+  "other_regions_preserved": 35,
+  "untouched_BC3_blocks": 259137,
+  "translation_policy_note": "AQUARIUS=물병자리, SOUTH KOREA=대한민국, ITALY=이탈리아; other 35 regions byte-identical",
+  "root_cause": "C344 independently observed BC3 color/alpha speckle in existing regions11/16/24",
+  "new_method": "Native unsqueezed Korean and exact source-flat gray RGB565 face, fixed BC3 alpha endpoints from glyph only; A218 targets 11/16/24 only, prior A201 08/10/12 and other 32 regions byte-identical",
+  "source_clean": "SHA-pinned English source versus three cleared source-effect bboxes, no changed pixels outside for retained candidate",
+  "machine_checks": {
+    "changed_pixels_outside_three_bboxes": 0,
+    "alpha_changed_outside_three_bboxes": 0,
+    "introduced_visible_outside_three_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "3/3 PASS",
+    "localized_overlap_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "all_unrelated_blocks_unchanged": true,
+    "preserved_A218_11_16_24_only_other_35_blocks": true,
+    "opaque_core_color_pinhole_pixels": 0,
+    "opaque_core_color_mismatch_pixels": 0
+  },
+  "persisted_dds_roundtrip": "PASS decoded source-visible and exact output header",
+  "producer_status": "TRIAL_ONLY_MACHINE_PASS_CONTROLLER_VISUAL_PENDING_NO_PROMOTION",
+  "C1": "C344_REWORK_REQUIRED_NOT_RECLEARED",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
