@@ -591,10 +591,20 @@ struct O {float4 position : SV_Position; float4 color : COLOR0;};
 O main(I i) {O o; o.position=float4(i.position,1.0f);
               o.color=i.color.bgra; return o;}
 )";
+        // R174 independent WARP constant VS: exact same IA and PS,
+        // fixed output bypasses source D3DCOLOR decoding.
+        static const std::string constantVS = R"(
+struct I {float3 position : POSITION0; float4 color : COLOR0;};
+struct O {float4 position : SV_Position; float4 color : COLOR0;};
+O main(I i) {O o; o.position=float4(i.position,1.0f);
+             o.color=float4(32.0f/255.0f,128.0f/255.0f,
+                            224.0f/255.0f,1.0f); return o;}
+)";
         static const char directPS[] = R"(
 float4 main(float4 color : COLOR0) : SV_Target {return color;}
 )";
         ID3DBlob* r173DirectCode = compile_vertex_shader(directVS);
+        ID3DBlob* r173ConstantCode = compile_vertex_shader(constantVS);
         ID3DBlob* r173GeneratedCode =
             compile_vertex_shader(r173Prototype.source);
         ID3DBlob* r173PixelCode = nullptr;
@@ -608,6 +618,7 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
         require(SUCCEEDED(r173Compile) && r173PixelCode,
                 "R173 passthrough COLOR0 PS compiled");
         ID3D11VertexShader* r173DirectVS = nullptr;
+        ID3D11VertexShader* r173ConstantVS = nullptr;
         ID3D11VertexShader* r173GeneratedVS = nullptr;
         ID3D11PixelShader* r173PS = nullptr;
         ID3D11InputLayout* r173IA = nullptr;
@@ -615,6 +626,10 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
                     r173DirectCode->GetBufferPointer(),
                     r173DirectCode->GetBufferSize(),nullptr,&r173DirectVS)) &&
                     r173DirectVS &&
+                SUCCEEDED(warp.device->CreateVertexShader(
+                    r173ConstantCode->GetBufferPointer(),
+                    r173ConstantCode->GetBufferSize(),nullptr,&r173ConstantVS)) &&
+                    r173ConstantVS &&
                 SUCCEEDED(warp.device->CreateVertexShader(
                     r173GeneratedCode->GetBufferPointer(),
                     r173GeneratedCode->GetBufferSize(),nullptr,&r173GeneratedVS)) &&
@@ -667,21 +682,48 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
         warp.context->DrawIndexed(3u,0u,0);
         const auto generatedColor = r173Pixel();
         const bool generatedMatches = generatedColor==expected;
+        // A constant-color VS isolates vertex COLOR0 from VS->PS and OM.
+        // A solid-red PS using the original VS independently proves coverage.
+        warp.context->VSSetShader(r173ConstantVS,nullptr,0u);
+        warp.context->ClearRenderTargetView(target,clear);
+        warp.context->DrawIndexed(3u,0u,0);
+        const auto constantColor = r173Pixel();
+        const bool constantMatches = constantColor==expected;
+        warp.context->VSSetShader(r173DirectVS,nullptr,0u);
+        warp.context->PSSetShader(ps,nullptr,0u);
+        warp.context->ClearRenderTargetView(target,clear);
+        warp.context->DrawIndexed(3u,0u,0);
+        const auto solidPsColor = r173Pixel();
+        const std::array<unsigned int,4> expectedRed{0u,0u,255u,255u};
+        const bool solidPsMatches = solidPsColor==expectedRed;
+        warp.context->PSSetShader(r173PS,nullptr,0u);
         std::cout<<"DX11 R173 COLOR0 direct VS BGRA=["
             <<directColor[0]<<","<<directColor[1]<<","
             <<directColor[2]<<","<<directColor[3]
             <<"] generated VS BGRA=["
             <<generatedColor[0]<<","<<generatedColor[1]<<","
             <<generatedColor[2]<<","<<generatedColor[3]
+            <<"] constant VS BGRA=["
+            <<constantColor[0]<<","<<constantColor[1]<<","
+            <<constantColor[2]<<","<<constantColor[3]
+            <<"] solid PS BGRA=["
+            <<solidPsColor[0]<<","<<solidPsColor[1]<<","
+            <<solidPsColor[2]<<","<<solidPsColor[3]
             <<"] expected BGRA=["
             <<expected[0]<<","<<expected[1]<<","
             <<expected[2]<<","<<expected[3]
             <<"] classification="
-            <<(!directMatches?"DIRECT_VS_COLOR0_MISMATCH"
+            <<(!solidPsMatches?"R174_GEOMETRY_OR_OM_MISMATCH"
+                :(!constantMatches?"R174_VS_PS_CONSTANT_MISMATCH"
+                :(!directMatches?"R174_IA_VERTEX_COLOR_MISMATCH"
                 :(!generatedMatches?"GENERATED_VS_COLOR0_MISMATCH"
-                                   :"BOTH_COLOR0_PATHS_MATCH"))<<"\\n";
+                                   :"ALL_R174_CONTROLS_MATCH"))))<<std::endl;
         // An incorrect direct control invalidates generated-VS attribution.
         // Neither failure can be treated as native gameplay approval.
+        require(solidPsMatches,
+                "R174 known-geometry solid PS must cover interior");
+        require(constantMatches,
+                "R174 constant VS color must survive PS and OM");
         require(directMatches,
                 "R173 direct VS COLOR0 packed-BGRA passthrough control");
         require(generatedMatches,
@@ -695,9 +737,11 @@ float4 main(float4 color : COLOR0) : SV_Target {return color;}
         r173VB->Release();
         r173PS->Release();
         r173GeneratedVS->Release();
+        r173ConstantVS->Release();
         r173DirectVS->Release();
         r173PixelCode->Release();
         r173GeneratedCode->Release();
+        r173ConstantCode->Release();
         r173DirectCode->Release();
         std::cout<<"DX11 WARP COLOR0 source-linkage isolation R173: PASS\n";
         ID3D11Buffer* r170NullWvp = nullptr;
