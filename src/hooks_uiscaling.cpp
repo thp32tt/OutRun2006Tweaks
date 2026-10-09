@@ -11,6 +11,7 @@
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRTelemetry; // defined in vr/settings.cpp
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
@@ -1479,7 +1480,43 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 {
 	inline static SafetyHookInline Draw_hk{};
 	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> SuccessfulFlushes{ 0 };
 	inline static std::atomic<std::uint64_t> Failures{ 0 };
+	inline static std::atomic<std::uint32_t> FirstSuccessfulProducerBits{ 0 };
+	inline static std::atomic<std::uint32_t> FirstFailedProducerBits{ 0 };
+
+	// D3DXSprite::Draw is batched; exact GOAL 0xBE020/0xBE150
+	// may queue a kind-0 sprite until the later priority-layer End.
+	// Report each GOAL parent once WITHOUT changing Flush policy. If
+	// neither parent appears on this path, investigate shader/XYZRHW,
+	// not a speculative global HUD Draw->Flush expansion.
+	static void R64TraceGoalD3dxQueued(
+		OutRunVR::GameSemantic::RenderScope scope,
+		OutRunVR::GameSemantic::ProducerToken source) noexcept
+	{
+		if (!Settings::VRTelemetry || !Game::current_mode ||
+			!OutRunVR::GameSemantic::CorroboratesHud(scope))
+			return;
+		const auto state = *Game::current_mode;
+		if (state != GameState::STATE_GOAL &&
+			state != GameState::STATE_TIMEUP &&
+			state != GameState::STATE_LINK_TIMEUP)
+			return;
+		if (source != OutRunVR::GameSemantic::ProducerToken::GoalTime020 &&
+			source != OutRunVR::GameSemantic::ProducerToken::GoalTime150)
+			return;
+		const unsigned tokenIndex = static_cast<unsigned>(source);
+		if (tokenIndex >= 32u)
+			return;
+		static std::atomic<std::uint32_t> seenGoals{ 0 };
+		const std::uint32_t bit = 1u << tokenIndex;
+		if ((seenGoals.fetch_or(bit, std::memory_order_relaxed) & bit) == 0)
+			spdlog::info(
+				"VR P0 GOAL D3DX DRAW QUEUED: producer={} state={} scope={} flushPolicy=UNCHANGED",
+				OutRunVR::GameSemantic::Name(source),
+				static_cast<int>(state),
+				OutRunVR::GameSemantic::Name(scope));
+	}
 
 	static HRESULT __stdcall DrawDest(
 		void* self, IDirect3DTexture9* texture, const RECT* rect,
@@ -1496,6 +1533,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 			OutRunVR::GameSemantic::CurrentProjectedMarker();
 		const auto source =
 			OutRunVR::GameSemantic::CurrentQueueProducerToken();
+		R64TraceGoalD3dxQueued(scope, source);
 		// Modern R84 also uses ProjectedWorldMarker2D for the rival-car
 		// icon, which was already HMD-correct and must NOT receive an
 		// unrelated new Flush. R64's old broad projected scope was
@@ -1526,14 +1564,30 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 			reinterpret_cast<FlushFn>(vtable[10])(self);
 		const auto count = Flushes.fetch_add(
 			1, std::memory_order_relaxed) + 1;
-		if (FAILED(flushHr))
+		const bool flushSucceeded = SUCCEEDED(flushHr);
+		if (flushSucceeded)
+			SuccessfulFlushes.fetch_add(1, std::memory_order_relaxed);
+		else
 			Failures.fetch_add(1, std::memory_order_relaxed);
-		if ((count & (count - 1)) == 0)
+		const unsigned producerIndex = static_cast<unsigned>(source);
+		bool firstProducerOutcome = false;
+		if (Settings::VRTelemetry && producerIndex < 32u)
+		{
+			auto& seen = flushSucceeded
+				? FirstSuccessfulProducerBits : FirstFailedProducerBits;
+			const std::uint32_t bit = 1u << producerIndex;
+			firstProducerOutcome =
+				(seen.fetch_or(bit, std::memory_order_relaxed) & bit) == 0;
+		}
+		if (Settings::VRTelemetry &&
+			(((count & (count - 1)) == 0) || firstProducerOutcome))
 			spdlog::info(
-				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} failures={} markerValid={}",
+				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} successful={} failures={} flushSucceeded={} markerValid={}",
 				projectedRank ? "projected-rank" : "disprank-hud",
 				OutRunVR::GameSemantic::Name(source),
-				count, Failures.load(std::memory_order_relaxed),
+				count, SuccessfulFlushes.load(std::memory_order_relaxed),
+				Failures.load(std::memory_order_relaxed),
+				flushSucceeded ? 1 : 0,
 				marker && marker->valid ? 1 : 0);
 		return hr;
 	}

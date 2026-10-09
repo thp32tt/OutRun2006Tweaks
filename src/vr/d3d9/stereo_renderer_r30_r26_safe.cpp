@@ -4915,21 +4915,57 @@ namespace OutRunVRStereo
                 R30ArmSafeFallback();
             }
 
+            // The stereo helper returns leftHr after a right-eye failure.
+            // "hits" is an attempt count; count real binocular validity too.
+            const bool stereoAccepted = SUCCEEDED(hr) && restored &&
+                !FrameRightDrawFailed && !FrameStereoIncomplete;
             static std::atomic<std::uint64_t> projectedDraws{ 0 };
             static std::atomic<std::uint64_t> hudDraws{ 0 };
+            static std::atomic<std::uint64_t> R62StereoAcceptedProjected{ 0 };
+            static std::atomic<std::uint64_t> R62StereoAcceptedHud{ 0 };
+            static std::atomic<std::uint64_t> R62StereoRejectedProjected{ 0 };
+            static std::atomic<std::uint64_t> R62StereoRejectedHud{ 0 };
             auto& counter = projected ? projectedDraws : hudDraws;
+            auto& accepted = projected
+                ? R62StereoAcceptedProjected : R62StereoAcceptedHud;
+            auto& rejected = projected
+                ? R62StereoRejectedProjected : R62StereoRejectedHud;
             const auto hit =
                 counter.fetch_add(1, std::memory_order_relaxed) + 1;
-            if ((hit & (hit - 1)) == 0)
+            if (stereoAccepted)
+                accepted.fetch_add(1, std::memory_order_relaxed);
+            else
+                rejected.fetch_add(1, std::memory_order_relaxed);
+            // Report once per original producer AND each outcome: a
+            // global power-of-two rank count masks whether 4/5 or 6th
+            // produced accepted L/R draw(s) at all.
+            static std::atomic<std::uint32_t> firstAcceptedProducers{ 0 };
+            static std::atomic<std::uint32_t> firstRejectedProducers{ 0 };
+            const auto producer =
+                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const unsigned producerIndex = static_cast<unsigned>(producer);
+            bool firstProducerOutcome = false;
+            if (Settings::VRTelemetry && producerIndex < 32u)
+            {
+                auto& seen = stereoAccepted
+                    ? firstAcceptedProducers : firstRejectedProducers;
+                const std::uint32_t bit = 1u << producerIndex;
+                firstProducerOutcome =
+                    (seen.fetch_or(bit, std::memory_order_relaxed) & bit) == 0;
+            }
+            if (Settings::VRTelemetry &&
+                (((hit & (hit - 1)) == 0) || firstProducerOutcome))
                 spdlog::info(
-                    "VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}",
+                    "VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={} stereoAccepted={} accepted={} rejected={} projectionRestored={} rightFailed={} frameIncomplete={}",
                     projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
-                    OutRunVR::GameSemantic::Name(
-                        OutRunVR::GameSemantic::CurrentQueueProducerToken()),
-                    static_cast<unsigned>(fvf),
-                    primitiveCount,
+                    OutRunVR::GameSemantic::Name(producer),
+                    static_cast<unsigned>(fvf), primitiveCount,
                     OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
-                    hit);
+                    hit, stereoAccepted ? 1 : 0,
+                    accepted.load(std::memory_order_relaxed),
+                    rejected.load(std::memory_order_relaxed),
+                    restored ? 1 : 0, FrameRightDrawFailed ? 1 : 0,
+                    FrameStereoIncomplete ? 1 : 0);
             return hr;
         }
 

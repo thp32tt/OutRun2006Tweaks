@@ -477,7 +477,7 @@ for marker in (
     'OutRunVR::GameSemantic::CurrentQueueProducerToken()',
     'ProducerToken::OutRunStagePrintf',
     'ProducerToken::GoalTime150',
-    '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={}"',
+    '"VR R62 FIXEDFN KIND0: owner={} producer={} fvf=0x{:08X} prim={} marker={} hits={} stereoAccepted={} accepted={} rejected={}',
 ):
     require(marker, r30, 'result sink provenance / R62 fixedfn telemetry')
 
@@ -637,6 +637,93 @@ for label, bad in (
         pass
     else:
         raise SystemExit('R62 HMD regression mutation survived: ' + label)
+
+# An R62 hit is not a successful TWO-EYE draw. R64 Flush attempts and
+# successful returns are also different facts. Detect 3 independent lies.
+def check_real_stereo_outcome_telemetry(r30_source, ui_source):
+    r62 = function_body(
+        r30_source, 'HRESULT R62TryFixedFunctionSpriteIndexed(')
+    for token in (
+        'const bool stereoAccepted = SUCCEEDED(hr) && restored &&',
+        '!FrameRightDrawFailed && !FrameStereoIncomplete;',
+        'R62StereoAcceptedProjected', 'R62StereoRejectedProjected',
+        'R62StereoAcceptedHud', 'R62StereoRejectedHud',
+        'firstAcceptedProducers', 'firstRejectedProducers',
+        'stereoAccepted={} accepted={} rejected={}',
+        'projectionRestored={} rightFailed={} frameIncomplete={}',
+    ):
+        require(token, r62, 'R62 real bilateral acceptance telemetry')
+    r64 = function_body(ui_source,
+                        'static HRESULT __stdcall DrawDest(')
+    for token in (
+        'const bool flushSucceeded = SUCCEEDED(flushHr);',
+        'SuccessfulFlushes.fetch_add', 'Failures.fetch_add',
+        'FirstSuccessfulProducerBits', 'FirstFailedProducerBits',
+        'successful={} failures={} flushSucceeded={}',
+    ):
+        require(token, r64, 'R64 actual Flush result telemetry')
+
+check_real_stereo_outcome_telemetry(r30, ui)
+for label, changed_r30, changed_ui in (
+    ('right-eye failure treated as binocular success',
+     r30.replace('!FrameRightDrawFailed && !FrameStereoIncomplete;',
+                 '!FrameStereoIncomplete;', 1), ui),
+    ('unrestored projection treated as success',
+     r30.replace('SUCCEEDED(hr) && restored &&',
+                 'SUCCEEDED(hr) &&', 1), ui),
+    ('R64 failed Flush falsely accepted', r30,
+     ui.replace('const bool flushSucceeded = SUCCEEDED(flushHr);',
+                'const bool flushSucceeded = true;', 1)),
+):
+    if changed_r30 == r30 and changed_ui == ui:
+        raise SystemExit('stereo outcome mutation unchanged: ' + label)
+    try:
+        check_real_stereo_outcome_telemetry(changed_r30, changed_ui)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('stereo outcome defect undetected: ' + label)
+
+# Historical original GOAL helpers are distinct. Trace D3DX batching but
+# NEVER widen post-Draw Flush to GOAL just because these tags are present.
+def check_goal_d3dx_queue_trace(ui_source):
+    tracer = function_body(
+        ui_source, 'static void R64TraceGoalD3dxQueued(')
+    for token in (
+        'Settings::VRTelemetry',
+        'GameState::STATE_GOAL',
+        'GameState::STATE_TIMEUP',
+        'GameState::STATE_LINK_TIMEUP',
+        'CorroboratesHud(scope)',
+        'ProducerToken::GoalTime020',
+        'ProducerToken::GoalTime150',
+        'VR P0 GOAL D3DX DRAW QUEUED:',
+    ):
+        require(token, tracer, 'exact GOAL D3DX queued-trace gate')
+    draw = function_body(ui_source,
+                         'static HRESULT __stdcall DrawDest(')
+    require('R64TraceGoalD3dxQueued(scope, source);', draw,
+            'R64 queued GOAL diagnostic invocation')
+    require('if (!projectedRank && !dispRankHud)', draw,
+            'R64 must still exclude GOAL from Flush policy')
+
+check_goal_d3dx_queue_trace(ui)
+for label, bad in (
+    ('GOAL 150 not traced',
+     ui.replace('source != OutRunVR::GameSemantic::ProducerToken::GoalTime150)',
+                'source != OutRunVR::GameSemantic::ProducerToken::None)', 1)),
+    ('GOAL Draw tracer not invoked',
+     ui.replace('R64TraceGoalD3dxQueued(scope, source);',
+                '(void)scope;', 1)),
+):
+    if bad == ui:
+        raise SystemExit('GOAL D3DX negative mutation not applied: ' + label)
+    try:
+        check_goal_d3dx_queue_trace(bad)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL D3DX diagnostic defect escaped: ' + label)
 
 # XMT loader: a corrupt/late XPR0 pointer must not read outside the XMT
 # system-memory block or overflow on pointer addition. This is a source

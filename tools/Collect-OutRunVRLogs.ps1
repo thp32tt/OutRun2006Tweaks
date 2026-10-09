@@ -55,7 +55,9 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
+    $userIni=Join-Path $root 'OutRun2006Tweaks.user.ini'
     $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+    $userConfigHash=if(Test-Path $userIni){(Get-FileHash $userIni -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
     $state=[ordered]@{
         SchemaVersion=3
         BuildMatrixId=$matrix
@@ -66,6 +68,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
+        UserConfigSha256=$userConfigHash
         CollectionStatus='prepared-after-previous-collection'
         PreexistingLogs=@()
     }
@@ -73,10 +76,27 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $sessionRoot 'session_manifest.json') -Encoding UTF8
     Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc $sourceSha
 
+    # Effective settings are base INI -> user override INI -> launch CLI.
+    # Snapshot the two INI layers separately; RUN_OVERRIDES.txt already
+    # retains the actual profile arguments when the runner starts the game.
+    $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView|UIScalingMode|UILetterboxing|HudScale|Telemetry|StereoDepth|WorldScale|FrameCadenceMode|FrameCadenceTargetHz)\s*='
+    $configLines=@(
+        'snapshotPhase=before-run'
+        'configPrecedence=base_ini,user_ini,command_line'
+        "baseConfigSha256=$configHash"
+        "userConfigSha256=$userConfigHash"
+        '[BASE_INI]'
+    )
     if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView)\s*='
-        Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
+        $configLines+=@(Get-Content $ini|Where-Object{$_ -match $allowed})
     }
+    $configLines+='[USER_OVERRIDE_INI]'
+    if(Test-Path $userIni){
+        $configLines+=@(Get-Content $userIni|Where-Object{$_ -match $allowed})
+    }
+    $configLines+='[COMMAND_LINE]'
+    $configLines+='source=RUN_OVERRIDES.txt'
+    $configLines|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
     $inputs=Join-Path $root 'BUILD_INPUTS.json'
     if(Test-Path $inputs){Copy-Item $inputs $sessionRoot -Force}
@@ -121,6 +141,17 @@ foreach($file in $sourceFiles){
 
 Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
+# The in-game overlay can update OutRun2006Tweaks.user.ini during a
+# test. A post-run view shows whether the UI/HudScale changed in-session.
+$baseIni=Join-Path $root 'OutRun2006Tweaks.ini'
+$userIni=Join-Path $root 'OutRun2006Tweaks.user.ini'
+$allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView|UIScalingMode|UILetterboxing|HudScale|Telemetry|StereoDepth|WorldScale|FrameCadenceMode|FrameCadenceTargetHz)\s*='
+$postConfig=@('snapshotPhase=after-run','[BASE_INI]')
+if(Test-Path $baseIni){$postConfig+=@(Get-Content $baseIni|Where-Object{$_ -match $allowed})}
+$postConfig+='[USER_OVERRIDE_INI]'
+if(Test-Path $userIni){$postConfig+=@(Get-Content $userIni|Where-Object{$_ -match $allowed})}
+$postConfig|Set-Content (Join-Path $dest 'VR_CONFIG_AFTER_RUN_SNAPSHOT.txt') -Encoding UTF8
+$copied+='VR_CONFIG_AFTER_RUN_SNAPSHOT.txt'
 $captureRoot=Join-Path $root 'captures'
 $capturedDirs=@()
 if(Test-Path $captureRoot){
