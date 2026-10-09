@@ -590,6 +590,18 @@ compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
 
+# R200: non-indexed native Draw independent alpha OM ownership WARP GPU probe.
+[target.dx11_blend_linear_probe_r200]
+type = "executable"
+sources = [
+    "tools/dx11_blend_linear_probe_r200.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
 # R191: owned immutable VS b0 generations + real WARP translated indexed pixels.
 [target.dx11_vs_constant_indexed_probe_r191]
 type = "executable"

@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00500",
+  "production_id": "CONVERSION-DX11-00500",
+  "event_id": "CONVERSION-DX11-00500-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "b70f44b9153d74099ca2186abf52385e7cfef5a4",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00500",
+  "lease_epoch": 1,
+  "work_key": "DX11:R200:LINEAR_LIVE_BLEND_OM_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_blend_binding.hpp:R200",
+    "tools/dx11_blend_linear_probe_r200.cpp:R200",
+    "tools/test_dx11_blend_linear_r200.py:R200",
+    "cmake.toml:R200",
+    ".github/workflows/backend-conversion-gate.yml:R200"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R200 fail-closed non-indexed native Draw alpha OM live object/factors/mask/device/write ownership; real WARP alpha purple, unexpected opaque red, restored purple pixel proof; native game Draw remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_blend_binding.hpp",
+    "tools/dx11_blend_linear_probe_r200.cpp",
+    "tools/test_dx11_blend_linear_r200.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00500.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS authenticated HEAD b70f44b9153d74099ca2186abf52385e7cfef5a4; no 00500 record/checkpoint; R199 terminal and R175 separately owned 00477",
+    "C1_REVIEW": "PASS R190 indexed path owns OM alpha while R185/R199 independent linear path lacked live alpha blend owner; R200 independent failure-key selected",
+    "C2_IMPLEMENT": "PASS separate native R200 OM live object ownership C++ and WARP real non-indexed Draw purple/opaque red/restore purple; CI target and four source-negative mutants",
+    "C3_VALIDATE": "Scoped JS source negative mutants once; exact-SHA GitHub Win32/SMOKE pending",
+    "C4_COMMIT": "material commit will contain exact [AUTO:CONVERSION-DX11-00500] with no CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED native gameplay Draw dormant",
+    "C6_STATE": "PENDING exact-SHA CI"
+  },
+  "evidence": {
+    "negative_source_mutants": 4,
+    "upstream_r175_owner": "CONVERSION-DX11-00477",
+    "expected_proof": "alpha red 0.5 over blue produces purple; unexpected opaque blend produces red; restored alpha purple"
+  },
+  "resume_cursor": "C3_EXACT_SHA_GATE_PENDING",
+  "next_action": "Inspect material exact-SHA Backend Conversion Gate Win32 R200 WARP proof and unrelated inherited R175, then seal C6; Quest3/VDXR UNTESTED."
+}

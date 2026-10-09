@@ -421,6 +421,24 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "R190 indexed alpha blend WARP probe failed: $LASTEXITCODE" }
 
 
+      # R200: independent non-indexed live alpha OM object with real WARP pixels.
+      - name: Verify R200 native linear OM alpha ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_blend_linear_r200.py
+
+      - name: Build R200 blend linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_blend_linear_probe_r200
+
+      - name: Run R200 blend linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_linear_probe_r200.exe | Select-Object -First 1
+          if (-not $probe) { throw "R200 linear blend WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R200 linear blend WARP probe failed: $LASTEXITCODE" }
+
       # R191: real VS b0 ownership/revision and shifted indexed GPU pixel proof.
       - name: Verify R191 VS constant indexed ownership
         if: github.ref_name == 'vr-dx11-native-r71'
