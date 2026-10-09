@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00478",
+  "production_id": "CONVERSION-DX11-00478",
+  "event_id": "CONVERSION-DX11-00478-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "resume_reason": "VR_FORCED_40_MINUTE_RESUME",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00478",
+  "lease_epoch": 1,
+  "work_key": "DX11:R176:INDEPENDENT_TEXCOORD6_DXBC_SIGNATURE:tools/dx11_shader_linkage_probe.cpp",
+  "conflict_keys": [
+    "tools/dx11_shader_linkage_probe.cpp:R176"
+  ],
+  "status": "IN_PROGRESS_EXACT_SHA_GATE",
+  "checkpoint": "C3_VALIDATE",
+  "base_sha": "02eeb7b4f05d7661664716ce9dff11dd279fa71b",
+  "material_result_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+  "validation_bearing_result_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "prior_task": {
+    "id": "CONVERSION-DX11-00477",
+    "status": "BLOCKED_WITH_SEPARATE_LIVE_DIAGNOSTIC_CONTINUATION",
+    "owned_path": "tools/dx11_constant_buffer_probe.cpp",
+    "last_head": "02eeb7b4f05d7661664716ce9dff11dd279fa71b",
+    "material_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
+    "gate_id": 37927656851,
+    "validate": "SUCCESS",
+    "smoke": "FAIL",
+    "classification": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "ownership_isolation": "R176 uses independent shader-linkage source; no changes to R173/R175 raster probe"
+  },
+  "selected_work_item": "R176 independently reproduce R175 TEXCOORD6 VS/PS DXBC signature as float4 and add negative TEXCOORD7 and UINT4 linkage guards; distinguish valid bytecode signatures from unchanged failing WARP raster output.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: live GitHub HEAD 02eeb7b4; no 00478 record/commit before this run; 00477 R175 exact-SHA failure gate and prior owner recovered.",
+    "C1_REVIEW": "PASS: R175 direct/generated/constant COLOR0 and TEXCOORD6 all returned identical incorrect BGRA; signed linkage is independent discriminator; separate tools/dx11_shader_linkage_probe.cpp selected to avoid 00477 write conflict.",
+    "C2_IMPLEMENT": "COMPLETE: new R176 C++ VS/PS DXBC reflection checks (float4, component mask, TEXCOORD6, VS/PS reflection and VS register/PS register observability) plus TEXCOORD7 and uint4 negative controls.",
+    "C3_VALIDATE": "PENDING: Backend Conversion Gate 37931273252 for exact material source 0593e17a; separately verify Run DX11 shader linkage probe step even if unrelated 00477 R175 WARP regression fails whole gate.",
+    "C4_COMMIT": "COMPLETE: non-bookkeeping source commit 0593e17afaaa02c5fb8f77a6315c4833185e3e1a with exact [AUTO:CONVERSION-DX11-00478] marker; Issue #14 append-only record 6081050084.",
+    "C5_PACKAGE": "NOT_REQUIRED: source-only isolated diagnostic guard; no native Draw activation or deployable Quest3/VDXR build identity advanced.",
+    "C6_STATE": "CHECKPOINT_PERSISTED_NONTERMINAL: pending exact-SHA step-level CI evidence, no completion claim or score until validation classified."
+  },
+  "changed_paths": [
+    "tools/dx11_shader_linkage_probe.cpp"
+  ],
+  "validation_run_id": 37931273252,
+  "validation_issue14_comment_id": 6081050084,
+  "checkpoints": [
+    {
+      "event": "E002",
+      "reason": "rollover recovery",
+      "timestamp_kst": "2026-10-09T21:38:00+09:00",
+      "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+      "ci_run_id": 37931273252,
+      "phase": "C3_PENDING",
+      "actual_runtime": "UNTESTED"
+    }
+  ],
+  "next_action": "Read exact-SHA Backend Conversion Gate 37931273252 jobs and logs. If shader linkage step PASSES, classify R176 signature positive/negative independently, keep the full gate FAIL for pre-existing R175 WARP until remediated. If R176 fails, repair this independent source path under same TASK_ID. Record C3/C6 final in this run JSON and lane state; do not claim HMD/runtime success. Leave 00477 R173/R175 source untouched.",
+  "resume_cursor": "WAIT_R176_EXACT_SHA_LINKAGE_STEP_AND_R175_WARP_GATE",
+  "blockers": [
+    "Prior 00477 R175 constant-buffer WARP smoke remains reproducibly failing; full Backend Conversion Gate may fail even if new R176 linkage test passes.",
+    "No Quest3/VDXR runtime evidence."
+  ],
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "New source commit exists but exact-SHA validation is still in progress; no duplicate/early score."
+}
