@@ -1,0 +1,119 @@
+{
+  "role": "C2",
+  "run": "C332",
+  "run_key": "OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050",
+  "date_kst": "2026-10-09 20:50 KST",
+  "temp_backlog_relief": "C2",
+  "shard": "EVEN",
+  "queue_index": 60,
+  "priority": "P0",
+  "user_igr": "IGR-044",
+  "screenshot": "스크린샷(203)(1).png",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "result": "REWORK_REQUIRED",
+  "failure_codes": [
+    "PROTECTED_ART_LOSS",
+    "INCOMPLETE_CLEAN_PLATE",
+    "BACKGROUND_PATCH_INTRUSION"
+  ],
+  "source_sha256_producer_claim": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_provenance": "B331_SOURCE_LOSSLESS PNG source-derived; unmodified original binary source still needs re-binding before approval",
+  "current_candidate_sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+  "current_git_blob": "0e87a9064f2b69dcbcba6dbeb700e666606d5aa9",
+  "independent_saved_dds": {
+    "sha256_verified": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "byte_size": 33554560,
+    "format": "DDS RGBA32",
+    "native": [
+      4096,
+      2048
+    ],
+    "mips": 1,
+    "readable_transform": "FLIP_Y",
+    "source_roi_readable": [
+      2081,
+      250,
+      2860,
+      370
+    ],
+    "candidate_visible_alpha_bbox": [
+      2133,
+      256,
+      2807,
+      363
+    ],
+    "saved_lossless_crop_matches_producer_trial_rgba_pixels": 0,
+    "old_vs_saved_rgba_mismatches": 56571
+  },
+  "new_pixel_finding": {
+    "lower_roi_local": [
+      0,
+      90,
+      779,
+      120
+    ],
+    "orange_visible_threshold": "alpha>90,R>150,G>35,B<R*0.55,R>G*1.05",
+    "source_orange_pixels": 8892,
+    "saved_orange_pixels": 0,
+    "source_to_clean_orange_alpha_lost": 8892,
+    "source_to_saved_orange_alpha_lost": 6917,
+    "source_to_previous_orange_alpha_lost": 7067,
+    "orange_source_mask_bbox_local": [
+      139,
+      97,
+      779,
+      120
+    ],
+    "independent_first_look": "source crop includes visibly separate neighboring orange BEST... artwork in bottom band; saved crop omits it. Prior Korean already erased most pixels, B331 new lean improvement did not restore neighboring protected sprite. Existing producer bbox-only positive margins miss overlapping sibling."
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_PERSISTED_READABLE_NATIVE.png",
+      "git_blob": "fff8bca1ae4117d992e39f8bc29cb6c53e69d0c1",
+      "sha256": "f36eac92bd0489cb7ac412487290719e7bfcdff17afa6058d5882f3acda87fb2"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_PERSISTED_RAW_NATIVE.png",
+      "git_blob": "f4f70cfe7f853cb4de8b08d1f750ea1474e6d17b",
+      "sha256": "8503ef4f3bf647a678895f7e3d85cac275ddac78302d5532ba213c018697480f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_INDEPENDENT_READABLE_NATIVE_SOURCE_PRIOR_SAVED.png",
+      "git_blob": "c568b03583a2f5b0b1394c5e8dd50f9ecb3aae11",
+      "sha256": "d4f2d5f0bd350980ddad4c4cbacb6dcd614e3416a29cc6f8888c848f7a09b1c7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_INDEPENDENT_READABLE_50_SOURCE_PRIOR_SAVED.png",
+      "git_blob": "f4ee899c29ddba260818eb7a880fa8f7fe3d5a63",
+      "sha256": "110fb711a20c26cf42ef472dd23f04753198c8b39ee3c72435f4ff7ebd67e70a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_INDEPENDENT_RAW_75_SOURCE_PRIOR_SAVED.png",
+      "git_blob": "5f8bbb6ea04ed9c71413af243664802d39fb1cdc",
+      "sha256": "c7fcbd82493e01f60f25107c2d899f950a21f7dd403972951f000e4f6c0572c9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_LOST_ORANGE_PROTECTED_SIBLING_2X.png",
+      "git_blob": "b740805c92a33b3639c52fc027019a6e8ec8b347",
+      "sha256": "53398458f93723d424b0886ffcf97cc93a62aa905f0a019529bda5a00eb2ec8f"
+    }
+  ],
+  "source_preview": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_SOURCE_LOSSLESS.png",
+  "producer_clean": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_CLEAN_LOSSLESS.png",
+  "repair": "B must restore protected neighboring orange artwork from exact English original rather than clearing entire gold bbox; rerender gold only with mask, independently check both source gold and sibling RAW/FLIPY 100/75/50, then submit new saved SHA for fresh C2/C3; no old SHA approval.",
+  "playtest": "IGR044 screenshot203 matching actual game OutRun Miles banner and neighboring orange label must be retested using exact repaired build; static QA cannot close.",
+  "source_consumer_chain": "canonical source -> q060 gold/sibling atlas -> saved DDS -> package -> runtime lookup/alpha -> composed HUD -> user screenshot 203. Runtime lookup/package/game links still unproven.",
+  "C3": "BLOCKED",
+  "APPROVALS": "BLOCKED",
+  "INGAME_RETEST": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "new_lossless_QA_PNG": 6,
+  "backend": "GitHub + N100 fallback (public raw 33MB read / native ROI inspection; ChatGPT local DNS failed, GitHub binary tool returned empty)",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

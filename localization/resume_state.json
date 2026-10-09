@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C332 2026-10-09 20:50 KST OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050 TEMP_BACKLOG_RELIEF=C2 EVEN q060 B331 exact saved SHA 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 4096x2048 native decoded; saved ROI exact B331 trial RGBA (0 mismatches). New C2 confirmed original orange BEST... adjacent protected source art in gold bbox: 8892 source orange pixels, 0 saved and CLEAN, 6917 original pixels become transparent in new candidate. Producer zero outside-gold bbox misses this protected sibling overlapping edited rectangle. REWORK_REQUIRED PROTECTED_ART_LOSS/INCOMPLETE_CLEAN_PLATE; B must restore original orange neighbor and remake gold masked candidate, then fresh C2/C3 + user actual game IGR044. No DDS produced, six QA PNG recorded localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_CONTROLLER_C2_REWORK.json RUNTIME_VALIDATION=UNTESTED.",
     "B331 q060 source-lean new native DDS 3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2 fresh C2 source-family exact-sha then C3 + NEW user IGR044 in-game screen 203; RUNTIME_VALIDATION=UNTESTED.",
     "C331 C2 EVEN q098 current B330 exact saved DDS SHA256 27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51 independent visible-alpha/RAW-FLIP pixel check: English Cl/ord. apparent in uncomposited PNG RGB are alpha0; 0 left/right visible English pixels, saved DDS vs FLIP PNG pixel-identical. SCOPED PASS, full C HOLD_STRICT_RECHECK source/CLEAN/blind family/C3 and NEW actual-game. Evidence localization/graphics/role_C/20261009-C331-C2-Q098-B330-INDEPENDENT-VISIBLE-ALPHA/C331_Q098_INDEPENDENT_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020 RUNTIME_VALIDATION=UNTESTED",
     "C330 C2 q236 new exact saved-DDS independent machine alpha scan 14/14 bboxes PASS and two new raw/native visual regions 09+13 scoped no obvious defects. Still HOLD_STRICT_RECHECK pending source/CLEAN/final/protected and blind calibration+full C3/real-game. SHA 9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337 QA localization/graphics/role_C/20261009-C330-C2-Q236-14-NATIVE-ALPHA/C330_Q236_INDEPENDENT_14_REGION_ALPHA_HOLD.json RUN_KEY=OUTRUN-KOR-C330-C2-Q236-PERSISTED-14-ALPHA-20261009-1950 RUNTIME_VALIDATION=UNTESTED",
@@ -6830,7 +6831,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 20:20 KST",
+  "updated_at_kst": "2026-10-09 20:56 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13496,8 +13497,7 @@
     "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
     "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
     "runtime_validation": "UNTESTED"
-  }
-,
+  },
   "b331_q060_p0_source_italic": {
     "run_key": "OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
     "queue_index": 60,
@@ -13509,5 +13509,15 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "github-actions"
+  },
+  "c332_c2_q060_b331_protected_art_loss": {
+    "run_key": "OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050",
+    "result": "REWORK_REQUIRED",
+    "qa": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_CONTROLLER_C2_REWORK.json",
+    "sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "new_DDS": 0,
+    "source_orange": 8892,
+    "saved_orange": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

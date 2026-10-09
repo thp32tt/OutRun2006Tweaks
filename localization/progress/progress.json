@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 20:48 KST",
+  "updated_at_kst": "2026-10-09 20:56 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
+  "next_checkpoint": "q060 C332 confirmed protected orange sibling lost in source CLEAN/current; new B repair required. C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -9321,8 +9321,7 @@
     "visible_alpha_outside_candidate_english_strips": 0,
     "run_key": "OUTRUN-KOR-C331-C2-Q098-PERSISTED-VISIBLE-ALPHA-20261009-2020",
     "RUNTIME_VALIDATION": "UNTESTED"
-  }
-,
+  },
   "b331_q060_p0_source_italic": {
     "run_key": "OUTRUN-KOR-B331-Q060-IGR044-SOURCE-ITALIC-METHOD-CHANGE-20261009-2040",
     "queue_index": 60,
@@ -9334,5 +9333,14 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261009-B331-Q060-P0-CONDENSED-RACING-ITALIC/B331_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "github-actions"
+  },
+  "c332_c2_q060_b331_protected_art_loss": {
+    "run_key": "OUTRUN-KOR-C332-C2-Q060-B331-LOST-ORANGE-ART-20261009-2050",
+    "result": "REWORK_REQUIRED",
+    "report": "localization/graphics/role_C/20261009-C332-C2-Q060-B331-ORANGE-PROTECTED-ART-FAIL/C332_Q060_CONTROLLER_C2_REWORK.json",
+    "sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "new_DDS": 0,
+    "new_proof_png": 6,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
