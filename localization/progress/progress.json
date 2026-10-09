@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 05:00 KST",
+  "updated_at_kst": "2026-10-10 05:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -257,7 +257,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A216 q175 hand vector trial recorded (persisted exact source outside=0), visually FAIL and NOT promoted; manual source-conditioned legible Korean glyph reconstruction required. q121 P0 semantic source-masks/C1 and q49 runtime mapping also remain open. A215 q121 P0 source attribution: source/CLEAN/current exact 30 regions published 2026-10-10, 149 other ranked source-component classifications beyond inspected, semantic text/protected mask calibration pending; C335 HOLD and IGR030/031/040 OPEN, new DDS0, real-game UNTESTED. C334 q060 original source identity independently verified; whole atlas/typography/C3 and IGR044 game pending. C333 q060 B332R exact same-source orange restore 8892/8892 verified with 0 mismatches, current C overall HOLD full atlas/calibration/C3/user real game; q060 C332 confirmed protected orange sibling lost in source CLEAN/current; new B repair required. C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
+  "next_checkpoint": "A217 q219 P1 newly produced actual persisted 16,777,344-byte trial SHA 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d after 2 same-task 14px extrusion boundary holds. Corrected 9px source-conditioned metal face, outside original source bbox RGBA/alpha0, 7/940/2/1 positive margins and exact RAW/FLIPY persisted roundtrip. Direct producer gray100 black50 white75 source/CLEAN/prior/trial visual REJECT: fragmented bands and insufficient welded rounded source-family style despite readable Hangul. Current official q219 candidate 8310a1e6 unchanged, 0 promoted DDS, 1 new rejected trial. C280 REWORK/C3/user IGR025 OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500. A216 q175 hand vector trial recorded (persisted exact source outside=0), visually FAIL and NOT promoted; manual source-conditioned legible Korean glyph reconstruction required. q121 P0 semantic source-masks/C1 and q49 runtime mapping also remain open. A215 q121 P0 source attribution: source/CLEAN/current exact 30 regions published 2026-10-10, 149 other ranked source-component classifications beyond inspected, semantic text/protected mask calibration pending; C335 HOLD and IGR030/031/040 OPEN, new DDS0, real-game UNTESTED. C334 q060 original source identity independently verified; whole atlas/typography/C3 and IGR044 game pending. C333 q060 B332R exact same-source orange restore 8892/8892 verified with 0 mismatches, current C overall HOLD full atlas/calibration/C3/user real game; q060 C332 confirmed protected orange sibling lost in source CLEAN/current; new B repair required. C331 C2 q098 B330 exact DDS independent saved alpha: English-only left/right visible0, matching decoded FLIPY PNG, HOLD full source/CLEAN/typography/calibration/C3/actual game. C330 C2 q236 new saved native alpha scope 14/14 actual bbox PASS/positive margin plus direct RAW/native/practical row09/13 visual scoped; full C still HOLD source-clean protected gate, C3/user test. C329 q212 B329 scoped native FLIPY/RAW improved, full source/clean/final 12-region verification missing, HOLD_STRICT_RECHECK. C328 C2 q098 B327R exact persisted full DDS REWORK_REQUIRED: old English 'Cl' and 'ord.' remain alongside Korean despite producer cropped QA PASS; B full mask/plate/encode and independent C2/C3, runtime game pending. C327 C2 fresh q212 B308 + q228 B323 independent review: REWORK_REQUIRED both, q212 PROFESSIONAL glyph hierarchy 120 vs638px, q228 12/13 previously rejected chrome family still byte-identical; NEW C after material A/B repair, user in-game IGR029/038 OPEN. DDS0, RUNTIME_VALIDATION=UNTESTED. C326 C2 q060 P0 IGR-044 fresh visual source-family FAIL on B313 be8aff... gold OUTRUN MILES; B native family/italic reconstruction and new real-game test required; no C3 or approval. Other ongoing lanes unchanged. B323 q228 IGR038 P1 one of 13 chrome glyph rows rebuilt in new native SHA cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473; producer scoped PASS from original/CLEAN/OLD/NEW native50RAW review, 12 remaining rework and fresh C2 representative source family gate before propagation; user IGR038 OPEN_USER_INGAME_FAIL, C3/actual-game untested. No VR/FFB/DX11/DXVK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -9889,5 +9889,45 @@
     "new_promoted_dds": 0,
     "QA": "localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a217_q219_source_metal_depth_pilot": {
+    "run": "A217",
+    "run_key": "OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500",
+    "owner_lane": "A",
+    "queue_index": 219,
+    "priority": "P1",
+    "asset": "D263B3F1_512x512.dds",
+    "english_source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+    "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+    "promoted_unmodified_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+    "new_trial_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+    "worker_run_id": 37985025669,
+    "source_box": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "trial_box": [
+      13,
+      1013,
+      533,
+      1128
+    ],
+    "margins": [
+      7,
+      940,
+      2,
+      1
+    ],
+    "outside_changes_px": 0,
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "producer_visual": "REJECT_SOURCE_FAMILY_AND_CHROME_FACE_BANDING",
+    "independent_C1": "C280_REWORK_REQUIRED_UNCHANGED",
+    "C3": "BLOCKED",
+    "IGR025": "OPEN_SOURCE_CONSUMER_MAPPING_AND_USER_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_CONTROLLER_VISUAL_REJECT.json"
   }
 }
