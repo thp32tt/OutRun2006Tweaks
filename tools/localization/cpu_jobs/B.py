@@ -194,5 +194,4 @@ report={
 "backend":"github-actions",
 "excluded":["VR","FFB","DX11","DXVK"]}
 (OUT/"B309_MACHINE_AND_METHOD.json").write_text(json.dumps(report,ensure_ascii=False,indent=2,default=lambda x: x.item() if hasattr(x,'item') else str(x))+"\n")
-print("B309_TRIAL_ONLY",json.dumps({"sha":sha(data),"bbox":report["trial_bbox"],
-   "palette":report["palette_from_native_source"],"qa":report["status"]},ensure_ascii=False))
+print("B309_TRIAL_ONLY",sha(data),"bbox",report["trial_bbox"],"status",report["status"])
