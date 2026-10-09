@@ -140,32 +140,50 @@ for marker in (
 
 require_finite_projected_anchor(calc)
 
-# Exact R57_06 and R62 HMD-tested ordinal capture uses the unique EXE
-# Calc3D2D return site 0xBAEE7, even when a separate sub_4BAD20 entry
-# detour is unavailable. NaviPub ScreenHud still excludes world capture.
+# The exact original 0xBAEE7 return edge is authoritative, but the
+# independently hooked sub_4BAD20 rank-producer lifetime can salvage the
+# same view-space anchor if x86 inline-hook return-site provenance drifts.
+# Neither condition may become a requirement for the other; NaviPub
+# ScreenHud scopes must always block vehicle-world capture.
 def require_historical_rank_capture_gate(body: str) -> None:
-    match = "if (returnAddress == Module::exe_ptr(0xBAEE7) &&"
-    if match not in body:
-        fail("R57/R62 ordinal Calc3D2D return-site capture missing")
-    section = body[body.index(match):body.index(
-        "recoverViewPoint(RankMarkerProjectedInfo, true);", body.index(match))]
-    if "RankMarkerSubScreenHudDepth == 0" not in section:
-        fail("NaviPub ScreenHud may contaminate car projected rank anchor")
-    if "RankMarkerSubActiveDepth" in section:
-        fail("R57/R62 rank capture improperly requires optional sub-entry hook")
+    for marker in (
+        "returnAddress == Module::exe_ptr(0xBAEE7)",
+        "ordinalProducerScope = RankMarkerSubActiveDepth != 0",
+        "ordinalReturnSite || ordinalProducerScope",
+        "RankMarkerSubScreenHudDepth == 0",
+        "recoverViewPoint(RankMarkerProjectedInfo, true);",
+    ):
+        if marker not in body:
+            fail("rank two-path exact ownership lost: " + marker)
+    section = body[body.index("const bool ordinalReturnSite ="):
+                   body.index("recoverViewPoint(RankMarkerProjectedInfo, true);",
+                              body.index("const bool ordinalReturnSite ="))]
+    if not (section.index("ordinalReturnSite || ordinalProducerScope") <
+            section.index("RankMarkerSubScreenHudDepth == 0")):
+        fail("NaviPub ScreenHud exclusion must guard both ordinal sources")
+    if "ordinalReturnSite && ordinalProducerScope" in section:
+        fail("rank fallback must never REQUIRE optional sub-entry hook")
 
 require_historical_rank_capture_gate(calc)
-bad_gate = calc.replace(
-    "RankMarkerSubScreenHudDepth == 0)",
-    "RankMarkerSubActiveDepth != 0 && RankMarkerSubScreenHudDepth == 0)", 1)
-if bad_gate == calc:
-    fail("rank capture-gate fault injection did not mutate source")
-try:
-    require_historical_rank_capture_gate(bad_gate)
-except SystemExit:
-    pass
-else:
-    fail("optional rank-sub-hook capture regression escaped verifier")
+for label, bad_gate in (
+    ("rank exact 0xBAEE7 lost", calc.replace(
+        "returnAddress == Module::exe_ptr(0xBAEE7)",
+        "returnAddress == Module::exe_ptr(0xBAEE8)", 1)),
+    ("parent salvage lost", calc.replace(
+        "ordinalReturnSite || ordinalProducerScope",
+        "ordinalReturnSite && ordinalProducerScope", 1)),
+    ("NaviPub exclusion lost", calc.replace(
+        "RankMarkerSubScreenHudDepth == 0",
+        "RankMarkerSubScreenHudDepth >= 0", 1)),
+):
+    if bad_gate == calc:
+        fail("rank capture-gate fault injection failed: " + label)
+    try:
+        require_historical_rank_capture_gate(bad_gate)
+    except SystemExit:
+        pass
+    else:
+        fail("rank capture-gate regression escaped: " + label)
 
 # The ordinal rank producer has the actual view-space input before
 # Calc3D2D flattens its result. Accept it only with a matching original
