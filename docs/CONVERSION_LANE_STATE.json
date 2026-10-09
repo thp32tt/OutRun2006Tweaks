@@ -4611,5 +4611,41 @@
     "latest_checkpoint_path": "docs/automation/runs/CONVERSION-DX11-00477.json",
     "last_confirmed_at_kst": "2026-10-09T21:05:00+09:00",
     "next_action": "Read run 37927656851 exact-SHA Windows validate and DX11 smoke, classify R175 TEXCOORD6 BGRA separately from R174 COLOR0; preserve negative evidence, do not promote native renderer."
+  },
+  "active_independent_task_00478": {
+    "task_id": "CONVERSION-DX11-00478",
+    "event_id": "CONVERSION-DX11-00478-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "owner_id": "ChatGPT2:CONVERSION-DX11-00478",
+    "scope": "tools/dx11_shader_linkage_probe.cpp:R176",
+    "status": "C3_EXACT_SHA_VALIDATION_IN_PROGRESS",
+    "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00478.json",
+    "ci_run_id": 37931273252,
+    "issue14_comment_id": 6081050084,
+    "parallel_task_collision_avoided": "CONVERSION-DX11-00477 R173/R175 owns tools/dx11_constant_buffer_probe.cpp; untouched by R176",
+    "prior_task_actual_gate": {
+      "id": 37927656851,
+      "validate": "SUCCESS",
+      "smoke": "FAIL",
+      "classification": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "next_action": "Read exact-SHA 0593e17a Backend Conversion Gate linkage step separately from pre-existing 00477 R175 constant-buffer WARP smoke failure; record scoped result and final task status.",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_active": false,
+    "score_change_pending": 0
   }
 }
