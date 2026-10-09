@@ -323,6 +323,8 @@ def _is_chrome_error_document(probe: object) -> bool:
     if not isinstance(probe, dict):
         return False
     url = str(probe.get("url") or "").lower()
+    if probe.get("composer") and not url.startswith("chrome-error://"):
+        return False
     if url.startswith(("chrome-error://", "chrome://crash", "chrome://kill")):
         return True
     title = str(probe.get("title") or "")
@@ -384,7 +386,8 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
                             """() => ({
                                 url: document.URL || location.href,
                                 title: document.title || '',
-                                body: (document.body?.innerText || '').slice(0, 800)
+                                body: (document.body?.innerText || '').slice(0, 800),
+                                composer: !!document.querySelector('[contenteditable="true"], textarea')
                             })""",
                         ), timeout=TAB_HEALTH_PROBE_TIMEOUT_SECONDS)
                         chrome_error = _is_chrome_error_document(probe)
@@ -444,13 +447,14 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
         if page is not None:
             crashed.discard(page)
             navigation_failed.discard(page)
+        replacement = None
         try:
             replacement = await context.new_page()
             pages[slot.name] = replacement
             _watch_slot_page_health(replacement, slot.name, state)
             await replacement.goto(target, wait_until="domcontentloaded", timeout=45000)
         except Exception as exc:
-            if "replacement" in locals() and pages.get(slot.name) is replacement:
+            if replacement is not None and pages.get(slot.name) is replacement:
                 navigation_failed.add(replacement)
                 failures[slot.name] = TAB_HEALTH_FAILURE_THRESHOLD
             write_runtime(tab_recovery_error=f"{slot.name}:{reason}:{type(exc).__name__}",
