@@ -1,0 +1,13 @@
+{
+  "task_id": "DX9EX-R84-R32-TRACKED-SURFACES-20261009",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "material_result_sha": "11b71a236af4b0112900061d7130875c4ae6d1e1",
+  "validation_bearing_result_sha": "11b71a236af4b0112900061d7130875c4ae6d1e1",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "ci_run": 37889666629,
+  "domain_run": 37889666717,
+  "artifact_id": 11597627361,
+  "summary": "R32 tracked RT/depth borrowed pointers now use R30 ownership API; three negative verifiers; Win32 game/host/full-chain/package success."
+}
