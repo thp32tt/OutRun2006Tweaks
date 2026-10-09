@@ -156,6 +156,10 @@ $projectedSemantic=-1
 $projectedSummary=Get-LastRegexMatch $gameLog 'projected\[semantic=(\d+),missingPayload='
 if($projectedSummary){$projectedSemantic=[int64]$projectedSummary.Groups[1].Value}
 $rankProjectionNotReached=($rankProducerObserved -and $projectedSemantic -eq 0)
+# Projected counters aggregate rank AND the already-working OutRun rival.
+# A healthy rival must not mask absence of the rank-only Calc3D2D callback.
+$rankExactCalcObserved=($gameLog -match 'VR R57 rank Calc3D2D: ordinal capture')
+$rankExactCalcUnobserved=($rankProducerObserved -and $projectedSemantic -gt 0 -and -not $rankExactCalcObserved)
 
 $gameDllIdentity=Read-AllText 'GAME_DLL_IDENTITY.txt'
 $gameDllMismatch=($gameDllIdentity -match '(?m)^installedMatchesSelected=False\s*$')
@@ -170,6 +174,7 @@ if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
 if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
 if($presentOverBudgetWindows -gt 0){$flags+='D3D9EX_PRESENT_LATENCY_OVER_XR_BUDGET'}
 if($rankProjectionNotReached){$flags+='HUD_RANK_PROJECTED_PATH_ZERO'}
+if($rankExactCalcUnobserved){$flags+='HUD_RANK_CALC_CAPTURE_UNOBSERVED'}
 if($gameDllMismatch){$flags+='GAME_DLL_SHA256_MISMATCH'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
@@ -184,6 +189,7 @@ elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
 elseif($gameDllMismatch){$status='GAME_DLL_SHA256_MISMATCH'}
 elseif($rankProjectionNotReached){$status='HUD_RANK_PROJECTED_PATH_ZERO'}
+elseif($rankExactCalcUnobserved){$status='HUD_RANK_CALC_CAPTURE_UNOBSERVED'}
 elseif($presentOverBudgetWindows -gt 0){$status='PERFORMANCE_WARNING'}
 
 $result=[ordered]@{
@@ -199,6 +205,7 @@ $result=[ordered]@{
     SharedD3D9ExProbeFailed=$sharedProbeFailed
     RankProducerObserved=$rankProducerObserved
     ProjectedMarkerSemanticCount=$projectedSemantic
+    RankExactCalcObserved=$rankExactCalcObserved
     GameDllIdentityMismatch=$gameDllMismatch
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
@@ -236,6 +243,7 @@ $lines=@(
     "sharedD3D9ExProbeFailed=$sharedProbeFailed"
     "rankProducerObserved=$rankProducerObserved"
     "projectedMarkerSemanticCount=$projectedSemantic"
+    "rankExactCalcObserved=$rankExactCalcObserved"
     "gameDllIdentityMismatch=$gameDllMismatch"
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
