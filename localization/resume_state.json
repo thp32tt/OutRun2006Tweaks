@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C341 C1 q193 source/CLEAN/current independently exact SHA inspected Goal A source bbox and 0 change outside vs previous, six inherited rework pending, C1 HOLD/C3 BLOCKED; OUTRUN-KOR-C341-C1-Q193-A208-EXACT-SOURCE-PILOT-20261010",
     "A217 q219 P1 newly produced actual persisted 16,777,344-byte trial SHA 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d after 2 same-task 14px extrusion boundary holds. Corrected 9px source-conditioned metal face, outside original source bbox RGBA/alpha0, 7/940/2/1 positive margins and exact RAW/FLIPY persisted roundtrip. Direct producer gray100 black50 white75 source/CLEAN/prior/trial visual REJECT: fragmented bands and insufficient welded rounded source-family style despite readable Hangul. Current official q219 candidate 8310a1e6 unchanged, 0 promoted DDS, 1 new rejected trial. C280 REWORK/C3/user IGR025 OPEN; RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A217-Q219-CANONICAL-CHROME-DEPTH-PILOT-20261010-0500.",
     "C342 C2 q060 verified exact native/source persisted DDS, source orange BEST TIME visibly remains behind overlapping Korean 최고 기록 in FLIP-Y/RAW despite B335 P1 guard. C2 REWORK_REQUIRED, asset index60 only (EVEN). Source SHA 6a33c730..., saved candidate d81d0d14... unchanged, report localization/graphics/role_C/20261010-C342-C2-Q060-PERSISTED-ORANGE-OVERLAP/C342_Q060_CONTROLLER_C2_VISUAL_REWORK.json. B fix sprite ownership/complete original removal WITHOUT deleting separately protected orange region. C3/current approvals/export blocked, IGR044 remains OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-C342-C2-Q060-SAVED-ORANGE-OVERLAP-20261010-0500",
     "B342 2026-10-10 04:45 KST q212 exact SOURCE provenance blocker resolved: original Sonic-TV source revision 3da797... failed expected sha; B329 actual canonical revision 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 independently downloaded, 16777344 bytes RGB32 2048x2048 mip1 SHA256 f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61 PASS. GitHub cpu B.py corrected 2f0d452...; corrected Actions 37982259716 QUEUED/PENDING; SOURCE/CLEAN 12-region new machine and P3 pending, current e22ad5c4 unchanged, B341 trial fa0acb56 unchanged, new promoted DDS0, C338 REWORK/C2/C3/IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261010-B342-Q212-EXACT-ENGLISH-PROVENANCE/B342_SOURCE_IDENTITY_CONTROLLER.json RUN_KEY=OUTRUN-KOR-B342-Q212-CANONICAL-REV-PIN-IDENTITY-20261010-0445.",
@@ -14146,5 +14147,34 @@
     "IGR025": "OPEN_SOURCE_CONSUMER_MAPPING_AND_USER_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_CONTROLLER_VISUAL_REJECT.json"
+  },
+  "c341_c1_q193_a208_exact_source_pilot": {
+    "run": "C341",
+    "run_key": "OUTRUN-KOR-C341-C1-Q193-A208-EXACT-SOURCE-PILOT-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 193,
+    "current_candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "canonical_source_sha256_independently_verified": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "producer_clean_png_sha256_verified": "1da47a8eb868383d76bdc6590b2b9bd377e20a17e33972ad9553cf2f86648dba",
+    "previous_candidate_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+    "changed_rgba_pixels": 4948,
+    "changed_outside_original_goal_box": 0,
+    "current_text_bbox": [
+      953,
+      223,
+      1075,
+      265
+    ],
+    "C1": "HOLD_STRICT_RECHECK",
+    "SCOPED": "Goal A source+CLEAN+current exact physical proof obtained",
+    "inherited_rework_labels": 6,
+    "prior_producer_rebuilt_labels": 7,
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "user_game": "IGR003_IGR019_IGR033_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "report": "localization/graphics/role_C/20261010-C341-C1-Q193-A208-EXACT-SOURCE-PILOT/C341_C1_CONTROLLER_HOLD.json"
   }
 }
