@@ -2,9 +2,9 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00496",
   "production_id": "CONVERSION-DX11-00496",
-  "event_id": "CONVERSION-DX11-00496-E002",
-  "event_type": "rollover",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00496-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "chat_rollover": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
@@ -20,8 +20,8 @@
   ],
   "base_sha": "e47ce7ee3aa085d591f6a28a48e3558a9af8bac0",
   "material_result_sha": "372b661cde8e96166f1870069150be2647bce107",
-  "status": "WAIT_EXACT_SHA_GATE",
-  "checkpoint": "C3_VALIDATE",
+  "status": "C3_PENDING_R195_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "native_draw_path_activation_changed": false,
@@ -30,7 +30,7 @@
     "C0_RECOVER": "PASS exact GitHub branch HEAD, 00495 C6 and 00477 ownership; no 00496 record; stale controller checkpoint ignored",
     "C1_REVIEW": "PASS R194 culling/front-facing is disjoint from R193 scissor, R189 depth, and 00477 R175 texture-color varying bug",
     "C2_IMPLEMENT": "R194 header/real WARP triangle polarity probe/4-negative source contract + target CI wiring",
-    "C3_VALIDATE": "R194 owned source guard remote review PASS, four independent source negative mutants PASS, CI wiring PASS; Windows MSVC/WARP real GPU result still pending exact material SHA Gate 37983464893.",
+    "C3_VALIDATE": "R194 exact SHA 372b661c Gate 37983464893 validate 113999484628 SUCCESS and R194 WARP PASS; smoke 114001315922 FAIL inherited R175. R195 new exact-SHA C3 pending.",
     "C4_COMMIT": "PASS: exact material 372b661cde8e96166f1870069150be2647bce107 with [AUTO:CONVERSION-DX11-00496] verified as GitHub branch HEAD before C6 checkpoint.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PARTIAL: durable exact-SHA CI resume cursor; no full Gate success or gameplay/native activation claim."
@@ -47,7 +47,7 @@
     "Inherited 00477 R175 TEXCOORD6 WARP BGRA mismatch, must not alter unrelated owner or bypass whole Gate",
     "No Quest 3/VDXR hardware runtime test"
   ],
-  "next_action": "Check exact material SHA 372b661c Backend Conversion Gate 37983464893 and job 113999484628: R194 source/MSVC/WARP result first, then inherited R175. Update 00496 record only, no redundant 00495/00477 implementation; runtime UNTESTED.",
+  "next_action": "Classify new R195 exact-SHA CI after push; inherited 00477 R175 remains out of scope; preserve runtime UNTESTED.",
   "score_change": 0,
   "score_reason": "R194 scoped GPU gate not yet completed and whole Gate may still fail inherited R175; do not double-score rollover.",
   "result_sha": "372b661cde8e96166f1870069150be2647bce107",
@@ -57,16 +57,35 @@
     "gate_name": "Backend Conversion Gate",
     "gate_run_id": 37983464893,
     "gate_head_sha": "372b661cde8e96166f1870069150be2647bce107",
-    "gate_status": "in_progress",
+    "gate_status": "completed",
     "validate_job_id": 113999484628,
     "scoped_r194_source_contract": "PASS",
     "scoped_negative_mutations": 4,
-    "scoped_win32_compile": "PENDING",
-    "scoped_warp_gpu_pixel": "PENDING",
+    "scoped_win32_compile": "PASS",
+    "scoped_warp_gpu_pixel": "PASS",
     "inherited_owner_task": "CONVERSION-DX11-00477",
     "known_r175_failure": "BGRA actual 128,0,16,255 expected 224,128,32,255",
-    "production_ledger_issue14_comment_id": 6088227683
+    "production_ledger_issue14_comment_id": 6088227683,
+    "gate_conclusion": "failure",
+    "smoke_job_id": 114001315922,
+    "inherited_r175_failure": "BGRA actual [128,0,16,255] expected [224,128,32,255]"
   },
-  "resume_cursor": "WAIT_R194_EXACT_SHA_GATE_37983464893_VALIDATE_113999484628",
-  "last_real_activity_at": "2026-10-10T04:57:00+09:00"
+  "resume_cursor": "WAIT_R195_EXACT_SHA_GATE",
+  "last_real_activity_at": "2026-10-10T04:57:00+09:00",
+  "automation_validation": "PENDING",
+  "continuation": {
+    "work_key": "DX11:R195:IMMUTABLE_IB_SUBSLICE_EXTREMA_TREE",
+    "base_sha": "c09aa76f44ecadd57c0d0542e4617c6e2e115f74",
+    "conflict_keys": [
+      "src/vr/d3d11/native_linear_buffer_mirror.hpp:R195",
+      "tools/dx11_linear_buffer_mirror_probe.cpp:R195",
+      "tools/test_dx11_index_slice_r195.py:R195",
+      ".github/workflows/backend-conversion-gate.yml:R195"
+    ],
+    "material_result_sha": "COMMIT_PENDING",
+    "validation_bearing_result_sha": "COMMIT_PENDING",
+    "status": "WAIT_EXACT_SHA_GATE",
+    "runtime_validation": "UNTESTED",
+    "summary": "R195 exact O(log N) immutable index slice extrema instead of whole-IB extrema false-negative; actual WARP VB/IB DrawIndexed test still isolated from game path."
+  }
 }

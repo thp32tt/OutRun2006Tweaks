@@ -297,6 +297,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_linear_draw_r185.py
 
+      # R195: exact immutable IB sub-slice bounds, no duplicate WARP target.
+      - name: Verify R195 native indexed slice ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_index_slice_r195.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe

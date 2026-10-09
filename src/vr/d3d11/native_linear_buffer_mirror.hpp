@@ -5,11 +5,14 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#include <memory>
+#include <new>
 #include <utility>
 #include <wrl/client.h>
 
 namespace outrun::vr::dx11 {
 class NativeLinearBufferMirror final {
+    struct IndexExtrema { UINT minimum; UINT maximum; };
 public:
     bool initialize(ID3D11Device* device, ResourceRole role,
                     D3DPOOL pool, DWORD usage, D3DFORMAT indexFormat,
@@ -52,16 +55,44 @@ public:
         // deliberately reject some legal partial draws rather than claim unsafe
         // parity before a future per-slice ownership implementation exists.
         UINT sealedIndexCount = 0, sealedMin = 0, sealedMax = 0;
+        std::size_t rangeLeaves = 0;
+        std::unique_ptr<IndexExtrema[]> rangeTree;
         if (role == ResourceRole::Index) {
             const UINT width = format == DXGI_FORMAT_R16_UINT ? 2u : 4u;
             sealedIndexCount = byteWidth / width;
             sealedMin = (std::numeric_limits<UINT>::max)();
             const auto* bytes = static_cast<const std::uint8_t*>(sourceBytes);
-            for (UINT i = 0; i < sealedIndexCount; ++i) {
-                UINT value = 0;
-                std::memcpy(&value, bytes + static_cast<std::size_t>(i) * width, width);
-                if (value < sealedMin) sealedMin = value;
-                if (value > sealedMax) sealedMax = value;
+            // R195: immutable per-index segment tree. Unused IB indices cannot
+            // poison an otherwise valid DrawIndexed subset.
+            rangeLeaves = 1;
+            while (rangeLeaves < sealedIndexCount) {
+                if (rangeLeaves > (std::numeric_limits<std::size_t>::max)() / 2)
+                    return false;
+                rangeLeaves *= 2;
+            }
+            if (rangeLeaves > (std::numeric_limits<std::size_t>::max)() /
+                    (2 * sizeof(IndexExtrema)))
+                return false;
+            rangeTree.reset(new (std::nothrow) IndexExtrema[rangeLeaves * 2]);
+            if (!rangeTree) return false;
+            for (std::size_t i = 0; i < rangeLeaves; ++i) {
+                IndexExtrema extrema{(std::numeric_limits<UINT>::max)(), 0};
+                if (i < sealedIndexCount) {
+                    UINT value = 0;
+                    std::memcpy(&value,
+                        bytes + i * static_cast<std::size_t>(width), width);
+                    extrema = {value, value};
+                    if (value < sealedMin) sealedMin = value;
+                    if (value > sealedMax) sealedMax = value;
+                }
+                rangeTree[rangeLeaves + i] = extrema;
+            }
+            for (std::size_t i = rangeLeaves; i-- > 1;) {
+                const auto& a = rangeTree[2 * i];
+                const auto& b = rangeTree[2 * i + 1];
+                rangeTree[i] = {
+                    a.minimum < b.minimum ? a.minimum : b.minimum,
+                    a.maximum > b.maximum ? a.maximum : b.maximum};
             }
         }
 
@@ -91,6 +122,8 @@ public:
         index_count_ = sealedIndexCount;
         index_min_ = sealedMin;
         index_max_ = sealedMax;
+        index_range_tree_ = std::move(rangeTree);
+        index_range_leaves_ = rangeLeaves;
         if (!descriptor_exact()) {
             shutdown();
             return false;
@@ -179,10 +212,35 @@ public:
             startIndex >= index.index_count_ ||
             indexCount > index.index_count_ - startIndex)
             return false;
+        UINT rangeMin = index.index_min_, rangeMax = index.index_max_;
+        // Immutable O(log N) exact subset query. No per-frame D3D9 Lock/Map
+        // shadow, and the original full-range R184 guard is preserved.
+        if (startIndex != 0 || indexCount != index.index_count_) {
+            if (!index.index_range_tree_ || !index.index_range_leaves_)
+                return false;
+            std::size_t left = index.index_range_leaves_ + startIndex;
+            std::size_t right = left + indexCount;
+            rangeMin = (std::numeric_limits<UINT>::max)();
+            rangeMax = 0;
+            while (left < right) {
+                if (left & 1u) {
+                    const auto& item = index.index_range_tree_[left++];
+                    if (item.minimum < rangeMin) rangeMin = item.minimum;
+                    if (item.maximum > rangeMax) rangeMax = item.maximum;
+                }
+                if (right & 1u) {
+                    const auto& item = index.index_range_tree_[--right];
+                    if (item.minimum < rangeMin) rangeMin = item.minimum;
+                    if (item.maximum > rangeMax) rangeMax = item.maximum;
+                }
+                left >>= 1;
+                right >>= 1;
+            }
+        }
         const std::int64_t low = static_cast<std::int64_t>(baseVertexLocation)
-            + static_cast<std::int64_t>(index.index_min_);
+            + static_cast<std::int64_t>(rangeMin);
         const std::int64_t high = static_cast<std::int64_t>(baseVertexLocation)
-            + static_cast<std::int64_t>(index.index_max_);
+            + static_cast<std::int64_t>(rangeMax);
         const std::int64_t vertices = static_cast<std::int64_t>(byte_width_ / stride_);
         return low >= 0 && high >= low && high < vertices;
     }
@@ -195,6 +253,8 @@ public:
         byte_width_ = stride_ = 0;
         generation_ = source_version_ = 0;
         index_count_ = index_min_ = index_max_ = 0;
+        index_range_tree_.reset();
+        index_range_leaves_ = 0;
     }
 
     [[nodiscard]] ID3D11Buffer* buffer() const noexcept { return buffer_.Get(); }
@@ -218,5 +278,7 @@ private:
     UINT index_count_ = 0;
     UINT index_min_ = 0;
     UINT index_max_ = 0;
+    std::unique_ptr<IndexExtrema[]> index_range_tree_;
+    std::size_t index_range_leaves_ = 0;
 };
 } // namespace outrun::vr::dx11

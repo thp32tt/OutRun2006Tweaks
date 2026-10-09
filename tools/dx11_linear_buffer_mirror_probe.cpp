@@ -26,7 +26,7 @@ int main() {
         other.GetAddressOf(), nullptr, otherCtx.GetAddressOf())), "other device");
     struct Vertex { float x, y; };
     const Vertex vertices[] = {{-.9f,-.9f},{0.f,.9f},{.9f,-.9f}};
-    const std::uint16_t indices[] = {0,1,2};
+    const std::uint16_t indices[] = {0,1,2,99,100,101};
     NativeLinearBufferMirror vb, ib;
     constexpr std::uint64_t generation = 71, version = 183;
     require(!vb.initialize(dev.Get(), ResourceRole::Vertex,
@@ -74,6 +74,12 @@ int main() {
     // R184: dormant DrawIndexed range attestations run before live GPU proof.
     require(vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,3,0,
             generation,version,version), "valid complete index slice");
+    // R195: the selected subset is valid though an unrelated trailing
+    // index slice addresses vertices absent from the currently bound VB.
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,6,0,
+            generation,version,version), "R195 reject whole IB invalid tail");
+    require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),3,3,0,
+            generation,version,version), "R195 reject bad tail slice");
     require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),0,0,0,
             generation,version,version), "empty indexed draw rejected");
     require(!vb.indexed_draw_bounds_exact(ib,ctx.Get(),1,3,0,
