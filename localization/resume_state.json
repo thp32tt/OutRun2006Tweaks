@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A218 A ODD q161 C344 fixed 11 물병자리/16 대한민국/24 이탈리아 actual persisted DXT5 trial SHA 8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e GitHub CPU 37997128618, 4194432 bytes. Other35 compressed blocks unchanged; exact native SRC/CLEAN/FINAL and BGW100/50 direct producer scoped visual PASS prior dotted glyph-face fixed; glyph alpha/color holes0, outside original region0; current official SHA8ded8565 unchanged. C344 official REWORK retained; C1 new SHA, C3, pixel guard manifest, actual user game UNTESTED. OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
     "C346 C2 EVEN q212: NEW authenticated source/C158 CLEAN/current full native RGB32 2048² source f83f58483... clean c13a24922... saved e22ad5c46...; 12-region source/clean/saved full atlas outside RGBA+alpha changed0, 12/12 CLEAN alpha0. Source face original PROFESSIONAL r43 x240->Korean 프로페셔널 x5 (−235), OUTRUN r44 source x0->아웃런 x63 (+63) at alpha>32. Existing C338 placement REWORK still OPEN; new 6 lossless images/metrics in localization/graphics/role_C/20261010-C346-C2-Q212-CANONICAL-SOURCE-PLATE-ANCHOR/C346_Q212_CONTROLLER_C2_REWORK_EVIDENCE.json. No second pass or new DDS; C3/APPROVAL/USER_IGR029 blocked and runtime UNTESTED. RUN_KEY=OUTRUN-KOR-C346-C2-Q212-EXACT-CANONICAL-SOURCE-CLEAN-ANCHOR-20261010-0659",
     "C345 C2 EVEN q098 2026-10-10 06:28 KST NEW canonical English BC3 exact source SHA 3b3cdd76.. independently downloaded from Sonic-TV a95efe... and verified against producer SOURCE RAW PNG diff0, candidate 27a1f95d... and B330 authored CLEAN c04e2427... SHA checked; true English RAW bbox [431,5,1674,122], prior producer [431,6,1674,123] omits 14 alpha pixels at y5 x756..774; outside true source bbox alpha/visible change0, transparent RGB outside cannot be called visible artifact. New 10 lossless SOURCE/CLEAN/SAVED native/75/50/RAW/BG and boundary PNG + original DDS exact machine. q98 C337 REWORK_REQUIRED remains; new current candidate0 and C/C3/APPROVAL/USER_GAME no new PASS, UNTESTED. localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_Q098_CONTROLLER_SOURCE_RECONCILIATION.json. RUN_KEY=OUTRUN-KOR-C345-C2-Q098-INDEPENDENT-CANONICAL-DDS-PLATE-20261010-0620",
     "C345 C1 q099 original/CLEAN/current SHA-bound: RAW original effect [514,39,1614,219], readable [514,37,1614,217] resolve C285 49 alpha-fringe coordinate confusion; CLEAN whole alpha0, SOURCE->CLEAN outside 2200 RGB-only both alpha0; SOURCE->FINAL outside RGBA/alpha0. 11 new PNG, HOLD calibration/C3/user-game. RUN_KEY=OUTRUN-KOR-C345-C1-Q099-EXACT-CLEAN-RAW-SCOPE-20261010",
@@ -6865,7 +6866,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 06:22 KST",
+  "updated_at_kst": "2026-10-10 07:07 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14240,5 +14241,41 @@
     "approval": "BLOCKED",
     "runtime_validation": "UNTESTED",
     "new_dds": 0
+  },
+  "a218_q161_c344_three_glpyhs": {
+    "run": "A218",
+    "run_key": "OUTRUN-KOR-A218-Q161-C344-THREE-PERSISTED-GLYPH-REPAIR-20261010-0700",
+    "role": "A",
+    "queue_index": 161,
+    "worker_run_id": 37997128618,
+    "source_SHA256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "current_official_SHA256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "new_trial_SHA256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+    "trial_bytes": 4194432,
+    "modified_existing_official_DDS": false,
+    "targets": [
+      11,
+      16,
+      24
+    ],
+    "other_35_blocks_preserved": true,
+    "changed_outside_original_regions_rgba": 0,
+    "alpha_extra_or_missing": 0,
+    "core_pinhole_pixels": 0,
+    "core_color_mismatch_pixels": 0,
+    "native_FLIPY_RAW": true,
+    "controller": "PRODUCER_SCOPED_VISUAL_PASS_NEW_TRIAL_ONLY",
+    "independent_C1": "C344_OLD_SHA_REWORK_CURRENT; FRESH_C1_NEW_SHA_REQUIRED",
+    "C3": "BLOCKED",
+    "user_ingame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "remainder": [
+      "font_sha_and_recipe_pin",
+      "full_current_policy_pixel_guard_final_manifest",
+      "independent_C1_new_SHA_full_38",
+      "C3",
+      "actual_game"
+    ],
+    "evidence": "localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_CONTROLLER_PRODUCER_QA.json"
   }
 }
