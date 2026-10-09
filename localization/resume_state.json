@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "A214 q227 P1 13 previously uncovered C320 cells exact-SHA-native-PNG/RAW source CLEAN persisted DDS worker GitHub Actions 37963658586 still IN_PROGRESS at 2026-10-10 02:14 KST, no result output yet. DO NOT RESTART OR CLAIM PASS; existing candidate 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 preserved, NEW DDS=0, new evidence presently 0 verified. Inspect existing job/result first. C320 C1 HOLD; IGR034/035/036 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200",
+    "A214 q227 P1 GitHub Actions 37963658586 rerun job 113937285379 SUCCESS, 13 previously uncovered C320 cells SOURCE/CLEAN/FINAL native RGBA, BGW 100/75/50, RAW new evidence published and direct producer visual 13/13 inspected. All 16 original cells machine-checked zero English alpha ghosts, changed outside source original text union RGBA/alpha zero, native persisted exact SHA 83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595 UNCHANGED, NEW DDS=0. A producer scoped evidence only; C320 C1 HOLD, blinded per-stroke style, full C3 and new IGR034/035/036 user in-game retest pending, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_CONTROLLER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-A214-Q227-C320-13CELL-LOSSLESS-EVIDENCE-20261010-0200.",
     "C336 C2 q154 B298 SHA c4d6c151... independent saved DDS five red current ROI exact pixel match C292 native lossless 5/5 FLIPY 0 diffs; first red protected separator 7860 original-source-identical pixels; 3 grey remain C323 HOLD. Overall HOLD_STRICT_RECHECK, C3/approval/game UNTESTED. QA localization/graphics/role_C/20261010-C336-C2-Q154-CURRENT-RED-IDENTITY/C336_CONTROLLER_QA.json RUN_KEY=OUTRUN-KOR-C336-C2-Q154-B298-FIVE-RED-EXACT-CURRENT-20261010-0150",
     "A213 q121 P0 native SHA-pinned SOURCE/CLEAN/A202 current saved DDS across full 4096x4096 established three title plates alpha0 and no CLEAN→FINAL edits outside those three title rectangles, but SOURCE→FINAL differs 1,934,984px outside those boxes because many other pre-existing UI strings legitimately localized. Source old alpha disappeared 982,705 and Korean new alpha appeared 537,912: NOT standalone protected artwork loss. Need full atlas localized edit union and independent C335 first-hand blind source-lean/protected-art calibration; no new DDS, IGR030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. OUTRUN-KOR-A213-Q121-P0-ATLAS-SOURCE-DIFF-ATTRIBUTION-20261010-0115",
     "B338 B q214 explicit hand drawn 출발/골 native vector BC3 trial b7c0dd8b9f8c4e62cb3b9e2fce88c3d44eb7c2e43d8dae9c3f7bfef84690facd only; saved DDS machine +0 outside PASS but controller GOAL stacked-horizontal pale bars SOURCE family FAIL; existing candidate ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 preserved, promoted 0, C2 REWORK. Next change BC3 per-block alpha+vertical stroke/counter topology, not another Noto/palette resize. QA localization/graphics/role_B/20261010-B338-Q214-MANUAL-JAMO-VECTOR-PILOT/B338_CONTROLLER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B338-Q214-MANUAL-HANGUL-PATH-SOURCE-BC3-PILOT-20261010-0040 RUNTIME_VALIDATION=UNTESTED.",
@@ -13921,18 +13921,18 @@
     "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
     "unchanged_candidate_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
     "new_promoted_dds": 0,
-    "verified_native_new_regions": 0,
+    "verified_native_new_regions": 13,
     "expected_regions_if_worker_succeeds": 13,
     "old_C320_verified_regions": 3,
     "worker_actions_run": 37963658586,
-    "worker_status": "IN_PROGRESS_AS_OF_2026-10-10_0214_KST",
-    "producer_evidence_status": "COMPUTE_PENDING_NO_REPORT_DO_NOT_CLAIM_PASS",
+    "worker_status": "SUCCESS_RERUN_JOB_113937285379_AFTER_INFRA_SETUP_FAILURE",
+    "producer_evidence_status": "A_PRODUCER_SCOPED_13_REGION_LOSSLESS_EVIDENCE_COMPLETE_C1_HOLD",
     "pending_file": "localization/graphics/role_A/20261010-A214-Q227-C320-13-CELL-EVIDENCE/A214_DISPATCH_PENDING.json",
     "C1": "C320_HOLD_STRICT_RECHECK",
     "C3": "BLOCKED",
     "user_game": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
-    "next": "Check exact result A214_EVIDENCE_REPORT.json or A214_EXECUTION_HOLD.json from existing Actions 37963658586 before any rerun; if report published inspect lossless cells and reconcile controller QA."
+    "next": "A214 successfully published proof. Do not rerun. C1 reverify exact q227 DDS and source/CLEAN/final all 16 native plus 1px margins and blind font calibration before C PASS. IGR034/035/036 still open."
   }
 
 }
