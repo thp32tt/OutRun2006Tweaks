@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 10:15 KST",
+  "updated_at_kst": "2026-10-09 10:36 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8973,5 +8973,46 @@
     "qa": "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "GITHUB_ACTIONS",
     "workflow_run_id": 37868593802
+  },
+  "c325_c2_q212_ten_preserved_lowres": {
+    "time_kst": "2026-10-09 10:36 KST",
+    "run_key": "OUTRUN-KOR-C325-C2-Q212-TEN-PRESERVED-LOWRES-20261009-1020",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "current_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+    "triage_at_selection": "EVIDENCE_ONLY_HOLD",
+    "current_independent_visual": "REWORK_REQUIRED",
+    "confirmed_visual_defect_ids": [
+      25,
+      26,
+      27,
+      30,
+      43,
+      44,
+      53
+    ],
+    "source_bboxes_full_12": "PASS",
+    "clean_alpha_12": "ZERO",
+    "outside_allowed_source_clean_source_current_clean_current": "0_0_0_RGBA",
+    "fresh_native_50_raw_png": 30,
+    "prior_C321_scoped_preserved": [
+      15,
+      28
+    ],
+    "other_scoped_unfailed": [
+      14,
+      16,
+      17
+    ],
+    "IGR029": "OPEN_MAPPING_SUSPECTED",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json"
   }
 }

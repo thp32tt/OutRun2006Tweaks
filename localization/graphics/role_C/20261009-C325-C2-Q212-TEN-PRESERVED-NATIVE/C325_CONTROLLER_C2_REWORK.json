@@ -1,0 +1,264 @@
+{
+  "task_id": "OUTRUN-KOR-C325-C2-Q212-TEN-PRESERVED-LOWRES-20261009-1020",
+  "timestamp_kst": "2026-10-09 10:35 KST",
+  "role": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "shard": "EVEN",
+  "queue_index": 212,
+  "asset": "BA0147DA_512x512.dds",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "candidate_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 Release/BA0147DA DDS exact SHA",
+  "current_git_blob": "cdf9a9690f1f17921141f2d3be209454563420ed",
+  "triage": "EVIDENCE_ONLY_HOLD_BEFORE_PIXEL_FIRST_LOOK",
+  "C": "REWORK_REQUIRED",
+  "reason_codes": [
+    "LOW_RES_UPSCALED_GLYPH_APPEARANCE",
+    "SOURCE_FAMILY_WEIGHT_MISMATCH",
+    "PRACTICAL_SCALE_READABILITY"
+  ],
+  "new_independent_region_count": 10,
+  "prior_C321_pass_scoped_preserved": [
+    15,
+    28
+  ],
+  "fail_regions": [
+    {
+      "id": 25,
+      "english": "SELECT STAR SIGN",
+      "korean": "별자리 선택",
+      "source_bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "candidate_bbox": [
+        4,
+        796,
+        236,
+        852
+      ],
+      "margins": [
+        4,
+        490,
+        8,
+        8
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r25_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r25_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r25_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 26,
+      "english": "SELECT PHOTO",
+      "korean": "사진 선택",
+      "source_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "candidate_bbox": [
+        4,
+        697,
+        192,
+        753
+      ],
+      "margins": [
+        4,
+        374,
+        5,
+        5
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r26_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r26_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r26_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 27,
+      "english": "SELECT NATIONALITY",
+      "korean": "국적 선택",
+      "source_bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "candidate_bbox": [
+        5,
+        609,
+        193,
+        665
+      ],
+      "margins": [
+        4,
+        652,
+        5,
+        5
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r27_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r27_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r27_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 30,
+      "english": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "candidate_bbox": [
+        1084,
+        427,
+        1204,
+        491
+      ],
+      "margins": [
+        4,
+        70,
+        4,
+        5
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r30_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r30_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r30_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 43,
+      "english": "PROFESSIONAL",
+      "korean": "프로",
+      "source_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "candidate_bbox": [
+        522,
+        346,
+        634,
+        398
+      ],
+      "margins": [
+        522,
+        4,
+        5,
+        6
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r43_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r43_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r43_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 44,
+      "english": "OUTRUN",
+      "korean": "아웃런",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "candidate_bbox": [
+        1701,
+        529,
+        1833,
+        581
+      ],
+      "margins": [
+        75,
+        4,
+        5,
+        6
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r44_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r44_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r44_raw.png",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "id": 53,
+      "english": "DONE",
+      "korean": "완료",
+      "source_bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "candidate_bbox": [
+        8,
+        84,
+        60,
+        116
+      ],
+      "margins": [
+        4,
+        78,
+        6,
+        6
+      ],
+      "reason": "Persisted native and 50% alpha-composited source/CLEAN/current comparison: jagged coarse/low-resolution Hangul and markedly weaker source weight/shape than strong native English label; user low-resolution-font regression family. Exact pixel downscale method not established, do not claim verified upscaling pipeline.",
+      "evidence_native": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r53_source_clean_current_100.png",
+      "evidence_practical": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r53_source_clean_current_50.png",
+      "evidence_raw": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r53_raw.png",
+      "decision": "REWORK_REQUIRED"
+    }
+  ],
+  "unfailed_new_scoped_review": [
+    {
+      "region_idx": 14,
+      "evidence": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r14_source_clean_current_100.png",
+      "decision": "SCOPED_NO_CONFIRMED_LOW_RES_FAIL_NOT_FINAL_C_PASS"
+    },
+    {
+      "region_idx": 16,
+      "evidence": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r16_source_clean_current_100.png",
+      "decision": "SCOPED_NO_CONFIRMED_LOW_RES_FAIL_NOT_FINAL_C_PASS"
+    },
+    {
+      "region_idx": 17,
+      "evidence": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/r17_source_clean_current_100.png",
+      "decision": "SCOPED_NO_CONFIRMED_LOW_RES_FAIL_NOT_FINAL_C_PASS"
+    }
+  ],
+  "machine": {
+    "all_12_alpha_bbox_contained": true,
+    "clean_12_region_source_script_alpha_zero": true,
+    "source_to_clean_outside_12_changed_rgba": 0,
+    "source_to_current_outside_12_changed_rgba": 0,
+    "clean_to_current_outside_12_changed_rgba": 0
+  },
+  "new_lossless_images": 30,
+  "inspection": "Visual first-look of all 10 native/50 alpha-composited English/CLEAN/SAVED Korean images; RAW crop generated each. Checked source font-family, relative stroke weight, coarse jagged pixel contours, 50% practicality and one-pixel region containment. No user-marked black rectangle presumed intrinsic.",
+  "rework_request": "B even-owner repair only visual-failed region IDs 25 26 27 30 43 44 53 using exact original English source's native dark/orange/red heavy font-family effect, new source-native Hangul glyph masks and clean plate; do not lowres upscale. Preserve B299 showroom region15 and enter-name region28 byte-exact, leave 14/16/17 unchanged unless independently confirmed future defect. Preserve brand/song/protected artwork, enforce source bbox ceiling, full native/75/50 RAW and masks on saved DDS, independent C2/C3 then user in-game review.",
+  "mapping": "IGR029 screen(179) remains SUSPECTED; do not assert q212 fixes that screenshot or close user report",
+  "C3": "BLOCKED",
+  "approval": false,
+  "game_retest": "UNTESTED",
+  "new_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub SSOT, N100 MCP fallback two 16MiB exact SHA input DDS and narrow ROI proof because GPT local DNS unavailable",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "qa_machine": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_MACHINE_FULL_12.json"
+}

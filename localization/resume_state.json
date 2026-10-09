@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C325 C2 q212: 7 exact native low-res/source-family visual failures region25/26/27/30/43/44/53 from 10 previous-unreviewed. Full 12 source-clean-current mask outside0, source bounds 12 PASS, yet visual outranks. B targeted repair, preserve showroom/name. localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json",
     "B306 q205 fresh heavy block-sans P0 OPTIONS/옵션 RANKINGS/랭킹 new persisted SHA d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70 from source-clean, B native/50/RAW QA scoped PASS. Fresh C1 odd, distinct C3 & newer user actual game retest needed. IGR026/027 OPEN, mixed IGR028 unchanged. localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
     "C324 C1 q205 P0 B303 new style-fail 2/2: B lane reconstruct heavy block sans Korean OPTIONS/RANKINGS, do not repeat pointed NotoSerif CJK. localization/graphics/role_C/20261009-C324-C1-Q205-B303-P0-STYLE-REJECTION/C324_Q205_CONTROLLER_C1_REWORK.json",
     "B305 B-owner IGR-037 q201: new native GOALS -> 목표 DDS d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8 from pinned English/B168 CLEAN; producer native/50/RAW 1 cell QA PASS; 16 unrelated regions exact; fresh C1 and C3, USER_GAME retest remain open. localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_CONTROLLER_SELF_QA_FINAL.json",
@@ -12988,5 +12989,46 @@
     "qa": "localization/graphics/role_B/20261009-B306-Q205-P0-SOURCE-BLOCK-SANS/B306_CONTROLLER_SELF_QA_FINAL.json",
     "backend": "GITHUB_ACTIONS",
     "workflow_run_id": 37868593802
+  },
+  "c325_c2_q212_ten_preserved_lowres": {
+    "time_kst": "2026-10-09 10:36 KST",
+    "run_key": "OUTRUN-KOR-C325-C2-Q212-TEN-PRESERVED-LOWRES-20261009-1020",
+    "role": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "current_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+    "triage_at_selection": "EVIDENCE_ONLY_HOLD",
+    "current_independent_visual": "REWORK_REQUIRED",
+    "confirmed_visual_defect_ids": [
+      25,
+      26,
+      27,
+      30,
+      43,
+      44,
+      53
+    ],
+    "source_bboxes_full_12": "PASS",
+    "clean_alpha_12": "ZERO",
+    "outside_allowed_source_clean_source_current_clean_current": "0_0_0_RGBA",
+    "fresh_native_50_raw_png": 30,
+    "prior_C321_scoped_preserved": [
+      15,
+      28
+    ],
+    "other_scoped_unfailed": [
+      14,
+      16,
+      17
+    ],
+    "IGR029": "OPEN_MAPPING_SUSPECTED",
+    "C": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json"
   }
 }

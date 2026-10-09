@@ -1,0 +1,535 @@
+{
+  "regions": [
+    {
+      "idx": 14,
+      "label": "HEART ATTACK",
+      "korean": "하트 어택",
+      "bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "SOURCE_alpha_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "CURRENT_alpha_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        5,
+        851,
+        2,
+        2
+      ]
+    },
+    {
+      "idx": 15,
+      "label": "SHOWROOM",
+      "korean": "쇼룸",
+      "bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "SOURCE_alpha_bbox": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "CURRENT_alpha_bbox": [
+        18,
+        1152,
+        730,
+        1292
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        1030,
+        4,
+        4
+      ]
+    },
+    {
+      "idx": 16,
+      "label": "COAST 2 COAST",
+      "korean": "코스트 2 코스트",
+      "bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "SOURCE_alpha_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "CURRENT_alpha_bbox": [
+        91,
+        966,
+        1344,
+        1120
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        91,
+        416,
+        2,
+        4
+      ]
+    },
+    {
+      "idx": 17,
+      "label": "OUTRUN",
+      "korean": "아웃런",
+      "bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "SOURCE_alpha_bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "CURRENT_alpha_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        342,
+        4,
+        4
+      ]
+    },
+    {
+      "idx": 25,
+      "label": "SELECT STAR SIGN",
+      "korean": "별자리 선택",
+      "bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "SOURCE_alpha_bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "CURRENT_alpha_bbox": [
+        4,
+        796,
+        236,
+        852
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        490,
+        8,
+        8
+      ]
+    },
+    {
+      "idx": 26,
+      "label": "SELECT PHOTO",
+      "korean": "사진 선택",
+      "bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "SOURCE_alpha_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "CURRENT_alpha_bbox": [
+        4,
+        697,
+        192,
+        753
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        374,
+        5,
+        5
+      ]
+    },
+    {
+      "idx": 27,
+      "label": "SELECT NATIONALITY",
+      "korean": "국적 선택",
+      "bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "SOURCE_alpha_bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "CURRENT_alpha_bbox": [
+        5,
+        609,
+        193,
+        665
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        652,
+        5,
+        5
+      ]
+    },
+    {
+      "idx": 28,
+      "label": "ENTER NAME",
+      "korean": "이름 입력",
+      "bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "SOURCE_alpha_bbox": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "CURRENT_alpha_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        811,
+        4,
+        4
+      ]
+    },
+    {
+      "idx": 30,
+      "label": "DONE",
+      "korean": "완료",
+      "bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "SOURCE_alpha_bbox": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "CURRENT_alpha_bbox": [
+        1084,
+        427,
+        1204,
+        491
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        70,
+        4,
+        5
+      ]
+    },
+    {
+      "idx": 43,
+      "label": "PROFESSIONAL",
+      "korean": "프로",
+      "bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "SOURCE_alpha_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "CURRENT_alpha_bbox": [
+        522,
+        346,
+        634,
+        398
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        522,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "idx": 44,
+      "label": "OUTRUN",
+      "korean": "아웃런",
+      "bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "SOURCE_alpha_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "CURRENT_alpha_bbox": [
+        1701,
+        529,
+        1833,
+        581
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        75,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "idx": 53,
+      "label": "DONE",
+      "korean": "완료",
+      "bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "SOURCE_alpha_bbox": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "CURRENT_alpha_bbox": [
+        8,
+        84,
+        60,
+        116
+      ],
+      "CLEAN_alpha_bbox": null,
+      "margins": [
+        4,
+        78,
+        6,
+        6
+      ]
+    }
+  ],
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "candidate_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "proofs": [
+    {
+      "name": "r14_source_clean_current_100.png",
+      "sha256": "f6fc088c24391ace4b55145abdf7512a1d18f5c92a4cbd76b964a8b57691fe81"
+    },
+    {
+      "name": "r14_source_clean_current_50.png",
+      "sha256": "a63e9533307136a86fa14691510ce89ec5c17871bb4579f208503f43648e5ff4"
+    },
+    {
+      "name": "r14_raw.png",
+      "sha256": "21dd5d2122b049e5e168032d3132ae807a5c4f7c7a49b400e7779ccc5efa42d4"
+    },
+    {
+      "name": "r16_source_clean_current_100.png",
+      "sha256": "005666084f956f1558c6f743d5af823fe5a3181977b591b2d6de219249fcf0ba"
+    },
+    {
+      "name": "r16_source_clean_current_50.png",
+      "sha256": "9b8a43a3b837d6858fd10485e847af33218d9dab0b3e156b368f944552434271"
+    },
+    {
+      "name": "r16_raw.png",
+      "sha256": "cc89206a03a623d5ac55aa29e149b738016fcd0c7f2ddbe6e71aaa6d3cd22460"
+    },
+    {
+      "name": "r17_source_clean_current_100.png",
+      "sha256": "21df175fcef3c29ab2b563e288a5f20c4edd0035b24c1431a3cffceac58a6304"
+    },
+    {
+      "name": "r17_source_clean_current_50.png",
+      "sha256": "9fdf77caf5b3fafd8a648a04e3f56ec938c0b7527ba9db76aaf5a8f594138d8a"
+    },
+    {
+      "name": "r17_raw.png",
+      "sha256": "16e78a27d25d40b366991ab6d75d45de417090a7694726c37aeed17f52edaed3"
+    },
+    {
+      "name": "r25_source_clean_current_100.png",
+      "sha256": "e33fa4d465573d0af7e0c3d8ffed1ff6a14cc41d5923c7caa8331e53a43640e5"
+    },
+    {
+      "name": "r25_source_clean_current_50.png",
+      "sha256": "e0814034652013a0910d7f5e1ccd59079d967d7108af20d543553a5526335d2a"
+    },
+    {
+      "name": "r25_raw.png",
+      "sha256": "32114957a620b8f17eded0b5b56494051f9adf12ecea5ad77681af328b201d7d"
+    },
+    {
+      "name": "r26_source_clean_current_100.png",
+      "sha256": "7c821b8297993147daa1269a5963f12a3d3a5a3883a726c605763aa50b4a469a"
+    },
+    {
+      "name": "r26_source_clean_current_50.png",
+      "sha256": "f18055b19a4171b436b50862202397fa7169e9b4ee684492ec923ec31e2de81b"
+    },
+    {
+      "name": "r26_raw.png",
+      "sha256": "60c8652cc0061776d2e108e156698042effad3de4d24435370176057dbb9f5dc"
+    },
+    {
+      "name": "r27_source_clean_current_100.png",
+      "sha256": "5fbba007d044404745630de52936a5d76c8a0fe1b0143ff501de2f1d512627b9"
+    },
+    {
+      "name": "r27_source_clean_current_50.png",
+      "sha256": "b947868a1a6554c1b847fe311f81c06c0d556e2a31a6da498d3e20db79169921"
+    },
+    {
+      "name": "r27_raw.png",
+      "sha256": "51e875aecb793d364150a6d64afabc13df8df371f8288845b372d1284b35d14e"
+    },
+    {
+      "name": "r30_source_clean_current_100.png",
+      "sha256": "c42f256f328e4db82852f9fed665ee2e7b89c07ea054ac78625cb6d15c30f2ca"
+    },
+    {
+      "name": "r30_source_clean_current_50.png",
+      "sha256": "a406ac796f465d1625e564b7999356cf3e0b728effaa4d5da947df472054e553"
+    },
+    {
+      "name": "r30_raw.png",
+      "sha256": "bb77792da65bd7c57b25413846238d3625004f567b4eea93f967aae89c18dbc2"
+    },
+    {
+      "name": "r43_source_clean_current_100.png",
+      "sha256": "863cd8a49f14c36d7c9c972af418f8af8a9686214f6248262a82bd7e8099c940"
+    },
+    {
+      "name": "r43_source_clean_current_50.png",
+      "sha256": "a755716d15c128e3684b504100a0c4f999d4b0addeb622eeeda92c79c41811dd"
+    },
+    {
+      "name": "r43_raw.png",
+      "sha256": "43f7dcb7f49db551d1a30bc617329f7f37a635eefea50e0ffd34adcbc31a0142"
+    },
+    {
+      "name": "r44_source_clean_current_100.png",
+      "sha256": "c5eca14d0e010e0cbe27cdb426d99fb4a50fb1887280326a57a7c8ed646b8e8f"
+    },
+    {
+      "name": "r44_source_clean_current_50.png",
+      "sha256": "443bf13be14c972c3e31bb39cfcbd47571d1c6885b35ed6db5c3b7362732f2dd"
+    },
+    {
+      "name": "r44_raw.png",
+      "sha256": "9a42a433e26e47dea44268a87aa3141e4e734b34611aa1f7bd537ccf27b8f951"
+    },
+    {
+      "name": "r53_source_clean_current_100.png",
+      "sha256": "f22f058509e7625006063ab5b4fce106bdc5f9445af56ddcb5a671c700114887"
+    },
+    {
+      "name": "r53_source_clean_current_50.png",
+      "sha256": "051e626248283803b412dfbc48b46e572af6eb7a4b969daa92472f7078812d38"
+    },
+    {
+      "name": "r53_raw.png",
+      "sha256": "fc0719e31d39a616e30f45f80561417798fedcea77f9ebb2cf9c06a7b5f58f62"
+    }
+  ],
+  "at_kst": "2026-10-09 10:35 KST",
+  "proof_kind": "Controller-independent decoded canonical SOURCE and saved CURRENT DDS, existing C158 CLEAN plate",
+  "clean_plate_provenance": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png",
+  "comparison_regions": 12,
+  "already_reviewed_c321": [
+    15,
+    28
+  ],
+  "new_reviewed_regions": 10,
+  "global_rgba_pixel_mask_diff": {
+    "source_clean": {
+      "total": 447850,
+      "outside_allowed": 0,
+      "outside_bbox": null
+    },
+    "source_current": {
+      "total": 706896,
+      "outside_allowed": 0,
+      "outside_bbox": null
+    },
+    "clean_current": {
+      "total": 544310,
+      "outside_allowed": 0,
+      "outside_bbox": null
+    }
+  },
+  "source_sha256_independently_verified": true,
+  "candidate_sha256_independently_verified": true,
+  "plate_png_sha256_independently_verified": false,
+  "bbox_source_region_provenance": "C158 independently identified twelve English source boxes",
+  "new_visual_fail_regions": [
+    25,
+    26,
+    27,
+    30,
+    43,
+    44,
+    53
+  ],
+  "scoped_undecided_regions": [
+    14,
+    16,
+    17
+  ],
+  "final_decision": "REWORK_REQUIRED",
+  "eight_gate_note": "Visible low-resolution pixel-quantized Hangul and source-family underweight in seven preserved prior-candidate regions; numeric source-region containment and zero outside cannot override visual fail",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
