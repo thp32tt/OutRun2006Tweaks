@@ -292,7 +292,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertEqual({node.name for node in functions}, wanted)
         ns = {'datetime': datetime, 're': re, 'CONTROLLER_MODE': 'conversion',
               'VR_FORCE_ROLLOVER_SECONDS': 1800, 'VR_CHECKPOINT_BRANCH': 'chat-controller-downloads',
-              '_parse_iso': datetime.fromisoformat}
+              '_parse_iso': lambda stamp: datetime.fromisoformat(stamp) if stamp else None}
         exec(compile(ast.Module(body=functions, type_ignores=[]), '<checkpoint>', 'exec'), ns)
         now = datetime(2026, 10, 9, 19, 30, tzinfo=ZoneInfo('Asia/Seoul'))
         task = {'task_id': 'CONVERSION-DX11-00478', 'branch': 'vr-dx11-native-r71',
