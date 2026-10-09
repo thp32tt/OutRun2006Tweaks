@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-B307-Q212-C325-THREE-SELECT-NATIVE-20261009-1040",
+  "role": "B",
+  "run": "B307",
+  "queue_index": 212,
+  "reason": "C325 independent C2 NEW evidence found seven coarse low-res-looking labels",
+  "priority": "P1",
+  "original_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "previous_candidate_sha256": "efe1750f9cd9d20a147c96fdf20aa729667a93a9982e5d932e645ac2dfc3b089",
+  "new_candidate_sha256": "73e4ba0127c4fce7157da3463062aa165525ca1e43f48b8716a73df13d871914",
+  "ref_c325": "localization/graphics/role_C/20261009-C325-C2-Q212-TEN-PRESERVED-NATIVE/C325_CONTROLLER_C2_REWORK.json",
+  "method": "Source-measured flat dark gray RGBA[63,71,74,255], 2048x2048 native NotoSansCJK-Black for SELECT STAR SIGN/PHOTO/NATIONALITY only, exact C158 verified CLEAN plate, original English source target widths/heights, no previous lowres Hangul raster re-use, no bitmap stretch, no rectangle composition",
+  "new_regions": [
+    {
+      "id": 25,
+      "source": "SELECT STAR SIGN",
+      "korean": "별자리 선택",
+      "source_bbox": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "new_bbox": [
+        5,
+        793,
+        305,
+        855
+      ],
+      "margin": [
+        5,
+        421,
+        5,
+        5
+      ],
+      "font_px": 64
+    },
+    {
+      "id": 26,
+      "source": "SELECT PHOTO",
+      "korean": "사진 선택",
+      "source_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "new_bbox": [
+        5,
+        697,
+        223,
+        753
+      ],
+      "margin": [
+        5,
+        343,
+        5,
+        5
+      ],
+      "font_px": 57
+    },
+    {
+      "id": 27,
+      "source": "SELECT NATIONALITY",
+      "korean": "국적 선택",
+      "source_bbox": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "new_bbox": [
+        6,
+        609,
+        222,
+        665
+      ],
+      "margin": [
+        5,
+        623,
+        5,
+        5
+      ],
+      "font_px": 57
+    }
+  ],
+  "preserved_exact_regions": [
+    14,
+    15,
+    16,
+    17,
+    28,
+    30,
+    43,
+    44,
+    53
+  ],
+  "remaining_C325_REWORK_regions": [
+    30,
+    43,
+    44,
+    53
+  ],
+  "machine_gates": {
+    "source_vs_clean_outside_original_12_regions": 0,
+    "clean_source_text_alpha_selected": 0,
+    "old_vs_new_changed_rgba_outside_three": 0,
+    "old_vs_new_changed_alpha_outside_three": 0,
+    "preserved_other_nine": "PIXEL_EXACT",
+    "native_dimensions": [
+      2048,
+      2048
+    ],
+    "source_header": "EXACT",
+    "saved_dds_decode": "EXACT",
+    "raw_orientation": "mirror_y",
+    "mips": 1,
+    "original_bbox": "3/3_POSITIVE_5PX_OR_GREATER",
+    "new_dds": 1,
+    "lossless_comparison_png": 54
+  },
+  "producer_direct_visual": [
+    {
+      "region": 25,
+      "view": "native100_GRAY SOURCE CLEAN OLD NEW",
+      "result": "SCOPED_PASS",
+      "finding": "Previously pixel stair-stepped low-res-looking gray Hangul; new glyph heavier filled native contours, close to source flat solid weight, no residual English or rectangular trace in inspected crop"
+    },
+    {
+      "region": 26,
+      "view": "50pct_GRAY SOURCE CLEAN OLD NEW",
+      "result": "SCOPED_PASS",
+      "finding": "New glyph remains legible at 50%, visually smoother and heavier than existing candidate; original gray source family retained"
+    },
+    {
+      "region": 27,
+      "view": "RAW75_GRAY SOURCE CLEAN OLD NEW",
+      "result": "SCOPED_PASS",
+      "finding": "Stored texture flip mirrors source and native Korean identically; new heavy glyph shape improved; no observed protected intrusion"
+    }
+  ],
+  "decision": "B_SELF_QA_SCOPED_PASS_PARTIAL_C325_REWORK_REM4",
+  "fresh_independent_C2": "NOT_RUN_FOR_NEW_SHA",
+  "C3": "BLOCKED",
+  "approval": false,
+  "user_ingame_report": "IGR029_MIXED_SOURCE_MAPPING_SUSPECTED_OPEN",
+  "user_game": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "workflow_run_id": 37871305365,
+  "workflow_result": "SUCCESS",
+  "failed_preflight_run": 37871117625,
+  "failed_preflight_reason": "Prior C325 queue status lacked rework_required parser token. Fixed queue status without changing C verdict; reran. One outcome only; no duplicate task score.",
+  "QA_machine": "localization/graphics/role_B/20261009-B307-Q212-C325-THREE-NATIVE-SELECT-HEADINGS/B307_MACHINE_QA.json",
+  "backend": "GITHUB_ACTIONS_FOR_PINNED_DDS_BINARY",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
