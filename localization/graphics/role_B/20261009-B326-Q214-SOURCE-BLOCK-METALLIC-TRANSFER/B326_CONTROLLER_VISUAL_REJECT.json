@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B326",
+  "run_key": "OUTRUN-KOR-B326-Q214-DARK-GOLD-LARGER-TRIAL-20261009",
+  "queue_index": 214,
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "unmodified_main_candidate_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "rejected_prior_trial_sha256": "eb5017ba4bc4919f7a34b26345e6f766c0d5f8f1b26b9aab5a80c83bb16c8b22",
+  "rejected_new_trial_sha256": "e714053ccb51b7722b8c4b1c1de6c244810e3a13c30bc8e7dfa10cb3578a44eb",
+  "construction_change": "B325 57x18/43x18 face material -> B326 native 60x19/51x19 and darker source BC3 donor warm keyline/dark extrusion. This is a trial, not a production promotion.",
+  "source_bbox": {
+    "START": [
+      815,
+      495,
+      899,
+      517
+    ],
+    "GOAL": [
+      1343,
+      764,
+      1417,
+      787
+    ]
+  },
+  "new_bbox": {
+    "START": [
+      828,
+      497,
+      886,
+      516
+    ],
+    "GOAL": [
+      1356,
+      765,
+      1404,
+      784
+    ]
+  },
+  "machine": {
+    "format": "BC3 DXT5",
+    "native": [
+      2048,
+      2048
+    ],
+    "source_vs_saved_outside_rgba": 0,
+    "source_vs_saved_outside_alpha": 0,
+    "old_vs_saved_outside_rgba": 0,
+    "header": "EXACT",
+    "mirror_y": "EXACT",
+    "mips": 1,
+    "bright_core_retention": 1,
+    "source_chromatic_block_transfers": 124,
+    "images": 36
+  },
+  "review": {
+    "direct_views": [
+      "START_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+      "GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B326.png",
+      "GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+      "START_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B326.png",
+      "GOAL_RAW_WHITE_75_SOURCE_CLEAN_OLD_B326.png"
+    ],
+    "native_result": "FAIL: q214 Korean GOAL still visually horizontal pale slab/streak against original engraved metallic italic letterforms. START still lacks continuous source-profile thick cream bevel and native hierarchy; dark palette changed material but not source geometry.",
+    "practical_50_result": "FAIL: Korean GOAL strokes still appear like bright parallel bars with source-relative low comprehension; machine bright-core ratio 1.0 does not validate actual glyph structure or original-style fidelity.",
+    "raw_result": "Matching mirror-Y transform in reviewed source/current crops; not a full in-game render."
+  },
+  "root_cause": "SOURCE_FAMILY_BEVEL_MISMATCH_PERSISTS_AFTER_SOURCE_COLOR_BLOCK_TRANSFER",
+  "visual_overrides_machine": true,
+  "decision": "PRODUCER_VISUAL_FAIL_NOT_PROMOTED",
+  "new_promoted_dds": 0,
+  "recommendation": "MANUAL_VECTOR_PER_GLYPH_SOURCE_SHAPED CREAM/GOLD FACE plus non-strip local contour/depth, BC3-safe glyph-aware geometry; no repeated palette/interpolation/font-width-only trial. Preserve B324 clean plate, original badge, source bbox; then recheck actual saved DDS native + practical + RAW before independent C2/C3.",
+  "worker_run_id": 37904119145,
+  "worker_status": "SUCCESS",
+  "current_C": "C289_REWORK_REQUIRED",
+  "next_C": "REQUIRES_MATERIAL_NEW_GOOD_DDS",
+  "C3": "BLOCKED",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS",
+  "N100_used": "SHORT_WORKFLOW_STATUS_ONLY",
+  "forbidden_domains_touched": []
+}
