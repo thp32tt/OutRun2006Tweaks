@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 17:56 KST",
+  "updated_at_kst": "2026-10-09 18:05 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9159,5 +9159,36 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0,
     "user_report_open": true
+  },
+  "b327r_q098_native_navy_halo": {
+    "role": "B",
+    "queue_index": 98,
+    "asset": "42E618FD_512x32.dds",
+    "run_key": "OUTRUN-KOR-B327R-Q098-NATIVE-VECTOR-NAVY-ALPHA-REBUILD-20261009",
+    "old_sha256": "192d627428dfa4328035d5105dcfbd4395d8bbadfa154a9f533a1c48583eac4b",
+    "candidate_sha256": "472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028",
+    "new_git_blob": "0739969967986f8a0b37d17f2a14038184ccc10b",
+    "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "clean_sha256": "b5c9c07a2490abd055153f750b415193eb84ef14c298b3e3873fd915db3af9e8",
+    "producer_qa": "SCOPED_PASS_PENDING_FRESH_C2",
+    "source_outside_rgba": 0,
+    "source_outside_alpha": 0,
+    "new_promoted_dds": 1,
+    "lossless_contacts": 18,
+    "workflow": 37907615230,
+    "workflow_result": "SUCCESS",
+    "binary_commit": "bbde0b6fd2d456672e2c5eb30d1d39d2ae2d9f77",
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "evidence_approval": false,
+    "user_in_game": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_CONTROLLER_SELF_QA_FINAL.json",
+    "excluded": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
   }
 }
