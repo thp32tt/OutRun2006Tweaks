@@ -1,0 +1,28 @@
+{
+  "checkpoint_schema": 1,
+  "task_id": "CONVERSION-DX11-00490",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "stage": "C2_IMPLEMENT_STAGED",
+  "work_key": "DX11:R188:NATIVE_INDEXED_PS_TEXTURE_SAMPLER_IDENTITY_WARP",
+  "last_verified_target_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "in_flight_blocker": {
+    "task_id": "CONVERSION-DX11-00489",
+    "gate_id": 37966364768,
+    "head_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+    "status": "IN_PROGRESS"
+  },
+  "staged_files": {
+    "src/vr/d3d11/native_indexed_texture_binding.hpp": "d0da7ad8ff36caf7c83d32602c0f0e086d53596d",
+    "tools/dx11_textured_indexed_probe_r188.cpp": "cd829dd2c20caa8438dcb0666171abc9f6399651",
+    "tools/test_dx11_textured_indexed_r188.py": "a795b7f0934ecfe2df9697eb03ffa7292d4f9560",
+    "cmake.toml": "d630bd32aac57e728fd4b0699417b8f7db9660b4",
+    ".github/workflows/backend-conversion-gate.yml": "c1e6d438d08a99569fb79dc5bd863e4394efed53",
+    "docs/automation/runs/CONVERSION-DX11-00490.json": "260ef5bdba9b5790c597a5f957a980aad0bcc5a8"
+  },
+  "material_commit_created": false,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "next_action": "Do not cancel 00489 Gate. Recheck target HEAD, 00489 Gate and work key, rebase staged manifest/workflow on latest HEAD if changed, use target material commit with required marker, exact-SHA Gate then seal C6."
+}
