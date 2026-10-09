@@ -25,6 +25,18 @@ start_vnc
 websockify --web=/usr/share/novnc/ 6080 localhost:5900 >/logs/novnc.log 2>&1 &
 
 start_chrome() {
+  # Never remove singleton locks or cache while an old Chrome still owns
+  # this profile; a concurrent launch would corrupt saved credentials.
+  for _chrome_stop_wait in 1 2 3 4 5; do
+    if ! pgrep -x chrome >/dev/null 2>&1; then
+      break
+    fi
+    sleep 2
+  done
+  if pgrep -x chrome >/dev/null 2>&1; then
+    echo "$(date -Is) Chrome still running; postpone profile reuse" >>/logs/chrome-recycle.log
+    return 0
+  fi
   # Only localization v2 enables this feature. Chrome must be stopped before
   # cache deletion; credentials, profile storage and sessions are never removed.
   if [[ "${CONTROLLER_MODE:-}" == "localization" && "${CHROME_RECYCLE_ENABLED:-false}" == "true" ]]; then
