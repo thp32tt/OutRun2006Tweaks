@@ -16,7 +16,8 @@ def valid(a,b):
         "ResourceRole::Index","ctx->DrawIndexed(3,0,0)",
         "ctx->CopyResource(staging.Get(),color.Get())",
         "center[0]==255","corner[0]==0","ib.shutdown()"))
-assert valid(h,p), "R183 production source or actual WARP GPU proof missing"
+assert valid(h,p) and h.count("currentGeneration != generation_") == 2, (
+    "R183 both generation checks and real WARP GPU proof required")
 for a,b in (
     ("currentGeneration != generation_","false"),
     ("context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE","false"),

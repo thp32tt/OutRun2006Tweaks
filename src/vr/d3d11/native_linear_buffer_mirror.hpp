@@ -3,6 +3,7 @@
 // A successful snapshot never authorizes game-native Draw or future Lock updates.
 #include "resource_translation.hpp"
 #include <cstdint>
+#include <utility>
 #include <wrl/client.h>
 
 namespace outrun::vr::dx11 {
