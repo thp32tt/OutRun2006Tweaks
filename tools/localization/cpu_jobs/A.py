@@ -209,3 +209,132 @@ with tempfile.TemporaryDirectory(prefix="a207_") as tmp:
     }
     (OUT/"recipe.json").write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("A207 PILOT_READY_FOR_CONTROLLER",json.dumps({"trial":report["trial_sha256"],"source_bbox":english,"candidate_bbox":report["candidate_bbox"],"protected_pixels":report["original_protected_nonzero_pixels"],"numeric":metrics},ensure_ascii=False),flush=True)
+
+# A207 phase 2: controller has inspected SOURCE/CLEAN/OLD/NEW black/gray/white
+# at 100 and 50 plus the isolated plate. Promote ONLY this one qualified
+# material pilot, using the exact saved trial and a strict publisher manifest.
+import sys
+import shutil
+from scipy.ndimage import label
+
+BASELINE_GIT_REVISION="fa838e2178959fb3ccf7ac408ba9132139b101aa"
+TRIAL_SHA="bb18e729bbb50914948231ac92ed87be5492768f34ea2ee822d7bf9380b7860e"
+trial=OUT/"A207_Q193_GOAL_A_NATIVE_FLAT_UI_PILOT.dds"
+if hashfile(trial)!=TRIAL_SHA:raise RuntimeError("A207 trial SHA drift at promotion")
+if hashfile(CAND)!=OLD_SHA:raise RuntimeError("A207 existing promoted candidate changed")
+# Anchors are independent alpha-measured corresponding ORIGINAL AND REBUILT
+# Latin 'A' outer *left diagonal* strokes, not an invented numeric slant.
+def latin_a_left_stem_alpha_anchors(rgba,coord):
+    x0,y0,x1,y1=coord
+    source_mask=(rgba[y0:y1,x0:x1,3]>=64)
+    labeled,n=label(source_mask,np.ones((3,3),dtype=int))
+    options=[]
+    for i in range(1,n+1):
+        ys,xs=np.nonzero(labeled==i)
+        if len(xs)<35:continue
+        xx0,xx1=int(xs.min()),int(xs.max()+1)
+        yy0,yy1=int(ys.min()),int(ys.max()+1)
+        if yy1-yy0>=30 and xx1-xx0>=16:
+            options.append((xx1,xx0,xx1,yy0,yy1,i))
+    if not options:raise RuntimeError("No literal A stem to anchor")
+    # Last connected letter is the shared Latin A in Goal A and 골 A.
+    _,cx0,cx1,cy0,cy1,i=max(options)
+    off=max(5,int((cy1-cy0)*.17))
+    upper,lower=cy0+off,cy1-1-off
+    xt=np.flatnonzero(labeled[upper]==i)
+    xb=np.flatnonzero(labeled[lower]==i)
+    if not len(xt) or not len(xb):raise RuntimeError("A diagonal edge not observed")
+    anchor={"top":[x0+int(xt.min()),y0+upper],"bottom":[x0+int(xb.min()),y0+lower]}
+    anchor_bbox=[x0+cx0,y0+cy0,x0+cx1,y0+cy1]
+    return anchor,anchor_bbox
+source_alpha=np.asarray(source)
+final_alpha=np.asarray(persist)
+sa,sbox=latin_a_left_stem_alpha_anchors(source_alpha,english)
+ca,cbox=latin_a_left_stem_alpha_anchors(final_alpha,(gx,gy,gx+glyph.width,gy+glyph.height))
+source_dx=sa["top"][0]-sa["bottom"][0]
+target_dx=ca["top"][0]-ca["bottom"][0]
+if (source_dx>0)-(source_dx<0)!=(target_dx>0)-(target_dx<0):
+    raise RuntimeError(("Measured common Latin A edge slant sign mismatch",sa,ca))
+evidence=Image.new("RGB",(940,245),(106,106,106))
+pen=ImageDraw.Draw(evidence)
+scale=3
+for k,(im,bbox,anchors,title) in enumerate([
+    (source,sbox,sa,"SOURCE LATIN A LEFT LEG"),
+    (persist,cbox,ca,"KOREAN REBUILT LATIN A LEFT LEG")]):
+    ex0,ey0,ex1,ey1=bbox
+    cropped=flatten(im,(106,106,106)).crop((ex0-5,ey0-5,ex1+5,ey1+5))
+    cropped=cropped.resize((cropped.width*scale,cropped.height*scale),Image.Resampling.NEAREST)
+    dst=(k*470+10,30)
+    evidence.paste(cropped,dst)
+    pen.text((dst[0],5),title,fill=(250,250,250))
+    for a,color in [(anchors["top"],(255,230,0)),(anchors["bottom"],(0,250,145))]:
+        sx=dst[0]+(a[0]-ex0+5)*scale
+        sy=dst[1]+(a[1]-ey0+5)*scale
+        pen.ellipse((sx-5,sy-5,sx+5,sy+5),fill=color,outline=(0,0,0))
+    pen.text((dst[0],220),str(anchors),fill=(250,250,250))
+evidence_path=OUT/"A207_SOURCE_AND_KOREAN_LATIN_A_ANCHORS.png"
+evidence.save(evidence_path)
+# Publication manifest uses the raw pinned English DDS, correct prior Git bytes
+# and full-native RAW PNG for clean/letter/masks, no screenshot/JPG substitution.
+target_path=str(CAND.relative_to(R))
+def pathsha(p):
+    return {"path":str(Path(p).relative_to(R)),"sha256":hashfile(p)}
+def masksha(name):
+    return pathsha(OUT/name)
+shutil.copyfile(trial,CAND)
+manifest={
+    "version":"production-pixels-v1-20261009",
+    "coordinates":"native_raw",
+    "stage":"final",
+    "inputs":{
+        "source":pathsha(OUT/"A207_SOURCE_CANONICAL_RGBA32.dds"),
+        "baseline":{"path":target_path,"sha256":OLD_SHA,
+                    "git_revision":BASELINE_GIT_REVISION},
+        "clean":pathsha(OUT/"A207_CLEAN_NATIVE_RAW.png"),
+        "lettering":pathsha(OUT/"A207_LETTER_ONLY_NATIVE_RAW.png"),
+        "candidate":pathsha(CAND)
+    },
+    "masks":{
+        "removal":masksha("A207_MASK_SOURCE_AND_EXISTING_REMOVAL_RAW.png"),
+        "protected":masksha("A207_MASK_SOURCE_PROTECTED_RAW.png"),
+        "edit":masksha("A207_MASK_SOURCE_BOUNDED_EDIT_RAW.png"),
+        "transparent":masksha("A207_MASK_TRANSPARENT_PLATE_RAW.png"),
+        "restore":masksha("A207_MASK_NONE_RAW.png"),
+        "effect":masksha("A207_MASK_NEW_GLYPH_EFFECT_RAW.png")
+    },
+    "regions":[{
+       "id":"Goal A / 골 A, shared actual Latin A outer left edge",
+       "source_anchors":sa,
+       "candidate_anchors":ca,
+       "anchor_evidence":pathsha(evidence_path)
+    }]
+}
+manifestdir=R/"localization/graphics/worker_results/production_manifests"
+manifestdir.mkdir(parents=True,exist_ok=True)
+manifestpath=manifestdir/(TRIAL_SHA+".json")
+manifestpath.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+sys.path.insert(0,str(R/"tools/localization"))
+import production_pixel_guard
+guard=production_pixel_guard.verify(R,manifest)
+(OUT/"A207_FINAL_MANIFEST_MECHANICAL_REPORT.json").write_text(json.dumps(guard,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+if guard["result"]!="MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED" or guard["errors"]:
+    raise RuntimeError(("Production reset pixel guard failed, abort publication",guard))
+recipe=json.loads((OUT/"recipe.json").read_text(encoding="utf8"))
+recipe["font"]["glyph_coverage"]="native full Hangul syllable glyph visible at source height; OFL exact font blob pinned"
+recipe["renderer_code_sha256"]=hashfile(Path(__file__))
+recipe["source_actual_slope_anchor"]=sa
+recipe["candidate_actual_slope_anchor"]=ca
+recipe["anchor_evidence"]=str(evidence_path.relative_to(R))
+recipe["state"]="FAMILY_PILOT_SCOPED_PRODUCER_PASS_PENDING_C1_METHOD_QUALIFICATION"
+(OUT/"recipe.json").write_text(json.dumps(recipe,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+report["status"]="A207_NEW_PROMOTED_GOAL_A_SOURCE_PROTECTED_SCOPED_PRODUCER_PASS_PENDING_FRESH_C1"
+report["promoted_candidate"]=1
+report["baseline_git_revision"]=BASELINE_GIT_REVISION
+report["anchor_source"]=sa
+report["anchor_candidate"]=ca
+report["source_dx"]=source_dx
+report["candidate_dx"]=target_dx
+report["production_pixel_guard"]=guard
+report["final_manifest"]=str(manifestpath.relative_to(R))
+(OUT/"A207_PILOT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+print("A207 PRODUCTION_PIXEL_GUARD_GOAL_A",json.dumps({"candidate":TRIAL_SHA,"source_anchor":sa,"new_anchor":ca,"guard":guard["result"],"counts":guard["counts"]},ensure_ascii=False),flush=True)
