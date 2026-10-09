@@ -1,0 +1,50 @@
+{
+  "role": "A",
+  "run": "A209",
+  "queue_index": 175,
+  "priority": "P1",
+  "regression": "IGR-032",
+  "status": "MANUAL_VECTOR_METHOD_PILOT_TRIAL_ONLY_PENDING_CONTROLLER_VISUAL",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "prior_promoted_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "new_trial_sha256": "d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7",
+  "new_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "source_bbox": [
+    6,
+    397,
+    956,
+    529
+  ],
+  "trial_bbox": [
+    51,
+    402,
+    508,
+    525
+  ],
+  "source_size": [
+    950,
+    132
+  ],
+  "trial_size": [
+    457,
+    123
+  ],
+  "recipe": "Hand-authored rounded Hangul stroke skeleton 쇼룸 (no Orbit/generic Noto); source English row chromatic chrome + bevel + in-cell shadow, custom rail joins, no raster text resize",
+  "construction": "SOURCE→clean copied from pinned A188→source-derived custom vector layer→DDS encode/decode→source/protected exact scope, BGW 100/75/50, RAW",
+  "machine": {
+    "previous_vs_trial_changed_outside_showroom": 0,
+    "previous_vs_trial_alpha_changed_outside_showroom": 0,
+    "source_vs_trial_change_in_untouched_headers": 0,
+    "source_derived_plate_alpha_in_showroom": 0,
+    "clean_vs_trial_changed_outside_glyph_and_depth": 0,
+    "source_vs_plate_protected_outside_region_not_a_global_test": 247717
+  },
+  "source_alpha_cleared_in_full_sprite": true,
+  "independent_C1": "BLOCKED_UNTIL_PRODUCER_VISUAL",
+  "C3": "BLOCKED",
+  "other_titles": "PRESERVED_EXACT_PRIOR_DDS_PIXELS_NOT_REPAIRED",
+  "runtime_validation": "UNTESTED",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "consumer_first_unproven_link": "trial->production promotion (not done); preview/game load untested"
+}
