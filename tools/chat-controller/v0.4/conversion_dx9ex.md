@@ -10,3 +10,7 @@ DX9Ex는 긴급 크래시 유지보수 전용이 아니다. Quest 3/VDXR 실제 
 Quest 3 실기 확인이 필요한 결함은 해당 런타임 검증 또는 보호 기준 승격만 NEED_HMD_TEST/BLOCKED_RUNTIME으로 보류한다. 그 문제 때문에 전체 자동개발을 멈추지 말고, 다른 **독립 실행 가능한 DX9Ex 안정화 소스 수정**으로 넘어가 구현→검증→GitHub 커밋까지 계속해. 빌드/CI PASS를 화면 정상 동작으로 표현하지 않고 RUNTIME_VALIDATION=UNTESTED를 유지한다.
 
 GitHub의 연결된 작업자 claim/lease와 동시 AI work_key 충돌을 확인하고 다른 작업의 소스·상태·TASK_ID를 중복 쓰지 않는다. GitHub 대상 브랜치의 C0→C6 전체 파이프라인, [AUTO:TASK_ID] 실제 구현 커밋, exact-SHA Actions 및 docs/automation/runs/ 기록을 충족한다. 성공한 동일 작업을 retry/rollover 시 재실행하지 않는다. 이번 변경은 **동시 작업 수 유지 + 각 작업의 개발 방향 변경**이며 DX9Ex를 중단하거나 DXVK를 재활성화하는 것이 아니다.
+
+
+[VR 체크포인트 정책]
+작업 중 5분 간격으로 실제로 완성된 소스·테스트 및 docs/automation/runs/ 진행 기록을 대상 브랜치 GitHub에 저장한다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
