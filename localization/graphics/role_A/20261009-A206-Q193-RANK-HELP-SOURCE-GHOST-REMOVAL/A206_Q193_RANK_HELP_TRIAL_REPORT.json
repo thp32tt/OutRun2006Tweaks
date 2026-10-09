@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261009-A206-Q193-RANK-HELP-SOURCE-GHOST-REMOVAL",
+  "index": 193,
+  "status": "TRIAL_PENDING_CONTROLLER_VISUAL_NOT_PROMOTED",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "before_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+  "trial_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+  "source_provenance": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "font_blob_sha1": "b5b67bf293310a3648468a21ac829d6f2d58b2d5",
+  "native_dims": [
+    2048,
+    1024
+  ],
+  "source_dds_masks": [
+    255,
+    65280,
+    16711680,
+    4278190080
+  ],
+  "mips": 1,
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "key": "online_rank_help",
+      "source": "View the online multiplayer rankings!",
+      "ko": "온라인 멀티플레이어 랭킹 보기!",
+      "cell": [
+        0,
+        372,
+        1160,
+        465
+      ],
+      "source_glyph_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "source_rgb_median": [
+        63,
+        71,
+        74
+      ],
+      "english_height": 66,
+      "english_width": 1130,
+      "font_size": 63,
+      "new_bbox": [
+        9,
+        386,
+        824,
+        448
+      ],
+      "new_size": [
+        815,
+        62
+      ],
+      "actual_source_bbox_size": [
+        1130,
+        66
+      ],
+      "margin_original_bbox": [
+        2,
+        313,
+        2,
+        2
+      ],
+      "source_width_coverage": 0.7212,
+      "native_font": "NotoSansCJKkr-Black"
+    },
+    {
+      "key": "outrun2sp_rank_help",
+      "source": "View OutRun2SP arcade rankings!",
+      "ko": "OutRun2SP 아케이드 랭킹 보기!",
+      "cell": [
+        0,
+        534,
+        1105,
+        633
+      ],
+      "source_glyph_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "source_rgb_median": [
+        63,
+        71,
+        74
+      ],
+      "english_height": 66,
+      "english_width": 1052,
+      "font_size": 63,
+      "new_bbox": [
+        9,
+        546,
+        901,
+        608
+      ],
+      "new_size": [
+        892,
+        62
+      ],
+      "actual_source_bbox_size": [
+        1052,
+        66
+      ],
+      "margin_original_bbox": [
+        2,
+        158,
+        2,
+        2
+      ],
+      "source_width_coverage": 0.8479,
+      "native_font": "NotoSansCJKkr-Black"
+    },
+    {
+      "key": "outrun_rank_help",
+      "source": "View OutRun single player rankings!",
+      "ko": "OutRun 싱글 플레이 랭킹 보기!",
+      "cell": [
+        0,
+        694,
+        1120,
+        792
+      ],
+      "source_glyph_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "source_rgb_median": [
+        63,
+        71,
+        74
+      ],
+      "english_height": 66,
+      "english_width": 1069,
+      "font_size": 63,
+      "new_bbox": [
+        9,
+        706,
+        851,
+        768
+      ],
+      "new_size": [
+        842,
+        62
+      ],
+      "actual_source_bbox_size": [
+        1069,
+        66
+      ],
+      "margin_original_bbox": [
+        2,
+        225,
+        2,
+        2
+      ],
+      "source_width_coverage": 0.7877,
+      "native_font": "NotoSansCJKkr-Black"
+    }
+  ],
+  "qa_numeric": {
+    "old_to_clean_changed_outside_source_cells": 0,
+    "old_to_final_changed_outside_source_cells": 0,
+    "old_to_final_alpha_changed_outside_source_cells": 0,
+    "clean_to_final_changed_outside_new_Hangul": 0,
+    "protected_source_sprites_changed": 0,
+    "plate_alpha_nonzero_in_3_source_cells": 0
+  },
+  "scope": "3 leftover rank/help English-source ghost overlapped legacy Korean",
+  "source_plate_clean": "transparent alpha 0, before Korean insertion",
+  "saved_dds_roundtrip": true,
+  "new_dds_trial": 1,
+  "candidate_promoted": 0,
+  "consumer_screen_family": [
+    "Multiplayer ranking help",
+    "OutRun2SP arcade ranking help",
+    "OutRun single-player rankings help"
+  ],
+  "first_unproven_consumer_link": "exact persisted candidate not yet entered reviewed patch manifest/build -> actual game load/texture sampling/composited screens",
+  "runtime_validation": "UNTESTED"
+}
