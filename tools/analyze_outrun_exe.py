@@ -81,10 +81,16 @@ PRODUCER_WINDOWS = (
         "name": "OutRunStageExtensionAnimation_0x98800",
         "start_rva": 0x00098800,
         "end_rva": 0x00098F00,
-        "anchors": (0x0009898E, 0x00098A36, 0x00098AC6),
+        "anchors": (
+            0x0009898E, 0x000989AD, 0x00098A10,
+            0x00098A36, 0x00098A89, 0x00098AC6,
+        ),
         "expected_direct_targets": {
             0x0009898E: 0x00029530,
+            0x000989AD: 0x000973C0,
+            0x00098A10: 0x000974E0,
             0x00098A36: 0x00029530,
+            0x00098A89: 0x000973C0,
             0x00098AC6: 0x00029530,
         },
     },
