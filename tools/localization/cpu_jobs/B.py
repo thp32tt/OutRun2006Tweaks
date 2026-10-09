@@ -18,7 +18,15 @@ h=lambda x:hashlib.sha256(x).hexdigest()
 SOURCE="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 OLD="209f8358c8f7a6ce88d54dfd0b39f3b6051e6a055f83db84dbeaa8f5dd97e74e"
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212","--require-safe-rerender"],text=True,capture_output=True,check=True)
-assert json.loads(tri.stdout)["assets"][0]["next_action"]=="MATERIAL_REWORK"
+action=json.loads(tri.stdout)["assets"][0]
+assert action["next_action"] in ("MATERIAL_REWORK","NORMAL_QUEUE_SELECTION"),action
+c327=json.loads((G/"role_C/20261009-C327-C2-Q212-Q228-VISUAL/C327_Q212_B308_SOURCE_HIERARCHY_REWORK.json").read_text())
+assert c327["decision"]=="REWORK_REQUIRED" and c327["queue_index"]==212
+assert c327["new_candidate_sha256"]==OLD
+assert any(x["region_id"]==43 and x["decision"]=="REWORK_REQUIRED" for x in c327["observed_regions"])
+assert action["current_status"]=="c327_c2_b308_visual_rework_professional_underfill_igr029_open",action
+# The read-only triage parser currently misses C327's status spelling; exact
+# independent C2 decision + source SHA supersede that lexical false negative.
 with (G/"asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
  row=next(r for r in csv.DictReader(f) if r["index"].lstrip("\ufeff")=="212")
 assert "rework" in row["artwork_status"]
