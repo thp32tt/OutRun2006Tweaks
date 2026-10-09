@@ -138,7 +138,7 @@
   },
   "runtime_blocker": "R172 generated DIFFUSE/COLOR0 WARP produced [128,0,16,255] rather than [224,128,32,255]; task 00477 BLOCKED after bounded negative exact-SHA gates; native gameplay Draw dormant.",
   "runtime_next_action": "Quest3/VDXR actual gameplay input/stereo/HUD/frame pacing and exact native DX11 visual proof required before runtime promotion.",
-  "independent_static_next_action": "Open a distinct independent task to inspect VS/PS DXBC signatures and live IA/OM/vertex COLOR0 bytes vs PS interpolation (or add a controlled passthrough PS). Do not retry the same R172 TEXCOORD8 substitution or enable gameplay Draw; preserve frozen DXVK and protected DX9Ex.",
+  "independent_static_next_action": "Read run 37927656851 exact-SHA Windows validate and DX11 smoke, classify R175 TEXCOORD6 BGRA separately from R174 COLOR0; preserve negative evidence, do not promote native renderer.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -4553,5 +4553,63 @@
     "new_gate_required": false,
     "runtime_validation": "UNTESTED",
     "reason": "QUEUE_CONTROLLER_CONTRACT requires exact-SHA fallback before accepting missing-run failure. The canonical successful Gate exists, so E004 only reconciles controller state and preserves the already validated R283 result."
+  },
+  "active_chat_direct_continuation": {
+    "task_id": "CONVERSION-DX11-00477",
+    "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
+    "status": "RUNNING_CI",
+    "checkpoint": "C3_VALIDATE",
+    "latest_material_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
+    "latest_exact_sha_gate_id": 37927656851,
+    "previous_gate": {
+      "id": 37926530851,
+      "validate": "SUCCESS",
+      "dx11_smoke": "FAIL",
+      "direct_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "generated_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "constant_vs_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "solid_ps_bgra": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "expected_color_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "root_cause_status": "UNRESOLVED_VS_PS_VARYING_COLOR0_PATH",
+    "active_test": "R175 isolated TEXCOORD6 constant varyings vs R174 COLOR0; no global R92/TEXCOORD8 changes",
+    "changed_paths": [
+      "tools/dx11_constant_buffer_probe.cpp"
+    ],
+    "issue14_comment_ids": [
+      6080155061,
+      6080328398,
+      6080516045
+    ],
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_active": false,
+    "latest_checkpoint_path": "docs/automation/runs/CONVERSION-DX11-00477.json",
+    "last_confirmed_at_kst": "2026-10-09T21:05:00+09:00",
+    "next_action": "Read run 37927656851 exact-SHA Windows validate and DX11 smoke, classify R175 TEXCOORD6 BGRA separately from R174 COLOR0; preserve negative evidence, do not promote native renderer."
   }
 }
