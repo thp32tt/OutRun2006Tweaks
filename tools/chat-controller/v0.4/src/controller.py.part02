@@ -390,7 +390,7 @@ def producer_prompt(active: dict) -> str:
     lines = [f"LANE={active['lane']}", "ASSET_SELECTION=AUTONOMOUS_WITHIN_SHARD", "STATE=SELECTING",
              f"BASE_SHA={active['base_sha']}", f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
              "자산 하나를 지정하지 않는다. 최신 canonical queue와 실제 취득 가능한 원본·증거를 확인하여 작업 대상을 스스로 선택해.",
-             "A는 짝수 index, B는 홀수 index만 담당한다. 완료/PASS와 C QA 대기 후보는 재생산하지 마.",
+             "A는 짝수 index, B는 홀수 index만 담당한다. 완료/PASS와 C1/C2 QA 대기 후보는 재생산하지 마.",
              "아래 목록은 우선순위 참고다. 첫 항목에 고정되지 말고 실제 제작 가능한 대상을 선택해.",
              "CANDIDATE_OPTIONS=" + json.dumps(options, ensure_ascii=False, separators=(",", ":")),
              "GitHub 연결 플러그인으로 최신 HEAD와 기존 증거를 읽어. 첫 경로가 없다는 이유로 연결/권한 없음이나 전체 작업 불가를 선언하지 마.",
@@ -418,8 +418,9 @@ def qa_prompt(active: dict) -> str:
     payload = {"asset_path": item["asset_path"], "candidate_sha": item["candidate_sha"],
                "artifact_sha": item["artifact_sha"], "status": "PASS 또는 REWORK_REQUIRED",
                "evidence_path": "<독립 검증 증거 JSON 경로>", "runtime_validation": "UNTESTED"}
+    qa_lane = item.get("lane") if item.get("lane") in QA_LANES else "C1"
     return "\n".join([
-        "LANE=C", f"ASSET={item['asset_path']}", "STATE=VERIFYING",
+        f"LANE={qa_lane}", f"ASSET={item['asset_path']}", "STATE=VERIFYING",
         f"CANDIDATE_SHA={item['candidate_sha']}", f"ARTIFACT_SHA={item['artifact_sha']}",
         f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
         "GitHub 연결 플러그인을 사용해 이 정확한 후보 커밋의 DDS와 self-QA를 독립 검증해.",
@@ -429,8 +430,8 @@ def qa_prompt(active: dict) -> str:
         json.dumps(payload, ensure_ascii=False),
         "판정은 PASS 또는 REWORK_REQUIRED. 최신 후보가 달라졌다면 오래된 후보로 공용 상태를 덮어쓰지 마.",
         "새 DDS를 만들거나 producer를 대신하지 마. 공용 상태 병합은 최신 HEAD 위에서 수행해.",
-        "commit 메시지는 [AUTO:LOCALIZATION-C]와 자산 경로를 사용해. CI-skip 지시어를 넣지 마.",
-        "최종 출력: LANE=C, ASSET, STATE, RESULT_SHA. 실기 테스트는 UNTESTED.",
+        f"commit 메시지는 [AUTO:LOCALIZATION-{qa_lane}]와 자산 경로를 사용해. CI-skip 지시어를 넣지 마.",
+        f"최종 출력: LANE={qa_lane}, ASSET, STATE, RESULT_SHA. 실기 테스트는 UNTESTED.",
     ]) + "\n\n" + read_prompt("localization_C.md")
 
 
