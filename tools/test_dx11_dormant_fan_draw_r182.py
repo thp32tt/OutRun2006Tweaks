@@ -8,8 +8,10 @@ SOURCE = ROOT / "src/vr/d3d11/triangle_fan_index_buffer.cpp"
 PROBE = ROOT / "tools/dx11_triangle_fan_index_buffer_probe.cpp"
 
 def exact(header: str, source: str, probe: str) -> bool:
+    if "context->DrawIndexed(" in source:
+        return False  # production activation boundary must remain dormant
     return all(mark in header for mark in (
-        "draw_indexed_dormant(", "bindingSnapshotToken",
+        "validate_dormant_draw_indexed(", "bindingSnapshotToken",
         "ID3D11RenderTargetView* expectedColorTarget",
     )) and all(mark in source for mark in (
         "!validate_binding_snapshot(context, bindingSnapshotToken)",
@@ -21,13 +23,14 @@ def exact(header: str, source: str, probe: str) -> bool:
         "targets[0] == expectedColorTarget",
         "!pixelShader || !outputExact",
         "viewportCount != 1",
-        "context->DrawIndexed(index_count_, 0u, baseVertexLocation)",
+        "return true;",
     )) and all(mark in probe for mark in (
         "R182 zero IA token must reject", "R182 missing PS must reject",
         "R182 missing OM target must reject", "R182 missing VB must reject",
         "R182 missing expected RTV must reject",
-        "R182 guarded native DrawIndexed dispatch",
-        "owner.draw_indexed_dormant(",
+        "R182 guarded native DrawIndexed preconditions",
+        "context->DrawIndexed(owner.index_count(), 0, 0)",
+        "owner.validate_dormant_draw_indexed(",
     ))
 
 def main() -> None:
@@ -38,7 +41,7 @@ def main() -> None:
     for old, new in (
         ("!validate_binding_snapshot(context, bindingSnapshotToken)", "false"),
         ("!pixelShader || !outputExact", "!pixelShader"),
-        ("context->DrawIndexed(index_count_, 0u, baseVertexLocation)", "/* no draw */"),
+        ("context->IAGetInputLayout(inputLayout.GetAddressOf())", "/* removed */"),
     ):
         mutant = s.replace(old, new, 1)
         if mutant == s or exact(h, mutant, p):

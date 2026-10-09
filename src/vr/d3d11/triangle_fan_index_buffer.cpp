@@ -320,7 +320,7 @@ bool NativeTriangleFanIndexBuffer::bind(
     return binding_readiness(context).ready;
 }
 
-bool NativeTriangleFanIndexBuffer::draw_indexed_dormant(
+bool NativeTriangleFanIndexBuffer::validate_dormant_draw_indexed(
     ID3D11DeviceContext* context,
     std::uint64_t bindingSnapshotToken,
     ID3D11RenderTargetView* expectedColorTarget,
@@ -364,7 +364,8 @@ bool NativeTriangleFanIndexBuffer::draw_indexed_dormant(
         viewport.Height <= 0.0f)
         return false;
 
-    context->DrawIndexed(index_count_, 0u, baseVertexLocation);
+    // Only a separate, isolated WARP tool may issue DrawIndexed. The
+    // native/game source tree must remain dormant until explicit activation.
     return true;
 }
 
