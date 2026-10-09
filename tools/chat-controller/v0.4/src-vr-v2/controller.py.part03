@@ -2000,6 +2000,24 @@ async def conversion_process_lane(
                             last_action=f"{active['task_id']} gate SUCCESS but task not released: {reason}",
                             queue=q,
                         )
+                    # A durable C6 record may never arrive (e.g. a historical
+                    # task whose exact-SHA CI passed but final record is absent).
+                    # Preserve the evidence as BLOCKED, never mislabel PASS, and
+                    # release this lane after 40 minutes for a fresh task.
+                    started = (_parse_iso(active.get("wait_actions_started_at"))
+                               or _parse_iso(active.get("sent_at")) or now)
+                    if (now - started).total_seconds() >= 2400:
+                        active["failure_context"] = (
+                            "C6 terminal record missing after 40m despite exact-SHA "
+                            f"Gate success: {reason}; lane released for new work"
+                        )
+                        active["automation_validation"] = "FAIL"
+                        active["runtime_validation"] = "UNTESTED"
+                        active["blocked_at"] = now.isoformat()
+                        active["terminal"] = "BLOCKED"
+                        active["phase"] = "DONE"
+                        q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
+                        save_queue_state(q)
                     return
                 active["automation_validation"] = "PASS"
                 active["runtime_validation"] = "UNTESTED"
