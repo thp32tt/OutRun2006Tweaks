@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-KOR-C335-C1-Q121-A202-SCOPED-FIRSTLOOK-20261010-0020",
+  "run": "C335",
+  "role": "C1",
+  "shard": "ODD",
+  "run_at_kst": "2026-10-10 00:20 KST",
+  "backend": "GitHub connector + ChatGPT first-hand image review",
+  "queue_index": 121,
+  "priority": "P0",
+  "selection": {
+    "current_queue_status": "a202_producer_self_qa_pass_pending_fresh_c1_p0_game_open",
+    "triage": "FRESH_C_REVIEW",
+    "prior_c318_candidate_sha_is_superseded": true,
+    "first_review_of_A202_current_sha": true,
+    "other_shard_not_claimed": true
+  },
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_sha256_from_producer_only": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256_from_producer_only": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "prior_candidate_sha256": "4e84afccc41dcb221a9c6eb164f0f82b15c52277647f122555e05e445a3de4d8",
+  "submitted_materials_inspected": [
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_1_select_car_GRAY_100.jpg",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_1_select_car_BLACK_50.jpg",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_RAW_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_READABLE_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_ORIGINAL_BBOX_SCOPE.png",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_COMPOSED_GLYPHS_SCOPE.png",
+    "localization/graphics/role_A/20261009-A202-P0-Q121-CAR-IMPERATIVE-FOOTPRINT/A202_CONTROLLER_SELF_QA_FINAL.json"
+  ],
+  "first_hand_observations": {
+    "car_title": "At producer-presented FLIP-Y gray/native and black/50 images the localized '차량을 선택하세요' is longer than the previous short label; Hangul is readable and appears to lean right like the source. No indisputable clipped glyph or added rectangular background is visible in these limited contacts.",
+    "source_clean_final": "The provided SOURCE|CLEAN|FINAL contact shows a neutral empty middle column. This is a composited JPEG, not separately persisted native-resolution lossless SOURCE and CLEAN pixels, so absence of hidden glyph residue or alpha discontinuities cannot be certified.",
+    "orientation": "The submitted whole-atlas RAW and FLIP-Y views exhibit expected vertical mirror presentation qualitatively; raw persisted candidate bytes, mips and true game consumer orientation were not independently decoded or measured by C335.",
+    "coverage": "Other already-localized atlas cells and any dynamic info/Dino logo overlays were not independently audited. An unchanged-cell producer claim does not certify the multi-screen consumer or prior user regressions.",
+    "calibration": "The reviewer read the A202 producer report before examining the contact images. An independent blind first-look/calibrated control comparison and original English matched-stroke slant anchors have not been performed."
+  },
+  "eight_ordered_visual_gates": {
+    "plate_restoration": "HOLD_NATIVE_SOURCE_CLEAN_DELTA_UNVERIFIED",
+    "source_rightward_slant": "SCOPED_VISUAL_NO_OPPOSITE_SLANT_OBSERVED_ANCHORS_UNVERIFIED",
+    "source_relative_readable_scale": "SCOPED_VISUAL_ACCEPTABLE_AT_SUBMITTED_100_50_NO_FINAL_APPROVAL",
+    "original_family_weight_outline_shadow": "HOLD_FIRSTLOOK_NOT_BLINDED_SOURCE_FAMILY_ANCHORS_UNVERIFIED",
+    "glyph_clipping": "SCOPED_NO_OBVIOUS_CLIP_BUT_NOT_LOSSLESS_NATIVE_ALPHA_CERTIFIED",
+    "protected_art_and_other_cells": "HOLD_PRODUCER_ZERO_ONLY_NOT_INDEPENDENTLY_REDERIVED",
+    "raw_flipY_mips": "SCOPED_JPEG_ORIENTATION_VIEWED_NATIVE_SAVED_MIP_VERIFICATION_MISSING",
+    "instant_readability": "SCOPED_50_PERCENT_CROP_READABLE_GAME_COMPOSITE_UNTESTED"
+  },
+  "quantitative_claims_not_independently_derived": {
+    "original_bbox": [
+      243,
+      947,
+      1156,
+      1111
+    ],
+    "localized_bbox": [
+      287,
+      964,
+      1111,
+      1072
+    ],
+    "reported_margins_left_right_top_bottom": [
+      44,
+      45,
+      17,
+      39
+    ],
+    "reported_noncar_changed_pixels": 0,
+    "reported_source_residue_outside_mask": 0,
+    "reported_native_dds_roundtrip": "PASS_BY_PRODUCER_ONLY"
+  },
+  "hold_reason_codes": [
+    "INDEPENDENT_EXACT_PERSISTED_DDS_DECODE_MISSING",
+    "INDEPENDENT_SOURCE_CLEAN_PLATE_ALPHA_PIXEL_PROOF_MISSING",
+    "BLIND_CALIBRATION_AND_SAME_STROKE_SLANT_SOURCE_FAMILY_MISSING",
+    "ALL_CELLS_AND_CONSUMER_CHAIN_NOT_CERTIFIED"
+  ],
+  "review_decision": "HOLD_STRICT_RECHECK",
+  "independent_C1_pass": false,
+  "C3": "NOT_RUN",
+  "approvals": "NOT_ISSUED",
+  "pre_ingame_export": "EXCLUDED",
+  "promoted_dds": 0,
+  "game_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_reports": {
+    "IGR-030": "OPEN_USER_INGAME_FAIL",
+    "IGR-031": "OPEN_USER_INGAME_FAIL",
+    "IGR-040": "OPEN_USER_INGAME_FAIL"
+  },
+  "next_actions": [
+    "Independently decode exact current SHA-pinned 4096x4096 DDS and original/CLEAN; obtain lossless 100/75/50 black/white/gray and RAW/FLIP-Y with native alpha.",
+    "Verify SOURCE to CLEAN ghost/alpha and CLEAN to FINAL glyph-only scopes; redo all region bbox/protected pixels independent of A202 assertions.",
+    "Perform blind defect-control calibration and matched-stroke source-family slant/weight assessment; certify all atlas cells and shared-screen consumers.",
+    "Only then decide independent C1 PASS or REWORK; new independent C3/evidence approval and user real-game retest remain required."
+  ],
+  "evidence_policy": "This is new scoped C1 first-hand image inspection on A202 bytes, not a valid C PASS, C3, source-native mechanical QA, in-game closure or new DDS."
+}
