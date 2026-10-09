@@ -81,6 +81,11 @@ jobs:
           }
           exit 0
 
+      - name: Verify DX11 transactional native resize R177
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_target_resize.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py

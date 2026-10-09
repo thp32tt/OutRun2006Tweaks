@@ -15279,13 +15279,11 @@ NativeBackend::observe_programmable_shader_source_evidence_chain(
 }
 
 bool NativeBackend::resize(std::uint32_t width, std::uint32_t height) noexcept {
-    if (!device_ || width == 0 || height == 0) return false;
-
-    color_srv_.Reset();
-    color_rtv_.Reset();
-    color_texture_.Reset();
-
-    if (!create_color_target(width, height, config_.color_format)) return false;
+    // R177: failed allocation must not destroy the last usable native target.
+    // The same-device RTV/SRV trio is committed only after all three succeed.
+    if (!ready() || width == 0 || height == 0) return false;
+    if (!create_color_target(width, height, config_.color_format))
+        return false;
     config_.width = width;
     config_.height = height;
     return true;
@@ -15333,17 +15331,28 @@ bool NativeBackend::create_color_target(
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
-    if (FAILED(device_->CreateTexture2D(&desc, nullptr, color_texture_.ReleaseAndGetAddressOf())))
+    // R177: stage the complete same-device target before replacing the
+    // currently published target. A failed RTV or SRV creation releases only
+    // these candidates and preserves the old texture/RTV/SRV/config.
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> candidateTexture;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> candidateRtv;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> candidateSrv;
+    if (FAILED(device_->CreateTexture2D(
+            &desc, nullptr, candidateTexture.GetAddressOf())) ||
+        !candidateTexture)
         return false;
-    if (FAILED(device_->CreateRenderTargetView(color_texture_.Get(), nullptr, color_rtv_.ReleaseAndGetAddressOf()))) {
-        color_texture_.Reset();
+    if (FAILED(device_->CreateRenderTargetView(
+            candidateTexture.Get(), nullptr, candidateRtv.GetAddressOf())) ||
+        !candidateRtv)
         return false;
-    }
-    if (FAILED(device_->CreateShaderResourceView(color_texture_.Get(), nullptr, color_srv_.ReleaseAndGetAddressOf()))) {
-        color_rtv_.Reset();
-        color_texture_.Reset();
+    if (FAILED(device_->CreateShaderResourceView(
+            candidateTexture.Get(), nullptr, candidateSrv.GetAddressOf())) ||
+        !candidateSrv)
         return false;
-    }
+
+    color_srv_ = std::move(candidateSrv);
+    color_rtv_ = std::move(candidateRtv);
+    color_texture_ = std::move(candidateTexture);
     return true;
 }
 
