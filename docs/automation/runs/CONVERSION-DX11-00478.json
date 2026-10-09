@@ -52,7 +52,7 @@
     "C0_RECOVER": "PASS: live GitHub HEAD 02eeb7b4; no 00478 record/commit before this run; 00477 R175 exact-SHA failure gate and prior owner recovered.",
     "C1_REVIEW": "PASS: R175 direct/generated/constant COLOR0 and TEXCOORD6 all returned identical incorrect BGRA; signed linkage is independent discriminator; separate tools/dx11_shader_linkage_probe.cpp selected to avoid 00477 write conflict.",
     "C2_IMPLEMENT": "COMPLETE: new R176 C++ VS/PS DXBC reflection checks (float4, component mask, TEXCOORD6, VS/PS reflection and VS register/PS register observability) plus TEXCOORD7 and uint4 negative controls.",
-    "C3_VALIDATE": "PENDING: Backend Conversion Gate 37931273252 for exact material source 0593e17a; separately verify Run DX11 shader linkage probe step even if unrelated 00477 R175 WARP regression fails whole gate.",
+    "C3_VALIDATE": "PARTIAL: Exact material SHA 0593e17a Backend Conversion Gate 37931273252 Win32 validate job 113822316237 SUCCESS; Windows DX11 readiness smoke job 113824261638 still IN_PROGRESS. R176 linkage step not yet concluded. Full gate not PASS.",
     "C4_COMMIT": "COMPLETE: non-bookkeeping source commit 0593e17afaaa02c5fb8f77a6315c4833185e3e1a with exact [AUTO:CONVERSION-DX11-00478] marker; Issue #14 append-only record 6081050084.",
     "C5_PACKAGE": "NOT_REQUIRED: source-only isolated diagnostic guard; no native Draw activation or deployable Quest3/VDXR build identity advanced.",
     "C6_STATE": "CHECKPOINT_PERSISTED_NONTERMINAL: pending exact-SHA step-level CI evidence, no completion claim or score until validation classified."
@@ -71,9 +71,22 @@
       "ci_run_id": 37931273252,
       "phase": "C3_PENDING",
       "actual_runtime": "UNTESTED"
+    },
+    {
+      "event": "C3_VALIDATE_PARTIAL",
+      "timestamp_kst": "2026-10-09T21:44:00+09:00",
+      "head": "a7b3e76807906df1098fe820093de11d931326b0",
+      "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+      "run_id": 37931273252,
+      "validate_job_id": 113822316237,
+      "validate": "SUCCESS",
+      "smoke_job_id": 113824261638,
+      "smoke": "IN_PROGRESS",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Read R176 shader linkage step and R175 inherited WARP error from the exact source's smoke job logs."
     }
   ],
-  "next_action": "Read exact-SHA Backend Conversion Gate 37931273252 jobs and logs. If shader linkage step PASSES, classify R176 signature positive/negative independently, keep the full gate FAIL for pre-existing R175 WARP until remediated. If R176 fails, repair this independent source path under same TASK_ID. Record C3/C6 final in this run JSON and lane state; do not claim HMD/runtime success. Leave 00477 R173/R175 source untouched.",
+  "next_action": "Await exact-SHA DX11 readiness smoke 113824261638. Check R176 linkage step independently before R175 constant-buffer WARP. Update C3/C6 and classify full gate; maintain runtime UNTESTED.",
   "resume_cursor": "WAIT_R176_EXACT_SHA_LINKAGE_STEP_AND_R175_WARP_GATE",
   "blockers": [
     "Prior 00477 R175 constant-buffer WARP smoke remains reproducibly failing; full Backend Conversion Gate may fail even if new R176 linkage test passes.",
@@ -81,5 +94,9 @@
   ],
   "state_persisted": true,
   "score_change": 0,
-  "score_reason": "New source commit exists but exact-SHA validation is still in progress; no duplicate/early score."
+  "score_reason": "New source commit exists but exact-SHA validation is still in progress; no duplicate/early score.",
+  "validation_job_id": 113822316237,
+  "validation_job_result": "SUCCESS",
+  "readiness_smoke_job_id": 113824261638,
+  "readiness_smoke_result": "IN_PROGRESS"
 }
