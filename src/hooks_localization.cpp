@@ -62,7 +62,7 @@ namespace Settings
         "Localization",
         "KoreanHudLayoutTrace",
         false,
-        "IGR-042 HUD time/heart plus IGR-043 Stage/Rank text diagnostics. Logs bounded text IDs, 
+        "IGR-042 HUD time/heart plus IGR-043 Stage/Rank text diagnostics. Logs bounded text IDs, "
         "stock coordinates, screen-space dimensions and compact keyline eligibility; "
         "does not change rendering, text selection or any DDS. Requires KoreanTextOverlayTest."
     };
