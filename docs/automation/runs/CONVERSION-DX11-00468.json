@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00468",
+  "production_id": "CONVERSION-DX11-00468",
+  "event_id": "CONVERSION-DX11-00468-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00468",
+  "lease_epoch": 1,
+  "work_key": "DX11:R163:OFFSCREEN_INDEXED_GS_HS_DS_STAGE_ISOLATION:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:prepare_fixed_function_indexed_direct_draw_probe:R163",
+    "tools/dx11_constant_buffer_probe.cpp:R163"
+  ],
+  "selected_work_item": "DX11_R163_INDEXED_OFFSCREEN_OPTIONAL_STAGE_ISOLATION",
+  "status": "VALIDATING",
+  "checkpoint": "C3_VALIDATE",
+  "base_sha": "9611da5d3ab2cef2950dd30de032600ea267a4fc",
+  "result_sha": "351ee1d3b19b027566935b9404c51101f6c2af67",
+  "material_result_sha": "351ee1d3b19b027566935b9404c51101f6c2af67",
+  "validation_bearing_sha": "351ee1d3b19b027566935b9404c51101f6c2af67",
+  "validation_bearing_result_sha": "351ee1d3b19b027566935b9404c51101f6c2af67",
+  "automation_validation": "PENDING_EXACT_SHA_WIN32_WARP",
+  "runtime_validation": "UNTESTED",
+  "summary": "R163 isolated WARP indexed DrawIndexed preflight now rejects live GS/HS/DS shader state pollution; WARP probe tests foreign GS injection reject and exact restoration permit. Native in-game Draw remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "implementation_commits": [
+    "9d504e09ab614c0da623c4405e2ffce0d251fdb4",
+    "351ee1d3b19b027566935b9404c51101f6c2af67"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub 9611da5d3ab2cef2950dd30de032600ea267a4fc, 00467 C6 complete, 00468 absent, rollover E002 ATTEMPT 1/3 preserved",
+    "C1_REVIEW": "PASS: current R157/R161/R162 indexed preflight, regression history and optional programmable stage contamination checked",
+    "C2_IMPLEMENT": "PASS: new R163 preflight GS/HS/DS fail closed and WARP GS injection reject/restore regression tests",
+    "C3_VALIDATE": "IN_PROGRESS: Backend Conversion Gate 37867010098 at exact material SHA 351ee1d3b19b027566935b9404c51101f6c2af67, job validate 113616323914",
+    "C4_COMMIT": "PASS: 9d504e09ab614c0da623c4405e2ffce0d251fdb4 and 351ee1d3b19b027566935b9404c51101f6c2af67 both contain [AUTO:CONVERSION-DX11-00468]",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated offscreen regression proof, no deployable candidate, gameplay native Draw dormant",
+    "C6_STATE": "PARTIAL: exact resume cursor persisted while CI runs; must seal terminal C6 after validate and smoke success"
+  },
+  "validation_run_id": 37867010098,
+  "validation_job_id": 113616323914,
+  "issue14_comment_id": 6072023027,
+  "state_persisted": false,
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "resume_cursor": "CHECK_EXACT_SHA_GATE_VALIDATE_AND_DX11_SMOKE_THEN_SEAL_C6",
+  "next_action": "Poll exact SHA GitHub Backend Conversion Gate 37867010098 validate 113616323914 and readiness smoke job; on SUCCESS update durable run + docs/CONVERSION_LANE_STATE.json + Issue14 validation and scoreboard exactly once. Repair failures before completing.",
+  "blockers": [
+    "Quest3/VDXR HMD not tested; game native Draw still unauthorized."
+  ]
+}
