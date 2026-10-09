@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A211",
+  "run_key": "OUTRUN-KOR-A211-Q175-TRUE-GLYPH-SOURCE-CHROME-20261010-0005",
+  "priority": "P1",
+  "queue_index": 175,
+  "ingame_issue": "IGR-032",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "prior_promoted_unchanged_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_sha256": "b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446",
+  "trial_dds_path": "localization/graphics/role_A/20261010-A211-Q175-TRUE-GLYPH-CHROME-PILOT/A211_Q175_SHOWROOM_TRUEGLYPH_CHROME_TRIAL.dds",
+  "trial_dds_created": 1,
+  "promoted_dds_created": 0,
+  "method": {
+    "prior_A204": "OFL Orbit geometric angular Hangul + simple chrome; rejected",
+    "prior_A209_A210": "hand-authored horizontal-rail jamo silhouette and flat/normal chrome; rejected",
+    "A211": "NotoSansCJK-Bold native genuine Korean outline rendered 123ppem with validated glyph coverage, no stretching; source-image row chrome profile and independent edge-normal bevel/shadow; face/depth transparency isolated",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "font_license": "SIL OFL 1.1, package fonts-noto-cjk",
+    "renderer_commit": "f3932a7d3b3d92038949f57cda6dcc724cbac04d"
+  },
+  "native": {
+    "source_bbox": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "source_size": [
+      950,
+      132
+    ],
+    "trial_bbox": [
+      24,
+      406,
+      246,
+      523
+    ],
+    "trial_size": [
+      222,
+      117
+    ],
+    "width_coverage": 0.233684,
+    "source_margin": [
+      18,
+      710,
+      9,
+      6
+    ],
+    "format": "BGRA32 2048x1024 mip1 RAW mirror Y",
+    "persisted_decode": "PASS_EXACT"
+  },
+  "mechanical": {
+    "source_to_clean_plate_alpha_nonzero": 0,
+    "old_to_trial_rgba_changed_outside_showroom": 0,
+    "old_to_trial_alpha_changed_outside_showroom": 0,
+    "clean_to_final_changed_outside_glyph_and_depth": 0,
+    "positive_bounding_margins": true,
+    "protected_other_titles": "UNCHANGED_RELATIVE_TO_PREVIOUS_CANDIDATE",
+    "whole_source_vs_current_protected": "NOT_INDEPENDENTLY_CLEARED"
+  },
+  "controller_visual": {
+    "native_gray_100": "FAIL: original English showroom source has long rounded welded chrome wordmark, prior/A211 ordinary separate Hangul shape is visually smaller and blockier, not same source font",
+    "white_75": "FAIL: source face chrome gradient/metal extrusion visibly richer than A211 silver+black offset",
+    "black_50": "FAIL: Hangul is legible but only 222px width vs original 950px; significant title hierarchy underfill at practical scale",
+    "source_clean": "SCOPED_PASS: original target English source alpha removed in isolated cell; neighboring top arc does not appear as newly introduced opaque patch",
+    "clean_final": "SCOPED_PASS: no introduced rectangle/opaque plate, 0 outside glyph effects",
+    "raw_flip_y": "PERSISTED_SAVED_DDS_MECHANICALLY_PRESENT; RAW image available; gameplay orientation not executed",
+    "glyph_integrity": "PASS: true Noto glyph topology and counters are intact; independent visual source style still FAIL",
+    "source_style": "FAIL: isolated ordinary-bold sans and narrow footprint cannot replace long connected rounded lower-case techno chrome",
+    "source_slant": "HOLD: no matched top/bottom source-to-korean glyph anchor proof",
+    "protected_art": "SCOPED_PASS: unchanged other current title regions; cannot infer full original protected art PASS"
+  },
+  "visual_reason_codes": [
+    "SOURCE_FAMILY_CONTOUR_MISMATCH",
+    "TITLE_VISUAL_HIERARCHY_UNDERFILL",
+    "CHROME_FACE_EXTRUSION_MISMATCH"
+  ],
+  "qa_result": "PRODUCER_VISUAL_FAIL_TRIAL_ONLY_NOT_PROMOTED",
+  "c1": "BLOCKED",
+  "c3": "BLOCKED",
+  "user_approval": "NOT_GRANTED",
+  "actual_game": "IGR-032_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_method": "STOP generic font/flat chrome, hand-rails, scaling/shear retry. To proceed, draw canonical English source-conditioned welded rounded TECH chrome silhouette and local Korean counter topology manually as contours, compare against source at native/50 before creating another full DDS. Independent visual family qualification required.",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37949025173",
+  "evidence_files": [
+    "A211_GRAY_100.jpg",
+    "A211_WHITE_75.jpg",
+    "A211_BLACK_50.jpg",
+    "A211_PLATE_ONLY_READABLE.png",
+    "A211_LETTERING_MASK.png",
+    "A211_PERSISTED_READABLE.png",
+    "A211_PERSISTED_RAW.png"
+  ],
+  "work_scope_exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
