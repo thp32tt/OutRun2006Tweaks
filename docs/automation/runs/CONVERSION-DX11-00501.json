@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00501",
+  "production_id": "CONVERSION-DX11-00501",
+  "event_id": "CONVERSION-DX11-00501-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "863f7fb530cf61bf2441b5e776d1fb21fafe769d",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00501",
+  "lease_epoch": 1,
+  "work_key": "DX11:R201:LINEAR_LIVE_RASTER_CULL_WINDING_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_cull_binding.hpp:R201",
+    "tools/dx11_cull_linear_probe_r201.cpp:R201",
+    "tools/test_dx11_cull_linear_r201.py:R201",
+    "cmake.toml:R201",
+    ".github/workflows/backend-conversion-gate.yml:R201"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R201 new isolated non-indexed native D3D11 Draw raster cull/winding ownership fence and actual WARP real GPU CW/CCW opposite pixel visibility; gameplay native Draw dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_cull_binding.hpp",
+    "tools/dx11_cull_linear_probe_r201.cpp",
+    "tools/test_dx11_cull_linear_r201.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00501.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest authenticated GitHub HEAD 863f7fb530cf61bf2441b5e776d1fb21fafe769d; no 00501 record/checkpoint; 00500 R200 parked upstream R175, independent R175 owned 00477.",
+    "C1_REVIEW": "PASS indexed R194 has live raster cull/front-face proof but non-indexed R185/R199/R200 lacks same cull owner. Select R201 independent non-indexed path, without touching indexed or R175.",
+    "C2_IMPLEMENT": "R201 dedicated C++ native non-indexed exact raster object/device/winding/shape guard, WARP live Draw GPU opposite cull pixels, dedicated CMake target/static four mutants/CI.",
+    "C3_VALIDATE": "one scoped source guard and 4 mutants authored; exact SHA Gate pending",
+    "C4_COMMIT": "material source commit will carry [AUTO:CONVERSION-DX11-00501] without CI-skip; exact validation-bearing result SHA resolved from commit.",
+    "C5_PACKAGE": "NOT_REQUIRED gameplay-native Draw dormant; no HMD promotion",
+    "C6_STATE": "PENDING exact SHA Gate"
+  },
+  "evidence": {
+    "negative_source_mutants": 4,
+    "reference_indexed_r194": "untouched",
+    "unrelated_r175_owner": "CONVERSION-DX11-00477",
+    "expected_warp": "native non-indexed Draw CullBack and FrontCounterClockwise polarity invert triangle pixel visibility"
+  },
+  "resume_cursor": "C3_EXACT_SHA_GATE_PENDING",
+  "next_action": "Read exact SHA Backend Conversion Gate Win32 static/WARP R201 and inherited R175, then seal C6. Quest3/VDXR UNTESTED."
+}

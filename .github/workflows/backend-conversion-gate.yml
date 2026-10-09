@@ -494,6 +494,24 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R193 clipped indexed WARP probe failed: $LASTEXITCODE" }
 
+      # R201: isolated non-indexed native Draw exact raster owner and WARP winding pixels.
+      - name: Verify R201 native linear raster cull ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_cull_linear_r201.py
+
+      - name: Build R201 cull linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_cull_linear_probe_r201
+
+      - name: Run R201 cull linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_linear_probe_r201.exe | Select-Object -First 1
+          if (-not $probe) { throw "R201 linear cull WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R201 linear cull WARP probe failed: $LASTEXITCODE" }
+
       # R194: independent winding/cull polarity on an owned dormant indexed GPU path.
       - name: Verify R194 native raster cull ownership
         if: github.ref_name == 'vr-dx11-native-r71'
