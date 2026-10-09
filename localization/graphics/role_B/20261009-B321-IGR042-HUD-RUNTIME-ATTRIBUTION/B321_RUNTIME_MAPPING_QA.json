@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B321",
+  "run_key": "OUTRUN-KOR-B321-IGR042-RUNTIME-HUD-LAYOUT-PROBE-20261009",
+  "date_kst": "2026-10-09",
+  "priority": "P0",
+  "user_regression": "IGR-042",
+  "screenshot": "스크린샷(197)(1).png",
+  "domain": "RUNTIME_TEXT_WITH_POSSIBLE_DDS_ARTWORK",
+  "mapping": "UNRESOLVED; do not claim baked DDS attribution from translated text strings",
+  "scope": "runtime time/heart Korean draw path only",
+  "changed_paths": [
+    "src/hooks_localization.cpp",
+    "OutRun2006Tweaks.ini"
+  ],
+  "source_blob_before": "954f09987228b5aeb221ea0aa90edb6072f36b5f",
+  "source_blob_after": "8051490a282c8c7a29ee5c656e7b616075e132e7",
+  "source_commit": "c1e591740a892b70c4b5506371480b8d444f561b",
+  "config_commit": "bbb586328bcbed6d4a0ba5124510435038cf5554",
+  "control": "[Localization] KoreanHudLayoutTrace=false by default; requires KoreanTextOverlayTest=true",
+  "trigger": "Explicitly enable for user's game retest; bounded 96 unique runtime translated draws containing 하트 or 시간",
+  "recorded_fields": [
+    "text_id",
+    "stock_logical_xy",
+    "stock_cell_height",
+    "scaleY",
+    "stock_flags",
+    "original_ARGB",
+    "screen_x_y_width_height",
+    "computed_font_px",
+    "compact_keyline_boolean",
+    "korean_text"
+  ],
+  "id_hints_not_mapping": [
+    539,
+    545,
+    547,
+    1094
+  ],
+  "source_execution": "capture in KoreanRuntime::Draw() after stock vertical/left-center-right positioning and before keyline/main glyph compositing",
+  "production_artifact": "one compiled source-level diagnostic path, no DDS and no visual candidate",
+  "new_DDS": 0,
+  "render_pixel_behavior": "UNCHANGED_WHEN_TRACE_ENABLED_OR_DISABLED; logging only",
+  "normal_execution": "DISABLED; zero extra drawing calls",
+  "static_checks": {
+    "diagnostic_opt_in": true,
+    "bounded_distinct_entries": 96,
+    "protected_art": "NO_DDS_CHANGE",
+    "no_background_patch": "NO_DDS_CHANGE",
+    "new_overlay_glyphs": 0,
+    "unstable_runtime_guess": "NONE"
+  },
+  "build": {
+    "Win32_Release_workflow": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37892438103",
+    "Korean_Test_Build_workflow": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37892438028",
+    "status": "IN_PROGRESS_PENDING_LOG_VERIFICATION"
+  },
+  "retest_procedure": [
+    "Set KoreanHudLayoutTrace=true under [Localization], retain KoreanTextOverlayTest=true and [Overlay] Enabled=true",
+    "Run Heart Attack HUD screenshot 197 equivalent; preserve unmarked screenshot at native display size and mod runtime log lines beginning KoreanHudLayoutTrace",
+    "Map runtime text IDs/positions to each on-screen total time, time and heart label, checking the dynamic heart icon/box art separately",
+    "If no matching runtime record appears, inspect exact original HUD DDS/atlas; do not invent runtime or DDS fix",
+    "Only after proving graphics-versus-runtime defect, modify the exact failing source, rerun Win32 build + independent C and newer real-game validation"
+  ],
+  "QA": "STATIC_PROBE_IMPLEMENTED_BUILD_RUNNING",
+  "C1": "NOT_RUN",
+  "C3": "NOT_APPLICABLE_UNTIL_DDS",
+  "actual_game": "NOT_RUN",
+  "IGR042": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
