@@ -1,5 +1,19 @@
 # Korean Localization Automation Contract
 
+## Production reset: qualify the method before multiplying candidates — 2026-10-09
+
+Read and apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md` before A/B production
+and fresh C review. Its stage prerequisites override throughput/same-invocation
+recommendations when they conflict: one unqualified family pilot at a time,
+source-derived CLEAN before lettering, pinned reusable font/effect recipes,
+readable-coordinate slant anchors, and exact persisted-DDS mechanical checks.
+New/changed hd_candidates require a final manifest and
+`production_pixel_guard.py --changed-since BASE_SHA` before publication.
+CPU-worker publication enforces this; direct-push CI detects violations without
+claiming automatic rollback or branch protection. Mechanical PASS is never
+visual/C/C3/game approval. Preserve unchanged candidates and independent lanes.
+
+
 ## External retro-localization skill adoption: consumer-chain and playtest coverage — 2026-10-09
 
 Read and apply `docs/KOREAN_LOCALIZATION_END_TO_END_PLAYTEST_GATE.md` whenever a new/materially revised DDS, font/runtime text, in-game regression, C/C3 review, or user preview build involves an in-game consumer. It requires exact source-to-persisted-byte-to-screen traceability, multi-screen shared-atlas impact checks, explicit untested runtime links, and reproducible user playtest routes. Existing A/B/C/C3 ownership, queue/evidence SSOT, ten-stage visual construction, 1-pixel rules, preview exclusion, and user-only in-game closure remain unchanged. Do not import ROM-console tooling or add new queues.

@@ -1,0 +1,38 @@
+name: Localization Production Guard
+on:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - 'localization/graphics/hd_candidates/**'
+      - 'localization/graphics/worker_results/production_manifests/**'
+      - 'tools/localization/production_pixel_guard.py'
+      - 'tools/localization/test_production_pixel_guard.py'
+      - '.github/workflows/localization-production-guard.yml'
+      - 'docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md'
+permissions:
+  contents: read
+jobs:
+  producer-pixel-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pixel-check dependencies
+        run: python -m pip install Pillow numpy
+      - name: Reject injected defects and recorded C332 protected-art loss
+        run: python -m unittest discover -s tools/localization -p test_production_pixel_guard.py -v
+      - name: Validate only production DDS changed by this push
+        env:
+          BASE_SHA: ${{ github.event.before }}
+        run: python tools/localization/production_pixel_guard.py --changed-since "$BASE_SHA" --report /tmp/production-guard.json
+      - name: Keep the mechanical result separate from visual approval
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-guard-${{ github.sha }}
+          path: /tmp/production-guard.json
+          if-no-files-found: ignore

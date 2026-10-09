@@ -9,6 +9,8 @@ on:
       - 'tools/localization/cpu_jobs/B.py'
       - 'tools/localization/cpu_jobs/C.py'
       - '.github/workflows/localization-cpu-worker.yml'
+      - 'tools/localization/production_pixel_guard.py'
+      - 'tools/localization/test_production_pixel_guard.py'
       - 'tools/localization/qa_evidence_gate.py'
       - 'tools/localization/test_qa_evidence_gate.py'
       - 'tools/localization/make_region_evidence.py'
@@ -44,6 +46,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python -m unittest discover -s tools/localization -p test_qa_evidence_gate.py -v
+
+      - name: Verify production pixel guard regressions
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest discover -s tools/localization -p test_production_pixel_guard.py -v
 
       - name: Select changed role jobs
         id: select
@@ -102,6 +109,18 @@ jobs:
             esac
           done < /tmp/localization_cpu_changed.txt
           test "$bad" -eq 0
+
+      - name: Validate changed producer DDS before publication
+        if: steps.select.outputs.has_jobs == 'true'
+        run: python tools/localization/production_pixel_guard.py --changed-since HEAD --report /tmp/production-pixel-guard.json
+
+      - name: Preserve failed production gate diagnosis
+        if: failure() && steps.select.outputs.has_jobs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-pixel-guard-${{ github.sha }}
+          path: /tmp/production-pixel-guard.json
+          if-no-files-found: ignore
 
       - name: Commit worker outputs
         if: steps.select.outputs.has_jobs == 'true'

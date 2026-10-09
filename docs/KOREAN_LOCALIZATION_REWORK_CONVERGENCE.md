@@ -53,3 +53,11 @@ independent C acceptance, active rework, repeated-cause failures,
 evidence-backed approval, user test-build candidates and true in-game
 acceptance. A `USER_REVIEW_NOT_APPROVED` package enables feedback before
 final export and never upgrades current QA state by itself.
+
+## Production-stage enforcement — 2026-10-09
+
+Apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md`: family-pilot WIP limit,
+pinned recipes, first-failed-stage repair, two same-method trials maximum,
+source-protected versus previous-candidate write checks and producer pixel guard.
+Missing-only evidence must not trigger rerender; new failures must not reset the
+same-method retry history. A family-scoped pilot review is not whole-atlas approval.

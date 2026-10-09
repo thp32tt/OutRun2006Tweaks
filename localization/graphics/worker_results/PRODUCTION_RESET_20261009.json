@@ -1,0 +1,33 @@
+{
+  "TASK_ID": "OUTRUN-KOR-PRODUCTION-RESET-20261009-2123",
+  "branch": "korean-localization-recovery-20260928",
+  "lane": "USER_AUTHORIZED_PRODUCTION_POLICY",
+  "attempt": 1,
+  "base_head": "24ab93b24d134e3a3873fd8e67922fe2072f2dd3",
+  "result_identity": "Git commit containing this report; exact HEAD confirmed after push",
+  "state": "IMPLEMENTED_LOCAL_TESTS_PASSED_PENDING_REMOTE_CI",
+  "changes": [
+    "family pilot and pinned recipe production sequence",
+    "plate/final native-pixel guard",
+    "pre-publication CPU worker check",
+    "direct-push detection CI",
+    "same-method retry limit with durable root-cause history"
+  ],
+  "tests": {
+    "production_guard": 13,
+    "existing_evidence_gate": 21,
+    "existing_rework_triage": 9,
+    "total_passed": 43,
+    "historical_defect": "C332/B331 q060 clean protected-source loss: 8892 pixels detected; historical crop only, not current candidate approval"
+  },
+  "new_dds": 0,
+  "new_C_approvals": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "limitations": [
+    "opaque plate residue and font likeness still require visual inspection",
+    "CI detection after direct push is not rollback or installed branch protection",
+    "already running jobs on older commits do not gain new gates retroactively"
+  ],
+  "next_action": "Verify published exact-SHA CI; next A/B calls read the new contract and create a qualified family pilot/manifest before candidate promotion.",
+  "publication_base_head": "162320cc992c852e20363e22607dcff7a11f958f"
+}
