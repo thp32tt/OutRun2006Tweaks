@@ -34,6 +34,7 @@ on:
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/disasm_outrun_goal_flare_p0.py'
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
@@ -83,6 +84,7 @@ on:
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/disasm_outrun_goal_flare_p0.py'
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
@@ -183,6 +185,14 @@ jobs:
           python tools/analyze_outrun_exe.py
           --exe analysis-input/OR2006C2C.EXE
           --out-dir analysis-output
+
+      - name: Disassemble exact goal-progress, stage-time and lens windows
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check capstone==5.0.6
+          if ($LASTEXITCODE -ne 0) { throw 'Capstone setup failed' }
+          python tools/disasm_outrun_goal_flare_p0.py --exe analysis-input/OR2006C2C.EXE --out-dir analysis-output
+          if ($LASTEXITCODE -ne 0) { throw 'P0 disassembly failed' }
 
       - name: Show analysis summary
         shell: pwsh
