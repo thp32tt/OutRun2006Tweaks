@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT",
+  "run_key": "OUTRUN-KOR-A209-Q175-SHOWROOM-ROUNDED-VECTOR-TRIAL-20261009-2300",
+  "role_lane": "ODD",
+  "queue_index": 175,
+  "priority": "P1",
+  "user_regression": "IGR-032",
+  "decision": "PRODUCER_VISUAL_FAIL_NOT_PROMOTED",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "preserved_current_candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_sha256": "d596d9a6159b386d1c7373577530c8ae1fbf51b4d5cc0e345e07e6cfcc62bff7",
+  "trial_repository_path": "localization/graphics/role_A/20261009-A209-Q175-SHOWROOM-ROUNDED-VECTOR-PILOT/A209_Q175_SHOWROOM_NATIVE_MANUAL_VECTOR_TRIAL.dds",
+  "new_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "persisted_trial_format": "2048x1024 BGRA32 mip1 raw_mirror_y",
+  "worker": {
+    "initial_actions": "37941598540 FAILED_PRE_GUARD",
+    "diagnostic_actions": "37942005968 SUCCESS_PUBLISHED_FIRST_GATE_FAILURE",
+    "corrected_actions": "37942397381 SUCCESS_TRIAL_PUBLISHED",
+    "published_worker_head": "c8e34c2a5d43e2ea17aa0fe654e81bff5ff6dcd8"
+  },
+  "root_cause_initial": "Shadow alpha spilled 169 pixels outside source-bounded showroom cell; caught by old-to-trial exact scope. Repositioned glyph 5px up; corrected persisted DDS now changed/alpha outside 0.",
+  "machine_after_corrected_trial": {
+    "old_to_trial_outside_showroom": 0,
+    "old_to_trial_alpha_outside_showroom": 0,
+    "other_current_titles_modified": 0,
+    "scoped_clean_alpha_residue": 0,
+    "clean_to_trial_outside_glyph_effect": 0,
+    "persisted_BGRA32_roundtrip": "PASS_EXACT_PILOT",
+    "original_to_prior_diff_outside_showroom": 247717,
+    "original_to_prior_diff_note": "Previously translated neighboring titles differ from unmodified English; 247717 does not by itself establish protected art corruption and is NOT a full original-to-final art clearance."
+  },
+  "source_bbox": [
+    6,
+    397,
+    956,
+    529
+  ],
+  "trial_bbox": [
+    51,
+    402,
+    508,
+    525
+  ],
+  "source_size": [
+    950,
+    132
+  ],
+  "trial_size": [
+    457,
+    123
+  ],
+  "source_width_coverage": 0.481,
+  "visual_review": {
+    "source_to_clean": "SCOPED_PASS no English showroom text remains in protected isolated transparent CLEAN plate; neighboring arc remains protected, not declared a plate ghost",
+    "clean_to_trial": "SCOPED_PASS no opaque rectangle or introduced change outside hand-vector/depth mask",
+    "source_family": "FAIL rounded but unlike joined low-wide original English techno chrome; new Hangul looks like smooth flat rails with insufficient source derived beveled depth",
+    "readability": "FAIL at 50 percent 룸 middle/bottom jamo stems collapse into three visually ambiguous horizontal bars; source English remains immediately legible",
+    "typography": "FAIL manual vector strokes lack authentic syllable interior counters; original source joins are not a license to merge Korean jamo anatomy",
+    "hierarchy": "FAIL Korean 457/950 source width; less than half original header occupancy; avoid merely stretching these deformed strokes",
+    "protected_art": "SCOPED_PASS old candidate other two header regions pixel identical, 0 changes outside showroom; canonical full-atlas ORIGINAL->CURRENT protection not independently certified",
+    "orientation": "SCOPED_PASS mechanically persisted RAW_FLIP_Y; reviewed 100/75/50 black-gray-white sheets; no actual game run",
+    "eight_rework_checks": [
+      "P1_ENGLISH_REMOVAL_SCOPED_PASS",
+      "P2_SLANT_ANCHORS_MISSING_HOLD",
+      "P3_LEGIBILITY_AND_HIERARCHY_FAIL",
+      "P4_CHROME_SOURCE_EFFECT_FAIL",
+      "P5_VISUAL_GLYPH_STRUCTURE_FAIL",
+      "P6_PROTECTED_SCOPE_MACHINE_PASS",
+      "P7_PERSISTED_RAW_FLIPY_SCOPED_PASS",
+      "P8_IMMEDIATE_50_PERCENT_READABILITY_FAIL"
+    ]
+  },
+  "evidence": [
+    "A209_SHOWROOM_GRAY_100.jpg",
+    "A209_SHOWROOM_WHITE_75.jpg",
+    "A209_SHOWROOM_BLACK_50.jpg",
+    "A209_TRIAL_PERSISTED_RAW.png",
+    "A209_TRIAL_PERSISTED_READABLE.png",
+    "A209_SHO_ROOM_CUSTOM_VECTOR_MASK.png"
+  ],
+  "method_change_from_A204": "Replaced rejected OFL Orbit angular generic outline and generic shear with custom per-jamo hand-authored rounded strokes plus source-pixel chrome profile; materially distinct but still failed visual style/counter QA. Do not retry same hand skeleton by merely adjusting bbox/shear/width.",
+  "next_method": "MANUAL_RECONSTRUCTION_REQUIRED: source-conditioned per-jamo rounded vector contours with independently checked Hangul counters at actual 50 percent, distinguish inner chrome face/upper highlight/lower extrusion, require all eight producer visual checks BEFORE candidate promotion; try different construction not another size/shear tweak",
+  "independent_C1": "BLOCKED_NO_PRODUCER_PASS",
+  "C3": "BLOCKED",
+  "user_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "output_scope": "TRIAL_NOT_CURRENT_CANDIDATE_NOT_PRE_INGAME_EXPORT",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
