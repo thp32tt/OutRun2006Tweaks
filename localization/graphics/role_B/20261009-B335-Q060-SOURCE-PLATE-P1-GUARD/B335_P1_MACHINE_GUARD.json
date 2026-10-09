@@ -1,0 +1,19 @@
+{
+  "version": "production-pixels-v1-20261009",
+  "stage": "plate",
+  "candidate_sha256": null,
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "counts": {
+    "removal_outside_edit": 0,
+    "removal_over_protected": 0,
+    "restore_outside_protected_edit": 0,
+    "clean_changed_outside_removal_or_restore": 0,
+    "clean_protected_diff_from_source": 0,
+    "transparent_plate_residue": 0,
+    "transparent_outside_removal": 0
+  },
+  "errors": [],
+  "result": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "limitations": "Mask semantics, opaque plate residue, typography, full segment coverage, mip aesthetics and actual game appearance require independent visual review."
+}

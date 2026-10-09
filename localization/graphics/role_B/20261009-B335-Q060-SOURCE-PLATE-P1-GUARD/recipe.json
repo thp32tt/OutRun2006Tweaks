@@ -1,0 +1,102 @@
+{
+  "schema_version": "production-family-recipe-v1",
+  "run_key": "OUTRUN-KOR-B335-Q060-FULL-NATIVE-SOURCE-PLATE-P1-20261009-2310",
+  "family": "gold racing HUD title q060",
+  "source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "revision": "OR2-HD-GUI-v0.25.10a"
+  },
+  "baseline": {
+    "sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+    "git_revision": "e34eab0b1ff22a3cb448bd0e35f8e26e0bd803c8"
+  },
+  "current": {
+    "sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+  },
+  "all_known_cells": [
+    "gold OUTRUN MILES",
+    "orange BEST TIME protected sibling",
+    "Stage kept outside edit",
+    "white Miles kept outside edit",
+    "all remaining current translated atlas cells unchanged"
+  ],
+  "source_text": "OUTRUN MILES",
+  "korean_text": "아웃런 마일:",
+  "protected_original": "orange BEST TIME color-labeled source + 12px contiguous nearby contour; exact 8892 orange alpha pixels; full-native 4096x2048",
+  "native_readable_edit_bbox": [
+    2081,
+    230,
+    2860,
+    370
+  ],
+  "native_readable_original_orange_lower_band_y": 340,
+  "font_recipe": {
+    "family": "NotoSansCJK Bold used by B331/B332R",
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "font_sha256": null,
+    "glyph_coverage": "P2_SOURCE_REVALIDATION_REQUIRED_NOT_CONFIRMED_BY_P1",
+    "native_size_and_hinting": "B332R inherited glyph reduced from 107px to 97px; further use requires P2 family validation",
+    "font_license": "not newly checked by B335; confirm before new render"
+  },
+  "geometry": {
+    "original_bbox": [
+      2081,
+      250,
+      2860,
+      370
+    ],
+    "gold_relocated_bbox": [
+      2133,
+      235,
+      2807,
+      332
+    ],
+    "gold_new_height": 97,
+    "native_readable_right_italic": "B331 +0.65 forward shear; P2 real top/bottom anchors not yet measured",
+    "source_top_bottom_anchors": null,
+    "candidate_top_bottom_anchors": null
+  },
+  "render_effect": {
+    "source_samples": "cream/gold face, navy edge (B331 provenance)",
+    "gradient": "B331 derived; P2 must validate full glyph weight/counter spacing",
+    "outline_shadow": "B331 layered, source style pending C2 qualification"
+  },
+  "masks": {
+    "removal": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_GOLD_REMOVAL_RAW.png",
+      "sha256": "50e12fa7c7f18926611a0b8570995dbd55a7a55d637a879caf0299ab70023168"
+    },
+    "protected": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_ORANGE_PROTECTED_RAW.png",
+      "sha256": "e63ebf4d5e8cba46db153bc21577e520c43d10021675c8b178311539c5c8f941"
+    },
+    "edit": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_BOUNDED_EDIT_RAW.png",
+      "sha256": "5937cd57f30e444fbf5238a71a91215a3ee2c949c363c1df92d3205842c01ca4"
+    },
+    "transparent": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_TRANSPARENT_REMOVAL_RAW.png",
+      "sha256": "50e12fa7c7f18926611a0b8570995dbd55a7a55d637a879caf0299ab70023168"
+    },
+    "restore": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_ORANGE_EXACT_RESTORE_RAW.png",
+      "sha256": "e63ebf4d5e8cba46db153bc21577e520c43d10021675c8b178311539c5c8f941"
+    }
+  },
+  "source_orange_protected_source_derived": true,
+  "intermediate_clean": {
+    "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_CLEAN_PLATE_FULL_NATIVE_RAW.png",
+    "sha256": "eaf4089fc460d648e479023be8e1bc268a6b8feb69406ba07e148f164f222198"
+  },
+  "plate_manifest": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_PLATE_MANIFEST.json",
+  "previous_rejections": [
+    "C326 SOURCE_FAMILY_MISMATCH/ITALIC_UNDERLEAN",
+    "C332 SOURCE_PROTECTED_ART_LOSS"
+  ],
+  "current_quality_gate": "P1 FULL_NATIVE_SOURCE-DERIVED PLATE MACHINE PASS; direct producer visual pending; C334 C2 HOLD unchanged",
+  "P2_status": "BLOCKED_FONT_HASH_AND_SLANT_ANCHOR_VERIFICATION",
+  "P3_status": "NOT_RUN_UNCHANGED_PERSISTED_DDS",
+  "runtime": "UNTESTED"
+}

@@ -1,0 +1,42 @@
+{
+  "version": "production-pixels-v1-20261009",
+  "coordinates": "native_raw",
+  "stage": "plate",
+  "inputs": {
+    "source": {
+      "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+    },
+    "baseline": {
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "sha256": "3480bef0369677d9e0b8d3d7b334d6a261de7bc2539c225a939843325a3e36a2",
+      "git_revision": "e34eab0b1ff22a3cb448bd0e35f8e26e0bd803c8"
+    },
+    "clean": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_P1_CLEAN_PLATE_FULL_NATIVE_RAW.png",
+      "sha256": "eaf4089fc460d648e479023be8e1bc268a6b8feb69406ba07e148f164f222198"
+    }
+  },
+  "masks": {
+    "removal": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_GOLD_REMOVAL_RAW.png",
+      "sha256": "50e12fa7c7f18926611a0b8570995dbd55a7a55d637a879caf0299ab70023168"
+    },
+    "protected": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_ORANGE_PROTECTED_RAW.png",
+      "sha256": "e63ebf4d5e8cba46db153bc21577e520c43d10021675c8b178311539c5c8f941"
+    },
+    "edit": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_BOUNDED_EDIT_RAW.png",
+      "sha256": "5937cd57f30e444fbf5238a71a91215a3ee2c949c363c1df92d3205842c01ca4"
+    },
+    "transparent": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_TRANSPARENT_REMOVAL_RAW.png",
+      "sha256": "50e12fa7c7f18926611a0b8570995dbd55a7a55d637a879caf0299ab70023168"
+    },
+    "restore": {
+      "path": "localization/graphics/role_B/20261009-B335-Q060-SOURCE-PLATE-P1-GUARD/B335_MASK_SOURCE_ORANGE_EXACT_RESTORE_RAW.png",
+      "sha256": "e63ebf4d5e8cba46db153bc21577e520c43d10021675c8b178311539c5c8f941"
+    }
+  }
+}
