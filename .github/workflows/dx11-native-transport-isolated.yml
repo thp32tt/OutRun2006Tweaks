@@ -1,0 +1,62 @@
+name: DX11 Native Transport Isolated WARP
+
+on:
+  push:
+    branches:
+      - vr-dx11-native-r71
+    paths:
+      - src/vr/d3d11/native_shared_eye_ring.cpp
+      - src/vr/d3d11/native_shared_eye_ring.hpp
+      - tools/dx11_native_transport_probe.cpp
+      - tools/verify_dx11_native_transport_contract.py
+      - .github/workflows/dx11-native-transport-isolated.yml
+  workflow_dispatch:
+
+concurrency:
+  group: dx11-native-transport-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  transport-warp:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      # Independent of R175's generated-varying pixel smoke; still fail closed.
+      - name: Verify native transport static contract R178
+        shell: pwsh
+        run: python tools/verify_dx11_native_transport_contract.py
+
+      - name: Configure Win32
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-transport -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-transport/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-transport/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-transport/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-transport/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-transport/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-transport/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-transport/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-transport/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-transport/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build isolated Win32 native transport probe
+        shell: pwsh
+        run: cmake --build build-transport --config Release --target dx11_native_transport_probe
+
+      - name: Execute native transport WARP regression R178
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-transport -Recurse -Filter dx11_native_transport_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 isolated native transport probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 isolated native transport WARP probe failed with exit code $LASTEXITCODE" }
