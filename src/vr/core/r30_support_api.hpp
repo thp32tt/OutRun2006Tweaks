@@ -106,6 +106,12 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;
     // Borrowed R9 right-eye depth surface; identity and lifetime stay lower-owned.
     IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept;
+    // The R9/R22 resource owner and depth-stencil safety predicates keep
+    // their original failure and D3D9 state handling; no eager allocation.
+    bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept;
+    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
+    bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept;
+    bool R30SupportStencilTestActive(IDirect3DDevice9* device) noexcept;
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;

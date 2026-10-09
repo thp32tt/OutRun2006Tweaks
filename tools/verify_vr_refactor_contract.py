@@ -47,6 +47,59 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
+# R84 R32 resource/depth readiness: keep lower allocation, recent-clear depth
+# bootstrap and independent depth/stencil live D3D9 state predicates. A forced
+# success could expose an incomplete right eye; swapped predicates suppress
+# stencil-only validation. Do not mutate per-frame state in this interface.
+def r32_resource_depth_owner_ok(api, lower, upper):
+    services = (
+        ("EnsureStereoResources", "EnsureStereoResources"),
+        ("TryBootstrapRightDepth", "TryBootstrapRightDepthFromRecentClear"),
+        ("DepthTestActive", "DepthTestActive"),
+        ("StencilTestActive", "StencilTestActive"),
+    )
+    for name, original in services:
+        if ("bool R30Support" + name +
+                "(IDirect3DDevice9* device) noexcept;") not in api:
+            return False
+        if not re.search(
+            r"bool R30Support" + name +
+            r"\(IDirect3DDevice9\* device\) noexcept\s*\{\s*return " +
+            original + r"\(device\);\s*\}", lower):
+            return False
+        if ("bool R32Review" + name +
+            "(IDirect3DDevice9* d) noexcept { return R30Support" + name +
+            "(d); }") not in upper:
+            return False
+    return True
+
+if not r32_resource_depth_owner_ok(r30_support_api, r30, r32):
+    errors.append("R32 stereo-resource/depth readiness no longer delegates original lower owners")
+for label, altered_r30, altered_r32 in (
+    ("resource allocation false success", r30.replace(
+        "return EnsureStereoResources(device);", "return true;", 1), r32),
+    ("right-depth bootstrap erased", r30.replace(
+        "return TryBootstrapRightDepthFromRecentClear(device);", "return false;", 1), r32),
+    ("depth test forced off", r30.replace(
+        "return DepthTestActive(device);", "return false;", 1), r32),
+    ("stencil test forced on", r30.replace(
+        "return StencilTestActive(device);", "return true;", 1), r32),
+    ("depth and stencil swapped", r30.replace(
+        "return DepthTestActive(device);", "return StencilTestActive(device);", 1), r32),
+    ("R32 resource bypass", r30, r32.replace(
+        "return R30SupportEnsureStereoResources(d);", "return EnsureStereoResources(d);", 1)),
+    ("R32 bootstrap bypass", r30, r32.replace(
+        "return R30SupportTryBootstrapRightDepth(d);", "return TryBootstrapRightDepthFromRecentClear(d);", 1)),
+    ("R32 depth bypass", r30, r32.replace(
+        "return R30SupportDepthTestActive(d);", "return DepthTestActive(d);", 1)),
+    ("R32 stencil bypass", r30, r32.replace(
+        "return R30SupportStencilTestActive(d);", "return StencilTestActive(d);", 1)),
+):
+    if altered_r30 == r30 and altered_r32 == r32:
+        errors.append("R84 resource/depth readiness mutation was not applied: " + label)
+    elif r32_resource_depth_owner_ok(r30_support_api, altered_r30, altered_r32):
+        errors.append("R84 resource/depth readiness negative mutation survived: " + label)
+
 # R84 R32/R31 compile-ownership follow-up: borrowed right-eye surface reads
 # must stay in the R30/lower owner, not R32's private textual include chain.
 # The API preserves raw pointer identity and lifetime (no AddRef/release).

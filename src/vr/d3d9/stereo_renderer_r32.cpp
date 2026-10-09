@@ -883,10 +883,10 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return R30SupportBorrowedTrackedDepthStencil(); }
     IDirect3DSurface9* R32ReviewRightEyeSurface() noexcept { return R30SupportBorrowedRightEyeSurface(); }
     IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept { return R30SupportBorrowedRightEyeDepth(); }
-    bool R32ReviewEnsureStereoResources(IDirect3DDevice9* d) noexcept { return EnsureStereoResources(d); }
-    bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* d) noexcept { return TryBootstrapRightDepthFromRecentClear(d); }
-    bool R32ReviewDepthTestActive(IDirect3DDevice9* d) noexcept { return DepthTestActive(d); }
-    bool R32ReviewStencilTestActive(IDirect3DDevice9* d) noexcept { return StencilTestActive(d); }
+    bool R32ReviewEnsureStereoResources(IDirect3DDevice9* d) noexcept { return R30SupportEnsureStereoResources(d); }
+    bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* d) noexcept { return R30SupportTryBootstrapRightDepth(d); }
+    bool R32ReviewDepthTestActive(IDirect3DDevice9* d) noexcept { return R30SupportDepthTestActive(d); }
+    bool R32ReviewStencilTestActive(IDirect3DDevice9* d) noexcept { return R30SupportStencilTestActive(d); }
     HRESULT R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return SetRenderTargetHook.stdcall<HRESULT>(d,i,s); }
     HRESULT R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return SetDepthStencilSurfaceHook ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(d,s) : d->SetDepthStencilSurface(s); }
 

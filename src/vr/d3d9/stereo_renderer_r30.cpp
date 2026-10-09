@@ -3496,6 +3496,26 @@ namespace OutRunVRStereo
         return RightEyeDepth;
     }
 
+    bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept
+    {
+        return EnsureStereoResources(device);
+    }
+
+    bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept
+    {
+        return TryBootstrapRightDepthFromRecentClear(device);
+    }
+
+    bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept
+    {
+        return DepthTestActive(device);
+    }
+
+    bool R30SupportStencilTestActive(IDirect3DDevice9* device) noexcept
+    {
+        return StencilTestActive(device);
+    }
+
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
         return FrameStereoPoseSequence;
