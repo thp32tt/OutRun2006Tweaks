@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00493",
+  "production_id": "CONVERSION-DX11-00493",
+  "event_id": "CONVERSION-DX11-00493-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00493",
+  "lease_epoch": 1,
+  "work_key": "DX11:R191:NATIVE_IMMUTABLE_VS_B0_SNAPSHOT_WARP_DRAWINDEXED",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_vs_constant.hpp:R191",
+    "tools/dx11_vs_constant_indexed_probe_r191.cpp:R191",
+    "tools/test_dx11_vs_constant_indexed_r191.py:R191",
+    "cmake.toml:R191",
+    ".github/workflows/backend-conversion-gate.yml:R191"
+  ],
+  "base_sha": "d5d8ede392a64907867893325a0e47adc9ca16a5",
+  "result_sha": "PENDING_EXACT_COMMIT",
+  "material_result_sha": "PENDING_EXACT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_EXACT_COMMIT",
+  "status": "WAITING_FOR_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R191 independent owned immutable native D3D11 VS b0 snapshot material implementation and real WARP DrawIndexed vertex translation pixel readback; no game-native draw activation.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest GitHub HEAD d5d8ede392a64907867893325a0e47adc9ca16a5; 00493 run and controller checkpoint absent; 00492 R190 C6 is BLOCKED_UPSTREAM_R175_FULL_GATE.",
+    "C1_REVIEW": "PASS: AGENTS.md, 100 review index, queue contract, branch state, R183/R186/R187/R190 source, visual regression history. R175 belongs to 00477; no shared source ownership. R191 develops native VS b0 resource and actual shader transform while dormant.",
+    "C2_IMPLEMENT": "PASS: real C++ immutable VS constant buffer snapshot creation/replacement, exact same immediate-device b0 binding, revision/descriptor guards, WARP DrawIndexed center-to-right translated pixels + 4 mutation source contract; CMake and GitHub Gate wired.",
+    "C3_VALIDATE": "PENDING scoped static source once and Win32 WARP real pixel validation on exact material SHA.",
+    "C4_COMMIT": "Material result commit with [AUTO:CONVERSION-DX11-00493], no CI skip; exact-SHA Gate pending.",
+    "C5_PACKAGE": "NOT_REQUIRED: native game Draw still dormant; no Quest3/VDXR evidence or backend promotion.",
+    "C6_STATE": "PENDING exact material SHA Gate; preserve runtime UNTESTED and inherited R175 blocker separately."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_vs_constant.hpp",
+    "tools/dx11_vs_constant_indexed_probe_r191.cpp",
+    "tools/test_dx11_vs_constant_indexed_r191.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00493.json"
+  ],
+  "evidence": {
+    "inherited_r175_gate": 37972934528,
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "new_r191_negative_mutants": 4,
+    "gate": "PENDING",
+    "manual_hmd": false
+  },
+  "blockers": [
+    "Existing unrelated R175 TEXCOORD6 generic varying mismatch owned by 00477 blocks whole Gate.",
+    "No user Quest3/VDXR headset/game runtime verification."
+  ],
+  "next_action": "Verify exact-SHA Backend Conversion Gate R191 Win32/WARP real b0 shader-transform pixels; inspect failure if any; seal C6 separately from material result without replacing SHA.",
+  "score_change": 0
+}

@@ -400,6 +400,25 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R190 indexed alpha blend WARP probe failed: $LASTEXITCODE" }
 
+
+      # R191: real VS b0 ownership/revision and shifted indexed GPU pixel proof.
+      - name: Verify R191 VS constant indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_vs_constant_indexed_r191.py
+
+      - name: Build R191 VS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_vs_constant_indexed_probe_r191
+
+      - name: Run R191 VS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_vs_constant_indexed_probe_r191.exe | Select-Object -First 1
+          if (-not $probe) { throw "R191 VS indexed constant WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R191 VS indexed constant WARP probe failed: $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
