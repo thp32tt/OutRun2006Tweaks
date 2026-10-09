@@ -95,6 +95,14 @@ int main() {
     require(SUCCEEDED(dev->CreateDepthStencilState(&dsDesc,
         reversedDepth.GetAddressOf())), "reversed depth state");
     dsDesc.DepthFunc=D3D11_COMPARISON_LESS; dsDesc.StencilEnable=TRUE;
+    // Valid explicit stencil operations: zero is not a D3D11_STENCIL_OP.
+    // The previous negative fixture itself failed CreateDepthStencilState.
+    D3D11_DEPTH_STENCILOP_DESC keepAlways{};
+    keepAlways.StencilFailOp=D3D11_STENCIL_OP_KEEP;
+    keepAlways.StencilDepthFailOp=D3D11_STENCIL_OP_KEEP;
+    keepAlways.StencilPassOp=D3D11_STENCIL_OP_KEEP;
+    keepAlways.StencilFunc=D3D11_COMPARISON_ALWAYS;
+    dsDesc.FrontFace=keepAlways; dsDesc.BackFace=keepAlways;
     require(SUCCEEDED(dev->CreateDepthStencilState(&dsDesc,
         stencilDepth.GetAddressOf())), "stencil state");
     ctx->OMSetRenderTargets(1,&raw,dsv.Get());

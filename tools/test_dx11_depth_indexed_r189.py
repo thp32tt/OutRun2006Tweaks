@@ -22,6 +22,8 @@ assert "->Draw(" not in h and "->DrawIndexed(" not in h, "game draw activated"
 for term in ("reject null expected DSV","reject same-sized wrong-eye DSV",
              "reject rebound depth state","reject stencil reference drift",
              "reject reversed depth compare","reject stencil-enabled depth",
+             "keepAlways.StencilFailOp=D3D11_STENCIL_OP_KEEP",
+             "dsDesc.FrontFace=keepAlways; dsDesc.BackFace=keepAlways",
              "ctx->DrawIndexed(3,0,0);", "ctx->DrawIndexed(3,3,0);",
              "actual depth-tested DrawIndexed green center / black corner pixels"):
     assert term in p, "missing R189 behavioral coverage: "+term
