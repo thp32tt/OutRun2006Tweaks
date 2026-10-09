@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL",
+  "run_key": "OUTRUN-KOR-A204-Q175-GEOMETRIC-CHROME-PRODUCER-REJECT-20261009",
+  "role_lane": "ODD",
+  "queue_index": 175,
+  "regression": "IGR-032",
+  "user_screenshot": "스크린샷(183)(1).png",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_preserved_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "current_candidate_dds_changed": false,
+  "new_dds": 0,
+  "trial_dds": 0,
+  "execution_backend": "GitHub Actions ubuntu-latest CPU worker 37912323889 SUCCESS; controller visual via saved GitHub JPEG",
+  "experimental_method": "Native Orbit geometric Hangul (OFL) with canonical English y-profile extracted metallic chrome bands and glyph-interior bevel; not same A188 source-unconditioned sans method",
+  "trial_generator_commit": "ac24f0238b61a5e868e6c85714c5f380ae534469",
+  "independent_plate_and_composite_numerics": {
+    "source_clean_changed_outside_source": 0,
+    "clean_trial_changed_outside_source": 0,
+    "clean_trial_changed_outside_transparent_glyph_effect": 0,
+    "clean_trial_alpha_changed_outside_source": 0,
+    "prior_trial_changed_outside_source": 0
+  },
+  "region_findings": [
+    {
+      "key": "stage_select",
+      "source_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "trial_bbox": [
+        14,
+        262,
+        808,
+        393
+      ],
+      "source_size": [
+        1366,
+        143
+      ],
+      "trial_size": [
+        794,
+        131
+      ],
+      "visual": "FAIL",
+      "reason_codes": [
+        "SOURCE_FAMILY_CONTOUR_MISMATCH",
+        "SOURCE_HIERARCHY_UNDERFILL"
+      ],
+      "observation": "English flat rounded joined lower-case techno rail profile; trial exposed isolated angular pointed Hangul terminals and 794/1366 (~58%) text width, less coverage than already rejected 911px A188.",
+      "evidence": "localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_0_stage_select_100.jpg"
+    },
+    {
+      "key": "showroom",
+      "source_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "trial_bbox": [
+        14,
+        405,
+        243,
+        526
+      ],
+      "source_size": [
+        950,
+        132
+      ],
+      "trial_size": [
+        229,
+        121
+      ],
+      "visual": "FAIL",
+      "reason_codes": [
+        "SOURCE_FAMILY_CONTOUR_MISMATCH",
+        "SOURCE_HIERARCHY_UNDERFILL"
+      ],
+      "observation": "Connected smooth lowercase chrome original vs detached sharp terminal/angular Orbit, only 229/950 source width. Metallic shading alone does not repair silhouette.",
+      "evidence": "localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_1_showroom_100.jpg"
+    },
+    {
+      "key": "single_player",
+      "source_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "trial_bbox": [
+        10,
+        574,
+        725,
+        714
+      ],
+      "source_size": [
+        1384,
+        151
+      ],
+      "trial_size": [
+        715,
+        140
+      ],
+      "visual": "FAIL",
+      "reason_codes": [
+        "SOURCE_FAMILY_CONTOUR_MISMATCH",
+        "SOURCE_HIERARCHY_UNDERFILL"
+      ],
+      "observation": "Faceted serif-like Hangul strokes and hard steel horizontal stripes, unlike rounded continuous English chrome. Width 715/1384 and irregular silhouette; machine mask zeros do not override visible failure.",
+      "evidence": "localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_2_single_player_100.jpg"
+    }
+  ],
+  "controller_visual_review": {
+    "reviewed": [
+      "A204_0_stage_select_100.jpg",
+      "A204_1_showroom_100.jpg",
+      "A204_2_single_player_100.jpg"
+    ],
+    "source_and_clean_distinct": true,
+    "old_and_trial_distinct": true,
+    "pass": false,
+    "decision": "PRODUCER_VISUAL_FAIL_NOT_PROMOTED",
+    "root_cause": "GEOMETRIC_FONT_CHROME_PROFILE_DOES_NOT_REPRODUCE_CONNECTED_ROUNDED_TECHNO_CONTOURS_AND_SOURCE_HIERARCHY"
+  },
+  "machine_qa": "PASS_SCOPED_PREVIEW_BBOX_ONLY",
+  "plate_gate": "PASS_SCOPED",
+  "composite_gate": "PASS_SCOPED",
+  "persisted_dds_gate": "NOT_RUN_TRIAL_NOT_PROMOTED",
+  "controller_visual_qa": "FAIL",
+  "next_action": "MANUAL_RECONSTRUCTION_REQUIRED: per-Hangul authored vector/source-shaped connected rounded metal structure matching 3 English title glyph families; one representative full DDS must pass real native/RAW/practical before propagation, no same Orbit/Nanum/shear/stretch retry",
+  "c1_approval": "BLOCKED",
+  "c3_approval": "BLOCKED",
+  "user_approval": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "new_game_retest": "PENDING",
+  "other_roles_not_changed": true,
+  "vr_ffb_dx11_dxvk_excluded": true
+}

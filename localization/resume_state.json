@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A204 q175 IGR032 new Orbit/source-chrome 3-row native TRIAL GitHub CPU 37912323889 SUCCESS; producer controller visual FAIL angular detached Hangul and source hierarchy underfill despite 0 pixel overflow, DDS 0, current A188 b9f60b45 preserved, manual vector connected/rounded techno needed. localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_CONTROLLER_PRODUCER_VISUAL_REJECT.json; NEW game/C1/C3 OPEN, RUNTIME_VALIDATION=UNTESTED.",
     "C327 C2 EVEN 2-new-exact-SHA independent visual REWORK: q212 B308 209f8358... PROFESSIONAL→프로 gross source hierarchy underfill 120/638=18.8% despite bbox PASS, IGR029 SUSPECTED OPEN; q228 B323 cab1ce08... 1-of-13 chrome revised, other 12 prior C317 source-family failures BYTE-IDENTICAL, IGR038 EXACT OPEN. C2 REWORK_REQUIRED both; no C3/approval or game closure; localization/graphics/role_C/20261009-C327-C2-Q212-Q228-VISUAL/C327_Q212_B308_SOURCE_HIERARCHY_REWORK.json ; localization/graphics/role_C/20261009-C327-C2-Q212-Q228-VISUAL/C327_Q228_B323_THIRTEEN_REGION_REWORK.json. RUNTIME_VALIDATION=UNTESTED.",
     "A203 P0 IGR-043: exact art-plan q49 rank glyph vs q44 separate Stage mapped; new opt-in KoreanHudLayoutTrace stage/rank positions + runtime-runtime intersection, no DDS edit and no asserted game fix. NEW real-game log/composed screenshot needed, IGR-043 OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261009-A203-IGR043-STAGE-RANK-TRACE/A203_IGR043_SOURCE_ATTRIBUTION.json.",
     "B327R q098 42E618FD new production DDS 472392829d96cc1dc6ed980d942c56df883758f2777490ac6e7f6dafb5f86028 full native vector Korean glow-alpha reconstruction from exact English source 3b3cdd76.../B40 CLEAN b5c9c07a... replacing C310 failed B279 192d6274...; source/CLEAN outside0 and final source-outside0; 18 RAW/FLIPY BGW 100/75/50 new lossless contacts controller producer-scoped visual PASS; GitHub worker 37907615230 SUCCESS; binary commit bbde0b6f; fresh C2/C3/user in-game pending; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_B/20261009-B327R-Q098-NATIVE-NAVY-HALO-REBUILD/B327R_CONTROLLER_SELF_QA_FINAL.json",
@@ -13380,5 +13381,15 @@
     ],
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_dds": 0
+  },
+  "a204_q175": {
+    "queue_index": 175,
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "current_candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "producer_trial": "VISUAL_REJECT",
+    "new_dds": 0,
+    "source_family": "MANUAL_VECTOR_RECONSTRUCTION_REQUIRED",
+    "qa_report": "localization/graphics/role_A/20261009-A204-Q175-SOURCE-CHROME-GEOMETRIC-TRIAL/A204_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "runtime_validation": "UNTESTED"
   }
 }

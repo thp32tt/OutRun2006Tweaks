@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-09 18:27 KST",
+  "updated_at_kst": "2026-10-09 18:42 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9215,5 +9215,14 @@
     ],
     "new_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "last_a204_q175": {
+    "producer_result": "VISUAL_REJECT",
+    "new_material_dds": 0,
+    "unchanged_candidate_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "c1": "BLOCKED",
+    "c3": "BLOCKED",
+    "user_game": "OPEN",
+    "runtime_validation": "UNTESTED"
   }
 }
