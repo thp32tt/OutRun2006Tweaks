@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """B307 C325 q212 three SELECT headings: full native heavy gray glyph master.
 
+C325 queue REWORK_REQUIRED triage-token normalization verified before rerun.
+
 Only region IDs 25/26/27 independently returned by C325. Other nine
 sprites including B299 15/28 and unrelated approved/protected artwork must
 remain exact. C2/C3/user remain open.
