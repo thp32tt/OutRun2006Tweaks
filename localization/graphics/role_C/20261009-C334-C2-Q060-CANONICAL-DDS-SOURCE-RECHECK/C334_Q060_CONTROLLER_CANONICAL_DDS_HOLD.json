@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 60,
+  "result": "HOLD_STRICT_RECHECK",
+  "scope_result": "PASS_CANONICAL_SOURCE_SHA_AND_SCOPED_ORANGE_CLEAN",
+  "canonical_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "native": [
+    4096,
+    2048
+  ],
+  "mips": 1,
+  "canonical_source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "original_canonical_sha_independently_verified": true,
+  "saved_candidate_sha_independently_verified": true,
+  "verified_native_source_and_candidate_roi": [
+    2081,
+    210,
+    2860,
+    400
+  ],
+  "canonical_dds_vs_producer_source_png_rgba_diff": 0,
+  "candidate_dds_vs_producer_final_png_rgba_diff": 0,
+  "source_orange_pixels": 8892,
+  "source_to_clean_orange_rgba_diff": 0,
+  "source_to_current_orange_rgba_diff": 0,
+  "clean_gold_alpha_nonzero": 0,
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "new_DDS": 0,
+  "C3": "PENDING",
+  "approval": "NOT_APPROVED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "open_gates": [
+    "Full atlas masks/visible segments",
+    "Blinded source family typography/italic profile",
+    "Per-region eight-axis C3/evidence gate",
+    "NEW in-game user retest"
+  ],
+  "proof_prefix": "localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

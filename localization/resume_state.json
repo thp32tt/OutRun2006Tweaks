@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C334 C2 EVEN q060: canonical original full DDS SHA independently verified and persisted source/FINAL native ROI matches producer proof; previous source identity blocker cleared. Full atlas typography calibration C3 and real game IGR044 OPEN. localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK/C334_Q060_CONTROLLER_CANONICAL_DDS_HOLD.json OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250 RUNTIME_VALIDATION=UNTESTED.",
     "A208 2026-10-09 22:44 KST q193 A-owned P1 NEW actual DDS Goal A → 목표 A exact SHA256 9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3; source width165,height47, new122x42 native; 0 source-protected/outside/alpha ghosts, persisted RAW/FLIPY/50% SOURCE/CLEAN/OLD/NEW producer SCOPED_PASS, guard mechanical PASS only. q193 7/13 labels rebuilt, 6 still REWORK; fresh independent C1 family-pilot, C3, user JPG/new game retest PENDING; IGR003/033 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION-20261009-2230;",
     "C333 C2 2026-10-09 21:50 KST OUTRUN-KOR-C333-C2-Q060-B332R-PROTECTED-PLATE-PERSISTED-20261009-2150: fresh B332R saved RGBA32 DDS exact SHA256 d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 4096x2048 persisted full gold+neighbor ROI independent Pillow RAW/FLIPY. NEW exact source original-orange area y130..159 restored 8892/8892 orange pixels, 0 RGBA diff; CLEAN pure transparent y20..129; next localized cell y160..189 previous→new 0 changed RGBA; full 779x190 ROI saved vs producer PNG exactly 0 mismatches. C SCOPED source-art and CLEAN pass, HOLD_STRICT_RECHECK canonical original whole-atlas SHA/full mask, calibrated family C3/evidence/user actual-game pending. IGR044 OPEN_USER_INGAME_FAIL; RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_C/20261009-C333-C2-Q060-B332R-INDEPENDENT-PROTECTED-PLATE/C333_Q060_C2_CONTROLLER_SCOPED_HOLD.json;",
     "B332R new q060 SOURCE+BEST neighbor SHA d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 producer protected alpha 8892 restored; independent C2 FULL 1px/whole source masked audit, then C3/export and NEW user's IGR044 real-game screenshot203; RUN_KEY=OUTRUN-KOR-B332-Q060-C332-ORANGE-PROTECTED-ART-20261009-2110 RUNTIME_VALIDATION=UNTESTED.",
@@ -6835,7 +6836,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-09 21:58 KST",
+  "updated_at_kst": "2026-10-09 22:50 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -13625,6 +13626,16 @@
     "candidate_published_at_sha": "2ba9e22fff492e9cc60aae228c8b97b4842a1755",
     "pixel_manifest": "localization/graphics/worker_results/production_manifests/9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3.json",
     "worker_run": 37938333213
+  },
+  "c334_c2_q060_canonical_source": {
+    "run_key": "OUTRUN-KOR-C334-C2-Q060-INDEPENDENT-CANONICAL-SOURCE-20261009-2250",
+    "qa": "localization/graphics/role_C/20261009-C334-C2-Q060-CANONICAL-DDS-SOURCE-RECHECK/C334_Q060_CONTROLLER_CANONICAL_DDS_HOLD.json",
+    "queue_index": 60,
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "result": "HOLD_STRICT_RECHECK",
+    "new_evidence": "Independent full original source DDS SHA+ROI and saved candidate verified; protected orange exact 8892 and CLEAN alpha0",
+    "new_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
-
 }
