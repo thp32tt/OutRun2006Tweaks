@@ -6,8 +6,8 @@
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "385e0ad3825eaa76cebb1b8374aeef33e98fdd78",
   "event_type": "new_independent_task_after_00558_complete",
-  "status": "CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "work_key": "DX9EX:UI:D3DX_MATRIX_OPTIONAL_INPUT_SCALE",
   "conflict_keys": [
@@ -30,5 +30,51 @@
     "runtime": "UNTESTED"
   },
   "score_change_pending": 0,
-  "next_action": "Read GitHub Actions exact material SHA and update record only after completion."
+  "next_action": "Do not retry this completed independent TASK_ID. Continue next unrelated DX9Ex R84/CMake or HMD work on separate task ID, with runtime UNTESTED until real Quest3 test.",
+  "event_id": "DX9EX-UI-MATRIX-SAFE-INPUTS-20261009-C6",
+  "material_result_sha": "a6f8497c2fbe83959984275c30fbf43aa6a72d55",
+  "validation_bearing_result_sha": "a6f8497c2fbe83959984275c30fbf43aa6a72d55",
+  "result_sha": "a6f8497c2fbe83959984275c30fbf43aa6a72d55",
+  "runtime_test_performed": false,
+  "ci_runs": {
+    "dx9ex_active": 37938219194,
+    "domain_isolation": 37938219200,
+    "hud_inspector": 37938219188,
+    "full_source_impact": 37938219198
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "full_source_impact_host": "SUCCESS",
+    "full_source_impact_game": "SUCCESS",
+    "full_source_impact_cross_domain": "SUCCESS"
+  },
+  "package": {
+    "status": "CI_PUBLISHED_NOT_HMD_APPROVED",
+    "artifact_id": 11618883818,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-a6f8497c2fbe83959984275c30fbf43aa6a72d55",
+    "digest": "sha256:c00acecfc155d3499ddbe98b63e45dc25e4f97e311c0559ff0653039c73c49f5"
+  },
+  "scoreboard": {
+    "ai": "AI2",
+    "prior": 1272,
+    "change": 1,
+    "cumulative": 1273,
+    "run_key": "DX9EX-UI-MATRIX-SAFE-INPUTS-20261009",
+    "commit": "57054a5d7ca5be7db1f949b07516c74d3c318375"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS branch HEAD, AGENTS, source owner and prior 00558 run verification",
+    "C1_REVIEW": "PASS confirmed null optional input/zero division risk in actual UI matrix hook; Microsoft D3DX9 contract treats NULL inputs as identity",
+    "C2_IMPLEMENT": "PASS nontrivial C++ guard, staged transform writes and independent 3-negative-mutation source verifier, CI wiring",
+    "C3_VALIDATE": "PASS exact-SHA active 37938219194 policy/game/host/R33/package; domain 37938219200; HUD 37938219188; impact 37938219198",
+    "C4_COMMIT": "PASS material a6f8497c2fbe83959984275c30fbf43aa6a72d55 with [AUTO:DX9EX-UI-MATRIX-SAFE-INPUTS-20261009]",
+    "C5_PACKAGE": "PASS exact source artifact 11618883818; user HMD UNTESTED",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; score once new task only, prior 00558 retry +0"
+  }
 }
