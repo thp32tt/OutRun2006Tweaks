@@ -9,6 +9,7 @@ on:
       - 'tools/chat-controller/v0.4-localization-v2/**'
       - 'tests/test_controller_v2.py'
       - 'tests/test_localization_tab_recovery.py'
+      - 'tests/test_localization_chrome_recycle.py'
       - '.github/workflows/localization-controller-v2.yml'
   workflow_dispatch:
 permissions:
@@ -26,6 +27,9 @@ jobs:
           python tests/test_controller_v2.py
           python tests/test_localization_execution.py
           python tests/test_localization_tab_recovery.py
+          python tests/test_localization_chrome_recycle.py
+          bash -n tools/chat-controller/v0.4/entrypoint.direct.sh
+          bash tools/chat-controller/v0.4/tests/test_chrome_cache_clean.sh
       - name: Compose configuration
         run: docker compose -f tools/chat-controller/v0.4-localization-v2/docker-compose.yml config --quiet
       - name: Build dedicated image
@@ -34,6 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          docker run --rm --entrypoint sh localization-v2:test -c 'test -x /opt/outrun/chrome-cache-clean.sh'
           docker run --rm --entrypoint sh localization-v2:test -c 'test -f /opt/outrun/prompts/localization_A.md && test -f /opt/outrun/prompts/localization_B.md && test -f /opt/outrun/prompts/localization_C.md && test ! -e /opt/outrun/prompts/vr_A.md'
           if docker run --rm -e CONTROLLER_MODE=conversion localization-v2:test; then
             echo 'ERROR: conversion mode must be rejected'; exit 1
