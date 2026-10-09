@@ -12,6 +12,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -98,6 +100,74 @@ class RecoveryMaintenanceTests(unittest.TestCase):
                          {0:"A", 10:"C1", 20:"C2", 30:"B", 40:"C1", 50:"C2"})
         self.assertNotIn("next_production_id", SOURCE)
         self.assertNotIn("task_events", SOURCE)
+
+    def test_legacy_three_tabs_migrate_in_place_and_keep_daily_history(self):
+        wanted = {"Slot", "Registry", "logical_date", "new_registry", "load_registry", "save_registry"}
+        tree = ast.parse(SOURCE)
+        nodes = [node for node in tree.body
+                 if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in wanted]
+        self.assertEqual(len(nodes), len(wanted))
+        sandbox = Path(self.temp.name)
+        registry_path = sandbox / "chat_registry.json"
+        environment = {
+            "dataclass": dataclass, "asdict": asdict,
+            "Optional": __import__("typing").Optional, "datetime": datetime,
+            "timedelta": timedelta, "TZ": timezone.utc,
+            "ROLLOVER_HOUR": 2, "CHAT_SLOTS": 4, "CONTROLLER_MODE": "localization",
+            "LOCALIZATION_SLOT_NAMES": ("A", "B", "C1", "C2"),
+            "STATE_DIR": sandbox, "REGISTRY_FILE": registry_path,
+            "json": json, "log": Mock(), "Slot": None, "Registry": None,
+        }
+        module = ast.Module(
+            body=[ast.ImportFrom(module="__future__", names=[
+                ast.alias(name="annotations")], level=0)] + nodes,
+            type_ignores=[])
+        exec(compile(ast.fix_missing_locations(module), "<recovery-registry>", "exec"),
+             environment)
+        now = datetime(2026, 10, 10, 9, tzinfo=timezone.utc)
+        old_date = "2026-10-08"
+        old = {
+            "logical_date": old_date, "next_slot": 2,
+            "slots": [{"name": "A", "url": "https://chatgpt.com/c/a", "runs": 3},
+                      {"name": "B", "url": "https://chatgpt.com/c/b", "runs": 4},
+                      {"name": "C", "url": "https://chatgpt.com/c/c", "runs": 17,
+                       "last_result": "sent"}],
+            "rate_limit_attempts": 2, "rate_limit_until": None,
+            "last_global_send_at": "2026-10-09T20:00:00+09:00",
+        }
+        registry_path.write_text(json.dumps(old), encoding="utf-8")
+        restored = environment["load_registry"](now)
+        self.assertEqual([s.name for s in restored.slots], ["A", "B", "C1", "C2"])
+        self.assertEqual(restored.slots[2].url, "https://chatgpt.com/c/c")
+        self.assertEqual(restored.slots[2].runs, 17)
+        self.assertEqual(restored.slots[2].last_result, "sent")
+        self.assertEqual(restored.rate_limit_attempts, 2)
+        self.assertEqual(restored.next_slot, 2)
+        self.assertEqual(restored.slots[3].runs, 0)
+        self.assertEqual(json.loads((sandbox / ("chat_registry_" + old_date + ".json")).read_text())["slots"][2]["name"], "C")
+        new_state = environment["load_registry"](now)
+        self.assertEqual(new_state.slots[2].runs, 17)
+        self.assertEqual(new_state.slots[2].name, "C1")
+
+    def test_corrupt_legacy_registry_is_not_erased(self):
+        wanted = {"Slot", "Registry", "logical_date", "new_registry", "load_registry", "save_registry"}
+        nodes = [n for n in ast.parse(SOURCE).body
+                 if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and n.name in wanted]
+        sandbox = Path(self.temp.name)
+        path = sandbox / "chat_registry.json"
+        path.write_text("{corrupt", encoding="utf-8")
+        env = {"dataclass": dataclass, "asdict": asdict, "datetime": datetime,
+               "timedelta": timedelta, "TZ": timezone.utc, "ROLLOVER_HOUR": 2,
+               "CHAT_SLOTS": 4, "CONTROLLER_MODE": "localization",
+               "LOCALIZATION_SLOT_NAMES": ("A", "B", "C1", "C2"),
+               "STATE_DIR": sandbox, "REGISTRY_FILE": path, "json": json, "log": Mock()}
+        mod = ast.Module(body=[
+            ast.ImportFrom(module="__future__", names=[ast.alias(name="annotations")], level=0)
+        ] + nodes, type_ignores=[])
+        exec(compile(ast.fix_missing_locations(mod), "<registry-test>", "exec"), env)
+        with self.assertRaises(json.JSONDecodeError):
+            env["load_registry"](datetime(2026, 10, 10, tzinfo=timezone.utc))
+        self.assertEqual(path.read_text(), "{corrupt")
 
     def test_closed_c2_is_reopened_without_touching_other_slots(self):
         old = self.pages["C2"]
