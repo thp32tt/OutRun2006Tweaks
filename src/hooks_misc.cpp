@@ -44,6 +44,11 @@ namespace Settings
 
 	Setting<bool> AutoDetectResolution{ "Window", "AutoDetectResolution", true,
 		"If the outrun2006.ini file doesn't exist, changes games default 640x480 resolution to primary display resolution instead." };
+    // Defined by the VR subsystem and kept opt-in: the OpenXR headset
+    // recommended eye extent is not yet available at this game init stage.
+    extern Setting<bool> VREnabled;
+    extern Setting<int> VRRenderWidth;
+    extern Setting<int> VRRenderHeight;
 }
 
 class ProtectLoginData : public Hook
@@ -948,23 +953,39 @@ public:
 		if (Settings::DisableCountdownTimer)
 			*Game::Sumo_CountdownTimerEnable = false;
 
-		if (Settings::AutoDetectResolution)
-		{
-			// Use the width/height of the primary screen
-			int width = GetSystemMetrics(SM_CXSCREEN);
-			int height = GetSystemMetrics(SM_CYSCREEN);
-			if (width < 640 || height < 480)
-				return false; // bail out if resolution is less than the default
+        const bool vrResolutionRequested = Settings::VREnabled &&
+            (Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0);
+        const int requestedWidth = Settings::VRRenderWidth;
+        const int requestedHeight = Settings::VRRenderHeight;
+        const bool vrResolutionValid = vrResolutionRequested &&
+            requestedWidth >= 640 && requestedHeight >= 480 &&
+            static_cast<std::int64_t>(requestedWidth) *
+                static_cast<std::int64_t>(requestedHeight) <= 16777216LL;
+        if (vrResolutionRequested && !vrResolutionValid)
+            spdlog::warn(
+                "VR render resolution override rejected: {}x{} (both dimensions >=640x480; maximum 16M pixels). Using desktop fallback.",
+                requestedWidth, requestedHeight);
+        if (Settings::AutoDetectResolution || vrResolutionValid)
+        {
+            // Explicit VR internal backbuffer dimensions supersede primary
+            // monitor size ONLY if both values are valid. Preserve legacy
+            // desktop behavior and original 2D installations by default.
+            const int width = vrResolutionValid
+                ? requestedWidth : GetSystemMetrics(SM_CXSCREEN);
+            const int height = vrResolutionValid
+                ? requestedHeight : GetSystemMetrics(SM_CYSCREEN);
+            if (width < 640 || height < 480)
+                return false;
 
-			Game::screen_resolution->x = width;
-			Game::screen_resolution->y = height;
+            Game::screen_resolution->x = width;
+            Game::screen_resolution->y = height;
 
 			*Game::D3DFogEnabled = true;
 			*Game::D3DWindowed = true;
 			*Game::D3DAntialiasing = 2;
 			*Game::CfgLanguage = 0;
 
-			spdlog::info("GameDefaultConfigOverride: default resolution set to {}x{}, windowed enabled, fog enabled, antialiasing 2", width, height);
+			spdlog::info("GameDefaultConfigOverride: default resolution set to {}x{}, windowed enabled, fog enabled, antialiasing 2; source={}", width, height, vrResolutionValid ? "VR_INTERNAL_OVERRIDE" : "DESKTOP_AUTO");
 		}
 
 		return true;
