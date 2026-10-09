@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-07T22:35:00+09:00",
+  "updatedKst": "2026-10-09T13:31:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "EXCLUSIVE P0 PHASE: DX9Ex visual-composition convergence on vr-d3d9ex-focus. Restore menu/car-selection textures and complete HUD/rank/rival/marker/lens-flare ownership before any new HMD candidate. R84 structural convergence is paused.",
+    "primaryBackend": "DX9Ex focus; USER-REQUESTED PRIORITY: finish R84 compile/TU structural convergence while protecting restored HUD; F11 user reports normal (exact tested SHA unprovided); HMD-only visual issues remain open.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -23,7 +23,7 @@
     "parallelBackendDevelopment": false,
     "backendReplacementGate": "DX11 Native and DXVK remain downstream/frozen while DX9Ex stabilization and Architecture v3 migration are incomplete. Reopen downstream porting only after the v3-primary DX9Ex runtime is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "parallelTracks": {
-      "HUD": "P0_ACTIVE: authoritative visual-composition lane; complete before HMD packaging or structural/performance work resumes.",
+      "HUD": "SOURCE_REPAIRS_BUILD_VERIFIED_NEED_MATCHING_HMD: F11 user reports normal; rest of visual acceptance remains separately tracked; protect working rival/DDS/world.",
       "PERFORMANCE": "FROZEN_BEHIND_P0_VISUAL: preserve evidence only until the visual-composition static gate is green.",
       "DXVK": "FROZEN_BY_USER: keep evidence/history only; no implementation or validation scheduling.",
       "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work."
@@ -55,7 +55,7 @@
       "disabledReason": "Frozen by user while DX9Ex structural refactor is the exclusive active track."
     },
     "automationCycle": {
-      "mode": "DX9EX_P0_VISUAL_COMPOSITION",
+      "mode": "DX9EX_R84_PRODUCTION_STRUCTURAL_CONVERGENCE",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
@@ -66,10 +66,10 @@
         "docs/automation/QUEUE_CONTROLLER_CONTRACT.md"
       ],
       "activeTaskIds": [
-        "DX9EX-P0-VISUAL-COMPOSITION-20261007"
+        "DX9EX-R84-PORT-SEAMS-001"
       ],
       "productionIntegrationWip": 1,
-      "rule": "Fetch latest focus HEAD before every dispatch. Work only P0 visual composition: upstream/fork/disassembly audit -> exact producer/resource fixes -> comprehensive static gate. Do not emit/request an HMD candidate until static closure is green."
+      "rule": "Reconcile latest validated seam before dispatch; finish only remaining independent textual TU/CMake ownership boundaries and exact SHA Windows CI. Do not count old refactor cycles or duplicate completed tasks; leave user HMD results separate."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -87,20 +87,18 @@
     },
     "exclusiveFocus": {
       "enabled": true,
-      "mode": "DX9EX_P0_VISUAL_COMPOSITION",
+      "mode": "DX9EX_R84_PRODUCTION_CONVERGENCE",
       "lane": "DX9EX",
       "branch": "vr-d3d9ex-focus",
-      "track": "HUD_MENU_MARKER_EFFECT_TEXTURE_STATIC_CONVERGENCE",
+      "track": "R84_REMAINING_TU_COMPILE_OWNERSHIP_CLEANUP",
       "frozenTracks": [
-        "DX9EX_R84_PRODUCTION_CONVERGENCE",
         "ARCH_V3",
         "DX9EX_GENERAL_PERF_TUNING",
-        "DX11",
         "DXVK",
         "HMD_MATRIX"
       ],
       "reopenRule": "Resume R84/architecture/performance only after the P0 visual-composition verifier and canonical exact-SHA DX9Ex gates are green. HMD reopens only after static completion.",
-      "reason": "User direction 2026-10-07 after 00519 HMD FAIL: stop trial builds; review upstream/disassembly/R73-era evidence, fix all HUD/display composition paths, finish static validation, then test."
+      "reason": "User 2026-10-09: F11 is normal; prioritize finishing structural improvement. Previously proven R84 Gate0 and Inventory must be reconciled as DONE, not repeated. Do not claim all-screen HMD success."
     },
     "architectureV3Transition": {
       "enabled": true,
@@ -119,10 +117,11 @@
       "donorBranch": "vr-refactor-r84-2000c-20261001",
       "donorHeadAtPlan": "40e998500fc758dd3b078d9df2ecc2a57a19bc5d",
       "donorMode": "READ_ONLY_REFERENCE",
-      "currentGate": "DX9EX-R84-PORT-GATE0-00505",
+      "currentGate": "DX9EX-R84-PORT-SEAMS-001",
       "wholesaleMerge": false,
       "cycleTargetAuthoritative": false,
-      "requiredCloseout": "SUPERSEDED_BY_DX9EX_FOCUS"
+      "requiredCloseout": "SUPERSEDED_BY_DX9EX_FOCUS",
+      "closeoutStatus": "INCOMPLETE_PENDING_R32_R31_TU_AND_CMAKE_CLEANUP"
     }
   },
   "candidateWip": {
@@ -717,7 +716,7 @@
     {
       "id": "DX9EX-R84-PORT-GATE0-00505",
       "priority": 20,
-      "status": "READY",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Repair the current CONVERSION-DX9EX-00505 post-Present unresolved-slot ownership change so the exact DX9Ex reset/transport contract and hosted Active Validation are green without reverting the intended ownership safety or weakening the verifier.",
       "testLevel": "LEVEL0",
@@ -730,12 +729,15 @@
         "failedJobId": 112578296612,
         "failure": "DirectGPU bounded post-Present publication order changed"
       },
-      "nextAction": "Recover latest focus and exact 00505 diff/verifier. Decide PRODUCT_DEFECT vs VERIFIER_DEFECT from intended slot ownership contract, make one bounded repair, require exact-SHA DX9Ex Active Validation + Domain Isolation success, then mark DONE. Runtime remains UNTESTED."
+      "nextAction": "ALREADY_DONE: validated Gate0 at exact 00505 recovery SHA; do not repeat or rescore.",
+      "validationSha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
+      "validationRunId": 37576055744,
+      "validationResult": "SUCCESS"
     },
     {
       "id": "DX9EX-R84-PORT-INVENTORY-001",
       "priority": 19,
-      "status": "BLOCKED",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Create a current-focus-vs-R84 structural inventory and classify every meaningful R84-only facade/API/TU/CMake/verifier change as APPLIED_EQUIVALENT, PORT_REQUIRED, SUPERSEDED, or DEFERRED_RUNTIME_RISK.",
       "testLevel": "LEVEL0",
@@ -744,12 +746,15 @@
       ],
       "attempts": 0,
       "runtimeCandidate": false,
-      "nextAction": "After Gate0 is DONE, diff current focus against R84 donor and persist docs/automation/r84-port/R84_TO_FOCUS_INVENTORY.json plus a concise human matrix. No runtime source changes in the inventory task."
+      "nextAction": "ALREADY_DONE: canonical R84_TO_FOCUS_INVENTORY.json has classification_complete=true, unclassified_count=0; do not regenerate or rescore.",
+      "validationSha": "4df538077584ed56c43ff5af0c89ca0c1257674e",
+      "validationRunId": 37578440381,
+      "validationResult": "SUCCESS"
     },
     {
       "id": "DX9EX-R84-PORT-SEAMS-001",
       "priority": 18,
-      "status": "BLOCKED",
+      "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Selectively port PORT_REQUIRED R84 ownership/interface boundaries into current focus one seam per AUTO task: R34/R33, R33/R32, R32/R31, R31/R30, R30/R29, then lower Present/Reset/DirectGPU facades.",
       "testLevel": "LEVEL0",
@@ -758,7 +763,7 @@
       ],
       "attempts": 0,
       "runtimeCandidate": false,
-      "nextAction": "Generate one child AUTO task per seam from current HEAD. Preserve current production behavior and newer focus fixes; require deterministic contract plus exact hosted compile/link/Active Validation before advancing."
+      "nextAction": "Resume remaining bounded CMake/textual TU ownership seams from latest focus, beginning with blocked R32/R31 split and lower-owner facade preflight; R33/R32 split and R30 support facade portions are already exact-SHA validated. Do not blanket-merge R84. CI and runtime validations are separate."
     },
     {
       "id": "DX9EX-R84-PORT-CLEANUP-001",
