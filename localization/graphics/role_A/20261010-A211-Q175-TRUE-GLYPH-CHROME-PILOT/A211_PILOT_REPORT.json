@@ -1,0 +1,61 @@
+{
+  "run": "A211",
+  "role": "A",
+  "queue_index": 175,
+  "priority": "P1",
+  "issue": "IGR-032",
+  "status": "TRIAL_ONLY_AWAITING_CONTROLLER_VISUAL",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "promoted_current_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "trial_sha256": "b9565dc944f68c9965d777b965c194fe4144d23b09f713834d9181f484e92446",
+  "trial_dds": 1,
+  "production_dds": 0,
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_license": "NotoSansCJK Open Font License; system package fonts-noto-cjk",
+  "native_ppem": 123,
+  "original_bbox": [
+    6,
+    397,
+    956,
+    529
+  ],
+  "trial_bbox": [
+    24,
+    406,
+    246,
+    523
+  ],
+  "trial_size": [
+    222,
+    117
+  ],
+  "source_size": [
+    950,
+    132
+  ],
+  "numerical": {
+    "clean_alpha_nonzero": 0,
+    "prior_final_RGBA_changed_outside_source": 0,
+    "prior_final_alpha_changed_outside_source": 0,
+    "clean_final_changed_outside_glyph_effect": 0,
+    "margins": [
+      18,
+      710,
+      9,
+      6
+    ],
+    "bbox": [
+      24,
+      406,
+      246,
+      523
+    ]
+  },
+  "persisted_dds": "BGRA32 2048x1024 mip1 mirror_Y decoded match",
+  "method": "Genuine licensed Hangul glyph strokes, source-derived chrome bands with local edge-normal light, isolated depth layer; not A204 Orbit or A209/A210 hand rail",
+  "new_user_game": "NOT_TESTED",
+  "independent_C1": "BLOCKED_UNTIL_PRODUCER_VISUAL",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
