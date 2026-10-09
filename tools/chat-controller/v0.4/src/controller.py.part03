@@ -418,8 +418,8 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
         if reason is None:
             continue
 
-        last = state.setdefault("last_recovered", {}).get(slot.name, 0.0)
-        if time.monotonic() - last < TAB_RECOVERY_COOLDOWN_SECONDS:
+        last = state.setdefault("last_recovered", {}).get(slot.name)
+        if last is not None and time.monotonic() - last < TAB_RECOVERY_COOLDOWN_SECONDS:
             continue
         # Another queue operation may have just exchanged this page reference.
         # Never close its newly created tab by racing with the health watcher.
