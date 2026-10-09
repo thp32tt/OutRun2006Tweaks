@@ -1,0 +1,59 @@
+{
+  "dds_sha256": {
+    "OFFICIAL": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "TRIAL": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8"
+  },
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "format": "BC3_DXT5",
+  "mips": 1,
+  "readable_transform": "FLIP_Y",
+  "changed_total_rgba_pixels": 1821,
+  "changed_outside_source_bbox_union": 0,
+  "raw_flip_y_identity": true,
+  "regions": {
+    "START": {
+      "changed_inside_region_rgba": 1069,
+      "alpha_gt24_official": 1848,
+      "alpha_gt24_trial": 1848,
+      "alpha_gt24_added": 0,
+      "alpha_gt24_removed": 0,
+      "declared_source_bbox_readable": [
+        815,
+        495,
+        899,
+        517
+      ],
+      "source_vs_trial_english_visual": "UNVERIFIED_FROM_AUTHENTIC_SOURCE_IN_THIS_RUN",
+      "changed_bbox_readable": [
+        824,
+        496,
+        892,
+        516
+      ]
+    },
+    "GOAL": {
+      "changed_inside_region_rgba": 752,
+      "alpha_gt24_official": 1702,
+      "alpha_gt24_trial": 1702,
+      "alpha_gt24_added": 0,
+      "alpha_gt24_removed": 0,
+      "declared_source_bbox_readable": [
+        1343,
+        764,
+        1417,
+        787
+      ],
+      "source_vs_trial_english_visual": "UNVERIFIED_FROM_AUTHENTIC_SOURCE_IN_THIS_RUN",
+      "changed_bbox_readable": [
+        1360,
+        764,
+        1400,
+        784
+      ]
+    }
+  },
+  "source_provenance": "Full original source DDS not downloaded in this run. B339 existing producer SOURCE_CLEAN comparison used only as visual reference, not independently certified pixel data."
+}

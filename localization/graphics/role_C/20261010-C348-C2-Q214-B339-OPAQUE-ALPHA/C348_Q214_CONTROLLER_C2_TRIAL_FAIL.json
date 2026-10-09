@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "shard": "EVEN_ONLY",
+  "run": "C348-C2",
+  "run_key": "OUTRUN-KOR-C348-C2-Q214-B339-OPAQUE-ALPHA-20261010-0820",
+  "policy_version": "visual-evidence-v1-20261008",
+  "observed_at_kst": "2026-10-10 08:31 KST",
+  "queue_index": 214,
+  "selected_remote_head": "3d799666d4acc7a05f03a4b7dc65720424e2a807",
+  "selected_queue_blob": "3c7c9dfd9ea4560052fa6704da3b2a51204b296d",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "scope": "NEW_DISTINCT_B339_TRIAL_INDEPENDENT_PERSISTED_BYTE_VISUAL_QA",
+  "canonical_source": {
+    "producer_reported_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "independently_reverified": false
+  },
+  "original_candidate": {
+    "sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+    "independent_sha256_verified": true,
+    "unchanged": true
+  },
+  "new_trial": {
+    "sha256": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+    "path": "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/B339_UNAPPROVED_MANUAL_JAMO_CHROME_TRIAL.dds",
+    "independent_sha256_verified": true,
+    "promoted": false
+  },
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "triage_source": "read-only current branch tools/localization/rework_triage.py --repo fresh-queue --index 214",
+  "machine": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "dds": "BC3_DXT5",
+    "mips": 1,
+    "raw_flipy_array_verified": true,
+    "changed_rgba": 1821,
+    "changed_outside_producer_declared_bboxes": 0,
+    "full_atlas_changed_alpha": 0,
+    "source_bboxes_not_independently_authenticated": true,
+    "START": {
+      "changed_rgba": 1069,
+      "rgba_channel_change_counts": [
+        910,
+        1036,
+        1016,
+        0
+      ],
+      "roi_alpha_min": 255,
+      "roi_alpha_max": 255
+    },
+    "GOAL": {
+      "changed_rgba": 752,
+      "rgba_channel_change_counts": [
+        518,
+        694,
+        733,
+        0
+      ],
+      "roi_alpha_min": 255,
+      "roi_alpha_max": 255
+    },
+    "interpretation": "Alpha==255 across opaque plate regions means B339 alpha-core coverage 1.0 cannot certify shape integrity; source-family RGB glyph silhouette, contour and practical-size readability must be independently validated."
+  },
+  "controller_visual": {
+    "direct_reviewed": "Independent persisted DDS native 100, gray black white, practical 75/50, readable FLIPY and RAW gray50, 400pct nearest pixel inspection",
+    "GOAL": "B339 ゴ? no: Korean 골 rendered as ambiguous flattened horizontal cream bars; weak identifiable initial consonant and vowel at native/50, reproduces on persisted RGB despite perfect alpha. Not an accepted Hangul display glyph.",
+    "START": "출발 improved letter differentiation vs old official but heavy fragmented cream/red face and source bevel continuity not certified.",
+    "calibration": "KNOWN_DEFECT_CALIBRATION_NOT_BLINDLY_QUALIFIED; producer B340 verdict consulted before first look, so no first-look pixels-before-producer verdict true claim",
+    "source_clean": "Full canonical original/CLEAN independently redecoded: NOT_DONE. Existing B339 SOURCE/CLEAN crop is reference only."
+  },
+  "eight_checks": {
+    "slant": "HOLD_MISSING_SOURCE_MATCHED_GLYPH_ANCHORS",
+    "clean_plate": "HOLD_EXACT_SOURCE_CLEAN_NOT_REAUTHENTICATED",
+    "style": "FAIL_SCOPED_GOAL_CHROME_FAMILY_AND_GLYPH_FACE",
+    "readability": "FAIL_GOAL_NATIVE_AND_50",
+    "glyph_integrity": "FAIL_GOAL_RECOGNIZABLE_STROKE_TOPOLOGY_WHILE_ALPHA_OPAQUE",
+    "protected_art": "HOLD_SOURCE_PROTECTED_MASK_NOT_INDEPENDENTLY_REAUTHENTICATED",
+    "placement": "HOLD_SOURCE_HIERARCHY_COMPARISON_NOT_PROVEN",
+    "orientation": "PASS_SCOPED_RAW_FLIP_Y_EXACT_AND_CROP_VIEWS"
+  },
+  "decision": "B339_NEW_TRIAL_INDEPENDENT_C2_VISUAL_FAIL",
+  "official_status": "B340_PRODUCER_REWORK_UNCHANGED_AND_PRIOR_C289_REWORK",
+  "C3": "BLOCKED",
+  "APPROVAL": "BLOCKED",
+  "USER_RUNTIME_VALIDATION": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_official_dds": 0,
+  "new_C2_dds": 0,
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_BOTH_ZOOM_CONTACT.png",
+      "sha256": "930d2efbf71e9a22e085f460eac3b16da8ccccf545e7d9f736415febf920ff1d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_FLIPY_GRAY_100.png",
+      "sha256": "2dbe804d585a29b9e9467790ea2807b35aed5db7e0bb1727b21e0b26be808cd9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_FLIPY_BLACK_100.png",
+      "sha256": "40ae49b0bda7b0da87ec5e7fbedded7df46ca6e2013dca95efc5d868da31d812"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_FLIPY_WHITE_100.png",
+      "sha256": "c5ed801e22967391ea91f6b6e7e44c65d717648b00500df60df242a158057ddc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_FLIPY_GRAY_75.png",
+      "sha256": "3e475a0a86e13a4e32abea6af0f68396663c2bef23ee84b7f2bb61a8c0057fa9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_FLIPY_GRAY_50.png",
+      "sha256": "44638b00f5af04acdd1c9c64bbe367cd08f6d7c022f9578985df6d28e5c726cd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_GOAL_RAW_GRAY_50.png",
+      "sha256": "3c627bc2d9d1eee3f3c2ccb495afe3be24e707308737f93aaee6e1e6d6832bca"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_START_FLIPY_GRAY_100.png",
+      "sha256": "85e4524596a9a2b52cf47c84635891bf3025792e6a6862334887bb9a7d8cfb23"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_START_FLIPY_GRAY_50.png",
+      "sha256": "436a2a55bc380529dedd0d92dd46f329dc210cb90f53a213710ae9c551f964b4"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_START_RAW_GRAY_50.png",
+      "sha256": "22d02f4e73bca66a6cb05302e9965a88597275c4c9b85d7707d88f2794a15bb1"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_INDEPENDENT_MACHINE.json",
+      "sha256": "4c91cff1ac9c75db4c1d881486f2d5a357b4709910ea26bd0385fc862abc7f99"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_CHANNEL_QA.json",
+      "sha256": "b03ad320772b0bdb258c2ead376655e69c196d0bb122a079579e7c38b4e3a1c8"
+    }
+  ],
+  "backend": "GITHUB_SSOT_N100_MCP_FALLBACK_SHA_VERIFIED_BC3_PIXEL_DECODE",
+  "excluded": [
+    "ODD_C1",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_TASK_QUEUE_ENGINE"
+  ]
+}

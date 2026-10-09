@@ -1,0 +1,45 @@
+{
+  "START": {
+    "per_channel_changed_RGBA": [
+      910,
+      1036,
+      1016,
+      0
+    ],
+    "alpha_same_all": true,
+    "alpha_minmax_official": [
+      255,
+      255
+    ],
+    "alpha_minmax_trial": [
+      255,
+      255
+    ],
+    "alpha_unique_official": [
+      255
+    ],
+    "fullchanged": 1069
+  },
+  "GOAL": {
+    "per_channel_changed_RGBA": [
+      518,
+      694,
+      733,
+      0
+    ],
+    "alpha_same_all": true,
+    "alpha_minmax_official": [
+      255,
+      255
+    ],
+    "alpha_minmax_trial": [
+      255,
+      255
+    ],
+    "alpha_unique_official": [
+      255
+    ],
+    "fullchanged": 752
+  },
+  "whole_canvas_alpha_changed": 0
+}
