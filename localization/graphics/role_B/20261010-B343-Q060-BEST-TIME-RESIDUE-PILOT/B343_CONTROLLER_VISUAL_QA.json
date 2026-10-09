@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B343",
+  "run_key": "OUTRUN-KOR-B343-Q060-C342-ENGLISH-RESIDUE-NATIVE-TRIAL-20261010-0535",
+  "observed_at_kst": "2026-10-10 05:43 KST",
+  "queue_index": 60,
+  "queue_previous": "c342_c2_rework_required_native_best_time_orange_overlap",
+  "priority": "P0",
+  "user_regression": "IGR-044",
+  "owner_lane": "B_EVEN",
+  "C2_defect": "C342 verified canonical original English BEST TIME ghost behind 최고 기록, FLIPY and RAW both defective.",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "original_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_trial_sha256": "8774e3993fc5a13f455f2c95ea5b358b2f75eae0634ab54bed137aeea819c9f6",
+  "ddspath": "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_Q060_BEST_TIME_GLYPH_RESIDUE_UNAPPROVED.dds",
+  "machine_evidence": "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_TRIAL_MACHINE_QA.json",
+  "build": {
+    "github_actions_run": 37987984654,
+    "conclusion": "SUCCESS",
+    "backend": "GITHUB_ACTIONS",
+    "reason": "ChatGPT sandbox not able to fetch 33.5MB GitHub-source and checked-in full DDS inputs safely.",
+    "native": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_flipy_exact_persisted_roundtrip": true
+  },
+  "material_change": {
+    "source_native_original_BEST_TIME_warm_bbox": [
+      2188,
+      345,
+      3016,
+      460
+    ],
+    "limited_detection_box": [
+      2090,
+      337,
+      3120,
+      485
+    ],
+    "source_face_pixels": 29582,
+    "visibly_persisted_original_english_pixels_erased": 19243,
+    "source_identical_visible_pixels_remaining_before_further_semantic_classification": 118,
+    "changed_outside_detection_box": 0,
+    "korean_pixels_changed": 0,
+    "algorithm": "Only source-identical persisted original BEST TIME glyph/face/11px halo pixels within bounded semantic ROI erased to transparency; all translated Korean pixels unchanged; no rectangular overlay or resized glyphs."
+  },
+  "controller_direct_visual": {
+    "examined": [
+      "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_FLIPY_GRAY_100_SOURCE_OLD_TRIAL.png",
+      "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_FLIPY_BLACK_50_SOURCE_OLD_TRIAL.png",
+      "localization/graphics/role_B/20261010-B343-Q060-BEST-TIME-RESIDUE-PILOT/B343_RAW_GRAY_75_SOURCE_OLD_TRIAL.png"
+    ],
+    "first_look": "SOURCE English BEST TIME strong orange title and previous candidate obvious behind-Hangul double lettering. New trial removes the large orange BEST TIME silhouette; Korean 최고 기록 readable and preserved at native and 50%, including mirrored RAW.",
+    "remaining": "Tiny isolated navy/dark flecks detectable near erased title stroke region at gray100/RAW; not safe to conclude full English contour/outline removed. Full source glyph halo morphology/protected-sibling mapping, RAW 100 and independent C2 required.",
+    "result": "SCOPED_MATERIAL_VISUAL_IMPROVEMENT_WITH_REMAINING_RESIDUE_HOLD",
+    "codes": [
+      "SOURCE_RESIDUE_UNDER_KOREAN_REDUCED_NOT_FULLY_CLEARED",
+      "SOURCE_SHADOW_FRINGE_UNDER_KOREAN_UNRESOLVED"
+    ]
+  },
+  "production": {
+    "P1": "PARTIAL_BEST_TIME_SOURCE_GLYPH_REPAIR_NOT_FULL_P1_PASS",
+    "P2": "EXISTING_KOREAN_UNCHANGED_NOT_REAUTHORIZED",
+    "P3": "HOLD_CONTAMINATION_SMALL_DARK_FLECKS_AND_MISSING_MANIFEST",
+    "new_material_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "previous_persisted_candidate_unchanged": true,
+    "C2": "C342_REWORK_REQUIRED_ON_OFFICIAL_SHA",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_IGR044": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "next": "Refine verified English source removal including any residual dark/navy fringe while maintaining exact Korean pixels; separately reconstruct only unambiguous affected UI region, rerun final manifest production_pixel_guard.py --changed-since BASE_SHA and full producer visual; then independent C2+C3 and actual in-game screenshot. Do not repeat unchanged B343 trial/score as new work.",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "n100_used": false
+}
