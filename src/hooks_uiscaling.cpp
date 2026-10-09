@@ -737,6 +737,8 @@ class UIScaling : public Hook
     inline static SafetyHookMid StageExtensionPrintLeaveHooks[
         std::size(StageExtensionPrintCalls)]{};
     inline static thread_local unsigned StageExtensionDepth = 0;
+    inline static thread_local OutRunVR::GameSemantic::RenderScope
+        StageExtensionSavedScope = OutRunVR::GameSemantic::RenderScope::None;
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
@@ -750,6 +752,13 @@ class UIScaling : public Hook
             SpriteNode* root = Game::sprite_prio_root[p];
             StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
         }
+        // The six original source E8 CALLs can synchronously draw text as
+        // well as enqueue sprites. Post-call node tags only cover the latter.
+        // Scope only this exact source call, never the shared text renderer.
+        StageExtensionSavedScope = OutRunVR::GameSemantic::CurrentScope;
+        if (Settings::VREnabled)
+            OutRunVR::GameSemantic::CurrentScope =
+                OutRunVR::GameSemantic::RenderScope::ScreenHud;
     }
 
     static void StageExtensionLeave(safetyhook::Context&)
@@ -759,6 +768,10 @@ class UIScaling : public Hook
         TagAppendedNodes(StageExtensionBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
             OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+        // Always unwind even if VR enablement changes during the call.
+        OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;
+        StageExtensionSavedScope =
+            OutRunVR::GameSemantic::RenderScope::None;
         const auto hit = ++StageExtensionCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
@@ -779,6 +792,8 @@ class UIScaling : public Hook
     inline static SafetyHookMid ResultTextLeaveHooks[
         std::size(ResultTextB9200Calls)]{};
     inline static thread_local unsigned ResultTextDepth = 0;
+    inline static thread_local OutRunVR::GameSemantic::RenderScope
+        ResultTextSavedScope = OutRunVR::GameSemantic::RenderScope::None;
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         ResultTextBefore{};
     inline static thread_local std::uint64_t ResultTextCompleted = 0;
@@ -792,6 +807,12 @@ class UIScaling : public Hook
             SpriteNode* root = Game::sprite_prio_root[p];
             ResultTextBefore[p] = root ? root->tail_4 : nullptr;
         }
+        // Exact 19 B9200 parent calls also need source-time ownership for
+        // immediate graphics, independent of later queued-node provenance.
+        ResultTextSavedScope = OutRunVR::GameSemantic::CurrentScope;
+        if (Settings::VREnabled)
+            OutRunVR::GameSemantic::CurrentScope =
+                OutRunVR::GameSemantic::RenderScope::ScreenHud;
     }
 
     static void ResultTextLeave(safetyhook::Context&)
@@ -801,6 +822,10 @@ class UIScaling : public Hook
         TagAppendedNodes(ResultTextBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
             OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+        // Restore the exact previous scope without relying on a live VR flag.
+        OutRunVR::GameSemantic::CurrentScope = ResultTextSavedScope;
+        ResultTextSavedScope =
+            OutRunVR::GameSemantic::RenderScope::None;
         const auto hit = ++ResultTextCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(

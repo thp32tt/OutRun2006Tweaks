@@ -653,6 +653,45 @@ for label, mutant in (
         pass
     else:
         raise SystemExit('unprotected GOAL text original source: ' + label)
+# The original exact E8 calls can emit immediate drawing while they run,
+# which a post-call SpriteNode-only tag cannot possibly cover. Limit the
+# transient CurrentScope to the original source call, and restore it
+# before returning, even when VR enablement toggles mid-call.
+def verify_exact_call_window_hud_scope(source):
+    for kind in ('StageExtension', 'ResultText'):
+        enter = function_body(source, f'static void {kind}Enter(')
+        leave = function_body(source, f'static void {kind}Leave(')
+        saved = f'{kind}SavedScope'
+        require(f'{saved} = OutRunVR::GameSemantic::CurrentScope;',
+                enter, kind+' saves original render semantic')
+        require('if (Settings::VREnabled)', enter,
+                kind+' scope only overrides in VR')
+        require('OutRunVR::GameSemantic::RenderScope::ScreenHud;',
+                enter, kind+' synchronous draw owner')
+        require(f'OutRunVR::GameSemantic::CurrentScope = {saved};',
+                leave, kind+' must restore former owner')
+        require(f'{saved} =', leave, kind+' resets saved scope')
+        if 'Settings::VREnabled' in leave:
+            raise SystemExit(kind+' leaked source-time scope on mid-call VR change')
+verify_exact_call_window_hud_scope(ui)
+for name, mutant in (
+    ('stage lost scope restoration', ui.replace(
+        'OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;',
+        'OutRunVR::GameSemantic::CurrentScope = OutRunVR::GameSemantic::RenderScope::None;', 1)),
+    ('result immediate draw owner removed', ui.replace(
+        'ResultTextSavedScope = OutRunVR::GameSemantic::CurrentScope;',
+        'ResultTextSavedScope = OutRunVR::GameSemantic::RenderScope::None;', 1)),
+    ('stage VR-toggle leaks scope', ui.replace(
+        'OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;',
+        'if (Settings::VREnabled) OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;', 1)),
+):
+    try:
+        verify_exact_call_window_hud_scope(mutant)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 E8 transient semantic negative mutation survived: ' + name)
+
 # The 93%-progress screenshot is a separate GOAL visual phase, not proof that
 # the final completed-result HUD is also broken. Preserve exact progress E8
 # node registration and add bounded *read-only* source evidence: never turn
