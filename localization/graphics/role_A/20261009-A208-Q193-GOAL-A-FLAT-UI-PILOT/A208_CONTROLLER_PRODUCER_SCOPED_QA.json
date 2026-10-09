@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "run": "20261009-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION",
+  "run_key": "OUTRUN-KOR-A208-Q193-GOAL-A-NATIVE-WIDTH-CORRECTION-20261009-2230",
+  "role": "A",
+  "asset_index": 193,
+  "owner_lane": "A",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "priority": "P1",
+  "user_issues": [
+    "IGR-003",
+    "IGR-033"
+  ],
+  "previous_candidate_sha256": "d90dada6007b0bba719889e8025c8aff332ddd21da296be540485536981859aa",
+  "canonical_source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "produced_candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+  "source_label": "Goal A",
+  "current_korean_label": "목표 A",
+  "source_bbox_readable": [
+    950,
+    221,
+    1115,
+    268
+  ],
+  "candidate_bbox_readable": [
+    953,
+    223,
+    1075,
+    265
+  ],
+  "size": {
+    "source_width": 165,
+    "source_height": 47,
+    "candidate_width": 122,
+    "candidate_height": 42,
+    "source_width_coverage": 0.7394,
+    "source_height_coverage": 0.8936,
+    "positive_margin_px": [
+      3,
+      40,
+      2,
+      3
+    ],
+    "previous_a207_trial_width": 83,
+    "previous_a207_coverage": 0.503
+  },
+  "font_family": "NotoSansCJKkr-Black native size 46; glyph shape not horizontally stretched; pinned recipe",
+  "orientation": "native_RGBA32_2048x1024_1mip_RAW_MIRROR_Y",
+  "new_dds": 1,
+  "mechanical": {
+    "result": "MECHANICAL_PASS_VISUAL_REVIEW_REQUIRED",
+    "source_protected_to_final_changed": 0,
+    "previous_to_final_outside_edit": 0,
+    "clean_to_final_outside_glyph_effect": 0,
+    "transparent_clean_alpha_residue": 0,
+    "persisted_dds_decode_match": true,
+    "source_and_candidate_latin_A_top_minus_bottom_x": [
+      8,
+      7
+    ],
+    "guard_errors": []
+  },
+  "controller_visual": {
+    "plate_only": "SCOPED_PASS_SOURCE_VS_CLEAN_ON_WHITE_AND_GRAY; prior legacy glyph removed without ghost",
+    "composite_only": "SCOPED_PASS_SOURCE_CLEAN_PREVIOUS_A206_NEW_A208_ON_GRAY_BLACK_AND_WHITE; no introduced visible rectangle",
+    "native_source_family": "SCOPED_PASS_GOAL_A_SOURCE_DARK_HEAVY_TYPOGRAPHY_AND_HIERARCHY; width materially improved from A207 trial (83px) to 122px, height42/47",
+    "practical_50": "SCOPED_PASS_GOAL_A_REVIEWED_BLACK_AND_GRAY",
+    "raw_flipY": "SCOPED_PASS_ANNOTATED_PERSISTED_RAW_AND_FLIPY; numerical anchor sign matches readable source",
+    "entire_atlas": "REWORK_REQUIRED_OTHER_SIX_GOAL_B-E_15_CONT_ONLINE_LEGACY; current total 7_of_13 rebuilt including this Goal A"
+  },
+  "pilot": "FAMILY_PILOT_SCOPED_PRODUCER_PASS_PENDING_C1_METHOD_QUALIFICATION; DO_NOT_MULTIPLY",
+  "production_manifest": "localization/graphics/worker_results/production_manifests/9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3.json",
+  "worker_actions_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37938333213",
+  "worker_result": "SUCCESS",
+  "first_failed_previous_attempt": "A207 worker output boundary (__pycache__ from local guard import), corrected by disabling Python bytecode and explicitly width-guarding the newly rendered Goal label",
+  "proof_directory": "localization/graphics/role_A/20261009-A208-Q193-GOAL-A-FLAT-UI-PILOT",
+  "independent_C1": "PENDING_FRESH_EXACT_SHA",
+  "C3": "PENDING_SEPARATE_AFTER_C1",
+  "approval": "NOT_GRANTED",
+  "consumer_chain": {
+    "source_to_queue": "PROVEN",
+    "source_to_candidate_persisted_dds": "PROVEN",
+    "github_candidate": "PROVEN",
+    "preview_package": "NOT_TESTED",
+    "actual_game_loaded_atlas": "NOT_TESTED",
+    "other_screens_using_shared_atlas": "NOT_TESTED",
+    "user_retest": "NOT_TESTED"
+  },
+  "actual_game": "IGR003_IGR033_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "scope_exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "execution_backend": "GitHub Actions ubuntu-latest CPU worker due local GitHub binary source not materializable through sandbox; no N100 heavy image jobs. N100 minimal metadata/API check only",
+  "status": "A_SCOPED_PRODUCER_PASS_FAMILY_PILOT_C1_PENDING_FULL_ATLAS_REWORK_REQUIRED"
+}
