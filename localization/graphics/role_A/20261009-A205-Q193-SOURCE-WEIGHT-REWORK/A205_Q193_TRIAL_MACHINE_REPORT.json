@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261009-A205-Q193-SOURCE-WEIGHT-REWORK",
+  "queue_index": 193,
+  "user_ingame_regressions": [
+    "IGR-003",
+    "IGR-019",
+    "IGR-033"
+  ],
+  "priority": "P1",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "previous_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+  "trial_sha256": "1cea9015c02bfe80efb1538ba69218c2b505438c78eb31ff64b7677f883824a6",
+  "trial_path": "localization/graphics/role_A/20261009-A205-Q193-SOURCE-WEIGHT-REWORK/A205_Q193_TRIAL_RGBA32_RAW_MIRRORY.dds",
+  "status": "TRIAL_ENCODDED_NOT_PROMOTED_PENDING_CONTROLLER_PIXEL_REVIEW",
+  "method": "full-native NotoSansCJKkr-Black source-exact-color sampled letterform + idiomatic MULTIPLAYER->멀티플레이어, English CLEAN from A171; no resize/stretched Korean raster",
+  "pinned_font_license": "SIL OFL-1.1",
+  "pinned_font_git_blob": "b5b67bf293310a3648468a21ac829d6f2d58b2d5",
+  "rows": [
+    {
+      "key": "welcome",
+      "english": "WELCOME TO THE",
+      "text": "환영합니다",
+      "bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "font": "NotoSansCJKkr-Black",
+      "font_size": 43,
+      "source_color": [
+        46,
+        53,
+        57
+      ],
+      "candidate_bbox": [
+        5,
+        150,
+        202,
+        193
+      ],
+      "candidate_size": [
+        197,
+        43
+      ],
+      "original_size": [
+        473,
+        47
+      ],
+      "margins": [
+        2,
+        274,
+        2,
+        2
+      ],
+      "coverage_ratio": 0.4165
+    },
+    {
+      "key": "multiplayer",
+      "english": "MULTIPLAYER",
+      "text": "멀티플레이어",
+      "bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "font": "NotoSansCJKkr-Black",
+      "font_size": 59,
+      "source_color": [
+        78,
+        96,
+        100
+      ],
+      "candidate_bbox": [
+        10,
+        299,
+        327,
+        357
+      ],
+      "candidate_size": [
+        317,
+        58
+      ],
+      "original_size": [
+        532,
+        62
+      ],
+      "margins": [
+        2,
+        213,
+        2,
+        2
+      ],
+      "coverage_ratio": 0.5959
+    },
+    {
+      "key": "showroom",
+      "english": "SHOWROOM",
+      "text": "쇼룸",
+      "bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "font": "NotoSansCJKkr-Black",
+      "font_size": 53,
+      "source_color": [
+        46,
+        53,
+        57
+      ],
+      "candidate_bbox": [
+        1207,
+        959,
+        1302,
+        1009
+      ],
+      "candidate_size": [
+        95,
+        50
+      ],
+      "original_size": [
+        389,
+        54
+      ],
+      "margins": [
+        2,
+        292,
+        2,
+        2
+      ],
+      "coverage_ratio": 0.2442
+    }
+  ],
+  "qa_numeric": {
+    "inherited_existing_localization_pixels_outside_three_rework_boxes": 115610,
+    "current_candidate_clean_drift_outside_boxes": 0,
+    "inherited_existing_translation_mismatch_with_candidate": 0,
+    "final_clean_changed_outside_source": 0,
+    "final_clean_changed_outside_translated_glyphs": 0,
+    "final_clean_alpha_changed_outside_source": 0,
+    "final_old_changed_outside_source": 0,
+    "protected_art_changed_against_current": 0
+  },
+  "dds_trial_produced": 1,
+  "dds_promoted": 0,
+  "manual_review": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Read trial 100/75/50 and RAW vs source; promote only if full source-style visual hierarchy/no source residue proves acceptable. Fresh C1,C3,new game retest mandatory"
+}
