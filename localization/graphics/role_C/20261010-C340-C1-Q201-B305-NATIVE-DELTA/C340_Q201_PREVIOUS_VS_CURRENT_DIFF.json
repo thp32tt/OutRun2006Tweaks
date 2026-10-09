@@ -1,0 +1,23 @@
+{
+  "previous_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+  "current_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "previous_git_commit_parent": "d9f74d1dfdd679ed2857d379bb9c5a6bbbf5ebce",
+  "header_128_exact": true,
+  "changed_rgba_pixels": 2505,
+  "changed_alpha_pixels": 1912,
+  "rgba_changed_outside_original_goals_bbox": 0,
+  "alpha_changed_outside_original_goals_bbox": 0,
+  "change_bbox_readable": [
+    1084,
+    1738,
+    1160,
+    1781
+  ],
+  "reported_source_bbox_readable": [
+    1079,
+    1734,
+    1255,
+    1785
+  ],
+  "other_atlas_16_regions_bitwise_unchanged": true
+}

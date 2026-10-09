@@ -1,0 +1,64 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "shard": "ODD_ONLY",
+  "run": "C340",
+  "run_key": "OUTRUN-KOR-C340-C1-Q201-B305-EXACT-NATIVE-DELTA-20261010",
+  "index": 201,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "previous_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+  "historical_git_parent": "d9f74d1dfdd679ed2857d379bb9c5a6bbbf5ebce",
+  "current_native": "2048x2048 BGRA32 mip1; source bbox [1079,1734,1255,1785], decoded Korean bbox [1084,1739,1160,1780]; positive margins 5,95,5,5",
+  "independent_full_saved_dds_comparison": "2505 RGBA pixels and 1912 alpha pixels changed compared with independently SHA-verified predecessor; 0 RGBA or alpha outside original GOALS bbox; DDS original 128-byte header byte-exact",
+  "producer_claimed_canonical_source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "canonical_source_independently_available": false,
+  "producer_comparison_source": "localization/graphics/role_B/20261009-B305-Q201-IGR037-GOALS-NATIVE/B305_GOALS_FLIP_Y_READABLE_128_100_SOURCE_CLEAN_OLD_NEW.png",
+  "pixels_before_producer_verdict": false,
+  "firstlook_note": "Actual saved current DDS inspected before reading detailed B305 QA, but user queue producer notes already seen; no fabricated blind first look.",
+  "visual_observations": {
+    "slant": "HOLD source English exact native slant anchor unverified",
+    "clean_plate": "HOLD producer comparison not an independently hashed English/CLEAN",
+    "style": "SCOPED visible Noto heavy Korean 목표 replaces previous underfilled 골; original typeface exact-byte source comparison pending",
+    "readability": "SCOPED intact native and 50-percent gray",
+    "glyph_integrity": "SCOPED no obvious fractured Hangul/clip in directly reviewed saved DDS",
+    "protected_art": "SCOPED unchanged pixels outside one GOALS box compared with predecessor; canonical English-source protection unverified",
+    "placement": "SCOPED min 5px source bbox clearance, no source-box growth",
+    "orientation": "SCOPED expected RAW upside-down vs FLIP-Y; runtime UV not tested"
+  },
+  "independent_native_png": [
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_Q201_PREVIOUS_VS_CURRENT_SAVED_NATIVE.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_Q201_EXACT_CHANGE_MASK.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/q201_goal_title_original_source_bbox_FLIPY_GRAY_100.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/q201_goal_title_original_source_bbox_FLIPY_GRAY_50.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/q201_goal_title_original_source_bbox_RAW_GRAY_75.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/q201_goal_title_original_source_bbox_FLIPY_BLACK_100.png",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/q201_goal_title_original_source_bbox_FLIPY_WHITE_100.png"
+  ],
+  "machine_json": [
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_Q201_NATIVE_FIRSTLOOK.json",
+    "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_Q201_PREVIOUS_VS_CURRENT_DIFF.json"
+  ],
+  "missing": [
+    "independent canonical English DDS and exact CLEAN SHA",
+    "blind controls calibration",
+    "all 17-region source-vs-candidate style/mask comparison",
+    "independent C3 separate eight-check inspection",
+    "new real game screenshot on matching DDS/runtime build"
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C1_PASS": false,
+  "C3_PASS": false,
+  "APPROVAL": false,
+  "IGR_037": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "execution_backend": "GitHub authoritative branch plus N100 MCP light native DDS fallback",
+  "next": "Acquire exact verified canonical English/CLEAN, audit all source/protected atlas cells, run blind calibration and C3 before any approval; user IGR037 remains open until matching actual game retest."
+}

@@ -1,0 +1,46 @@
+{
+  "dds_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "width": 2048,
+  "height": 2048,
+  "mips": 1,
+  "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089",
+  "rgba_masks": [
+    16711680,
+    65280,
+    255,
+    4278190080
+  ],
+  "cropping": {
+    "goal_title_original_source_bbox": {
+      "roi": [
+        1079,
+        1734,
+        1255,
+        1785
+      ],
+      "alpha_bbox": [
+        1084,
+        1739,
+        1160,
+        1780
+      ],
+      "alpha_positive_pixels": 2133
+    },
+    "goal_title_wide_context": {
+      "roi": [
+        1030,
+        1690,
+        1310,
+        1820
+      ],
+      "alpha_bbox": [
+        1030,
+        1734,
+        1160,
+        1820
+      ],
+      "alpha_positive_pixels": 2454
+    }
+  },
+  "visual_review_before_producer_report": true
+}
