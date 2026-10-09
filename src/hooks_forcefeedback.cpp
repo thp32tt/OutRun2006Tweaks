@@ -33,6 +33,7 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     // DirectInput WheelFFBEngine currently owns an acquired output device.
     // A configured-but-missing/lost/unacquired wheel must not disable controller rumble.
     static bool wheelOwnedLastCall = false;
+    static bool rumbleDisabledLastCall = false;
     if (WheelFFB_IsOutputOwnerActive())
     {
         if (!wheelOwnedLastCall)
@@ -51,16 +52,21 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     {
         // Disabling rumble must clear the last command; simply returning
         // leaves a previously active motor running on some XInput devices.
-        void InputManager_StopVibration();
-        InputManager_StopVibration();
-        if (!Settings::UseNewInput)
+        if (!rumbleDisabledLastCall)
         {
-            XINPUT_VIBRATION zero{};
-            XInputSetState(userId, &zero);
+            void InputManager_StopVibration();
+            InputManager_StopVibration();
+            if (!Settings::UseNewInput)
+            {
+                XINPUT_VIBRATION zero{};
+                XInputSetState(userId, &zero);
+            }
         }
+        rumbleDisabledLastCall = true;
         return;
     }
-    else if (Settings::VibrationMode == 2) // Swap L/R
+    rumbleDisabledLastCall = false;
+    if (Settings::VibrationMode == 2) // Swap L/R
     {
         float left = leftMotor;
         leftMotor = rightMotor;
