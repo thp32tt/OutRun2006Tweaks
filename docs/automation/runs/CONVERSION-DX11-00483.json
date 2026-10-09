@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00483",
+  "production_id": "CONVERSION-DX11-00483",
+  "event_id": "CONVERSION-DX11-00483-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00483",
+  "lease_epoch": 1,
+  "work_key": "DX11:R181:TRIANGLE_FAN_REAL_WARP_DRAWINDEXED_GPU_PIXELS",
+  "conflict_keys": [
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp:R181",
+    "cmake.toml:dx11_triangle_fan_index_buffer_probe",
+    "CMakeLists.txt:dx11_triangle_fan_index_buffer_probe",
+    ".github/workflows/backend-conversion-gate.yml:R181",
+    "tools/test_dx11_triangle_fan_gpu_draw_r181.py"
+  ],
+  "base_sha": "d6a6d6f1e78acb5b1c5b8355daee42074e6c0cc0",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "status": "MATERIAL_C3_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R181 adds real isolated WARP D3D11 DrawIndexed GPU pixel proof for expanded native nonindexed/indexed D3D9 triangle fans using immutable vertex/index buffers, compiled VS/PS, input layout and staged 32x32 RT readback, without game hook activation. cmkr/Gate updated to run R181 before inherited R175 failure.",
+  "changed_paths": [
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp",
+    "cmake.toml",
+    "CMakeLists.txt",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_triangle_fan_gpu_draw_r181.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch HEAD d6a6d6f1; 00482 R180 scoped PASS but inherited R175 full Gate fail. No 00483 run or conflicting claim. Checkpoint path 404; direct GitHub HEAD/runs authoritative.",
+    "C1_REVIEW": "PASS: triangle-fan generated IB existed with IA binding but without isolated DrawIndexed WARP GPU pixel proof. 00482 earlier review made no fan commit; 00483 independent R181 scope.",
+    "C2_IMPLEMENT": "PASS: actual WARP offscreen DrawIndexed for nonindexed and source-indexed triangle fan, staged pixel assertions, static three negative mutants and cmkr + workflow integration.",
+    "C3_VALIDATE": "PENDING: exact material-SHA Backend Conversion Gate after GitHub push.",
+    "C4_COMMIT": "PENDING: CAS material commit to target branch.",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated WARP proof only, no game native Draw activation/HMD release.",
+    "C6_STATE": "PENDING: exact-SHA CI proof and final next action."
+  },
+  "blockers": [
+    "R175 inherited constant-buffer probe COLOR0/TEXCOORD6 mismatch may fail full smoke downstream of R181.",
+    "No user Quest3/VDXR runtime evidence; UNTESTED."
+  ],
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "Await exact-SHA full automation validation; no point on dispatch.",
+  "resume_cursor": "READ_R181_EXACT_SHA_GATE",
+  "next_action": "Check exact-SHA Backend Conversion Gate validate and R181 WARP DrawIndexed pixel proof; distinguish inherited R175 failure; preserve exact material result SHA."
+}

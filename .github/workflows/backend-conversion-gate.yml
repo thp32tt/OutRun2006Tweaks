@@ -86,6 +86,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_surface_pair_readback_r180.py
 
+      - name: Verify DX11 triangle-fan actual GPU DrawIndexed R181
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_triangle_fan_gpu_draw_r181.py
+
       - name: Verify DX11 resource format role isolation R179
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
@@ -259,6 +264,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
 
 
+      # R181 independently verifies real WARP DrawIndexed before inherited R175.
+      - name: Build DX11 triangle-fan generated index-buffer probe
+        run: cmake --build build-auto --config Release --target dx11_triangle_fan_index_buffer_probe
+
+      - name: Run DX11 triangle-fan generated index-buffer probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_triangle_fan_index_buffer_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 triangle-fan generated index-buffer probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 triangle-fan generated index-buffer probe failed with exit code $LASTEXITCODE" }
+
       - name: Build DX11 constant buffer probe
         run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
 
@@ -280,17 +297,6 @@ jobs:
           if (-not $probe) { throw "DX11 native transport probe executable missing" }
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 native transport probe failed with exit code $LASTEXITCODE" }
-
-      - name: Build DX11 triangle-fan generated index-buffer probe
-        run: cmake --build build-auto --config Release --target dx11_triangle_fan_index_buffer_probe
-
-      - name: Run DX11 triangle-fan generated index-buffer probe
-        shell: pwsh
-        run: |
-          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_triangle_fan_index_buffer_probe.exe | Select-Object -First 1
-          if (-not $probe) { throw "DX11 triangle-fan generated index-buffer probe executable missing" }
-          & $probe.FullName
-          if ($LASTEXITCODE -ne 0) { throw "DX11 triangle-fan generated index-buffer probe failed with exit code $LASTEXITCODE" }
 
       - name: Build DX11 fixed-function pipeline handoff probe
         run: cmake --build build-auto --config Release --target dx11_fixed_function_pipeline_probe

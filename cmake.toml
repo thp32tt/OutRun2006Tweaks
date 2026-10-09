@@ -504,7 +504,7 @@ sources = [
 include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
-link-libraries = ["d3d11.lib"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
 
 [target.dx11_fixed_function_pipeline_probe]
 type = "executable"

@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <d3dcompiler.h>
 #include <iostream>
 #include <vector>
 #include <wrl/client.h>
@@ -93,6 +94,120 @@ void require_indices(
         actual.size() == expected.size() &&
             std::equal(actual.begin(), actual.end(), expected.begin()),
         message);
+}
+
+
+void prove_fan_gpu_pixels(ID3D11Device* device, ID3D11DeviceContext* context,
+                          NativeTriangleFanIndexBuffer& owner) {
+    // R181: real DrawIndexed in the isolated WARP probe, never a game hook.
+    const char hlsl[] = R"(
+        float4 vs(float2 p : POSITION) : SV_POSITION {
+            return float4(p, 0, 1);
+        }
+        float4 ps() : SV_Target { return float4(1, 0, 0, 1); }
+    )";
+    ComPtr<ID3DBlob> vsCode, psCode;
+    require(SUCCEEDED(D3DCompile(hlsl, sizeof(hlsl)-1, nullptr, nullptr,
+            nullptr, "vs", "vs_4_0", 0, 0, vsCode.GetAddressOf(), nullptr)) &&
+            vsCode, "R181 VS compile");
+    require(SUCCEEDED(D3DCompile(hlsl, sizeof(hlsl)-1, nullptr, nullptr,
+            nullptr, "ps", "ps_4_0", 0, 0, psCode.GetAddressOf(), nullptr)) &&
+            psCode, "R181 PS compile");
+    ComPtr<ID3D11VertexShader> vs;
+    ComPtr<ID3D11PixelShader> ps;
+    require(SUCCEEDED(device->CreateVertexShader(vsCode->GetBufferPointer(),
+            vsCode->GetBufferSize(), nullptr, vs.GetAddressOf())) &&
+            SUCCEEDED(device->CreatePixelShader(psCode->GetBufferPointer(),
+            psCode->GetBufferSize(), nullptr, ps.GetAddressOf())),
+            "R181 shader objects");
+    const D3D11_INPUT_ELEMENT_DESC el{"POSITION", 0,
+        DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+    ComPtr<ID3D11InputLayout> layout;
+    require(SUCCEEDED(device->CreateInputLayout(&el, 1,
+            vsCode->GetBufferPointer(), vsCode->GetBufferSize(),
+            layout.GetAddressOf())), "R181 input layout");
+    struct Vertex { float x, y; };
+    const Vertex quad[] = {{-.8f,-.8f},{.8f,-.8f},{.8f,.8f},{-.8f,.8f}};
+    D3D11_BUFFER_DESC bd{};
+    bd.ByteWidth = sizeof(quad);
+    bd.Usage = D3D11_USAGE_IMMUTABLE;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    D3D11_SUBRESOURCE_DATA initial{};
+    initial.pSysMem = quad;
+    ComPtr<ID3D11Buffer> vb;
+    require(SUCCEEDED(device->CreateBuffer(&bd, &initial, vb.GetAddressOf())),
+            "R181 immutable vertex buffer");
+    D3D11_TEXTURE2D_DESC td{};
+    td.Width = td.Height = 32;
+    td.MipLevels = td.ArraySize = 1;
+    td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    td.SampleDesc.Count = 1;
+    td.Usage = D3D11_USAGE_DEFAULT;
+    td.BindFlags = D3D11_BIND_RENDER_TARGET;
+    ComPtr<ID3D11Texture2D> target;
+    ComPtr<ID3D11RenderTargetView> rtv;
+    require(SUCCEEDED(device->CreateTexture2D(&td, nullptr,
+            target.GetAddressOf())) &&
+            SUCCEEDED(device->CreateRenderTargetView(target.Get(), nullptr,
+            rtv.GetAddressOf())), "R181 color target");
+    td.Usage = D3D11_USAGE_STAGING;
+    td.BindFlags = 0;
+    td.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ComPtr<ID3D11Texture2D> staging;
+    require(SUCCEEDED(device->CreateTexture2D(&td, nullptr,
+            staging.GetAddressOf())), "R181 readback staging");
+    D3D11_RASTERIZER_DESC rd{};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = TRUE;
+    ComPtr<ID3D11RasterizerState> rs;
+    require(SUCCEEDED(device->CreateRasterizerState(&rd, rs.GetAddressOf())),
+            "R181 rasterizer");
+    const UINT stride = sizeof(Vertex), offset = 0;
+    ID3D11Buffer* rawVB = vb.Get();
+    context->IASetVertexBuffers(0, 1, &rawVB, &stride, &offset);
+    context->IASetInputLayout(layout.Get());
+    context->VSSetShader(vs.Get(), nullptr, 0);
+    context->PSSetShader(ps.Get(), nullptr, 0);
+    context->RSSetState(rs.Get());
+    D3D11_VIEWPORT vp{};
+    vp.Width = vp.Height = 32.0f;
+    vp.MinDepth = 0; vp.MaxDepth = 1;
+    context->RSSetViewports(1, &vp);
+    ID3D11RenderTargetView* rawRTV = rtv.Get();
+    context->OMSetRenderTargets(1, &rawRTV, nullptr);
+    const auto draw = [&]() {
+        const float black[] = {0,0,0,1};
+        context->ClearRenderTargetView(rtv.Get(), black);
+        require(owner.bind(context) && owner.index_count() == 6,
+                "R181 native fan owner IA bind");
+        context->DrawIndexed(owner.index_count(), 0, 0);
+        context->CopyResource(staging.Get(), target.Get());
+        D3D11_MAPPED_SUBRESOURCE m{};
+        require(SUCCEEDED(context->Map(staging.Get(), 0, D3D11_MAP_READ,
+                0, &m)), "R181 map GPU pixels");
+        const auto* b = static_cast<const unsigned char*>(m.pData);
+        const auto* center = b + m.RowPitch * 16 + 16 * 4;
+        const auto* corner = b + m.RowPitch + 4;
+        bool exact = center[0] == 255 && center[1] == 0 &&
+            center[2] == 0 && center[3] == 255 &&
+            corner[0] == 0 && corner[1] == 0 &&
+            corner[2] == 0 && corner[3] == 255;
+        context->Unmap(staging.Get(), 0);
+        require(exact, "R181 DrawIndexed generated fan WARP pixel mismatch");
+    };
+    require(owner.initialize_nonindexed(device, 2, 0),
+            "R181 nonindexed fan materialization");
+    draw();
+    const std::array<std::uint16_t, 6> source{99,0,1,2,3,88};
+    require(owner.initialize_indexed(device, 2, D3DFMT_INDEX16, 1,
+                source.data(), source.size(), 0x18100001ull),
+            "R181 source indexed fan materialization");
+    draw();
+    context->OMSetRenderTargets(0, nullptr, nullptr);
+    context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    owner.shutdown();
+    std::cout << "R181 native triangle fan GPU DrawIndexed: PASS\\n";
 }
 
 } // namespace
@@ -371,6 +486,7 @@ int main() {
             !owner.ready(),
         "R126 zero-primitive fan unexpectedly created an IB");
 
+    prove_fan_gpu_pixels(device.Get(), context.Get(), owner);
     std::cout << "DX11 triangle-fan generated index buffer R126: PASS\n";
     std::cout << "DX11 indexed triangle-fan source provenance R129: PASS\n";
     std::cout << "DX11 triangle-fan live IA binding R141: PASS\n";
