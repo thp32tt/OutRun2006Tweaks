@@ -174,10 +174,13 @@ def queue_rollover_prompt(active: dict) -> str:
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
         f"CHAT_ROLLOVER={rollover}",
         "",
-        "이전 대화를 계속 사용할 수 없어 같은 프로젝트의 새 채팅으로 전환했다. 아래 실제 사유를 확인해.",
+        "VR 작업은 30분 주기로 새 대화로 전환한다. 이전 대화가 반드시 실패한 것은 아니다. GitHub 체크포인트와 게임 브랜치의 커밋으로 실제 진행 상태를 복원해.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
+        "CHECKPOINT_BRANCH=" + VR_CHECKPOINT_BRANCH,
+        "CHECKPOINT_PATH=" + str(active.get("vr_checkpoint_last_path") or ""),
+        "먼저 해당 5분 체크포인트를 읽고 게임 브랜치의 material commit 및 docs/automation/runs 기록과 대조해. 체크포인트에 없는 미커밋 추론은 저장되었다고 가정하지 마.",
         source_policy,
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
@@ -239,6 +242,154 @@ def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> t
     return True, "C6_EXACT_SHA_VERIFIED"
 
 
+
+def vr_checkpoint_path(active: dict, now: datetime, purpose: str = "periodic") -> str:
+    """Five-minute immutable GitHub checkpoint on the controller branch, NOT the game branch."""
+    bucket_minute = now.minute - (now.minute % 5)
+    bucket = now.replace(minute=bucket_minute, second=0, microsecond=0)
+    task_id = str(active["task_id"])
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", task_id):
+        raise ValueError("Unsafe checkpoint task identity")
+    suffix = "periodic" if purpose == "periodic" else f"pre-rollover-{int(active.get('chat_rollovers', 0)) + 1:04d}"
+    return f"tools/chat-controller/checkpoints/vr/{task_id}/{bucket.strftime('%Y%m%dT%H%M')}-{suffix}.json"
+
+
+def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head: str) -> dict:
+    """No chat URLs, tokens, cookies, or private response text in public GitHub."""
+    allowed = (
+        "task_id", "production_id", "event_id", "event_type", "lane", "slot",
+        "branch", "base_sha", "result_sha", "result_message", "phase",
+        "status", "terminal", "attempt", "retry_count", "rollover_count",
+        "chat_rollovers", "sent_at", "last_rollover_at", "last_hash",
+        "last_hash_changed_at", "last_gate_poll_at", "wait_actions_started_at",
+        "failure_context", "last_gate_status", "automation_validation",
+        "runtime_validation", "last_liveness_reason", "chat_liveness",
+    )
+    details = {k: active.get(k) for k in allowed if k in active}
+    # Failure/commit text can contain user data. Preserve only short, typed identifiers.
+    for key in ("result_message", "failure_context", "last_liveness_reason"):
+        if key in details:
+            details[key] = None
+    return {
+        "schema": 1, "kind": "vr_queue_checkpoint",
+        "purpose": purpose, "captured_at_kst": now.isoformat(),
+        "controller_branch": VR_CHECKPOINT_BRANCH,
+        "game_branch_head": branch_head,
+        "record": details,
+        "recovery": {
+            "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+            "do_not_duplicate": True,
+            "runtime_validation": "UNTESTED unless real HMD tested",
+            "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved",
+        },
+    }
+
+
+def github_write_vr_checkpoint(path: str, data: dict) -> bool:
+    """Append-only, idempotent GitHub file creation on controller branch."""
+    if not GITHUB_TOKEN:
+        raise RuntimeError("VR checkpoint requires configured GitHub token")
+    encoded = base64.b64encode((json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")).decode("ascii")
+    endpoint = "/repos/" + GITHUB_REPO + "/contents/" + urllib.parse.quote(path, safe="/")
+    payload = json.dumps({
+        "message": f"chore(vr-controller): persist five-minute queue checkpoint {data['record']['task_id']}",
+        "content": encoded, "branch": VR_CHECKPOINT_BRANCH,
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.github.com" + endpoint, data=payload, method="PUT",
+        headers={
+            "Authorization": "Bearer " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "outrun-chat-controller/vr-checkpoint",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=20) as response:
+            receipt = json.loads(response.read().decode("utf-8"))
+            if not (receipt.get("commit") or {}).get("sha"):
+                raise RuntimeError("GitHub returned no checkpoint commit SHA")
+            return True
+    except urllib.error.HTTPError as exc:
+        if exc.code not in (409, 422):
+            raise
+        # Crash/restart can replay the same slot. Verify the existing immutable
+        # file before accepting it; never overwrite or force-push checkpoint history.
+        try:
+            query = urllib.parse.urlencode({"ref": VR_CHECKPOINT_BRANCH})
+            found = github_api_json(endpoint + "?" + query)
+            if found.get("type") == "file" and found.get("sha"):
+                return True
+        except Exception:
+            pass
+        raise
+
+
+async def vr_persist_checkpoint(q: dict, active: dict, now: datetime, purpose: str = "periodic") -> bool:
+    """Durability before rollover. Retry failed writes; never claim an unsaved checkpoint."""
+    if CONTROLLER_MODE != "conversion" or not VR_CHECKPOINT_ENABLED:
+        return True
+    path = vr_checkpoint_path(active, now, purpose)
+    if (active.get("vr_checkpoint_last_path") == path or
+            path in active.get("vr_checkpoint_verified_paths", [])):
+        return True
+    last_attempt = _parse_iso(active.get("vr_checkpoint_last_attempt_at"))
+    if last_attempt and (now - last_attempt).total_seconds() < 45:
+        return False
+    active["vr_checkpoint_last_attempt_at"] = now.isoformat()
+    save_queue_state(q)
+    try:
+        branch_head = await asyncio.to_thread(github_branch_head, active["branch"])
+        if not branch_head:
+            raise RuntimeError("Game branch HEAD unavailable; snapshot not trustworthy")
+        payload = vr_checkpoint_payload(active, now, purpose, branch_head)
+        await asyncio.to_thread(github_write_vr_checkpoint, path, payload)
+    except Exception as exc:
+        log.warning("VR checkpoint failed task=%s purpose=%s kind=%s", active["task_id"], purpose, type(exc).__name__)
+        active["vr_checkpoint_last_error"] = type(exc).__name__
+        save_queue_state(q)
+        write_runtime(vr_checkpoint_status="FAILED_RETRY", vr_checkpoint_error=type(exc).__name__,
+                      vr_checkpoint_task=active["task_id"])
+        return False
+    active["vr_checkpoint_last_path"] = path
+    active["vr_checkpoint_last_at"] = now.isoformat()
+    active["vr_checkpoint_last_error"] = None
+    active["vr_checkpoint_verified_paths"] = (active.get("vr_checkpoint_verified_paths", []) + [path])[-8:]
+    save_queue_state(q)
+    write_runtime(vr_checkpoint_status="SAVED", vr_checkpoint_last_at=now.isoformat(),
+                  vr_checkpoint_path=path, vr_checkpoint_task=active["task_id"])
+    return True
+
+
+def vr_forced_rollover_due(active: dict, now: datetime) -> bool:
+    if CONTROLLER_MODE != "conversion" or not VR_FORCE_ROLLOVER_SECONDS:
+        return False
+    if active.get("phase") != "WAIT_CHAT":
+        return False
+    anchor = (_parse_iso(active.get("last_rollover_at")) or
+              _parse_iso(active.get("sent_at")))
+    return bool(anchor and (now - anchor).total_seconds() >= VR_FORCE_ROLLOVER_SECONDS)
+
+
+async def vr_checkpoint_and_rollover(context: BrowserContext, pages: dict, q: dict, active: dict, now: datetime) -> bool:
+    """Return True if rollover processing consumed this lane poll."""
+    if vr_forced_rollover_due(active, now):
+        # No new chat unless the previous state is safely persisted remotely.
+        if not await vr_persist_checkpoint(q, active, now, "pre_rollover"):
+            write_runtime(status="vr_rollover_wait_checkpoint",
+                          last_action=f"{active['task_id']} 30m rollover pending verified GitHub checkpoint")
+            return True
+        await queue_rollover_chat(context, pages, active, "VR_FORCED_30_MINUTE_ROLLOVER")
+        save_queue_state(q)
+        return True
+    if VR_CHECKPOINT_ENABLED and active.get("phase") == "WAIT_CHAT":
+        bucket_path = vr_checkpoint_path(active, now)
+        if active.get("vr_checkpoint_last_path") != bucket_path:
+            await vr_persist_checkpoint(q, active, now, "periodic")
+    return False
+
+
 def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
     """Keep the original TASK_ID owned while an unfinished chat is ambiguous."""
     if active.get("chat_liveness") != "STALE_UNCONFIRMED" or active.get("last_liveness_reason") != reason:
@@ -254,10 +405,11 @@ def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
 
 
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    """Rollover only after an explicit terminal UI failure, never due to wall-clock age."""
+    """Rollover on confirmed UI failure or a VR 30-minute forced interval."""
     if not CONVERSATION_ROLLOVER_ENABLED:
         return False
-    if not rollover_has_confirmed_ui_failure(reason):
+    vr_forced = CONTROLLER_MODE == "conversion" and reason == "VR_FORCED_30_MINUTE_ROLLOVER"
+    if not vr_forced and not rollover_has_confirmed_ui_failure(reason):
         write_runtime(
             status="conversation_rollover_held",
             last_action=f"{active['task_id']}: unconfirmed worker state, rollover denied: {reason}",
@@ -1945,6 +2097,9 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
 
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
+            active = active_by_lane[lane_key]
+            if lane_key in ("A", "C") and await vr_checkpoint_and_rollover(context, pages, q, active, now):
+                continue
             await conversion_process_lane(context, pages, q, lane_key)
 
     for lane_key in list(active_by_lane):
