@@ -421,7 +421,7 @@ async def monitor_slot_tab_health(context: BrowserContext, pages: dict[str, Page
         last = state.setdefault("last_recovered", {}).get(slot.name, 0.0)
         if time.monotonic() - last < TAB_RECOVERY_COOLDOWN_SECONDS:
             continue
-        # A queue dispatch/rollover may have just exchanged the page reference.
+        # Another queue operation may have just exchanged this page reference.
         # Never close its newly created tab by racing with the health watcher.
         if pages.get(slot.name) is not page:
             continue
