@@ -11537,12 +11537,52 @@ VSOutput main(VSInput input)
             r167Rejected == nullptr,
             "R167 rejects color-role object as depth mirror");
 
+        // R168: a live slot-0 RTV/DSV is not sufficient if the producer's
+        // complete R145 OM binding receipt is missing, forged or polluted.
+        ID3D11Texture2D* r168Rejected = nullptr;
+        require(
+            !outputColorSurface.copy_bound_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, surfaceTargetBinding,
+                0u, &r168Rejected) && r168Rejected == nullptr,
+            "R168 rejects absent R145 binding snapshot");
+        require(
+            !outputColorSurface.copy_bound_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, surfaceTargetBinding,
+                surfaceTargetBindingReady.snapshotToken ^ 1ull,
+                &r168Rejected) && r168Rejected == nullptr,
+            "R168 rejects forged R145 binding snapshot");
+        outrun::vr::dx11::NativeSurfacePairBinding r168UnsealedOwner;
+        require(
+            !outputColorSurface.copy_bound_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, r168UnsealedOwner,
+                surfaceTargetBindingReady.snapshotToken, &r168Rejected) &&
+            r168Rejected == nullptr,
+            "R168 rejects unsealed owner even with copied R145 token");
+        ID3D11RenderTargetView* r168ExtraRtvs[2] = {
+            r164Color, r166SubstituteColor.render_target_view()};
+        require(r168ExtraRtvs[1] != nullptr,
+                "R168 additional offscreen RTV fixture");
+        d3d.context->OMSetRenderTargets(
+            2u, r168ExtraRtvs, outputDepthSurface.depth_stencil_view());
+        require(
+            !outputColorSurface.copy_bound_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, surfaceTargetBinding,
+                surfaceTargetBindingReady.snapshotToken, &r168Rejected) &&
+            r168Rejected == nullptr,
+            "R168 rejects polluted OM slot 1 despite exact slot-0 RTV/DSV");
+        require(
+            surfaceTargetBinding.apply(
+                d3d.context, outputColorSurface, outputDepthSurface) &&
+            r157Probe(d3d.context, r164Color, indexedDirectDispatch),
+            "R168 restores exact R145 OM owner after second-RTV pollution");
+
         ID3D11Texture2D* r165Readback = nullptr;
         require(
-            outputColorSurface.copy_color_depth_pair_to_staging(
-                d3d.context, outputDepthSurface, &r165Readback) &&
+            outputColorSurface.copy_bound_color_depth_pair_to_staging(
+                d3d.context, outputDepthSurface, surfaceTargetBinding,
+                surfaceTargetBindingReady.snapshotToken, &r165Readback) &&
             r165Readback != nullptr,
-            "R167 exact live RTV/DSV pair staging copy after indexed WARP draw");
+            "R168 exact R145 binding lineage stages indexed WARP color/depth");
         D3D11_TEXTURE2D_DESC r165Desc{};
         r165Readback->GetDesc(&r165Desc);
         require(

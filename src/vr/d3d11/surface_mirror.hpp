@@ -9,6 +9,8 @@
 
 namespace outrun::vr::dx11
 {
+    class NativeSurfacePairBinding;
+
     // Dormant R118 owner for DEFAULT-pool D3D9 render-target/depth-stencil
     // surfaces. The mirror is generation-bound: a successful D3D9 Reset
     // invalidates the D3D11 Texture2D/view and requires explicit recreation.
@@ -56,6 +58,16 @@ namespace outrun::vr::dx11
         [[nodiscard]] bool copy_color_depth_pair_to_staging(
             ID3D11DeviceContext* context,
             const NativeSurfaceMirror& depth,
+            ID3D11Texture2D** stagingOutput) const noexcept;
+
+        // R168 diagnostic-only: requires the producer's exact R145 live OM
+        // binding receipt, not merely the slot-0 RTV/DSV pair identity.
+        // Rejects extra RTV/UAV attachments and stale/foreign owner receipts.
+        [[nodiscard]] bool copy_bound_color_depth_pair_to_staging(
+            ID3D11DeviceContext* context,
+            const NativeSurfaceMirror& depth,
+            const NativeSurfacePairBinding& binding,
+            std::uint64_t bindingSnapshotToken,
             ID3D11Texture2D** stagingOutput) const noexcept;
 
         [[nodiscard]] ResourceRole role() const noexcept { return role_; }

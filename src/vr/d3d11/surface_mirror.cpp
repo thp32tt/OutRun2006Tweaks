@@ -575,4 +575,28 @@ namespace outrun::vr::dx11
         const auto current = binding_readiness(context, color, depth);
         return current.ready && current.snapshotToken == snapshotToken;
     }
+
+    bool NativeSurfaceMirror::copy_bound_color_depth_pair_to_staging(
+        ID3D11DeviceContext* context,
+        const NativeSurfaceMirror& depth,
+        const NativeSurfacePairBinding& binding,
+        std::uint64_t bindingSnapshotToken,
+        ID3D11Texture2D** stagingOutput) const noexcept
+    {
+        if (!stagingOutput)
+            return false;
+        *stagingOutput = nullptr;
+
+        // R168: R167's slot-0 proof alone cannot exclude a second live RTV
+        // or an unrelated R145 owner. Revalidate the exact binding receipt
+        // (all RTV slots/UAVs, DSV, immediate context and surface generation)
+        // before staging the color member of that sealed pair.
+        if (bindingSnapshotToken == 0 ||
+            !binding.validate_binding_snapshot(
+                context, *this, depth, bindingSnapshotToken))
+            return false;
+
+        return copy_color_depth_pair_to_staging(
+            context, depth, stagingOutput);
+    }
 }
