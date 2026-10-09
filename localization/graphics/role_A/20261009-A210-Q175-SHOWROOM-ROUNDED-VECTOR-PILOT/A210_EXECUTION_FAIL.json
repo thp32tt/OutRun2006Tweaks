@@ -1,0 +1,13 @@
+{
+  "role": "A",
+  "run": "A210",
+  "queue_index": 175,
+  "status": "EXECUTION_DIAGNOSTIC_ONLY_NOT_CANDIDATE",
+  "exception": "RuntimeError",
+  "message": "('vector effect crosses source bbox', [47, 401, 487, 529])",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/A.py\", line 154, in <module>\n    raise RuntimeError((\"vector effect crosses source bbox\",bbox))\nRuntimeError: ('vector effect crosses source bbox', [47, 401, 487, 529])\n",
+  "new_promoted_dds": 0,
+  "new_trial_dds": 0,
+  "runtime_validation": "UNTESTED",
+  "candidate_preserved": true
+}
