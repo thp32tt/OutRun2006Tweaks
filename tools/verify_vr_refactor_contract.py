@@ -521,8 +521,11 @@ if "R32ReviewNoteMainDepthContentWrite()" not in r33:
     errors.append("R33 missing R32 review facade for R9 main-depth write owner API")
 if "R9NoteMainDepthContentWrite()" in r31:
     errors.append("R31 regained retired draw-side main-depth accounting")
-if "void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }" not in r32:
-    errors.append("R32 split facade must delegate main-depth accounting to the R9 owner API")
+# The R32 split now delegates the same R9 side effect through the R30 owner.
+# Keep this legacy review check aligned with the exact negative-mutation
+# owner-boundary contract above; do not require an obsolete direct R9 call.
+if "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }" not in r32:
+    errors.append("R32 split facade must delegate main-depth accounting through R30 to the R9 owner API")
 
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
