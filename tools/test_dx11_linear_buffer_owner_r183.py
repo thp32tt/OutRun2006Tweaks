@@ -8,7 +8,9 @@ gate=(root/".github/workflows/backend-conversion-gate.yml").read_text(encoding="
 cm=(root/"cmake.toml").read_text(encoding="utf-8")
 generated=(root/"CMakeLists.txt").read_text(encoding="utf-8")
 def valid(a,b):
-    return all(s in a for s in ("context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE",
+    # Both the pre-bind and live IA verification generation fences are required.
+    # A mutant that drops either one must fail, not inherit the other check.
+    return a.count("currentGeneration != generation_") == 2 and all(s in a for s in ("context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE",
         "buffer_->GetDevice(", "desc.Usage == D3D11_USAGE_DEFAULT",
         "currentGeneration != generation_", "currentSnapshotVersion != source_version_",
         "context->IAGetVertexBuffers(", "context->IAGetIndexBuffer(")) and all(
