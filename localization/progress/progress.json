@@ -9798,17 +9798,40 @@
     "USER_GAME": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C339-C1-Q227-A214-CURRENT-13-EXACT/C339_C1_CONTROLLER_HOLD.json"
-  }
-,
+  },
   "b341_q212_two_anchor_trial": {
-  "run_key": "OUTRUN-KOR-B341-Q212-TWO-ANCHORED-MATERIAL-TRIAL-20261010-0341",
-  "queue_index": 212,
-  "trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
-  "current_promoted_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
-  "trial_dds": 1,
-  "new_promoted_dds": 0,
-  "qa": "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_CONTROLLER_SCOPED_QA.json",
-  "decision": "SCOPED_PRODUCER_TRIAL_UNAPPROVED",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
+    "run_key": "OUTRUN-KOR-B341-Q212-TWO-ANCHORED-MATERIAL-TRIAL-20261010-0341",
+    "queue_index": 212,
+    "trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "current_promoted_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "trial_dds": 1,
+    "new_promoted_dds": 0,
+    "qa": "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_CONTROLLER_SCOPED_QA.json",
+    "decision": "SCOPED_PRODUCER_TRIAL_UNAPPROVED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c340_c1_q201_b305_exact_saved_delta": {
+    "role": "C1",
+    "shard": "ODD",
+    "run": "C340",
+    "run_key": "OUTRUN-KOR-C340-C1-Q201-B305-EXACT-NATIVE-DELTA-20261010",
+    "queue_index": 201,
+    "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+    "old_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+    "native_saved_dds_dimensions": [
+      2048,
+      2048
+    ],
+    "native_rgba_changes": 2505,
+    "native_alpha_changes": 1912,
+    "changed_outside_authorized_source_bbox": 0,
+    "source_and_clean_independent_verified": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "new_DDS": 0,
+    "IGR037": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C340-C1-Q201-B305-NATIVE-DELTA/C340_C1_CONTROLLER_HOLD.json"
+  }
 }
