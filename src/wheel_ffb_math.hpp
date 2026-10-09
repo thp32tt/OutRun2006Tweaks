@@ -9,6 +9,63 @@
 
 namespace WheelFFBMath
 {
+    enum class Model : int
+    {
+        ModernDD = 0,
+        ArcadeOriginal = 1,
+        RetiredLegacyModel2 = 2,
+        PS2OriginalExperimental = 3,
+    };
+
+    inline Model sanitize_model(int value)
+    {
+        // R10 follow-up: Hybrid is retired from the selectable/runtime model set.
+        // Preserve legacy numeric compatibility by treating saved Model=2 as
+        // Modern DD; Model=3 remains PS2 so old profiles do not renumber.
+        if (value == 2)
+            return Model::ModernDD;
+        if (value <= 0)
+            return Model::ModernDD;
+        if (value == 1)
+            return Model::ArcadeOriginal;
+        return Model::PS2OriginalExperimental;
+    }
+
+    inline const char* model_name(Model model)
+    {
+        switch (model)
+        {
+        case Model::ArcadeOriginal: return "ARCADE_ORIGINAL";
+        case Model::PS2OriginalExperimental: return "PS2_ORIGINAL_EXPERIMENTAL";
+        default: return "MODERN_DD";
+        }
+    }
+
+    inline bool model_uses_modern_sat(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
+    inline bool model_uses_arcade_events(Model model)
+    {
+        return model == Model::ArcadeOriginal;
+    }
+
+    inline bool model_uses_original_condition_backbone(Model model)
+    {
+        return model == Model::ArcadeOriginal ||
+               model == Model::PS2OriginalExperimental;
+    }
+
+    // MOZA R3 hardware A/B establishes opposite DirectInput polarity families:
+    // Modern DD needs both output and Spring reversed, while Arcade/PS2
+    // use the backend's native signs.  Keep this model rule in one place so
+    // profile/UI/runtime paths cannot drift apart again.
+    inline bool model_uses_reversed_r3_polarity(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     inline float smoothstep01(float t)
     {
         t = std::clamp(t, 0.0f, 1.0f);
