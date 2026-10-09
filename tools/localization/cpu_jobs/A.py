@@ -59,11 +59,29 @@ def make_trial(source,prior,clean,source_header,raw):
  # Distinct from simple change-of-brightness: explicitly model 12px deep side wall.
  # Source Korean is high in sprite, and the new 12px extrusion must leave positive lower margin.
  # Shift source glyph core 6 native pixels up to reserve real source-metal depth.
- core=np.float32(v>=162)
- for val in (170,200):
-  if np.count_nonzero(v>=val)>9500:core=np.float32(v>=val);break
- if np.count_nonzero(core)<8000:raise ValueError("not enough original real Hangul glyph pixels")
- face=offset(core,-5,0)
+ # Distinguish bright native face from the old beveled/extruded dark mask;
+ # a low threshold also selects its bottom lip and makes any new depth touch bbox.
+ bounds=[]
+ for value in (162,200,230,242,250):
+  yy,xx=np.nonzero(v>=value)
+  if len(yy):bounds.append({"threshold":value,"px":int(len(yy)),"bounds":[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]})
+ (OUT/"A217_FACE_EXTRACTION_PROVENANCE.json").write_text(json.dumps(bounds,indent=2)+"\n")
+ candidates=[(cut,v>=cut) for cut in (250,242,230,200) if np.count_nonzero(v>=cut)>8000]
+ if not candidates:raise ValueError("no sufficiently complete face in current Korean mask "+str(bounds))
+ selected=None
+ for cut,ary in candidates:
+  ys,xs=np.nonzero(ary)
+  if ys.max()-ys.min()+1<=97:
+   selected=(cut,ary,int(ys.min()),int(ys.max()));break
+ if selected is None:raise ValueError("original mask core too tall for 14px chrome depth, cannot crop "+str(bounds))
+ cut,raw_core,miny,maxy=selected
+ core=np.float32(raw_core)
+ # translate the complete extracted face; never clip a glyph or compress Hangul.
+ shift=4-miny
+ face=offset(core,shift,0)
+ if np.count_nonzero(face>=0.5)!=np.count_nonzero(core>=0.5):
+  raise ValueError("face translation cropped glyph mask")
+
  # one-pixel AA on same native source space, no scaling/tracking/stretch
  face=np.clip(gaussian_filter(face,0.46),0,1)
  solid=face>=0.38
