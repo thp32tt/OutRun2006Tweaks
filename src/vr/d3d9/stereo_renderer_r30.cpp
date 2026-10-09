@@ -3469,6 +3469,11 @@ namespace OutRunVRStereo
         return RightEyeSurface;
     }
 
+    IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept
+    {
+        return RightEyeDepth;
+    }
+
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
         return FrameStereoPoseSequence;

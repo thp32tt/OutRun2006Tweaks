@@ -61,6 +61,38 @@ if not re.search(
     r"\s*\{\s*return R30SupportBorrowedRightEyeSurface\(\);\s*\}", r32):
     errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
 
+# R84: right-eye depth is a borrowed lower resource, not the color surface.
+# Move only the R32 lookup across R30; do not AddRef, Release, cache or
+# mask a null/failed allocation. Use negative controls for swapped identity,
+# a forced null pointer and a bypass of the independent-TU owner facade.
+def r32_borrowed_right_depth_boundary_ok(api, owner, consumer):
+    return (
+        "IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept;" in api
+        and bool(re.search(
+            r"IDirect3DSurface9\*\s+R30SupportBorrowedRightEyeDepth"
+            r"\(\) noexcept\s*\{\s*return RightEyeDepth;\s*\}", owner))
+        and bool(re.search(
+            r"IDirect3DSurface9\*\s+R32ReviewRightEyeDepth"
+            r"\(\) noexcept\s*\{\s*return R30SupportBorrowedRightEyeDepth\(\);\s*\}",
+            consumer))
+    )
+
+if not r32_borrowed_right_depth_boundary_ok(r30_support_api, r30, r32):
+    errors.append("R32 right-eye depth must borrow original R9 depth through R30 owner")
+for label, mutated_r30, mutated_r32 in (
+    ("depth confused with color surface", r30.replace(
+        "return RightEyeDepth;", "return RightEyeSurface;", 1), r32),
+    ("depth incorrectly forced null", r30.replace(
+        "return RightEyeDepth;", "return nullptr;", 1), r32),
+    ("R32 bypasses depth owner", r30, r32.replace(
+        "return R30SupportBorrowedRightEyeDepth();", "return RightEyeDepth;", 1)),
+):
+    if mutated_r30 == r30 and mutated_r32 == r32:
+        errors.append("R84 right-depth negative mutation not applied: " + label)
+    elif r32_borrowed_right_depth_boundary_ok(
+            r30_support_api, mutated_r30, mutated_r32):
+        errors.append("R84 right-depth negative mutation survived: " + label)
+
 # R84 borrowed tracked RT/depth owner seam. These are two reads from the same
 # tracked-surface ownership domain, never COM AddRef/release or value copies.
 def check_r32_tracked_surface_borrow(source_h, source_r30, source_r32):

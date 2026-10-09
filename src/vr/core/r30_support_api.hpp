@@ -96,6 +96,8 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept;
     IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept;
     IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;
+    // Borrowed R9 right-eye depth surface; identity and lifetime stay lower-owned.
+    IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept;
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;

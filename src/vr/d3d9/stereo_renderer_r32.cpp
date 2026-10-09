@@ -882,7 +882,7 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return R30SupportBorrowedTrackedRenderTarget(); }
     IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return R30SupportBorrowedTrackedDepthStencil(); }
     IDirect3DSurface9* R32ReviewRightEyeSurface() noexcept { return R30SupportBorrowedRightEyeSurface(); }
-    IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept { return RightEyeDepth; }
+    IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept { return R30SupportBorrowedRightEyeDepth(); }
     bool R32ReviewEnsureStereoResources(IDirect3DDevice9* d) noexcept { return EnsureStereoResources(d); }
     bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* d) noexcept { return TryBootstrapRightDepthFromRecentClear(d); }
     bool R32ReviewDepthTestActive(IDirect3DDevice9* d) noexcept { return DepthTestActive(d); }
