@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 02:19 KST",
+  "updated_at_kst": "2026-10-10 02:23 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9696,6 +9696,27 @@
     "user_game": "IGR034_IGR035_IGR036_OPEN_USER_INGAME_FAIL",
     "RUNTIME_VALIDATION": "UNTESTED",
     "next": "A214 successfully published proof. Do not rerun. C1 reverify exact q227 DDS and source/CLEAN/final all 16 native plus 1px margins and blind font calibration before C PASS. IGR034/035/036 still open."
+  },
+  "c337_c1_q137_b320_current_native_hold": {
+    "run": "C337",
+    "run_key": "OUTRUN-KOR-C337-C1-Q137-B320-CURRENT-NATIVE-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 137,
+    "exact_candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+    "new_DDS": 0,
+    "independent_native_alpha_bbox": [
+      1340,
+      99,
+      1516,
+      125
+    ],
+    "source_and_clean_independently_verified": false,
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "USER_GAME": "IGR041_OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C337-C1-Q137-B320-NATIVE-HOLD/C337_C1_CONTROLLER_HOLD.json"
   }
-
 }
