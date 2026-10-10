@@ -55,6 +55,20 @@ namespace OutRunVRStereo
     };
     bool R29OwnerTryGetDirectTransportIdentity(
         R29OwnerTransportIdentity& out) noexcept;
+    // Consolidated lower draw/depth/restore services. These forward existing
+    // R9/R23 behavior without creating a second owner or hook instance.
+    bool R29OwnerEnsureStereoResources(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerDepthTestActive(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerStencilTestActive(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;
+    bool R29OwnerLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;
+    void R29OwnerNoteMainDepthContentWrite() noexcept;
+    void R29OwnerNoteStereoDrawWithoutMonoBackup() noexcept;
+    void R29OwnerUndoStereoDrawCount() noexcept;
+    IDirect3DSurface9* R29OwnerBorrowTrackedRenderTarget() noexcept;
+    void R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(IDirect3DDevice9* device) noexcept;
+    void R29OwnerNoteRestoreFailure(const char* site) noexcept;
     bool R29OwnerStereoWanted() noexcept;
     bool R29OwnerTargetIsBackBuffer() noexcept;
     bool R29OwnerExchangeInternalStereoPass(bool active) noexcept;
