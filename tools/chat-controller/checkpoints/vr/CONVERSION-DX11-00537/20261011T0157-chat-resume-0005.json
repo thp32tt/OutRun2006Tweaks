@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "5minute_feature_progress",
+  "captured_at_kst": "2026-10-11T01:57:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_stage": "IMPLEMENTING_CI_VERIFYING",
+  "target_branch": "vr-dx11-native-r71",
+  "target_branch_unchanged_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "c89bb18178f3426723aa2432d52afb380f825980",
+  "last_real_activity": "material source Draw sampling, static negative regression and named 5 acceptance CI steps on feature branch; direct material ledger Issue #14 comment 6099914081",
+  "acceptance_provisional": {
+    "DX11-LIVE-CALLSITE": "PASS_STATIC_CI_ONLY",
+    "DX11-NATIVE-DRAW": "PASS_STATIC_CI_ONLY",
+    "DX11-VISIBLE-FRAME": "PASS_STATIC_CI_ONLY",
+    "DX11-SAFE-RETURN": "PASS_STATIC_CI_ONLY",
+    "DX11-TEST-BUNDLE": "PENDING_EXACT_SHA"
+  },
+  "incomplete_acceptance_ids": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "validation": {
+    "build_run": 38069385610,
+    "build_status": "RUNNING_CXX_COMPILE",
+    "openxr_run": 38069385616,
+    "openxr_status": "RUNNING_WIN32_COMPILE",
+    "host_x64": "SUCCESS",
+    "backend_gate": "NOT_RUN_FEATURE_BRANCH"
+  },
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_ready": false,
+  "score_change": 0,
+  "next_action": "Check c89bb181 exact-SHA Build/OpenXR final status and named DX11-TEST-BUNDLE artifact. If SUCCESS, log precise static/build acceptance separately from unresolved live desktop and HMD evidence; preserve target, send FEATURE_READY for diagnostic bundle only after contract and gate satisfied. If FAIL, repair on feature branch. Never count WARP-only or source-only checks as runtime graphics success."
+}
