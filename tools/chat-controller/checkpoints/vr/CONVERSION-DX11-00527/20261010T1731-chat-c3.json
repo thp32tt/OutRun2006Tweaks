@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_C3_exact_sha_ci",
+  "captured_at_kst": "2026-10-10T17:31:30+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX11-00527",
+  "event_id": "CONVERSION-DX11-00527-E001",
+  "lane": "DX11",
+  "slot": "A",
+  "branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00527",
+  "work_key": "DX11:R230:LINEAR_GPU_PREDICATION_EXECUTION_FENCE",
+  "phase": "C3_VALIDATE",
+  "status": "WAITING_CI",
+  "terminal": false,
+  "base_sha": "7cc09b3c87762ab36fa4cdf2f3c9ce3af9b9efcd",
+  "initial_material_sha": "4b3f87156894e8ff8ff37f01f17575b67e53dc10",
+  "validation_bearing_result_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "ci_run_id": 38037881328,
+  "ci_validate": "success",
+  "ci_smoke": "in_progress",
+  "prior_run": {
+    "id": 38037301902,
+    "failed_step": "Verify R221 linear OM UAV isolation",
+    "repair": "scoped R221 source-mutant verifier"
+  },
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "next_action": "Observe exact-SHA R230 source mutants + WARP linear Draw smoke, inherited R175 blocker; seal C6 only after Gate result.",
+  "note": "Controller-branch checkpoint only; not a game commit, not terminal, not evidence of runtime PASS."
+}
