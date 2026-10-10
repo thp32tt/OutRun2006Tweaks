@@ -3981,4 +3981,22 @@ namespace OutRunVRStereo
     {
         SetStereoRecoverySafetyThroughEpoch(throughEpoch);
     }
+    bool R30SupportFrameIdAtOrAfter(
+        std::uint32_t candidate, std::uint32_t reference) noexcept
+    {
+        return FrameIdAtOrAfter(candidate, reference);
+    }
+    void R30SupportFailClosedResetBaselineState() noexcept
+    {
+        FailClosedResetBaselineState();
+    }
+    void R30SupportArmStereoRecoverySafety(
+        std::uint64_t extraPresents) noexcept
+    {
+        ArmStereoRecoverySafety(extraPresents);
+    }
+    void R30SupportNoteRestoreFailure(const char* what) noexcept
+    {
+        NoteRestoreFailure(what);
+    }
 }

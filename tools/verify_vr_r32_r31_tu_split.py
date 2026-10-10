@@ -74,6 +74,27 @@ if "R30SupportSetStereoRecoverySafetyThroughEpoch(" not in r32:
     errors.append("R32 Reset lifecycle still uses transitive R29 recovery function")
 if "            SetStereoRecoverySafetyThroughEpoch(" in r32:
     errors.append("R32 regained private R29 recovery linkage")
+if '#include "vr_pass_policy.hpp"' not in r32:
+    errors.append("R32 standalone translation unit lacks shared effect policy")
+for public, lower in (
+    ("FrameIdAtOrAfter", "return FrameIdAtOrAfter(candidate, reference);"),
+    ("FailClosedResetBaselineState", "FailClosedResetBaselineState();"),
+    ("ArmStereoRecoverySafety", "ArmStereoRecoverySafety(extraPresents);"),
+    ("NoteRestoreFailure", "NoteRestoreFailure(what);"),
+):
+    facade = "R30Support" + public + "("
+    if facade not in r30_api or facade not in r30 or facade not in r32:
+        errors.append("missing isolated lower-owner facade: " + facade)
+    if lower not in r30:
+        errors.append("R30 lower-owner delegation drifted: " + lower)
+for old in (
+    "!FrameIdAtOrAfter(gpuCompleted, candidate.frameId)",
+    "{ FailClosedResetBaselineState(); }",
+    "{ ArmStereoRecoverySafety(n); }",
+    "{ NoteRestoreFailure(what); }",
+):
+    if old in r32:
+        errors.append("R32 retains private R9/R29 imported identifier: " + old)
 
 legacy_r31_calls = (
     "R31TelemetryFrameSnapshot(", "R31TelemetryLiveWvpChecks(",
