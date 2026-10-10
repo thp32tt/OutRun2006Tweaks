@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_worker_progress",
+  "captured_at_kst": "2026-10-10T16:35:00+09:00",
+  "task_id": "CONVERSION-DX9EX-00580",
+  "event_id": "CONVERSION-DX9EX-00580-E001",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "source_base_sha": "ac7e36a5e3eca7283321907582b920eb0ddd49ec",
+  "first_material_sha": "5ba7c33ee477c81e8d0f75bd099b811fdfc87587",
+  "final_validation_bearing_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "work_key": "DX9EX:P0:FFB_V02_XINPUT_TO_SDL_STALE_RUMBLE_HANDOFF",
+  "status": "C3_EXACT_SHA_CI_RUNNING",
+  "gate_runs": {
+    "active": 38034625458,
+    "domain": 38034625492,
+    "fullsource": 38034625521
+  },
+  "gate_snapshot": {
+    "active": "IN_PROGRESS",
+    "domain": "SUCCESS",
+    "fullsource": "IN_PROGRESS"
+  },
+  "runtime_validation": "UNTESTED",
+  "wheel_hardware_validation": "UNTESTED",
+  "changed_paths": [
+    "src/hooks_forcefeedback.cpp",
+    "tools/verify_vr_ffb_controller_routing.py"
+  ],
+  "temporary_safety_branch": "work/CONVERSION-DX9EX-00580-input-stop",
+  "temporary_sha": "e0f9f28e5a7abcbf5a407f9a91f1d743e8a6f177",
+  "next_action": "Await exact final SHA gate completion, then C6 run record, Issue14 update, AI2 scoreboard once; never claim runtime PASS."
+}
