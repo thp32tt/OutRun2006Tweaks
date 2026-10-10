@@ -103,6 +103,26 @@ def check(r29: str, r30: str, header: str) -> None:
         assert api in header, f"R29 owner header missing: {api}"
         assert api in r30, f"R30 missing lower owner ABI use: {api}"
     assert not re.search(r"\bSharedState\b", r30), "R30 still owns lower shared IPC pointer"
+    lower_services = {
+        "R29OwnerEnsureStereoResources(": "return EnsureStereoResources(device);",
+        "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device);",
+        "R29OwnerDepthTestActive(": "return DepthTestActive(device);",
+        "R29OwnerStencilTestActive(": "return StencilTestActive(device);",
+        "R29OwnerLeftDrawMayWriteDepth(": "return LeftDrawMayWriteDepth(device);",
+        "R29OwnerLeftDrawMayWriteStencil(": "return LeftDrawMayWriteStencil(device);",
+        "R29OwnerNoteMainDepthContentWrite(": "R9NoteMainDepthContentWrite();",
+        "R29OwnerNoteStereoDrawWithoutMonoBackup(": "R9NoteStereoDrawWithoutMonoBackup();",
+        "R29OwnerUndoStereoDrawCount(": "R9UndoStereoDrawCount();",
+        "R29OwnerBorrowTrackedRenderTarget(": "return TrackedRenderTarget;",
+        "R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(": "InvalidateRightDepthStencilIfLeftMayWrite(device);",
+        "R29OwnerNoteRestoreFailure(": "NoteRestoreFailure(site);",
+    }
+    for signature, forwarding in lower_services.items():
+        assert signature in header, f"R29 header lacks lower service: {signature}"
+        assert signature in r30, f"R30 retained lower-symbol dependency: {signature}"
+        assert forwarding in body(r29, signature), (
+            f"R29 lower service delegation lost: {signature}"
+        )
     assert "R30ScopedInternalPass" in r30
     assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
     assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
@@ -174,7 +194,19 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {marker}")
-    print("R29/R30 owner ABI regression PASS (21 negative mutations)")
+    for signature, delegation in lower_services.items():
+        pos = r29.find(signature)
+        assert pos >= 0
+        mutated = r29[:pos] + r29[pos:].replace(
+            delegation, "/* lost lower service delegation */", 1)
+        assert mutated != r29
+        try:
+            check(mutated, r30, header)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"negative mutation unexpectedly PASS: {signature}")
+    print("R29/R30 owner ABI regression PASS (33 negative mutations)")
 
 
 if __name__ == "__main__":
