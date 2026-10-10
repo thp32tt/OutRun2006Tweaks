@@ -11,7 +11,16 @@
   "evidence": {
     "local_static": "PASS 12 scoped negative guard mutations and isolated WARP fixture/workflow wiring",
     "warp": "PENDING exact-SHA Windows WARP",
-    "prior_gate_blocker": "Inherited R175 TEXCOORD6 mismatch owned by CONVERSION-DX11-00477; do not edit/bypass"
+    "prior_gate_blocker": "Inherited R175 TEXCOORD6 mismatch owned by CONVERSION-DX11-00477; do not edit/bypass",
+    "first_material_sha": "17924691c1da7cc7be9aee2dfd2c0aa065f50638",
+    "first_gate": {
+      "id": 38030067509,
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_job": "DX11 readiness smoke probes",
+      "reason": "R225 probe CreateRenderTargetView third parameter passed ComPtr.Get() not GetAddressOf(): MSVC C2664"
+    },
+    "local_repair": "PASS exact one-pointer output argument correction (no gameplay C++ guard changes)"
   },
   "attempt": "1/3",
   "event_id": "CONVERSION-DX11-00522-E001",
@@ -22,19 +31,19 @@
     "tools/test_dx11_viewport_draw_r187.py"
   ],
   "owner_id": "ChatGPT2:CONVERSION-DX11-00522",
-  "checkpoint": "C4_COMMIT",
-  "status": "WAIT_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT_REPAIR_1",
+  "status": "WAIT_EXACT_SHA_GATE_REPAIR_1",
   "terminal": false,
   "pipeline": {
     "C0": "PASS GitHub base/checkpoint and 00520/00521 work owner separation",
     "C1": "PASS indexed R187 color backing missing R224-like typed resource fence",
     "C2": "PASS coherent 3-file C++/WARP/static contract change",
-    "C3": "LOCAL_STATIC_PASS; exact-SHA Gate pending",
+    "C3": "INITIAL_GATE_FAIL_WARP_PROBE_COMPILE_C2664; NEW_EXACT_SHA_GATE_PENDING",
     "C4": "COMMIT_IN_PROGRESS",
     "C5": "NOT_REQUIRED native gameplay activation remains dormant",
     "C6": "PENDING exact-SHA CI result"
   },
-  "retry_count": 0,
+  "retry_count": 1,
   "changed_files": [
     "src/vr/d3d11/native_indexed_target_viewport.hpp",
     "tools/dx11_viewport_draw_probe_r187.cpp",
@@ -44,6 +53,6 @@
     "Quest3/VDXR HMD runtime UNTESTED",
     "Existing unrelated R175 TEXCOORD6 Gate failure still unresolved"
   ],
-  "resume_cursor": "WAIT_BACKEND_CONVERSION_GATE",
-  "next_action": "Verify full exact-SHA Backend Conversion Gate and R187 WARP, record canonical run and inherited R175 failure separately."
+  "resume_cursor": "WAIT_REPAIR_EXACT_SHA_GATE",
+  "next_action": "Inspect R225 WARP compile/run and full exact-SHA Gate on repaired material; do not re-run initial SHA."
 }

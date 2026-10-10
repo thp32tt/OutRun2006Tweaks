@@ -101,7 +101,7 @@ int main() {
     rtv->GetDesc(&r225ViewDesc);
     ComPtr<ID3D11RenderTargetView> r225TypedView;
     require(SUCCEEDED(dev->CreateRenderTargetView(
-        r225TypelessColor.Get(),&r225ViewDesc,r225TypedView.Get())) &&
+        r225TypelessColor.Get(),&r225ViewDesc,r225TypedView.GetAddressOf())) &&
         r225TypedView, "R225 typed RTV over typeless indexed eye");
     ID3D11RenderTargetView* r225Raw=r225TypedView.Get();
     ctx->OMSetRenderTargets(1,&r225Raw,nullptr);
