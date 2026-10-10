@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B355",
+  "index": 154,
+  "run_key": "OUTRUN-KOR-B355-Q154-EXACT-C311-C356-SUBPIXEL-FAMILY-20261010",
+  "triage": "MATERIAL_REWORK",
+  "method": "Exact historical C311 underweight native silhouette (SHA946...) and C356 B298 overweight glyph silhouette (SHAc4d6..) non-destructively alpha-interpolated 50% at original 4096x1024 pixels, with source-conditioned gray face retained. Source-derived native stem weight repair; never rescale old lowres raster.",
+  "canonical_source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "pre_B298_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "current_official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "authored_C344_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "new_unapproved_saved_dds_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+  "dds_size_bytes": 16777344,
+  "new_saved_unapproved_trials": 1,
+  "promoted_official_dds": 0,
+  "changed_visible_rgba": 22195,
+  "outside_gray3_changed": 0,
+  "decoded_persisted_diff_pixels": 0,
+  "native": [
+    4096,
+    1024
+  ],
+  "format": "RGBA32",
+  "mip_count": 1,
+  "raw_transform": "MIRROR_Y",
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "candidate_alpha_gt128_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "changed_native_alpha_pixels": 9275,
+      "previous_original_alpha_pixels": 13360,
+      "current_rejected_alpha_pixels": 17549,
+      "interpolated_alpha_pixels": 17549,
+      "remaining_positive_bbox_margins": [
+        2,
+        174,
+        3,
+        3
+      ]
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "candidate_alpha_gt128_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "changed_native_alpha_pixels": 4430,
+      "previous_original_alpha_pixels": 6628,
+      "current_rejected_alpha_pixels": 8579,
+      "interpolated_alpha_pixels": 8579,
+      "remaining_positive_bbox_margins": [
+        2,
+        208,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "candidate_alpha_gt128_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "changed_native_alpha_pixels": 8490,
+      "previous_original_alpha_pixels": 12757,
+      "current_rejected_alpha_pixels": 16680,
+      "interpolated_alpha_pixels": 16680,
+      "remaining_positive_bbox_margins": [
+        2,
+        154,
+        2,
+        2
+      ]
+    }
+  ],
+  "evidence_images": [
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_FLIPY.png",
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_75_FLIPY.png",
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_RAW.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_FLIPY.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_75_FLIPY.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_RAW.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_FLIPY.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_75_FLIPY.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_RAW.png"
+  ],
+  "producer_static": "MECHANICAL_PASS_OPTICAL_SOURCE_FAMILY_CONTROLLER_REVIEW_PENDING",
+  "C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

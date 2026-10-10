@@ -1,0 +1,13 @@
+{
+  "source_SHA": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "reference_C311_alpha_SHA": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "reference_C356_alpha_SHA": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "subpixel_core_alpha_formula": "(C311+C356+1)//2",
+  "native_source_face_RGB": [
+    78,
+    96,
+    100
+  ],
+  "protected_original_red5": true,
+  "review_required": "native100/75/50 RAW source-relative gray family and C2 first-look; no promotion until producer PASS"
+}
