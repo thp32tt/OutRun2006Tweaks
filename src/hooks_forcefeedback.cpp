@@ -41,7 +41,7 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
             void InputManager_StopVibration();
             InputManager_StopVibration();
             XINPUT_VIBRATION zero{};
-            XInputSetState(Settings::VibrationControllerId, &zero);
+            XInputSetState(userId, &zero);
         }
         wheelOwnedLastCall = true;
         // Force a fresh disabled-mode stop if wheel ownership is later lost.
@@ -109,7 +109,9 @@ class Vibration : public Hook
         // intentionally different: sample the car only AFTER its physics Ctrl
         // returns so body motion/yaw belong to the current simulation tick.
         CalcVibrationValues(car);
-        SetVibration(0, VibrationLeftMotor, VibrationRightMotor);
+        // Match wheel-owner/disabled stop and legacy XInput output to the
+        // configured controller; do not hardcode port 0.
+        SetVibration(VibrationUserId, VibrationLeftMotor, VibrationRightMotor);
 
         GamePlCar_Ctrl.call(car);
         WheelFFB_UpdateAfterPhysics(car);
