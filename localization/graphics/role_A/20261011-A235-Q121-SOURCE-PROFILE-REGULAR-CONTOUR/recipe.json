@@ -1,0 +1,65 @@
+{
+  "version": "source-native-flat-plate-v1",
+  "index": 121,
+  "cell_id": "rank20_Gas_Pedal",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_crop_path": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_20_SOURCE_NATIVE_RGBA.png",
+  "source_crop_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "source_bbox_readable": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "plate_from_source_modal_RGBA": [
+    0,
+    111,
+    159,
+    0
+  ],
+  "modal_support_fraction": 0.4428219563687544,
+  "alpha_layer_compositing": "straight_alpha_src_over",
+  "border_source_modal_support": 0.8451957295373665,
+  "render_text": "가속 페달",
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+  "font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "native_ppem": 41,
+  "english_face_profile": {
+    "source_white_pixels": 3901,
+    "source_dark_rim_pixels": 1729,
+    "source_face_rgb": [
+      255,
+      255,
+      255
+    ],
+    "source_rim_rgb": [
+      0,
+      17,
+      24
+    ],
+    "face_bbox": [
+      1,
+      0,
+      229,
+      46
+    ],
+    "english_G_top_left_x7pct": 7.940000000000001,
+    "english_G_bottom_left_x7pct": 3.0,
+    "english_G_top_minus_bottom_dx": 4.940000000000001,
+    "optical_lean_hint_not_homologous": 0.198,
+    "source_anchor_not_independently_homologous": true
+  },
+  "supersample_one_time": 3,
+  "readable_italic_shear": 0.198,
+  "original_font_effect": "white italic face / navy outline and extrusion",
+  "glyph_box_local": [
+    11,
+    7,
+    221,
+    41
+  ],
+  "lettering_separate": true,
+  "orient": "READABLE_FLIP_Y -> DDS RAW Y-MIRROR",
+  "background": "source-derived modal solid native pixels"
+}
