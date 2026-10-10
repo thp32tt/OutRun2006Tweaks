@@ -1,0 +1,138 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C2-Q060-B350-20261010T1550-4899FBD0",
+  "run_key": "OUTRUN-KOR-C2-Q060-B350-NATIVE-GOLD-FAMILY-FAIL-20261010-1550",
+  "reviewed_at_kst": "2026-10-10 16:01:58 KST",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "official_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "unapproved_persisted_trial_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+  "material_candidate_sha_is_distinct_from_previous_B349": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159",
+  "firstlook": "Independently visually inspected three downloaded B350 comparator PNGs and new C2 persisted-DDS 100/75/50 and RAW evidence; producer verdict was read before first look, NOT a blind C calibration.",
+  "calibration": "NOT_QUALIFIED_FOR_PASS",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "machine_report": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_INDEPENDENT_PERSISTED_MACHINE.json",
+  "result": "REWORK_REQUIRED_FOR_UNPROMOTED_B350_TRIAL",
+  "new_independent_C2_visual_decision": true,
+  "stage_C": {
+    "pixels_before_producer_verdict": false,
+    "reviewer": "ChatGPT AI1 C2 (same controller)",
+    "eight_checks": {
+      "BEST_TIME_TITLE": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable right lean exists in B350; homologous source vs Hangul contour anchors and depth perspective not independently calibrated; cannot claim accurate slant.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+            "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+          }
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Source-derived B348 clean reused by producer, but independent full-atlas SOURCE-to-CLEAN removal/plate-only pixels were not reconstructed in this C2 pass; trial visual FAIL takes priority.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+            "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+          }
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Direct independently decoded exact DDS EN/B350 comparison: English BEST TIME has bright yellow/cream core, orange band and deep navy keyline with layered raised bevel, whereas Hangul 최고 기록 has dark orange/red bands, fine flat bright stripe and reddish-brown outer extrusion; source racing glyph face and 3D optical material not matched.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+            "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+          }
+        },
+        "readability": {
+          "result": "SCOPED_PASS",
+          "observation": "New Hangul is readable at 100% and black-background practical 50%; unlike B349, new relative width 794/849 is no longer main defect; style remains blocking.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_50_BLACK.png",
+            "sha256": "5f9a7fd5a6569a2c7803c69694ac1ca91e2d1220ffe28254824cf667ba3502dd"
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "Saved DDS readable 100% and 50% panels show individually legible Hangul with no obvious missing whole syllable or clipped edge; this is not full mip/region PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_50_BLACK.png",
+            "sha256": "5f9a7fd5a6569a2c7803c69694ac1ca91e2d1220ffe28254824cf667ba3502dd"
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Independently verified exact persisted official and trial DDS changed 99,951 RGBA pixels all inside readable ROI; changed RGBA and alpha outside ROI both 0; full canonical SOURCE/CLEAN composite proof is still missing.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+            "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+          }
+        },
+        "placement": {
+          "result": "SCOPED_PASS",
+          "observation": "Producer measured B350 translated effect bbox [2227,350,3021,473] within canonical English bbox [2179,340,3028,474] with margins [48,7,10,1]; no neighboring sibling intrusion in inspected ROI; near bottom/right requires future game view.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+            "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Independently generated RAW and vertically flipped readable panels from exact 4096x2048 saved DDS, no orientation reversal noted; visual family FAIL occurs in both.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_RAW_100_GRAY.png",
+            "sha256": "46a7c3214c136b5ab6f17df1e0ab462b555158fc2e4e0731fa365d2e8e6a69a8"
+          }
+        }
+      }
+    }
+  },
+  "C3": "BLOCKED_C2_FAIL",
+  "APPROVAL": "NOT_ISSUED",
+  "reason_codes": [
+    "SOURCE_FAMILY_GOLD_FACE_DEPTH_MISMATCH",
+    "SOURCE_FAMILY_CONDENSED_RACING_FACE_MISMATCH",
+    "READABLE_SLANT_SOURCE_ANCHORS_UNQUALIFIED"
+  ],
+  "corrective_method": "Source-conditioned bright cream/yellow/orange racing bevel and navy depth from canonical English, qualifying comparable readable slant anchors; do not recolor/stretch entire B350 glyph or redo an unchanged candidate.",
+  "official_asset_status": "C342_C2_REWORK_REQUIRED_UNCHANGED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_promoted_DDS": 0,
+  "modified_official_DDS": false,
+  "limitations": [
+    "This FAIL is not current-policy complete PASS evidence",
+    "No game-composed retest; user game failure remains open",
+    "No synthetic calibration is claimed to be genuine visual approval"
+  ],
+  "views": [
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+      "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_75_WHITE.png",
+      "sha256": "b4f7b52844f0defdb314cb19c821e1aebd790822657d34ebf1d76fc911d4db0b"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_50_BLACK.png",
+      "sha256": "5f9a7fd5a6569a2c7803c69694ac1ca91e2d1220ffe28254824cf667ba3502dd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_RAW_100_GRAY.png",
+      "sha256": "46a7c3214c136b5ab6f17df1e0ab462b555158fc2e4e0731fa365d2e8e6a69a8"
+    }
+  ],
+  "execution_backend": "GitHub SSOT + N100 MCP binary-only fallback",
+  "forbidden_untouched": [
+    "ODD_SHARD",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

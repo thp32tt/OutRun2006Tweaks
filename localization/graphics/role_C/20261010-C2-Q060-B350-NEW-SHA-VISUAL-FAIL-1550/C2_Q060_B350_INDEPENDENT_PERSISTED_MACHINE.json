@@ -1,0 +1,74 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C2-Q060-B350-NATIVE-GOLD-FAMILY-FAIL-20261010-1550",
+  "review_type": "INDEPENDENT_C2_MACHINE_FOR_REJECTED_UNPROMOTED_TRIAL",
+  "queue_index": 60,
+  "shard": "EVEN",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "unapproved_trial_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+  "backend": "N100_MCP_FALLBACK_FOR_BINARY_DDS_NOT_AVAILABLE_IN_GPT_LOCAL",
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "mip_levels_inspected": [
+    0
+  ],
+  "format": "RGBA32",
+  "source_bbox_readable": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "trial_effect_bbox_from_B350_producer_measurement": [
+    2227,
+    350,
+    3021,
+    473
+  ],
+  "roi_readable": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "original_to_trial_source_family_widths": {
+    "english": 849,
+    "korean": 794,
+    "ratio_percent": 93.52
+  },
+  "verified_independently": {
+    "all_three_persisted_sha256": true,
+    "decoded_PIL_RGBA": true,
+    "official_to_trial_rgba_changed_pixels": 99951,
+    "official_to_trial_rgba_outside_roi": 0,
+    "official_to_trial_alpha_outside_roi": 0,
+    "readable_and_raw_images_generated_from_saved_dds": true
+  },
+  "limitations": [
+    "Bounding box of new glyph effect is inherited from B350, not independently resegmented here",
+    "SOURCE/CLEAN full-atlas independent plate proof not completed",
+    "No blind defect calibration or in-game retest; no C/C3 PASS"
+  ],
+  "result": "MACHINE_SCOPE_PASS_VISUAL_STYLE_FAIL",
+  "views": [
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_100_GRAY.png",
+      "sha256": "b7df75312e2d19380175f6e4d546dcfa53cce8c50cbbf2b0ba390592b9a7623d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_75_WHITE.png",
+      "sha256": "b4f7b52844f0defdb314cb19c821e1aebd790822657d34ebf1d76fc911d4db0b"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_READABLE_50_BLACK.png",
+      "sha256": "5f9a7fd5a6569a2c7803c69694ac1ca91e2d1220ffe28254824cf667ba3502dd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_RAW_100_GRAY.png",
+      "sha256": "46a7c3214c136b5ab6f17df1e0ab462b555158fc2e4e0731fa365d2e8e6a69a8"
+    }
+  ]
+}

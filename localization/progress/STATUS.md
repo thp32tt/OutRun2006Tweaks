@@ -1,3 +1,9 @@
+## 2026-10-10 16:01:58 KST — C2 EVEN q060 B350 independent persisted-DDS visual REWORK (unpromoted)
+
+- C2 reviewed new B350 saved candidate SHA256 `4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5` distinct from prior B349; canonical English `6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc` and unchanged official `d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01` independently SHA-verified. Native decoded 4096×2048, readable 100/75/50 and RAW lossless triptychs persisted.
+- Mechanical official→trial 99,951 changed RGBA pixels; changed RGBA/alpha outside ROI **0/0**. Optical failure overrides mechanical containment: original cream/yellow/orange bevel + navy racing depth is not reproduced by orange/red face + brown extrusion Korean trial.
+- **REWORK_REQUIRED (trial only)**; queue official C342 REWORK unchanged, triage METHOD_CHANGE_REQUIRED, C3/current approval blocked, IGR044 open, `RUNTIME_VALIDATION=UNTESTED`. No promoted/new official DDS. Evidence `localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_INDEPENDENT_VISUAL_REWORK.json`. `OUTRUN-KOR-C2-Q060-B350-NATIVE-GOLD-FAMILY-FAIL-20261010-1550`.
+
 ## 2026-10-10 15:48 KST — B350 even q060 P0 source-contour gold title trial (PRODUCER VISUAL REJECT)
 
 - **New distinct persisted 4096×2048, 33,554,560-byte RGBA32 trial DDS** SHA-256 `4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5`, GitHub Actions [CPU worker #38031651627](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38031651627) SUCCESS. This is an unapproved role-B evidence trial, not an official HD candidate or in-game fix.
