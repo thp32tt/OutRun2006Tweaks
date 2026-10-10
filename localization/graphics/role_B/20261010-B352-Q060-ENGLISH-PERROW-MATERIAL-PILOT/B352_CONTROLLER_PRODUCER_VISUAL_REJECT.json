@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run": "B352",
+  "role": "B",
+  "queue_index": 60,
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "authored_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "prior_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "trial_persisted_sha256": "620266f60da9677234281a88958cd0fca6db1adc01b655ef66df889d8714d229",
+  "actual_inspection": [
+    "B352_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "B352_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_50_FLIPY.png"
+  ],
+  "mechanical": {
+    "changed_rgba_pixels": 87073,
+    "changed_outside_roi": 0,
+    "persisted_roundtrip_mismatch": 0,
+    "bbox": [
+      2247,
+      357,
+      2974,
+      462
+    ],
+    "source_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ]
+  },
+  "visual_decision": "REWORK_REQUIRED_UNPROMOTED_TRIAL",
+  "reasons": [
+    "NATIVE_REGULAR_STROKE_TOO_THIN_RELATIVE_TO_SOURCE_RACING_GOLD",
+    "HANGUL_OPTICAL_HEIGHT_TOO_SMALL_FOR_SOURCE_BEST_TIME_TITLE",
+    "WEAK_CHROME_FACE_DEPTH_AT_50_PERCENT"
+  ],
+  "first_failed_stage": "P2_NATIVE_GLYPH_FAMILY_AND_EFFECT_WEIGHT",
+  "next_action": "TRY_UP_TO_ONE_MORE_SAME_FAMILY_CHANGE_WITH_NATIVE_BOLD_122_PPEM_CONDENSED_GLYPHS_WITHOUT_HEAVY_8PX_EDGE_THEN_FAIL_CLOSED_IF_STILL_WRONG",
+  "official_changed": false,
+  "C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "run_key": "OUTRUN-KOR-B352-Q060-REGULAR-SLENDER-VISUAL-REJECT-20261010"
+}
