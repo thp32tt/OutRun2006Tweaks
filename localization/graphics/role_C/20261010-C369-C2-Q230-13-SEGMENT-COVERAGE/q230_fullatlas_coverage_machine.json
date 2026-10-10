@@ -1,0 +1,151 @@
+{
+  "queue_index": 230,
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "actual_decoded_rgba_shape": [
+    1024,
+    2048,
+    4
+  ],
+  "source_clean_outside_help": 137224,
+  "clean_final_outside_help": 0,
+  "clean_final_inside_help": 15398,
+  "outside_help_coverage_regions": [
+    {
+      "id": "left-01",
+      "bbox_readable": [
+        94,
+        47,
+        745,
+        88
+      ],
+      "source_clean_diff_pixels": 12205,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "left-02",
+      "bbox_readable": [
+        4,
+        252,
+        536,
+        304
+      ],
+      "source_clean_diff_pixels": 19146,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "left-03",
+      "bbox_readable": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "source_clean_diff_pixels": 10437,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "left-04",
+      "bbox_readable": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "source_clean_diff_pixels": 15126,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "left-05",
+      "bbox_readable": [
+        12,
+        709,
+        363,
+        760
+      ],
+      "source_clean_diff_pixels": 10290,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "right-01",
+      "bbox_readable": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "source_clean_diff_pixels": 10403,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "right-02",
+      "bbox_readable": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "source_clean_diff_pixels": 15846,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "right-03",
+      "bbox_readable": [
+        960,
+        404,
+        1280,
+        456
+      ],
+      "source_clean_diff_pixels": 11554,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "right-04",
+      "bbox_readable": [
+        964,
+        484,
+        1528,
+        536
+      ],
+      "source_clean_diff_pixels": 20762,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    },
+    {
+      "id": "right-05",
+      "bbox_readable": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "source_clean_diff_pixels": 11455,
+      "classification": "PRELIMINARY_UNMAPPED_PRIOR_LOCALIZATION",
+      "expected_art": "REQUIRES_EXACT_SEGMENT_INVENTORY_AND_BLIND_SOURCE_FAMILY",
+      "qa_status": "HOLD"
+    }
+  ],
+  "outside_help_region_sum": 137224,
+  "all_non_help_deltas_classified": true,
+  "semantic_segment_inventory_complete": false,
+  "blind_calibration_done": false,
+  "conclusion": "HOLD_STRICT_RECHECK; unchanged DDS; no new approval; no user/game acceptance"
+}

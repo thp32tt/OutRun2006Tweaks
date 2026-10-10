@@ -1,0 +1,293 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 230,
+  "reviewer": "ChatGPT C2 (same controller)",
+  "review_id": "C369-Q230-FULL-ATLAS-DELTA-SEGMENT-COVERAGE",
+  "review_type": "ADDITIONAL_REAL_PIXEL_EVIDENCE_NOT_NEW_C_PASS",
+  "source_upstream": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "native_size": [
+    2048,
+    1024
+  ],
+  "persisted_DDS_decoded": true,
+  "raw_orientation": "mirror_y",
+  "source_to_clean_changed_total": 159051,
+  "source_to_clean_13_segment_sum": 159051,
+  "source_to_clean_unmapped_diff_pixels": 0,
+  "source_clean_outside_help": 137224,
+  "clean_final_outside_help": 0,
+  "clean_final_inside_help": 15398,
+  "segments": [
+    {
+      "id": "left-02",
+      "source_label_observed": "BONUS MATERIAL",
+      "current_label_observed": "보너스 자료",
+      "source_clean_delta_bbox_readable": [
+        4,
+        252,
+        536,
+        304
+      ],
+      "changed_source_clean_pixels": 19146,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "left-03",
+      "source_label_observed": "COURSES",
+      "current_label_observed": "코스",
+      "source_clean_delta_bbox_readable": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "changed_source_clean_pixels": 10437,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "left-04",
+      "source_label_observed": "GAME MODES",
+      "current_label_observed": "게임 모드",
+      "source_clean_delta_bbox_readable": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "changed_source_clean_pixels": 15126,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "left-05",
+      "source_label_observed": "CAR COLORS",
+      "current_label_observed": "차량 색상",
+      "source_clean_delta_bbox_readable": [
+        12,
+        709,
+        363,
+        760
+      ],
+      "changed_source_clean_pixels": 10290,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "right-01",
+      "source_label_observed": "BGMUSIC",
+      "current_label_observed": "BGM",
+      "source_clean_delta_bbox_readable": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "changed_source_clean_pixels": 10403,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "right-02",
+      "source_label_observed": "CAR COLOURS",
+      "current_label_observed": "차량 색상",
+      "source_clean_delta_bbox_readable": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "changed_source_clean_pixels": 15846,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "right-03",
+      "source_label_observed": "FERRARI'S",
+      "current_label_observed": "페라리",
+      "source_clean_delta_bbox_readable": [
+        960,
+        404,
+        1280,
+        456
+      ],
+      "changed_source_clean_pixels": 11554,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "right-04",
+      "source_label_observed": "SHOWROOM ITEMS",
+      "current_label_observed": "쇼룸 아이템",
+      "source_clean_delta_bbox_readable": [
+        964,
+        484,
+        1528,
+        536
+      ],
+      "changed_source_clean_pixels": 20762,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "right-05",
+      "source_label_observed": "FERRARI CARS",
+      "current_label_observed": "페라리 차량",
+      "source_clean_delta_bbox_readable": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "changed_source_clean_pixels": 11455,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "left-01a",
+      "source_label_observed": "UNAVAILABLE",
+      "current_label_observed": "이용 불가",
+      "source_clean_delta_bbox_readable": [
+        94,
+        49,
+        447,
+        88
+      ],
+      "changed_source_clean_pixels": 8636,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "left-01b",
+      "source_label_observed": "SOLD",
+      "current_label_observed": "판매 완료",
+      "source_clean_delta_bbox_readable": [
+        624,
+        47,
+        745,
+        88
+      ],
+      "changed_source_clean_pixels": 3569,
+      "changed_clean_final_pixels": 0,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "help-20",
+      "source_label_observed": "You cannot buy this item yet",
+      "current_label_observed": "아직 구매할 수 없습니다",
+      "source_clean_delta_bbox_readable": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "changed_source_clean_pixels": 11407,
+      "changed_clean_final_pixels": 8584,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    },
+    {
+      "id": "help-21",
+      "source_label_observed": "You already own this item",
+      "current_label_observed": "이미 보유 중입니다",
+      "source_clean_delta_bbox_readable": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "changed_source_clean_pixels": 10420,
+      "changed_clean_final_pixels": 6814,
+      "scope_status": "SOURCE_CLEAN_DELTA_MAPPED_NOT_C_APPROVED",
+      "source_label_readable_orientation": "mirror_y_raw_to_flipy"
+    }
+  ],
+  "prior_protected_music_evidence": "C366 covers seven named music/album/BGM ROIs; no new claim of song-by-song independent measurement in this invocation",
+  "firstlook_before_producer_verdict": false,
+  "calibration": "NOT_QUALIFIED; known historical C reports read prior to this targeted image audit",
+  "all_semantic_segment_ids_qualified": false,
+  "actual_game_consumer_test": "UNTESTED",
+  "static_C_PASS": false,
+  "C3_STRICT_PASS": false,
+  "current_export_approval": false,
+  "result": "HOLD_STRICT_RECHECK",
+  "novelty": "First exact independently recomputed source-to-clean pixel coverage by 13 named changed localizable text regions, splitting UNAVAILABLE/SOLD, and proving zero unclassified source-to-clean changed pixels across full atlas; supplements C366 coarse 12 bands, not a repeat approval",
+  "required_next": [
+    "Blind calibration and source-family typography test of all 13 localized segments",
+    "Complete source inventory of untouched protected original text/music/brand rows separately",
+    "Independent 8-check region findings and C3 on same exact DDS SHA",
+    "User actual-game retest matching new build"
+  ],
+  "evidence": {
+    "full_english_source_native": {
+      "path": "localization/graphics/role_C/20261010-C369-C2-Q230-13-SEGMENT-COVERAGE/q230_13_segment_english_regions_native.png",
+      "sha256": "7dff4ea5146d00e0ca43661f1134fbffa7ccd789645cf28e8c1f643111b517b2",
+      "bytes": 26929
+    },
+    "source_clean_final_50percent": {
+      "path": "localization/graphics/role_C/20261010-C369-C2-Q230-13-SEGMENT-COVERAGE/q230_13_segment_source_clean_final_50.png",
+      "sha256": "53b01ded57871ac572cdb01e1099df16df6542039ac5fdc2eac2e865675c2532",
+      "bytes": 181600
+    },
+    "quantitative_changed_pixel_mask": {
+      "path": "localization/graphics/role_C/20261010-C369-C2-Q230-13-SEGMENT-COVERAGE/q230_fullatlas_sourceclean_vs_cleanfinal_diff.png",
+      "sha256": "df71d796dc7c28542ef2397b07b6df2dc292712b64433ecffc5bded2f67dad8e",
+      "bytes": 19473
+    },
+    "machine_report": {
+      "path": "localization/graphics/role_C/20261010-C369-C2-Q230-13-SEGMENT-COVERAGE/q230_fullatlas_coverage_machine.json",
+      "sha256": "2cc7edb71cb32a1c9e8c3be7652fa26c55d274cd2d5cfb9f19a5a12d7fc03b17",
+      "bytes": 4128
+    }
+  },
+  "eight_visual_gate_summary": {
+    "slant": {
+      "result": "HOLD",
+      "observation": "All 13 text regions not individually matched with same-stem top-minus-bottom anchors in readable coordinates; source visual used for mapping, no slant approval"
+    },
+    "clean_plate": {
+      "result": "HOLD",
+      "observation": "Exact source-clean delta exhaustively mapped to 13 source segments; 137224 outside two HELP regions are earlier localized text changes, not proof of complete 13-segment plate-only artifact freedom"
+    },
+    "style": {
+      "result": "HOLD",
+      "observation": "Unqualified source-family optical comparator; 13 labels mapped but no independent blind typography/control first-look, do not infer source-font match"
+    },
+    "readability": {
+      "result": "HOLD",
+      "observation": "Readable half-scale overview generated from exact decoded pixels; full 100/75/50 black-white-gray per 13 segments not independently observed in this run"
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "Pixel-accurate changed locations identified; fine glyph stroke/counter inspection and all per-region native zoom proof incomplete"
+    },
+    "protected_art": {
+      "result": "HOLD",
+      "observation": "CLEAN-to-final zero outside the two HELP regions. SOURCE-to-CLEAN full atlas has 137224 prior-content changed pixels; C366 seven protected music ROIs previously checked, not blanket protection proof"
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "Region locations/changed-pixel bounding boxes measured exactly; no current full source text/effects bbox containment comparison per 13"
+    },
+    "orientation": {
+      "result": "SCOPED_PASS",
+      "observation": "Canonical English source and current stored DDS decoded RAW and mirror-Y FLIP-Y; native shape 2048x1024; no 13-region game-composition proof"
+    }
+  },
+  "QA_inference": "This report adds an exhaustively mapped source-to-CLEAN pixel-delta catalog, not 13 whole-asset C approvals; historical C230 remains historical. Current C/C3, official DDS, queue HOLD, runtime unchanged."
+}
