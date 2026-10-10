@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T05:32:00+09:00",
+  "updated_at_kst": "2026-10-11T05:41:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,32 @@
       "total": 243
     },
     "graphics_localization": {
+      "b364_q236_row05_family_native_pilot_20261011": {
+        "run_key": "OUTRUN-KOR-B364-Q236-ROW05-NATIVE-FAMILY-PILOT-20261011-0541",
+        "role": "B",
+        "queue_index": 236,
+        "priority": "C358_REWORK_SOURCE_FAMILY",
+        "scope": "ROW05_ONLY_1_OF_14",
+        "old_official_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+        "new_saved_unapproved_trial_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+        "original_source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+        "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+        "source_height_px": 95,
+        "old_height_px": 87,
+        "new_height_px": 91,
+        "changed_rgba_pixels": 56558,
+        "outside_roi_changed": 0,
+        "decoded_roundtrip_mismatch": 0,
+        "persisted_trial_dds": 1,
+        "official_promoted_dds": 0,
+        "producer_status": "SCOPED_OPTICAL_PILOT_HOLD_UNQUALIFIED_FAMILY",
+        "independent_C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "backend": "GITHUB_ACTIONS_CPU_WORKER",
+        "worker_run_id": 38084528610,
+        "qa": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_CONTROLLER_FIRST_HAND_QA.json"
+      },
       "latest_c1_q121_a230_independent_20261011": {
         "run_key": "OUTRUN-KOR-C1-Q121-A230-FIRST-INDEPENDENT-EXACT-DDS-20261011",
         "index": 121,
