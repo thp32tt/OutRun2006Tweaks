@@ -8,6 +8,16 @@
 #include "../core/r32_review_api.hpp"
 #include "../core/r31_support_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "vr_shared.hpp"
+#include "hook_mgr.hpp"
+#include "draw_state_helpers.hpp"
+#include "../state/state_block_tracker.hpp"
+#include <spdlog/spdlog.h>
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
 #include "stereo_renderer_r31.cpp"
 #endif
@@ -597,7 +607,7 @@ namespace OutRunVRStereo
 
         void R32ResetAfterGameReset() noexcept
         {
-            SetStereoRecoverySafetyThroughEpoch(
+            R30SupportSetStereoRecoverySafetyThroughEpoch(
                 OutRunVR::R32::RearmMonoSafetyEpoch(R30SupportPresentEpoch()));
             R32InvalidateResetCaches();
             ++R32ResetEpochRearms;

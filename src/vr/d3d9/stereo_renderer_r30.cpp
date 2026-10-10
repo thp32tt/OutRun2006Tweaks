@@ -3975,4 +3975,10 @@ namespace OutRunVRStereo
     {
         return PrimeTrackedRasterShadow(device);
     }
+
+    void R30SupportSetStereoRecoverySafetyThroughEpoch(
+        std::uint64_t throughEpoch) noexcept
+    {
+        SetStereoRecoverySafetyThroughEpoch(throughEpoch);
+    }
 }

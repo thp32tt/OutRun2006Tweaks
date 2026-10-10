@@ -88,6 +88,9 @@ namespace OutRunVRStereo
     bool R30SupportInternalStereoPassActive() noexcept;
     bool R30SupportExchangeInternalStereoPass(bool active) noexcept;
     std::uint64_t R30SupportPresentEpoch() noexcept;
+    // Physical lower R29 mono-recovery epoch stays owned by the R30/R29 TU.
+    void R30SupportSetStereoRecoverySafetyThroughEpoch(
+        std::uint64_t throughEpoch) noexcept;
     bool R30SupportStereoWanted() noexcept;
     bool R30SupportStereoBaselineSeeded() noexcept;
     // R9 depth-generation/stencil metadata remains lower-owned and read-only.

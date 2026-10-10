@@ -31,6 +31,8 @@
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_events.hpp"
 #include "draw_state_helpers.hpp"
+#include "vr_shared.hpp"
+#include <spdlog/spdlog.h>
 
 namespace OutRunVRStereo
 {
