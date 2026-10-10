@@ -1,16 +1,10 @@
 {
-  "source_sha": "bd81283b9a4c2207d42a2b5c573119600b2c024d",
+  "source_sha": "bc7b91794f08b556938e7678ded6bcc8ab3a4ba5",
   "reviewed": [
     0,
     1,
-    2,
-    3,
-    4,
-    5,
     6,
-    7,
-    8,
-    9
+    8
   ],
   "issues": [
     {
@@ -19,12 +13,12 @@
     }
   ],
   "RUNTIME_VALIDATION": "UNTESTED",
-  "initial_contract": "PASS",
-  "last_tick": "2026-10-11 00:28:23 KST",
-  "last_status": "NO_SOURCE_CHANGE",
+  "initial_contract": "FAIL: ence\",\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/verify_vr_hud_exact_callsite_contract.py\", line 49, in ordered\n    fail(label)\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/verify_vr_hud_exact_callsite_contract.py\", line 25, in fail\n    raise ValueError(\"P0 HUD producer FAIL: \" + reason)\nValueError: P0 HUD producer FAIL: rank screen-vs-world precedence\n",
+  "last_tick": "2026-10-11 00:33:23 KST",
+  "last_status": "SOURCE_CONTRACT_OK",
   "completed": {
     "0": "75625bd0e4b183a4f429f7cfcbd1d199f4273494c9c8f1c682a3dcffe8b2b175",
-    "1": "fa14235762b051a3cc6cd321eadfd63cc0f46ccff3421e405cb0f7377b412174",
+    "1": "8e4972a68ab5d5e6f4b2e218ff6fbc41ba7b1671d91ff79fd683ba1a3de944c7",
     "2": "1fe7e6398a06879b91df587aac3ac2cb9f301a53c24cf0566b90a873c888de1e",
     "3": "7376f7932b059f1adff33d3e53d4d54923f04c4a68a39edba45ce5413138f9c8",
     "4": "fa14235762b051a3cc6cd321eadfd63cc0f46ccff3421e405cb0f7377b412174",
@@ -34,5 +28,5 @@
     "8": "9ce767679acc68984cc18982bc01c3817ae416da9f3f14f2952b21e0765aadfd",
     "9": "788b37d452e96f29d2488b732d7f5c699920165a09b2b71f7be26c0b0c23ccf2"
   },
-  "verifier_sig": "8942b8366fd7f0ec5e84f4f90eb75ab4154b471d9b3ec9e73a5cf6cebbf5bb34"
+  "verifier_sig": "616fc27a3182419ca64b4191f0df0e667a39f5335d7bb94b37497d89d3358c9f"
 }
