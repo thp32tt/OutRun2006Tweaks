@@ -14,7 +14,7 @@
   "automation_validation": "IN_PROGRESS",
   "runtime_validation": "UNTESTED",
   "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
-  "last_implemented_source_sha": "612b05bd8fe3cff390d824ac57fbd6f02d7bbc37",
+  "last_implemented_source_sha": "13f0cc7e73b63218a490299c57ca651af1dbb3f1",
   "validation_bearing_result_sha": null,
   "material_result_sha": null,
   "feature_contract": {
@@ -95,7 +95,8 @@
       "R29/R30 owner seam mutations PASS 19 on local validation pending run",
       "R30 support seam adjusted for explicit owner getter pending run",
       "R29 lower IPC recommended-eye extent and direct-transport adapter identity copied behind typed owner ABI; R30 no longer dereferences SharedState (feature SHA b9c1bd91); R29 malformed include repaired.",
-      "R29/R30 negative mutation regression expanded 19 -> 21 and R84 feature workflow updated; GitHub Actions after SHA b9c1bd91 pending confirmation, no CI PASS assumed."
+      "R29/R30 negative mutation regression expanded 19 -> 21 and R84 feature workflow updated; GitHub Actions after SHA b9c1bd91 pending confirmation, no CI PASS assumed.",
+      "R29 owner API expands 12 lower draw/depth/resource/state services, R30 callsites 39 replacements; 33 negative mutation regression authored and workflow labeled; no exact-SHA Win32 PASS confirmed."
     ],
     "integration_contract": "PENDING: independent R29-R33 Win32 game/host full-chain link, accepted steps, exact SHA gates and binary bundle"
   },
@@ -155,8 +156,8 @@
     "Feature artifact host/game/full-chain package with binaries/config/manifest/collector",
     "Controller-only target fast-forward and C6 bookkeeping; HMD UNTESTED"
   ],
-  "next_action": "On feature branch b9c1bd91 inspect isolated Win32 compilation after lower IPC ABI extraction, then continue R30->R29 typed services for R9/RT/depth/restore state; run negative regression and host/game/full-chain. Do not change target branch or claim FEATURE_READY.",
-  "feature_last_head": "b9c1bd91f54c1dfaadc96fc8701f964422a48d5c",
+  "next_action": "Execute R29 lower-owner seam mutation suite and isolated Win32 game/host compile, fix remaining raw hook, frame-metadata, RT/restore and matrix-private-symbol dependencies; verify feature CI on exact SHA; synchronize concurrent target only via controller.",
+  "feature_last_head": "51bed465a5d504cd543ecfafe1a6544bdc174f2a",
   "checkpoint_history": [
     {
       "at_kst": "2026-10-11T01:35:05+09:00",
@@ -171,6 +172,32 @@
       ],
       "next_action": "On feature branch b9c1bd91 inspect isolated Win32 compilation after lower IPC ABI extraction, then continue R30->R29 typed services for R9/RT/depth/restore state; run negative regression and host/game/full-chain. Do not change target branch or claim FEATURE_READY.",
       "runtime_validation": "UNTESTED"
+    },
+    {
+      "at_kst": "2026-10-11T01:39:43+09:00",
+      "event_id": "CONVERSION-DX9EX-00591-E003",
+      "feature_sha": "51bed465a5d504cd543ecfafe1a6544bdc174f2a",
+      "incomplete_acceptance_ids": [
+        "R84-OWNERS",
+        "R84-ABI",
+        "R84-BUILD-GRAPH",
+        "R84-REGRESSION",
+        "R84-TEST-BUNDLE"
+      ],
+      "next_action": "Execute R29 lower-owner seam mutation suite and isolated Win32 game/host compile, fix remaining raw hook, frame-metadata, RT/restore and matrix-private-symbol dependencies; verify feature CI on exact SHA; synchronize concurrent target only via controller.",
+      "runtime_validation": "UNTESTED"
     }
-  ]
+  ],
+  "concurrent_target_status": {
+    "target_branch": "vr-d3d9ex-focus",
+    "base_sha": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
+    "ahead_by": 1,
+    "status": "ahead",
+    "concurrent_paths": [
+      "docs/automation/reviews/DX9EX_MINIDUMP_97E75_R57_HISTORICAL_RESTORE_20261011.md",
+      "src/hooks_uiscaling.cpp",
+      "tools/verify_vr_visual_composition_p0.py"
+    ],
+    "action": "controller-only sync after feature acceptance; do not write target here"
+  }
 }
