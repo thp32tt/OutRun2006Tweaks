@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 17:27:07 KST",
+  "updated_at_kst": "2026-10-10 17:43:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,41 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q060_B352_B353_two_optical_trials": {
+        "index": 60,
+        "role": "B",
+        "run_key": "OUTRUN-KOR-B352-B353-Q060-TWO-TRIAL-FAIL-CLOSED-20261010-1743",
+        "execution_backend": "GITHUB_ACTIONS",
+        "workflow_runs": [
+          38038365617,
+          38038629107
+        ],
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+        "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "B352_unapproved_sha256": "620266f60da9677234281a88958cd0fca6db1adc01b655ef66df889d8714d229",
+        "B353_unapproved_sha256": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+        "new_saved_trial_dds": 2,
+        "new_promoted_dds": 0,
+        "changed_rgba_pixels": [
+          87073,
+          88852
+        ],
+        "outside_mask_pixels": [
+          0,
+          0
+        ],
+        "dds_roundtrip_pixel_mismatch": [
+          0,
+          0
+        ],
+        "source_family_producer_visual": "FAIL_B352_THIN_UNDERSIZED_B353_UNDERWEIGHT_RACING_ITALIC",
+        "next_method": "MANUAL_VECTOR_OR_SOURCE_CONTOUR",
+        "C2": "C342_OLD_REWORK_UNCHANGED",
+        "C3": "BLOCKED",
+        "IGR044": "OPEN_USER_INGAME_FAIL",
+        "RUNTIME_VALIDATION": "UNTESTED"
+      },
       "latest_b_q060_original_face_trial": {
         "index": 60,
         "role": "B",
