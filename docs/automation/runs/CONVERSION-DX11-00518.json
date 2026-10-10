@@ -83,8 +83,9 @@
     "hmd_test_performed": false,
     "native_gameplay_activation": false
   },
-  "score_previous_confirmed": 1075,
+  "score_previous_confirmed": 1076,
   "score_change": 0,
-  "score_new_confirmed": 1075,
-  "timestamp_kst": "2026-10-10T14:18:00+09:00"
+  "score_new_confirmed": 1076,
+  "timestamp_kst": "2026-10-10T14:18:00+09:00",
+  "scoreboard_basis": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md AI2 1076 at 2026-10-10 14:09 KST (separate CONVERSION-DX9EX-00570 +1); 00518 has no PASS and awards +0"
 }
