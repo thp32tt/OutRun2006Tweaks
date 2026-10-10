@@ -68,7 +68,33 @@ def main() -> None:
         assert evidence in bridge, "missing diagnostic safety/telemetry: " + evidence
     assert bridge.count("ctx->DrawIndexed(") == 1
     assert bridge.count("ctx->Draw(") == 1
-    print("DX11 live game diagnostic descriptor/lifetime/telemetry regression PASS (static only)")
+
+    # A static guard plus a deterministic negative mutation for sampling.
+    # It is not GPU/Quest3 evidence. Each frame is still limited to one
+    # native submit but cannot permanently pick only the first eligible Draw.
+    sampling = (
+        "const UINT candidateOrdinal = s.eligibleThisFrame++;",
+        "++s.eligible;",
+        "if (s.attempted || candidateOrdinal != s.probeSlot) return;",
+        "const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);",
+        "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;",
+        "s.eligibleThisFrame = 0;",
+    )
+    assert all(item in bridge for item in sampling)
+    broken = bridge.replace("candidateOrdinal != s.probeSlot",
+                            "candidateOrdinal != 0u", 1)
+    assert broken != bridge and sampling[2] not in broken
+    slot = 0
+    chosen = []
+    for _ in range(8):
+        population = 3
+        hits = [i for i in range(population) if i == slot]
+        assert len(hits) <= 1
+        chosen.extend(hits)
+        slot = (slot + 1) % min(population, 64)
+    assert chosen == [0, 1, 2, 0, 1, 2, 0, 1]
+    assert "s.probeSlot = 0;" in bridge  # Reset and failure rollback
+    print("DX11 live game diagnostic sampling/lifetime/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
