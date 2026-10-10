@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A219 2026-10-10 09:20 KST A q121 P0 exact English source residue 33px fixed in unpromoted saved DDS trial SHA 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb. Source/CLEAN/current white 255 x33; saved DDS 132 bytes only, outside 0, RAW/FLIPY native/75/50 producer scoped visual PASS. OFFICIAL current A202 SHA 38d5c2c3 unchanged; q121 REWORK_REQUIRED, IGR030/031/040 OPEN, no C1/C3/new game acceptance; RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_CONTROLLER_SELF_QA.json",
     "C349 C2 2026-10-10 09:10 KST EVEN q212 distinct B341 unpromoted trial SHA fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7 vs unchanged official SHA e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea. Independently fetched SHA verified canonical English source f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61, full authored C158 CLEAN c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67, official and trial native 2048x2048 RGBA32 mip1; true RGBA channel/order and RAW=flipY stored confirmed. Full 12 source inventory bboxes SOURCE/CLEAN, SOURCE/TRIAL, CLEAN/TRIAL all RGBA+alpha outside0; all12 CLEAN original alpha0. Official→trial changes only r43/r44 within their source ROIs 37978 RGBA, other10 unchanged exact. r43 ORIGINAL PROFESSIONAL visible alpha>32 x240, official Korean x5, B341 trial x241 (dx+1); r44 OUTRUN x1626, official Korean x1689, B341 trial x1628 (dx+2). Native+practical50 visual shows layout improves without obvious ghost/box/glyph break; persists RAW orientation. But alpha>32 English glyph height r43=45 vs trial55, r44=45 vs trial52 (source alpha>0 effect envelope=63, so this is an optical high-opacity hierarchy HOLD, NOT proven literal source-effect-bbox pixel escape); qualified blind calibration/complete source-family slant/effect review and producer P1/P2/P3 manifest missing, trial not promoter nor full C2 PASS. C2 scoped placement PASS / overall HOLD_STRICT_RECHECK on trial only; official remains C338 REWORK_REQUIRED, C3/APPROVAL/IGR029 user game BLOCKED UNTESTED. New 10 lossless evidence PNG 2 machine JSON C2 report localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_C2_TRIAL_HOLD.json, DDS officially promoted0. OUTRUN-KOR-C349-C2-Q212-B341-SOURCE-CLEAN-PERSISTED-20261010-0850.",
     "C348 C2 2026-10-10 08:31 KST EVEN q214 NEW independent persisted DDS official SHA ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 vs B339 unapproved trial SHA d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8. Downloaded and SHA-verified both 2048x2048 BC3 DXT5 DDS. Independently decoded raw/FLIPY + native/75/50/400% START/GOAL, 10 new lossless PNG+2 JSON. 1821 RGBA pixels changed within B339 declared two source ROIs, outside0. Crucial: persisted old and trial alpha channels byte-identical across entire decoded atlas; START and GOAL source ROIs are fully alpha255. B339 alpha-core coverage1.0 is vacuous for glyph quality on these opaque panels; only RGB/bevel glyph topology visibly changes. Native gray/black/white and 50% show GOAL 골 trial still visually horizontally smeared/weak-vowel unreadable, while START 출발 is more recognizable but chrome mismatch not qualified. Fresh trial C2 scoped VISUAL_FAIL, method-change required from C285/C289 true C rejects; old official and current producer REWORK maintained, trial not promoted, full SOURCE/CLEAN exact independent provenance and blind calibration missing so no C PASS/C3/approval/user game. Source from B339 producer visual only (not independently SHA verified). RUNTIME_VALIDATION=UNTESTED; no new promoted DDS. localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_CONTROLLER_C2_TRIAL_FAIL.json. RUN_KEY=OUTRUN-KOR-C348-C2-Q214-B339-OPAQUE-ALPHA-20261010-0820.",
     "C348 C1 q217 first authenticated authored A189 CLEAN SHA f937fbaa; CLEAN stored readable, source/final DDS RAW, corrected aligned SOURCE→CLEAN 3921 RGBA delta not 2885246 false inversion; CLEAN→FINAL 1141, SOURCE→FINAL 3940; changed 425 RGBA outside narrow source glyph boxes but alpha unchanged, needs original halo/fringe vs protected badge classification. New 12 lossless and QA source-clean-final: localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/C348_Q217_CONTROLLER_C1_HOLD.json. Same candidate SHA C292 HOLD, DO NOT count repeat PASS. Blind calibration/C3/user game UNTESTED; OUTRUN-KOR-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION-20261010",
@@ -14351,5 +14352,33 @@
     "report": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_CONTROLLER_C1_HOLD.json",
     "c3": "NOT_RUN",
     "runtime_validation": "UNTESTED"
+  },
+  "a219_q121_goal_source_residue_33": {
+    "run": "A219",
+    "run_key": "OUTRUN-KOR-A219-Q121-GOAL-33-SOURCE-RESIDUE-20261010",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "changed_rgba_pixels": 33,
+    "changed_bytes": 132,
+    "outside_changed_pixels": 0,
+    "status": "MATERIAL_SOURCE_RESIDUE_CONFIRMED_REWORK_REQUIRED_SCOPED_TRIAL_QA_PASS_NOT_PROMOTED",
+    "official_dds_changed": false,
+    "official_new_dds_count": 0,
+    "trial_new_dds_count": 1,
+    "user_reports": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "trial_path": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_Q121_SOURCE_GOAL_33_RESIDUE_REMOVAL_UNPROMOTED.dds",
+    "producer_machine_qa": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_Q121_MACHINE_TRIAL_QA.json",
+    "producer_visual_qa": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_CONTROLLER_SELF_QA.json",
+    "next_gate": "C1 exact 29-source-cell/protected-art blind calibration + C3 + new user game retest",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "updated_at_kst": "2026-10-10 09:20 KST"
   }
 }
