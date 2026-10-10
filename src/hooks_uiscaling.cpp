@@ -159,6 +159,8 @@ class UIScaling : public Hook
     // 0x97C5F, so this is not a safe midhook placement. Keep the
     // original 0x97C57 E8 CALL completely unmodified until a verified
     // CALL-ABI wrapper can replace this parent without a post-CALL detour.
+    // All nineteen result text E8 parents must remain untouched until a
+    // verified ABI-safe wrapper exists: minidumps EIP 0x97C5F / 0x97E75.
     static constexpr int ResultTextUnsafeReturnRva = 0x97C57;
 
     static constexpr int ResultProgressCallA = 0x97BE4;
@@ -175,6 +177,12 @@ class UIScaling : public Hook
 	// Rank state belongs to exactly one sub_4BAD20 invocation; rival state
 	// belongs to the next exact 0xBB796 producer and is consumed once.
 	inline static thread_local unsigned RankMarkerSubActiveDepth = 0;
+    // R57/R62 Quest3 known-good calls the original Calc3D2D from
+    // EXE+0xBAEE2. Source 9e393cfd/b913ef69 logged rank glyphs but no
+    // exact Calc3D2D event, causing world-marker projection to remain zero.
+    // Bind this exact CALL edge, rather than relying on _ReturnAddress()
+    // from the shared 0x49940 inline trampoline alone.
+    inline static thread_local bool RankMarkerExactCalcEdge = false;
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -440,7 +448,8 @@ class UIScaling : public Hook
         const bool ordinalReturnSite =
             returnAddress == Module::exe_ptr(0xBAEE7);
         const bool ordinalProducerScope = RankMarkerSubActiveDepth != 0;
-        if ((ordinalReturnSite || ordinalProducerScope) &&
+        if ((ordinalReturnSite || ordinalProducerScope ||
+             RankMarkerExactCalcEdge) &&
             RankMarkerSubScreenHudDepth == 0)
         {
             recoverViewPoint(RankMarkerProjectedInfo, true);
@@ -455,6 +464,12 @@ class UIScaling : public Hook
                     out ? out->z : 0.0f, originalInput.z,
                     ordinalReturnSite ? 1 : 0,
                     ordinalProducerScope ? 1 : 0);
+                spdlog::info(
+                    "VR R57 EXACT CALC EDGE: originalE8=0xBAEE2 hooked={} "
+                    "markerValid={} NaviPubDepth={}",
+                    RankMarkerExactCalcEdge ? 1 : 0,
+                    RankMarkerProjectedInfo.valid ? 1 : 0,
+                    RankMarkerSubScreenHudDepth);
             }
         }
 		else if (returnAddress == Module::exe_ptr(0xBB6F5))
@@ -467,6 +482,19 @@ class UIScaling : public Hook
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
 			out->x = (out->x / Game::screen_scale->y) * Game::screen_scale->x;
 	};
+
+    // Exact source CALL wrapper for canonical original E8 0xBAEE2->0x49940.
+    // Input/output ABI mirrors original Calc3D2D (void __cdecl, two floats,
+    // two D3DVECTOR pointers). All graphics and UI scaling continue through
+    // the same shared Calc3D2D_dest; the flag binds ONLY this rank parent.
+    static void __cdecl Calc3D2D_OrdinalExactCall(
+        float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
+    {
+        const bool previous = RankMarkerExactCalcEdge;
+        RankMarkerExactCalcEdge = true;
+        Calc3D2D_dest(a1, a2, in, out);
+        RankMarkerExactCalcEdge = previous;
+    }
 
 	// The fraction of a pixel sub_4BAD20 discarded when it rounded the marker
 	// position down, for the draws below to add back.
@@ -1483,6 +1511,19 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+        if (Calc3D2D_hk)
+        {
+            Memory::VP::InjectHook(
+                Module::exe_ptr(0xBAEE2), Calc3D2D_OrdinalExactCall,
+                Memory::HookType::Call);
+            spdlog::info(
+                "VR R57 KNOWN-GOOD SOURCE: exact 0xBAEE2 original rank "
+                "Calc3D2D E8 edge installed (R57_06/R62)");
+        }
+        else
+            spdlog::error(
+                "VR R57 exact rank E8 left stock: original Calc3D2D "
+                "trampoline unavailable");
 		// 5868 runtime/old R70 evidence: FUN_004BA9D0's two proven E8
 		// children lost their parent HUD identity. Do not install a broad
 		// sprani/clip hook; intercept only these two canonical CALL sites.
@@ -1635,45 +1676,24 @@ public:
             spdlog::info(
                 "VR P0 +TIME: 3 original sprani + 3 print E8 parents -> SCREEN_HUD (game animation unchanged)");
 
-        // Inline E8 parent hooks are installed atomically; a partially
-        // bracketed result print sequence could tag only half the large
-        // record digits and cause an eye-to-eye double image.
-        bool resultTextOk = true;
-        for (unsigned i = 0; i < std::size(ResultTextB9200Calls); ++i)
-        {
-            const int rva = ResultTextB9200Calls[i];
-            if (rva == ResultTextUnsafeReturnRva)
-            {
-                // Do not hook EITHER side. An Enter-only hook leaks
-                // CurrentScope into subsequent world draws; the Leave
-                // hook is confirmed to corrupt an original branch target.
-                // The unmodified call still produces the original text.
-                spdlog::warn(
-                    "VR P0 RESULT CRASH GUARD: omitted unsafe E8 parent "
-                    "0x97C57 / post-call 0x97C5C (dump EIP 0x97C5F); "
-                    "game result text preserved, only this HUD semantic unowned");
-                continue;
-            }
-            ResultTextEnterHooks[i] = safetyhook::create_mid(
-                Module::exe_ptr(rva), ResultTextEnter);
-            ResultTextLeaveHooks[i] = safetyhook::create_mid(
-                Module::exe_ptr(rva + 5), ResultTextLeave);
-            resultTextOk = resultTextOk &&
-                ResultTextEnterHooks[i] && ResultTextLeaveHooks[i];
-        }
-        if (!resultTextOk)
-        {
-            for (unsigned i = 0; i < std::size(ResultTextB9200Calls); ++i)
-            {
-                ResultTextEnterHooks[i] = {};
-                ResultTextLeaveHooks[i] = {};
-            }
-            spdlog::error(
-                "VR P0 RESULT TEXT: exact B9200 print parent midhooks incomplete; rolled back");
-        }
-        else
-            spdlog::info(
-                "VR P0 RESULT TEXT: 18 safe original B9200 parent CALLs -> SCREEN_HUD; 0x97C57 remains unhooked (crash guard)");
+        // Exact source RVA comparison against 2026-10-11 user minidump:
+        // first result crash EIP 0x97C5F = inside old E9 displacement from
+        // EXE+0x97C5C (post-CALL after original E8 at 0x97C57).
+        // second crash EIP 0x97E75 = inside another E9 displacement from
+        // EXE+0x97E72 (post-CALL after original E8 at 0x97E6D).
+        // The fault moved only because we disabled 0x97C57; the 18
+        // remaining rva+5 detours have the SAME unsafe overlap condition.
+        // An original branch can land inside a five-byte hook displacement.
+        // Do not reinstall ANY of the 19 B9200 parent enter/leave midhooks.
+        // Preserve all stock E8 calls and their result graph/digit content.
+        // The dedicated result-progress / two GOAL helper sources below
+        // are separate, still covered; safe B9200 caller wrappers require
+        // confirmed original call ABI before another optical attempt.
+        spdlog::warn(
+            "VR P0 RESULT CRASH GUARD 20261011: 19 B9200 original E8 "
+            "calls unmodified, all rva+5 midhooks disabled "
+            "(minidump EIPs 0x97C5F and 0x97E75); "
+            "stock result graph preserved, stereo correction still pending");
 
 		// The two GOAL CALLs are adjacent, so preserve the original function
 		// signatures and redirect only their individually proven E8 edges.
