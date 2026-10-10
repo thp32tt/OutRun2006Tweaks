@@ -240,6 +240,9 @@ namespace OutRunVRStereo
     bool R30SupportGetVerifiedProjection(
         float outProjection[16], std::uint32_t& generation,
         std::uint32_t& poseSequence) noexcept;
+    // R31 reads the shader epoch through R30 ABI, not textual .cpp inclusion.
+    bool R30SupportCurrentShaderEpoch(
+        std::uintptr_t& identity, std::uint64_t& serial) noexcept;
     void R30SupportResynchronizeShaderEpoch(
         IDirect3DDevice9* device) noexcept;
     void R30SupportInvalidateRendererStateAfterExternalRestore() noexcept;

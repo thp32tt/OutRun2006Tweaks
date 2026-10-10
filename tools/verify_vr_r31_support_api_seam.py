@@ -26,6 +26,8 @@ def function_body(source: str, marker: str) -> str:
 
 header = read("src/vr/core/r31_support_api.hpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
+r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
+r30_api = read("src/vr/core/r30_support_api.hpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 workflow = read(".github/workflows/vr-dx9ex-active.yml")
 errors = []
@@ -53,6 +55,22 @@ for marker in api:
         errors.append(f"R31 support API missing implementation: {marker}")
     if marker not in r32:
         errors.append(f"R32 missing R31 support API use: {marker}")
+
+# Preserve original shader epoch semantics and deny a private R31 lower call.
+epoch_api = "R30SupportCurrentShaderEpoch("
+if epoch_api not in r30_api or epoch_api not in r30 or epoch_api not in r31:
+    errors.append("R31 shader epoch support declaration/implementation/use missing")
+else:
+    try:
+        body = function_body(r30, epoch_api)
+        if "return GetCurrentShaderEpoch(identity, serial);" not in body:
+            errors.append("R30 shader epoch facade lost lower owner delegation")
+    except ValueError as exc:
+        errors.append(str(exc))
+if "if (!GetCurrentShaderEpoch(" in r31:
+    errors.append("R31 still uses private shader epoch textual dependency")
+if "if (!R30SupportCurrentShaderEpoch(currentShader, currentShaderSerial) ||" not in r31:
+    errors.append("R31 fast-world gate lacks explicit shader epoch API")
 
 if '#include "../core/r31_support_api.hpp"' not in r31:
     errors.append("R31 implementation missing public support API header")

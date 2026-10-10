@@ -3894,6 +3894,12 @@ namespace OutRunVRStereo
             outProjection, generation, poseSequence);
     }
 
+    bool R30SupportCurrentShaderEpoch(
+        std::uintptr_t& identity, std::uint64_t& serial) noexcept
+    {
+        return GetCurrentShaderEpoch(identity, serial);
+    }
+
     void R30SupportResynchronizeShaderEpoch(
         IDirect3DDevice9* device) noexcept
     {

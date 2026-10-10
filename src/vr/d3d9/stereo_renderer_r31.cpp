@@ -302,7 +302,7 @@ namespace OutRunVRStereo
 
             std::uintptr_t currentShader = 0;
             std::uint64_t currentShaderSerial = 0;
-            if (!GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
+            if (!R30SupportCurrentShaderEpoch(currentShader, currentShaderSerial) ||
                 currentShader == 0 || currentShader != verifiedShader ||
                 currentShaderSerial != verifiedShaderSerial)
                 return false;
