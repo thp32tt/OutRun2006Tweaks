@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C1-q121-A230",
+  "run_key": "OUTRUN-KOR-C1-Q121-A230-NEW-SHA-INDEPENDENT-PERSISTED-20261010-2234",
+  "role": "C",
+  "lane": "C1",
+  "queue_index": 121,
+  "owner_shard": "ODD",
+  "priority": "P0",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "reviewed_candidate_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "exact_verified_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "exact_verified_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "prior_review_C353_A220_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "first_look_recorded_before_producer_verdict": true,
+  "reviewer": "C1 current invocation; not a fabricated second reviewer",
+  "calibration_status": "blind calibration not complete; no C PASS claimed",
+  "pixel_proof": {
+    "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_INDEPENDENT_BYTE_PROOF.json"
+  },
+  "region": {
+    "id": "rank20_gas_pedal",
+    "native_readable_bbox": [
+      3490,
+      391,
+      3722,
+      440
+    ],
+    "original_label": "Gas Pedal",
+    "localized_label": "가속 페달",
+    "counts": {
+      "source_exact_a220": 266,
+      "source_exact_a230": 236,
+      "deleted_alpha_to_zero": 30,
+      "raw_changed_bytes": 120,
+      "native_raw_changed_pixels": 30,
+      "outside_region_changed": 0,
+      "header_same": true
+    }
+  },
+  "views": {
+    "native": {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_gray_100.png",
+      "sha256": "df9cccd5006003e050de663534a2308a74e3250656f67c521a8f0a7e4cd933e6"
+    },
+    "practical_50": {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_black_50.png",
+      "sha256": "fafc20f97113cfc5d7b4aab9190640daeaf5e8ce441364470b6e22e75a2593b1"
+    },
+    "practical_75": {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_white_75.png",
+      "sha256": "cf565799d263346ab2c57240e32d628ebe6200cda39e8c812407b9affac9fcc3"
+    },
+    "raw": {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_PERSISTED_RAW.png",
+      "sha256": "db3b4cdd517fa9934f0b3d45d3ebdcfa8496e58955df435813c1df730e55b7be"
+    }
+  },
+  "findings": {
+    "slant": {
+      "result": "FAIL",
+      "observation": "Right-italic white canonical Gas Pedal lettering differs from near-upright wide blue-outlined Hangul; homologous source anchor gate not established"
+    },
+    "clean_plate": {
+      "result": "FAIL",
+      "reason_code": "INCOMPLETE_CLEAN_PLATE",
+      "observation": "30 source-identical pixels cleared but 236 remain; independent gray native/black50 and white75 visual first look shows detached light flecks adjacent to Hangul. Their proximity to protected Hangul prevents indiscriminate erasure."
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Canonical condensed slanted white/light-shadow source effect is not reproduced by heavy white Hangul with broad dark-blue outer edge"
+    },
+    "readability": {
+      "result": "HOLD",
+      "observation": "Localized text legible isolated; residue and style incongruity remain visible, especially native and practical scale"
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "30-pixel removal did not modify any pixels outside own source region; full glyph/counter validation and protected-neighbor within-region masks unqualified"
+    },
+    "protected_art": {
+      "result": "HOLD",
+      "observation": "A220->A230 0 pixels changed outside rank20; unverified semantic mask and 29 other atlas cells prevent whole-atlas PASS"
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "Single rank20 crop not sufficient for complete 30-label placement and game-composed overlap"
+    },
+    "orientation": {
+      "result": "PASS_SCOPED",
+      "observation": "Persisted DDS 4096 square mip1, header unchanged, independent RAW Y-mirror and readable native crops checked"
+    }
+  },
+  "decision": "C1_REWORK_REQUIRED_UNPROMOTED",
+  "official_status": "REWORK_REQUIRED_OFFICIAL_UNCHANGED",
+  "C3": "BLOCKED",
+  "APPROVAL": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "game_regressions_open": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "new_promoted_dds": 0,
+  "next_action": "Rebuild source-conditioned transparent CLEAN without remaining English ghost while preserving Korean protected neighbor; material fix then fresh independent C1/C3 and only newer user game test can close regressions.",
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_gray_100.png",
+      "sha256": "df9cccd5006003e050de663534a2308a74e3250656f67c521a8f0a7e4cd933e6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_black_50.png",
+      "sha256": "fafc20f97113cfc5d7b4aab9190640daeaf5e8ce441364470b6e22e75a2593b1"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_white_75.png",
+      "sha256": "cf565799d263346ab2c57240e32d628ebe6200cda39e8c812407b9affac9fcc3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q121-A230-NEW-SHA-NATIVE-GHOST-REWORK/C1_Q121_A230_PERSISTED_RAW.png",
+      "sha256": "db3b4cdd517fa9934f0b3d45d3ebdcfa8496e58955df435813c1df730e55b7be"
+    }
+  ],
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

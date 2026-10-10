@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C1-Q121-A230-NEW-SHA-INDEPENDENT-PERSISTED-20261010-2234",
+  "index": 121,
+  "shard": "C1_ODD",
+  "execution_backend": "N100 MCP fallback; native local container DNS inaccessible",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "prior_trial_A220_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "reviewed_new_A230_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "bytes_per_file": 67108992,
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "mip_count": 1,
+  "readable_roi": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "method": "Independent SHA256 full-file validation; streamed every A220->A230 RAW byte, decoded just rank20 rows in actual stored RGBA32 Y-mirrored DDS; source full-row matching and alpha tests; raw-to-readable own lossless region PNG",
+  "counts": {
+    "source_exact_a220": 266,
+    "source_exact_a230": 236,
+    "deleted_alpha_to_zero": 30,
+    "raw_changed_bytes": 120,
+    "native_raw_changed_pixels": 30,
+    "outside_region_changed": 0,
+    "header_same": true
+  },
+  "assertion": "30 pixels (120 bytes) cleared exactly to zero alpha inside original bbox; 236 source-identical alpha-positive pixels remain; other atlas bytes unchanged",
+  "result": "C1_REWORK_REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
