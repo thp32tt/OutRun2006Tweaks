@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 15:42 KST",
+  "updated_at_kst": "2026-10-10 15:44+ KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,29 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q060_contour_trial": {
+        "index": 60,
+        "role": "B",
+        "run": "B350",
+        "run_key": "OUTRUN-KOR-B350-Q060-P0-CONTOUR-OPTICAL-TRIAL-20261010-1535",
+        "execution_backend": "GITHUB_ACTIONS",
+        "workflow_run_id": 38031651627,
+        "new_unapproved_persisted_trial_DDS": 1,
+        "official_promoted_DDS": 0,
+        "trial_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "source_effect_width": 849,
+        "trial_effect_width": 794,
+        "previous_rejected_effect_width": 512,
+        "changed_rgba_pixels": 99951,
+        "changed_outside_roi_pixels": 0,
+        "persisted_dds_roundtrip_mismatch": 0,
+        "producer_visual_result": "FAIL_SOURCE_FAMILY_GOLD_FACE_BROWN_EXTRUSION_AND_UNQUALIFIED_SLANT",
+        "official_C2_status": "C342_REWORK_REQUIRED_UNCHANGED",
+        "IGR044": "OPEN_USER_INGAME_FAIL",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa": "localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+      },
       "latest_b_q060_material_trial": {
         "index": 60,
         "role": "B",
