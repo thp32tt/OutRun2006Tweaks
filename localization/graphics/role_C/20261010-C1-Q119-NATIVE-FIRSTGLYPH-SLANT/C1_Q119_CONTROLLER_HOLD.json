@@ -1,0 +1,167 @@
+{
+  "schema": "C1_NATIVE_FIRSTGLYPH_ANCHOR_EVIDENCE",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 119,
+  "shard": "C1_ODD",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
+  "reviewed_at_kst": "2026-10-10 19:49 KST",
+  "backend": "N100 MCP for lightweight persisted DXT5 direct decode; GitHub for SSOT and publication",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "clean_sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "result": "HOLD_STRICT_RECHECK",
+  "prior": "C297/C346 exact same candidate previously HOLD; no repeat approval",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/C1_Q119_NATIVE_FIRSTGLYPH_MACHINE.json"
+  },
+  "native_verified": {
+    "dds": "2048x256 DXT5/BC3 mip1 SHA-exact actual stored candidate",
+    "orientation": "RAW mirrored vertically; evidence in READABLE FLIP-Y",
+    "source_candidate_outside_raw_bbox": {
+      "rgba_outside": 0,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 0,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 169922
+    },
+    "source_clean_outside_raw_bbox": {
+      "rgba_outside": 2484,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 2484,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 172040
+    },
+    "candidate_clean_outside_raw_bbox": {
+      "rgba_outside": 2484,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 2484,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 73134
+    }
+  },
+  "slant": {
+    "source_first_T": {
+      "top": [
+        436,
+        109
+      ],
+      "bottom": [
+        423,
+        143
+      ],
+      "dx_px": 13,
+      "dy_px": 34,
+      "slope": 0.382,
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/english_T_C1_NATIVE_SLANT_ANCHORS.png",
+        "sha256": "8801e283ad27d75346aa96768b64b5497cba5906ab06095c4a4c3a915f7bd540"
+      }
+    },
+    "korean_first_ta": {
+      "top": [
+        745,
+        109
+      ],
+      "bottom": [
+        736,
+        143
+      ],
+      "dx_px": 9,
+      "dy_px": 34,
+      "slope": 0.265,
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/korean_ta_C1_NATIVE_SLANT_ANCHORS.png",
+        "sha256": "155bd940602c41bac034b16af7aca790170e8f74cd0780a0eadef5b37a5ab376"
+      }
+    },
+    "observed": "First glyph left orange-face contour: both positive top-minus-bottom dx (same readable right-lean), exact magnitude difference 13 vs 9; source-vs-Korean different glyph structure prevents universal style PASS."
+  },
+  "eight_c1_region_observations": {
+    "slant": {
+      "result": "SCOPED_SAME_DIRECTION_NOT_FINAL",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/english_T_C1_NATIVE_SLANT_ANCHORS.png",
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/korean_ta_C1_NATIVE_SLANT_ANCHORS.png"
+      ],
+      "observation": "Source English first T upper left x436 lower x423; Korean 타 x745/x736; +13 and +9 over equal vertical 34px; orientation matches, family-level magnitude not calibrated"
+    },
+    "clean_plate": {
+      "result": "SCOPED_VISIBLE_PASS_RAW_HOLD",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_gray_TRIAD.png"
+      ],
+      "observation": "Source/CLEAN 2484 outside raw-bbox differences are exclusively RGB at alpha0 on both; visible outside0; exact-raw byte-match cannot be asserted"
+    },
+    "style": {
+      "result": "HOLD",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/english_T_C1_NATIVE_SLANT_ANCHORS.png",
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/korean_ta_C1_NATIVE_SLANT_ANCHORS.png"
+      ],
+      "observation": "Orange body, navy outline and white halo resemble original; slope ratio shape-dependent; full homologous stem family and actual game composition not validated"
+    },
+    "readability": {
+      "result": "SCOPED_PASS",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/PRACTICAL_50.png"
+      ],
+      "observation": "Directly reviewed current exact glyph in practical50 gray and readable native/black: Korean title readily visible"
+    },
+    "glyph_integrity": {
+      "result": "SCOPED_PASS_NO_CONFIRMED_DEFECT",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/korean_ta_C1_NATIVE_SLANT_ANCHORS.png"
+      ],
+      "observation": "Orange face and navy/white effect show no confirmed missing/stipple/clipped first-glyph pixels in inspected persisted BC3 crop; full label pixel-gate not newly retested"
+    },
+    "protected_art": {
+      "result": "SCOPED_MACHINE_PASS",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/C1_Q119_NATIVE_FIRSTGLYPH_MACHINE.json"
+      ],
+      "observation": "Exact SOURCE→FINAL RGBA and alpha changed outside original RAW box both zero"
+    },
+    "placement": {
+      "result": "SCOPED_PASS",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/FLIPY_gray_TRIAD.png"
+      ],
+      "observation": "Prior independent readable original bbox [390,54,1632,200], candidate [710,58,1311,196], positive margins 320,321,4,4; unchanged exact source/candidate SHA"
+    },
+    "orientation": {
+      "result": "SCOPED_PASS",
+      "evidence": [
+        "localization/graphics/role_C/20261010-C346-C1-Q119-EXACT-PLATE-HALO/RAW_gray_TRIAD.png"
+      ],
+      "observation": "Raw/FLIP-Y source and final correspond to identical vertical flip; marker placement explicitly readable orientation"
+    }
+  },
+  "calibration": {
+    "blind_known_defects": "NOT_QUALIFIED",
+    "pixels_before_producer_verdict": false,
+    "reviewer_identity": "one C1 agent; no independent second reviewer"
+  },
+  "c3": {
+    "result": "NOT_RUN",
+    "reason": "C1 full current-policy evidence not complete"
+  },
+  "approval": {
+    "result": "NOT_CREATED",
+    "reason": "no fully accepted eight-gate/blind calibration per current schema"
+  },
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "changed_candidate": false,
+  "new_native_marker_png_count": 2,
+  "same_candidate_sha_is_not_new_qa_pass": true,
+  "unresolved": [
+    "homologous per-stem/source-family slant across all characters",
+    "blind defect calibration before C PASS",
+    "C3 distinct full QA",
+    "approval schema/evidence gate",
+    "user actual-game retest"
+  ]
+}

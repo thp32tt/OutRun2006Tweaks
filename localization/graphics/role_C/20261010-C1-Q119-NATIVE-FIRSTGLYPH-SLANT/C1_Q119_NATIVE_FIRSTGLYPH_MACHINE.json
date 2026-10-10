@@ -1,0 +1,212 @@
+{
+  "queue_index": 119,
+  "shard": "C1_ODD",
+  "validation_scope": "new independent localized first-glyph face-anchor test on actual saved BC3 pixels",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "clean_sha256": "a51c74d129d8cb6fe92046926e93686a9be20c3b8b040c36c03fed685b4e509e",
+  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+  "dds_native_dimensions": [
+    2048,
+    256
+  ],
+  "fourcc": "DXT5",
+  "mips": 1,
+  "raw_readable": "readable=vertical_flip(raw)",
+  "source_effect_bbox_raw": [
+    390,
+    56,
+    1632,
+    202
+  ],
+  "pair_diffs": {
+    "SOURCE_CLEAN": {
+      "rgba_outside": 2484,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 2484,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 172040
+    },
+    "CLEAN_FINAL": {
+      "rgba_outside": 2484,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 2484,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 73134
+    },
+    "SOURCE_FINAL": {
+      "rgba_outside": 0,
+      "alpha_outside": 0,
+      "hidden_rgba_only_outside": 0,
+      "visible_rgba_outside": 0,
+      "rgba_inside": 169922
+    }
+  },
+  "orange_face_first_glyph_anchors": [
+    {
+      "name": "english_T",
+      "readable_first_glyph_face_x_crop": [
+        390,
+        515
+      ],
+      "face_threshold": "alpha>160, red>180, 60<green<215, blue<100, red>1.25*green",
+      "upper_rows": [
+        {
+          "y": 107,
+          "x": 437,
+          "face_pixels": 40
+        },
+        {
+          "y": 108,
+          "x": 436,
+          "face_pixels": 41
+        },
+        {
+          "y": 109,
+          "x": 436,
+          "face_pixels": 41
+        },
+        {
+          "y": 110,
+          "x": 435,
+          "face_pixels": 42
+        },
+        {
+          "y": 111,
+          "x": 435,
+          "face_pixels": 42
+        }
+      ],
+      "lower_rows": [
+        {
+          "y": 141,
+          "x": 424,
+          "face_pixels": 46
+        },
+        {
+          "y": 142,
+          "x": 424,
+          "face_pixels": 46
+        },
+        {
+          "y": 143,
+          "x": 423,
+          "face_pixels": 46
+        },
+        {
+          "y": 144,
+          "x": 423,
+          "face_pixels": 47
+        },
+        {
+          "y": 145,
+          "x": 423,
+          "face_pixels": 46
+        },
+        {
+          "y": 146,
+          "x": 422,
+          "face_pixels": 46
+        }
+      ],
+      "upper_anchor_xy": [
+        436,
+        109
+      ],
+      "lower_anchor_xy": [
+        423,
+        143
+      ],
+      "readable_top_minus_bottom_dx_px": 13,
+      "stem_dy_px": 34,
+      "horizontal_px_per_vertical_px": 0.382,
+      "interpretation": "positive x on upper vs lower = readable right lean; these are first-glyph left-envelope sample anchors, NOT full-region homologous stem proof"
+    },
+    {
+      "name": "korean_ta",
+      "readable_first_glyph_face_x_crop": [
+        710,
+        825
+      ],
+      "face_threshold": "alpha>160, red>180, 60<green<215, blue<100, red>1.25*green",
+      "upper_rows": [
+        {
+          "y": 107,
+          "x": 746,
+          "face_pixels": 29
+        },
+        {
+          "y": 108,
+          "x": 745,
+          "face_pixels": 29
+        },
+        {
+          "y": 109,
+          "x": 745,
+          "face_pixels": 29
+        },
+        {
+          "y": 110,
+          "x": 745,
+          "face_pixels": 28
+        },
+        {
+          "y": 111,
+          "x": 744,
+          "face_pixels": 30
+        }
+      ],
+      "lower_rows": [
+        {
+          "y": 141,
+          "x": 737,
+          "face_pixels": 60
+        },
+        {
+          "y": 142,
+          "x": 737,
+          "face_pixels": 59
+        },
+        {
+          "y": 143,
+          "x": 736,
+          "face_pixels": 61
+        },
+        {
+          "y": 144,
+          "x": 736,
+          "face_pixels": 60
+        },
+        {
+          "y": 145,
+          "x": 736,
+          "face_pixels": 60
+        },
+        {
+          "y": 146,
+          "x": 736,
+          "face_pixels": 60
+        }
+      ],
+      "upper_anchor_xy": [
+        745,
+        109
+      ],
+      "lower_anchor_xy": [
+        736,
+        143
+      ],
+      "readable_top_minus_bottom_dx_px": 9,
+      "stem_dy_px": 34,
+      "horizontal_px_per_vertical_px": 0.265,
+      "interpretation": "positive x on upper vs lower = readable right lean; these are first-glyph left-envelope sample anchors, NOT full-region homologous stem proof"
+    }
+  ],
+  "images_sha256": {
+    "english_T_C1_NATIVE_SLANT_ANCHORS.png": "8801e283ad27d75346aa96768b64b5497cba5906ab06095c4a4c3a915f7bd540",
+    "korean_ta_C1_NATIVE_SLANT_ANCHORS.png": "155bd940602c41bac034b16af7aca790170e8f74cd0780a0eadef5b37a5ab376"
+  },
+  "conclusion": "FIRST_GLYPH_SAME_POSITIVE_RIGHT_LEAN; FULL_STYLE_ANCHOR_CALIBRATION_HOLD",
+  "calibration": "HOLD: no independently blind-tested known-defect suite, first glyph outline anchors are not a substitute for all source homologous stems",
+  "c3": "NOT_RUN",
+  "runtime": "UNTESTED"
+}

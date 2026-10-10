@@ -11397,5 +11397,24 @@
     "qa": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_CONTROLLER_INDEPENDENT_VISUAL_REWORK.json",
     "runtime_validation": "UNTESTED",
     "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935"
-  }
+  },
+  "c1_q119_firstglyph_direction_20261010": {
+  "queue_index": 119,
+  "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
+  "result": "HOLD_STRICT_RECHECK",
+  "new_annotated_native_png": 2,
+  "source_firstglyph_dx": 13,
+  "final_firstglyph_dx": 9,
+  "source_candidate_outside_rgba": 0,
+  "source_candidate_outside_alpha": 0,
+  "source_clean_outside_alpha0_hidden_rgb": 2484,
+  "unverified": [
+    "blind calibration",
+    "all homologous source/final stems",
+    "C3",
+    "user actual game"
+  ],
+  "new_dds": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
 }
