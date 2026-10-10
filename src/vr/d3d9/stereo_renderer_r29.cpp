@@ -792,6 +792,38 @@ namespace OutRunVRStereo
         NoteRestoreFailure(site);
     }
 
+    void R29OwnerReportStereoFailure(
+        OutRunVR::StereoFailureReason reason,
+        const char* site, HRESULT hr) noexcept
+    {
+        R9Poison(reason, site, hr);
+    }
+    void R29OwnerMarkRightDrawFailed() noexcept
+    {
+        FrameRightDrawFailed = true;
+    }
+    HRESULT R29OwnerCallOriginalSetRenderTarget(
+        IDirect3DDevice9* device, DWORD index,
+        IDirect3DSurface9* surface) noexcept
+    {
+        return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);
+    }
+    HRESULT R29OwnerCallOriginalSetDepthStencilSurface(
+        IDirect3DDevice9* device, IDirect3DSurface9* surface) noexcept
+    {
+        return SetDepthStencilSurfaceHook
+            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)
+            : device->SetDepthStencilSurface(surface);
+    }
+    bool R29OwnerRestoreRightPassState(
+        IDirect3DDevice9* device, IDirect3DSurface9* target,
+        IDirect3DSurface9* depth, const D3DVIEWPORT9& viewport,
+        const float* originalWvp, bool restoreWvp) noexcept
+    {
+        return RestoreRightPassState(
+            device, target, depth, viewport, originalWvp, restoreWvp);
+    }
+
     bool R29OwnerStereoWanted() noexcept
     {
         return StereoWanted();
