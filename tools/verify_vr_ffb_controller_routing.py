@@ -160,7 +160,7 @@ def main() -> None:
     negative_handoffs = (
         ("SDL_RumbleGamepad(previous, 0, 0, 0);", "/* primary stop removed */"),
         ("SDL_RumbleGamepad(*it, 0, 0, 0);", "/* unplug stop removed */"),
-        ("SDL_RumbleGamepad(controller, 0, 0, 0);", "/* shutdown stop removed */"),
+        ("SDL_RumbleGamepad(controller, 0, 0, 0);\n\t\t\tSDL_CloseGamepad(controller);", "/* shutdown stop removed */\n\t\t\tSDL_CloseGamepad(controller);"),
         ("if (nextIndex != primaryControllerIndex)", "if (false)"),
     )
     for original, mutated in negative_handoffs:
