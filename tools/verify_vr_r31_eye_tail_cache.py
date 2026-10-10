@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R31 exact OpenXR eye-tail cache-key verifier: one pass + seven mutations."""
+"""R31 exact OpenXR eye cache and Reset telemetry-epoch verifier: nine mutations."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,8 +39,11 @@ def violations(source: str) -> list[str]:
         errors.append("inverseProjection: missing cache-hit comparison")
     if "R31EyeCache = next;" not in prepare or "if (!R30SupportMatrixFinite(next.eyeTail[eye]))" not in prepare:
         errors.append("transactional finite validation/publish lost")
-    if "R31EyeCache = {};" not in source:
+    reset = body(source, "inline void R31ResetFastPathState()")
+    if "R31EyeCache = {};" not in reset:
         errors.append("Reset cache invalidation lost")
+    if "R31TelemetryResetFrameWindow();" not in reset or "R31Window = {};" not in reset:
+        errors.append("Reset/ResetEx must clear frame and performance windows")
     return errors
 
 
@@ -61,7 +64,15 @@ def main() -> None:
     for marker in negative_markers:
         if source.count(marker) != 1 or not violations(source.replace(marker, "MUTATED", 1)):
             raise SystemExit("R31 EYE CACHE mutation not rejected: " + marker)
-    print(f"R31 EYE CACHE PASS: exact pose/FOV/projection key and {len(negative_markers)} negative mutations")
+    reset = body(source, "inline void R31ResetFastPathState()")
+    reset_markers = ("R31EyeCache = {};", "R31Window = {};")
+    for marker in reset_markers:
+        if reset.count(marker) != 1:
+            raise SystemExit("R31 RESET marker not unique: " + marker)
+        mutated_reset = reset.replace(marker, "MUTATED", 1)
+        if not violations(source.replace(reset, mutated_reset, 1)):
+            raise SystemExit("R31 RESET negative mutation survived: " + marker)
+    print(f"R31 EYE CACHE PASS: exact pose/FOV/projection and reset-epoch guards; {len(negative_markers) + len(reset_markers)} negative mutations")
 
 
 if __name__ == "__main__":

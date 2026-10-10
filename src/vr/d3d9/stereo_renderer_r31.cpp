@@ -152,6 +152,9 @@ namespace OutRunVRStereo
             R31FastWorldCandidates = 0;
             R31EyeCache = {};
             R31TelemetryResetFrameWindow();
+            // Reset/ResetEx opens a new performance epoch. Never mix
+            // pre-reset route counts with recovered-device telemetry.
+            R31Window = {};
         }
 
         void R31FinalizePerfFrame() noexcept
