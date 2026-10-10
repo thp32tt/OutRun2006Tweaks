@@ -10,6 +10,28 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/hooks_forcefeedback.cpp"
 
 
+INPUT_SOURCE = ROOT / "src/input_manager.hpp"
+
+
+def lifetime_violations(source: str) -> list[str]:
+    """The FFB-to-SDL handoff must not race gamepad disconnect/shutdown."""
+    try:
+        rumble = source.split("void setVibration(WORD left, WORD right)", 1)[1].split("// Add sources to bindings", 1)[0]
+        shutdown = source.split("void shutdown()", 1)[1].split("SDL_Gamepad* getPrimaryGamepad()", 1)[0]
+        unplug = source.split("void onControllerRemoved(SDL_JoystickID instanceId)", 1)[1].split("public:", 1)[0]
+    except IndexError:
+        return ["missing SDL lifetime boundary"]
+    lock = "std::lock_guard<std::mutex> lock(mtx);"
+    failures: list[str] = []
+    if rumble.count(lock) != 1 or "getPrimaryGamepad()" not in rumble or "SDL_RumbleGamepad(controller, left, right, 1000);" not in rumble or not (rumble.index(lock) < rumble.index("getPrimaryGamepad()") < rumble.index("SDL_RumbleGamepad(controller, left, right, 1000);")):
+        failures.append("rumble must resolve and use its SDL handle under the same mutex")
+    if shutdown.count(lock) != 1 or "SDL_CloseGamepad(controller);" not in shutdown or shutdown.index(lock) > shutdown.index("SDL_CloseGamepad(controller);"):
+        failures.append("shutdown must close SDL handles under the rumble mutex")
+    if unplug.count(lock) != 1 or "SDL_CloseGamepad(*it);" not in unplug or unplug.index(lock) > unplug.index("SDL_CloseGamepad(*it);"):
+        failures.append("hot-unplug must close SDL handles under the rumble mutex")
+    return failures
+
+
 def violations(source: str) -> list[str]:
     errors: list[str] = []
     try:
@@ -67,7 +89,20 @@ def main() -> None:
     for before, after in mutations:
         if before not in source or not violations(source.replace(before, after, 1)):
             raise SystemExit("VR FFB ROUTING mutation escaped: " + before)
-    print(f"VR FFB ROUTING PASS: selected legacy ID, wheel handoff, FFB post-physics, {len(mutations)} negative mutations")
+    source_input = INPUT_SOURCE.read_text(encoding="utf-8")
+    if lifetime_violations(source_input):
+        raise SystemExit("VR FFB SDL LIFETIME FAIL: " + "; ".join(lifetime_violations(source_input)))
+    negative_lifetimes = (
+        ("std::lock_guard<std::mutex> lock(mtx);\n\t\tauto* controller = getPrimaryGamepad();",
+         "auto* controller = getPrimaryGamepad();\n\t\tstd::lock_guard<std::mutex> lock(mtx);"),
+        ("void shutdown()\n\t{\n\t\t// Serialize teardown with VR/FFB rumble and SDL hot-unplug.\n\t\tstd::lock_guard<std::mutex> lock(mtx);",
+         "void shutdown()\n\t{\n\t\t// unsafe unlocked teardown"),
+    )
+    for original, mutated in negative_lifetimes:
+        if source_input.count(original) != 1 or not lifetime_violations(source_input.replace(original, mutated, 1)):
+            raise SystemExit("VR FFB SDL LIFETIME mutation escaped: " + original[:60])
+    print(f"VR FFB ROUTING PASS: selected legacy ID, wheel handoff, FFB post-physics, "
+          f"{len(mutations)} routing + {len(negative_lifetimes)} lifetime negative mutations")
 
 
 if __name__ == "__main__":

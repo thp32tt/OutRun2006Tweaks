@@ -733,6 +733,8 @@ public:
 
 	void shutdown()
 	{
+		// Serialize teardown with VR/FFB rumble and SDL hot-unplug.
+		std::lock_guard<std::mutex> lock(mtx);
 		for (auto controller : controllers)
 			SDL_CloseGamepad(controller);
 		controllers.clear();
@@ -1495,11 +1497,13 @@ public:
 
 	void setVibration(WORD left, WORD right)
 	{
+		// onControllerRemoved closes the handle under mtx: select and rumble
+		// while holding that same mutex to avoid a use-after-close on unplug.
+		std::lock_guard<std::mutex> lock(mtx);
 		auto* controller = getPrimaryGamepad();
 		if (!controller)
 			return;
 
-		std::lock_guard<std::mutex> lock(mtx);
 		SDL_RumbleGamepad(controller, left, right, 1000);
 
 		// TODO: SDL_RumbleGamepadTriggers doesn't appear to work with any backend?
