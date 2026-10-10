@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""B345 q176: fresh native Hangul red-block source-family font construction.
+"""B346 q176: fresh native Hangul red-block source-family font construction.
 
-A material TRIAL only; full persisted DDS, source->CLEAN->LETTERING->FINAL,
+Final same-family correction after directly observed B345 counter-space FAIL; a material TRIAL only; full persisted DDS, source->CLEAN->LETTERING->FINAL,
 protected outside pixel proofs, raw and 100/75/50 readable visual exports.
 Never change approved hd_candidates before independent direct producer review.
 """
@@ -12,7 +12,7 @@ from PIL import Image,ImageDraw,ImageFont
 from fontTools.ttLib import TTCollection
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-OUT=G/"role_B/20261010-B345-Q176-SOURCE-HEAVY-RED-FONT-PILOT"
+OUT=G/"role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT"
 OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SOURCE_SHA="8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708"
@@ -20,6 +20,8 @@ CURRENT_SHA="494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407"
 q=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","176"],capture_output=True,text=True,check=True).stdout)["assets"][0]
 assert q["next_action"]=="MATERIAL_REWORK",q
 assert subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","176","--require-safe-rerender"],stdout=subprocess.DEVNULL).returncode==0
+first=json.loads((G/"role_B/20261010-B345-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B345_CONTROLLER_PRODUCER_VISUAL_REJECT.json").read_text())
+assert first["decision"]=="PRODUCER_VISUAL_REJECT_TRIAL_UNAPPROVED" and first["new_trial_sha256"]=="34edd2aa06eb8dc8611c8b67738d147e3197325e1af6e54347439b491838075f"
 prior=json.loads((G/"role_C/20261010-C343-C2-Q176-OPTICAL-SOURCE-FAMILY/C343_Q176_CONTROLLER_C2_REWORK.json").read_text())
 assert prior["decision"]=="REWORK_REQUIRED" and prior["candidate_sha256"]==CURRENT_SHA and prior["source_sha256"]==SOURCE_SHA
 cp=G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
@@ -74,7 +76,7 @@ for name,eng,kor,(x0,y0,x1,y1) in regions:
  # Pinned English pixel samples should be flat red, not a blue/chrome case.
  assert rgb[0]>150 and rgb[1]<25 and rgb[2]<25,(name,rgb.tolist())
  target_h=h-10
- stroke=3  # PIL FreeType vector glyph stroke; NOT post-render dilation
+ stroke=1  # source-conditioned smaller native vector stroke after B345 counter collapse; NOT bitmap dilation
  best=None
  for size in range(100,260):
   f=ImageFont.truetype(str(fontp),size,index=fontindex)
@@ -115,11 +117,11 @@ assert all(min(z["four_margins"])>=3 for z in rows)
 order=[0,1,2,3] if masks[0]==255 else [2,1,0,3]
 output=current[:128]+np.flipud(F)[:,:,order].copy().tobytes()
 assert len(output)==len(current) and np.array_equal(dec(output),F)
-outdds=OUT/"B345_Q176_NATIVE_BOLD_SOURCE_FAMILY_UNAPPROVED.dds"
+outdds=OUT/"B346_Q176_NATIVE_BOLD_SOURCE_FAMILY_UNAPPROVED.dds"
 outdds.write_bytes(output)
 for name,arr in (("P1_CLEAN_SOURCE_ONLY",C),("P2_TRANSPARENT_LETTERING_ONLY",L)):
- Image.fromarray(arr,"RGBA").save(OUT/(f"B345_{name}.png"),optimize=True)
-Image.fromarray((scope*255).astype(np.uint8),"L").save(OUT/"B345_SOURCE_BOUNDED_PROTECTED_UNION_MASK.png")
+ Image.fromarray(arr,"RGBA").save(OUT/(f"B346_{name}.png"),optimize=True)
+Image.fromarray((scope*255).astype(np.uint8),"L").save(OUT/"B346_SOURCE_BOUNDED_PROTECTED_UNION_MASK.png")
 views=[]
 def flat(arr,bg):
  x=Image.new("RGBA",(arr.shape[1],arr.shape[0]),bg+(255,))
@@ -135,10 +137,10 @@ for name,eng,kor,(x0,y0,x1,y1) in regions:
     w,h=imgs[0].size
     view=Image.new("RGB",(w*4+18,h),bg)
     for i,im in enumerate(imgs):view.paste(im,(i*(w+6),0))
-    fn=f"B345_{name}_{orientation}_{bgname}_{pct}_SOURCE_CLEAN_OLD_NEW.png"
+    fn=f"B346_{name}_{orientation}_{bgname}_{pct}_SOURCE_CLEAN_OLD_NEW.png"
     view.save(OUT/fn,optimize=True);views.append(fn)
-qa={"run":"B345","role":"B","queue_index":176,
-"run_key":"OUTRUN-KOR-B345-Q176-HEAVY-SOURCE-BLOCK-GLYPH-20261010",
+qa={"run":"B346","role":"B","queue_index":176,
+"run_key":"OUTRUN-KOR-B346-Q176-HEAVY-SOURCE-BLOCK-GLYPH-20261010",
 "source_sha256":SOURCE_SHA,"current_candidate_sha256":CURRENT_SHA,
 "new_trial_sha256":sha(output),"new_trial_bytes":len(output),
 "format":"RGBA32","native":[2048,2048],"mips":1,
@@ -157,16 +159,16 @@ qa={"run":"B345","role":"B","queue_index":176,
 "C2":"C343_CURRENT_REWORK_REQUIRED","C3":"BLOCKED",
 "APPROVAL":False,"RUNTIME_VALIDATION":"UNTESTED",
 "backend":"GITHUB_ACTIONS_CPU_WORKER","exclusions":["ODD_A","C1","VR","FFB","DX11","DXVK"]}
-(OUT/"B345_MECHANICAL_AND_SOURCE_PLATE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"B346_MECHANICAL_AND_SOURCE_PLATE_QA.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
 (OUT/"recipe.json").write_text(json.dumps({
 "family":"red-flat-heavy-block-menu","source_sha256":SOURCE_SHA,
 "source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
 "protected":"Entire unedited atlas including original ??? and route",
 "source_regions":rows,"font_sha256":sha(fb),"font_face_index":fontindex,
-"stroke_width":3,"render_method":"Pillow native pinned font Bold FreeType face with calibrated 3px vector stroke; source sampled flat red face; no bitmap resize or fallback",
+"stroke_width":1,"render_method":"Pillow native pinned font Bold FreeType face with calibrated 1px native vector stroke; source sampled flat red face; no bitmap resize or fallback",
 "earlier_reject":"C343 optical source red-block face visibly thicker than B201 saved",
 "source_to_clean":"zero exact canonical English source bboxes, preserve outside",
 "clean_to_final":"replace each clean bbox with isolated native glyph pixels",
 "RAW_FLIPY":"same exact source/current mirror-Y orientation",
 "producer":"UNAPPROVED TRIAL / visual self-QA pending","runtime":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print("B345_TRIAL",sha(output),[(z["id"],z["font_size_px"],z["final_size"],z["four_margins"]) for z in rows],flush=True)
+print("B346_TRIAL",sha(output),[(z["id"],z["font_size_px"],z["final_size"],z["four_margins"]) for z in rows],flush=True)
