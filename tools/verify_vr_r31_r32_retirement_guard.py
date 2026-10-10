@@ -695,16 +695,22 @@ require(
 require(
     r32,
     "R32 split target facade",
-    "R32ReviewDrawPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveDestR30);}",
-    "R32ReviewDrawIndexedPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30);}",
-    "R32ReviewDrawPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveUPDestR30);}",
-    "R32ReviewDrawIndexedPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30);}",
+    "R32ReviewDrawPrimitiveTarget() noexcept{return R30SupportDrawPrimitiveTarget();}",
+    "R32ReviewDrawIndexedPrimitiveTarget() noexcept{return R30SupportDrawIndexedPrimitiveTarget();}",
+    "R32ReviewDrawPrimitiveUPTarget() noexcept{return R30SupportDrawPrimitiveUPTarget();}",
+    "R32ReviewDrawIndexedPrimitiveUPTarget() noexcept{return R30SupportDrawIndexedPrimitiveUPTarget();}",
     "R32ReviewResetTarget() noexcept{return R30SupportResetTarget();}",
     "R32ReviewPresentTarget() noexcept{return R30SupportPresentTarget();}",
     # R30 support now owns the same physical lower target addresses.
     # A separate fail-closed owner verifier protects the exact R22/R13 identities.
     "R32ReviewDirectTransportTarget() noexcept{return R30SupportDirectTransportTarget();}",
 )
+
+# R30, not R32, owns the physical lower target pointers after the split.
+for label in ("DrawPrimitive", "DrawIndexedPrimitive", "DrawPrimitiveUP", "DrawIndexedPrimitiveUP"):
+    lower = function_body(r30, f"void* R30Support{label}Target() noexcept")
+    require(lower, f"R30 {label} hook target owner",
+            f"reinterpret_cast<void*>(&{label}DestR30)")
 
 r33_install = function_body(r33, "DWORD WINAPI R33InstallThread(void*)")
 require(
@@ -721,10 +727,9 @@ require(
     "R32 split prerequisite delegation",
     "R32ReviewPrerequisiteStatus() noexcept",
     "R31SupportInstallStatus()",
-    "R22InstallStatus()",
-    "R13InstallStatus()",
-    "R13InstallStatusValue::Failed",
-    "R13InstallStatusValue::Ready",
+    "const auto lower = R30SupportLowerPrerequisiteStatus();",
+    "lower == State::Failed",
+    "lower == State::Ready",
 )
 forbid(
     r33_install,
