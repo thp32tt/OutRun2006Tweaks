@@ -20,6 +20,9 @@ def violations(source: str) -> list[str]:
 
     if "VibrationUserId = Settings::VibrationControllerId;" not in source:
         errors.append("configured legacy controller identity not latched")
+    selected_slot = source.split("Setting<int> VibrationControllerId{", 1)[1].split("};", 1)[0]
+    if "Range<int>{ 0, 3 }" not in selected_slot:
+        errors.append("XInput controller ID must be one of ports 0-3")
     if entry.count("SetVibration(VibrationUserId, VibrationLeftMotor, VibrationRightMotor);") != 1:
         errors.append("physics hook bypasses configured legacy controller identity")
     expected_order = ("CalcVibrationValues(car);",
@@ -59,6 +62,7 @@ def main() -> None:
         ("if (WheelFFB_IsOutputOwnerActive())", "if (false)"),
         ("GamePlCar_Ctrl.call(car);", "/* game trampoline omitted */"),
         ("VibrationUserId = Settings::VibrationControllerId;", "VibrationUserId = 0;"),
+        ("Range<int>{ 0, 3 }", "Range<int>{ 0, 4 }"),
     )
     for before, after in mutations:
         if before not in source or not violations(source.replace(before, after, 1)):
