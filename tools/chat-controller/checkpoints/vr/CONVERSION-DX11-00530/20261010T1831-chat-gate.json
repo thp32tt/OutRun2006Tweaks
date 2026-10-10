@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "exact_sha_gate_result",
+  "captured_at_kst": "2026-10-10T18:31:00+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX11-00530",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00530",
+  "work_key": "DX11:R233:NATIVE_LINEAR_SINGLE_IA_STREAM_OWNERSHIP",
+  "target_branch": "vr-dx11-native-r71",
+  "material_result_sha": "c7ee8d63c177e6b59ca6de212feebd20c1b083ef",
+  "validation_bearing_result_sha": "c7ee8d63c177e6b59ca6de212feebd20c1b083ef",
+  "ci_run_id": 38041164018,
+  "ci_status": "completed",
+  "automation_validation": "FAIL",
+  "scoped_validation": "PASS_R183_R233_WIN32_WARP",
+  "runtime_validation": "UNTESTED",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_PENDING_RUN_RECORD",
+  "terminal": false,
+  "blocker": {
+    "owner_task": "CONVERSION-DX11-00477",
+    "step": "Run DX11 constant buffer probe",
+    "classification": "R175_GENERIC_VARYING_MISMATCH",
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ]
+  },
+  "other_ci_in_progress": "OutRun EXE HUD Inspector CI 38041166834",
+  "next_action": "Wait without cancelling pre-existing HUD CI; then persist exact material result and C6 in docs/automation/runs/CONVERSION-DX11-00530.json as a separate bookkeeping commit. No rerun or score."
+}
