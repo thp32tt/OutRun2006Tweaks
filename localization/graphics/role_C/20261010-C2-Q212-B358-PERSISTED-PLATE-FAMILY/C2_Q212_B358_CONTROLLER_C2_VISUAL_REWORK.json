@@ -1,0 +1,231 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "queue_index": 212,
+  "run_key": "OUTRUN-KOR-C2-Q212-B358-NEW-SHA-GHOST-REPAIR-STYLE-REWORK-20261010",
+  "timestamp_kst": "2026-10-10T20:56:55+09:00",
+  "new_candidate_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "full_C158_clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "official_candidate_sha256_unchanged": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "prior_rejected_B357_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+  "direct_saved_bytes_verified": true,
+  "C2_result": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_HIERARCHY_AFTER_CLEAN_REPAIR",
+  "mechanical_conclusion": "P3 prior duplicated stale Korean fixed in new persisted B358; proof from independent saved byte pixel decode, but optical/translation PASS not achieved",
+  "pixel_evidence": {
+    "official_to_B358": {
+      "changed_rgba_full": 29668,
+      "changed_alpha_full": 17044,
+      "changed_rgba_outside_two_cells": 0,
+      "changed_alpha_outside_two_cells": 0
+    },
+    "B357_to_B358": {
+      "changed_rgba_full": 16769,
+      "changed_alpha_full": 6573,
+      "changed_rgba_outside_two_cells": 0,
+      "changed_alpha_outside_two_cells": 0
+    },
+    "SOURCE_to_C158_CLEAN": {
+      "changed_rgba_full": 447850,
+      "changed_alpha_full": 447850,
+      "changed_rgba_outside_two_cells": 428262,
+      "changed_alpha_outside_two_cells": 428262
+    },
+    "CLEAN_to_B358": {
+      "changed_rgba_full": 597301,
+      "changed_alpha_full": 252865,
+      "changed_rgba_outside_two_cells": 562660,
+      "changed_alpha_outside_two_cells": 244351
+    },
+    "note": "Full C158 CLEAN strips other 10 atlas English labels; nonzero differences outside 2 cells are existing other localized atlas text, not attributed to this candidate."
+  },
+  "native_size": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "readable_transform": "FLIP_Y; raw mirrored Y",
+  "calibration": "No complete independent blind calibration — cannot declare new-policy PASS",
+  "pixels_before_producer_verdict": true,
+  "firstlook": "B358 SOURCE/CLEAN/OFFICIAL/B358 native 100%, black 50% visually viewed before reading B358 machine/controller QA; independently generated native five-way with B357 comparator confirms ghost removed but unqualified typography.",
+  "regions": [
+    {
+      "id": "r43_professional",
+      "english": "PROFESSIONAL",
+      "candidate": "프로페셔널 모드",
+      "native_source_alpha32_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "native_B358_alpha32_bbox": [
+        243,
+        342,
+        527,
+        384
+      ],
+      "source_native_width": 397,
+      "new_native_width": 284,
+      "width_ratio": 0.7154,
+      "B357_outside_visible_alpha32": 5638,
+      "B358_outside_visible_alpha32": 0,
+      "authored_clean_alpha_nonzero": 0,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable source and candidate right/upward lean anchors have not been measured as homologous source and Korean stroke endpoints; no sign/tolerance invented.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_100_5WAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Re-downloaded exact canonical English DDS SHA and authenticated C158 full CLEAN SHA. Region CLEAN alpha0; full-atlas SOURCE→CLEAN outside these 2 cells is nonzero because C158 cleaned other atlas content, not a source-relative failure.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_100_5WAY.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Native source headline uses strong condensed heavy uppercase (orange PROFESSIONAL/red OUTRUN); new Korean typography remains smaller/less forceful, sparse compared with original source family.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_100_5WAY.png"
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_HIERARCHY",
+          "observation": "At 50%, PROFESSIONAL source strong 395px and Korean only 284px native; weaker title visual hierarchy. Numerics alone not a universal threshold.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_BLACK_50_5WAY.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "Old B357 double-glyph contamination eliminated in persisted B358; no apparent clipped Hangul on native/half-size sampled view; does not establish all 12 atlas regions.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Official→B358 changes only 2 specified full source sprite cells, 29668 RGBA/17044 alpha, outside both exactly 0; no new visible pixels outside high-alpha English glyph core in those 2 cells.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "placement": {
+          "result": "HOLD_STYLE_HIERARCHY",
+          "observation": "Actual saved B358 alpha>32 core bbox strictly inside source glyph core; old candidate alpha outside source glyph core fully cleared. Position physically contained; r43 remains far narrower than source.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted 2048² RGBA32 mip1 native RAW and mirrored FLIP-Y inspected; source/CLEAN/B357/B358 shown on black/gray/white 100/75/50% direct comparisons.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_RAW_RGBA.png"
+        }
+      },
+      "views": {
+        "source_clean_B357_B358_native": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_100_5WAY.png",
+        "practical_75": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_75_5WAY.png",
+        "practical_50": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_GRAY_50_5WAY.png",
+        "black": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_BLACK_100_5WAY.png",
+        "white": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_WHITE_100_5WAY.png",
+        "source_core_mask": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_SOURCE_CORE_MASK_3X.png",
+        "prior_rejected_mask": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B357_SOURCE_CORE_MASK_3X.png",
+        "raw": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_RAW_RGBA.png",
+        "flip_y": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R43_PROFESSIONAL_B358_FLIPY_RGBA.png"
+      }
+    },
+    {
+      "id": "r44_outrun",
+      "english": "OUTRUN",
+      "candidate": "아웃런 모드",
+      "native_source_alpha32_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "native_B358_alpha32_bbox": [
+        1630,
+        526,
+        1829,
+        566
+      ],
+      "source_native_width": 211,
+      "new_native_width": 199,
+      "width_ratio": 0.9431,
+      "B357_outside_visible_alpha32": 712,
+      "B358_outside_visible_alpha32": 0,
+      "authored_clean_alpha_nonzero": 0,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable source and candidate right/upward lean anchors have not been measured as homologous source and Korean stroke endpoints; no sign/tolerance invented.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_100_5WAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Re-downloaded exact canonical English DDS SHA and authenticated C158 full CLEAN SHA. Region CLEAN alpha0; full-atlas SOURCE→CLEAN outside these 2 cells is nonzero because C158 cleaned other atlas content, not a source-relative failure.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_100_5WAY.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "OUTRUN red condensed uppercase replaced by semantic-expanded Korean 아웃런 모드 without independently approved label meaning; source-family letter proportions and weight unqualified.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_100_5WAY.png"
+        },
+        "readability": {
+          "result": "HOLD_SEMANTIC",
+          "observation": "At 50% Korean letters discernible but expansion with 모드 is not yet independently approved by label/context policy.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_BLACK_50_5WAY.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "Old B357 double-glyph contamination eliminated in persisted B358; no apparent clipped Hangul on native/half-size sampled view; does not establish all 12 atlas regions.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Official→B358 changes only 2 specified full source sprite cells, 29668 RGBA/17044 alpha, outside both exactly 0; no new visible pixels outside high-alpha English glyph core in those 2 cells.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "placement": {
+          "result": "PASS_SCOPED",
+          "observation": "Actual saved B358 bbox inside original source boundary, no old ghost; text semantics/consumer layout unverified.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_SOURCE_CORE_MASK_3X.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted 2048² RGBA32 mip1 native RAW and mirrored FLIP-Y inspected; source/CLEAN/B357/B358 shown on black/gray/white 100/75/50% direct comparisons.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_RAW_RGBA.png"
+        }
+      },
+      "views": {
+        "source_clean_B357_B358_native": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_100_5WAY.png",
+        "practical_75": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_75_5WAY.png",
+        "practical_50": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_GRAY_50_5WAY.png",
+        "black": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_BLACK_100_5WAY.png",
+        "white": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_WHITE_100_5WAY.png",
+        "source_core_mask": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_SOURCE_CORE_MASK_3X.png",
+        "prior_rejected_mask": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B357_SOURCE_CORE_MASK_3X.png",
+        "raw": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_RAW_RGBA.png",
+        "flip_y": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_R44_OUTRUN_B358_FLIPY_RGBA.png"
+      }
+    }
+  ],
+  "decision_rationale": "r43 source-family optical underfill 284px/395px and comparatively weaker hierarchy/condensed style; r44 semantic expanded 모드 requires independent translation/context; prior double lettering fixed. Numeric containment and clean plate do not override visual family failure.",
+  "reason_codes": [
+    "SOURCE_FAMILY_HIERARCHY_UNDERFILL",
+    "SEMANTIC_SUFFIX_UNAPPROVED"
+  ],
+  "required_fix": "Use source-character-native condensed heavier family contour/margins with measured typography hierarchy; verify source consumer text for mode suffix before promotion; no duplicate same glyph generation or old-layer carryover.",
+  "official_status_kept": "c338_c2_rework_required_r43_r44_original_anchor_shift",
+  "C_PASS": 0,
+  "C3": "NOT_RUN_BLOCKED",
+  "APPROVAL": "NONE",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "dds_promoted": 0,
+  "new_dds_created_by_C2": 0,
+  "backend": "GitHub latest SSOT + N100 MCP temporary native DDS decode, since checkout DDS not locally mounted in ChatGPT",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "C1_ODD",
+    "UNINDEXED_SPECIAL"
+  ]
+}

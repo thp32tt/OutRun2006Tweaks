@@ -1,0 +1,214 @@
+{
+  "reviewer": "C2",
+  "queue_index": 212,
+  "review_scope": "new B358 saved bytes, not duplicate B357",
+  "timestamp_kst": "2026-10-10T20:54:13+09:00",
+  "canonical_source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "clean": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "B357": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+    "B358": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8"
+  },
+  "dds_provenance": {
+    "source": {
+      "sha": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "official": {
+      "sha": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "B357": {
+      "sha": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "B358": {
+      "sha": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    }
+  },
+  "native_size": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "readable_transform": "flip_y",
+  "comparisons": {
+    "source_TO_clean": {
+      "changed_rgba_full": 447850,
+      "changed_alpha_full": 447850,
+      "changed_rgba_outside_two_cells": 428262,
+      "changed_alpha_outside_two_cells": 428262
+    },
+    "official_TO_B358": {
+      "changed_rgba_full": 29668,
+      "changed_alpha_full": 17044,
+      "changed_rgba_outside_two_cells": 0,
+      "changed_alpha_outside_two_cells": 0
+    },
+    "B357_TO_B358": {
+      "changed_rgba_full": 16769,
+      "changed_alpha_full": 6573,
+      "changed_rgba_outside_two_cells": 0,
+      "changed_alpha_outside_two_cells": 0
+    },
+    "clean_TO_B358": {
+      "changed_rgba_full": 597301,
+      "changed_alpha_full": 252865,
+      "changed_rgba_outside_two_cells": 562660,
+      "changed_alpha_outside_two_cells": 244351
+    },
+    "source_TO_B358": {
+      "changed_rgba_full": 736021,
+      "changed_alpha_full": 463327,
+      "changed_rgba_outside_two_cells": 693608,
+      "changed_alpha_outside_two_cells": 443279
+    }
+  },
+  "regions": [
+    {
+      "id": "r43_professional",
+      "english": "PROFESSIONAL",
+      "candidate": "프로페셔널 모드",
+      "source_glyph_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "full_cell_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_alpha32_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "B357_alpha32_bbox": [
+        5,
+        342,
+        527,
+        400
+      ],
+      "B358_alpha32_bbox": [
+        243,
+        342,
+        527,
+        384
+      ],
+      "B357_visible_alpha32_outside_source_glyph_bbox": 5638,
+      "B358_visible_alpha32_outside_source_glyph_bbox": 0,
+      "official_visible_alpha32_outside_source_glyph_bbox": 5638,
+      "canonical_clean_nonzero_alpha": 0,
+      "B358_alpha32_pixels_inside_source_glyph_bbox": 4926,
+      "B358_alpha32_pixels_full_cell": 4926,
+      "B358_inherited_B357_visible_alpha32_outside_source": 0,
+      "clean_to_B358_nonzero_alpha_outside_source": 0
+    },
+    {
+      "id": "r44_outrun",
+      "english": "OUTRUN",
+      "candidate": "아웃런 모드",
+      "source_glyph_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "full_cell_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_alpha32_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "B357_alpha32_bbox": [
+        1630,
+        526,
+        1832,
+        581
+      ],
+      "B358_alpha32_bbox": [
+        1630,
+        526,
+        1829,
+        566
+      ],
+      "B357_visible_alpha32_outside_source_glyph_bbox": 712,
+      "B358_visible_alpha32_outside_source_glyph_bbox": 0,
+      "official_visible_alpha32_outside_source_glyph_bbox": 712,
+      "canonical_clean_nonzero_alpha": 0,
+      "B358_alpha32_pixels_inside_source_glyph_bbox": 3272,
+      "B358_alpha32_pixels_full_cell": 3272,
+      "B358_inherited_B357_visible_alpha32_outside_source": 0,
+      "clean_to_B358_nonzero_alpha_outside_source": 0
+    }
+  ],
+  "new_images": [
+    "C2_Q212_B358_R43_PROFESSIONAL_GRAY_100_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_GRAY_75_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_GRAY_50_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_BLACK_100_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_BLACK_75_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_BLACK_50_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_WHITE_100_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_WHITE_75_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_WHITE_50_5WAY.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_B357_SOURCE_CORE_MASK_3X.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_B358_SOURCE_CORE_MASK_3X.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_SOURCE_RAW_RGBA.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_SOURCE_FLIPY_RGBA.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_B358_RAW_RGBA.png",
+    "C2_Q212_B358_R43_PROFESSIONAL_B358_FLIPY_RGBA.png",
+    "C2_Q212_B358_R44_OUTRUN_GRAY_100_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_GRAY_75_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_GRAY_50_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_BLACK_100_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_BLACK_75_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_BLACK_50_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_WHITE_100_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_WHITE_75_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_WHITE_50_5WAY.png",
+    "C2_Q212_B358_R44_OUTRUN_B357_SOURCE_CORE_MASK_3X.png",
+    "C2_Q212_B358_R44_OUTRUN_B358_SOURCE_CORE_MASK_3X.png",
+    "C2_Q212_B358_R44_OUTRUN_SOURCE_RAW_RGBA.png",
+    "C2_Q212_B358_R44_OUTRUN_SOURCE_FLIPY_RGBA.png",
+    "C2_Q212_B358_R44_OUTRUN_B358_RAW_RGBA.png",
+    "C2_Q212_B358_R44_OUTRUN_B358_FLIPY_RGBA.png"
+  ],
+  "visual_review": "MUST_BE_DONE_HUMAN_SEPARATELY",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

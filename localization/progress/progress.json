@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T20:38:00+09:00",
+  "updated_at_kst": "2026-10-10T20:58:50+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11521,38 +11521,52 @@
     "forbidden_domains_touched": []
   },
   "c1_20261010_q201_canonical_english_source_auth": {
-  "queue_index": 201,
-  "run_key": "OUTRUN-KOR-C1-Q201-EXACT-ENGLISH-ROI-20261010-2040",
-  "shard": "C1_ODD",
-  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
-  "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
-  "result": "HOLD_STRICT_RECHECK",
-  "native_roi_rgba_exact_source": 8976,
-  "native_roi_rgba_exact_candidate": 8976,
-  "authenticated_clean_roi_alpha_pixels": 0,
-  "source_native_bbox": [
-    1079,
-    1734,
-    1255,
-    1785
-  ],
-  "candidate_native_bbox": [
-    1084,
-    1739,
-    1160,
-    1780
-  ],
-  "neighbor_stage_change_outside_goal_bbox": 393,
-  "neighbor_change_x": [
-    1039,
-    1048
-  ],
-  "new_evidence_png_count": 10,
-  "new_dds": 0,
-  "approval": false,
-  "C3": "NOT_RUN",
-  "IGR037": "OPEN_USER_INGAME_FAIL",
-  "RUNTIME_VALIDATION": "UNTESTED",
-  "qa": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/C1_Q201_CONTROLLER_C1_HOLD.json"
-}
+    "queue_index": 201,
+    "run_key": "OUTRUN-KOR-C1-Q201-EXACT-ENGLISH-ROI-20261010-2040",
+    "shard": "C1_ODD",
+    "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+    "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+    "result": "HOLD_STRICT_RECHECK",
+    "native_roi_rgba_exact_source": 8976,
+    "native_roi_rgba_exact_candidate": 8976,
+    "authenticated_clean_roi_alpha_pixels": 0,
+    "source_native_bbox": [
+      1079,
+      1734,
+      1255,
+      1785
+    ],
+    "candidate_native_bbox": [
+      1084,
+      1739,
+      1160,
+      1780
+    ],
+    "neighbor_stage_change_outside_goal_bbox": 393,
+    "neighbor_change_x": [
+      1039,
+      1048
+    ],
+    "new_evidence_png_count": 10,
+    "new_dds": 0,
+    "approval": false,
+    "C3": "NOT_RUN",
+    "IGR037": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/C1_Q201_CONTROLLER_C1_HOLD.json"
+  },
+  "c2_q212_b358_independent_ghost_repair_style_20261010": {
+    "role": "C2",
+    "queue_index": 212,
+    "shard": "EVEN",
+    "timestamp_kst": "2026-10-10T20:56:55+09:00",
+    "run_key": "OUTRUN-KOR-C2-Q212-B358-NEW-SHA-GHOST-REPAIR-STYLE-REWORK-20261010",
+    "trial_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+    "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "decision": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_HIERARCHY_AFTER_CLEAN_REPAIR",
+    "machine_png_count": 30,
+    "IGR029": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_CONTROLLER_C2_VISUAL_REWORK.json"
+  }
 }
