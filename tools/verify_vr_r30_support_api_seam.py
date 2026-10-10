@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +27,7 @@ def function_body(source: str, marker: str) -> str:
 
 header = read("src/vr/core/r30_support_api.hpp")
 r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
+r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 workflow = read(".github/workflows/vr-dx9ex-active.yml")
 errors = []
@@ -123,13 +125,13 @@ delegations = {
     "R30SupportInvalidateTrackedRasterShadow(": ("InvalidateTrackedRasterShadow()",),
     "R30SupportInvalidateLiveStateSample(": ("InvalidateLiveStateSample()",),
     "R30SupportWorldScale(": ("Settings::VRWorldScale",),
-    "R30SupportMatrixFromQuaternionTranslation(": ("MatrixFromQuaternionTranslation(",),
-    "R30SupportInverseRigid(": ("InverseRigid(matrix)",),
-    "R30SupportProjectionFromFov(": ("ProjectionFromFov(base, fov)",),
-    "R30SupportMultiplyMatrix(": ("MultiplyMatrix(a, b)",),
-    "R30SupportTransposeMatrix(": ("TransposeMatrix(matrix)",),
-    "R30SupportMatrixFinite(": ("MatrixFinite(matrix)",),
-    "R30SupportGetInverseProjection(": ("GetInverseProjection(projection, inverse)",),
+    "R30SupportMatrixFromQuaternionTranslation(": ("R29OwnerMatrixFromQuaternionTranslation(",),
+    "R30SupportInverseRigid(": ("R29OwnerInverseRigid(matrix)",),
+    "R30SupportProjectionFromFov(": ("R29OwnerProjectionFromFov(base, fov)",),
+    "R30SupportMultiplyMatrix(": ("R29OwnerMultiplyMatrix(a, b)",),
+    "R30SupportTransposeMatrix(": ("R29OwnerTransposeMatrix(matrix)",),
+    "R30SupportMatrixFinite(": ("R29OwnerMatrixFinite(matrix)",),
+    "R30SupportGetInverseProjection(": ("R29OwnerGetInverseProjection(projection, inverse)",),
     "R30SupportValidateVerifiedWvp(": (
         "GetVertexShaderConstantF(",
         "OutRunWvpRegister",
@@ -138,8 +140,7 @@ delegations = {
     ),
     "R30SupportGetVerifiedProjection(": ("OutRunVRRenderer::GetR28VerifiedProjection(",),
     "R30SupportResynchronizeShaderEpoch(": (
-        "CurrentVertexShaderIdentity.exchange(",
-        "VertexShaderSerial.fetch_add(",
+        "R29OwnerResynchronizeShaderEpoch(device)",
     ),
     "R30SupportInvalidateRendererStateAfterExternalRestore(": (
         "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore()",
@@ -156,6 +157,53 @@ for marker, expected in delegations.items():
     for token in expected:
         if token not in body:
             errors.append(f"{marker.rstrip('(')} lost lower-owner delegation: {token}")
+
+# Independent R29 TU now owns matrix/shader/frame ABI. Validate BOTH ends:
+# an R30 delegate with no R29 implementation is a link error; a direct
+# R30 private reference is a compile error under split.
+owner_pairs = {
+    "R29OwnerMatrixFromQuaternionTranslation(": ("MatrixFromQuaternionTranslation(",),
+    "R29OwnerInverseRigid(": ("InverseRigid(matrix)",),
+    "R29OwnerProjectionFromFov(": ("ProjectionFromFov(base, fov)",),
+    "R29OwnerMultiplyMatrix(": ("MultiplyMatrix(a, b)",),
+    "R29OwnerTransposeMatrix(": ("TransposeMatrix(matrix)",),
+    "R29OwnerMatrixFinite(": ("MatrixFinite(matrix)",),
+    "R29OwnerGetInverseProjection(": ("GetInverseProjection(matrix, inverse)",),
+    "R29OwnerCurrentVertexShaderIdentity(": ("CurrentVertexShaderIdentity.load(",),
+    "R29OwnerResynchronizeShaderEpoch(": (
+        "CurrentVertexShaderIdentity.exchange(", "VertexShaderSerial.fetch_add("),
+    "R29OwnerRecordWorldStereoDuplicate(": (
+        "FrameHadDuplicatedDraw = true;", "++DuplicatedDraws;",
+        "FrameStereoMetadata = stereo;"),
+    "R29OwnerRecordXyzrhwWorldStereoDuplicate(": (
+        "FrameHadDuplicatedDraw = true;", "++DuplicatedDraws;",
+        "FrameRightDrawFailed = true;",
+        "PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);"),
+    "R29OwnerRecordHudStereoDuplicate(": (
+        "FrameHadDuplicatedDraw = true;", "++NonWorldDuplicatedDraws;"),
+}
+owner_header = read("src/vr/core/r29_owner_api.hpp")
+for marker, required in owner_pairs.items():
+    if marker.rstrip("(") not in owner_header:
+        errors.append(f"missing R29 declared owner: {marker}")
+    try:
+        body = function_body(r29, marker)
+    except ValueError as exc:
+        errors.append(str(exc))
+        continue
+    for token in required:
+        if token not in body:
+            errors.append(f"R29 owner lost physical binding {marker}: {token}")
+
+for raw in ("FrameHadDuplicatedDraw", "FrameStereoMetadata",
+            "VertexShaderSerial", "CurrentVertexShaderIdentity"):
+    if re.search(r"(?<![A-Za-z0-9_])" + raw + r"(?![A-Za-z0-9_])", r30):
+        errors.append(f"R30 retained private R29 symbol: {raw}")
+for must in ("R29OwnerRecordXyzrhwWorldStereoDuplicate(",
+             "R29OwnerRecordHudStereoDuplicate(",
+             "R29OwnerCurrentVertexShaderIdentity()"):
+    if must not in r30:
+        errors.append(f"R30 lost R29 owner consumer: {must}")
 
 # Integrated R33/R32/R31/R30 build now owns explicit R30 support and
 # R31 upper owners in distinct translation units. Refuse the once-dangerous

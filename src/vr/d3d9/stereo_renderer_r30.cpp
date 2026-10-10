@@ -1408,7 +1408,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
             if (!R29OwnerStableStereoBase(device) ||
-                CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
+                R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
 
             IDirect3DVertexShader9* shader = nullptr;
@@ -1548,12 +1548,12 @@ namespace OutRunVRStereo
             if (!haveBaseProjection)
                 return false;
             state.baseProjection = baseProjection;
-            if (!MatrixFinite(baseProjection) ||
+            if (!R29OwnerMatrixFinite(baseProjection) ||
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
                 std::fabs(baseProjection._34) < 0.25f ||
-                !InvertMatrix(baseProjection, state.inverseBaseProjection) ||
-                !MatrixFinite(state.inverseBaseProjection))
+                !R29OwnerInvertMatrix(baseProjection, state.inverseBaseProjection) ||
+                !R29OwnerMatrixFinite(state.inverseBaseProjection))
                 return false;
             state.fullWorldReprojection = true;
 
@@ -1589,12 +1589,12 @@ namespace OutRunVRStereo
                     0.0f, 0.0f, 0.0f, 1.0f
                 };
                 const D3DMATRIX eyePose =
-                    MatrixFromQuaternionTranslation(
+                    R29OwnerMatrixFromQuaternionTranslation(
                         identityOrientation, relativeEye,
                         Settings::VRWorldScale * Settings::VRStereoDepth);
-                state.eyeInverse[eye] = InverseRigid(eyePose);
+                state.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);
                 state.eyeProjection[eye] =
-                    ProjectionFromFov(baseProjection,
+                    R29OwnerProjectionFromFov(baseProjection,
                         state.stereo.eyeFov[eye]);
 
                 // Preserve a conservative affine fallback for vertices whose
@@ -1637,8 +1637,8 @@ namespace OutRunVRStereo
                     !std::isfinite(state.worldOffsetY[eye]) ||
                     !std::isfinite(state.parallaxPerRhwX[eye]) ||
                     !std::isfinite(state.parallaxPerRhwY[eye]) ||
-                    !MatrixFinite(state.eyeProjection[eye]) ||
-                    !MatrixFinite(state.eyeInverse[eye]) ||
+                    !R29OwnerMatrixFinite(state.eyeProjection[eye]) ||
+                    !R29OwnerMatrixFinite(state.eyeInverse[eye]) ||
                     state.worldScaleX[eye] < 0.20f ||
                     state.worldScaleX[eye] > 5.0f ||
                     state.worldScaleY[eye] < 0.20f ||
@@ -2086,24 +2086,12 @@ namespace OutRunVRStereo
                     savedRt, savedDepth, state.viewport, nullptr, false);
             }
 
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
             R29OwnerNoteStableTwoEyeDraw();
             if (state.worldEffect)
             {
                 ++R30XyzrhwWorldEffectDraws;
-                if (R29OwnerCaptureFrameSnapshot().poseSequence == 0)
-                {
-                    FrameStereoPoseSequence = state.stereo.poseSequence;
-                    FrameStereoMetadata = state.stereo;
-                }
-                else if (R29OwnerCaptureFrameSnapshot().poseSequence != state.stereo.poseSequence)
-                {
-                    R29OwnerMarkRightDrawFailed();
-                    PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
-                }
-                FrameHadWorldStereo = true;
-                ++WorldStereoDraws;
+                R29OwnerRecordXyzrhwWorldStereoDuplicate(
+                    state.stereo.poseSequence, state.stereo);
                 if (!R30FirstXyzrhwWorldLogged)
                 {
                     R30FirstXyzrhwWorldLogged = true;
@@ -2113,7 +2101,7 @@ namespace OutRunVRStereo
             }
             else
             {
-                ++NonWorldDuplicatedDraws;
+                R29OwnerRecordHudStereoDuplicate();
                 ++R30XyzrhwHudDraws;
                 if (!R30FirstXyzrhwHudLogged)
                 {
@@ -2642,7 +2630,7 @@ namespace OutRunVRStereo
             float eyeScale[2], float eyeOffset[2]) noexcept
         {
             if (!device ||
-                CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+                R29OwnerCurrentVertexShaderIdentity() == 0)
                 return false;
 
             if (FAILED(device->GetVertexShaderConstantF(
@@ -2654,8 +2642,8 @@ namespace OutRunVRStereo
 
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, original, sizeof(uploadedT));
-            const D3DMATRIX stockWvp = TransposeMatrix(uploadedT);
-            if (!MatrixFinite(stockWvp))
+            const D3DMATRIX stockWvp = R29OwnerTransposeMatrix(uploadedT);
+            if (!R29OwnerMatrixFinite(stockWvp))
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)
@@ -2675,9 +2663,9 @@ namespace OutRunVRStereo
                     sizeof(baseProjection));
                 std::memcpy(&headInverse, headRaw,
                     sizeof(headInverse));
-                if (!MatrixFinite(baseProjection) ||
-                    !MatrixFinite(headInverse) ||
-                    !InvertMatrix(baseProjection, inverseBaseProjection))
+                if (!R29OwnerMatrixFinite(baseProjection) ||
+                    !R29OwnerMatrixFinite(headInverse) ||
+                    !R29OwnerInvertMatrix(baseProjection, inverseBaseProjection))
                     return false;
 
                 // Turn a screen-space alpha overlay into a finite common view
@@ -2700,40 +2688,40 @@ namespace OutRunVRStereo
                 if (!std::isfinite(planeNdcZ))
                     return false;
 
-                D3DMATRIX depthReset = IdentityMatrix();
+                D3DMATRIX depthReset = R29OwnerIdentityMatrix();
                 depthReset._33 = 0.0f;
                 depthReset._43 = planeNdcZ;
                 const D3DMATRIX commonViewPlane =
-                    MultiplyMatrix(
-                        MultiplyMatrix(stockWvp, depthReset),
+                    R29OwnerMultiplyMatrix(
+                        R29OwnerMultiplyMatrix(stockWvp, depthReset),
                         inverseBaseProjection);
-                if (!MatrixFinite(commonViewPlane))
+                if (!R29OwnerMatrixFinite(commonViewPlane))
                     return false;
 
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyePose =
-                        MatrixFromQuaternionTranslation(
+                        R29OwnerMatrixFromQuaternionTranslation(
                             stereo.eyeOrientation[eye],
                             stereo.eyeOffset[eye],
                             Settings::VRWorldScale *
                                 Settings::VRStereoDepth);
                     const D3DMATRIX eyeInverse =
-                        InverseRigid(eyePose);
+                        R29OwnerInverseRigid(eyePose);
                     const D3DMATRIX eyeProjection =
-                        ProjectionFromFov(
+                        R29OwnerProjectionFromFov(
                             baseProjection, stereo.eyeFov[eye]);
                     const D3DMATRIX corrected =
-                        MultiplyMatrix(
-                            MultiplyMatrix(
-                                MultiplyMatrix(
+                        R29OwnerMultiplyMatrix(
+                            R29OwnerMultiplyMatrix(
+                                R29OwnerMultiplyMatrix(
                                     commonViewPlane, headInverse),
                                 eyeInverse),
                             eyeProjection);
-                    if (!MatrixFinite(corrected))
+                    if (!R29OwnerMatrixFinite(corrected))
                         return false;
                     const D3DMATRIX correctedT =
-                        TransposeMatrix(corrected);
+                        R29OwnerTransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
                 }
@@ -2758,11 +2746,11 @@ namespace OutRunVRStereo
                 clipCorrection._41 = eyeOffset[eye];
 
                 const D3DMATRIX corrected =
-                    MultiplyMatrix(stockWvp, clipCorrection);
-                if (!MatrixFinite(corrected))
+                    R29OwnerMultiplyMatrix(stockWvp, clipCorrection);
+                if (!R29OwnerMatrixFinite(corrected))
                     return false;
 
-                const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                const D3DMATRIX correctedT = R29OwnerTransposeMatrix(corrected);
                 std::memcpy(eyeConstants[eye], &correctedT,
                     sizeof(correctedT));
             }
@@ -2952,9 +2940,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
-            ++NonWorldDuplicatedDraws;
+            R29OwnerRecordHudStereoDuplicate();
             R29OwnerNoteStableTwoEyeDraw();
             ++R30ScreenSpaceFovDraws;
 
@@ -3777,22 +3763,12 @@ namespace OutRunVRStereo
         std::uint32_t poseSequence,
         const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
     {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (R29OwnerCaptureFrameSnapshot().poseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
+        R29OwnerRecordWorldStereoDuplicate(poseSequence, stereo);
     }
 
     void R30SupportRecordHudStereoDuplicate() noexcept
     {
-        FrameHadDuplicatedDraw = true;
-        ++DuplicatedDraws;
-        ++NonWorldDuplicatedDraws;
+        R29OwnerRecordHudStereoDuplicate();
     }
 
     void R30SupportMarkFrameRightDrawFailed() noexcept
@@ -3872,25 +3848,19 @@ namespace OutRunVRStereo
 
     std::uintptr_t R30SupportCurrentVertexShaderIdentity() noexcept
     {
-        return CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+        return R29OwnerCurrentVertexShaderIdentity();
     }
 
     std::uintptr_t R30SupportExchangeVertexShaderIdentity(
         std::uintptr_t identity) noexcept
     {
-        return CurrentVertexShaderIdentity.exchange(
-            identity, std::memory_order_acq_rel);
+        return R29OwnerExchangeVertexShaderIdentity(identity);
     }
 
     void R30SupportRestoreVertexShaderIdentityIfEmpty(
         std::uintptr_t identity) noexcept
     {
-        if (!identity)
-            return;
-        std::uintptr_t expected = 0;
-        CurrentVertexShaderIdentity.compare_exchange_strong(
-            expected, identity,
-            std::memory_order_acq_rel, std::memory_order_acquire);
+        R29OwnerRestoreVertexShaderIdentityIfEmpty(identity);
     }
 
     float R30SupportWorldScale() noexcept
@@ -3902,41 +3872,41 @@ namespace OutRunVRStereo
         const float orientation[4], const float position[3],
         float positionScale) noexcept
     {
-        return MatrixFromQuaternionTranslation(
+        return R29OwnerMatrixFromQuaternionTranslation(
             orientation, position, positionScale);
     }
 
     D3DMATRIX R30SupportInverseRigid(const D3DMATRIX& matrix) noexcept
     {
-        return InverseRigid(matrix);
+        return R29OwnerInverseRigid(matrix);
     }
 
     D3DMATRIX R30SupportProjectionFromFov(
         const D3DMATRIX& base, const OutRunVR::SharedFov& fov) noexcept
     {
-        return ProjectionFromFov(base, fov);
+        return R29OwnerProjectionFromFov(base, fov);
     }
 
     D3DMATRIX R30SupportMultiplyMatrix(
         const D3DMATRIX& a, const D3DMATRIX& b) noexcept
     {
-        return MultiplyMatrix(a, b);
+        return R29OwnerMultiplyMatrix(a, b);
     }
 
     D3DMATRIX R30SupportTransposeMatrix(const D3DMATRIX& matrix) noexcept
     {
-        return TransposeMatrix(matrix);
+        return R29OwnerTransposeMatrix(matrix);
     }
 
     bool R30SupportMatrixFinite(const D3DMATRIX& matrix) noexcept
     {
-        return MatrixFinite(matrix);
+        return R29OwnerMatrixFinite(matrix);
     }
 
     bool R30SupportGetInverseProjection(
         const D3DMATRIX& projection, D3DMATRIX& inverse) noexcept
     {
-        return GetInverseProjection(projection, inverse);
+        return R29OwnerGetInverseProjection(projection, inverse);
     }
 
     bool R30SupportValidateVerifiedWvp(
@@ -3960,30 +3930,13 @@ namespace OutRunVRStereo
     bool R30SupportCurrentShaderEpoch(
         std::uintptr_t& identity, std::uint64_t& serial) noexcept
     {
-        return GetCurrentShaderEpoch(identity, serial);
+        return R29OwnerCurrentShaderEpoch(identity, serial);
     }
 
     void R30SupportResynchronizeShaderEpoch(
         IDirect3DDevice9* device) noexcept
     {
-        IDirect3DVertexShader9* shader = nullptr;
-        const HRESULT hr = device
-            ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
-        const std::uintptr_t identity = SUCCEEDED(hr)
-            ? reinterpret_cast<std::uintptr_t>(shader) : 0;
-        if (shader)
-            shader->Release();
-
-        const std::uintptr_t previous =
-            CurrentVertexShaderIdentity.exchange(identity,
-                std::memory_order_acq_rel);
-        if (previous != identity)
-        {
-            std::uint64_t serial = VertexShaderSerial.fetch_add(
-                1, std::memory_order_acq_rel) + 1;
-            if (serial == 0)
-                VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
-        }
+        R29OwnerResynchronizeShaderEpoch(device);
     }
 
     void R30SupportInvalidateRendererStateAfterExternalRestore() noexcept

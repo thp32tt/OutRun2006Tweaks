@@ -840,4 +840,137 @@ namespace OutRunVRStereo
         InternalStereoPass = active;
         return prior;
     }
+
+    // R84 owner boundary: keep exactly the lower R9/R29 counters and latch.
+    void R29OwnerRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        FrameHadWorldStereo = true;
+        ++DuplicatedDraws;
+        ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+    }
+    void R29OwnerRecordXyzrhwWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+    {
+        // Preserve original R30 XYZRHW ordering even on pose mismatch:
+        // count duplicate, latch/check pose, poison, then world counters.
+        // R31's standard duplicate owner intentionally has no pose check.
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        if (FrameStereoPoseSequence == 0)
+        {
+            FrameStereoPoseSequence = poseSequence;
+            FrameStereoMetadata = stereo;
+        }
+        else if (FrameStereoPoseSequence != poseSequence)
+        {
+            FrameRightDrawFailed = true;
+            PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
+        }
+        FrameHadWorldStereo = true;
+        ++WorldStereoDraws;
+    }
+    void R29OwnerRecordHudStereoDuplicate() noexcept
+    {
+        FrameHadDuplicatedDraw = true;
+        ++DuplicatedDraws;
+        ++NonWorldDuplicatedDraws;
+    }
+    std::uintptr_t R29OwnerCurrentVertexShaderIdentity() noexcept
+    {
+        return CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+    }
+    std::uintptr_t R29OwnerExchangeVertexShaderIdentity(
+        std::uintptr_t identity) noexcept
+    {
+        return CurrentVertexShaderIdentity.exchange(
+            identity, std::memory_order_acq_rel);
+    }
+    void R29OwnerRestoreVertexShaderIdentityIfEmpty(
+        std::uintptr_t identity) noexcept
+    {
+        if (!identity)
+            return;
+        std::uintptr_t expected = 0;
+        CurrentVertexShaderIdentity.compare_exchange_strong(
+            expected, identity,
+            std::memory_order_acq_rel, std::memory_order_acquire);
+    }
+    bool R29OwnerCurrentShaderEpoch(
+        std::uintptr_t& identity, std::uint64_t& serial) noexcept
+    {
+        return GetCurrentShaderEpoch(identity, serial);
+    }
+    void R29OwnerResynchronizeShaderEpoch(
+        IDirect3DDevice9* device) noexcept
+    {
+        IDirect3DVertexShader9* shader = nullptr;
+        const HRESULT hr = device
+            ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
+        const std::uintptr_t identity = SUCCEEDED(hr)
+            ? reinterpret_cast<std::uintptr_t>(shader) : 0;
+        if (shader)
+            shader->Release();
+        const std::uintptr_t previous =
+            CurrentVertexShaderIdentity.exchange(
+                identity, std::memory_order_acq_rel);
+        if (previous != identity)
+        {
+            std::uint64_t serial = VertexShaderSerial.fetch_add(
+                1, std::memory_order_acq_rel) + 1;
+            if (serial == 0)
+                VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+        }
+    }
+    D3DMATRIX R29OwnerIdentityMatrix() noexcept
+    {
+        return IdentityMatrix();
+    }
+    D3DMATRIX R29OwnerMatrixFromQuaternionTranslation(
+        const float orientation[4], const float position[3],
+        float positionScale) noexcept
+    {
+        return MatrixFromQuaternionTranslation(
+            orientation, position, positionScale);
+    }
+    D3DMATRIX R29OwnerInverseRigid(const D3DMATRIX& matrix) noexcept
+    {
+        return InverseRigid(matrix);
+    }
+    D3DMATRIX R29OwnerProjectionFromFov(
+        const D3DMATRIX& base, const OutRunVR::SharedFov& fov) noexcept
+    {
+        return ProjectionFromFov(base, fov);
+    }
+    D3DMATRIX R29OwnerMultiplyMatrix(
+        const D3DMATRIX& a, const D3DMATRIX& b) noexcept
+    {
+        return MultiplyMatrix(a, b);
+    }
+    D3DMATRIX R29OwnerTransposeMatrix(const D3DMATRIX& matrix) noexcept
+    {
+        return TransposeMatrix(matrix);
+    }
+    bool R29OwnerMatrixFinite(const D3DMATRIX& matrix) noexcept
+    {
+        return MatrixFinite(matrix);
+    }
+    bool R29OwnerInvertMatrix(
+        const D3DMATRIX& matrix, D3DMATRIX& inverse) noexcept
+    {
+        return InvertMatrix(matrix, inverse);
+    }
+    bool R29OwnerGetInverseProjection(
+        const D3DMATRIX& matrix, D3DMATRIX& inverse) noexcept
+    {
+        return GetInverseProjection(matrix, inverse);
+    }
 }

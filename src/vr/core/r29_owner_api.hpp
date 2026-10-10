@@ -87,4 +87,38 @@ namespace OutRunVRStereo
     bool R29OwnerStereoWanted() noexcept;
     bool R29OwnerTargetIsBackBuffer() noexcept;
     bool R29OwnerExchangeInternalStereoPass(bool active) noexcept;
+
+    // R84: R29 is the sole owner of frame counters, latched pose metadata,
+    // lower shader epoch and matrix helpers. All pointers remain borrowed.
+    void R29OwnerRecordWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;
+    void R29OwnerRecordXyzrhwWorldStereoDuplicate(
+        std::uint32_t poseSequence,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;
+    void R29OwnerRecordHudStereoDuplicate() noexcept;
+    std::uintptr_t R29OwnerCurrentVertexShaderIdentity() noexcept;
+    std::uintptr_t R29OwnerExchangeVertexShaderIdentity(
+        std::uintptr_t identity) noexcept;
+    void R29OwnerRestoreVertexShaderIdentityIfEmpty(
+        std::uintptr_t identity) noexcept;
+    bool R29OwnerCurrentShaderEpoch(
+        std::uintptr_t& identity, std::uint64_t& serial) noexcept;
+    void R29OwnerResynchronizeShaderEpoch(
+        IDirect3DDevice9* device) noexcept;
+    D3DMATRIX R29OwnerIdentityMatrix() noexcept;
+    D3DMATRIX R29OwnerMatrixFromQuaternionTranslation(
+        const float orientation[4], const float position[3],
+        float positionScale) noexcept;
+    D3DMATRIX R29OwnerInverseRigid(const D3DMATRIX& matrix) noexcept;
+    D3DMATRIX R29OwnerProjectionFromFov(
+        const D3DMATRIX& base, const OutRunVR::SharedFov& fov) noexcept;
+    D3DMATRIX R29OwnerMultiplyMatrix(
+        const D3DMATRIX& a, const D3DMATRIX& b) noexcept;
+    D3DMATRIX R29OwnerTransposeMatrix(const D3DMATRIX& matrix) noexcept;
+    bool R29OwnerMatrixFinite(const D3DMATRIX& matrix) noexcept;
+    bool R29OwnerInvertMatrix(
+        const D3DMATRIX& matrix, D3DMATRIX& inverse) noexcept;
+    bool R29OwnerGetInverseProjection(
+        const D3DMATRIX& matrix, D3DMATRIX& inverse) noexcept;
 }
