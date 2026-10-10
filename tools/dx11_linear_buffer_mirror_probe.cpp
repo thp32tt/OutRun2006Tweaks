@@ -602,6 +602,43 @@ int main() {
     require(samplePixelEquals(255,0,0),
         "R230 restored WARP Draw paints red eye pixel");
 
+    // R232: all four Stream Output slots are potential GPU write sinks
+    // outside the owned eye. Compare predecessor, negative SO slots and
+    // restored real WARP Draw, without enabling the game native path.
+    const auto r232Ready = [&] {
+        return outrun::vr::dx11::verified_linear_no_stream_output_eye_ready(
+            vb, ctx.Get(), 0u, 3u, generation, version,
+            32u, 32u, DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(), vs.Get(), ps.Get(), rtv.Get(),
+            ownDsv.Get(), depthState.Get(), rs.Get());
+    };
+    require(r232Ready(), "R232 initial clean linear eye");
+    D3D11_BUFFER_DESC r232BufferDesc{};
+    r232BufferDesc.ByteWidth = 64u;
+    r232BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    r232BufferDesc.BindFlags = D3D11_BIND_STREAM_OUTPUT;
+    ComPtr<ID3D11Buffer> r232SoBuffer;
+    require(SUCCEEDED(dev->CreateBuffer(
+        &r232BufferDesc, nullptr, r232SoBuffer.GetAddressOf())) && r232SoBuffer,
+        "R232 same-device stream-output buffer");
+    ID3D11Buffer* r232Slot0 = r232SoBuffer.Get();
+    UINT r232Offsets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    ctx->SOSetTargets(1u, &r232Slot0, r232Offsets);
+    require(r230Ready(), "R232 predecessor ignores SO target");
+    require(!r232Ready(), "R232 reject slot-zero stream-output");
+    ID3D11Buffer* r232Slot3[D3D11_SO_BUFFER_SLOT_COUNT]{
+        nullptr, nullptr, nullptr, r232SoBuffer.Get()};
+    ctx->SOSetTargets(D3D11_SO_BUFFER_SLOT_COUNT, r232Slot3, r232Offsets);
+    require(!r232Ready(), "R232 reject highest stream-output slot");
+    ctx->SOSetTargets(0u, nullptr, nullptr);
+    require(r232Ready(), "R232 restore after SO unbind");
+    ctx->ClearDepthStencilView(ownDsv.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+    ctx->ClearRenderTargetView(rtv.Get(), clear);
+    ctx->Draw(3u, 0u);
+    require(samplePixelEquals(255,0,0),
+        "R232 restored WARP Draw paints red eye pixel");
+
+
 
 
 

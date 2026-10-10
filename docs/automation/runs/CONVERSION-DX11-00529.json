@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00529",
+  "production_id": "CONVERSION-DX11-00529",
+  "event_id": "CONVERSION-DX11-00529-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "f8ba4814ba891ed419c84ccacff1f7c3dc9d2496",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00529",
+  "lease_epoch": 1,
+  "work_key": "DX11:R232:LINEAR_STREAM_OUTPUT_SIDE_EFFECT_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_uav_eye_guard.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_stream_output_r232.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "terminal": false,
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "summary": "R232 dormant native non-indexed Draw rejects all 4 SO write-target slots after R230 predication and R221 OM UAV checks; WARP slot 0/3 negative and red pixel restoration.",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_uav_eye_guard.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_stream_output_r232.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00529.json"
+  ],
+  "pipeline": {
+    "C0": "PASS authenticated GitHub base HEAD + controller checkpoint WAIT_CHAT; 00528 terminal scoped PASS/full Gate FAIL R175 independent owner; refreshed 00528 descendant docs-only f8ba4814 and preserved changes via parent rebase",
+    "C1": "PASS independent R232 linear SO side-effect fence, distinct from R231 indexed SO and R175 constant buffer",
+    "C2": "PASS production C++ SOGetTargets/COM cleanup; same-device slot-zero/slot-three WARP tests; nine static mutations; workflow registration",
+    "C3": "LOCAL_STATIC_PASS nine negative source mutations and WARP/CI wiring; exact-SHA Gate PENDING",
+    "C4": "PENDING final material commit [AUTO:CONVERSION-DX11-00529] (result SHA populated only after remote commit)",
+    "C5": "NOT_REQUIRED: dormant readiness only; no gameplay native Draw or HMD candidate package",
+    "C6": "WAIT_GATE; retain RUNTIME_VALIDATION=UNTESTED; preserve R175 known independent Gate blocker"
+  },
+  "blockers": [
+    "Inherited R175 constant-buffer pixel mismatch is independently owned by 00477; may fail full Gate",
+    "Quest3/VDXR runtime not tested; gameplay native activation dormant"
+  ],
+  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "next_action": "Verify R232 source/static/WARP steps and exact material SHA Gate; record PASS only on whole Gate SUCCESS, otherwise BLOCKED_DEPENDENCY_R175",
+  "static_validation": "LOCAL_JS_R232_NINE_SOURCE_MUTANTS_AND_WARP_CI_CONTRACT_PASS; HOSTED_WINDOWS_PENDING",
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00529",
+  "last_real_activity_evidence": "R232 Git objects saved; rebasing onto 00528 docs-only HEAD while preserving source-only batch",
+  "state_persisted": true,
+  "dispatch_base_sha": "65dfe1d8c194fe49632d88eb28894752fd255e18",
+  "rebased_over_prior_task_checkpoint": "CONVERSION-DX11-00528 HEAD f8ba4814 docs-only"
+}

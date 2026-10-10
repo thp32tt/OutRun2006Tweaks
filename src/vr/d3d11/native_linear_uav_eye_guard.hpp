@@ -65,4 +65,38 @@ namespace outrun::vr::dx11 {
     context->GetPredication(livePredicate.GetAddressOf(), &predicatePolarity);
     return !livePredicate;
 }
+
+// R232: even an otherwise unpredicated, sole-eye non-indexed Draw can retain
+// a stream-output destination invisible to OM/UAV checks. Reject all SO slots
+// before ever considering native gameplay activation; no Draw dispatch here.
+[[nodiscard]] inline bool verified_linear_no_stream_output_eye_ready(
+    const NativeLinearBufferMirror& vb, ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t generation, std::uint64_t snapshotVersion,
+    UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !verified_linear_unpredicated_eye_ready(
+            vb, context, startVertex, vertexCount,
+            generation, snapshotVersion, width, height, format,
+            expectedLayout, expectedVs, expectedPs, expectedRtv,
+            expectedDsv, expectedDepthState, expectedRaster))
+        return false;
+    ID3D11Buffer* soTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    context->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, soTargets);
+    bool isolated = true;
+    // SOGetTargets AddRefs each returned target, including rejected slots.
+    for (auto* target : soTargets) {
+        if (target) {
+            isolated = false;
+            target->Release();
+        }
+    }
+    return isolated;
+}
+
 } // namespace outrun::vr::dx11
