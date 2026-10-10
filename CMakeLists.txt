@@ -1130,3 +1130,14 @@ target_compile_features(dx11_indexed_draw_probe_r186 PUBLIC cxx_std_20)
 target_compile_options(dx11_indexed_draw_probe_r186 PUBLIC "/GS" "/utf-8")
 target_include_directories(dx11_indexed_draw_probe_r186 PUBLIC "src/" "shared/" "include/")
 target_link_libraries(dx11_indexed_draw_probe_r186 PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R238: D3D9 transient DrawIndexedPrimitiveUP to immutable native WARP pixels.
+add_executable(dx11_indexed_up_probe_r238)
+target_sources(dx11_indexed_up_probe_r238 PRIVATE
+    "tools/dx11_indexed_up_probe_r238.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_up_probe_r238 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_up_probe_r238 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_up_probe_r238 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_up_probe_r238 PUBLIC d3dcompiler.lib d3d11.lib)

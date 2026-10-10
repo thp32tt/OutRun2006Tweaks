@@ -686,3 +686,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R238 source-owned indexed UP capture, separate WARP-only draw and readback.
+[target.dx11_indexed_up_probe_r238]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_up_probe_r238.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

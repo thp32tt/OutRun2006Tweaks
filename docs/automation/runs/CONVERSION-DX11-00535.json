@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00535",
+  "production_id": "CONVERSION-DX11-00535",
+  "event_id": "CONVERSION-DX11-00535-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "b7ce97e8b13033b617d1d5267816245c4ed96e80",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00535",
+  "lease_epoch": 1,
+  "work_key": "DX11:R238:D3D9_INDEXED_UP_IMMUTABLE_CPU_TO_NATIVE_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_d3d9_indexed_up_batch.hpp",
+    "tools/dx11_indexed_up_probe_r238.cpp",
+    "tools/test_dx11_indexed_up_r238.py",
+    "DX11:R238:INDEXED_UP_MONO"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 DrawIndexedPrimitiveUP caller-attested transient vertex/index spans and zero-based index window",
+      "R238 immutable DEFAULT D3D11 VB/IB pair with matching device generation and separately versioned IA",
+      "R212/R187 exact single-eye shader/RTV/viewport preflight",
+      "WARP DrawIndexed(3,0,0) and center/corner GPU pixel readback for INDEX16, center pixel for INDEX32"
+    ],
+    "batch_components": [
+      "native_d3d9_indexed_up_batch.hpp CPU owner/native IA integration",
+      "dx11_indexed_up_probe_r238.cpp actual WARP GPU positive and negative tests",
+      "test_dx11_indexed_up_r238.py negative mutation and CI wiring",
+      "cmake.toml+CMakeLists+backend Gate dedicated R238 target"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP INDEX16 center red/corner black plus INDEX32 center red after mutating original D3D9 source pointers",
+      "negative_regression": "15 source guard mutation checks, null/short source, invalid index, stale generation and per-resource version, foreign RTV, retired owner",
+      "component_integration": "D3D9 indexed UP caller -> immutable D3D11 vertex/index resources -> exact IA/shaders/sole RTV -> WARP GPU DrawIndexed -> readback"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_d3d9_indexed_up_batch.hpp",
+      "tools/dx11_indexed_up_probe_r238.cpp",
+      "tools/test_dx11_indexed_up_r238.py",
+      "DX11:R238:INDEXED_UP_MONO"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "VALIDATING",
+  "checkpoint": "C4_MATERIAL_CANDIDATE",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "changed_files": [
+    "src/vr/d3d11/native_d3d9_indexed_up_batch.hpp",
+    "tools/dx11_indexed_up_probe_r238.cpp",
+    "tools/test_dx11_indexed_up_r238.py",
+    "CMakeLists.txt",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00535.json"
+  ],
+  "evidence": {
+    "static": "PENDING",
+    "targeted_warp": "PENDING",
+    "backend_gate_conclusion": "PENDING"
+  },
+  "pipeline": {
+    "C0": "GitHub HEAD and controller checkpoint recovered; run absent at dispatch",
+    "C1": "R238 independent indexed UP mono native WARP source-to-pixel selected",
+    "C2": "batched header, probe, test, CMake target and exact-sha Gate integration",
+    "C3": "PENDING CI",
+    "C4": "PENDING branch publication",
+    "C5": "NOT_REQUIRED",
+    "C6": "PENDING exact-sha CI"
+  },
+  "blockers": [
+    "R175 shader-varying full-Gate inherited failure owned by CONVERSION-DX11-00477",
+    "Quest3/VDXR live HMD runtime UNTESTED"
+  ],
+  "next_action": "Inspect exact material SHA GitHub Backend Conversion Gate, do not claim PASS on inherited R175 failure",
+  "score_change": 0
+}

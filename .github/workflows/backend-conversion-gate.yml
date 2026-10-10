@@ -444,6 +444,25 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R186 indexed Draw WARP probe failed: $LASTEXITCODE" }
 
+
+      # R238: immutable transient D3D9 indexed-UP data to native WARP GPU output.
+      - name: Verify R238 indexed UP native source integration
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_up_r238.py
+
+      - name: Build R238 indexed UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_indexed_up_probe_r238
+
+      - name: Run R238 indexed UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_probe_r238.exe | Select-Object -First 1
+          if (-not $probe) { throw "R238 WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R238 indexed UP GPU pixel probe failed: $LASTEXITCODE" }
+
       # R187 isolated owned indexed GPU path: exact RTV and full viewport.
       - name: Verify R187 native indexed viewport ownership
         if: github.ref_name == 'vr-dx11-native-r71'
