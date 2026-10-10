@@ -71,7 +71,13 @@ def main() -> None:
     header = (CORE / "r29_owner_api.hpp").read_text(encoding="utf-8")
     check(r29, r30, header)
     for signature, delegation in OWNER_CALLS.items():
-        mutated = r29.replace(delegation, "/* poisoned delegation */", 1)
+        # Mutate the exported owner definition, not an earlier lower-owner
+        # call with the same spelling elsewhere in the R29 translation unit.
+        pos = r29.find(signature)
+        assert pos >= 0
+        mutated = r29[:pos] + r29[pos:].replace(
+            delegation, "/* poisoned delegation */", 1
+        )
         try:
             check(mutated, r30, header)
         except AssertionError:
