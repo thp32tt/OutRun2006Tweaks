@@ -1,0 +1,41 @@
+{
+  "asset": "q060 A064FDFC",
+  "candidate_status": "TRIAL_UNAPPROVED_C2_NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "source_psd_sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+  "psd_layer": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 0",
+  "english_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "old_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_trial_sha256": "bab8dc25bc900d6806adf0462adb2046321353b78e29bdc82885ec9feef33255",
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "localized_text": "최고 주행 시간",
+  "glyph_mask_bbox_native": [
+    65,
+    11,
+    784,
+    122
+  ],
+  "change_pixels": 104704,
+  "outside_source_bbox_change_pixels": 0,
+  "persisted_decoder_roundtrip_mismatch": 0,
+  "original_header_equal": true,
+  "psd_text_independent": false,
+  "psd_background_rgb_recovered": true,
+  "source_family_optical": "UNQUALIFIED_VISUAL_REVIEW_REQUIRED",
+  "visual_first_look": "HOLD_SOURCE_FAMILY_REWORK",
+  "visual_findings": [
+    "New glyphs remove English original in BEST TIME localized ROI",
+    "Original BEST TIME has stronger condensed forward italic and narrower racing title hierarchy; pilot Hangul differs",
+    "Gold bevel and navy extrusion still need source-family optical calibration before any C2 PASS"
+  ],
+  "clean_plate_first_look": "PSD Flat Colors 0 source RGB matches known background spot samples; alpha intentionally zero only inside original BEST TIME ROI",
+  "source_format": "Photoshop community layered asset; provenance as game-development original unverified",
+  "score_eligible": "one distinct experimental DDS with PSD-derived plate, not approval",
+  "producer_QA": "MACHINE_PASS_VISUAL_HOLD",
+  "publication_scope": "role_B isolated unapproved pilot; official queue/hd_candidates untouched"
+}
