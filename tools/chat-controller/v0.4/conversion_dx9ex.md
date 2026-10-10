@@ -1,9 +1,11 @@
 OutRun 2006 DX9Ex VR 화면·안정화 자동개발 — C 슬롯 (DX11 A와 병행).
 
-[2026-10-10 최신 사용자 지시 — BATCH_COMPILE_POLICY=GROUPED / 작은 수정 묶음 검증]
-같은 TASK_ID·work_key·소스 소유권 안에서 관련된 작은 수정 2~5건(또는 하나의 완결된 기능)을 한 배치로 모아 개발한다. 숫자를 채우려고 불필요한 변경을 만들지 말고, 약 20분 이내의 검토 가능한 범위로 한정한다. 변경마다 전체 컴파일/Win32-WARP/호스트·게임 패키징/GitHub Actions를 실행하지 마. 중간에는 문법 검사·관련 소스 정적 검사·작은 단위 테스트 등 가벼운 확인만 하고, 모든 소스/테스트 수정을 묶은 최종 material commit에 [AUTO:TASK_ID]를 붙여 대상 게임 브랜치에 한 번 반영해 exact-SHA 필수 Gate 및 필요한 전체 컴파일을 배치당 한 번 수행해. 실패가 확인되면 그 원인만 수정한 새 SHA로 필수 Gate를 다시 실행한다. ABI/훅/메모리 안전 관련 중대한 위험이 있으면 전체 빌드를 조기 수행할 수 있다.
-5분 GitHub 진행 체크포인트는 컨트롤러 체크포인트 브랜치에 그대로 저장하되, 게임 브랜치에 미완성 소스를 수정 한 건마다 push해 무거운 CI를 재실행하지 마. 30분 롤오버 전에 아직 커밋하지 않은 실제 코드가 유실될 우려가 있으면 해당 TASK_ID만 소유하는 임시 작업 브랜치에 미완성 패치/소스를 보존하고, 재개 시 원격 HEAD/소유권을 확인해 최종 배치에 통합해. 임시 브랜치는 C6 완료·PASS 증명이 아니며 [AUTO:TASK_ID] 최종 표식을 붙이지 않는다. 검증된 최종 material SHA를 bookkeeping SHA로 덮어쓰지 마. 작업/CI가 이미 같은 SHA로 끝났다면 재실행하지 마.
-최종 판정은 변경된 전체 배치 소스의 정확한 SHA에서 필수 GitHub CI가 PASS해야만 가능하다. RUNTIME_VALIDATION=UNTESTED 및 독립 lane 경계, C0→C6, 기존 회귀 안전 게이트를 유지한다.
+[2026-10-10 최신 사용자 확정 — FEATURE_BASED_DEVELOPMENT]
+20분/2~5개 사소한 수정 묶음 정책은 폐기한다. 작업 단위는 작은 패치가 아니라 하나의 완결된 기능이다. 기본 1~3시간 규모를 상정하되 시간·커밋 수로 완료 여부를 판단하거나 쪼개지 마. 기능 정의는 미완료인 최우선 실제 문제·구현 경로·완료 조건·변경 대상·부정 회귀로 명확히 한정한다. 조사만 하고 끝내거나 이미 해결된 패치를 재검토하는 신규 TASK_ID를 만들지 마.
+컨트롤러가 준 FEATURE_ID와 FEATURE_BRANCH(보통 vr-feature/<lane>/<task-id>)를 확인해. 기능 미완료 중에는 컨트롤러 체크포인트 브랜치에 소스 패치를 저장하고 FEATURE_BRANCH 및 TARGET_BRANCH에는 중간 push하지 마. 기능 개발 중 변경은 5분마다 소스 패치로 보존하고 최종 기능 완성 시 FEATURE_BRANCH에 결합해. 5분 간격으로 실제 변경 패치와 남은 TODO를 GitHub 컨트롤러 체크포인트에 보존하고, 30분 채팅 롤오버에서는 같은 FEATURE_ID/TASK_ID와 브랜치를 계속 사용해. 점수·완료를 중간 커밋마다 증가시키지 마.
+전체 컴파일/Win32-WARP/패키징/GitHub Actions를 중간 수정마다 하지 말고 문법·변경부 관련 경량 정적·필요한 targeted 테스트만 수행해. 단, 위험한 ABI/훅/메모리 문제가 발생하면 관련 빌드를 조기에 시행할 수 있다. 기능 통합 소스가 완성되고 targeted 테스트가 준비되면 FEATURE_BRANCH의 docs/automation/runs/<TASK_ID>.json에 task_id/target_branch/feature_id/feature_branch/work_key/feature_status=FEATURE_READY/feature_acceptance={implementation_complete:true,targeted_checks:[검증 명세],integration_contract:연결된 실질 기능·안전 회귀 계약}/runtime_validation=UNTESTED를 남겨. 그 최종 기능 커밋의 메시지에 [AUTO:TASK_ID]를 단 한 번 넣되 CI skip을 넣지 마. 컨트롤러가 최종 기능 브랜치와 target 최신 HEAD의 fast-forward·실제 소스 diff·명시적 기능 완료 증거를 검사하여 TARGET_BRANCH로 게시하고 해당 SHA에서 전체 CI를 한 번 실행한다.
+TARGET_BRANCH의 Actions가 완료되기 전에는 FEATURE_READY가 PASS가 아니다. 실제 CI 실패 시 실패한 원인만 같은 FEATURE_BRANCH에서 수리하고 변경된 최종 SHA를 다시 제출해. 실패한 동일 SHA를 검증·재시도 반복하지 마. CI PASS 뒤 C6 결과만 별도 bookkeeping 커밋으로 기입하고 필수 검증을 재실행하지 마. HMD 실기 미수행은 언제나 RUNTIME_VALIDATION=UNTESTED.
+DX11 A와 DX9Ex C는 서로 독립, DXVK B는 FROZEN. 기능별 원격 work_key/owner/경로 충돌을 먼저 확인하고 타 작업자 변경에 force-push·강제 reset·덮어쓰기 하지 마.
 
 TARGET_BRANCH=vr-d3d9ex-focus. **개발 작업자 2개 A(DX11 Native 실구현)+C(DX9Ex 안정화)를 기존처럼 동시에 돌리고 B(DXVK)는 FROZEN**한다. DX11/DXVK/Localization 소스는 수정하지 말고 C의 GitHub HEAD, AGENTS.md, docs/VR_AUTODEV_STATE.json, docs/VR_WORK_QUEUE.json, docs/VR_PROBLEM_HISTORY.md, 원본 포크의 기존 HUD 관련 소스/자료, HUD Inspector, Issue #13/#14와 현재 회귀 기록을 먼저 확인해 기존 실패 가설을 재발명하지 마.
 
@@ -26,4 +28,4 @@ GitHub의 연결된 작업자 claim/lease와 동시 AI work_key 충돌을 확인
 
 
 [VR 체크포인트 정책]
-작업 중 5분마다 컨트롤러 브랜치 체크포인트에 최신 변경 및 검증 진행 상황을 저장한다. 미완성 소스는 필요시 작업 전용 임시 브랜치에 백업하고, 대상 게임 브랜치에는 관련 수정을 묶은 최종 material commit을 올린다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
+5분마다 컨트롤러 GitHub 체크포인트를 저장하고 실제 중간 소스/테스트는 FEATURE_BRANCH에 보존한다. 대상 게임 브랜치는 기능 완료 시 컨트롤러만 갱신한다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
