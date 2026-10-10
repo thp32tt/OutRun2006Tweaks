@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T20:58:50+09:00",
+  "updated_at_kst": "2026-10-10T21:42:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11570,29 +11570,75 @@
     "report": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_CONTROLLER_C2_VISUAL_REWORK.json"
   },
   "c1_q059_a228_fresh_bc3_trial_review_20261010": {
-  "queue_index": 59,
-  "shard": "C1_ODD",
-  "run_key": "OUTRUN-KOR-C1-Q059-A228-INDEPENDENT-BC3-VISUAL-20261010-2120",
-  "trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
-  "official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
-  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
-  "C1_trial": "REWORK_REQUIRED",
-  "official": "REWORK_REQUIRED_UNCHANGED",
-  "source_roi_exact": 4,
-  "clean_roi_alpha_zero": 4,
-  "delta_rgba": 534,
-  "delta_outside_source_union": 0,
-  "changed_alpha": 0,
-  "decoding": "DXT5_2048x512_RAW_FLIPY",
-  "artifacts": {
-    "qa": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_VISUAL_REWORK.json",
-    "machine": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_MACHINE.json",
-    "evidence_png_count": 13
+    "queue_index": 59,
+    "shard": "C1_ODD",
+    "run_key": "OUTRUN-KOR-C1-Q059-A228-INDEPENDENT-BC3-VISUAL-20261010-2120",
+    "trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+    "official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "C1_trial": "REWORK_REQUIRED",
+    "official": "REWORK_REQUIRED_UNCHANGED",
+    "source_roi_exact": 4,
+    "clean_roi_alpha_zero": 4,
+    "delta_rgba": 534,
+    "delta_outside_source_union": 0,
+    "changed_alpha": 0,
+    "decoding": "DXT5_2048x512_RAW_FLIPY",
+    "artifacts": {
+      "qa": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_VISUAL_REWORK.json",
+      "machine": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_MACHINE.json",
+      "evidence_png_count": 13
+    },
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "PJR019": "OPEN",
+    "new_dds_by_C1": 0,
+    "approval": false
   },
-  "C3": "NOT_RUN",
-  "RUNTIME_VALIDATION": "UNTESTED",
-  "PJR019": "OPEN",
-  "new_dds_by_C1": 0,
-  "approval": false
-}
+  "b359_q060_source_normal_bevel_pilot": {
+    "run_key": "OUTRUN-KOR-B359-Q060-P0-NORMAL-BEVEL-SOURCE-ANCHOR-20261010-2133",
+    "timestamp_kst": "2026-10-10T21:42:00+09:00",
+    "role": "B",
+    "queue_index": 60,
+    "triage": "METHOD_CHANGE_REQUIRED",
+    "priority": "P0_IGR044",
+    "execution_backend": "GITHUB_ACTIONS_CPU_WORKER",
+    "worker_run_success": 38052736141,
+    "first_attempt_failed_source_1px": true,
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "new_unapproved_candidate_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+    "source_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "new_effect_bbox": [
+      2221,
+      341,
+      3024,
+      471
+    ],
+    "English_B_source_stem_slant_readable": 0.3421,
+    "modified_px_inside_ROI": 92937,
+    "modified_px_outside_ROI": 0,
+    "protected_source_art_changed": 0,
+    "decoded_DDS_mismatch": 0,
+    "new_saved_trial_DDS": 1,
+    "official_promoted_DDS": 0,
+    "independent_C2": "PENDING",
+    "C3": "BLOCKED",
+    "producer_visual": "PASS_SCOPED_P2_SOURCE_FAMILY_PENDING_INDEPENDENT",
+    "user_ingame_regression": "IGR044_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_CONTROLLER_QA.json",
+    "excluded_domains": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  }
 }
