@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_5min_checkpoint",
+  "captured_at_kst": "2026-10-11T03:10:00+09:00",
+  "task_id": "CONVERSION-DX9EX-00591",
+  "event_id": "CONVERSION-DX9EX-00591-E004",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+  "feature_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_sha_not_updated": "a5a5b4d5eda3a7a15717898e8644a7279701727b",
+  "merge_preserved_p0": true,
+  "compare": "feature ahead 44 behind 0",
+  "r84_ci_run_id": 38074313696,
+  "verified_completed_jobs": {
+    "r84-local": "SUCCESS",
+    "r84-win32": "SUCCESS"
+  },
+  "ongoing_jobs": [
+    "r84-host",
+    "r84-baseline-game"
+  ],
+  "not_yet_started": [
+    "r84-bundle"
+  ],
+  "incomplete_acceptance_ids_on_new_sha": [
+    "R84-REGRESSION protected baseline",
+    "R84-TEST-BUNDLE"
+  ],
+  "already_passed_on_new_sha": [
+    "R84-ABI",
+    "R84-BUILD-GRAPH",
+    "R84-OWNERS",
+    "R84-REGRESSION producer-consumer"
+  ],
+  "target_exact_sha_required_gates": "PENDING_CONTROLLER_PROMOTION",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Continue exact-SHA CI #38074313696; inspect r84-host smoke, r84-baseline-game, r84-bundle artifacts; if SUCCESS mark all five feature acceptance PASS and handoff FEATURE_READY. Do not touch TARGET branch (controller-only). After controller target promotion require DX9Ex Active policy/host/game/full-chain-compile/package and Domain Isolation Guard domain-isolation exact-SHA; no duplicate score for same TASK_ID."
+}
