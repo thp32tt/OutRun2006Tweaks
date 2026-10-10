@@ -2,6 +2,7 @@
 // No game draw hook, backend activation or Quest 3 runtime claim.
 #include "vr/d3d11/native_linear_buffer_mirror.hpp"
 #include "vr/d3d11/native_linear_target_viewport.hpp"
+#include "vr/d3d11/native_linear_uav_eye_guard.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <d3dcompiler.h>
@@ -497,6 +498,82 @@ int main() {
     ctx->Draw(3,0);
     require(samplePixelEquals(255,0,0),
             "R216 real WARP restored D32 eye draws red");
+    // R221: an exact linear D32 eye can still write a retained second-eye UAV.
+    const auto isolatedLinearReady = [&] {
+        return outrun::vr::dx11::verified_linear_uav_isolated_eye_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            ownDsv.Get(),depthState.Get(),rs.Get());
+    };
+    require(isolatedLinearReady(), "R221 isolated linear eye initial");
+    require(!outrun::vr::dx11::verified_linear_uav_isolated_eye_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            nullptr,depthState.Get(),rs.Get()),
+            "R221 rejects missing DSV owner");
+    D3D11_TEXTURE2D_DESC eyeDesc{};
+    eyeDesc.Width=32; eyeDesc.Height=32; eyeDesc.MipLevels=1;
+    eyeDesc.ArraySize=1; eyeDesc.SampleDesc.Count=1;
+    eyeDesc.Format=DXGI_FORMAT_R8G8B8A8_UNORM;
+    eyeDesc.Usage=D3D11_USAGE_DEFAULT;
+    eyeDesc.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
+    ComPtr<ID3D11Texture2D> sideEye, sideRead;
+    ComPtr<ID3D11UnorderedAccessView> sideUav;
+    require(SUCCEEDED(dev->CreateTexture2D(
+        &eyeDesc,nullptr,sideEye.GetAddressOf())), "R221 UAV texture");
+    require(SUCCEEDED(dev->CreateUnorderedAccessView(
+        sideEye.Get(),nullptr,sideUav.GetAddressOf())), "R221 UAV view");
+    eyeDesc.Usage=D3D11_USAGE_STAGING; eyeDesc.BindFlags=0;
+    eyeDesc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
+    require(SUCCEEDED(dev->CreateTexture2D(
+        &eyeDesc,nullptr,sideRead.GetAddressOf())), "R221 UAV readback");
+    ID3D11UnorderedAccessView* rawSide=sideUav.Get();
+    ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+        1,&rawRTV,ownDsv.Get(),1,1,&rawSide,nullptr);
+    require(floatDepthEyeReady(ownDsv.Get()),
+        "R221 old R216 admits hidden OM UAV");
+    require(!isolatedLinearReady(), "R221 rejects hidden OM UAV");
+
+    // WARP negative proof: a real pixel shader writes GREEN into side eye.
+    constexpr char sideShader[] =
+        "RWTexture2D<float4> eye:register(u1);"
+        "float4 psSide(float4 p:SV_Position):SV_Target{"
+        "eye[uint2(p.xy)]=float4(0,1,0,1);return float4(1,0,0,1);}";
+    ComPtr<ID3DBlob> sideCode;
+    require(SUCCEEDED(D3DCompile(sideShader,sizeof(sideShader)-1,
+        nullptr,nullptr,nullptr,"psSide","ps_5_0",0,0,
+        sideCode.GetAddressOf(),nullptr)), "R221 compile UAV pixel shader");
+    ComPtr<ID3D11PixelShader> sidePs;
+    require(SUCCEEDED(dev->CreatePixelShader(
+        sideCode->GetBufferPointer(),sideCode->GetBufferSize(),
+        nullptr,sidePs.GetAddressOf())), "R221 create UAV pixel shader");
+    const float zeroSide[]={0,0,0,1};
+    ctx->ClearUnorderedAccessViewFloat(sideUav.Get(),zeroSide);
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->PSSetShader(sidePs.Get(),nullptr,0);
+    ctx->Draw(3,0);
+    ctx->CopyResource(sideRead.Get(),sideEye.Get());
+    D3D11_MAPPED_SUBRESOURCE sideMap{};
+    require(SUCCEEDED(ctx->Map(
+        sideRead.Get(),0,D3D11_MAP_READ,0,&sideMap)) && sideMap.pData,
+        "R221 map WARP second eye");
+    const auto* green=static_cast<const unsigned char*>(sideMap.pData)
+        +16*sideMap.RowPitch+16*4;
+    const bool leak=green[0]==0 && green[1]==255 &&
+        green[2]==0 && green[3]==255;
+    ctx->Unmap(sideRead.Get(),0);
+    require(leak, "R221 WARP second-eye UAV pixel write");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    require(isolatedLinearReady(), "R221 isolation recovered");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0), "R221 WARP red eye recovered");
+
 
 
 

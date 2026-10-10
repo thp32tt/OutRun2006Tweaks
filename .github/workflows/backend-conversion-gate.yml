@@ -346,6 +346,12 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_float_depth_eye_r216.py
 
+      # R221: non-indexed OM UAV eye isolation before WARP GPU draw.
+      - name: Verify R221 linear OM UAV isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_uav_eye_r221.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
