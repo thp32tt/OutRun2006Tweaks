@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "shard": "EVEN",
+  "index": 212,
+  "region": "r43_professional",
+  "timestamp_kst": "2026-10-11T03:43:00+09:00",
+  "run_key": "OUTRUN-KOR-B362-Q212-R43-OPEN-COUNTERS-SECOND-20261011-0340",
+  "source": "OR2-HD-GUI-v0.25.10a / Sonic-TV OR2006Sprites @ 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "production_status": "P2_MATERIAL_CORRECTION_VERIFIED_BUT_WHOLE_ATLAS_AND_SOURCE_FAMILY_HOLD",
+  "controller_visual": "PARTIAL_IMPROVEMENT_NOT_A_FINAL_PRODUCER_PASS",
+  "plate_library_lookup": "NOT_REGISTERED_Q212_REUSE_SHA_PINNED_B358_SCOPED_SOURCE_ALPHA_ZERO",
+  "existing_C158_full_clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "official_unchanged_dds_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "B358_C2_rejected_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "B361_visual_failed_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+  "new_saved_unapproved_dds_sha256": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+  "candidate_path": "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_Q212_R43_SOURCE_OUTLINE_UNAPPROVED.dds",
+  "execution_backend": "GITHUB_ACTIONS_CPU_WORKER",
+  "worker_run_id": 38076601477,
+  "workflow_result": "SUCCESS",
+  "source_region_r43_bbox": [
+    240,
+    341,
+    637,
+    386
+  ],
+  "source_alpha_opaque_width": 395,
+  "new_alpha_effect_bbox": [
+    270,
+    343,
+    607,
+    384
+  ],
+  "new_width": 337,
+  "width_ratio": 0.8532,
+  "previous_B358_width": 284,
+  "previous_B361_width": 325,
+  "material_change": "B361 2px outline caused closed Hangul counters and illegible practical size; B362 uses same canonical orange [241,147,49], each glyph vector-rendered at true native size 40ppem with 1px stroke, 10px independent tracking, no whole-word transform/resampling. Original source-size 45px glyph bbox protected and r43 CLEAN alpha0 rebuilt before text. Second and last similar-method attempt under production convergence policy.",
+  "machine": {
+    "native": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mips": 1,
+    "RAW": "MIRROR_Y",
+    "source_region_new_margin_px": [
+      30,
+      30,
+      2,
+      2
+    ],
+    "old_official_alpha_outside_original_source_bbox_removed": 5832,
+    "candidate_alpha_outside_original_bbox": 0,
+    "changed_rgba_px": 22434,
+    "changed_rgba_outside_r43_roi": 0,
+    "remaining_11_atlas_cells_byte_exact": true,
+    "persisted_dds_roundtrip_mismatch": 0
+  },
+  "comparative_visual_observation": "Opened saved four-panel SOURCE/CLEAN/OFFICIAL/B362 at 100% and 50% readable gray as well as mirrored RAW. Compared with B361, B362 reopens syllabic interior spaces and thin breaks in horizontal Korean components are more legible at 50%; orange hue sourced from original, no inherited ghost or visible foreign plate. Compared with ORIGINAL PROFESSIONAL, Korean is 337/395px, narrower and letterform/condensation not independently homologous. Added mode suffix remains semantically unapproved, entire atlas r44 old official unchanged, game composition not tested. Therefore partial P2 construction improvement, not final PASS.",
+  "checks_ordered": [
+    {
+      "check": "source_removal_plate",
+      "result": "PASS_SCOPED",
+      "observation": "source English r43 transparent sprite CLEAN full ROI alpha zero before new letters; source/CLEAN preview"
+    },
+    {
+      "check": "slant_direction",
+      "result": "HOLD_SOURCE_FAMILY",
+      "observation": "upright original/native; no new inverse italic; no source-homologous multi-stroke confirmation"
+    },
+    {
+      "check": "font_size_proportion",
+      "result": "HOLD",
+      "observation": "337px/395px=85.3%, improvement from 71.9% B358 but original heavy condensed hierarchy differs"
+    },
+    {
+      "check": "stroke_outline_shadow",
+      "result": "HOLD",
+      "observation": "native 1px outline and sampled source orange now preserve more open counters; not exact approved source glyph family"
+    },
+    {
+      "check": "broken_or_cut_glyph",
+      "result": "PASS_SCOPED",
+      "observation": "native and 50% readability improved over B361; source positive 2px vertical margins"
+    },
+    {
+      "check": "protected_art",
+      "result": "PASS_SCOPED",
+      "observation": "11 untouched atlas cells exact, all 22434 changed RGBA pixels in r43 only"
+    },
+    {
+      "check": "RAW_FLIPY",
+      "result": "PASS_SCOPED",
+      "observation": "persisted RAW mirrored and readable FLIPY images reviewed, decoded mismatch0"
+    },
+    {
+      "check": "hierarchy_readability",
+      "result": "HOLD_INDEPENDENT_C2",
+      "observation": "readable at 50% but optical source typography equivalence requires independent C2"
+    }
+  ],
+  "proofs": [
+    "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png",
+    "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_r43_professional_PLATE_ONLY.png",
+    "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_r43_professional_LETTERING_ONLY.png"
+  ],
+  "current_official_status": "C338_C2_REWORK_REQUIRED_UNCHANGED",
+  "new_material_trial_count_this_run": 2,
+  "official_promotion_count": 0,
+  "independent_C2": "NOT_RUN_NEW_SHA",
+  "C3": "NOT_RUN",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "scope_warning": "Scoped r43 P2 trial only: r44 and other 10 cells preserved official, not proven whole-atlas correctness; C2 can inspect representative before manual source outline method propagation.",
+  "next_action": "C2 independently review exact B362 persisted SHA source outline/r43 counters at 100/75/50 RAW and original source; if source-family HOLD/FAIL persists after two attempt limit use manual vector/PSD source-conditioned contour reconstruction, NOT another same Noto+stroke+tracking trial. r44 semantics must be separately source-approved and rebuilt. User re-test for IGR029 only after approved whole-atlas consumer build.",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
