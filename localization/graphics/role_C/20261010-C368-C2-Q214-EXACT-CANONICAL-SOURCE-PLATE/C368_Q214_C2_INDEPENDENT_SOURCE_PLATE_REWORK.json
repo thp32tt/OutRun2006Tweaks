@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C368-Q214-NEW-EXACT-ORIGINAL-SOURCE-CLEAN-BOUNDARY-CLASSIFICATION",
+  "run_key": "OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
+  "reviewed_at_kst": "2026-10-10 17:27:07 KST",
+  "index": 214,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+  "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+  "official_sha256": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+  "unapproved_trial_sha256": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+  "new_inspection_scope": "INDEPENDENT_SOURCE_TO_CLEAN_FULL_ATLAS_2048_BC3_PROVENANCE_AND_SAVED_GOAL_SOURCE_STYLE_RECONFIRMATION",
+  "duplicate_same_SHA_completion": false,
+  "existing_C348_visual_rejection_preserved": true,
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "firstlook_pixels_before_prior_verdict": false,
+  "reviewer": "ChatGPT AI1 C2 same controller",
+  "blind_defect_calibration": "NOT_QUALIFIED_FOR_PASS",
+  "source_clean_pixel_delta_newly_authenticated": {
+    "source_clean_rgba": 3210,
+    "source_clean_alpha": 0,
+    "outside_original_two_box_rgba": 0,
+    "outside_original_two_box_alpha": 0,
+    "START_rgba": 1635,
+    "GOAL_rgba": 1575
+  },
+  "clean_trial_full_atlas_delta": {
+    "changed_rgba": 2778,
+    "changed_alpha": 0,
+    "outside_source_boxes_rgba": 0
+  },
+  "old_trial_delta": {
+    "changed_rgba": 1821,
+    "changed_alpha": 0,
+    "outside_source_boxes_rgba": 0
+  },
+  "machine_report": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_SHA_AUTHENTICATED_MACHINE.json",
+  "eight_checks": {
+    "START": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Saved original START/GOAL lean differs from localized contour; source-homologous stem anchor coordinates and blind opposite-slant calibration not qualified, do not invent angle.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+        }
+      },
+      "clean_plate": {
+        "result": "NEW_SHA_AUTHENTICATED_SCOPED_PASS",
+        "observation": "Independently authenticated canonical source and B324 clean. SOURCE→CLEAN 1635 RGB/RGBA pixels inside START, no alpha changes; 0 full-atlas changed RGBA/alpha outside source START+GOAL boxes. Native clean red stripe visible with no English source letters in the reviewed tile.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+        }
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "The source has cream-white continuous diagonal beveled racing letters. The official and B339 Korean START faces have segmented bright bars and inconsistent source bevel/outline. Machine 0 outside does not imply style acceptance.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+        }
+      },
+      "readability": {
+        "result": "SCOPED_LIMITED",
+        "observation": "START 출발 is relatively distinguishable but fragmented/jagged cream face and weak depth remain at native/50 percent.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+          "sha256": "0728cd5197f8e19cfaea6994a16930fb2f7405d5faa99f23b0aecd9b6911c094"
+        }
+      },
+      "glyph_integrity": {
+        "result": "REWORK",
+        "observation": "No complete syllable loss proved, but stroke fragmentation and interrupted bevel appearance remain.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+        }
+      },
+      "protected_art": {
+        "result": "NEW_EXACT_SOURCE_CLEAN_PROTECTION_PASS_SCOPED",
+        "observation": "SOURCE→CLEAN has 3210 changed RGBA total inside two English boxes, 0 RGB/alpha outside. CLEAN→OFFICIAL, CLEAN→B339 and OFFICIAL→B339 also change 0 outside those boxes on exact saved DDS; all decoded alpha is unchanged.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_NEW_SOURCE_CLEAN_CHANGED_MASK.png",
+          "sha256": "e7806d445e02ee5f626bff8ebb061de51d71ae9f7ca9b7d67d4c06694b042fae"
+        }
+      },
+      "placement": {
+        "result": "SCOPED_PIXEL_CONTAINMENT_PASS",
+        "observation": "All SOURCE-CLEAN and CLEAN-TRIAL changes remain within declared source bboxes; does not qualify relative font hierarchy or gameplay position.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+        }
+      },
+      "orientation": {
+        "result": "SCOPED_PASS",
+        "observation": "RAW and FLIP-Y views were independently generated from exact 2048² persisted source/official/B339 BC3 DDS; raw orientation agrees with source Y mirroring.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_RAW_NATIVE_NEAREST4.png",
+          "sha256": "e96a7b8f3394f5b36f264a41dc943b548acb1f192163601c0a4211125e95e3a5"
+        }
+      }
+    },
+    "GOAL": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Saved original START/GOAL lean differs from localized contour; source-homologous stem anchor coordinates and blind opposite-slant calibration not qualified, do not invent angle.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+        }
+      },
+      "clean_plate": {
+        "result": "NEW_SHA_AUTHENTICATED_SCOPED_PASS",
+        "observation": "Independently authenticated canonical source and B324 clean. SOURCE→CLEAN 1575 RGB/RGBA pixels inside GOAL, no alpha changes; 0 full-atlas changed RGBA/alpha outside source START+GOAL boxes. Native clean red stripe visible with no English source letters in the reviewed tile.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+        }
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "The source has cream-white continuous diagonal beveled racing letters. The official and B339 Korean GOAL faces have segmented bright bars and inconsistent source bevel/outline. Machine 0 outside does not imply style acceptance.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+        }
+      },
+      "readability": {
+        "result": "FAIL",
+        "observation": "At native 100 and practical 50 percent, trial glyph 골 reads as flattened bright horizontal strokes and is not reliably distinguishable from other marks.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+          "sha256": "27ee1733b303f77986548f42cec16dc293e14f7508cd064432c610afa773b531"
+        }
+      },
+      "glyph_integrity": {
+        "result": "FAIL",
+        "observation": "Goal vowel and initial consonant topology visually lost in the opaque RGB plate despite alpha==255; source-family morphology not restored.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+        }
+      },
+      "protected_art": {
+        "result": "NEW_EXACT_SOURCE_CLEAN_PROTECTION_PASS_SCOPED",
+        "observation": "SOURCE→CLEAN has 3210 changed RGBA total inside two English boxes, 0 RGB/alpha outside. CLEAN→OFFICIAL, CLEAN→B339 and OFFICIAL→B339 also change 0 outside those boxes on exact saved DDS; all decoded alpha is unchanged.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_NEW_SOURCE_CLEAN_CHANGED_MASK.png",
+          "sha256": "e7806d445e02ee5f626bff8ebb061de51d71ae9f7ca9b7d67d4c06694b042fae"
+        }
+      },
+      "placement": {
+        "result": "SCOPED_PIXEL_CONTAINMENT_PASS",
+        "observation": "All SOURCE-CLEAN and CLEAN-TRIAL changes remain within declared source bboxes; does not qualify relative font hierarchy or gameplay position.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+          "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+        }
+      },
+      "orientation": {
+        "result": "SCOPED_PASS",
+        "observation": "RAW and FLIP-Y views were independently generated from exact 2048² persisted source/official/B339 BC3 DDS; raw orientation agrees with source Y mirroring.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_RAW_NATIVE_NEAREST4.png",
+          "sha256": "d0c6017e5d04c2d3bf9111723702f66bf84d84db23c09cb32013a8c4122dfbd3"
+        }
+      }
+    }
+  },
+  "visual_outcome": "REWORK_REQUIRED_PREVIOUSLY_CONFIRMED_NO_NEW_C_PASS",
+  "explicit_conclusion": "C368 independently closes prior C348 canonical SOURCE/CLEAN SHA and 1-pixel protection evidence gap. It does NOT transform the unchanged B339 rejected SHA into a new C2 completed/passed candidate; the same saved B339 has still-unreadable GOAL 골 on exact native/practical output.",
+  "official_queue_status": "b340_b339_bc3_alpha_topology_producer_visual_fail_original_preserved_UNCHANGED",
+  "ROOT_CAUSE": "SOURCE_FAMILY_BEVEL_MISMATCH_AND_OPAQUE_GOAL_GLYPH_TOPOLOGY",
+  "correction": "A/B manual source-bevel-continuous Korean GOAL/START face reconstruction is required with source-derived CLEAN retained; any future new saved SHA requires producer QA, new C2 and separate C3, new actual-game retest.",
+  "new_dds": 0,
+  "new_promoted_dds": 0,
+  "c_current_PASS": false,
+  "C3": {
+    "status": "BLOCKED_FOR_VISUAL_REWORK",
+    "separate_review_id": null
+  },
+  "pre_ingame_approval": false,
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+      "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+      "sha256": "0728cd5197f8e19cfaea6994a16930fb2f7405d5faa99f23b0aecd9b6911c094"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_RAW_NATIVE_NEAREST4.png",
+      "sha256": "e96a7b8f3394f5b36f264a41dc943b548acb1f192163601c0a4211125e95e3a5"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+      "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_75.png",
+      "sha256": "0383de1f63880b271a697658fc4461f9293d1b4f6ecbd0208b0aef84e85d329c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+      "sha256": "27ee1733b303f77986548f42cec16dc293e14f7508cd064432c610afa773b531"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_RAW_NATIVE_NEAREST4.png",
+      "sha256": "d0c6017e5d04c2d3bf9111723702f66bf84d84db23c09cb32013a8c4122dfbd3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_NEW_SOURCE_CLEAN_CHANGED_MASK.png",
+      "sha256": "e7806d445e02ee5f626bff8ebb061de51d71ae9f7ca9b7d67d4c06694b042fae"
+    }
+  ],
+  "excluded": [
+    "ODD_INDEX",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "TASK_QUEUE_ENGINE"
+  ],
+  "limitations": [
+    "Calibration first-look not blinded because historical producer/C348 reports read before pixels",
+    "Evidence is for q214 START/GOAL source-region; cannot imply user-game acceptance",
+    "No new material candidate; same-B339 review is not re-scored as separate completed DDS"
+  ]
+}

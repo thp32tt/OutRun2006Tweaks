@@ -1,3 +1,8 @@
+## 2026-10-10 17:27:07 KST — C368 C2 EVEN q214 full canonical SOURCE/CLEAN independent pixel provenance (visual REWORK unchanged)
+
+- Newly independently SHA-verified pinned English DDS `9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b`, B324 CLEAN PNG `5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b`, official `ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30`, B339 saved trial `d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8`. Decoded native BC3 2048×2048, native/practical RAW & FLIP-Y 100/75/50. NEW exact full-atlas SOURCE→CLEAN diff only 3,210 RGB/RGBA pixels inside original START 1,635 / GOAL 1,575, outside both boxes 0, alpha changes 0. CLEAN→OFFICIAL/TRIAL + OFFICIAL→TRIAL outside changed RGBA/alpha 0.
+- Existing B339 GOAL 골 visually flattened, native 100/50 unreadable; **C348 REWORK_REQUIRED preserved**, not same-SHA C2 PASS/completion. C3 blocked, no user-game closure, `RUNTIME_VALIDATION=UNTESTED`, DDS 0. Report `localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json`. RUN_KEY=OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010.
+
 ## 2026-10-10 17:22 KST — C1 q231 independent full native SOURCE/CLEAN/current 4-region pixel audit (HOLD)
 
 - Refreshed GitHub odd queue and read-only `rework_triage.py --index 231`: EVIDENCE_ONLY_HOLD; no rerender. Exact persisted 2048×1024 BGRA32 MIP1, RAW mirror-Y source SHA `29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34`, A194 CLEAN `1e1c5f5472a4c69b1c16392073c35ac26aa7b4e2e734ca759b811bbf4da0926a`, unchanged candidate `7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76`, direct SHA verification.

@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C368 C2 2026-10-10 17:27:07 KST q214 NEW independently source-authenticated SHA source 9a2e428bdb87 CLEAN 5beb411d1692, original→CLEAN 3210 inside source START/GOAL, 0 outside, preserved alpha; B339 same trial SHA d273a208d521 GOAL visually REWORK, no re-completion, C3/game UNTESTED. localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
     "C1 2026-10-10 17:22 KST q231 ODD same official A194 SHA 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76 NEW independent 4-region source CLEAN persist decode full alpha/pixel gate: SHA original 29b87a5c8a... CLEAN 1e1c5f54... SOURCE->CLEAN 121288, CLEAN->FINAL 90590, SOURCE->FINAL 140523; all RGBA/alpha outside 0, protected LAN retained. 26 SHA-bound lossless PNG and machine JSON; C1 HOLD no blind calibration/slant family anchors/C3/actual user game; no DDS or approval. QA localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_INDEPENDENT_PIPELINE_HOLD.json RUN_KEY=OUTRUN-KOR-C1-Q231-A194-INDEPENDENT-4REGION-BGRA-CLEAN-20261010-1722",
     "C367 C2 2026-10-10 17:02:20 KST EVEN q060 B351 distinct new candidate ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd SHA-verified saved source/CLEAN/official/trial, full official→trial RGBA97359 inside ROI outside RGBA/alpha0, first independently reconstructed source→CLEAN q060 effect removal89391 and remaining alpha0. Direct RAW/FLIPY 100/75/50 4-panel visual REWORK_REQUIRED racing italic family + heavy navy outline despite gold color progress. Official unchanged C342 REWORK; C3/approval/game UNTESTED. Evidence localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C367_Q060_C2_INDEPENDENT_B351_VISUAL_REWORK.json OUTRUN-KOR-C367-C2-Q060-B351-NEW-SHA-VISUAL-20261010-1651",
     "C1 2026-10-10 16:50 KST ODD q219 first-ever independent SHA-bound A217 trial 622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d versus canonical source 6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d and CLEAN 8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968: saved-native 100/75/50 & RAW independent source-chrome FAIL despite source-clean outside0, clean-final outside0 and official-to-trial outside0. Exact machine + 11 lossless PNG. Trial REWORK_REQUIRED, official C280 REWORK unchanged, triage METHOD_CHANGE_REQUIRED, C3/approval/user-game UNTESTED, IGR025 OPEN. QA localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/C1_Q219_CONTROLLER_INDEPENDENT_REWORK.json RUN_KEY=OUTRUN-KOR-C1-Q219-A217-EXACT-CHROME-OPTICAL-REWORK-20261010-1650",
@@ -15219,5 +15220,15 @@
     "qa_report": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C367_Q060_C2_INDEPENDENT_B351_VISUAL_REWORK.json",
     "dds_produced": 0,
     "runtime_validation": "UNTESTED"
+  },
+  "c368_c2_q214_exact_source_boundary_20261010": {
+    "run_key": "OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
+    "old_trial_sha256": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+    "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "clean_sha256": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b",
+    "decision": "NEW_EXACT_SOURCE_PROOF_PRIOR_REWORK_UNCHANGED",
+    "report": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json",
+    "runtime_validation": "UNTESTED",
+    "dds_produced": 0
   }
 }

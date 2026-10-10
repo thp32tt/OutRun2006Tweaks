@@ -1,0 +1,180 @@
+{
+  "sha256": {
+    "source": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+    "official": "ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30",
+    "trial": "d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8",
+    "clean": "5beb411d1692032d028b747f93083c6b438da1d4ff122f479d3d2f23d08b604b"
+  },
+  "size": [
+    2048,
+    2048
+  ],
+  "dds_pixel_format": "BC3 DXT5 single authored mip",
+  "source_clean_exact_2region_bboxes_readable": {
+    "START": [
+      815,
+      495,
+      899,
+      517
+    ],
+    "GOAL": [
+      1343,
+      764,
+      1417,
+      787
+    ]
+  },
+  "pairwise": {
+    "SOURCE_CLEAN": {
+      "changed_rgba": 3210,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1635,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 1575,
+          "changed_alpha": 0
+        }
+      }
+    },
+    "CLEAN_OFFICIAL": {
+      "changed_rgba": 2546,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1419,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 1127,
+          "changed_alpha": 0
+        }
+      }
+    },
+    "CLEAN_TRIAL": {
+      "changed_rgba": 2778,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1538,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 1240,
+          "changed_alpha": 0
+        }
+      }
+    },
+    "SOURCE_OFFICIAL": {
+      "changed_rgba": 3111,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1591,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 1520,
+          "changed_alpha": 0
+        }
+      }
+    },
+    "SOURCE_TRIAL": {
+      "changed_rgba": 3073,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1578,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 1495,
+          "changed_alpha": 0
+        }
+      }
+    },
+    "OFFICIAL_TRIAL": {
+      "changed_rgba": 1821,
+      "changed_alpha": 0,
+      "outside_two_source_bboxes_rgba": 0,
+      "outside_two_source_bboxes_alpha": 0,
+      "regions": {
+        "START": {
+          "changed_rgba": 1069,
+          "changed_alpha": 0
+        },
+        "GOAL": {
+          "changed_rgba": 752,
+          "changed_alpha": 0
+        }
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+      "sha256": "dfaed82e0c32dd74fcd8cbcb6ac60b73ef4efeb5052566727ce33601430b0bf0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+      "sha256": "0728cd5197f8e19cfaea6994a16930fb2f7405d5faa99f23b0aecd9b6911c094"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_START_RAW_NATIVE_NEAREST4.png",
+      "sha256": "e96a7b8f3394f5b36f264a41dc943b548acb1f192163601c0a4211125e95e3a5"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_100.png",
+      "sha256": "5eb8e712fc0353657fd4494227ecc8d81e5e60bf0b5e5a3ef64a0c626719593f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_75.png",
+      "sha256": "0383de1f63880b271a697658fc4461f9293d1b4f6ecbd0208b0aef84e85d329c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_SOURCE_CLEAN_CURRENT_TRIAL_FLIPY_50.png",
+      "sha256": "27ee1733b303f77986548f42cec16dc293e14f7508cd064432c610afa773b531"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_GOAL_RAW_NATIVE_NEAREST4.png",
+      "sha256": "d0c6017e5d04c2d3bf9111723702f66bf84d84db23c09cb32013a8c4122dfbd3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C2_Q214_NEW_SOURCE_CLEAN_CHANGED_MASK.png",
+      "sha256": "e7806d445e02ee5f626bff8ebb061de51d71ae9f7ca9b7d67d4c06694b042fae"
+    }
+  ],
+  "source_and_trial_header_128_equal": true,
+  "limitations": [
+    "Out-of-region SOURCE-CLEAN pixel proof only applies to two named original START/GOAL boxes",
+    "Clean to current/trial outside changes must be reported truthfully even when older localization exists",
+    "No blind calibration or game runtime performed"
+  ],
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C368",
+  "queue_index": 214,
+  "source_reference": "Sonic-TV/OR2006Sprites@3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "clean_reference": "localization/graphics/role_B/20261009-B324-Q214-CANONICAL-PLATE-BOUNDARY/B324_CANONICAL_BOUNDARY_CLEAN_PLATE_LOSSLESS.png",
+  "candidate_reference": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "trial_reference": "localization/graphics/role_B/20261010-B339-Q214-BC3-ALPHA-TOPOLOGY-PILOT/B339_UNAPPROVED_MANUAL_JAMO_CHROME_TRIAL.dds",
+  "conclusion": "SOURCE_CLEAN_EXACT_AUTHENTICATED_SCOPED_PASS_BUT_B339_GOAL_VISUAL_REWORK_UNCHANGED",
+  "new_proof_not_repeated_C348": "Prior C348 left canonical SOURCE/CLEAN SHA and protective delta unauthenticated. C368 redownloaded+verified the canonical source, B324 clean, old official, saved B339 trial; all six full-atlas pairwise RGBA/alpha diff matrices freshly recomputed.",
+  "runtime": "UNTESTED",
+  "C3": "BLOCKED",
+  "official_candidate_modified": false
+}
