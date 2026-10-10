@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00572",
+  "production_id": "CONVERSION-DX9EX-00572",
+  "event_id": "CONVERSION-DX9EX-00572-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "cfea26b8cb7a50b1bdcbdbdd7686ebb3c29522a5",
+  "material_result_sha": "b045413aeaac4cb47d5e00ec8f7c462a7b4f7d8c",
+  "validation_bearing_result_sha": "b045413aeaac4cb47d5e00ec8f7c462a7b4f7d8c",
+  "initial_failed_material_sha": "3355ae2c4e1664e7c6615502853198da328a0f17",
+  "initial_failure": "host MSVC C3861 regression smoke unqualified ShadowV2 APIs, resolved in final material SHA",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00572]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:V2_SHADOW_ATOMIC_PUBLICATION",
+  "conflict_keys": [
+    "src/vr/ipc/shadow_legacy_v2.hpp:ShadowV2::StableReadPose",
+    "src/vr/ipc/shadow_legacy_v2.hpp:ShadowV2::StableReadFrameRing",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp:stable-shadow-read-smoke"
+  ],
+  "changed_paths": [
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp"
+  ],
+  "summary": "Fail closed and publish staged legacy v2 shadow pose/frame ring snapshots only on matching even seqlocks, consistent copied sequence and valid headers; clear failed output and cover success/odd-writer/invalid-header/null/zero-attempt negative controls; correct smoke's ShadowV2 namespace scope after first exact-SHA CI diagnosis.",
+  "static_validation": "PASS_ONE_RELEVANT_SOURCE_CHANGE_CHECK",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38027582325,
+    "domain_isolation": 38027582297,
+    "full_source_impact": 38027582370
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_cross_domain": "SUCCESS",
+    "full_source_openxr_host_analyze": "SUCCESS",
+    "full_source_active_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11660573220,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-b045413aeaac4cb47d5e00ec8f7c462a7b4f7d8c",
+    "digest": "sha256:b0c3c0a151e01f10604b9413629483899b4872e01f834aa98035a2edc2fb06a8",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD, latest 00571 C6 and 00572 checkpoint; independent scope",
+    "C1_REVIEW": "PASS FFB release confirmed; P1 v2 shadow read partial publication diagnosis",
+    "C2_IMPLEMENT": "PASS two related production/test files in batch; namespace compile failure corrected in subsequent SHA",
+    "C3_VALIDATE": "PASS final SHA exact DX9Ex Active, Domain, Full Source",
+    "C4_COMMIT": "PASS material commit bears exact task marker without CI-skip",
+    "C5_PACKAGE": "PASS exact SHA CI artifact published not user-tested",
+    "C6_RESULT": "PASS separate run JSON bookkeeping; validation-bearing result remains final material SHA"
+  },
+  "next_action": "Advance independent DX9Ex P1 refactor/R84 or safe P2 OpenXR recommended eye resolution without duplicating work. Need real Quest3/VDXR and MOZA R3 for HMD/FFB runtime acceptance. DX11 A active, DXVK B frozen."
+}
