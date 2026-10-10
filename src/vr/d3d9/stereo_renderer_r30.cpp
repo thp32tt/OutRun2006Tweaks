@@ -19,6 +19,7 @@
 #endif
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "vr_pass_policy.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "vr_shared.hpp"
@@ -40,6 +41,8 @@
 
 namespace Settings
 {
+    extern Setting<bool> VRTelemetry;
+    extern Setting<float> VRWorldScale;
     extern Setting<float> VRHudScale;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
@@ -48,6 +51,31 @@ namespace Settings
 
 namespace OutRunVRStereo
 {
+
+    template <typename T>
+    void R30ReleaseCom(T*& value) noexcept
+    {
+        if (value)
+        {
+            value->Release();
+            value = nullptr;
+        }
+    }
+
+    class R30ScopedInternalPass final
+    {
+    public:
+        R30ScopedInternalPass() noexcept
+            : previous_(R29OwnerExchangeInternalStereoPass(true)) {}
+        ~R30ScopedInternalPass()
+        {
+            R29OwnerExchangeInternalStereoPass(previous_);
+        }
+        R30ScopedInternalPass(const R30ScopedInternalPass&) = delete;
+        R30ScopedInternalPass& operator=(const R30ScopedInternalPass&) = delete;
+    private:
+        bool previous_ = false;
+    };
     namespace
     {
         SafetyHookInline R30DrawPrimitiveR29Hook{};
@@ -616,12 +644,12 @@ namespace OutRunVRStereo
         {
             for (int eye = 0; eye < 2; ++eye)
             {
-                ReleaseCom(R30SkyGlow.reduced[eye]);
-                ReleaseCom(R30SkyGlow.temp[eye]);
+                R30ReleaseCom(R30SkyGlow.reduced[eye]);
+                R30ReleaseCom(R30SkyGlow.temp[eye]);
             }
-            ReleaseCom(R30SkyGlow.bright);
-            ReleaseCom(R30SkyGlow.blur);
-            ReleaseCom(R30SkyGlow.composite);
+            R30ReleaseCom(R30SkyGlow.bright);
+            R30ReleaseCom(R30SkyGlow.blur);
+            R30ReleaseCom(R30SkyGlow.composite);
             R30SkyGlow.eyeWidth = 0;
             R30SkyGlow.eyeHeight = 0;
             R30SkyGlow.glowWidth = 0;
@@ -650,37 +678,37 @@ namespace OutRunVRStereo
                         "VR SKY GLOW: pixel shader compile failed: {}",
                         static_cast<const char*>(
                             errors->GetBufferPointer()));
-                ReleaseCom(errors);
-                ReleaseCom(bytecode);
+                R30ReleaseCom(errors);
+                R30ReleaseCom(bytecode);
                 return false;
             }
             const HRESULT create = device->CreatePixelShader(
                 static_cast<const DWORD*>(bytecode->GetBufferPointer()),
                 shader);
-            ReleaseCom(errors);
-            ReleaseCom(bytecode);
+            R30ReleaseCom(errors);
+            R30ReleaseCom(bytecode);
             return SUCCEEDED(create) && *shader;
         }
 
         bool R30EnsureSkyGlowResources(IDirect3DDevice9* device)
         {
-            if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
+            if (!device || !R29OwnerCaptureFrameSnapshot().width || !R29OwnerCaptureFrameSnapshot().height)
                 return false;
             const int factor =
                 std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
-                160u, BackBufferDesc.Width /
+                160u, R29OwnerCaptureFrameSnapshot().width /
                     static_cast<UINT>(factor));
             const UINT glowHeight = std::max<UINT>(
-                120u, BackBufferDesc.Height /
+                120u, R29OwnerCaptureFrameSnapshot().height /
                     static_cast<UINT>(factor));
 
             if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
                 R30SkyGlow.temp[0] && R30SkyGlow.temp[1] &&
                 R30SkyGlow.bright && R30SkyGlow.blur &&
                 R30SkyGlow.composite &&
-                R30SkyGlow.eyeWidth == BackBufferDesc.Width &&
-                R30SkyGlow.eyeHeight == BackBufferDesc.Height &&
+                R30SkyGlow.eyeWidth == R29OwnerCaptureFrameSnapshot().width &&
+                R30SkyGlow.eyeHeight == R29OwnerCaptureFrameSnapshot().height &&
                 R30SkyGlow.glowWidth == glowWidth &&
                 R30SkyGlow.glowHeight == glowHeight &&
                 R30SkyGlow.factor == factor)
@@ -757,8 +785,8 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            R30SkyGlow.eyeWidth = BackBufferDesc.Width;
-            R30SkyGlow.eyeHeight = BackBufferDesc.Height;
+            R30SkyGlow.eyeWidth = R29OwnerCaptureFrameSnapshot().width;
+            R30SkyGlow.eyeHeight = R29OwnerCaptureFrameSnapshot().height;
             R30SkyGlow.glowWidth = glowWidth;
             R30SkyGlow.glowHeight = glowHeight;
             R30SkyGlow.factor = factor;
@@ -849,18 +877,18 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device)
         {
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
-                FrameRightDrawFailed || FrameStereoIncomplete ||
-                !BackBuffer || !RightEyeSurface)
+                !R29OwnerCaptureFrameSnapshot().hadWorldStereo || !R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw ||
+                R29OwnerCaptureFrameSnapshot().rightDrawFailed || R29OwnerCaptureFrameSnapshot().stereoIncomplete ||
+                !R29OwnerCaptureFrameSnapshot().backBuffer || !R29OwnerCaptureFrameSnapshot().rightEyeSurface)
                 return false;
 
-            if (R30SkyGlowSceneCaptureEpoch == PresentEpoch)
+            if (R30SkyGlowSceneCaptureEpoch == R29OwnerCaptureFrameSnapshot().presentEpoch)
                 return true;
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
             IDirect3DSurface9* eyeSurface[2]{
-                BackBuffer, RightEyeSurface
+                R29OwnerCaptureFrameSnapshot().backBuffer, R29OwnerCaptureFrameSnapshot().rightEyeSurface
             };
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
@@ -878,17 +906,17 @@ namespace OutRunVRStereo
                 reduced->Release();
             }
             if (ok)
-                R30SkyGlowSceneCaptureEpoch = PresentEpoch;
+                R30SkyGlowSceneCaptureEpoch = R29OwnerCaptureFrameSnapshot().presentEpoch;
             return ok;
         }
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !StereoWanted() || !FrameHadWorldStereo ||
-                !FrameHadDuplicatedDraw || FrameRightDrawFailed ||
-                FrameStereoIncomplete || !BackBuffer ||
-                !RightEyeSurface)
+                !R29OwnerStereoWanted() || !R29OwnerCaptureFrameSnapshot().hadWorldStereo ||
+                !R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw || R29OwnerCaptureFrameSnapshot().rightDrawFailed ||
+                R29OwnerCaptureFrameSnapshot().stereoIncomplete || !R29OwnerCaptureFrameSnapshot().backBuffer ||
+                !R29OwnerCaptureFrameSnapshot().rightEyeSurface)
                 return true;
 
             if (!R30EnsureSkyGlowResources(device))
@@ -922,7 +950,7 @@ namespace OutRunVRStereo
 
             bool ok = true;
             IDirect3DSurface9* eyeSurface[2]{
-                BackBuffer, RightEyeSurface
+                R29OwnerCaptureFrameSnapshot().backBuffer, R29OwnerCaptureFrameSnapshot().rightEyeSurface
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
@@ -939,7 +967,7 @@ namespace OutRunVRStereo
                     break;
                 }
 
-                if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)
+                if (R30SkyGlowSceneCaptureEpoch != R29OwnerCaptureFrameSnapshot().presentEpoch)
                 {
                     ok = SUCCEEDED(device->StretchRect(
                         eyeSurface[eye], nullptr, reduced, nullptr,
@@ -1007,8 +1035,8 @@ namespace OutRunVRStereo
                 if (ok)
                     ok = R30DrawSkyGlowPass(
                         device, eyeSurface[eye],
-                        BackBufferDesc.Width,
-                        BackBufferDesc.Height,
+                        R29OwnerCaptureFrameSnapshot().width,
+                        R29OwnerCaptureFrameSnapshot().height,
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
@@ -1095,11 +1123,11 @@ namespace OutRunVRStereo
         {
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
-                StereoWanted() && FrameHadWorldStereo &&
-                FrameHadDuplicatedDraw &&
-                !FrameRightDrawFailed && !FrameStereoIncomplete)
+                R29OwnerStereoWanted() && R29OwnerCaptureFrameSnapshot().hadWorldStereo &&
+                R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw &&
+                !R29OwnerCaptureFrameSnapshot().rightDrawFailed && !R29OwnerCaptureFrameSnapshot().stereoIncomplete)
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 R30ApplyStereoSkyGlow(device);
             }
             return R30PresentR29Hook.stdcall<HRESULT>(
@@ -1127,12 +1155,12 @@ namespace OutRunVRStereo
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
-            if (!BackBufferDesc.Width || !BackBufferDesc.Height)
+            if (!R29OwnerCaptureFrameSnapshot().width || !R29OwnerCaptureFrameSnapshot().height)
                 return 1.0f;
 
             const float sourceAspect =
-                static_cast<float>(BackBufferDesc.Width) /
-                static_cast<float>(BackBufferDesc.Height);
+                static_cast<float>(R29OwnerCaptureFrameSnapshot().width) /
+                static_cast<float>(R29OwnerCaptureFrameSnapshot().height);
 
             // R35.4: SharedPoseState already carries the runtime's actual
             // recommended per-eye render-target size. That pixel aspect is the
@@ -1290,7 +1318,7 @@ namespace OutRunVRStereo
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
         {
-            if (!device || !TargetIsBackBuffer())
+            if (!device || !R29OwnerTargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
@@ -1422,8 +1450,8 @@ namespace OutRunVRStereo
 
             if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
                 state.stereo.poseSequence == 0 ||
-                (FrameStereoPoseSequence != 0 &&
-                 FrameStereoPoseSequence != state.stereo.poseSequence) ||
+                (R29OwnerCaptureFrameSnapshot().poseSequence != 0 &&
+                 R29OwnerCaptureFrameSnapshot().poseSequence != state.stereo.poseSequence) ||
                 !R30BuildEyeAffine(state.stereo,
                     state.eyeScale, state.eyeOffset))
                 return false;
@@ -1517,14 +1545,14 @@ namespace OutRunVRStereo
             if (!state.worldEffect)
                 return true;
 
-            if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
+                (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil &&
-                !RightDepthSynchronized && DepthTestActive(device))
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
+                !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized && DepthTestActive(device))
                 return false;
-            if (TrackedDepthStencil &&
-                !RightStencilSynchronized && StencilTestActive(device))
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
+                !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized && StencilTestActive(device))
                 return false;
 
             if (!haveBaseProjection)
@@ -2044,18 +2072,18 @@ namespace OutRunVRStereo
             }
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
-            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
             bool restoreOk = true;
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 rightHr = SetRenderTargetHook.stdcall<HRESULT>(
-                    device, 0u, RightEyeSurface);
+                    device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
                 if (SUCCEEDED(rightHr))
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                        device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&state.viewport);
                 if (SUCCEEDED(rightHr))
@@ -2074,12 +2102,12 @@ namespace OutRunVRStereo
             if (state.worldEffect)
             {
                 ++R30XyzrhwWorldEffectDraws;
-                if (FrameStereoPoseSequence == 0)
+                if (R29OwnerCaptureFrameSnapshot().poseSequence == 0)
                 {
                     FrameStereoPoseSequence = state.stereo.poseSequence;
                     FrameStereoMetadata = state.stereo;
                 }
-                else if (FrameStereoPoseSequence != state.stereo.poseSequence)
+                else if (R29OwnerCaptureFrameSnapshot().poseSequence != state.stereo.poseSequence)
                 {
                     FrameRightDrawFailed = true;
                     PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
@@ -2346,7 +2374,7 @@ namespace OutRunVRStereo
                 "R30.6/DrawPrimitiveVB-ShadowXYZRHW");
 
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 if (FAILED(device->SetStreamSource(
                         0, vb, streamOffset, stride)))
                 {
@@ -2601,7 +2629,7 @@ namespace OutRunVRStereo
                 "R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW");
 
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 bool restoreOk = SUCCEEDED(device->SetStreamSource(
                     0, vb, streamOffset, stride));
                 restoreOk = SUCCEEDED(device->SetIndices(ib)) && restoreOk;
@@ -2767,13 +2795,13 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return E_NOTIMPL;
 
-            if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
+                (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized &&
                 DepthTestActive(device))
                 return E_NOTIMPL;
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized &&
                 StencilTestActive(device))
                 return E_NOTIMPL;
 
@@ -2784,8 +2812,8 @@ namespace OutRunVRStereo
 
             // If perspective world geometry already established this Present's
             // pose sequence, screen-space correction must use that exact packet.
-            if (FrameStereoPoseSequence != 0 &&
-                FrameStereoPoseSequence != stereo.poseSequence)
+            if (R29OwnerCaptureFrameSnapshot().poseSequence != 0 &&
+                R29OwnerCaptureFrameSnapshot().poseSequence != stereo.poseSequence)
                 return E_NOTIMPL;
 
             float original[16]{};
@@ -2833,7 +2861,7 @@ namespace OutRunVRStereo
 
             bool leftWvpOk = false;
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 leftWvpOk = SetWvpOneRegisterAtATime(
                     device, eyeConstants[0]);
             }
@@ -2841,7 +2869,7 @@ namespace OutRunVRStereo
             {
                 bool restored = false;
                 {
-                    InternalPassScope guard;
+                    R30ScopedInternalPass guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
                 if (!restored)
@@ -2857,7 +2885,7 @@ namespace OutRunVRStereo
 
             if (transformScissor)
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 if (FAILED(device->SetScissorRect(&eyeScissor[0])))
                 {
                     SetWvpOneRegisterAtATime(device, original);
@@ -2870,7 +2898,7 @@ namespace OutRunVRStereo
 
             if (transformScissor)
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 if (FAILED(device->SetScissorRect(&savedScissor)))
                 {
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
@@ -2882,7 +2910,7 @@ namespace OutRunVRStereo
             {
                 bool restored = false;
                 {
-                    InternalPassScope guard;
+                    R30ScopedInternalPass guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
@@ -2894,19 +2922,19 @@ namespace OutRunVRStereo
             }
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
-            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
             bool restoreOk = true;
             {
-                InternalPassScope guard;
+                R30ScopedInternalPass guard;
                 rightHr = SetRenderTargetHook.stdcall<HRESULT>(
-                    device, 0u, RightEyeSurface);
+                    device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
                 if (SUCCEEDED(rightHr))
                 {
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                        device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
                 }
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
@@ -3415,19 +3443,17 @@ namespace OutRunVRStereo
 
     bool R30SupportExchangeInternalStereoPass(bool active) noexcept
     {
-        const bool previous = InternalStereoPass;
-        InternalStereoPass = active;
-        return previous;
+        return R29OwnerExchangeInternalStereoPass(active);
     }
 
     std::uint64_t R30SupportPresentEpoch() noexcept
     {
-        return PresentEpoch;
+        return R29OwnerCaptureFrameSnapshot().presentEpoch;
     }
 
-    bool R30SupportStereoWanted() noexcept
+    bool R30SupportR29OwnerStereoWanted() noexcept
     {
-        return StereoWanted();
+        return R29OwnerStereoWanted();
     }
 
     bool R30SupportStereoBaselineSeeded() noexcept
@@ -3524,9 +3550,9 @@ namespace OutRunVRStereo
         return R9IsRightStencilInSync();
     }
 
-    bool R30SupportTargetIsBackBuffer() noexcept
+    bool R30SupportR29OwnerTargetIsBackBuffer() noexcept
     {
-        return TargetIsBackBuffer();
+        return R29OwnerTargetIsBackBuffer();
     }
 
     bool R30SupportAnyAuxRenderTargetActive() noexcept
@@ -3672,8 +3698,8 @@ namespace OutRunVRStereo
     bool R30SupportTryGetDirectTransportSourceSurfaces(
         R30SupportDirectTransportSourceSurfaces& out) noexcept
     {
-        out.left = BackBuffer;
-        out.right = RightEyeSurface;
+        out.left = R29OwnerCaptureFrameSnapshot().backBuffer;
+        out.right = R29OwnerCaptureFrameSnapshot().rightEyeSurface;
         return out.left != nullptr && out.right != nullptr;
     }
 
@@ -3690,7 +3716,7 @@ namespace OutRunVRStereo
         if (!slot.leftSurface || !slot.rightSurface || !slot.fence)
             return {D3DERR_INVALIDCALL, true};
 
-        InternalPassScope guard;
+        R30ScopedInternalPass guard;
         const HRESULT leftCopy = device->StretchRect(
             source.left, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE);
         const HRESULT rightCopy = SUCCEEDED(leftCopy)
@@ -3710,17 +3736,17 @@ namespace OutRunVRStereo
 
     IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept
     {
-        return TrackedDepthStencil;
+        return R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
     }
 
     IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept
     {
-        return RightEyeSurface;
+        return R29OwnerCaptureFrameSnapshot().rightEyeSurface;
     }
 
     IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept
     {
-        return RightEyeDepth;
+        return R29OwnerCaptureFrameSnapshot().rightEyeDepth;
     }
 
     bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept
@@ -3767,7 +3793,7 @@ namespace OutRunVRStereo
         FrameHadWorldStereo = true;
         ++DuplicatedDraws;
         ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
+        if (R29OwnerCaptureFrameSnapshot().poseSequence == 0)
         {
             FrameStereoPoseSequence = poseSequence;
             FrameStereoMetadata = stereo;
@@ -3813,7 +3839,7 @@ namespace OutRunVRStereo
 
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
-        return FrameStereoPoseSequence;
+        return R29OwnerCaptureFrameSnapshot().poseSequence;
     }
 
     void R30SupportReleaseDirectAckState() noexcept

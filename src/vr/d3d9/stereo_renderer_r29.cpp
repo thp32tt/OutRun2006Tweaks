@@ -686,4 +686,40 @@ namespace OutRunVRStereo
     {
         return R29StereoInstallState.load(std::memory_order_acquire);
     }
+    R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept
+    {
+        R29OwnerFrameSnapshot view{};
+        view.width = BackBufferDesc.Width;
+        view.height = BackBufferDesc.Height;
+        view.backBuffer = BackBuffer;
+        view.rightEyeSurface = RightEyeSurface;
+        view.rightEyeDepth = RightEyeDepth;
+        view.trackedDepthStencil = TrackedDepthStencil;
+        view.presentEpoch = PresentEpoch;
+        view.poseSequence = FrameStereoPoseSequence;
+        view.hadWorldStereo = FrameHadWorldStereo;
+        view.hadDuplicatedDraw = FrameHadDuplicatedDraw;
+        view.rightDrawFailed = FrameRightDrawFailed;
+        view.stereoIncomplete = FrameStereoIncomplete;
+        view.rightDepthSynchronized = RightDepthSynchronized;
+        view.rightStencilSynchronized = RightStencilSynchronized;
+        return view;
+    }
+
+    bool R29OwnerStereoWanted() noexcept
+    {
+        return StereoWanted();
+    }
+
+    bool R29OwnerTargetIsBackBuffer() noexcept
+    {
+        return TargetIsBackBuffer();
+    }
+
+    bool R29OwnerExchangeInternalStereoPass(bool active) noexcept
+    {
+        const bool prior = InternalStereoPass;
+        InternalStereoPass = active;
+        return prior;
+    }
 }
