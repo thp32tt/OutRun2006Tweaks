@@ -58,7 +58,7 @@ for reg in regions:
  # Use the dominant near-opaque face color, never a guessed brand palette.
  keys,counts=np.unique(values,axis=0,return_counts=True)
  core=keys[counts.argmax()].astype(np.uint8)
- font_size=47 if reg["id"].startswith("r43") else 47
+ font_size=43  # exact native source height ceiling: prior 47 produced 46px > 45px English
  font=ImageFont.truetype(str(fontpath),font_size,index=fontindex)
  img=Image.new("L",(x-l,b-t),0);d=ImageDraw.Draw(img)
  # Draw directly at output pixel resolution, do not resample old Korean.
