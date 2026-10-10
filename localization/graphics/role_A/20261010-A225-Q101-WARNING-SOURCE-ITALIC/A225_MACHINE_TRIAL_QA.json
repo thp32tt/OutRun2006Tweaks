@@ -1,0 +1,104 @@
+{
+  "run": "A225",
+  "role": "A",
+  "queue_index": 101,
+  "run_key": "OUTRUN-KOR-A225-Q101-C1-ITALIC-SOURCE-CONTOUR-20261010-1500",
+  "triage": {
+    "index": 101,
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+    "current_status": "c1_20261010_q101_rework_required_source_italic_mismatch",
+    "next_action": "MATERIAL_REWORK",
+    "repeated_root_causes": [],
+    "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "old_official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "official_changed": false,
+  "new_trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+  "new_trial_path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_Q101_WARNING_NATIVE_ITALIC_UNPROMOTED.dds",
+  "format": "4096x4096 RGBA32 mip1 RAW mirror_y",
+  "original_warning_bbox": [
+    3006,
+    25,
+    3932,
+    168
+  ],
+  "source_line_bboxes": [
+    [
+      3006,
+      25,
+      3729,
+      92
+    ],
+    [
+      3062,
+      92,
+      3931,
+      168
+    ]
+  ],
+  "new_korean_lines": [
+    "모든 플레이어가 동시에 참가해야",
+    "이 모드를 플레이할 수 있습니다."
+  ],
+  "new_glyph_bboxes": [
+    [
+      3013,
+      30,
+      3721,
+      87
+    ],
+    [
+      3161,
+      101,
+      3832,
+      158
+    ]
+  ],
+  "source_italic_source_family_ratio": 0.32,
+  "slant_anchor_evidence": "SOURCE/CLEAN/FINAL native + RAW; independent paired-glyph source anchor pending",
+  "font": {
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "face_index": 1,
+    "family": "Noto Sans CJK KR Bold",
+    "ppem": 51,
+    "glyph_coverage": true
+  },
+  "source_sampled_face_rgb": [
+    247,
+    186,
+    24
+  ],
+  "source_sampled_outline_rgb": [
+    0,
+    10,
+    57
+  ],
+  "original_region_source_alpha_nonzero": 77026,
+  "original_region_old_alpha_nonzero": 60177,
+  "clean_alpha_nonzero": 0,
+  "new_letter_alpha_nonzero": 58155,
+  "changed_rgba_pixels": 114661,
+  "changed_alpha_pixels": 57193,
+  "changed_outside_source_bbox": 0,
+  "source_warning_icon_numeric_outside_edit_preserved": true,
+  "persisted_dds_redecoded_equal": true,
+  "native_source_size_ceiling_each_line": true,
+  "new_trial_dds": 1,
+  "promoted_dds": 0,
+  "stage": "SCOPE_WARNING_PILOT_P3_PERSISTED",
+  "visual_review": "PENDING_CONTROLLER_FIRSTHAND",
+  "independent_C1": "PENDING",
+  "C3": "NOT_RUN",
+  "USER_INGAME": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
