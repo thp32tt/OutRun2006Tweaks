@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 07:01:02 KST",
+  "updated_at_kst": "2026-10-11T07:11:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,41 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_a235r_q121_source_profile_20261011": {
+        "run_key": "OUTRUN-KOR-A235-Q121-REGULAR-SOURCE-CONTOUR-VECTOR-20261011-0700",
+        "index": 121,
+        "priority": "P0",
+        "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "official_preserved_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+        "a235_rejected_trial_sha256": "571bf039e8d6a0ee1d56f2df543a68ba960b510875e1662e09b9a8a6e52750f6",
+        "a235r_trial_sha256": "1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98",
+        "native": [
+          4096,
+          4096
+        ],
+        "source_bbox": [
+          3490,
+          391,
+          3722,
+          440
+        ],
+        "glyph_bbox": [
+          11,
+          5,
+          221,
+          44
+        ],
+        "visible_alpha_pixels": 6352,
+        "off_roi_pixels": 0,
+        "other_cells_exact": 29,
+        "producer": "SCOPED_MATERIAL_IMPROVEMENT_HOLD",
+        "official_promoted": 0,
+        "c1": "NOT_RUN_NEW_SHA",
+        "c3": "NOT_RUN",
+        "user_game": "OPEN",
+        "runtime": "UNTESTED",
+        "qa": "localization/graphics/role_A/20261011-A235R-Q121-SOURCE-CONTOUR-NATIVE-HEIGHT-REFIT/A235R_CONTROLLER_OPTICAL_QA.json"
+      },
       "b365_q176_nanum_native_alternate_rework_20261011": {
         "run_key": "OUTRUN-KOR-B365-Q176-NANUM-ALT-FAMILY-20261011-0644",
         "role": "B",
