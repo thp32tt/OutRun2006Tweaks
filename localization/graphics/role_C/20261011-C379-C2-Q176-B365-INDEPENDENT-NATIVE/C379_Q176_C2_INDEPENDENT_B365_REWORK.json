@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "reviewer": "C2",
+  "shard": "EVEN",
+  "index": 176,
+  "review_id": "C379-C2-Q176-B365-FIRST-INDEPENDENT-SAVED-DDS",
+  "timestamp_kst": "2026-10-11 07:00:24 KST",
+  "type": "FRESH_INDEPENDENT_REVIEW_NEW_UNPROMOTED_SHA",
+  "source": {
+    "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "verified_download": true
+  },
+  "official": {
+    "sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "preserved": true,
+    "status": "C343_REWORK_REQUIRED"
+  },
+  "trial": {
+    "sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+    "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_Q176_FLAGMAN_NANUM_UNAPPROVED.dds",
+    "approved": false
+  },
+  "clean": {
+    "producer_report_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+    "independently_reauthenticated_this_run": false,
+    "decision": "HOLD"
+  },
+  "backend": "N100_MCP_BINARY_DDS_DECODE_GITHUB_SSOT",
+  "independent_machine": {
+    "native_wh": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_to_readable": "flip_y",
+    "source_bbox": [
+      8,
+      49,
+      988,
+      204
+    ],
+    "trial_bbox": [
+      14,
+      54,
+      720,
+      199
+    ],
+    "source_visible_alpha": 75687,
+    "trial_visible_alpha": 36648,
+    "bbox_positive_margins": [
+      6,
+      268,
+      5,
+      5
+    ],
+    "official_to_trial_rgba_changed": 80387,
+    "official_to_trial_rgba_outside": 0,
+    "official_to_trial_alpha_outside": 0,
+    "header_equal_source_trial": true,
+    "source_width_px": 980,
+    "trial_width_px": 706,
+    "trial_percent_of_source_width": 72
+  },
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_MACHINE.json"
+  },
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "reason": "B365 producer QA read to identify new SHA before first independent pixel inspection; cannot claim blind PASS"
+  },
+  "observations": {
+    "FLAGMAN4": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Original and Korean visually upright, but homologous stem anchors and blind slant calibration unavailable; no invented numeric angle"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "Source->producer CLEAN not independently decoded here; no source ghost visibly confirmed in saved final, but full PLATE_ONLY cannot be certified"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Native saved English FLAGMAN 4 uses broad thick solid deep-red racing face (980px); B365 706px Korean has reduced stroke mass/large right void and materially weaker source-family proportions"
+      },
+      "readability": {
+        "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+        "observation": "Korean readable at native/white50; source-relative bold hierarchy underfilled at 72% of English width"
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED",
+        "observation": "No visually confirmed broken or clipped Hangul in FLAGMAN4 crop at 100 and 50; not whole atlas acceptance"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED",
+        "observation": "80,387 changed pixels from official to new B365, zero RGBA and alpha outside original FLAGMAN4 source bbox; three Korean sibling labels remain exact"
+      },
+      "placement": {
+        "result": "PASS_SCOPED",
+        "observation": "Source bbox [8,49,988,204], B365 visible [14,54,720,199], positive margins [6,268,5,5]; no 1px boundary escape"
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "Actual saved DDS RAW and FLIP-Y native crop viewed, preserved source 128-byte DDS header, RGBA32 2048x2048 mip1"
+      }
+    }
+  },
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_Q176_READABLE_GRAY100.png",
+      "sha256": "f4a2b6d46e2a4de6f942ed997a3dd3fe78f2dac4c80496da7e5762aa35c142e9",
+      "size": 26720
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_Q176_READABLE_BLACK75.png",
+      "sha256": "4e413a8d6705fb997cbd5c1885a3358ddf34410e90cd1d9ed80169eb54ac9884",
+      "size": 28904
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_Q176_READABLE_WHITE50.png",
+      "sha256": "8bd9fc5c7e491ad8e2e77db9ab623b10b93d5b812a56cd0a429f842282289a80",
+      "size": 29195
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_Q176_RAW_GRAY100.png",
+      "sha256": "d7219a5e7f7697a8873ee98480517768770f50c512a3f387b43a4ed03de73310",
+      "size": 27143
+    }
+  ],
+  "calibration": "NOT_COMPLETED_FULL_CURRENT_POLICY",
+  "C3": "NOT_RUN",
+  "USER_INGAME": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "verdict": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_UNDERWEIGHT",
+  "official_status_unchanged": true,
+  "new_approved_dds": 0,
+  "notes": "Independent visual FAIL overrides mechanical bbox PASS. No final C PASS or APPROVALS/q176.json and no user-game closure."
+}

@@ -1,0 +1,61 @@
+{
+  "native_dimensions": [
+    2048,
+    2048
+  ],
+  "encoding": "RGBA32_PIL_DDS_decode",
+  "mips": 1,
+  "readable_transform": "flip_y",
+  "paths": {
+    "SOURCE": {
+      "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "bytes": 16777344,
+      "header_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "OFFICIAL": {
+      "sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+      "bytes": 16777344,
+      "header_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "B365": {
+      "sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+      "bytes": 16777344,
+      "header_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    }
+  },
+  "review_bbox": [
+    8,
+    49,
+    988,
+    204
+  ],
+  "source_visible_bbox": [
+    8,
+    49,
+    988,
+    204
+  ],
+  "trial_visible_bbox": [
+    14,
+    54,
+    720,
+    199
+  ],
+  "source_alpha_positive": 75687,
+  "trial_alpha_positive": 36648,
+  "trial_bbox_margins": [
+    6,
+    268,
+    5,
+    5
+  ],
+  "official_to_trial_rgba_changed": 80387,
+  "official_to_trial_rgba_outside": 0,
+  "official_to_trial_alpha_outside": 0,
+  "official_to_trial_alpha_changed": 29183,
+  "header_equal_source_trial": true,
+  "mip_decode_levels": 1,
+  "relative_visible_width_percent": 72,
+  "decision": "REWORK_REQUIRED_SOURCE_STYLE_FAMILY_UNPROMOTED",
+  "runtime": "UNTESTED"
+}
