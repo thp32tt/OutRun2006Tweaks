@@ -15,7 +15,7 @@
   "mips": 1,
   "source_clean_lettering_final": true,
   "P1": "MECHANICAL_SOURCE_CLEAN_CANDIDATE_SAVED_DIRECT_CONTROLLER_VISUAL_PENDING",
-  "P2": "NATIVE_FONT_BOLD_VECTOR_SOURCE_RED_FACE_STROKE3_DIRECT_CONTROLLER_VISUAL_PENDING",
+  "P2": "NATIVE_PINNED_NOTO_CJK_BOLD_FREE_TYPE_STROKE_1PX_VECTOR_SOURCE_FLAT_RED_CONTROLLER_VISUAL_SCOPED_ACCEPT_PENDING_INDEPENDENT_C2",
   "P3": "DDS_ROUNDTRIP_EXACT_NO_OFFICIAL_PROMOTION",
   "source_clean_outside_rgba": 0,
   "clean_final_outside_rgba": 0,
@@ -274,7 +274,7 @@
     "B346_flagman4_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png"
   ],
   "same_SHA_repeated": false,
-  "producer_visual": "PENDING_DIRECT_CONTROLLER",
+  "producer_visual": "SCOPED_FOUR_SOURCE_TEXT_REGIONS_ACCEPT_NO_OFFICIAL_PROMOTION",
   "new_material_trial_dds": 1,
   "new_promoted_dds": 0,
   "C2": "C343_CURRENT_REWORK_REQUIRED",
@@ -289,5 +289,6 @@
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "qa_note": "Correct metadata: B345 used stroke3 and was visual-rejected; B346 uses persisted vector stroke1 in all four per_region values. Readable native100 four regions and three direct RAW/practical 50-75 checks reveal preserved Hangul counters, no new clipping or foreign box; no C/C3/game approval claimed."
 }
