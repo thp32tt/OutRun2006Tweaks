@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R187/R204/R205 single-pass contract with targeted negative source mutations."""
+"""R187/R204/R205/R225 single-pass contract with targeted negative source mutations."""
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 h=(root/"src/vr/d3d11/native_indexed_target_viewport.hpp").read_text(encoding="utf-8")
@@ -10,6 +10,8 @@ guards=(
     "!verified_indexed_linear_draw_ready(",
     "view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D",
     "desc.Width != width || desc.Height != height",
+    "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
+    "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
     "context->RSGetViewports(&boundCount, nullptr)",
     "boundCount != 1",
     "rasterDesc.ScissorEnable",
@@ -26,7 +28,7 @@ guards=(
 r187 = h.split("// R218: composed indexed full-eye D32 readiness:", 1)[0]
 def contract(text): return all(g in text for g in guards)
 assert contract(r187), "missing native indexed viewport/target protection"
-for g in (guards[0],guards[2],guards[5],guards[6],guards[7],guards[8],guards[9],guards[10],guards[11],guards[12]):
+for g in (guards[0],guards[2],guards[3],guards[4],guards[7],guards[8],guards[9],guards[10],guards[11],guards[12],guards[13],guards[14]):
     assert not contract(r187.replace(g,"",1)), "source mutation survived: "+g
 assert "->Draw(" not in h and "->DrawIndexed(" not in h, "game Draw activation prohibited"
 for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
@@ -39,10 +41,15 @@ for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
     "restore sole indexed RTV after MRT",
     "reject unowned indexed DSV",
     "restore no-depth indexed owner after DSV",
+    "R225 create same-device typeless indexed eye",
+    "R225 typed RTV over typeless indexed eye",
+    "R225 indexed IA accepts same-device typed view",
+    "R225 reject typeless indexed backing despite typed RTV",
+    "R225 restore exact typed indexed eye",
     "actual DrawIndexed green center / black corner pixels"):
     assert phrase in p, "missing WARP behavior coverage: "+phrase
 assert "[target.dx11_viewport_draw_probe_r187]" in manifest
 assert '"tools/dx11_viewport_draw_probe_r187.cpp"' in manifest
 assert "python tools/test_dx11_viewport_draw_r187.py" in workflow
 assert workflow.index("Run R187 indexed viewport WARP probe") < workflow.index("Build DX11 constant buffer probe")
-print("R187/R204/R205 indexed viewport, sole RTV/no foreign DSV, 10 source mutations and WARP contract: PASS")
+print("R187/R204/R205 indexed viewport, sole RTV/no foreign DSV, 12 source mutations and WARP contract: PASS")

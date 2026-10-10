@@ -88,6 +88,32 @@ int main() {
             vb,ib,ctx.Get(),0,3,0,gen,vv,iv,w,h,f,rtv.Get());
     };
     require(ready(), "baseline native indexed viewport ready");
+    // R225: a typed RTV can mask a same-device TYPELESS backing texture.
+    // Bind it in the real WARP OM state before querying indexed ownership.
+    D3D11_TEXTURE2D_DESC r225Backing{};
+    color->GetDesc(&r225Backing);
+    r225Backing.Format=DXGI_FORMAT_R8G8B8A8_TYPELESS;
+    ComPtr<ID3D11Texture2D> r225TypelessColor;
+    require(SUCCEEDED(dev->CreateTexture2D(&r225Backing,nullptr,
+        r225TypelessColor.GetAddressOf())) && r225TypelessColor,
+        "R225 create same-device typeless indexed eye");
+    D3D11_RENDER_TARGET_VIEW_DESC r225ViewDesc{};
+    rtv->GetDesc(&r225ViewDesc);
+    ComPtr<ID3D11RenderTargetView> r225TypedView;
+    require(SUCCEEDED(dev->CreateRenderTargetView(
+        r225TypelessColor.Get(),&r225ViewDesc,r225TypedView.Get())) &&
+        r225TypedView, "R225 typed RTV over typeless indexed eye");
+    ID3D11RenderTargetView* r225Raw=r225TypedView.Get();
+    ctx->OMSetRenderTargets(1,&r225Raw,nullptr);
+    require(verified_indexed_linear_draw_ready(
+        vb,ib,ctx.Get(),0,3,0,gen,vv,iv),
+        "R225 indexed IA accepts same-device typed view");
+    require(!verified_indexed_full_target_draw_ready(
+        vb,ib,ctx.Get(),0,3,0,gen,vv,iv,40,40,
+        DXGI_FORMAT_R8G8B8A8_UNORM,r225TypedView.Get()),
+        "R225 reject typeless indexed backing despite typed RTV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(), "R225 restore exact typed indexed eye");
     require(!verified_indexed_full_target_draw_ready(
         vb,ib,ctx.Get(),0,3,0,gen,vv,iv,40,40,
         DXGI_FORMAT_R8G8B8A8_UNORM,nullptr), "reject null expected RTV");
