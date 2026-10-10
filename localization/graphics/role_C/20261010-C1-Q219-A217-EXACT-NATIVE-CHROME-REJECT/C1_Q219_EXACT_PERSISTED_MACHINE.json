@@ -1,0 +1,60 @@
+{
+  "sha_old": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "sha_trial": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+  "source_bbox_readable": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "allowed_bbox_RAW": [
+    6,
+    919,
+    1473,
+    1037
+  ],
+  "changed_rgba_pixels": 29487,
+  "changed_alpha_pixels": 12896,
+  "changed_outside_source_bbox_rgba": 0,
+  "changed_outside_source_bbox_alpha": 0,
+  "changed_bbox_raw": [
+    12,
+    920,
+    533,
+    1035
+  ],
+  "changed_bbox_readable": [
+    12,
+    1013,
+    533,
+    1128
+  ],
+  "exact_DDS_persisted": true,
+  "dds_format": "2048x2048 32-bit RGBA raw, one mip",
+  "source_file_authenticated_this_run": false,
+  "runtime": "UNTESTED",
+  "reviewer_visual": "SOURCE source-panel racing welded horizontal letters are rounded; A217 trial Korean has blocky disconnected stiff individual letters with jagged stepped chrome and over-heavy lower rails. At black50 shows source cohesive thin-luminous continuous face vs fractured Korean bevel/counter. This is an optical style FAIL; not rescued by region containment.",
+  "generated_at_kst": "2026-10-10T16:47:35.511269+09:00",
+  "evidence_png_sha256": {
+    "OFFICIAL_FLIPY_BLACK_50.png": "d1263bc91f364848166d41dd9f13553552db2d8d76de1fd4cc539b4a71dc0618",
+    "OFFICIAL_FLIPY_GRAY_100.png": "e3b25fde2fe71b6f00d9c304f9c8db18199ec30d15979f4630a206e3c65ce327",
+    "OFFICIAL_FLIPY_WHITE_75.png": "9bfa9aa11c6b5871e6b844931cacc7f1a5a2c205f81941b51d36c3f2acdeb53c",
+    "OFFICIAL_RAW_GRAY_100.png": "e0e438f39c3d65508bc8a857f31fdfbe4e67a53563b6ae9d3ca826d18d054f3c",
+    "OFFICIAL_TO_TRIAL_PERSISTED_RGBA_CHANGE_MASK.png": "2558f30dfbe8e3f97b9d3ea8d2cb8215e834ad8f02a1ea1c42108ea0198fa96e",
+    "TRIAL_FLIPY_BLACK_50.png": "7f548304755922f71687c659c242d06a8a4bbafcbc2c2b209bcd25ecb148d0b6",
+    "TRIAL_FLIPY_GRAY_100.png": "4b66bf1e61e805331e428f839190342eb0f0fd353a231437092bbd9d9e3cbba4",
+    "TRIAL_FLIPY_WHITE_75.png": "d96e29ad931a7c589eadcbd7b3c750e0ebbbc6a01e62676ccb843eae1390c6ac",
+    "TRIAL_RAW_GRAY_100.png": "43ee577f1756efb8162ba0eadebce56aad0111f4d0b79fb2b18a18733fcefcb5"
+  },
+  "evidence_png_size_bytes": {
+    "OFFICIAL_FLIPY_BLACK_50.png": 14641,
+    "OFFICIAL_FLIPY_GRAY_100.png": 35895,
+    "OFFICIAL_FLIPY_WHITE_75.png": 31519,
+    "OFFICIAL_RAW_GRAY_100.png": 36417,
+    "OFFICIAL_TO_TRIAL_PERSISTED_RGBA_CHANGE_MASK.png": 1459,
+    "TRIAL_FLIPY_BLACK_50.png": 15321,
+    "TRIAL_FLIPY_GRAY_100.png": 23543,
+    "TRIAL_FLIPY_WHITE_75.png": 29395,
+    "TRIAL_RAW_GRAY_100.png": 23544
+  }
+}

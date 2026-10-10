@@ -1,0 +1,39 @@
+{
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+  "final_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+  "source_clean_rgba_changed": 96041,
+  "source_clean_outside_rgba": 0,
+  "source_clean_outside_alpha": 0,
+  "clean_final_rgba_changed": 28219,
+  "clean_final_outside_rgba": 0,
+  "clean_final_outside_alpha": 0,
+  "clean_alpha_nonzero_in_source_title": 0,
+  "source_alpha_nonzero_in_source_title": 96041,
+  "final_alpha_nonzero_in_source_title": 28219,
+  "readable_source_bbox": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "source_and_plate_exact_sha_verified": true,
+  "evidence_png_sha256": {
+    "AUTHENTICATED_CLEAN_PLATE_FLIPY_BLACK_50.png": "b86f4a1392715c6f292fbd9a6dad653f975bd516611b876f16503a0c96daf294",
+    "AUTHENTICATED_CLEAN_PLATE_FLIPY_GRAY_100.png": "6dd1920cf96eac3fcc0420519faa7dcc517dca52415a1d711b2bea130f8641a7",
+    "AUTHENTICATED_CLEAN_PLATE_FLIPY_WHITE_75.png": "b71b9ccb655505ded5141834e96f0ea91e5a3c4f883d3ff6a7230dae07ed57d5",
+    "CANONICAL_SOURCE_FLIPY_BLACK_50.png": "0eb75d0fd88320f60f80a80348bcdf3790b4344480c5a38966323ce6a404ec01",
+    "CANONICAL_SOURCE_FLIPY_GRAY_100.png": "6c582d186f18e5c4898db931b55a2265138acc48caebda3d4176ae6dfc8f3dd3",
+    "CANONICAL_SOURCE_FLIPY_WHITE_75.png": "98dbb82fb3715e1fb976e90346d59eb8f7286b79abe7c795f62f1ad3a136a6c8",
+    "CANONICAL_SOURCE_RAW_GRAY_100.png": "cb53ecf1b89d9e28dce024db9c18dc874babf6741aa8b8fd2a30e6522635fd86",
+    "OFFICIAL_FLIPY_BLACK_50.png": "d1263bc91f364848166d41dd9f13553552db2d8d76de1fd4cc539b4a71dc0618",
+    "OFFICIAL_FLIPY_GRAY_100.png": "e3b25fde2fe71b6f00d9c304f9c8db18199ec30d15979f4630a206e3c65ce327",
+    "OFFICIAL_FLIPY_WHITE_75.png": "9bfa9aa11c6b5871e6b844931cacc7f1a5a2c205f81941b51d36c3f2acdeb53c",
+    "OFFICIAL_RAW_GRAY_100.png": "e0e438f39c3d65508bc8a857f31fdfbe4e67a53563b6ae9d3ca826d18d054f3c",
+    "OFFICIAL_TO_TRIAL_PERSISTED_RGBA_CHANGE_MASK.png": "2558f30dfbe8e3f97b9d3ea8d2cb8215e834ad8f02a1ea1c42108ea0198fa96e",
+    "TRIAL_FLIPY_BLACK_50.png": "7f548304755922f71687c659c242d06a8a4bbafcbc2c2b209bcd25ecb148d0b6",
+    "TRIAL_FLIPY_GRAY_100.png": "4b66bf1e61e805331e428f839190342eb0f0fd353a231437092bbd9d9e3cbba4",
+    "TRIAL_FLIPY_WHITE_75.png": "d96e29ad931a7c589eadcbd7b3c750e0ebbbc6a01e62676ccb843eae1390c6ac",
+    "TRIAL_RAW_GRAY_100.png": "43ee577f1756efb8162ba0eadebce56aad0111f4d0b79fb2b18a18733fcefcb5"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 16:41:36 KST",
+  "updated_at_kst": "2026-10-10 16:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -233,6 +233,32 @@
         "new_promoted_dds": 0,
         "RUNTIME_VALIDATION": "UNTESTED",
         "qa": "localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A225_INDEPENDENT_PERSISTED_REWORK.json"
+      },
+      "latest_c1_q219_trial_review": {
+        "role": "C1",
+        "shard": "ODD",
+        "index": 219,
+        "run_key": "OUTRUN-KOR-C1-Q219-A217-EXACT-CHROME-OPTICAL-REWORK-20261010-1650",
+        "canonical_source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+        "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+        "trial_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+        "official_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+        "official_promoted": false,
+        "old_to_trial_changed_rgba": 29487,
+        "old_to_trial_alpha_changed": 12896,
+        "changed_outside_source": 0,
+        "source_clean_changed": 96041,
+        "source_clean_outside": 0,
+        "clean_final_changed": 28219,
+        "clean_final_outside": 0,
+        "C1_result": "TRIAL_REWORK_REQUIRED_SOURCE_FAMILY_CHROME",
+        "triage": "METHOD_CHANGE_REQUIRED",
+        "C3": "BLOCKED",
+        "approved": 0,
+        "new_DDS_from_C1": 0,
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "IGR025": "OPEN",
+        "report": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/C1_Q219_CONTROLLER_INDEPENDENT_REWORK.json"
       }
     },
     "runtime_text_trace": {

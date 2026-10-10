@@ -1,0 +1,182 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 219,
+  "review_id": "C1-Q219-A217-SAVED-CHROME-20261010-1650",
+  "run_key": "OUTRUN-KOR-C1-Q219-A217-EXACT-CHROME-OPTICAL-REWORK-20261010-1650",
+  "review_time_kst": "2026-10-10 approx 16:50 KST",
+  "reviewer": "ChatGPT AI 1 (single inspector; distinct C3 reviewer not claimed)",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "source_origin": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "clean_sha256": "8acd881db0149894c2e35855229851476dbcd4a0676ee78f454e876d37d1f968",
+  "official_sha256": "8310a1e62adb6e742c7c44e489f0169c3e6139548b316d53112e9606f01a7f46",
+  "candidate_sha256": "622f4f9178cc8150672127aa2196f63cb018b52ab10e6df942581486e0c7800d",
+  "candidate_path": "localization/graphics/role_A/20261010-A217-Q219-SOURCE-CHROME-DEPTH-PILOT/A217_Q219_SOURCE_CHROME_DEPTH_TRIAL.dds",
+  "current_official_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "clean_path": "localization/graphics/role_A/20261008-A186R-Q219-SOURCE-HEIGHT-CHROME/A186R_Q219_CLEAN_PLATE.png",
+  "machine_reports": [
+    "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/C1_Q219_EXACT_PERSISTED_MACHINE.json",
+    "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/C1_Q219_SOURCE_CLEAN_COMPOSITE_MACHINE.json"
+  ],
+  "canonical_source_authenticated": true,
+  "clean_source_authenticated": true,
+  "trial_dds_saved_sha_authenticated": true,
+  "official_dds_saved_sha_authenticated": true,
+  "reviewer_sequence": "Inspected saved upstream A217 SOURCE/CLEAN/OFFICIAL/TRIAL visual four-way images then independently downloaded original/clean/official/trial by exact SHA, decoded and directly reviewed lossless persisted native 100/75/50 & RAW images. Producer note later used for path/source identity; this is not blind calibration.",
+  "pixels_before_producer_verdict": false,
+  "blind_defect_calibration_completed": false,
+  "candidate_originality": "First independent C1 decision for this newly distinct A217 SHA, not another review of previous official or A186R SHA.",
+  "source_text": "COURSE SELECT",
+  "localized_text": "코스 선택",
+  "region_inventory": [
+    "course_select"
+  ],
+  "regions": [
+    {
+      "id": "course_select",
+      "bbox_readable_source": [
+        6,
+        1011,
+        1473,
+        1129
+      ],
+      "candidate_changed_bbox_readable": [
+        12,
+        1013,
+        533,
+        1128
+      ],
+      "readable_transform": "flip_y",
+      "source_glyph_slope_anchor": "NOT_MEASURED",
+      "candidate_glyph_slope_anchor": "NOT_MEASURED",
+      "plate_only": {
+        "result": "PASS_SCOPED_MECHANICAL_AND_NATIVE_VISUAL",
+        "source_clean_changed": 96041,
+        "outside": 0,
+        "source_alpha_removed": 96041,
+        "clean_alpha": 0,
+        "observation": "Direct SHA-authenticated source and CLEAN same native PNG; source chrome face removed in original source box without altered neighboring atlas cells; original unrelated colored bars below title are preserved."
+      },
+      "composite_only": {
+        "result": "PASS_SCOPED_MECHANICAL",
+        "clean_final_changed": 28219,
+        "clean_final_changed_outside": 0,
+        "clean_final_alpha_changed_outside": 0,
+        "observation": "Persisted saved DDS compared against SHA-authenticated CLEAN in readable RGBA. Source allowed ROI entirely contains changes; no masked-away infringement. Numeric cannot override style FAIL."
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No independently sourced top/bottom glyph-anchor measurements; final Korean silhouette is visually not a faithful connected racing-metal source family; no numeric slant PASS."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Authentic SOURCE->CLEAN changes 96,041 within source effect, 0 outside, CLEAN alpha inside 0; visually seamless background."
+        },
+        "style": {
+          "result": "FAIL",
+          "reason": "SOURCE_FAMILY_MISMATCH",
+          "observation": "Canonical English is continuous welded rounded smooth horizontal beveled chrome with broad curved counters and integral elongated roof; persisted Korean A217 is separated blocky face with sharp square/fragmented step highlights and oversized stacked extrusion/rails. Native grayscale and black50 immediately show materially different family/depth, notwithstanding numeric containment."
+        },
+        "readability": {
+          "result": "PASS_SCOPED_NOT_APPROVAL",
+          "observation": "Korean 코스 선택 is legible at native and black50 but source hierarchy/material character differs; legibility alone is insufficient."
+        },
+        "glyph_integrity": {
+          "result": "HOLD_STYLE_DEFECT",
+          "observation": "No tofu or missing syllable confirmed but beveled rails/contours alter visual glyph silhouette and harm source family; distinct glyph-stroke damage not separately proven."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Old official->trial 29,487 changed RGBA & 12,896 alpha, both 0 outside original bbox; source->CLEAN and CLEAN->final also 0 outside. Adjacent orange/blue baseline art unchanged by new trial."
+        },
+        "placement": {
+          "result": "HOLD_SOURCE_HIERARCHY",
+          "observation": "Trial changed bbox [12,1013,533,1128] stays inside source [6,1011,1473,1129] and leaves positive margins. Korean shorter wording cannot be rejected only by English-width ratio; optical weight & horizontal continuity are independently unacceptable."
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Saved DDS RAW vertical mirror is consistent with canonical English RAW; FLIP-Y gives readable Korean. Only authored mip0/mip1 recorded; no game-composed validation."
+        }
+      }
+    }
+  ],
+  "raw_and_practical_png": {
+    "CANONICAL_SOURCE_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/CANONICAL_SOURCE_FLIPY_GRAY_100.png",
+      "sha256": "6c582d186f18e5c4898db931b55a2265138acc48caebda3d4176ae6dfc8f3dd3"
+    },
+    "AUTHENTICATED_CLEAN_PLATE_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/AUTHENTICATED_CLEAN_PLATE_FLIPY_GRAY_100.png",
+      "sha256": "6dd1920cf96eac3fcc0420519faa7dcc517dca52415a1d711b2bea130f8641a7"
+    },
+    "OFFICIAL_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/OFFICIAL_FLIPY_GRAY_100.png",
+      "sha256": "e3b25fde2fe71b6f00d9c304f9c8db18199ec30d15979f4630a206e3c65ce327"
+    },
+    "TRIAL_FLIPY_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/TRIAL_FLIPY_GRAY_100.png",
+      "sha256": "4b66bf1e61e805331e428f839190342eb0f0fd353a231437092bbd9d9e3cbba4"
+    },
+    "CANONICAL_SOURCE_FLIPY_BLACK_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/CANONICAL_SOURCE_FLIPY_BLACK_50.png",
+      "sha256": "0eb75d0fd88320f60f80a80348bcdf3790b4344480c5a38966323ce6a404ec01"
+    },
+    "AUTHENTICATED_CLEAN_PLATE_FLIPY_BLACK_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/AUTHENTICATED_CLEAN_PLATE_FLIPY_BLACK_50.png",
+      "sha256": "b86f4a1392715c6f292fbd9a6dad653f975bd516611b876f16503a0c96daf294"
+    },
+    "TRIAL_FLIPY_BLACK_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/TRIAL_FLIPY_BLACK_50.png",
+      "sha256": "7f548304755922f71687c659c242d06a8a4bbafcbc2c2b209bcd25ecb148d0b6"
+    },
+    "TRIAL_FLIPY_WHITE_75.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/TRIAL_FLIPY_WHITE_75.png",
+      "sha256": "d96e29ad931a7c589eadcbd7b3c750e0ebbbc6a01e62676ccb843eae1390c6ac"
+    },
+    "CANONICAL_SOURCE_RAW_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/CANONICAL_SOURCE_RAW_GRAY_100.png",
+      "sha256": "cb53ecf1b89d9e28dce024db9c18dc874babf6741aa8b8fd2a30e6522635fd86"
+    },
+    "TRIAL_RAW_GRAY_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/TRIAL_RAW_GRAY_100.png",
+      "sha256": "43ee577f1756efb8162ba0eadebce56aad0111f4d0b79fb2b18a18733fcefcb5"
+    },
+    "OFFICIAL_TO_TRIAL_PERSISTED_RGBA_CHANGE_MASK.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/evidence/OFFICIAL_TO_TRIAL_PERSISTED_RGBA_CHANGE_MASK.png",
+      "sha256": "2558f30dfbe8e3f97b9d3ea8d2cb8215e834ad8f02a1ea1c42108ea0198fa96e"
+    }
+  },
+  "exact_byte_measures": {
+    "old_to_trial_changed_rgba": 29487,
+    "old_to_trial_changed_alpha": 12896,
+    "changed_outside_source_rgba": 0,
+    "changed_outside_source_alpha": 0,
+    "source_clean_changed_rgba": 96041,
+    "source_clean_outside_rgba": 0,
+    "clean_trial_changed_rgba": 28219,
+    "clean_trial_outside_rgba": 0
+  },
+  "inspection_result": "REWORK_REQUIRED",
+  "reason_code": "SOURCE_FAMILY_MISMATCH",
+  "escalation": "METHOD_CHANGE_REQUIRED",
+  "triage": "python tools/localization/rework_triage.py --index 219",
+  "triage_source": "Latest GitHub asset_queue.csv and REWORK_ESCALATIONS.json read only; independent failures already cited.",
+  "official_queue_candidate_changed": false,
+  "trial_promoted": false,
+  "new_dds_by_C1": 0,
+  "qa_evidence_approved": false,
+  "C3": "NOT_RUN_BLOCKED",
+  "user_ingame_backlog": "IGR025_OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Producer new source-derived genuinely rounded/welded Korean course-selector chrome family pilot. Do not retry width stretch or artificial fragmented metallic rails. Revalidate same source CLEAN and per-glyph construction; create materially changed persisted SHA, independent C1 with blind calibration & source-slant anchors, separate C3; actual user in-game retest still required. Do not alter or approve official bytes.",
+  "exclusion": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "backend": "GitHub connector for SSOT/history/blob publishing + ChatGPT local preliminary review; N100 MCP fallback only for 16 MB DDS direct decode after container DNS failure."
+}
