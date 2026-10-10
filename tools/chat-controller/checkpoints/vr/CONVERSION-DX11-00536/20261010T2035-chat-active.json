@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "chat_worker_progress",
+  "task_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E001",
+  "work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00536",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "validation_bearing_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "checkpoint": "C3_WAITING_CI",
+  "status": "WAITING_CI",
+  "ci_run_id": 38048751349,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "last_real_activity_evidence": "GitHub material CAS result + exact-SHA fast structural success + Gate run 38048751349 active; no HMD test",
+  "next_action": "Inspect exact-SHA Gate validate+smoke and report R239 GPU vs inherited R175 independently; do not duplicate source edits",
+  "source_branch_head_at_last_verification": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "score_change": 0
+}
