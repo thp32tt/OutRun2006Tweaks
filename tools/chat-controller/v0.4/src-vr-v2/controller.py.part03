@@ -60,6 +60,197 @@ def _production_number(production_id: str) -> Optional[int]:
     return int(match.group(1)) if match else None
 
 
+# Feature-level VR pipeline: develop on CI-quiet branches; promote one ready
+# material SHA to the canonical branch and run full Actions exactly there.
+VR_FEATURE_DEVELOPMENT_ENABLED = os.environ.get(
+    "VR_FEATURE_DEVELOPMENT_ENABLED", "true"
+).strip().lower() in {"1", "true", "yes", "on"}
+VR_FEATURE_POLL_SECONDS = max(30, int(os.environ.get("VR_FEATURE_POLL_SECONDS", "60")))
+VR_FEATURE_C6_REMINDER_SECONDS = max(60, int(os.environ.get("VR_FEATURE_C6_REMINDER_SECONDS", "90")))
+
+
+def vr_feature_branch_name(lane: str, task_id: str) -> str:
+    if lane not in {"DX11", "DX9EX"} or not re.fullmatch(
+        r"CONVERSION-(?:DX11|DX9EX)-[0-9]{5,}", str(task_id or "")
+    ) or not task_id.startswith("CONVERSION-" + lane + "-"):
+        raise ValueError("INVALID_FEATURE_IDENTITY")
+    return f"vr-d3d9ex-review-feature-{lane.lower()}-{task_id.rsplit('-', 1)[-1]}"
+
+
+def github_feature_mutate(method: str, endpoint: str, payload: dict) -> dict:
+    """GitHub REST write using Docker's authorized token; no force-push."""
+    if not GITHUB_TOKEN:
+        raise RuntimeError("FEATURE_GITHUB_TOKEN_REQUIRED")
+    data = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.github.com" + endpoint, data=data, method=method,
+        headers={
+            "Authorization": "Bearer " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "outrun-chat-controller/feature-pipeline",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=20) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def github_create_feature_branch(lane: str, task_id: str, base_sha: str) -> str:
+    """Create a new task-owned branch once; an unrelated existing tip is a blocker."""
+    branch = vr_feature_branch_name(lane, task_id)
+    endpoint = f"/repos/{GITHUB_REPO}/git/ref/heads/{urllib.parse.quote(branch, safe='')}"
+    try:
+        existing = github_api_json(endpoint).get("object", {}).get("sha")
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404:
+            raise
+        existing = None
+    if existing:
+        if existing != base_sha:
+            raise RuntimeError("FEATURE_BRANCH_ALREADY_ADVANCED_REQUIRES_RECONCILIATION")
+        return branch
+    try:
+        github_feature_mutate("POST", f"/repos/{GITHUB_REPO}/git/refs", {
+            "ref": "refs/heads/" + branch, "sha": base_sha,
+        })
+    except urllib.error.HTTPError as exc:
+        if exc.code != 422:
+            raise
+        # Concurrent creation is acceptable only at the exact expected base.
+        if github_branch_head(branch) != base_sha:
+            raise
+    if github_branch_head(branch) != base_sha:
+        raise RuntimeError("FEATURE_BRANCH_CREATE_NOT_VERIFIED")
+    return branch
+
+
+def github_feature_ready_record(active: dict, feature_head: str) -> Optional[dict]:
+    """Only an explicit feature-ready record can authorize promotion."""
+    task_id = active["task_id"]
+    path = "docs/automation/runs/" + task_id + ".json"
+    endpoint = (
+        f"/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(path, safe='/')}"
+        f"?ref={urllib.parse.quote(feature_head, safe='')}"
+    )
+    try:
+        obj = github_api_json(endpoint)
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        raise
+    record = json.loads(base64.b64decode(obj["content"]).decode("utf-8"))
+    if not isinstance(record, dict):
+        return None
+    acceptance = record.get("feature_acceptance")
+    if not isinstance(acceptance, dict):
+        return None
+    if not (
+        record.get("task_id") == task_id
+        and record.get("feature_id") == active.get("feature_id")
+        and record.get("feature_branch") == active.get("feature_branch")
+        and record.get("target_branch") == active.get("branch")
+        and str(record.get("feature_status") or "").upper() == "FEATURE_READY"
+        and acceptance.get("implementation_complete") is True
+        and acceptance.get("targeted_checks")
+        and acceptance.get("integration_contract")
+        and record.get("work_key")
+    ):
+        return None
+    return record
+
+
+def github_feature_promote_ready(active: dict, now: datetime) -> bool:
+    """Fail-closed, fast-forward promotion of a completed feature snapshot.
+
+    The pre-existing review prefix avoids broad Build on intermediate refs.
+    Before the one target push verify feature ownership, real source changes,
+    final marker, explicit acceptance and unchanged branch ancestry.
+    """
+    feature_branch = active.get("feature_branch")
+    if not feature_branch or active.get("phase") != "WAIT_CHAT":
+        return False
+    previous = _parse_iso(active.get("feature_last_poll_at"))
+    if previous and (now - previous).total_seconds() < VR_FEATURE_POLL_SECONDS:
+        return False
+    active["feature_last_poll_at"] = now.isoformat()
+    feature_head = github_branch_head(feature_branch)
+    if not feature_head:
+        active["feature_blocker"] = "FEATURE_BRANCH_UNAVAILABLE"
+        return False
+    if feature_head != active.get("feature_last_head"):
+        active["feature_last_head"] = feature_head
+        active["feature_last_real_activity_at"] = now.isoformat()
+    if feature_head == active.get("feature_base_sha"):
+        return False
+
+    record = github_feature_ready_record(active, feature_head)
+    if not record:
+        active["feature_stage"] = "IMPLEMENTING"
+        return False
+    active["feature_stage"] = "FEATURE_READY"
+    active["feature_work_key"] = record["work_key"]
+    msg = github_commit_message(feature_head)
+    if not msg or f"[AUTO:{active['task_id']}]" not in msg:
+        active["feature_blocker"] = "FINAL_FEATURE_COMMIT_MARKER_MISSING"
+        return False
+    if github_actions_skip_directive(msg):
+        active["feature_blocker"] = "FINAL_FEATURE_COMMIT_CI_SKIP_FORBIDDEN"
+        return False
+
+    target_head = github_branch_head(active["branch"])
+    if not target_head:
+        active["feature_blocker"] = "TARGET_HEAD_UNAVAILABLE"
+        return False
+    comparison = github_api_json(
+        f"/repos/{GITHUB_REPO}/compare/{target_head}...{feature_head}"
+    )
+    files = comparison.get("files") or []
+    substantive = any(
+        str(item.get("filename") or "").startswith(("src/", "vrhost/"))
+        or str(item.get("filename") or "") in {"CMakeLists.txt", "cmake.toml"}
+        for item in files
+    )
+    if not (
+        comparison.get("status") == "ahead"
+        and int(comparison.get("behind_by", -1)) == 0
+        and int(comparison.get("ahead_by", 0)) > 0
+        and substantive
+        and not comparison.get("too_large")
+    ):
+        active["feature_blocker"] = "FEATURE_REBASE_OR_SOURCE_REQUIRED"
+        return False
+
+    # No unverified tip changes between the frozen ready record and the push.
+    if github_branch_head(feature_branch) != feature_head:
+        active["feature_blocker"] = "FEATURE_HEAD_CHANGED_RETRY"
+        return False
+    try:
+        github_feature_mutate(
+            "PATCH",
+            f"/repos/{GITHUB_REPO}/git/refs/heads/{urllib.parse.quote(active['branch'], safe='')}",
+            {"sha": feature_head, "force": False},
+        )
+    except urllib.error.HTTPError as exc:
+        if exc.code in (409, 422):
+            active["feature_blocker"] = "TARGET_MOVED_REBASE_REQUIRED"
+            return False
+        raise
+    if github_branch_head(active["branch"]) != feature_head:
+        active["feature_blocker"] = "FEATURE_PROMOTION_NOT_VERIFIED"
+        return False
+    active["result_sha"] = feature_head
+    active["result_message"] = msg
+    active["feature_stage"] = "VALIDATING"
+    active["feature_promoted_at"] = now.isoformat()
+    active["feature_blocker"] = None
+    active["phase"] = "WAIT_ACTIONS"
+    active["wait_actions_started_at"] = now.isoformat()
+    active["last_gate_poll_at"] = None
+    active.pop("gate_run", None)
+    return True
+
+
 def github_stale_event_guard(active: dict, trigger: str) -> bool:
     """Drop stale retry/rollover work before it can reopen an older production task."""
     if CONTROLLER_MODE != "conversion":
@@ -136,7 +327,9 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
             )
             return True
 
-        if task_commit and task_commit.get("sha") and not repair_send:
+        if task_commit and task_commit.get("sha") and not repair_send and (
+        task_commit.get("sha") != active.get("retry_failed_sha")
+    ):
             active["result_sha"] = task_commit["sha"]
             active["result_message"] = task_commit.get("message", "")
             active["phase"] = "WAIT_ACTIONS"
@@ -180,6 +373,14 @@ def queue_rollover_prompt(active: dict) -> str:
         "VR 작업은 30분 주기로 새 대화로 전환한다. 이전 대화가 반드시 실패한 것은 아니다. GitHub 체크포인트와 게임 브랜치의 커밋으로 실제 진행 상태를 복원해.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
+        "FEATURE_ID=" + str(active.get("feature_id") or ""),
+        "FEATURE_BRANCH=" + str(active.get("feature_branch") or ""),
+        "FEATURE_STAGE=" + str(active.get("feature_stage") or ""),
+        "FEATURE_BASE_SHA=" + str(active.get("feature_base_sha") or ""),
+        "FEATURE_LAST_HEAD=" + str(active.get("feature_last_head") or ""),
+        "기능 미완료 시 실제 변경 소스는 컨트롤러 체크포인트 브랜치의 TASK_ID별 source patch로 5분마다 보존하고, FEATURE_BRANCH 및 TARGET_BRANCH로 중간 push/전체 빌드를 하지 마.",
+        "기능 구현·국소 검증이 끝나면 체크포인트 패치를 FEATURE_BRANCH에 결합하여 FEATURE_READY 작업 기록 및 최종 [AUTO:TASK_ID] 커밋을 한 번 생성해. 컨트롤러가 fast-forward로 대상 브랜치에 게시한다.",
+
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
         "CHECKPOINT_BRANCH=" + VR_CHECKPOINT_BRANCH,
         "CHECKPOINT_PATH=" + str(active.get("vr_checkpoint_last_path") or ""),
@@ -295,6 +496,10 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
         "last_hash_changed_at", "last_gate_poll_at", "wait_actions_started_at",
         "failure_context", "last_gate_status", "automation_validation",
         "runtime_validation", "last_liveness_reason", "chat_liveness",
+        "feature_id", "feature_branch", "feature_stage", "feature_goal",
+        "feature_base_sha", "feature_last_head", "feature_last_real_activity_at",
+        "feature_work_key", "feature_blocker", "feature_promoted_at",
+        "retry_failed_sha", "last_c6_finalize_at", "c6_finalize_count",
     )
     details = {k: active.get(k) for k in allowed if k in active}
     # Failure/commit text can contain user data. Preserve only short, typed identifiers.
@@ -781,6 +986,8 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     runtime["queue_wave_id"] = active.get("wave_id")
     runtime["queue_failure_context"] = reason
     runtime["queue_qa_batch"] = active.get("qa_batch") or []
+    runtime["queue_feature_id"] = active.get("feature_id") or ""
+    runtime["queue_feature_branch"] = active.get("feature_branch") or ""
 
     previous_event_id = active.get("event_id")
     previous_event_type = active.get("event_type")
@@ -820,8 +1027,12 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     active["sent_at"] = now.isoformat()
     active["last_hash"] = None
     active["last_hash_changed_at"] = now.isoformat()
+    active["retry_failed_sha"] = active.get("result_sha")
     active["result_sha"] = None
     active["phase"] = "WAIT_CHAT"
+    if active.get("feature_branch"):
+        active["feature_stage"] = "IMPLEMENTING"
+        active.pop("feature_blocker", None)
     active["last_gate_poll_at"] = None
     active.pop("wait_actions_started_at", None)
     active.pop("missing_gate_run_detected_at", None)
@@ -1742,6 +1953,22 @@ async def conversion_send_lane_task(
         "chat_rollovers": 0,
     }
     event = append_task_event(reg, draft, "dispatch")
+    feature_branch = None
+    if VR_FEATURE_DEVELOPMENT_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
+        try:
+            feature_branch = await asyncio.to_thread(
+                github_create_feature_branch, target["lane"], production_id, base_sha
+            )
+        except Exception as exc:
+            log.warning("Feature branch create blocked task=%s: %r", production_id, exc)
+            write_runtime(
+                status="feature_branch_create_blocked",
+                last_action=f"{production_id} feature branch unavailable: {type(exc).__name__}",
+                queue=q,
+            )
+            return False
+    runtime["queue_feature_id"] = production_id if feature_branch else ""
+    runtime["queue_feature_branch"] = feature_branch or ""
     runtime["queue_task_id"] = production_id
     runtime["queue_production_id"] = production_id
     runtime["queue_event_id"] = event.event_id
@@ -1805,6 +2032,13 @@ async def conversion_send_lane_task(
         "branch": target["branch"],
         "workflow": target["workflow"],
         "base_sha": base_sha,
+        "feature_id": production_id if feature_branch else None,
+        "feature_branch": feature_branch,
+        "feature_stage": "IMPLEMENTING" if feature_branch else "LEGACY",
+        "feature_goal": "Choose and complete one coherent end-to-end milestone" if feature_branch else None,
+        "feature_base_sha": base_sha if feature_branch else None,
+        "feature_last_head": base_sha if feature_branch else None,
+        "feature_started_at": sent_at.isoformat() if feature_branch else None,
         "result_sha": None,
         "attempt": 1,
         "retry_count": 0,
@@ -1830,6 +2064,54 @@ async def conversion_send_lane_task(
     return True
 
 
+async def conversion_request_feature_c6(
+    context: BrowserContext, pages: dict, active: dict, q: dict,
+    now: datetime, reason: str,
+) -> bool:
+    """Ask for missing C6 bookkeeping after exact-SHA CI PASS, never rebuild."""
+    active.setdefault("c6_wait_started_at", now.isoformat())
+    first = _parse_iso(active.get("c6_wait_started_at")) or now
+    if (now - first).total_seconds() < VR_FEATURE_C6_REMINDER_SECONDS:
+        return False
+    last = _parse_iso(active.get("last_c6_finalize_at"))
+    if last and (now - last).total_seconds() < VR_FEATURE_C6_REMINDER_SECONDS * 2:
+        return False
+    if int(active.get("c6_finalize_count", 0)) >= 2:
+        return False
+    reg = load_registry(now)
+    slot = next((x for x in reg.slots if x.name == active.get("slot")), None)
+    if slot is None or send_guard_reason(reg, slot, now):
+        return False
+    page = await slot_page(context, pages, slot)
+    if await detect_busy(page) or not await ensure_logged_in(page):
+        return False
+    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        if not await ensure_logged_in(page):
+            return False
+    message = (
+        f"[FEATURE C6 RESULT ONLY] TASK_ID={active['task_id']} "
+        f"FEATURE_ID={active.get('feature_id')} TARGET_BRANCH={active['branch']} "
+        f"VALIDATION_SHA={active.get('result_sha')}\\n"
+        "정확한 SHA의 GitHub CI는 SUCCESS다. 소스를 다시 수정하거나 전체 빌드/CI를 재실행하지 마. "
+        f"docs/automation/runs/{active['task_id']}.json 에 C6 PASS_EXACT_SHA 결과를 "
+        "별도 bookkeeping 커밋([skip ci])으로 기록해. "
+        f"보류 사유={reason}. HMD 미실행 시 RUNTIME_VALIDATION=UNTESTED. "
+        "검증 SHA를 변경하거나 중복 점수 반영하지 마."
+    )
+    if await send_message(page, message) != "sent":
+        return False
+    at = datetime.now(TZ)
+    note_successful_request(reg, at, slot.name)
+    slot.last_sent_at = at.isoformat()
+    slot.last_result = "feature_c6_finalize_requested"
+    active["last_c6_finalize_at"] = at.isoformat()
+    active["c6_finalize_count"] = int(active.get("c6_finalize_count", 0)) + 1
+    save_registry(reg)
+    save_queue_state(q)
+    return True
+
+
 async def conversion_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -1852,14 +2134,33 @@ async def conversion_process_lane(
 
         if active["phase"] == "WAIT_CHAT":
             task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
+                task_commit = None
             if task_commit:
                 active["result_sha"] = task_commit["sha"]
                 active["result_message"] = task_commit["message"]
                 active["phase"] = "WAIT_ACTIONS"
+                if active.get("feature_branch"):
+                    active["feature_stage"] = "VALIDATING"
                 active["wait_actions_started_at"] = now.isoformat()
                 active["last_gate_poll_at"] = None
                 save_queue_state(q)
                 return
+
+            if active.get("feature_branch"):
+                try:
+                    if await asyncio.to_thread(github_feature_promote_ready, active, now):
+                        save_queue_state(q)
+                        write_runtime(
+                            status="feature_promoted_for_final_ci",
+                            last_action=f"{active['task_id']} feature ready; exact-SHA Gate requested",
+                            queue=q,
+                        )
+                        return
+                except Exception as exc:
+                    log.warning("Feature promotion postponed task=%s: %r", active["task_id"], exc)
+                    active["feature_blocker"] = "FEATURE_PROMOTION_ERROR:" + type(exc).__name__
+                    save_queue_state(q)
 
             if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
                 return
@@ -1901,6 +2202,8 @@ async def conversion_process_lane(
                 return
 
             task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
+                task_commit = None
             if not task_commit:
                 sent_at = _parse_iso(active.get("sent_at")) or now
                 if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
@@ -2014,6 +2317,13 @@ async def conversion_process_lane(
                             last_action=f"{active['task_id']} gate SUCCESS but task not released: {reason}",
                             queue=q,
                         )
+                    if active.get("feature_branch") and reason in {
+                        "RUN_RECORD_NOT_FOUND", "C6_NOT_COMPLETE",
+                        "TERMINAL_STATUS_NOT_COMPLETE",
+                    }:
+                        await conversion_request_feature_c6(
+                            context, pages, active, q, now, reason
+                        )
                     # A durable C6 record may never arrive (e.g. a historical
                     # task whose exact-SHA CI passed but final record is absent).
                     # Preserve the evidence as BLOCKED, never mislabel PASS, and
@@ -2039,6 +2349,8 @@ async def conversion_process_lane(
                 active["terminal_verification"] = reason
                 active["terminal"] = "PASS"
                 active["phase"] = "DONE"
+                if active.get("feature_branch"):
+                    active["feature_stage"] = "COMPLETE"
                 q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
                 save_queue_state(q)
                 write_runtime(
@@ -2067,6 +2379,8 @@ async def conversion_process_lane(
             active["phase"] = "BLOCKED"
 
     if active.get("phase") == "BLOCKED":
+        if active.get("feature_branch"):
+            active["feature_stage"] = "BLOCKED"
         active["automation_validation"] = "FAIL"
         active["runtime_validation"] = "UNTESTED"
         active["blocked_at"] = now.isoformat()
@@ -3153,5 +3467,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
