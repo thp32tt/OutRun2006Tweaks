@@ -430,7 +430,10 @@ namespace OutRunVRStereo
             R31MarkStateBlockCachesDirty();
         }
 
-        void R31OnStateBlockApply(IDirect3DDevice9*, HRESULT hr) noexcept
+        // Keep the state-block callback translation-unit local and match the
+        // generation producer contract. No change to when NoteApply/dirty
+        // invalidation actually execute.
+        static void R31OnStateBlockApply(IDirect3DDevice9*, HRESULT hr) noexcept
         {
             OutRunVR::State::StateBlockTracker::NoteApply();
             R31MarkStateBlockCachesDirty();
