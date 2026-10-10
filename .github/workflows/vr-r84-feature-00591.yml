@@ -15,6 +15,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: R29 IPC owner ABI and 33 negative mutation checks
         run: python3 tools/verify_vr_r29_owner_api_seam.py
+      - name: R30 producer-consumer owner seam regression
+        run: python3 tools/verify_vr_r30_support_api_seam.py
+      - name: R84 complete host-game-fullchain bundle contract
+        run: python3 tools/verify_vr_r84_feature_bundle.py
   r84-win32:
     needs: r84-local
     runs-on: windows-2022
