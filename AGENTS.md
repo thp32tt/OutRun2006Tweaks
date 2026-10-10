@@ -1,3 +1,11 @@
+# DX9Ex functional-feature completion gate — 2026-10-10 21:40 KST (top precedence)
+
+- **User directive: work and debug by COMPLETE FUNCTION, not one tiny change per finished work item.** Applies to autonomous C DX9Ex and controller dispatch. Read `docs/DX9EX_AUTODEV_PRIORITY_20261010.md` and `docs/automation/QUEUE_CONTROLLER_CONTRACT.md` latest active feature-scoped sections at every dispatch. These override older single-seam/small-task terminal practices.
+- Keep one stable FEATURE_ID / work_key / TASK_ID for a functional deliverable across multiple meaningful code commits, local negative tests, integrated Win32 build/link, error repair and same-SHA DX9Ex Active + Domain Isolation CI. Only the feature-level acceptance checklist all-green can reach DONE_BUILD_VERIFIED; `FEATURE_READY`, `PENDING_CONTROLLER_EXACT_SHA`, partial compile, one passing test, a skipped/failing required job and chat rollover are not completion. Resume the same TASK_ID on error or rollover, respecting existing live claims; never increment score for partial micro-commits or retry.
+- **R84 is one whole outstanding feature:** finish remaining R33→R32→R31→R30→R29 independent TU/headers/lower-symbol boundaries and cmkr/CMake/HEADER_FILE_ONLY reconciliation, full Win32 compile/link, fix build failures, pass relevant exact-SHA gates, then close `SUPERSEDED_BY_DX9EX_FOCUS`; no per-seam terminal DONE. Existing working hook/state/FFB/HUD behavior and immutable rollback are protected.
+- Repair true blockers under the same feature; classify irrecoverable cases BLOCKED with exact evidence, not DONE. Quest3 hardware remains UNTESTED until actually exercised. DX11 A continues independently, DXVK B stays frozen. GitHub policy commit is NOT proof of live Docker reload; deployment is done by the user.
+- Known nonterminal example: DX9Ex 00590 SHA dbf6678e had `FEATURE_READY` yet DX9Ex Active run 38051682030 failed the R31 Apply-generation verifier, skipping full-chain work. Treat it as pending repair/validation, not a completed function.
+
 # Effective backend execution policy (2026-10-10; supersedes older cross-lane freezes)
 
 - **A DX11 Native ACTIVE** at `vr-dx11-native-r71`, highest global conversion priority; independent A development MUST NOT wait for DX9Ex visual, R84 or Architecture v3 Quest3 acceptance.
