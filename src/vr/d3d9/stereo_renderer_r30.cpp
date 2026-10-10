@@ -2055,7 +2055,7 @@ namespace OutRunVRStereo
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 R29OwnerArmMonoSafety();
                 return leftHr;
@@ -2069,10 +2069,10 @@ namespace OutRunVRStereo
             bool restoreOk = true;
             {
                 R30ScopedInternalPass guard;
-                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
+                rightHr = R29OwnerCallOriginalSetRenderTarget(
                     device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
                 if (SUCCEEDED(rightHr))
-                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                    rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
                         device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&state.viewport);
@@ -2082,7 +2082,7 @@ namespace OutRunVRStereo
                         OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = rightDraw();
                 }
-                restoreOk = RestoreRightPassState(device,
+                restoreOk = R29OwnerRestoreRightPassState(device,
                     savedRt, savedDepth, state.viewport, nullptr, false);
             }
 
@@ -2099,7 +2099,7 @@ namespace OutRunVRStereo
                 }
                 else if (R29OwnerCaptureFrameSnapshot().poseSequence != state.stereo.poseSequence)
                 {
-                    FrameRightDrawFailed = true;
+                    R29OwnerMarkRightDrawFailed();
                     PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
                 }
                 FrameHadWorldStereo = true;
@@ -2125,9 +2125,9 @@ namespace OutRunVRStereo
 
             if (FAILED(rightHr))
             {
-                FrameRightDrawFailed = true;
+                R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(rightFailure, site, rightHr);
+                R29OwnerReportStereoFailure(rightFailure, site, rightHr);
                 R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
@@ -2864,7 +2864,7 @@ namespace OutRunVRStereo
                 }
                 if (!restored)
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback");
                     R29OwnerArmMonoSafety();
                     return E_FAIL;
@@ -2891,7 +2891,7 @@ namespace OutRunVRStereo
                 R30ScopedInternalPass guard;
                 if (FAILED(device->SetScissorRect(&savedScissor)))
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-scissor");
                     R29OwnerArmMonoSafety();
                 }
@@ -2903,7 +2903,7 @@ namespace OutRunVRStereo
                     R30ScopedInternalPass guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 if (!restored)
                     R29OwnerNoteRestoreFailure("R30 HUD left draw c64");
@@ -2919,11 +2919,11 @@ namespace OutRunVRStereo
             bool restoreOk = true;
             {
                 R30ScopedInternalPass guard;
-                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
+                rightHr = R29OwnerCallOriginalSetRenderTarget(
                     device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
                 if (SUCCEEDED(rightHr))
                 {
-                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                    rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
                         device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
                 }
                 if (SUCCEEDED(rightHr))
@@ -2942,7 +2942,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
+                restoreOk = R29OwnerRestoreRightPassState(device, savedRt, savedDepth,
                     savedViewport, original, true);
                 if (transformScissor &&
                     FAILED(device->SetScissorRect(&savedScissor)))
@@ -2976,9 +2976,9 @@ namespace OutRunVRStereo
 
             if (FAILED(rightHr))
             {
-                FrameRightDrawFailed = true;
+                R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(rightFailure, site, rightHr);
+                R29OwnerReportStereoFailure(rightFailure, site, rightHr);
                 R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
@@ -3521,7 +3521,7 @@ namespace OutRunVRStereo
         OutRunVR::StereoFailureReason reason,
         const char* site, HRESULT hr) noexcept
     {
-        R9Poison(reason, site, hr);
+        R29OwnerReportStereoFailure(reason, site, hr);
     }
 
     void R30SupportInvalidateRightDepthStencilSync(
@@ -3763,16 +3763,14 @@ namespace OutRunVRStereo
         IDirect3DDevice9* device, DWORD index,
         IDirect3DSurface9* surface) noexcept
     {
-        return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);
+        return R29OwnerCallOriginalSetRenderTarget(device, index, surface);
     }
 
     HRESULT R30SupportCallOriginalSetDepthStencilSurface(
         IDirect3DDevice9* device,
         IDirect3DSurface9* surface) noexcept
     {
-        return SetDepthStencilSurfaceHook
-            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)
-            : device->SetDepthStencilSurface(surface);
+        return R29OwnerCallOriginalSetDepthStencilSurface(device, surface);
     }
 
     void R30SupportRecordWorldStereoDuplicate(
@@ -3799,7 +3797,7 @@ namespace OutRunVRStereo
 
     void R30SupportMarkFrameRightDrawFailed() noexcept
     {
-        FrameRightDrawFailed = true;
+        R29OwnerMarkRightDrawFailed();
     }
 
     void* R30SupportResetTarget() noexcept
