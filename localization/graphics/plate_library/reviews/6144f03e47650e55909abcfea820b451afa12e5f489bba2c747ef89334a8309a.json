@@ -1,0 +1,72 @@
+{
+  "schema": "clean-plate-review-v1",
+  "manifest_sha256": "6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a",
+  "reviewer": "C2",
+  "queue_index": 60,
+  "region_id": "BEST_TIME",
+  "status": "PLATE_PASS",
+  "independent_review_id": "C372-C2-Q060-BEST-TIME-PLATE-20261011",
+  "reviewed_at_kst": "2026-10-11 03:29 KST",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "removal_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "orientation": "readable_flip_y",
+  "size": [
+    4096,
+    2048
+  ],
+  "decision_scope": "Independent C2 approval of reused SOURCE-FIRST CLEAN PLATE only; no C or C3 approval of any Korean DDS, no user actual-game closure.",
+  "observations": {
+    "plate_only": "PASS: C2 directly inspected SHA-verified source DDS vs exact library CLEAN PNG at source native100 gray, white75 and black50. English BEST TIME face, white rim, orange glow and navy sidewall fully removed; target alpha0 and no recognizable halo/ghost/box in scoped ROI.",
+    "source_removal": "PASS: 89391 removal-mask pixels, 89391 source alpha-positive mask pixels and 89391 rgba/alpha changed inside only; zero source alpha-zero pixels falsely masked, zero clean alpha nonzero in mask.",
+    "protected_art": "PASS: full 4096x2048 SOURCE vs CLEAN outside mask 0 RGBA and alpha. OUTRUN MILES upper preserved ROI 51879 alpha-positive unchanged, HOLLY WOLF lower ROI 71466 alpha-positive unchanged. No 1px intrusion into other atlas content.",
+    "readable_and_raw": "PASS: C2 inspected 100% FLIPY readable full-context and actual mirrored RAW gray context. Both show the same BEST TIME removal and neighboring preserved lettering in their own correct orientations.",
+    "background": "PASS scoped: Native+75+50 on black/gray/white visibly shows clean transparent region with no rectangular residue, bright edge, isolated leftover stroke or patch seam. No colored/semiopaque plate reconstruction attempted.",
+    "manifest_binding": "PASS: q060 BEST_TIME readable_flip_y manifest identity 6144f03e..., immutable CLEAN a03687d4..., removal 25a89817..., pinned original 6a33c730... all checked; no competing q060 manifest in current entries.",
+    "limitations": "Plate-only pass does NOT validate new lettering, source-family face/depth/italic, consumer-composed game HUD, new/old Korean DDS, C3, IGR044, final export or runtime."
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG128_100.png",
+      "sha256": "aa9850aae4e934d20d6640cd22c97a0c98732b06042bf34231f90c50e7aa5994"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG0_50.png",
+      "sha256": "49eecac4c9d9b99802b5d45b75181df5c40dcfce2c3640b037446f640cf112cb"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG255_75.png",
+      "sha256": "d9cafe0c40a6624ab009077fd4a7751f757aa1c4c22ed8fd4f00f41e5851587e"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_FULL_CONTEXT_FLIPY_GRAY100.png",
+      "sha256": "cb6ee4eacbebd2ba18649d1deeb7e2ca73ac36933a7eed1037f831c90e2761d7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_FULL_CONTEXT_RAW_GRAY100.png",
+      "sha256": "4c32b4e411e03bfe84f6553b8bde5b4be17397a7b072970c840f5b2f3bf4c557"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_REMOVAL_MASK_NATIVE.png",
+      "sha256": "441283044feaf7baa7ff2a39113e60fdbc7c877ea162475fcc0ad8be101c4325"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C372-C2-Q060-SHARED-PLATE-INDEPENDENT/C2_Q060_PLATE_MACHINE.json",
+      "sha256": "9db7f25a9e40c684887d43ed590dceedc60adb24f9b8415f55ad6a3fb572bb0b"
+    }
+  ],
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "candidate_sha256": "",
+  "final_dds_approval": false,
+  "c3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "user_in_game_regression": "IGR044_OPEN",
+  "machine_summary": {
+    "pixels_removed": 89391,
+    "outside_mask_rgba": 0,
+    "outside_mask_alpha": 0,
+    "alpha_residue": 0,
+    "source_mask_coverage": 89391
+  },
+  "eligible_for_plate_reuse": true
+}

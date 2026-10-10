@@ -1,0 +1,102 @@
+{
+  "queue_index": 60,
+  "region_id": "BEST_TIME",
+  "manifest_sha256": "6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "removal_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "source_format": "RGBA32 4096x2048 DDS 1 mip",
+  "canonical_readable": "RAW_MIRROR_Y_TO_FLIPY",
+  "mask_dtype": "L",
+  "native_size": [
+    4096,
+    2048
+  ],
+  "mask_pixels": 89391,
+  "source_alpha_positive_in_mask": 89391,
+  "source_alpha_zero_in_mask": 0,
+  "source_to_clean_rgba_changed_inside_mask": 89391,
+  "source_to_clean_rgba_changed_outside_mask": 0,
+  "source_to_clean_alpha_changed_outside_mask": 0,
+  "clean_alpha_inside_mask_nonzero": 0,
+  "source_total_alpha_pos": 3713923,
+  "clean_total_alpha_pos": 3624532,
+  "removed_alpha_positive_global": 89391,
+  "regions": [
+    {
+      "name": "BEST_TIME_left_component",
+      "rect": [
+        2177,
+        338,
+        2606,
+        476
+      ],
+      "mask": 43974,
+      "source_alpha_pos": 43974,
+      "clean_alpha_pos": 0,
+      "pixels_changed": 43974
+    },
+    {
+      "name": "BEST_TIME_right_component",
+      "rect": [
+        2624,
+        339,
+        3030,
+        473
+      ],
+      "mask": 45417,
+      "source_alpha_pos": 45417,
+      "clean_alpha_pos": 0,
+      "pixels_changed": 45417
+    },
+    {
+      "name": "whole_target",
+      "rect": [
+        2177,
+        338,
+        3030,
+        476
+      ],
+      "mask": 89391,
+      "source_alpha_pos": 89391,
+      "clean_alpha_pos": 0,
+      "pixels_changed": 89391
+    },
+    {
+      "name": "OUTRUN_MILES_upper_protected",
+      "rect": [
+        2040,
+        250,
+        3130,
+        335
+      ],
+      "mask": 0,
+      "source_alpha_pos": 51879,
+      "clean_alpha_pos": 51879,
+      "pixels_changed": 0
+    },
+    {
+      "name": "HOLLY_WOLF_lower_protected",
+      "rect": [
+        2020,
+        487,
+        3100,
+        600
+      ],
+      "mask": 0,
+      "source_alpha_pos": 71466,
+      "clean_alpha_pos": 71466,
+      "pixels_changed": 0
+    }
+  ],
+  "visual_evidence_files": [
+    "C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG128_100.png",
+    "C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG0_50.png",
+    "C2_Q060_PLATE_SOURCE_CLEAN_FLIPY_BG255_75.png",
+    "C2_Q060_PLATE_FULL_CONTEXT_FLIPY_GRAY100.png",
+    "C2_Q060_PLATE_FULL_CONTEXT_RAW_GRAY100.png",
+    "C2_Q060_PLATE_REMOVAL_MASK_NATIVE.png"
+  ],
+  "scope": "BEST_TIME English removal only; no Korean DDS/C/C3/game pass",
+  "firstlook": "Visual images must be independently inspected; machine arithmetic alone is not approval"
+}

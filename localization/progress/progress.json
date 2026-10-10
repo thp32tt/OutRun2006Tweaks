@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T03:21:00+09:00",
+  "updated_at_kst": "2026-10-11T03:31:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11839,5 +11839,23 @@
     "official_promoted_dds": 0,
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_Q217_A231_INDEPENDENT_QA.json"
+  },
+  "c372_c2_q060_plate_library_20261011": {
+    "role": "C2",
+    "index": 60,
+    "manifest_sha256": "6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "new_plate_pass": 1,
+    "source_mask_pixels": 89391,
+    "outside_source_to_plate_rgba": 0,
+    "plate_alpha_residue": 0,
+    "new_DDS": 0,
+    "new_C_candidate_PASS": 0,
+    "C3": "NOT_RUN",
+    "user_game": "UNTESTED",
+    "IGR044": "OPEN",
+    "review_path": "localization/graphics/plate_library/reviews/6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a.json",
+    "review_id": "C372-C2-Q060-BEST-TIME-PLATE-20261011"
   }
 }
