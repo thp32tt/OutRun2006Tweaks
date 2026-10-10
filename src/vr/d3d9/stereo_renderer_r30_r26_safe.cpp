@@ -1183,6 +1183,27 @@ namespace OutRunVRStereo
                 !RightEyeSurface)
                 return true;
 
+            // During OutRun's GOAL/TIMEUP and mission finish or stage warp,
+            // the sky is redrawn at a scene boundary while old eye history
+            // may still exist. Never add a second glow layer extracted from
+            // those transient buffers. Normal gameplay keeps its independent
+            // left/right bloom; world stereo and HUD draw calls are intact.
+            if (Game::current_mode)
+            {
+                switch (static_cast<GameState>(*Game::current_mode))
+                {
+                case GameState::STATE_WARP:
+                case GameState::STATE_RESTART:
+                case GameState::STATE_GOAL:
+                case GameState::STATE_TIMEUP:
+                case GameState::STATE_LINK_TIMEUP:
+                case GameState::STATE_GIVEUP:
+                    return true;
+                default:
+                    break;
+                }
+            }
+
             // A screen draw was already submitted but its pre-HUD stereo scene
             // was never captured. Never use the current HUD-filled backbuffers
             // for bloom: +TIME, finish text and F11 otherwise become halos.

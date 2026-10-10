@@ -1874,6 +1874,33 @@ for marker, d3dx_call in (
 
 require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semantic retained')
 
+# Restore the original R57 producer-time vehicle marker semantic in addition
+# to queue-node tagging. Without it direct sprani/clip drawing can happen
+# before the deferred SpriteNode exists and remain head-locked.
+def verify_rank_producer_time_scopes(source):
+    for name in ('RankMarker_sprani(', 'RankMarker_putClipSprite('):
+        body = function_body(source, 'static int __cdecl ' + name)
+        require('ScopedRenderSemantic producerScope(', body,
+                'rank semantic while game producer actually executes')
+        require('RankMarkerSubScreenHudDepth != 0', body,
+                'NaviPub ScreenHud must not become a vehicle billboard')
+        require('RankMarkerProjectedInfo.valid', body,
+                'real Calc3D2D anchor remains necessary')
+        require('TagAppendedNodes(', body,
+                'delayed queue sprites still individually tagged')
+verify_rank_producer_time_scopes(ui)
+for fn in ('RankMarker_sprani(', 'RankMarker_putClipSprite('):
+    start = ui.index('static int __cdecl ' + fn)
+    pos = ui.index('ScopedRenderSemantic producerScope(', start)
+    corrupted = ui[:pos] + ui[pos:].replace(
+        'ScopedRenderSemantic producerScope(', 'ScopedRenderSemanticLost producerScope(', 1)
+    try:
+        verify_rank_producer_time_scopes(corrupted)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('rank producer-time scope regression escaped: ' + fn)
+
 # Lens P0: R73 HMD proved scalar disparity tuning was not a fix.
 # The canonical CALL at 0xCABE is in the PRE-0xCAE0 region; Calc3D2D
 # 0xCF4E is in the separate 0xCAE0..0xD100 region. Do NOT treat their
@@ -1973,6 +2000,27 @@ def verify_centre_only_lens_owner(source, analyzer):
     ):
         require(needle, analyzer, 'original central-vs-outer x86 call targets')
 verify_centre_only_lens_owner(graphics, read('tools/analyze_outrun_exe.py'))
+# The 2026-10-10 optical report still saw ONLY the sun's centre doubled
+# despite the D3A5 parent scope. It has a separate original E8 at C993
+# into the same DrawObjectAlpha_Internal ABI as the outer CABE producer.
+def verify_centre_actual_draw_owner(source):
+    section = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
+    section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
+    for required in ('static void __cdecl DrawObjectAlphaCentre(',
+                     'ScopedRenderSemantic semantic(',
+                     'RenderScope::ProjectedScreenEffect2D',
+                     'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
+                     'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):
+        require(required, section, 'centre-only independent actual draw')
+verify_centre_actual_draw_owner(graphics)
+try:
+    verify_centre_actual_draw_owner(graphics.replace(
+        'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
+        'Module::exe_ptr(0xCABE), DrawObjectAlphaCentre', 1))
+except SystemExit:
+    pass
+else:
+    raise SystemExit('central actual-draw source collision escaped')
 for label, mutant in (
     ('central hook widen 0xD3A5 to outer D5F5', graphics.replace(
         'Module::exe_ptr(0xD3A5), LensCentreEnter',

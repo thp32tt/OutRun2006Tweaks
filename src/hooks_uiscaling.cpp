@@ -890,8 +890,23 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+        // Reestablish the historically working producer-time spatial scope.
+        // A sprani may draw synchronously before its SpriteNode siblings are
+        // published; a post-CALL TagAppendedNodes alone cannot own that draw.
+        // NaviPub's four exact caller exceptions remain screen HUD.
+        const auto immediateScope = RankMarkerSubScreenHudDepth != 0
+            ? OutRunVR::GameSemantic::RenderScope::ScreenHud
+            : (RankMarkerProjectedInfo.valid
+                ? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+                : OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(
+                immediateScope);
+            result = Game::sprani_play_ae_auth_alpha(
+                spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
+                a4, a5, alpha);
+        }
 
 		OutRunVR::GameSemantic::RenderScope scope{};
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
@@ -932,8 +947,21 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
-		const int result =
-			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+        // The original kind-0 digit producer may perform immediate draws
+        // before its delayed queued nodes are registered. Preserve the
+        // exact car anchor during the original call as well as afterward.
+        const auto immediateScope = RankMarkerSubScreenHudDepth != 0
+            ? OutRunVR::GameSemantic::RenderScope::ScreenHud
+            : (RankMarkerProjectedInfo.valid
+                ? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+                : OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(
+                immediateScope);
+            result = Game::put_clip_sprite(
+                xstnum, x, y, flags, priority, color);
+        }
 
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
 		const bool projected = !screenHud && RankMarkerProjectedInfo.valid;
