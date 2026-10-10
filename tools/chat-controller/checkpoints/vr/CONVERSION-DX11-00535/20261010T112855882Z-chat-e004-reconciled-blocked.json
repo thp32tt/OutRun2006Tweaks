@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "retry_3_terminal_reconciliation",
+  "captured_at_utc": "2026-10-10T11:28:55.882Z",
+  "task_id": "CONVERSION-DX11-00535",
+  "event_id": "CONVERSION-DX11-00535-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "target_branch": "vr-dx11-native-r71",
+  "observed_branch_head": "e3f49c2496ff82319dad2d64facc30fefea2f65f",
+  "material_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "validation_bearing_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "bookkeeping_sha": "e3f49c2496ff82319dad2d64facc30fefea2f65f",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "no_new_material_commit": true,
+  "no_new_ci": true,
+  "no_score_change": true,
+  "evidence": {
+    "backend_gate_run_id": 38047742767,
+    "backend_gate_head_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+    "backend_gate_conclusion": "failure",
+    "failed_step": "Run DX11 constant buffer probe",
+    "r238_static": "success",
+    "r238_warp_build": "success",
+    "r238_warp_gpu": "success",
+    "other_exact_sha_workflows": "Build, DX11 Fast Structural Checks, OpenXR, HUD Inspector all SUCCESS",
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "upstream_owner_status": "continuation RUNNING/C3_VALIDATE; separate R175/TEXCOORD6 work",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ]
+  },
+  "next_action": "Controller reconcile 00535 as blocked upstream; do not replay same task/material/CI or score. Fence/release separate R175 owner before modifying its files. Allocate a genuinely distinct DX11 task only under atomic lease/claim contract. DXVK frozen; DX9Ex untouched.",
+  "note": "Retry E004 is not new C2. This checkpoint is bookkeeping on chat-controller-downloads only and is not a final material commit, CI pass, HMD pass or runtime controller deployment proof."
+}
