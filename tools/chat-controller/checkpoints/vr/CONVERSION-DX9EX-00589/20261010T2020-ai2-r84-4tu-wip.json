@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX9EX-00589",
+  "event_id": "CONVERSION-DX9EX-00589-E001",
+  "lane": "DX9EX",
+  "work_key": "DX9EX:R84:UPPER_4TU_CMAKE_SPLIT",
+  "status": "WIP_CANDIDATE_VALIDATE",
+  "candidate_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-00589-r84-upper-tu",
+  "candidate_sha": "8615c46a0a218121b21586397f6d16d789959ca2",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "ab33a12011d2e53ff3b9f42a4fe06898e0d27958",
+  "notes": [
+    "Nine-file integrated R33/R32/R31/R30 independent CMake TU split, R30 lower recovery-epoch API, header decoupling and policy guard",
+    "R29 and older lower chain deliberately remains textual; full R84 terminal closeout not yet claimed",
+    "Candidate Gate #38047797755 failed obsolete R30 static gate; targeted guard repaired in SHA 8615c46",
+    "Candidate Gate #38047869526 policy SUCCESS, host SUCCESS, game SUCCESS; R33 full-chain compile in progress",
+    "Do not create final [AUTO:00589] until candidate compile/link and target exact-SHA gates pass"
+  ],
+  "runtime_validation": "UNTESTED",
+  "recommended_next_action": "Read candidate exact-SHA Gate #38047869526 Win32 full-chain job log; repair real linker/compiler errors in candidate, preserve current target HEAD and other worker ownership; after candidate PASS graft validated files into one CAS target material commit with [AUTO:CONVERSION-DX9EX-00589] and run target exact SHA DX9Ex Active+Domain+Full Source. C6 and score only after success."
+}
