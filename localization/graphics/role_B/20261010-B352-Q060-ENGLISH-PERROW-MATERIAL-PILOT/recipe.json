@@ -1,0 +1,47 @@
+{
+  "canonical_source": {
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "revision": "OR2-HD-GUI-v0.25.10a"
+  },
+  "source_clean": {
+    "path": "localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png",
+    "sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
+  },
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+    "index": 1,
+    "native_ppem": 103,
+    "glyphs": "최고 기록:"
+  },
+  "plate_mask_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "source_face_row_profile": "B352_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json",
+  "face_gradient": [
+    [
+      247,
+      218,
+      183
+    ],
+    [
+      247,
+      219,
+      171
+    ]
+  ],
+  "effect": {
+    "outline": 3,
+    "shadow_offset": [
+      2,
+      3
+    ],
+    "readable_right_italic_shear": 0.4
+  },
+  "protected_siblings": [
+    "OUTRUN MILES",
+    "HOLLY WOLF",
+    "all other source atlas regions"
+  ],
+  "construction": "Source-derived gold face blended with 80th-percentile highlight on Regular native slender contour, reduced 3px navy edge, 2x3 extrusion, 0.40 readable right lean; independent method from rejected B351 Bold 8px stroke",
+  "need_C2_source_slant_homologous_anchors": true,
+  "no_final_candidate_published": true
+}
