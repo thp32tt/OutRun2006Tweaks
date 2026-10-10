@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "run": "A219",
+  "role": "A",
+  "owner_lane": "A",
+  "queue_index": 121,
+  "run_key": "OUTRUN-KOR-A219-Q121-GOAL-33-SOURCE-RESIDUE-20261010",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "original_english_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_unmodified_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+  "official_changed": false,
+  "comparison_image": "A219_SOURCE_CLEAN_OFFICIAL_TRIAL_2X.png",
+  "images_reviewed": [
+    "A219_SOURCE_CLEAN_OFFICIAL_TRIAL_NATIVE_RGB.png",
+    "A219_SOURCE_CLEAN_OFFICIAL_TRIAL_2X.png",
+    "A219_ORIGINAL_GLYPH_RESIDUE_33_MASK.png",
+    "A219_PERSISTED_DDS_RAW_GOAL_CROP.png",
+    "A219_PERSISTED_DDS_75PCT_GRAY.png",
+    "A219_PERSISTED_DDS_50PCT_GRAY.png"
+  ],
+  "visual_observation": {
+    "source": "White italic original word goal. clearly visible on dark stroke.",
+    "clean_before": "Three clusters of white stray single-pixel/thin marks visibly remain in text cell although English full word removed; these are 33 white 255-alpha pixels matching original.",
+    "official_before": "Same three white stray clusters as CLEAN, independently compared in native100/2x gray.",
+    "trial_after": "Source ghost specks absent and crop shows continuous neutral gray at 100/75/50; no new speck, seam, box, glyph overlap in precisely repaired scope.",
+    "raw": "RAW persisted crop has expected Y-mirror display compared with human-readable FLIP-Y; actual PNG alpha-zero non-glyph pixels can show dark RGB in transparent image, not a visible black box. Gray composite shows uniform plate.",
+    "protected": "Other DDS bytes and pixels unchanged by exact-byte diff; entire original artwork and 29 unrelated semantic cells NOT certified."
+  },
+  "machine_checks": {
+    "persisted_trial_decoded_roundtrip": "PASS",
+    "prior_to_trial_changed_rgba_pixels": 33,
+    "changed_bytes": 132,
+    "changed_rgba_pixels_outside_confirmed_33": 0,
+    "dds_header_identity": "EXACT",
+    "source_33_white_pixels_cleared_to_alpha0": true,
+    "sha256_pin": "PASS"
+  },
+  "constrained_qa": "SCOPED_SOURCE_RESIDUE_REMOVAL_PASS_ONLY",
+  "full_atlas_producer_qa": "HOLD_29_SEGMENT_TEXT_AND_PROTECTED_ART_MASK_NOT_VERIFIED",
+  "trials_created": 1,
+  "official_dds_promoted": 0,
+  "fresh_c1": "PENDING",
+  "c3": "NOT_RUN",
+  "pre_ingame": "BLOCKED",
+  "user_actual_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "separate_domain_exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "pending_actions": [
+    "C1 independent exact-source/clean/old/trial SHA + native 100/75/50 RAW review",
+    "Full atlas 29 text-cell original source glyph/effect and protected-art masks before formal promotion",
+    "C3 strict after C1 and NEW user game retest for IGR030/031/040"
+  ]
+}
