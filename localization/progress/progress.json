@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T19:59:54+09:00",
+  "updated_at_kst": "2026-10-10 20:08 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -394,6 +394,28 @@
         "dds_promoted": 0,
         "independent_C_PASS": 0,
         "qa": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_INDEPENDENT_PIPELINE_HOLD.json"
+      },
+      "latest_a_source_slant_evidence": {
+        "role": "A",
+        "run": "A227",
+        "index": 101,
+        "run_key": "OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
+        "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+        "source_crop_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+        "english_left_edge_slope_dx_per_dy": -0.33202,
+        "korean_left_edge_slope_dx_per_dy": -0.31126,
+        "slope_diff_abs": 0.02076,
+        "measurement_rows": 23,
+        "parameter_checks": 12,
+        "producer_evidence_status": "SCOPED_FIRST_GLYPH_SOURCE_PROFILE_ONLY",
+        "C1": "HOLD_STRICT_RECHECK",
+        "C3": "BLOCKED",
+        "new_dds": 0,
+        "promoted_dds": 0,
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "QA": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json",
+        "machine": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
+        "figure": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png"
       }
     },
     "runtime_text_trace": {
@@ -11431,5 +11453,27 @@
     },
     "report": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_CONTROLLER_C2_REWORK.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a227_q101_firstglyph_profile": {
+    "role": "A",
+    "run": "A227",
+    "index": 101,
+    "run_key": "OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
+    "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "source_crop_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+    "english_left_edge_slope_dx_per_dy": -0.33202,
+    "korean_left_edge_slope_dx_per_dy": -0.31126,
+    "slope_diff_abs": 0.02076,
+    "measurement_rows": 23,
+    "parameter_checks": 12,
+    "producer_evidence_status": "SCOPED_FIRST_GLYPH_SOURCE_PROFILE_ONLY",
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "new_dds": 0,
+    "promoted_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json",
+    "machine": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
+    "figure": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png"
   }
 }
