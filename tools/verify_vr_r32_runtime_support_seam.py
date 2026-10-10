@@ -341,6 +341,48 @@ destructor = body(r32, "R32ReviewInternalStereoPassScope::~R32ReviewInternalSter
 if "R30SupportExchangeInternalStereoPass(previous_)" not in destructor:
     errors.append("R32 internal-pass scope no longer restores through owner exchange")
 
+# R32 must compile against the lower-owner support ABI, not private R7/R9
+# symbols imported accidentally by the historical textual include chain.
+r7 = read("src/vr/d3d9/stereo_renderer_r7.inc")
+for constant, value in (
+    ("R30SupportWvpFirstRegister", "64"),
+    ("R30SupportWvpRegisterCount", "4"),
+):
+    if f"inline constexpr UINT {constant} = {value};" not in header:
+        errors.append(f"R30 WVP support contract changed {constant}")
+if "constexpr UINT OutRunWvpRegister = 64;" not in r7 or \\
+        "constexpr UINT OutRunWvpRegisterCount = 4;" not in r7:
+    errors.append("R30 WVP support contract diverged from original R7 c64..c67")
+if re.search(r"(?<!Support)\\bOutRunWvpRegister(?:Count)?\\b", r32):
+    errors.append("R32 retained private R7 WVP register constants")
+batch = body(r32, "bool R32SetWvpBatch(")
+if ("device, R30SupportWvpFirstRegister, constants," not in batch or
+        "R30SupportWvpRegisterCount" not in batch):
+    errors.append("R32 batched WVP upload bypasses pinned R30 register ABI")
+restore = body(r32, "bool R32RestoreRightPassState(")
+restore_order = (
+    "R30SupportCallOriginalSetRenderTarget(",
+    "R30SupportCallOriginalSetDepthStencilSurface(",
+    "device->SetViewport(&savedViewport)",
+    "R32SetWvpBatch(device, originalConstants)",
+)
+restore_positions = [restore.find(token) for token in restore_order]
+if any(pos < 0 for pos in restore_positions) or restore_positions != sorted(restore_positions):
+    errors.append("R32 right-eye restore lost original RT/depth/viewport/WVP order")
+if re.search(r"\\b(?:SetRenderTargetHook|SetDepthStencilSurfaceHook)\\b", r32):
+    errors.append("R32 still directly owns private R9 render-target/depth hooks")
+for signature, delegation in (
+    ("HRESULT R30SupportCallOriginalSetRenderTarget(",
+     "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);"),
+    ("HRESULT R30SupportCallOriginalSetDepthStencilSurface(",
+     "SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)"),
+):
+    if delegation not in body(r30, signature):
+        errors.append("R30 hook facade no longer delegates unchanged: " + signature)
+if "device->SetDepthStencilSurface(surface)" not in body(
+        r30, "HRESULT R30SupportCallOriginalSetDepthStencilSurface("):
+    errors.append("R30 depth fallback lost original direct-device path")
+
 if "'tools/verify_vr_r32_runtime_support_seam.py'" not in workflow:
     errors.append("DX9Ex workflow does not run R32 runtime support verifier")
 

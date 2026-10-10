@@ -324,8 +324,8 @@ namespace OutRunVRStereo
             if (R30SupportTelemetryEnabled())
                 ++R32BatchWvpUploads;
             if (!OutRunVR::D3D9::SetVertexShaderConstantBatch(
-                    device, OutRunWvpRegister, constants,
-                    OutRunWvpRegisterCount))
+                    device, R30SupportWvpFirstRegister, constants,
+                    R30SupportWvpRegisterCount))
             {
                 ++R32BatchWvpFailures;
                 return false;
@@ -355,12 +355,11 @@ namespace OutRunVRStereo
             const float* originalConstants, bool restoreWvp) noexcept
         {
             bool ok = true;
-            if (savedRt && FAILED(SetRenderTargetHook.stdcall<HRESULT>(
+            if (savedRt && FAILED(R30SupportCallOriginalSetRenderTarget(
                     device, 0u, savedRt)))
                 ok = false;
-            const HRESULT depthHr = SetDepthStencilSurfaceHook
-                ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth)
-                : device->SetDepthStencilSurface(savedDepth);
+            const HRESULT depthHr = R30SupportCallOriginalSetDepthStencilSurface(
+                device, savedDepth);
             if (FAILED(depthHr)) ok = false;
             if (FAILED(device->SetViewport(&savedViewport))) ok = false;
             if (restoreWvp && !R32SetWvpBatch(device, originalConstants)) ok = false;

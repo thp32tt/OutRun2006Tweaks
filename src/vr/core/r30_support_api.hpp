@@ -21,6 +21,12 @@
 
 namespace OutRunVRStereo
 {
+    // Exact original c64..c67 world-WVP upload contract from R7.
+    // R32 consumes the explicit lower-owner contract rather than depending on
+    // R7 anonymous namespace constants via the textual .cpp include chain.
+    inline constexpr UINT R30SupportWvpFirstRegister = 64;
+    inline constexpr UINT R30SupportWvpRegisterCount = 4;
+
     OutRunVR::RuntimeEligibility::InstallState R30InstallStatus() noexcept;
 
     // Stable R30-owned render routing, not the anonymous R30 private enum.
