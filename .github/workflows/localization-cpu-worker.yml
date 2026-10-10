@@ -108,7 +108,7 @@ jobs:
           while IFS= read -r p; do
             [ -z "$p" ] && continue
             case "$p" in
-              localization/graphics/hd_candidates/*|              localization/graphics/role_A/*|              localization/graphics/role_B/*|              localization/graphics/role_C/*|              localization/graphics/worker_results/*)
+              localization/graphics/hd_candidates/*|              localization/graphics/role_A/*|              localization/graphics/role_B/*|              localization/graphics/role_C/*|              localization/graphics/plate_library/objects/*|              localization/graphics/plate_library/entries/*|              localization/graphics/worker_results/*)
                 ;;
               *)
                 echo "::error::CPU worker attempted forbidden write: $p"
@@ -135,7 +135,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git add -A             localization/graphics/hd_candidates             localization/graphics/role_A             localization/graphics/role_B             localization/graphics/role_C             localization/graphics/worker_results 2>/dev/null || true
+          git add -A             localization/graphics/hd_candidates             localization/graphics/role_A             localization/graphics/role_B             localization/graphics/role_C             localization/graphics/plate_library/objects             localization/graphics/plate_library/entries             localization/graphics/worker_results 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Worker produced no repository output."
             exit 0
