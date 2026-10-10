@@ -19,12 +19,24 @@
 #endif
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "hook_mgr.hpp"
+#include "plugin.hpp"
+#include "vr_shared.hpp"
+#include <spdlog/spdlog.h>
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
+
+// Do not inherit these guards from the lower R29 textual implementation.
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 
 namespace Settings
 {
