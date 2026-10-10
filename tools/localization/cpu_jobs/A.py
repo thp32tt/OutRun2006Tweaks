@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A230 q121 P0: source-exact Gas Pedal leftover removal bounded by Korean
+"""A230 retry source-cached q121 P0: source-exact Gas Pedal leftover removal bounded by Korean
 lettering protection. Source remainder is a confirmed text-only original
 label region from A229, NOT the unresolved A221 neighbor sources. Trial only.
 """
@@ -29,15 +29,24 @@ assert sha(current_bytes)==a229["a220_trial_sha256"]
 official_path=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
 official_bytes=official_path.read_bytes()
 assert sha(official_bytes)==a229["official_sha256"]
-original_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-with urllib.request.urlopen(original_url,timeout=200) as v: source_bytes=v.read()
-assert sha(source_bytes)==a229["source_sha256"]
-assert len(current_bytes)==128+4096*4096*4 and source_bytes[:4]==current_bytes[:4]==official_bytes[:4]==b"DDS "
+# The 67-MB public source DDS timed out in initial A230 runner attempt.
+# Reuse the A215 lossless native source-region PNG (Git-tracked) previously
+# produced from the exact English SHA and cross-checked in successful A229.
+a215=json.loads((root/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_COMPONENT_QA.json").read_text())
+rank20=next(i for i in a215["regions"] if i["rank"]==20)
+assert a215["source_sha256"]==a229["source_sha256"]
+assert rank20["bbox_readable"]==r20["source_bbox"]
+ex0,ey0,ex1,ey1=rank20["expanded_crop_readable"]
+source_png=root/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_20_SOURCE_NATIVE_RGBA.png"
+source_tile=Image.open(source_png).convert("RGBA")
+assert source_tile.size==(ex1-ex0,ey1-ey0)
+assert len(current_bytes)==len(official_bytes)==128+4096*4096*4 and current_bytes[:4]==official_bytes[:4]==b"DDS "
 def decode(x):return Image.open(io.BytesIO(x)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-source=decode(source_bytes); current=decode(current_bytes); official=decode(official_bytes)
-assert source.size==current.size==official.size==(4096,4096)
+current=decode(current_bytes); official=decode(official_bytes)
+assert current.size==official.size==(4096,4096)
 x0,y0,x1,y1=r20["source_bbox"];rect=(x0,y0,x1,y1)
-S=np.array(source.crop(rect),dtype=np.uint8)
+source_crop=source_tile.crop((x0-ex0,y0-ey0,x1-ex0,y1-ey0))
+S=np.array(source_crop,dtype=np.uint8)
 C=np.array(current.crop(rect),dtype=np.uint8)
 exact=(S[:,:,3]>0)&(C[:,:,3]>0)&np.all(S==C,axis=2)
 assert int(exact.sum())==266
@@ -86,7 +95,7 @@ assert np.array_equal(raw_changed,expected),"No unrelated-pixel changes allowed"
 # and isolated original remnants separated. Both RAW/readable shown.
 def comp(im,bg):
  return Image.alpha_composite(Image.new("RGBA",im.size,bg+(255,)),im).convert("RGB")
-imgs=[source.crop(rect),official.crop(rect),current.crop(rect),saved.crop(rect)]
+imgs=[source_crop,official.crop(rect),current.crop(rect),saved.crop(rect)]
 for bgname,bg in [("BLACK",(0,0,0)),("GRAY",(100,100,100)),("WHITE",(255,255,255))]:
  for pct in (100,75,50):
   cells=[comp(im,bg) for im in imgs]
@@ -107,7 +116,7 @@ report={"run":"A230","run_key":"OUTRUN-KOR-A230-Q121-P0-GAS-PEDAL-ISOLATED-SOURC
  "P0_ingame_backlog":["IGR-030","IGR-031","IGR-040"],
  "semantic_binding":"Gas Pedal -> 가속 페달: source text only; 30-region A229 inventory rank20",
  "source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
- "source_sha256":sha(source_bytes),"official_sha256":sha(official_bytes),
+ "source_sha256":a229["source_sha256"],"source_region_png_sha256":sha(source_png.read_bytes()),"canonical_source_full_dds_reused_from_prior_verified_A229":True,"official_sha256":sha(official_bytes),
  "A220_sha256":sha(current_bytes),"new_trial_sha256":sha(new),
  "trial_path":str(ddspath.relative_to(root)),"source_bbox_readable":list(rect),
  "source_exact_remaining_before":266,"source_exact_isolated_removal_pixels":pixels,"source_exact_remaining_after":remaining,
