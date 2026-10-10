@@ -3,6 +3,8 @@ name: OutRun EXE HUD Inspector CI
 on:
   workflow_dispatch:
   push:
+    branches-ignore:
+      - 'vr-d3d9ex-review-feature-*'
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
       - 'external/imgui'
