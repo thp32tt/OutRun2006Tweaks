@@ -10,6 +10,21 @@ namespace outrun::vr::dx11
 {
     namespace
     {
+        // Shared VS/PS signature. FVF NORMAL0 output follows these
+        // members to avoid shifting COLOR0 or TEXCOORD registers.
+        constexpr const char* kFixedFunctionVaryingMembers =
+            "    float4 position : SV_Position;\n"
+            "    float4 diffuse : COLOR0;\n"
+            "    float4 specular : COLOR1;\n"
+            "    float4 tex0 : TEXCOORD0;\n"
+            "    float4 tex1 : TEXCOORD1;\n"
+            "    float4 tex2 : TEXCOORD2;\n"
+            "    float4 tex3 : TEXCOORD3;\n"
+            "    float4 tex4 : TEXCOORD4;\n"
+            "    float4 tex5 : TEXCOORD5;\n"
+            "    float4 tex6 : TEXCOORD6;\n"
+            "    float4 tex7 : TEXCOORD7;\n";
+
         UINT8 translate_color_write_mask(DWORD value) noexcept
         {
             UINT8 mask = 0;
@@ -1209,17 +1224,8 @@ namespace outrun::vr::dx11
         shader +=
             "// R84 diagnostic-only fixed-function pixel-shader prototype\n"
             "struct PSInput\n"
-            "{\n"
-            "    float4 diffuse : COLOR0;\n"
-            "    float4 specular : COLOR1;\n";
-        for (std::size_t index = 0; index < source.size(); ++index)
-        {
-            shader += "    float4 tex";
-            shader += std::to_string(index);
-            shader += " : TEXCOORD";
-            shader += std::to_string(index);
-            shader += ";\n";
-        }
+            "{\n";
+        shader += kFixedFunctionVaryingMembers;
         shader += "};\n";
 
         premodulateColor = false;
@@ -1256,6 +1262,15 @@ namespace outrun::vr::dx11
         shader +=
             "float4 main(PSInput input) : SV_Target\n"
             "{\n"
+            // Keep every transport register in compiled SM4 signatures,
+            // including unsampled TEXCOORD slots. Visible viewport x is
+            // nonnegative, normalized SPECULAR alpha is nonnegative, and
+            // nonfinite texcoords cannot be translated exactly.
+            "    if (input.position.x < 0.0f || input.specular.a < 0.0f\n"
+            "        || any(isnan(input.tex0)) || any(isnan(input.tex1))\n"
+            "        || any(isnan(input.tex2)) || any(isnan(input.tex3))\n"
+            "        || any(isnan(input.tex4)) || any(isnan(input.tex5))\n"
+            "        || any(isnan(input.tex6)) || any(isnan(input.tex7))) discard;\n"
             "    float4 current = input.diffuse;\n"
             "    float4 temp = 0.0f;\n";
 
@@ -2988,21 +3003,10 @@ namespace outrun::vr::dx11
         shader +=
             "};\n"
             "struct VSOutput\n"
-            "{\n"
-            "    float4 position : SV_Position;\n";
+            "{\n";
+        shader += kFixedFunctionVaryingMembers;
         if (out.hasNormal)
             shader += "    float3 normal : NORMAL0;\n";
-        shader +=
-            "    float4 diffuse : COLOR0;\n"
-            "    float4 specular : COLOR1;\n";
-        for (UINT index = 0; index < 8; ++index)
-        {
-            shader += "    float4 tex";
-            shader += std::to_string(index);
-            shader += " : TEXCOORD";
-            shader += std::to_string(index);
-            shader += ";\n";
-        }
         shader +=
             "};\n"
             "VSOutput main(VSInput input)\n"

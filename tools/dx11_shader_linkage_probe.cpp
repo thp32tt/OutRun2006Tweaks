@@ -127,6 +127,8 @@ namespace
                     return false;
                 if ((output.Mask & input.Mask) != input.Mask)
                     return false;
+                if (output.Register != input.Register)
+                    return false;
 
                 if (_stricmp(input.SemanticName, "COLOR") == 0 &&
                     input.SemanticIndex == 0)
@@ -441,6 +443,14 @@ Output main(Input input) {
 }
 )";
     constexpr const char* r176PixelShader = R"(
+struct Input { float4 position : SV_Position; float4 payload : TEXCOORD6; };
+float4 main(Input input) : SV_Target {
+    if (input.position.x < 0.0f) discard;
+    return input.payload;
+}
+)";
+    // Same semantic/type but different DXBC register than the vertex output.
+    constexpr const char* r176WrongRegisterPixelShader = R"(
 float4 main(float4 payload : TEXCOORD6) : SV_Target { return payload; }
 )";
     constexpr const char* r176WrongSemanticPixelShader = R"(
@@ -457,6 +467,10 @@ float4 main(uint4 payload : TEXCOORD6) : SV_Target {
     ID3DBlob* r176Ps = compile_shader(
         r176PixelShader, std::strlen(r176PixelShader),
         "OutRunR176Texcoord6PS", "ps_4_0");
+    ID3DBlob* r176WrongRegisterPs = compile_shader(
+        r176WrongRegisterPixelShader,
+        std::strlen(r176WrongRegisterPixelShader),
+        "OutRunR176WrongRegisterPS", "ps_4_0");
     ID3DBlob* r176WrongSemanticPs = compile_shader(
         r176WrongSemanticPixelShader,
         std::strlen(r176WrongSemanticPixelShader),
@@ -466,6 +480,8 @@ float4 main(uint4 payload : TEXCOORD6) : SV_Target {
         "OutRunR176WrongTypePS", "ps_4_0");
     ID3D11ShaderReflection* r176VsReflection = reflect_shader(r176Vs);
     ID3D11ShaderReflection* r176PsReflection = reflect_shader(r176Ps);
+    ID3D11ShaderReflection* r176WrongRegisterReflection =
+        reflect_shader(r176WrongRegisterPs);
     ID3D11ShaderReflection* r176WrongSemanticReflection =
         reflect_shader(r176WrongSemanticPs);
     ID3D11ShaderReflection* r176WrongTypeReflection =
@@ -516,10 +532,15 @@ float4 main(uint4 payload : TEXCOORD6) : SV_Target {
             r176PsRegister = p.Register;
         }
     }
-    require(r176FoundVs && r176FoundPs,
-            "R176 dedicated TEXCOORD6 must survive DXBC signatures");
+    require(r176FoundVs && r176FoundPs &&
+                r176VsRegister == r176PsRegister,
+            "R176 TEXCOORD6 must occupy matching DXBC registers");
     bool r176NegativeColor = false;
     bool r176NegativeTexcoord = false;
+    require(!interfaces_compatible(
+                r176VsReflection, r176WrongRegisterReflection,
+                r176NegativeColor, r176NegativeTexcoord),
+            "R176 same semantic but wrong register must fail closed");
     require(!interfaces_compatible(
                 r176VsReflection, r176WrongSemanticReflection,
                 r176NegativeColor, r176NegativeTexcoord),
@@ -534,10 +555,12 @@ float4 main(uint4 payload : TEXCOORD6) : SV_Target {
               << " negative_semantic=REJECT negative_type=REJECT\n";
     r176WrongTypeReflection->Release();
     r176WrongSemanticReflection->Release();
+    r176WrongRegisterReflection->Release();
     r176PsReflection->Release();
     r176VsReflection->Release();
     r176WrongTypePs->Release();
     r176WrongSemanticPs->Release();
+    r176WrongRegisterPs->Release();
     r176Ps->Release();
     r176Vs->Release();
 

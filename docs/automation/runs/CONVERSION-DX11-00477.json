@@ -87,24 +87,26 @@
   "rollback_gate_status": "PASS",
   "continuation": {
     "event_id": "CONVERSION-DX11-00477-CONTINUE-20261009-1853",
-    "status": "RUNNING",
-    "checkpoint": "C3_VALIDATE",
+    "status": "IN_PROGRESS_R175_REPAIR_PENDING_EXACT_SHA_CI",
+    "checkpoint": "C2_IMPLEMENT",
     "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
-    "lease_epoch": 2,
-    "work_key": "DX11:R173:COLOR0_GENERATED_VS_TO_DIRECT_PS_DIAGNOSTIC",
+    "lease_epoch": 3,
+    "work_key": "DX11:R175:SHARED_VS_PS_SIGNATURE_AND_BGRA_WARP_ROOT_CAUSE",
     "conflict_keys": [
-      "tools/dx11_constant_buffer_probe.cpp:R173"
+      "src/vr/d3d11/pipeline_translation.cpp",
+      "tools/dx11_constant_buffer_probe.cpp",
+      "tools/dx11_shader_linkage_probe.cpp"
     ],
     "base_sha": "d07035fc40fb04633b5ba8f5975bd5f540b577f6",
     "material_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
     "validation_bearing_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
     "ci_run_id": 37927656851,
-    "resume_cursor": "WAIT_R175_EXACT_SHA_GATE_CLASSIFY_TEXCOORD6_COLOR0",
+    "resume_cursor": "VERIFY_R175_WARP_BGR_AND_REFLECTION_EXACT_SHA_CI",
     "runtime_validation": "UNTESTED",
-    "automation_validation": "IN_PROGRESS",
-    "reason": "R173 first direct-VS fail lacked actual BGRA readback. Source commit a0a13c8 now logs both direct/generated data prior to fail-closed checks; exact-SHA CI started. Retain same TASK_ID 00477 for continuation and do not claim success or rescore.",
+    "automation_validation": "PENDING",
+    "reason": "User-directed 2026-10-10 direct ChatGPT2 continuation under original owner; stale previous epoch 2 fenced after new evidence shows PS register 0 interpreted VS SV_Position register 0; original 00477 remains same TASK_ID; no duplicate score.",
     "prior_blocked_material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-    "last_real_activity_at": "2026-10-09T21:06:06+09:00",
+    "last_real_activity_at": "2026-10-10T21:04:00+09:00",
     "evidence": "Exact-SHA Gate 37925304067 validate SUCCESS, DX11 smoke 113804628002 FAILURE. Direct VS BGRA [128,0,16,255]; generated VS BGRA [128,0,16,255]; expected [224,128,32,255]. Same mismatch in both branches; cannot attribute to generated VS alone.",
     "prior_gate_evidence": "Gate 37926530851 validate SUCCESS, DX11 smoke FAILED: R174 direct VS/generated VS/constant VS all [128,0,16,255] vs expected [224,128,32,255], red solid-PS correctly [0,0,255,255]."
   },
@@ -206,6 +208,22 @@
       "previous_smoke": "FAIL_R174_VS_PS_CONSTANT_MISMATCH",
       "runtime_validation": "UNTESTED",
       "next_action": "Read exact R175 GitHub Windows validation and smoke; no score before complete independently validated outcome."
+    },
+    {
+      "checkpoint_id": "DX11-00477-CHAT-R175-REGISTER-LINKAGE-20261010",
+      "at_kst": "2026-10-10 21:04+ KST",
+      "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
+      "lease_epoch": 3,
+      "state": "C2_IMPLEMENT_VALIDATION_PENDING",
+      "change": "R175 and R173 shared VS/PS DXBC register order, PS generator signature occupancy, R92 register+mask fail-closed check and shifted-register negative test",
+      "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/dx11_shader_linkage_probe.cpp"
+      ],
+      "validation": "NOT_YET_VERIFIED",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Check exact-SHA Backend Conversion Gate WARP pixel expected [224,128,32,255], R92/R176 registers, only after success close task and consider scoring."
     }
   ]
 }

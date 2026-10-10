@@ -610,10 +610,18 @@ O main(I i) {O o; o.position=float4(i.position,1.0f);
                               224.0f/255.0f,1.0f); return o;}
 )";
         static const char r175PS[] = R"(
-float4 main(float4 payload : TEXCOORD6) : SV_Target {return payload;}
+struct I {float4 position : SV_Position; float4 payload : TEXCOORD6;};
+float4 main(I i) : SV_Target {
+    if (i.position.x < 0.0f) discard;
+    return i.payload;
+}
 )";
         static const char directPS[] = R"(
-float4 main(float4 color : COLOR0) : SV_Target {return color;}
+struct I {float4 position : SV_Position; float4 color : COLOR0;};
+float4 main(I i) : SV_Target {
+    if (i.position.x < 0.0f) discard;
+    return i.color;
+}
 )";
         ID3DBlob* r173DirectCode = compile_vertex_shader(directVS);
         ID3DBlob* r173ConstantCode = compile_vertex_shader(constantVS);
