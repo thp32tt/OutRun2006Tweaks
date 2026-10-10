@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 08:25 KST",
+  "updated_at_kst": "2026-10-11 08:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12385,5 +12385,23 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "approved_dds": 0,
     "report": "localization/graphics/role_C/20261011-C382-C2-Q060-PSD-TRANSPARENT-RGB-BILINEAR/C382_Q060_INDEPENDENT_PLATE_FILTER_QA.json"
+  },
+  "c383_c1_q099_native_style_visual_rework_20261011": {
+    "queue_index": 99,
+    "shard": "C1_ODD",
+    "run_key": "OUTRUN-KOR-C1-Q099-NATIVE-STYLE-REWORK-FIRST-20261011-0840",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "result": "REWORK_REQUIRED",
+    "reason_codes": [
+      "SOURCE_FAMILY_ITALIC_STYLE_MISMATCH",
+      "SOURCE_FAMILY_PROPORTION_HIERARCHY_MISMATCH"
+    ],
+    "candidate_unchanged": true,
+    "approved_dds": 0,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "execution_backend": "GitHub+N100 MCP fallback exact binary DDS decode",
+    "qa_report": "localization/graphics/role_C/20261011-C383-C1-Q099-NATIVE-STYLE-VISUAL-REWORK/C383_Q099_CONTROLLER_C1_VISUAL_REWORK.json"
   }
 }
