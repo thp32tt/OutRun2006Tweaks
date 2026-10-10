@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B360",
+  "run_key": "OUTRUN-KOR-B360-Q060-P0-SOURCE-FOUR-LAYER-MANUAL-20261010-2230",
+  "timestamp_kst": "2026-10-10T22:40:40+09:00",
+  "queue_index": 60,
+  "asset": "A064FDFC",
+  "priority": "P0",
+  "owner_parity": "EVEN",
+  "user_regression": "IGR-044",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "producer_status": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_VISUAL_FAIL",
+  "producer_visual": "FAIL_NATIVE_AND_PRACTICAL_SCALE_HORIZONTAL_BANDING_UNQUALIFIED_RACING_FAMILY",
+  "reason": "Native persisted DDS visually differs from English original's dense orange/yellow racing italic: Korean has distinct uniform horizontal orange bars on individual Hangul strokes, weak cream face/counters and less authentic italic/3-D typography despite a new source-measured layered palette. Quantitative native source containment passes but cannot override the visible source-family mismatch. Do not promote, do not reproduce same recipe.",
+  "method_change_from_B359": "Completely replaced B359 diffuse contour-normal face with pixel-classified separate orange/cream/gold matte bands reconstructed from SHA-authenticated English BEST TIME original; 1px native-resolution face expansion; separate navy extrusion and source-English B-stem OLS retained. No upscaled prior Korean and no other atlas labels altered.",
+  "backend": "GITHUB_ACTIONS_CPU_WORKER_LOCAL_GITHUB_DNS_UNAVAILABLE",
+  "workflow_success": 38056393386,
+  "first_preflight_run": 38056221140,
+  "first_preflight_result": "FAILED_SYNTAX_BEFORE_DDS_NO_OUTPUT",
+  "script_fix_commit": "23c35e1c217693604061f9710b9d543c113526d5",
+  "worker_output_commit": "e5c0344ad2c9e6622a8d1a0384911b71d97d1554",
+  "source": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4d2a8809d4120cadbc"
+  },
+  "authored_clean": {
+    "path": "localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png",
+    "sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "reused": true
+  },
+  "current_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "prior_C2_rejected_B359_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+  "new_distinct_unapproved_saved_dds_sha256": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d",
+  "trial_dds": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_Q060_SOURCE_LAYERED_FACE_KOREAN_UNAPPROVED.dds",
+  "new_trial_dds": 1,
+  "official_promoted_dds": 0,
+  "independent_C2_pass": 0,
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "persisted_new_effect_bbox": [
+    2221,
+    342,
+    3024,
+    472
+  ],
+  "bbox_margins_px": [
+    42,
+    4,
+    2,
+    2
+  ],
+  "source_size_px": [
+    849,
+    134
+  ],
+  "new_effect_size_px": [
+    803,
+    130
+  ],
+  "dds": {
+    "decoded_size": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "orientation": "RAW_MIRROR_Y",
+    "persisted_roundtrip_mismatch_pixels": 0,
+    "official_to_trial_changed_rgba_pixels": 93196,
+    "outside_worker_roi_rgba_changed": 0,
+    "protected_source_sibling_delta": 0
+  },
+  "source_material_samples": {
+    "orange_rgb": [
+      255,
+      134,
+      0
+    ],
+    "cream_rgb": [
+      255,
+      223,
+      180
+    ],
+    "gold_rgb": [
+      255,
+      210,
+      95
+    ],
+    "orange_source_pixels": 26502,
+    "cream_source_pixels": 2110,
+    "gold_source_pixels": 35189,
+    "navy_source_pixels": 32234,
+    "new_face_orange_pixels": 12179,
+    "new_face_cream_pixels": 1685
+  },
+  "eight_visual_checks": [
+    {
+      "name": "source_english_removal",
+      "result": "PASS_SCOPED",
+      "observation": "Exact reused source->B348 CLEAN plate originally 89391 in source bbox and alpha zero in removal mask"
+    },
+    {
+      "name": "slant_lean_original",
+      "result": "HOLD_MULTI_GLYPH",
+      "observation": "Original English B stem OLS readable +0.3421 only; no homologous all-glyph blind source-family slant qualification"
+    },
+    {
+      "name": "native_scale",
+      "result": "PASS_CONTAINMENT",
+      "observation": "803x130 within 849x134 English effect, positive 42/4/2/2 margins"
+    },
+    {
+      "name": "stroke_fill_shadow",
+      "result": "FAIL_STYLE",
+      "observation": "Source orange/cream/gold samples numerically grounded but still form flat near-horizontal stripe/slab Hangul, unlike original depth, glyph proportions and italic racing family"
+    },
+    {
+      "name": "glyph_integrity_clipping",
+      "result": "PASS_SCOPED",
+      "observation": "No obvious clipped Korean in native or 50% readable saved 4-column comparison"
+    },
+    {
+      "name": "protected_art",
+      "result": "PASS_SCOPED",
+      "observation": "93,196 RGBA modifications are within 1030x148 BEST TIME worker ROI; outside/protected source sibling modification 0"
+    },
+    {
+      "name": "orientation",
+      "result": "PASS_SCOPED",
+      "observation": "Opened native FLIPY and vertical mirrored RAW views of SAVED DDS; one authored mip"
+    },
+    {
+      "name": "readability",
+      "result": "HOLD_FAMILY",
+      "observation": "Individual Hangul legible at 50%, but original racing headline density and source palette depth not met"
+    }
+  ],
+  "evidence": {
+    "machine": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_Q060_MACHINE_AND_SOURCE_FAMILY.json",
+    "source_palette_profile": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_SOURCE_ENGLISH_FOUR_MATERIAL_LAYERS.json",
+    "native": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "practical50": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_50_FLIPY.png",
+    "raw": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png",
+    "plate_only": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_BEST_TIME_PLATE_ONLY_ROI.png",
+    "lettering_only": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_BEST_TIME_TRANSPARENT_LETTERING_ROI.png"
+  },
+  "consumer_coverage": {
+    "current": "STATIC_PERSISTED_ONLY",
+    "untested": [
+      "game selection of HUD atlas after race",
+      "BEST TIME during race result refresh",
+      "screen stack with HUD/heart/rank overlays"
+    ],
+    "first_unverified_link": "EXACT_PREVIEW_MANIFEST_TO_GAME_LOOKUP_AND_COMPOSITION"
+  },
+  "official_status": "C342_REWORK_REQUIRED_UNCHANGED",
+  "C2": "NOT_RUN_ON_B360",
+  "C3": "BLOCKED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "MANUAL_RECONSTRUCTION_REQUIRED: reconstruct actual source brush-like racing glyph strokes, independently validate English and Korean analogous stem widths, beveled sidewall profile and natural Hangul counters. Do not multiply unapproved equivalent trials. Independent C2 only on a visually qualified new method.",
+  "forbidden_domains_touched": []
+}
