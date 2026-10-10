@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 101,
+  "review_id": "C1-Q101-A225-NEW-SHA-20261010-1620",
+  "run_key": "OUTRUN-KOR-C1-Q101-A225-SAVED-CLEAN-45PIXEL-REWORK-20261010-1620",
+  "reviewer": "ChatGPT AI 1 C1 (not a separate C3 reviewer)",
+  "reviewed_at_kst": "2026-10-10 16:20 KST",
+  "execution_backend": "GitHub connector + N100 MCP auxiliary for direct persisted DDS SHA verification and read-only numpy/Pillow inspection; no game run",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "candidate_path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_Q101_WARNING_NATIVE_ITALIC_UNPROMOTED.dds",
+  "source_sha256_producer_pinned": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "old_official_candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "trial_candidate_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+  "trial_sha_verified_from_download": true,
+  "producer_trial_reviewed_distinct_from_earlier_C1_sha": true,
+  "evidence_sources": [
+    {
+      "path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_GRAY_100.png",
+      "sha256": "c26c07d4b69a092fe97448a78466db634b11f9e85d1c35b2a2b652a585e32d15",
+      "mode": "visual first-hand + pixel RGB comparisons"
+    },
+    {
+      "path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_BLACK_50.png",
+      "sha256": "fa4ace4cce08896479027e900b77382844c137107e1e2e522d514176025a8dce",
+      "mode": "visual native practical 50 percent"
+    },
+    {
+      "path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_FINAL_RAW_NATIVE_RGBA.png",
+      "sha256": "7209986145609626fb815a73abe22c5b891f5c1c689256f6dd01abc4941f2aad",
+      "mode": "persisted RAW orientation visual"
+    },
+    {
+      "path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_Q101_WARNING_NATIVE_ITALIC_UNPROMOTED.dds",
+      "sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+      "mode": "saved DDS independently downloaded and hashed"
+    }
+  ],
+  "observed_machine": {
+    "candidate_dimensions": [
+      4096,
+      4096
+    ],
+    "pixel_format": "DDS RGB32, RGBA four-channel little-endian",
+    "dds_header_bytes": 128,
+    "mips": 1,
+    "source_and_trial_raw_orientation": "mirror_Y",
+    "old_to_trial_changed_RGBA_pixels": 114661,
+    "old_to_trial_changed_alpha_pixels": 57193,
+    "changed_RGBA_outside_warning_raw_ROI": 0,
+    "changed_alpha_outside_warning_raw_ROI": 0,
+    "raw_bbox_used_for_unchanged_neighbor_check": [
+      3006,
+      3928,
+      3932,
+      4071
+    ],
+    "roi_coordinate_note": "original readable warning bbox [3006,25,3932,168] mapped to RAW mirror-Y [3006,3928,3932,4071] inclusive/exclusive rectangle",
+    "caution": "Old-to-trial 0 outside pixel count does NOT establish source-to-CLEAN protection PASS or total atlas correctness."
+  },
+  "first_hand_contact_residue": {
+    "input": "A225_COMPARE_GRAY_100.png four equal panels SOURCE/CLEAN/A38/A225, each 1246x238",
+    "coordinate_roi": {
+      "local_panel_x": [
+        152,
+        156
+      ],
+      "y": [
+        28,
+        120
+      ],
+      "coordinate_system": "saved source/CLEAN/old/trial contact PNG panel coordinates (not native DDS)"
+    },
+    "clean_visible_non_gray_pixels": 45,
+    "source_visible_non_gray_pixels_same_coordinates": 45,
+    "clean_source_RGB_identical_pixels": 45,
+    "clean_old_RGB_identical_pixels": 45,
+    "clean_trial_RGB_identical_pixels": 45,
+    "observed": "Isolated navy/dark source-derived mark to the right of warning icon, left of first Korean glyph, persists in CLEAN and exact new A225 candidate contact, separate from visible triangular warning icon outline. Source glyph/effect pixels have not been fully removed.",
+    "verdict": "FAIL",
+    "reason_codes": [
+      "INCOMPLETE_CLEAN_PLATE",
+      "SOURCE_RESIDUE_LEFT_OF_KOREAN_WARNING"
+    ]
+  },
+  "first_hand_visual": {
+    "slant": "SCOPED_IMPROVED_NOT_FINAL_SOURCE_ANCHORS_UNMEASURED: native and 50% show A225 Korean right lean, unlike prior almost-upright A38; no formal source top-minus-bottom glyph anchors",
+    "clean_plate": "FAIL: 45 original-color non-background contact PNG pixels survive SOURCE->CLEAN->FINAL",
+    "style": "HOLD: face/outline broadly yellow/navy and italics improved but source-family independently calibrated acceptance unproven",
+    "readability": "SCOPED legible at 50% but line2 narrower than source and canonical wording has changed",
+    "glyph_integrity": "SCOPED no obvious fractured Hangul in shown PNG; cannot override contaminated plate",
+    "protected_art": "PASS for old-to-new unchanged pixels outside original warning bbox, original-vs-CLEAN protected icon classification still HOLD",
+    "placement": "SCOPED 0 changes outside original warning raw ROI; native source bboxes per line sourced from producer not independently rederived",
+    "orientation": "RAW displayed inverted as expected under source mirror-Y, FLIP-Y readable in saved comparison; game consumer untested"
+  },
+  "calibration": {
+    "blind_review_completed": false,
+    "comment": "A historical defect and producer HOLD were known before this C review; never label this as blind calibration."
+  },
+  "review_order": {
+    "pixels_before_producer_verdict": false,
+    "comment": "A225 producer report was consulted before this review, no false first-look claim."
+  },
+  "independent_C1_result": "REWORK_REQUIRED",
+  "trial_only": true,
+  "official_candidate_promoted": false,
+  "official_queue_state": "REWORK_REQUIRED_OFFICIAL_UNCHANGED",
+  "new_produced_dds_by_C1": 0,
+  "accepted_C1_pass": false,
+  "c3": "BLOCKED",
+  "current_policy_approval": "BLOCKED",
+  "user_ingame_regression_closure": "OPEN_OR_UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "A correct SOURCE->CLEAN warning start glyph remnant without deleting icon/protected pixels; authenticate canonical SOURCE/CLEAN and glyph footprint, retain authorized Korean sentence and source-matched slant anchors; producer strict pixel guard; then genuinely new SHA C1, separate C3, and actual user in-game retest. Never mark unchanged official or this trial PASS.",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
