@@ -68,12 +68,30 @@ namespace OutRunVR::IpcV3
             return false;
         if (!QuaternionSane(state.headOrientation))
             return false;
-        if (qpcFrequency <= 0 || state.sampleQpc <= 0 || staleMilliseconds <= 0)
+        // Reject clock regression before subtracting signed QPC samples.
+        if (nowQpc <= 0 || qpcFrequency <= 0 || state.sampleQpc <= 0 ||
+            staleMilliseconds <= 0 || nowQpc < state.sampleQpc)
             return false;
-        const std::int64_t age = nowQpc - state.sampleQpc;
-        const std::int64_t maxAge = (qpcFrequency * staleMilliseconds) / 1000;
-        if (age < 0 || age > maxAge)
+        const auto age = static_cast<std::uint64_t>(nowQpc - state.sampleQpc);
+        const auto frequency = static_cast<std::uint64_t>(qpcFrequency);
+        const auto toleranceMs = static_cast<std::uint64_t>(staleMilliseconds);
+
+        // Compare whole seconds, then fractional ticks against the exact
+        // floor(frequency * remaining_ms / 1000). Neither multiply can
+        // overflow uint64_t: remaining_ms is strictly less than 1000.
+        const auto ageSeconds = age / frequency;
+        const auto toleranceSeconds = toleranceMs / 1000u;
+        if (ageSeconds > toleranceSeconds)
             return false;
+        if (ageSeconds == toleranceSeconds)
+        {
+            const auto remainingMs = toleranceMs % 1000u;
+            const auto partialTicks =
+                (frequency / 1000u) * remainingMs +
+                ((frequency % 1000u) * remainingMs) / 1000u;
+            if (age % frequency > partialTicks)
+                return false;
+        }
         if ((state.flags & PositionValid) != 0 && !Vector3Finite(state.headPositionMeters))
             return false;
 

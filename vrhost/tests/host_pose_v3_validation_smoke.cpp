@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <limits>
 
 #include "vr/ipc/host_pose_v3.hpp"
 
@@ -53,6 +54,35 @@ int main()
     state = MakeValid();
     state.sampleQpc = now - frequency;
     ok &= Expect(!HostStateUsable(state, now, frequency), "stale pose rejected");
+
+    // Inclusive age boundary and fractional QPC ticks-per-millisecond.
+    state = MakeValid();
+    state.sampleQpc = now - 250'000;
+    ok &= Expect(HostStateUsable(state, now, frequency), "250 ms boundary accepted");
+    state.sampleQpc = now - 250'001;
+    ok &= Expect(!HostStateUsable(state, now, frequency), "250 ms plus one tick rejected");
+
+    state = MakeValid();
+    state.sampleQpc = now - 250;
+    ok &= Expect(HostStateUsable(state, now, 1001), "fractional QPC cutoff accepted");
+    state.sampleQpc = now - 251;
+    ok &= Expect(!HostStateUsable(state, now, 1001), "fractional QPC stale rejected");
+
+    // Old (frequency * staleMilliseconds) overflowed int64.
+    constexpr auto maxQpc = std::numeric_limits<std::int64_t>::max();
+    state = MakeValid();
+    state.sampleQpc = 1;
+    ok &= Expect(HostStateUsable(state, maxQpc, maxQpc, 1000),
+        "int64 limit at one-second cutoff accepted");
+    ok &= Expect(HostStateUsable(state, maxQpc, maxQpc, maxQpc),
+        "int64 frequency and tolerance accepted without wrap");
+    ok &= Expect(!HostStateUsable(state, maxQpc, 1, maxQpc),
+        "int64 tolerance cannot admit stale sample");
+
+    state = MakeValid();
+    state.sampleQpc = now + 1;
+    ok &= Expect(!HostStateUsable(state, now, frequency), "future QPC sample rejected");
+    ok &= Expect(!HostStateUsable(state, -1, frequency), "negative now QPC rejected");
 
     state = MakeValid();
     state.headOrientation[0] = std::nanf("");
