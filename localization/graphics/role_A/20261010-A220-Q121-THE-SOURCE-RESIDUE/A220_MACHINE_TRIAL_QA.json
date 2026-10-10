@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "run": "A220",
+  "run_key": "OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
+  "role": "A",
+  "queue_index": 121,
+  "priority": "P0",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "triage": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"MATERIAL_REWORK\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 121,\n      \"path\": \"textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds\",\n      \"current_status\": \"a219_p0_q121_source_goal_33_english_residue_rework_required_official_unchanged\",\n      \"next_action\": \"MATERIAL_REWORK\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Current candidate has an actionable defect; rebuild the failed source-style stage\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
+  "canonical_source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "A219_existing_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+  "new_distinct_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "native": [
+    4096,
+    4096
+  ],
+  "DDS": "RGBA32 1 mip",
+  "source_rank": 24,
+  "source_english": "the",
+  "source_readable_crop": [
+    3056,
+    651,
+    3205,
+    743
+  ],
+  "A215_rank24_source_exact": true,
+  "source_plate_final_old_exact": true,
+  "new_source_identical_orphan_pixels_removed": 24,
+  "ambiguous_alpha_pixels_in_inner_bbox_untouched": 0,
+  "changed_pixels_vs_prior_trial": 24,
+  "changed_bytes_vs_prior_trial": 95,
+  "outside_selected_exact_source_pixels_changed": 0,
+  "A219_prior33_preserved": true,
+  "other_atlas_pixels_byte_identical_to_A219": true,
+  "new_candidate_published": false,
+  "trial_only": true,
+  "self_machine": "SCOPED_SOURCE_RESIDUE_REMOVAL_PASS",
+  "visual": "CONTROLLER_FIRSTLOOK_REQUIRED",
+  "full_atlas": "HOLD_NEEDS_29_TEXT_SEGMENTS_PROTECTED_ART_MASK_FONT_CALIBRATION",
+  "c1": "PENDING_NEW_TRIAL",
+  "c3": "NOT_RUN",
+  "user_ingame": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions CPU worker, local container DNS unavailable; N100 not used"
+}
