@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 18:12 KST",
+  "updated_at_kst": "2026-10-10 18:47:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,44 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q154_B354_B355_two_visual_rework_trials": {
+        "index": 154,
+        "role": "B",
+        "run_key": "OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847",
+        "backend": "GITHUB_ACTIONS",
+        "worker_runs": [
+          38042052215,
+          38042396989
+        ],
+        "initial_failed_preflight_run": 38041963130,
+        "canonical_source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+        "known_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+        "unchanged_official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+        "new_B354_unapproved_dds_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+        "new_B355_unapproved_dds_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+        "new_persisted_trial_dds": 2,
+        "official_promoted_dds": 0,
+        "first_pass_independent_C_accept": 0,
+        "persisted_roundtrip_mismatch": [
+          0,
+          0
+        ],
+        "outside_3_changed_rgba": [
+          0,
+          0
+        ],
+        "changed_rgba_pixels": [
+          65222,
+          22195
+        ],
+        "visual_B354": "FAIL_NATIVE_REGULAR_UNDERWEIGHT_UNDERFILL",
+        "visual_B355": "FAIL_NATIVE_GLYPH_COUNTER_NOT_RECONSTRUCTED",
+        "C2": "C356_REWORK_UNCHANGED",
+        "C3": "BLOCKED",
+        "IGR_USER_GAME": "UNTESTED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "future_method": "MANUAL_SOURCE_VECTOR_COUNTER_REBUILD"
+      },
       "latest_b_q060_B352_B353_two_optical_trials": {
         "index": 60,
         "role": "B",
