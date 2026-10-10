@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B356",
+  "run_key": "OUTRUN-KOR-B356-Q212-P1-SOURCE-MODE-NATIVE-TRIAL-20261010-1942",
+  "queue_index": 212,
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "C158_clean_reference_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "new_trial_sha256": "db72a9b52bf6b86c0dfbc9181b17542aa81e21fe4fa8161769b0f657f4532d35",
+  "backend": "GitHub Actions 38045635253 producer; ChatGPT firsthand visual optical QA; N100 metadata-only",
+  "initial_preflight_failed_run": 38045458122,
+  "machine": {
+    "native": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32 mip1",
+    "changed_rgba_pixels": 13320,
+    "changed_outside_2_source_rois": 0,
+    "stored_decode_difference": 0,
+    "protected_other_ten_current_sprites_byte_exact": true
+  },
+  "actual_views": [
+    "B356_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B356_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "B356_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B356_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png"
+  ],
+  "region_findings": [
+    {
+      "region": "43",
+      "source": "PROFESSIONAL",
+      "trial": "프로페셔널 모드",
+      "source_width": 395,
+      "trial_width": 284,
+      "ratio": 0.719,
+      "result": "HOLD_NEW_SEMANTIC_SUFFIX_AND_SOURCE_TITLE_HIERARCHY",
+      "observation": "Native-size new Korean title restores original source anchor and 42px high text inside 45px English bbox; source title remains more expansive. Added 모드 conveys menu-category function but requires translation semantic approval before promotion."
+    },
+    {
+      "region": "44",
+      "source": "OUTRUN",
+      "trial": "아웃런",
+      "source_width": 209,
+      "trial_width": 113,
+      "ratio": 0.5407,
+      "result": "FAIL_SOURCE_HIERARCHY_UNDERFILL",
+      "observation": "Direct decoded actual PNG at native 100 shows too small/narrow Korean versus source heavy wide title, unlike source. 50% further reduces headline weight; numeric containment cannot override visible scale hierarchy failure."
+    }
+  ],
+  "producer_decision": "REWORK_REQUIRED_UNPROMOTED",
+  "next_attempt": "One final semantically explicit OUTRUN -> 아웃런 모드 at native 39ppem within exact source 211x45 effect ceiling, no inflated old rasters; compare to canonical under native/50, fail closed if style insufficient.",
+  "official_promoted": 0,
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
