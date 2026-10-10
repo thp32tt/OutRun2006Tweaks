@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX9EX-00589",
+  "lane": "DX9EX",
+  "work_key": "DX9EX:R84:UPPER_4TU_CMAKE_SPLIT",
+  "phase": "C4_COMMITTED_C3_EXACT_TARGET_GATE",
+  "target_branch": "vr-d3d9ex-focus",
+  "validation_bearing_result_sha": "9e393cfdc2865e580c0cb2e16b364017afd3b1da",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00589]",
+  "candidate_validation": {
+    "sha": "bacb75aeb9857cee01fe7137b4adc505b3b6755d",
+    "run_id": 38048371231,
+    "result": "SUCCESS"
+  },
+  "target_gates": {
+    "dx9ex_active": 38048763176,
+    "domain_isolation": 38048763206,
+    "full_source": 38048763249,
+    "hud_inspector": 38048763180
+  },
+  "changed_paths": 11,
+  "issue14_material_log_comment_id": 6097056954,
+  "c6_record": "docs/automation/runs/CONVERSION-DX9EX-00589.json",
+  "controller_terminal": false,
+  "retry_allowed": false,
+  "do_not_duplicate_source": true,
+  "runtime_validation": "UNTESTED",
+  "notes": "R33/R32/R31/R30 four-TU verified candidate port material applied exactly once; next action poll exact target SHA CI. If all Gate SUCCESS write separate C6 docs bookkeeping and AI2 scoreboard from current GitHub SSOT (952 at dispatch) +1 ONCE. Full R84 R30/R29 lower textual split remains incomplete. Do not rerun 00589 work when CI already complete."
+}
