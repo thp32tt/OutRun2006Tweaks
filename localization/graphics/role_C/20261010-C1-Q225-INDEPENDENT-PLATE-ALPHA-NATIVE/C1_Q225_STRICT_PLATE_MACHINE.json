@@ -1,0 +1,365 @@
+{
+  "sha256": {
+    "source": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "candidate": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "clean": "1191e5c8287f6385ae34c390c4969eedb1a2c9ad86d0867a4a3192ea0ca102cf"
+  },
+  "image_dims": [
+    2048,
+    1024
+  ],
+  "clean_mode_used": "as_stored",
+  "clean_orient_tests": {
+    "as_stored": {
+      "diff_total_rgba": 61787,
+      "changed_outside_original_9_boxes_rgba": 0,
+      "changed_outside_original_9_boxes_alpha": 0,
+      "alpha_changes_total": 61787
+    },
+    "flipy": {
+      "diff_total_rgba": 1414997,
+      "changed_outside_original_9_boxes_rgba": 1297937,
+      "changed_outside_original_9_boxes_alpha": 168618,
+      "alpha_changes_total": 230292
+    }
+  },
+  "pixel_global": {
+    "source_clean": {
+      "diff_total_rgba": 61787,
+      "changed_outside_original_9_boxes_rgba": 0,
+      "changed_outside_original_9_boxes_alpha": 0,
+      "alpha_changes_total": 61787
+    },
+    "clean_final": {
+      "diff_total_rgba": 28442,
+      "changed_outside_original_9_boxes_rgba": 0,
+      "changed_outside_original_9_boxes_alpha": 0,
+      "alpha_changes_total": 28442
+    },
+    "source_final": {
+      "diff_total_rgba": 66385,
+      "changed_outside_original_9_boxes_rgba": 0,
+      "changed_outside_original_9_boxes_alpha": 0,
+      "alpha_changes_total": 66385
+    }
+  },
+  "region_info": [
+    {
+      "id": "game_lobby",
+      "bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "pixels_source_clean": 14900,
+      "pixels_clean_final": 6552,
+      "source_clean_alpha_changes": 14900,
+      "clean_final_alpha_changes": 6552
+    },
+    {
+      "id": "game_list",
+      "bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "pixels_source_clean": 11957,
+      "pixels_clean_final": 6782,
+      "source_clean_alpha_changes": 11957,
+      "clean_final_alpha_changes": 6782
+    },
+    {
+      "id": "setup",
+      "bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "pixels_source_clean": 7097,
+      "pixels_clean_final": 3498,
+      "source_clean_alpha_changes": 7097,
+      "clean_final_alpha_changes": 3498
+    },
+    {
+      "id": "course_type",
+      "bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "pixels_source_clean": 6190,
+      "pixels_clean_final": 2127,
+      "source_clean_alpha_changes": 6190,
+      "clean_final_alpha_changes": 2127
+    },
+    {
+      "id": "course",
+      "bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "pixels_source_clean": 3976,
+      "pixels_clean_final": 904,
+      "source_clean_alpha_changes": 3976,
+      "clean_final_alpha_changes": 904
+    },
+    {
+      "id": "car_type",
+      "bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "pixels_source_clean": 4152,
+      "pixels_clean_final": 2450,
+      "source_clean_alpha_changes": 4152,
+      "clean_final_alpha_changes": 2450
+    },
+    {
+      "id": "catch_up",
+      "bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "pixels_source_clean": 4392,
+      "pixels_clean_final": 2278,
+      "source_clean_alpha_changes": 4392,
+      "clean_final_alpha_changes": 2278
+    },
+    {
+      "id": "collision",
+      "bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "pixels_source_clean": 4991,
+      "pixels_clean_final": 1404,
+      "source_clean_alpha_changes": 4991,
+      "clean_final_alpha_changes": 1404
+    },
+    {
+      "id": "players",
+      "bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "pixels_source_clean": 4132,
+      "pixels_clean_final": 2447,
+      "source_clean_alpha_changes": 4132,
+      "clean_final_alpha_changes": 2447
+    }
+  ],
+  "raw_flipy_source_diff": 0,
+  "raw_flipy_final_diff": 0,
+  "header_equal": true,
+  "source_dds_bytes": 8388736,
+  "candidate_dds_bytes": 8388736,
+  "views": [
+    {
+      "path": "C1_Q225_game_lobby_GRAY.png",
+      "sha256": "55974bfdf5b0619cb3518ee462f0d9826ffb5c941e4f7bb2fcdd962860a900de",
+      "bytes": 6733,
+      "region": "game_lobby",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_game_lobby_BLACK.png",
+      "sha256": "5595344442b1d10276bbec8e778cc728f0ffb4e2f435a5714d9c3093c1845837",
+      "bytes": 9580,
+      "region": "game_lobby",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_game_list_GRAY.png",
+      "sha256": "cf94953fa02a4195f6ad146c9c77237f072a9d85ddd52f1aa8834b7370271e47",
+      "bytes": 5939,
+      "region": "game_list",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_game_list_BLACK.png",
+      "sha256": "d244a35ace402f653b5f26e11484c99b66fbff56d1ffb1517b86aaff621d88be",
+      "bytes": 8499,
+      "region": "game_list",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_setup_GRAY.png",
+      "sha256": "466b2bd19a114ccdfcf0d813774d1ead030346e1f3b3a8e7214622107f3517ee",
+      "bytes": 6098,
+      "region": "setup",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_setup_BLACK.png",
+      "sha256": "8e20e6a5600e7f69e54b888b584eb19b54ee201fd5a04e6c0adf1b015fdb222b",
+      "bytes": 5812,
+      "region": "setup",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_course_type_GRAY.png",
+      "sha256": "013dca27f7386ad2dd0b1a732aa8a04125cfc150e3b8d2f6bad65217e3a74d01",
+      "bytes": 5686,
+      "region": "course_type",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_course_type_BLACK.png",
+      "sha256": "ddf1c76dd6bac4f510b9ad2b187af2a475b857cb8847b1268b29b428c2b88952",
+      "bytes": 6371,
+      "region": "course_type",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_course_GRAY.png",
+      "sha256": "fcbada98e8bed593a3610c24ba65aae8bcff7364a32d8e2a9bddd12a3ac200a1",
+      "bytes": 3932,
+      "region": "course",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_course_BLACK.png",
+      "sha256": "3c0550f22989cf17ba6ff1afaee57a02d29c630160fa3121c4537f481864dbf2",
+      "bytes": 4200,
+      "region": "course",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_car_type_GRAY.png",
+      "sha256": "4a58a717baf69f7205b5d30032a2288e9bd337300af11e5a517dd3706fca89ed",
+      "bytes": 5098,
+      "region": "car_type",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_car_type_BLACK.png",
+      "sha256": "bc2bedae848fa26b05a0bdfa62958c4200a2e919d5425a696cc6fada9f20de58",
+      "bytes": 5609,
+      "region": "car_type",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_catch_up_GRAY.png",
+      "sha256": "a141e71849c11b91c4646d7db19c5921b1e2dfb4bda59ca02c65cd47c5f8fa51",
+      "bytes": 4585,
+      "region": "catch_up",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_catch_up_BLACK.png",
+      "sha256": "fd0eb1cc553609270226f5c8ec69efb236549d01713f8be87ffa60273a77e0fb",
+      "bytes": 5356,
+      "region": "catch_up",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_collision_GRAY.png",
+      "sha256": "c79c11c30822b5c803ad1eafdcbb0241f3fc350bcc95a4b389945c9ceef77163",
+      "bytes": 4220,
+      "region": "collision",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_collision_BLACK.png",
+      "sha256": "be7256add485de95dace85954fd7fb2bceeb668c37cb71bffcf6b608c46d3213",
+      "bytes": 4872,
+      "region": "collision",
+      "view": "BLACK",
+      "scale": 50
+    },
+    {
+      "path": "C1_Q225_players_GRAY.png",
+      "sha256": "1eaf6079a04e1c8444f7758f20ebe32bfaa6f32b72b8c45631c4d8f73b384ef9",
+      "bytes": 4602,
+      "region": "players",
+      "view": "GRAY",
+      "scale": 100
+    },
+    {
+      "path": "C1_Q225_players_BLACK.png",
+      "sha256": "edfcec27350a01e198a5deacf19f24026f6af4da14cef7c5d14624307a4a13af",
+      "bytes": 5358,
+      "region": "players",
+      "view": "BLACK",
+      "scale": 50
+    }
+  ],
+  "unpublished_views": [
+    {
+      "path": "C1_Q225_game_lobby_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_game_list_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_setup_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_course_type_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_course_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_car_type_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_catch_up_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_collision_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    },
+    {
+      "path": "C1_Q225_players_WHITE.png",
+      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+    }
+  ],
+  "kind": "NEW_INDEPENDENT_SOURCE_TO_CLEAN_PER_REGION_ALPHA_PROOF",
+  "role": "C1",
+  "queue_index": 225,
+  "conclusion": "EVIDENCE_ONLY_HOLD_STRICT_RECHECK_NO_C_PASS",
+  "coverage": {
+    "source_clean_visible_alpha_zero_inside_9_of_9": true,
+    "source_clean_changed_outside_original_bboxes": 0,
+    "clean_final_changed_outside_original_bboxes": 0,
+    "black_50_gray_100_persisted": true,
+    "white_75_persisted": false
+  }
+}
