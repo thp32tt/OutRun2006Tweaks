@@ -20,7 +20,8 @@ guards = (
 )
 assert all(g in r211 for g in guards), "R211 missing OM/MRT guard"
 for g in guards:
-    mutant = r211.replace(g, "", 1)
+    # Remove every instance: OM slot-count appears in the buffer and loop.
+    mutant = r211.replace(g, "")
     assert not all(x in mutant for x in guards), "R211 guard mutation escaped: " + g
 assert "->Draw(" not in source and "->DrawIndexed(" not in source, "gameplay Draw forbidden"
 for item in (

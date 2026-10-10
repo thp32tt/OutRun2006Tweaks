@@ -110,6 +110,13 @@
     "runtime_validation": "UNTESTED",
     "implementation": "R211 opt-in nonindexed depth OM guard refuses live RTV slots 1..7, retains R210 depth and R209 exact pipeline, restores bound one-eye state after WARP negative; no gameplay Draw",
     "blocked_upstream": "R175 source owner 00477 remains separate; full exact SHA may fail prior TEXCOORD6 mismatch",
-    "next_action": "Await exact GitHub Backend Conversion Gate for R211 material result, record scoped/whole distinction"
+    "next_action": "After R212 exact Gate completed, fast-forward this staged R211 test oracle fix with CAS; evaluate its own exact-SHA Gate before C6. RUNTIME_VALIDATION=UNTESTED.",
+    "first_candidate_sha": "927a0d2a715f4aaa9aeb8d0193f49b154f5ac5fd",
+    "first_gate_run_id": 38009897280,
+    "first_gate_status": "FAIL_R211_NEGATIVE_MUTATION_FALSE_POSITIVE",
+    "first_gate_win32": "PASS_114087229518",
+    "first_gate_smoke": "FAIL_114088546152",
+    "first_gate_failure_line": "AssertionError: R211 guard mutation escaped: D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT",
+    "source_guard_fail_observed": false
   }
 }
