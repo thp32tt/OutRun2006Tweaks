@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B349",
+  "queue_index": 60,
+  "run_key": "OUTRUN-KOR-B349-Q060-P0-SOURCE-FIRST-NATIVE-LETTERING-20261010-1430",
+  "method": "B348 authenticated original English two-component alpha CLEAN, new native direct glyphs with pinned font, sampled SOURCE warm face, transparent-only gradient/navy rim/brown extrusion",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "priority": "P0",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "prior_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "authored_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "authored_mask_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "trial_persisted_sha256": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159",
+  "trial_DDS": "B349_Q060_SOURCE_FIRST_GOLD_KOREAN_UNAPPROVED.dds",
+  "bytes": 33554560,
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "new_effect_bbox": [
+    2358,
+    353,
+    2870,
+    467
+  ],
+  "native_glyph_bbox_pre_italic": [
+    2357,
+    358,
+    2846,
+    457
+  ],
+  "text": "최고 기록:",
+  "font_file": "NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_license": "OFL Noto CJK; verify distribution before packaging",
+  "glyph_coverage": "ALL_CODEPOINTS_PRESENT",
+  "font_native_ppem": 104,
+  "letter_spacing": 12,
+  "natural_advance_px": 440.15625,
+  "source_gold_sample_rgb_upper": [
+    255,
+    181,
+    76
+  ],
+  "source_gold_sample_rgb_lower": [
+    255,
+    187,
+    56
+  ],
+  "source_italic_readable_right_anchor_shear_ESTIMATE_NOT_C_QUALIFIED": 0.22,
+  "gradient": "SOURCE_NATIVE_WARM_FACE_ROW_MEDIAN_INTERPOLATED",
+  "stroke_px": 5,
+  "extrusion_offset": [
+    5,
+    5
+  ],
+  "roi": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "changed_rgba_pixels": 87512,
+  "changed_rgba_outside_roi": 0,
+  "original_protected_sibling_rgba_changed_outside_effect": 0,
+  "persisted_dds_roundtrip_mismatch": 0,
+  "raw_channel_masks": [
+    255,
+    65280,
+    16711680,
+    4278190080
+  ],
+  "source_clean_source_pixels_removed": 89391,
+  "preview_files": [
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_75_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_50_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_100_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_75_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_50_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_WHITE_100_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_WHITE_75_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_WHITE_50_FLIPY.png",
+    "B349_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png"
+  ],
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "P1": "REUSED_B348_SCOPED_SOURCE_CLEAN_VISUAL_PASS",
+  "P2": "NEW_TRANSPARENT_GLYPHS_NEED_CONTROLLER_OPTICAL_REVIEW",
+  "P3": "PERSISTED_TRIAL_MECHANICAL_ROUNDTRIP_PASS_VISUAL_PENDING",
+  "final_production_pixel_guard": "NOT_APPLICABLE_TO_UNPROMOTED_TRIAL",
+  "official_C2": "C342_REWORK_REQUIRED_UNCHANGED",
+  "C3": "BLOCKED",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden": [
+    "A_ODD",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
