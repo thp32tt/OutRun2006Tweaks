@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "implementation_validation_in_progress",
+  "captured_at_kst": "2026-10-10T16:48:00+09:00",
+  "task_id": "CONVERSION-DX9EX-00581",
+  "production_id": "CONVERSION-DX9EX-00581",
+  "lane": "DX9EX",
+  "slot": "C",
+  "branch": "vr-d3d9ex-focus",
+  "base_sha": "b35e39f7011d7234bfb8fd2d7cc95057cf511e70",
+  "first_material_sha": "23f0b9f352dc00bba6427e7a172f98d089078f2f",
+  "repair_material_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+  "work_key": "DX9EX:P0:VR_SDL_TO_XINPUT_RUMBLE_EXCLUSIVE",
+  "changed_paths": [
+    "src/hooks_forcefeedback.cpp",
+    "tools/verify_vr_ffb_controller_routing.py"
+  ],
+  "result_sha": null,
+  "terminal": false,
+  "status": "C3_EXACT_SHA_CI_IN_PROGRESS",
+  "validator": "static preflight 6/6; initial CI failed on verifier negative mutation uncaught IndexError; repaired missing-wheel-branch guard",
+  "exact_sha_ci": {
+    "active": {
+      "sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+      "run_id": 38035379682,
+      "status": "IN_PROGRESS_POLICY_AND_HOST_PASS"
+    },
+    "domain": {
+      "sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+      "run_id": 38035379693,
+      "status": "SUCCESS"
+    },
+    "full_source": {
+      "sha": "23f0b9f352dc00bba6427e7a172f98d089078f2f",
+      "run_id": 38035318052,
+      "status": "IN_PROGRESS_SOURCE_SHA_PRIOR_TO_VERIFIER_ONLY_REPAIR"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "next_action": "Do not repeat existing implementation or rerun successful SHA; consume Active game/full-chain/package CI and parent-source Full Source CI; repair only if failure; then append C6 docs and scoreboard without altering validation-bearing SHA."
+}
