@@ -765,3 +765,36 @@ jobs:
           name: outrun-vr-host-x64
           path: build-vrhost/bin/outrun-vr-host.exe
           if-no-files-found: error
+  dx11-first-game-frame-bundle:
+    name: DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle
+    if: github.event_name == 'pull_request' && github.head_ref == 'vr-d3d9ex-review-feature-dx11-00537'
+    needs: [game-x86-r26-hud-safe, host-x64]
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: outrun2006-vr-x86-r26-hud-safe
+          path: payload/game
+      - uses: actions/download-artifact@v4
+        with:
+          name: outrun-vr-host-x64
+          path: payload/host
+      - name: Verify opt-in package negatives
+        run: python tools/test_package_dx11_first_game_frame.py
+      - name: Assemble real x86 game and x64 host package
+        shell: pwsh
+        run: >
+          python tools/package_dx11_first_game_frame.py
+          --game payload/game/dinput8.dll
+          --host payload/host/outrun-vr-host.exe
+          --output output/feature-dx11-first-game-frame-${{ github.event.pull_request.head.sha }}.zip
+          --build-sha "${{ github.sha }}"
+          --feature-sha "${{ github.event.pull_request.head.sha }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx11-first-game-frame-${{ github.event.pull_request.head.sha }}
+          path: output/*.zip
+          if-no-files-found: error
