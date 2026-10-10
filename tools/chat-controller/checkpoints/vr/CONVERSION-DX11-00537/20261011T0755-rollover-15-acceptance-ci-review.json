@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "rollover_15_review",
+  "captured_at_kst": "2026-10-11T07:55:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E017",
+  "event_type": "rollover",
+  "attempt": "3/3",
+  "chat_rollover": 15,
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head_sha": "0d2e35c4d690585b8182b27fd16cf2322b1021d7",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+  "verification": {
+    "github_checkpoint": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0750-pre-rollover-0014.json",
+    "material_repair_commit": "0d2e35c4d690585b8182b27fd16cf2322b1021d7",
+    "repair_pr_number": 115,
+    "repair_pr_state_at_capture": "OPEN",
+    "feature_source_cpp_changes": false,
+    "build_run_id": 38093092203,
+    "build_run_state_at_capture": "IN_PROGRESS",
+    "build_acceptance_steps_completed_success": [
+      "DX11-LIVE-CALLSITE",
+      "DX11-NATIVE-DRAW",
+      "DX11-VISIBLE-FRAME",
+      "DX11-SAFE-RETURN"
+    ],
+    "openxr_run_id": 38093092342,
+    "openxr_run_state_at_capture": "IN_PROGRESS",
+    "target_prior_openxr_id": 38092242555,
+    "target_prior_bundle_job": "SKIPPED",
+    "pr_review_comment_id": 6103063095
+  },
+  "incomplete_acceptance_ids": [
+    "DX11-TEST-BUNDLE:PR_RUN_NOT_FINAL",
+    "DX11-TEST-BUNDLE:TARGET_EXACT_SHA_PENDING"
+  ],
+  "next_action": "Observe PR #115 Build/OpenXR completion and bundle step/artifact; controller-only promote workflow into target; confirm exact target SHA OpenXR acceptance ZIP and required gates. If gates fail repair only tools/tests/workflow; no new Rxxx or C++ until separately justified.",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "score_change": 0
+}
