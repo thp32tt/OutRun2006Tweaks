@@ -12,7 +12,7 @@ sys.dont_write_bytecode=True
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 root=Path.cwd()
-run="20261011-A234-Q121-RANK20-SOURCE-NATIVE-PLATE-AND-TYPE"
+run="20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA"
 out=root/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -87,7 +87,18 @@ mask_h.paste(resized,((W*S-resized.width)//2,(H*S-resized.height)//2))
 lean=0.22
 mask_h=mask_h.transform(mask_h.size,Image.Transform.AFFINE,
     (1,lean,-lean*(H*S),0,1,0),resample=Image.Resampling.BICUBIC)
-mask=np.array(mask_h.resize((W,H),Image.Resampling.LANCZOS),dtype=np.uint8)
+# Optical width fit to 82% of the source text width at high resolution
+# BEFORE the one final downsample, avoiding the 60% underfill of first trial.
+support=mask_h.getbbox()
+assert support is not None
+kx0,ky0,kx1,ky1=support
+glyph_hi=mask_h.crop((kx0,ky0,kx1,ky1))
+target_width=int(W*S*.82)
+assert target_width<W*S-6*S
+glyph_hi=glyph_hi.resize((target_width,glyph_hi.height),Image.Resampling.LANCZOS)
+mask_fit=Image.new("L",(W*S,H*S),0)
+mask_fit.paste(glyph_hi,((W*S-target_width)//2,(H*S-glyph_hi.height)//2))
+mask=np.array(mask_fit.resize((W,H),Image.Resampling.LANCZOS),dtype=np.uint8)
 # The original English uses white face, dark blue keyline + bottom-right dark
 # extrusion. Recreate on CLEAN with genuinely separate transparent masks.
 core=mask>28
@@ -111,18 +122,23 @@ inside=np.zeros((H,W),dtype=bool);inside[1:-1,1:-1]=True
 def paint(color,opacity):
     global bg
     a=(np.asarray(opacity,dtype=np.float32)/255.0)*inside
+    old_a=bg[:,:,3]/255.0
+    new_a=a+old_a*(1-a)
     rgb=np.array(color[:3],dtype=np.float32)
-    bg[:,:,:3]=bg[:,:,:3]*(1-a[:,:,None])+rgb[None,None,:]*a[:,:,None]
-    # Preserve source-authored opaque plate alpha, not a rectangle pasted in
-    # from an unrelated flattened compositor.
+    numerator=rgb[None,None,:]*a[:,:,None]+bg[:,:,:3]*old_a[:,:,None]*(1-a[:,:,None])
+    new_rgb=np.divide(numerator,new_a[:,:,None],out=np.zeros_like(numerator),where=new_a[:,:,None]>1e-8)
+    bg[:,:,:3]=np.where(new_a[:,:,None]>1e-8,new_rgb,bg[:,:,:3])
+    # A234 first trial was invisible: a transparent background must acquire
+    # alpha from the Hangul face, outline and offset shadow layers.
+    bg[:,:,3]=new_a*255.0
 paint((3,17,62),extrude)
 paint((4,17,70),outline)
 paint((255,255,255),mask)
 final=np.rint(np.clip(bg,0,255)).astype(np.uint8)
-# A234 plate-only: visually and mechanically demonstrate English removal before
-# lettering. Test byte-exact source background, outside region untouched.
 assert np.array_equal(plate[0,0],best)
-assert np.array_equal(final[:,:,3],plate[:,:,3])
+assert np.all(plate[:,:,3]==best[3])
+assert int(np.count_nonzero(final[:,:,3]>0))>300
+assert np.array_equal(final[:,:,3][~inside],plate[:,:,3][~inside])
 prior=np.array(Image.open(io.BytesIO(dds_bytes)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
 assert prior.shape==(4096,4096,4)
 # DDS raw is first validated through Pillow; change only the rank20 row range.
@@ -173,21 +189,21 @@ recipe={"version":"source-native-flat-plate-v1","index":121,"cell_id":"rank20_Ga
     "source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
     "source_dds_sha256":qa["source_sha256"],"source_crop_path":str(source_path.relative_to(root)),
     "source_crop_sha256":sha(src_bytes),"source_bbox_readable":[x0,y0,x1,y1],
-    "plate_from_source_modal_RGBA":best.tolist(),"modal_support_fraction":fraction,
+    "plate_from_source_modal_RGBA":best.tolist(),"modal_support_fraction":fraction,"alpha_layer_compositing":"straight_alpha_src_over",
     "border_source_modal_support":edge_support,"render_text":phrase,"font_path":str(font_path),
     "font_sha256":font_sha,"native_ppem":39,"supersample_one_time":3,
     "readable_italic_shear":lean,"original_font_effect":"white italic face / navy outline and extrusion",
     "glyph_box_local":[minx,miny,maxx,maxy],"lettering_separate":True,
     "orient":"READABLE_FLIP_Y -> DDS RAW Y-MIRROR","background":"source-derived modal solid native pixels"}
 dump(recipe,"recipe.json")
-report={"run":"A234","run_key":"OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
+report={"run":"A234R","run_key":"OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
     "role":"A","index":121,"P0":["IGR-030","IGR-031","IGR-040"],
-    "method_change":"Entire source-derived rank20 CLEAN plate rebuilt BEFORE native Hangul lettering; previous A230 remnant deletion and corrupted inherited CLEAN abandoned",
+    "method_change":"Source-derived rank20 CLEAN before lettering; separate transparent glyph/outline/offset with alpha; optical width fit corrected prior invisible-alpha trial; A230 ghost subtraction abandoned",
     "source_sha256":qa["source_sha256"],"source_crop_sha256":sha(src_bytes),
     "old_official_sha256":official_sha,"new_unpromoted_trial_sha256":newsha,
     "new_unpromoted_trial_path":str(newpath.relative_to(root)),
     "native_whole_atlas":[4096,4096],"source_region_bbox":[x0,y0,x1,y1],
-    "plate_background_support":fraction,"plate_edge_support":edge_support,
+    "plate_background_support":fraction,"plate_edge_support":edge_support,"new_alpha_visible_pixels":int(np.count_nonzero(final[:,:,3]>0)),
     "glyph_bbox_inside_source":[minx,miny,maxx,maxy],
     "non_target_pixels_exact":True,"dds_header_exact":True,"saved_DDS_decode_exact":True,
     "changed_outside_source_region":0,"other_29_regions_byte_exact":True,
