@@ -50,6 +50,46 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q212_B356_B357_mode_native_two_trials": {
+        "index": 212,
+        "role": "B",
+        "run_key": "OUTRUN-KOR-B356-B357-Q212-P1-NEW-SOURCE-MODE-TRIALS-20261010-1947",
+        "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+        "C158_clean_reference_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+        "official_sha256_unchanged": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+        "new_B356_trial_dds_sha256": "db72a9b52bf6b86c0dfbc9181b17542aa81e21fe4fa8161769b0f657f4532d35",
+        "new_B357_trial_dds_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+        "new_saved_distinct_trial_dds": 2,
+        "official_promoted_dds": 0,
+        "producer_first_pass_approved": 0,
+        "independent_C_accepted": 0,
+        "changed_rgba_pixels": [
+          13320,
+          12899
+        ],
+        "outside_two_roi_changed": [
+          0,
+          0
+        ],
+        "saved_decoded_mismatch": [
+          0,
+          0
+        ],
+        "B356_r44_percent_source": 54.1,
+        "B357_r44_percent_source": 95.7,
+        "B357_r43_percent_source": 71.9,
+        "producer_qa": "B356_REWORK_B357_SCOPED_IMPROVED_HOLD_SEMANTIC_C2",
+        "official_C2": "C338_REWORK_REQUIRED_UNCHANGED",
+        "C3": "BLOCKED",
+        "IGR029": "OPEN_USER_INGAME_FAIL",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "backend": "GITHUB_ACTIONS_REMOTE_PINNED_LARGE_DDS_LOCAL_CONTROLLER",
+        "run_ids": [
+          38045635253,
+          38045904085
+        ],
+        "initial_preflight_failed_run": 38045458122
+      },
       "latest_b_q154_B354_B355_two_visual_rework_trials": {
         "index": 154,
         "role": "B",
