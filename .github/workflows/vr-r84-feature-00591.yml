@@ -1,0 +1,39 @@
+name: R84 isolated Win32 TU compile (feature development)
+on:
+  push:
+    branches:
+      - vr-d3d9ex-review-feature-dx9ex-00591
+permissions:
+  contents: read
+concurrency:
+  group: r84-feature-00591-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  r84-local:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: R29 owner ABI regression and 5 mutation checks
+        run: python3 tools/verify_vr_r29_owner_api_seam.py
+  r84-win32:
+    needs: r84-local
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure independent R29-R33 Win32 owners
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-r84 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON
+      - name: Apply VC2022 third-party compile workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-r84/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-r84/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-r84/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content build-r84/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-r84/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-r84/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Compile and link independent R29-R33 Win32 game
+        run: cmake --build build-r84 --config Release --target outrun2006tweaks -- /m:2

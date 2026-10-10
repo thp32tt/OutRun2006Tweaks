@@ -158,6 +158,26 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R31_R30=1)
     message(STATUS "OutRun VR refactor gate: R30 compiled separately below R31")
 endif()
+# R84 compile development gate: R29 owns the lower original renderer
+# implementation, R30 consumes only its public ABI. Default runtime variants
+# remain unchanged until exact Win32 link and protected regressions pass.
+option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29 "Compile R29 separately from R30" OFF)
+if(OUTRUN_VR_REFACTOR_SPLIT_R30_R29)
+    if(NOT OUTRUN_VR_REFACTOR_SPLIT_R31_R30 OR
+       NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31 OR
+       NOT OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+        message(FATAL_ERROR "R30/R29 split requires the complete R33-R30 owner chain")
+    endif()
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R30/R29 split requires comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R30_R29=1)
+    message(STATUS "OutRun VR R84: R33/R32/R31/R30/R29 independently compiled")
+endif()
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
