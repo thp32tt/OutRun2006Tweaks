@@ -1,5 +1,9 @@
 # Korean Localization Automation Contract
 
+## Separated lettering engine — 2026-10-11
+
+Apply `docs/KOREAN_LOCALIZATION_LETTERING_ENGINE.md` for new lettering. Review native glyph geometry before effects, preserve separate face/effect layers and compose through `compose_lettering.py`. Newly published production DDS require a SHA-bound `lettering_recipe` in the final manifest; the existing changed-candidate gate verifies the actual composition. Producer geometry readiness is not C/C3/game approval. Keep existing scheduling and ownership.
+
 ## Shared PSD/CLEAN engine — 2026-10-11
 
 A/B and C1/C2/C3 MUST apply `docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md`.
@@ -385,3 +389,4 @@ C3 MUST compare the canonical English source, verified clean plate, and current 
 - Use `C3_STRICT_PASS` only when all ordered visual checks and the existing numeric/containment gates pass for the same candidate SHA.
 - C3_STRICT_PASS is **not** runtime validation and does not close any user in-game backlog. Keep `RUNTIME_VALIDATION=UNTESTED` or the existing pending-in-game state until an actual game retest exists.
 - Record candidate SHA, canonical source SHA/provenance, clean-plate evidence, prior C-pass provenance, FLIP-Y+RAW review evidence, C3 result and failure reason in the C role report/WORKLOG. Third-stage PASS is QA hardening, not a new production completion and must not be counted as a newly produced DDS.
+

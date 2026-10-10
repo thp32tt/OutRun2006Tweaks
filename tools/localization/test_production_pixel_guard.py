@@ -42,6 +42,24 @@ class GuardTests(unittest.TestCase):
         for key, image in self.masks.items():
             self.manifest["masks"][key] = self.save(key + ".png", image.astype(np.uint8) * 255)
         self.manifest["regions"][0]["anchor_evidence"] = self.save("anchors.png", self.source)
+        geometry = self.save("geometry.png", self.letters[:, :, 3])
+        self.recipe = {"version": "separated-lettering-v1", "coordinates": "native_raw",
+                       "route": "native_small", "source": self.manifest["inputs"]["source"],
+                       "geometry": geometry,
+                       "geometry_recipe": self.save_json("geometry_recipe.json", {"synthetic_test_only": True}),
+                       "layers": [{"role": "face", "input": self.manifest["inputs"]["lettering"]}]}
+        review = {"status": "GEOMETRY_READY", "reviewer": "A", "route": "native_small",
+                  "source_sha256": self.recipe["source"]["sha256"], "geometry_sha256": geometry["sha256"],
+                  "observations": {k: "Synthetic test only; not artwork approval" for k in
+                                   ("stroke", "counterspace", "proportions", "slant", "readability")},
+                  "evidence": [self.manifest["regions"][0]["anchor_evidence"]]}
+        self.recipe["geometry_review"] = self.save_json("geometry_review.json", review)
+        self.manifest["lettering_recipe"] = self.save_json("lettering_recipe.json", self.recipe)
+
+    def save_json(self, path, data):
+        p = self.repo / path
+        p.write_text(json.dumps(data), encoding="utf-8")
+        return {"path": path, "sha256": sha(p.read_bytes())}
 
     def save(self, path, array):
         p = self.repo / path
@@ -150,3 +168,4 @@ class RecordedDefectTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -190,6 +190,10 @@ def check_changed(repo, base):
         report = verify(repo, m)
         if report["candidate_sha256"] != digest or report["errors"]:
             raise ValueError("Production pixel gate rejected " + name + ": " + str(report["errors"]))
+        # Only newly published production candidates require separated lettering.
+        # Historical byte-identical candidates and plate-only work remain untouched.
+        from compose_lettering import verify_lettering
+        report["lettering"] = verify_lettering(repo, m)
         reports.append({"path": name, **report})
     return reports
 
@@ -219,3 +223,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
