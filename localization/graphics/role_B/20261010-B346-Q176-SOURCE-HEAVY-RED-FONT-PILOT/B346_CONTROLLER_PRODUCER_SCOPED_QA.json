@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B346",
+  "queue_index": 176,
+  "run_key": "OUTRUN-KOR-B346-Q176-SOURCE-CALIBRATED-COUNTERS-20261010",
+  "execution": {
+    "backend": "GITHUB_ACTIONS",
+    "run": 38009996777,
+    "conclusion": "SUCCESS",
+    "direct_visual_backend": "CHATGPT_CONTROLLER_WITH_N100_MCP_SMALL_IMAGE_VIEW",
+    "worker_commit": "aed291c7d288b0793d999ad9896ad90772bd0a94"
+  },
+  "exact_sha256": {
+    "canonical_english": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "current_official": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "rejected_B345_trial": "34edd2aa06eb8dc8611c8b67738d147e3197325e1af6e54347439b491838075f",
+    "B346_trial": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45"
+  },
+  "source_conditioning": "Canonical-source flat red RGBA opaque median [186,0,0,255], native 2048x2048, FLIP-Y-readable/RAW-mirror-y, original source-bbox ceiling. Source family solid block upright; pinned Noto CJK Bold 1px vector stroke at native ppem151/153/142/148, not old resized bitmap and not arbitrary morphological dilation. Font SHA faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb.",
+  "producer_qa": {
+    "P1": "SOURCE-derived plate with English glyph bboxes cleared before Korean; scoped raw alpha0 4/4, SOURCE->CLEAN diff outside four canonical source regions0, directly inspected clean panels",
+    "P2": "4/4 accurate semantic mappings 제니퍼/클라리사/홀리/플래그맨 4. B345 stroke3 trial caused compressed glyph counters in 홀리 and 클라리사; B346 pinned font stroke1 visibly restores readable counters and limits fill density. Four native FLIPY gray contacts directly inspected.",
+    "P3": "Persisted 16,777,344-byte DDS exact decode roundtrip 2048x2048 RGBA32 mip1, RAW/FLIP-Y 3BG native100/75/50 proof saved; directly inspected holly RAW black50, clarissa FLIPY gray50, flagman4 RAW white75. Original-source outside 4 region difference0 and previous-old outside 4 diff0; numerical per-region 4/4 positive bounding margins >=5px. No new image intrusion, ghost, visible rectangle, missing syllable or clipping in scoped comparisons.",
+    "eight_checks": {
+      "source_removal": "SCOPED_PASS",
+      "readable_slant": "SCOPED_PASS_SOURCE_AND_KOREAN_APPEAR_UPRIGHT_MATCHED_STEM_ANCHOR_NOT_INDEPENDENTLY_CERTIFIED",
+      "size": "PASS_SOURCE_CEILING_4_OF_4",
+      "effects": "SCOPED_PASS_FLAT_RED_COLOR_MATCH_BUT_FAMILY_C_UNVALIDATED",
+      "clipping": "PASS_BBOX_POSITIVE_MARGINS",
+      "protected_art": "PASS_ZERO_CHANGE_OUTSIDE_TEXT_BBOXES",
+      "orientation": "SCOPED_DIRECT_RAW_FLIPY_3_VIEW_PLUS_MACHINE_EXACT",
+      "readability": "SCOPED_PASS_AFTER_NATIVE_STROKE_REDUCTION"
+    }
+  },
+  "firsthand_images": [
+    "B346_jennifer_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "pixel_report": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_MECHANICAL_AND_SOURCE_PLATE_QA.json",
+  "font_recipe": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/recipe.json",
+  "decision": "SCOPED_PRODUCER_VISUAL_ACCEPT_UNAPPROVED_TRIAL_NOT_FINAL_EXPORT",
+  "why_not_promoted": "New/changed hd_candidates require final production-pixel manifest and publication guard, plus remaining qualified family/effect reference; do not bypass source-family independent C2 or publish an unproven candidate. Two same-method attempts used, no repeated blind rerender allowed.",
+  "new_trial_dds": 1,
+  "promoted_dds": 0,
+  "remaining": "final source-derived protected/removal/lettering/edit/effect mask manifest; production_pixel_guard --changed-since; independent exact-SHA C2 and distinct C3; user game test",
+  "C2": "C343_OFFICIAL_REWORK_REQUIRED_UNCHANGED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "ODD_A",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
