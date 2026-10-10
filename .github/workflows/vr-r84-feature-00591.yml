@@ -17,6 +17,47 @@ jobs:
         run: python3 tools/verify_vr_r29_owner_api_seam.py
       - name: 'Feature acceptance: R84-REGRESSION - R30 producer-consumer owner regression'
         run: python3 tools/verify_vr_r30_support_api_seam.py
+      - name: "R84 integration preflight - strict target policy verifier parity"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/verify_vr_architecture.py
+          python3 tools/verify_vr_r51_runtime_contract.py
+          python3 tools/verify_vr_r32_review.py
+          python3 tools/verify_vr_hook_graph.py
+          python3 tools/verify_vr_refactor_contract.py
+          python3 tools/verify_vr_r84_focus_inventory.py
+          python3 tools/verify_vr_r29_effect_cache_generation.py
+          python3 tools/verify_vr_r30_support_api_seam.py
+          python3 tools/verify_vr_r32_runtime_support_seam.py
+          python3 tools/verify_vr_r31_support_api_seam.py
+          python3 tools/verify_vr_r31_eye_tail_cache.py
+          python3 tools/verify_vr_policy_alignment.py
+          python3 tools/verify_vr_r31_live_wvp_consistency.py
+          python3 tools/verify_vr_r31_window_telemetry.py
+          python3 tools/verify_vr_helper_probe_host_identity.py
+          python3 tools/verify_vr_ffb_controller_routing.py
+          python3 tools/verify_vr_ffb_release_ini_contract.py
+          python3 tools/verify_vr_r32_r31_tu_split.py
+          python3 tools/verify_vr_r32_review_api_seam.py
+          python3 tools/verify_vr_r33_r32_tu_split.py
+          python3 tools/verify_vr_sumo_replay_semantics.py
+          python3 tools/verify_vr_hud_cadence_restore.py
+          python3 tools/verify_vr_producer_provenance.py
+          python3 tools/verify_vr_cross_thread_semantic_registry.py
+          python3 tools/verify_vr_projected_marker_anchor.py
+          python3 tools/verify_vr_ui_matrix_safety.py
+          python3 tools/verify_vr_custom_sprite_descriptor.py
+          python3 tools/verify_vr_projected_marker_telemetry.py
+          python3 tools/verify_vr_visual_composition_p0.py
+          python3 tools/audit_vr_result_full_source.py
+          python3 tools/verify_vr_texture_scene_contract.py
+          python3 tools/verify_vr_r31_r32_retirement_guard.py
+          python3 tools/verify_vr_recenter_contract.py
+          python3 tools/verify_vr_recenter_publication_snapshot.py
+          python3 tools/verify_vr_dx9ex_reset_transport_contract.py
+          python3 tools/verify_vr_final_submission_contract.py
+          python3 tools/verify_vr_r84_focus_inventory.py
       - name: R84 complete host-game-fullchain bundle contract
         run: python3 tools/verify_vr_r84_feature_bundle.py
   r84-win32:
