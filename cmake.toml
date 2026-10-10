@@ -698,3 +698,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R239: native indexed-UP strip winding expansion, WARP GPU test.
+[target.dx11_indexed_up_strip_probe_r239]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

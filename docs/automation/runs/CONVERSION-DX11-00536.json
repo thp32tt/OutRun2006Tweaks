@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00536",
+  "production_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "e3f49c2496ff82319dad2d64facc30fefea2f65f",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00536",
+  "lease_epoch": 1,
+  "work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "tools/test_dx11_indexed_up_strip_r239.py",
+    "DX11:R239:STRIP_INDEXED_UP"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 caller-attested transient INDEX16/INDEX32 triangle-strip spans",
+      "Winding-correct strip-to-list expansion and immutable R238 D3D11 VB/IB ownership",
+      "R238 exact shader/IA/sole-eye RTV preflight",
+      "Native WARP DrawIndexed(6) GPU dual-triangle pixel readback"
+    ],
+    "batch_components": [
+      "native_d3d9_indexed_up_strip_batch.hpp real adapter",
+      "dx11_indexed_up_strip_probe_r239.cpp WARP GPU readback and negative runtime cases",
+      "test_dx11_indexed_up_strip_r239.py negative source mutants and workflow/CMake integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Both INDEX16 and INDEX32 strip expand into six immutable D3D11 indices and render two WARP triangles with a black corner",
+      "negative_regression": "12 guard destructive mutations, null/short/index-overflow/out-of-range/stale generation/versions/PS/retire checks",
+      "component_integration": "D3D9 indexed-UP strip -> CPU winding expansion -> R238 immutable native IA/PS/RTV -> WARP GPU pixels"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+      "tools/dx11_indexed_up_strip_probe_r239.cpp",
+      "tools/test_dx11_indexed_up_strip_r239.py",
+      "DX11:R239:STRIP_INDEXED_UP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "VALIDATING",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "score_change": 0,
+  "summary": "R239 complete dormant indexed-UP strip-to-WARP pixel integration; exact-SHA CI pending",
+  "changed_files": [
+    "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "tools/test_dx11_indexed_up_strip_r239.py",
+    "CMakeLists.txt",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00536.json"
+  ],
+  "pipeline": {
+    "C0": "PASS: remote head/owner/recent run reconciliation",
+    "C1": "PASS: independent R239 strip path; R175 owned by 00477, R238 preserved",
+    "C2": "IMPLEMENTED: source adapter+WARP GPU probe+static proof+build/CI integration",
+    "C3": "PENDING: exact-SHA full Backend Conversion Gate",
+    "C4": "PENDING material SHA publication",
+    "C5": "NOT_REQUIRED: standalone dormant WARP; no package",
+    "C6": "PENDING exact-SHA CI"
+  },
+  "evidence": {
+    "backend_gate_conclusion": "pending",
+    "runtime": "UNTESTED: no Quest3/VDXR gameplay"
+  }
+}

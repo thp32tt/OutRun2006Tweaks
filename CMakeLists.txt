@@ -1141,3 +1141,14 @@ target_compile_features(dx11_indexed_up_probe_r238 PUBLIC cxx_std_20)
 target_compile_options(dx11_indexed_up_probe_r238 PUBLIC "/GS" "/utf-8")
 target_include_directories(dx11_indexed_up_probe_r238 PUBLIC "src/" "shared/" "include/")
 target_link_libraries(dx11_indexed_up_probe_r238 PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R239: native indexed-UP strip winding expansion and real WARP pixel integration.
+add_executable(dx11_indexed_up_strip_probe_r239)
+target_sources(dx11_indexed_up_strip_probe_r239 PRIVATE
+    "tools/dx11_indexed_up_strip_probe_r239.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_up_strip_probe_r239 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_up_strip_probe_r239 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_up_strip_probe_r239 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_up_strip_probe_r239 PUBLIC d3dcompiler.lib d3d11.lib)

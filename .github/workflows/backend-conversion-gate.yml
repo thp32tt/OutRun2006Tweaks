@@ -463,6 +463,25 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "R238 indexed UP GPU pixel probe failed: $LASTEXITCODE" }
 
+
+      # R239: independent indexed-UP triangle-strip GPU output through R238 IA.
+      - name: Verify R239 strip adapter and GPU proof contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_up_strip_r239.py
+
+      - name: Build R239 strip indexed-UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_indexed_up_strip_probe_r239
+
+      - name: Run R239 strip indexed-UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_strip_probe_r239.exe | Select-Object -First 1
+          if (-not $probe) { throw "R239 WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R239 strip indexed UP GPU probe failed: $LASTEXITCODE" }
+
       # R187 isolated owned indexed GPU path: exact RTV and full viewport.
       - name: Verify R187 native indexed viewport ownership
         if: github.ref_name == 'vr-dx11-native-r71'
