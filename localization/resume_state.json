@@ -14518,5 +14518,28 @@
     "C3": "BLOCKED",
     "IGR029": "OPEN",
     "runtime_validation": "UNTESTED"
+  },
+  "c352_c2_q176_b346_unpromoted_independent_hold": {
+    "run_key": "OUTRUN-KOR-C352-C2-Q176-B346-INDEPENDENT-NATIVE-20261010-1020",
+    "role": "C2",
+    "shard": "EVEN",
+    "queue_index": 176,
+    "official_candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "unapproved_B346_trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+    "canonical_source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "source_clean_outside_rgba": 0,
+    "source_clean_outside_alpha": 0,
+    "clean_trial_outside_rgba": 0,
+    "clean_trial_outside_alpha": 0,
+    "official_trial_changed_rgba_pixels": 215951,
+    "qualified_fresh_C2": "HOLD_STRICT_RECHECK_UNPROMOTED_TRIAL",
+    "official_C2": "C343_REWORK_REQUIRED_UNCHANGED",
+    "C3": "NOT_RUN",
+    "APPROVAL": "NOT_GRANTED",
+    "promoted_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_CONTROLLER_C2_HOLD.json",
+    "machine_report": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_INDEPENDENT_PIXEL_AUDIT.json",
+    "updated_at_kst": "2026-10-10 10:39 KST"
   }
 }

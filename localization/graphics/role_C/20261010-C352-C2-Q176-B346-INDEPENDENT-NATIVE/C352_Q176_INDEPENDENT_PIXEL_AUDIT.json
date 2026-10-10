@@ -1,0 +1,298 @@
+{
+  "run": "C352-C2",
+  "queue_index": 176,
+  "mode": "UNAPPROVED_B346_TRIAL_INDEPENDENT_QA",
+  "backend": "N100_MCP_PIL_NUMPY_FROM_EXACT_SOURCE_OFFICIAL_TRIAL_DDS",
+  "input_identity": {
+    "source": {
+      "path": "/home/chatgpt-runner2/tmp/C352_Q176_CANONICAL_ENGLISH.dds",
+      "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "size_bytes": 16777344
+    },
+    "official": {
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+      "sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+      "size_bytes": 16777344
+    },
+    "trial": {
+      "path": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_Q176_NATIVE_BOLD_SOURCE_FAMILY_UNAPPROVED.dds",
+      "sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+      "size_bytes": 16777344
+    },
+    "clean": {
+      "path": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_P1_CLEAN_SOURCE_ONLY.png",
+      "sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+      "size_bytes": 350321
+    }
+  },
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "format": "uncompressed ARGB8888 DDS decoded RGBA via PIL; 2048x2048, mip1",
+  "header_equal_128": true,
+  "total_pixels": 4194304,
+  "allowed_union_pixel_count": 499187,
+  "source_clean_changed_outside_union_rgba": 0,
+  "source_clean_alpha_changed_outside_union": 0,
+  "clean_trial_changed_outside_union_rgba": 0,
+  "clean_trial_alpha_changed_outside_union": 0,
+  "source_trial_changed_outside_union_rgba": 0,
+  "source_trial_alpha_changed_outside_union": 0,
+  "official_trial_changed_outside_union_rgba": 0,
+  "official_trial_alpha_changed_outside_union": 0,
+  "official_trial_modified_rgba_pixels": 215951,
+  "source_trial_visible_rgba_outside_union": 0,
+  "source_trial_alpha_visible_outside_union": 0,
+  "source_to_clean_alpha_zero_all_scoped": true,
+  "regions": [
+    {
+      "id": "jennifer",
+      "korean": "제니퍼",
+      "source_region_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "independent_source_alpha_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "independent_trial_alpha_bbox": [
+        11,
+        379,
+        425,
+        527
+      ],
+      "source_size": [
+        838,
+        158
+      ],
+      "trial_size": [
+        414,
+        148
+      ],
+      "region_bbox_margins": [
+        11,
+        413,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 72799,
+      "official_alpha_positive_pixels": 31464,
+      "trial_alpha_positive_pixels": 28352,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 56817,
+      "source_trial_changed_rgba_pixels": 119191,
+      "source_clean_changed_rgba_pixels": 132404,
+      "clean_trial_changed_rgba_pixels": 28352,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true
+    },
+    {
+      "id": "clarissa",
+      "korean": "클라리사",
+      "source_region_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "independent_source_alpha_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "independent_trial_alpha_bbox": [
+        919,
+        377,
+        1490,
+        527
+      ],
+      "source_size": [
+        840,
+        160
+      ],
+      "trial_size": [
+        571,
+        150
+      ],
+      "region_bbox_margins": [
+        14,
+        255,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 68689,
+      "official_alpha_positive_pixels": 43528,
+      "trial_alpha_positive_pixels": 39097,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 55273,
+      "source_trial_changed_rgba_pixels": 116997,
+      "source_clean_changed_rgba_pixels": 134400,
+      "clean_trial_changed_rgba_pixels": 39097,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true
+    },
+    {
+      "id": "holly",
+      "korean": "홀리",
+      "source_region_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "independent_source_alpha_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "independent_trial_alpha_bbox": [
+        22,
+        218,
+        272,
+        359
+      ],
+      "source_size": [
+        533,
+        151
+      ],
+      "trial_size": [
+        250,
+        141
+      ],
+      "region_bbox_margins": [
+        13,
+        270,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 41097,
+      "official_alpha_positive_pixels": 21834,
+      "trial_alpha_positive_pixels": 19625,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 36579,
+      "source_trial_changed_rgba_pixels": 70171,
+      "source_clean_changed_rgba_pixels": 80483,
+      "clean_trial_changed_rgba_pixels": 19625,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true
+    },
+    {
+      "id": "flagman4",
+      "korean": "플래그맨 4",
+      "source_region_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "independent_source_alpha_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "independent_trial_alpha_bbox": [
+        22,
+        54,
+        698,
+        199
+      ],
+      "source_size": [
+        980,
+        155
+      ],
+      "trial_size": [
+        676,
+        145
+      ],
+      "region_bbox_margins": [
+        14,
+        290,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 75687,
+      "official_alpha_positive_pixels": 49663,
+      "trial_alpha_positive_pixels": 44976,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 67282,
+      "source_trial_changed_rgba_pixels": 129904,
+      "source_clean_changed_rgba_pixels": 151900,
+      "clean_trial_changed_rgba_pixels": 44976,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true
+    }
+  ],
+  "evidence": [
+    {
+      "file": "C352_jennifer_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+      "size_bytes": 19617,
+      "sha256": "79e6d826b27021262172d104f4aeee327d1ad210876e3f1b87d87570d32a7f6c"
+    },
+    {
+      "file": "C352_jennifer_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+      "size_bytes": 19668,
+      "sha256": "d624ae53de26a33b68f9a2b47ca93642ef4e9d2bf1d95fe69763cc5c0bff8121"
+    },
+    {
+      "file": "C352_jennifer_EN_TRIAL_RAW_BLACK_NATIVE.png",
+      "size_bytes": 9635,
+      "sha256": "ff92e902ad1007a462f741a3c2846e3c0bab81bd16ea027a05796dd0e31f8905"
+    },
+    {
+      "file": "C352_clarissa_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+      "size_bytes": 32173,
+      "sha256": "9adef7d46d0824771480690e22f2ac99f4733505c32d9cfd3de9d53f6758ec5f"
+    },
+    {
+      "file": "C352_clarissa_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+      "size_bytes": 33027,
+      "sha256": "d376d7681a67784f17513e291945809ae9d9f573d33291640a40fa8c8364ade0"
+    },
+    {
+      "file": "C352_clarissa_EN_TRIAL_RAW_BLACK_NATIVE.png",
+      "size_bytes": 17348,
+      "sha256": "2ed91e9ca5cc6675ad3af76e324efd5451197d048f330d5face52ba66074730a"
+    },
+    {
+      "file": "C352_holly_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+      "size_bytes": 14630,
+      "sha256": "38c49050e2129ad09e91554e9065204998c56716cb7a75237f9502a92f95aa6a"
+    },
+    {
+      "file": "C352_holly_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+      "size_bytes": 15532,
+      "sha256": "05ca66a28075a224699dca1b3450b2373dac8642cc553e21041098277ec4bb5d"
+    },
+    {
+      "file": "C352_holly_EN_TRIAL_RAW_BLACK_NATIVE.png",
+      "size_bytes": 7206,
+      "sha256": "67232ea68be17edfc7db16cdb142fe20504e327433e5e2dbaf7a979594ecd774"
+    },
+    {
+      "file": "C352_flagman4_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+      "size_bytes": 27182,
+      "sha256": "ea58c0c6944981ed6e4ddcd332c41473bc7f7cee4bac727b07218c176233d778"
+    },
+    {
+      "file": "C352_flagman4_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+      "size_bytes": 29184,
+      "sha256": "4401c7446c505bbbf1358d05e0eaeb54a6f2d3c762c2dcfd01d4beb31bfc2aa7"
+    },
+    {
+      "file": "C352_flagman4_EN_TRIAL_RAW_BLACK_NATIVE.png",
+      "size_bytes": 15239,
+      "sha256": "fbc667437b1f412ce92d274df820a80c66d54ea232e5784b35fa13b7179037d5"
+    },
+    {
+      "file": "C352_Q176_SOURCE_TRIAL_WHOLE_ATLAS_FLIPY_25.png",
+      "size_bytes": 142420,
+      "sha256": "aac2bc55d6a9976d6972beac6654a2e1f04b8c478dfd40a56cc4fcde0fcd0007"
+    }
+  ]
+}

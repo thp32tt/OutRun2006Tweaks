@@ -1,0 +1,425 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C352",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 176,
+  "run_key": "OUTRUN-KOR-C352-C2-Q176-B346-INDEPENDENT-NATIVE-20261010-1020",
+  "selected_remote_head": "9acf2ce34b296171cfec09e848d14041e51eeec5",
+  "selection_reason": "New B346 unpromoted material DDS sha eea9... is different from C343-reviewed official sha494d...; review different saved bytes, not re-PASS old official.",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "canonical_source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "official_current_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "new_unapproved_trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+  "exact_clean_png_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "machine_report_path": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_INDEPENDENT_PIXEL_AUDIT.json",
+  "machine_result": "SCOPED_PIXEL_GUARDS_PASS_ALL_FOUR_NEW_TRIAL",
+  "execution_backend": "GITHUB_SSOT_AND_N100_MCP_FALLBACK_INDEPENDENT_DOWNLOAD_PIL_PIXEL_DECODE",
+  "selection_triage": "MATERIAL_REWORK official original; new unpromoted trial merits independent C2 only.",
+  "source_to_clean": {
+    "result": "SCOPED_PASS",
+    "full_2048x2048_source_versus_clean_changed_outside_source_regions_rgba": 0,
+    "alpha_outside": 0,
+    "all_four_clean_alpha_zero": true
+  },
+  "clean_to_final": {
+    "result": "SCOPED_PASS",
+    "changed_outside_rgba": 0,
+    "alpha_changed_outside": 0
+  },
+  "source_to_trial": {
+    "result": "SCOPED_PASS",
+    "outside_rgba": 0,
+    "alpha_outside": 0
+  },
+  "official_to_trial": {
+    "changed_rgba_pixels": 215951,
+    "changed_rgba_outside_four_regions": 0
+  },
+  "native_dds": {
+    "source": "2048x2048, RGBA32, 1 mip, saved 16,777,344 bytes",
+    "header_first128_exact": true,
+    "orientation": "PIL raw DDS mirror-Y; CLEAN PNG FLIP-Y/readable; compare normalized readable source and trial. First exploratory transform mismatch was caught and corrected before authoritative measurements."
+  },
+  "regions": [
+    {
+      "id": "jennifer",
+      "korean": "제니퍼",
+      "source_region_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "independent_source_alpha_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "independent_trial_alpha_bbox": [
+        11,
+        379,
+        425,
+        527
+      ],
+      "source_size": [
+        838,
+        158
+      ],
+      "trial_size": [
+        414,
+        148
+      ],
+      "region_bbox_margins": [
+        11,
+        413,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 72799,
+      "official_alpha_positive_pixels": 31464,
+      "trial_alpha_positive_pixels": 28352,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 56817,
+      "source_trial_changed_rgba_pixels": 119191,
+      "source_clean_changed_rgba_pixels": 132404,
+      "clean_trial_changed_rgba_pixels": 28352,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true,
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean both visually upright in readable view, but comparable top-minus-bottom stem anchors/blind calibration are not qualified."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical SOURCE against readable-coordinate CLEAN: exact source bbox fully alpha zero; outside four permitted regions RGBA delta zero. Inspect independent native plate proof."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Saved B346 native one-pixel stroke is heavier than previous Korean official; no blind matched source-family stem/counter optical qualification. Do not promote from producer-scope acceptance."
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Korean syllables legible in independent native and 50 percent readable crop; not real-game sampling."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No broken syllables or glyph holes apparent in examined native and 50 percent crop, not all shared consumer states."
+        },
+        "protected_art": {
+          "result": "PASS_EXACT_OUTSIDE_FOUR_BBOX",
+          "observation": "Source/trial and official/trial RGBA and alpha outside four original source rectangles exactly unchanged; entire shared atlas source and trial decoded and inspected at 25%."
+        },
+        "placement": {
+          "result": "PASS_EXACT_SCOPED",
+          "observation": "Source permitted [838,158], saved Korean [414,148] and margins [11,413,5,5] all positive; no 1px escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_EXACT_DDS",
+          "observation": "Native persisted SOURCE/TRIAL both RAW vertically inverted relative to readable FLIP-Y, no extra output vertical flip; DDS header first128 bytes identical, mip1."
+        }
+      },
+      "views": {
+        "native": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_jennifer_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+        "practical_50": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_jennifer_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+        "raw": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_jennifer_EN_TRIAL_RAW_BLACK_NATIVE.png"
+      }
+    },
+    {
+      "id": "clarissa",
+      "korean": "클라리사",
+      "source_region_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "independent_source_alpha_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "independent_trial_alpha_bbox": [
+        919,
+        377,
+        1490,
+        527
+      ],
+      "source_size": [
+        840,
+        160
+      ],
+      "trial_size": [
+        571,
+        150
+      ],
+      "region_bbox_margins": [
+        14,
+        255,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 68689,
+      "official_alpha_positive_pixels": 43528,
+      "trial_alpha_positive_pixels": 39097,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 55273,
+      "source_trial_changed_rgba_pixels": 116997,
+      "source_clean_changed_rgba_pixels": 134400,
+      "clean_trial_changed_rgba_pixels": 39097,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true,
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean both visually upright in readable view, but comparable top-minus-bottom stem anchors/blind calibration are not qualified."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical SOURCE against readable-coordinate CLEAN: exact source bbox fully alpha zero; outside four permitted regions RGBA delta zero. Inspect independent native plate proof."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Saved B346 native one-pixel stroke is heavier than previous Korean official; no blind matched source-family stem/counter optical qualification. Do not promote from producer-scope acceptance."
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Korean syllables legible in independent native and 50 percent readable crop; not real-game sampling."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No broken syllables or glyph holes apparent in examined native and 50 percent crop, not all shared consumer states."
+        },
+        "protected_art": {
+          "result": "PASS_EXACT_OUTSIDE_FOUR_BBOX",
+          "observation": "Source/trial and official/trial RGBA and alpha outside four original source rectangles exactly unchanged; entire shared atlas source and trial decoded and inspected at 25%."
+        },
+        "placement": {
+          "result": "PASS_EXACT_SCOPED",
+          "observation": "Source permitted [840,160], saved Korean [571,150] and margins [14,255,5,5] all positive; no 1px escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_EXACT_DDS",
+          "observation": "Native persisted SOURCE/TRIAL both RAW vertically inverted relative to readable FLIP-Y, no extra output vertical flip; DDS header first128 bytes identical, mip1."
+        }
+      },
+      "views": {
+        "native": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_clarissa_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+        "practical_50": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_clarissa_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+        "raw": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_clarissa_EN_TRIAL_RAW_BLACK_NATIVE.png"
+      }
+    },
+    {
+      "id": "holly",
+      "korean": "홀리",
+      "source_region_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "independent_source_alpha_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "independent_trial_alpha_bbox": [
+        22,
+        218,
+        272,
+        359
+      ],
+      "source_size": [
+        533,
+        151
+      ],
+      "trial_size": [
+        250,
+        141
+      ],
+      "region_bbox_margins": [
+        13,
+        270,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 41097,
+      "official_alpha_positive_pixels": 21834,
+      "trial_alpha_positive_pixels": 19625,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 36579,
+      "source_trial_changed_rgba_pixels": 70171,
+      "source_clean_changed_rgba_pixels": 80483,
+      "clean_trial_changed_rgba_pixels": 19625,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true,
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean both visually upright in readable view, but comparable top-minus-bottom stem anchors/blind calibration are not qualified."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical SOURCE against readable-coordinate CLEAN: exact source bbox fully alpha zero; outside four permitted regions RGBA delta zero. Inspect independent native plate proof."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Saved B346 native one-pixel stroke is heavier than previous Korean official; no blind matched source-family stem/counter optical qualification. Do not promote from producer-scope acceptance."
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Korean syllables legible in independent native and 50 percent readable crop; not real-game sampling."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No broken syllables or glyph holes apparent in examined native and 50 percent crop, not all shared consumer states."
+        },
+        "protected_art": {
+          "result": "PASS_EXACT_OUTSIDE_FOUR_BBOX",
+          "observation": "Source/trial and official/trial RGBA and alpha outside four original source rectangles exactly unchanged; entire shared atlas source and trial decoded and inspected at 25%."
+        },
+        "placement": {
+          "result": "PASS_EXACT_SCOPED",
+          "observation": "Source permitted [533,151], saved Korean [250,141] and margins [13,270,5,5] all positive; no 1px escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_EXACT_DDS",
+          "observation": "Native persisted SOURCE/TRIAL both RAW vertically inverted relative to readable FLIP-Y, no extra output vertical flip; DDS header first128 bytes identical, mip1."
+        }
+      },
+      "views": {
+        "native": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_holly_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+        "practical_50": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_holly_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+        "raw": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_holly_EN_TRIAL_RAW_BLACK_NATIVE.png"
+      }
+    },
+    {
+      "id": "flagman4",
+      "korean": "플래그맨 4",
+      "source_region_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "independent_source_alpha_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "independent_trial_alpha_bbox": [
+        22,
+        54,
+        698,
+        199
+      ],
+      "source_size": [
+        980,
+        155
+      ],
+      "trial_size": [
+        676,
+        145
+      ],
+      "region_bbox_margins": [
+        14,
+        290,
+        5,
+        5
+      ],
+      "source_alpha_positive_pixels": 75687,
+      "official_alpha_positive_pixels": 49663,
+      "trial_alpha_positive_pixels": 44976,
+      "clean_alpha_positive_pixels": 0,
+      "official_trial_changed_rgba_pixels": 67282,
+      "source_trial_changed_rgba_pixels": 129904,
+      "source_clean_changed_rgba_pixels": 151900,
+      "clean_trial_changed_rgba_pixels": 44976,
+      "positive_bbox_margin": true,
+      "source_size_ceiling": true,
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean both visually upright in readable view, but comparable top-minus-bottom stem anchors/blind calibration are not qualified."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Canonical SOURCE against readable-coordinate CLEAN: exact source bbox fully alpha zero; outside four permitted regions RGBA delta zero. Inspect independent native plate proof."
+        },
+        "style": {
+          "result": "HOLD_FAMILY_CALIBRATION",
+          "observation": "Saved B346 native one-pixel stroke is heavier than previous Korean official; no blind matched source-family stem/counter optical qualification. Do not promote from producer-scope acceptance."
+        },
+        "readability": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "Korean syllables legible in independent native and 50 percent readable crop; not real-game sampling."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS_VISUAL",
+          "observation": "No broken syllables or glyph holes apparent in examined native and 50 percent crop, not all shared consumer states."
+        },
+        "protected_art": {
+          "result": "PASS_EXACT_OUTSIDE_FOUR_BBOX",
+          "observation": "Source/trial and official/trial RGBA and alpha outside four original source rectangles exactly unchanged; entire shared atlas source and trial decoded and inspected at 25%."
+        },
+        "placement": {
+          "result": "PASS_EXACT_SCOPED",
+          "observation": "Source permitted [980,155], saved Korean [676,145] and margins [14,290,5,5] all positive; no 1px escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_EXACT_DDS",
+          "observation": "Native persisted SOURCE/TRIAL both RAW vertically inverted relative to readable FLIP-Y, no extra output vertical flip; DDS header first128 bytes identical, mip1."
+        }
+      },
+      "views": {
+        "native": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_flagman4_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_NATIVE.png",
+        "practical_50": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_flagman4_EN_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+        "raw": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_flagman4_EN_TRIAL_RAW_BLACK_NATIVE.png"
+      }
+    }
+  ],
+  "full_atlas_visual": {
+    "result": "SCOPED_PASS_NO_VISIBLE_INTRUSION_ON_FULL_ATLAS",
+    "file": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_SOURCE_TRIAL_WHOLE_ATLAS_FLIPY_25.png",
+    "observed": "Faces, UI connectors, route artwork and protected ??? remain present; never infer game render/stack-order from scaled overview."
+  },
+  "review": {
+    "pixels_before_producer_verdict": false,
+    "blind_calibration_completed": false,
+    "firstlook_status": "SEEN_PRODUCER_BEFORE_NEW_QUALIFIED_BLIND_REVIEW",
+    "direct_visual": "Native and 50% 4-way English/CLEAN/official/trial FLIP-Y, RAW, black/gray/white inspected; no definite new composite residue, clipped glyph or unwanted protected intrusion confirmed."
+  },
+  "decision": "HOLD_STRICT_RECHECK_NEW_B346_TRIAL_SCOPED_STATIC_GUARDS_PASS",
+  "official_queue_status_preserved": "c343_c2_rework_required_source_family_stroke_underweight",
+  "blocked_next": [
+    "QUALIFIED_BLIND_C2_FAMILY_CALIBRATION",
+    "SOURCE_FAMILY_STEM_COUNTER_REFERENCE",
+    "FINAL_PRODUCTION_PIXEL_MANIFEST_AND_GUARD",
+    "OFFICIAL_CANDIDATE_PROMOTION_WITH_NEW_SHA_IF_PRODUCER_QUALIFIES",
+    "FRESH_C2_AFTER_PROMOTION",
+    "DISTINCT_C3_REVIEW",
+    "USER_JPG_ACCEPTANCE",
+    "ACTUAL_USER_GAME_RETEST"
+  ],
+  "c3": "NOT_PERFORMED",
+  "approval": "NOT_GRANTED",
+  "new_promoted_dds": 0,
+  "new_unapproved_trials_by_C": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "C1_ODD",
+    "UNINDEXED_SPECIAL",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_OR_QUEUE_ENGINE"
+  ]
+}
