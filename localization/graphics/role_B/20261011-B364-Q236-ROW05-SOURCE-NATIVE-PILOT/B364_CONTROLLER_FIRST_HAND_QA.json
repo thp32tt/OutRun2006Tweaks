@@ -1,0 +1,186 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "shard": "EVEN",
+  "run": "B364",
+  "run_key": "OUTRUN-KOR-B364-Q236-ROW05-NATIVE-FAMILY-PILOT-20261011-0541",
+  "timestamp_kst": "2026-10-11T05:41:00+09:00",
+  "index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selected_reason": "C358 exact native C2 source-family row height/stroke REWORK_REQUIRED after higher-priority q060/q212/q228 method change blockers; alternate flat stage-family scoped pilot, do not multiply without C2 family qualification",
+  "triage": "worker subprocess tools/localization/rework_triage.py --index 236 completed without error",
+  "production_reset": "ONE_UNQUALIFIED_FAMILY_PILOT_ONLY",
+  "original_source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "unchanged_official_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "new_trial_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+  "dds": "BGRA32 2048x2048 one mip, RAW mirror Y",
+  "source_region": [
+    255,
+    1356,
+    1056,
+    1451
+  ],
+  "old_native_row_height": 87,
+  "new_native_row_height": 91,
+  "original_native_height": 95,
+  "new_bbox": [
+    278,
+    1358,
+    1052,
+    1449
+  ],
+  "new_native_source_margin": [
+    23,
+    2,
+    4,
+    2
+  ],
+  "korean": "스카이스크레이퍼스",
+  "font": "NotoSansCJK-Bold.ttc native ppem94 + 1px native stroke; 100% source-sized direct contour, no old raster upscale",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "method_change": "Different from B302 Black ppem~90 underheight; reconstruct one original-height row with newly rendered Bold glyph plus intrinsic native stroke and source-sampled ink; source/CLEAN/final layer separate.",
+  "persisted_pixel_machine": {
+    "same_header_as_original": true,
+    "changed_rgba_pixels": 56558,
+    "changed_outside_row05": 0,
+    "decoded_roundtrip_mismatch": 0,
+    "unchanged_other_13_regions": true,
+    "source_bbox_containment": "PASS_SCOPED",
+    "min_positive_margins": true
+  },
+  "actual_controller_visual": {
+    "source_clean_final_gray_native": "READABLE 100% reviewed: source bold uppercase, CLEAN row visually blank, official smaller Hangul, new fuller-height/heavier Hangul. No visible foreign rectangle, duplicated English, glyph clipping, or outside artwork in row05 crop.",
+    "source_clean_final_white_50": "READABLE 50% reviewed: new Korean legible, increased visual weight over old. Original source stroke/width/counter/hierarchy not yet independently calibrated across complete 14-cell family.",
+    "raw_gray_native": "Mirrored RAW 100% reviewed: intended vertical inversion of entire row; no newly observed foreign crop; other 13 rows not independently reopened.",
+    "limits": "First-hand pilot optical observation of one row, NOT a full-asset independent C2 or C3 pass. Whole atlas retains prior C358 visual rework and in-game UNTESTED."
+  },
+  "ten_stage_producer": [
+    {
+      "stage": 1,
+      "result": "PASS",
+      "evidence": "canonical English source exact SHA, 2048² BGRA32 DDS; current exact SHA"
+    },
+    {
+      "stage": 2,
+      "result": "SCOPED",
+      "evidence": "C340 all14 original cell inventory; row05 localized and other 13 byte-identical to unchanged official"
+    },
+    {
+      "stage": 3,
+      "result": "PASS_SCOPED_REUSE",
+      "evidence": "B80 independent SHA-pinned authored CLEAN fully transparent row05 before Korean overlay"
+    },
+    {
+      "stage": 4,
+      "result": "PASS_SCOPED_FIRST_HAND",
+      "evidence": "source vs CLEAN at native gray and white practical 50: no visible row05 English residue or rectangular plate"
+    },
+    {
+      "stage": 5,
+      "result": "HOLD_SOURCE_FAMILY_PILOT_C2",
+      "evidence": "source original 95px heavy condensed family vs previous 87px; new 91px native, blinded family calibration outstanding"
+    },
+    {
+      "stage": 6,
+      "result": "PASS_SCOPED",
+      "evidence": "fresh native Korean glyphs ppem94, actual 91px, source bbox and size ceiling"
+    },
+    {
+      "stage": 7,
+      "result": "PASS_SCOPED",
+      "evidence": "only CLEAN row05 transparent glyph pixels; no opaque copied background"
+    },
+    {
+      "stage": 8,
+      "result": "PASS_SCOPED",
+      "evidence": "56558 changed pixel locations entirely within English row bbox; first-hand compared CLEAN vs PILOT"
+    },
+    {
+      "stage": 9,
+      "result": "PASS_SCOPED",
+      "evidence": "persisted saved trial DDS SHA and native exact roundtrip; RAW/FLIPY 100/75/50 available, reviewed native/50/RAW"
+    },
+    {
+      "stage": 10,
+      "result": "HOLD_FRESH_C2",
+      "evidence": "no promotion; needs separately approved source family and all14 C2/C3 and user actual-game QA"
+    }
+  ],
+  "ordered_eight_checks": [
+    {
+      "name": "english_removal_plate",
+      "result": "PASS_SCOPED"
+    },
+    {
+      "name": "readable_slant",
+      "result": "HOLD_SOURCE_STEM_CALIBRATION"
+    },
+    {
+      "name": "relative_size",
+      "result": "PASS_SCOPED_91_OF_95_PIXELS"
+    },
+    {
+      "name": "stroke_fill_outline",
+      "result": "HOLD_FAMILY_C2_BLIND_COMPARISON"
+    },
+    {
+      "name": "glyph_clipping",
+      "result": "NO_DEFECT_OBSERVED_ROW05"
+    },
+    {
+      "name": "protected_art",
+      "result": "PASS_EXACT_OUTSIDE_ROW05_ZERO"
+    },
+    {
+      "name": "RAW_FLIPY",
+      "result": "PASS_SCOPED"
+    },
+    {
+      "name": "game_scale_readability",
+      "result": "PASS_50_STATIC_HOLD_GAME"
+    }
+  ],
+  "qa_status": "PRODUCER_SCOPED_PILOT_IMPROVEMENT_HOLD_BLIND_FAMILY_AND_OTHER_13",
+  "new_saved_unapproved_dds": 1,
+  "official_promoted_dds": 0,
+  "independent_C2": "NOT_RUN_NEW_SHA",
+  "C3": "NOT_RUN",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "evidence": [
+    {
+      "path": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_MACHINE.json",
+      "kind": "machine"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG128_100.png",
+      "sha256": "4770b2ec5eb5d59f2f8a5637b11b4d14c6e4ae70da3562ca0e85ee57b2efc8aa",
+      "kind": "firsthand_original_clean_old_trial_native"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG255_50.png",
+      "sha256": "abfb0024bc42c1ad0f841bf488637cfa28b0a6b76e361fa13621a30d41160e8f",
+      "kind": "firsthand_original_clean_old_trial_practical"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_RAW_BG128_100.png",
+      "sha256": "57efdf7c68151811869b7289668b407a44e93f27b880045c330e19faee052701",
+      "kind": "firsthand_saved_raw"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_Q236_ROW05_NATIVE_BOLD_UNAPPROVED.dds",
+      "sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+      "kind": "trial_not_official"
+    }
+  ],
+  "worker_run_id": 38084528610,
+  "backend": "GITHUB_ACTIONS_CPU_WORKER_WITH_N100_SMALL_REFERENCE_IMAGE_FETCH_FOR_CONTROLLER_EYEBALL",
+  "cleanup": "hosted worker ephemeral; three small N100 reference images transient cleanup required; no N100 worktree or heavy compute"
+}
