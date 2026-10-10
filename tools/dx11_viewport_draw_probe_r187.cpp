@@ -114,6 +114,31 @@ int main() {
         "R225 reject typeless indexed backing despite typed RTV");
     ctx->OMSetRenderTargets(1,&raw,nullptr);
     require(ready(), "R225 restore exact typed indexed eye");
+    // R227: a same-device typed/default RTV is not exclusively owned
+    // when its texture supports SRV binding. Check actual WARP OM state.
+    D3D11_TEXTURE2D_DESC r227Backing{};
+    color->GetDesc(&r227Backing);
+    r227Backing.BindFlags=D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    ComPtr<ID3D11Texture2D> r227SharedColor;
+    ComPtr<ID3D11RenderTargetView> r227SharedRtv;
+    require(SUCCEEDED(dev->CreateTexture2D(&r227Backing,nullptr,
+        r227SharedColor.GetAddressOf())) && r227SharedColor,
+        "R227 create same-device RTV SRV indexed eye");
+    require(SUCCEEDED(dev->CreateRenderTargetView(r227SharedColor.Get(),
+        nullptr,r227SharedRtv.GetAddressOf())) && r227SharedRtv,
+        "R227 RTV over SRV-capable indexed eye");
+    ID3D11RenderTargetView* r227Raw=r227SharedRtv.Get();
+    ctx->OMSetRenderTargets(1,&r227Raw,nullptr);
+    require(verified_indexed_linear_draw_ready(
+        vb,ib,ctx.Get(),0,3,0,gen,vv,iv),
+        "R227 indexed IA still accepts shared same-device color");
+    require(!verified_indexed_full_target_draw_ready(
+        vb,ib,ctx.Get(),0,3,0,gen,vv,iv,40,40,
+        DXGI_FORMAT_R8G8B8A8_UNORM,r227SharedRtv.Get()),
+        "R227 reject alias-capable indexed eye RTV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(), "R227 restore dedicated RTV-only indexed eye");
+
     require(!verified_indexed_full_target_draw_ready(
         vb,ib,ctx.Get(),0,3,0,gen,vv,iv,40,40,
         DXGI_FORMAT_R8G8B8A8_UNORM,nullptr), "reject null expected RTV");

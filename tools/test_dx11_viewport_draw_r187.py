@@ -12,6 +12,7 @@ guards=(
     "desc.Width != width || desc.Height != height",
     "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
     "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
+    "desc.BindFlags != D3D11_BIND_RENDER_TARGET",
     "context->RSGetViewports(&boundCount, nullptr)",
     "boundCount != 1",
     "rasterDesc.ScissorEnable",
@@ -46,6 +47,11 @@ for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
     "R225 indexed IA accepts same-device typed view",
     "R225 reject typeless indexed backing despite typed RTV",
     "R225 restore exact typed indexed eye",
+    "R227 create same-device RTV SRV indexed eye",
+    "R227 RTV over SRV-capable indexed eye",
+    "R227 indexed IA still accepts shared same-device color",
+    "R227 reject alias-capable indexed eye RTV",
+    "R227 restore dedicated RTV-only indexed eye",
     "actual DrawIndexed green center / black corner pixels"):
     assert phrase in p, "missing WARP behavior coverage: "+phrase
 assert "[target.dx11_viewport_draw_probe_r187]" in manifest

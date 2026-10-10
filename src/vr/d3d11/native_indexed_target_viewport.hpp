@@ -58,7 +58,8 @@ namespace outrun::vr::dx11 {
         // ownership: reject TYPELESS resource aliases or CPU/misc allocations.
         desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT ||
         desc.CPUAccessFlags != 0 || desc.MiscFlags != 0 ||
-        !(desc.BindFlags & D3D11_BIND_RENDER_TARGET))
+        // R227: same-device RTV|SRV/UAV alias is not a dedicated eye color.
+        desc.BindFlags != D3D11_BIND_RENDER_TARGET)
         return false;
 
     // Query the actual bound count first; requesting one viewport alone
