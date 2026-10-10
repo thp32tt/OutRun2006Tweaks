@@ -6887,7 +6887,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 15:10+ KST",
+  "updated_at_kst": "2026-10-10 15:47 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15144,5 +15144,27 @@
       "black50": 9,
       "white75": 9
     }
+  },
+  "c1_20261010_q217_425_source_clean_stage_boundary": {
+    "run_key": "OUTRUN-KOR-C1-Q217-BOUNDARY-425-CLASSIFICATION-20261010-1547",
+    "review_id": "C1-Q217-20261010-1547-BOUNDARY-CLASSIFICATION",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 217,
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+    "decision": "HOLD_STRICT_RECHECK",
+    "new_evidence": "C348 previously unclassified source glyph border 425 opaque visible pixels now connected-component isolated: START195 5, GOAL230 6; changed SOURCE/CLEAN425, CLEAN/FINAL0, alpha change0, distance <=8px. Stage proven PLATE_ONLY source removal, not Korean compositing; protected border vs source glow still unresolved.",
+    "machine_report": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/C1_Q217_OUTSIDE_425_MACHINE.json",
+    "visual_report": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/C1_Q217_CONTROLLER_C1_HOLD.json",
+    "new_dds": 0,
+    "modified_candidate": false,
+    "new_C_PASS": 0,
+    "C3": "BLOCKED",
+    "APPROVAL": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "user_ingame": "UNTESTED",
+    "next": "Source-conditioned original glyph-glow vs protected red badge border mask verification, blinded calibration, paired slant anchors and separate C3 required."
   }
 }
