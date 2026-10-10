@@ -301,7 +301,7 @@ Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B360_PREVIOUS_TO_TRIA
 # not a computed homologous-source slant PASS.
 report={"schema_version":2,"role":"B","run":"B360","queue_index":60,
 "run_key":"OUTRUN-KOR-B360-Q060-P0-SOURCE-FOUR-LAYER-MANUAL-20261010-2230",
-"method":"B360 materially changed P2: native English glyph color classification into orange/cream/gold/navy source layer profiles, native 1px contour face expansion, separate navy extrusion + measured English-B stem lean. Designed to repair C2 B359 too-pale thin racing title; old B359 normal-wash generator NOT reused. Only one unapproved pilot pending independent C2."
+"method":"B360 materially changed P2: native English glyph color classification into orange/cream/gold/navy source layer profiles, native 1px contour face expansion, separate navy extrusion + measured English-B stem lean. Designed to repair C2 B359 too-pale thin racing title; old B359 normal-wash generator NOT reused. Only one unapproved pilot pending independent C2.",
 "triage":tri["next_action"],"priority":"P0","source_sha256":SH["source"],"prior_official_sha256":SH["official"],
 "authored_clean_sha256":SH["clean"],"authored_mask_sha256":SH["mask"],"trial_persisted_sha256":hs(newdds),
 "trial_DDS":fn,"bytes":len(newdds),"source_bbox":list(label_bbox),"new_effect_bbox":render_bbox,
