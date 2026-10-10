@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX11-00514",
+  "event_id": "CONVERSION-DX11-00514-E001",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R217:INDEXED_OPAQUE_DEPTH_EYE_GPU",
+  "branch": "vr-dx11-native-r71",
+  "initial_material_sha": "7ad0be9b22a5bc59b1dcd99ff1d3293f14719bf0",
+  "latest_material_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "validation_bearing_result_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "initial_exact_gate": 38021355703,
+  "initial_gate_result": "FAIL R212 static scope overcounts additive R217",
+  "repair_exact_gate": 38021861636,
+  "repair_gate_status": "IN_PROGRESS",
+  "status": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "paths": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_single_eye_mrt_r212.py"
+  ],
+  "C2": "R217 strict DSV/depth opaque indexed ownership & WARP GPU positives/negatives; R212 static scope isolated; 11 new R217 mutant guards",
+  "local_checks": "Focused static R212 9 + R217 11 guarded 1x PASS",
+  "next_action": "Consume exact-SHA Gate 38021861636, inspect failure only if present, then C6 run record bookkeeping after Gate completion; do not cancel current CI",
+  "conflict_info": "R175 owned by CONVERSION-DX11-00477; cannot touch it; R216 owned by 00513"
+}
