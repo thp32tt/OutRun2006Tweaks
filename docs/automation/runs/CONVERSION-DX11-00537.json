@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E015",
+  "event_id": "CONVERSION-DX11-00537-E016",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX11",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00537",
   "lease_epoch": 1,
@@ -79,8 +79,8 @@
   "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
   "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
   "feature_status": "FEATURE_READY",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
+  "status": "FEATURE_READY_CI_REPAIR_PENDING_TARGET_PROMOTION",
+  "checkpoint": "C4_REPAIR_CANDIDATE",
   "feature_acceptance": {
     "implementation_complete": true,
     "targeted_checks": [
@@ -178,15 +178,15 @@
   "material_result_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
   "validation_bearing_result_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
   "result_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
-  "automation_validation": "PASS_EXACT_SHA",
+  "automation_validation": "PENDING_TARGET_EXACT_SHA_TEST_BUNDLE",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_draw_path_production_default": false,
   "source_stage": "SOURCE_BUILD_BUNDLE_VERIFIED__GAME_PIXEL_AND_HMD_UNTESTED",
   "last_real_activity_evidence": "Game material a2255b977fcfec16b75e93b32a0857c46879e1c3 validated unchanged at feature head 2cf69905c2adc4ebd495c373f1a67d64fbe32417, synthetic PR merge 0e355699723d376eaac1b7796f66b76fdd544ed8 identical tree ecfc4932f098c8a0e26c2d35d6d132532a7c224c; Build #38085544687, OpenXR #38085544613, HUD #38085544668 SUCCESS; package artifact 11682327338; real game/HMD UNTESTED.",
-  "blocker": "Controller-only TARGET promotion and Backend Conversion Gate; game-authored actual pixels, diagnostic inset, controls and Quest3/VDXR runtime all UNTESTED.",
+  "blocker": "DX11-TEST-BUNDLE CI step SKIPPED on target exact 937f6bf4 despite other three required workflows SUCCESS; workflow repair awaiting controller-only promotion.",
   "resume_cursor": "FEATURE_READY_AWAIT_CONTROLLER_PROMOTION_BACKEND_GATE_AND_USER_GAME_TEST",
-  "next_action": "BUILD_VERIFIED; controller may record terminal C6 on TARGET after checking FEATURE bookkeeping and exact SHA, then allocate a genuinely independent next game-menu/drive/input/OpenXR deliverable. Actual hardware pixels/inset/input/Quest3 VDXR require separate NEED_HMD_TEST.",
+  "next_action": "Review new workflow repair PR; controller-only fast-forward/promotion into TARGET and inspect OpenXR DX11-TEST-BUNDLE step + artifact on exact target SHA; then restore C6 COMPLETE_BUILD_VERIFIED without claiming HMD pixels.",
   "score_change": 0,
   "validation_gates": {
     "build": {
@@ -857,5 +857,19 @@
       "Game menu/drive controls",
       "Quest3/VDXR bilateral/HUD/OpenXR runtime parity"
     ]
+  },
+  "retry_3": {
+    "event_id": "CONVERSION-DX11-00537-E016",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "observed_feature_head": "040dc07ccdaa059acd8f45ab95b70fd5cab1fdf6",
+    "confirmed_target_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+    "source_code_changes": false,
+    "failure_context": "ACCEPTANCE_CI_STEP_MISSING:DX11-TEST-BUNDLE",
+    "root_cause": "OpenXR diagnostic bundle job if guarded only PR head feature branch. Target exact 937f6bf4 OpenXR #38092242555 skipped the job; no target exact bundle artifact.",
+    "fix": "Allow target push event; include target branch push trigger; derive bundle filename and manifest from PR head sha OR push github.sha. Preserve opt-in marker, PE/sha negative tests, original source and fallback.",
+    "pending": "Feature branch repair commit and PR; controller target promotion and exact target SHA OpenXR bundle step/artifact evidence remain pending.",
+    "runtime_validation": "UNTESTED",
+    "score_change": 0
   }
 }
