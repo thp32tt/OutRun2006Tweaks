@@ -58,8 +58,8 @@ for xx,yy in zip(xs.tolist(),ys.tolist()):
     x,y=rect[0]+xx,rect[1]+yy
     ry=H-1-y
     offset=128+(ry*W+x)*4
-    assert prev[offset:offset+4]!=b"\\0"*4
-    trial[offset:offset+4]=b"\\0"*4
+    assert prev[offset:offset+4]!=bytes(4)
+    trial[offset:offset+4]=bytes(4)
     spots.append({"readable_xy":[x,y],"native_raw_xy":[x,ry],"byte_offset":offset,
                   "prior_readable_rgba":[255,255,255,255],"new_readable_rgba":[0,0,0,0]})
 trial=bytes(trial)
@@ -125,5 +125,5 @@ report={
  "RUNTIME_VALIDATION":"UNTESTED",
  "backend":"GitHub Actions CPU worker; no N100 heavy",
  "exclusions":["VR","FFB","DX11","DXVK"]}
-(out/"A219_Q121_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+(out/"A219_Q121_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+chr(10),encoding="utf-8")
 print(json.dumps({k:report[k] for k in ("run","unpromoted_trial_candidate_sha256","source_residue_pixels_removed","outside_33_pixels_changed")},ensure_ascii=False))
