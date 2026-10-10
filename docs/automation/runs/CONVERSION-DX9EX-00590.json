@@ -16,7 +16,8 @@
     "targeted_checks": [
       "In-memory source RED/GREEN static contract PASS",
       "6 targeted negative source mutations rejected",
-      "Python regression verifier wired into DX9Ex Active Gate; runner execution pending"
+      "Python regression verifier wired into DX9Ex Active Gate; runner execution pending",
+      "R31 real Apply handler declaration and NoteApply call verified against current GitHub source"
     ],
     "integration_contract": "R29 effect cache and telemetry reuse only if R22/R31 StateBlock events are reliable, global Apply generation matches, Present epoch and age match. All 5 live render-state getters are bracketed by global generation; setters do not revive fields from before Apply; unsafe reads fail closed to legacy R13."
   },
@@ -26,14 +27,22 @@
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00590.json"
   ],
-  "automation_validation": "PENDING_CONTROLLER_EXACT_SHA",
+  "automation_validation": "PENDING_REPAIRED_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "status": "FEATURE_READY_AWAIT_CONTROLLER_FAST_FORWARD_AND_EXACT_SHA_GATES",
+  "status": "FEATURE_READY_REPAIR_SUBMITTED",
   "hmd_test": "NOT_RUN",
   "ffb_release": "v0.2",
   "ffb_source_changed": false,
   "dxvk_status": "FROZEN",
   "r84_convergence": "INCOMPLETE_R30_R29_TU_SPLIT",
   "feature_final_promotion": "CONTROLLER_FAST_FORWARD_AFTER_READY",
-  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1"
+  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+  "previous_candidate_sha": "dbf6678e543b636858a4cbb1bc8ae847af82597e",
+  "previous_ci_failure": {
+    "run_id": 38051682030,
+    "stage": "policy",
+    "reason": "verifier incorrectly required static declaration of R31OnStateBlockApply",
+    "classification": "VERIFIER_DEFECT",
+    "status": "CORRECTED"
+  }
 }

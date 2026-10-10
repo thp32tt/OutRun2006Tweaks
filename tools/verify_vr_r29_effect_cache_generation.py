@@ -49,7 +49,7 @@ def contract(s):
 errors = []
 if not contract(src):
     errors.append("R29 effect-cache generation/read fencing contract")
-if "static void R31OnStateBlockApply(" not in r31 or "StateBlockTracker::NoteApply();" not in r31:
+if "void R31OnStateBlockApply(" not in r31 or "StateBlockTracker::NoteApply();" not in r31:
     errors.append("R31 StateBlock Apply generation producer")
 if "static bool Reliable() noexcept" not in tracker or "static std::uint64_t ApplyGeneration()" not in tracker:
     errors.append("shared generation/coverage tracker")
