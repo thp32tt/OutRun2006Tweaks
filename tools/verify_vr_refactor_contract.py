@@ -425,7 +425,9 @@ for label, changed_r30, changed_r32 in (
         "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);",
         "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,0);", 1), r32),
     ("indexed UP index format changed", r30.replace(
-        "d,t,m,n,p,idx,f,v,st);", "d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
+        # Target the raw R9 trampoline, not an earlier lower-draw wrapper.
+        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st);",
+        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
     ("Present region dropped", r30.replace(
         "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);",
         "return PresentHook.stdcall<HRESULT>(d,s,dst,w,nullptr);", 1), r32),
@@ -1631,9 +1633,22 @@ for marker, source, owner in (
 ):
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
-for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31SupportInstallStatus()"):
+# R13/R22 move to the R30 lower-owner prerequisite aggregation; R32
+# consumes only the R31 status plus the aggregated lower status.  Requiring
+# direct R13/R22 references in R32 would undo the new TU ownership seam.
+for marker in ("R13InstallStatus()", "R22InstallStatus()"):
+    if marker not in r30:
+        errors.append(f"R30 lower owner missing prerequisite query: {marker}")
+if "R30SupportLowerPrerequisiteStatus() noexcept" not in r30_support_api:
+    errors.append("R30 API missing lower prerequisite status declaration")
+if "R30SupportLowerPrerequisiteStatus() noexcept" not in r30:
+    errors.append("R30 lower prerequisite aggregator missing implementation")
+for marker in ("R31SupportInstallStatus()", "R30SupportLowerPrerequisiteStatus()"):
     if marker not in r32:
         errors.append(f"R32 split facade missing prerequisite owner query: {marker}")
+for banned in ("R13InstallStatus()", "R22InstallStatus()"):
+    if banned in r32:
+        errors.append(f"R32 retained direct lower prerequisite query: {banned}")
 if "R32ReviewPrerequisiteStatus()" not in r33:
     errors.append("R33 missing R32 split facade prerequisite query")
 
