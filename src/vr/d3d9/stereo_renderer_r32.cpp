@@ -543,6 +543,9 @@ namespace OutRunVRStereo
                 device, selected, sourceSurfaces);
             if (FAILED(copy.hr))
             {
+                // StretchRect commands are already queued when an EVENT
+                // Issue fails. Quarantine either copy or fence failure before
+                // the transport ring may consider this slot reusable.
                 R32DirectCopyPathRejected = true;
                 R32DirectCopyRejectHr = copy.hr;
                 if (copy.copyFailed)
