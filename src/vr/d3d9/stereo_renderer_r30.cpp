@@ -3594,6 +3594,16 @@ namespace OutRunVRStereo
         target.published = false;
     }
 
+    R30SupportDirectTransportSlotPublication
+    R30SupportGetDirectTransportSlotPublication(
+        std::uint32_t slot) noexcept
+    {
+        if (slot >= OutRunVR::RenderFrameRingSize)
+            return {};
+        const auto& candidate = DirectTransportSlots[slot];
+        return {candidate.published, candidate.frameId};
+    }
+
     HRESULT R30SupportPollDirectTransportSlotProducer(
         std::uint32_t slot) noexcept
     {
@@ -3653,6 +3663,32 @@ namespace OutRunVRStereo
         out.left = BackBuffer;
         out.right = RightEyeSurface;
         return out.left != nullptr && out.right != nullptr;
+    }
+
+    R30SupportDirectTransportCopyResult
+    R30SupportCopyDirectTransportEyesAndIssueFence(
+        IDirect3DDevice9* device, std::uint32_t index,
+        const R30SupportDirectTransportSourceSurfaces& source) noexcept
+    {
+        if (!device || !source.left || !source.right ||
+            index >= OutRunVR::RenderFrameRingSize)
+            return {D3DERR_INVALIDCALL, true};
+
+        auto& slot = DirectTransportSlots[index];
+        if (!slot.leftSurface || !slot.rightSurface || !slot.fence)
+            return {D3DERR_INVALIDCALL, true};
+
+        InternalPassScope guard;
+        const HRESULT leftCopy = device->StretchRect(
+            source.left, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE);
+        const HRESULT rightCopy = SUCCEEDED(leftCopy)
+            ? device->StretchRect(
+                source.right, nullptr, slot.rightSurface, nullptr, D3DTEXF_NONE)
+            : leftCopy;
+        if (FAILED(leftCopy) || FAILED(rightCopy))
+            return {FAILED(leftCopy) ? leftCopy : rightCopy, true};
+
+        return {slot.fence->Issue(D3DISSUE_END), false};
     }
 
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept
