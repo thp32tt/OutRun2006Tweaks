@@ -1,0 +1,41 @@
+{
+  "run": "A227",
+  "role": "A",
+  "index": 101,
+  "run_key": "OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
+  "source_sha256_claim": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "source_png_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+  "candidate_dds_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+  "first_glyph_reference": "English E",
+  "first_glyph_candidate": "Korean 이",
+  "evidence_method": "native PNG leftmost alpha-edge OLS x(y) with 64/128/220 alpha thresholds and 2 exact y windows; no resized inputs",
+  "threshold": 128,
+  "y_range": [
+    44,
+    67
+  ],
+  "rows": 23,
+  "source_left_dx_dy": -0.33202,
+  "candidate_left_dx_dy": -0.31126,
+  "slope_abs_difference": 0.02076,
+  "machine_report": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
+  "reproduction_script": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_MEASURE_FIRSTGLYPH_SLANT.py",
+  "proof_png": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png",
+  "firsthand_visual": "Visually viewed and annotated exact native English E and Korean 이 partial mid-stem slant. Comparable rightward lean only within selected first-glyph rows; letterform topology and other rows differ.",
+  "scope": "SCOPED_SOURCE_PROFILE_EVIDENCE_NOT_FULL_SOURCE_FAMILY_PASS",
+  "source_full_DDS_independently_authenticated": false,
+  "blind_control_calibration": false,
+  "full_all_glyph_anchor_verification": false,
+  "existing_A226_DDS_changed": false,
+  "new_dds": 0,
+  "promoted_dds": 0,
+  "C1": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
