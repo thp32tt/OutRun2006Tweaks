@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 ODD q055 new exact SOURCE DDS→CLEAN independent validation 116439 source glyph pixels cleared and 0 outside, CLEAN alpha0, BC3 source/candidate protected block change outside0; current SHA ee11a2521e3c79c4 unchanged from C305, not reapproval or new DDS. C3 HOLD due blind calibration/anchor; game UNTESTED. OUTRUN-KOR-C1-Q055-EXACT-CLEAN-SOURCE-BC3-20261011-0345",
     "B361/B362 q212 even r43 source-sized native outline pilot, first 2px fail SHA c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d (50%-counter collapse), final 1px corrected SHA 0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33 337/395=85.3%; 22434 changed RGBA inside r43 ROI, other11 atlas cells exact, old-alpha outside original bbox 5832 ->0, decode0. Producer scoped readability improved but semantic/source family and r44 unfinished -> independent C2 HOLD, C3/user game UNTESTED and official C338 remains REWORK. Source-conditioned PSD/manual vector required if C2 rejects; do NOT repeat Noto glyph+tracking. Evidence localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-B361-B362-Q212-R43-NATIVE-COUNTER-SOURCE-20261011-0330",
     "C372 C2 q060 FIRST independent shared-plate exact-SHA PLATE_PASS manifest 6144f03e... 89391 all SOURCE alpha removed, outside0 and protected siblings untouched, 6 genuine PNG. New lettering remains producer REWORK, IGR044 open, C3/game UNTESTED. localization/graphics/plate_library/reviews/6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a.json C372-C2-Q060-BEST-TIME-PLATE-20261011",
     "C1 q217 ODD new A231 CLEAN+trial independently reviewed: canonical original SOURCE DDS SHA d3d2d155 and raw-to-PNG mismatch0; 3496 exact glyph-only CLEAN change outside0, 425 opaque original RGB rim restored (START195 GOAL230), alpha unchanged; same source native 2048 DDS; plate scope pixel PASS but blind calibration pending so library HOLD; new distinct trial 8043bd79 inheritance small pale Korean/gold bevel mismatch REWORK; official SHA a4d817 unchanged, C3/game UNTESTED. OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
@@ -15593,5 +15594,20 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_Q217_A231_INDEPENDENT_QA.json"
+  },
+  "c1_20261011_q055_independent_exact_clean_bc3": {
+    "run_key": "OUTRUN-KOR-C1-Q055-EXACT-CLEAN-SOURCE-BC3-20261011-0345",
+    "index": 55,
+    "shard": "ODD",
+    "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+    "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+    "clean_sha256": "7b72b6da1d4a2653526bddda12813ebbbcd011ceaa5168e6f74ac1ec5d25ec19",
+    "independent_plate": "SCOPED_PASS_116439_EXACT_MASK",
+    "source_to_clean_outside": 0,
+    "bc3_changed_outside_allowed": 0,
+    "full_C3": "HOLD_MISSING_BLIND_CALIBRATION_SLANT",
+    "candidate_changed": false,
+    "game": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_SOURCE_CLEAN_CONTROLLER_HOLD.json"
   }
 }

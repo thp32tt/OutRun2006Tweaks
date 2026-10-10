@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T03:44:00+09:00",
+  "updated_at_kst": "2026-10-11T03:50:57+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11896,5 +11896,22 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_CONTROLLER_PRODUCER_QA.json",
     "excluded_domains": []
+  },
+  "c1_20261011_q055_independent_exact_clean_bc3": {
+    "run_key": "OUTRUN-KOR-C1-Q055-EXACT-CLEAN-SOURCE-BC3-20261011-0345",
+    "queue_index": 55,
+    "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+    "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+    "auth_clean_sha256": "7b72b6da1d4a2653526bddda12813ebbbcd011ceaa5168e6f74ac1ec5d25ec19",
+    "independent_plate_pixels": 116439,
+    "changed_source_clean_outside": 0,
+    "bc3_changed_outside": 0,
+    "current_c_approved": 0,
+    "current_c3_approved": 0,
+    "user_ingame_accepted": 0,
+    "dds_produced": 0,
+    "status": "HOLD_STRICT_RECHECK",
+    "runtime": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_SOURCE_CLEAN_CONTROLLER_HOLD.json"
   }
 }

@@ -1,0 +1,245 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C1-Q055-EXACT-CLEAN-SOURCE-BC3-20261011-0345",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 55,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "source_origin": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "clean_sha256": "7b72b6da1d4a2653526bddda12813ebbbcd011ceaa5168e6f74ac1ec5d25ec19",
+  "clean_origin": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/2EA557B4_HD_CLEAN_PLATE.png",
+  "execution_backend": "N100 MCP fallback only after ChatGPT-local github raw download failed DNS; Pillow independently decoded authentic BC3 DDS and SHA validated inputs; no git/worktree or game execution",
+  "independent_first_look": "Opened native persisted 3-column SOURCE/CLEAN/FINAL PNG on gray and RAW before C3 approval decision. Title source is cyan-white-blue leaned face; candidate cyan-white-blue Hangul on matching dark outline, but relative source glyph-family slant/weight unresolved. CLEAN is visibly transparent without source glyph ghost or unrelated background intrusion.",
+  "visual_reviewer": "ChatGPT C1 independently inspecting stored bytes; no fictitious human or blind calibration",
+  "pixels_before_producer_verdict": false,
+  "blind_calibration": {
+    "completed": false,
+    "reason": "Previously seen C305 status, no five-case blind calibration run"
+  },
+  "source_clean_verification": {
+    "result": "SCOPED_PASS",
+    "pixel_counts": {
+      "source_to_clean_changed": 116439,
+      "outside_authored_source_text_mask": 0,
+      "outside_allowed_mask": 0,
+      "clean_alpha_positive": 0,
+      "source_dds_png_mismatch": 0
+    }
+  },
+  "composite_verification": {
+    "result": "SCOPED_PASS",
+    "changed_clean_to_candidate": 89404,
+    "changed_source_to_candidate": 130768,
+    "changed_outside_allowed": 0,
+    "raw_changed_bc3_blocks": 9509,
+    "dds_header_equal": true
+  },
+  "per_region": [
+    {
+      "id": "next_round_title",
+      "source_english": "NEXT ROUND",
+      "localized": "다음 라운드",
+      "readable_transform": "flip_y",
+      "source_bbox": [
+        1,
+        105,
+        1090,
+        248
+      ],
+      "candidate_bbox": [
+        9,
+        113,
+        890,
+        240
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable SOURCE and FINAL both appear right-leaning in controller review, but corresponding stroke top-minus-bottom dx anchors and blinded source-family calibration are missing; no quantitative slant PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Canonical SHA-authenticated BC3 SOURCE decoded to original PNG exactly; 116439 source-positive pixels cleared in CLEAN, transparent alpha=0, 0 RGBA changed outside source glyph mask, no letter residue in native BGW/50% review.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "SOURCE thin racing italic gradient face versus Korean visibly broader Hangul treatment; calibration/family alignment unresolved, do not assert source-faithful style approval.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "readability": {
+          "result": "OBSERVED_NO_NEW_FAIL",
+          "observation": "Native persisted Hangul legible at 100/75/50 on BG0/128/255; does not replace actual game HUD composite.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_50.png",
+            "sha256": "e316b1d0865c7f62c10c44b1780072d1ded267b16dc0092c23d55be74fd0d4fa",
+            "github_blob_sha": "2cf6060b92d0bc8c8e58e9e7ee42ce53f9ccad1d",
+            "view": "readable",
+            "background": 128,
+            "scale": 0.5
+          }
+        },
+        "glyph_integrity": {
+          "result": "OBSERVED_NO_NEW_FAIL",
+          "observation": "No conspicuous clipped Hangul in native and 50% screenshots, but detailed per-glyph transformation or original-family reference is not fully qualified.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS",
+          "observation": "SOURCE→CLEAN and SOURCE→FINAL changes outside 155727px allowed title footprint=0; BC3 changed blocks wholly outside allowed 4x4 blocks=0. No other art seen in title-only sprite.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "placement": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "Native source readable bbox [1,105,1090,248], current readable bbox [9,113,890,240] (prior C305 measured); independently verified candidate/source changed outside allowed mask=0.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+            "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+            "github_blob_sha": "e1f1f8216743d86353fc95801038f7e8cf20309c",
+            "view": "readable",
+            "background": 128,
+            "scale": 1
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Native BC3 source and persisted final decoded RAW/FLIP-Y pair checked, source DDS→source PNG mismatch0, DXT5 headers equal, only mip level 1.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_RAW_BG128_100.png",
+            "sha256": "c1cd03c126c98f62a305cf5e5fca552d9bed5b3fe895dcac086b2b9add31ef09",
+            "github_blob_sha": "cfd2a2c643d88f4b6452ed846ff8a366661f6ec8",
+            "view": "raw",
+            "background": 128,
+            "scale": 1
+          }
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG0_100.png",
+      "sha256": "92cdbf96ba9691cf42b147886fd3fedd966aa618958848ab26752274733e0d2e",
+      "view": "readable",
+      "background": 0,
+      "scale": 1
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG0_75.png",
+      "sha256": "fef4cf2b9be0b296b28ff0bc6cd3043b6acb03c3681fdcc5be5aea403f0e6390",
+      "view": "readable",
+      "background": 0,
+      "scale": 0.75
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG0_50.png",
+      "sha256": "b96777b3e0cc8c5d90b61d9d9fd1b6f36959d15587dfc32097b7454468635562",
+      "view": "readable",
+      "background": 0,
+      "scale": 0.5
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_100.png",
+      "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+      "view": "readable",
+      "background": 128,
+      "scale": 1
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_75.png",
+      "sha256": "21335905ede900df3e0f8380527433aa5b06028c5ca1650bb4a7d056bb29ca92",
+      "view": "readable",
+      "background": 128,
+      "scale": 0.75
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG128_50.png",
+      "sha256": "e316b1d0865c7f62c10c44b1780072d1ded267b16dc0092c23d55be74fd0d4fa",
+      "view": "readable",
+      "background": 128,
+      "scale": 0.5
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG255_100.png",
+      "sha256": "68783a679582ea68ff1a24a910f142e5310ad1728e29e5e6402d5671e6692b2f",
+      "view": "readable",
+      "background": 255,
+      "scale": 1
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG255_75.png",
+      "sha256": "081a475fd6ee18358575f0683a65410b81c365789616abddedaad8c8c942f4f9",
+      "view": "readable",
+      "background": 255,
+      "scale": 0.75
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_READABLE_BG255_50.png",
+      "sha256": "4f75bb2ec98eccf078d4e092efcfc4a05c698842f710721b0b190a47a5392cbb",
+      "view": "readable",
+      "background": 255,
+      "scale": 0.5
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_RAW_BG128_100.png",
+      "sha256": "c1cd03c126c98f62a305cf5e5fca552d9bed5b3fe895dcac086b2b9add31ef09",
+      "view": "raw",
+      "background": 128,
+      "scale": 1
+    }
+  ],
+  "C1_result": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN_THIS_INVOCATION",
+  "historical_C224": "historical_static_PASS_not_current_evidence_approval",
+  "C305_gap_closed": "exact authenticated SOURCE-to-CLEAN native pixel proof and BC3 block-protected comparison",
+  "remaining": [
+    "five-case blind defect calibration",
+    "independent corresponding source/candidate glyph slant anchors and family qualification",
+    "separate C3 eight observations with current evidence-gate approval",
+    "user real-game test if applicable"
+  ],
+  "APPROVAL": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_new_DDS": true,
+  "no_modified_candidate": true,
+  "forbidden_domains_touched": []
+}

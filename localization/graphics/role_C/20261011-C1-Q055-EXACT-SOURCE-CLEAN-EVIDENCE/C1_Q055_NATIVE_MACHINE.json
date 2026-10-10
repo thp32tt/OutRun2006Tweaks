@@ -1,0 +1,110 @@
+{
+  "asset_index": 55,
+  "native": [
+    2048,
+    256
+  ],
+  "source_dds_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_dds_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "clean_sha256": "7b72b6da1d4a2653526bddda12813ebbbcd011ceaa5168e6f74ac1ec5d25ec19",
+  "source_preview_sha256": "886f70728e77ebd9190befc1929e2ce72568424f9e7962f60c71ef1cc9c2d5f7",
+  "text_mask_sha256": "4c8c65e16ba3f2f650d49f8faff33e8470a11bb6c705c3cc5435ab1530185fdf",
+  "allowed_mask_sha256": "dae5c5914b6848fedbae641589bf9ce2b5dcb4348ec78c9a3e38d67ae2f1e372",
+  "source_dds_png_mismatch_rgba": 0,
+  "dds_header_equal": true,
+  "source_to_clean_changed_rgba": 116439,
+  "source_to_clean_changed_outside_author_mask": 0,
+  "source_to_clean_changed_outside_allowed_mask": 0,
+  "source_to_clean_changed_alpha": 116439,
+  "clean_alpha_positive": 0,
+  "source_to_clean_positive_alpha_inside_text_mask": 0,
+  "clean_to_candidate_changed_rgba": 89404,
+  "clean_to_candidate_outside_author_mask": 18800,
+  "clean_to_candidate_outside_allowed": 0,
+  "source_to_candidate_changed_rgba": 130768,
+  "source_to_candidate_outside_allowed": 0,
+  "mask_positive": 116439,
+  "allowed_mask_positive": 155727,
+  "source_alpha_positive": 116439,
+  "candidate_alpha_positive": 88589,
+  "candidate_alpha_outside_allowed": 0,
+  "mip_header_source": 1,
+  "mip_header_candidate": 1,
+  "evidence": [
+    {
+      "path_local": "C1_Q055_READABLE_BG0_100.png",
+      "sha256": "92cdbf96ba9691cf42b147886fd3fedd966aa618958848ab26752274733e0d2e",
+      "bg": 0,
+      "view": "readable",
+      "scale": 1
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG0_75.png",
+      "sha256": "fef4cf2b9be0b296b28ff0bc6cd3043b6acb03c3681fdcc5be5aea403f0e6390",
+      "bg": 0,
+      "view": "readable",
+      "scale": 0.75
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG0_50.png",
+      "sha256": "b96777b3e0cc8c5d90b61d9d9fd1b6f36959d15587dfc32097b7454468635562",
+      "bg": 0,
+      "view": "readable",
+      "scale": 0.5
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG128_100.png",
+      "sha256": "7d0998a472cdd281ecf54d3a59b14a7ecd965089d0cccad33c8bccd652531f30",
+      "bg": 128,
+      "view": "readable",
+      "scale": 1
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG128_75.png",
+      "sha256": "21335905ede900df3e0f8380527433aa5b06028c5ca1650bb4a7d056bb29ca92",
+      "bg": 128,
+      "view": "readable",
+      "scale": 0.75
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG128_50.png",
+      "sha256": "e316b1d0865c7f62c10c44b1780072d1ded267b16dc0092c23d55be74fd0d4fa",
+      "bg": 128,
+      "view": "readable",
+      "scale": 0.5
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG255_100.png",
+      "sha256": "68783a679582ea68ff1a24a910f142e5310ad1728e29e5e6402d5671e6692b2f",
+      "bg": 255,
+      "view": "readable",
+      "scale": 1
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG255_75.png",
+      "sha256": "081a475fd6ee18358575f0683a65410b81c365789616abddedaad8c8c942f4f9",
+      "bg": 255,
+      "view": "readable",
+      "scale": 0.75
+    },
+    {
+      "path_local": "C1_Q055_READABLE_BG255_50.png",
+      "sha256": "4f75bb2ec98eccf078d4e092efcfc4a05c698842f710721b0b190a47a5392cbb",
+      "bg": 255,
+      "view": "readable",
+      "scale": 0.5
+    },
+    {
+      "path_local": "C1_Q055_RAW_BG128_100.png",
+      "sha256": "c1cd03c126c98f62a305cf5e5fca552d9bed5b3fe895dcac086b2b9add31ef09",
+      "bg": 128,
+      "view": "raw",
+      "scale": 1
+    }
+  ],
+  "dds_format": "DXT5 BC3",
+  "changed_bc3_blocks": 9509,
+  "changed_bc3_blocks_wholly_outside_allowed_4x4": 0,
+  "source_bc3_bytes": 524416,
+  "candidate_bc3_bytes": 524416
+}
