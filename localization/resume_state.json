@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B358 q212 P1 IGR029 source CLEAN P3 correctness repaired: unpromoted persisted DDS 38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8; old official alpha outside English core 5832+741 -> new 0+0; 29668 RGBA change restricted two title ROIs, 10 protected cells and decoded persisted exact. Native/50% source-family optical HOLD (r43 width284/395=71.9%) and semantic 모드 suffix not approved; official C338 REWORK unchanged; C2/C3/USER_GAME UNTESTED. QA localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_CONTROLLER_QA.json RUN_KEY=OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
     "C2 q060 new trial B353 optical source-family REWORK, same-method rerender blocked, old C342 official unchanged; OUTRUN-KOR-C2-Q060-B353-NEW-SHA-SOURCE-FAMILY-20261010-2020",
     "A227 2026-10-10 20:08 KST measured English E vs Korean 이 first-glyph native source-family alpha outline: -0.33202 versus -0.31126 dx/dy, 23 rows, 12 threshold/window evidence and native 4x plot. Prior A226 exact DDS unchanged, official still REWORK, C1 HOLD until full source + blind multi-glyph, C3/game UNTESTED. localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json RUN_KEY=OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
     "C2 q212 B357 independent persisted SHA pixel visual FAIL: old official Hangul visible alpha32 source-core overflow r43 5638, r44 712; official C338 unchanged and IGR029 OPEN; OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000.",
@@ -6998,7 +6999,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 15:47 KST",
+  "updated_at_kst": "2026-10-10T20:38:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
