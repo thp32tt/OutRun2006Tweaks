@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B358",
+  "queue_index": 212,
+  "run_key": "OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
+  "priority": "P1_IGR029_SHARED_MODE_ATLAS",
+  "triage": "MATERIAL_REWORK",
+  "method": "P3 composition logic materially corrected after independent C2 old Hangul residue proof: initialize persisted atlas with entire two source-transparency-clean sprite ROIs before new source-bbox glyph-only overlay; purge 5638/712-like old bleed. Same native Korean lettering retained pending strict source-family appearance review; official C338 remains unchanged.",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "full_C158_clean_reference_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "source_clean_stage": "P1_SCOPED_PERSISTED_ZERO_ALPHA_TWO_FULL_ROIS_NOT_FULL_C158_ATLAS",
+  "current_official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "new_unapproved_trial_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "C2_B357_defect": "INHERITED_OLD_KOREAN_VISIBLE_OUTSIDE_EXACT_ENGLISH_BBOX",
+  "fix_stage": "P3_ACTUAL_ZERO_ALPHA_PLATE_USED_AS_COMPOSITE_BASE",
+  "new_saved_trial_DDS": 1,
+  "official_promoted_DDS": 0,
+  "native_size": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA32",
+  "mips": 1,
+  "raw_orientation": "MIRROR_Y",
+  "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_index": 1,
+  "regions": [
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 5832,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r43_professional",
+      "source_english": "PROFESSIONAL",
+      "translated_text": "프로페셔널 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "native_font_ppem": 43,
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_opaque_width": 395,
+      "candidate_bbox": [
+        243,
+        342,
+        527,
+        384
+      ],
+      "candidate_width": 284,
+      "candidate_width_ratio": 0.719,
+      "positive_margins": [
+        3,
+        110,
+        1,
+        2
+      ],
+      "original_source_core_rgb": [
+        241,
+        147,
+        49
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 8209
+    },
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 741,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r44_outrun",
+      "source_english": "OUTRUN",
+      "translated_text": "아웃런 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "native_font_ppem": 42,
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "source_opaque_width": 209,
+      "candidate_bbox": [
+        1629,
+        526,
+        1829,
+        567
+      ],
+      "candidate_width": 200,
+      "candidate_width_ratio": 0.9569,
+      "positive_margins": [
+        3,
+        8,
+        2,
+        2
+      ],
+      "original_source_core_rgb": [
+        186,
+        0,
+        0
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 4503
+    }
+  ],
+  "changed_rgba_pixels": 29668,
+  "outside_two_rois_rgba_change": 0,
+  "protected_other_10_current_cells_byte_exact": true,
+  "decoded_persisted_mismatch": 0,
+  "evidence_previews": [
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_75.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_100.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_75.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_50.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_100.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_75.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_50.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_BLACK_100.png",
+    "B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_WHITE_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_75.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_75.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_50.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_75.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_50.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_BLACK_100.png",
+    "B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_WHITE_100.png"
+  ],
+  "producer_visual": "HOLD_SOURCE_FAMILY_OPTICAL_CONTROLLER_REVIEW",
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

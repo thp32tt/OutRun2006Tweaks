@@ -1,0 +1,97 @@
+{
+  "source": {
+    "uri": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+    "sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+  },
+  "full_clean_reference": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "old_official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "index": 1
+  },
+  "regions": [
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 5832,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r43_professional",
+      "source_english": "PROFESSIONAL",
+      "translated_text": "프로페셔널 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "native_font_ppem": 43,
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_opaque_width": 395,
+      "candidate_bbox": [
+        243,
+        342,
+        527,
+        384
+      ],
+      "candidate_width": 284,
+      "candidate_width_ratio": 0.719,
+      "positive_margins": [
+        3,
+        110,
+        1,
+        2
+      ],
+      "original_source_core_rgb": [
+        241,
+        147,
+        49
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 8209
+    },
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 741,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r44_outrun",
+      "source_english": "OUTRUN",
+      "translated_text": "아웃런 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "native_font_ppem": 42,
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "source_opaque_width": 209,
+      "candidate_bbox": [
+        1629,
+        526,
+        1829,
+        567
+      ],
+      "candidate_width": 200,
+      "candidate_width_ratio": 0.9569,
+      "positive_margins": [
+        3,
+        8,
+        2,
+        2
+      ],
+      "original_source_core_rgb": [
+        186,
+        0,
+        0
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 4503
+    }
+  ],
+  "protected": "other 10 current atlas cells exact",
+  "method": "first-failure-stage P3 true CLEAN composition patch; unchanged native letters; no lowres upscaling, no width/shear affine",
+  "C2_and_runtime_required": true
+}
