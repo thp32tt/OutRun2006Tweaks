@@ -93,7 +93,7 @@ for ch in word:
 glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
 advance=glyph_width-tracking*(len(native_glyphs)-1)
 assert 700<=glyph_width<=845,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
-left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0-4 # source effect bbox centered with protected sibling margins
+left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0-7 # re-center 3px left to eliminate measured 1px source-right overflow
 top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
 top-=2
 pen=left
@@ -185,8 +185,8 @@ colored[deep_face]=.75*colored[deep_face]+.25*row_profile[q][deep_face]
 ink=Image.new("RGBA",(W,H),(0,0,0,0))
 # 3D sidewall: source-conditioned navy blue extrusion is visibly thick on
 # English BEST TIME; use a true separated backplate (not flat all-red shadow).
-edge=local.filter(ImageFilter.MaxFilter(9))
-extrusion=ImageChops.offset(edge,3,5)
+edge=local.filter(ImageFilter.MaxFilter(7))
+extrusion=ImageChops.offset(edge,2,3)
 shade=Image.new("RGBA",(W,H),tuple(navy)+(0,));shade.putalpha(extrusion)
 ink=Image.alpha_composite(ink,shade)
 rim=Image.new("RGBA",(W,H),tuple(navy)+(0,));rim.putalpha(edge)
@@ -267,7 +267,7 @@ report={"schema_version":2,"role":"B","run":"B359","queue_index":60,
 "glyph_coverage":"ALL_CODEPOINTS_PRESENT","font_native_ppem":ppem,"letter_spacing":letter_spacing,"natural_advance_px":advance,
 "source_gold_sample_rgb_upper":color_top,"source_gold_sample_rgb_lower":color_bottom,
 "readable_single_affine_lean_SOURCE_B_STEM_ONLY_NOT_WHOLE_FAMILY":incline,"source_B_stem_fit_dx_dy":source_slope,
-"gradient":"SOURCE_MEASURED_ENGLISH_FACE_ROWS_AND_QUANTILES","stroke_px":4,"extrusion_offset":[3,5],
+"gradient":"SOURCE_MEASURED_ENGLISH_FACE_ROWS_AND_QUANTILES","stroke_px":3,"extrusion_offset":[2,3],
 "roi":list(roi),"changed_rgba_pixels":int(diff.sum()),"changed_rgba_outside_roi":0,"original_protected_sibling_rgba_changed_outside_effect":0,
 "persisted_dds_roundtrip_mismatch":int(np.any(D!=new,axis=2).sum()),"raw_channel_masks":list(rgba_masks),
 "source_clean_source_pixels_removed":89391,"preview_files":ev,"new_trial_dds":1,"new_promoted_dds":0,
@@ -281,9 +281,9 @@ report={"schema_version":2,"role":"B","run":"B359","queue_index":60,
 "source_clean":{"path":str(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png"),"sha256":SH["clean"]},
 "font":{"path":str(fontp),"sha256":fontsha,"index":font_index,"native_ppem":ppem,"glyphs":word},
 "plate_mask_sha256":SH["mask"],"source_face_row_profile":"B359_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json","face_gradient":[color_top,color_bottom],
-"effect":{"outline":4,"navy_extrusion_offset":[3,5],"readable_lean_source_B_stem_measured":incline,"face_normal_lighting":"source-English face 85-percentile highlighted at top-facing glyph contour normals"},
+"effect":{"outline":3,"navy_extrusion_offset":[2,3],"readable_lean_source_B_stem_measured":incline,"face_normal_lighting":"source-English face 85-percentile highlighted at top-facing glyph contour normals"},
 "protected_siblings":["OUTRUN MILES","HOLLY WOLF","all other source atlas regions"],
-"construction":"B359 genuinely different source-normal bevel: 128ppem native Hangul with contour-space 85th-percentile SOURCE highlight (top-facing gradients), navy 3x5 side wall and actual English B first-stem right-lean OLS; source-proven B348 PLATE. C2 visual candidate only.",
+"construction":"B359 genuine source-normal bevel: 128ppem native Hangul with contour-space SOURCE highlight, bounded navy 2x3 side wall after initial 1px top/right source effect overflow was fail-closed; actual English B first-stem OLS right-lean; source B348 PLATE. C2 review required.",
 "need_C2_source_slant_homologous_anchors":True,
 "no_final_candidate_published":True},ensure_ascii=False,indent=2)+"\n")
 print("B359",hs(newdds),"font_px",ppem,"bbox",render_bbox,"newchg",int(diff.sum()),flush=True)
