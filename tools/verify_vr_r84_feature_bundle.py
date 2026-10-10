@@ -75,7 +75,7 @@ def main():
         "-DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON",
         "RuntimeValidation = 'UNTESTED'", "r84-host-x64",
     ):
-        altered = original.replace(missing, "NEGATIVE_MUTATION", 1)
+        altered = original.replace(missing, "NEGATIVE_MUTATION")
         assert altered != original, missing
         try:
             verify(altered)
