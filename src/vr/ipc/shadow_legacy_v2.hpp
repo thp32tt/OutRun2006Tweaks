@@ -148,18 +148,31 @@ namespace OutRunVR::IpcV3::ShadowV2
 
     inline bool LatestFrame(const SharedRenderFrameRing& ring, SharedRenderFrameState& out) noexcept
     {
+        // Refuse destination aliasing with any ring slot: failure output
+        // clearing must never alter producer-owned memory.
+        for (const auto& producerSlot : ring.slots)
+            if (&producerSlot == &out)
+                return false;
+
+        // Fail closed rather than leaking a previous valid frame to callers.
+        // Commit only a fully validated slot/run snapshot to the destination.
+        out = {};
         if (!LegacyFrameHeaderValid(ring))
             return false;
         const std::uint32_t slot = ring.latestSlot;
         if (slot >= RenderFrameRingSize)
             return false;
-        out = ring.slots[slot];
-        return out.magic == RenderFrameMagic &&
-            out.protocolVersion == RenderFrameProtocolVersion &&
-            out.structSize == sizeof(SharedRenderFrameState) &&
-            !(out.sequence & 1u) &&
-            RenderFrameRunIdentityMatches(ring, out) &&
-            out.frameId != 0;
+        const SharedRenderFrameState candidate = ring.slots[slot];
+        if (candidate.magic != RenderFrameMagic ||
+            candidate.protocolVersion != RenderFrameProtocolVersion ||
+            candidate.structSize != sizeof(SharedRenderFrameState) ||
+            (candidate.sequence & 1u) ||
+            !RenderFrameRunIdentityMatches(ring, candidate) ||
+            candidate.frameId == 0)
+            return false;
+
+        out = candidate;
+        return true;
     }
 
     inline std::uint32_t HostFlagsFromV2(std::uint32_t flags) noexcept

@@ -249,6 +249,42 @@ int main()
         capturedRing.latestSlot != 0)
         return 15;
 
+    // LatestFrame publication must fail closed for malformed, stale and
+    // producer-aliased frames; keep these checks active in Release builds.
+    stableRing.slotCount = RenderFrameRingSize;
+    stableRing.clientPid = pose.clientPid;
+    stableRing.reserved0 = 8;
+    stableRing.latestSlot = 1;
+    stableRing.slots[1] = frame;
+    stableRing.slots[1].reserved[RenderFrameRunGenerationIndex] = stableRing.reserved0;
+    SharedRenderFrameState latest{};
+    latest.frameId = 999;
+    if (!ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 77)
+        return 16;
+    stableRing.slots[1].sequence |= 1u;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 17;
+    stableRing.slots[1].sequence &= ~1u;
+    stableRing.slots[1].reserved[RenderFrameRunGenerationIndex] = 7;
+    latest.frameId = 999;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 18;
+    stableRing.slots[1].reserved[RenderFrameRunGenerationIndex] = 8;
+    stableRing.latestSlot = RenderFrameRingSize;
+    latest.frameId = 999;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 19;
+    stableRing.latestSlot = 1;
+    stableRing.magic = 0;
+    latest.frameId = 999;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 20;
+    stableRing.magic = RenderFrameMagic;
+    const auto savedFrameId = stableRing.slots[1].frameId;
+    if (ShadowV2::LatestFrame(stableRing, stableRing.slots[1]) ||
+        stableRing.slots[1].frameId != savedFrameId)
+        return 21;
+
     std::cout << "v2->v3 host/client/frame/ack conversion smoke passed.\n";
     return 0;
 }
