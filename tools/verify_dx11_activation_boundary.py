@@ -82,9 +82,19 @@ def main() -> None:
         )
 
     violations: list[str] = []
+    approved_diagnostic = DX11 / "live_game_frame_bridge.cpp"
     for path in activation_sources:
         text = path.read_text(encoding="utf-8")
-        for match in DRAW_DISPATCH.finditer(text):
+        matches = list(DRAW_DISPATCH.finditer(text))
+        if path == approved_diagnostic and matches:
+            # This is a deliberate, separately audited activation—not an
+            # exemption for arbitrary D3D11 Draw or main gameplay promotion.
+            from verify_dx11_first_game_frame_boundary import (
+                main as review_first_game_frame_diagnostic,
+            )
+            review_first_game_frame_diagnostic()
+            continue
+        for match in matches:
             line = text.count("\n", 0, match.start()) + 1
             violations.append(f"{path.relative_to(ROOT)}:{line}:{match.group(0).strip()}")
 
