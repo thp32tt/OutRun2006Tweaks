@@ -79,4 +79,27 @@ namespace outrun::vr::dx11 {
     }
     return true;
 }
+
+// R213: opt-in combined exact DSV/depth and shader/layout identity for indexed
+// stereo. R189 alone cannot reject a different same-device PS. Never dispatch
+// a gameplay DrawIndexed from this dormant readiness helper.
+[[nodiscard]] inline bool verified_indexed_exact_depth_pipeline_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, UINT startIndex, UINT indexCount, INT baseVertex,
+    std::uint64_t generation, std::uint64_t vbVersion, std::uint64_t ibVersion,
+    UINT targetWidth, UINT targetHeight, DXGI_FORMAT targetFormat,
+    ID3D11RenderTargetView* expectedRtv, ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11InputLayout* expectedLayout, ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs) noexcept {
+    if (!context || !expectedLayout || !expectedVs || !expectedPs ||
+        !expectedRtv || !expectedDsv || !expectedDepthState) return false;
+    return verified_indexed_depth_draw_ready(
+        vb, ib, context, startIndex, indexCount, baseVertex, generation,
+        vbVersion, ibVersion, targetWidth, targetHeight, targetFormat,
+        expectedRtv, expectedDsv, expectedDepthState) &&
+        verified_indexed_pipeline_identity_ready(
+        vb, ib, context, startIndex, indexCount, baseVertex, generation,
+        vbVersion, ibVersion, expectedLayout, expectedVs, expectedPs, expectedRtv);
+}
 } // namespace outrun::vr::dx11

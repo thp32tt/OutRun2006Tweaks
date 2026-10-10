@@ -126,14 +126,31 @@ int main() {
             rtv.Get(),dsv.Get(),depthState.Get());
     };
     require(ready(), "baseline exact DSV/depth state");
+    // R213 same-device shader drift: R189 passes, joined exact guard must fail.
+    const auto exactReady=[&](ID3D11PixelShader* expectedPs, UINT start=0) {
+        return verified_indexed_exact_depth_pipeline_ready(
+            vb,ib,ctx.Get(),start,3,0,gen,vv,iv,40,40,
+            DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get(),dsv.Get(),depthState.Get(),
+            layout.Get(),vs.Get(),expectedPs);
+    };
+    require(exactReady(ps.Get()), "R213 baseline exact indexed pipeline");
+    ctx->PSSetShader(redPs.Get(),nullptr,0);
+    require(ready(), "R213 R189 accepts a foreign same-device PS");
+    require(!exactReady(ps.Get()), "R213 rejects same-device PS drift");
+    require(exactReady(redPs.Get()), "R213 exact alternate expected PS");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    require(exactReady(ps.Get()), "R213 restores exact PS");
+
     require(!verified_indexed_depth_draw_ready(vb,ib,ctx.Get(),0,3,0,
         gen,vv,iv,40,40,DXGI_FORMAT_R8G8B8A8_UNORM,
         rtv.Get(),nullptr,depthState.Get()), "reject null expected DSV");
     ctx->OMSetRenderTargets(1,&raw,otherDsv.Get());
     require(!ready(), "reject same-sized wrong-eye DSV");
+    require(!exactReady(ps.Get()), "R213 rejects wrong-eye DSV");
     ctx->OMSetRenderTargets(1,&raw,dsv.Get());
     ctx->OMSetDepthStencilState(disabledDepth.Get(),0);
     require(!ready(), "reject rebound depth state");
+    require(!exactReady(ps.Get()), "R213 rejects rebound depth state");
     ctx->OMSetDepthStencilState(depthState.Get(),1);
     require(!ready(), "reject stencil reference drift");
     ctx->OMSetDepthStencilState(reversedDepth.Get(),0);
@@ -145,16 +162,17 @@ int main() {
         gen,vv,iv,40,40,DXGI_FORMAT_R8G8B8A8_UNORM,
         rtv.Get(),dsv.Get(),stencilDepth.Get()), "reject stencil-enabled depth");
     ctx->OMSetDepthStencilState(depthState.Get(),0);
-    require(ready() && ready(3), "restored exact depth binding");
+    require(ready() && ready(3) && exactReady(ps.Get()) && exactReady(ps.Get(),3),
+        "R213 restored combined depth/pipeline binding");
     const float black[]={0,0,0,1};
     ctx->ClearRenderTargetView(rtv.Get(),black);
     ctx->ClearDepthStencilView(dsv.Get(),D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL,1.f,0);
     // Near green writes .2 depth; far red at .8 must NOT overdraw it.
-    require(ready(0), "preflight near draw");
+    require(exactReady(ps.Get(),0), "R213 exact preflight near draw");
     ctx->PSSetShader(ps.Get(),nullptr,0);
     ctx->DrawIndexed(3,0,0);
-    require(ready(3), "preflight far draw");
     ctx->PSSetShader(redPs.Get(),nullptr,0);
+    require(exactReady(redPs.Get(),3), "R213 exact preflight far draw");
     ctx->DrawIndexed(3,3,0);
     ctx->CopyResource(staging.Get(),color.Get());
     D3D11_MAPPED_SUBRESOURCE map{};
@@ -169,6 +187,6 @@ int main() {
     ctx->Unmap(staging.Get(),0);
     require(pixels, "actual depth-tested DrawIndexed green center / black corner pixels");
     ib.shutdown();
-    require(!ready(), "reject retired IB");
+    require(!ready() && !exactReady(redPs.Get()), "R213 rejects retired IB");
     std::cout << "R189 exact DSV depth-tested indexed WARP pixels: PASS\n";
 }

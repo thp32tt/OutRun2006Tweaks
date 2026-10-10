@@ -451,6 +451,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_depth_indexed_r189.py
 
+      # R213 exact shader/layout + depth ownership; isolated WARP pixel path.
+      - name: Verify R213 indexed exact depth pipeline identity
+        shell: pwsh
+        run: python tools/test_dx11_indexed_depth_pipeline_identity_r213.py
+
       - name: Build R189 depth indexed WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_depth_indexed_probe_r189

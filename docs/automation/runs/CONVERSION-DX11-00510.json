@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00510",
+  "production_id": "CONVERSION-DX11-00510",
+  "event_id": "CONVERSION-DX11-00510-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "a50064e958f96d76f635a96a537fbb029f330138",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00510",
+  "work_key": "DX11:R213:INDEXED_EXACT_DEPTH_PIPELINE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_depth_binding.hpp:R213",
+    "tools/dx11_depth_indexed_probe_r189.cpp:R213",
+    "tools/test_dx11_indexed_depth_pipeline_identity_r213.py",
+    ".github/workflows/backend-conversion-gate.yml:R213"
+  ],
+  "status": "CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "Combine indexed R189 exact depth/DSV/eye with R207 shader/layout identity, resisting same-device PS drift. Real indexed depth WARP probe now exercises guarded green and red near/far DrawIndexed with rejection/restoration, seven distinct negative static mutants. All production DrawIndexed paths remain dormant.",
+  "pipeline": {
+    "C0_RECOVER": "PASS authenticated HEAD a50064e958f96d76f635a96a537fbb029f330138; no 00510 record; prior 00508/00509 sealed, R175 owned by 00477; checkpoint 403 not required",
+    "C1_REVIEW": "PASS R189 depth preflight accepts an independently rebound same-device PS, R207 shader exact preflight lacks depth, R213 joins both",
+    "C2_IMPLEMENT": "PASS new independent R213 C++ readiness helper, WARP drift/wrong DSV/wrong state/restore and near-far GPU guard, CI static 7 mutations",
+    "C3_VALIDATE": "LOCAL_STRUCTURAL_ASSERTIONS_PASS; exact SHA GitHub CI PENDING; never represent CI as passed",
+    "C4_COMMIT": "Atomic material commit planned with exact [AUTO:CONVERSION-DX11-00510] marker",
+    "C5_PACKAGE": "NOT_REQUIRED dormant source-only, no gameplay native Draw activation and no HMD candidate",
+    "C6_STATE": "PENDING CI verdict; runtime UNTESTED"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_depth_binding.hpp",
+    "tools/dx11_depth_indexed_probe_r189.cpp",
+    "tools/test_dx11_indexed_depth_pipeline_identity_r213.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00510.json"
+  ],
+  "blockers": [
+    "Inherited DX11 constant-buffer R175 TEXCOORD6 WARP mismatch owned by 00477",
+    "Quest3/VDXR in-game test not performed"
+  ],
+  "next_action": "Read exact material SHA Backend Conversion Gate; classify R213 static/actual WARP, repair if necessary. Preserve R175 source ownership. Complete C6 independently with accurate PASS/FAIL and score+0 until success."
+}
