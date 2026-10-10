@@ -146,6 +146,13 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
     message(FATAL_ERROR
         "R32/R31 split is blocked until lower R30/R29/Reset/Present/DirectGPU owner APIs replace R32 private textual-chain dependencies; see docs/automation/r84-port/R32_R31_SPLIT_PREFLIGHT.json")
 endif()
+# Prevent unsupported simultaneous split gates before changing source ownership.
+# Each gate has a separately validated translation-unit boundary; combining
+# them requires a dedicated integrated linkage and regression validation.
+if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 AND OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
+    message(FATAL_ERROR
+        "R33/R32 and R31/R30 split gates cannot be enabled together without integrated validation")
+endif()
 option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 "Refactor gate: compile R30 separately from the R31 textual chain" OFF)
 if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
     if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
