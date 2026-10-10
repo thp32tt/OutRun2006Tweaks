@@ -84,12 +84,25 @@ foreach($slot in $slots.Keys){
     $btn.Size=New-Object System.Drawing.Size(255,46)
     $btn.Location=New-Object System.Drawing.Point(35,$y)
     $btn.Tag=$slot
-    if($slot -notin @('CURRENT_FOCUS','E_DXVK_SAFE','G_COCKPIT')){
-        $slotPath=Join-Path $root ("slots/"+$slot)
-        if(!(Test-Path $slotPath)){
-            $btn.Enabled=$false
-            $btn.Text+=' (payload 없음)'
-        }
+    # The DX9Ex ACTIVE test ZIP intentionally ships one shared backends/d3d9
+    # executable pair, not separate slots/A_CONTROL, slots/B_HUD, etc.  The
+    # backend selector already falls back to that pair for each HUD profile.
+    # Enable a button only when its *effective* payload can actually launch.
+    $slotPath=Join-Path $root ("slots/"+$slot)
+    $backendPath=Join-Path $root 'backends/d3d9'
+    $effectivePath=if($slot -ne 'CURRENT_FOCUS' -and (Test-Path $slotPath)) {
+        $slotPath
+    } else {
+        $backendPath
+    }
+    $hasPayload=(Test-Path (Join-Path $effectivePath 'dinput8.dll')) -and (Test-Path (Join-Path $effectivePath 'outrun-vr-host.exe'))
+    if($cfg.Backend -eq 'dxvk-safe') {
+        # SAFE mode additionally needs its independent DXVK x86 provider.
+        $hasPayload=$hasPayload -and (Test-Path (Join-Path $root 'backends/dxvk/d3d9.dll'))
+    }
+    if(-not $hasPayload) {
+        $btn.Enabled=$false
+        $btn.Text+=' (payload 없음)'
     }
     $btn.Add_Click({
         try{
