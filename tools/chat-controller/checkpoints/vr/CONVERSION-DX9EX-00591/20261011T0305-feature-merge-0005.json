@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_5min_checkpoint",
+  "captured_at_kst": "2026-10-11T03:05:04+09:00",
+  "task_id": "CONVERSION-DX9EX-00591",
+  "event_id": "CONVERSION-DX9EX-00591-E004",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+  "feature_head": "8b9a179a8506be368443514fd8c219e0ec10796d",
+  "feature_merge_parents": [
+    "9e0e676480b125c4a57a50f6a52c3237533f771e",
+    "a5a5b4d5eda3a7a15717898e8644a7279701727b"
+  ],
+  "target_branch": "vr-d3d9ex-focus",
+  "target_head_preserved": "a5a5b4d5eda3a7a15717898e8644a7279701727b",
+  "feature_target_status": "ahead 44, behind 0, controller-only promotion",
+  "change": "Content-verified P0 HUD/crash target files merged, workflow labels all five acceptance steps; no CI-skip in new HEAD",
+  "previous_feature_success": {
+    "sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
+    "run_id": 38071953016,
+    "art_id": 11677164470
+  },
+  "new_feature_ci": {
+    "sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
+    "run_id": 38074313696,
+    "status": "IN_PROGRESS_AS_OF_CHECKPOINT"
+  },
+  "incomplete_acceptance_ids_on_new_merged_sha": [
+    "R84-OWNERS",
+    "R84-ABI",
+    "R84-BUILD-GRAPH",
+    "R84-REGRESSION",
+    "R84-TEST-BUNDLE"
+  ],
+  "note": "All five previously PASS_FEATURE_CI at 97a2c676; awaiting exact merged-SHA CI before reattesting. No C++ R84 rework needed.",
+  "required_target_gates": [
+    "DX9Ex Active Validation: policy/host/game/full-chain-compile/package PENDING_CONTROLLER_PROMOTION",
+    "Domain Isolation Guard: domain-isolation PENDING_CONTROLLER_PROMOTION"
+  ],
+  "runtime_validation": "UNTESTED",
+  "next_action": "Poll exact integrated feature HEAD 8b9a179a Actions #38074313696. If fail, repair only evidence-backed source/workflow blocker on FEATURE; if success, keep FEATURE_READY and request controller fast-forward of target with lease protecting original P0 target a5a5b4d5, then require exact target SHA DX9Ex Active Validation and Domain Isolation Guard. Do not change target from feature worker; do not score same TASK_ID again."
+}
