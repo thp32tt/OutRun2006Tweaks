@@ -1,0 +1,178 @@
+{
+  "run": "A233",
+  "run_key": "OUTRUN-KOR-A233-Q217-SOURCE-SAMPLED-GOLD-DEPTH-NEW-FAMILY-20261011-0505",
+  "role": "A",
+  "index": 217,
+  "method_change": "A233 second & final family-pilot correction to A232 optical reject: source-rightlean inverse shearing corrected (+matrix shear), source orange original extrusion pixels sampled independently from cream face, shortened 1px only material depth with source gold upper lip; no repeated generic color scaling; original CLEAN and 425 source-red rim protected",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "source_png_sha256": "0c16fc19ff97916a84464c896f355aa552440645e0253072847261e2e9bb4b56",
+  "plate_manifest_sha256": "d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+  "clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+  "plate_C1_status": "HOLD",
+  "prior_A231_trial_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "new_trial_sha256": "84753cf3dd7c5d187b14056e86ef18522ca54536691b1541f335192dcb5618ad",
+  "new_trial_path": "localization/graphics/role_A/20261011-A233-Q217-SOURCE-SAMPLED-NATIVE-GOLD-DEPTH/A233_Q217_SOURCE_SAMPLED_GOLD_DEPTH_UNPROMOTED.dds",
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "glyph_coverage": "ALL_VERIFIED",
+  "regions": [
+    {
+      "id": "start",
+      "original_text": "START",
+      "korean": "출발",
+      "original_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "source_natural_bbox_size": [
+        81,
+        23
+      ],
+      "new_ko_bbox_readable": [
+        828,
+        511,
+        866,
+        530
+      ],
+      "new_ko_margin": [
+        25,
+        18,
+        2,
+        2
+      ],
+      "font_px": 20,
+      "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+      "source_english_face_sampled_pixels": 931,
+      "source_palette_upper": [
+        244,
+        230,
+        181
+      ],
+      "source_palette_middle": [
+        242,
+        211,
+        171
+      ],
+      "source_palette_bottom": [
+        241,
+        219,
+        156
+      ],
+      "source_orange_depth_sampled": [
+        234,
+        124,
+        89
+      ],
+      "source_orange_pixel_samples": 523,
+      "layers": [
+        "source-color rim ORIGINAL CLEAN",
+        "source-sampled dark 1px extrusion",
+        "native outline",
+        "source-sampled copper bottom bevel",
+        "source-sampled cream face",
+        "bright source top ridge"
+      ],
+      "source_italic_readable_shear": 0.28,
+      "inverse_matrix": [
+        1,
+        0.28,
+        -25.76,
+        0,
+        1,
+        0
+      ],
+      "new_effect_mask_pixels": 649
+    },
+    {
+      "id": "goal",
+      "original_text": "GOAL",
+      "korean": "골",
+      "original_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "source_natural_bbox_size": [
+        77,
+        24
+      ],
+      "new_ko_bbox_readable": [
+        1375,
+        773,
+        1394,
+        793
+      ],
+      "new_ko_margin": [
+        32,
+        26,
+        2,
+        2
+      ],
+      "font_px": 21,
+      "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+      "source_english_face_sampled_pixels": 976,
+      "source_palette_upper": [
+        254,
+        216,
+        170
+      ],
+      "source_palette_middle": [
+        254,
+        231,
+        181
+      ],
+      "source_palette_bottom": [
+        255,
+        230,
+        154
+      ],
+      "source_orange_depth_sampled": [
+        247,
+        111,
+        82
+      ],
+      "source_orange_pixel_samples": 499,
+      "layers": [
+        "source-color rim ORIGINAL CLEAN",
+        "source-sampled dark 1px extrusion",
+        "native outline",
+        "source-sampled copper bottom bevel",
+        "source-sampled cream face",
+        "bright source top ridge"
+      ],
+      "source_italic_readable_shear": 0.28,
+      "inverse_matrix": [
+        1,
+        0.28,
+        -26.880000000000003,
+        0,
+        1,
+        0
+      ],
+      "new_effect_mask_pixels": 356
+    }
+  ],
+  "old_to_new_changed_rgba": 1352,
+  "source_to_new_outside_original_bboxes": 0,
+  "old_to_new_outside_original_bboxes": 0,
+  "clean_to_new_outside_original_bboxes": 0,
+  "source_red_rim_protected_exact": true,
+  "all_alpha_unchanged": true,
+  "header_and_mip_preserved": true,
+  "native": [
+    2048,
+    2048
+  ],
+  "persisted_decode_equal_exact": true,
+  "independent_C1": "NOT_RUN_NEW_BYTES",
+  "producer_self_visual": "PENDING_CONTROLLER_DIRECT_VIEW_NO_PASS",
+  "official_updated": false,
+  "new_unpromoted_dds": 1,
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "VR_FFB_DX11_DXVK": false,
+  "next_action": "Producer inspect source-native original face vs new saved Korean on BGW 100/75/50/RAW; if still small/wrong family, fail closed and use extracted PSD/native vector hand glyph instead of more Noto recolors"
+}
