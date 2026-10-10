@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B353",
+  "queue_index": 60,
+  "run_key": "OUTRUN-KOR-B353-Q060-BOLD122-LAST-OPTICAL-FAIL-20261010-1742",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "authored_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_candidate_sha256_unchanged": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_trial_dds_sha256": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+  "actual_visual_evidence": [
+    "B353_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "B353_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_50_FLIPY.png"
+  ],
+  "machine": {
+    "native_source_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "trial_bbox": [
+      2245,
+      348,
+      2983,
+      472
+    ],
+    "full_atlas_changed_rgba_pixels": 88852,
+    "outside_declared_roi": 0,
+    "original_protected_neighbor_change": 0,
+    "persisted_dds_roundtrip_mismatch": 0
+  },
+  "visual_result": "REWORK_REQUIRED_UNPROMOTED",
+  "visual_observations": [
+    "B353 Bold122+3px contour increases face weight and native height versus B352 Regular103; source family still visibly heavier and more pronounced condensed italic than B353 after optical adjustment.",
+    "At actual 50 percent scale the English BEST TIME gold title retains stronger racing-logo face/body contrast, italic rhythm and depth; new Hangul lacks comparable stroke heft and source-type depth despite mechanical bbox PASS.",
+    "B351 big-8px-edge/oversquare and B352 small-thin style are different failures, both preserved as separate SHA-bound trials; do not mark revised B353 as source-family PASS."
+  ],
+  "first_failed_stage": "P2_NATIVE_LETTERING_SOURCE_FAMILY",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "next_method": "MANUAL_VECTOR_OR_SOURCE_CONTOUR_RECONSTRUCTION_REQUIRED; stop auto-scaling/shear/font-weight same-family trials; retain B348 exact CLEAN, derive glyph-by-glyph source angular silhouette, bevel face and homologous readable slant anchors before any further DDS publication",
+  "candidate_promoted": 0,
+  "C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "user_IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GITHUB_ACTIONS",
+  "controller_review_backend": "GPT_LOCAL_VISUAL"
+}
