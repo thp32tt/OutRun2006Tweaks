@@ -25,10 +25,10 @@
   "material_result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
   "validation_bearing_result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
   "result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
-  "checkpoint": "C3_VALIDATE",
-  "status": "WAIT_EXACT_SHA_GATE",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_DEPENDENCY_R175",
   "terminal": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "selected_work_item": "R222 dormant R203 linear textured single-eye OM DSV fail-closed + WARP negative and restore",
   "summary": "Owned textured linear preflight now disallows retained depth view when no expected DSV owner exists, in addition to existing RTV/MRT/SRV/sampler invariants. Real WARP same-device D32 DSV denial/restore fixture added; native gameplay Draw still dormant.",
@@ -41,10 +41,10 @@
     "C0_RECOVER": "PASS GitHub checkpoint and branch HEAD, 00519 result absent, 00518 inherited R175 blocker",
     "C1_REVIEW": "PASS independent R203 full color eye preflight lacks unowned DSV guard; R221/R175 fenced",
     "C2_IMPLEMENT": "PASS 3 material source/probe/test files, exact [AUTO:CONVERSION-DX11-00519] commit b76606a3",
-    "C3_VALIDATE": "IN_PROGRESS exact-SHA Backend Conversion Gate 38027358089",
+    "C3_VALIDATE": "FAIL whole exact material SHA b76606a3 Gate 38027358089: Win32 validate job114140931369 SUCCESS; R203/R222 static step50 SUCCESS, WARP build step51 SUCCESS, WARP real execution step52 SUCCESS; readiness smoke job114141837471 FAIL at inherited R175 TEXCOORD6 BGRA step85; NOT R222 failure",
     "C4_COMMIT": "PASS b76606a3ab504022c749a02ea0df47c27ac4b27d",
     "C5_PACKAGE": "NOT_REQUIRED dormant R203 diagnostic; no native gameplay Draw activation",
-    "C6_STATE": "PARTIAL checkpoint while exact-SHA Gate in progress"
+    "C6_STATE": "PASS durable full exact-SHA failure and scoped success persisted; task BLOCKED_DEPENDENCY_R175, native gameplay dormant, HMD UNTESTED"
   },
   "evidence": {
     "material_commit": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
@@ -53,14 +53,46 @@
     "validate_job_id": 114140931369,
     "issue14_comment_id": 6094182108,
     "hmd_test_performed": false,
-    "native_gameplay_activation": false
+    "native_gameplay_activation": false,
+    "gate_status": "failure",
+    "gate_validate_conclusion": "success",
+    "readiness_smoke_job_id": 114141837471,
+    "readiness_smoke_conclusion": "failure",
+    "r203_r222_static_step": 50,
+    "r203_r222_static": "success",
+    "r203_r222_warp_build_step": 51,
+    "r203_r222_warp_build": "success",
+    "r203_r222_warp_exec_step": 52,
+    "r203_r222_warp_exec": "success",
+    "r175_failed_step": 85,
+    "r175_failed_step_name": "Run DX11 constant buffer probe",
+    "r175_failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "issue14_validation_comment_id": 6094257849,
+    "durable_pre_validation_checkpoint": "0abcd6f51dcc8e5b5d518dca9a19f05106ae4a5f"
   },
   "blockers": [
-    "Full exact-SHA backend gate not yet concluded; previous 00518 failed independently owned R175 generic varying and cannot be assumed fixed",
-    "Quest3/VDXR game runtime UNTESTED"
+    "Full exact-SHA Gate 38027358089 FAIL at independently owned R175 TEXCOORD6/COLOR0 generic varying: observed BGRA [128,0,16,255], expected [224,128,32,255]; DO NOT BYPASS",
+    "R175 tools/dx11_constant_buffer_probe.cpp belongs to CONVERSION-DX11-00477, no source edit or duplicate rerun in 00519",
+    "Quest3/VDXR runtime evidence absent, RUNTIME_VALIDATION=UNTESTED"
   ],
-  "resume_cursor": "POLL_GATE_38027358089_AND_RECONCILE_C3_C6",
-  "next_action": "On exact material SHA b76606a3 inspect R203 static and WARP steps, full gate result, fail if inherited R175 remains. Update C6 record and Issue #14 with exact job evidence; never retry unchanged failure or award score solely for rollover.",
+  "resume_cursor": "WAIT_INDEPENDENT_R175_OWNER_RELEASE",
+  "next_action": "Do not duplicate validated R222 material or rescore this rollover. Independent R175 owner CONVERSION-DX11-00477 must fix TEXCOORD6 WARP evidence without disabling checks; then reconcile latest branch and rerun full exact-SHA Gate only on a legitimate new material commit. Quest3/VDXR exact build HMD test still required before native promotion.",
   "score_change": 0,
-  "timestamp_kst": "2026-10-10T14:2x+09:00"
+  "timestamp_kst": "2026-10-10T14:34:25+09:00",
+  "score_previous_confirmed": 1077,
+  "score_new_confirmed": 1077,
+  "score_run_key": "CONVERSION-DX11-00519"
 }
