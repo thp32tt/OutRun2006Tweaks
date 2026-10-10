@@ -11,6 +11,8 @@ guards=(
     "liveTarget.Get() != expectedTarget",
     "view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D",
     "desc.Width != width || desc.Height != height",
+    "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
+    "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
     "context->RSGetViewports(&boundCount, nullptr)",
     "boundCount != 1",
     "rasterDesc.ScissorEnable",
@@ -21,6 +23,8 @@ assert contract(h), "R199 non-indexed target and viewport owner guard absent"
 for token in (
     "liveTarget.Get() != expectedTarget",
     "desc.Width != width || desc.Height != height",
+    "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
+    "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
     "context->RSGetViewports(&boundCount, nullptr)",
     "rasterDesc.ScissorEnable",
 ):
@@ -42,6 +46,11 @@ for token in (
     '"R199 restore full viewport"',
     '"R199 reject scissor-enabled rasterizer"',
     '"R199 restore full RTV/viewport/scissor"',
+    '"R224 create same-device typeless color resource"',
+    '"R224 typed RTV over typeless color resource"',
+    '"R224 IA baseline admits typed view of typeless resource"',
+    '"R224 reject typeless backing resource despite typed exact RTV"',
+    '"R224 restore exact typed single-eye color resource"',
     '"R199 final owned linear full target ready"',
     '"linear Draw GPU pixel readback"',
 ):
@@ -53,4 +62,4 @@ assert probe.index('"R199 reject half viewport"') < probe.index(
 assert ci.count("python tools/test_dx11_linear_target_r199.py")==1
 assert ci.index("Verify R199 native linear target and viewport fence") < ci.index(
     "Build DX11 linear VB/IB mirror R183 WARP probe")
-print("R199 non-indexed native target/viewport owner, 4 mutants, WARP pixel negative and recovery: PASS")
+print("R199/R224 typed linear eye resource owner, 6 mutants and actual WARP negative/recovery wired: PASS")

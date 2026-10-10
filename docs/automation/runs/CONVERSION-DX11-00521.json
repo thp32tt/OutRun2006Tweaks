@@ -1,0 +1,39 @@
+{
+  "task_id": "CONVERSION-DX11-00521",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "3d0c3186c04297d82ce6572250f82d27d7153a3d",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R224 typed linear RTV must bind exact typed DEFAULT color texture, rejecting typeless backing and CPU/misc alias flags. Same-device WARP negative/restore added; game Draw remains dormant.",
+  "evidence": {
+    "local_static": "PASS focused guards/negative mutants/fixture check",
+    "warp": "R224 added to existing R183 WARP probe; exact-SHA CI pending",
+    "prior_gate_blocker": "R175 TEXCOORD6 varying mismatch is owned by 00477",
+    "controller_claim": "41432628475f73e72399e8d074545470bdb61cd0"
+  },
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00521-E001",
+  "work_key": "DX11:R224:LINEAR_TYPED_RTV_TYPELESS_RESOURCE_REJECTION",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_target_r199.py"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00521",
+  "checkpoint": "C4_COMMIT",
+  "status": "WAIT_EXACT_SHA_GATE",
+  "terminal": false,
+  "pipeline": {
+    "C0": "PASS GitHub HEAD and checkpoint",
+    "C1": "PASS tested R224 typed RTV/typeless resource gap",
+    "C2": "PASS material C++ and WARP/source regression batch",
+    "C3": "Local PASS, GitHub Gate pending",
+    "C4": "Material commit pending",
+    "C5": "NOT_REQUIRED dormant",
+    "C6": "PENDING exact-SHA Gate"
+  },
+  "timestamp_kst": "2026-10-10 14:56:00+09:00"
+}

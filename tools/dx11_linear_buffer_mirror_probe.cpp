@@ -689,6 +689,34 @@ int main() {
     require(fullTargetReady(), "R199 recover original eye RTV");
     require(exactLinearReady(), "R209 restore original eye RTV identity");
 
+    // R224: typed RTV view over a same-device TYPELESS color allocation
+    // previously satisfied format/identity checks despite an alias-capable
+    // backing resource. The actual WARP OM binding exercises this state.
+    D3D11_TEXTURE2D_DESC r224Backing{};
+    color->GetDesc(&r224Backing);
+    r224Backing.Format = DXGI_FORMAT_R8G8B8A8_TYPELESS;
+    ComPtr<ID3D11Texture2D> r224Typeless;
+    require(SUCCEEDED(dev->CreateTexture2D(&r224Backing,nullptr,
+            r224Typeless.GetAddressOf())) && r224Typeless,
+            "R224 create same-device typeless color resource");
+    D3D11_RENDER_TARGET_VIEW_DESC r224TypedView{};
+    rtv->GetDesc(&r224TypedView);
+    ComPtr<ID3D11RenderTargetView> r224TypedRtv;
+    require(SUCCEEDED(dev->CreateRenderTargetView(
+            r224Typeless.Get(), &r224TypedView,
+            r224TypedRtv.GetAddressOf())) && r224TypedRtv,
+            "R224 typed RTV over typeless color resource");
+    ID3D11RenderTargetView* r224Raw = r224TypedRtv.Get();
+    ctx->OMSetRenderTargets(1,&r224Raw,nullptr);
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R224 IA baseline admits typed view of typeless resource");
+    require(!outrun::vr::dx11::verified_linear_full_target_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,r224TypedRtv.Get()),
+            "R224 reject typeless backing resource despite typed exact RTV");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    require(fullTargetReady(), "R224 restore exact typed single-eye color resource");
+
     ctx->RSSetViewports(0,nullptr);
     require(!fullTargetReady(), "R199 reject missing viewport");
     const D3D11_VIEWPORT doubleViewports[]={vp,vp};

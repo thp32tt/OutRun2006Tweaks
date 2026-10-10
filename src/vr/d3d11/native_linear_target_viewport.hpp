@@ -34,10 +34,14 @@ namespace outrun::vr::dx11 {
         return false;
     D3D11_TEXTURE2D_DESC desc{};
     color->GetDesc(&desc);
+    // R224: RTV.Format alone does not seal a TYPELESS underlying texture.
+    // A native eye's exact color ownership requires a dedicated typed
+    // DEFAULT allocation without CPU access or alias-enabling misc flags.
     if (desc.Width != width || desc.Height != height ||
         desc.MipLevels != 1 || desc.ArraySize != 1 ||
         desc.SampleDesc.Count != 1 || desc.SampleDesc.Quality != 0 ||
-        desc.Format != format ||
+        desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT ||
+        desc.CPUAccessFlags != 0 || desc.MiscFlags != 0 ||
         !(desc.BindFlags & D3D11_BIND_RENDER_TARGET))
         return false;
 
