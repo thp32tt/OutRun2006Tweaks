@@ -1,0 +1,242 @@
+{
+  "role": "C1",
+  "asset": "q103_590A4724",
+  "sha256": {
+    "source": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "official": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "trial": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+    "clean": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942",
+    "allowed": "f4fb41cd80d55a50460767ea9aea29209131ac4a82738c9a8acc8ac9651676e0",
+    "protected": "7ff49e76135ccb04065793946b16188d58fdcf1c137a6e8dc52e1916f2b84701"
+  },
+  "dds_headers": {
+    "source": {
+      "w": 2048,
+      "h": 2048,
+      "mips": 1,
+      "bytes": 16777344,
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ],
+      "header_sha": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "official": {
+      "w": 2048,
+      "h": 2048,
+      "mips": 1,
+      "bytes": 16777344,
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ],
+      "header_sha": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "trial": {
+      "w": 2048,
+      "h": 2048,
+      "mips": 1,
+      "bytes": 16777344,
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ],
+      "header_sha": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "source_trial_header_equal": true,
+    "official_trial_header_equal": true
+  },
+  "target_readable_source_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "source_bbox_readable_pixels": 28080,
+  "diffs": {
+    "source_clean": {
+      "changed_rgba": 7439,
+      "changed_alpha": 0,
+      "outside_target_rgba": 0,
+      "outside_target_alpha": 0,
+      "outside_allowed_rgba": 0,
+      "outside_allowed_alpha": 0,
+      "protected_changed_rgba": 0,
+      "protected_changed_alpha": 0
+    },
+    "official_trial": {
+      "changed_rgba": 9049,
+      "changed_alpha": 0,
+      "outside_target_rgba": 0,
+      "outside_target_alpha": 0,
+      "outside_allowed_rgba": 0,
+      "outside_allowed_alpha": 0,
+      "protected_changed_rgba": 0,
+      "protected_changed_alpha": 0
+    },
+    "source_trial": {
+      "changed_rgba": 10035,
+      "changed_alpha": 0,
+      "outside_target_rgba": 0,
+      "outside_target_alpha": 0,
+      "outside_allowed_rgba": 0,
+      "outside_allowed_alpha": 0,
+      "protected_changed_rgba": 0,
+      "protected_changed_alpha": 0
+    },
+    "clean_trial": {
+      "changed_rgba": 6139,
+      "changed_alpha": 0,
+      "outside_target_rgba": 0,
+      "outside_target_alpha": 0,
+      "outside_allowed_rgba": 0,
+      "outside_allowed_alpha": 0,
+      "protected_changed_rgba": 0,
+      "protected_changed_alpha": 0
+    },
+    "clean_official": {
+      "changed_rgba": 9599,
+      "changed_alpha": 0,
+      "outside_target_rgba": 0,
+      "outside_target_alpha": 0,
+      "outside_allowed_rgba": 0,
+      "outside_allowed_alpha": 0,
+      "protected_changed_rgba": 0,
+      "protected_changed_alpha": 0
+    }
+  },
+  "bboxes": {
+    "source": {
+      "bbox": [
+        1432,
+        1980,
+        1786,
+        2025
+      ],
+      "pixels_changed_from_clean": 7439,
+      "source_margins": [
+        21,
+        15,
+        12,
+        15
+      ]
+    },
+    "official": {
+      "bbox": [
+        1431,
+        1972,
+        1780,
+        2036
+      ],
+      "pixels_changed_from_clean": 9599,
+      "source_margins": [
+        20,
+        21,
+        4,
+        4
+      ]
+    },
+    "trial": {
+      "bbox": [
+        1443,
+        1974,
+        1768,
+        2034
+      ],
+      "pixels_changed_from_clean": 6139,
+      "source_margins": [
+        32,
+        33,
+        6,
+        6
+      ]
+    }
+  },
+  "clean_target_alpha_positive": 27476,
+  "source_target_alpha_positive": 27476,
+  "allowed_mask_pixels": 28080,
+  "protected_mask_pixels": 4166224,
+  "raw_orientation": "source/official/trial Y-mirrored in stored DDS, readable=vertical flip; one authored mip",
+  "images": [
+    {
+      "path": "Q103_GRAY_FLIPY_100_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "e9bb7a9e1d80bbf07b61ca638eb9e11f0451053058ef4e36e9e9dcfcd57be868",
+      "bytes": 31115
+    },
+    {
+      "path": "Q103_GRAY_FLIPY_75_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "703cea1bfbf034b917957a6c88b0d2a98b76040e24ad4d9f98fb27111cfbfb6c",
+      "bytes": 43286
+    },
+    {
+      "path": "Q103_GRAY_FLIPY_50_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "e2fbca445fc5b6e6ba073279b3f8448434cb0a5f18dc569cd3d0f672a9f93a03",
+      "bytes": 26293
+    },
+    {
+      "path": "Q103_BLACK_FLIPY_100_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "011c8a940737185850973d910b5be0a3a39eb103a0653cbab017f800cd311244",
+      "bytes": 31226
+    },
+    {
+      "path": "Q103_BLACK_FLIPY_75_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "24c9c22e0578747f39467947e230d227d8d5f4cbd12a7da297ca90cff85c2142",
+      "bytes": 43416
+    },
+    {
+      "path": "Q103_BLACK_FLIPY_50_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "6dbddbe14835378a6928dcf22b553dd0bef4c63f952969588ec19b8814bed10d",
+      "bytes": 26263
+    },
+    {
+      "path": "Q103_WHITE_FLIPY_100_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "92195ba453a7a55307de18ff6454295324ec6651cda98e9e90620833d39b2b0a",
+      "bytes": 30960
+    },
+    {
+      "path": "Q103_WHITE_FLIPY_75_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "e3bd8017f1e05fba6b405f950764d7bd923ced478e7bf89c704daa8a94482816",
+      "bytes": 43031
+    },
+    {
+      "path": "Q103_WHITE_FLIPY_50_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "d7fb3a25f9a6129ecce835a11128cd6430184ab24620f2c514739891b3e5dc34",
+      "bytes": 26087
+    },
+    {
+      "path": "Q103_A222_EXACT_SAVED_RAW_VS_FLIPY.png",
+      "sha256": "8556040b65f45cd174c80395986b7edf504a65a42a593e0b94d3c0da60685277",
+      "bytes": 33393
+    }
+  ],
+  "exact_source_glyph_effect_size": {
+    "english_bbox_readable": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "english_width": 354,
+    "english_height": 45,
+    "korean_trial_bbox_readable": [
+      1443,
+      1974,
+      1768,
+      2034
+    ],
+    "korean_width": 325,
+    "korean_height": 60,
+    "width_excess_px": 0,
+    "height_excess_px": 15,
+    "strict_size_ceiling_pass": false,
+    "strict_requirement": "exact source glyph/effect bbox width/height must not be exceeded even when original sprite or selection plate has more room"
+  },
+  "machine_final": "REWORK_REQUIRED_SOURCE_GLYPH_EFFECT_HEIGHT_EXCEED_15PX",
+  "artwork_mask_numerical_scope": "Outside original plate bbox/allowed-mask/protected mask 0, but a zero is NOT strict source-glyph size PASS"
+}

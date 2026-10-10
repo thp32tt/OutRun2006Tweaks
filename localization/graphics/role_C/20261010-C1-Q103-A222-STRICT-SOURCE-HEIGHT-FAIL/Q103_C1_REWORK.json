@@ -1,0 +1,190 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD_ONLY",
+  "queue_index": 103,
+  "run_key": "OUTRUN-KOR-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL-20261010",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_english_text": "Normal Balance",
+  "korean_text": "일반 밸런스",
+  "candidate_kind": "UNPROMOTED_A222_TRIAL",
+  "producer_report": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_CONTROLLER_PRODUCER_SCOPED_QA.json",
+  "candidate_path": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_Q103_LIGHT_RIGHT_ITALIC_UNPROMOTED.dds",
+  "candidate_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "pinned_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+    "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "independently_sha_verified": true
+  },
+  "official_current": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+    "sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "decision_previous_C1": "REWORK_REQUIRED_SOURCE_FAMILY_STROKE_OVERWEIGHT",
+    "unchanged": true
+  },
+  "clean_plate": {
+    "path": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+    "sha256": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942"
+  },
+  "QA_decision": "REWORK_REQUIRED",
+  "scope": "Independent first C1 review of new SHA A222 trial, not a repeated completion of old A197 candidate",
+  "reason_code": "STRICT_ORIGINAL_GLYPH_EFFECT_HEIGHT_EXCEED_15PX",
+  "comparison_exact": {
+    "english_native_removed_from_clean_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "source_effect_width": 354,
+    "source_effect_height": 45,
+    "trial_native_changed_from_clean_bbox": [
+      1443,
+      1974,
+      1768,
+      2034
+    ],
+    "trial_effect_width": 325,
+    "trial_effect_height": 60,
+    "width_change_px": -29,
+    "height_change_px": 15,
+    "height_change_pct": 33.3333,
+    "english_top_y": 1980,
+    "trial_top_y": 1974,
+    "english_bottom_y_exclusive": 2025,
+    "trial_bottom_y_exclusive": 2034,
+    "nominal_allowed_source_edit_region": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "nominal_bbox_fit": true,
+    "strict_source_glyph_size_fit": false,
+    "contract_clause": "Before rendering, measure the exact source glyph/effect bbox; localized width and height may never exceed source width/height by even 1 pixel regardless of plate/cell headroom."
+  },
+  "machine_evidence": {
+    "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_MACHINE.json",
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "candidate_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+    "result": "REWORK_REQUIRED_SOURCE_GLYPH_EFFECT_HEIGHT_EXCEED_15PX",
+    "persisted_structure": {
+      "w": 2048,
+      "h": 2048,
+      "mips": 1,
+      "bytes": 16777344,
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ],
+      "header_sha": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+    },
+    "header_matches_source": true
+  },
+  "source_clean_change_px": 7439,
+  "official_trial_changes_rgba": 9049,
+  "official_trial_changes_outside_source_region": 0,
+  "source_trial_changes_outside_allowed_rgba": 0,
+  "source_trial_changes_in_protected_mask": 0,
+  "raw_orientation": "mirrored Y in actual saved trial DDS, FLIP-Y readable",
+  "fresh_manual_visual": "At native gray and practical50 black/gray, A222 improves over A197 weight and Korean counters; exact original English lettering has visibly lower-height italic strokes, while trial Korean extends 6px above and 9px below the exact original glyph-effect bbox. No visible plate residue or clipping on inspected source/CLEAN/current/trial crop. Reject due source-height ceiling, not prior overweight reason.",
+  "eight_checks": [
+    {
+      "id": "PLATE_CLEAN",
+      "result": "SCOPED_PASS",
+      "observation": "A108 CLEAN preserves yellow plate/outline in exact source effect area, no obvious residual English shadow in inspected contact; independent source->CLEAN 7439 pixels, no outside or protected edits."
+    },
+    {
+      "id": "LEAN_OR_PERSPECTIVE",
+      "result": "HOLD",
+      "observation": "Native readable overall right-italic impression similar to source; independent per-glyph slant anchors not calibrated, no claim of exact angle."
+    },
+    {
+      "id": "SOURCE_FAMILY_WEIGHT",
+      "result": "IMPROVED_NOT_PASS",
+      "observation": "A222 strokes thinner/less blocky than rejected A197; still needs qualified family anchor and final vertical size correction."
+    },
+    {
+      "id": "SOURCE_GLYPH_HEIGHT",
+      "result": "FAIL",
+      "observation": "Exact source-English removed effect bbox 354x45 vs trial 325x60; height +15px exceeds absolute ceiling even though both fit yellow plate's 390x72 allowed editing rectangle."
+    },
+    {
+      "id": "GLYPH_INTEGRITY",
+      "result": "SCOPED_PASS",
+      "observation": "No visible clipped/broken Hangul strokes at native and practical50 sample."
+    },
+    {
+      "id": "PROTECTED_PIXEL_BOUNDS",
+      "result": "SCOPED_PASS",
+      "observation": "Actual persisted DDS source->trial, official->trial rgba/alpha changes outside original editing bbox/allowed/protected masks all zero."
+    },
+    {
+      "id": "PLACEMENT",
+      "result": "FAIL_SOURCE_EFFECT",
+      "observation": "Original effect y1980..2025, Korean trial y1974..2034; above original by6px and below original by9px."
+    },
+    {
+      "id": "RAW_FLIPY_MIPS",
+      "result": "SCOPED_PASS",
+      "observation": "Persisted 2048x2048 RGBA DDS header preserved, 1 mip, raw upside-down is exact readable vertical flip; not a game rendering test."
+    }
+  ],
+  "calibration": {
+    "normal_control": "NOT_BLINDLY_DONE",
+    "known_overweight_control": "HISTORICAL_A197_FAIL_VISUALLY_RECOGNIZED",
+    "opposite_slant": "NOT_BLINDLY_DONE",
+    "clipped_stroke": "NOT_BLINDLY_DONE",
+    "residue": "NOT_BLINDLY_DONE",
+    "blind_firstlook": false,
+    "reason": "Producer report A222 read before independent native visual so no fake blind claim"
+  },
+  "required_rework": "Reconstruct native Regular source-derived lettering preserving thinner italic contour and plate, but reduce glyph vertical effect height from 60px to <=45px based on exact English source glyph footprint, maintaining readability and avoiding bitmap squeeze/resize; remeasure per-glyph lean and full SOURCE/CLEAN/COMPOSITE saved DDS, then fresh C1 and separate C3 on a NEW SHA. Do NOT promote A222 test or resurrect overweight A197.",
+  "new_DDS_produced_by_C1": 0,
+  "trial_DDS_preserved": true,
+  "promotion": false,
+  "C1_PASS": false,
+  "C3_STRICT_PASS": false,
+  "APPROVAL": false,
+  "PRE_INGAME": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "USER_INGAME": "NOT_RETESTED",
+  "backend": "GitHub connector source SSOT; local ChatGPT DNS tested unavailable; bounded N100 MCP exact SHA verified source/official/trial DDS native pixel QA; no Actions run/no game",
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_EXACT_ENGLISH_GLYPH_HEIGHT_CEILING_FAIL.png",
+      "sha256": "88a0d479074d0f53a31839235dc1eca436ab6e6ded28b156eccd63b6825b7365"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_GRAY_FLIPY_100_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "e9bb7a9e1d80bbf07b61ca638eb9e11f0451053058ef4e36e9e9dcfcd57be868"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_GRAY_FLIPY_50_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "e2fbca445fc5b6e6ba073279b3f8448434cb0a5f18dc569cd3d0f672a9f93a03"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_BLACK_FLIPY_50_SOURCE_CLEAN_A197_A222.png",
+      "sha256": "6dbddbe14835378a6928dcf22b553dd0bef4c63f952969588ec19b8814bed10d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_A222_EXACT_SAVED_RAW_VS_FLIPY.png",
+      "sha256": "8556040b65f45cd174c80395986b7edf504a65a42a593e0b94d3c0da60685277"
+    }
+  ],
+  "exclusions": [
+    "C2 EVEN indexes",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "controller TASK_ID/queue engine"
+  ]
+}
