@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q217-BOUNDARY-425-CLASSIFICATION-20261010-1547",
+  "review_id": "C1-Q217-20261010-1547-BOUNDARY-CLASSIFICATION",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "asset_kind": "UNCHANGED_OFFICIAL_C348_HOLD",
+  "prior_qa": "localization/graphics/role_C/20261010-C348-C1-Q217-A189-EXACT-CLEAN-ORIENTATION/C348_Q217_CONTROLLER_C1_HOLD.json",
+  "machine": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/C1_Q217_OUTSIDE_425_MACHINE.json",
+  "new_evidence_kind": "Per-component localization and provenance of previously unclassified visible boundary delta, NOT a new candidate or repeated C PASS.",
+  "results": {
+    "outside_source_glyph_bbox_changed_rgba": 425,
+    "source_to_clean": 425,
+    "clean_to_final": 0,
+    "source_to_final": 425,
+    "unchanged_alpha": 425,
+    "alpha_zero_false_ghost": 0,
+    "opaque_pixel_clusters": 11,
+    "start_clusters": 5,
+    "start_pixels": 195,
+    "goal_clusters": 6,
+    "goal_pixels": 230,
+    "max_distance_from_tight_glyph_px": 8,
+    "classification": "All 425 pixels belong to original SOURCE-removal CLEAN stage, not Korean lettering raster or CLEAN→FINAL composite. Alpha remained 255 in SOURCE/CLEAN/FINAL, so they are visible RGB edits to red badge/glyph-edge art, not hidden alpha0 ghosts.",
+    "protected_art_uncertain": "Clusters touch red badge edges; no source-conditioned effect mask separates legitimate original glyph-effect halo from border/foreground. DO NOT classify all as safe or automatic red badge damage."
+  },
+  "regions": [
+    {
+      "id": "start",
+      "english": "START",
+      "korean": "출발",
+      "opaque_changed_outside_tight_glyph": 195,
+      "connected_components": 5,
+      "maximum_distance_px": 2.24,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean glyph lean per-stem paired top-minus-bottom anchors remain uncalibrated; prior strong directional agreement cannot establish exact source-family similarity.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PROVENANCE_PASS_NOT_FULL_PROTECTION",
+          "observation": "Of the 425 atlas-wide visible source-tight-outside changes, 195 in this region are SOURCE→CLEAN only. Each pixel is CLEAN-identical to FINAL, with unchanged opaque alpha. No fresh Korean composite outside original glyph rectangle.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Cream/orange beveled source and Korean glyph appear right-slanted but family/weight exact match remains unqualified; source/border effect continuity not fully proven.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "readability": {
+          "result": "STATIC_ONLY",
+          "observation": "Localized word readable on the native pixel comparison, not a new in-game acceptance.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No confirmed new Hangul stroke-clipping in inspected source/clean/final crop, but full crop/FX/mip calibration missing.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "195 changed opaque RGB pixels adjacent to the source glyph bbox, including red-badge edge positions. Stage provenance says source-removal plate edit, NOT newly rendered Korean spill; does not distinguish legitimate original glyph glow removal from protected red-border damage. Protected mask needs source-aware certification.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "No altered CLEAN→FINAL pixel outside original narrow glyph rectangles; original source-effect versus protected badge border still unresolved.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Fresh exact SHA-verified source/clean/candidate pixels with source/candidate RAW mirror-Y and CLEAN readable orientation; existing C348 RAW visual corroborated.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        }
+      }
+    },
+    {
+      "id": "goal",
+      "english": "GOAL",
+      "korean": "골",
+      "opaque_changed_outside_tight_glyph": 230,
+      "connected_components": 6,
+      "maximum_distance_px": 8,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "English and Korean glyph lean per-stem paired top-minus-bottom anchors remain uncalibrated; prior strong directional agreement cannot establish exact source-family similarity.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PROVENANCE_PASS_NOT_FULL_PROTECTION",
+          "observation": "Of the 425 atlas-wide visible source-tight-outside changes, 230 in this region are SOURCE→CLEAN only. Each pixel is CLEAN-identical to FINAL, with unchanged opaque alpha. No fresh Korean composite outside original glyph rectangle.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Cream/orange beveled source and Korean glyph appear right-slanted but family/weight exact match remains unqualified; source/border effect continuity not fully proven.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "readability": {
+          "result": "STATIC_ONLY",
+          "observation": "Localized word readable on the native pixel comparison, not a new in-game acceptance.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No confirmed new Hangul stroke-clipping in inspected source/clean/final crop, but full crop/FX/mip calibration missing.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "230 changed opaque RGB pixels adjacent to the source glyph bbox, including red-badge edge positions. Stage provenance says source-removal plate edit, NOT newly rendered Korean spill; does not distinguish legitimate original glyph glow removal from protected red-border damage. Protected mask needs source-aware certification.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "No altered CLEAN→FINAL pixel outside original narrow glyph rectangles; original source-effect versus protected badge border still unresolved.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Fresh exact SHA-verified source/clean/candidate pixels with source/candidate RAW mirror-Y and CLEAN readable orientation; existing C348 RAW visual corroborated.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png"
+        }
+      }
+    }
+  ],
+  "calibration": {
+    "blind_normal_defects": false,
+    "producer_report_read_before_pixels": true,
+    "approved_family_profile": false,
+    "slant_stem_anchors": false
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "New exact provenance/stage evidence narrows 425 pixel uncertainty but cannot approve protected art or source family. Distinct C3/current export/user game tests absent.",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C3": "NOT_PERFORMED",
+  "approval": false,
+  "user_actual_game": false,
+  "new_dds": 0,
+  "candidate_modified": false,
+  "next": "A/B must supply exact original source-text/effect mask vs protected red badge border and confirm 425 touched opaque border pixels are deliberately safe; C1 blind known-defect calibration, top-minus-bottom stem lean, independent native BGW/75/50 and C3 separate then user in-game."
+}
