@@ -2,7 +2,7 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E009",
+  "event_id": "CONVERSION-DX11-00537-E010",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
@@ -167,9 +167,9 @@
   "native_draw_path_production_default": false,
   "source_stage": "SOURCE_BUILD_BUNDLE_VERIFIED__GAME_PIXEL_AND_HMD_UNTESTED",
   "last_real_activity_evidence": "4c9ccac8dd75956531a37e630fb9552f9e467a52 D3DTA modifier and fog/scissor fail-closed guard; 4 negative mutations PASS. Build 38074993048 and OpenXR 38074993038 SUCCESS. PR synthetic merge ace79c52e876635d6be5c0b59a71bc459ac3f7a8 and feature 4c9ccac8dd75956531a37e630fb9552f9e467a52 have identical tree 4ea3bfabd13985a0b81f9bd37c133af644234fef; artifact 11678470577 ZIP SHA256 2b0e43c67ea7bbf39d42768554d0eb60feca1630efd9ab8357afc4252a27ef5f. Real-game pixels/HMD UNTESTED.",
-  "blocker": "Controller-only target promotion and post-promotion Backend Conversion Gate pending; actual OR2006C2C.EXE game-native pixel/display/input and Quest3/VDXR runtime UNTESTED; only opt-in untextured XYZRHW|DIFFUSE diagnostic.",
+  "blocker": "Controller-only target promotion + target exact-SHA Backend Conversion Gate; real OR2006 native pixels/desktop inset/input and Quest3/VDXR HMD runtime UNTESTED; source-build five acceptance PASS, controller checkpoint LIVE-CALLSITE blocker stale.",
   "resume_cursor": "FEATURE_READY_AWAIT_CONTROLLER_PROMOTION_BACKEND_GATE_AND_USER_GAME_TEST",
-  "next_action": "Controller: verify PR #114 feature branch C6 HEAD and source material 4c9ccac8dd75956531a37e630fb9552f9e467a52, fast-forward merge only after ownership/lease check; run Backend Conversion Gate validate + DX11 readiness smoke on vr-dx11-native-r71. User: run DX9Ex control and opt-in game-draw test bundle artifact 11678470577 and compare actual native_draws/desktop_insets/input. Runtime/HMD UNTESTED.",
+  "next_action": "Controller: verify feature PR #114 and owner leases, promote TARGET only from controller, run Backend Conversion Gate validate and DX11 readiness smoke on post-promotion target exact SHA. User: download feature diagnostic bundle artifact 11679934776, compare DX9Ex default control vs OUTRUN_DX11_FIRST_GAME_FRAME=1, report game_tri_draws/native_draws/desktop_insets/failed, controls, Quest3/VDXR. Never claim production-native game rendering from source/build alone.",
   "score_change": 0,
   "validation_gates": {
     "build": {
@@ -431,6 +431,91 @@
     ],
     "next_action": "Controller only: recheck PR #114 ownership and target lease, promote FEATURE_READY, then target exact-SHA Backend Conversion Gate. User: run artifact 11679776354 DX9Ex control and DX11 opt-in pair, collect game_tri_draws/native_draws/desktop_insets/failed plus input and HMD observations. Do not create a new WARP Rxxx work item.",
     "runtime_validation": "UNTESTED",
+    "score_change": 0,
+    "implementation_or_package_changes_in_rollover": false
+  },
+  "rollover_10": {
+    "event_id": "CONVERSION-DX11-00537-E010",
+    "event_type": "rollover",
+    "chat_rollover": 10,
+    "attempt": "1/3",
+    "checkpoint_verified": {
+      "repo": "thp32tt/OutRun2006Tweaks",
+      "branch": "chat-controller-downloads",
+      "path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0510-pre-rollover-0009.json",
+      "blob_sha": "b57e7901cb3871f36251d40274b406d5e6852768",
+      "checkpoint_game_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+      "stale_controller_blocker": "ACCEPTANCE_ITEM_PENDING:DX11-LIVE-CALLSITE"
+    },
+    "feature_head_verified": "14189087899be2c30af612c03d438ede96aeac28",
+    "target_head_verified": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "validation_bearing_material_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+    "source_diff_since_material": "4 commits ahead, only docs/automation/runs/CONVERSION-DX11-00537.json modified; no additional C++/workflow/test diff",
+    "source_inspected": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "source_scope": "Game-authored D3D9 VB/IB/UP capture -> opt-in narrow untextured XYZRHW|DIFFUSE D3D11 Draw -> staging readback -> D3D9 desktop diagnostic inset. All other draws preserve original D3D9 path; production native backend remains disabled.",
+    "exact_feature_head_ci": {
+      "Build": {
+        "run_id": 38081155445,
+        "head_sha": "14189087899be2c30af612c03d438ede96aeac28",
+        "conclusion": "SUCCESS",
+        "steps": [
+          "DX11-LIVE-CALLSITE",
+          "DX11-NATIVE-DRAW",
+          "DX11-VISIBLE-FRAME",
+          "DX11-SAFE-RETURN"
+        ],
+        "win32_release": "SUCCESS"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38081155431,
+        "head_sha": "14189087899be2c30af612c03d438ede96aeac28",
+        "conclusion": "SUCCESS",
+        "acceptance": "DX11-TEST-BUNDLE",
+        "game_x86_jobs": 5,
+        "host_x64": "SUCCESS"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38081155429,
+        "head_sha": "14189087899be2c30af612c03d438ede96aeac28",
+        "conclusion": "SUCCESS"
+      }
+    },
+    "test_bundle": {
+      "run_id": 38081155431,
+      "artifact_id": 11679934776,
+      "name": "feature-dx11-first-game-frame-14189087899be2c30af612c03d438ede96aeac28",
+      "artifact_digest": "sha256:6e0a471f3dea5431224226d519ab2c2044c8550a8ddf2e9138fb66373c289a19",
+      "size_bytes": 2790275
+    },
+    "pr": {
+      "number": 114,
+      "state": "OPEN",
+      "draft": true,
+      "mergeable": true,
+      "head_sha": "14189087899be2c30af612c03d438ede96aeac28",
+      "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba"
+    },
+    "r175_owner": "CONVERSION-DX11-00477 confirmed COMPLETE_R175_SOURCE_WARP_PARITY; R175 shader/translator/probe files untouched.",
+    "acceptance_results": {
+      "DX11-LIVE-CALLSITE": "PASS_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
+      "DX11-NATIVE-DRAW": "PASS_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
+      "DX11-VISIBLE-FRAME": "PASS_SOURCE_AND_BUILD__GAME_VISIBLE_PIXELS_UNTESTED",
+      "DX11-SAFE-RETURN": "PASS_SOURCE_NEGATIVE_REGRESSION__GAME_INPUT_UNTESTED",
+      "DX11-TEST-BUNDLE": "PASS_X86_X64_ARTIFACT__RUNTIME_UNTESTED"
+    },
+    "incomplete_acceptance_at_source_build": [],
+    "incomplete_evidence": [
+      "Controller-only promotion to TARGET after lease review",
+      "Post-promotion TARGET exact-SHA Backend Conversion Gate validate and DX11 readiness smoke",
+      "Real OR2006C2C.EXE game-authored D3D11 pixel readback and diagnostic desktop inset",
+      "Game controls and Quest3/VDXR HMD proof"
+    ],
+    "next_action": "Controller promote feature PR #114 under owner/lease policy; run TARGET exact-SHA Backend Conversion Gate. User compare DX9Ex and opt-in DX11 bundle with logs and controls. No WARP-only new work.",
+    "runtime_validation": "UNTESTED",
+    "hmd_test_performed": false,
     "score_change": 0,
     "implementation_or_package_changes_in_rollover": false
   }
