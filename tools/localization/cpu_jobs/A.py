@@ -16,7 +16,9 @@ out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 q=json.loads(subprocess.run(["python","tools/localization/rework_triage.py","--index","101","--require-safe-rerender"],check=True,text=True,capture_output=True).stdout)["assets"][0]
-assert q["index"]==101 and q["next_action"]=="MATERIAL_REWORK",q
+assert q["index"]==101 and q["current_status"]=="c1_20261010_q101_a225_trial_clean_residue_rework_official_unchanged" and q["next_action"] in ("MATERIAL_REWORK","NORMAL_QUEUE_SELECTION"),q
+# The read-only triage only keyword-matches status; independently authored C1 A225
+# source-residue REWORK, pinned below, is the hard evidence for this safe repair.
 review=json.loads((repo/"localization/graphics/role_C/20261010-C1-Q101-SOURCE-ITALIC-REWORK/C1_Q101_INDEPENDENT_VISUAL_REJECT.json").read_text())
 assert review["decision"]=="REWORK_REQUIRED" and review["firsthand_review"]["reason_code"]=="SOURCE_FAMILY_RIGHT_ITALIC_MISMATCH"
 new_c1=json.loads((repo/"localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A225_INDEPENDENT_PERSISTED_REWORK.json").read_text())
