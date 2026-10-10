@@ -70,4 +70,38 @@ namespace outrun::vr::dx11 {
     // ownership contract is implemented. Do not assume a stale result.
     return !livePredicate;
 }
+
+ 
+// R231: a retained stream-output buffer is a hidden GPU write destination
+// even when the selected indexed RTV/DSV/UAVs and predication are clean.
+// Refuse the dormant DrawIndexed path until every SO slot is unbound.
+// SOGetTargets AddRefs each returned buffer; release even on rejection.
+[[nodiscard]] inline bool verified_indexed_no_stream_output_eye_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, UINT firstIndex, UINT indexCount,
+    INT baseVertex, std::uint64_t generation, std::uint64_t vbVersion,
+    std::uint64_t ibVersion, UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv, ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !verified_indexed_unpredicated_eye_ready(
+            vb, ib, context, firstIndex, indexCount, baseVertex,
+            generation, vbVersion, ibVersion, width, height, format,
+            expectedLayout, expectedVs, expectedPs, expectedRtv,
+            expectedDsv, expectedDepthState, expectedRaster))
+        return false;
+    ID3D11Buffer* soTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    context->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, soTargets);
+    bool isolated = true;
+    for (auto* target : soTargets) {
+        if (target) {
+            isolated = false;
+            target->Release();
+        }
+    }
+    return isolated;
+}
+
 } // namespace outrun::vr::dx11

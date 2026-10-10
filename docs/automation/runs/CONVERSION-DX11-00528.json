@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00528",
+  "production_id": "CONVERSION-DX11-00528",
+  "event_id": "CONVERSION-DX11-00528-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "chat_rollovers": 2,
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "140cf9c7bfc3a5139e2affba8e7df9bec77adf48",
+  "checkpoint_base_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00528",
+  "lease_epoch": 1,
+  "work_key": "DX11:R231:INDEXED_STREAM_OUTPUT_SIDE_EFFECT_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_stream_output_r231.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "terminal": false,
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R231 indexed dormant sole-eye rejects any SO target slot, composed after R229 predication fence; WARP slot-zero/slot-three rejection and restored GPU pixel; unrelated R175 remains independently owned.",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_stream_output_r231.py",
+    "docs/automation/runs/CONVERSION-DX11-00528.json"
+  ],
+  "pipeline": {
+    "C0": "PASS checkpoint E001 WAIT_CHAT matched; E002 rollover kept attempt 1/3; latest GitHub HEAD recovered, 00528 absent",
+    "C1": "PASS distinct R231 indexed SO side-effect fence; R175 owner 00477 excluded",
+    "C2": "PASS pending committed C++ guard, WARP tests, source mutants, CI wiring",
+    "C3": "PENDING exact-SHA GitHub Backend Conversion Gate",
+    "C4": "PENDING atomic Git tree commit with marker",
+    "C5": "NOT_REQUIRED dormant game draw, no runtime package",
+    "C6": "PENDING exact-SHA gate result and durable final ledger"
+  },
+  "blockers": [
+    "Inherited independently-owned R175 WARP generic-varying mismatch may fail full Gate; do not mask or edit."
+  ],
+  "resume_cursor": "WAIT_EXACT_SHA_GATE",
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00528",
+  "next_action": "Inspect exact material SHA Backend Conversion Gate. If R231 scoped PASS but R175 fails, persist BLOCKED_DEPENDENCY_R175 and no score. Never claim HMD run.",
+  "evidence": {
+    "checkpoint": "chat-controller-downloads/tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00528/20261010T1735-periodic.json",
+    "static_contract_precommit": "R231 eight source omissions fail contract; R186 WARP slot 0/3 and restored green pixel included; native compile requires GitHub Actions"
+  }
+}

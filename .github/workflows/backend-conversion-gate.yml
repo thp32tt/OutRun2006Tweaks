@@ -412,6 +412,12 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_indexed_predication_r229.py
 
+
+      # R231: a hidden stream-output binding cannot be another eye write.
+      - name: Verify R231 indexed stream-output isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_stream_output_r231.py
+
       - name: Build R186 owned indexed Draw WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186

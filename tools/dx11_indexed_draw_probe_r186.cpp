@@ -460,6 +460,40 @@ int main() {
     require(r217ReadCenter(true),
         "R229 unpredicated WARP DrawIndexed restores green pixel");
 
+    // R231: a latent SO destination is invisible to RTV/UAV/predicate checks.
+    const auto r231Ready = [&] {
+        return outrun::vr::dx11::verified_indexed_no_stream_output_eye_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),r217Dsv.Get(),
+            r217State.Get(),rs.Get());
+    };
+    require(r231Ready(),"R231 initial clean indexed eye");
+    D3D11_BUFFER_DESC r231BufferDesc{};
+    r231BufferDesc.ByteWidth=64u;
+    r231BufferDesc.Usage=D3D11_USAGE_DEFAULT;
+    r231BufferDesc.BindFlags=D3D11_BIND_STREAM_OUTPUT;
+    ComPtr<ID3D11Buffer> r231SoBuffer;
+    require(SUCCEEDED(device->CreateBuffer(
+        &r231BufferDesc,nullptr,r231SoBuffer.GetAddressOf())) && r231SoBuffer,
+        "R231 same-device stream-output buffer");
+    ID3D11Buffer* r231Slot0=r231SoBuffer.Get();
+    UINT r231Offsets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    context->SOSetTargets(1u,&r231Slot0,r231Offsets);
+    require(r229Ready(),"R231 predecessor ignores SO target");
+    require(!r231Ready(),"R231 reject slot-zero stream-output");
+    ID3D11Buffer* r231Slot3[D3D11_SO_BUFFER_SLOT_COUNT]{
+        nullptr,nullptr,nullptr,r231SoBuffer.Get()};
+    context->SOSetTargets(D3D11_SO_BUFFER_SLOT_COUNT,r231Slot3,r231Offsets);
+    require(!r231Ready(),"R231 reject highest stream-output slot");
+    context->SOSetTargets(0u,nullptr,nullptr);
+    require(r231Ready(),"R231 restore after SO unbind");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),
+        "R231 restored WARP DrawIndexed green pixel");
+
     context->OMSetRenderTargets(1,&rawTarget,nullptr);
     context->OMSetDepthStencilState(nullptr,0u);
 
