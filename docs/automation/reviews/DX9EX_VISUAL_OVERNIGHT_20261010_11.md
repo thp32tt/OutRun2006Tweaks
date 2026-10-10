@@ -218,3 +218,4 @@ Schedule is best-effort, not guaranteed exact. Fixed run deadline: **2026-10-11 
 | 2026-10-11 00:08:23 KST | 4de8dfaabddd | RB02 progressive GOAL text | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
 | 2026-10-11 00:13:23 KST | bd81283b9a4c | RB03 +TIME six source edges | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 7 source contracts present |
 | 2026-10-11 00:18:23 KST | bd81283b9a4c | RB05 car-relative rank owner | SOURCE_CONTRACT_OK | src/hooks_uiscaling.cpp: 4 source contracts present |
+| 2026-10-11 00:23:23 KST | bd81283b9a4c | RB10 negative/failure-path contract | SOURCE_CONTRACT_OK | tools/verify_vr_visual_composition_p0.py: 3 source contracts present |
