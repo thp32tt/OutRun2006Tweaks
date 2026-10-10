@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T23:21:00+09:00",
+  "updated_at_kst": "2026-10-10T23:37:32+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11741,5 +11741,28 @@
     "evidence": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/C1_Q103_A224_CONTROLLER_REWORK.json",
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c371_c2_q176_b346_optical_20261010": {
+    "role": "C2",
+    "queue_index": 176,
+    "trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+    "same_sha_prior_C352": true,
+    "distinct_new_optical_evidence": true,
+    "result": "REWORK_REQUIRED_UNPROMOTED",
+    "same_Korean_alpha16_losses_pct": {
+      "jennifer": -9.96,
+      "clarissa": -10.24,
+      "holly": -11.14,
+      "flagman4": -9.74
+    },
+    "outside_rgba": 0,
+    "outside_alpha": 0,
+    "source_bbox_4of4": true,
+    "new_dds": 0,
+    "new_approval": 0,
+    "c3": "NOT_RUN",
+    "runtime": "UNTESTED",
+    "qa_json": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_Q176_C2_INDEPENDENT_OPTICAL_REWORK.json",
+    "run_key": "OUTRUN-KOR-C371-C2-Q176-B346-NEW-OPTICAL-SAME-KOREAN-UNDERFILL-20261010-2321"
   }
 }

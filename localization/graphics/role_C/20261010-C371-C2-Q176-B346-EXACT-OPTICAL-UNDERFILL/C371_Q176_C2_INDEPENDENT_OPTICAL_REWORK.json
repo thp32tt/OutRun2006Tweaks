@@ -1,0 +1,868 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C371-Q176-B346-NEW-OPTICAL-SAME-KOREAN-PIXEL-FAIL",
+  "run_key": "OUTRUN-KOR-C371-C2-Q176-B346-NEW-OPTICAL-SAME-KOREAN-UNDERFILL-20261010-2321",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 176,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "reviewed_at_kst": "2026-10-10 23:35 KST",
+  "candidate_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+  "official_saved_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "clean_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "execution_backend": "GITHUB_SSOT_AND_N100_MCP_FALLBACK_BECAUSE_GPT_LOCAL_DNS_DENIED",
+  "new_candidate_sha_reviewed": false,
+  "same_sha_prior_C352_review": true,
+  "new_distinct_evidence": "First exact persisted four-name SAME-KOREAN official->B346 pixel occupancy multi-alpha-threshold quant plus independent native/50/BGW source-family optical comparison and per-name displacement overlays; C352 provisional HOLD did not test this specific comparator.",
+  "pixels_before_producer_verdict": false,
+  "firstlook_note": "Read historical C352 and producer B346 notes to locate original/candidate before pixel analysis; independent blind review not claimed.",
+  "blind_calibration": "NOT_QUALIFIED",
+  "triage": "MATERIAL_REWORK",
+  "result": "REWORK_REQUIRED_UNPROMOTED_B346_SOURCE_FAMILY_OPTICAL_UNDERFILL",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_Q176_INDEPENDENT_OPTICAL_MACHINE.json",
+    "sha256": "abe9e57d5fcaf16595480dba95c8ece991363f837c2842d5e466e7fd7a78b26f",
+    "bytes": 17920
+  },
+  "regions": [
+    {
+      "id": "flagman4",
+      "text": "플래그맨 4",
+      "bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_alpha16_bbox": [
+        8,
+        49,
+        988,
+        199
+      ],
+      "trial_alpha16_bbox": [
+        22,
+        55,
+        698,
+        199
+      ],
+      "same_korean_alpha16_change_pct": -9.74,
+      "same_korean_alpha128_change_pct": -9.39,
+      "same_korean_alpha240_change_pct": -9.68,
+      "views": {
+        "native_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+          "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+          "bytes": 28406
+        },
+        "practical_black_50": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+          "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+          "bytes": 20701
+        },
+        "raw_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_B346_RAW_NATIVE.png",
+          "sha256": "5b380baa0f002c6c71fdd0fe51e3f3a0adf37f0c0c1c0b8ce36596814c21c74c",
+          "bytes": 22924
+        },
+        "same_korean_alpha_delta": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+          "sha256": "552a612c5aa0ce0f175fd16b7718698426064790b56ab3c7a842e6eb664760a0",
+          "bytes": 2143
+        },
+        "practical_white_75": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+          "sha256": "b297ede0eae4edcdd7d0ab4a8d606babbb756c2b12877a6891922c70ae308844",
+          "bytes": 43440
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+            "bytes": 28406
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+            "bytes": 28406
+          }
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+          "observation": "Direct native 100 and black 50 compare shows trial Korean 플래그맨 4 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 44492 vs official 49295 (-9.74%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+            "bytes": 20701
+          }
+        },
+        "readability": {
+          "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+          "observation": "Text 플래그맨 4 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+            "bytes": 20701
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_BROKEN_SYLLABLE",
+          "observation": "No clear missing Korean stroke or clipping in 플래그맨 4 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+            "sha256": "552a612c5aa0ce0f175fd16b7718698426064790b56ab3c7a842e6eb664760a0",
+            "bytes": 2143
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+            "bytes": 28406
+          }
+        },
+        "placement": {
+          "result": "PASS_EXACT_BBOX",
+          "observation": "Trial alpha>16 bbox [22, 55, 698, 199] inside exact source region [8, 49, 988, 204], positive margins [14, 290, 6, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+            "bytes": 28406
+          }
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_B346_RAW_NATIVE.png",
+            "sha256": "5b380baa0f002c6c71fdd0fe51e3f3a0adf37f0c0c1c0b8ce36596814c21c74c",
+            "bytes": 22924
+          }
+        }
+      }
+    },
+    {
+      "id": "holly",
+      "text": "홀리",
+      "bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_alpha16_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "trial_alpha16_bbox": [
+        22,
+        218,
+        272,
+        358
+      ],
+      "same_korean_alpha16_change_pct": -11.14,
+      "same_korean_alpha128_change_pct": -9.6,
+      "same_korean_alpha240_change_pct": -10.54,
+      "views": {
+        "native_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+          "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+          "bytes": 15211
+        },
+        "practical_black_50": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+          "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+          "bytes": 10489
+        },
+        "raw_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_B346_RAW_NATIVE.png",
+          "sha256": "6c5532200457a487ba7a9605e3ce2b05c70150cef8c99eed3f303dbe69cd4720",
+          "bytes": 11915
+        },
+        "same_korean_alpha_delta": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+          "sha256": "4df81c6890a469d6e8ad2471634d8ec150b1af5fcffbd44547b2fcd1b61447bf",
+          "bytes": 1646
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+            "bytes": 15211
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+            "bytes": 15211
+          }
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+          "observation": "Direct native 100 and black 50 compare shows trial Korean 홀리 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 19283 vs official 21700 (-11.14%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+            "bytes": 10489
+          }
+        },
+        "readability": {
+          "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+          "observation": "Text 홀리 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+            "bytes": 10489
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_BROKEN_SYLLABLE",
+          "observation": "No clear missing Korean stroke or clipping in 홀리 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+            "sha256": "4df81c6890a469d6e8ad2471634d8ec150b1af5fcffbd44547b2fcd1b61447bf",
+            "bytes": 1646
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+            "bytes": 15211
+          }
+        },
+        "placement": {
+          "result": "PASS_EXACT_BBOX",
+          "observation": "Trial alpha>16 bbox [22, 218, 272, 358] inside exact source region [9, 213, 542, 364], positive margins [13, 270, 5, 6]. No 1px escape; geometric PASS does not resolve font underweight.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+            "bytes": 15211
+          }
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_B346_RAW_NATIVE.png",
+            "sha256": "6c5532200457a487ba7a9605e3ce2b05c70150cef8c99eed3f303dbe69cd4720",
+            "bytes": 11915
+          }
+        }
+      }
+    },
+    {
+      "id": "jennifer",
+      "text": "제니퍼",
+      "bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_alpha16_bbox": [
+        14,
+        384,
+        838,
+        532
+      ],
+      "trial_alpha16_bbox": [
+        11,
+        379,
+        425,
+        527
+      ],
+      "same_korean_alpha16_change_pct": -9.96,
+      "same_korean_alpha128_change_pct": -10.18,
+      "same_korean_alpha240_change_pct": -9.98,
+      "views": {
+        "native_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+          "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+          "bytes": 20468
+        },
+        "practical_black_50": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+          "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+          "bytes": 13622
+        },
+        "raw_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_B346_RAW_NATIVE.png",
+          "sha256": "9999c7579a1cd2b50bfaeab011815199c87ee92030d32bb54ee63bf2b416a30e",
+          "bytes": 15027
+        },
+        "same_korean_alpha_delta": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+          "sha256": "417174b9fee9484e5b8c1eaa18f0d6684ddc60d9a3618491d6ec8737090cdf18",
+          "bytes": 2201
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+            "bytes": 20468
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+            "bytes": 20468
+          }
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+          "observation": "Direct native 100 and black 50 compare shows trial Korean 제니퍼 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 28264 vs official 31389 (-9.96%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+            "bytes": 13622
+          }
+        },
+        "readability": {
+          "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+          "observation": "Text 제니퍼 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+            "bytes": 13622
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_BROKEN_SYLLABLE",
+          "observation": "No clear missing Korean stroke or clipping in 제니퍼 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+            "sha256": "417174b9fee9484e5b8c1eaa18f0d6684ddc60d9a3618491d6ec8737090cdf18",
+            "bytes": 2201
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+            "bytes": 20468
+          }
+        },
+        "placement": {
+          "result": "PASS_EXACT_BBOX",
+          "observation": "Trial alpha>16 bbox [11, 379, 425, 527] inside exact source region [0, 374, 838, 532], positive margins [11, 413, 5, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+            "bytes": 20468
+          }
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_B346_RAW_NATIVE.png",
+            "sha256": "9999c7579a1cd2b50bfaeab011815199c87ee92030d32bb54ee63bf2b416a30e",
+            "bytes": 15027
+          }
+        }
+      }
+    },
+    {
+      "id": "clarissa",
+      "text": "클라리사",
+      "bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_alpha16_bbox": [
+        905,
+        380,
+        1745,
+        532
+      ],
+      "trial_alpha16_bbox": [
+        919,
+        377,
+        1490,
+        527
+      ],
+      "same_korean_alpha16_change_pct": -10.24,
+      "same_korean_alpha128_change_pct": -9.75,
+      "same_korean_alpha240_change_pct": -10.86,
+      "views": {
+        "native_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+          "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+          "bytes": 33646
+        },
+        "practical_black_50": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+          "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+          "bytes": 22679
+        },
+        "raw_gray_100": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_B346_RAW_NATIVE.png",
+          "sha256": "58fb5270dd38b31bae013a85a3fee6e907a3710eeed5e66c19a752351569386c",
+          "bytes": 26779
+        },
+        "same_korean_alpha_delta": {
+          "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+          "sha256": "3fc135da7c31860f65a162b12a713b78ded50ffe0c221afc36bbf5b11c6c0568",
+          "bytes": 2402
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+            "bytes": 33646
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+            "bytes": 33646
+          }
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+          "observation": "Direct native 100 and black 50 compare shows trial Korean 클라리사 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 38982 vs official 43431 (-10.24%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+            "bytes": 22679
+          }
+        },
+        "readability": {
+          "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+          "observation": "Text 클라리사 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+            "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+            "bytes": 22679
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_BROKEN_SYLLABLE",
+          "observation": "No clear missing Korean stroke or clipping in 클라리사 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+            "sha256": "3fc135da7c31860f65a162b12a713b78ded50ffe0c221afc36bbf5b11c6c0568",
+            "bytes": 2402
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+            "bytes": 33646
+          }
+        },
+        "placement": {
+          "result": "PASS_EXACT_BBOX",
+          "observation": "Trial alpha>16 bbox [919, 377, 1490, 527] inside exact source region [905, 372, 1745, 532], positive margins [14, 255, 5, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+            "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+            "bytes": 33646
+          }
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_B346_RAW_NATIVE.png",
+            "sha256": "58fb5270dd38b31bae013a85a3fee6e907a3710eeed5e66c19a752351569386c",
+            "bytes": 26779
+          }
+        }
+      }
+    }
+  ],
+  "machine_summary": {
+    "source_clean": {
+      "rgba": 499187,
+      "alpha": 258272,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "clean_trial": {
+      "rgba": 132050,
+      "alpha": 132050,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "source_trial": {
+      "rgba": 436263,
+      "alpha": 253715,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "official_trial": {
+      "rgba": 215951,
+      "alpha": 42532,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    }
+  },
+  "new_dds_by_C2": 0,
+  "new_approved_candidate": 0,
+  "approved_export": false,
+  "official_queue_status": "c343_c2_rework_required_source_family_stroke_underweight_UNCHANGED",
+  "stages": {
+    "C": {
+      "review_id": "C371",
+      "result": "REWORK_REQUIRED_UNPROMOTED",
+      "reviewer": "ChatGPT AI1 C2 same controller",
+      "pixels_before_producer_verdict": false,
+      "calibration": "NOT_QUALIFIED",
+      "findings": {
+        "flagman4": {
+          "slant": {
+            "result": "HOLD_CALIBRATION",
+            "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+              "bytes": 28406
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+              "bytes": 28406
+            }
+          },
+          "style": {
+            "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+            "observation": "Direct native 100 and black 50 compare shows trial Korean 플래그맨 4 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 44492 vs official 49295 (-9.74%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+              "bytes": 20701
+            }
+          },
+          "readability": {
+            "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+            "observation": "Text 플래그맨 4 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+              "bytes": 20701
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_BROKEN_SYLLABLE",
+            "observation": "No clear missing Korean stroke or clipping in 플래그맨 4 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+              "sha256": "552a612c5aa0ce0f175fd16b7718698426064790b56ab3c7a842e6eb664760a0",
+              "bytes": 2143
+            }
+          },
+          "protected_art": {
+            "result": "PASS_SCOPED",
+            "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+              "bytes": 28406
+            }
+          },
+          "placement": {
+            "result": "PASS_EXACT_BBOX",
+            "observation": "Trial alpha>16 bbox [22, 55, 698, 199] inside exact source region [8, 49, 988, 204], positive margins [14, 290, 6, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+              "bytes": 28406
+            }
+          },
+          "orientation": {
+            "result": "PASS_SCOPED_RAW_FLIPY",
+            "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_B346_RAW_NATIVE.png",
+              "sha256": "5b380baa0f002c6c71fdd0fe51e3f3a0adf37f0c0c1c0b8ce36596814c21c74c",
+              "bytes": 22924
+            }
+          }
+        },
+        "holly": {
+          "slant": {
+            "result": "HOLD_CALIBRATION",
+            "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+              "bytes": 15211
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+              "bytes": 15211
+            }
+          },
+          "style": {
+            "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+            "observation": "Direct native 100 and black 50 compare shows trial Korean 홀리 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 19283 vs official 21700 (-11.14%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+              "bytes": 10489
+            }
+          },
+          "readability": {
+            "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+            "observation": "Text 홀리 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+              "bytes": 10489
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_BROKEN_SYLLABLE",
+            "observation": "No clear missing Korean stroke or clipping in 홀리 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+              "sha256": "4df81c6890a469d6e8ad2471634d8ec150b1af5fcffbd44547b2fcd1b61447bf",
+              "bytes": 1646
+            }
+          },
+          "protected_art": {
+            "result": "PASS_SCOPED",
+            "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+              "bytes": 15211
+            }
+          },
+          "placement": {
+            "result": "PASS_EXACT_BBOX",
+            "observation": "Trial alpha>16 bbox [22, 218, 272, 358] inside exact source region [9, 213, 542, 364], positive margins [13, 270, 5, 6]. No 1px escape; geometric PASS does not resolve font underweight.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+              "bytes": 15211
+            }
+          },
+          "orientation": {
+            "result": "PASS_SCOPED_RAW_FLIPY",
+            "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_B346_RAW_NATIVE.png",
+              "sha256": "6c5532200457a487ba7a9605e3ce2b05c70150cef8c99eed3f303dbe69cd4720",
+              "bytes": 11915
+            }
+          }
+        },
+        "jennifer": {
+          "slant": {
+            "result": "HOLD_CALIBRATION",
+            "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+              "bytes": 20468
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+              "bytes": 20468
+            }
+          },
+          "style": {
+            "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+            "observation": "Direct native 100 and black 50 compare shows trial Korean 제니퍼 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 28264 vs official 31389 (-9.96%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+              "bytes": 13622
+            }
+          },
+          "readability": {
+            "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+            "observation": "Text 제니퍼 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+              "bytes": 13622
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_BROKEN_SYLLABLE",
+            "observation": "No clear missing Korean stroke or clipping in 제니퍼 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+              "sha256": "417174b9fee9484e5b8c1eaa18f0d6684ddc60d9a3618491d6ec8737090cdf18",
+              "bytes": 2201
+            }
+          },
+          "protected_art": {
+            "result": "PASS_SCOPED",
+            "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+              "bytes": 20468
+            }
+          },
+          "placement": {
+            "result": "PASS_EXACT_BBOX",
+            "observation": "Trial alpha>16 bbox [11, 379, 425, 527] inside exact source region [0, 374, 838, 532], positive margins [11, 413, 5, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+              "bytes": 20468
+            }
+          },
+          "orientation": {
+            "result": "PASS_SCOPED_RAW_FLIPY",
+            "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_B346_RAW_NATIVE.png",
+              "sha256": "9999c7579a1cd2b50bfaeab011815199c87ee92030d32bb54ee63bf2b416a30e",
+              "bytes": 15027
+            }
+          }
+        },
+        "clarissa": {
+          "slant": {
+            "result": "HOLD_CALIBRATION",
+            "observation": "Original English red block headline and Korean appear roughly upright in normalized FLIP-Y, but independently marked comparable same-glyph stem top-minus-bottom anchors and blind slant controls were not completed. No inferred 0 angle.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+              "bytes": 33646
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Read persisted English source versus B346 CLEAN without lettering. Selected source bbox CLEAN alpha>16 is 0; SOURCE->CLEAN outside union four 0 RGBA/alpha. No newly observed source ghost in scoped four boxes.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+              "bytes": 33646
+            }
+          },
+          "style": {
+            "result": "FAIL_SOURCE_FAMILY_UNDERWEIGHT",
+            "observation": "Direct native 100 and black 50 compare shows trial Korean 클라리사 narrower/lighter in solid-red visual presence than the English original's heavy uppercase block and than SAME Korean official. At alpha>16 saved B346 38982 vs official 43431 (-10.24%). All four follow this direction at >16/>128/>240; not a universal Latin/Hangul matching threshold.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+              "bytes": 22679
+            }
+          },
+          "readability": {
+            "result": "SCOPED_TEXT_READABLE_BUT_HIERARCHY_FAIL",
+            "observation": "Text 클라리사 can be read at native/50, but lighter raster footprint weakens source-style headline hierarchy; C3 and actual-game legibility remain untested.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+              "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+              "bytes": 22679
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_BROKEN_SYLLABLE",
+            "observation": "No clear missing Korean stroke or clipping in 클라리사 at native/black 50. Same-Korean official vs trial alpha16 overlay confirms red removed vs blue added pixels; delta includes anchoring shifts, not just stroke thinning.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+              "sha256": "3fc135da7c31860f65a162b12a713b78ded50ffe0c221afc36bbf5b11c6c0568",
+              "bytes": 2402
+            }
+          },
+          "protected_art": {
+            "result": "PASS_SCOPED",
+            "observation": "Whole 2048² SOURCE->CLEAN/CLEAN->B346/SOURCE->B346/OFFICIAL->B346 RGBA/alpha outside FOUR source bboxes are all ZERO. Scope exact; no visible protected atlas pixel intrusion.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+              "bytes": 33646
+            }
+          },
+          "placement": {
+            "result": "PASS_EXACT_BBOX",
+            "observation": "Trial alpha>16 bbox [919, 377, 1490, 527] inside exact source region [905, 372, 1745, 532], positive margins [14, 255, 5, 5]. No 1px escape; geometric PASS does not resolve font underweight.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+              "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+              "bytes": 33646
+            }
+          },
+          "orientation": {
+            "result": "PASS_SCOPED_RAW_FLIPY",
+            "observation": "Persisted SOURCE/OFFICIAL/B346 DDS headers equal and mip1; native 2048x2048 raw stored vertical mirror-Y. Readable FLIPY and RAW original/trial were independently examined.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_B346_RAW_NATIVE.png",
+              "sha256": "58fb5270dd38b31bae013a85a3fee6e907a3710eeed5e66c19a752351569386c",
+              "bytes": 26779
+            }
+          }
+        }
+      }
+    },
+    "C3": {
+      "result": "NOT_RUN",
+      "reason": "Optical C2 source-family fail; C3 qualification blocked"
+    }
+  },
+  "user_actual_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "decision_note": "This is not a duplicate B346 SHA completion or new production. C352 HOLD remains historical; B346 is now independently REWORK as a potential promotion candidate based on new source-style optical/consistent same-text thinning proof. Existing official unchanged. Font family reconstruction needed; no automatic re-render of same method.",
+  "required_next": [
+    "B producer: rebuild original heavy block family while preserving natural Hangul counters; do not duplicate B346 stroke1 automatically",
+    "Independently qualify source-family stem/counter/slant calibration with controls before fresh C PASS",
+    "Pixel guard final manifest, fresh distinct C3 and user image+game retest"
+  ]
+}

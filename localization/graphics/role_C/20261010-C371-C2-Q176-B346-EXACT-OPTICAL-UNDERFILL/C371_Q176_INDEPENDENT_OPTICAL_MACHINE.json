@@ -1,0 +1,530 @@
+{
+  "queue_index": 176,
+  "source": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "clean": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "official": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "trial": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+  "native": [
+    2048,
+    2048
+  ],
+  "orientation": "RAW MIRROR-Y; readable FLIP-Y",
+  "pixel_diff": {
+    "source_clean": {
+      "rgba": 499187,
+      "alpha": 258272,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "clean_trial": {
+      "rgba": 132050,
+      "alpha": 132050,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "source_trial": {
+      "rgba": 436263,
+      "alpha": 253715,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "official_trial": {
+      "rgba": 215951,
+      "alpha": 42532,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    }
+  },
+  "region_metrics": [
+    {
+      "id": "flagman4",
+      "korean": "플래그맨 4",
+      "source_region": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "optical": {
+        "source": {
+          "bbox": [
+            8,
+            49,
+            988,
+            199
+          ],
+          "ink_pixels_alpha_gt16": 75271,
+          "alpha_gt16_bbox_fill_ratio": 0.512,
+          "mean_ink_pixels_per_occupied_row": 501.81,
+          "occupied_row_count": 150,
+          "max_alpha": 255
+        },
+        "official": {
+          "bbox": [
+            15,
+            53,
+            707,
+            200
+          ],
+          "ink_pixels_alpha_gt16": 49295,
+          "alpha_gt16_bbox_fill_ratio": 0.4846,
+          "mean_ink_pixels_per_occupied_row": 335.34,
+          "occupied_row_count": 147,
+          "max_alpha": 255
+        },
+        "trial": {
+          "bbox": [
+            22,
+            55,
+            698,
+            199
+          ],
+          "ink_pixels_alpha_gt16": 44492,
+          "alpha_gt16_bbox_fill_ratio": 0.4571,
+          "mean_ink_pixels_per_occupied_row": 308.97,
+          "occupied_row_count": 144,
+          "max_alpha": 255
+        }
+      },
+      "trial_positive_margin": [
+        14,
+        290,
+        6,
+        5
+      ],
+      "clean_alpha_gt16": 0
+    },
+    {
+      "id": "holly",
+      "korean": "홀리",
+      "source_region": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "optical": {
+        "source": {
+          "bbox": [
+            9,
+            213,
+            542,
+            364
+          ],
+          "ink_pixels_alpha_gt16": 41037,
+          "alpha_gt16_bbox_fill_ratio": 0.5099,
+          "mean_ink_pixels_per_occupied_row": 271.77,
+          "occupied_row_count": 151,
+          "max_alpha": 255
+        },
+        "official": {
+          "bbox": [
+            16,
+            216,
+            275,
+            360
+          ],
+          "ink_pixels_alpha_gt16": 21700,
+          "alpha_gt16_bbox_fill_ratio": 0.5818,
+          "mean_ink_pixels_per_occupied_row": 150.69,
+          "occupied_row_count": 144,
+          "max_alpha": 255
+        },
+        "trial": {
+          "bbox": [
+            22,
+            218,
+            272,
+            358
+          ],
+          "ink_pixels_alpha_gt16": 19283,
+          "alpha_gt16_bbox_fill_ratio": 0.5509,
+          "mean_ink_pixels_per_occupied_row": 137.74,
+          "occupied_row_count": 140,
+          "max_alpha": 255
+        }
+      },
+      "trial_positive_margin": [
+        13,
+        270,
+        5,
+        6
+      ],
+      "clean_alpha_gt16": 0
+    },
+    {
+      "id": "jennifer",
+      "korean": "제니퍼",
+      "source_region": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "optical": {
+        "source": {
+          "bbox": [
+            14,
+            384,
+            838,
+            532
+          ],
+          "ink_pixels_alpha_gt16": 71113,
+          "alpha_gt16_bbox_fill_ratio": 0.5831,
+          "mean_ink_pixels_per_occupied_row": 480.49,
+          "occupied_row_count": 148,
+          "max_alpha": 255
+        },
+        "official": {
+          "bbox": [
+            4,
+            378,
+            425,
+            528
+          ],
+          "ink_pixels_alpha_gt16": 31389,
+          "alpha_gt16_bbox_fill_ratio": 0.4971,
+          "mean_ink_pixels_per_occupied_row": 209.26,
+          "occupied_row_count": 150,
+          "max_alpha": 255
+        },
+        "trial": {
+          "bbox": [
+            11,
+            379,
+            425,
+            527
+          ],
+          "ink_pixels_alpha_gt16": 28264,
+          "alpha_gt16_bbox_fill_ratio": 0.4613,
+          "mean_ink_pixels_per_occupied_row": 190.97,
+          "occupied_row_count": 148,
+          "max_alpha": 255
+        }
+      },
+      "trial_positive_margin": [
+        11,
+        413,
+        5,
+        5
+      ],
+      "clean_alpha_gt16": 0
+    },
+    {
+      "id": "clarissa",
+      "korean": "클라리사",
+      "source_region": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "optical": {
+        "source": {
+          "bbox": [
+            905,
+            380,
+            1745,
+            532
+          ],
+          "ink_pixels_alpha_gt16": 67417,
+          "alpha_gt16_bbox_fill_ratio": 0.528,
+          "mean_ink_pixels_per_occupied_row": 443.53,
+          "occupied_row_count": 152,
+          "max_alpha": 255
+        },
+        "official": {
+          "bbox": [
+            913,
+            376,
+            1494,
+            528
+          ],
+          "ink_pixels_alpha_gt16": 43431,
+          "alpha_gt16_bbox_fill_ratio": 0.4918,
+          "mean_ink_pixels_per_occupied_row": 285.73,
+          "occupied_row_count": 152,
+          "max_alpha": 255
+        },
+        "trial": {
+          "bbox": [
+            919,
+            377,
+            1490,
+            527
+          ],
+          "ink_pixels_alpha_gt16": 38982,
+          "alpha_gt16_bbox_fill_ratio": 0.4551,
+          "mean_ink_pixels_per_occupied_row": 259.88,
+          "occupied_row_count": 150,
+          "max_alpha": 255
+        }
+      },
+      "trial_positive_margin": [
+        14,
+        255,
+        5,
+        5
+      ],
+      "clean_alpha_gt16": 0
+    }
+  ],
+  "png_files": [
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+    "C371_flagman4_SOURCE_B346_RAW_NATIVE.png",
+    "C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+    "C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+    "C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+    "C371_holly_SOURCE_B346_RAW_NATIVE.png",
+    "C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+    "C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+    "C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+    "C371_jennifer_SOURCE_B346_RAW_NATIVE.png",
+    "C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+    "C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+    "C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+    "C371_clarissa_SOURCE_B346_RAW_NATIVE.png",
+    "C371_jennifer_NATIVE_ALPHA_SILHOUETTES.png"
+  ],
+  "result": "REWORK_REQUIRED_UNPROMOTED_INDEPENDENT_OPTICAL_UNDERFILL",
+  "new_same_hangul_alpha_comparison": [
+    {
+      "id": "flagman4",
+      "text": "플래그맨 4",
+      "same_korean_official_vs_trial": true,
+      "alpha_gt16": {
+        "official": 49295,
+        "trial": 44492,
+        "delta": -4803,
+        "percent_change": -9.74,
+        "removed_exclusive": 7280,
+        "added_exclusive": 2477,
+        "common": 42015
+      },
+      "alpha_gt128": {
+        "official": 47623,
+        "trial": 43153,
+        "delta": -4470,
+        "percent_change": -9.39,
+        "removed_exclusive": 7417,
+        "added_exclusive": 2947,
+        "common": 40206
+      },
+      "alpha_gt240": {
+        "official": 46160,
+        "trial": 41690,
+        "delta": -4470,
+        "percent_change": -9.68,
+        "removed_exclusive": 7221,
+        "added_exclusive": 2751,
+        "common": 38939
+      },
+      "evidence": "C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png"
+    },
+    {
+      "id": "holly",
+      "text": "홀리",
+      "same_korean_official_vs_trial": true,
+      "alpha_gt16": {
+        "official": 21700,
+        "trial": 19283,
+        "delta": -2417,
+        "percent_change": -11.14,
+        "removed_exclusive": 3365,
+        "added_exclusive": 948,
+        "common": 18335
+      },
+      "alpha_gt128": {
+        "official": 20558,
+        "trial": 18584,
+        "delta": -1974,
+        "percent_change": -9.6,
+        "removed_exclusive": 2898,
+        "added_exclusive": 924,
+        "common": 17660
+      },
+      "alpha_gt240": {
+        "official": 20117,
+        "trial": 17996,
+        "delta": -2121,
+        "percent_change": -10.54,
+        "removed_exclusive": 3132,
+        "added_exclusive": 1011,
+        "common": 16985
+      },
+      "evidence": "C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png"
+    },
+    {
+      "id": "jennifer",
+      "text": "제니퍼",
+      "same_korean_official_vs_trial": true,
+      "alpha_gt16": {
+        "official": 31389,
+        "trial": 28264,
+        "delta": -3125,
+        "percent_change": -9.96,
+        "removed_exclusive": 6326,
+        "added_exclusive": 3201,
+        "common": 25063
+      },
+      "alpha_gt128": {
+        "official": 30289,
+        "trial": 27205,
+        "delta": -3084,
+        "percent_change": -10.18,
+        "removed_exclusive": 6551,
+        "added_exclusive": 3467,
+        "common": 23738
+      },
+      "alpha_gt240": {
+        "official": 28866,
+        "trial": 25986,
+        "delta": -2880,
+        "percent_change": -9.98,
+        "removed_exclusive": 6304,
+        "added_exclusive": 3424,
+        "common": 22562
+      },
+      "evidence": "C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png"
+    },
+    {
+      "id": "clarissa",
+      "text": "클라리사",
+      "same_korean_official_vs_trial": true,
+      "alpha_gt16": {
+        "official": 43431,
+        "trial": 38982,
+        "delta": -4449,
+        "percent_change": -10.24,
+        "removed_exclusive": 6088,
+        "added_exclusive": 1639,
+        "common": 37343
+      },
+      "alpha_gt128": {
+        "official": 41584,
+        "trial": 37529,
+        "delta": -4055,
+        "percent_change": -9.75,
+        "removed_exclusive": 5784,
+        "added_exclusive": 1729,
+        "common": 35800
+      },
+      "alpha_gt240": {
+        "official": 40431,
+        "trial": 36041,
+        "delta": -4390,
+        "percent_change": -10.86,
+        "removed_exclusive": 6045,
+        "added_exclusive": 1655,
+        "common": 34386
+      },
+      "evidence": "C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png"
+    }
+  ],
+  "methodology": {
+    "alpha_thresholds": [
+      16,
+      128,
+      240
+    ],
+    "meaning": "Same Korean labels officially saved vs B346 trial, native decoded and corresponding atlas coordinates; occupancy differences not a calibrated stroke-width angle; label movement contributes to exclusive pixels.",
+    "visual": "Independent reviewer compared actual source/clean/official/trial native and practical BGW, no quantified universal cross-script pass threshold.",
+    "cross_script_diagnostic": "Original English glyph coverage ratio is supporting context, not automatic native Hangul/Latin equality."
+  },
+  "canonical_source_upstream": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "role": "C2",
+  "evidence": {
+    "C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+      "sha256": "717ac3fe7dac1a231e54578630bc1386e3f3d57bc07a25d8fb7f97cd7f78c4b7",
+      "bytes": 20468
+    },
+    "C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+      "sha256": "61d3448e2f0946852a0aae5faf897626867b1f1798c468ee1cb383ca9e3f2751",
+      "bytes": 13622
+    },
+    "C371_jennifer_SOURCE_B346_RAW_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_SOURCE_B346_RAW_NATIVE.png",
+      "sha256": "9999c7579a1cd2b50bfaeab011815199c87ee92030d32bb54ee63bf2b416a30e",
+      "bytes": 15027
+    },
+    "C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_jennifer_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+      "sha256": "417174b9fee9484e5b8c1eaa18f0d6684ddc60d9a3618491d6ec8737090cdf18",
+      "bytes": 2201
+    },
+    "C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+      "sha256": "5247af4f18b15bc7c24b2549f7464bfe6909beb34b00d1686327ebac8389549d",
+      "bytes": 33646
+    },
+    "C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+      "sha256": "8ccf6bfa2dfb75c68a1c85305307166d80872dae01ef16c8e021fdbae81decee",
+      "bytes": 22679
+    },
+    "C371_clarissa_SOURCE_B346_RAW_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_SOURCE_B346_RAW_NATIVE.png",
+      "sha256": "58fb5270dd38b31bae013a85a3fee6e907a3710eeed5e66c19a752351569386c",
+      "bytes": 26779
+    },
+    "C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_clarissa_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+      "sha256": "3fc135da7c31860f65a162b12a713b78ded50ffe0c221afc36bbf5b11c6c0568",
+      "bytes": 2402
+    },
+    "C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+      "sha256": "3d86826d47668a6455eb649019f6aa1e6ea479dff9d6e4f756daf739c8a4b6d1",
+      "bytes": 15211
+    },
+    "C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+      "sha256": "1902ba4133a8de872d1603d3cc1df23994f1d4a80e255f46a0accd9481096778",
+      "bytes": 10489
+    },
+    "C371_holly_SOURCE_B346_RAW_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_SOURCE_B346_RAW_NATIVE.png",
+      "sha256": "6c5532200457a487ba7a9605e3ce2b05c70150cef8c99eed3f303dbe69cd4720",
+      "bytes": 11915
+    },
+    "C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_holly_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+      "sha256": "4df81c6890a469d6e8ad2471634d8ec150b1af5fcffbd44547b2fcd1b61447bf",
+      "bytes": 1646
+    },
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG128_100.png",
+      "sha256": "359343f0e978f2923fcf506584340a3b562094d10673ccb583d5e8cd9b259b28",
+      "bytes": 28406
+    },
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG0_50.png",
+      "sha256": "dc95195e6ac5a0814f0e443968ff426baf8b5e0d506c31068f15facd929999e0",
+      "bytes": 20701
+    },
+    "C371_flagman4_SOURCE_B346_RAW_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_B346_RAW_NATIVE.png",
+      "sha256": "5b380baa0f002c6c71fdd0fe51e3f3a0adf37f0c0c1c0b8ce36596814c21c74c",
+      "bytes": 22924
+    },
+    "C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_OFFICIAL_B346_ALPHA16_REMOVED_RED_ADDED_BLUE.png",
+      "sha256": "552a612c5aa0ce0f175fd16b7718698426064790b56ab3c7a842e6eb664760a0",
+      "bytes": 2143
+    },
+    "C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png": {
+      "path": "localization/graphics/role_C/20261010-C371-C2-Q176-B346-EXACT-OPTICAL-UNDERFILL/C371_flagman4_SOURCE_CLEAN_OFFICIAL_B346_BG255_75.png",
+      "sha256": "b297ede0eae4edcdd7d0ab4a8d606babbb756c2b12877a6891922c70ae308844",
+      "bytes": 43440
+    }
+  },
+  "decision_basis": "Source-family optical block-red text is visually more substantial than B346 Hangul in native and practical views; stronger same-Korean comparator official -> B346 alpha occupancy drops at all thresholds in ALL four regions, which was not independently quantified at prior C352 HOLD. Counts alone are not a cross-script weight criterion. This is a new visually supported defect observation on unchanged B346 candidate, NOT a new-C2 SHA completion, no DDS promotion or C/C3 PASS.",
+  "review_history": {
+    "previous_C352": "HOLD_STRICT_RECHECK (B346 same SHA)",
+    "current_C371": "NEW native same-Korean four-region alpha area evidence and independently viewed optic source-family REWORK, supersedes previous provisional HOLD not duplicate candidate completion"
+  }
+}
