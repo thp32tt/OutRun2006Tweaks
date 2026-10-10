@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "run": "B349",
+  "role": "B",
+  "owner": "EVEN",
+  "index": 60,
+  "priority": "P0",
+  "run_key": "OUTRUN-KOR-B349-Q060-SOURCE-FIRST-PERSISTED-TRIAL-20261010-1430",
+  "date_kst": "2026-10-10 14:30+ KST",
+  "worker": {
+    "workflow_run_id": 38027947143,
+    "conclusion": "SUCCESS",
+    "code_commit": "bd1e427b8c23fd25ef17456d1754387caef6ae9c",
+    "output_commit": "c4d24c25bd035c5b0d8a5267ad1ba46bef00f5cb",
+    "backend": "GITHUB_ACTIONS"
+  },
+  "identities": {
+    "canonical_english_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "B348_verified_clean_plate_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "previous_official_DDS_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "new_unapproved_persisted_DDS_sha256": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159"
+  },
+  "production": {
+    "P1": "REUSED_B348_SOURCE_FIRST_SCOPED_PLATE_ONLY_QA",
+    "P2": "FAIL_SOURCE_FAMILY_WIDTH_AND_EFFECT_DEPTH",
+    "P3": "PERSISTED_TRIAL_DECODE_MECHANICAL_PASS_VISUAL_REJECT",
+    "full_PRODUCTION_PIXEL_GUARD": "NOT_RUN_UNAPPROVED_TRIAL_ONLY",
+    "source_text": "BEST TIME:",
+    "korean": "최고 기록:",
+    "native": [
+      4096,
+      2048
+    ],
+    "original_source_effect_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "new_saved_effect_bbox": [
+      2358,
+      353,
+      2870,
+      467
+    ],
+    "source_effect_width": 849,
+    "new_effect_width": 512,
+    "width_fill_ratio": 0.6031,
+    "source_effect_height": 134,
+    "new_effect_height": 114,
+    "changed_saved_RGBA_pixels_vs_official": 87512,
+    "outside_declared_ROI_RGBA_changed": 0,
+    "protected_source_siblings_outside_new_effect_changed_RGBA": 0,
+    "new_saved_dds_roundtrip_rgba_mismatch": 0,
+    "renderer": {
+      "family": "Noto Sans CJK Bold",
+      "native_ppem": 104,
+      "source_warm_upper_RGB": [
+        255,
+        181,
+        76
+      ],
+      "source_warm_lower_RGB": [
+        255,
+        187,
+        56
+      ],
+      "shear_estimate_right": 0.22
+    }
+  },
+  "visual": {
+    "firsthand_controller": true,
+    "views": [
+      {
+        "path": "localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+        "sha256": "874cf3a8e76cb52096d9fccc62ce04e1bd3aeaf43e253319c5dd1eab9e3cf7af"
+      },
+      {
+        "path": "localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_50_FLIPY.png",
+        "sha256": "0b70e5686c4d5b95c813e22896660cc0f367ef3d56e285dd41a25c30521a1afe"
+      },
+      {
+        "path": "localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png",
+        "sha256": "029703bc31db20a46de1d3b520b437ba86f9e1dd4d60e7a7744fc765abded1af"
+      }
+    ],
+    "source_and_clean": "Original English bright orange large italic BEST TIME, new source-first CLEAN bare transparent with no English face/outline shadow visible within scoped ROI and adjacent OUTRUN MILES/HOLLY art preserved.",
+    "official_old": "Prior official shows large orange English BEST TIME underneath dark Korean lettering, definite double drawing.",
+    "new_trial": "New candidate removes giant English ghost and restores adjacent source art; native & half-scale Korean is readable and RAW vertical mirror consistent. However the new Korean '최고 기록:' is only 512px versus 849px original title, appearing materially undersized and near-upright/generic; face is pale almost flat tan instead of original vivid orange-to-gold depth/highlight. Controller visual FAIL despite numeric containment and glyph readability.",
+    "reason_codes": [
+      "SOURCE_HIERARCHY_UNDERFILL",
+      "SOURCE_FONT_FAMILY_MISMATCH",
+      "GOLD_FACE_DEPTH_INSUFFICIENT",
+      "READABLE_SLANT_UNQUALIFIED"
+    ],
+    "decision": "PRODUCER_VISUAL_REJECT_NOT_PROMOTED"
+  },
+  "state": {
+    "trial_DDS_materially_created": 1,
+    "official_hd_candidate_changed": false,
+    "new_promoted_DDS": 0,
+    "q060": "C342_C2_REWORK_REQUIRED_OFFICIAL_UNCHANGED",
+    "C2": "NOT_RUN_ON_B349_NEW_TRIAL",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "next_corrective_method": "Do not repeat same Noto CJK Bold shear/flat sampled gradient with increased horizontal spacing. Need native source-derived custom italic racing outlined/gold bevel vector contours with proportional full-word layout and clean source-aligned anchors; keep exact B348 P1 and protect adjacent labels; then new different method, persisted test, pixel-guard manifest, C2+C3 and user in-game retest.",
+  "evidence_machine": "localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_Q060_MACHINE_AND_SOURCE_FAMILY.json",
+  "exclusions": [
+    "A_ODD",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
