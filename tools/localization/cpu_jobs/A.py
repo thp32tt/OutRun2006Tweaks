@@ -32,7 +32,11 @@ assert verdict["reason_code"]=="STRICT_ORIGINAL_GLYPH_EFFECT_HEIGHT_EXCEED_15PX"
 assert verdict["comparison_exact"]["source_effect_height"]==45
 assert verdict["comparison_exact"]["trial_effect_height"]==60
 assert verdict["candidate_sha256"]=="a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07"
-assert "rework_source_glyph_effect_height15" in decision["current_status"],decision
+assert "q103_a223_new_trial_rework_source_weight_spacing" in decision["current_status"],decision
+last=json.loads((repo/"localization/graphics/role_A/20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR/A223_CONTROLLER_SELF_QA.json").read_text(encoding="utf-8"))
+assert last["new_trial_sha256"]=="a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9"
+assert last["firsthand_visual"]["decision"]=="PRODUCER_VISUAL_HOLD_NOT_FULL_PASS"
+assert last["firsthand_visual"]["defect_remaining"]=="FONT_OPTICAL_SIZE_AND_LOOSE_TRACKING_SOURCE_STYLE_MISMATCH"
 assert decision["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED","NORMAL_QUEUE_SELECTION"),decision
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/"
