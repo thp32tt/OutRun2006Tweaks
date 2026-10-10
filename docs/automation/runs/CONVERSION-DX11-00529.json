@@ -17,8 +17,8 @@
     "tools/test_dx11_linear_stream_output_r232.py",
     ".github/workflows/backend-conversion-gate.yml"
   ],
-  "status": "WAITING_FOR_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "REVALIDATING",
+  "checkpoint": "C3_VALIDATE",
   "terminal": false,
   "result_sha": null,
   "material_result_sha": null,
@@ -33,14 +33,15 @@
     "tools/dx11_linear_buffer_mirror_probe.cpp",
     "tools/test_dx11_linear_stream_output_r232.py",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00529.json"
+    "docs/automation/runs/CONVERSION-DX11-00529.json",
+    "tools/test_dx11_linear_predication_r230.py"
   ],
   "pipeline": {
     "C0": "PASS authenticated GitHub base HEAD + controller checkpoint WAIT_CHAT; 00528 terminal scoped PASS/full Gate FAIL R175 independent owner; refreshed 00528 descendant docs-only f8ba4814 and preserved changes via parent rebase",
     "C1": "PASS independent R232 linear SO side-effect fence, distinct from R231 indexed SO and R175 constant buffer",
     "C2": "PASS production C++ SOGetTargets/COM cleanup; same-device slot-zero/slot-three WARP tests; nine static mutations; workflow registration",
-    "C3": "LOCAL_STATIC_PASS nine negative source mutations and WARP/CI wiring; exact-SHA Gate PENDING",
-    "C4": "PENDING final material commit [AUTO:CONVERSION-DX11-00529] (result SHA populated only after remote commit)",
+    "C3": "INITIAL_EXACT_SHA_FAILURE 5645b66d Gate 38039708614: Win32 validate SUCCESS, readiness smoke FAIL at R230 source mutation false duplicate induced by R232 successor; R232 static/WARP SKIPPED. Scoped R230 verifier now excludes R232 caller, local five mutation variants PASS. New exact-SHA Gate PENDING.",
+    "C4": "R232 production 5645b66d material published; separate focused R230 mutator repair commit PENDING [AUTO:CONVERSION-DX11-00529].",
     "C5": "NOT_REQUIRED: dormant readiness only; no gameplay native Draw or HMD candidate package",
     "C6": "WAIT_GATE; retain RUNTIME_VALIDATION=UNTESTED; preserve R175 known independent Gate blocker"
   },
@@ -48,13 +49,28 @@
     "Inherited R175 constant-buffer pixel mismatch is independently owned by 00477; may fail full Gate",
     "Quest3/VDXR runtime not tested; gameplay native activation dormant"
   ],
-  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
-  "next_action": "Verify R232 source/static/WARP steps and exact material SHA Gate; record PASS only on whole Gate SUCCESS, otherwise BLOCKED_DEPENDENCY_R175",
-  "static_validation": "LOCAL_JS_R232_NINE_SOURCE_MUTANTS_AND_WARP_CI_CONTRACT_PASS; HOSTED_WINDOWS_PENDING",
+  "resume_cursor": "WAIT_REPAIR_EXACT_SHA_GATE",
+  "next_action": "After focused R230 mutator repair, verify exact-SHA Gate including R230/R232, WARP linear probe and full inherited R175; no PASS until whole Gate success",
+  "static_validation": "R232_JS_9_MUTANTS_PASS + R230_SCOPED_JS_5_MUTANTS_PASS; WINDOWS_NEW_GATE_PENDING",
   "score_change": 0,
   "score_run_key": "CONVERSION-DX11-00529",
   "last_real_activity_evidence": "R232 Git objects saved; rebasing onto 00528 docs-only HEAD while preserving source-only batch",
   "state_persisted": true,
   "dispatch_base_sha": "65dfe1d8c194fe49632d88eb28894752fd255e18",
-  "rebased_over_prior_task_checkpoint": "CONVERSION-DX11-00528 HEAD f8ba4814 docs-only"
+  "rebased_over_prior_task_checkpoint": "CONVERSION-DX11-00528 HEAD f8ba4814 docs-only",
+  "previous_material_result_sha": "5645b66df11c8aa8460029ed3e5af60223e0ce28",
+  "evidence": {
+    "initial_gate": {
+      "id": 38039708614,
+      "head_sha": "5645b66df11c8aa8460029ed3e5af60223e0ce28",
+      "validate": "success",
+      "readiness_smoke": "failure",
+      "failed_step": "Verify R230 non-indexed predication guard",
+      "error": "surviving R230 guard mutant: verified_linear_unpredicated_eye_ready(",
+      "cause": "downstream R232 composition creates second lexical occurrence",
+      "r232_steps": "skipped"
+    },
+    "repair": "Scope prior R230 mutation section before R232, preserve full-header native Draw ban",
+    "repair_static": "PASS all 5 R230 scoped negative mutations"
+  }
 }

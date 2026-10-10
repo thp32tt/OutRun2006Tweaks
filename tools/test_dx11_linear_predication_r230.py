@@ -5,7 +5,10 @@ root = Path(__file__).resolve().parents[1]
 s = (root / "src/vr/d3d11/native_linear_uav_eye_guard.hpp").read_text(encoding="utf-8")
 p = (root / "tools/dx11_linear_buffer_mirror_probe.cpp").read_text(encoding="utf-8")
 w = (root / ".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
-section = s.split("// R230: a live D3D11 predicate", 1)[1]
+# R232 composes the R230 preflight, so mutation checks cover R230's body
+# only. Retain the full-header no-Draw activation invariant below.
+section = s.split("// R230: a live D3D11 predicate", 1)[1].split(
+    "// R232: even an otherwise unpredicated", 1)[0]
 required = (
     "verified_linear_unpredicated_eye_ready(",
     "!verified_linear_uav_isolated_eye_ready(",
