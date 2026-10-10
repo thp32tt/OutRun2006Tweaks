@@ -95,7 +95,8 @@ miny,minx=alpha_yx.min(axis=0);maxy,maxx=alpha_yx.max(axis=0)+1
 bbox=[x0+int(minx),y0+int(miny),x0+int(maxx),y0+int(maxy)]
 assert bbox[0]>x0 and bbox[1]>y0 and bbox[2]<x1 and bbox[3]<y1,("OVERFLOW",bbox)
 # Commit only experiment bytes to role_B (NOT hd_candidates).
-raw=old[:128]+result[::-1][:,:,[2,1,0,3]].tobytes()
+assert struct.unpack_from("<IIII",old,92)==(0xff,0xff00,0xff0000,0xff000000), "SOURCE_RGBA_CHANNEL_MASK_CHANGED"
+raw=old[:128]+result[::-1].tobytes()
 saved=O/"B365_Q176_FLAGMAN_NANUM_UNAPPROVED.dds"
 saved.write_bytes(raw)
 actual=decode(saved.read_bytes())
@@ -131,7 +132,7 @@ report={"run":"B365","role":"B","index":176,"candidate":"UNAPPROVED_SINGLE_FLAGM
 "official_sha256_unchanged":OFFICIAL_SHA,"trial_sha256":sha(raw),"font_sha256":sha(fb),"font_license":"Ubuntu fonts-nanum packaged open licensed font",
 "font":str(fontpath),"font_glyph_coverage":"ALL_VERIFIED","native_ppem":ppem,"renderer":"Pillow FreeType BASIC native no outline no postscale",
 "method_change":"Replace Noto CJK Bold synthetic 1-3px stroke family with authentic NanumGothicBold native geometric glyph contours and exact red source ink; preserve each glyph counter",
-"bbox_original":list(bb),"bbox_trial":bbox,"native_wh":[2048,2048],"dds":"BGRA32_MIP1_RAW_MIRROR_Y",
+"bbox_original":list(bb),"bbox_trial":bbox,"native_wh":[2048,2048],"dds":"RGBA32_MIP1_RAW_MIRROR_Y",
 "changed_rgba":int(delta.sum()),"outside_region":0,"roundtrip_difference":0,"other_three_labels_unchanged":True,
 "plate_qa":"SOURCE_PINNED_AND_CLEAN_ALPHA_ZERO_FLAGMAN","producer_visual":"PENDING_FIRSTHAND_NATIVE",
 "family_gate":"C2_NEW_PILOT_PENDING","whole_atlas":"C343_REWORK_UNCHANGED","C3":"NOT_RUN",
