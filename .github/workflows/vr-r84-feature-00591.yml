@@ -1,4 +1,4 @@
-name: R84 isolated Win32 TU compile (feature development)
+name: R84 feature integrated Win32 x64 host and bundle
 on:
   push:
     branches:
@@ -37,3 +37,182 @@ jobs:
           (Get-Content build-r84/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-r84/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
       - name: Compile and link independent R29-R33 Win32 game
         run: cmake --build build-r84 --config Release --target outrun2006tweaks -- /m:2
+      - name: Stage independent full-chain x86 game
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-r84 -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'R84 full-chain dinput8.dll missing' }
+          New-Item -ItemType Directory -Force stage-r84-chain | Out-Null
+          Copy-Item $dll.FullName stage-r84-chain/dinput8.dll
+          Set-Content stage-r84-chain/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r84-full-chain
+          path: stage-r84-chain/
+          if-no-files-found: error
+
+  r84-host:
+    needs: r84-win32
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build x64 OpenXR host and required smoke targets
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host-r84 -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host-r84 --config Release --target outrun-vr-host outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+      - name: Run deterministic host smoke tests
+        shell: pwsh
+        run: |
+          $names = @('outrun-vr-runtime-eligibility-smoke','outrun-vr-r23-verified-bundle-smoke','outrun-vr-r32-policy-smoke','outrun-vr-protocol-v3-smoke','outrun-vr-core-math-smoke','outrun-vr-host-state-v3-channel-smoke','outrun-vr-v2-v3-shadow-conversion-smoke','outrun-vr-host-pose-v3-validation-smoke')
+          foreach ($name in $names) {
+            $exe = Join-Path build-host-r84/bin "$name.exe"
+            if (-not (Test-Path $exe)) { throw "R84 host smoke missing: $name" }
+            & $exe
+            if ($LASTEXITCODE -ne 0) { throw "R84 host smoke failed: $name" }
+          }
+      - name: Stage x64 host
+        shell: pwsh
+        run: |
+          if (-not (Test-Path build-host-r84/bin/outrun-vr-host.exe)) { throw 'R84 host missing' }
+          New-Item -ItemType Directory -Force stage-r84-host | Out-Null
+          Copy-Item build-host-r84/bin/outrun-vr-host.exe stage-r84-host/outrun-vr-host.exe
+          Set-Content stage-r84-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r84-host-x64
+          path: stage-r84-host/
+          if-no-files-found: error
+
+  r84-baseline-game:
+    needs: r84-win32
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure protected Win32 active baseline (non-split)
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-r84-baseline -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+      - name: Apply third-party VC2022 compatibility patches
+        shell: pwsh
+        run: |
+          (Get-Content build-r84-baseline/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84-baseline/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-r84-baseline/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84-baseline/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-r84-baseline/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r84-baseline/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content build-r84-baseline/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-r84-baseline/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-r84-baseline/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Compile protected Win32 baseline game
+        run: cmake --build build-r84-baseline --config Release --target outrun2006tweaks -- /m:2
+      - name: Stage protected x86 reference game
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-r84-baseline -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'R84 baseline dinput8.dll missing' }
+          New-Item -ItemType Directory -Force stage-r84-game | Out-Null
+          Copy-Item $dll.FullName stage-r84-game/dinput8.dll
+          Set-Content stage-r84-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r84-baseline-game
+          path: stage-r84-game/
+          if-no-files-found: error
+
+  r84-bundle:
+    needs: [r84-win32, r84-host, r84-baseline-game]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: r84-full-chain
+          path: payload/full-chain
+      - uses: actions/download-artifact@v4
+        with:
+          name: r84-baseline-game
+          path: payload/baseline-game
+      - uses: actions/download-artifact@v4
+        with:
+          name: r84-host-x64
+          path: payload/host
+      - name: Assemble exact-SHA R84 test bundle and log collector
+        shell: pwsh
+        run: |
+          $dir = 'feature-dx9ex-r84-payload'
+          $dest = Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force (Join-Path $dir 'reference'), $dest | Out-Null
+          Copy-Item payload/full-chain/dinput8.dll (Join-Path $dest 'dinput8.dll')
+          Copy-Item payload/baseline-game/dinput8.dll (Join-Path $dir 'reference/dinput8-R26-baseline.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $dest 'outrun-vr-host.exe')
+          foreach ($script in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
+            Copy-Item (Join-Path tools $script) (Join-Path $dir $script)
+          }
+          foreach ($config in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
+            Copy-Item $config (Join-Path $dir $config)
+          }
+          Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          $manifest = [ordered]@{
+            SchemaVersion = 1
+            FeatureId = 'DX9EX:R84_RENDERER_GRAPH'
+            TaskId = 'CONVERSION-DX9EX-00591'
+            SourceSha = $env:GITHUB_SHA
+            FullChainVariant = 'R84_SPLIT_R33_R32_R31_R30_R29'
+            FullChainFlags = '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON'
+            BaselineVariant = 'R26_HUD_COMPARE_NON_SPLIT'
+            RuntimeValidation = 'UNTESTED'
+            MainGameDll = 'backends/d3d9/dinput8.dll'
+            BaselineReferenceDll = 'reference/dinput8-R26-baseline.dll'
+            HostExe = 'backends/d3d9/outrun-vr-host.exe'
+            Collector = 'Collect-OutRunVRLogs.ps1'
+          }
+          $manifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'FEATURE_MANIFEST.json') -Encoding UTF8
+          Set-Content (Join-Path $dir 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          @(
+            'R84 FUNCTIONAL BUILD TEST ONLY - Quest3/VDXR runtime is UNTESTED'
+            'Extract to a clean folder containing OR2006C2C.EXE.'
+            'Start OutRunVR-Slot-Selector.cmd. Upload collector-generated session ZIP.'
+            'The reference/dinput8-R26-baseline.dll is an offline comparison file only.'
+            'Never load the full-chain and reference DLL into the same game process.'
+          ) | Set-Content (Join-Path $dir 'R84_README.txt') -Encoding UTF8
+          $root = (Resolve-Path $dir).Path
+          Get-ChildItem $dir -Recurse -File | Sort-Object FullName | ForEach-Object {
+            $rel = $_.FullName.Substring($root.Length + 1).Replace('\\','/')
+            "$( (Get-FileHash $_.FullName -Algorithm SHA256).Hash )  $rel"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "feature-dx9ex-r84-$($env:GITHUB_SHA.Substring(0,12)).zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+      - name: Validate full-chain host game reference and collector in ZIP
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Filter 'feature-dx9ex-r84-*.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'R84 feature ZIP missing' }
+          Expand-Archive $zip.FullName verify-r84
+          foreach ($file in @('backends/d3d9/dinput8.dll','backends/d3d9/outrun-vr-host.exe','reference/dinput8-R26-baseline.dll','FEATURE_MANIFEST.json','SHA256SUMS.txt','R84_README.txt','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.cmd','SOURCE_SHA.txt')) {
+            if (-not (Test-Path (Join-Path verify-r84 $file))) { throw "R84 bundle missing: $file" }
+          }
+          $manifest = Get-Content verify-r84/FEATURE_MANIFEST.json -Raw | ConvertFrom-Json
+          if ($manifest.SourceSha -ne $env:GITHUB_SHA -or $manifest.RuntimeValidation -ne 'UNTESTED') { throw 'R84 manifest SHA or HMD status mismatch' }
+          foreach ($path in @('payload/full-chain/SOURCE_SHA.txt','payload/host/SOURCE_SHA.txt','payload/baseline-game/SOURCE_SHA.txt')) {
+            if ((Get-Content $path -Raw).Trim() -ne $env:GITHUB_SHA) { throw "R84 mixed SHA: $path" }
+          }
+          function Assert-PeMachine($file, $machine) {
+            $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $file))
+            if ($bytes.Length -lt 0x100 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "R84 invalid MZ: $file" }
+            $pe = [BitConverter]::ToInt32($bytes, 0x3C)
+            if ($pe -lt 0x40 -or $pe + 6 -ge $bytes.Length -or [BitConverter]::ToUInt32($bytes,$pe) -ne 0x4550) { throw "R84 invalid PE: $file" }
+            if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne $machine) { throw "R84 wrong PE architecture: $file" }
+          }
+          Assert-PeMachine verify-r84/backends/d3d9/dinput8.dll 0x014c
+          Assert-PeMachine verify-r84/reference/dinput8-R26-baseline.dll 0x014c
+          Assert-PeMachine verify-r84/backends/d3d9/outrun-vr-host.exe 0x8664
+          $collector = Get-Content verify-r84/Collect-OutRunVRLogs.ps1 -Raw
+          if ($collector -notlike '*OutRun2_VR_ANALYZE_*') { throw 'R84 collector regression' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-r84-${{ github.sha }}
+          path: feature-dx9ex-r84-*.zip
+          if-no-files-found: error
