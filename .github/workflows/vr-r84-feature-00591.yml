@@ -148,7 +148,8 @@ jobs:
         run: |
           $dir = 'feature-dx9ex-r84-payload'
           $dest = Join-Path $dir 'backends/d3d9'
-          New-Item -ItemType Directory -Force (Join-Path $dir 'reference'), $dest | Out-Null
+          New-Item -ItemType Directory -Force (Join-Path $dir 'reference') | Out-Null
+          New-Item -ItemType Directory -Force $dest | Out-Null
           Copy-Item payload/full-chain/dinput8.dll (Join-Path $dest 'dinput8.dll')
           Copy-Item payload/baseline-game/dinput8.dll (Join-Path $dir 'reference/dinput8-R26-baseline.dll')
           Copy-Item payload/host/outrun-vr-host.exe (Join-Path $dest 'outrun-vr-host.exe')
@@ -184,7 +185,7 @@ jobs:
           ) | Set-Content (Join-Path $dir 'R84_README.txt') -Encoding UTF8
           $root = (Resolve-Path $dir).Path
           Get-ChildItem $dir -Recurse -File | Sort-Object FullName | ForEach-Object {
-            $rel = $_.FullName.Substring($root.Length + 1).Replace('\\','/')
+            $rel = $_.FullName.Substring($root.Length + 1).Replace('\','/')
             "$( (Get-FileHash $_.FullName -Algorithm SHA256).Hash )  $rel"
           } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
           $zip = "feature-dx9ex-r84-$($env:GITHUB_SHA.Substring(0,12)).zip"
