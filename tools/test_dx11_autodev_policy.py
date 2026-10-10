@@ -56,6 +56,44 @@ legacy = copy.deepcopy(base)
 legacy["task_id"] = "CONVERSION-DX11-00530"
 legacy.pop("development_strategy")
 assert not validate_task(legacy, p), "live 00530 must not be retroactively invalidated"
+# 00531-00536 durable work remains grandfathered; 00537+ must ship game-frame progress.
+historical = copy.deepcopy(base)
+historical['task_id'] = 'CONVERSION-DX11-00536'
+assert not validate_task(historical, p), validate_task(historical, p)
+frame = copy.deepcopy(base)
+frame['task_id'] = 'CONVERSION-DX11-00537'
+frame['development_strategy'].update(
+    milestone_id='first_live_game_draw',
+    gameplay_delivery_target='FIRST_GAME_DRAW_FRAME',
+    live_game_draw_path=['LIVE_D3D9_CALLSITE', 'D3D11_NATIVE_DRAW', 'VISIBLE_FRAME_OUTPUT'],
+    visible_frame_acceptance='one OutRun authored draw creates a diagnostic native game frame; HMD result untested',
+    activation_guard_and_fallback='explicit diagnostic opt-in, NativeDrawPathActive false by default, unsupported paths use DX9Ex',
+)
+assert not validate_task(frame, p), validate_task(frame, p)
+mutations = [
+    ('old dormant milestone', lambda t: t['development_strategy'].update(milestone_id='mono_native_draw')),
+    ('missing gameplay delivery', lambda t: t['development_strategy'].pop('gameplay_delivery_target')),
+    ('missing actual D3D9 callsite', lambda t: t['development_strategy'].update(live_game_draw_path=['D3D11_NATIVE_DRAW','VISIBLE_FRAME_OUTPUT'])),
+    ('no visible output', lambda t: t['development_strategy'].update(live_game_draw_path=['LIVE_D3D9_CALLSITE','D3D11_NATIVE_DRAW'])),
+    ('reverse-order frame pipeline', lambda t: t['development_strategy'].update(live_game_draw_path=['VISIBLE_FRAME_OUTPUT','D3D11_NATIVE_DRAW','LIVE_D3D9_CALLSITE'])),
+    ('no fallback', lambda t: t['development_strategy'].update(activation_guard_and_fallback='')),
+    ('no acceptance', lambda t: t['development_strategy'].update(visible_frame_acceptance='')),
+    ('test-only claimed complete', lambda t: t.update(status='COMPLETE', changed_files=['tools/test_dx11_probe.py'])),
+]
+for label, mutate in mutations:
+    bad = copy.deepcopy(frame)
+    mutate(bad)
+    assert validate_task(bad, p), 'gameplay-first negative admitted: '+label
+r175_new = copy.deepcopy(frame)
+r175_new['development_strategy'].update(
+    milestone_id='shader_parity_r175', work_class='blocker_resolution',
+    gameplay_delivery_target='R175_CI_UNBLOCK',
+    blocking_evidence='R175 mismatch WARP TEXCOORD6 [128,0,16,255] != [224,128,32,255]',
+    r175_owner_handoff_evidence='verified fenced handoff from original 00477 owner',
+)
+assert not validate_task(r175_new, p), validate_task(r175_new, p)
+r175_new['development_strategy'].pop('r175_owner_handoff_evidence')
+assert validate_task(r175_new, p), 'R175 ownership takeover without evidence must fail'
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
-print("DX11 auto-development policy: 11 negative mutations, 2 positive classes, pre-policy compatibility PASS")
+print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
