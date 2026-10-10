@@ -29,9 +29,9 @@
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00590.json"
   ],
-  "automation_validation": "BASE_TARGET_EXACT_SHA_PASS_FINAL_FEATURE_SHA_PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "status": "FEATURE_READY_MERGED_ON_LATEST_TARGET_AWAIT_CONTROLLER_FF",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "hmd_test": "NOT_RUN",
   "ffb_release": "v0.2",
   "ffb_source_changed": false,
@@ -71,5 +71,7 @@
     "source_patch": "no preserved uncommitted source patch identified in 5-minute checkpoint; preserve only Git-recorded material",
     "attempt": "2/3 unchanged",
     "rollover": "not retry"
-  }
+  },
+  "checkpoint": "C6_STATE",
+  "validation_bearing_result_sha": "b913ef69e14aa2472260350f676fccae1c06a772"
 }
