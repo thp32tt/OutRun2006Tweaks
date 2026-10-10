@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A227 2026-10-10 20:08 KST measured English E vs Korean 이 first-glyph native source-family alpha outline: -0.33202 versus -0.31126 dx/dy, 23 rows, 12 threshold/window evidence and native 4x plot. Prior A226 exact DDS unchanged, official still REWORK, C1 HOLD until full source + blind multi-glyph, C3/game UNTESTED. localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json RUN_KEY=OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
     "C2 q212 B357 independent persisted SHA pixel visual FAIL: old official Hangul visible alpha32 source-core overflow r43 5638, r44 712; official C338 unchanged and IGR029 OPEN; OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000.",
     "C1 q119 first-glyph DXT5 native source T right-lean +13px/34, Korean 타 right-lean +9px/34; 2 native annotated PNG and machine proof; boundary outside visible0 and source-final RGBA/alpha0; independent C1 HOLD pending blind full family/C3/user game. DDS 0. OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
     "B356/B357 q212 2026-10-10 19:47 KST TWO new native P1 mode-title DDS saved SHA db72a9b5 and 6d0098dc, r44 source ratio 54.1%->95.7%, r43 71.9%; official unchanged, B357 semantic qualifier/C2 HOLD, IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-B356-B357-Q212-P1-NEW-SOURCE-MODE-TRIALS-20261010-1947.",
@@ -15434,5 +15435,27 @@
     },
     "report": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_CONTROLLER_C2_REWORK.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a227_q101_firstglyph_profile": {
+    "role": "A",
+    "run": "A227",
+    "index": 101,
+    "run_key": "OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
+    "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "source_crop_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+    "english_left_edge_slope_dx_per_dy": -0.33202,
+    "korean_left_edge_slope_dx_per_dy": -0.31126,
+    "slope_diff_abs": 0.02076,
+    "measurement_rows": 23,
+    "parameter_checks": 12,
+    "producer_evidence_status": "SCOPED_FIRST_GLYPH_SOURCE_PROFILE_ONLY",
+    "C1": "HOLD_STRICT_RECHECK",
+    "C3": "BLOCKED",
+    "new_dds": 0,
+    "promoted_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json",
+    "machine": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
+    "figure": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png"
   }
 }
