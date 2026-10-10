@@ -17,9 +17,9 @@
     "tools/test_dx11_indexed_depth_pipeline_identity_r213.py",
     ".github/workflows/backend-conversion-gate.yml:R213"
   ],
-  "status": "WAITING_FOR_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BLOCKED_DEPENDENCY",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "summary": "Combine indexed R189 exact depth/DSV/eye with R207 shader/layout identity, resisting same-device PS drift. Real indexed depth WARP probe now exercises guarded green and red near/far DrawIndexed with rejection/restoration, seven distinct negative static mutants. All production DrawIndexed paths remain dormant. Retry: exact native OM blending/sample mask checked to prevent false-positive opaque indexed Draw readiness; real WARP negative-state/restoration probes.",
@@ -27,10 +27,10 @@
     "C0_RECOVER": "PASS authenticated HEAD a50064e958f96d76f635a96a537fbb029f330138; no 00510 record; prior 00508/00509 sealed, R175 owned by 00477; checkpoint 403 not required",
     "C1_REVIEW": "PASS R189 depth preflight accepts an independently rebound same-device PS, R207 shader exact preflight lacks depth, R213 joins both",
     "C2_IMPLEMENT": "PASS original R213 indexed depth+shader identity; retry extends fail-closed exact opaque output ownership with live OM blend state and full sample mask checks plus WARP negative/restore controls",
-    "C3_VALIDATE": "prior exact-SHA Gate 38014241967: validate PASS; R213 WARP PASS; inherited R175 TEXCOORD6 WARP FAIL; new exact-SHA Gate pending",
-    "C4_COMMIT": "R213 material repair commit [AUTO:CONVERSION-DX11-00510] on same branch (final SHA from git commit identity)",
-    "C5_PACKAGE": "NOT_REQUIRED dormant source-only, no gameplay native Draw activation and no HMD candidate",
-    "C6_STATE": "PENDING exact-SHA verdict. R175 owned by CONVERSION-DX11-00477; no bypass, runtime UNTESTED"
+    "C3_VALIDATE": "EXACT-SHA 38015033299: Win32 validate PASS (114103293193); R213 nine mutants PASS; actual R189 WARP pixels PASS; inherited R175 TEXCOORD6 varying FAIL in smoke (114104065258); overall FAIL, no bypass.",
+    "C4_COMMIT": "PASS material commit 5e2a4c674822001e32bee3bcd25cd4da5f2ce887 [AUTO:CONVERSION-DX11-00510], no CI skip on material result.",
+    "C5_PACKAGE": "NOT_REQUIRED; source-only, native gameplay Draw dormant; no deployment/HMD promotion.",
+    "C6_STATE": "BLOCKED_DEPENDENCY after truthful exact-SHA Gate FAIL from distinct R175 owner 00477. R213 scoped checks PASS; user HMD/game test UNTESTED; no duplicate dispatch or score."
   },
   "changed_paths": [
     "src/vr/d3d11/native_indexed_depth_binding.hpp",
@@ -40,13 +40,47 @@
     "docs/automation/runs/CONVERSION-DX11-00510.json"
   ],
   "blockers": [
-    "Inherited DX11 constant-buffer R175 TEXCOORD6 WARP mismatch owned by 00477",
+    "Exact-SHA Backend Conversion Gate 38015033299 FAILED after R213 WARP PASS at independent inherited R175 TEXCOORD6 varying mismatch ([128,0,16,255] != [224,128,32,255]); owned by CONVERSION-DX11-00477",
     "Quest3/VDXR in-game test not performed"
   ],
-  "next_action": "Collect exact-SHA Gate for latest material repair; R213 isolated WARP expected PASS, inherited R175 must be reported FAIL unless independently repaired under its own work_key. Seal truthful C6 and preserve material SHA. No gameplay Draw or HMD pass.",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "next_action": "Leave this 00510 R213 material SHA immutable and do not re-run identical CI or reassign this work_key. Exact-SHA overall Gate failed because independent R175 TEXCOORD6 regression in tools/dx11_constant_buffer_probe.cpp owned by 00477. Resume R175 only under a verified nonconflicting owner/claim or select a genuinely disjoint DX11 item via controller. Do not claim HMD runtime PASS or add score for blocked outcome.",
+  "validation_bearing_result_sha": "5e2a4c674822001e32bee3bcd25cd4da5f2ce887",
+  "result_sha": "5e2a4c674822001e32bee3bcd25cd4da5f2ce887",
   "prior_failure_run_id": 38014241967,
   "prior_failure_head_sha": "79c55527516755034990656f1cb5cfda6bcc5a3b",
-  "prior_failure_classification": "INHERITED_R175_TEXCOORD6_WARP_BGR_MISMATCH__R213_PROBES_PASSED"
+  "prior_failure_classification": "INHERITED_R175_TEXCOORD6_WARP_BGR_MISMATCH__R213_PROBES_PASSED",
+  "material_result_sha": "5e2a4c674822001e32bee3bcd25cd4da5f2ce887",
+  "validation_run_id": 38015033299,
+  "validation_job_id": 114103293193,
+  "readiness_smoke_job_id": 114104065258,
+  "last_activity_evidence": "exact-SHA Gate 38015033299 Windows validate SUCCESS; R213 9 static mutants PASS and R189 WARP DrawIndexed PASS; DX11 constant-buffer R175 TEXCOORD6 varying BGRA mismatch FAIL",
+  "resume_cursor": "BLOCKED_EXTERNAL_R175_OWNER_00477__DO_NOT_REPEAT_R213",
+  "evidence": {
+    "validation_bearing_result_sha": "5e2a4c674822001e32bee3bcd25cd4da5f2ce887",
+    "prior_gate_run_id": 38014241967,
+    "exact_sha_gate_run_id": 38015033299,
+    "gate_conclusion": "failure",
+    "validate_job_id": 114103293193,
+    "validate_conclusion": "success",
+    "dx11_smoke_job_id": 114104065258,
+    "dx11_smoke_conclusion": "failure",
+    "r213_static": "PASS nine mutation guards",
+    "r213_warp_indexed_real_gpu": "PASS R189 exact DSV depth-tested indexed WARP pixels",
+    "failure_step": "Run DX11 constant buffer probe",
+    "failure_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task_id": "CONVERSION-DX11-00477",
+    "runtime_validation": "UNTESTED"
+  }
 }
