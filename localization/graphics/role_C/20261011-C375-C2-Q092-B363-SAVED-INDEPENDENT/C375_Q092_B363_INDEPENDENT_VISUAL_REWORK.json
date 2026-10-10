@@ -1,0 +1,245 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C375-C2-Q092-B363-SAVED-FIRST-INDEPENDENT-20261011-0457",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 92,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+  "candidate_kind": "new saved B363 unpromoted production pilot",
+  "candidate_sha256": "f113c3aafff77ef3ace10246975dbf199188077a3b08541dddae8a612ba028c3",
+  "official_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "source_provenance": {
+    "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG128.png",
+    "sha256": "b48cb38525114b7bdd9038103ef1aff5d4b4a58aaeab31b22923317d03a633cb",
+    "note": "Prior C364 independently authenticated SHA-pinned canonical English comparison PNG, hash reverified now. Full canonical English DDS bytes not downloaded again in this C375 invocation, so no fabricated fresh source/CLEAN pixel certification."
+  },
+  "authored_clean_sha256": "1a06b6ce304337b9487f4c130ea5e68c8fa6cd24dc460a2b03acef56a0187a35",
+  "source_clean_status": "HOLD_INDEPENDENT_C375_RAW_SOURCE_CLEAN_BYTES_NOT_REAUTHENTICATED",
+  "first_look_producer_blind": false,
+  "calibration_status": "HOLD_NOT_COMPLETED_THIS_INVOCATION",
+  "mode": "rework_trial_not_promoted",
+  "backend": "GitHub connector SSOT, N100 MCP only for small 524416-byte actual DDS download/PNG decoding fallback; local GitHub raw DNS unavailable",
+  "saved_dds_machine": {
+    "source_bbox_readable": [
+      387,
+      13,
+      1318,
+      132
+    ],
+    "native_dimensions": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mip_levels": 1,
+    "official_and_trial_saved_dds_sha256_verified": true,
+    "official_to_trial_dds_header_exact": true,
+    "saved_decoder": "Pillow BC3 DDS RGBA RAW + vertical mirror-Y once for readable",
+    "official_to_trial_rgba_changed": 31867,
+    "official_to_trial_alpha_changed": 29698,
+    "changed_bc3_4x4_blocks": 2274,
+    "outside_source_bbox_rgba_changed": 0,
+    "outside_source_bbox_alpha_changed": 0,
+    "visible_change_bbox_readable": [
+      388,
+      16,
+      1128,
+      132
+    ],
+    "second_row_region_readable": [
+      519,
+      132,
+      1589,
+      245
+    ],
+    "second_row_changed_rgba": 0,
+    "official_alpha_translucent_1_through_179": 4480,
+    "trial_alpha_translucent_1_through_179": 24156,
+    "prior_c364_source_alpha_translucent_1_through_179": 16391,
+    "alpha_comparison_note": "Historical source 16391 is cited for context only; trial 24156 increase is not a quality PASS and original DDS source not newly opened in C375.",
+    "check_scope": "Full saved official vs trial DDS array and raw 4x4 BC3 blocks; no unsupported source/CLEAN zeros invented"
+  },
+  "regions": {
+    "outrun_mode": {
+      "original_bbox_readable": [
+        387,
+        13,
+        1318,
+        132
+      ],
+      "text": "아웃런 모드",
+      "slant": {
+        "result": "HOLD",
+        "observation": "Measured homologous English/Korean top-minus-bottom anchor pairs unavailable; visually original uses strong racing-italic condensed strokes and candidate face remains disconnected/dotted.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_black50.png",
+            "sha256": "088124a13d14399165e2078d17ea581345abe57150968d24a7a22000d3534262"
+          }
+        ]
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "C375 did not newly authenticate exact B221 CLEAN pixels vs English DDS; B363 producer clean-only source stage cannot be independently promoted.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          }
+        ]
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "The exact saved B363 adds visibly soft diffuse white outer rim but retains thin, segmented/dotted inner orange band and navy body unlike prior SHA-verified source's broad, smooth solid italic racing title. Optical defect remains at native 100 and 50.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_black50.png",
+            "sha256": "088124a13d14399165e2078d17ea581345abe57150968d24a7a22000d3534262"
+          }
+        ]
+      },
+      "readability": {
+        "result": "HOLD",
+        "observation": "Korean glyphs can be read at practical50, but source-relative headline weight and priority remain visibly weak; practical readable alone is insufficient for PASS.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_black50.png",
+            "sha256": "088124a13d14399165e2078d17ea581345abe57150968d24a7a22000d3534262"
+          }
+        ]
+      },
+      "glyph_integrity": {
+        "result": "FAIL",
+        "observation": "Saved BC3 native/50 shows persistent dotted white/orange outline noise and hollow segmented strokes; halo-only correction does not repair native contours.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_black50.png",
+            "sha256": "088124a13d14399165e2078d17ea581345abe57150968d24a7a22000d3534262"
+          }
+        ]
+      },
+      "protected_art": {
+        "result": "PASS",
+        "observation": "Full array diff outside original first-row English source bbox RGBA/alpha 0/0; second row untouched, 2274 changed BC3 blocks inside allowable first-row origin; existing protected row preserved.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_RAW_gray_native.png",
+            "sha256": "bbc1b259076ecc332d252abc5a180336a90014a1e4b2e1d24d1ef5176745a763"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_changed_pixels.png",
+            "sha256": "6bdf0efda2ed7cfa9d6899edccbcff4140bdfcd0132403f50e759e414ccb7316"
+          }
+        ]
+      },
+      "placement": {
+        "result": "HOLD",
+        "observation": "Saved changes inside allowed English source bbox, but native source-like visual hierarchy and italic anchor position unqualified; no geometry-only PASS.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_white75.png",
+            "sha256": "b5888e70cac684bffac48f2ef612ceee46c018e90407f35e0c608f07855a86dc"
+          }
+        ]
+      },
+      "orientation": {
+        "result": "PASS",
+        "observation": "Decoded persisted RAW mirror-Y and readable FLIP-Y show consistent content; original DDS header/2048x256/BC3/mip1 preserved.",
+        "evidence": [
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+            "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_RAW_gray_native.png",
+            "sha256": "bbc1b259076ecc332d252abc5a180336a90014a1e4b2e1d24d1ef5176745a763"
+          }
+        ]
+      }
+    },
+    "continuous_15": {
+      "status": "UNMODIFIED_PROTECTED_SIBLING_NOT_FRESH_FULL_C_QA",
+      "region_readable": [
+        519,
+        132,
+        1589,
+        245
+      ],
+      "changed_rgba_pixels": 0,
+      "evidence": [
+        "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_RAW_gray_native.png"
+      ],
+      "decision": "PRESERVE_EXISTING_C364_STATUS"
+    }
+  },
+  "source_family_reference": {
+    "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG128.png",
+    "sha256": "b48cb38525114b7bdd9038103ef1aff5d4b4a58aaeab31b22923317d03a633cb",
+    "note": "Prior C364 independently authenticated SHA-pinned canonical English comparison PNG, hash reverified now. Full canonical English DDS bytes not downloaded again in this C375 invocation, so no fabricated fresh source/CLEAN pixel certification."
+  },
+  "firsthand_inspection": [
+    "Viewed independently regenerated stored-DDS native gray official/trial contact",
+    "Viewed practical black50 and white75 contact",
+    "Viewed RAW orientation and change-pixel mask",
+    "Compared source racing-italic style against SHA-verified C364 English-original contact"
+  ],
+  "decision": {
+    "result": "REWORK_REQUIRED_UNPROMOTED_B363",
+    "reasons": [
+      "SOURCE_FAMILY_HOLLOW_DOTTED_FACE",
+      "SOURCE_RACING_ITALIC_WEIGHT_DEPTH_MISMATCH"
+    ],
+    "official_queue_status_unchanged": "c364_c2_c3_strict_rework_required_source_glow_hard_stipple",
+    "C_PASS": false,
+    "C3": "NOT_RUN",
+    "approval": "BLOCKED",
+    "IGR_status": "NOT_CLOSED_ASSET_Q092",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_candidate_count": 0,
+    "official_candidate_promoted": 0,
+    "next": "B to develop source-conditioned native/vector thick continuous orange face, navy sidewall and white soft halo together; no repeat only Gaussian glow. Re-run fresh independent C2 with source/CLEAN first look, C3 and actual game when corrected."
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_gray_native.png",
+      "sha256": "2963dcf180cf532b940015c5ffeef6add64c763190a39905c7981f0eef6cea0f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_white75.png",
+      "sha256": "b5888e70cac684bffac48f2ef612ceee46c018e90407f35e0c608f07855a86dc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_flipY_black50.png",
+      "sha256": "088124a13d14399165e2078d17ea581345abe57150968d24a7a22000d3534262"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_RAW_gray_native.png",
+      "sha256": "bbc1b259076ecc332d252abc5a180336a90014a1e4b2e1d24d1ef5176745a763"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_q092_official_trial_changed_pixels.png",
+      "sha256": "6bdf0efda2ed7cfa9d6899edccbcff4140bdfcd0132403f50e759e414ccb7316"
+    }
+  ]
+}

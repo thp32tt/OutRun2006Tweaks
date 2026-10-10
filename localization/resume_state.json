@@ -7022,7 +7022,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11T04:47:00+09:00",
+  "updated_at_kst": "2026-10-11T04:57:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15613,5 +15613,21 @@
     "candidate_changed": false,
     "game": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_SOURCE_CLEAN_CONTROLLER_HOLD.json"
+  },
+  "c375_c2_q092_b363_first_independent": {
+    "index": 92,
+    "role": "C2",
+    "review_id": "C375-C2-Q092-B363-SAVED-FIRST-INDEPENDENT-20261011-0457",
+    "trial_sha256": "f113c3aafff77ef3ace10246975dbf199188077a3b08541dddae8a612ba028c3",
+    "official_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+    "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+    "C2": "REWORK_REQUIRED_UNPROMOTED",
+    "existing_official_queue": "c364_c2_c3_strict_rework_required_source_glow_hard_stipple",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "changed_rgba_pixels": 31867,
+    "changed_outside_source_pixels": 0,
+    "visual_defect": "DOTTED_HOLLOW_SOURCE_FAMILY_WEIGHT",
+    "qa_path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_Q092_B363_INDEPENDENT_VISUAL_REWORK.json"
   }
 }
