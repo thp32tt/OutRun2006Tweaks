@@ -170,5 +170,34 @@ int main()
     if (!Near(RigidTransform(q, p, 2.0f)[3][0], 2.0f))
         return 28;
 
+    // P1: inverse rigid poses must reject malformed shared eye matrices and
+    // finite dot-product overflow without poisoning the consumer.
+    Matrix4 malformedInverse = rigid;
+    malformedInverse[3][1] = nan;
+    if (!isIdentityMatrix(InverseRigid(malformedInverse)))
+        return 29;
+    malformedInverse = rigid;
+    malformedInverse[0][2] = posInf;
+    if (!isIdentityMatrix(InverseRigid(malformedInverse)))
+        return 30;
+
+    // All source elements remain finite; the inverse translation overflows.
+    Matrix4 overflowingInverse = IdentityMatrix();
+    overflowingInverse[3][0] = huge;
+    overflowingInverse[0][0] = 2.0f;
+    if (!isIdentityMatrix(InverseRigid(overflowingInverse)))
+        return 31;
+
+    // Retain the normal nontrivial rotation/translation inverse behavior.
+    const Quaternion quarterTurn{0.0f, 0.0f, 0.70710678f, 0.70710678f};
+    const Matrix4 rotated = RigidTransform(quarterTurn, p, 1.0f);
+    const Matrix4 roundTrip = Multiply(rotated, InverseRigid(rotated));
+    if (!MatrixFinite(roundTrip))
+        return 32;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            if (!Near(roundTrip[r][c], r == c ? 1.0f : 0.0f))
+                return 33;
+
     return 0;
 }

@@ -148,6 +148,11 @@ namespace OutRunVR::Core
 
     inline Matrix4 InverseRigid(const Matrix4& m) noexcept
     {
+        // A corrupt shared XR/eye transform must never propagate nonfinite
+        // rotation or translation into the inverse used for stereo rendering.
+        if (!MatrixFinite(m))
+            return IdentityMatrix();
+
         Matrix4 out = IdentityMatrix();
         out[0][0]=m[0][0]; out[0][1]=m[1][0]; out[0][2]=m[2][0];
         out[1][0]=m[0][1]; out[1][1]=m[1][1]; out[1][2]=m[2][1];
@@ -155,7 +160,9 @@ namespace OutRunVR::Core
         out[3][0]=-(m[3][0]*out[0][0] + m[3][1]*out[1][0] + m[3][2]*out[2][0]);
         out[3][1]=-(m[3][0]*out[0][1] + m[3][1]*out[1][1] + m[3][2]*out[2][1]);
         out[3][2]=-(m[3][0]*out[0][2] + m[3][1]*out[1][2] + m[3][2]*out[2][2]);
-        return out;
+        // Finite entries can still overflow in the dot products. Publish
+        // only a finite inverse; retain the established identity fallback.
+        return MatrixFinite(out) ? out : IdentityMatrix();
     }
 
     inline bool ProjectionFromOpenXrFov(const Matrix4& base, const Fov& fov,
