@@ -1,0 +1,61 @@
+{
+  "source_first_glyph": "B",
+  "source_alpha_warm_stem_rows": 98,
+  "source_x_dy": -0.34212650383489945,
+  "readable_top_minus_bottom_per_y": 0.3421,
+  "anchors": [
+    [
+      358,
+      2232.96
+    ],
+    [
+      366,
+      2230.6
+    ],
+    [
+      374,
+      2224.32
+    ],
+    [
+      382,
+      2221.08
+    ],
+    [
+      390,
+      2218.4
+    ],
+    [
+      398,
+      2218.36
+    ],
+    [
+      406,
+      2216.88
+    ],
+    [
+      414,
+      2209.32
+    ],
+    [
+      422,
+      2206.16
+    ],
+    [
+      430,
+      2203.4
+    ],
+    [
+      438,
+      2206.16
+    ],
+    [
+      446,
+      2203.0
+    ],
+    [
+      454,
+      2199.12
+    ]
+  ],
+  "review": "P2 source-single-B calibration only; independent multi-stem QA required"
+}

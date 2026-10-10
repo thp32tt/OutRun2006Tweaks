@@ -1,0 +1,128 @@
+{
+  "canonical_source_samples": {
+    "orange": 26502,
+    "cream": 2110,
+    "gold": 35189,
+    "navy": 32234
+  },
+  "sampled_source_rgbs": {
+    "orange": [
+      255,
+      134,
+      0
+    ],
+    "cream": [
+      255,
+      223,
+      180
+    ],
+    "gold": [
+      255,
+      210,
+      95
+    ]
+  },
+  "native_source_orange_row_threshold": 0.43771323253120953,
+  "native_source_cream_row_threshold": 0.010123224550097223,
+  "source_face_opaque_total": 80606,
+  "candidate_face_orange_pixels": 12179,
+  "candidate_face_cream_pixels": 1685,
+  "source_face_method": "P2 FOUR SOURCE-COLOR LAYERS + native slight face expansion; independent palette/row occupancy (not B359 pixel-normal-only wash)",
+  "source_rows_evidence": [
+    {
+      "native_y": 340,
+      "orange_fraction": 1e-05,
+      "cream_fraction": 9e-05
+    },
+    {
+      "native_y": 347,
+      "orange_fraction": 0.09115,
+      "cream_fraction": 0.11378
+    },
+    {
+      "native_y": 354,
+      "orange_fraction": 0.75091,
+      "cream_fraction": 0.05653
+    },
+    {
+      "native_y": 361,
+      "orange_fraction": 0.82183,
+      "cream_fraction": 0.03168
+    },
+    {
+      "native_y": 368,
+      "orange_fraction": 0.66793,
+      "cream_fraction": 0.00034
+    },
+    {
+      "native_y": 375,
+      "orange_fraction": 0.40861,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 382,
+      "orange_fraction": 0.4935,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 389,
+      "orange_fraction": 0.0105,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 396,
+      "orange_fraction": 0.0,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 403,
+      "orange_fraction": 0.0,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 410,
+      "orange_fraction": 0.0,
+      "cream_fraction": 0.00056
+    },
+    {
+      "native_y": 417,
+      "orange_fraction": 0.0,
+      "cream_fraction": 1e-05
+    },
+    {
+      "native_y": 424,
+      "orange_fraction": 0.04212,
+      "cream_fraction": 0.0
+    },
+    {
+      "native_y": 431,
+      "orange_fraction": 0.42217,
+      "cream_fraction": 8e-05
+    },
+    {
+      "native_y": 438,
+      "orange_fraction": 0.63043,
+      "cream_fraction": 0.02473
+    },
+    {
+      "native_y": 445,
+      "orange_fraction": 0.67411,
+      "cream_fraction": 0.05041
+    },
+    {
+      "native_y": 452,
+      "orange_fraction": 0.56796,
+      "cream_fraction": 0.10482
+    },
+    {
+      "native_y": 459,
+      "orange_fraction": 0.0119,
+      "cream_fraction": 0.03028
+    },
+    {
+      "native_y": 466,
+      "orange_fraction": 0.0,
+      "cream_fraction": 0.0
+    }
+  ]
+}
