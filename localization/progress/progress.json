@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 23:51 KST",
+  "updated_at_kst": "2026-10-11 02:53 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11784,5 +11784,24 @@
     "game": "UNTESTED",
     "new_DDS": 0,
     "evidence": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_INDEPENDENT_CONTROLLER_HOLD.json"
+  },
+  "c1_20261011_q217_red_badge_425_material_rework": {
+    "run_key": "OUTRUN-KOR-C1-Q217-OUTER-RED-BADGE-PROTECTED-425-20261011-0240",
+    "index": 217,
+    "role": "C1",
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+    "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "visible_protected_red_rgba_changed_outside_source_glyph_bbox": 425,
+    "start": 195,
+    "goal": 230,
+    "all_alpha_preserved": true,
+    "C1": "REWORK_REQUIRED",
+    "prior_C348_HOLD_superseded": true,
+    "C3": "NOT_RUN",
+    "approval": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0,
+    "evidence": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_CONTROLLER_REWORK.json"
   }
 }

@@ -1,0 +1,234 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q217-OUTER-RED-BADGE-PROTECTED-425-20261011-0240",
+  "review_id": "C1-Q217-RED-BADGE-425-20261011",
+  "reviewer": "C1 (same account; no fictitious independent human)",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD",
+  "index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_SHA256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "current_candidate_SHA256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "authored_clean_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "same_candidate_as_previous_C292_C348": true,
+  "new_material_evidence_not_duplicate_SHA_completion": true,
+  "triage_initial": "EVIDENCE_ONLY_HOLD",
+  "QA_decision": "REWORK_REQUIRED",
+  "reason_code": "PROTECTED_OPAQUE_RED_BADGE_OUTER_ART_RGB_RECOLOR",
+  "pixels_before_producer_notes": false,
+  "blind_calibration": "NOT_RUN, no PASS claimed",
+  "firsthand": "Native English START/GOAL original, authored CLEAN and persisted FINAL decoded 4x gray, BGW100, practical50 and RAW viewed. 425 actual opaque (alpha255 unchanged) red badge RGB pixels outside exact English lettering bbox visibly recolored in CLEAN and FINAL: START 195/GOAL230. Highlighted maps identify upper/lower/red border stripes, not transparent RGB leftovers. Alpha-only zero-diff producer protection gate was a false negative for colored protected plate. Preserve existing DDS, do not produce fake rebuilt plate.",
+  "artifacts": {
+    "machine": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_MACHINE_425_RED_BADGE.json",
+    "images": [
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_GRAY_400.png",
+        "sha256": "2b594e9ce704b6f4fdc580123423ff108624894576e0e8317cb10a0b4b485e7a"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_GRAY_400.png",
+        "sha256": "0c9c91b0967d383fbc385d833bb7c0a551ba2127ae540c5d718aed563949bfa3"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_425_SCOPE_4X.png",
+        "sha256": "94bf6b7ad6f7c1bba746158206e3a879273e20a969b4058110832eee1881c82d"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_425_SCOPE_4X.png",
+        "sha256": "5719fb5c0654ce002af6e40fcf018ad0ff13d8abe6707d895fd33f1520afbf0e"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_GRAY_50.png",
+        "sha256": "3f41ac6e9cbe12fbcf8cc8f71e8ac4902d4737ed29e10e57f173a6dbd02a7eb3"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_GRAY_50.png",
+        "sha256": "87b210a31fd6a3eedffab3917ba8ca3f84f48eae723ea88ba59d7ad53ec99103"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_RAW.png",
+        "sha256": "cb6cb778dbefc56fab94a64d5028e1b407e87c4f41fe5ea80c8a434b6e3cc2b5"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_RAW.png",
+        "sha256": "2731aaee61f1f160e8d33370a9ece468c8e454457cd868d86d3d018cd157405f"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_BLACK_100.png",
+        "sha256": "39a9ba6747c6d256cfeba443693a9d775768377e438af183d5b361b9a50101a0"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_BLACK_100.png",
+        "sha256": "0f6283ef1bdf151e21a6b39ed7115bf302104370f4c6c00fe452f22f8f5c77f1"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_WHITE_100.png",
+        "sha256": "0a9f1b81b0e1ac00cd7de3acdd79b4556d540f29ab756e2b2220deae7734d315"
+      },
+      {
+        "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_WHITE_100.png",
+        "sha256": "c48c1f0c6b515032ab0238603c94214358c16d78cb06c9c4daf3392f5bf79848"
+      }
+    ]
+  },
+  "region_reviews": [
+    {
+      "id": "start",
+      "original_text": "START",
+      "translation": "출발",
+      "original_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "current_bbox": [
+        824,
+        510,
+        863,
+        531
+      ],
+      "opaque_outer_rgb_changes": 195,
+      "edge_details": {
+        "changed_total": 195,
+        "top": 69,
+        "bottom": 80,
+        "left_side": 2,
+        "right_side": 44,
+        "opaque_old": 195,
+        "opaque_after": 195,
+        "red_before": [
+          231.5,
+          32.3,
+          47.2
+        ],
+        "red_after": [
+          231.1,
+          16.5,
+          35.5
+        ],
+        "red_dominance": 193
+      },
+      "checks": {
+        "clean_plate": {
+          "result": "FAIL",
+          "observation": "START 195 alpha255 source red badge pixels outside original glyph bbox recolored by authored CLEAN, inherited byte-identically in final; redo protected red plate, do not clear blindly."
+        },
+        "source_slant": {
+          "result": "HOLD",
+          "observation": "Canonical English appears right-italic, current Korean right-leaning but separate matched stroke-anchor angles not measured"
+        },
+        "scale": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "English START glyph region 81×23 versus Korean 39×21 strictly contained with positive margins"
+        },
+        "weight": {
+          "result": "HOLD",
+          "observation": "Cream/orange beveled original vs improved source-inspired Korean; family-qualified independent calibration incomplete"
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "Native and 400% viewed saved Hangul shows no evident missing glyph core; screen-level gameplay not tested"
+        },
+        "protected_graphics": {
+          "result": "FAIL",
+          "observation": "Opaque red header/edge pixels outside exact English text boxes are changed, proven by native first-hand SOURCE/CLEAN/FINAL plus color and coordinate machine evidence"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "BGW-native, 4x, half-scale and RAW mirrored image generated from authenticated stored DDS/PNG"
+        },
+        "readability": {
+          "result": "HOLD_GAME",
+          "observation": "Static 출발/골 readable; game composite and user retest not executed"
+        }
+      }
+    },
+    {
+      "id": "goal",
+      "original_text": "GOAL",
+      "translation": "골",
+      "original_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "current_bbox": [
+        1371,
+        772,
+        1392,
+        794
+      ],
+      "opaque_outer_rgb_changes": 230,
+      "edge_details": {
+        "changed_total": 230,
+        "top": 0,
+        "bottom": 75,
+        "left_side": 18,
+        "right_side": 137,
+        "opaque_old": 230,
+        "opaque_after": 230,
+        "red_before": [
+          226.3,
+          38.6,
+          86.9
+        ],
+        "red_after": [
+          233.4,
+          6.1,
+          55.6
+        ],
+        "red_dominance": 204
+      },
+      "checks": {
+        "clean_plate": {
+          "result": "FAIL",
+          "observation": "GOAL 230 alpha255 source red badge pixels outside original glyph bbox recolored by authored CLEAN, inherited byte-identically in final; redo protected red plate, do not clear blindly."
+        },
+        "source_slant": {
+          "result": "HOLD",
+          "observation": "Canonical English appears right-italic, current Korean right-leaning but separate matched stroke-anchor angles not measured"
+        },
+        "scale": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "English GOAL glyph region 77×24 versus Korean 21×22 strictly contained with positive margins"
+        },
+        "weight": {
+          "result": "HOLD",
+          "observation": "Cream/orange beveled original vs improved source-inspired Korean; family-qualified independent calibration incomplete"
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "Native and 400% viewed saved Hangul shows no evident missing glyph core; screen-level gameplay not tested"
+        },
+        "protected_graphics": {
+          "result": "FAIL",
+          "observation": "Opaque red header/edge pixels outside exact English text boxes are changed, proven by native first-hand SOURCE/CLEAN/FINAL plus color and coordinate machine evidence"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "BGW-native, 4x, half-scale and RAW mirrored image generated from authenticated stored DDS/PNG"
+        },
+        "readability": {
+          "result": "HOLD_GAME",
+          "observation": "Static 출발/골 readable; game composite and user retest not executed"
+        }
+      }
+    }
+  ],
+  "safety_classification": "Original source red badge pixels beyond tight source lettering were recolored, including top/bottom stripe, at unchanged full alpha. This is prohibited unless verified originally part of removal and independently protected art preserved; absent provenance fail closed. No claim to know exact per-pixel historical authoring layers.",
+  "new_DDS": 0,
+  "new_promoted_DDS": 0,
+  "official_DDS_SHA_unchanged": true,
+  "C1_PASS": false,
+  "C3": "BLOCKED_FRESH_QA_REQUIRED_AFTER_REAL_REWORK",
+  "APPROVAL": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "USER_INGAME": "UNTESTED",
+  "next_action": "A production must reconstruct/source-condition CLEAN only for verified original English glyph+halo pixels, using source-red badge protected mask and lossless source-derived plate; preserve alpha255 rim/stripes (195 START +230 GOAL) and restore accurate source colors where no English. Compare SOURCE/CLEAN/FINAL pixel-for-pixel at RAW/readable native and composited opaque BGW, and independently C1 then separate C3 before newer user-game retest.",
+  "plate_library": "q217 has no SHA-bound manifest in current shared library (single listed manifest targets q060); do not create C PLATE_PASS for this defective unregistered clean",
+  "forbidden_domains_touched": []
+}

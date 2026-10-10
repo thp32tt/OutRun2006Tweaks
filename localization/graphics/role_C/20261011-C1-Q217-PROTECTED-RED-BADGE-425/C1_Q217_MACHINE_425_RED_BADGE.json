@@ -1,0 +1,348 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q217-OUTER-RED-BADGE-PROTECTED-425-20261011-0240",
+  "role": "C1",
+  "shard": "ODD",
+  "index": 217,
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "bytes_authenticated": true,
+  "native": [
+    2048,
+    2048
+  ],
+  "DDS": "RGBA32 mip1 RAW Y mirrored",
+  "source_SHA256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "official_candidate_SHA256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "authored_clean_SHA256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "source_CLEAN_FINAL_readable_orientation": "Correctly aligned; authored CLEAN readable, both DDS raw mirror Y",
+  "triage_before": "EVIDENCE_ONLY_HOLD",
+  "classification": "NEW_VISIBLE_PROTECTED_ART_RGB_RECOLOR",
+  "input_candidate_SHA_unchanged_C292_C348": true,
+  "measurements": {
+    "sha256": {
+      "source": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "current": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+      "clean_png": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41"
+    },
+    "source_clean_total_rgba": 3921,
+    "clean_final_total_rgba": 1141,
+    "source_final_total_rgba": 3940,
+    "outside_english_tight_bbox_changes_rgba": 425,
+    "outside_english_tight_bbox_changes_alpha": 0,
+    "outside_source_clean_rgba": 425,
+    "outside_clean_final_rgba": 0,
+    "outside_SC_and_SF_same_boolean": true,
+    "outside_CF_zero": true,
+    "outside_source_clean_final_rgb_is_clean_exact": true,
+    "outside_source_final_alpha_preserved": true,
+    "outside_source_final_rgb_delta_classes": {},
+    "per_label": [
+      {
+        "id": "start",
+        "source_bbox": [
+          803,
+          509,
+          884,
+          532
+        ],
+        "check_bbox": [
+          785,
+          492,
+          903,
+          549
+        ],
+        "outside_changed": 195,
+        "min_distance_px": 1,
+        "max_distance_px": 5,
+        "distance_distribution": {
+          "1": 161,
+          "2": 14,
+          "3": 10,
+          "4": 7,
+          "5": 3
+        },
+        "source_colors_top": [
+          {
+            "rgb": [
+              224,
+              6,
+              18
+            ],
+            "count": 5
+          },
+          {
+            "rgb": [
+              231,
+              0,
+              43
+            ],
+            "count": 21
+          },
+          {
+            "rgb": [
+              231,
+              3,
+              24
+            ],
+            "count": 5
+          },
+          {
+            "rgb": [
+              231,
+              9,
+              30
+            ],
+            "count": 8
+          },
+          {
+            "rgb": [
+              231,
+              12,
+              24
+            ],
+            "count": 8
+          },
+          {
+            "rgb": [
+              231,
+              12,
+              33
+            ],
+            "count": 11
+          },
+          {
+            "rgb": [
+              231,
+              16,
+              24
+            ],
+            "count": 13
+          },
+          {
+            "rgb": [
+              231,
+              20,
+              33
+            ],
+            "count": 32
+          }
+        ],
+        "max_RGB_channel_delta": 182,
+        "outside_alpha_nonzero": 195,
+        "out_of_bbox_3px_near_interior_count": 185,
+        "out_of_bbox_1px_adjacent_interior_count": 161
+      },
+      {
+        "id": "goal",
+        "source_bbox": [
+          1343,
+          771,
+          1420,
+          795
+        ],
+        "check_bbox": [
+          1324,
+          751,
+          1442,
+          812
+        ],
+        "outside_changed": 230,
+        "min_distance_px": 1,
+        "max_distance_px": 8,
+        "distance_distribution": {
+          "1": 104,
+          "2": 28,
+          "3": 23,
+          "4": 18,
+          "5": 16,
+          "6": 15,
+          "7": 14,
+          "8": 12
+        },
+        "source_colors_top": [
+          {
+            "rgb": [
+              219,
+              9,
+              74
+            ],
+            "count": 9
+          },
+          {
+            "rgb": [
+              222,
+              12,
+              66
+            ],
+            "count": 12
+          },
+          {
+            "rgb": [
+              222,
+              16,
+              66
+            ],
+            "count": 17
+          },
+          {
+            "rgb": [
+              225,
+              13,
+              71
+            ],
+            "count": 16
+          },
+          {
+            "rgb": [
+              231,
+              4,
+              57
+            ],
+            "count": 9
+          },
+          {
+            "rgb": [
+              239,
+              0,
+              41
+            ],
+            "count": 36
+          },
+          {
+            "rgb": [
+              239,
+              0,
+              49
+            ],
+            "count": 14
+          },
+          {
+            "rgb": [
+              239,
+              0,
+              57
+            ],
+            "count": 13
+          }
+        ],
+        "max_RGB_channel_delta": 243,
+        "outside_alpha_nonzero": 230,
+        "out_of_bbox_3px_near_interior_count": 155,
+        "out_of_bbox_1px_adjacent_interior_count": 95
+      }
+    ],
+    "views": {
+      "C1_Q217_goal_425_SCOPE_4X.png": "5719fb5c0654ce002af6e40fcf018ad0ff13d8abe6707d895fd33f1520afbf0e",
+      "C1_Q217_goal_BLACK_100.png": "0f6283ef1bdf151e21a6b39ed7115bf302104370f4c6c00fe452f22f8f5c77f1",
+      "C1_Q217_goal_GRAY_100.png": "e45f64b61457a74dc4d9729ee0f07b36ebc66cf02031646b40bd066885c1c2fa",
+      "C1_Q217_goal_GRAY_400.png": "0c9c91b0967d383fbc385d833bb7c0a551ba2127ae540c5d718aed563949bfa3",
+      "C1_Q217_goal_GRAY_50.png": "87b210a31fd6a3eedffab3917ba8ca3f84f48eae723ea88ba59d7ad53ec99103",
+      "C1_Q217_goal_RAW.png": "2731aaee61f1f160e8d33370a9ece468c8e454457cd868d86d3d018cd157405f",
+      "C1_Q217_goal_WHITE_100.png": "c48c1f0c6b515032ab0238603c94214358c16d78cb06c9c4daf3392f5bf79848",
+      "C1_Q217_start_425_SCOPE_4X.png": "94bf6b7ad6f7c1bba746158206e3a879273e20a969b4058110832eee1881c82d",
+      "C1_Q217_start_BLACK_100.png": "39a9ba6747c6d256cfeba443693a9d775768377e438af183d5b361b9a50101a0",
+      "C1_Q217_start_GRAY_100.png": "f437b219d93ecf49b9a5b8c499345a4bb68f2f98401ba4fbf0627a01815fd6f8",
+      "C1_Q217_start_GRAY_400.png": "2b594e9ce704b6f4fdc580123423ff108624894576e0e8317cb10a0b4b485e7a",
+      "C1_Q217_start_GRAY_50.png": "3f41ac6e9cbe12fbcf8cc8f71e8ac4902d4737ed29e10e57f173a6dbd02a7eb3",
+      "C1_Q217_start_RAW.png": "cb6cb778dbefc56fab94a64d5028e1b407e87c4f41fe5ea80c8a434b6e3cc2b5",
+      "C1_Q217_start_WHITE_100.png": "0a9f1b81b0e1ac00cd7de3acdd79b4556d540f29ab756e2b2220deae7734d315"
+    }
+  },
+  "red_border_color_analysis": {
+    "start": {
+      "changed_total": 195,
+      "top": 69,
+      "bottom": 80,
+      "left_side": 2,
+      "right_side": 44,
+      "opaque_old": 195,
+      "opaque_after": 195,
+      "red_before": [
+        231.5,
+        32.3,
+        47.2
+      ],
+      "red_after": [
+        231.1,
+        16.5,
+        35.5
+      ],
+      "red_dominance": 193
+    },
+    "goal": {
+      "changed_total": 230,
+      "top": 0,
+      "bottom": 75,
+      "left_side": 18,
+      "right_side": 137,
+      "opaque_old": 230,
+      "opaque_after": 230,
+      "red_before": [
+        226.3,
+        38.6,
+        86.9
+      ],
+      "red_after": [
+        233.4,
+        6.1,
+        55.6
+      ],
+      "red_dominance": 204
+    }
+  },
+  "hard_gate": "Source-protected red badge stripe/outer rim rendered RGB changed at 425 full-opacity pixels outside strict source text bounds. Clean->final unchanged there; source->CLEAN plate performed recolor, final DDS inherits; 0 alpha difference does not mean unchanged protected art.",
+  "scope_limit": "Within original tight source text bboxes protected English edge needs independent verified source/text mask; no claim that all red border pixels can be deleted, and no new DDS made.",
+  "result": "REWORK_REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_GRAY_400.png",
+      "sha256": "2b594e9ce704b6f4fdc580123423ff108624894576e0e8317cb10a0b4b485e7a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_GRAY_400.png",
+      "sha256": "0c9c91b0967d383fbc385d833bb7c0a551ba2127ae540c5d718aed563949bfa3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_425_SCOPE_4X.png",
+      "sha256": "94bf6b7ad6f7c1bba746158206e3a879273e20a969b4058110832eee1881c82d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_425_SCOPE_4X.png",
+      "sha256": "5719fb5c0654ce002af6e40fcf018ad0ff13d8abe6707d895fd33f1520afbf0e"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_GRAY_50.png",
+      "sha256": "3f41ac6e9cbe12fbcf8cc8f71e8ac4902d4737ed29e10e57f173a6dbd02a7eb3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_GRAY_50.png",
+      "sha256": "87b210a31fd6a3eedffab3917ba8ca3f84f48eae723ea88ba59d7ad53ec99103"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_RAW.png",
+      "sha256": "cb6cb778dbefc56fab94a64d5028e1b407e87c4f41fe5ea80c8a434b6e3cc2b5"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_RAW.png",
+      "sha256": "2731aaee61f1f160e8d33370a9ece468c8e454457cd868d86d3d018cd157405f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_BLACK_100.png",
+      "sha256": "39a9ba6747c6d256cfeba443693a9d775768377e438af183d5b361b9a50101a0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_BLACK_100.png",
+      "sha256": "0f6283ef1bdf151e21a6b39ed7115bf302104370f4c6c00fe452f22f8f5c77f1"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_start_WHITE_100.png",
+      "sha256": "0a9f1b81b0e1ac00cd7de3acdd79b4556d540f29ab756e2b2220deae7734d315"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_goal_WHITE_100.png",
+      "sha256": "c48c1f0c6b515032ab0238603c94214358c16d78cb06c9c4daf3392f5bf79848"
+    }
+  ]
+}
