@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_rollover_checkpoint",
+  "timestamp_kst": "2026-10-11T03:16:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 6,
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_untouched": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+  "feature_material_commit": "a03fe24f9ca70e1cb70f88d07041e2d45fc4f3ca",
+  "feature_test_commit": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+  "checkpoint_stage": "C3_VALIDATE_IN_PROGRESS",
+  "existing_acceptance_pass_scope": "STATIC_BUILD_ONLY_AS_OF_PRIOR_307845ea_SHA",
+  "acceptance_ids_pending_exact_sha_confirmation": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "new_change": "fail closed on D3DTA_COMPLEMENT/ALPHAREPLICATE and unsupported fog/scissor with 4 static negative mutations",
+  "ci": [
+    {
+      "workflow": "Build",
+      "id": 38074993048,
+      "sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+      "status": "IN_PROGRESS_AT_CHECKPOINT"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "id": 38074993038,
+      "sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+      "status": "IN_PROGRESS_AT_CHECKPOINT"
+    }
+  ],
+  "next_action": "Confirm exact-SHA Build/OpenXR and bundle; preserve target; amend feature run record and PR readiness for controller. No game/HMD execution; RUNTIME_VALIDATION=UNTESTED.",
+  "score_change": 0
+}
