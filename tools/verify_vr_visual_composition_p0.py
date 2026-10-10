@@ -560,12 +560,39 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
                   'ResultTextLeaveHooks[i] = safetyhook::create_mid(',
                   'Module::exe_ptr(rva + 5), ResultTextLeave',
                   'if (!resultTextOk)')
+    # The exact user minidumps fault at EXE+0x97C5F inside the E9 rel32
+    # detour that the old 0x97C57+5 midhook placed at EXE+0x97C5C.
+    # Unlike other E8+5 sites this original control-flow target cannot
+    # be overwritten. Both before/after hooks must be skipped together.
+    # Preserve all 19 original EXE E8 identities; install only 18 safe
+    # scoped parents. An enter-only detour would leak screen HUD ownership.
+    require('static constexpr int ResultTextUnsafeReturnRva = 0x97C57;',
+            ui_source, 'two-minidump result crash signature exclusion')
+    require_order(apply, 'unsafe result E8+5 detour excluded before install',
+                  'if (rva == ResultTextUnsafeReturnRva)',
+                  'continue;',
+                  'ResultTextEnterHooks[i] = safetyhook::create_mid(',
+                  'ResultTextLeaveHooks[i] = safetyhook::create_mid(')
+    require('0x97C5F', apply, 'document exact faulting return target')
     if any(bad in leave for bad in (
         'SetRenderState(', 'SetTransform(', 'SuppressSprite',
     )):
         raise SystemExit('result text HUD parent may not change game draw/state')
 
 verify_goal_b9200_source(ui, sem, read('tools/analyze_outrun_exe.py'))
+# Explicit negative test: putting the unsafe post-call detour back must FAIL.
+_corrupt_result_guard = ui.replace(
+    'if (rva == ResultTextUnsafeReturnRva)',
+    'if (false)', 1)
+if _corrupt_result_guard == ui:
+    raise SystemExit('result crash negative mutation injection failed')
+try:
+    verify_goal_b9200_source(
+        _corrupt_result_guard, sem, read('tools/analyze_outrun_exe.py'))
+except SystemExit:
+    pass
+else:
+    raise SystemExit('result EXE+0x97C5F crash guard regression escaped')
 
 # The in-game course-extension transient lives in the distinct 0x989xx
 # original sprani animation, not the GOAL 0x97xxx record/percentage.

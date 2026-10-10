@@ -151,6 +151,15 @@ class UIScaling : public Hook
         0x9784F, 0x9787D, 0x9788E, 0x978B4, 0x978C8, 0x978EC,
         0x97C31, 0x97C57, 0x97E47, 0x97E6D
     };
+    // Two user minidumps (23:33:04 and 23:35:50 KST, exact test SHA
+    // 9e393cfd) both faulted with 0xC0000096 at EXE+0x97C5F.
+    // The installed SafetyHookMid at 0x97C57 + 5 = 0x97C5C overwrote
+    // bytes 0x97C5C..0x97C60 with E9 rel32, and 0x97C5F lies INSIDE
+    // that jump displacement. The original result branch can arrive at
+    // 0x97C5F, so this is not a safe midhook placement. Keep the
+    // original 0x97C57 E8 CALL completely unmodified until a verified
+    // CALL-ABI wrapper can replace this parent without a post-CALL detour.
+    static constexpr int ResultTextUnsafeReturnRva = 0x97C57;
 
     static constexpr int ResultProgressCallA = 0x97BE4;
 	static constexpr int ResultProgressCallB = 0x97DEC;
@@ -1619,6 +1628,18 @@ public:
         for (unsigned i = 0; i < std::size(ResultTextB9200Calls); ++i)
         {
             const int rva = ResultTextB9200Calls[i];
+            if (rva == ResultTextUnsafeReturnRva)
+            {
+                // Do not hook EITHER side. An Enter-only hook leaks
+                // CurrentScope into subsequent world draws; the Leave
+                // hook is confirmed to corrupt an original branch target.
+                // The unmodified call still produces the original text.
+                spdlog::warn(
+                    "VR P0 RESULT CRASH GUARD: omitted unsafe E8 parent "
+                    "0x97C57 / post-call 0x97C5C (dump EIP 0x97C5F); "
+                    "game result text preserved, only this HUD semantic unowned");
+                continue;
+            }
             ResultTextEnterHooks[i] = safetyhook::create_mid(
                 Module::exe_ptr(rva), ResultTextEnter);
             ResultTextLeaveHooks[i] = safetyhook::create_mid(
@@ -1638,7 +1659,7 @@ public:
         }
         else
             spdlog::info(
-                "VR P0 RESULT TEXT: 19 original result/stage B9200 parent CALLs -> SCREEN_HUD");
+                "VR P0 RESULT TEXT: 18 safe original B9200 parent CALLs -> SCREEN_HUD; 0x97C57 remains unhooked (crash guard)");
 
 		// The two GOAL CALLs are adjacent, so preserve the original function
 		// signatures and redirect only their individually proven E8 edges.
