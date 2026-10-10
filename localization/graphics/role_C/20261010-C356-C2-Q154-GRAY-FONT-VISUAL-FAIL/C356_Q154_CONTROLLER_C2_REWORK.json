@@ -1,0 +1,186 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C356-Q154-NEW-VISUAL-FAIL",
+  "run_key": "OUTRUN-KOR-C356-C2-Q154-GRAY-FONT-VISUAL-20261010-1250",
+  "date_kst": "2026-10-10 12:58 KST",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "persisted_candidate_rehashed_now": true,
+  "candidate_changed": false,
+  "result": "REWORK_REQUIRED",
+  "new_dds": 0,
+  "independent_first_look_blind_calibration": "NOT_QUALIFIED: prior report consulted before visual review",
+  "pixel_before_producer_verdict": false,
+  "new_contribution": "C2 controller newly inspects exact authenticated prior-C344 lossless PNGs at native/75/50 and RAW and observes source-family stroke/negative-space mismatch in all 3 gray labels; this is a NEW confirmed visual failure after C344 evidence-only HOLD, not a duplicate C PASS.",
+  "evidence_reuse_disclosure": "PNG SHA256 independently reverified from immutable C344; original source/CLEAN hash and zero-outside counts are prior C344 machine evidence, not recomputed now; exact candidate file was independently SHA256 hashed now.",
+  "machine_evidence": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_EXACT_FULL_CLEAN_MACHINE.json",
+  "prior_hold_review": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_CONTROLLER_C2_HOLD.json",
+  "regions": {
+    "06_single_player_gray": {
+      "source_bbox_raw": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "caption": "SINGLE PLAYER / 싱글 플레이",
+      "result": "FAIL",
+      "actual_visual_observation": "English source narrow separated vertical strokes; Hangul final has broader slab strokes and squeezed small inner spaces. Practical 50% looks denser than original.",
+      "visual_defects": [
+        "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+        "COUNTERSPACE_COMPRESSION"
+      ],
+      "eight_checks": {
+        "slant": "HOLD: exact top-minus-bottom stem anchors not independently calibrated",
+        "clean_plate": "PRIOR_C344_SCOPED_PIXEL_PASS: this run visually inspected PLATE_ONLY; no new machine recomputation",
+        "style": "FAIL: thick slab-like Korean face no longer matches condensed English type family",
+        "readability": "FAIL: dense internal shapes at practical 50% compared to open source",
+        "glyph_integrity": "HOLD: no new codec-fracture claim or full mip proof",
+        "protected_art": "PRIOR_C344_ZERO_OUTSIDE_8_ROIS: machine numeric proof reused, not new",
+        "placement": "HOLD: full composed game scene untested",
+        "orientation": "SCOPED_RAW_FLIPY_VIEWED: same mirror-Y source/final readable and RAW transform"
+      },
+      "lossless_png_sha256_verified": {
+        "GRAY_100_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e33bc0713b6fb3a3a29cb87d21b33e0cfa5a4ff66c6c53f3ac37afbafec086a3"
+        },
+        "GRAY_75_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "feb91bf2cbd1dc0407252cd06dca159014a9175a6821b3d3c7dd7af555114f59"
+        },
+        "GRAY_50_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "e469019b4640643fef5a3affdb2262bcedf541402f3a38792f7ad11a63a56860"
+        },
+        "PLATE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_PLATE_ONLY.png",
+          "sha256": "d626cf395c4b1289da1b9b9020bf596436cde5c9d961a9c65ec6ad15621f1d4e"
+        },
+        "COMPOSITE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_COMPOSITE_ONLY.png",
+          "sha256": "d7c53d5d037d792e29ad39c3d1a7f000474fc2e8c6a59beadb90a176ce51c3f0"
+        },
+        "RAW_SOURCE_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_06_single_player_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "c1bd264efeae20bcdf4e17c91411ff24673802de0e041c2750c6750691accd3c"
+        }
+      }
+    },
+    "07_showroom_gray": {
+      "source_bbox_raw": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "caption": "SHOWROOM / 쇼룸",
+      "result": "FAIL",
+      "actual_visual_observation": "Native original O/R interiors remain open despite heavy condensed capitals; Korean 쇼룸 has visibly thick horizontal slab strokes, reduced negative space and much more blocked appearance at 50%.",
+      "visual_defects": [
+        "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+        "COUNTERSPACE_COMPRESSION"
+      ],
+      "eight_checks": {
+        "slant": "HOLD: exact top-minus-bottom stem anchors not independently calibrated",
+        "clean_plate": "PRIOR_C344_SCOPED_PIXEL_PASS: this run visually inspected PLATE_ONLY; no new machine recomputation",
+        "style": "FAIL: thick slab-like Korean face no longer matches condensed English type family",
+        "readability": "FAIL: dense internal shapes at practical 50% compared to open source",
+        "glyph_integrity": "HOLD: no new codec-fracture claim or full mip proof",
+        "protected_art": "PRIOR_C344_ZERO_OUTSIDE_8_ROIS: machine numeric proof reused, not new",
+        "placement": "HOLD: full composed game scene untested",
+        "orientation": "SCOPED_RAW_FLIPY_VIEWED: same mirror-Y source/final readable and RAW transform"
+      },
+      "lossless_png_sha256_verified": {
+        "GRAY_100_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "5496904c01ef8ea206eddb794fb6173794009f7c35d064c9a9105b2cd0a5b93a"
+        },
+        "GRAY_75_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "3c1db6f3a09707baf8e4c893375e2e2d0fd5450999e210e9b154007783156433"
+        },
+        "GRAY_50_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "4d9e977327938fbdd9ba1972c68cb171664f0478ec83b178679ad77066132143"
+        },
+        "PLATE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_PLATE_ONLY.png",
+          "sha256": "e992a18af60c3354075cd6f37c5de1faa634b5309958dde358f963b33f60abd1"
+        },
+        "COMPOSITE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_COMPOSITE_ONLY.png",
+          "sha256": "19b7e5dc5a4be7b2c26535ea9eba0d3dfa0ebf79283cdc58702f87a5542be7b1"
+        },
+        "RAW_SOURCE_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_07_showroom_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "b2a5b4ac6ebfb5fa91b15339d266dfd3740ac78a581a62efca83103092e5896a"
+        }
+      }
+    },
+    "08_multiplayer_gray": {
+      "source_bbox_raw": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "caption": "MULTIPLAYER / 멀티플레이어",
+      "result": "FAIL",
+      "actual_visual_observation": "Source is tall/condensed with distinct intervals; Hangul appears blockier with overly thick contiguous strokes and comparatively congested counter space at 50%.",
+      "visual_defects": [
+        "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+        "COUNTERSPACE_COMPRESSION"
+      ],
+      "eight_checks": {
+        "slant": "HOLD: exact top-minus-bottom stem anchors not independently calibrated",
+        "clean_plate": "PRIOR_C344_SCOPED_PIXEL_PASS: this run visually inspected PLATE_ONLY; no new machine recomputation",
+        "style": "FAIL: thick slab-like Korean face no longer matches condensed English type family",
+        "readability": "FAIL: dense internal shapes at practical 50% compared to open source",
+        "glyph_integrity": "HOLD: no new codec-fracture claim or full mip proof",
+        "protected_art": "PRIOR_C344_ZERO_OUTSIDE_8_ROIS: machine numeric proof reused, not new",
+        "placement": "HOLD: full composed game scene untested",
+        "orientation": "SCOPED_RAW_FLIPY_VIEWED: same mirror-Y source/final readable and RAW transform"
+      },
+      "lossless_png_sha256_verified": {
+        "GRAY_100_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_100_SOURCE_CLEAN_FINAL.png",
+          "sha256": "faf0b1b1d653ca6c96b0023c5af1d36a716de56d3636bd0a9c5d915d5df8c365"
+        },
+        "GRAY_75_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_75_SOURCE_CLEAN_FINAL.png",
+          "sha256": "d48ce6e904e6d5ab7a1eb1060e5a921781198af9056df618cea767d665b1c089"
+        },
+        "GRAY_50_SOURCE_CLEAN_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_GRAY_50_SOURCE_CLEAN_FINAL.png",
+          "sha256": "a6da62bc5a9a2f1d7af321e93b8c3af05bbc506d448f122223623c443f2a6b16"
+        },
+        "PLATE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_PLATE_ONLY.png",
+          "sha256": "797aea3e05c63a53cca8b149a82b598e89e033c5cbed8f7297da74b8deaea9ca"
+        },
+        "COMPOSITE_ONLY": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_COMPOSITE_ONLY.png",
+          "sha256": "3116144695be35b2c9697254fce4686acc9ab0d0d6abbdeb3be72ec772c4e856"
+        },
+        "RAW_SOURCE_FINAL": {
+          "path": "localization/graphics/role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_08_multiplayer_gray_RAW_SOURCE_FINAL.png",
+          "sha256": "211a65ab53d2922757fcb809c010d112151ae7baf6eda321aad03f8f11792a44"
+        }
+      }
+    }
+  },
+  "red_regions_status": "NOT_REVIEWED_THIS_PASS—one visually failed family blocks whole-asset C PASS",
+  "C3": "BLOCKED_ON_C2_FAIL",
+  "current_policy_export": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_in_game_retest": "REQUIRED",
+  "user_game_regression_closed": false,
+  "repair_directive": "Source-derived lighter/condensed native Korean gray-family treatment restoring counter space, exact English effect-bbox ceiling and CLEAN/transparent-glyph isolation; then fresh C2, distinct C3, real game retest.",
+  "execution_backend": "N100_MCP_BINARY_FALLBACK_AFTER_GITHUB_SSOT_READ"
+}

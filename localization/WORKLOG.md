@@ -1,3 +1,9 @@
+## 2026-10-10 12:58 KST — C356 C2 q154 gray-family visual failure
+
+- New direct independent controller viewing of SHA-registered C344 native/75/50 and RAW English/CLEAN/Korean panels: three gray labels show overly heavy broad Hangul face and compressed counter spaces versus vertically condensed English source, most visible at 50%. Source family visual hard FAIL despite 0 outside-eight ROI prior machine pixels.
+- Persisted candidate SHA c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524 independently verified unchanged. Source/CLEAN/PNG provenances reused from C344 with independent manifest hash check; no new raster produced. C344 HOLD now REWORK_REQUIRED; C3/current export/game untested, runtime UNTESTED.
+- QA localization/graphics/role_C/20261010-C356-C2-Q154-GRAY-FONT-VISUAL-FAIL/C356_Q154_CONTROLLER_C2_REWORK.json RUN_KEY=OUTRUN-KOR-C356-C2-Q154-GRAY-FONT-VISUAL-20261010-1250. Even C2 only; no C1, VR, FFB, DX11, DXVK changes.
+
 # Korean Localization Worklog
 
 ## 2026-09-24 18:36 KST - CP0
