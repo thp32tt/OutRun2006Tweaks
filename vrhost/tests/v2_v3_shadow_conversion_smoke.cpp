@@ -285,6 +285,18 @@ int main()
         stableRing.slots[1].frameId != savedFrameId)
         return 21;
 
+    // A slot from another game process must not be published under the
+    // current ring identity; likewise an uninitialized frameId is invalid.
+    stableRing.slots[1].clientPid = 0;
+    latest.frameId = 999;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 22;
+    stableRing.slots[1].clientPid = pose.clientPid;
+    stableRing.slots[1].frameId = 0;
+    latest.frameId = 999;
+    if (ShadowV2::LatestFrame(stableRing, latest) || latest.frameId != 0)
+        return 23;
+
     std::cout << "v2->v3 host/client/frame/ack conversion smoke passed.\n";
     return 0;
 }
