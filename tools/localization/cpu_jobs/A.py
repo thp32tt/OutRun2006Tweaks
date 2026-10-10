@@ -117,7 +117,7 @@ beyond=int(np.count_nonzero(np.any(np.asarray(persisted,dtype=np.uint8)!=np.asar
 # Region-only edited image: require all mutations inside bbox, no alpha outside.
 assert beyond==int(np.count_nonzero(np.any(actual!=barr,axis=2)))
 assert np.count_nonzero(edited[:,:,3])>0 and np.count_nonzero(gl[:,:,3])>0
-nz=np.nonzero(edited[:,:,3]>0)
+nz=np.nonzero(gl[:,:,3]>0)
 local_bbox=[int(min(nz[1])),int(min(nz[0])),int(max(nz[1]))+1,int(max(nz[0]))+1]
 global_bbox=[1411+local_bbox[0],1968+local_bbox[1],1411+local_bbox[2],1968+local_bbox[3]]
 margins=[global_bbox[0]-1411,1801-global_bbox[2],global_bbox[1]-1968,2040-global_bbox[3]]
