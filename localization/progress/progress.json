@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T08:19:00+09:00",
+  "updated_at_kst": "2026-10-11 08:25 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12369,5 +12369,21 @@
     "official_updated": false,
     "new_DDS": 0,
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c382_c2_q060_psd_bilinear_20261011": {
+    "review_id": "C382-C2-Q060-PSD-ALPHA-BILINEAR-INDEPENDENT-20261011",
+    "role": "C2",
+    "queue_index": 60,
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "psd_sha256": "a07ce4cc896148ce8c80463fe03de56f3db0bf8d77fb673c48ab0395fd7ec347",
+    "result": "SCOPED_PASS_IDEAL_BILINEAR_WITH_RUNTIME_HOLD",
+    "model_cases": 48,
+    "model_changed_outputs": 0,
+    "official": "C342_REWORK_REQUIRED_UNCHANGED",
+    "trial": "C374_REWORK_REQUIRED_UNCHANGED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "approved_dds": 0,
+    "report": "localization/graphics/role_C/20261011-C382-C2-Q060-PSD-TRANSPARENT-RGB-BILINEAR/C382_Q060_INDEPENDENT_PLATE_FILTER_QA.json"
   }
 }
