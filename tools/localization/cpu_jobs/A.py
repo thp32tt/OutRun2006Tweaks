@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A232 q217: SOURCE-SAMPLED depth-layer native Korean lettering trial.
+"""A233 q217: SOURCE-SAMPLED depth-layer native Korean lettering trial.
 C1 rejected previous A231 trial's pale flat Korean; source-protected rim and
 plate were restored pixel-exact. Do NOT replicate rejected NanumSquareRound
 flat font method: draw a NEW NotoCJK-native mask, then source-sample top lip,
@@ -14,14 +14,14 @@ from PIL import Image,ImageDraw,ImageFont
 from scipy.ndimage import binary_dilation,binary_erosion,distance_transform_edt
 root=Path.cwd()
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="A"
-run="20261011-A232-Q217-SOURCE-SAMPLED-NATIVE-GOLD-DEPTH"
+run="20261011-A233-Q217-SOURCE-SAMPLED-NATIVE-GOLD-DEPTH"
 out=root/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 def dump(x,p):(out/p).write_text(json.dumps(x,ensure_ascii=False,indent=2)+"\n")
 t=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","217"],text=True,capture_output=True)
 assert t.returncode==0 and '"index": 217' in t.stdout
-dump({"exit":t.returncode,"stdout":t.stdout[-6000:]},"A232_TRIAGE.json")
+dump({"exit":t.returncode,"stdout":t.stdout[-6000:]},"A233_TRIAGE.json")
 manifest_path=root/"localization/graphics/plate_library/entries/d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c.json"
 m=json.loads(manifest_path.read_text())
 assert m["queue_index"]==217 and m["source_sha256"]=="d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0"
@@ -78,6 +78,10 @@ for q in rects:
  bright=robust_color(y_sample<=max(2,int(H*.31)),[255,241,202])
  middle=robust_color((y_sample>H*.30)&(y_sample<H*.71),[252,210,143])
  low=robust_color(y_sample>=int(H*.68),[247,135,82])
+ # Original English face has a separate copper/red side face (not the cream
+ # bottom fill). Sample orange depth pixels from the actual English glyphs.
+ depth_mask=(sR>165)&(sG>55)&(sG<172)&(sB>26)&(sB<172)&(sR>sG*1.20)&src_changed
+ source_depth=np.median(src_rgb[depth_mask],axis=0).astype(np.uint8) if depth_mask.sum()>=10 else np.array([234,131,95],dtype=np.uint8)
  # Force depth from SOURCE palettes, not arbitrary generic P1 flat coloring.
  # Top cream lip, warm beveled face, copper/red lower extrusion.
  font=ImageFont.truetype(str(font_path),q["font_px"]*scale)
@@ -96,7 +100,7 @@ for q in rects:
  # source right-lean 0.28; top glyph leaning right in readable coordinates.
  shear=.28
  canvas=canvas.transform(canvas.size,Image.Transform.AFFINE,
-    (1,-shear,-0.28*H*scale,0,1,0),resample=Image.Resampling.BICUBIC)
+    (1,+shear,-shear*H*scale,0,1,0),resample=Image.Resampling.BICUBIC)
  alpha=np.array(canvas.resize((W,H),Image.Resampling.LANCZOS))
  binary=alpha>=55
  yy,xx=np.nonzero(binary)
@@ -112,7 +116,6 @@ for q in rects:
  core=binary
  extrusion=np.zeros_like(core)
  extrusion[1:,1:] |= core[:-1,:-1]
- extrusion[2:,1:] |= core[:-2,:-1]
  outline=binary_dilation(core,iterations=1)&~core
  inside_edge=core&~binary_erosion(core,iterations=1)
  # Build masks constrained to exact source text bbox + 1px inward margin.
@@ -123,9 +126,9 @@ for q in rects:
  alphaN=np.clip(alpha.astype(np.float64)/255,0,1)
  mask_ex=(extrusion&~core&guard).astype(float)*.92
  mask_out=(outline&guard).astype(float)*.72
- red_edge=np.array([max(164,int(low[0])*.80),max(35,int(low[1])*.42),max(20,int(low[2])*.47)],dtype=np.float64)
+ red_edge=np.array([max(160,int(source_depth[0])*.82),max(35,int(source_depth[1])*.60),max(20,int(source_depth[2])*.57)],dtype=np.float64)
  # No change outside active; source-native red backdrop always underlying.
- for mm,col in [(mask_ex,red_edge),(mask_out,low.astype(float)*.87)]:
+ for mm,col in [(mask_ex,red_edge),(mask_out,source_depth.astype(float)*.88)]:
   R=R*(1-mm[:,:,None])+col[None,None,:]*mm[:,:,None]
  inside_y=np.arange(H)[:,None].astype(float)/(H-1)
  grad=np.empty((H,3),float)
@@ -141,7 +144,7 @@ for q in rects:
  lip=(inside_edge&core&(np.arange(H)[:,None]<int(.30*H)))
  bevel=(inside_edge&core&(np.arange(H)[:,None]>=int(.67*H)))
  col[lip]=np.clip(bright.astype(float)*1.06,0,255)
- col[bevel]=low
+ col[bevel]=source_depth
  R=R*(1-alphaN[:,:,None])+col*alphaN[:,:,None]
  patch[:,:,:3]=np.uint8(np.clip(np.round(R),0,255))
  # NOTE original red badge fully opaque inside the title, so alpha retained.
@@ -152,9 +155,9 @@ for q in rects:
   "new_ko_bbox_readable":[x0+glyphbox[0],y0+glyphbox[1],x0+glyphbox[2],y0+glyphbox[3]],
   "new_ko_margin":margin,"font_px":q["font_px"],"font_sha256":font_sha,
   "source_english_face_sampled_pixels":int(english_face.sum()),
-  "source_palette_upper":bright.tolist(),"source_palette_middle":middle.tolist(),"source_palette_bottom":low.tolist(),
+  "source_palette_upper":bright.tolist(),"source_palette_middle":middle.tolist(),"source_palette_bottom":low.tolist(),"source_orange_depth_sampled":source_depth.tolist(),"source_orange_pixel_samples":int(depth_mask.sum()),
   "layers":["source-color rim ORIGINAL CLEAN","source-sampled dark 1px extrusion","native outline","source-sampled copper bottom bevel","source-sampled cream face","bright source top ridge"],
-  "source_italic_readable_shear":shear,"new_effect_mask_pixels":int(active.sum())})
+  "source_italic_readable_shear":shear,"inverse_matrix":[1,+shear,-shear*H*scale,0,1,0],"new_effect_mask_pixels":int(active.sum())})
  layers.append({"id":q["id"],"x0":x0,"y0":y0,"x1":x1,"y1":y1,"mask":active})
 # Safeguard full-atlas source, alpha, and candidate snapshots.
 delta_old=np.any(result!=old_arr,axis=2)
@@ -173,7 +176,7 @@ for q in rects:
   data[start:start+(x1-x0)*4]=result[y,x0:x1].tobytes()
 bytes_final=bytes(data)
 assert bytes_final[:128]==old_bytes[:128] and len(bytes_final)==len(old_bytes)
-out_file=out/"A232_Q217_SOURCE_SAMPLED_GOLD_DEPTH_UNPROMOTED.dds"
+out_file=out/"A233_Q217_SOURCE_SAMPLED_GOLD_DEPTH_UNPROMOTED.dds"
 out_file.write_bytes(bytes_final)
 decoded=np.array(Image.open(out_file).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
 assert np.array_equal(decoded,result),"Saved DDS RGB mismatch"
@@ -196,17 +199,17 @@ for q in rects:
     if pct!=100:filled=filled.resize((int(filled.width*pct/100),int(filled.height*pct/100)),Image.Resampling.LANCZOS)
     panels.append(filled)
    w,h=panels[0].size;sheet=Image.new("RGB",(4*w,h+22),bg);d=ImageDraw.Draw(sheet)
-   for i,(label,panel) in enumerate(zip(("SOURCE","CLEAN","A231_FAILED","A232_NEW"),panels)):
+   for i,(label,panel) in enumerate(zip(("SOURCE","CLEAN","A231_FAILED","A233_NEW"),panels)):
     sheet.paste(panel,(i*w,22));d.text((i*w+1,3),label,fill="black" if bgname=="WHITE" else "white")
-   sheet.save(out/f"A232_{q['id']}_{bgname}_{pct}.png")
- new_img.crop(tuple(R)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/f"A232_{q['id']}_RAW.png")
+   sheet.save(out/f"A233_{q['id']}_{bgname}_{pct}.png")
+ new_img.crop(tuple(R)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/f"A233_{q['id']}_RAW.png")
  # Source-conditioned silhouette and effects preview (transparent L mask).
  layer=next(a for a in layers if a["id"]==q["id"])
  crop=np.any(decoded[y0:y1,x0:x1,:3]!=cln[y0:y1,x0:x1,:3],axis=2).astype(np.uint8)*255
- Image.fromarray(crop,"L").save(out/f"A232_{q['id']}_EFFECT_MASK_NATIVE.png")
+ Image.fromarray(crop,"L").save(out/f"A233_{q['id']}_EFFECT_MASK_NATIVE.png")
 report={
- "run":"A232","run_key":"OUTRUN-KOR-A232-Q217-SOURCE-SAMPLED-GOLD-DEPTH-NEW-FAMILY-20261011-0505",
- "role":"A","index":217,"method_change":"replace rejected A189/A231 NanumSquareRound flat gold letter pass by independently Noto CJK native glyph mask + source-sampled face-top/highlight/midface/warm depth/outline/extrusion; existing source-conditioned CLEAN and verified rim unchanged",
+ "run":"A233","run_key":"OUTRUN-KOR-A233-Q217-SOURCE-SAMPLED-GOLD-DEPTH-NEW-FAMILY-20261011-0505",
+ "role":"A","index":217,"method_change":"A233 second & final family-pilot correction to A232 optical reject: source-rightlean inverse shearing corrected (+matrix shear), source orange original extrusion pixels sampled independently from cream face, shortened 1px only material depth with source gold upper lip; no repeated generic color scaling; original CLEAN and 425 source-red rim protected",
  "source_sha256":m["source_sha256"],"source_png_sha256":sha(source_bytes),
  "plate_manifest_sha256":"d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
  "clean_sha256":sha(clean_bytes),"plate_C1_status":r["status"],
@@ -222,6 +225,6 @@ report={
  "official_updated":False,"new_unpromoted_dds":1,"C3":"NOT_RUN",
  "RUNTIME_VALIDATION":"UNTESTED","VR_FFB_DX11_DXVK":False,
  "next_action":"Producer inspect source-native original face vs new saved Korean on BGW 100/75/50/RAW; if still small/wrong family, fail closed and use extracted PSD/native vector hand glyph instead of more Noto recolors"}
-dump(report,"A232_MACHINE_QA.json")
-print(json.dumps({"run":"A232","new_sha":sha(bytes_final),"changed":int(delta_old.sum()),
+dump(report,"A233_MACHINE_QA.json")
+print(json.dumps({"run":"A233","new_sha":sha(bytes_final),"changed":int(delta_old.sum()),
  "source_red_protected":True,"trial_only":True},ensure_ascii=False))
