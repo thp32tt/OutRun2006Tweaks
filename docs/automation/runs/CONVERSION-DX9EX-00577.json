@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00577",
+  "production_id": "CONVERSION-DX9EX-00577",
+  "event_id": "CONVERSION-DX9EX-00577-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "record_branch": "chat-controller-downloads",
+  "base_sha": "60235e9ecba3bd4c51f3d85899b07b4cb17162e7",
+  "first_material_sha": "b57cd1f5aeb4ac2cddaa25bb4f818c00ed7f62ee",
+  "result_sha": "eb17f46dd0c1ae03d83c1be4831abe659c56bafc",
+  "material_result_sha": "eb17f46dd0c1ae03d83c1be4831abe659c56bafc",
+  "validation_bearing_result_sha": "eb17f46dd0c1ae03d83c1be4831abe659c56bafc",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00577]",
+  "work_key": "DX9EX:P1:SOFT_SUSPEND_FAIL_CLOSED_RELEASE_SMOKE",
+  "changed_paths": [
+    "src/vr/runtime_eligibility.hpp",
+    "vrhost/tests/runtime_eligibility_smoke.cpp",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "summary": "Fail-closed protection against disconnected/stale-host resurrection during OpenXR soft pause, preserves already verified renderable source, Release-active smoke with NDEBUG-safe REQUIRE and R32 phase-specific static verifier repair.",
+  "initial_failure": {
+    "run_id": 38031399039,
+    "sha": "b57cd1f5aeb4ac2cddaa25bb4f818c00ed7f62ee",
+    "cause": "R32 verifier expected removed assert(!HostRenderable.load()) after Release-active REQUIRE macro conversion",
+    "fixed": true
+  },
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "automation_validation": "PASS_EXACT_SHA_TRIGGERED_ACTIVE_DOMAIN",
+  "ci_runs": {
+    "dx9ex_active": 38031603436,
+    "domain_isolation": 38031603482,
+    "full_source_parent": 38031399037,
+    "full_source_final_sha": "NOT_TRIGGERED_BY_WORKFLOW_PATH_FILTER"
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_parent_cross_domain": "SUCCESS",
+    "fullsource_parent_openxr_host_analyze": "SUCCESS",
+    "fullsource_parent_active_game_analyze": "SUCCESS",
+    "fullsource_final_sha": "NOT_RUN_NOT_CLAIMED"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11662625939,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-eb17f46dd0c1ae03d83c1be4831abe659c56bafc",
+    "digest": "sha256:24e02e2fa0e42bef243c40912d519fdd98e03356fbdb750b7efab60ae214fc99",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS existing b57 material, checkpoint, exact failure #38031399039",
+    "C1_REVIEW": "PASS code/verifier, priority, head, issue #13/#14, active claims",
+    "C2_IMPLEMENT": "PASS source+smoke on initial material and R32 verifier contract repair final material",
+    "C3_VALIDATE": "PASS final SHA Active #38031603436 and Domain #38031603482; FullSource on preceding source-only b57 SHA #38031399037 SUCCESS, final verifier SHA not path-triggered",
+    "C4_COMMIT": "PASS two material commits with exact marker, no CI skip",
+    "C5_PACKAGE": "PASS exact final SHA CI package 11662625939 without HMD promotion",
+    "C6_RESULT": "PASS Issue #14 ledger comment 6094787402 and separated controller-branch result record; game-branch bookkeeping deferred to avoid disrupting running 00578 CI"
+  },
+  "production_ledger_issue_comment_id": 6094787402,
+  "concurrency_note": "00578 independently advanced game branch to 2c35f7be; no post-CI 00577 bookkeeping commit on game branch to prevent CI cancellation",
+  "next_action": "Do not retry 00577; continue new independent DX9Ex P1 item, DX11 A active, DXVK B frozen."
+}
