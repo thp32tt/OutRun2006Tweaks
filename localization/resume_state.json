@@ -14419,5 +14419,33 @@
     "evidence": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "next": "Full final source-derived mask and manifest plus production_pixel_guard before any official promotion; then independent exact-SHA C2, C3 and user in-game; do not repeat B345/B346 same method",
     "runtime_validation": "UNTESTED"
+  },
+  "c351_c1_q121_a219_goal_trial_33_exact": {
+    "run_key": "OUTRUN-KOR-C351-C1-Q121-A219-NEW-TRIAL-33-EXACT-SOURCE-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "index": 121,
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "new_unpromoted_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "independent_verified_original_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "trial_change_pixels": 33,
+    "trial_changed_bytes": 132,
+    "changed_outside_component": 0,
+    "unchanged_atlas_pixels": 16777183,
+    "localized_source_clean_in_goal_persisted": "OLD_HAS_33_REMAINDER_TRIAL_CLEARS_ALL",
+    "independent_visual": "SCOPED_RESIDUE_CLEAN_PASS",
+    "whole_atlas_C1": "HOLD_STRICT_RECHECK",
+    "official_queue": "REWORK_REQUIRED_UNCHANGED",
+    "image_evidence": 12,
+    "qa_report": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_INDEPENDENT_C1_HOLD.json",
+    "machine_report": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_INDEPENDENT_MACHINE.json",
+    "new_promoted_dds": 0,
+    "C3": "NOT_RUN",
+    "user_igrs": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

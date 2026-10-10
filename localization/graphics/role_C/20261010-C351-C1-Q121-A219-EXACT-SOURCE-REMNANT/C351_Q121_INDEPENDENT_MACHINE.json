@@ -1,0 +1,246 @@
+{
+  "policy": "visual-evidence-v1-20261008",
+  "run": "C351",
+  "index": 121,
+  "native": [
+    4096,
+    4096
+  ],
+  "format": "RGB32 DDS mip1 RAW mirror_y",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "trial": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb"
+  },
+  "file_bytes": {
+    "source": 67108992,
+    "official": 67108992,
+    "trial": 67108992
+  },
+  "header_exact": true,
+  "independent_published_SOURCE_crop_exact": true,
+  "independent_published_CLEAN_equals_OFFICIAL_crop": true,
+  "independent_published_FINAL_equals_OFFICIAL_crop": true,
+  "clip_readable": [
+    3184,
+    651,
+    3391,
+    756
+  ],
+  "changed_rgba_pixels": 33,
+  "changed_bytes": 132,
+  "changed_outside_crop": 0,
+  "changed_mask_bbox_readable": [
+    3210,
+    690,
+    3308,
+    722
+  ],
+  "changed_points_readable": [
+    [
+      3280,
+      690
+    ],
+    [
+      3283,
+      690
+    ],
+    [
+      3236,
+      691
+    ],
+    [
+      3280,
+      691
+    ],
+    [
+      3306,
+      691
+    ],
+    [
+      3236,
+      692
+    ],
+    [
+      3280,
+      692
+    ],
+    [
+      3306,
+      692
+    ],
+    [
+      3236,
+      693
+    ],
+    [
+      3280,
+      693
+    ],
+    [
+      3306,
+      693
+    ],
+    [
+      3306,
+      694
+    ],
+    [
+      3306,
+      695
+    ],
+    [
+      3306,
+      696
+    ],
+    [
+      3284,
+      708
+    ],
+    [
+      3212,
+      709
+    ],
+    [
+      3284,
+      709
+    ],
+    [
+      3212,
+      710
+    ],
+    [
+      3284,
+      710
+    ],
+    [
+      3213,
+      712
+    ],
+    [
+      3282,
+      712
+    ],
+    [
+      3281,
+      713
+    ],
+    [
+      3210,
+      714
+    ],
+    [
+      3307,
+      715
+    ],
+    [
+      3211,
+      716
+    ],
+    [
+      3307,
+      716
+    ],
+    [
+      3212,
+      717
+    ],
+    [
+      3307,
+      717
+    ],
+    [
+      3213,
+      718
+    ],
+    [
+      3307,
+      718
+    ],
+    [
+      3307,
+      719
+    ],
+    [
+      3307,
+      720
+    ],
+    [
+      3307,
+      721
+    ]
+  ],
+  "original_unchanged_source_whites_selected_33": true,
+  "trial_33_white_source_matching_alpha255_to_zero": true,
+  "unmodified_atlas_pixels": 16777183,
+  "source_matching_pixels_remaining_in_crop": 0,
+  "source_matching_pixels_current_in_crop": 33,
+  "source_matching_caution": "Unchanged source-matching pixels may be correct artwork; not all remaining pixels can be classified as residue from source equality alone.",
+  "image_evidence": [
+    {
+      "path": "C351_Q121_GRAY_100.png",
+      "sha256": "e27ff3404ed864511f32e545bdcac9396fcbd45d6ba045520f845cf61ad6c380",
+      "bytes": 7629
+    },
+    {
+      "path": "C351_Q121_GRAY_75.png",
+      "sha256": "1294612f06ddacee98e52686b994e1461c2e6a55b86f78bc47793b5a4521fbe9",
+      "bytes": 14435
+    },
+    {
+      "path": "C351_Q121_GRAY_50.png",
+      "sha256": "29f0a874312f02fb4d0c5b4966475de02ba53450aae867e9837bbcc1d26ea492",
+      "bytes": 8811
+    },
+    {
+      "path": "C351_Q121_BLACK_100.png",
+      "sha256": "464fbacf6f81055cd5da552409de4e8288385b207d7006a637fac6123012e6d3",
+      "bytes": 7491
+    },
+    {
+      "path": "C351_Q121_BLACK_75.png",
+      "sha256": "ed65f599dc0c38789510cbf834bb8104cceecc4b16254c794ba2015a0d560bed",
+      "bytes": 13635
+    },
+    {
+      "path": "C351_Q121_BLACK_50.png",
+      "sha256": "55d0d59e9c84051b6e5a3458e12752000030cf4564df30bb8f50557c779fc623",
+      "bytes": 8010
+    },
+    {
+      "path": "C351_Q121_WHITE_100.png",
+      "sha256": "048477516b7c4ceec0cbbe7844e58f851adf3c7c6ce38e2f1c6c736ce32110ba",
+      "bytes": 7376
+    },
+    {
+      "path": "C351_Q121_WHITE_75.png",
+      "sha256": "fde78a285798d2462d46cd69580755a8f586b14c84f78c0b09561f4ef7ccd78e",
+      "bytes": 13608
+    },
+    {
+      "path": "C351_Q121_WHITE_50.png",
+      "sha256": "da15dd302c516bdb83f255d70d33b75ef9d202f1b59968b3c7af358a149fda0a",
+      "bytes": 8138
+    },
+    {
+      "path": "C351_Q121_RAW_100.png",
+      "sha256": "815bd9ede40009275598425bec26c9e8301858438812c9ee7b2465ea764e83b9",
+      "bytes": 8084
+    },
+    {
+      "path": "C351_Q121_33_MASK_4X.png",
+      "sha256": "1016945940924adc1da25048be7bda33823de4583731d94f97a315f13467046f",
+      "bytes": 2154
+    },
+    {
+      "path": "C351_Q121_SOURCE_CLEAN_OFFICIAL_TRIAL_2X.png",
+      "sha256": "9d9e4b6a6958b1c7a413345c7462d7b0008f9c5db01e0a344c19216b1f0bd282",
+      "bytes": 11283
+    }
+  ],
+  "region_only": "SCOPED_STORED_BYTE_PASS_NOT_FULL_ATLAS_C1",
+  "full_atlas": "UNTESTED_29_SEGMENTS",
+  "C3": "NOT_RUN",
+  "runtime": "UNTESTED"
+}

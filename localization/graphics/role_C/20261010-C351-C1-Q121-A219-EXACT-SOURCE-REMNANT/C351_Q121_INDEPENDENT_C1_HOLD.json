@@ -1,0 +1,200 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C351",
+  "run_key": "OUTRUN-KOR-C351-C1-Q121-A219-NEW-TRIAL-33-EXACT-SOURCE-20261010",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "triage": {
+    "command": "python tools/localization/rework_triage.py --index 121",
+    "result": "MATERIAL_REWORK",
+    "actual_current_queue": "a219_p0_q121_source_goal_33_english_residue_rework_required_official_unchanged"
+  },
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "native": "4096x4096 RGB32 mip1"
+  },
+  "prior_c1_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "reviewed_new_unpromoted_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+  "independent_new_SHA_vs_official": true,
+  "source_clean_evidence": {
+    "source_crop": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_19_SOURCE_NATIVE_RGBA.png",
+    "published_clean": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_19_CLEAN_NATIVE_RGBA.png",
+    "published_clean_matches_actual_official": true,
+    "independent_authentic_source_matches_published_source": true,
+    "historical_clean_state": "FAIL: original-white-glyph remainder at 33 alpha255 pixels in goal. word source, matches official exactly; source CLEAN was not actually clean for this component",
+    "trial_post_repair": "Scoped 33 source-white pixels cleared on persisted DDS; no independently authenticated full 29-region clean plate"
+  },
+  "machine": {
+    "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_INDEPENDENT_MACHINE.json",
+    "sha256": "9ce601e36f2d467239854a71927171681fada35793c70d6ea28ba39deb532dd7",
+    "saved_bytes_sha256_verified": true,
+    "source_current_trial_dds_bytes": 67108992,
+    "dds_native": "4096x4096; 1 mip; header identical",
+    "old_to_trial_changed_rgba_pixels": 33,
+    "old_to_trial_changed_bytes": 132,
+    "total_pixels_unchanged": 16777183,
+    "unrelated_atlas_changed_pixels": 0,
+    "old_33_pixels_exact_original_rgba255": true,
+    "trial_33_pixels_exact_rgba0": true,
+    "goal_readable_crop": [
+      3184,
+      651,
+      3391,
+      756
+    ],
+    "change_readable_bbox": [
+      3210,
+      690,
+      3308,
+      722
+    ],
+    "source_identical_opacity_pixels_remaining_in_goal_crop": 0,
+    "RAW_FLIPY": "source/official/trial expected y=4095-readable_y"
+  },
+  "firstlook": {
+    "did_not_use_producer_pass_as_acceptance": true,
+    "native_gray": "English goal. face evident in canonical original; three small dispersed white-clipped strokes in official and CLEAN; new trial gray backdrop makes 33 remnants disappear, no newly discernible rectangular plate boundary in this exact scope",
+    "backgrounds": "BLACK_100/WHITE_100, GRAY_100/75/50 directly inspected. White backdrop obscures white remnants, black and gray reveal; trial clear against black/gray. RAW Y-inversion verified. Gray 50% preserves absence of specks.",
+    "visual_result": "SCOPED_GOAL_RESIDUE_REMOVAL_OBSERVED; neither lettering nor adjacent full atlas independently re-approved",
+    "text_readability": "This component contains English source residue removal only, no newly authored Hangul glyph. Cannot infer Korean family/style correctness for 29 other text cells."
+  },
+  "eight_visual_gates": [
+    {
+      "gate": "SOURCE English removal",
+      "result": "SCOPED_PASS",
+      "evidence": "33 source-identical opaque white pixels replaced alpha0; no source-identical alpha-positive pixels remain in exact 207x105 crop"
+    },
+    {
+      "gate": "CLEAN full plate/background",
+      "result": "HOLD",
+      "evidence": "Previous CLEAN has 33 residue pixels; trial locally fixes only them; independent all 29 region SOURCE→CLEAN masks absent"
+    },
+    {
+      "gate": "slant perspective",
+      "result": "NOT_APPLICABLE_TO_PIXEL_REMOVAL_SCOPE; FULL_ATLAS_HOLD",
+      "evidence": "No Hangul glyph rendered in corrected 33-pixel scope"
+    },
+    {
+      "gate": "native readable weight/style",
+      "result": "FULL_ATLAS_HOLD",
+      "evidence": "No text font or face change in trial; other cells untouched"
+    },
+    {
+      "gate": "clipping",
+      "result": "SCOPED_PASS",
+      "evidence": "No new foreground pixels, only source-identical orphan pixels removed"
+    },
+    {
+      "gate": "protected graphics",
+      "result": "SCOPED_PASS",
+      "evidence": "33 persisted pixel edits entirely inside original goal source crop; every unrelated atlas pixel byte-identical"
+    },
+    {
+      "gate": "FLIP-Y RAW",
+      "result": "SCOPED_PASS",
+      "evidence": "SHA-verified saved DDS direct RAW and readable y mirrored; native RAW contact inspected"
+    },
+    {
+      "gate": "visible readability/consumer UI",
+      "result": "RUNTIME_UNTESTED",
+      "evidence": "Game HUD scene/layer stacks, user IGR030/031/040 not run"
+    }
+  ],
+  "image_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_GRAY_100.png",
+      "sha256": "e27ff3404ed864511f32e545bdcac9396fcbd45d6ba045520f845cf61ad6c380",
+      "bytes": 7629
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_GRAY_75.png",
+      "sha256": "1294612f06ddacee98e52686b994e1461c2e6a55b86f78bc47793b5a4521fbe9",
+      "bytes": 14435
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_GRAY_50.png",
+      "sha256": "29f0a874312f02fb4d0c5b4966475de02ba53450aae867e9837bbcc1d26ea492",
+      "bytes": 8811
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_BLACK_100.png",
+      "sha256": "464fbacf6f81055cd5da552409de4e8288385b207d7006a637fac6123012e6d3",
+      "bytes": 7491
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_BLACK_75.png",
+      "sha256": "ed65f599dc0c38789510cbf834bb8104cceecc4b16254c794ba2015a0d560bed",
+      "bytes": 13635
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_BLACK_50.png",
+      "sha256": "55d0d59e9c84051b6e5a3458e12752000030cf4564df30bb8f50557c779fc623",
+      "bytes": 8010
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_WHITE_100.png",
+      "sha256": "048477516b7c4ceec0cbbe7844e58f851adf3c7c6ce38e2f1c6c736ce32110ba",
+      "bytes": 7376
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_WHITE_75.png",
+      "sha256": "fde78a285798d2462d46cd69580755a8f586b14c84f78c0b09561f4ef7ccd78e",
+      "bytes": 13608
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_WHITE_50.png",
+      "sha256": "da15dd302c516bdb83f255d70d33b75ef9d202f1b59968b3c7af358a149fda0a",
+      "bytes": 8138
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_RAW_100.png",
+      "sha256": "815bd9ede40009275598425bec26c9e8301858438812c9ee7b2465ea764e83b9",
+      "bytes": 8084
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_33_MASK_4X.png",
+      "sha256": "1016945940924adc1da25048be7bda33823de4583731d94f97a315f13467046f",
+      "bytes": 2154
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C351-C1-Q121-A219-EXACT-SOURCE-REMNANT/C351_Q121_SOURCE_CLEAN_OFFICIAL_TRIAL_2X.png",
+      "sha256": "9d9e4b6a6958b1c7a413345c7462d7b0008f9c5db01e0a344c19216b1f0bd282",
+      "bytes": 11283
+    }
+  ],
+  "independent_full_atlas_29_cells": "NOT_DONE",
+  "blind_calibration": "NOT_RUN",
+  "distinct_exact_SHA_C3": "NOT_RUN",
+  "current_official_status": "REWORK_REQUIRED: official DDS SHA 38d5... unchanged",
+  "trial_C1_verdict": "SCOPED_SOURCE_REMAINDER_REMOVAL_PASS; WHOLE_ATLAS_HOLD_STRICT_RECHECK",
+  "full_C1_final": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED",
+  "APPROVALS": "BLOCKED",
+  "USER_PRE_INGAME": "BLOCKED",
+  "USER_IGR_OPEN": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds_produced_by_C": 0,
+  "new_promoted_dds": 0,
+  "next_action": "A/B qualify 29 region source-clean and source-style masks and current-policy producer gates, retain scoped 33-pixel repair trial, then new full exact-byte C1 with blinded control and independent C3/user game screenshots. Do not promote trial on scope alone.",
+  "exclusions": [
+    "C2_EVEN",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_ID_QUEUE"
+  ]
+}
