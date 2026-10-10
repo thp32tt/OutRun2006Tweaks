@@ -1,5 +1,10 @@
 OutRun 2006 DX9Ex VR 화면·안정화 자동개발 — C 슬롯 (DX11 A와 병행).
 
+[2026-10-10 최신 사용자 지시 — BATCH_COMPILE_POLICY=GROUPED / 작은 수정 묶음 검증]
+같은 TASK_ID·work_key·소스 소유권 안에서 관련된 작은 수정 2~5건(또는 하나의 완결된 기능)을 한 배치로 모아 개발한다. 숫자를 채우려고 불필요한 변경을 만들지 말고, 약 20분 이내의 검토 가능한 범위로 한정한다. 변경마다 전체 컴파일/Win32-WARP/호스트·게임 패키징/GitHub Actions를 실행하지 마. 중간에는 문법 검사·관련 소스 정적 검사·작은 단위 테스트 등 가벼운 확인만 하고, 모든 소스/테스트 수정을 묶은 최종 material commit에 [AUTO:TASK_ID]를 붙여 대상 게임 브랜치에 한 번 반영해 exact-SHA 필수 Gate 및 필요한 전체 컴파일을 배치당 한 번 수행해. 실패가 확인되면 그 원인만 수정한 새 SHA로 필수 Gate를 다시 실행한다. ABI/훅/메모리 안전 관련 중대한 위험이 있으면 전체 빌드를 조기 수행할 수 있다.
+5분 GitHub 진행 체크포인트는 컨트롤러 체크포인트 브랜치에 그대로 저장하되, 게임 브랜치에 미완성 소스를 수정 한 건마다 push해 무거운 CI를 재실행하지 마. 30분 롤오버 전에 아직 커밋하지 않은 실제 코드가 유실될 우려가 있으면 해당 TASK_ID만 소유하는 임시 작업 브랜치에 미완성 패치/소스를 보존하고, 재개 시 원격 HEAD/소유권을 확인해 최종 배치에 통합해. 임시 브랜치는 C6 완료·PASS 증명이 아니며 [AUTO:TASK_ID] 최종 표식을 붙이지 않는다. 검증된 최종 material SHA를 bookkeeping SHA로 덮어쓰지 마. 작업/CI가 이미 같은 SHA로 끝났다면 재실행하지 마.
+최종 판정은 변경된 전체 배치 소스의 정확한 SHA에서 필수 GitHub CI가 PASS해야만 가능하다. RUNTIME_VALIDATION=UNTESTED 및 독립 lane 경계, C0→C6, 기존 회귀 안전 게이트를 유지한다.
+
 TARGET_BRANCH=vr-d3d9ex-focus. **개발 작업자 2개 A(DX11 Native 실구현)+C(DX9Ex 안정화)를 기존처럼 동시에 돌리고 B(DXVK)는 FROZEN**한다. DX11/DXVK/Localization 소스는 수정하지 말고 C의 GitHub HEAD, AGENTS.md, docs/VR_AUTODEV_STATE.json, docs/VR_WORK_QUEUE.json, docs/VR_PROBLEM_HISTORY.md, 원본 포크의 기존 HUD 관련 소스/자료, HUD Inspector, Issue #13/#14와 현재 회귀 기록을 먼저 확인해 기존 실패 가설을 재발명하지 마.
 
 [2026-10-10 확정 개발 우선순위 — 기존 안정화 목록보다 우선]
@@ -21,4 +26,4 @@ GitHub의 연결된 작업자 claim/lease와 동시 AI work_key 충돌을 확인
 
 
 [VR 체크포인트 정책]
-작업 중 5분 간격으로 실제로 완성된 소스·테스트 및 docs/automation/runs/ 진행 기록을 대상 브랜치 GitHub에 저장한다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
+작업 중 5분마다 컨트롤러 브랜치 체크포인트에 최신 변경 및 검증 진행 상황을 저장한다. 미완성 소스는 필요시 작업 전용 임시 브랜치에 백업하고, 대상 게임 브랜치에는 관련 수정을 묶은 최종 material commit을 올린다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
