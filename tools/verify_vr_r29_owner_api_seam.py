@@ -60,6 +60,11 @@ FRAME_DELEGATIONS = {
 
 
 LOWER_SERVICES = {
+    "R29OwnerReportStereoFailure(": "R9Poison(reason, site, hr);",
+    "R29OwnerMarkRightDrawFailed(": "FrameRightDrawFailed = true;",
+    "R29OwnerCallOriginalSetRenderTarget(": "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+    "R29OwnerCallOriginalSetDepthStencilSurface(": "SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)",
+    "R29OwnerRestoreRightPassState(": "return RestoreRightPassState(",
     "R29OwnerEnsureStereoResources(": "return EnsureStereoResources(device);",
     "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device);",
     "R29OwnerDepthTestActive(": "return DepthTestActive(device);",
@@ -208,7 +213,7 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {signature}")
-    print("R29/R30 owner ABI regression PASS (33 negative mutations)")
+    print("R29/R30 owner ABI regression PASS (38 negative mutations)")
 
 
 if __name__ == "__main__":
