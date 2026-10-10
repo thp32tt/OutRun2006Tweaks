@@ -1,0 +1,129 @@
+{
+  "asset_index": 121,
+  "role": "C1",
+  "source": {
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "bytes": 67108992,
+    "w": 4096,
+    "h": 4096,
+    "mips": 1,
+    "channel_masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+  },
+  "official": {
+    "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "bytes": 67108992,
+    "w": 4096,
+    "h": 4096,
+    "mips": 1,
+    "channel_masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+  },
+  "new_unpromoted_trial": {
+    "sha256": "1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98",
+    "bytes": 67108992,
+    "w": 4096,
+    "h": 4096,
+    "mips": 1,
+    "channel_masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ],
+    "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+  },
+  "bbox_readable": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "bbox_raw": [
+    3490,
+    3656,
+    3722,
+    3705
+  ],
+  "source_candidate_png_mismatch": {
+    "source": 0,
+    "trial": 0
+  },
+  "original_to_clean_rgba_changes": 6334,
+  "source_clean_alpha0": 0,
+  "clean_to_trial_rgba_changes": 6352,
+  "source_to_trial_rgba_changes": 8544,
+  "official_to_trial_full_atlas_rgba_changed": 9275,
+  "official_to_trial_full_atlas_alpha_changed": 5824,
+  "outside_original_GAS_PEDAL_bbox_changed_RGBA": 0,
+  "outside_original_GAS_PEDAL_bbox_changed_alpha": 0,
+  "changed_bbox_raw": [
+    3490,
+    3656,
+    3722,
+    3705
+  ],
+  "metrics": {
+    "source": {
+      "visible_alpha": 6334,
+      "opaque": 3422,
+      "bbox_local": [
+        0,
+        0,
+        232,
+        49
+      ],
+      "near_white_face_opaque": 3504,
+      "dark_blue_visible": 1518
+    },
+    "official": {
+      "visible_alpha": 5765,
+      "opaque": 3331,
+      "bbox_local": [
+        3,
+        0,
+        218,
+        47
+      ],
+      "near_white_face_opaque": 1781,
+      "dark_blue_visible": 2274
+    },
+    "trial": {
+      "visible_alpha": 6352,
+      "opaque": 3084,
+      "bbox_local": [
+        7,
+        2,
+        225,
+        48
+      ],
+      "near_white_face_opaque": 1426,
+      "dark_blue_visible": 2462
+    },
+    "clean": {
+      "visible_alpha": 0,
+      "opaque": 0,
+      "bbox_local": null,
+      "near_white_face_opaque": 0,
+      "dark_blue_visible": 0
+    }
+  },
+  "no_new_game_test": true,
+  "C3": "NOT_RUN",
+  "trial_positive_margins_ltrb": [
+    7,
+    2,
+    7,
+    1
+  ]
+}

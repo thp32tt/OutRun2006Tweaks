@@ -1,0 +1,208 @@
+{
+  "schema_version": 3,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C1-Q121-A235R-NEW-SHA-INDEPENDENT-WHITE-FACE-20261011-0710",
+  "run_key": "OUTRUN-KOR-C1-Q121-A235R-NEW-SHA-NATIVE-WHITE-FACE-20261011-0710",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "eligibility": "NEW distinct producer A235R persisted candidate; C1 prior reviewed A234R e87c... only; NOT a same-SHA retry",
+  "prior_C1_candidate_sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+  "source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+  },
+  "official": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "preserved": true
+  },
+  "trial": {
+    "path": "localization/graphics/role_A/20261011-A235R-Q121-SOURCE-CONTOUR-NATIVE-HEIGHT-REFIT/A235R_Q121_SOURCE_CONTOUR_HEIGHT_REFIT_UNPROMOTED.dds",
+    "sha256": "1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98",
+    "promoted": false
+  },
+  "execution": {
+    "backend": "GitHub SSOT; ChatGPT local environment tested raw.githubusercontent.com DNS but unavailable; N100 MCP read-only isolated scratch for three exact 67MB DDS and Pillow/numpy machine+visual evidence. No GitHub Actions or separate controller/task engine.",
+    "prior_producer_verdict_read_before_c1_first_look": true,
+    "pixels_first_independent_decision": true
+  },
+  "machine": {
+    "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_MACHINE.json",
+    "sha256": "c9a543866d30e84303dccf644f4da22628bcda94fca126cc15ef44726c906322"
+  },
+  "actual_saved_DDS": {
+    "format": "RGBA32 native masks [255,65280,16711680,4278190080]",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mips": 1,
+    "source_original_png_mismatch_pixels": 0,
+    "trial_original_png_mismatch_pixels": 0,
+    "official_to_trial_changed_rgba": 9275,
+    "official_to_trial_changed_alpha": 5824,
+    "changed_outside_roi_rgba": 0,
+    "changed_outside_roi_alpha": 0,
+    "source_to_clean_original_text_alpha_removed": 6334,
+    "clean_remnant_alpha": 0,
+    "clean_to_trial_alpha_pixels": 6352
+  },
+  "source_family_metrics": {
+    "english_near_white_opaque_proxy": 3504,
+    "trial_near_white_opaque_proxy": 1426,
+    "white_face_ratio": 0.40696,
+    "source_dark_blue_visible_proxy": 1518,
+    "trial_dark_blue_visible_proxy": 2462,
+    "observed_lean": "RIGHT in readable coordinate; independent homologous anchor missing"
+  },
+  "region": {
+    "region_id": "rank20_GAS_PEDAL",
+    "source_text": "Gas Pedal",
+    "translated_text": "가속 페달",
+    "bbox_readable": [
+      3490,
+      391,
+      3722,
+      440
+    ],
+    "source_ink_effect_bbox_local": [
+      0,
+      0,
+      232,
+      49
+    ],
+    "trial_full_alpha_effect_bbox_local": [
+      7,
+      2,
+      225,
+      48
+    ],
+    "producer_declared_ink_bbox_local": [
+      11,
+      5,
+      221,
+      44
+    ],
+    "actual_alpha_outside_producer_ink_box": 420,
+    "trial_margins_ltrb": [
+      7,
+      2,
+      7,
+      1
+    ],
+    "raw_mirror_y_bbox": [
+      3490,
+      3656,
+      3722,
+      3705
+    ],
+    "slant": {
+      "source_top_minus_bottom_dx": null,
+      "trial_top_minus_bottom_dx": null,
+      "anchor_observation": "Original G 4.94px producer hint is not a homologous Korean stem; no confident numeric slant PASS."
+    },
+    "checks": {
+      "clean_plate": {
+        "result": "PASS_SCOPED",
+        "observation": "Canonical native English region alpha 6,334 pixels; source-derived CLEAN region alpha0, source-versus-CLEAN changes 6,334; no visible English residue in CLEAN. Plate material is fully transparent at rank20, not proof of full atlas plate.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+          "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+        }
+      },
+      "source_slant": {
+        "result": "HOLD",
+        "observation": "Both source and new Hangul visibly tilt right in FLIP-Y; homologous per-character stroke top-minus-bottom anchors are uncalibrated and source G-only optical hint is not a valid shared anchor.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+          "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+        }
+      },
+      "source_style": {
+        "result": "FAIL",
+        "observation": "Native source broad smooth white italic fills 3504 opaque-near-white pixels within ROI; newly saved A235R fills only 1426 (40.7% of source), while dark-blue visible proxy grows 1518->2462 (162.2%). Black/gray/white 100/75/50 independent views show thin outlined/segmented Korean rather than source dense white face and subtle navy depth. Numeric width and alpha containment do not override optical family mismatch.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_WHITE_75.png",
+          "sha256": "1820e8b94bfaa98d81c1cc200f9e56afed945b1bb6015b08afa60970f8319f0a"
+        }
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED",
+        "observation": "At native and 50%, phrase 가속 페달 is readable, no obvious broken syllable/counter. Thin white face and 1px bottom effect padding increase risk; separate family FAIL.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_BLACK_50.png",
+          "sha256": "70be9aea39d6dee1557811dc46cbc0c7b1e555fc264222757583d04d7484d01c"
+        }
+      },
+      "clipping": {
+        "result": "PASS_NUMERIC_HIGH_RISK",
+        "observation": "Visible candidate saved-DDS alpha bbox local [7,2,225,48] within English source 232x49 with effect-inclusive margins L7/T2/R7/B1; producer's ink box [11,5,221,44] omits 420 actual visible alpha pixels, so do not use it as full effect margin.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+          "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+        }
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED",
+        "observation": "Official->A235R full 4096x4096 atlas changes 9275 RGBA, 5824 alpha, all within Gas Pedal exact readable ROI [3490,391,3722,440]; changed outside target RGBA0/alpha0, other29 regions unchanged.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+          "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+        }
+      },
+      "placement": {
+        "result": "PASS_SCOPED",
+        "observation": "Source native ROI bbox 232x49. New full-alpha effect width218 height46 and positive margins L7/T2/R7/B1; no collision inside the current atlas ROI, with 1px bottom safety margin.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+          "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+        }
+      },
+      "orientation": {
+        "result": "PASS_SAVED_ONLY",
+        "observation": "Original/current/new DDS share native RGBA32 header and one mip, RAW mirror-Y footprint [3490,3656,3722,3705]. Independently decoded FLIP-Y source and A235R each exactly match producer native PNG at 0 different pixels. Actual runtime sprite UV/render not tested.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_RAW.png",
+          "sha256": "c57051efe63d32ed2c3b5b722d30e97dd7573ae4efdf6efe997eab4ca0e1147a"
+        }
+      }
+    }
+  },
+  "decision": "REWORK_REQUIRED_UNPROMOTED_A235R",
+  "whole_atlas": "REWORK_REQUIRED",
+  "reason": "A235R recovers some A234R heavy outer glow through thin Regular vector but overcorrects into under-filled white face, overdominant dark rim and 1px bottom effect margin. Independently decoded native and 50% visual read no current-family PASS. Return to A for a source-profile-driven face/rim reconstruction; independent plate and slant calibration required before any approval.",
+  "calibration_reference": "20261011 C1 q195 upright-family 5/5 controls historical only; no new blind certification claimed for this run",
+  "C3": "NOT_RUN",
+  "APPROVAL": "BLOCKED",
+  "user_ingame": [
+    "IGR-030 OPEN",
+    "IGR-031 OPEN",
+    "IGR-040 OPEN"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_official_DDS": 0,
+  "new_candidate_produced_by_C1": 0,
+  "new_candidate_independently_reviewed": 1,
+  "evidence_png": 12,
+  "source_original_sheet_files": {
+    "BGW100": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_100.png",
+      "sha256": "4fd88dd4b96b329f3911a1635713afbb4f8b8551c37c93b31d187fdb31713f46"
+    },
+    "BLACK50": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_BLACK_50.png",
+      "sha256": "70be9aea39d6dee1557811dc46cbc0c7b1e555fc264222757583d04d7484d01c"
+    },
+    "WHITE75": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_WHITE_75.png",
+      "sha256": "1820e8b94bfaa98d81c1cc200f9e56afed945b1bb6015b08afa60970f8319f0a"
+    },
+    "RAW": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_GRAY_RAW.png",
+      "sha256": "c57051efe63d32ed2c3b5b722d30e97dd7573ae4efdf6efe997eab4ca0e1147a"
+    }
+  }
+}
