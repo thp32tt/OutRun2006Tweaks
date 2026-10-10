@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 15:10+ KST",
+  "updated_at_kst": "2026-10-10 15:42 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -99,14 +99,14 @@
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1,
       "latest_c2_independent_finding": {
-        "index": 236,
-        "asset": "FEF70E85_512x512.dds",
-        "result": "REWORK_REQUIRED_UNCHANGED",
-        "evidence": "NEW_SOURCE_CURRENT_NATIVE_14_ALPHA_AND_12_LOSSLESS_VISUAL_HEIGHT_STROKE",
-        "candidate_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
-        "qa_report": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/C358_Q236_CONTROLLER_C2_VISUAL_REWORK.json",
-        "runtime_validation": "UNTESTED",
-        "new_dds": 0
+        "index": 92,
+        "result": "C3_STRICT_REWORK_REQUIRED",
+        "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+        "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+        "reason": "SOURCE_DIFFUSE_GLOW_LOSS_STIPPLED_HARD_OUTLINE",
+        "qa_report": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_C2_C3_STRICT_VISUAL_REWORK.json",
+        "new_dds": 0,
+        "runtime_validation": "UNTESTED"
       },
       "latest_c2_evidence_supplement": {
         "index": 230,
@@ -143,6 +143,16 @@
         "promoted_dds": 0,
         "official_rework": true,
         "qa_path": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_CONTROLLER_SELF_QA.json"
+      },
+      "c364_q092_strict_finding": {
+        "index": 92,
+        "result": "C3_STRICT_REWORK_REQUIRED",
+        "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+        "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+        "reason": "SOURCE_DIFFUSE_GLOW_LOSS_STIPPLED_HARD_OUTLINE",
+        "qa_report": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_C2_C3_STRICT_VISUAL_REWORK.json",
+        "new_dds": 0,
+        "runtime_validation": "UNTESTED"
       }
     },
     "runtime_text_trace": {

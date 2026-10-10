@@ -1,0 +1,167 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C364",
+  "role": "C2",
+  "shard": "EVEN",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "size": [
+    2048,
+    256
+  ],
+  "format": "RGBA32",
+  "mip_count": 1,
+  "dds_header_first_128_bytes_equal": true,
+  "readable_transform": "DDS/PIL RAW flip_y applied once for readable",
+  "prior_region_boxes": {
+    "outrun_mode": [
+      387,
+      13,
+      1318,
+      132
+    ],
+    "continuous_15": [
+      519,
+      132,
+      1589,
+      245
+    ]
+  },
+  "source_to_current_full_atlas_changed_rgba": 177679,
+  "source_to_current_outside_roi_changed_rgba": 0,
+  "source_to_current_full_atlas_changed_alpha": 113941,
+  "source_to_current_outside_roi_changed_alpha": 0,
+  "metric_note": "Alpha 1..179 translucent and RGB bright-neutral pixel counts support directly observed loss of diffuse glow but are not a universal effect-quality threshold.",
+  "measured_regions": {
+    "outrun_mode": {
+      "source": {
+        "visible_bbox_rel": [
+          3,
+          3,
+          922,
+          119
+        ],
+        "alpha_gt16": 64738,
+        "bright_neutral_pixels": 18248,
+        "translucent_alpha_1_179": 16391,
+        "unique_alpha_counts": 256
+      },
+      "candidate": {
+        "visible_bbox_rel": [
+          3,
+          6,
+          728,
+          116
+        ],
+        "alpha_gt16": 54195,
+        "bright_neutral_pixels": 14310,
+        "translucent_alpha_1_179": 4480,
+        "unique_alpha_counts": 251
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG128.png",
+          "sha256": "b48cb38525114b7bdd9038103ef1aff5d4b4a58aaeab31b22923317d03a633cb",
+          "scale": 100,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_50_BG128.png",
+          "sha256": "5feae5613aa75bfd8e8f6d11124f1e24d6b6069f67d712a9d0aa00747fa2d5ee",
+          "scale": 50,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_200_BG128.png",
+          "sha256": "2010361262374de2c66a6bdad8cffa39bd806e03caebbe0755f5798ac5c2feeb",
+          "scale": 200,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG0.png",
+          "sha256": "efc730a7904ce2ce8d679721fce6f24fde5bbbe044271e085c35d01746ce37b1",
+          "scale": 100,
+          "bg": 0
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG255.png",
+          "sha256": "8b0f3321b589973c69ce606fe53918a4ba297d0f0bc64db0a7ef915330a6e22e",
+          "scale": 100,
+          "bg": 255
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_RAW_NATIVE.png",
+          "sha256": "e1c88da25ba220e3dd4581c2b5345072c5e3053b1a530e6f259d8c757c70a20f",
+          "scale": 100,
+          "bg": 128,
+          "orientation": "RAW"
+        }
+      ]
+    },
+    "continuous_15": {
+      "source": {
+        "visible_bbox_rel": [
+          2,
+          0,
+          1067,
+          111
+        ],
+        "alpha_gt16": 98791,
+        "bright_neutral_pixels": 28631,
+        "translucent_alpha_1_179": 23646,
+        "unique_alpha_counts": 256
+      },
+      "candidate": {
+        "visible_bbox_rel": [
+          3,
+          2,
+          838,
+          110
+        ],
+        "alpha_gt16": 56158,
+        "bright_neutral_pixels": 14488,
+        "translucent_alpha_1_179": 4894,
+        "unique_alpha_counts": 255
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG128.png",
+          "sha256": "e4aa743e3eafcef491c994d7b379def352ba1904f75da2b4f7ae449fcc13d872",
+          "scale": 100,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_50_BG128.png",
+          "sha256": "0f473d1e74317aaa25d0d4a1d7d4c0dc79650d8844ae21b02ebceb0263ff96f2",
+          "scale": 50,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_200_BG128.png",
+          "sha256": "b6a71b4132ef33c523695d428599a2c14a928e80799e58a69cca8833a344469b",
+          "scale": 200,
+          "bg": 128
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG0.png",
+          "sha256": "537b40285fd66b81bf9300cfc2852ee06b997d3ea09cb27ce1b923037e6b1d9e",
+          "scale": 100,
+          "bg": 0
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG255.png",
+          "sha256": "a1a0394b6d1f733b9a0844e6cb4de1f9b076c4402ee6f7be58ee265c8820f11c",
+          "scale": 100,
+          "bg": 255
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_RAW_NATIVE.png",
+          "sha256": "3cbe5bd8361560131c5187e402651b953e14683f12242bb0278c1f0d82221a8a",
+          "scale": 100,
+          "bg": 128,
+          "orientation": "RAW"
+        }
+      ]
+    }
+  }
+}

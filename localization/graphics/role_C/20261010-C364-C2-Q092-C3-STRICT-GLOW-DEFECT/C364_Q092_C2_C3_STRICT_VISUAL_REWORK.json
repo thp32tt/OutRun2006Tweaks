@@ -1,0 +1,184 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_type": "C3_STRICT_AUDIT",
+  "review_id": "C364-Q092-SOURCE-GLOW-STIPPLE",
+  "run_key": "OUTRUN-KOR-C364-C2-Q092-STRICT-GLOW-STIPPLE-FAIL-20261010-1520",
+  "time_kst": "2026-10-10 15:32 KST",
+  "queue_index": 92,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "current_candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "candidate_modified": false,
+  "prior_result": "C260_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH",
+  "result": "REWORK_REQUIRED",
+  "C3_STRICT": "FAIL",
+  "prior_historical_C3_PASS_invalidated": true,
+  "new_independently_observed_hard_defect": "SOURCE_FAMILY_DIFFUSE_GLOW_LOSS_AND_HARD_STIPPLED_OUTLINE",
+  "numeric_false_negative": "SOURCE-CURRENT changed RGB/alpha outside allowed text ROIs 0 but candidate hard pixelated white rim lacks source soft luminous halo.",
+  "first_look": "Controller directly viewed old lossless source/final native appearance before prior C260 machine prose, then independently downloaded/hashed original DDS and persisted current DDS, native/50/200 gray, native black/white, RAW original/final.",
+  "prior_defect_observation": "Older C260 high-risk edge-touch was recorded as visual PASS; this new strict audit identifies visibly unqualified source-family glow effect in both text strings, not merely edge contact.",
+  "calibration": "NOT_BLIND_QUALIFIED; no fabricated answer-key or distinct human reviewer claimed.",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_INDEPENDENT_SOURCE_CURRENT_MACHINE.json",
+    "sha256": "245cb68977155063fa0db83a033dac44e2f73f71048692faec808ef1c156f688"
+  },
+  "regions": {
+    "outrun_mode": {
+      "english": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "Both readable text groups lean right; homologous top-minus-bottom source/final stem anchors not blind-calibrated; no falsely invented angle."
+        },
+        "clean_plate": {
+          "result": "HOLD_FRESH_CLEAN",
+          "observation": "Exact SOURCE and saved FINAL independently remeasured; historical CLEAN not independently reconstructed this run, no current policy approval."
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Original saturated orange thick navy racing italic body and wide continuous diffuse soft-white halo replaced with thin orange/hollow Korean strokes and narrow jagged stippled/checkerboard white rim at native/50/200 on gray, black and white."
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE",
+          "observation": "Hangul legible by itself but thin outlined rendering loses strong original wordmark hierarchy and visual halo at 50%; in-game untested."
+        },
+        "glyph_integrity": {
+          "result": "FAIL_PIXELATED_EFFECT_EDGE",
+          "observation": "Visible alternating white/dark pixel stipple in persisted antialiased outer boundary at native/200 zoom; Hangul codepoints are intact, defect lies in rasterized effect and family styling."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Fresh full atlas SOURCE/CURRENT diff changed RGBA and alpha outside two previously established source text rectangles exactly 0; does not imply source-family styling is valid."
+        },
+        "placement": {
+          "result": "HOLD_SOURCE_EDGE_TOUCH",
+          "observation": "Prior C260 source ROI containment pass with top-edge touch, high risk remains; confirmed effect failure blocks any promotion."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Persisted native candidate and canonical SOURCE first 128 DDS bytes equal; 2048x256 single mip; saved RAW vertical mirror and readable FLIP-Y inspected."
+        }
+      },
+      "visual_counts": {
+        "source_translucent_1_179": 16391,
+        "current_translucent_1_179": 4480,
+        "source_bright_neutral": 18248,
+        "current_bright_neutral": 14310
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG128.png",
+          "sha256": "b48cb38525114b7bdd9038103ef1aff5d4b4a58aaeab31b22923317d03a633cb"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_50_BG128.png",
+          "sha256": "5feae5613aa75bfd8e8f6d11124f1e24d6b6069f67d712a9d0aa00747fa2d5ee"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_200_BG128.png",
+          "sha256": "2010361262374de2c66a6bdad8cffa39bd806e03caebbe0755f5798ac5c2feeb"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG0.png",
+          "sha256": "efc730a7904ce2ce8d679721fce6f24fde5bbbe044271e085c35d01746ce37b1"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_EN_KO_READABLE_100_BG255.png",
+          "sha256": "8b0f3321b589973c69ce606fe53918a4ba297d0f0bc64db0a7ef915330a6e22e"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_outrun_mode_RAW_NATIVE.png",
+          "sha256": "e1c88da25ba220e3dd4581c2b5345072c5e3053b1a530e6f259d8c757c70a20f"
+        }
+      ]
+    },
+    "continuous_15": {
+      "english": "15 Continuous Course",
+      "korean": "15코스 연속",
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_STEM_ANCHORS",
+          "observation": "Both readable text groups lean right; homologous top-minus-bottom source/final stem anchors not blind-calibrated; no falsely invented angle."
+        },
+        "clean_plate": {
+          "result": "HOLD_FRESH_CLEAN",
+          "observation": "Exact SOURCE and saved FINAL independently remeasured; historical CLEAN not independently reconstructed this run, no current policy approval."
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Original saturated orange thick navy racing italic body and wide continuous diffuse soft-white halo replaced with thin orange/hollow Korean strokes and narrow jagged stippled/checkerboard white rim at native/50/200 on gray, black and white."
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE",
+          "observation": "Hangul legible by itself but thin outlined rendering loses strong original wordmark hierarchy and visual halo at 50%; in-game untested."
+        },
+        "glyph_integrity": {
+          "result": "FAIL_PIXELATED_EFFECT_EDGE",
+          "observation": "Visible alternating white/dark pixel stipple in persisted antialiased outer boundary at native/200 zoom; Hangul codepoints are intact, defect lies in rasterized effect and family styling."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Fresh full atlas SOURCE/CURRENT diff changed RGBA and alpha outside two previously established source text rectangles exactly 0; does not imply source-family styling is valid."
+        },
+        "placement": {
+          "result": "HOLD_SOURCE_EDGE_TOUCH",
+          "observation": "Prior C260 source ROI containment pass with top-edge touch, high risk remains; confirmed effect failure blocks any promotion."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Persisted native candidate and canonical SOURCE first 128 DDS bytes equal; 2048x256 single mip; saved RAW vertical mirror and readable FLIP-Y inspected."
+        }
+      },
+      "visual_counts": {
+        "source_translucent_1_179": 23646,
+        "current_translucent_1_179": 4894,
+        "source_bright_neutral": 28631,
+        "current_bright_neutral": 14488
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG128.png",
+          "sha256": "e4aa743e3eafcef491c994d7b379def352ba1904f75da2b4f7ae449fcc13d872"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_50_BG128.png",
+          "sha256": "0f473d1e74317aaa25d0d4a1d7d4c0dc79650d8844ae21b02ebceb0263ff96f2"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_200_BG128.png",
+          "sha256": "b6a71b4132ef33c523695d428599a2c14a928e80799e58a69cca8833a344469b"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG0.png",
+          "sha256": "537b40285fd66b81bf9300cfc2852ee06b997d3ea09cb27ce1b923037e6b1d9e"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_EN_KO_READABLE_100_BG255.png",
+          "sha256": "a1a0394b6d1f733b9a0844e6cb4de1f9b076c4402ee6f7be58ee265c8820f11c"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_continuous_15_RAW_NATIVE.png",
+          "sha256": "3cbe5bd8361560131c5187e402651b953e14683f12242bb0278c1f0d82221a8a"
+        }
+      ]
+    }
+  },
+  "new_dds": 0,
+  "current_approval": "BLOCKED",
+  "pre_ingame_export": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_game": "UNTESTED",
+  "required_fix": "Reconstruct original saturated orange/native bold navy racing italic face and continuous broad soft-white halo from exact source mask/optical falloff, not width-only or hard dotted stroke. Restore CLEAN separately, valid source slant anchors, do persisted DDS RAW/FLIP-Y/native/75/50 checks, then fresh C2/C3 and separate actual-game test.",
+  "exclusions": [
+    "C1_ODD",
+    "UNINDEXED_SPECIAL_C",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

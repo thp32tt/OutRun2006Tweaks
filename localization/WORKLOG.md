@@ -1,3 +1,9 @@
+## 2026-10-10 15:32 KST — C364 C2 EVEN q092 strict C3 glow/outline false negative
+
+- Original SOURCE SHA d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774 independently downloaded, exact saved candidate SHA c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a independently decoded 2048x256 1 mip. Reviewed both labels SOURCE/CURRENT at 100/50/200, black/gray/white and RAW Y-mirrored; 12 SHA-bound new PNG. **New hard visual FAIL** original broad soft-white diffuse glow, saturated filled orange and thick navy racing effect replaced by stippled thin white hard contour and hollow orange Korean. Native source translucent alpha counts 16,391/23,646 vs Korean 4,480/4,894 support visual observation only, not universal threshold.
+- Independently full-atlas SOURCE/CURRENT change outside both source edit ROIs RGBA 0 and alpha 0; numeric containment previously masked source-family optical error. Older C260 C3_STRICT_PASS invalidated for same candidate SHA, q092 REWORK_REQUIRED; C3 strict new FAIL, no new DDS, user-game RUNTIME_VALIDATION=UNTESTED.
+- QA localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_C2_C3_STRICT_VISUAL_REWORK.json / localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_INDEPENDENT_SOURCE_CURRENT_MACHINE.json, RUN_KEY=OUTRUN-KOR-C364-C2-Q092-STRICT-GLOW-STIPPLE-FAIL-20261010-1520. C1 odd/VR/FFB/DX11/DXVK untouched.
+
 ## 2026-10-10 15:00 KST — C362 C2 EVEN q060 independent B349 new-SHA rejection
 
 - C2 separately inspected **distinct new unpromoted B349** persisted DDS SHA 0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159; verified exact file SHA, same DDS header as official, native 4096x2048 and 6 NEW readable/RAW PNGs. Original source face comparison uses SHA-bound B349 prior SOURCE visual and B348 canonical effect bbox, NOT a newly downloaded source DDS; no blind calibrated homologous glyph slant anchor claim.
