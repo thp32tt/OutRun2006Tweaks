@@ -475,7 +475,7 @@ namespace OutRunVRStereo
             {
                 const std::uint32_t index =
                     (preferred + offset) % OutRunVR::RenderFrameRingSize;
-                const auto candidate =
+                const R30SupportDirectTransportSlotPublication candidate =
                     R30SupportGetDirectTransportSlotPublication(index);
 
                 // DirectTransportFrameReadyAfterPresent() may leave an
@@ -538,7 +538,8 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            const auto copy = R30SupportCopyDirectTransportEyesAndIssueFence(
+            const R30SupportDirectTransportCopyResult copy =
+                R30SupportCopyDirectTransportEyesAndIssueFence(
                 device, selected, sourceSurfaces);
             if (FAILED(copy.hr))
             {
