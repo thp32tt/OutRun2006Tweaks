@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "run": "A222",
+  "run_key": "OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200",
+  "role": "A",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "original_english": "Normal Balance",
+  "korean": "일반 밸런스",
+  "prior_C1_review": "OUTRUN-KOR-C1-Q103-A197-FAMILY-WEIGHT-REJECT-20261010-1110",
+  "root_cause": "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+  "official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "trial_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+  "production_change": "Material new native Korean Regular lighter stroke (not resizing old bold pixels), source olive gray, source-family right-italic. Opaque source CLEAN yellow selector plate kept, only transparent glyph composited.",
+  "font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "glyphs_present": true,
+  "glyph_bbox": [
+    1443,
+    1974,
+    1768,
+    2034
+  ],
+  "source_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "source_margins": [
+    32,
+    33,
+    6,
+    6
+  ],
+  "machine": {
+    "github_actions": 38019304438,
+    "conclusion": "SUCCESS",
+    "source_sha_verified": true,
+    "persisted_dds_verified": true,
+    "dds": "2048x2048 RGBA32 mip1",
+    "pixels_changed": 9049,
+    "bytes_changed": 27145,
+    "outside_source_bbox_pixels_changed": 0,
+    "header_preserved": true,
+    "alpha_letter_mask": "A222_LETTERING_NATIVE_ALPHA.png",
+    "source_clean_plate": "OPAQUE_SOURCE_CORRECT",
+    "raw_flipY": "PASS"
+  },
+  "firsthand_views": [
+    "A222_COMPARE_GRAY_100.png",
+    "A222_COMPARE_BLACK_50.png",
+    "A222_COMPARE_WHITE_75.png",
+    "A222_TRIAL_RAW_NATIVE_RGBA.png"
+  ],
+  "observations": {
+    "source": "Medium-light narrow olive-gray italic Normal Balance",
+    "old": "A197 broad angular thick Hangul mismatched source",
+    "trial": "New Regular glyph strokes visibly thinner, Korean inner spaces open at native/50%, no visible ghost/rectangle/clipping in inspected cropped views; orientation RAW expected mirror-y",
+    "remaining": "Not independent C qualified. Exact visual source lean/morphology, full protected art and real game not closed."
+  },
+  "producer_decision": "SCOPED_TRIAL_VISUAL_IMPROVED_C1_PENDING_NOT_PROMOTED",
+  "trial_dds_path": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_Q103_LIGHT_RIGHT_ITALIC_UNPROMOTED.dds",
+  "new_trial_dds": 1,
+  "promoted_dds": 0,
+  "C1": "PENDING_NEW_SHA",
+  "C3": "PENDING",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

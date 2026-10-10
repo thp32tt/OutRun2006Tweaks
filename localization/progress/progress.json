@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 11:59 KST",
+  "updated_at_kst": "2026-10-10 12:09 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10524,5 +10524,37 @@
     "evidence_controller": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_C2_CONTROLLER_VISUAL_REWORK.json",
     "evidence_machine": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_MACHINE.json",
     "timestamp_kst": "2026-10-10 11:59 KST"
+  },
+  "a222_q103_light_family_trial": {
+    "run": "A222",
+    "run_key": "OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200",
+    "queue_index": 103,
+    "official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "new_trial_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+    "canonical_source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "new_trial_dds": 1,
+    "promoted_dds": 0,
+    "changed_rgba_pixels": 9049,
+    "changed_outside_source": 0,
+    "source_bbox": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "new_bbox": [
+      1443,
+      1974,
+      1768,
+      2034
+    ],
+    "source_family_method": "NotoSansCJK-Regular 65px 4px native tracking, source olive gray 143/137/84; readable top-right 0.265 skew",
+    "self_QA": "SCOPED_PRODUCER_VISUAL_IMPROVED_ONLY",
+    "C1": "NEW_SHA_INDEPENDENT_REQUIRED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_CONTROLLER_PRODUCER_SCOPED_QA.json",
+    "run_id": 38019304438,
+    "updated_at_kst": "2026-10-10 12:09 KST"
   }
 }

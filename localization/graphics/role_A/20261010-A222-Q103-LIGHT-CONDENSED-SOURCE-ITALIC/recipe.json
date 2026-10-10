@@ -1,0 +1,53 @@
+{
+  "recipe_version": "q103-source-italic-v1",
+  "run": "A222",
+  "scope": "one original-source title cell (not full DDS approval)",
+  "canonical_source": {
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+  },
+  "clean_path": "localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CLEAN_PLATE.png",
+  "font": {
+    "family": "Noto Sans CJK Regular",
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+    "license": "SIL OFL",
+    "ppem": 65,
+    "ttc_index": 1,
+    "coverage": "verified",
+    "tracking_px": 4
+  },
+  "render": {
+    "color_RGB": [
+      143,
+      137,
+      84
+    ],
+    "mask": "A222_LETTERING_NATIVE_ALPHA.png",
+    "native_raster": true,
+    "skew_right_top": 0.265,
+    "AA": "Pillow bicubic for affine",
+    "resizing_previous_raster": false
+  },
+  "original_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "trial_bbox": [
+    1443,
+    1974,
+    1768,
+    2034
+  ],
+  "source_plate": "opaque original English-removed yellow bevel/gradient, alpha0 invalid here",
+  "raw_transform": "Y mirror 2048-1-y",
+  "renderer_code": "tools/localization/cpu_jobs/A.py",
+  "trigger_sha": "23e862303463458c5f6630026e27b223acf8614a",
+  "candidate_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+  "prior_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "guards": "source bbox strict + persisted RGBA outside0; final production manifest required if promoted",
+  "C1": "not qualified",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

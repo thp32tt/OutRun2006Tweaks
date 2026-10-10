@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A222 q103 2026-10-10 12:09 KST: C1-confirmed A197 bold overweight -> NEW native Regular italic light source-color trial persisted SHA a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07, source verified, 9049 changed pixels outside0, C1/C3/game still pending. Official unchanged. localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_CONTROLLER_PRODUCER_SCOPED_QA.json OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200",
     "A221 2026-10-10 11:13 KST: q121 P0 NEW exact-source boundary safety: rank21 CLEAN alpha738 but no original-equal removable pixels, rank26 81 original alpha all below outside English Do bbox. Worker #38015566261 safety-aborted, no DDS, no source mask invented, official/A220 unchanged. QA localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json OUTRUN-KOR-A221-Q121-P0-ADJACENT-PROTECTED-REGION-20261010-1100; q121 still REWORK_REQUIRED/IGR030/031/040 OPEN, runtime UNTESTED. Switch to safe distinct asset work rather than blind deletion.",
     "B347 2026-10-10 B q212 P1 canonical SOURCE f83f5848 / C158 CLEAN c13a2492 / B341 already C349 HOLD fa0acb56. GitHub CPU #38013622393 SUCCESS created 16,777,344-byte new trial DDS SHA 9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa, r43+r44 core height corrected 55/52 -> 44 vs English45, 41644 changed pixels outside2 ROIs0; other10 exact. Controller source/CLEAN/old/B341/new native gray and black50/RAW visual REJECT due PRO r43 source width397 vs new206 (visual hierarchy too narrow); trial not promoted, C338 official REWORK, C349 scoped HOLD, IGR029 OPEN, C3/approval/game UNTESTED. Source-condensed family width/stroke/optical 2D reconstruction required before next candidate. QA role_B/20261010-B347-Q212-SOURCE-CORE45-NATIVE-REBUILD/B347_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B347-Q212-C349-SOURCE-CORE45-REBUILD-20261010",
     "A220 2026-10-10 10:12 KST q121 P0 NEW distinct 24 source-matching English 'the' stray visible pixels repaired into unpromoted saved 4096x4096 DDS trial SHA256 6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06 from A219 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb; preserves previously repaired 33 'goal.' pixels; total 57. Native SHA-pinned SOURCE/CLEAN/OFFICIAL/TRIAL, BGW100/75/50 and RAW scoped visual + exact changed bytes95 (pixels24) PASS. Official 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844 unchanged REWORK_REQUIRED, whole atlas/C1/C3/APPROVAL/game IGR030/031/040 untested. Evidence localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json RUN_KEY=OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
@@ -6876,7 +6877,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 11:13 KST",
+  "updated_at_kst": "2026-10-10 12:09 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14715,5 +14716,37 @@
     "evidence_controller": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_C2_CONTROLLER_VISUAL_REWORK.json",
     "evidence_machine": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_MACHINE.json",
     "timestamp_kst": "2026-10-10 11:59 KST"
+  },
+  "a222_q103_light_family_trial": {
+    "run": "A222",
+    "run_key": "OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200",
+    "queue_index": 103,
+    "official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "new_trial_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+    "canonical_source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "new_trial_dds": 1,
+    "promoted_dds": 0,
+    "changed_rgba_pixels": 9049,
+    "changed_outside_source": 0,
+    "source_bbox": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "new_bbox": [
+      1443,
+      1974,
+      1768,
+      2034
+    ],
+    "source_family_method": "NotoSansCJK-Regular 65px 4px native tracking, source olive gray 143/137/84; readable top-right 0.265 skew",
+    "self_QA": "SCOPED_PRODUCER_VISUAL_IMPROVED_ONLY",
+    "C1": "NEW_SHA_INDEPENDENT_REQUIRED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_CONTROLLER_PRODUCER_SCOPED_QA.json",
+    "run_id": 38019304438,
+    "updated_at_kst": "2026-10-10 12:09 KST"
   }
 }
