@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00583",
+  "production_id": "CONVERSION-DX9EX-00583",
+  "event_id": "CONVERSION-DX9EX-00583-E003",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "base_sha": "64dd98b834cf858720d4d3fb4b583e77f0217bc8",
+  "first_material_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+  "validation_bearing_result_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+  "result_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00583]",
+  "work_key": "DX9EX:P1:SDL_TERMINAL_HOTPLUG_FENCE",
+  "status": "WAIT_EXACT_SHA_CI",
+  "controller_terminal": false,
+  "retry_allowed": true,
+  "changed_paths": [
+    "src/input_manager.hpp",
+    "tools/verify_vr_ffb_controller_routing.py"
+  ],
+  "summary": "Serialize SDL_OpenGamepad with terminal shutdown, reject late joystick/gamepad add callbacks once shutdown fenced, preserve pinned wheel FFB v0.2 and add four targeted negative-mutation regressions.",
+  "ci_runs": {
+    "dx9ex_active": 38038968852,
+    "domain_isolation": 38038968893,
+    "full_source_impact": 38038968844
+  },
+  "ci_results": [
+    {
+      "gate": "policy",
+      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "success",
+      "run_id": 38038968852
+    },
+    {
+      "gate": "domain_isolation",
+      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "success",
+      "run_id": 38038968893
+    },
+    {
+      "gate": "source_cross_domain",
+      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "success",
+      "run_id": 38038968844
+    },
+    {
+      "gate": "game_host_full_chain",
+      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "in_progress",
+      "run_id": 38038968852
+    },
+    {
+      "gate": "msvc_static_analysis",
+      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "in_progress",
+      "run_id": 38038968844
+    }
+  ],
+  "static_validation": "PASS: 4 injected lifetime mutants rejected within VR FFB routing verifier exact-SHA policy job",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "ffb_wheel_hardware_validation": "UNTESTED",
+  "native_120fps_target": "NOT_MEASURED",
+  "pinned_ffb_release": {
+    "tag": "v0.2",
+    "sha": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "modified": false
+  },
+  "baseline": {
+    "sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "modified": false
+  },
+  "lane_policy": {
+    "dx11": "ACTIVE_INDEPENDENT",
+    "dxvk": "FROZEN",
+    "localization": "UNMODIFIED"
+  },
+  "score_applied": false,
+  "note": "This preliminary durable record is not C6 completion. Exact source SHA is pinned independently of the bookkeeping HEAD. Finalize after the running CI results."
+}
