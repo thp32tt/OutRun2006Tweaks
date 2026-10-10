@@ -362,6 +362,23 @@ class VRLensFlareProjected2D : public Hook
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
 	}
 
+    // Unlike the outer halo discs at 0xCABE, the central 0x570002 sun
+    // travels through sub_40C980 and its independent 0xC993 E8 call to
+    // DrawObjectAlpha_Internal. The old D3A5 scope only marked the parent
+    // lifetime; nested SceneEffect and the actual draw can overwrite it.
+    // Own THIS one actual draw, not the shared object renderer or the
+    // four already-correct surrounding discs. Matching the EXE's existing
+    // 0xCABE call signature preserves the original arguments and alpha.
+    static void __cdecl DrawObjectAlphaCentre(
+        int objectId, float alpha, void* work, int flags)
+    {
+        // This is an original 0xC993 non-queued call; do not let a prior
+        // SpriteNode's ScreenHud/WorldBillboard scope hijack the centre sun.
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
+            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+        Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
+    }
+
 public:
 	std::string_view description() override
 	{
@@ -373,6 +390,11 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
 			Memory::HookType::Call);
+        // Separate verified E8 into the same DrawObjectAlpha_Internal ABI,
+        // invoked only by the primary sun's sub_40C980 producer.
+        Memory::VP::InjectHook(
+            Module::exe_ptr(0xC993), DrawObjectAlphaCentre,
+            Memory::HookType::Call);
         // Exact E8 source for central 0x570002 object, not the shared
         // sub_40C980 target. If either enter/leave cannot relocate, retain
         // the unchanged original lens behavior rather than leaking a world
@@ -390,7 +412,7 @@ public:
         }
         else
             spdlog::info(
-                "VR P0 LENS CENTRE: exact 0x570002 object 0xD3A5 -> WORLD_BILLBOARD (other discs unchanged)");
+                "VR P0 LENS CENTRE: 0xD3A5 owner plus exact 0xC993 projected draw scope (outer 0xCABE discs untouched)");
 		spdlog::info(
 			"VR P0 FLARE: exact EXE+0xCABE producer -> PROJECTED_SCREEN_EFFECT_2D; placement remains WVP-proven");
 		return true;

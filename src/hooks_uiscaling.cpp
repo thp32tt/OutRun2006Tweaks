@@ -890,9 +890,6 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
-
 		OutRunVR::GameSemantic::RenderScope scope{};
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
 		if (RankMarkerSubScreenHudDepth != 0)
@@ -907,6 +904,18 @@ class UIScaling : public Hook
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
 			marker = projected ? &RankMarkerProjectedInfo : nullptr;
 		}
+
+        // Scope the actual original draw AFTER determining NaviPub vs
+        // vehicle owner; this preserves the historical precedence contract.
+        // Post-call SpriteNode tagging remains necessary for queued siblings.
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
+                scope, marker);
+            result = Game::sprani_play_ae_auth_alpha(
+                spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
+                a4, a5, alpha);
+        }
 
 		// These four exact producer callsites own the vehicle-relative rank
 		// markers. Prefer the recovered Calc3D2D anchor; retain the current
@@ -932,9 +941,6 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
-		const int result =
-			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
-
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
 		const bool projected = !screenHud && RankMarkerProjectedInfo.valid;
 		const auto scope = screenHud
@@ -942,6 +948,14 @@ class UIScaling : public Hook
 			: (projected
 				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
+                scope, projected ? &RankMarkerProjectedInfo : nullptr);
+            result = Game::put_clip_sprite(
+                xstnum, x, y, flags, priority, color);
+        }
+
 		// put_clip_sprite normally queues one glyph. If an animation/mask
 		// expands it to sibling nodes (even at another priority), every child
 		// needs the original fractional offset and the same spatial owner.
