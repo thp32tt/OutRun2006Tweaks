@@ -21,10 +21,13 @@ guards=(
     "outputs[slot]->Release();",
     "ID3D11DepthStencilView* expectedDepthTarget = nullptr",
 )
+# R218 adds an independent raster contract in this header; mutation checks
+# must scope to the original R187/R204/R205 helper, never a later helper.
+r187 = h.split("// R218: composed indexed full-eye D32 readiness:", 1)[0]
 def contract(text): return all(g in text for g in guards)
-assert contract(h), "missing native indexed viewport/target protection"
+assert contract(r187), "missing native indexed viewport/target protection"
 for g in (guards[0],guards[2],guards[5],guards[6],guards[7],guards[8],guards[9],guards[10],guards[11],guards[12]):
-    assert not contract(h.replace(g,"",1)), "source mutation survived: "+g
+    assert not contract(r187.replace(g,"",1)), "source mutation survived: "+g
 assert "->Draw(" not in h and "->DrawIndexed(" not in h, "game Draw activation prohibited"
 for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
     "reject extra viewport", "reject half viewport", "reject scissor enabled",
