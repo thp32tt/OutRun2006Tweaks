@@ -1,0 +1,4 @@
+{
+  "exit": 0,
+  "stdout": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"MATERIAL_REWORK\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 217,\n      \"path\": \"textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds\",\n      \"current_status\": \"c1_20261011_q217_red_badge_protected_425_rework_required\",\n      \"next_action\": \"MATERIAL_REWORK\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Current candidate has an actionable defect; rebuild the failed source-style stage\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n"
+}
