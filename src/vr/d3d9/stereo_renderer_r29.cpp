@@ -732,6 +732,66 @@ namespace OutRunVRStereo
         return true;
     }
 
+    bool R29OwnerEnsureStereoResources(IDirect3DDevice9* device) noexcept
+    {
+        return EnsureStereoResources(device);
+    }
+
+    bool R29OwnerTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept
+    {
+        return TryBootstrapRightDepthFromRecentClear(device);
+    }
+
+    bool R29OwnerDepthTestActive(IDirect3DDevice9* device) noexcept
+    {
+        return DepthTestActive(device);
+    }
+
+    bool R29OwnerStencilTestActive(IDirect3DDevice9* device) noexcept
+    {
+        return StencilTestActive(device);
+    }
+
+    bool R29OwnerLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept
+    {
+        return LeftDrawMayWriteDepth(device);
+    }
+
+    bool R29OwnerLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept
+    {
+        return LeftDrawMayWriteStencil(device);
+    }
+
+    void R29OwnerNoteMainDepthContentWrite() noexcept
+    {
+        R9NoteMainDepthContentWrite();
+    }
+
+    void R29OwnerNoteStereoDrawWithoutMonoBackup() noexcept
+    {
+        R9NoteStereoDrawWithoutMonoBackup();
+    }
+
+    void R29OwnerUndoStereoDrawCount() noexcept
+    {
+        R9UndoStereoDrawCount();
+    }
+
+    IDirect3DSurface9* R29OwnerBorrowTrackedRenderTarget() noexcept
+    {
+        return TrackedRenderTarget;
+    }
+
+    void R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(IDirect3DDevice9* device) noexcept
+    {
+        InvalidateRightDepthStencilIfLeftMayWrite(device);
+    }
+
+    void R29OwnerNoteRestoreFailure(const char* site) noexcept
+    {
+        NoteRestoreFailure(site);
+    }
+
     bool R29OwnerStereoWanted() noexcept
     {
         return StereoWanted();
