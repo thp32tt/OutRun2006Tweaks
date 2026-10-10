@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "chat_worker_rollover_reconciliation",
+  "task_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E004",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "2/3",
+  "target_branch": "vr-dx11-native-r71",
+  "checkpoint_branch": "chat-controller-downloads",
+  "checkpoint_observed_at_kst": "2026-10-10T21:15:11+09:00",
+  "checkpoint_path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00536/20261010T2110-periodic.json",
+  "recovered_source": {
+    "base_sha": "9f27f5f664b34793e7aa4abf323717876ac25841",
+    "task_material_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "latest_head": "86ea5dc4383fdf6bfc6fe4fbabdc07a104da7688",
+    "task_work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+    "already_committed": true,
+    "required_marker_existing": true,
+    "source_patch_required": false,
+    "feature_branch_created": false
+  },
+  "evidence": {
+    "task_record": "docs/automation/runs/CONVERSION-DX11-00536.json",
+    "r239_static": "PASS",
+    "r239_build": "PASS",
+    "r239_gpu_index16_and_index32": "PASS",
+    "task_exact_sha_full_gate_run_id": 38048751349,
+    "task_exact_sha_full_gate": "FAIL",
+    "inherited_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_owner_material_sha": "86ea5dc4383fdf6bfc6fe4fbabdc07a104da7688",
+    "r175_fix_changes": [
+      "src/vr/d3d11/pipeline_translation.cpp",
+      "tools/dx11_constant_buffer_probe.cpp",
+      "tools/dx11_shader_linkage_probe.cpp"
+    ],
+    "upstream_exact_sha_gate_run_id": 38051097858,
+    "upstream_gate_status_at_capture": "IN_PROGRESS_WIN32_BUILD",
+    "fast_structural_gate_run_id": 38051097873,
+    "fast_structural_gate": "SUCCESS"
+  },
+  "decision": {
+    "status": "UPSTREAM_R175_GATE_PENDING",
+    "phase": "C6_STATE",
+    "duplicate_source_write": false,
+    "conflicting_owner_write": false,
+    "target_branch_intermediate_push": false,
+    "feature_ready": false,
+    "original_task_automation_validation": "FAIL",
+    "integrated_latest_head_full_gate": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "score_change": 0
+  },
+  "next_action": "After R175 owner 00477 exact-SHA Backend Conversion Gate #38051097858 is complete, verify pixel regression and integration gate at latest head. If PASS, report R239 retained as scoped evidence with new integrated exact-SHA success, without duplicate 00536 production commit or score. If FAIL, continue with 00477 owner without touching owned shader files and do not classify 00536 complete."
+}
