@@ -35,6 +35,7 @@ on:
       - 'docs/VR_REGRESSION_KNOWLEDGE.json'
       - 'docs/VR_AUTODEV_PROTOCOL.md'
       - 'docs/VR_AUTODEV_STATE.json'
+      - 'docs/DX9EX_AUTODEV_PRIORITY_20261010.md' # Actual P0/P1 authority; policy guard must re-run on updates.
       - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'docs/VR_PROBLEM_HISTORY.md'
