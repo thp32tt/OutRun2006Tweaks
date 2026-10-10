@@ -16,8 +16,8 @@
   "material_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
   "validation_bearing_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00567]",
-  "status": "WAIT_FULL_CHAIN_AND_GAME_ANALYZER_CI",
-  "controller_terminal": false,
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
   "retry_allowed": false,
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -33,14 +33,14 @@
   ],
   "summary": "Reject negative-width/height XR per-eye FOV instead of mirroring stereo; publish candidate projection only after MatrixFinite validation. Add Release-active checks for zero, inverted axes, NaN, Infinity base, asymmetric valid FOV.",
   "source_review": "Confirmed independent from 00566 R32 diagnostic and smoke paths; no files overlap 00566; no previous 00567 result. Preserved FFB v0.2, immutable DX9Ex baseline and isolated DX11/DXVK/localization.",
-  "static_validation": "PASS_EXACT_SHA_DX9EX_POLICY_HOST_CORE_MATH_WIN32_GAME_DOMAIN_GUARD_HOST_MSVC_ANALYSIS; R33_FULL_CHAIN_AND_WIN32_MSVC_ANALYSIS_PENDING",
+  "static_validation": "PASS_EXACT_SHA: DX9Ex Active policy/host/core_math/game/R33 full-chain/package; Domain Isolation; Full Source Impact cross-domain, x64 host analyze, Win32 game analyze",
   "ci_runs": {
     "dx9ex_active": 38022025928,
     "domain_isolation": 38022025870,
     "full_source_impact": 38022025968
   },
   "package": {
-    "status": "PUBLISHED_EXACT_SHA_CI_PENDING_REMAINING_GATES",
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
     "artifact_id": 11658119002,
     "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-54cc213f19da1f5d010bb80e288d1be8a73f9f49",
     "digest": "sha256:54172d11d86168d6bc860606e7bfeebc573b3944aeac974fe653c072dc099b17",
@@ -50,22 +50,34 @@
     "C0_RECOVER": "PASS GitHub HEAD/checkpoint 00567 E002 and no result record",
     "C1_REVIEW": "PASS unique inverted-FOV and partial-publication defect; independent 00566 file ownership",
     "C2_IMPLEMENT": "PASS two-file source change and Release-active smoke negative cases",
-    "C3_VALIDATE": "PARTIAL_PASS exact SHA: host/core_math, active game, policy, domain, host analyze SUCCESS; R33 full-chain and game analyzer pending",
+    "C3_VALIDATE": "PASS exact SHA 54cc213f: DX9Ex Active #38022025928, Domain #38022025870, Full Source #38022025968 all SUCCESS",
     "C4_COMMIT": "PASS material 54cc213f19da with exact marker, remote ref verified",
-    "C5_PACKAGE": "PASS exact-SHA CI artifact 11658119002 published; NOT HMD approved",
-    "C6_RESULT": "INTERIM await CI; do not mark COMPLETE"
+    "C5_PACKAGE": "PASS exact-SHA artifact 11658119002 digest sha256:54172d11d86168d6bc860606e7bfeebc573b3944aeac974fe653c072dc099b17; HMD UNTESTED",
+    "C6_RESULT": "PASS durable terminal record separate from material source commit; one score eligible, no duplicate on retries/rollovers"
   },
-  "next_action": "Poll the existing exact-SHA DX9Ex Active #38022025928 full-chain and Full Source #38022025968 game-analyze jobs; do not start duplicate source work or a duplicate workflow. On success finalize C6 and score once; keep HMD UNTESTED.",
+  "next_action": "Advance to a new independent DX9Ex P1 R84 or P2 OpenXR per-eye task; never repeat 00567, never infer native120fps or Quest3/HMD PASS from CI.",
   "ci_jobs": {
     "policy": "SUCCESS",
     "host": "SUCCESS",
     "host_core_math_smoke": "SUCCESS",
     "game": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
     "package": "SUCCESS",
     "domain_isolation": "SUCCESS",
     "fullsource_cross_domain": "SUCCESS",
     "fullsource_host_analyze": "SUCCESS",
-    "full_chain_compile": "IN_PROGRESS",
-    "fullsource_game_analyze": "IN_PROGRESS"
+    "fullsource_game_analyze": "SUCCESS"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
   }
 }
