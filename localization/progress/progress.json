@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 12:09 KST",
+  "updated_at_kst": "2026-10-10 12:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10556,5 +10556,57 @@
     "qa": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_CONTROLLER_PRODUCER_SCOPED_QA.json",
     "run_id": 38019304438,
     "updated_at_kst": "2026-10-10 12:09 KST"
+  },
+  "c1_20261010_q205_exact_source_A76_B303_clean_current": {
+    "role": "C1",
+    "SHARD": "ODD",
+    "index": 205,
+    "run_key": "OUTRUN-KOR-C1-Q205-B306-CANONICAL-CLEAN-PIXEL-PROOF-20261010-1210",
+    "priority": "P0",
+    "user_ingame": [
+      "IGR-026 OPEN",
+      "IGR-027 OPEN",
+      "IGR-028 MIXED_UNMAPPED_OPEN"
+    ],
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "A76_clean_sha256": "2e06b0d14f372a5e904ff09e62fb9ed14387fe8b98e49ae385af094a4b0fd73f",
+    "B303_clean_sha256": "245c66e49b3b4254b5eb7043b3de1364982414ff76e7dc1c68006951f92effac",
+    "new_achievement": "Canonical source DDS authenticated; A76 and B303 full decoded CLEAN pixel identity, and independent three-way SOURCE/CLEAN/CURRENT protected-mask preservation and two P0 title direct visual",
+    "same_candidate_as_C338": true,
+    "source_png_exact_readable": true,
+    "clean_pixel_diff_all_atlas": 0,
+    "source_clean_changed_rgba": 319471,
+    "clean_final_changed_rgba": 162672,
+    "source_final_changed_rgba": 378490,
+    "all_three_changed_outside_allowed_mask_rgba_alpha": 0,
+    "all_three_changed_protected_visible_mask": 0,
+    "source_removed_OPTIONS_alpha": 56371,
+    "source_removed_RANKINGS_alpha": 68359,
+    "candidate_bbox_margins": {
+      "OPTIONS": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "RANKINGS": [
+        6,
+        659,
+        6,
+        6
+      ]
+    },
+    "reviewed_regions": 2,
+    "unreviewed_regions": 21,
+    "decision": "HOLD_STRICT_RECHECK",
+    "blind_calibration": "NOT_COMPLETED",
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "USER_IN_GAME": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "report": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_C1_CONTROLLER_C1_HOLD.json",
+    "machine": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_C1_INDEPENDENT_MACHINE.json"
   }
 }
