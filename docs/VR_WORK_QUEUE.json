@@ -67,7 +67,7 @@
       ],
       "activeTaskIds": [],
       "productionIntegrationWip": 1,
-      "rule": "Inspect remote HEAD and task work_key lease; perform next independent C P0 FFB integration then P1 structural then P2 XR per-eye then P3 native 120fps; hardware only gates acceptance. DX11 A active concurrently, DXVK B frozen."
+      "rule": "Inspect remote HEAD and current feature/work_key claim before dispatch. Continue feature-scoped DX9Ex C implementation + integrated Win32 debug + exact-SHA gates under SAME TASK_ID until all acceptance criteria pass; do not retire a job after a single minor edit or FEATURE_READY. R84 is one full TU/CMake feature. DX11 A stays independently active, DXVK B frozen; Quest3 runtime acceptance separate."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -117,7 +117,11 @@
       "wholesaleMerge": false,
       "cycleTargetAuthoritative": false,
       "requiredCloseout": "SUPERSEDED_BY_DX9EX_FOCUS",
-      "closeoutStatus": "INCOMPLETE_PENDING_R32_R31_TU_AND_CMAKE_CLEANUP"
+      "closeoutStatus": "INCOMPLETE_PENDING_R32_R31_TU_AND_CMAKE_CLEANUP",
+      "featureScope": "ONE_FUNCTIONAL_DELIVERABLE_R33_TO_R29_TU_AND_CMAKE_WIN32_FULL_CHAIN",
+      "completionRule": "Do not close per-seam AUTO microtasks as R84 DONE. Integrate the full remaining textual implementation split, reconcile CMake, compile/link, debug/rebuild and pass exact-SHA DX9Ex Active plus Domain Isolation before SUPERSEDED_BY_DX9EX_FOCUS.",
+      "intermediateStatusRule": "FEATURE_READY/PENDING_CONTROLLER_EXACT_SHA/isolated guard PASS/rollover are NONTERMINAL",
+      "requiredDeterministicGates": ["INDEPENDENT_R33_R32_R31_R30_R29_TUS", "RETIRED_TEXTUAL_CPP_INCLUDES", "CMAKE_AND_HEADER_FILE_ONLY_SYNC", "WIN32_FULL_CHAIN_COMPILE_AND_LINK", "DX9EX_ACTIVE_SUCCESS_SAME_SHA", "DOMAIN_ISOLATION_SUCCESS_SAME_SHA"]
     },
     "executionAuthority": {
       "effective": "2026-10-10",
@@ -786,28 +790,28 @@
       "priority": 18,
       "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "Selectively port PORT_REQUIRED R84 ownership/interface boundaries into current focus one seam per AUTO task: R34/R33, R33/R32, R32/R31, R31/R30, R30/R29, then lower Present/Reset/DirectGPU facades.",
+      "summary": "Complete the one remaining R84 functional deliverable as a coherent implementation: independent R33/R32/R31/R30/R29 translation-unit compile/link owners, explicit lower owner headers/interfaces, retired textual .cpp includes, cmake.toml/CMakeLists.txt/HEADER_FILE_ONLY graph cleanup, full Win32 integration build and exact-SHA gates. Substeps are checkpoints within one feature, not terminal AUTO tasks.",
       "testLevel": "LEVEL0",
       "dependencies": [
         "DX9EX-R84-PORT-INVENTORY-001"
       ],
       "attempts": 0,
       "runtimeCandidate": false,
-      "nextAction": "Resume remaining bounded CMake/textual TU ownership seams from latest focus, beginning with blocked R32/R31 split and lower-owner facade preflight; R33/R32 split and R30 support facade portions are already exact-SHA validated. Do not blanket-merge R84. CI and runtime validations are separate."
+      "nextAction": "Resume the SAME R84 functional feature/work_key with current GitHub owner lease; finish ALL remaining R32/R31/R30/R29 textual/TU and CMake boundaries in one coherent change, then run Win32 full-chain, diagnose and repair compiler/linker/CI errors, rerun exact-SHA DX9Ex Active and Domain Isolation until green or log a genuine BLOCKED reason. Do not declare DONE for one small seam, one commit, FEATURE_READY or static PASS. Do not blanket-merge R84; Quest3 runtime remains UNTESTED."
     },
     {
       "id": "DX9EX-R84-PORT-CLEANUP-001",
       "priority": 17,
       "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "After required seams are independently compiled, remove obsolete HEADER_FILE_ONLY/textual .cpp ownership and gate-only compatibility structure from the production graph while retaining exactly one active stereo/renderer owner.",
+      "summary": "R84 functional acceptance phase (not an independently completed microtask): reconcile generated CMake, HEADER_FILE_ONLY and removed textual .cpp includes together with the seam implementation; retain exactly one renderer/stereo compile owner.",
       "testLevel": "LEVEL0",
       "dependencies": [
         "DX9EX-R84-PORT-SEAMS-001"
       ],
       "attempts": 0,
       "runtimeCandidate": false,
-      "nextAction": "Reconcile cmake.toml and generated CMakeLists, add fail-closed verifier guards against textual .cpp include reintroduction, and require exact hosted compile/link + Active Validation + Domain Isolation."
+      "nextAction": "Include cleanup within the same R84 feature rather than waiting for a new task after a per-seam DONE. Require coherent cmkr/CMake source graph, fail-closed include guards, full Win32 compile/link, then exact-SHA DX9Ex Active and Domain Isolation SUCCESS."
     },
     {
       "id": "DX9EX-R84-CONVERGENCE-CLOSEOUT-001",
