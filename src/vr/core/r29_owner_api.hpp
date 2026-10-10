@@ -69,6 +69,20 @@ namespace OutRunVRStereo
     IDirect3DSurface9* R29OwnerBorrowTrackedRenderTarget() noexcept;
     void R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(IDirect3DDevice9* device) noexcept;
     void R29OwnerNoteRestoreFailure(const char* site) noexcept;
+    // Lower-owned original-hook and frame-failure services.
+    void R29OwnerReportStereoFailure(
+        OutRunVR::StereoFailureReason reason,
+        const char* site, HRESULT hr) noexcept;
+    void R29OwnerMarkRightDrawFailed() noexcept;
+    HRESULT R29OwnerCallOriginalSetRenderTarget(
+        IDirect3DDevice9* device, DWORD index,
+        IDirect3DSurface9* surface) noexcept;
+    HRESULT R29OwnerCallOriginalSetDepthStencilSurface(
+        IDirect3DDevice9* device, IDirect3DSurface9* surface) noexcept;
+    bool R29OwnerRestoreRightPassState(
+        IDirect3DDevice9* device, IDirect3DSurface9* target,
+        IDirect3DSurface9* depth, const D3DVIEWPORT9& viewport,
+        const float* originalWvp, bool restoreWvp) noexcept;
     bool R29OwnerStereoWanted() noexcept;
     bool R29OwnerTargetIsBackBuffer() noexcept;
     bool R29OwnerExchangeInternalStereoPass(bool active) noexcept;
