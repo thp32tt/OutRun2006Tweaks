@@ -1,0 +1,156 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00537",
+  "lease_epoch": 1,
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "target_branch": "vr-dx11-native-r71",
+  "work_key": "DX11:FIRST_GAME_DRAW_FRAME",
+  "conflict_keys": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp:FIRST_GAME_DRAW_FRAME",
+    "CMakeLists.txt:live_frame_game_target",
+    "DX11:FIRST_GAME_DRAW_FRAME"
+  ],
+  "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "feature_base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+  "live_game_draw_path": [
+    "R30 real D3D9 DrawPrimitive/DrawIndexedPrimitive/UP entrypoint, before legacy stereo return",
+    "R30 current source lock/unlock shadow for non-UP VB/IB, bounded copy and rebased indices",
+    "Game device FVF/VS/PS/texture/render-state query with COM ownership and unsupported fail-closed",
+    "D3D11 native device, immutable VB/IB, input layout, compiled fixed-function subset shaders and native Draw/DrawIndexed",
+    "D3D11 staging GPU pixel readback and opt-in desktop D3D9 UpdateSurface inset ahead of original Present",
+    "Preserve original D3D9 draw, DX9Ex fallback, Reset cleanup and user input"
+  ],
+  "owner_handoff_evidence": {
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "r175_status": "COMPLETE_R175_SOURCE_WARP_PARITY",
+    "r175_material_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+    "r175_verified_gate_id": 38055194091,
+    "r175_source_files_not_modified": [
+      "src/vr/d3d11/pipeline_translation.cpp",
+      "tools/dx11_constant_buffer_probe.cpp",
+      "tools/dx11_shader_linkage_probe.cpp"
+    ],
+    "owner_00536": "C6 complete, not replayed",
+    "target_head_at_dispatch": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "feature_head_at_dispatch": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba"
+  },
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "first_live_game_draw",
+    "integration_path": [
+      "D3D9 game callsite with lifetime-bounded VB/IB/UP sources",
+      "Native D3D11 draw with game-authored FVF geometry",
+      "Game-visible opt-in diagnostic inset and original D3D9 Present"
+    ],
+    "batch_components": [
+      "R30 production Draw/DrawIndexed/UP callsites and lock/unlock shadow",
+      "D3D11 game frame bridge owning native VB/IB/shaders/RT/readback",
+      "CMake game DLL integration and Reset/Present paths"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PENDING: Windows compiled, live D3D9 device/hook and D3D11 output proof",
+      "negative_regression": "PENDING: invalid FVF/state/shader/index/reset/default-off negatives",
+      "component_integration": "SOURCE_IMPLEMENTED_UNVALIDATED: R30 live draw to DX11 native Draw and game-visible desktop inset"
+    },
+    "conflict_keys": [
+      "DX11:FIRST_GAME_DRAW_FRAME",
+      "src/vr/d3d9/stereo_renderer_r30.cpp:FIRST_GAME_DRAW_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha_at_FEATURE_READY"
+  },
+  "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
+  "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
+  "feature_status": "IMPLEMENTING",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C2_IMPLEMENT",
+  "feature_acceptance": {
+    "implementation_complete": false,
+    "targeted_checks": [],
+    "integration_contract": "D3D9_CALLSITE→D3D11_NATIVE_DRAW→VISIBLE_FRAME_OUTPUT (source path implemented, CI/runtime pending)"
+  },
+  "acceptance_results": [
+    {
+      "id": "DX11-LIVE-CALLSITE",
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.hpp"
+      ],
+      "validation_command": "PENDING_WIN32_GAME_BUILD_AND_DYNAMIC_CALLEE_TEST"
+    },
+    {
+      "id": "DX11-NATIVE-DRAW",
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "PENDING_NATIVE_DRAW_GPU_INTEGRATION_TEST"
+    },
+    {
+      "id": "DX11-VISIBLE-FRAME",
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp"
+      ],
+      "validation_command": "PENDING_BACKBUFFER_PIXEL_READBACK_TEST"
+    },
+    {
+      "id": "DX11-SAFE-RETURN",
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "PENDING_NEGATIVE_RUNTIME_TESTS"
+    },
+    {
+      "id": "DX11-TEST-BUNDLE",
+      "status": "PENDING",
+      "evidence_paths": [
+        "CMakeLists.txt"
+      ],
+      "validation_command": "PENDING_WIN32_GAME_HOST_PACKAGE_BUILD"
+    }
+  ],
+  "required_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    {
+      "name": "Build",
+      "jobs": []
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "jobs": []
+    }
+  ],
+  "artifact_prefix": "feature-dx11-first-game-frame-",
+  "material_result_sha": "70fb68fbb071c2d72bfb372d842c8103c2ef519b",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_draw_path_production_default": false,
+  "source_stage": "Game callsite/native draw/readback path coded but not compiled or validated",
+  "last_real_activity_evidence": "feature commits 724bf572, 68f7e26a, e5ee29ac, 70fb68fb",
+  "blocker": "Native game subset currently limited to untextured FVF XYZRHW|DIFFUSE triangles; no general shader/texture/VS path; Windows build, GPU/backbuffer live proof and game/Quest3 still pending.",
+  "resume_cursor": "C2_REVIEW_COMPILER_WARNINGS_THEN_C3_WIN32_BUILD_AND_INTEGRATION_TESTS",
+  "next_action": "Validate Win32 compilation via draft feature PR; repair source failures on feature branch; add genuine live draw/visible pixel and negative controls; package exact SHA; only then FEATURE_READY and controller promotion.",
+  "score_change": 0
+}
