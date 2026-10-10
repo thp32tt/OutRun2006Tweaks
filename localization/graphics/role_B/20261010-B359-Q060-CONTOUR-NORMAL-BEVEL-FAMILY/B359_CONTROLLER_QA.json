@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B359",
+  "run_key": "OUTRUN-KOR-B359-Q060-P0-NORMAL-BEVEL-SOURCE-ANCHOR-20261010-2133",
+  "timestamp_kst": "2026-10-10T21:42:00+09:00",
+  "index": 60,
+  "asset": "A064FDFC",
+  "shard": "EVEN",
+  "ingame_regression": "IGR-044",
+  "priority": "P0",
+  "triage": "METHOD_CHANGE_REQUIRED",
+  "prior_C2_B353_result": "REWORK_REQUIRED_OPTICAL_SOURCE_FAMILY",
+  "method_change": "Source pixel-normal-facing contour highlights sampled from canonical English upper-warm 85th-percentile + native 128ppem Korean contour and separately constructed source-navy extrusion. Measured original English first-B left warm-core x(y) readable right-lean +0.3421 instead of blindly chosen affine. Source-authored B348 CLEAN reused unchanged; no raster rescales of old Korean. Compared with B353 row-only gold gradient and thinner optical depth; not a parameter-only rerender.",
+  "execution_backend": "GITHUB_ACTIONS_CPU_WORKER",
+  "workflow_run_id": 38052736141,
+  "worker_success": true,
+  "attempts": [
+    {
+      "commit": "7d7022243e56e509cc7078be72e353b161ef62aa",
+      "result": "FAIL_CLOSED_NO_DDS",
+      "reason": "source-bbox outside top/bottom 1px, right edge 1px; worker rejected [2223,340,3029,474] against English [2179,340,3028,474]"
+    },
+    {
+      "commit": "71ab586193959c8bcfc0433076570073d7d14a65",
+      "result": "SUCCESS_SAVED_UNPROMOTED_TRIAL",
+      "worker_output_commit": "4a95f1def569cc25ed2e6e5520da7afd4c697ea5",
+      "reason": "corrected bevel geometry to exact source box [2221,341,3024,471]"
+    }
+  ],
+  "canonical_source": {
+    "revision": "OR2-HD-GUI-v0.25.10a",
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+  },
+  "authored_source_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "existing_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_unapproved_saved_trial_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+  "candidate_path": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_Q060_SOURCE_CONTOUR_GOLD_KOREAN_UNAPPROVED.dds",
+  "native_size": [
+    4096,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "RAW_orientation": "MIRROR_Y",
+  "scope": "BEST TIME English/Hangul source text only in 1030x148 ROI. OUTRUN MILES, HOLLY WOLF and other sibling sprites unchanged.",
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "effect_bbox": [
+    2221,
+    341,
+    3024,
+    471
+  ],
+  "source_effect_width": 849,
+  "source_effect_height": 134,
+  "new_effect_width": 803,
+  "new_effect_height": 130,
+  "positive_margins": [
+    42,
+    4,
+    1,
+    3
+  ],
+  "native_source_to_trial_width_ratio": 0.9458,
+  "source_first_glyph_OLS_right_slant_per_y": 0.3421,
+  "machine": {
+    "source_to_clean_removed_px": 89391,
+    "source_clean_effect_outside_px": 0,
+    "official_to_trial_changed_RGBA": 92937,
+    "outside_worker_roi_changed_RGBA": 0,
+    "protected_source_neighbour_modified_px": 0,
+    "persisted_roundtrip_mismatch_px": 0
+  },
+  "visual_proof": {
+    "readable_native_gray": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "readable_practical_50_gray": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_50_FLIPY.png",
+    "raw_gray": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png",
+    "source_first_stem_measure": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_SOURCE_B_RIGHT_LEAN_STEM.json",
+    "material_profile": "localization/graphics/role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY/B359_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json",
+    "observations": "Viewed persisted four-column English / source-authored CLEAN / official / B359 on gray at 100/50 and RAW at native. B359 has noticeably richer gold/yellow face, distinct navy contour and stronger source-tracked right slant than prior B353. Korean remains legible at 50%; original English's per-glyph racing letter shapes have not been independently judged equivalent by C2, and in-game composition not tested.",
+    "ordered_8": [
+      {
+        "check": "source_removal",
+        "result": "PASS_SCOPED_B348_SOURCE_MASK_SHA"
+      },
+      {
+        "check": "readable_slant",
+        "result": "PASS_DIRECTION_SINGLE_ENGLISH_B_OLS_BUT_HOLD_MULTI_GLYPH_HOMOLOGY"
+      },
+      {
+        "check": "source_relative_scale",
+        "result": "PASS_SCOPED_803_OF_849_WIDTH_130_OF_134_HEIGHT"
+      },
+      {
+        "check": "font_style_effect",
+        "result": "HOLD_INDEPENDENT_C2_SOURCE_FAMILY_OPTICAL"
+      },
+      {
+        "check": "clipped_glyph_pixels",
+        "result": "PASS_SOURCE_EFFECT_INSIDE_BY_1PX_PLUS"
+      },
+      {
+        "check": "protected_sibling",
+        "result": "PASS_0_DELTA"
+      },
+      {
+        "check": "RAW_FLIPY",
+        "result": "PASS_NATIVE_PIXEL_PREVIEWS"
+      },
+      {
+        "check": "immediate_readability",
+        "result": "PASS_SCOPED_NATIVE_50_PERCENT_VISUAL"
+      }
+    ]
+  },
+  "controller_producer_decision": "PRODUCER_SCOPED_VISUAL_PASS_PENDING_INDEPENDENT_C2_SOURCE_FAMILY_AND_BLIND_SLANT_CONFIRMATION",
+  "independent_C2": "NOT_RUN_ON_B359_SHA",
+  "C3": "BLOCKED",
+  "C_approval": false,
+  "official_promoted_dds": 0,
+  "materially_new_unapproved_trial_dds": 1,
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "consumer_chain": {
+    "static_source_candidate_proven": true,
+    "known_consumers": [
+      "INGAME_HUD_OUTRUN_MILES",
+      "BEST_TIME_SHARED_ATLAS",
+      "STAGE_HEART_TALLY"
+    ],
+    "unverified_first_link": "preview_manifest_asset_selection_actual_game_load",
+    "untested_routes": [
+      "driving HUD after race launch",
+      "Best Time change after driving result",
+      "transition HUD + Stage/Heart overlays"
+    ],
+    "new_user_screenshot_required": true
+  },
+  "cleanup": "GitHub-hosted ephemeral runner scratch discarded; no N100 workload/worktrees",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "independent_C2_next_step": "Check exact 6551bd... against canonical source at native,50% and RAW, independent homologous source racing-family bevel and slant before any official promotion; game retest required to close IGR044."
+}
