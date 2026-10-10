@@ -1,0 +1,84 @@
+{
+  "source": {
+    "uri": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+    "sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+  },
+  "full_clean_reference": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "old_official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "index": 1
+  },
+  "regions": [
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 5832,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r43_professional",
+      "source_english": "PROFESSIONAL",
+      "translated_text": "프로페셔널 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "glyph_rendering": "native_per_syllable_stroked_outline",
+      "stroke_px": 1,
+      "native_tracking_px": 10,
+      "geometry_attempts": [
+        [
+          43,
+          359,
+          44
+        ],
+        [
+          42,
+          352,
+          43
+        ],
+        [
+          41,
+          345,
+          42
+        ],
+        [
+          40,
+          339,
+          41
+        ]
+      ],
+      "plate_library_status": "NOT_REGISTERED_REUSE_B358_SOURCE_ALPHA_ZERO_SCOPED_PROOF",
+      "native_font_ppem": 40,
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_opaque_width": 395,
+      "candidate_bbox": [
+        270,
+        343,
+        607,
+        384
+      ],
+      "candidate_width": 337,
+      "candidate_width_ratio": 0.8532,
+      "positive_margins": [
+        30,
+        30,
+        2,
+        2
+      ],
+      "original_source_core_rgb": [
+        241,
+        147,
+        49
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 8209
+    }
+  ],
+  "protected": "other 11 current atlas cells exact",
+  "method": "second/final native per-glyph positioned outlines+1px stroke after B361 2px counter visual FAIL, source-proven zero-alpha r43; no lowres resampling/whole-word scaling",
+  "C2_and_runtime_required": true
+}

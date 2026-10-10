@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B362",
+  "queue_index": 212,
+  "run_key": "OUTRUN-KOR-B362-Q212-R43-OPEN-COUNTERS-SECOND-20261011-0340",
+  "priority": "P1_IGR029_SHARED_MODE_ATLAS",
+  "triage": "MATERIAL_REWORK",
+  "method": "B362 second/final source-bounded individual-syllable native glyph layout: preserve orange SOURCE core and spacing, decrease B361 stroke 2px to 1px while increasing native glyph point size within 45px source bound to reopen Korean counters. Exact source-zero-alpha CLEAN used, r44 and other 10 atlas cells protected. Previously B361 visual counter-collapse rejected; no arbitrary bitmap scaling. Independent C2/C3/USER game untested.",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "full_C158_clean_reference_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "source_clean_stage": "P1_REUSE_B358_EXACT_SOURCE-TRANSPARENT_SCOPED_R43_PERSISTED_BASE",
+  "current_official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "new_unapproved_trial_sha256": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+  "B361_rejected_trial_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+  "B361_root_cause": "HEAVY_2PX_STROKE_CAUSED_KOREAN_COUNTER_COLLAPSE_AT_PRACTICAL_50PCT",
+  "fix_stage": "P2_NATIVELY_REOPEN_GLYPH_COUNTERS_WITH_1PX_OUTLINE",
+  "new_saved_trial_DDS": 1,
+  "official_promoted_DDS": 0,
+  "native_size": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA32",
+  "mips": 1,
+  "raw_orientation": "MIRROR_Y",
+  "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_index": 1,
+  "regions": [
+    {
+      "inherited_old_alpha_pixels_removed_outside_source_bbox": 5832,
+      "persisted_alpha_outside_source_bbox": 0,
+      "P1_plate_qa": "SCOPED_TRANSPARENT_ALPHA_ZERO",
+      "P3_composite_qa": "GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+      "id": "r43_professional",
+      "source_english": "PROFESSIONAL",
+      "translated_text": "프로페셔널 모드",
+      "new_text_has_semantic_suffix_for_source_hierarchy": true,
+      "glyph_rendering": "native_per_syllable_stroked_outline",
+      "stroke_px": 1,
+      "native_tracking_px": 10,
+      "geometry_attempts": [
+        [
+          43,
+          359,
+          44
+        ],
+        [
+          42,
+          352,
+          43
+        ],
+        [
+          41,
+          345,
+          42
+        ],
+        [
+          40,
+          339,
+          41
+        ]
+      ],
+      "plate_library_status": "NOT_REGISTERED_REUSE_B358_SOURCE_ALPHA_ZERO_SCOPED_PROOF",
+      "native_font_ppem": 40,
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_opaque_width": 395,
+      "candidate_bbox": [
+        270,
+        343,
+        607,
+        384
+      ],
+      "candidate_width": 337,
+      "candidate_width_ratio": 0.8532,
+      "positive_margins": [
+        30,
+        30,
+        2,
+        2
+      ],
+      "original_source_core_rgb": [
+        241,
+        147,
+        49
+      ],
+      "clean_alpha_zero": true,
+      "source_opaque_face_count": 8209
+    }
+  ],
+  "changed_rgba_pixels": 22434,
+  "outside_two_rois_rgba_change": 0,
+  "protected_other_11_current_cells_byte_exact": true,
+  "plate_library_status": "NOT_REGISTERED_REUSE_B358_SOURCE_ALPHA_ZERO_SCOPED_PROOF",
+  "decoded_persisted_mismatch": 0,
+  "evidence_previews": [
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_75.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_100.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_75.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_50.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_100.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_75.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_50.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_BLACK_100.png",
+    "B362_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_WHITE_100.png"
+  ],
+  "producer_visual": "HOLD_CONTROLLER_ACTUAL_SOURCE_FAMILY_AND_50PCT_REVIEW",
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
