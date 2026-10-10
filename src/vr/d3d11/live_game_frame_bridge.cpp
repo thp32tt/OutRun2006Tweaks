@@ -136,12 +136,17 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
     // no-depth pretransformed diffuse triangles. Every other real game draw
     // proceeds exclusively through DX9Ex. No visual parity claim for others.
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
+    DWORD fog=TRUE, scissor=TRUE;
+    // The native diffuse shader does not implement D3D9 fog or scissor
+    // clipping. Reject those states rather than showing a false color match.
     if (FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
         FAILED(game->GetRenderState(D3DRS_ALPHATESTENABLE, &alpha)) ||
         FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencil)) ||
         FAILED(game->GetRenderState(D3DRS_ZENABLE, &depth)) ||
         FAILED(game->GetRenderState(D3DRS_CLIPPING, &clip)) ||
-        blend || alpha || stencil || depth || !clip)
+        FAILED(game->GetRenderState(D3DRS_FOGENABLE, &fog)) ||
+        FAILED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)) ||
+        blend || alpha || stencil || depth || !clip || fog || scissor)
         return false;
     DWORD op=0, arg=0, nextColorOp=0;
     // A later fixed-function texture stage can still change the result even
@@ -150,7 +155,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
     if (FAILED(game->GetTextureStageState(0, D3DTSS_COLOROP, &op)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &arg)) ||
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
-        op != D3DTOP_SELECTARG1 || (arg & D3DTA_SELECTMASK) != D3DTA_DIFFUSE ||
+        op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE ||
         nextColorOp != D3DTOP_DISABLE)
         return false;
     return true;
