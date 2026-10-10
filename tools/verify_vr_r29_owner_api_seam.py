@@ -80,6 +80,37 @@ LOWER_SERVICES = {
 }
 
 
+
+# Strict physical lower hook address exports; the R29 TU is the only owner.
+# A valid R30 facade is not sufficient if the target points at the wrong hook.
+PHYSICAL_HOOK_TARGETS = {
+    "R29OwnerResetR22Target() noexcept": (
+        "return reinterpret_cast<void*>(&ResetDestR22);",
+        "R30SupportResetTarget() noexcept",
+        "return R29OwnerResetR22Target();",
+    ),
+    "R29OwnerPresentR13Target() noexcept": (
+        "return reinterpret_cast<void*>(&PresentDestR13);",
+        "R30SupportPresentTarget() noexcept",
+        "return R29OwnerPresentR13Target();",
+    ),
+    "R29OwnerDirectTransportR13Target() noexcept": (
+        "return reinterpret_cast<void*>(&ResolveDirectTransportR13);",
+        "R30SupportDirectTransportTarget() noexcept",
+        "return R29OwnerDirectTransportR13Target();",
+    ),
+    "R29OwnerSetRenderStateR29Target() noexcept": (
+        "return reinterpret_cast<void*>(&SetRenderStateDestR29);",
+        "R30SupportSetRenderStateTarget() noexcept",
+        "return R29OwnerSetRenderStateR29Target();",
+    ),
+    "R29OwnerInstalledDevice() noexcept": (
+        "return StereoInstalledDevice.load(std::memory_order_acquire);",
+        "R30SupportInstalledDevice() noexcept",
+        "return R29OwnerInstalledDevice();",
+    ),
+}
+
 def check(r29: str, r30: str, header: str) -> None:
     for signature, delegation in OWNER_CALLS.items():
         implementation = body(r29, signature)
@@ -130,6 +161,13 @@ def check(r29: str, r30: str, header: str) -> None:
         assert forwarding in body(r29, signature), (
             f"R29 lower service delegation lost: {signature}"
         )
+    for signature, (physical, facade, delegate) in PHYSICAL_HOOK_TARGETS.items():
+        name = signature.split("(", 1)[0]
+        assert name + "(" in header, f"R29 physical hook ABI declaration missing: {name}"
+        actual = body(r29, signature).strip()
+        assert actual == physical, f"R29 physical hook pointer or acquire semantics drifted: {name}"
+        forwarder = body(r30, facade).strip()
+        assert forwarder == delegate, f"R30 physical hook facade retargeted: {facade}"
     assert "R30ScopedInternalPass" in r30
     assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
     assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
@@ -213,7 +251,29 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {signature}")
-    print("R29/R30 owner ABI regression PASS (38 negative mutations)")
+    # One wrong physical hook and one wrong upper forwarding edge per export.
+    for signature, (physical, facade, delegate) in PHYSICAL_HOOK_TARGETS.items():
+        poison = ("return nullptr;" if "InstalledDevice" in signature
+                  else "return reinterpret_cast<void*>(&PresentDestR13);"
+                  if "PresentR13Target" not in signature
+                  else "return reinterpret_cast<void*>(&ResetDestR22);")
+        mutated_r29 = r29.replace(physical, poison, 1)
+        assert mutated_r29 != r29, f"missing R29 physical mutation target: {signature}"
+        try:
+            check(mutated_r29, r30, header)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"physical target mutation unexpectedly PASS: {signature}")
+        mutated_r30 = r30.replace(delegate, "return nullptr;", 1)
+        assert mutated_r30 != r30, f"missing R30 target mutation: {facade}"
+        try:
+            check(r29, mutated_r30, header)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"R30 hook facade mutation unexpectedly PASS: {facade}")
+    print("R29/R30 owner ABI regression PASS (48 negative mutations)")
 
 
 if __name__ == "__main__":
