@@ -25,6 +25,12 @@ namespace OutRunVR::R32
             return false;
         if (baselineUs == 0)
             return true;
+        // FrameUs is bounded by the hard-spike early return above; a
+        // corrupt/stale baseline may not be. Avoid wrapping the RHS and
+        // incorrectly reporting a normal frame as a diagnostic spike.
+        const auto maxValue = (std::numeric_limits<std::uint64_t>::max)();
+        if (baselineUs > maxValue / PerfSpikeRelativePercent)
+            return false;
         return frameUs * 100 >= baselineUs * PerfSpikeRelativePercent;
     }
 
@@ -39,7 +45,13 @@ namespace OutRunVR::R32
             return frameUs;
         if (spike)
             return baselineUs;
-        return (baselineUs * 31 + frameUs) / 32;
+        // Exact integer EMA (31*baseline + frame)/32 without overflowing
+        // uint64_t on a stale QPC-derived sample. Preserve floor rounding
+        // when the new frame is smaller than the current baseline.
+        if (frameUs >= baselineUs)
+            return baselineUs + (frameUs - baselineUs) / 32;
+        const auto drop = baselineUs - frameUs;
+        return baselineUs - drop / 32 - (drop % 32 != 0 ? 1 : 0);
     }
 
     constexpr std::uint64_t RearmMonoSafetyEpoch(
