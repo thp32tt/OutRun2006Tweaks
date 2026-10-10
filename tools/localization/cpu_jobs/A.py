@@ -11,6 +11,7 @@ from PIL import Image,ImageDraw
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 root=Path.cwd()
+sys.dont_write_bytecode=True
 sys.path.insert(0,str(root/"tools/localization"))
 import plate_library as pl
 run="20261011-A231-Q217-SOURCE-RED-RIM-RESTORE"
