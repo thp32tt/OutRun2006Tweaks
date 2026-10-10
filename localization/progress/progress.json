@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 10:12 KST",
+  "updated_at_kst": "2026-10-10 10:3x KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10307,5 +10307,26 @@
     "APPROVALS": "NOT_GRANTED",
     "user_ingame": "IGR032_OPEN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "b347_q212_source_core45": {
+    "run_key": "OUTRUN-KOR-B347-Q212-C349-SOURCE-CORE45-REBUILD-20261010",
+    "producer": "B",
+    "index": 212,
+    "published_trial_dds": 1,
+    "promoted_candidate_dds": 0,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "previous_trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "new_trial_sha256": "9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa",
+    "workflow_run_id": 38013622393,
+    "changed_pixels": 41644,
+    "changed_outside_two_regions": 0,
+    "source_core_height": 45,
+    "new_core_height": 44,
+    "producer_verdict": "VISUAL_REJECT_TOO_NARROW_R43",
+    "C2": "OFFICIAL_REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "IGR029": "OPEN_USER_INGAME_FAIL",
+    "runtime_validation": "UNTESTED",
+    "QA": "localization/graphics/role_B/20261010-B347-Q212-SOURCE-CORE45-NATIVE-REBUILD/B347_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
   }
 }
