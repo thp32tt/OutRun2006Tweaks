@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_rollover_checkpoint",
+  "captured_at_kst": "2026-10-11T03:21:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "chat_rollover": 6,
+  "attempt": "1/3",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "phase": "C3_EXACT_SHA_CI_PROGRESS",
+  "completed_acceptance_static": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "remaining_acceptance_ids": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME"
+  ],
+  "remaining_reason": "real OR2006C2C.EXE native draw/pixel and HMD not observed (source/build-only acceptance passed)",
+  "ci": {
+    "Build": {
+      "id": 38074993048,
+      "head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+      "status": "IN_PROGRESS_WIN32"
+    },
+    "OpenXR": {
+      "id": 38074993038,
+      "head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+      "status": "IN_PROGRESS_REMAINING_GAME_VARIANTS",
+      "passed_jobs": [
+        "host-x64",
+        "game-x86-r26-hud-safe",
+        "DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle"
+      ]
+    }
+  },
+  "bundle": {
+    "artifact_id": 11678470577,
+    "name": "feature-dx11-first-game-frame-4c9ccac8dd75956531a37e630fb9552f9e467a52",
+    "size_bytes": 2790273,
+    "digest": "sha256:3e5e7afcc62b74b9e5c52fcfa0e32c5fbcfc8a7d14fed9dbbed426595e05bf2d"
+  },
+  "next_action": "Complete exact-SHA Build/OpenXR CI; append source+CI evidence to docs/automation/runs/CONVERSION-DX11-00537.json once source build completes; do not alter TARGET; runtime UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0
+}
