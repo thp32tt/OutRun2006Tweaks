@@ -66,7 +66,11 @@
       "DX11:FIRST_GAME_DRAW_FRAME",
       "src/vr/d3d9/stereo_renderer_r30.cpp:FIRST_GAME_DRAW_FRAME"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_at_FEATURE_READY"
+    "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+    "live_game_draw_path": ["LIVE_D3D9_CALLSITE","D3D11_NATIVE_DRAW","VISIBLE_FRAME_OUTPUT"],
+    "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
   "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
