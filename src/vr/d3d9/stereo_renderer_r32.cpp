@@ -125,8 +125,15 @@ namespace OutRunVRStereo
             const LONGLONG frequency = R32PerfQpcFrequency();
             if (frequency <= 0 || begin <= 0 || end < begin)
                 return 0;
-            return static_cast<std::uint64_t>(
-                ((end - begin) * 1000000LL) / frequency);
+            // Divide first: (end - begin) * 1,000,000 can overflow a
+            // signed 64-bit counter during long-running diagnostic sessions.
+            const auto elapsed = static_cast<std::uint64_t>(end - begin);
+            const auto hz = static_cast<std::uint64_t>(frequency);
+            const auto whole = elapsed / hz;
+            const auto remainder = elapsed % hz;
+            if (whole > UINT64_MAX / 1000000ULL)
+                return UINT64_MAX;
+            return whole * 1000000ULL + (remainder * 1000000ULL) / hz;
         }
 
         R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
