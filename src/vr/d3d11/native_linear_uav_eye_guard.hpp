@@ -39,4 +39,30 @@ namespace outrun::vr::dx11 {
     }
     return isolated;
 }
+
+
+// R230: a live D3D11 predicate can suppress an otherwise owned, sole-eye
+// non-indexed Draw. Both polarities are unproven; never activate game Draw.
+[[nodiscard]] inline bool verified_linear_unpredicated_eye_ready(
+    const NativeLinearBufferMirror& vb, ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t generation, std::uint64_t snapshotVersion,
+    UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !verified_linear_uav_isolated_eye_ready(
+            vb, context, startVertex, vertexCount,
+            generation, snapshotVersion, width, height, format,
+            expectedLayout, expectedVs, expectedPs, expectedRtv,
+            expectedDsv, expectedDepthState, expectedRaster))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Predicate> livePredicate;
+    BOOL predicatePolarity = FALSE;
+    context->GetPredication(livePredicate.GetAddressOf(), &predicatePolarity);
+    return !livePredicate;
+}
 } // namespace outrun::vr::dx11

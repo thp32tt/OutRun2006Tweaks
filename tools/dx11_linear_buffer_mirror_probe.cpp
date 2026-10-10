@@ -574,6 +574,35 @@ int main() {
     ctx->Draw(3,0);
     require(samplePixelEquals(255,0,0), "R221 WARP red eye recovered");
 
+    // R230: isolate non-indexed Draw from any live GPU predication. The
+    // unpredicated recovery performs a real WARP pixel write/readback.
+    const auto r230Ready = [&] {
+        return outrun::vr::dx11::verified_linear_unpredicated_eye_ready(
+            vb, ctx.Get(), 0u, 3u, generation, version,
+            32u, 32u, DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(), vs.Get(), ps.Get(), rtv.Get(),
+            ownDsv.Get(), depthState.Get(), rs.Get());
+    };
+    require(r230Ready(), "R230 initial unpredicated linear eye");
+    D3D11_QUERY_DESC r230Query{};
+    r230Query.Query = D3D11_QUERY_OCCLUSION_PREDICATE;
+    ComPtr<ID3D11Predicate> r230Predicate;
+    require(SUCCEEDED(dev->CreatePredicate(&r230Query,
+        r230Predicate.GetAddressOf())), "R230 same-device predicate object");
+    ctx->SetPredication(r230Predicate.Get(), FALSE);
+    require(isolatedLinearReady(), "R230 predecessor accepts active predicate");
+    require(!r230Ready(), "R230 reject false-polarity predication");
+    ctx->SetPredication(r230Predicate.Get(), TRUE);
+    require(!r230Ready(), "R230 reject true-polarity predication");
+    ctx->SetPredication(nullptr, FALSE);
+    require(r230Ready(), "R230 restore unpredicated linear eye");
+    ctx->ClearDepthStencilView(ownDsv.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+    ctx->ClearRenderTargetView(rtv.Get(), clear);
+    ctx->Draw(3u, 0u);
+    require(samplePixelEquals(255,0,0),
+        "R230 restored WARP Draw paints red eye pixel");
+
+
 
 
 

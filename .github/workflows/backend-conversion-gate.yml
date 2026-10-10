@@ -352,6 +352,12 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_linear_uav_eye_r221.py
 
+      # R230: non-indexed owned-eye GPU predicate exclusion.
+      - name: Verify R230 non-indexed predication guard
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_predication_r230.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
