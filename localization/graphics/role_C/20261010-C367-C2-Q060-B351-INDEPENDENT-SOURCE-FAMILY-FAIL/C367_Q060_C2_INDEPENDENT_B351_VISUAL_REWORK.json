@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C367-Q060-B351-NEW-INDEPENDENT-PERSISTED-STYLE-FAIL",
+  "run_key": "OUTRUN-KOR-C367-C2-Q060-B351-NEW-SHA-VISUAL-20261010-1651",
+  "reviewed_at_kst": "2026-10-10 17:02:20 KST",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "new_distinct_unpromoted_B351_sha256": "ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd",
+  "prior_B350_C2_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+  "original_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "B348_source_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_candidate_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "duplicate_C2_review_of_same_trial_sha": false,
+  "triage_result": "METHOD_CHANGE_REQUIRED",
+  "firstlook": {
+    "visually_inspected_actual_saved_dds": true,
+    "blind_calibration": "NOT_QUALIFIED",
+    "producer_report_read_before_firstlook": true,
+    "reviewer": "ChatGPT AI1 C2; no different independent human claimed"
+  },
+  "eight_checks": {
+    "BEST_TIME": {
+      "slant": {
+        "result": "FAIL_SOURCE_RELATIVE_APPEARANCE_WITH_UNQUALIFIED_NUMERIC_ANCHOR",
+        "note": "Canonical EN BEST TIME strongly right-leaning racing italics; independently decoded B351 최고 기록 appears comparatively upright with broad blocky silhouettes. Corresponding readable glyph stem top/bottom source anchor coordinates not measurable across scripts; no invented numeric angle.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+          "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+        }
+      },
+      "clean_plate": {
+        "result": "SCOPED_PASS_Q060",
+        "note": "SHA-verified B348 source-first CLEAN PNG directly compared against canonical English source within exact readable ROI: 89,391 English source RGBA pixels removed, zero changed elsewhere within this ROI, CLEAN source English bbox alpha occupancy 0. Full all-atlas proof not independently claimed.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+          "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+        }
+      },
+      "style": {
+        "result": "FAIL",
+        "note": "B351 golden-yellow/cream face now closer to English than rejected B350 red/brown, but compressed italic racing effect still absent: letterface too broad/square, navy contour/extrusion is thick and flat versus slender EN gilded bevel/narrow family; direct 100%, 75%, 50% visual rejection.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_75_BG255.png",
+          "sha256": "e48967fc9faea3a589f6bb3bd5fcb983034eab2a0abca63e36b882e92a341a2c"
+        }
+      },
+      "readability": {
+        "result": "SCOPED_PASS",
+        "note": "B351 '최고 기록:' legible on native gray, 75% white and 50% black; source family hierarchy and slant mismatch blocks approval.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_50_BG0.png",
+          "sha256": "7f36219b0775381903034ee7311aaeb77d84962f7952dbf2e1f5fe2617745388"
+        }
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_HARD_GLYPH_BREAK",
+        "note": "In saved B351 native/50% actual pixels no clear missing full syllable or clipped strokes identified. This cannot certify gameplay/composite rendering.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_50_BG0.png",
+          "sha256": "7f36219b0775381903034ee7311aaeb77d84962f7952dbf2e1f5fe2617745388"
+        }
+      },
+      "protected_art": {
+        "result": "SCOPED_PIXEL_PASS_ONLY",
+        "note": "Exactly saved official→B351 97,359 changed pixels, zero RGBA and alpha outside declared 1030x148 ROI including neighbors; source→CLEAN comparison only ROI, not full all-atlas English/protected pixel guarantee.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+          "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+        }
+      },
+      "placement": {
+        "result": "SCOPED_MACHINE_WITH_VISUAL_HOLD",
+        "note": "Producer B351 effect bbox [2221,351,2992,470] within source bbox [2179,340,3028,474] with L42/R36/T11/B4 margin. Source optical hierarchy and corresponding anchor not visually faithful.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+          "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+        }
+      },
+      "orientation": {
+        "result": "SCOPED_PASS",
+        "note": "Independent RAW source/official/B351 comparisons are derived from same original DDS bytes using exact inverse-Y ROI, and separate correctly vertically flipped 100/75/50 readable panels were visually examined. Source and trial header exact 128-byte match.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_RAW_MIRROR_SOURCE_100_BG128.png",
+          "sha256": "988a4a6bde2a6a02fe605ea877aa5e6dc44561ea51c1d220096796e7fcc3eee7"
+        }
+      }
+    }
+  },
+  "decision": "REWORK_REQUIRED_NEW_B351_TRIAL_ONLY",
+  "reason_codes": [
+    "SOURCE_FAMILY_CONDENSED_RACING_ITALIC_MISMATCH",
+    "HEAVY_NAVY_OUTLINE_EXTRUSION",
+    "UNQUALIFIED_HOMOLOGOUS_SLANT_ANCHORS"
+  ],
+  "mechanical_report": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C367_Q060_INDEPENDENT_MACHINE.json",
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+      "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_75_BG255.png",
+      "sha256": "e48967fc9faea3a589f6bb3bd5fcb983034eab2a0abca63e36b882e92a341a2c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_50_BG0.png",
+      "sha256": "7f36219b0775381903034ee7311aaeb77d84962f7952dbf2e1f5fe2617745388"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_RAW_MIRROR_SOURCE_100_BG128.png",
+      "sha256": "988a4a6bde2a6a02fe605ea877aa5e6dc44561ea51c1d220096796e7fcc3eee7"
+    }
+  ],
+  "material_change": "B351 compared to B350 changes gold material, but new separate saved SHA still fails compressed racing italic contour and outline family",
+  "corrective_direction": "Retain source-pixel gold profile and validated source-first plate; rebuild source-condensed italic Korean contour with source-relative slant anchor calibration and lighter layered navy bevel, then save new SHA, producer self-QA and distinct independent C2, C3, new user in-game retest.",
+  "official_C342_status": "REWORK_REQUIRED_UNCHANGED",
+  "same_SHA_official_not_reapproved": true,
+  "new_promoted_DDS": 0,
+  "new_DDS_by_C2": 0,
+  "C3": "BLOCKED_C2_VISUAL_FAIL",
+  "current_approval": false,
+  "user_IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "limitations": [
+    "Mechanical PASS does not imply style approval",
+    "No actual game renderer/runtime test",
+    "Separate C3 strict audit cannot pass on rejected B351",
+    "C2 did not modify official DDS or odd/unindexed C1 work"
+  ],
+  "exclusions": [
+    "ODD_SHARD",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C367",
+  "run_key": "OUTRUN-KOR-C367-C2-Q060-B351-NEW-SHA-VISUAL-20261010-1651",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_first_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_unpromoted_trial_sha256": "ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd",
+  "prior_C2_rejected_B350_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+  "inputs_direct_independent_verified": true,
+  "files": [
+    "source.dds",
+    "clean.png",
+    "official.dds",
+    "trial.dds"
+  ],
+  "asset_native_size": [
+    4096,
+    2048
+  ],
+  "dds_format": "RGB32_RGBA_8x4_channels",
+  "authored_mip_count": 1,
+  "roi_readable": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "source_effect_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "producer_trial_bbox_unindependently_segmented": [
+    2221,
+    351,
+    2992,
+    470
+  ],
+  "source_effect_dimensions": [
+    849,
+    134
+  ],
+  "trial_effect_dimensions_producer": [
+    771,
+    119
+  ],
+  "source_first_clean_independent_q060_evidence": {
+    "source_to_clean_rgba_changed_in_english_effect_bbox": 89391,
+    "source_to_clean_rgba_changed_elsewhere_within_ROI": 0,
+    "clean_english_effect_bbox_alpha_nonzero": 0,
+    "scope": "Only readable ROI cropped, not full atlas SOURCE/CLEAN protective comparison"
+  },
+  "full_saved_official_vs_trial_independent": {
+    "rgba_changed_pixels": 97359,
+    "rgba_outside_authorized_roi": 0,
+    "alpha_outside_authorized_roi": 0,
+    "raw_source_header_matches_trial_128bytes": true,
+    "comparison": "4096x2048 saved RGBA pixel delta in 64-row mmap stripes; ROI raw mirror-Y mapped from readable bbox"
+  },
+  "views": [
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_EN_CLEAN_OFFICIAL_TRIAL_NATIVE100.png",
+      "sha256": "10a7eba145ca148adab064f251c223642423e182384355031cac58c4aacbc433"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_75_BG255.png",
+      "sha256": "e48967fc9faea3a589f6bb3bd5fcb983034eab2a0abca63e36b882e92a341a2c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_FLIPY_50_BG0.png",
+      "sha256": "7f36219b0775381903034ee7311aaeb77d84962f7952dbf2e1f5fe2617745388"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C2_B351_RAW_MIRROR_SOURCE_100_BG128.png",
+      "sha256": "988a4a6bde2a6a02fe605ea877aa5e6dc44561ea51c1d220096796e7fcc3eee7"
+    }
+  ],
+  "result": "SCOPED_MECHANICAL_PASS_SOURCE_FAMILY_VISUAL_FAIL",
+  "limitations": [
+    "Native source-family qualitative mismatch proves rejection; no invented glyph stem anchor angles",
+    "Not blind-calibrated for PASS; producer report consulted before first look",
+    "No full-canon source→CLEAN→final all-atlas protected mask test, do not assert approval",
+    "No player runtime, C3, user in-game retest"
+  ]
+}
