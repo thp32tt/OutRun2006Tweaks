@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q103-A224-NEW-SHA-INDEPENDENT-OPTICAL-20261010-2317",
+  "index": 103,
+  "sha256": {
+    "source": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "official": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "prior_A223": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+    "new_A224": "2ad5e25e03bc1c9598548ef64ec397be91eae86f0b4f8d4cc161438c9e354c31"
+  },
+  "verified_binary": "Four 16,777,344-byte saved DDS SHA256 verified; independently extracted raw RGBA rows with Y mirroring",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "mip_count": 1,
+  "english_bbox": [
+    1432,
+    1980,
+    1786,
+    2025
+  ],
+  "korean_bbox": [
+    1451,
+    1981,
+    1766,
+    2024
+  ],
+  "margins": [
+    19,
+    20,
+    1,
+    1
+  ],
+  "official_to_A224_changed_pixels": 11089,
+  "changed_bbox": [
+    1431,
+    1972,
+    1780,
+    2036
+  ],
+  "bounded_edit_envelope": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "original_effect_bbox_outside_changes": 2489,
+  "note": "2489 changes outside tight English glyph effect but inside larger authorized edit envelope include erasure of superseded Korean pixels, NOT claimed as new candidate glyph overflow. Independent source/clean protection mask missing.",
+  "dark_ink_proxy": {
+    "source": 6665,
+    "prior_A223": 2868,
+    "new_A224": 3773,
+    "area": 15930,
+    "rule": "R<215 && G<205 && B<175 inside tight effect bbox; descriptive only"
+  },
+  "views": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_GRAY_75.png",
+      "sha256": "e3281faeb97a1e5bacd032ff94da65967aac07fa1e7d161e4d6a6c5254e5dc15"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_GRAY_50.png",
+      "sha256": "2e7420270f7dd5d5d30a59e557671d16a10fc1274a6aea035c44f0bec86db6c3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_BLACK_75.png",
+      "sha256": "40decdd15d2ca97adb2d1dee1048147a00e97fa2be985167e6e2d02fb97c425a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_BLACK_100.png",
+      "sha256": "256f2abf44a263ec26fd31a8edc6f58a8cabae1d422b4b4c35ab0a64ab75e87b"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_TRIAL_RAW.png",
+      "sha256": "9c6bc5b2316683d3ac98bc83da4dcc2a75b1c4713578990e0254d012999cac73"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_WHITE_75.png",
+      "sha256": "efb767e4253e8bfbdf2cabc6461060b1adcc08335594290dfebb13e5b493e1d9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_BLACK_50.png",
+      "sha256": "e0e161192d14a302847f37e487cf8cc8ec9c4a02680f0db930908c971597bad9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_WHITE_100.png",
+      "sha256": "9cfb87bdce60e462147e2a46e22df9e9c0499514b2958f1ebcea496fdb4368f0"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_GRAY_100.png",
+      "sha256": "40d04221e52c85c267016ca87d92cb4f83ceda766a235f00d1beb23a385ab992"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q103-A224-SOURCE-OPTICAL-REWORK/Q103_WHITE_50.png",
+      "sha256": "3b8dac1790031e23006af77858f6fe48104044f18ab98b8e6ce109f8c4c28a3e"
+    }
+  ],
+  "result": "NUMERIC_SCOPED_PASS_VISUAL_REWORK",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
