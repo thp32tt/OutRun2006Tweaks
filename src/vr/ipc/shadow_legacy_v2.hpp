@@ -90,6 +90,12 @@ namespace OutRunVR::IpcV3::ShadowV2
 
     inline bool StableReadPose(const SharedPoseState* shared, SharedPoseState& out, int attempts = 8) noexcept
     {
+        // The mapped producer and destination must be distinct. Refuse an alias
+        // rather than clearing the live producer on a malformed caller request.
+        if (shared == &out)
+            return false;
+        // Failed reads must not expose a prior successful frame or a torn copy.
+        out = {};
         if (!shared || attempts <= 0)
             return false;
         for (int attempt = 0; attempt < attempts; ++attempt)
@@ -97,12 +103,17 @@ namespace OutRunVR::IpcV3::ShadowV2
             const std::uint32_t before = shared->sequence;
             if (before & 1u)
                 continue;
+            SharedPoseState candidate{};
             MemoryBarrier();
-            std::memcpy(&out, shared, sizeof(out));
+            std::memcpy(&candidate, shared, sizeof(candidate));
             MemoryBarrier();
             const std::uint32_t after = shared->sequence;
-            if (before == after && !(after & 1u) && LegacyPoseHeaderValid(out))
+            if (before == after && !(after & 1u) &&
+                candidate.sequence == before && LegacyPoseHeaderValid(candidate))
+            {
+                out = candidate;
                 return true;
+            }
         }
         return false;
     }
@@ -110,6 +121,9 @@ namespace OutRunVR::IpcV3::ShadowV2
     inline bool StableReadFrameRing(const SharedRenderFrameRing* shared, SharedRenderFrameRing& out,
         int attempts = 8) noexcept
     {
+        if (shared == &out)
+            return false;
+        out = {};
         if (!shared || attempts <= 0)
             return false;
         for (int attempt = 0; attempt < attempts; ++attempt)
@@ -117,12 +131,17 @@ namespace OutRunVR::IpcV3::ShadowV2
             const std::uint32_t before = shared->publishSequence;
             if (before & 1u)
                 continue;
+            SharedRenderFrameRing candidate{};
             MemoryBarrier();
-            std::memcpy(&out, shared, sizeof(out));
+            std::memcpy(&candidate, shared, sizeof(candidate));
             MemoryBarrier();
             const std::uint32_t after = shared->publishSequence;
-            if (before == after && !(after & 1u) && LegacyFrameHeaderValid(out))
+            if (before == after && !(after & 1u) &&
+                candidate.publishSequence == before && LegacyFrameHeaderValid(candidate))
+            {
+                out = candidate;
                 return true;
+            }
         }
         return false;
     }
