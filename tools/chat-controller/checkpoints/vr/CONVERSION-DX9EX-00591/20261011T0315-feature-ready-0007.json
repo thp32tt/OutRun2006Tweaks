@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_5min_checkpoint",
+  "captured_at_kst": "2026-10-11T03:15:10+09:00",
+  "task_id": "CONVERSION-DX9EX-00591",
+  "production_id": "CONVERSION-DX9EX-00591",
+  "event_id": "CONVERSION-DX9EX-00591-E004",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_stage": "FEATURE_READY",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+  "feature_head": "8b9a179a8506be368443514fd8c219e0ec10796d",
+  "feature_merge_parents": [
+    "9e0e676480b125c4a57a50f6a52c3237533f771e",
+    "a5a5b4d5eda3a7a15717898e8644a7279701727b"
+  ],
+  "target_branch": "vr-d3d9ex-focus",
+  "target_head_unchanged": "a5a5b4d5eda3a7a15717898e8644a7279701727b",
+  "compare": {
+    "ahead_by": 44,
+    "behind_by": 0,
+    "status": "ahead",
+    "target_ancestor": true
+  },
+  "feature_ci": {
+    "run_id": 38074313696,
+    "head_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
+    "conclusion": "SUCCESS",
+    "jobs": {
+      "r84-local": "SUCCESS",
+      "r84-win32": "SUCCESS",
+      "r84-host": "SUCCESS",
+      "r84-baseline-game": "SUCCESS",
+      "r84-bundle": "SUCCESS"
+    },
+    "acceptance_results": {
+      "R84-OWNERS": "PASS_EXACT_SHA",
+      "R84-ABI": "PASS_EXACT_SHA",
+      "R84-BUILD-GRAPH": "PASS_EXACT_SHA",
+      "R84-REGRESSION": "PASS_EXACT_SHA",
+      "R84-TEST-BUNDLE": "PASS_EXACT_SHA"
+    },
+    "test_bundle_artifact_id": 11677543821,
+    "test_bundle_artifact_name": "feature-dx9ex-r84-8b9a179a8506be368443514fd8c219e0ec10796d",
+    "test_bundle_size_bytes": 5142122,
+    "full_chain_artifact_id": 11677778286,
+    "host_artifact_id": 11678317698,
+    "baseline_artifact_id": 11677998565
+  },
+  "incomplete_acceptance_ids": [],
+  "controller_pending": [
+    "PROMOTE_TARGET_WITH_EXPECTED_SHA_a5a5b4d5eda3a7a15717898e8644a7279701727b",
+    "DX9Ex Active Validation policy/host/game/full-chain-compile/package exact target SHA",
+    "Domain Isolation Guard domain-isolation exact target SHA"
+  ],
+  "runtime_validation": "UNTESTED",
+  "next_action": "Controller only: recheck latest target HEAD; fast-forward vr-d3d9ex-focus to verified feature 8b9a179a with expected_sha lease a5a5b4d5 if still ancestor. If advanced, reconcile forward protecting existing P0 fixes. Run exact target SHA DX9Ex Active Validation and Domain Isolation Guard, require all named jobs SUCCESS before DONE_BUILD_VERIFIED; Quest3 HMD UNTESTED. Same TASK_ID has already received +1 at source CI, no score duplication."
+}
