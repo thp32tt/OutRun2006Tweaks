@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""B357 q212 P1 IGR029: new native Korean source-family two-label pilot.
-Producer must inspect actual DDS and maintain C2 official REWORK unless pass.
+"""B358 q212 P1: fix independently verified B358 P3 leaked old Hangul.
+New source-derived alpha-zero clean is committed to two full sprite ROIs
+before transparent-only glyph composition; trial is not official or C PASS.
 """
 import io,json,os,hashlib,subprocess,sys,urllib.request,struct
 from pathlib import Path
@@ -10,7 +11,7 @@ from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 ROOT=Path("localization/graphics")
 ASSET=ROOT/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=ROOT/"role_B/20261010-B357-Q212-NATIVE-SOURCE-MODE-FAMILY";OUT.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/"role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD";OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SOURCE_SHA="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 OFFICIAL_SHA="e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
@@ -41,12 +42,20 @@ for reg in regions:assert all(ord(ch) in coverage for ch in reg["ko"] if ch!=" "
 result=O.copy();mask=np.zeros(S.shape[:2],bool)
 for r in regions:
  l,t,x,b=r["atlas_roi"];mask[t:b,l:x]=True
-# For these two slots, existing official Korean may be at the wrong English
-# x anchor and tall outside source glyph footprint; we replace the ENTIRE
-# source-text ROI with the SOURCE-derived transparent plate before rendering.
+# C2 B357 proved old Korean pixels leaked because C was constructed but
+# result stayed initialized from O outside original English glyph bboxes.
+# Do not paint Korean onto those stale bytes. The known source-transparent
+# English title sprites get an independently decoded zero-alpha CLEAN PLATE;
+# preserve the other ten atlas cells, and make this full-roi CLEAN the actual
+# composite base BEFORE any glyph is added.
 C=O.copy()
 for r in regions:
- l,t,x,b=r["atlas_roi"];C[t:b,l:x]=0
+ l,t,x,b=r["atlas_roi"]
+ assert np.count_nonzero(S[t:b,l:x,3])>100,("canonical_source_slot_empty",r["id"])
+ C[t:b,l:x]=0
+ assert np.count_nonzero(C[t:b,l:x,3])==0,("P1_DIRTY_CLEAN",r["id"])
+result[mask]=C[mask]
+assert np.count_nonzero(result[mask,3])==0,"P3_COMPOSITE_BASE_DIRTY"
 # C158 full CLEAN provenance is separately sourced; scoped source-clean uses
 # two designated empty text cells, not a false whole-atlas identity claim.
 rec=[]
@@ -78,7 +87,17 @@ for reg in regions:
  result[t:b,l:x]=layer
  # O may have historic text in left part of the same ROI; untouched neighbors
  # protected because only exact two ROIs are replaced.
- rec.append({"id":reg["id"],"source_english":reg["english"],"translated_text":reg["ko"],
+ # C2 hard-fail gate: no inherited official glyph may survive anywhere
+ # inside the full sprite ROI outside the original English glyph bbox.
+ inside=np.zeros((bottom-top,right-left),bool)
+ inside[t-top:b-top,l-left:x-left]=True
+ old_outside=int(np.count_nonzero(O[top:bottom,left:right,3][~inside]))
+ new_outside=int(np.count_nonzero(result[top:bottom,left:right,3][~inside]))
+ assert new_outside==0,("OLD_KOREAN_LEAK",reg["id"],old_outside,new_outside)
+ assert np.array_equal(result[t:b,l:x,3],a),("P3_GLYPH_ONLY_ALPHA",reg["id"])
+ rec.append({"inherited_old_alpha_pixels_removed_outside_source_bbox":old_outside,"persisted_alpha_outside_source_bbox":new_outside,
+  "P1_plate_qa":"SCOPED_TRANSPARENT_ALPHA_ZERO","P3_composite_qa":"GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
+  "id":reg["id"],"source_english":reg["english"],"translated_text":reg["ko"],
   "new_text_has_semantic_suffix_for_source_hierarchy":True,
   "native_font_ppem":font_size,"source_bbox":reg["original_bbox"],
   "source_opaque_width":reg["source_opaque_width"],
@@ -98,7 +117,7 @@ dds=raw[:128]+np.flipud(result)[:,:,order].copy().tobytes()
 assert len(dds)==len(raw) and sha(dds)!=OFFICIAL_SHA
 D=decode(dds)
 assert np.array_equal(D,result),("DDS_ROUNDTRIP_FAIL")
-(OUT/"B357_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds").write_bytes(dds)
+(OUT/"B358_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds").write_bytes(dds)
 def compose(a,roi,bg,rawview=False):
  l,t,r,b=roi
  if rawview:a=np.flipud(a);t,b=2048-b,2048-t
@@ -116,18 +135,20 @@ for r in regions:
     sheet=Image.new("RGB",(width,max(im.height for im in ims)),bg)
     off=0
     for im in ims:sheet.paste(im,(off,0));off+=im.width+8
-    fn=f"B357_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
+    fn=f"B358_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
     sheet.save(OUT/fn,optimize=True);evidence.append(fn)
  l,t,x,b=r["atlas_roi"]
- Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B357_{r['id']}_PLATE_ONLY.png")
- Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B357_{r['id']}_LETTERING_ONLY.png")
-qa={"schema_version":2,"role":"B","run":"B357","queue_index":212,
- "run_key":"OUTRUN-KOR-B357-Q212-P1-SOURCE-FAMILY-SEMANTIC-NATIVE-20261010-1935",
+ Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B358_{r['id']}_PLATE_ONLY.png")
+ Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B358_{r['id']}_LETTERING_ONLY.png")
+qa={"schema_version":2,"role":"B","run":"B358","queue_index":212,
+ "run_key":"OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
  "priority":"P1_IGR029_SHARED_MODE_ATLAS","triage":tri["next_action"],
- "method":"Second and final source-bbox-native family pilot: semantic Korean mode qualifier on PROFESSIONAL and OUTRUN improves source hierarchy without forced glyph stretching, preserving native vector Bold 43/42px, original English sampled face palette, and positive source-mask margins; language expansion is UNAPPROVED pending producer/C2.",
+ "method":"P3 composition logic materially corrected after independent C2 old Hangul residue proof: initialize persisted atlas with entire two source-transparency-clean sprite ROIs before new source-bbox glyph-only overlay; purge 5638/712-like old bleed. Same native Korean lettering retained pending strict source-family appearance review; official C338 remains unchanged.",
  "canonical_source_sha256":SOURCE_SHA,"full_C158_clean_reference_sha256":C158_CLEAN_SHA,
- "source_clean_stage":"TWO_REGION_SCOPED_ZERO_ALPHA_NOT_FULL_C158_ATLAS",
+ "source_clean_stage":"P1_SCOPED_PERSISTED_ZERO_ALPHA_TWO_FULL_ROIS_NOT_FULL_C158_ATLAS",
  "current_official_sha256":OFFICIAL_SHA,"new_unapproved_trial_sha256":sha(dds),
+ "C2_B357_defect":"INHERITED_OLD_KOREAN_VISIBLE_OUTSIDE_EXACT_ENGLISH_BBOX",
+ "fix_stage":"P3_ACTUAL_ZERO_ALPHA_PLATE_USED_AS_COMPOSITE_BASE",
  "new_saved_trial_DDS":1,"official_promoted_DDS":0,
  "native_size":[2048,2048],"dds_format":"RGBA32","mips":1,"raw_orientation":"MIRROR_Y",
  "font_file":str(fontpath),"font_sha256":font_sha,"font_index":fontindex,
@@ -135,9 +156,9 @@ qa={"schema_version":2,"role":"B","run":"B357","queue_index":212,
  "outside_two_rois_rgba_change":int(np.count_nonzero(change&~mask)),
  "protected_other_10_current_cells_byte_exact":True,
  "decoded_persisted_mismatch":int(np.count_nonzero(np.any(D!=result,axis=2))),
- "evidence_previews":evidence,"producer_visual":"CONTROLLER_REQUIRED",
+ "evidence_previews":evidence,"producer_visual":"HOLD_SOURCE_FAMILY_OPTICAL_CONTROLLER_REVIEW",
  "independent_C2":"NOT_RUN","C3":"BLOCKED",
  "IGR029":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED"}
-(OUT/"B357_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-(OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 10 current atlas cells exact","method":"source native single-pass letters, no lowres upscaling, no width/shear affine","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B357","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
+(OUT/"B358_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 10 current atlas cells exact","method":"first-failure-stage P3 true CLEAN composition patch; unchanged native letters; no lowres upscaling, no width/shear affine","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B358","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
