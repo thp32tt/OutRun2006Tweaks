@@ -157,8 +157,24 @@ for marker, expected in delegations.items():
         if token not in body:
             errors.append(f"{marker.rstrip('(')} lost lower-owner delegation: {token}")
 
-if "-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON" in workflow:
-    errors.append("canonical full-chain gate still forces incomplete R31/R30 TU split")
+# Integrated R33/R32/R31/R30 build now owns explicit R30 support and
+# R31 upper owners in distinct translation units. Refuse the once-dangerous
+# R31/R30 split when the prerequisite R32/R31 support boundary is absent.
+full_split = "-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON" in workflow
+if full_split:
+    for required in (
+        "-DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON",
+        "-DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON",
+    ):
+        if required not in workflow:
+            errors.append("integrated full-chain split lost predecessor " + required)
+    for label, body in (("cmake.toml", read("cmake.toml")),
+                        ("CMakeLists.txt", read("CMakeLists.txt"))):
+        if 'option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30' not in body:
+            errors.append(label + " lacks integrated R31/R30 split option")
+        if ("src/vr/d3d9/stereo_renderer_r30.cpp\n"
+                "        PROPERTIES HEADER_FILE_ONLY FALSE)" not in body):
+            errors.append(label + " lacks independent lower R30 source compilation")
 if "'tools/verify_vr_r30_support_api_seam.py'" not in workflow:
     errors.append("DX9Ex workflow does not execute the R30 support seam verifier")
 if "'src/vr/core/r30_support_api.hpp'" not in workflow:

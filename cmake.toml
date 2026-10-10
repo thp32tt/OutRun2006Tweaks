@@ -123,16 +123,28 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R33_R32=1)
     message(STATUS "OutRun VR refactor gate: R32 + R33 separate translation units")
 endif()
-option(OUTRUN_VR_REFACTOR_SPLIT_R32_R31 "Refactor preflight only: R32/R31 separate translation units" OFF)
+option(OUTRUN_VR_REFACTOR_SPLIT_R32_R31 "Compile R31 independently below R32" OFF)
 if(OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
-    message(FATAL_ERROR
-        "R32/R31 split is blocked until lower R30/R29/Reset/Present/DirectGPU owner APIs replace R32 private textual-chain dependencies; see docs/automation/r84-port/R32_R31_SPLIT_PREFLIGHT.json")
+    if(NOT OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+        message(FATAL_ERROR "R32/R31 split requires the R33/R32 interface boundary")
+    endif()
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R32/R31 split requires comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r31.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R32_R31=1)
+    message(STATUS "OutRun VR refactor: R33/R32/R31 separate translation units")
 endif()
-# Keep the generated CMakeLists.txt and cmkr source synchronized. Do not
-# combine split gates until the integrated link/owner contract is validated.
-if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 AND OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
+# Combined R33/R32/R31/R30 ownership is checked by the canonical Win32 gate.
+# The R29 and lower original renderer chain remains textual until independently
+# exported and verified; never compile R29 both standalone and through R30.
+if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 AND
+   NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
     message(FATAL_ERROR
-        "R33/R32 and R31/R30 split gates cannot be enabled together without integrated validation")
+        "Combined R31/R30 extraction requires the R32/R31 support boundary")
 endif()
 option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 "Refactor gate: compile R30 separately from the R31 textual chain" OFF)
 if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)

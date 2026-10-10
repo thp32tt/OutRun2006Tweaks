@@ -8,6 +8,17 @@
 #include "../core/r32_review_api.hpp"
 #include "../core/r31_support_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "vr_shared.hpp"
+#include "hook_mgr.hpp"
+#include "draw_state_helpers.hpp"
+#include "vr_pass_policy.hpp"
+#include "../state/state_block_tracker.hpp"
+#include <spdlog/spdlog.h>
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
 #include "stereo_renderer_r31.cpp"
 #endif
@@ -514,7 +525,7 @@ namespace OutRunVRStereo
                         ? ackSnapshot.completedFrameId[index] : 0;
 
                     if (!ackValid ||
-                        !FrameIdAtOrAfter(gpuCompleted, candidate.frameId))
+                        !R30SupportFrameIdAtOrAfter(gpuCompleted, candidate.frameId))
                     {
                         ackBlocked = true;
                         continue;
@@ -597,7 +608,7 @@ namespace OutRunVRStereo
 
         void R32ResetAfterGameReset() noexcept
         {
-            SetStereoRecoverySafetyThroughEpoch(
+            R30SupportSetStereoRecoverySafetyThroughEpoch(
                 OutRunVR::R32::RearmMonoSafetyEpoch(R30SupportPresentEpoch()));
             R32InvalidateResetCaches();
             ++R32ResetEpochRearms;
@@ -850,8 +861,8 @@ namespace OutRunVRStereo
     bool R32ReviewInternalStereoPass() noexcept { return R30SupportInternalStereoPassActive(); }
     bool R32ReviewStereoWanted() noexcept { return R30SupportStereoWanted(); }
     bool R32ReviewTargetIsBackBuffer() noexcept { return R30SupportTargetIsBackBuffer(); }
-    void R32ReviewFailClosedResetBaselineState() noexcept { FailClosedResetBaselineState(); }
-    void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { ArmStereoRecoverySafety(n); }
+    void R32ReviewFailClosedResetBaselineState() noexcept { R30SupportFailClosedResetBaselineState(); }
+    void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { R30SupportArmStereoRecoverySafety(n); }
 
     HRESULT R32ReviewRunRasterReplayGuardCallback(
         IDirect3DDevice9* d, const char* site,
@@ -872,7 +883,7 @@ namespace OutRunVRStereo
     void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }
     void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }
     void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R30SupportReportStereoFailure(r,s,hr); }
-    void R32ReviewNoteRestoreFailure(const char* what) noexcept { NoteRestoreFailure(what); }
+    void R32ReviewNoteRestoreFailure(const char* what) noexcept { R30SupportNoteRestoreFailure(what); }
 
     IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return R30SupportBorrowedTrackedRenderTarget(); }
     IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return R30SupportBorrowedTrackedDepthStencil(); }

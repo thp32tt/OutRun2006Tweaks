@@ -53,7 +53,7 @@ r32 = require(
     "R32WithResetLifecycle",
     "R32ResetAfterGameReset",
     "R32InvalidateResetCaches",
-    "SetStereoRecoverySafetyThroughEpoch(",
+    "R30SupportSetStereoRecoverySafetyThroughEpoch(",
     "OutRunVR::R32::RearmMonoSafetyEpoch(R30SupportPresentEpoch())",
     "R32EffectIsFragileLive",
     "draw is forced to stock-WVP zero disparity",
