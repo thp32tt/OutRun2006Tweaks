@@ -39,6 +39,12 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
 
+      - name: Test DX11 live game draw diagnostic safety
+        shell: pwsh
+        run: |
+          python tools/verify_dx11_first_game_frame_boundary.py
+          python tools/test_dx11_first_game_frame_regressions.py
+
       - name: Test DX11 census analyzer
         shell: pwsh
         run: python tools/test_analyze_dx11_census.py

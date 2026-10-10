@@ -44,6 +44,7 @@ struct State {
     bool attempted = false;
     bool logged = false;
     UINT observed = 0;
+    std::uint64_t presents = 0;
     UINT issued = 0;
     UINT visible = 0;
     UINT failed = 0;
@@ -325,6 +326,16 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         }
         s.pending = false;
         s.attempted = false;
+        // Opt-in-only evidence: a hooked game Draw is not proof that the
+        // restricted FVF subset was admitted, nor that GPU pixels became
+        // visible in the game's backbuffer. Log both missing links explicitly.
+        ++s.presents;
+        if (s.presents == 300 ||
+            (s.presents % 1800u == 0u && s.visible == 0u)) {
+            spdlog::info(
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                s.observed, s.issued, s.visible, s.failed, s.presents);
+        }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.
         state().pending = false;

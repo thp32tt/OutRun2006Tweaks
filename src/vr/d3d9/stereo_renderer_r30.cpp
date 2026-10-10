@@ -3179,7 +3179,6 @@ namespace OutRunVRStereo
                 }
                 D3DVERTEXBUFFER_DESC vDesc{};
                 D3DINDEXBUFFER_DESC iDesc{};
-                const UINT size = (iDesc.Format == D3DFMT_INDEX16) ? 2u : 4u;
                 // Format comes from the live index owner, never from a probe.
                 bool ok = SUCCEEDED(ib->GetDesc(&iDesc)) &&
                     SUCCEEDED(vb->GetDesc(&vDesc)) &&
