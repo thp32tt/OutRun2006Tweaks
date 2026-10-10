@@ -1,84 +1,96 @@
 #include "vr/runtime_eligibility.hpp"
 
-#include <cassert>
+// Release CI must retain checks: NDEBUG strips standard assert statements.
+#define REQUIRE(condition) do { if (!(condition)) return __LINE__; } while (false)
 
 int main()
 {
     using namespace OutRunVR::RuntimeEligibility;
 
     MarkSafetyOverlayUnavailable();
-    assert(!SafetyOverlayReady.load());
-    assert(!HostFresh.load());
-    assert(!StereoAllowed.load());
-    assert(RecoveryPending.load());
-    assert(!MayInjectStereo());
+    // Soft compositor suspension cannot invent a new fresh host after loss.
+    ObserveSoftHostSuspend();
+    REQUIRE(!SafetyOverlayReady.load());
+    REQUIRE(!HostFresh.load());
+    REQUIRE(!HostRenderable.load());
+    REQUIRE(!StereoAllowed.load());
+    REQUIRE(RecoveryPending.load());
+    REQUIRE(!MayInjectStereo());
 
     // Host freshness alone must never reopen stereo after a stall.
     ObserveFreshHost();
-    assert(HostFresh.load());
-    assert(!MayInjectStereo());
+    REQUIRE(HostFresh.load());
+    REQUIRE(!MayInjectStereo());
 
     // A baseline observed before the final safety overlay is installed is not
     // authoritative and therefore may not reopen stereo.
     BaselineVerified();
-    assert(!MayInjectStereo());
+    REQUIRE(!MayInjectStereo());
 
     MarkSafetyOverlayInstalled();
-    assert(SafetyOverlayReady.load());
-    assert(!HostFresh.load());
-    assert(RecoveryPending.load());
-    assert(!MayInjectStereo());
-
-    ObserveFreshHost();
-    assert(!MayInjectStereo());
-    BaselineVerified();
-    assert(MayInjectStereo());
-
-    // A transient shouldRender=false frame pauses injection but preserves the
-    // proven baseline. Fresh renderability resumes immediately without a new
-    // recovery seed.
     ObserveSoftHostSuspend();
-    assert(HostFresh.load());
-    assert(!HostRenderable.load());
-    assert(StereoAllowed.load());
-    assert(!RecoveryPending.load());
-    assert(!MayInjectStereo());
-    ObserveFreshHost();
-    assert(HostRenderable.load());
-    assert(MayInjectStereo());
+    REQUIRE(SafetyOverlayReady.load());
+    REQUIRE(!HostFresh.load());
+    REQUIRE(!HostRenderable.load());
+    REQUIRE(RecoveryPending.load());
+    REQUIRE(!MayInjectStereo());
 
-    // Host death immediately closes the gate and recovery again requires both
-    // a fresh host observation and a new baseline.
-    FailClosed();
-    assert(!MayInjectStereo());
     ObserveFreshHost();
-    assert(!MayInjectStereo());
+    REQUIRE(!MayInjectStereo());
     BaselineVerified();
-    assert(MayInjectStereo());
+    REQUIRE(MayInjectStereo());
+
+    // A verified soft shouldRender=false pause preserves the stereo source.
+    // Only the host decides whether to submit a layer this OpenXR frame.
+    ObserveSoftHostSuspend();
+    REQUIRE(HostFresh.load());
+    REQUIRE(HostRenderable.load());
+    REQUIRE(StereoAllowed.load());
+    REQUIRE(!RecoveryPending.load());
+    REQUIRE(MayInjectStereo());
+    ObserveFreshHost();
+    REQUIRE(HostRenderable.load());
+    REQUIRE(MayInjectStereo());
+
+    // Host death immediately closes the gate. A later soft suspend must
+    // not turn a disconnected host into a new baseline-ready host.
+    FailClosed();
+    ObserveSoftHostSuspend();
+    REQUIRE(!HostFresh.load());
+    REQUIRE(!HostRenderable.load());
+    REQUIRE(!MayInjectStereo());
+    BaselineVerified();
+    REQUIRE(!MayInjectStereo());
+    ObserveFreshHost();
+    REQUIRE(!MayInjectStereo());
+    BaselineVerified();
+    REQUIRE(MayInjectStereo());
 
     // ResetEx/classic-state health is an independent persistent safety gate.
     // A later baseline must not reopen stereo until the compatibility owner
     // explicitly clears the block.
     SetExternalSafetyBlock(true);
-    assert(ExternalSafetyBlock.load());
-    assert(!StereoAllowed.load());
-    assert(RecoveryPending.load());
-    assert(!MayInjectStereo());
+    REQUIRE(ExternalSafetyBlock.load());
+    REQUIRE(!StereoAllowed.load());
+    REQUIRE(RecoveryPending.load());
+    REQUIRE(!MayInjectStereo());
+    ObserveSoftHostSuspend();
+    REQUIRE(!MayInjectStereo());
     BaselineVerified();
-    assert(!MayInjectStereo());
+    REQUIRE(!MayInjectStereo());
 
     SetExternalSafetyBlock(false);
-    assert(!ExternalSafetyBlock.load());
-    assert(!MayInjectStereo());
+    REQUIRE(!ExternalSafetyBlock.load());
+    REQUIRE(!MayInjectStereo());
     BaselineVerified();
-    assert(MayInjectStereo());
+    REQUIRE(MayInjectStereo());
 
     std::atomic<InstallState> state{ InstallState::Pending };
-    assert(!IsReady(state));
-    assert(!IsFailed(state));
+    REQUIRE(!IsReady(state));
+    REQUIRE(!IsFailed(state));
     state.store(InstallState::Ready);
-    assert(IsReady(state));
+    REQUIRE(IsReady(state));
     state.store(InstallState::Failed);
-    assert(IsFailed(state));
+    REQUIRE(IsFailed(state));
     return 0;
 }

@@ -97,8 +97,12 @@ namespace OutRunVR::RuntimeEligibility
         // stereo source active so the host can immediately reuse/capture it when
         // shouldRender returns. The x64 host remains the sole authority for
         // deciding whether the current OpenXR frame actually submits a layer.
-        HostFresh.store(true, std::memory_order_release);
-        HostRenderable.store(true, std::memory_order_release);
+        // A soft pause is only a preservation signal, never a fresh-host
+        // observation. In particular, a stale/disconnected host or a reset
+        // cannot be resurrected by a shouldRender=false frame.
+        if (!HostFresh.load(std::memory_order_acquire) ||
+            !HostRenderable.load(std::memory_order_acquire))
+            FailClosed();
     }
 
     inline void ArmRecoveryPoseWarmup() noexcept
