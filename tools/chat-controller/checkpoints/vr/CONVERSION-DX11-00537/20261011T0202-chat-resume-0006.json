@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "5minute_feature_progress",
+  "captured_at_kst": "2026-10-11T02:02:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+  "feature_stage": "IMPLEMENTING_CI_VALIDATING",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_unchanged": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "material_changes": [
+    "bounded rotating native Draw sampler source and negative regression",
+    "named 5 source/build acceptance CI steps",
+    "MSVC C2589 Windows min macro fix at fa55a1d4"
+  ],
+  "last_real_activity_evidence": "OpenXR exact c89 SHA run 38069385616 reported compiler errors at live_game_frame_bridge.cpp:340 (std::min macro). Fixed via feature commits f2e95be2, 91be3ecc, fa55a1d4, Issue #14 comment 6099980082.",
+  "acceptance_static": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN"
+  ],
+  "incomplete_acceptance_ids": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "ci": {
+    "exact_feature_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+    "build_run": 38069889292,
+    "build_status": "RUNNING",
+    "openxr_run": 38069889239,
+    "openxr_status": "RUNNING",
+    "host_x64": "SUCCESS",
+    "named_source_acceptance": "PASS",
+    "named_bundle_acceptance": "PENDING",
+    "backend_conversion_gate": "NOT_RUN_ON_FEATURE_BRANCH"
+  },
+  "next_action": "Watch fa55a1d4 exact-SHA Win32 game compilers for new errors and DX11-TEST-BUNDLE artifact, repair failure if present. If clean, preserve evidence in docs/automation/runs/CONVERSION-DX11-00537.json on FEATURE_BRANCH; signal FEATURE_READY only for opt-in diagnostic code/bundle with game/HMD UNTESTED, controller owns TARGET_BRANCH promotion and Backend Gate. No duplicate score.",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_ready": false,
+  "score_change": 0
+}
