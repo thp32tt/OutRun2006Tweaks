@@ -1,0 +1,350 @@
+{
+  "schema_version": 2,
+  "run": "C353-C2",
+  "index": 212,
+  "role": "C2",
+  "shard": "EVEN",
+  "mode": "UNPROMOTED_B347_TRIAL_INDEPENDENT",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "clean": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "B341": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "B347": "9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa"
+  },
+  "size_bytes": {
+    "source": 16777344,
+    "clean": 462350,
+    "official": 16777344,
+    "B341": 16777344,
+    "B347": 16777344
+  },
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "dds_header_exact": true,
+  "pixel_format": "RGBA32,mip1",
+  "readable_transform": "FLIP_Y for DDS, CLEAN PNG is readable natively",
+  "scopes": {
+    "source_to_clean_twelve_canonical": {
+      "changed_rgba_inside": 447850,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 447850,
+      "changed_alpha_outside": 0
+    },
+    "source_to_B347_twelve_canonical": {
+      "changed_rgba_inside": 744984,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 463717,
+      "changed_alpha_outside": 0
+    },
+    "clean_to_B347_twelve_canonical": {
+      "changed_rgba_inside": 616147,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 251121,
+      "changed_alpha_outside": 0
+    },
+    "official_to_B347_twelve_canonical": {
+      "changed_rgba_inside": 40364,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 15955,
+      "changed_alpha_outside": 0
+    },
+    "B341_to_B347_two_changed": {
+      "changed_rgba_inside": 41644,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 13543,
+      "changed_alpha_outside": 0
+    },
+    "official_to_B347_two_changed": {
+      "changed_rgba_inside": 40364,
+      "changed_rgba_outside": 0,
+      "changed_alpha_inside": 15955,
+      "changed_alpha_outside": 0
+    },
+    "source_to_B347_two_changed": {
+      "changed_rgba_inside": 51376,
+      "changed_rgba_outside": 693608,
+      "changed_alpha_inside": 20438,
+      "changed_alpha_outside": 443279
+    }
+  },
+  "regions": {
+    "43": {
+      "source_box": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "opaque_reference_box": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "semantic_source": "PROFESSIONAL",
+      "semantic_trial": "프로페셔널",
+      "clean_alpha_nonzero": 0,
+      "alphabboxes": {
+        "source_alpha_gt_0": [
+          0,
+          341,
+          638,
+          404
+        ],
+        "source_alpha_gt_32": [
+          240,
+          341,
+          637,
+          386
+        ],
+        "source_alpha_gt_200": [
+          241,
+          342,
+          636,
+          386
+        ],
+        "official_alpha_gt_0": [
+          5,
+          345,
+          321,
+          400
+        ],
+        "official_alpha_gt_32": [
+          5,
+          345,
+          321,
+          400
+        ],
+        "official_alpha_gt_200": [
+          5,
+          346,
+          320,
+          399
+        ],
+        "B341_alpha_gt_0": [
+          241,
+          345,
+          557,
+          400
+        ],
+        "B341_alpha_gt_32": [
+          241,
+          345,
+          557,
+          400
+        ],
+        "B341_alpha_gt_200": [
+          241,
+          346,
+          556,
+          399
+        ],
+        "B347_alpha_gt_0": [
+          243,
+          341,
+          450,
+          386
+        ],
+        "B347_alpha_gt_32": [
+          244,
+          341,
+          450,
+          385
+        ],
+        "B347_alpha_gt_200": [
+          244,
+          342,
+          449,
+          385
+        ]
+      },
+      "per_region_machine": {},
+      "core_width_ratio": 0.519,
+      "core_width_change_vs_B341": -110,
+      "full_region_b341_to_b347": {
+        "changed_rgba_inside": 31664,
+        "changed_rgba_outside": 0,
+        "changed_alpha_inside": 9003,
+        "changed_alpha_outside": 0
+      },
+      "candidate_bbox_allowed_with_source_bbox": true,
+      "font_hierarchy": "FAIL_HARD_UNDERFILL"
+    },
+    "44": {
+      "source_box": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "opaque_reference_box": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "semantic_source": "OUTRUN",
+      "semantic_trial": "아웃런",
+      "clean_alpha_nonzero": 0,
+      "alphabboxes": {
+        "source_alpha_gt_0": [
+          1626,
+          524,
+          1837,
+          587
+        ],
+        "source_alpha_gt_32": [
+          1626,
+          524,
+          1837,
+          569
+        ],
+        "source_alpha_gt_200": [
+          1627,
+          525,
+          1836,
+          569
+        ],
+        "official_alpha_gt_0": [
+          1688,
+          529,
+          1832,
+          582
+        ],
+        "official_alpha_gt_32": [
+          1689,
+          529,
+          1832,
+          581
+        ],
+        "official_alpha_gt_200": [
+          1689,
+          530,
+          1831,
+          581
+        ],
+        "B341_alpha_gt_0": [
+          1627,
+          529,
+          1771,
+          582
+        ],
+        "B341_alpha_gt_32": [
+          1628,
+          529,
+          1771,
+          581
+        ],
+        "B341_alpha_gt_200": [
+          1628,
+          530,
+          1770,
+          581
+        ],
+        "B347_alpha_gt_0": [
+          1630,
+          524,
+          1752,
+          569
+        ],
+        "B347_alpha_gt_32": [
+          1630,
+          524,
+          1752,
+          568
+        ],
+        "B347_alpha_gt_200": [
+          1630,
+          525,
+          1751,
+          568
+        ]
+      },
+      "per_region_machine": {},
+      "core_width_ratio": 0.5789,
+      "core_width_change_vs_B341": -21,
+      "full_region_b341_to_b347": {
+        "changed_rgba_inside": 9980,
+        "changed_rgba_outside": 0,
+        "changed_alpha_inside": 4540,
+        "changed_alpha_outside": 0
+      },
+      "candidate_bbox_allowed_with_source_bbox": true,
+      "font_hierarchy": "FAIL_HARD_UNDERFILL"
+    }
+  },
+  "images": [
+    {
+      "name": "C353_q212_r43_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 13426,
+      "sha256": "31d09ef521cc7144dada93041b4d98aa05e57f6d570f40d0c14d39e4d8462348"
+    },
+    {
+      "name": "C353_q212_r43_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 28496,
+      "sha256": "3ef6f9cc505387beba38d38b5f3d9c8f86f638d42ec37f19957994874cc14bed"
+    },
+    {
+      "name": "C353_q212_r43_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 15616,
+      "sha256": "1287b15b7cddf291bc9a815a5e2f4950bc87a1e62e7ecb53f04c4de55b64eb06"
+    },
+    {
+      "name": "C353_q212_r43_FLIPY_BLACK_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 17043,
+      "sha256": "e4733dfb89991c5b1e110c9307c51585f393498673ef064b68f2494039419528"
+    },
+    {
+      "name": "C353_q212_r43_FLIPY_WHITE_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 15797,
+      "sha256": "e2f215d0408ac58f68ac835efc26d7020642361eb87f1d8888e743549947dd03"
+    },
+    {
+      "name": "C353_q212_r43_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 12546,
+      "sha256": "f705b7a1ec07c37698624854d27070ab3770928cb7911b68a531ff7433f778a1"
+    },
+    {
+      "name": "C353_q212_r44_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 11071,
+      "sha256": "96b0f5211abbe3b41abc379b170c6e478b1fc6fab35c86b86a9920a02008a1e2"
+    },
+    {
+      "name": "C353_q212_r44_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 20439,
+      "sha256": "c73aa7da79bb83626c3265d64aabf976c2631483b19b50a320bfe6d8f02553dc"
+    },
+    {
+      "name": "C353_q212_r44_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 12883,
+      "sha256": "0c5458e59ad4249fe913bf76e8b567953f1b56a9711bd92e2f563e10582b9c5c"
+    },
+    {
+      "name": "C353_q212_r44_FLIPY_BLACK_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 8677,
+      "sha256": "4a387291fe48320fc9a5e8abb4f6c3065136e88914cda6754202d4d321298d52"
+    },
+    {
+      "name": "C353_q212_r44_FLIPY_WHITE_50_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 13034,
+      "sha256": "da1d6dbc2f2e1122d5c603b66cdddd36a4d521dbee60142196f80004c0aa59b9"
+    },
+    {
+      "name": "C353_q212_r44_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_B341_B347.png",
+      "bytes": 10404,
+      "sha256": "874dca29b2def8e62f475df5f275723114353b4ba4babf948cba7a2b30cb660c"
+    },
+    {
+      "name": "C353_Q212_ALL_ATLAS_SOURCE_OFFICIAL_B341_B347_FLIPY_25.png",
+      "bytes": 176104,
+      "sha256": "c8f0b0aa2a47e89add1e64f9ad9b638a61656d559d79faf3ceb430c63459e64c"
+    }
+  ],
+  "generated_images_total": 37,
+  "committed_evidence_count": 13,
+  "uncommitted_views_notice": "Other local backgrounds and RAW sizes were generated for direct QA but only representative lossless images listed in images were selected for GitHub persistence."
+}

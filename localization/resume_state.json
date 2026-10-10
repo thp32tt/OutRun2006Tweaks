@@ -14568,5 +14568,33 @@
     "evidence_png": 13,
     "evidence_json": 2,
     "qa_report": "localization/graphics/role_C/20261010-C353-C1-Q121-A220-THE24-GOAL33-EXACT/C353_Q121_C1_HOLD.json"
+  },
+  "c353_c2_q212_b347_new_trial_independent_visual_fail": {
+    "run_key": "OUTRUN-KOR-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL-20261010-1050",
+    "role": "C2",
+    "shard": "EVEN",
+    "queue_index": 212,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "official_candidate_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "prior_b341_trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "new_b347_unpromoted_trial_sha256": "9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa",
+    "trial_result": "C2_INDEPENDENT_REWORK_REQUIRED_SOURCE_FAMILY_CORE_WIDTH_UNDERFILL",
+    "official_C2": "C338_REWORK_REQUIRED_UNCHANGED",
+    "source_clean_12_outside_rgba": 0,
+    "clean_to_trial_12_outside_rgba": 0,
+    "b341_to_b347_changed_rgba": 41644,
+    "b341_to_b347_changed_alpha": 13543,
+    "b341_to_b347_outside_two": 0,
+    "r43_core_width_ratio": 0.519,
+    "r44_core_width_ratio": 0.5789,
+    "C3": "NOT_RUN_BLOCKED_ON_VISUAL_FAIL",
+    "APPROVAL": "NOT_GRANTED",
+    "new_promoted_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "user_ingame": "IGR029_OPEN",
+    "machine_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_INDEPENDENT_MACHINE.json",
+    "qa_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_CONTROLLER_C2_REWORK.json",
+    "updated_at_kst": "2026-10-10 11:10 KST"
   }
 }
