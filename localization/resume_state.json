@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B352/B353 q060 2026-10-10 17:43 KST: two distinct saved unapproved DDS with visual FAIL on native/50% source-family weight and racing-italic depth; official C342 REWORK unchanged; IGR044 OPEN; no further same-method trial; manual vector/source contour and homologous slant needed. RUNTIME_VALIDATION=UNTESTED.",
     "C368 C2 2026-10-10 17:27:07 KST q214 NEW independently source-authenticated SHA source 9a2e428bdb87 CLEAN 5beb411d1692, original→CLEAN 3210 inside source START/GOAL, 0 outside, preserved alpha; B339 same trial SHA d273a208d521 GOAL visually REWORK, no re-completion, C3/game UNTESTED. localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
     "C1 2026-10-10 17:22 KST q231 ODD same official A194 SHA 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76 NEW independent 4-region source CLEAN persist decode full alpha/pixel gate: SHA original 29b87a5c8a... CLEAN 1e1c5f54... SOURCE->CLEAN 121288, CLEAN->FINAL 90590, SOURCE->FINAL 140523; all RGBA/alpha outside 0, protected LAN retained. 26 SHA-bound lossless PNG and machine JSON; C1 HOLD no blind calibration/slant family anchors/C3/actual user game; no DDS or approval. QA localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_INDEPENDENT_PIPELINE_HOLD.json RUN_KEY=OUTRUN-KOR-C1-Q231-A194-INDEPENDENT-4REGION-BGRA-CLEAN-20261010-1722",
     "C367 C2 2026-10-10 17:02:20 KST EVEN q060 B351 distinct new candidate ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd SHA-verified saved source/CLEAN/official/trial, full official→trial RGBA97359 inside ROI outside RGBA/alpha0, first independently reconstructed source→CLEAN q060 effect removal89391 and remaining alpha0. Direct RAW/FLIPY 100/75/50 4-panel visual REWORK_REQUIRED racing italic family + heavy navy outline despite gold color progress. Official unchanged C342 REWORK; C3/approval/game UNTESTED. Evidence localization/graphics/role_C/20261010-C367-C2-Q060-B351-INDEPENDENT-SOURCE-FAMILY-FAIL/C367_Q060_C2_INDEPENDENT_B351_VISUAL_REWORK.json OUTRUN-KOR-C367-C2-Q060-B351-NEW-SHA-VISUAL-20261010-1651",
@@ -294,6 +295,29 @@
     "A_RECOVERY08 repaired C92-returned FD90AA9; candidate 0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b passed A static + controller visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "C92 strict checkpoint remains authoritative until C revalidates A_RECOVERY08; FD90AA9 is the only C92-returned REWORK asset."
   ],
+  "b352_b353_q060_two_native_trials_20261010": {
+    "role": "B",
+    "queue_index": 60,
+    "priority": "P0",
+    "run_key": "OUTRUN-KOR-B352-B353-Q060-TWO-TRIAL-FAIL-CLOSED-20261010-1743",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "unchanged_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "B352_trial_sha256": "620266f60da9677234281a88958cd0fca6db1adc01b655ef66df889d8714d229",
+    "B353_trial_sha256": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+    "new_distinct_unapproved_DDS": 2,
+    "official_promoted_DDS": 0,
+    "B352_review": "NATIVE_AND_50_PERCENT_SOURCE_FAMILY_FAIL_THIN_SMALL",
+    "B353_review": "NATIVE_AND_50_PERCENT_SOURCE_FAMILY_FAIL_UNDERWEIGHT_AND_CHROME_ITALIC",
+    "triage": "METHOD_CHANGE_REQUIRED",
+    "next_action": "MANUAL_VECTOR_OR_SOURCE_CONTOUR_REQUIRED; NO_THIRD_AUTOMATIC_SAME_FAMILY_TRIAL",
+    "current_C2": "C342_REWORK_REQUIRED_UNCHANGED",
+    "C3": "BLOCKED",
+    "IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA_B352": "localization/graphics/role_B/20261010-B352-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B352_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+    "QA_B353": "localization/graphics/role_B/20261010-B353-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B353_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+  },
   "prototype_history": {
     "branch": "korean-localization-prototype",
     "k1_ci_run_id": 35981045694,
@@ -359,7 +383,7 @@
     "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
     "strict_qa_reset": {
-      "updated_at_kst": "2026-10-09 05:47 KST",
+      "updated_at_kst": "2026-10-10 17:43:00 KST",
       "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
       "package_assets_scanned": 32,
       "rework_required": 24,
