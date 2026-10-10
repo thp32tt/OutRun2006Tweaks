@@ -469,7 +469,7 @@ require_order(
     "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
     "R30SupportCopyDirectTransportEyesAndIssueFence(",
     "if (FAILED(copy.hr))",
-    "R32DirectCopyPathRejected = true;",
+    "R32DirectCopyRejectHr = copy.hr;",
     "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
 )
 forbid(
