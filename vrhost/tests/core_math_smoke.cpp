@@ -142,5 +142,33 @@ int main()
     if (!Invert(inPlace, inPlace) || !Near(inPlace[3][0], -3.0f))
         return 22;
 
+    // P1: OpenXR pose translation must fail closed just like an invalid
+    // quaternion. Checks are active in Release and preserve normal poses.
+    const auto isIdentityMatrix = [](const Matrix4& value) {
+        if (!MatrixFinite(value))
+            return false;
+        for (int r = 0; r < 4; ++r)
+            for (int c = 0; c < 4; ++c)
+                if (value[r][c] != (r == c ? 1.0f : 0.0f))
+                    return false;
+        return true;
+    };
+    const Vector3 nanPosition{nan, 2.0f, -3.0f};
+    const Vector3 infPosition{1.0f, posInf, -3.0f};
+    if (!isIdentityMatrix(RigidTransform(q, nanPosition, 1.0f)))
+        return 23;
+    if (!isIdentityMatrix(RigidTransform(q, infPosition, 1.0f)))
+        return 24;
+    if (!isIdentityMatrix(RigidTransform(q, p, nan)))
+        return 25;
+    if (!isIdentityMatrix(RigidTransform(q, p, posInf)))
+        return 26;
+    // Finite but extreme translation/scale must not overflow into the eye.
+    const float huge = (std::numeric_limits<float>::max)();
+    if (!isIdentityMatrix(RigidTransform(q, Vector3{huge, 0.0f, 0.0f}, huge)))
+        return 27;
+    if (!Near(RigidTransform(q, p, 2.0f)[3][0], 2.0f))
+        return 28;
+
     return 0;
 }

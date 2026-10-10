@@ -117,6 +117,13 @@ namespace OutRunVR::Core
         float y = qIn.y;
         float z = qIn.z;
         float w = qIn.w;
+        // The pose contract is value-based: a valid orientation alone cannot
+        // authorize publishing NaN/Inf translations from a bad XR position
+        // or a corrupted world-unit scale.
+        if (!std::isfinite(position.x) || !std::isfinite(position.y) ||
+            !std::isfinite(position.z) || !std::isfinite(positionScale))
+            return IdentityMatrix();
+
         const float lenSq = x*x + y*y + z*z + w*w;
         if (!std::isfinite(lenSq) || lenSq <= 1.0e-12f)
             return IdentityMatrix();
@@ -133,7 +140,10 @@ namespace OutRunVR::Core
         out[3][0]=position.x*positionScale;
         out[3][1]=position.y*positionScale;
         out[3][2]=position.z*positionScale;
-        return out;
+        // Even finite inputs may overflow during unit-scale multiplication.
+        // Match the existing invalid-quaternion identity fallback instead
+        // of leaking a nonfinite view transform into per-eye rendering.
+        return MatrixFinite(out) ? out : IdentityMatrix();
     }
 
     inline Matrix4 InverseRigid(const Matrix4& m) noexcept
