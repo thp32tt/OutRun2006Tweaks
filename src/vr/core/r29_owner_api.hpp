@@ -43,6 +43,18 @@ namespace OutRunVRStereo
         bool rightStencilSynchronized = false;
     };
     R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept;
+    // Only R29 accesses lower-chain IPC and adapter lifetime state.
+    // Consumers receive copied dimensions/identity, never the shared pointer.
+    bool R29OwnerRecommendedEyeExtent(std::uint32_t eye,
+        std::uint32_t& width, std::uint32_t& height) noexcept;
+    struct R29OwnerTransportIdentity
+    {
+        std::uint32_t hostPid = 0;
+        std::uint32_t hostAdapterLuidLow = 0;
+        std::uint32_t hostAdapterLuidHigh = 0;
+    };
+    bool R29OwnerTryGetDirectTransportIdentity(
+        R29OwnerTransportIdentity& out) noexcept;
     bool R29OwnerStereoWanted() noexcept;
     bool R29OwnerTargetIsBackBuffer() noexcept;
     bool R29OwnerExchangeInternalStereoPass(bool active) noexcept;
