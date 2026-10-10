@@ -1,6 +1,7 @@
 #include "vr/core/matrix.hpp"
 
 #include <cmath>
+#include <limits>
 
 namespace
 {
@@ -54,9 +55,45 @@ int main()
             if (!Near(identity2[r][c], r == c ? 1.0f : 0.0f))
                 return 7;
 
+    // A rejected FOV must neither mirror the view nor poison the last
+    // published finite projection. These checks also run under Release/NDEBUG.
+    const Matrix4 validProjection = projection;
     Fov invalid{};
     if (ProjectionFromOpenXrFov(base, invalid, projection))
         return 8;
+    if (!Near(projection[0][0], validProjection[0][0]))
+        return 9;
+
+    const Fov reversedHorizontal{0.7f, -0.7f, 0.6f, -0.6f};
+    if (ProjectionFromOpenXrFov(base, reversedHorizontal, projection))
+        return 10;
+    const Fov reversedVertical{-0.7f, 0.7f, -0.6f, 0.6f};
+    if (ProjectionFromOpenXrFov(base, reversedVertical, projection))
+        return 11;
+    if (!Near(projection[0][0], validProjection[0][0]) ||
+        !Near(projection[1][1], validProjection[1][1]))
+        return 12;
+
+    const Fov nonfinite{
+        -0.7f, (std::numeric_limits<float>::quiet_NaN)(), 0.6f, -0.6f};
+    if (ProjectionFromOpenXrFov(base, nonfinite, projection))
+        return 13;
+
+    Matrix4 badBase = base;
+    badBase[2][2] = (std::numeric_limits<float>::infinity)();
+    if (ProjectionFromOpenXrFov(badBase, symmetric, projection))
+        return 14;
+    if (!Near(projection[2][2], validProjection[2][2]) ||
+        !Near(projection[2][3], validProjection[2][3]))
+        return 15;
+
+    // A finite, asymmetric runtime FOV remains valid.
+    const Fov asymmetric{-0.8f, 0.7f, 0.65f, -0.6f};
+    if (!ProjectionFromOpenXrFov(base, asymmetric, projection) ||
+        !MatrixFinite(projection) ||
+        Near(projection[2][0], 0.0f) ||
+        Near(projection[2][1], 0.0f))
+        return 16;
 
     return 0;
 }

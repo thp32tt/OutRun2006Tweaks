@@ -147,19 +147,26 @@ namespace OutRunVR::Core
         const float tanDown = std::tan(fov.angleDown);
         const float width = tanRight - tanLeft;
         const float height = tanUp - tanDown;
+        // A negative span mirrors an eye (or turns the world upside down).
+        // Fail closed rather than accepting a nonzero but inverted XR FOV.
         if (!std::isfinite(width) || !std::isfinite(height) ||
-            std::fabs(width) < 1.0e-6f || std::fabs(height) < 1.0e-6f)
+            width <= 1.0e-6f || height <= 1.0e-6f)
             return false;
 
-        out = {};
-        out[0][0] = 2.0f / width;
-        out[1][1] = 2.0f / height;
-        out[2][0] = (tanRight + tanLeft) / width;
-        out[2][1] = (tanUp + tanDown) / height;
-        out[2][2] = base[2][2];
-        out[2][3] = base[2][3];
-        out[3][2] = base[3][2];
-        out[3][3] = base[3][3];
-        return MatrixFinite(out);
+        // Build transactionally: invalid base terms or extreme XR tangents
+        // must not expose a partially written/nonfinite eye projection.
+        Matrix4 candidate{};
+        candidate[0][0] = 2.0f / width;
+        candidate[1][1] = 2.0f / height;
+        candidate[2][0] = (tanRight + tanLeft) / width;
+        candidate[2][1] = (tanUp + tanDown) / height;
+        candidate[2][2] = base[2][2];
+        candidate[2][3] = base[2][3];
+        candidate[3][2] = base[3][2];
+        candidate[3][3] = base[3][3];
+        if (!MatrixFinite(candidate))
+            return false;
+        out = candidate;
+        return true;
     }
 }
