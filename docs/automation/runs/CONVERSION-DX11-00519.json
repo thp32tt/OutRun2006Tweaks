@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00519",
+  "production_id": "CONVERSION-DX11-00519",
+  "event_id": "CONVERSION-DX11-00519-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "retry_count": 0,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00519",
+  "work_key": "DX11:R222:R203_LINEAR_TEXTURE_UNOWNED_DSV_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp:R222",
+    "tools/dx11_textured_linear_probe_r203.cpp:R222",
+    "tools/test_dx11_textured_linear_r203.py:R222"
+  ],
+  "previous_owner_exclusions": [
+    "CONVERSION-DX11-00477:R175",
+    "CONVERSION-DX11-00518:R221"
+  ],
+  "base_sha": "1abef36c49269cfef3e40ef832b29041f613a8da",
+  "material_result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
+  "validation_bearing_result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
+  "result_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAIT_EXACT_SHA_GATE",
+  "terminal": false,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "R222 dormant R203 linear textured single-eye OM DSV fail-closed + WARP negative and restore",
+  "summary": "Owned textured linear preflight now disallows retained depth view when no expected DSV owner exists, in addition to existing RTV/MRT/SRV/sampler invariants. Real WARP same-device D32 DSV denial/restore fixture added; native gameplay Draw still dormant.",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub checkpoint and branch HEAD, 00519 result absent, 00518 inherited R175 blocker",
+    "C1_REVIEW": "PASS independent R203 full color eye preflight lacks unowned DSV guard; R221/R175 fenced",
+    "C2_IMPLEMENT": "PASS 3 material source/probe/test files, exact [AUTO:CONVERSION-DX11-00519] commit b76606a3",
+    "C3_VALIDATE": "IN_PROGRESS exact-SHA Backend Conversion Gate 38027358089",
+    "C4_COMMIT": "PASS b76606a3ab504022c749a02ea0df47c27ac4b27d",
+    "C5_PACKAGE": "NOT_REQUIRED dormant R203 diagnostic; no native gameplay Draw activation",
+    "C6_STATE": "PARTIAL checkpoint while exact-SHA Gate in progress"
+  },
+  "evidence": {
+    "material_commit": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
+    "gate_run_id": 38027358089,
+    "gate_head_sha": "b76606a3ab504022c749a02ea0df47c27ac4b27d",
+    "validate_job_id": 114140931369,
+    "issue14_comment_id": 6094182108,
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false
+  },
+  "blockers": [
+    "Full exact-SHA backend gate not yet concluded; previous 00518 failed independently owned R175 generic varying and cannot be assumed fixed",
+    "Quest3/VDXR game runtime UNTESTED"
+  ],
+  "resume_cursor": "POLL_GATE_38027358089_AND_RECONCILE_C3_C6",
+  "next_action": "On exact material SHA b76606a3 inspect R203 static and WARP steps, full gate result, fail if inherited R175 remains. Update C6 record and Issue #14 with exact job evidence; never retry unchanged failure or award score solely for rollover.",
+  "score_change": 0,
+  "timestamp_kst": "2026-10-10T14:2x+09:00"
+}
