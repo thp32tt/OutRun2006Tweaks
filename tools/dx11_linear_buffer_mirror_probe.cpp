@@ -375,6 +375,45 @@ int main() {
     require(samplePixelEquals(255,0,0),
             "R214 real WARP Draw restored red pixel after OM repair");
 
+    // R215: R214 alone accepts a half eye viewport or a foreign raster
+    // state, even though both can invalidate an otherwise exact OM Draw.
+    const auto sealedEyeReady = [&] {
+        return outrun::vr::dx11::verified_linear_sealed_opaque_eye_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            ownDsv.Get(),depthState.Get(),rs.Get());
+    };
+    require(sealedEyeReady(), "R215 sealed opaque eye initial readiness");
+    D3D11_VIEWPORT r215Half=vp;
+    r215Half.Width=16.f;
+    ctx->RSSetViewports(1,&r215Half);
+    require(exactOpaqueEyeReady(), "R215 R214 admits retained half viewport");
+    require(!sealedEyeReady(), "R215 reject half-eye viewport");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(0,0,0),
+            "R215 real WARP half-viewport suppresses center pixel");
+    ctx->RSSetViewports(1,&vp);
+    require(sealedEyeReady(), "R215 full-eye viewport restored");
+    D3D11_RASTERIZER_DESC foreignRasterDesc=raster;
+    foreignRasterDesc.CullMode=D3D11_CULL_BACK;
+    ComPtr<ID3D11RasterizerState> foreignRaster;
+    require(SUCCEEDED(dev->CreateRasterizerState(
+            &foreignRasterDesc,foreignRaster.GetAddressOf())),
+            "R215 alternate same-device raster");
+    ctx->RSSetState(foreignRaster.Get());
+    require(exactOpaqueEyeReady(), "R215 R214 admits foreign raster");
+    require(!sealedEyeReady(), "R215 reject foreign raster owner");
+    ctx->RSSetState(rs.Get());
+    require(sealedEyeReady(), "R215 exact raster object restored");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0),
+            "R215 real WARP restores full-eye red pixel");
+
 
     require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
             vb,ctx.Get(),0,3,generation,version,

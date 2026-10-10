@@ -334,6 +334,12 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_linear_opaque_om_r214.py
 
+      # R215: full-eye viewport, exact raster and opaque OM composition.
+      - name: Verify R215 sealed opaque eye scope
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_sealed_opaque_eye_r215.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe

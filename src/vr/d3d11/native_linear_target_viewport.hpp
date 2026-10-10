@@ -66,4 +66,49 @@ namespace outrun::vr::dx11 {
     }
     return true;
 }
+// R215: compose the previously independent full-target/viewport (R199),
+// depth + single-eye + opaque OM (R214), and exact raster ownership into one
+// dormant non-indexed eye preflight. Passing R214 alone did not attest that
+// the eye viewport was full-sized or that RS belonged to the intended owner.
+// No gameplay Draw is authorized or submitted by this helper.
+[[nodiscard]] inline bool verified_linear_sealed_opaque_eye_draw_ready(
+    const NativeLinearBufferMirror& vb, ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t generation, std::uint64_t snapshotVersion,
+    UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !expectedRaster ||
+        !verified_linear_full_target_draw_ready(
+            vb, context, startVertex, vertexCount, generation,
+            snapshotVersion, width, height, format, expectedRtv) ||
+        !verified_linear_opaque_single_eye_draw_ready(
+            vb, context, startVertex, vertexCount, generation,
+            snapshotVersion, expectedLayout, expectedVs, expectedPs,
+            expectedRtv, expectedDsv, expectedDepthState))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> liveRaster;
+    context->RSGetState(liveRaster.GetAddressOf());
+    if (liveRaster.Get() != expectedRaster) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> liveDevice, rasterDevice;
+    context->GetDevice(liveDevice.GetAddressOf());
+    expectedRaster->GetDevice(rasterDevice.GetAddressOf());
+    if (!liveDevice || rasterDevice.Get() != liveDevice.Get()) return false;
+    D3D11_RASTERIZER_DESC desc{};
+    expectedRaster->GetDesc(&desc);
+    // This deliberately narrow path proves the existing WARP triangle with
+    // CULL_NONE; explicit culling has a separately owned R201 contract.
+    return desc.FillMode == D3D11_FILL_SOLID &&
+        desc.CullMode == D3D11_CULL_NONE &&
+        !desc.ScissorEnable && desc.DepthClipEnable &&
+        desc.DepthBias == 0 && desc.DepthBiasClamp == 0.f &&
+        desc.SlopeScaledDepthBias == 0.f &&
+        !desc.MultisampleEnable && !desc.AntialiasedLineEnable;
+}
+
 } // namespace outrun::vr::dx11
