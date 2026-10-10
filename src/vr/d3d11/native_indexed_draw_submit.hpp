@@ -104,4 +104,31 @@ namespace outrun::vr::dx11 {
            rtv.Get() == expectedRtv;
 }
 
+
+// R212: indexed DrawIndexed exact OM eye ownership, independent of R211.
+// R207 checks RTV0 only; a live SV_Target1 can write a secondary eye.
+// Dormant/readiness-only: never activate gameplay DrawIndexed here.
+[[nodiscard]] inline bool verified_indexed_single_eye_output_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, UINT firstIndex, UINT indexCount,
+    INT baseVertex, std::uint64_t gen, std::uint64_t vbVer,
+    std::uint64_t ibVer, ID3D11InputLayout* layout,
+    ID3D11VertexShader* vs, ID3D11PixelShader* ps,
+    ID3D11RenderTargetView* expectedRtv) noexcept {
+    if (!context || !expectedRtv ||
+        !verified_indexed_pipeline_identity_ready(
+            vb,ib,context,firstIndex,indexCount,baseVertex,
+            gen,vbVer,ibVer,layout,vs,ps,expectedRtv))
+        return false;
+    ID3D11RenderTargetView* views[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                views,nullptr);
+    bool single = views[0] == expectedRtv;
+    for (UINT i=1; i<D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        if (views[i]) single=false;
+    // OMGetRenderTargets AddRef: balance every returned COM reference.
+    for (auto* v: views)
+        if (v) v->Release();
+    return single;
+}
 } // namespace outrun::vr::dx11

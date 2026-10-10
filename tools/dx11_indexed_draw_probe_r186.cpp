@@ -131,6 +131,60 @@ int main() {
     context->PSSetShader(ps.Get(),nullptr,0);
     require(exactReady(), "R207 restore exact expected PS");
 
+    // R212 real WARP DrawIndexed: valid slot0 still leaks SV_Target1.
+    constexpr char dualShader[] =
+        "struct O{float4 a:SV_Target0;float4 b:SV_Target1;};"
+        "O ps(){O o;o.a=float4(0,1,0,1);o.b=float4(1,0,0,1);return o;}";
+    ComPtr<ID3DBlob> dualCode;
+    require(SUCCEEDED(D3DCompile(dualShader,sizeof(dualShader)-1,
+        nullptr,nullptr,nullptr,"ps","ps_4_0",0,0,
+        dualCode.GetAddressOf(),nullptr)), "R212 compile dual PS");
+    ComPtr<ID3D11PixelShader> dualPs;
+    require(SUCCEEDED(device->CreatePixelShader(dualCode->GetBufferPointer(),
+        dualCode->GetBufferSize(),nullptr,dualPs.GetAddressOf())),
+        "R212 native dual-output shader");
+    D3D11_TEXTURE2D_DESC foreignDesc{};
+    color->GetDesc(&foreignDesc);
+    ComPtr<ID3D11Texture2D> foreignColor;
+    ComPtr<ID3D11RenderTargetView> foreignRtv;
+    require(SUCCEEDED(device->CreateTexture2D(&foreignDesc,nullptr,
+        foreignColor.GetAddressOf())), "R212 same-device foreign eye texture");
+    require(SUCCEEDED(device->CreateRenderTargetView(foreignColor.Get(),
+        nullptr,foreignRtv.GetAddressOf())), "R212 second eye RTV");
+    context->PSSetShader(dualPs.Get(),nullptr,0);
+    ID3D11RenderTargetView* twoEyes[]={rtv.Get(),foreignRtv.Get()};
+    context->OMSetRenderTargets(2,twoEyes,nullptr);
+    const auto oldMrtReady=[&] {
+        return outrun::vr::dx11::verified_indexed_pipeline_identity_ready(
+            vb,ib,context.Get(),0,3,0,generation,vbVersion,ibVersion,
+            layout.Get(),vs.Get(),dualPs.Get(),rtv.Get());
+    };
+    const auto newMrtReady=[&] {
+        return outrun::vr::dx11::verified_indexed_single_eye_output_ready(
+            vb,ib,context.Get(),0,3,0,generation,vbVersion,ibVersion,
+            layout.Get(),vs.Get(),dualPs.Get(),rtv.Get());
+    };
+    require(oldMrtReady(), "R212 R207 accepts second eye");
+    require(!newMrtReady(), "R212 rejects second eye");
+    const float eyeClear[]={0,0,0,1};
+    context->ClearRenderTargetView(foreignRtv.Get(),eyeClear);
+    context->DrawIndexed(3,0,0);
+    context->CopyResource(readback.Get(),foreignColor.Get());
+    D3D11_MAPPED_SUBRESOURCE eyeMap{};
+    require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,0,
+        &eyeMap)) && eyeMap.pData, "R212 map foreign eye");
+    const auto* eye=static_cast<const unsigned char*>(eyeMap.pData)
+        +16*eyeMap.RowPitch+16*4;
+    const bool leakedRed=eye[0]==255 && eye[1]==0 &&
+        eye[2]==0 && eye[3]==255;
+    context->Unmap(readback.Get(),0);
+    require(leakedRed, "R212 real indexed eye leak red pixel");
+    context->OMSetRenderTargets(1,&rawTarget,nullptr);
+    require(newMrtReady(), "R212 recovered single eye");
+    context->PSSetShader(ps.Get(),nullptr,0);
+    require(exactReady(), "R212 recovered original shader");
+
+
     require(!ready(context.Get(),0,0,0,generation,vbVersion,ibVersion), "reject zero indices");
     require(!ready(context.Get(),0,2,0,generation,vbVersion,ibVersion), "reject partial triangle");
     require(!ready(context.Get(),1,3,0,generation,vbVersion,ibVersion), "reject IB overrun");

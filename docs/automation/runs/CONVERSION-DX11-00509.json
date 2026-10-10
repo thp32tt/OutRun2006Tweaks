@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00509",
+  "production_id": "CONVERSION-DX11-00509",
+  "event_id": "CONVERSION-DX11-00509-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "927a0d2a715f4aaa9aeb8d0193f49b154f5ac5fd",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00509",
+  "lease_epoch": 1,
+  "work_key": "DX11:R212:INDEXED_OM_SECONDARY_EYE_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp:R212",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R212",
+    "tools/test_dx11_indexed_single_eye_mrt_r212.py",
+    ".github/workflows/backend-conversion-gate.yml:R212"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R212 dormant indexed D3D11 DrawIndexed single-eye OM slot-set provenance; reject secondary RTV while R207 accepts slot0; WARP real SV_Target1 unintended eye pixel.",
+  "last_real_activity_at": "2026-10-10T00:43:59.442Z",
+  "last_activity_evidence": "R212 independent indexed C++ gate, 9 mutation guards and WARP dual-SV_Target pixel proof prepared.",
+  "resume_cursor": "WAIT_00508_GATE_THEN_CAS",
+  "next_action": "Wait 00508 Gate #38009897280 before publishing; then CAS material and inspect exact SHA Backend Conversion Gate.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD 927a0d2a, 00508 R211 ongoing, no 00509 checkpoint.",
+    "C1_REVIEW": "PASS: R207 indexed misses extra OM targets.",
+    "C2_IMPLEMENT": "PREPARED: C++ R212+real WARP readback+nine mutants.",
+    "C3_VALIDATE": "LOCAL_STATIC_PASS; exact SHA CI pending.",
+    "C4_COMMIT": "PREPARED material Git object; hold branch until concurrent CI completes.",
+    "C5_PACKAGE": "NOT_REQUIRED_NEED_HMD_TEST",
+    "C6_STATE": "PENDING"
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_single_eye_mrt_r212.py",
+    "docs/automation/runs/CONVERSION-DX11-00509.json"
+  ],
+  "evidence": {
+    "local_static": "PASS: 9 unique guards and mutations",
+    "prior_gate": 38009897280
+  },
+  "blockers": [
+    "Concurrent 00508 CI must not be cancelled.",
+    "Upstream R175 may fail full Gate.",
+    "Quest3 runtime UNTESTED."
+  ],
+  "updated_at_utc": "2026-10-10T00:43:59.442Z",
+  "score_change": 0
+}
