@@ -10156,5 +10156,34 @@
     "report": "localization/graphics/role_C/20261010-C349-C1-Q161-A218-TRIAL-INDEPENDENT/C349_Q161_CONTROLLER_C1_HOLD.json",
     "c3": "NOT_RUN",
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "a219_q121_goal_source_residue_33": {
+    "run": "A219",
+    "run_key": "OUTRUN-KOR-A219-Q121-GOAL-33-SOURCE-RESIDUE-20261010",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "changed_rgba_pixels": 33,
+    "changed_bytes": 132,
+    "outside_changed_pixels": 0,
+    "status": "MATERIAL_SOURCE_RESIDUE_CONFIRMED_REWORK_REQUIRED_SCOPED_TRIAL_QA_PASS_NOT_PROMOTED",
+    "official_dds_changed": false,
+    "official_new_dds_count": 0,
+    "trial_new_dds_count": 1,
+    "user_reports": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "trial_path": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_Q121_SOURCE_GOAL_33_RESIDUE_REMOVAL_UNPROMOTED.dds",
+    "producer_machine_qa": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_Q121_MACHINE_TRIAL_QA.json",
+    "producer_visual_qa": "localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_CONTROLLER_SELF_QA.json",
+    "next_gate": "C1 exact 29-source-cell/protected-art blind calibration + C3 + new user game retest",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "updated_at_kst": "2026-10-10 09:20 KST"
+  },
+  "updated_at": "2026-10-10 09:20 KST"
 }
