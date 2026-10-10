@@ -6880,7 +6880,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 13:10 KST",
+  "updated_at_kst": "2026-10-10 13:50 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14923,5 +14923,24 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine_report": "localization/graphics/role_C/20261010-C1-Q103-A223-WEIGHT-TRACKING-REJECT/Q103_A223_C1_MACHINE.json",
     "qa_report": "localization/graphics/role_C/20261010-C1-Q103-A223-WEIGHT-TRACKING-REJECT/Q103_A223_C1_REWORK.json"
+  },
+  "c1_20261010_q101_source_italic_visual_rework": {
+    "review_id": "C1-Q101-20261010-1350",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 101,
+    "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "status": "REWORK_REQUIRED",
+    "reason": "SOURCE_FAMILY_RIGHT_ITALIC_MISMATCH",
+    "explanation": "New firsthand independent inspection of SHA-matched persisted native candidate and pinned SOURCE/CLEAN/FINAL warning comparison: source strongly right-italic, Korean warning near upright. Earlier C180 PASS is superseded for q101; C180 machine bbox PASS remains historical only.",
+    "proof": "localization/graphics/role_C/20261010-C1-Q101-SOURCE-ITALIC-REWORK/C1_Q101_INDEPENDENT_VISUAL_REJECT.json",
+    "candidate_changed": false,
+    "new_dds": 0,
+    "new_C_PASS": 0,
+    "C3": "BLOCKED",
+    "approval": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "producer_next": "Reconstruct source-anchored right-italic warning and rerun native lossless C1/C3 and game retest"
   }
 }
