@@ -446,14 +446,76 @@ if min(create_r14, direct_r14, hard_fail_r14) < 0 or \
     raise SystemExit(
         "R14 must degrade CPU-shadow allocation failure to tracked DirectOnly before the hard coverage fail-close")
 
-require(
+# Keep the policy guard aligned with the executable Release smoke test:
+# assert(...) disappears under NDEBUG, whereas REQUIRE returns a nonzero exit
+# code on failure. Check both fail-closed and valid-soft-suspend scenarios.
+smoke = require(
     "vrhost/tests/runtime_eligibility_smoke.cpp",
-    "SetExternalSafetyBlock(true)",
-    "ObserveSoftHostSuspend()",
-    "assert(!HostRenderable.load());",
+    "#define REQUIRE(condition) do { if (!(condition)) return __LINE__; } while (false)",
+    "SetExternalSafetyBlock(true);",
+    "ObserveSoftHostSuspend();",
+    "REQUIRE(!HostRenderable.load());",
     "BaselineVerified();",
-    "assert(!MayInjectStereo());",
+    "REQUIRE(!MayInjectStereo());",
 )
+
+
+def require_smoke_phase(label: str, start: str, end: str, *markers: str) -> None:
+    begin = smoke.find(start)
+    finish = smoke.find(end, begin + len(start))
+    if begin < 0 or finish < 0:
+        raise SystemExit(f"R32/R33 smoke phase missing: {label}")
+    phase = smoke[begin:finish]
+    for marker in markers:
+        if marker not in phase:
+            raise SystemExit(f"R32/R33 smoke invariant missing: {label} :: {marker}")
+
+
+require_smoke_phase(
+    "soft-suspend cannot resurrect disconnected host",
+    "MarkSafetyOverlayUnavailable();",
+    "// Host freshness alone",
+    "ObserveSoftHostSuspend();",
+    "REQUIRE(!HostFresh.load());",
+    "REQUIRE(!HostRenderable.load());",
+    "REQUIRE(!MayInjectStereo());",
+)
+require_smoke_phase(
+    "uninstalled overlay cannot be resurrected",
+    "MarkSafetyOverlayInstalled();",
+    "// A verified soft",
+    "ObserveSoftHostSuspend();",
+    "REQUIRE(!HostFresh.load());",
+    "REQUIRE(!MayInjectStereo());",
+)
+require_smoke_phase(
+    "verified compositor soft pause preserves renderable stereo",
+    "// A verified soft",
+    "// Host death",
+    "ObserveSoftHostSuspend();",
+    "REQUIRE(HostFresh.load());",
+    "REQUIRE(HostRenderable.load());",
+    "REQUIRE(MayInjectStereo());",
+)
+require_smoke_phase(
+    "hard host loss requires fresh baseline",
+    "// Host death",
+    "// ResetEx/classic-state",
+    "FailClosed();",
+    "ObserveSoftHostSuspend();",
+    "REQUIRE(!HostRenderable.load());",
+    "BaselineVerified();",
+    "REQUIRE(!MayInjectStereo());",
+)
+require_smoke_phase(
+    "ResetEx safety block cannot be bypassed by soft pause",
+    "SetExternalSafetyBlock(true);",
+    "SetExternalSafetyBlock(false);",
+    "ObserveSoftHostSuspend();",
+    "BaselineVerified();",
+    "REQUIRE(!MayInjectStereo());",
+)
+
 
 require(
     "src/vr/d3d9/stereo_renderer_r21.cpp",
