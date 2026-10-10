@@ -435,6 +435,8 @@ private:
 	std::vector<InputDevice> devices;
 	std::vector<SDL_Gamepad*> controllers;
 	int primaryControllerIndex = -1;
+	// Terminal shutdown rejects late SDL hotplug callbacks.
+	bool shuttingDown = false;
 
 	SDL_Window* window = nullptr;
 
@@ -553,14 +555,17 @@ private:
 	{
 		spdlog::debug(__FUNCTION__ "({})", instanceId);
 
+		// Open and publish a new SDL handle under the same shutdown mutex.
+		std::lock_guard<std::mutex> lock(mtx);
+		if (shuttingDown)
+			return;
+
 		SDL_Gamepad* controller = SDL_OpenGamepad(instanceId);
 		if (!controller)
 		{
 			spdlog::error(__FUNCTION__ "({}): !controller", instanceId);
 			return;
 		}
-
-		std::lock_guard<std::mutex> lock(mtx);
 
 		// check if we've already seen this controller, SDL sometimes sends two controller added events some reason
 		if (std::find_if(controllers.begin(), controllers.end(), [instanceId](SDL_Gamepad* existing)
@@ -583,6 +588,8 @@ private:
 	void onJoystickAdded(SDL_JoystickID instanceId)
 	{
 		std::lock_guard<std::mutex> lock(mtx);
+		if (shuttingDown)
+			return;
 		if (std::find_if(devices.begin(), devices.end(), [instanceId](const InputDevice& device)
 			{
 				return device.instanceId == instanceId;
@@ -737,6 +744,8 @@ public:
 	{
 		// Serialize teardown with VR/FFB rumble and SDL hot-unplug.
 		std::lock_guard<std::mutex> lock(mtx);
+		// Prevent any pending add callback from reopening handles after this.
+		shuttingDown = true;
 		for (auto controller : controllers)
 		{
 			// Explicit zero keeps the old timed effect from surviving teardown.

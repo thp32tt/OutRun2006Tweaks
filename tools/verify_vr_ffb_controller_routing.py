@@ -33,6 +33,38 @@ def lifetime_violations(source: str) -> list[str]:
 
 
 
+
+def hotplug_shutdown_violations(source: str) -> list[str]:
+    """Late gamepad/joystick add callbacks must not outlive terminal shutdown."""
+    try:
+        pad = source.split("void onControllerAdded(SDL_JoystickID instanceId)", 1)[1].split("void onJoystickAdded(", 1)[0]
+        joy = source.split("void onJoystickAdded(SDL_JoystickID instanceId)", 1)[1].split("static bool deviceMatchesBinding", 1)[0]
+        close = source.split("void shutdown()", 1)[1].split("SDL_Gamepad* getPrimaryGamepad()", 1)[0]
+    except IndexError:
+        return ["missing hotplug/shutdown lifetime boundary"]
+    failures: list[str] = []
+    mutex = "std::lock_guard<std::mutex> lock(mtx);"
+    guard = "if (shuttingDown)"
+    if "bool shuttingDown = false;" not in source:
+        failures.append("shutdown fence default state missing")
+    for body, opening, label in (
+        (pad, "SDL_OpenGamepad(instanceId);", "controller"),
+        (joy, "SDL_OpenJoystick(instanceId);", "joystick"),
+    ):
+        if not all(token in body for token in (mutex, guard, opening)) or (
+            all(token in body for token in (mutex, guard, opening)) and
+            not (body.index(mutex) < body.index(guard) < body.index("return;", body.index(guard)) < body.index(opening))
+        ):
+            failures.append(label + " add must hold mutex and fence shutdown before open")
+    fence = "shuttingDown = true;"
+    closed_pad = "SDL_CloseGamepad(controller);"
+    if not all(token in close for token in (mutex, fence, closed_pad)) or (
+        all(token in close for token in (mutex, fence, closed_pad)) and
+        not (close.index(mutex) < close.index(fence) < close.index(closed_pad))
+    ):
+        failures.append("terminal shutdown must fence adds before device close")
+    return failures
+
 def primary_handoff_violations(source: str) -> list[str]:
     """SDL timed rumble must stop before primary switch, unplug and shutdown."""
     try:
@@ -157,6 +189,21 @@ def main() -> None:
         raise SystemExit("VR FFB SDL LIFETIME FAIL: " + "; ".join(lifetime_violations(source_input)))
     if primary_handoff_violations(source_input):
         raise SystemExit("VR FFB SDL HANDOFF FAIL: " + "; ".join(primary_handoff_violations(source_input)))
+
+    hotplug_errors = hotplug_shutdown_violations(source_input)
+    if hotplug_errors:
+        raise SystemExit("VR FFB SDL HOTPLUG FAIL: " + "; ".join(hotplug_errors))
+    # Negative controls: a missing pad gate, joystick gate, mutex, or shutdown fence.
+    negative_hotplug = (
+        ("if (shuttingDown)", "if (false)"),
+        ("void onJoystickAdded(SDL_JoystickID instanceId)", "void onJoystickAdded_MUTATED(SDL_JoystickID instanceId)"),
+        ("std::lock_guard<std::mutex> lock(mtx);", "/* missing pad-open mutex */"),
+        ("shuttingDown = true;", "/* terminal shutdown fence removed */"),
+    )
+    for before, after in negative_hotplug:
+        mutated = source_input.replace(before, after, 1)
+        if mutated == source_input or not hotplug_shutdown_violations(mutated):
+            raise SystemExit("VR FFB SDL HOTPLUG mutation escaped: " + before[:64])
     negative_handoffs = (
         ("SDL_RumbleGamepad(previous, 0, 0, 0);", "/* primary stop removed */"),
         ("SDL_RumbleGamepad(*it, 0, 0, 0);", "/* unplug stop removed */"),
