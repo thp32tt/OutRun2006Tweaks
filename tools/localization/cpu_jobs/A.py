@@ -21,7 +21,19 @@ source_sha="76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544"
 assert sha(prior)==prior_sha and prior[:4]==b"DDS " and len(prior)==128+2048*2048*4
 W=H=2048
 triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","103"],check=True,text=True,capture_output=True).stdout
-assert "MATERIAL_REWORK" in triage or "METHOD_CHANGE_REQUIRED" in triage,triage
+# Queue triage is advisory; a separately independently confirmed C1 REWORK with
+# new failure pixels is stronger than a stale NORMAL_QUEUE_SELECTION reason.
+decision=json.loads(triage)["assets"][0]
+confirmed=repo/"localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_REWORK.json"
+verdict=json.loads(confirmed.read_text(encoding="utf-8"))
+assert decision["index"]==103
+assert verdict["QA_decision"]=="REWORK_REQUIRED"
+assert verdict["reason_code"]=="STRICT_ORIGINAL_GLYPH_EFFECT_HEIGHT_EXCEED_15PX"
+assert verdict["comparison_exact"]["source_effect_height"]==45
+assert verdict["comparison_exact"]["trial_effect_height"]==60
+assert verdict["candidate_sha256"]=="a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07"
+assert "rework_source_glyph_effect_height15" in decision["current_status"],decision
+assert decision["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED","NORMAL_QUEUE_SELECTION"),decision
 url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
 "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/"
 "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds")
