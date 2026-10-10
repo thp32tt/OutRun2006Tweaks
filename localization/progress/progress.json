@@ -50,6 +50,24 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_a234r_q121_source_derived_transparent_rank20_20261011": {
+        "run_key": "OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
+        "role": "A",
+        "queue_index": 121,
+        "scope": "rank20 Gas Pedal 1/30",
+        "trial_dds_sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+        "failed_trial_sha256": "dd1cb811cf449f108913906cd2ef47d2c46fabe1bd1cafb0f5c611fe2ca7de29",
+        "visible_alpha_pixels": 6672,
+        "changed_outside_source_roi": 0,
+        "other_cells_unchanged": 29,
+        "producer": "SCOPED_IMPROVED_STYLE_HOLD",
+        "official_promoted": 0,
+        "c1": "NOT_RUN",
+        "c3": "NOT_RUN",
+        "user_game": "OPEN",
+        "runtime": "UNTESTED",
+        "qa": "localization/graphics/role_A/20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA/A234R_CONTROLLER_OPTICAL_QA.json"
+      },
       "latest_c1_odd_q217_a233_20261011": {
         "review_id": "C1-Q217-A233-FIRST-INDEPENDENT-20261011-0541",
         "queue_index": 217,
