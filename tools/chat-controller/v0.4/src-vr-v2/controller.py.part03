@@ -82,21 +82,24 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
             or (record or {}).get("result_sha")
             or ""
         )
-        complete = status in {"COMPLETE", "PASS", "SUCCESS", "DONE"}
+        complete = status in {
+            "COMPLETE", "COMPLETE_BUILD_VERIFIED",
+            "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+            "COMPLETE_CI_VERIFIED_RUNTIME_UNTESTED", "PASS", "DONE",
+        }
 
-        if complete:
-            if re.fullmatch(r"[0-9a-fA-F]{40}", result_sha):
-                active["result_sha"] = result_sha.lower()
-            elif task_commit and task_commit.get("sha"):
-                active["result_sha"] = task_commit["sha"]
-            active["automation_validation"] = str((record or {}).get("automation_validation") or "PASS")
-            active["runtime_validation"] = str((record or {}).get("runtime_validation") or "UNTESTED")
-            active["terminal"] = "PASS"
-            active["phase"] = "DONE"
+        if complete and re.fullmatch(r"[0-9a-fA-F]{40}", result_sha):
+            # A run record alone is not evidence of successful CI. Route through
+            # the exact-SHA Actions + C6 verifier instead of marking PASS here.
+            active["result_sha"] = result_sha.lower()
+            active["gate_run"] = None
+            active["last_gate_poll_at"] = None
+            active["wait_actions_started_at"] = datetime.now(TZ).isoformat()
+            active["phase"] = "WAIT_ACTIONS"
             active["stale_event_drop"] = trigger
             write_runtime(
                 status="stale_event_drop",
-                last_action=f"{production_id} {trigger} dropped: GitHub run record is already {status or 'COMPLETE'}",
+                last_action=f"{production_id} {trigger} stale: durable terminal record found; verifying exact-SHA CI",
                 queue=active,
             )
             return True
@@ -210,27 +213,52 @@ def rollover_has_confirmed_ui_failure(reason: str) -> bool:
 
 
 def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> tuple[bool, str]:
-    """Require a GitHub C6/terminal PASS record tied to the successful exact SHA."""
+    """Accept real C6 variants only after exact-SHA CI SUCCESS; never infer HMD PASS."""
     if not isinstance(record, dict):
         return False, "RUN_RECORD_NOT_FOUND"
     if str(record.get("task_id") or record.get("TASK_ID") or "") != str(active.get("task_id") or ""):
         return False, "TASK_ID_MISMATCH"
     if str(record.get("target_branch") or "") != str(active.get("branch") or ""):
         return False, "BRANCH_MISMATCH"
-    status = str(record.get("status") or "").upper()
+
+    status = str(record.get("status") or "").strip().upper()
+    # Real DX9Ex records use the explicit runtime-untested suffix. Previously
+    # these verified results were incorrectly held for 40 minutes as C6_PENDING.
+    complete_statuses = {
+        "COMPLETE", "COMPLETE_BUILD_VERIFIED",
+        "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+        "COMPLETE_CI_VERIFIED_RUNTIME_UNTESTED",
+        "PASS", "DONE",
+    }
+    if status not in complete_statuses:
+        return False, "TERMINAL_STATUS_NOT_COMPLETE"
+
     pipeline = record.get("pipeline") if isinstance(record.get("pipeline"), dict) else {}
-    c6 = pipeline.get("C6_STATE") if isinstance(pipeline, dict) else None
+
+    def c6_pass(value) -> bool:
+        if isinstance(value, dict):
+            return str(value.get("status") or "").upper() in {"COMPLETE", "PASS"}
+        if isinstance(value, str):
+            marker = value.strip().upper()
+            # C6_RESULT in existing durable records is a narrative string,
+            # e.g. "PASS: ..." or "COMPLETE_BUILD_VERIFIED; ...".
+            return bool(re.match(r"^(?:PASS|COMPLETE(?:_BUILD_VERIFIED)?)(?=$|[\s:;,.])", marker))
+        return False
+
     c6_complete = (
-        bool(record.get("controller_terminal"))
+        record.get("controller_terminal") is True
         or str(record.get("checkpoint") or "").upper() == "C6_STATE"
-        or (isinstance(c6, dict) and str(c6.get("status") or "").upper() in {"COMPLETE", "PASS"})
+        or c6_pass(pipeline.get("C6_STATE"))
+        or c6_pass(pipeline.get("C6_RESULT"))
     )
-    if status not in {"COMPLETE", "COMPLETE_BUILD_VERIFIED", "PASS", "DONE"} or not c6_complete:
+    if not c6_complete:
         return False, "C6_NOT_COMPLETE"
+
     nested_validation = record.get("validation") if isinstance(record.get("validation"), dict) else {}
     validation = str(record.get("automation_validation") or nested_validation.get("automation_validation") or "").upper()
     if not validation.startswith("PASS"):
         return False, "AUTOMATION_VALIDATION_NOT_PASS"
+
     exact_sha = str(
         record.get("validation_bearing_result_sha")
         or record.get("validation_bearing_sha")
@@ -244,7 +272,6 @@ def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> t
     if gate_run.get("status") != "completed" or gate_run.get("conclusion") != "success":
         return False, "EXACT_GATE_NOT_SUCCESS"
     return True, "C6_EXACT_SHA_VERIFIED"
-
 
 
 def vr_checkpoint_path(active: dict, now: datetime, purpose: str = "periodic") -> str:
