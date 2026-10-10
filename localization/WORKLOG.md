@@ -1,3 +1,7 @@
+## 2026-10-10 — C358 C2 evidence orientation correction (no new QA score)
+
+- Initial C358 source/candidate contact PNG publication displayed RAW vertically mirrored letters. Restored readable FLIP-Y orientation using ImageOps.flip before gray composition/scaling on all 12 exact DDS comparison images, regenerated SHA bindings in C358 controller/machine JSON. Candidate/source DDS and 14 native alpha/height metrics unchanged. No second C review, no C3 or game validation.
+
 ## 2026-10-10 14:00 KST — C358 C2 q236 independent native source-family visual REWORK
 
 - C2 EVEN independent reread verified exact source DDS SHA a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518 and persisted candidate DDS SHA 9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337; decoded full 2048x2048, RAW mirrored Y to readable orientation. Scanned 14/14 source vs new-current opaque alpha tight bounds: 7–9px less native height in all14 (conservation ceiling PASS), source type family much heavier/taller optically on selected 100%/50% rows (especially SUNNY BEACH / SNOW MOUNTAIN / SKYSCRAPERS / LEGEND); conditional glyph-dependent ink density checks support source-family underweight suspicion, visual comparison determines hard rejection. 12 NEW lossless panels for six focused rows.

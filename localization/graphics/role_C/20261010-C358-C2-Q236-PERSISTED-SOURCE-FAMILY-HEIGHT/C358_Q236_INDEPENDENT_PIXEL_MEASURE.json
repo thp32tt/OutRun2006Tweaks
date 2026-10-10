@@ -12,7 +12,7 @@
     2048
   ],
   "mip_levels": 1,
-  "native_pillow_coordinate_convention": "DDS decoded PIL pixels FLIP-Y/readable; RAW stored y map explicitly inverted",
+  "native_pillow_coordinate_convention": "CORRECTED: PIL decoded DDS is RAW vertically mirrored relative to text-readable view. C340 readable bbox [x0,y0,x1,y1] maps to PIL raw y=[2048-y1,2048-y0]. All newly persisted SOURCE/CURRENT comparison PNGs are cropped in RAW then explicitly ImageOps.flip into readable text orientation before compositing and resizing. Numeric bbox/alpha unaffected by flipping.",
   "alpha_threshold": ">16",
   "source_bbox_and_position_scan": "fresh independently re-derived, not only copied producer metrics",
   "rows": [
@@ -26,7 +26,7 @@
         1161,
         2024
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           1105,
@@ -59,7 +59,7 @@
         1038,
         1899
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           716,
@@ -92,7 +92,7 @@
         1056,
         1788
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           793,
@@ -125,7 +125,7 @@
         1063,
         1675
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           780,
@@ -158,7 +158,7 @@
         1034,
         1559
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           928,
@@ -191,7 +191,7 @@
         1056,
         1451
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           801,
@@ -224,7 +224,7 @@
         1057,
         1335
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           706,
@@ -257,7 +257,7 @@
         1056,
         1227
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           865,
@@ -290,7 +290,7 @@
         1051,
         1112
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           628,
@@ -323,7 +323,7 @@
         1057,
         1003
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           710,
@@ -356,7 +356,7 @@
         1050,
         890
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           534,
@@ -389,7 +389,7 @@
         1055,
         775
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           423,
@@ -422,7 +422,7 @@
         1043,
         667
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           420,
@@ -455,7 +455,7 @@
         1046,
         559
       ],
-      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "readable_orientation": "CORRECTED: measured native RAW alpha after y-coordinate inversion from C340 readable bbox; equivalent height/density under vertical flip. Optical PNG visual explicitly flipped RAW glyph pixels to readable.",
       "original_alpha": {
         "bbox_wh": [
           1010,
@@ -489,7 +489,7 @@
     "row00": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "f3a4523805a5744bcd307ed834e79c49ec22ef2d287fbbaeb5703e5eddf4a147",
+        "sha256": "b9e240b54be403e9c19e007d612150cf1e5274cba21a2ce7797a1b607da54b73",
         "size": [
           2238,
           87
@@ -497,7 +497,7 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "158b382a9943f75a09b6f82133d91f0a892ab1bed5d1edc56e16cd56cd182aa9",
+        "sha256": "daf3dc4c4fddd46e30fe607488803e611d6f29e2bb6ede47a0bfad0d3d54d2ec",
         "size": [
           1118,
           43
@@ -507,7 +507,7 @@
     "row03": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "7dcf0971e623bfd09232bc1c61bb1d40b5bf180e89a5baf67c41925fe9db8dc2",
+        "sha256": "289697c8035ef6eeee2b750dde181e6e1b5ddb0301212dbe5c4890971590d743",
         "size": [
           1584,
           95
@@ -515,7 +515,7 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "cf085a3e75a1c07c1f4191998697934a586f91a1b45847441ea2bc41230b777a",
+        "sha256": "1cb011a75ea311118576fdc52df0de25990149d0ebe606a9d881e8f62411f0c0",
         "size": [
           792,
           47
@@ -525,7 +525,7 @@
     "row04": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "d411cb17dbff48352b4912ce0da02317b95cb5e9b4affdbcd7ff7b151ff082ae",
+        "sha256": "f2517aa31b34e85d2f944eda1e9c83d1dc0b86e7d0c38a035d45eed389e3e377",
         "size": [
           1880,
           95
@@ -533,7 +533,7 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "d84c303a13ba694f2a15a3b4e818cf7b6f79d17d87a64705db2e68e3610e69c2",
+        "sha256": "efd5a51a9c4422e0acbcfabb854d356f4c092f3bd462629209a5bf0b0b44443f",
         "size": [
           940,
           47
@@ -543,7 +543,7 @@
     "row05": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "8afba301038d87f1526134c6d6dd259586f1411cd385f3ff956aa84a6645243f",
+        "sha256": "32f9f63f6cf6d5f9564965b6330343a76b134e5db5eae5e45bcf22a2190fb233",
         "size": [
           1626,
           95
@@ -551,7 +551,7 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "60b02dcf7cb31d465ef12acf2969112f6bd4be371dd9a71b425723525392c213",
+        "sha256": "b72aa17ce5a203efde6fb88684a1aae613cd5b33886c50b89919157167642c69",
         "size": [
           812,
           47
@@ -561,7 +561,7 @@
     "row11": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "cde919b0f2b2d0c090bd173073c55b3990d92569609e3fee43326cb81bf141d7",
+        "sha256": "2a116782db35ab61e89ad4fd29706d69a41f3aaf6ca6bdef05e97268636da8e1",
         "size": [
           870,
           94
@@ -569,7 +569,7 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "7304d7ec32c084f514cd1b629a7daa8a311f91e79cd08d54bec860e9cc4bea70",
+        "sha256": "81290897b36c5a180c7c030224c44321b4625d9db4f3af7f8a01f2478155377e",
         "size": [
           434,
           47
@@ -579,7 +579,7 @@
     "row13": {
       "native_100": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_100.png",
-        "sha256": "aa954cf70503ec78c5b4183a98203dc71ec93c9c14709506bc8b5141070e1db3",
+        "sha256": "73b979dc2faf2eed23d0b1cb39b818d33287c8aa12a35f57795db0582d109965",
         "size": [
           2044,
           92
@@ -587,12 +587,13 @@
       },
       "native_50": {
         "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_50.png",
-        "sha256": "477a171e01b2f1aae225ff06d6e0aac88abb95e7bf5d32171d18409b9edc3184",
+        "sha256": "a6912fd18ea71b57a7aeebbec39d27710aff0981aaea4b28d9e45b4b22af3c2f",
         "size": [
           1022,
           46
         ]
       }
     }
-  }
+  },
+  "orientation_erratum": "Initial C358 PNGs in commit 547d00ae were composed in mirrored RAW order and were invalid as readable-format optical proof. This correction overwrites exactly the same 12 evidence paths with readable FLIP-Y image pixels and recalculated SHA256; numeric 14/14 source-height result remains valid. No candidate DDS modification."
 }
