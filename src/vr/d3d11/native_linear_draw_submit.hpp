@@ -83,4 +83,38 @@ namespace outrun::vr::dx11 {
     // game-native activation/runtime review authorizes dispatch.
     return true;
 }
+
+// R209: opt-in exact pipeline identity for dormant non-indexed native Draw.
+// R185's same-device prerequisite cannot reject a different object made on
+// that same device (e.g. a re-bound PS or another eye RTV). The caller must
+// provide the exact original pipeline objects, never just a compatible device.
+// This helper only verifies; it cannot activate a gameplay D3D11 Draw.
+[[nodiscard]] inline bool verified_linear_pipeline_identity_ready(
+    const NativeLinearBufferMirror& vertexOwner,
+    ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t deviceGeneration,
+    std::uint64_t sourceSnapshotVersion,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv) noexcept {
+    if (!expectedLayout || !expectedVs || !expectedPs || !expectedRtv ||
+        !verified_linear_draw_ready(
+            vertexOwner, context, startVertex, vertexCount,
+            deviceGeneration, sourceSnapshotVersion))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
+    context->IAGetInputLayout(layout.GetAddressOf());
+    context->VSGetShader(vs.GetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(ps.GetAddressOf(), nullptr, nullptr);
+    context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    return layout.Get() == expectedLayout &&
+           vs.Get() == expectedVs &&
+           ps.Get() == expectedPs &&
+           rtv.Get() == expectedRtv;
+}
 } // namespace outrun::vr::dx11

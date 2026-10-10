@@ -17,18 +17,39 @@
     "tools/test_dx11_linear_pipeline_identity_r209.py",
     ".github/workflows/backend-conversion-gate.yml:R209"
   ],
-  "status": "RUNNING",
-  "checkpoint": "C1_REVIEW",
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C3_VALIDATE",
   "result_sha": null,
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "summary": "Claimed distinct dormant non-indexed exact IA/VS/PS/RTV live identity gate; R175 owned by 00477 is out of scope.",
-  "resume_cursor": "C2_IMPLEMENT_R209",
-  "next_action": "Implement C++ live exact linear pipeline identity plus real WARP alien same-device PS GPU pixels and changed-input static test.",
-  "last_real_activity_at": "2026-10-10T00:01:20.670Z",
-  "last_activity_evidence": "GitHub branch HEAD checked; 00507 record and checkpoint absent; 00506 C6 terminal; R185 live source reviewed.",
-  "score_change": 0
+  "summary": "R209 opt-in exact non-indexed IA/VS/PS/RTV identity protects dormant Draw from same-device wrong shader/eye; WARP negative and source mutants wired.",
+  "resume_cursor": "C3_WAIT_EXACT_SHA_GATE",
+  "next_action": "Resolve material SHA and exact Backend Conversion Gate; record scoped/WARP results and full run conclusion.",
+  "last_real_activity_at": "2026-10-10T00:02:20.949Z",
+  "last_activity_evidence": "R209 source/test/workflow prepared and 6 negative contracts checked before GitHub material publication",
+  "score_change": 0,
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch exact remote HEAD, controller contract, index, active owner and 00506 terminal checked.",
+    "C1_REVIEW": "PASS: distinct R209 linear non-indexed same-device identity gap; independent R175 owned by 00477 untouched.",
+    "C2_IMPLEMENT": "R209 native_linear_draw_submit.hpp opt-in exact pipeline identity; real WARP alien same-device PS green pixel and wrong-eye RTV negative, restore original; 6 mutation static test and Gate hook.",
+    "C3_VALIDATE": "LOCAL_SOURCE_CONTRACT_PASS; exact GitHub SHA Gate pending after publication.",
+    "C4_COMMIT": "MATERIAL_COMMIT_IN_PROGRESS: [AUTO:CONVERSION-DX11-00507] no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: gameplay native Draw remains dormant and Quest3/VDXR UNTESTED.",
+    "C6_STATE": "PENDING exact-SHA CI conclusion; do not promote runtime."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_linear_pipeline_identity_r209.py",
+    "docs/automation/runs/CONVERSION-DX11-00507.json"
+  ],
+  "evidence": {
+    "local_source_contract": "PASS_6_MUTANTS_DECLARATIVE_JS",
+    "isolated_warp_probe": "PENDING_GITHUB_ACTIONS",
+    "known_upstream_blocker": "R175_GENERIC_VARYING_MISMATCH owned by 00477"
+  }
 }

@@ -307,6 +307,12 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_linear_draw_r185.py
 
+      # R209: same-device alien PS/RTV cannot satisfy exact non-indexed
+      # pipeline provenance; R183 WARP confirms actual changed GPU pixels.
+      - name: Verify R209 native linear exact pipeline identity
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_pipeline_identity_r209.py
+
       # R195: exact immutable IB sub-slice bounds, no duplicate WARP target.
       - name: Verify R195 native indexed slice ownership
         if: github.ref_name == 'vr-dx11-native-r71'

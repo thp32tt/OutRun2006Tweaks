@@ -203,6 +203,52 @@ int main() {
     ctx->ClearRenderTargetView(rtv.Get(),clear);
     require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
             "R185 dormant native linear Draw IA/pipeline ready");
+    // R209: R185 passes a same-device alien PS, but exact pipeline identity
+    // must reject it. Real WARP non-indexed GPU Draw changes red to green.
+    const auto exactLinearReady = [&] {
+        return outrun::vr::dx11::verified_linear_pipeline_identity_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get());
+    };
+    require(exactLinearReady(), "R209 exact linear pipeline initial objects");
+    require(!outrun::vr::dx11::verified_linear_pipeline_identity_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),nullptr,rtv.Get()),
+            "R209 reject absent expected PS");
+    constexpr char alienLinearShader[] =
+        "float4 ps():SV_Target{return float4(0,1,0,1);}";
+    ComPtr<ID3DBlob> alienLinearCode;
+    require(SUCCEEDED(D3DCompile(alienLinearShader,
+        sizeof(alienLinearShader)-1,nullptr,nullptr,nullptr,
+        "ps","ps_4_0",0,0,alienLinearCode.GetAddressOf(),nullptr)),
+        "R209 compile alternate same-device PS");
+    ComPtr<ID3D11PixelShader> alienLinearPs;
+    require(SUCCEEDED(dev->CreatePixelShader(
+        alienLinearCode->GetBufferPointer(),alienLinearCode->GetBufferSize(),
+        nullptr,alienLinearPs.GetAddressOf())),
+        "R209 create alternate same-device PS");
+    ctx->PSSetShader(alienLinearPs.Get(),nullptr,0);
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R209 base readiness admits alien same-device PS");
+    require(!exactLinearReady(), "R209 reject alternate same-device PS");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE alienLinearMap{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &alienLinearMap)) && alienLinearMap.pData,
+            "R209 map changed real WARP nonindexed pixel");
+    const auto* alienLinearPixel =
+        static_cast<const unsigned char*>(alienLinearMap.pData)
+        +16*alienLinearMap.RowPitch+16*4;
+    const bool alienGreen=alienLinearPixel[0]==0 &&
+        alienLinearPixel[1]==255 && alienLinearPixel[2]==0 &&
+        alienLinearPixel[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(alienGreen, "R209 alien PS changes real WARP linear pixel green");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    require(exactLinearReady(), "R209 restore exact linear pipeline PS");
+
     // R199 independent non-indexed RTV/viewport ownership contract.
     const auto fullTargetReady = [&] {
         return outrun::vr::dx11::verified_linear_full_target_draw_ready(
@@ -235,8 +281,12 @@ int main() {
     ID3D11RenderTargetView* wrongEyeRaw=wrongEyeRtv.Get();
     ctx->OMSetRenderTargets(1,&wrongEyeRaw,nullptr);
     require(!fullTargetReady(), "R199 reject different-eye RTV");
+    require(verified_linear_draw_ready(vb,ctx.Get(),0,3,generation,version),
+            "R209 base readiness admits alien same-device eye RTV");
+    require(!exactLinearReady(), "R209 reject alien same-device RTV");
     ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
     require(fullTargetReady(), "R199 recover original eye RTV");
+    require(exactLinearReady(), "R209 restore original eye RTV identity");
 
     ctx->RSSetViewports(0,nullptr);
     require(!fullTargetReady(), "R199 reject missing viewport");
