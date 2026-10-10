@@ -1,0 +1,443 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD",
+  "queue_index": 137,
+  "run_key": "OUTRUN-KOR-C1-Q137-B320-FULL-SOURCE-CLEAN-6REGION-20261010",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "selected_priority": "P0",
+  "ingame_regression": "IGR-041 OPEN_USER_INGAME_FAIL",
+  "triage": "EVIDENCE_ONLY_HOLD using tools/localization/rework_triage.py --index 137 on fetched current GitHub queue",
+  "previous_review": "C337 same candidate source/CLEAN were UNVERIFIED; no duplicate PASS or candidate production; this run independently validates both previously missing source+CLEAN and all six regions",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Remakes and Reskins/UI/Menus/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
+  },
+  "clean_plate": {
+    "path": "localization/graphics/role_A/20261005-A-PRODUCTION22/30CF0D_HD_CLEAN_PLATE.png",
+    "sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098"
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+    "persisted_dds_bytes": 8388736
+  },
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C1-Q137-EXACT-SOURCE-CLEAN-6REGION/C1_Q137_MACHINE.json",
+    "sha256": "cd6807ebdd5d16f33c0d5ee4a1ee1a2c88aba53b280ce9d507baf0192a64045e"
+  },
+  "independent_machine": {
+    "format": "BGRA32 2048x1024 mip1",
+    "dds_header_source_candidate_equal": true,
+    "source_clean_readable_changed": 107239,
+    "source_clean_raw_misaligned": 1640044,
+    "protected_mask_source_sha256": "5eacc087baf5c569657611e72f3b8617e390366843f9a5c83ebddb0c000f02ac",
+    "protected_pixels": 1129655,
+    "allowed_mask_sha256": "d53611508b2409ab069050e0a323507539fcd2d481b21b1dd2719c518d62e18c",
+    "source_clean": {
+      "rgba_changed_total": 107239,
+      "rgba_outside_union": 0,
+      "alpha_changed_total": 96481,
+      "alpha_outside_union": 0,
+      "changed_protected_mask": 0,
+      "changed_outside_allowed_mask": 0
+    },
+    "clean_final": {
+      "rgba_changed_total": 106016,
+      "rgba_outside_union": 0,
+      "alpha_changed_total": 52197,
+      "alpha_outside_union": 0,
+      "changed_protected_mask": 0,
+      "changed_outside_allowed_mask": 0
+    },
+    "source_final": {
+      "rgba_changed_total": 140100,
+      "rgba_outside_union": 0,
+      "alpha_changed_total": 110230,
+      "alpha_outside_union": 0,
+      "changed_protected_mask": 0,
+      "changed_outside_allowed_mask": 0
+    }
+  },
+  "proofs": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q137-EXACT-SOURCE-CLEAN-6REGION/C1_Q137_SIX_REGION_SOURCE_CLEAN_FINAL.png",
+      "sha256": "a652a2dd291d95ba7294b2d5642a8d536ce96ffb32c0a555f578ad0ffffb154d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q137-EXACT-SOURCE-CLEAN-6REGION/C1_Q137_REGION6_FLIPY_RAW_BG.png",
+      "sha256": "ec0d7f9793dcfba25cbfef98ac7660ee8a7adb154e1d0f67d9f0267a40d4c35d"
+    }
+  ],
+  "c_stage": {
+    "reviewer": "ChatGPT AI1 (same controller; no fabricated second reviewer)",
+    "pixels_before_producer_verdict": false,
+    "blind_known_defect_calibration": "NOT_PERFORMED",
+    "firstlook": "Viewed B320 producer contact before new full source-CLEAN inspection; cannot claim blind pixels-first C approval.",
+    "observation": "Exact pin SHA checks and whole six-region decoded pixel comparisons independently performed. SOURCE/CLEAN naked regions uniform gray; no visible English leftover, no new foreign background rectangle, glyph clipping or protected intrusions observed on shown native sheet. Region6 RAW has expected vertical inversion. A22 historical protected mask may omit semantic protected layers; no independent per-glyph slant anchors or full visual blind calibration, so no current-policy PASS.",
+    "regions": [
+      {
+        "id": "manual_large",
+        "source_bbox": [
+          1,
+          235,
+          397,
+          315
+        ],
+        "current_observed_edit_bbox": [
+          74,
+          239,
+          324,
+          311
+        ],
+        "changed_pixels_from_clean": 18000,
+        "positive_margin": [
+          73,
+          73,
+          4,
+          4
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 14333; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [74,239,324,311] lies in original bbox with margins 73/73/4/4; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      },
+      {
+        "id": "automatic_large",
+        "source_bbox": [
+          889,
+          233,
+          1775,
+          315
+        ],
+        "current_observed_edit_bbox": [
+          1136,
+          237,
+          1528,
+          310
+        ],
+        "changed_pixels_from_clean": 28616,
+        "positive_margin": [
+          247,
+          247,
+          4,
+          5
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 22524; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [1136,237,1528,310] lies in original bbox with margins 247/247/4/5; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      },
+      {
+        "id": "manual_small",
+        "source_bbox": [
+          14,
+          148,
+          339,
+          210
+        ],
+        "current_observed_edit_bbox": [
+          74,
+          152,
+          279,
+          206
+        ],
+        "changed_pixels_from_clean": 11070,
+        "positive_margin": [
+          60,
+          60,
+          4,
+          4
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 10860; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [74,152,279,206] lies in original bbox with margins 60/60/4/4; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      },
+      {
+        "id": "automatic_small",
+        "source_bbox": [
+          822,
+          147,
+          1376,
+          216
+        ],
+        "current_observed_edit_bbox": [
+          982,
+          151,
+          1216,
+          212
+        ],
+        "changed_pixels_from_clean": 14274,
+        "positive_margin": [
+          160,
+          160,
+          4,
+          4
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 17185; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [982,151,1216,212] lies in original bbox with margins 160/160/4/4; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      },
+      {
+        "id": "select_transmission",
+        "source_bbox": [
+          5,
+          67,
+          868,
+          130
+        ],
+        "current_observed_edit_bbox": [
+          168,
+          71,
+          704,
+          126
+        ],
+        "changed_pixels_from_clean": 29480,
+        "positive_margin": [
+          163,
+          164,
+          4,
+          4
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 36865; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [168,71,704,126] lies in original bbox with margins 163/164/4/4; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      },
+      {
+        "id": "transmission_small",
+        "source_bbox": [
+          1288,
+          96,
+          1569,
+          128
+        ],
+        "current_observed_edit_bbox": [
+          1340,
+          99,
+          1516,
+          125
+        ],
+        "changed_pixels_from_clean": 4576,
+        "positive_margin": [
+          52,
+          53,
+          3,
+          3
+        ],
+        "eight_checks": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "No source/Korean per-glyph top-bottom anchors independently measured; treat direction as unapproved."
+          },
+          "clean_plate": {
+            "result": "PASS_SCOPED",
+            "observation": "Canonical SOURCE->A22 authenticated CLEAN was visually blank at this label; independent source->clean region changes 5472; all six source effects are within original bbox union, no confirmed ghost/foreign rectangle in direct 6-region sheet."
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Source predominantly condensed/heavy Latin face; current Hangul readable but the font-family weight/counter and specific scene-scale composition lack qualified blind family calibration."
+          },
+          "readability": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "Independent native gray source/clean/final sheet shows legible Hangul; region6 further inspected black/gray/white and RAW; not an actual game scale approval."
+          },
+          "glyph_integrity": {
+            "result": "PASS_STATIC_SCOPED",
+            "observation": "No obvious broken Hangul stroke visible in direct source/clean/current comparison; compression DDS BGRA32 mip1; high zoom blind inspection not sufficient for final PASS."
+          },
+          "protected_art": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Independent CLEAN->FINAL changed pixels within producer A22 protected mask=0 and bbox union outside=0; semantic completeness of that historical protected mask not newly proved."
+          },
+          "placement": {
+            "result": "PASS_MACHINE_SCOPE",
+            "observation": "Candidate visible edit bbox [1340,99,1516,125] lies in original bbox with margins 52/53/3/3; no 1px source bbox intrusion."
+          },
+          "orientation": {
+            "result": "PASS_STATIC_SCOPE",
+            "observation": "Exactly saved BGRA32 RAW DDS is mirror_y; independent FLIP-Y/source/clean/current and region6 RAW/FLIP-Y contact checked."
+          }
+        }
+      }
+    ],
+    "decision": "HOLD_STRICT_RECHECK"
+  },
+  "C3": {
+    "decision": "NOT_RUN",
+    "review_id": null
+  },
+  "APPROVAL": false,
+  "PRE_INGAME": "BLOCKED",
+  "USER_INGAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "next": "Do not rerender current same SHA without new pixel defect; complete blind calibration and source-family/anchor profile independently with all six text/consumer regions, C3 separate review, QA evidence gate and new user game screenshot after candidate changes. IGR-041 cannot be closed via static proof.",
+  "backend": "GitHub connector SSOT + N100 MCP bounded exact asset download/Python because ChatGPT local DNS unavailable; no heavy build or controller queue engine",
+  "exclusions": [
+    "EVEN C2",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "separate controller TASK_ID/queue engine"
+  ]
+}
