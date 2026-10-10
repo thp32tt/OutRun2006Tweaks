@@ -1,6 +1,6 @@
 // R186: isolated WARP GPU DrawIndexed proves production-owned VB/IB +
 // pipeline readiness and actual framebuffer pixels. No gameplay activation.
-#include "vr/d3d11/native_indexed_target_viewport.hpp"
+#include "vr/d3d11/native_indexed_uav_eye_guard.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <d3dcompiler.h>
@@ -339,6 +339,84 @@ int main() {
     require(r218Ready(r217Dsv.Get()),"R218 ready before restored WARP DrawIndexed");
     context->DrawIndexed(3u,0u,0);
     require(r217ReadCenter(true),"R218 restored WARP green indexed pixel");
+
+    // R219: an OM UAV does not occupy a second RTV slot. The old composed
+    // full-eye guard accepts it even though a real indexed PS can write it.
+    D3D11_TEXTURE2D_DESC r219UavDesc{};
+    r219UavDesc.Width=r219UavDesc.Height=4u;
+    r219UavDesc.MipLevels=r219UavDesc.ArraySize=1u;
+    r219UavDesc.Format=DXGI_FORMAT_R32_UINT;
+    r219UavDesc.SampleDesc.Count=1u;
+    r219UavDesc.Usage=D3D11_USAGE_DEFAULT;
+    r219UavDesc.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
+    ComPtr<ID3D11Texture2D> r219ForeignTexture;
+    ComPtr<ID3D11UnorderedAccessView> r219ForeignUav;
+    require(SUCCEEDED(device->CreateTexture2D(&r219UavDesc,nullptr,
+        r219ForeignTexture.GetAddressOf())), "R219 create foreign UAV texture");
+    require(SUCCEEDED(device->CreateUnorderedAccessView(
+        r219ForeignTexture.Get(),nullptr,r219ForeignUav.GetAddressOf())),
+        "R219 create foreign UAV");
+    D3D11_TEXTURE2D_DESC r219ReadDesc=r219UavDesc;
+    r219ReadDesc.Usage=D3D11_USAGE_STAGING;
+    r219ReadDesc.BindFlags=0u;
+    r219ReadDesc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
+    ComPtr<ID3D11Texture2D> r219Readback;
+    require(SUCCEEDED(device->CreateTexture2D(&r219ReadDesc,nullptr,
+        r219Readback.GetAddressOf())), "R219 foreign UAV readback");
+    constexpr char r219Shader[] =
+        "RWTexture2D<uint> foreignEye:register(u1);"
+        "float4 ps():SV_Target{foreignEye[uint2(0,0)]=0x1234u;"
+        "return float4(0,1,0,1);}";
+    ComPtr<ID3DBlob> r219Code;
+    require(SUCCEEDED(D3DCompile(r219Shader,sizeof(r219Shader)-1,nullptr,
+        nullptr,nullptr,"ps","ps_5_0",0u,0u,
+        r219Code.GetAddressOf(),nullptr)), "R219 compile PS with hidden UAV");
+    ComPtr<ID3D11PixelShader> r219Ps;
+    require(SUCCEEDED(device->CreatePixelShader(r219Code->GetBufferPointer(),
+        r219Code->GetBufferSize(),nullptr,r219Ps.GetAddressOf())),
+        "R219 create PS with hidden UAV");
+    const auto r219OldReady = [&] {
+        return outrun::vr::dx11::verified_indexed_sealed_opaque_eye_draw_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,layout.Get(),vs.Get(),
+            r219Ps.Get(),rtv.Get(),r217Dsv.Get(),r217State.Get(),rs.Get());
+    };
+    const auto r219NewReady = [&](ID3D11PixelShader* expectedPs) {
+        return outrun::vr::dx11::verified_indexed_uav_isolated_eye_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,layout.Get(),vs.Get(),
+            expectedPs,rtv.Get(),r217Dsv.Get(),r217State.Get(),rs.Get());
+    };
+    context->PSSetShader(r219Ps.Get(),nullptr,0u);
+    ID3D11UnorderedAccessView* r219BoundUav=r219ForeignUav.Get();
+    context->OMSetRenderTargetsAndUnorderedAccessViews(
+        1u,&rawTarget,r217Dsv.Get(),1u,1u,&r219BoundUav,nullptr);
+    require(r219OldReady(),"R219 old guard accepts extra OM UAV");
+    require(!r219NewReady(r219Ps.Get()),"R219 new guard rejects extra OM UAV");
+    const UINT r219ClearUav[4]={0u,0u,0u,0u};
+    context->ClearUnorderedAccessViewUint(r219ForeignUav.Get(),r219ClearUav);
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    context->DrawIndexed(3u,0u,0);
+    context->CopyResource(r219Readback.Get(),r219ForeignTexture.Get());
+    D3D11_MAPPED_SUBRESOURCE r219Mapped{};
+    require(SUCCEEDED(context->Map(r219Readback.Get(),0u,D3D11_MAP_READ,
+        0u,&r219Mapped)) && r219Mapped.pData,
+        "R219 map foreign UAV GPU output");
+    const auto r219Written=*static_cast<const UINT*>(r219Mapped.pData);
+    context->Unmap(r219Readback.Get(),0u);
+    require(r219Written==0x1234u,
+        "R219 WARP hidden UAV writes real second texture");
+    require(r217ReadCenter(true),"R219 WARP indexed RTV remains green");
+    ID3D11UnorderedAccessView* r219NullUav=nullptr;
+    context->OMSetRenderTargetsAndUnorderedAccessViews(
+        1u,&rawTarget,r217Dsv.Get(),1u,1u,&r219NullUav,nullptr);
+    context->PSSetShader(ps.Get(),nullptr,0u);
+    require(r219NewReady(ps.Get()),"R219 UAV unbound restores isolated eye");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),"R219 restored WARP indexed green pixel");
 
     context->OMSetRenderTargets(1,&rawTarget,nullptr);
     context->OMSetDepthStencilState(nullptr,0u);

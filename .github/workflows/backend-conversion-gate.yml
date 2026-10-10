@@ -385,6 +385,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_indexed_sealed_eye_r218.py
 
+      # R219: no hidden OM UAV/second-eye writes during indexed DrawIndexed.
+      - name: Verify R219 indexed OM UAV isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_uav_eye_r219.py
+
       - name: Build R186 owned indexed Draw WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186

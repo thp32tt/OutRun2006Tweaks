@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00516",
+  "production_id": "CONVERSION-DX11-00516",
+  "event_id": "CONVERSION-DX11-00516-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "c2adc4fa3ba08afb91c1107686cc12aac337f1b1",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00516",
+  "work_key": "DX11:R219:INDEXED_OM_UAV_SINGLE_EYE_ISOLATION",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp:R219",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R219",
+    "tools/test_dx11_indexed_uav_eye_r219.py",
+    ".github/workflows/backend-conversion-gate.yml:R219"
+  ],
+  "checkpoint": "C2_IMPLEMENT",
+  "status": "WAITING_CI",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R219 isolates indexed D3D11 eye from retained OM UAV outputs; real WARP shader writes second texture (negative) and restores single eye (positive). No native gameplay activation.",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_uav_eye_r219.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "next_action": "Verify exact material SHA Backend Conversion Gate; distinguish scoped R219 from independently owned inherited R175 failure."
+}
