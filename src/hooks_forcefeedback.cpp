@@ -35,6 +35,8 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     // A configured-but-missing/lost/unacquired wheel must not disable controller rumble.
     static bool wheelOwnedLastCall = false;
     static bool rumbleDisabledLastCall = false;
+    // A live UseNewInput switch must release previously driven legacy rumble.
+    static bool legacyXInputOutputActive = false;
     if (WheelFFB_IsOutputOwnerActive())
     {
         if (!wheelOwnedLastCall)
@@ -43,6 +45,7 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
             InputManager_StopVibration();
             XINPUT_VIBRATION zero{};
             XInputSetState(userId, &zero);
+            legacyXInputOutputActive = false;
         }
         wheelOwnedLastCall = true;
         // Force a fresh disabled-mode stop if wheel ownership is later lost.
@@ -59,10 +62,12 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
         {
             void InputManager_StopVibration();
             InputManager_StopVibration();
-            if (!Settings::UseNewInput)
+            // Even after switching to SDL, stop a previously driven XInput port.
+            if (legacyXInputOutputActive)
             {
                 XINPUT_VIBRATION zero{};
                 XInputSetState(userId, &zero);
+                legacyXInputOutputActive = false;
             }
         }
         rumbleDisabledLastCall = true;
@@ -84,11 +89,23 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     vib.wLeftMotorSpeed = OutRunVR::Input::RumbleAmplitudeToWord(leftMotor);
     vib.wRightMotorSpeed = OutRunVR::Input::RumbleAmplitudeToWord(rightMotor);
 
+    // Release old XInput rumble before the first SDL-forwarded vibration.
+    // Never alter the pinned DirectInput Wheel FFB v0.2 implementation.
+    if (Settings::UseNewInput && legacyXInputOutputActive)
+    {
+        XINPUT_VIBRATION zero{};
+        XInputSetState(userId, &zero);
+        legacyXInputOutputActive = false;
+    }
+
     void InputManager_SetVibration(WORD, WORD);
     InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);
 
 	if (!Settings::UseNewInput)
+	{
 		XInputSetState(userId, &vib);
+		legacyXInputOutputActive = true;
+	}
 }
 
 extern "C"

@@ -61,9 +61,19 @@ def violations(source: str) -> list[str]:
         errors.append("wheel ownership must suppress separate rumble")
     if "if (!wheelOwnedLastCall)" not in route or "rumbleDisabledLastCall = false;" not in route:
         errors.append("wheel acquisition/loss stop transition missing")
-    if route.count("XInputSetState(userId, &zero);") != 2:
-        errors.append("wheel-owned and disabled stop must address same selected controller")
-    if "if (!Settings::UseNewInput)\n\t\tXInputSetState(userId, &vib);" not in route:
+    if route.count("XInputSetState(userId, &zero);") != 3:
+        errors.append("wheel-owned, disabled and SDL-handoff stops must target selected port")
+    if "static bool legacyXInputOutputActive = false;" not in route or route.count("legacyXInputOutputActive = false;") != 4:
+        errors.append("legacy rumble state must reset after wheel, disable and SDL handoff")
+    disabled = route.split("if (!Settings::VibrationMode)", 1)[1].split("rumbleDisabledLastCall = true;", 1)[0]
+    if "if (legacyXInputOutputActive)" not in disabled or "XInputSetState(userId, &zero);" not in disabled:
+        errors.append("disable must stop previously driven XInput even after SDL switch")
+    handoff = "if (Settings::UseNewInput && legacyXInputOutputActive)"
+    if handoff not in route or route.index(handoff) > route.index("InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);"):
+        errors.append("SDL transition must clear previous XInput before forwarding new rumble")
+    if "legacyXInputOutputActive = true;" not in route or route.index("legacyXInputOutputActive = true;") < route.index("XInputSetState(userId, &vib);"):
+        errors.append("legacy rumble output must be tracked after XInput send")
+    if "if (!Settings::UseNewInput)\n\t{\n\t\tXInputSetState(userId, &vib);" not in route:
         errors.append("legacy XInput output must use selected controller")
     if "InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);" not in route:
         errors.append("SDL output forwarding lost")
@@ -85,6 +95,10 @@ def main() -> None:
         ("GamePlCar_Ctrl.call(car);", "/* game trampoline omitted */"),
         ("VibrationUserId = Settings::VibrationControllerId;", "VibrationUserId = 0;"),
         ("Range<int>{ 0, 3 }", "Range<int>{ 0, 4 }"),
+        ("if (Settings::UseNewInput && legacyXInputOutputActive)", "if (false)"),
+        ("if (legacyXInputOutputActive)", "if (!Settings::UseNewInput)"),
+        ("legacyXInputOutputActive = true;", "legacyXInputOutputActive = false;"),
+        ("legacyXInputOutputActive = false;\n    }\n\n    void InputManager_SetVibration", "/* handoff state clear removed */\n    }\n\n    void InputManager_SetVibration"),
     )
     for before, after in mutations:
         if before not in source or not violations(source.replace(before, after, 1)):
