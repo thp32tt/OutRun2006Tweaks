@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "feature_ready_controller_handoff",
+  "captured_at_kst": "2026-10-11T02:08:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_stage": "FEATURE_READY",
+  "feature_head": "010ca772e07737ae816f5a938784177a5e3e42ae",
+  "source_validation_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_unchanged": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "acceptance": [
+    {
+      "id": "DX11-LIVE-CALLSITE",
+      "status": "PASS_STATIC_BUILD__RUNTIME_UNTESTED"
+    },
+    {
+      "id": "DX11-NATIVE-DRAW",
+      "status": "PASS_STATIC_BUILD__RUNTIME_UNTESTED"
+    },
+    {
+      "id": "DX11-VISIBLE-FRAME",
+      "status": "PASS_SOURCE_BACKBUFFER_PATH_BUILD__RUNTIME_UNTESTED"
+    },
+    {
+      "id": "DX11-SAFE-RETURN",
+      "status": "PASS_STATIC_BUILD__RUNTIME_UNTESTED"
+    },
+    {
+      "id": "DX11-TEST-BUNDLE",
+      "status": "PASS_REAL_PE_AND_SHA_ZIP"
+    }
+  ],
+  "ci": {
+    "build": {
+      "run_id": 38069889292,
+      "result": "SUCCESS",
+      "head_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a"
+    },
+    "openxr": {
+      "run_id": 38069889239,
+      "result": "SUCCESS",
+      "head_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a"
+    },
+    "backend_conversion_gate": {
+      "status": "PENDING_CONTROLLER_TARGET_INTEGRATION"
+    }
+  },
+  "package": {
+    "artifact_id": 11677140344,
+    "zip_sha256": "ff3122f15b8728a9488aead1cf91cf2c2db1ee2d1804057a1907ebf24670c4be",
+    "game_sha256": "fd1b340e2c99333474d5edd637e8bb5948cdb1816c33edac29fac981b7abd418",
+    "host_sha256": "c7f6ad517a30c5e2ca09367e1263fcecbf24f32e65e451acbe452fa80aab8bb8"
+  },
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_ready_scope": "OPT_IN_NATIVE_DIAGNOSTIC_TEST_NOT_PRODUCTION_GAMEPLAY",
+  "next_action": "CONTROLLER ONLY: verify feature HEAD 010ca772 is linear descendant of target HEAD 8fb3d860, promote to vr-dx11-native-r71 and run exact SHA Backend Conversion Gate; if gate fails repair on feature branch per policy, preserve opt-in default-off and DX9Ex return. Then solicit real game desktop inset/input and Quest3 evidence separately; no HMD validation claim.",
+  "score_change": 0
+}
