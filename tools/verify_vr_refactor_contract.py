@@ -51,14 +51,30 @@ text("tools/verify_vr_hook_graph.py")
 # R84 migrated the physical R9/R13/R22 ownership from R30 to R29.
 # Detect the actual forwarding edge, never a JSON claim alone. Historical
 # contract and mutations remain active for the old textual-owner layout.
+# Structural mode is defined by the independent TU build graph and the
+# public R29 owner header, not by individual forwarding calls. A missing
+# forwarding call must FAIL the modern owner contract, never silently switch
+# the verifier back to the obsolete textual-CPP mutation suite.
 R84_MODERN_OWNER_LAYOUT = all((
-    "R29OwnerCaptureFrameSnapshot(" in r30,
-    "R29OwnerCallOriginalSetRenderTarget(" in r30,
-    "R29OwnerCallOriginalSetRenderTarget(" in r29,
-    "R29OwnerRunRasterReplayGuardCallback(" in r30,
+    (ROOT / "src/vr/core/r29_owner_api.hpp").is_file(),
     "option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29" in cmake,
     "option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29" in cmake_toml,
 ))
+if R84_MODERN_OWNER_LAYOUT:
+    for edge in (
+        "R29OwnerCaptureFrameSnapshot(",
+        "R29OwnerCallOriginalSetRenderTarget(",
+        "R29OwnerRunRasterReplayGuardCallback(",
+    ):
+        if edge not in r30:
+            errors.append("R84 R30 lost physical R29 owner forwarding edge: " + edge)
+    for edge in (
+        "R29OwnerCaptureFrameSnapshot(",
+        "R29OwnerCallOriginalSetRenderTarget(",
+        "R29OwnerRunRasterReplayGuardCallback(",
+    ):
+        if edge not in r29:
+            errors.append("R84 R29 lost independent owner implementation: " + edge)
 
 # The pre-R84 tests below matched private R30 bodies. On a physical R29
 # owner graph these negative mutations would mutate no bytes and report

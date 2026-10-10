@@ -67,6 +67,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: 'Feature acceptance: R84-REGRESSION - Windows active-policy parity'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($verifier in @(
+            'tools/verify_vr_architecture.py',
+            'tools/verify_vr_refactor_contract.py',
+            'tools/verify_vr_r84_focus_inventory.py',
+            'tools/verify_vr_r29_owner_api_seam.py',
+            'tools/verify_vr_r30_support_api_seam.py',
+            'tools/verify_vr_r32_runtime_support_seam.py'
+          )) {
+            & python $verifier
+            if ($LASTEXITCODE -ne 0) { throw "R84 Windows policy preflight failed: $verifier" }
+          }
       - name: 'Feature acceptance: R84-BUILD-GRAPH - configure independent R29-R33 owners'
         shell: pwsh
         run: |
