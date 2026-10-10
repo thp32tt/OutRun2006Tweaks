@@ -8,15 +8,15 @@
   "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
   "target_branch": "vr-d3d9ex-focus",
   "work_key": "DX9EX:R84_RENDERER_GRAPH",
-  "feature_status": "IMPLEMENTING",
+  "feature_status": "FEATURE_READY",
   "status": "IN_PROGRESS",
-  "checkpoint": "C2_IMPLEMENT",
+  "checkpoint": "FEATURE_READY_PENDING_CONTROLLER_EXACT_SHA",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
   "last_implemented_source_sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null,
+  "validation_bearing_result_sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
+  "material_result_sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
   "feature_contract": {
     "feature_id": "DX9EX:R84_RENDERER_GRAPH",
     "lane": "DX9EX",
@@ -90,7 +90,7 @@
     "policy_blob_sha": "7b61519aa94193a883e86735a9ba4ebacc93f4aa"
   },
   "feature_acceptance": {
-    "implementation_complete": false,
+    "implementation_complete": true,
     "targeted_checks": [
       "R29/R30 owner seam mutations PASS 19 on local validation pending run",
       "R30 support seam adjusted for explicit owner getter pending run",
@@ -100,40 +100,61 @@
       "N100 worktree feature-branch exact SHA f94c051: python3 tools/verify_vr_r29_owner_api_seam.py PASS (33 negative mutations), python3 tools/verify_vr_r30_support_api_seam.py PASS.",
       "R84 package workflow feature SHA 9d0554b: Win32 split x86, baseline x86, host x64, manifest, collector, SHA/PE checks; N100 python3 tools/verify_vr_r84_feature_bundle.py PASS (5 negative mutations), workflow not yet Windows-run verified.",
       "R29 lower failure/original-hook/RT restore typed ABI 5 methods + R30 18 callsites; N100 owner seam PASS (38 negative mutations) and R30 support API PASS after feature SHA e95e00c.",
-      "R84 complete-feature packaging workflow static suite PASS (5 negative mutations) after PowerShell path fixes; no Win32 successful game/host/fullchain build/link or published ZIP verified."
+      "R84 complete-feature packaging workflow static suite PASS (5 negative mutations) after PowerShell path fixes; no Win32 successful game/host/fullchain build/link or published ZIP verified.",
+      "GitHub Actions R84 exact-SHA 38071953016 SUCCESS: 38 R29 negative mutation checks + R30 support seam + 5 bundle mutation checks; independent R29-R33 Win32 game compiled/linked; x64 host smoke tests and R26 reference x86 game built; exact-source final 5,142,744-byte ZIP artifact 11677164470 passed manifest/PE/source checks."
     ],
-    "integration_contract": "PENDING: independent R29-R33 Win32 game/host full-chain link, accepted steps, exact SHA gates and binary bundle"
+    "integration_contract": "R84 full-chain feature CI SUCCESS at exact source 97a2c6769d92963b8ad5410c4e774e399a62f4ae (run 38071953016, jobs r84-local/r84-win32/r84-host/r84-baseline-game/r84-bundle). FEATURE_READY; DX9Ex Active Validation and Domain Isolation Guard still PENDING on controller-reconciled target SHA. Not DONE_BUILD_VERIFIED."
   },
   "acceptance_results": [
     {
       "id": "R84-OWNERS",
-      "status": "PENDING",
-      "evidence_paths": [],
-      "validation_command": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r29.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d9/stereo_renderer_r31.cpp",
+        "src/vr/d3d9/stereo_renderer_r32.cpp",
+        "src/vr/d3d9/stereo_renderer_r33.cpp"
+      ],
+      "validation_command": "R84 run 38071953016: r84-win32 Compile and link independent R29-R33 Win32 game SUCCESS"
     },
     {
       "id": "R84-ABI",
-      "status": "PENDING",
-      "evidence_paths": [],
-      "validation_command": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/core/r29_owner_api.hpp",
+        "tools/verify_vr_r29_owner_api_seam.py",
+        "tools/verify_vr_r30_support_api_seam.py"
+      ],
+      "validation_command": "R84 run 38071953016: r84-local R29 negative-mutation and R30 producer-consumer tests SUCCESS; r84-win32 linker SUCCESS"
     },
     {
       "id": "R84-BUILD-GRAPH",
-      "status": "PENDING",
-      "evidence_paths": [],
-      "validation_command": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "cmake.toml",
+        "CMakeLists.txt"
+      ],
+      "validation_command": "R84 run 38071953016: r84-win32 four R33/R32/R31/R30/R29 split flags CMake configure and Win32 link SUCCESS; ownership configuration blocks compared byte-for-byte"
     },
     {
       "id": "R84-REGRESSION",
-      "status": "PENDING",
-      "evidence_paths": [],
-      "validation_command": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/verify_vr_r29_owner_api_seam.py",
+        "tools/verify_vr_r30_support_api_seam.py",
+        ".github/workflows/vr-r84-feature-00591.yml"
+      ],
+      "validation_command": "R84 run 38071953016: r84-local, r84-host smoke, and protected R26 baseline x86 game all SUCCESS"
     },
     {
       "id": "R84-TEST-BUNDLE",
-      "status": "PENDING",
-      "evidence_paths": [],
-      "validation_command": "PENDING"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/verify_vr_r84_feature_bundle.py",
+        ".github/workflows/vr-r84-feature-00591.yml"
+      ],
+      "validation_command": "R84 run 38071953016: r84-bundle SUCCESS artifact 11677164470 with x86 split game/x86 baseline/x64 host/manifest/log collector, SHA and PE checks"
     }
   ],
   "dev_ci_history": [
@@ -161,16 +182,24 @@
       "sha": "39fbe7e4489dd809d616966d110ef1356e83168d",
       "run_id": 38071540989,
       "status": "FAIL_WIN32_10_ERRORS_4_TARGET_6_RENDERER_ALREADY_ADDRESSED"
+    },
+    {
+      "sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
+      "run_id": 38071953016,
+      "status": "SUCCESS_FEATURE_R84_LOCAL_WIN32_HOST_BASELINE_BUNDLE",
+      "full_chain_artifact_id": 11677760019,
+      "host_artifact_id": 11676904409,
+      "baseline_artifact_id": 11677229003,
+      "test_bundle_artifact_id": 11677164470
     }
   ],
   "outstanding": [
-    "R84 39fbe7e Win32 independent R29-R33 owner compilation/link and baseline x86/host x64/full-chain bundle CI awaiting exact-SHA verification",
-    "R84-OWNERS/R84-ABI/R84-BUILD-GRAPH/R84-REGRESSION/R84-TEST-BUNDLE all PENDING until full CI passes",
-    "DX9Ex Active Validation and Domain Isolation Guard required gates pending exact-SHA validation",
-    "Controller-only promotion to vr-d3d9ex-focus must reconcile concurrent HUD/crash changes, not overwrite",
-    "Quest 3/VDXR practical HMD validation UNTESTED"
+    "Required DX9Ex Active Validation exact-SHA jobs on controller-integrated target: PENDING",
+    "Required Domain Isolation Guard exact-SHA job on controller-integrated target: PENDING",
+    "Feature/target diverged by 42 ahead and 1 behind; target P0 HUD/crash changes must be preserved",
+    "Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
   ],
-  "next_action": "Run exact-SHA Windows split R29-R33 game x86 compile/link, then x64 host, baseline and complete test ZIP. Read first failing compile/link log; fix only remaining R84 ABI. Keep R84-OWNERS/R84-ABI/R84-BUILD-GRAPH/R84-REGRESSION/R84-TEST-BUNDLE PENDING until integrated build and required gates pass. No FEATURE_READY, controller-only target, HMD UNTESTED.",
+  "next_action": "Controller only: preserve concurrent P0 HUD/crash target a5a5b4d5eda3a7a15717898e8644a7279701727b; reconcile diverged feature into target without overwrite, then run DX9Ex Active Validation (policy/host/game/full-chain-compile/package) and Domain Isolation Guard (domain-isolation) at the exact integrated target SHA. Mark DONE_BUILD_VERIFIED only after those mandatory gates pass; Quest3/VDXR UNTESTED.",
   "feature_last_head": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
   "checkpoint_history": [
     {
@@ -268,17 +297,31 @@
         "R84_bundle_5_negative_mutations": "PASS"
       },
       "validation_gate": "Await material 97a2c676 exact-SHA integrated Windows/host/ZIP; R84 feature NOT READY"
+    },
+    {
+      "at_kst": "2026-10-11T02:43:40+09:00",
+      "event_id": "CONVERSION-DX9EX-00591-E002",
+      "feature_sha": "97a2c6769d92963b8ad5410c4e774e399a62f4ae",
+      "incomplete_acceptance_ids": [],
+      "next_action": "Controller only: preserve concurrent P0 HUD/crash target a5a5b4d5eda3a7a15717898e8644a7279701727b; reconcile diverged feature into target without overwrite, then run DX9Ex Active Validation (policy/host/game/full-chain-compile/package) and Domain Isolation Guard (domain-isolation) at the exact integrated target SHA. Mark DONE_BUILD_VERIFIED only after those mandatory gates pass; Quest3/VDXR UNTESTED.",
+      "runtime_validation": "UNTESTED",
+      "feature_ci_run_id": 38071953016,
+      "feature_ci_result": "SUCCESS",
+      "feature_artifact_id": 11677164470,
+      "required_gates": "PENDING_CONTROLLER_EXACT_SHA"
     }
   ],
   "concurrent_target_status": {
     "base_sha": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
-    "status": "ahead",
-    "ahead_by": 1,
+    "target_head": "a5a5b4d5eda3a7a15717898e8644a7279701727b",
+    "status": "diverged",
+    "feature_ahead_by": 42,
+    "feature_behind_by": 1,
     "paths": [
       "docs/automation/reviews/DX9EX_MINIDUMP_97E75_R57_HISTORICAL_RESTORE_20261011.md",
       "src/hooks_uiscaling.cpp",
       "tools/verify_vr_visual_composition_p0.py"
     ],
-    "note": "Controller-only target; concurrent HUD/crash source changes not overwritten"
+    "note": "Feature READY; controller-only target promotion, do not overwrite verified P0 crash/HUD correction"
   }
 }
