@@ -61,7 +61,7 @@
     "gate_readiness_job_id": 114135829493,
     "gate_readiness_conclusion": "failure",
     "r193_r220_scoped_static_steps": "74 PASS",
-    "r193_r220_scoped_warp_steps": "75 PASS",
+    "r193_r220_scoped_warp_steps": "75 build PASS / 76 WARP execution PASS",
     "constant_buffer_smoke_step": "84 FAIL: R175_GENERIC_VARYING_MISMATCH",
     "r175_bgra_observed": [
       128,
@@ -86,7 +86,7 @@
   "score_previous_confirmed": 1075,
   "score_change": 0,
   "score_new_confirmed": 1075,
-  "timestamp_kst": "2026-10-10T14:00:00+09:00",
+  "timestamp_kst": "2026-10-10T14:01:27+09:00",
   "result_sha": "d9f87c4d189dc2eb9b7e5018e510adec90bd52a5",
   "resume_cursor": "BLOCKED_DEPENDENCY_R175_WAIT_OWNER_RELEASE",
   "last_real_activity_evidence": "Inspected failed run 38025344528 exact material SHA; Win32 validate PASS and R193 WARP PASS, inherited constant buffer R175 BGRA failure reproduced at step 84."
