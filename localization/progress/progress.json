@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 13:50 KST",
+  "updated_at_kst": "2026-10-10 14:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -80,12 +80,12 @@
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1,
       "latest_c2_independent_finding": {
-        "index": 154,
-        "asset": "4D38BBB0_1024x256.dds",
+        "index": 236,
+        "asset": "FEF70E85_512x512.dds",
         "result": "REWORK_REQUIRED_UNCHANGED",
-        "evidence": "ACTUAL_VISUAL_SOURCE_FAMILY_OVERWEIGHT_COUNTERSPACE_GRAY_3_OF_3",
-        "candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
-        "qa_report": "localization/graphics/role_C/20261010-C356-C2-Q154-GRAY-FONT-VISUAL-FAIL/C356_Q154_CONTROLLER_C2_REWORK.json",
+        "evidence": "NEW_SOURCE_CURRENT_NATIVE_14_ALPHA_AND_12_LOSSLESS_VISUAL_HEIGHT_STROKE",
+        "candidate_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+        "qa_report": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/C358_Q236_CONTROLLER_C2_VISUAL_REWORK.json",
         "runtime_validation": "UNTESTED",
         "new_dds": 0
       },

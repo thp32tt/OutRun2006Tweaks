@@ -1,0 +1,598 @@
+{
+  "role": "C2",
+  "queue_index": 236,
+  "time_kst": "2026-10-10 14:00 KST",
+  "independent_source_SHA": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "current_persisted_DDS_SHA": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "byte_source": "re-downloaded canonical Sonic-TV source DDS, exact SHA-verified",
+  "byte_candidate": "GitHub branch persisted official DDS, exact SHA-verified",
+  "exact_128_byte_header_equal": true,
+  "DDS_NATIVE_DIMENSIONS": [
+    2048,
+    2048
+  ],
+  "mip_levels": 1,
+  "native_pillow_coordinate_convention": "DDS decoded PIL pixels FLIP-Y/readable; RAW stored y map explicitly inverted",
+  "alpha_threshold": ">16",
+  "source_bbox_and_position_scan": "fresh independently re-derived, not only copied producer metrics",
+  "rows": [
+    {
+      "row_index": 0,
+      "english": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "source_original_raw_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          1105,
+          86
+        ],
+        "alpha_gt16_pixel_count": 50441,
+        "occupied_fraction_in_tight_bbox": 0.53079
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          768,
+          79
+        ],
+        "alpha_gt16_pixel_count": 28717,
+        "occupied_fraction_in_tight_bbox": 0.473316
+      },
+      "height_underfill_px": 7,
+      "height_ratio": 0.9186,
+      "opaque_fraction_ratio_glpyh_dependent": 0.89172,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 1,
+      "english": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_original_raw_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          716,
+          95
+        ],
+        "alpha_gt16_pixel_count": 34345,
+        "occupied_fraction_in_tight_bbox": 0.504925
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          325,
+          87
+        ],
+        "alpha_gt16_pixel_count": 13968,
+        "occupied_fraction_in_tight_bbox": 0.494005
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91579,
+      "opaque_fraction_ratio_glpyh_dependent": 0.97837,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 2,
+      "english": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "source_original_raw_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          793,
+          94
+        ],
+        "alpha_gt16_pixel_count": 38329,
+        "occupied_fraction_in_tight_bbox": 0.514193
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          342,
+          86
+        ],
+        "alpha_gt16_pixel_count": 14846,
+        "occupied_fraction_in_tight_bbox": 0.50476
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91489,
+      "opaque_fraction_ratio_glpyh_dependent": 0.98165,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 3,
+      "english": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "source_original_raw_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          780,
+          94
+        ],
+        "alpha_gt16_pixel_count": 37585,
+        "occupied_fraction_in_tight_bbox": 0.512616
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          342,
+          87
+        ],
+        "alpha_gt16_pixel_count": 12174,
+        "occupied_fraction_in_tight_bbox": 0.409155
+      },
+      "height_underfill_px": 7,
+      "height_ratio": 0.92553,
+      "opaque_fraction_ratio_glpyh_dependent": 0.79817,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 4,
+      "english": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "source_original_raw_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          928,
+          95
+        ],
+        "alpha_gt16_pixel_count": 46808,
+        "occupied_fraction_in_tight_bbox": 0.530944
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          425,
+          87
+        ],
+        "alpha_gt16_pixel_count": 15434,
+        "occupied_fraction_in_tight_bbox": 0.417417
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91579,
+      "opaque_fraction_ratio_glpyh_dependent": 0.78618,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 5,
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "source_original_raw_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          801,
+          95
+        ],
+        "alpha_gt16_pixel_count": 39134,
+        "occupied_fraction_in_tight_bbox": 0.514278
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          739,
+          87
+        ],
+        "alpha_gt16_pixel_count": 27069,
+        "occupied_fraction_in_tight_bbox": 0.421026
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91579,
+      "opaque_fraction_ratio_glpyh_dependent": 0.81867,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 6,
+      "english": "PALM BEACH",
+      "korean": "팜 비치",
+      "source_original_raw_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          706,
+          94
+        ],
+        "alpha_gt16_pixel_count": 33992,
+        "occupied_fraction_in_tight_bbox": 0.512205
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          255,
+          86
+        ],
+        "alpha_gt16_pixel_count": 10605,
+        "occupied_fraction_in_tight_bbox": 0.483584
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91489,
+      "opaque_fraction_ratio_glpyh_dependent": 0.94412,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 7,
+      "english": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "source_original_raw_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          865,
+          93
+        ],
+        "alpha_gt16_pixel_count": 41540,
+        "occupied_fraction_in_tight_bbox": 0.516378
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          417,
+          85
+        ],
+        "alpha_gt16_pixel_count": 16782,
+        "occupied_fraction_in_tight_bbox": 0.473466
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91398,
+      "opaque_fraction_ratio_glpyh_dependent": 0.9169,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 8,
+      "english": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "source_original_raw_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          628,
+          89
+        ],
+        "alpha_gt16_pixel_count": 28230,
+        "occupied_fraction_in_tight_bbox": 0.505081
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          314,
+          81
+        ],
+        "alpha_gt16_pixel_count": 12970,
+        "occupied_fraction_in_tight_bbox": 0.509947
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91011,
+      "opaque_fraction_ratio_glpyh_dependent": 1.00963,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 9,
+      "english": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "source_original_raw_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          710,
+          95
+        ],
+        "alpha_gt16_pixel_count": 35318,
+        "occupied_fraction_in_tight_bbox": 0.523617
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          489,
+          87
+        ],
+        "alpha_gt16_pixel_count": 21362,
+        "occupied_fraction_in_tight_bbox": 0.502127
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91579,
+      "opaque_fraction_ratio_glpyh_dependent": 0.95896,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 10,
+      "english": "LOST CITY",
+      "korean": "로스트 시티",
+      "source_original_raw_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          534,
+          95
+        ],
+        "alpha_gt16_pixel_count": 23294,
+        "occupied_fraction_in_tight_bbox": 0.459176
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          428,
+          87
+        ],
+        "alpha_gt16_pixel_count": 15480,
+        "occupied_fraction_in_tight_bbox": 0.415727
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91579,
+      "opaque_fraction_ratio_glpyh_dependent": 0.90538,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 11,
+      "english": "LEGEND",
+      "korean": "레전드",
+      "source_original_raw_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          423,
+          94
+        ],
+        "alpha_gt16_pixel_count": 22498,
+        "occupied_fraction_in_tight_bbox": 0.565817
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          238,
+          86
+        ],
+        "alpha_gt16_pixel_count": 10123,
+        "occupied_fraction_in_tight_bbox": 0.494577
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91489,
+      "opaque_fraction_ratio_glpyh_dependent": 0.87409,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 12,
+      "english": "JUNGLE",
+      "korean": "정글",
+      "source_original_raw_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          420,
+          94
+        ],
+        "alpha_gt16_pixel_count": 20809,
+        "occupied_fraction_in_tight_bbox": 0.527077
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          161,
+          85
+        ],
+        "alpha_gt16_pixel_count": 7773,
+        "occupied_fraction_in_tight_bbox": 0.567994
+      },
+      "height_underfill_px": 9,
+      "height_ratio": 0.90426,
+      "opaque_fraction_ratio_glpyh_dependent": 1.07763,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    },
+    {
+      "row_index": 13,
+      "english": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "source_original_raw_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "readable_orientation": "PIL decoded FLIP-Y; original raw y mapped to 2048-y1:2048-y0",
+      "original_alpha": {
+        "bbox_wh": [
+          1010,
+          92
+        ],
+        "alpha_gt16_pixel_count": 49374,
+        "occupied_fraction_in_tight_bbox": 0.53136
+      },
+      "candidate_alpha": {
+        "bbox_wh": [
+          574,
+          84
+        ],
+        "alpha_gt16_pixel_count": 24437,
+        "occupied_fraction_in_tight_bbox": 0.506823
+      },
+      "height_underfill_px": 8,
+      "height_ratio": 0.91304,
+      "opaque_fraction_ratio_glpyh_dependent": 0.95382,
+      "strict_original_height_ceiling_held": true,
+      "exact_bounding_box_position_within_source": true
+    }
+  ],
+  "source_clean_and_clean_current_outside_union": [
+    0,
+    0
+  ],
+  "outside_union_numeric_attribution": "PREVIOUS C340, not independently recalculated in this invocation",
+  "style_interpretation_warning": "Different scripts can have different glyph counters, opacity density not universal typography threshold; optical original-family failure also based on direct SHA-pinned pixel visual review.",
+  "proof_png": {
+    "row00": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "f3a4523805a5744bcd307ed834e79c49ec22ef2d287fbbaeb5703e5eddf4a147",
+        "size": [
+          2238,
+          87
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "158b382a9943f75a09b6f82133d91f0a892ab1bed5d1edc56e16cd56cd182aa9",
+        "size": [
+          1118,
+          43
+        ]
+      }
+    },
+    "row03": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "7dcf0971e623bfd09232bc1c61bb1d40b5bf180e89a5baf67c41925fe9db8dc2",
+        "size": [
+          1584,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "cf085a3e75a1c07c1f4191998697934a586f91a1b45847441ea2bc41230b777a",
+        "size": [
+          792,
+          47
+        ]
+      }
+    },
+    "row04": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "d411cb17dbff48352b4912ce0da02317b95cb5e9b4affdbcd7ff7b151ff082ae",
+        "size": [
+          1880,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "d84c303a13ba694f2a15a3b4e818cf7b6f79d17d87a64705db2e68e3610e69c2",
+        "size": [
+          940,
+          47
+        ]
+      }
+    },
+    "row05": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "8afba301038d87f1526134c6d6dd259586f1411cd385f3ff956aa84a6645243f",
+        "size": [
+          1626,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "60b02dcf7cb31d465ef12acf2969112f6bd4be371dd9a71b425723525392c213",
+        "size": [
+          812,
+          47
+        ]
+      }
+    },
+    "row11": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "cde919b0f2b2d0c090bd173073c55b3990d92569609e3fee43326cb81bf141d7",
+        "size": [
+          870,
+          94
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "7304d7ec32c084f514cd1b629a7daa8a311f91e79cd08d54bec860e9cc4bea70",
+        "size": [
+          434,
+          47
+        ]
+      }
+    },
+    "row13": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "aa954cf70503ec78c5b4183a98203dc71ec93c9c14709506bc8b5141070e1db3",
+        "size": [
+          2044,
+          92
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "477a171e01b2f1aae225ff06d6e0aac88abb95e7bf5d32171d18409b9edc3184",
+        "size": [
+          1022,
+          46
+        ]
+      }
+    }
+  }
+}

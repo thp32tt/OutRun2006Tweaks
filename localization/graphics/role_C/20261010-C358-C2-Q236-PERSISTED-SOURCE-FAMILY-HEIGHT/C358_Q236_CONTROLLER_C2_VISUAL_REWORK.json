@@ -1,0 +1,866 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C358-Q236-NATIVE-SOURCE-FAMILY-HEIGHT-STROKE",
+  "run_key": "OUTRUN-KOR-C358-C2-Q236-INDEPENDENT-NATIVE-HEIGHT-FAMILY-20261010-1350",
+  "date_kst": "2026-10-10 14:00 KST",
+  "queue_index": 236,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "authored_clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "candidate_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "candidate_changes": false,
+  "new_dds": 0,
+  "selection_triage": "EVIDENCE_ONLY_HOLD",
+  "base_remote_head": "23d8757e818afc9e1b54f7d813151fd1db38a018",
+  "decision": "REWORK_REQUIRED",
+  "hard_reason_codes": [
+    "SOURCE_FAMILY_HEIGHT_UNDERFILL",
+    "SOURCE_FAMILY_STROKE_UNDERWEIGHT_SCOPED"
+  ],
+  "new_independent_material": "Canonical source re-downloaded and SHA checked; persisted official DDS SHA checked; PIL actually decoded both complete native DDS. All 14 fresh source/current alpha bounds, 7-9 px systematic native-height underfill. Subset row03 SUNNNY BEACH, row04 SNOW MOUNTAIN, row05 SKYSCRAPERS show optical over-thin/hierarchy reduction and lower normalized opaque fraction, row11 LEGEND source-heavy-versus-Korean family difference. Six new focus families (rows 0,3,4,5,11,13) in two practical native/50 formats = 12 new lossless exact DDS comparison PNG.",
+  "visual_observation": "Source family bold vertically condensed capitals with dense regular stem geometry. B302 current Hangul face is smaller by systematically introduced 7–9 native px across all14 and visibly thinner/less impactful in key rows, especially SUNNY BEACH, SNOW MOUNTAIN, SKYSCRAPERS and LEGEND at practical 50%. This is a source-family visual mismatch despite formal source bbox ceiling/other mechanical controls passing. A uniform numeric tolerance is NOT being imposed; language-dependent occupancy is not itself hard FAIL.",
+  "scope_and_limits": "All14 source/current native alpha independently inspected, all14 C340 existing gray50 lossless row montage visually checked, and selected six new independently decoded SOURCE/CURRENT 100/50 focus pairs; CLEAN plate/whole atlas protected delta are cited as prior C340 evidence, not newly measured. Does NOT fabricate blind calibration, per-glyph slant anchors, current-policy approval or real game.",
+  "machine": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/C358_Q236_INDEPENDENT_PIXEL_MEASURE.json",
+  "earlier_work": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/C340_Q236_CONTROLLER_HOLD.json",
+  "prior_clean_stage": "localization/graphics/role_C/20261010-C340-C2-Q236-EXACT-SOURCE-CLEAN-CURRENT-14/C340_Q236_EXACT_MACHINE.json",
+  "findings": {
+    "row00": {
+      "english": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "source_height_native_px": 86,
+      "current_height_native_px": 79,
+      "underfill_px": 7,
+      "ratio": 0.9186,
+      "ink_density_ratio_script_dependent": 0.89172,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "f3a4523805a5744bcd307ed834e79c49ec22ef2d287fbbaeb5703e5eddf4a147",
+          "size": [
+            2238,
+            87
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "158b382a9943f75a09b6f82133d91f0a892ab1bed5d1edc56e16cd56cd182aa9",
+          "size": [
+            1118,
+            43
+          ]
+        }
+      }
+    },
+    "row01": {
+      "english": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_height_native_px": 95,
+      "current_height_native_px": 87,
+      "underfill_px": 8,
+      "ratio": 0.91579,
+      "ink_density_ratio_script_dependent": 0.97837,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row02": {
+      "english": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "source_height_native_px": 94,
+      "current_height_native_px": 86,
+      "underfill_px": 8,
+      "ratio": 0.91489,
+      "ink_density_ratio_script_dependent": 0.98165,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row03": {
+      "english": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "source_height_native_px": 94,
+      "current_height_native_px": 87,
+      "underfill_px": 7,
+      "ratio": 0.92553,
+      "ink_density_ratio_script_dependent": 0.79817,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "7dcf0971e623bfd09232bc1c61bb1d40b5bf180e89a5baf67c41925fe9db8dc2",
+          "size": [
+            1584,
+            95
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "cf085a3e75a1c07c1f4191998697934a586f91a1b45847441ea2bc41230b777a",
+          "size": [
+            792,
+            47
+          ]
+        }
+      }
+    },
+    "row04": {
+      "english": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "source_height_native_px": 95,
+      "current_height_native_px": 87,
+      "underfill_px": 8,
+      "ratio": 0.91579,
+      "ink_density_ratio_script_dependent": 0.78618,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "d411cb17dbff48352b4912ce0da02317b95cb5e9b4affdbcd7ff7b151ff082ae",
+          "size": [
+            1880,
+            95
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "d84c303a13ba694f2a15a3b4e818cf7b6f79d17d87a64705db2e68e3610e69c2",
+          "size": [
+            940,
+            47
+          ]
+        }
+      }
+    },
+    "row05": {
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "source_height_native_px": 95,
+      "current_height_native_px": 87,
+      "underfill_px": 8,
+      "ratio": 0.91579,
+      "ink_density_ratio_script_dependent": 0.81867,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "8afba301038d87f1526134c6d6dd259586f1411cd385f3ff956aa84a6645243f",
+          "size": [
+            1626,
+            95
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "60b02dcf7cb31d465ef12acf2969112f6bd4be371dd9a71b425723525392c213",
+          "size": [
+            812,
+            47
+          ]
+        }
+      }
+    },
+    "row06": {
+      "english": "PALM BEACH",
+      "korean": "팜 비치",
+      "source_height_native_px": 94,
+      "current_height_native_px": 86,
+      "underfill_px": 8,
+      "ratio": 0.91489,
+      "ink_density_ratio_script_dependent": 0.94412,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row07": {
+      "english": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "source_height_native_px": 93,
+      "current_height_native_px": 85,
+      "underfill_px": 8,
+      "ratio": 0.91398,
+      "ink_density_ratio_script_dependent": 0.9169,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row08": {
+      "english": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "source_height_native_px": 89,
+      "current_height_native_px": 81,
+      "underfill_px": 8,
+      "ratio": 0.91011,
+      "ink_density_ratio_script_dependent": 1.00963,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row09": {
+      "english": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "source_height_native_px": 95,
+      "current_height_native_px": 87,
+      "underfill_px": 8,
+      "ratio": 0.91579,
+      "ink_density_ratio_script_dependent": 0.95896,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row10": {
+      "english": "LOST CITY",
+      "korean": "로스트 시티",
+      "source_height_native_px": 95,
+      "current_height_native_px": 87,
+      "underfill_px": 8,
+      "ratio": 0.91579,
+      "ink_density_ratio_script_dependent": 0.90538,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row11": {
+      "english": "LEGEND",
+      "korean": "레전드",
+      "source_height_native_px": 94,
+      "current_height_native_px": 86,
+      "underfill_px": 8,
+      "ratio": 0.91489,
+      "ink_density_ratio_script_dependent": 0.87409,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "cde919b0f2b2d0c090bd173073c55b3990d92569609e3fee43326cb81bf141d7",
+          "size": [
+            870,
+            94
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "7304d7ec32c084f514cd1b629a7daa8a311f91e79cd08d54bec860e9cc4bea70",
+          "size": [
+            434,
+            47
+          ]
+        }
+      }
+    },
+    "row12": {
+      "english": "JUNGLE",
+      "korean": "정글",
+      "source_height_native_px": 94,
+      "current_height_native_px": 85,
+      "underfill_px": 9,
+      "ratio": 0.90426,
+      "ink_density_ratio_script_dependent": 1.07763,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAMILY_FAIL_GLOBAL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {}
+    },
+    "row13": {
+      "english": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "source_height_native_px": 92,
+      "current_height_native_px": 84,
+      "underfill_px": 8,
+      "ratio": 0.91304,
+      "ink_density_ratio_script_dependent": 0.95382,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "source and final appear upright in readable view, no qualified homologous stem top-bottom pairs"
+        },
+        "clean_plate": {
+          "result": "PRIOR_SCOPED_PASS",
+          "observation": "C340 independently authenticates exact SHA authored clean and alpha0 inside all14, not newly recomputed here"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source has tall, heavy condensed stroke geometry; existing Korean is uniformly 7-9 native px shorter. In focus rows the 50% visual source-family body/stem appears perceptibly weaker/narrower; density varies by glyph language and is supporting evidence only."
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean text readable in native/50 contacts but consistently reduced source vertical hierarchy; in-game impact not tested"
+        },
+        "glyph_integrity": {
+          "result": "NO_CONFIRMED_BREAK",
+          "observation": "No definite fracture from sampled persisted native readable; not a full final passing calibration"
+        },
+        "protected_art": {
+          "result": "PRIOR_PIXEL_PASS",
+          "observation": "Previous C340 full-atlas zero changed outside 14 source bboxes, exact byte source/candidate rehashed"
+        },
+        "placement": {
+          "result": "STRICT_INSIDE_SOURCE",
+          "observation": "Fresh independent per-region alpha bbox rederived; 14/14 positive source bbox containment"
+        },
+        "orientation": {
+          "result": "PERSISTED_RAW_FLIPY_CONFIRMED",
+          "observation": "Native source/candidate DDS decoded with explicit mirrored RAW→readable coordinate mapping"
+        }
+      },
+      "new_png_evidence": {
+        "native_100": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_100.png",
+          "sha256": "aa954cf70503ec78c5b4183a98203dc71ec93c9c14709506bc8b5141070e1db3",
+          "size": [
+            2044,
+            92
+          ]
+        },
+        "native_50": {
+          "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_50.png",
+          "sha256": "477a171e01b2f1aae225ff06d6e0aac88abb95e7bf5d32171d18409b9edc3184",
+          "size": [
+            1022,
+            46
+          ]
+        }
+      }
+    }
+  },
+  "evidence": {
+    "row00": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "f3a4523805a5744bcd307ed834e79c49ec22ef2d287fbbaeb5703e5eddf4a147",
+        "size": [
+          2238,
+          87
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row00_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "158b382a9943f75a09b6f82133d91f0a892ab1bed5d1edc56e16cd56cd182aa9",
+        "size": [
+          1118,
+          43
+        ]
+      }
+    },
+    "row03": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "7dcf0971e623bfd09232bc1c61bb1d40b5bf180e89a5baf67c41925fe9db8dc2",
+        "size": [
+          1584,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row03_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "cf085a3e75a1c07c1f4191998697934a586f91a1b45847441ea2bc41230b777a",
+        "size": [
+          792,
+          47
+        ]
+      }
+    },
+    "row04": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "d411cb17dbff48352b4912ce0da02317b95cb5e9b4affdbcd7ff7b151ff082ae",
+        "size": [
+          1880,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row04_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "d84c303a13ba694f2a15a3b4e818cf7b6f79d17d87a64705db2e68e3610e69c2",
+        "size": [
+          940,
+          47
+        ]
+      }
+    },
+    "row05": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "8afba301038d87f1526134c6d6dd259586f1411cd385f3ff956aa84a6645243f",
+        "size": [
+          1626,
+          95
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row05_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "60b02dcf7cb31d465ef12acf2969112f6bd4be371dd9a71b425723525392c213",
+        "size": [
+          812,
+          47
+        ]
+      }
+    },
+    "row11": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "cde919b0f2b2d0c090bd173073c55b3990d92569609e3fee43326cb81bf141d7",
+        "size": [
+          870,
+          94
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row11_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "7304d7ec32c084f514cd1b629a7daa8a311f91e79cd08d54bec860e9cc4bea70",
+        "size": [
+          434,
+          47
+        ]
+      }
+    },
+    "row13": {
+      "native_100": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_100.png",
+        "sha256": "aa954cf70503ec78c5b4183a98203dc71ec93c9c14709506bc8b5141070e1db3",
+        "size": [
+          2044,
+          92
+        ]
+      },
+      "native_50": {
+        "path": "localization/graphics/role_C/20261010-C358-C2-Q236-PERSISTED-SOURCE-FAMILY-HEIGHT/row13_SOURCE_CURRENT_GRAY_50.png",
+        "sha256": "477a171e01b2f1aae225ff06d6e0aac88abb95e7bf5d32171d18409b9edc3184",
+        "size": [
+          1022,
+          46
+        ]
+      }
+    }
+  },
+  "pixel_before_producer_verdict": false,
+  "blind_calibration": "NOT_QUALIFIED; previous records consulted before this strict C2 review",
+  "c3_status": "BLOCKED_UNTIL_NEW_C2_PASS",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence_export": "BLOCKED",
+  "repair": "Rebuild q236 style profile from authentic source: actual source-origin condensed stroke/counter, native glyph height nearer source while respecting strict original extent and zero protected-pixel intrusion. Validate source CLEAN before lettering, persisted RAW and all14 50%, fresh C2/C3 and user in-game."
+}
