@@ -1,0 +1,138 @@
+{
+  "role": "C2",
+  "index": 60,
+  "shard": "EVEN",
+  "timestamp_kst": "2026-10-10T21:56:26+09:00",
+  "sha256": {
+    "source": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "B353": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+    "B359": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366"
+  },
+  "format": "RGBA32",
+  "width": 4096,
+  "height": 2048,
+  "mip_count": 1,
+  "dds_headers_exact_equal": true,
+  "orientation": "RAW_Y_MIRROR_TO_READABLE_FLIP_Y",
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "worker_roi": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "computed_pixel_differences": {
+    "SOURCE_TO_CLEAN_source_box": {
+      "rgba_changed": 89391,
+      "alpha_changed": 89391,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "OFFICIAL_TO_B359_worker_ROI": {
+      "rgba_changed": 92937,
+      "alpha_changed": 60437,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "B353_TO_B359_worker_ROI": {
+      "rgba_changed": 56289,
+      "alpha_changed": 33710,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "CLEAN_TO_B359_worker_ROI": {
+      "rgba_changed": 1552293,
+      "alpha_changed": 1137072,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928
+    },
+    "SOURCE_TO_B359_worker_ROI": {
+      "rgba_changed": 1596290,
+      "alpha_changed": 1148382,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928
+    }
+  },
+  "source_alpha32_bbox": [
+    2180,
+    340,
+    3027,
+    473
+  ],
+  "B359_alpha32_bbox": [
+    2222,
+    341,
+    3023,
+    471
+  ],
+  "source_clean_alpha_nonzero_inside_sourcebox": 0,
+  "images": [
+    "C2_Q060_B359_FIVEWAY_GRAY_100.png",
+    "C2_Q060_B359_FIVEWAY_GRAY_75.png",
+    "C2_Q060_B359_FIVEWAY_GRAY_50.png",
+    "C2_Q060_B359_FIVEWAY_BLACK_100.png",
+    "C2_Q060_B359_FIVEWAY_BLACK_75.png",
+    "C2_Q060_B359_FIVEWAY_BLACK_50.png",
+    "C2_Q060_B359_FIVEWAY_WHITE_100.png",
+    "C2_Q060_B359_FIVEWAY_WHITE_75.png",
+    "C2_Q060_B359_FIVEWAY_WHITE_50.png",
+    "C2_Q060_B359_SOURCE_GRAY_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_SOURCE_BLACK_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_CLEAN_GRAY_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_CLEAN_BLACK_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_OFFICIAL_GRAY_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_OFFICIAL_BLACK_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_B353_GRAY_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_B353_BLACK_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_B359_GRAY_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_B359_BLACK_BESTTIME_NATIVE.png",
+    "C2_Q060_B359_SOURCE_RAW_ROI.png",
+    "C2_Q060_B359_SOURCE_FLIPY_ROI.png",
+    "C2_Q060_B359_B359_RAW_ROI.png",
+    "C2_Q060_B359_B359_FLIPY_ROI.png",
+    "C2_Q060_B359_OFFICIAL_TRIAL_RGBA_CHANGED_MASK.png"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C3": "NOT_RUN",
+  "note": "Full authored source CLEAN retains English in non-BEST TIME cells unlike localized B359, therefore CLEAN_TO_B359 outside single ROI is expected other-asset delta, not source damage.",
+  "color_family_proxy": {
+    "source": {
+      "alpha_ge_200": 80606,
+      "saturated_source_orange_face_pixels": 18090,
+      "pale_cream_face_pixels": 3921,
+      "gold_yellow_pixels": 24872,
+      "navy_pixels": 32392,
+      "bright_highlight_pixels": 1363,
+      "saturated_orange_of_opaque_ratio": 0.2244,
+      "pale_cream_of_opaque_ratio": 0.0486
+    },
+    "B353": {
+      "alpha_ge_200": 38499,
+      "saturated_source_orange_face_pixels": 7324,
+      "pale_cream_face_pixels": 1101,
+      "gold_yellow_pixels": 13441,
+      "navy_pixels": 15450,
+      "bright_highlight_pixels": 170,
+      "saturated_orange_of_opaque_ratio": 0.1902,
+      "pale_cream_of_opaque_ratio": 0.0286
+    },
+    "B359": {
+      "alpha_ge_200": 44060,
+      "saturated_source_orange_face_pixels": 7352,
+      "pale_cream_face_pixels": 227,
+      "gold_yellow_pixels": 18348,
+      "navy_pixels": 16591,
+      "bright_highlight_pixels": 84,
+      "saturated_orange_of_opaque_ratio": 0.1669,
+      "pale_cream_of_opaque_ratio": 0.0052
+    }
+  },
+  "color_metric_limit": "Fixed RGB thresholds are descriptive of actual persisted pixels and not universal font-quality or visual-approval thresholds. Text glyph shapes differ; cross-script pixel fraction alone cannot determine PASS."
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "queue_index": 60,
+  "timestamp_kst": "2026-10-10T21:59:16+09:00",
+  "run_key": "OUTRUN-KOR-C2-Q060-B359-NEW-SHA-INDEPENDENT-SOURCE-FAMILY-20261010-2150",
+  "result": "REWORK_REQUIRED_UNPROMOTED_B359_SOURCE_FAMILY_OPTICAL_HIERARCHY",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_provenance": "OR2-HD-GUI-v0.25.10a local pinned GitHub source high-res DDS",
+  "B348_authored_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "unchanged_official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "previous_B353_C2_rejected_sha256": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+  "new_distinct_B359_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+  "same_sha_completed_before": false,
+  "firstlook": "Independently opened persisted source/CLEAN/official/B359 readable native+50%, then read producer machine; independently decoded whole DDS saved bytes. Stronger gold than B353 but source-family contour and emphasis still not homologous.",
+  "blind_calibration": "NOT_QUALIFIED; prior producer preview known, no PASS",
+  "machine_report": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_INDEPENDENT_MACHINE.json",
+  "native_size": [
+    4096,
+    2048
+  ],
+  "codec": "RGBA32_MIP1",
+  "orientation": "RAW_MIRROR_Y_TO_READABLE_FLIP_Y",
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "trial_alpha32_bbox": [
+    2222,
+    341,
+    3023,
+    471
+  ],
+  "pixel_scope": {
+    "SOURCE_TO_CLEAN_source_box": {
+      "rgba_changed": 89391,
+      "alpha_changed": 89391,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "OFFICIAL_TO_B359_worker_ROI": {
+      "rgba_changed": 92937,
+      "alpha_changed": 60437,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "B353_TO_B359_worker_ROI": {
+      "rgba_changed": 56289,
+      "alpha_changed": 33710,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "CLEAN_TO_B359_worker_ROI": {
+      "rgba_changed": 1552293,
+      "alpha_changed": 1137072,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928
+    },
+    "SOURCE_TO_B359_worker_ROI": {
+      "rgba_changed": 1596290,
+      "alpha_changed": 1148382,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928
+    }
+  },
+  "color_proxy": {
+    "source": {
+      "alpha_ge_200": 80606,
+      "saturated_source_orange_face_pixels": 18090,
+      "pale_cream_face_pixels": 3921,
+      "gold_yellow_pixels": 24872,
+      "navy_pixels": 32392,
+      "bright_highlight_pixels": 1363,
+      "saturated_orange_of_opaque_ratio": 0.2244,
+      "pale_cream_of_opaque_ratio": 0.0486
+    },
+    "B353": {
+      "alpha_ge_200": 38499,
+      "saturated_source_orange_face_pixels": 7324,
+      "pale_cream_face_pixels": 1101,
+      "gold_yellow_pixels": 13441,
+      "navy_pixels": 15450,
+      "bright_highlight_pixels": 170,
+      "saturated_orange_of_opaque_ratio": 0.1902,
+      "pale_cream_of_opaque_ratio": 0.0286
+    },
+    "B359": {
+      "alpha_ge_200": 44060,
+      "saturated_source_orange_face_pixels": 7352,
+      "pale_cream_face_pixels": 227,
+      "gold_yellow_pixels": 18348,
+      "navy_pixels": 16591,
+      "bright_highlight_pixels": 84,
+      "saturated_orange_of_opaque_ratio": 0.1669,
+      "pale_cream_of_opaque_ratio": 0.0052
+    }
+  },
+  "color_proxy_qualification": "proxy not universal source-Hangul equality metric; corroborates manual optical mismatch only",
+  "regions": {
+    "BEST_TIME": {
+      "english": "BEST TIME:",
+      "korean": "최고 기록:",
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_STRICT_RECHECK",
+          "observation": "B359 uses source-B stem reported slope +0.3421 readable, but independent per-Korean homologous stroke/top-bottom slant anchors and multiple English glyphs not established; first-glyph numeric provenance does not qualify all Hangul.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_100.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "SHA-verified full canonical SOURCE + B348 CLEAN. Direct independently decoded original-to-CLEAN changed 89391 RGBA/alpha pixels inside source [2179,340,3028,474] only, outside zero, CLEAN source box alpha zero. No independent full-atlas all-component approved source plate.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_100.png"
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY",
+          "observation": "Source BEST TIME compact bold racing italic orange upper/navy extruded deep bevel; B359 Hangul remains slender long horizontal elements, brighter yellow front-face, shallower source-relative thick orange face despite contour-normal change. At half size visual headline density remains significantly weaker. Measured opaque orange proxy: source 18090/80606=22.44%, B359 7352/44060=16.69% (descriptive, script differences prevent universal numeric gate).",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_100.png"
+        },
+        "readability": {
+          "result": "HOLD_HIERARCHY",
+          "observation": "Hangul is legible on 50% black and gray but source headline hierarchy, glyph counters/italics not equivalent; legibility alone not C PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_BLACK_50.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "Observed native B359 trial specific BEST TIME Korean contours intact at readable 100/75/50; no obvious broken Hangul; no claim all atlas cells passed.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_B359_GRAY_BESTTIME_NATIVE.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact independently saved OFFICIAL-to-B359 pixel differences 92937 RGBA / 60437 alpha in worker ROI [2090,337,3120,485]; outside 0/0. English SOURCE-to-CLEAN outside original text box zero. Other localized cells carry prior content; no independent in-game composition.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_OFFICIAL_TRIAL_RGBA_CHANGED_MASK.png"
+        },
+        "placement": {
+          "result": "HOLD_SOURCE_FAMILY",
+          "observation": "B359 saved alpha>32 bbox [2222,341,3023,471] contained in original source high-alpha bbox [2180,340,3027,473], all margins positive; source-leading-lineup optical hierarchy and adjacent HUD projection unverified.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_100.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Independent 4096x2048 one mip RGBA32 full DDS with channel masks [255,65280,16711680,4278190080]; RAW mirror-Y and readable FLIP-Y separately rendered. No invented runtime PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_B359_RAW_ROI.png"
+        }
+      },
+      "views": {
+        "native": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_100.png",
+        "gray_75": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_75.png",
+        "practical_50": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_GRAY_50.png",
+        "black": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_BLACK_100.png",
+        "white": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_FIVEWAY_WHITE_100.png",
+        "raw": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_B359_RAW_ROI.png",
+        "flip_y": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_B359_FLIPY_ROI.png"
+      }
+    }
+  },
+  "required_fix": "Independent multiglyph paired English-Hangul typography samples and manual source-conditioned orange face / navysidewall depth / stroke rhythm reconstruction; do not duplicate B353 gradient or B359 unqualified same-method renderer. Revalidate exact full source-CLEAN-FINAL and IGR044 game route.",
+  "official_queue_status_kept": "c342_c2_rework_required_native_best_time_orange_overlap",
+  "new_DDS_promoted": 0,
+  "C2_PASS": 0,
+  "C3": "NOT_RUN_BLOCKED",
+  "current_approval": "NONE",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub SSOT + N100 MCP minimal fallback actual saved DDS binary inspection",
+  "forbidden": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "C1_ODD",
+    "UNINDEXED_SPECIAL"
+  ]
+}

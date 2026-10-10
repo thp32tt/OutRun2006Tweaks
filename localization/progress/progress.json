@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T21:42:00+09:00",
+  "updated_at_kst": "2026-10-10T21:59:16+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11640,5 +11640,18 @@
       "DX11",
       "DXVK"
     ]
+  },
+  "c2_q060_b359_source_family_20261010": {
+    "timestamp_kst": "2026-10-10T21:59:16+09:00",
+    "run_key": "OUTRUN-KOR-C2-Q060-B359-NEW-SHA-INDEPENDENT-SOURCE-FAMILY-20261010-2150",
+    "role": "C2",
+    "queue_index": 60,
+    "shard": "EVEN",
+    "candidate_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+    "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "result": "REWORK_REQUIRED_UNPROMOTED_B359_SOURCE_FAMILY_OPTICAL_HIERARCHY",
+    "qa": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_CONTROLLER_INDEPENDENT_REWORK.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "IGR044": "OPEN"
   }
 }
