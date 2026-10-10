@@ -1138,16 +1138,32 @@ def queue_dynamic_prefix() -> str:
         ]
     if lane in {"DX11", "DX9EX"}:
         lines += [
-            "BATCH_COMPILE_POLICY=GROUPED: 작은 소스 수정마다 전체 컴파일·Win32/WARP·호스트/게임 CI를 돌리지 마. "
-            "같은 TASK_ID/work_key/소유 코드의 관련된 2~5개 수정(또는 완성 가능한 한 기능)을 약 20분 이내 한 배치로 묶어. "
-            "중간 수정은 문법/국소 정적·단위 검사만 필요시 시행하고, 최종 material commit 한 번에 필수 exact-SHA GitHub Actions 전체 검증을 수행해. "
-            "실패 시 필요한 부분만 고친 새 SHA에 대해 Gate를 다시 실행하며 ABI·hook·메모리 위험은 조기 검증할 수 있다.",
-            "5분 컨트롤러 GitHub 체크포인트와 30분 대화 롤오버를 유지하되 게임 브랜치에 미완성 소스를 한 줄씩 push하지 마. "
-            "미완성 변경이 롤오버로 소실될 위험이 있다면 TASK_ID 전용 GitHub 임시 브랜치에 보존하고 "
-            "재개 시 HEAD/owner/work_key를 확인해 최종 배치 커밋에 통합해. "
-            "임시 브랜치는 final material [AUTO:TASK_ID] 및 완료 판정이 아니다. "
-            "최종 결과는 exact-SHA 필수 CI PASS 이후에만 PASS, 실기 미검증은 RUNTIME_VALIDATION=UNTESTED다.",
+            "FEATURE_BASED_DEVELOPMENT=ON: 작은 패치 개수/20분 종료 규칙은 폐기. "
+            "기능 하나(1~3시간 이상 가능)를 C0 조사→C1 구현 범위 확정→C2 전체 경로 구현→경량 국소검사→"
+            "FEATURE_READY→최종 exact-SHA Gate→C6로 완성해. 기능이 안 끝났으면 시간 경과·작은 커밋 때문에 종료하지 마.",
+            "중간 변경은 5분 전후 컨트롤러 브랜치 TASK_ID별 source patch와 진도 체크포인트로 저장하고, FEATURE_BRANCH에는 완료한 기능을 한 번에 결합해. "
+            "TARGET_BRANCH에는 새 구현을 미리 올리지 말고, 기능 수용 기준을 모두 충족한 후에만 "
+            "컨트롤러의 원자적 fast-forward 프로모션을 허용한다. "
+            "완성 전의 feature branch push 자체를 피하고 문법/경량 정적·"
+            "필요한 targeted test만 실행해. 위험한 훅/ABI 결함의 조기 검증은 예외.",
+            "기능 구현 완료 시 checkpoint source patch를 FEATURE_BRANCH에 모두 결합하고, 그 브랜치 docs/automation/runs/TASK_ID.json에 "
+            "feature_id, feature_branch, feature_status=FEATURE_READY, work_key, target_branch, "
+            "feature_acceptance={implementation_complete:true,targeted_checks:[...],integration_contract:'...'} "
+            "필드를 기록하고 FEATURE_BRANCH 최신 최종 material commit 메시지에 [AUTO:TASK_ID]를 붙여. "
+            "후속 대상 브랜치 게시와 전체 CI는 컨트롤러가 한다. Gate가 PASS일 때만 C6 최종 결과를 "
+            "별도 기록하고 HMD 미검증은 RUNTIME_VALIDATION=UNTESTED로 유지.",
+            "30분 대화 롤오버와 retry는 동일 FEATURE_ID/FEATURE_BRANCH/원래 TASK_ID 및 controller-source-checkpoint로 "
+            "실제 진행 중인 구현 단계를 이어받는다. FEATURE_READY 이전에 개발 완료라고 보고하지 마.",
         ]
+        feature_branch = str(runtime.get("queue_feature_branch") or "")
+        feature_id = str(runtime.get("queue_feature_id") or "")
+        if feature_branch:
+            lines += [
+                "FEATURE_ID=" + feature_id,
+                "FEATURE_BRANCH=" + feature_branch,
+                "FEATURE_MODE=IMPLEMENT_ON_FEATURE_BRANCH_ONLY",
+                "FEATURE_FINAL_PROMOTION=CONTROLLER_FAST_FORWARD_AFTER_READY",
+            ]
     if lane.startswith("LOCALIZATION_"):
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
@@ -1485,6 +1501,3 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
-
-
-
