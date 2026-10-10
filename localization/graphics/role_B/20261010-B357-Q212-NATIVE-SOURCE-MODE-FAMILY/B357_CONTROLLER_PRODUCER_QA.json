@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B357",
+  "queue_index": 212,
+  "run_key": "OUTRUN-KOR-B357-Q212-P1-MODE-HEADINGS-NATIVE-SOURCE-20261010-2000",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "full_atlas_clean_reference_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "official_candidate_sha256_unchanged": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "trial_saved_dds_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+  "execution_backend": "GITHUB_ACTIONS_REQUIRED_LOCAL_CANNOT_MATERIALIZE_EXACT_RAW_GITHUB_ASSETS",
+  "worker_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38045904085",
+  "qa_source": "Human visual review of SHA-pinned actual B357 stored lossless PNGs, not inferred solely from numeric masks",
+  "producer_decision": "SCOPED_VISUAL_IMPROVEMENT_HOLD_SEMANTIC_AND_INDEPENDENT_C2",
+  "dds_promotion": 0,
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "user_IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "machine": {
+    "native": [
+      2048,
+      2048
+    ],
+    "codec": "RGBA32",
+    "mip_count": 1,
+    "orientation": "raw_y_mirror",
+    "changed_pixels": 12899,
+    "outside_two_source_rois": 0,
+    "persisted_decode_mismatch": 0,
+    "other_ten_current_regions_byte_exact": true
+  },
+  "source_clean": {
+    "source_SHA_pinned": true,
+    "two_target_English_text_rois_transparent_alpha_zero": true,
+    "full_C158_clean_SHA_reference_pinned_not_equated_to_worker_partial_plate": true
+  },
+  "region_observations": [
+    {
+      "region": "43_PROFESSIONAL",
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_width": 395,
+      "korean": "프로페셔널 모드",
+      "native_font_px": 43,
+      "new_bbox": [
+        243,
+        342,
+        527,
+        384
+      ],
+      "new_width": 284,
+      "source_width_ratio": 0.719,
+      "source_height": 45,
+      "new_height": 42,
+      "positive_source_margin": [
+        3,
+        110,
+        1,
+        2
+      ],
+      "visual": "SOURCE/CLEAN/OFFICIAL/B357 native100 gray and black50 read left source anchor, intact Hangul strokes and preserved orange. Wider than previously rejected B347 205px; still only 71.9% of original opaque title span, so source hierarchy calibration and semantic word expansion HOLD. No producer full PASS."
+    },
+    {
+      "region": "44_OUTRUN",
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "source_width": 209,
+      "korean": "아웃런 모드",
+      "native_font_px": 42,
+      "new_bbox": [
+        1629,
+        526,
+        1829,
+        567
+      ],
+      "new_width": 200,
+      "source_width_ratio": 0.9569,
+      "source_height": 45,
+      "new_height": 41,
+      "positive_source_margin": [
+        3,
+        8,
+        2,
+        2
+      ],
+      "visual": "Native100 gray, white75, gray50 and RAW100 directly inspected; source-relative width improves to 95.7% from B356 54.1%, all letters intact and within source. Korean semantic mode qualifier unapproved until translation/C2 confirms, no user game."
+    }
+  ],
+  "fresh_visual_files": [
+    "B357_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B357_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_BLACK_50.png",
+    "B357_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "B357_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "B357_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_WHITE_75.png",
+    "B357_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png"
+  ],
+  "limitations": [
+    "Two labels only, not whole twelve-region atlas signed off",
+    "Unapproved expanded Korean mode names require source context/translation independent review",
+    "No independently blinded C2 controls or approved pixel guard manifest, so cannot publish to official hd_candidates",
+    "No actual game screenshot with this trial asset loaded"
+  ],
+  "next_action": "C2 scoped independent q212 B357 native source/CLEAN/FINAL RAW+FLIPY, evaluate semantic expansion and source-family width/slant; if satisfactory qualify representative region and prepare full production pixel manifest before any official DDS promotion. Otherwise manual contour/mode-title reconstruction; no duplicate B356/B357 byte completion.",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
