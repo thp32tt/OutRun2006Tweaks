@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "run": "A226",
+  "role": "A",
+  "queue_index": 101,
+  "run_key": "OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800",
+  "reviewed_at_kst": "2026-10-10 18:12 KST",
+  "role_scope": "one C1-returned warning region only",
+  "source": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "original_english": "Every player must participate at the same time to play this mode.",
+    "region": [
+      3002,
+      25,
+      3932,
+      168
+    ],
+    "source_line_bboxes": [
+      [
+        3002,
+        25,
+        3729,
+        92
+      ],
+      [
+        3062,
+        92,
+        3931,
+        168
+      ]
+    ]
+  },
+  "previous": {
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "independently_c1_rejected_trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+    "reason_codes": [
+      "INCOMPLETE_CLEAN_PLATE",
+      "SOURCE_RESIDUE_LEFT_OF_KOREAN_WARNING"
+    ],
+    "exact_residue_pixels": 45,
+    "residue_readable_x": [
+      3002,
+      3006
+    ],
+    "icon_protected_blank_gap_x": [
+      3000,
+      3002
+    ]
+  },
+  "material": {
+    "trial_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "trial_path": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_Q101_REMNANT45_CANONICAL_UNPROMOTED.dds",
+    "output_format": "4096x4096 RGBA32 mip1 RAW mirror_y",
+    "canonical_text": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+    "line_text": [
+      "이 모드를 플레이하려면 모든",
+      "플레이어가 동시에 참가해야 합니다."
+    ],
+    "canonical_concatenation_verified": true,
+    "source_first_clean_remnant_repaired": true,
+    "remnant_alpha_pixels_source": 45,
+    "remnant_alpha_pixels_clean": 0,
+    "icon_gap_source_alpha0": true,
+    "old_candidate_unchanged": true,
+    "ppem": 57,
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "font_license": "SIL Open Font License",
+    "font_coverage": true,
+    "readable_right_slant_ratio_assumed": 0.32,
+    "readable_source_glyph_slant_anchors_measured": false,
+    "face_rgb": [
+      247,
+      186,
+      24
+    ],
+    "outline_rgb": [
+      0,
+      10,
+      57
+    ],
+    "new_korean_bboxes": [
+      [
+        3028,
+        27,
+        3703,
+        90
+      ],
+      [
+        3074,
+        98,
+        3919,
+        161
+      ]
+    ],
+    "source_size_line_ceiling": true,
+    "persisted_redecoded_exact": true,
+    "modified_rgba_vs_official": 121345,
+    "modified_alpha_vs_official": 65934,
+    "modified_outside_source_bbox_rgba": 0,
+    "protected_icon_numbers_preserved_vs_official": true,
+    "new_dds": 1,
+    "official_promoted_dds": 0
+  },
+  "worker": {
+    "run_id": 38040234772,
+    "conclusion": "SUCCESS",
+    "rerun_initial_failures_are_not_results": [
+      38040094575,
+      38040120927
+    ]
+  },
+  "views_inspected": [
+    "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_COMPARE_GRAY_100.png",
+    "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_COMPARE_BLACK_50.png",
+    "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_FINAL_RAW_NATIVE_RGBA.png"
+  ],
+  "producer_visual": {
+    "source_vs_clean": "TARGETED_45_PX_REMNANT_CLEANED; warning source text absent on alpha0 clean, warning icon unchanged by old->new",
+    "clean_vs_final": "No visible foreign background rectangle or overlap in scoped source CLEAN/FINAL; text only rendered within original warning row bboxes",
+    "source_vs_final": "Korean right italic has correct readable direction, yellow face navy outline and strong readable 50pct; optical stroke and source-specific per-stem italic calibration still pending",
+    "protected": "No differences outside x3002..3932,y25..168 relative official; no icon collision in native contact; original-vs-final full-atlas protected mask not independently reviewed",
+    "raw_flip_y": "RAW inverted exactly as source, saved readable mirrored to display",
+    "semantic": "Approved original warning meaning and same canonical Korean sentence restored without new wording"
+  },
+  "ordered_visual_checks": {
+    "plate": "SCOPED_PASS_REMNANT45_FIXED",
+    "lean": "HOLD_UNCALIBRATED_HOMOLOGOUS_ANCHORS",
+    "font": "HOLD_C1_SOURCE_FAMILY_VERDICT",
+    "scale": "PASS_SOURCE_ROW_BBOX_CEILING_POSITIVE_MARGINS",
+    "stroke": "SCOPED_NO_CLIPPING_NATIVE_AND_50",
+    "protected": "SCOPED_ZERO_OUTSIDE_ORIGINAL_REGION",
+    "readable": "SCOPED_PASS_NATIVE_AND_50",
+    "raw": "PASS_EXPECTED_MIRROR_Y"
+  },
+  "first_unproven_consumer": "Independent C1 family-slant/source-protected-plate calibration and current-byte full atlas; runtime load/compose/user acceptance untested",
+  "producer_decision": "SCOPED_MATERIAL_REPAIR_PROVED_HOLD_STRICT_RECHECK",
+  "independent_C1": "NOT_RUN_ON_A226_SHA",
+  "C3": "BLOCKED",
+  "approval": false,
+  "user_ingame": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclude": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

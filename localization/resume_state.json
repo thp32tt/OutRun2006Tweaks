@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A226 q101 2026-10-10 18:12 KST NEW physically persisted 4096x4096 unpromoted DDS ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06 worker #38040234772 SUCCESS; newly repaired C1 45-pixel original residue by x3002..3005, protected x3000..3001 blank, canonical translated warning restored; saved SOURCE/CLEAN/A38/A226 gray100 black50 RAW firsthand scoped PASS, protected outside0; producer HOLD_STRICT_RECHECK source glyph slant anchor & full mask, official still REWORK, C1/C3/game UNTESTED. localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800.",
     "B352/B353 q060 2026-10-10 17:43 KST: two distinct saved unapproved DDS with visual FAIL on native/50% source-family weight and racing-italic depth; official C342 REWORK unchanged; IGR044 OPEN; no further same-method trial; manual vector/source contour and homologous slant needed. RUNTIME_VALIDATION=UNTESTED.",
     "C368 C2 2026-10-10 17:27:07 KST q214 NEW independently source-authenticated SHA source 9a2e428bdb87 CLEAN 5beb411d1692, original→CLEAN 3210 inside source START/GOAL, 0 outside, preserved alpha; B339 same trial SHA d273a208d521 GOAL visually REWORK, no re-completion, C3/game UNTESTED. localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
     "C1 2026-10-10 17:22 KST q231 ODD same official A194 SHA 7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76 NEW independent 4-region source CLEAN persist decode full alpha/pixel gate: SHA original 29b87a5c8a... CLEAN 1e1c5f54... SOURCE->CLEAN 121288, CLEAN->FINAL 90590, SOURCE->FINAL 140523; all RGBA/alpha outside 0, protected LAN retained. 26 SHA-bound lossless PNG and machine JSON; C1 HOLD no blind calibration/slant family anchors/C3/actual user game; no DDS or approval. QA localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_INDEPENDENT_PIPELINE_HOLD.json RUN_KEY=OUTRUN-KOR-C1-Q231-A194-INDEPENDENT-4REGION-BGRA-CLEAN-20261010-1722",
@@ -15254,5 +15255,25 @@
     "report": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json",
     "runtime_validation": "UNTESTED",
     "dds_produced": 0
+  },
+  "a226_q101_residue45_canonical_trial": {
+    "run_key": "OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800",
+    "role": "A",
+    "index": 101,
+    "trial_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "new_unpromoted_dds": 1,
+    "new_promoted_dds": 0,
+    "worker_run": 38040234772,
+    "material_diff_rgba": 121345,
+    "outside_original_effect_rgba": 0,
+    "source_remnant_removed_pixels": 45,
+    "source_gap_protected": true,
+    "canonical_text_restored": true,
+    "QA": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json",
+    "status": "SCOPED_MATERIAL_REPAIR_PROVED_HOLD_STRICT_RECHECK",
+    "independent_C1": "PENDING",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

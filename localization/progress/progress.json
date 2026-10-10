@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 17:43:00 KST",
+  "updated_at_kst": "2026-10-10 18:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -240,13 +240,15 @@
         "runtime_validation": "UNTESTED"
       },
       "latest_a_q101": {
-        "run": "A225",
+        "run": "A226",
         "index": 101,
-        "trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
-        "created_dds": 1,
+        "real_new_trial_dds": 1,
+        "trial_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
         "promoted_dds": 0,
-        "status": "HOLD_STRICT_RECHECK_SCOPED_VISUAL_IMPROVEMENT_NOT_APPROVED",
-        "source_family_rework": true,
+        "C1": "PENDING",
+        "protected_region_outside_delta": 0,
+        "status": "SCOPED_MATERIAL_REPAIR_PROVED_HOLD_STRICT_RECHECK",
+        "qa_path": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json",
         "RUNTIME_VALIDATION": "UNTESTED"
       },
       "latest_c1_q101_trial_rework": {
@@ -11235,5 +11237,27 @@
     "report": "localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json",
     "dds_produced": 0,
     "runtime_validation": "UNTESTED"
+  },
+  "a226_q101_residue45_canonical_trial": {
+    "run_key": "OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800",
+    "role": "A",
+    "index": 101,
+    "trial_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "new_unpromoted_dds": 1,
+    "new_promoted_dds": 0,
+    "worker_run": 38040234772,
+    "material_diff_rgba": 121345,
+    "outside_original_effect_rgba": 0,
+    "source_remnant_removed_pixels": 45,
+    "source_gap_protected": true,
+    "canonical_text_restored": true,
+    "QA": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json",
+    "status": "SCOPED_MATERIAL_REPAIR_PROVED_HOLD_STRICT_RECHECK",
+    "independent_C1": "PENDING",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa_status": "SCOPED_SOURCE_RESIDUE_REPAIR_HOLD",
+    "producer_firsthand_inspection": true
   }
 }

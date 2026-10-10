@@ -1,0 +1,140 @@
+{
+  "schema": "source-family-recipe-v1",
+  "run": "A226",
+  "queue_index": 101,
+  "source": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "original_english": "Every player must participate at the same time to play this mode.",
+    "region": [
+      3002,
+      25,
+      3932,
+      168
+    ],
+    "source_line_bboxes": [
+      [
+        3002,
+        25,
+        3729,
+        92
+      ],
+      [
+        3062,
+        92,
+        3931,
+        168
+      ]
+    ]
+  },
+  "canonical_korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+  "lines": [
+    "이 모드를 플레이하려면 모든",
+    "플레이어가 동시에 참가해야 합니다."
+  ],
+  "exact_old_sha": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "rejected_a225_sha": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+  "new_sha": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+  "new_dds_path": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_Q101_REMNANT45_CANONICAL_UNPROMOTED.dds",
+  "source_pixel_repair": {
+    "reason": "C1 source remnant 45px located immediately left of x3006 warning bound",
+    "source_alpha_pixels": 45,
+    "source_and_official_equal": true,
+    "rect_readable": [
+      3002,
+      25,
+      3932,
+      168
+    ],
+    "protected_gap_readable": [
+      3000,
+      25,
+      3002,
+      110
+    ],
+    "protected_gap_alpha0": true,
+    "clean_alpha0": true
+  },
+  "font": {
+    "family": "Noto Sans CJK KR Bold",
+    "face_index": 1,
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "ppem": 57,
+    "coverage": true,
+    "license": "SIL Open Font License"
+  },
+  "color": {
+    "face": [
+      247,
+      186,
+      24
+    ],
+    "outline": [
+      0,
+      10,
+      57
+    ]
+  },
+  "glyph_effect": {
+    "slant_readable_right_ratio": 0.32,
+    "source_homologous_anchor_evidence": "NOT_MEASURED",
+    "native_antialias": "Pillow FreeType+affine BICUBIC; no prior Korean raster upscaling"
+  },
+  "source_line_bboxes": [
+    [
+      3002,
+      25,
+      3729,
+      92
+    ],
+    [
+      3062,
+      92,
+      3931,
+      168
+    ]
+  ],
+  "final_line_bboxes": [
+    [
+      3028,
+      27,
+      3703,
+      90
+    ],
+    [
+      3074,
+      98,
+      3919,
+      161
+    ]
+  ],
+  "readable_storage": "FLIP-Y display; DDS RAW mirrored-Y",
+  "format": "4096x4096 RGBA32 mip1 RAW mirror_y",
+  "pixel_preservation": {
+    "official_persisted_unchanged": true,
+    "changed_vs_official": 121345,
+    "outside_effect_bbox_rgba": 0,
+    "decoded_equal_saved": true,
+    "full_source_protected_mask_calibration": "PENDING"
+  },
+  "consumer": {
+    "resource": "spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+    "runtime_lookup": "UNTESTED",
+    "actual_game": "UNTESTED"
+  },
+  "qa": {
+    "producer": "SCOPED_REMNANT_FIXED_HOLD_SOURCE_FAMILY",
+    "C1": "PENDING_NEW_SHA",
+    "C3": "BLOCKED",
+    "game": "UNTESTED"
+  },
+  "worker_run": 38040234772,
+  "script": "tools/localization/cpu_jobs/A.py",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
