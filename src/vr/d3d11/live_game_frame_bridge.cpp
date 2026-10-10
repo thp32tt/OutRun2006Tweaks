@@ -137,6 +137,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
     // proceeds exclusively through DX9Ex. No visual parity claim for others.
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
     DWORD fog=TRUE, scissor=TRUE;
+    DWORD colorMask=0, cullMode=0, fillMode=0;
+    // A D3D11 solid, no-cull diagnostic triangle must not produce pixels
+    // which the original D3D9 color-write mask, cull or fill state discards.
+    // Keep this first native slice conservative instead of falsely reporting
+    // game-visible parity. Unsupported states retain the original DX9Ex draw.
     // The native diffuse shader does not implement D3D9 fog or scissor
     // clipping. Reject those states rather than showing a false color match.
     if (FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
@@ -146,7 +151,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
         FAILED(game->GetRenderState(D3DRS_CLIPPING, &clip)) ||
         FAILED(game->GetRenderState(D3DRS_FOGENABLE, &fog)) ||
         FAILED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)) ||
-        blend || alpha || stencil || depth || !clip || fog || scissor)
+        FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
+        FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
+        FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
+        blend || alpha || stencil || depth || !clip || fog || scissor ||
+        colorMask != (D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+                      D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA) ||
+        cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
     DWORD op=0, arg=0, nextColorOp=0;
     // A later fixed-function texture stage can still change the result even

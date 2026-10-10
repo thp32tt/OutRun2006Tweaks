@@ -127,6 +127,43 @@ def main() -> None:
             "untranslated game-state negative control missed: " + bad
         )
 
+    # An offscreen game triangle, a masked target, or wireframe source
+    # must not be counted as a D3D9-equivalent D3D11 colored frame.
+    # Fail closed: keep the original D3D9 draw and input path intact.
+    def exact_raster_output_gate(code: str) -> bool:
+        start = code.find("bool supported_game_state(")
+        end = code.find("bool translate_vertices(", start)
+        if start < 0 or end <= start:
+            return False
+        section = code[start:end]
+        return all(token in section for token in (
+            "GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)",
+            "GetRenderState(D3DRS_CULLMODE, &cullMode)",
+            "GetRenderState(D3DRS_FILLMODE, &fillMode)",
+            "colorMask != (D3DCOLORWRITEENABLE_RED |",
+            "D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA)",
+            "cullMode != D3DCULL_NONE",
+            "fillMode != D3DFILL_SOLID",
+        ))
+
+    assert exact_raster_output_gate(bridge)
+    for original, mutated in (
+        ("GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)",
+         "GetRenderState(D3DRS_COLORWRITEENABLE, &cullMode)"),
+        ("GetRenderState(D3DRS_CULLMODE, &cullMode)",
+         "GetRenderState(D3DRS_CULLMODE, &fillMode)"),
+        ("GetRenderState(D3DRS_FILLMODE, &fillMode)",
+         "GetRenderState(D3DRS_FILLMODE, &colorMask)"),
+        ("colorMask != (D3DCOLORWRITEENABLE_RED |",
+         "colorMask == (D3DCOLORWRITEENABLE_RED |"),
+        ("cullMode != D3DCULL_NONE", "cullMode == D3DCULL_NONE"),
+        ("fillMode != D3DFILL_SOLID", "fillMode == D3DFILL_SOLID"),
+    ):
+        bad = bridge.replace(original, mutated, 1)
+        assert bad != bridge and not exact_raster_output_gate(bad), (
+            "untranslated native raster/output state was not rejected: " + original
+        )
+
     # A static guard plus a deterministic negative mutation for sampling.
     # It is not GPU/Quest3 evidence. Each frame is still limited to one
     # native submit but cannot permanently pick only the first eligible Draw.
