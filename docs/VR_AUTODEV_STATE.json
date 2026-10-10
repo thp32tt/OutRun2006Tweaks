@@ -4,16 +4,15 @@
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R84 selective CMake/translation-unit structural convergence; DX9Ex current-focus baseline protected; remaining HMD visual issues separately open",
+  "phase": "DX9Ex C ACTIVE P0-P3 alongside first-priority DX11 Native A; R84 P1 only; HMD runtime acceptance distinct",
   "checkpoint": "R84_PORT_SEAMS_PENDING",
   "policy": {
-    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host on vr-d3d9ex-focus; EXCLUSIVE CURRENT PHASE is P0 visual-composition convergence after 00519 HMD failure.",
+    "primaryBackend": "DX9Ex C ACTIVE parallel to first-priority DX11 A; DXVK B FROZEN. C priority P0 FFB -> P1 R84 -> P2 XR per-eye -> P3 native 120fps.",
     "blockedBackends": [
-      "DX11_NATIVE_DOWNSTREAM_PORT",
-      "DXVK_DOWNSTREAM_PORT",
+      "DXVK_B_NEW_DEVELOPMENT_BUILD_RELEASE_PROMOTION",
       "DX12_D3D9ON12_REFERENCE_ONLY"
     ],
-    "blockedBackendAction": "Keep DX11 Native and DXVK frozen during DX9Ex stabilization and the Architecture v3 live migration. After ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 handoff, port the proven common contract downstream. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
+    "blockedBackendAction": "DXVK B frozen until explicit later user authorization. DX11 Native A independently active and not gated by DX9Ex HMD/R84/Architecture-v3.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
     "runtimeTesting": "HMD runtime only for hardware-visible acceptance; F11 user reports normal on 2026-10-09 but exact tested material SHA not provided. Remaining visual regressions and structural code changes remain RUNTIME_VALIDATION=UNTESTED until exact-build evidence.",
@@ -39,8 +38,8 @@
       "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
       "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
       "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
-      "defaultSourceBuilds": "DX9Ex active game DLL + x64 OpenXR host and deterministic smoke/package gates. Downstream backend builds are deferred in this stabilization project.",
-      "comparisonMatrix": "Use exact-SHA DX9Ex correctness/performance evidence first. Carry proven fixes to DX11/DXVK only after the stable DX9Ex reference is established."
+      "defaultSourceBuilds": "DX9Ex C exact-SHA CI here, independent DX11 A exact-SHA CI on own branch. DXVK B frozen.",
+      "comparisonMatrix": "Do not gate independent DX11 Native A source development on DX9Ex runtime baseline or Architecture v3; preserve per-lane CI/HMD acceptance."
     },
     "userRuntimeBaseline": {
       "sourceOfTruth": "docs/VR_REGRESSION_KNOWLEDGE.json::userRuntimeVerifiedBaseline",
@@ -72,9 +71,9 @@
       "runtimeRegressionLedgerIssue": 13
     },
     "parallelBackendDevelopment": {
-      "enabled": false,
+      "enabled": true,
       "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-      "reason": "User direction 2026-09-30: stabilize DX9Ex first, then port the proven result to DX11 Native and DXVK.",
+      "reason": "2026-10-10 user override: A DX11 highest priority, C DX9Ex concurrent with 50% effort target, B DXVK frozen",
       "activeUserVisibleTracks": [
         "DX9Ex HUD semantic lifetime and visual correctness",
         "DX9Ex lens flare / smoke / skid effect correctness",
@@ -83,7 +82,15 @@
       ],
       "productionIntegrationWip": 1,
       "maxParallelHmdExperimentSlots": 6,
-      "nonBlockingRule": "DX9Ex HUD/visual/performance/stability lanes may proceed independently before the HMD baseline gate. Architecture v3 becomes the next active phase only through ARCH-V3-GATE-001. Downstream DX11/DXVK/DX12 work must not displace either phase."
+      "nonBlockingRule": "A/C independent branches and claims; hardware-only HMD gates affect acceptance, not separate source implementation; DXVK B frozen.",
+      "activeLanes": [
+        "DX11_A",
+        "DX9EX_C"
+      ],
+      "frozenLanes": [
+        "DXVK_B"
+      ],
+      "dx9exEffortTargetPercent": 50
     },
     "pcFastBuild": {
       "defaultMode": "INCREMENTAL",
@@ -134,7 +141,7 @@
       "currentStatus": "WAITING_FOR_R84_PRODUCTION_CONVERGENCE_THEN_HMD_GATE",
       "currentAuthority": "IPC v2 live; IPC v3 test/shadow only until gate opens",
       "autoTransitionRule": "After an exact Quest3/VDXR DX9Ex baseline is accepted and blocking P0 lifecycle/resource/reset/recenter/direct-transport regressions are cleared, promote ARCH-V3-001 to READY and execute the sequence in order. Do not manufacture filler if only HMD-gated work remains.",
-      "downstreamRule": "Keep DX11 Native and DXVK frozen until ARCH-V3-007 is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff.",
+      "downstreamRule": "DX9Ex Architecture v3 HMD acceptance gates only DX9Ex live IPC migration/handoff; DX11 Native A independently ACTIVE; DXVK B frozen until explicit user decision.",
       "precondition": "DX9EX-R84-CONVERGENCE-CLOSEOUT-001 DONE before ARCH-V3-GATE-001 may advance live migration."
     },
     "r84ProductionConvergence": {
@@ -163,6 +170,38 @@
       "inventoryStatus": "DONE",
       "gate0ValidationSha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
       "inventoryValidationSha": "4df538077584ed56c43ff5af0c89ca0c1257674e"
+    },
+    "executionAuthority": {
+      "effective": "2026-10-10",
+      "priorityDocument": "docs/DX9EX_AUTODEV_PRIORITY_20261010.md",
+      "roles": {
+        "A": {
+          "backend": "DX11_NATIVE",
+          "branch": "vr-dx11-native-r71",
+          "status": "ACTIVE",
+          "globalPriority": 0
+        },
+        "C": {
+          "backend": "DX9EX",
+          "branch": "vr-d3d9ex-focus",
+          "status": "ACTIVE",
+          "effortTargetPercent": 50
+        },
+        "B": {
+          "backend": "DXVK",
+          "branch": "vr-dxvk-r71-disasm",
+          "status": "FROZEN"
+        }
+      },
+      "dx9exPriority": [
+        "P0_FFB_V0_2_INTEGRATION",
+        "P1_R84_STRUCTURAL",
+        "P2_XR_PER_EYE_RESOLUTION",
+        "P3_NATIVE_120FPS"
+      ],
+      "protectedBaseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+      "hmdScope": "DX9EX_RUNTIME_ACCEPTANCE_NOT_DX11_SOURCE_GATE",
+      "autoThawDxvk": false
     }
   },
   "runtimeEvidence": {
@@ -186,7 +225,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "R84 Gate0 and inventory are already green/durable. Finish only remaining bounded R32/R31, R31/R30 and CMake textual TU ownership seams with one exact-SHA Win32 Active Validation and Domain Isolation per material change; do not repeat Gate0/inventory or port donor policy. Complete cleanup and closeout only after actual CI. Preserve user-reported F11 normal and protect the rest of the HMD baseline.",
+  "nextAction": "C strict P0 FFB release integration -> P1 R84/refactor -> P2 automatic OpenXR per-eye extent -> P3 native 120FPS; HMD-only blockage does not suspend independent source work; A DX11 concurrent, B frozen.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -363,11 +402,11 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "A_00": "Hourly :00 DX9Ex architecture/state/lifetime/OpenXR/synchronization review; downstream DX11/DXVK porting is deferred until the stable DX9Ex reference is accepted.",
+    "A_00": "HISTORICAL hourly DX9Ex architecture review; not current Docker A/C dispatch. DX11 A independently ACTIVE.",
     "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
     "B_20": "Hourly :20 DX9Ex rendering/stereo/visual/performance/frame-pacing review, including dense-scene and effect-load spikes while protecting the runtime baseline.",
-    "C_35": "Hourly :35 post-fix/change-sanity/dedup/validation-prep for DX9Ex correctness/performance candidates only; downstream backend candidates are deferred.",
-    "D_45": "Hourly :45 sole DX9Ex production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker. Optimize only from deterministic or Quest3/VDXR evidence; keep downstream ports deferred.",
+    "C_35": "HISTORICAL DX9Ex C post-review schedule; current C source development ACTIVE alongside DX11 A.",
+    "D_45": "HISTORICAL sole-DX9Ex production schedule; A/C parallel is current authority, controller deployment separate.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
@@ -378,7 +417,7 @@
     "baselineLock": true,
     "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
     "chatSchedulesAuthoritative": false,
-    "currentProductionPlan": "docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md"
+    "currentProductionPlan": "docs/DX9EX_AUTODEV_PRIORITY_20261010.md"
   },
   "policyVerification": {
     "lightweightWorkflow": "VR Test Policy",
@@ -581,10 +620,9 @@
       "implementer": "D isolated candidate",
       "priority": "P1",
       "scope": [
-        "DXVK",
-        "DX12/D3D9On12"
+        "DX11_NATIVE_A_INDEPENDENT_ACTIVE"
       ],
-      "guard": "Isolated backend candidates only until parity gate passes."
+      "guard": "DX11 A operates on separate branch; DXVK B frozen; DX12 reference-only."
     },
     "performance": {
       "ownerLens": "B/C",
@@ -716,10 +754,10 @@
     "pcRunnerUsed": false
   },
   "p0VisualComposition": {
-    "status": "ACTIVE_NO_HMD_BUILD",
+    "status": "OPTICAL_REGRESSION_GUARDS_OPEN_NO_GLOBAL_SOURCE_FREEZE",
     "triggerSourceSha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
     "triggerResult": "USER_RUNTIME_FAIL",
-    "priority": "P0",
+    "priority": "DX9EX_OPTICAL_SAFETY_NOT_GLOBAL_DISPATCH_FREEZE",
     "evidenceOrder": [
       "emoose upstream hooks",
       "fork R65-R74/R73-era history",
@@ -729,12 +767,8 @@
       "HMD last"
     ],
     "blockedUntilStaticGreen": [
-      "R84 structural convergence",
-      "Architecture v3",
-      "general performance tuning",
-      "DX11",
-      "DXVK",
-      "routine HMD packaging"
+      "DX9EX_HMD_OPTICAL_ACCEPTANCE",
+      "DX9EX_LIVE_IPC_V3_PROMOTION"
     ],
     "requiredAreas": [
       "menu/car-selection textures",

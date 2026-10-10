@@ -1,3 +1,13 @@
+# Effective backend execution policy (2026-10-10; supersedes older cross-lane freezes)
+
+- **A DX11 Native ACTIVE** at `vr-dx11-native-r71`, highest global conversion priority; independent A development MUST NOT wait for DX9Ex visual, R84 or Architecture v3 Quest3 acceptance.
+- **C DX9Ex ACTIVE concurrently** at `vr-d3d9ex-focus`, 50% VR backend engineering-effort target. Strict local order: P0 finalized FFB v0.2 integration -> P1 R84/refactor -> P2 Virtual Desktop High OpenXR-recommended per-eye render targets -> P3 Quest3/RTX4070 native 120FPS (8.33ms; SSW/reprojection excluded). When a stage only awaits HMD/wheel runtime proof, continue another independent implementation without claiming runtime PASS.
+- **B DXVK FROZEN** for new development/build/distribution/promotion until an explicit later user decision. DX12 reference-only. Do not edit FFB upstream or localization from C.
+- **Immutable DX9Ex rollback baseline**: `dx9ex-baseline-20261010` at `fcd18ddd89f6dd40a8246fcf8591f086811149f1`; never mutate or reset.
+- **Policy precedence**: this header, `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`, matching state/queue JSON and the 2026-10-10 controller contract override any 2026-09-29 50/40/10 allocation, 2026-10-07 exclusive visual/R84 freezes, old `DX11 downstream` requirements and legacy schedules below. Historical technical evidence, HMD acceptance gates and regression cases are NOT deleted.
+- **DX9Ex Architecture v3** acceptance gates only DX9Ex live IPC promotion, not separate DX11 A source work. B DXVK does not auto-unfreeze when an XR/HMD/Architecture gate passes.
+- **GitHub actual-state controls**: verify latest remote HEAD, active claim/work_key/file overlap and exact-SHA Actions. No status-only commit that cancels an active CI run; a C0-C6 source result does not prove Quest3/VDXR gameplay. Controller deployment/parallel runtime must be independently checked; documents alone do not prove it.
+
 ## VR integration of finalized FFB — 2026-10-10 (user-authorized exception)
 
 - FFB development is complete. **Do not edit the original FFB release, its dedicated branch, or its source files as a separate development task.** The approved integration target is `vr-d3d9ex-focus` only.
@@ -117,20 +127,20 @@ This policy applies to all AI agents, chats, scheduled automation and retries wo
 
 # P0 visual-composition convergence override — 2026-10-07
 
-This is the newest DX9Ex execution authority and overrides the R84 structural-convergence priority below when they conflict.
+Historical P0 optical regression response, superseded for dispatch by the 2026-10-10 effective policy at file start. Optical evidence and headset acceptance are retained.
 
 - P0 is visual composition before any new HMD candidate. DX9Ex 00519 (9a3e08cc62b6a36a8196936eacead8cc08fcc756) is a user-runtime FAIL: menu/car-selection textures disappeared; HUD/rank/rival/+TIME/menu arrows/YES-NO/lens flare were doubled or head-following; 90 Hz pacing was not met.
 - Do not package or request another routine Quest 3/VDXR test until tools/verify_vr_visual_composition_p0.py and canonical DX9Ex static/build gates pass on the exact candidate SHA.
 - Mandatory evidence order: original emoose/OutRun2006Tweaks hooks -> fork R65-R74/R73-era history -> pinned canonical EXE disassembly/XREF/byte contracts -> current producer/queue/draw ownership -> deterministic static verifier -> HMD last.
 - P0 covers menu/car-selection textures, rank/position/6th/6/+TIME/checkpoint/goal/result HUD, menu arrows/YES-NO, vehicle rank/rival markers including 4th/5th, F11 gameplay overlay, lens flare/SceneEffect, visual shadows, and recenter-visible HUD placement while preserving world stereo.
-- R84 structural convergence, Architecture v3, general performance tuning, DX11/DXVK, and routine HMD packaging are frozen behind this P0 gate.
+- HISTORICAL/INACTIVE GLOBAL FREEZE: the 2026-10-07 DX11+DXVK+R84 pause has been superseded. A DX11 and C DX9Ex are ACTIVE; only DX9Ex optic/IPC promotion remains gated, and B DXVK is independently FROZEN.
 - Generic ScreenOverlay2D, automation PASS, or AUTO_ANALYSIS status=OK are not visual acceptance. Future candidates stay RUNTIME_VALIDATION=UNTESTED until exact-build user HMD evidence.
 
 # OutRun2 VR Development Execution Contract
 
 ## DX9Ex R84 production-convergence override — 2026-10-07
 
-This is the newest DX9Ex execution authority and overrides older backend-allocation/refactor-cycle text when it conflicts.
+Historical R84 development sequence, now a DX9Ex C P1 subtask rather than an exclusive all-backend instruction; 2026-10-10 authority supersedes it.
 
 - **Canonical production/development branch:** `vr-d3d9ex-focus`.
 - **R84 donor/reference branch:** `vr-refactor-r84-2000c-20261001` at recovered donor HEAD `40e998500fc758dd3b078d9df2ecc2a57a19bc5d`. Treat it as read-only design/evidence. Do not continue its cycle counter, merge it wholesale, or develop new runtime behavior there.
@@ -143,7 +153,7 @@ This is the newest DX9Ex execution authority and overrides older backend-allocat
 - Every seam requires a deterministic fail-before/pass-after contract where practical, exact GitHub-hosted compile/link validation, Domain Isolation, and current DX9Ex regression gates before the next seam.
 - Preserve current DX9Ex runtime semantics: Reset/ResetEx, StateBlock, DirectGPU/ACK/fence/slot ownership, HUD/XYZRHW/SkyGlow, recenter, effects, protected world stereo, and fail-closed fallback.
 - `RUNTIME_VALIDATION=UNTESTED` remains mandatory unless the user actually tests the exact build on Quest 3/VDXR.
-- Architecture v3 live migration and downstream DX11/DXVK porting remain downstream of this production-convergence phase and their existing HMD gates.
+- Historical DX9Ex v3 live migration still requires its own hardware gate; independent DX11 Native A development is not gated. DXVK B remains user-frozen.
 - The production automation executor is the external Docker queue controller. ChatGPT schedule IDs/cadence are not execution authority; GitHub HEAD + queue + this contract are.
 
 This file defines the default execution model for substantial work in this repository, especially the OutRun2 VR/OpenXR backends and build matrix.
@@ -284,18 +294,18 @@ Do not rerun a completed batch unless a relevant input changed. Mark only affect
 ## Branch and release safety
 
 - Treat `vr-openxr` as stable unless the user explicitly requests modification/merge.
-- Use `vr-unified-backends` as the primary integration/development branch unless current durable state says otherwise.
+- Current targets explicitly override the historical unified-branch default: DX11 A `vr-dx11-native-r71`, DX9Ex C `vr-d3d9ex-focus`, DXVK B FROZEN.
 - Preserve the five-mode architecture and explicit backend isolation.
 - Record every component SHA used by a package; integration HEAD alone is not package identity.
 - Do not silently substitute fallback backends or fake A-F variants.
 
 ## Backend development priority override — 2026-09-29
 
-Historical allocation policy; superseded for DX9Ex by the 2026-10-10 DX9Ex autonomous development allocation override above.
+HISTORICAL ONLY (not executable): 2026-09-29 50/40/10 allocation was superseded by DX11 A + DX9Ex C ACTIVE and DXVK B FROZEN. Following historical bullets must never select new work.
 
 - **DX11 Native is the primary implementation/performance lane** (nominal engineering allocation about 50%).
-- **DXVK is the secondary implementation/performance lane** (nominal engineering allocation about 40%) and remains isolated until exact-build Quest 3/VDXR evidence is available.
-- **DX9Ex is maintenance/reference only** (normally <=10%). Do not spend autonomous cycles on new DX9Ex performance tuning or feature expansion. Keep it as the protected visual/regression baseline and fallback; change it only for a critical crash/regression, a deterministic baseline verifier, or work strictly required to compare/unblock DX11/DXVK.
+- **Historical inactive DXVK 40% assignment:** B is currently FROZEN and must not automatically resume.
+- **Historical inactive DX9Ex <=10% assignment:** C is currently ACTIVE, 50% engineering-effort target, including P0 FFB, P1 structural, P2 automatic XR resolution and P3 performance.
 - **DX12/D3D9On12 is frozen/reference-only.** Do not autonomously implement, build, package, optimize, or promote it unless the user explicitly reopens that lane.
 - Distribution performance work must target hardware below the development RTX 4070. Do not claim a minimum GPU until measured; prioritize scalable PERFORMANCE/BALANCED/QUALITY profiles, frame-time stability, transport/copy/wait reduction, and 72 Hz viability on lower-tier hardware.
 - Single-pass/multiview remains a later optimization candidate only after graphics, lifecycle, selector and two-pass runtime gates are stable.

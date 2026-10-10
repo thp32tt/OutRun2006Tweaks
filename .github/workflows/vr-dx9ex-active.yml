@@ -52,6 +52,7 @@ on:
       - 'tools/verify_vr_r32_runtime_support_seam.py'
       - 'tools/verify_vr_r31_support_api_seam.py'
       - 'tools/verify_vr_r31_eye_tail_cache.py'
+      - 'tools/verify_vr_policy_alignment.py'
       - 'tools/verify_vr_r31_live_wvp_consistency.py'
       - 'tools/verify_vr_ffb_controller_routing.py'
       - 'tools/verify_vr_ffb_release_ini_contract.py'
@@ -157,6 +158,7 @@ jobs:
             'tools/verify_vr_r32_runtime_support_seam.py',
             'tools/verify_vr_r31_support_api_seam.py',
             'tools/verify_vr_r31_eye_tail_cache.py',
+            'tools/verify_vr_policy_alignment.py',
             'tools/verify_vr_r31_live_wvp_consistency.py',
             'tools/verify_vr_ffb_controller_routing.py',
             'tools/verify_vr_ffb_release_ini_contract.py',

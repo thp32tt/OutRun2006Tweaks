@@ -1,6 +1,12 @@
 # DX9Ex automatic development policy — 2026-10-10
 
-Status: requested activation; controller deployment remains separate.
+Status: authoritative GitHub DX9Ex C priority policy. External Docker controller deployment/execution must be verified separately.
+
+## Global concurrency and supersession — 2026-10-10
+- **DX11 A** first-priority ACTIVE (`vr-dx11-native-r71`) and **DX9Ex C** ACTIVE concurrently (`vr-d3d9ex-focus`, 50% backend effort target). **DXVK B** FROZEN (no source/build/release/promotion); DX12 reference-only.
+- Older DX9Ex-only R84 and visual P0 global freezes / DX9Ex maintenance-only allocation are superseded. R84 remains DX9Ex P1; visual regressions remain protected. DX9Ex Architecture v3 hardware gate does not freeze independent DX11 A source implementation.
+- FFB `v0.2` formal release SHA `0da626463810322a74118d03b10ca0dd195d7cb2`: nine imported files already exist; preserve release integrity and complete any remaining VR-specific integration/regression without claiming wheel hardware PASS.
+- When a higher stage only waits on Quest3/VDXR or wheel testing, progress the next independent implementable source task, preserving explicit RUNTIME_VALIDATION=UNTESTED.
 
 ## Immutable baseline
 - Snapshot branch: `dx9ex-baseline-20261010`
@@ -15,7 +21,7 @@ Status: requested activation; controller deployment remains separate.
 3. Optimize frame pacing and GPU/CPU performance, targeting **120 FPS / 120 Hz** on **RTX 4070 12 GB**, **Virtual Desktop High streaming quality**, and **Quest 3**. Follow OpenXR-recommended per-eye resolution at VD High (do not substitute a fixed pixel count). Frame budget **8.33 ms**. Measure app-rendered FPS separately from VD display/stream FPS, SSW/reprojection, encode/network/decode latency, and dropped frames. Do not count synthetic/reprojected frames as native 120 FPS. Capture measured before/after evidence, prioritizing dense buildings/sand/particles. Maintain visual quality unless a documented user-approved tradeoff is required.
 
 ## Execution contract
-- DX9Ex lane enabled in controller only after controller config update and redeploy; do not claim activation from this document alone.
+- DX9Ex C is ACTIVE as GitHub development policy; Docker controller A/C live dispatch must be checked against deployment/process evidence and is not established by this document alone.
 - Run end-to-end inspect -> implement -> test -> material commit -> CI -> result; avoid inspect-only completion.
 - Respect separate DX11/DXVK/localization branches; do not overwrite concurrent work.
 - Retain baseline as recovery point and compare changes against pinned SHA.
