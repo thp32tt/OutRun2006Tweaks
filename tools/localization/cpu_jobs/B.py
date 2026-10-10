@@ -92,7 +92,7 @@ for ch in word:
 glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
 advance=glyph_width-tracking*(len(native_glyphs)-1)
 assert 680<=glyph_width<=830,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
-left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0
+left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0-18 # native contour overhang: shift 18px left to keep 1px+ right source margin
 top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
 top+=1
 pen=left
