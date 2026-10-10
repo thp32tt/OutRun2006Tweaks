@@ -1270,7 +1270,8 @@ namespace outrun::vr::dx11
             "        || any(isnan(input.tex0)) || any(isnan(input.tex1))\n"
             "        || any(isnan(input.tex2)) || any(isnan(input.tex3))\n"
             "        || any(isnan(input.tex4)) || any(isnan(input.tex5))\n"
-            "        || any(isnan(input.tex6)) || any(isnan(input.tex7))) discard;\n"
+            "        || any(isnan(input.tex6)) || any(isnan(input.tex7)))\n"
+            "        return float4(0.0f, 0.0f, 0.0f, 0.0f);\n"
             "    float4 current = input.diffuse;\n"
             "    float4 temp = 0.0f;\n";
 

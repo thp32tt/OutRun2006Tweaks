@@ -87,7 +87,7 @@
   "rollback_gate_status": "PASS",
   "continuation": {
     "event_id": "CONVERSION-DX11-00477-CONTINUE-20261009-1853",
-    "status": "IN_PROGRESS_R175_REPAIR_PENDING_EXACT_SHA_CI",
+    "status": "IN_PROGRESS_R175_REPAIR_AFTER_R87_SEMANTIC_FAIL",
     "checkpoint": "C2_IMPLEMENT",
     "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
     "lease_epoch": 3,
@@ -101,14 +101,20 @@
     "material_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
     "validation_bearing_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
     "ci_run_id": 37927656851,
-    "resume_cursor": "VERIFY_R175_WARP_BGR_AND_REFLECTION_EXACT_SHA_CI",
+    "resume_cursor": "CHECK_R87_SEMANTIC_THEN_R92_R176_R175_GPU",
     "runtime_validation": "UNTESTED",
-    "automation_validation": "PENDING",
-    "reason": "User-directed 2026-10-10 direct ChatGPT2 continuation under original owner; stale previous epoch 2 fenced after new evidence shows PS register 0 interpreted VS SV_Position register 0; original 00477 remains same TASK_ID; no duplicate score.",
+    "automation_validation": "RETRY_PENDING",
+    "reason": "Preserve R87 no-pixel-kill when alpha test disabled. Invalid-signature payload now returns transparent output instead of discard; retain PS register occupancy, R92 register negative checks and R175 fail-closed pixel tests.",
     "prior_blocked_material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
     "last_real_activity_at": "2026-10-10T21:04:00+09:00",
     "evidence": "Exact-SHA Gate 37925304067 validate SUCCESS, DX11 smoke 113804628002 FAILURE. Direct VS BGRA [128,0,16,255]; generated VS BGRA [128,0,16,255]; expected [224,128,32,255]. Same mismatch in both branches; cannot attribute to generated VS alone.",
-    "prior_gate_evidence": "Gate 37926530851 validate SUCCESS, DX11 smoke FAILED: R174 direct VS/generated VS/constant VS all [128,0,16,255] vs expected [224,128,32,255], red solid-PS correctly [0,0,255,255]."
+    "prior_gate_evidence": "Gate 37926530851 validate SUCCESS, DX11 smoke FAILED: R174 direct VS/generated VS/constant VS all [128,0,16,255] vs expected [224,128,32,255], red solid-PS correctly [0,0,255,255].",
+    "previous_failed_gate": {
+      "head": "86ea5dc4383fdf6bfc6fe4fbabdc07a104da7688",
+      "run_id": 38051097858,
+      "smoke_job_id": 114211187735,
+      "first_failure": "R87 semantic smoke: disabled alpha test injected pixel-kill semantics (new signature-retention discard). Win32 validate PASS, Fast Structural PASS; R175 not reached."
+    }
   },
   "direct_chat_checkpoints": [
     {
@@ -224,6 +230,18 @@
       "validation": "NOT_YET_VERIFIED",
       "runtime_validation": "UNTESTED",
       "next_action": "Check exact-SHA Backend Conversion Gate WARP pixel expected [224,128,32,255], R92/R176 registers, only after success close task and consider scoring."
+    },
+    {
+      "checkpoint_id": "DX11-00477-R175-R87-CORRECTION-20261010",
+      "at_kst": "2026-10-10 21:20 KST",
+      "base_sha": "86ea5dc4383fdf6bfc6fe4fbabdc07a104da7688",
+      "change": "No discard when alpha test disabled; input keepalive branches use transparent output on unsupported inputs",
+      "paths": [
+        "src/vr/d3d11/pipeline_translation.cpp"
+      ],
+      "validation": "PENDING_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Check R87, R92, R176, R175 WARP exact gate; do not bypass any assertion."
     }
   ]
 }
