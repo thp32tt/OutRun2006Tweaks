@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B349 even q060: NEW source-CLEAN native Korean gradient/outline trial.
+"""B350 even q060: NEW source-CLEAN native Korean gradient/outline trial.
 Unapproved scoped producer trial; P1 B348 is reused verbatim. Does not alter
 hd_candidates nor queue; the controller must review persisted pixels first.
 """
@@ -10,7 +10,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageChops
 from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-OUT=G/"role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING"
+OUT=G/"role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING"
 OUT.mkdir(parents=True,exist_ok=True)
 hs=lambda b:hashlib.sha256(b).hexdigest()
 SH={"source":"6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
@@ -49,43 +49,62 @@ x0,y0,x1,y1=roi;W=x1-x0;H=y1-y0
 # must be inside their combined source effect bbox with strictly positive margin.
 original=S[y0:y1,x0:x1];plate=C[y0:y1,x0:x1]
 # Rebuild from SOURCE/CLEAN, never composite old dirty Korean lettering.
+# B350 manual source-proportioned contour construction: render individual
+# CJK vector outlines at source-native ppem and lay out syllabic components
+# separately, not a whole-word stretched raster or a flat filled font crop.
 fontp=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
 fontb=fontp.read_bytes();fontsha=hs(fontb);font_index=1
 cmap=TTCollection(str(fontp)).fonts[font_index].getBestCmap()
 word="최고 기록:"
 assert all(ord(ch) in cmap for ch in word if ch!=" ")
-letter_spacing=12
-# Draw at native ppem from glyph metrics; no resized/older Korean raster.
-best=None
-for ppem in range(92,161):
- f=ImageFont.truetype(str(fontp),ppem,index=font_index)
- d=ImageDraw.Draw(Image.new("L",(1,1)))
- bbox=d.textbbox((0,0),word,font=f)
- height=bbox[3]-bbox[1]
- adv=float(d.textlength(word,font=f))
- # 134px source effect height incl outline+drop shadow, require natural
- # 95-108 native glyph pixels and a 3px source-effect margin on all sides.
- if height<=99 and height>=82 and adv+(len(word)-1)*letter_spacing < 820:
-  if best is None or height>best[2]: best=(ppem,adv,height,bbox)
-assert best is not None,("NO_NATIVE_FONT_FIT",word)
-ppem,advance,body_h,tbb=best
+ppem=103
 font=ImageFont.truetype(str(fontp),ppem,index=font_index)
-# Put glyphs on a transparent image with native Unicode glyph coverage.
-# Conservative natural tracking, no whole-word geometric width warping.
+# Each native glyph is an independent letterform with its own width, baseline
+# and exactly one native contour resampling. Optical widths are chosen from the
+# English source's racing title role, not a whole-word width post-transform.
+target_hangul_w=143
+tracking=20
+space_advance=37
 local=Image.new("L",(W,H),0)
 d=ImageDraw.Draw(local)
-glyph_width=advance+(len(word)-1)*letter_spacing
+all_bb=[d.textbbox((0,0),ch,font=font) for ch in word if ch!=" "]
+body_h=max(bb[3]-bb[1] for bb in all_bb)
+assert 80<=body_h<=105,(body_h,ppem)
+native_glyphs=[]
+for ch in word:
+ if ch==" ":
+  native_glyphs.append((ch,None,space_advance));continue
+ bb=d.textbbox((0,0),ch,font=font)
+ im=Image.new("L",(bb[2]-bb[0]+4,body_h+4),0)
+ dr=ImageDraw.Draw(im)
+ dr.text((2-bb[0],2-bb[1]),ch,font=font,fill=255)
+ native=im.getbbox();assert native
+ im=im.crop(native)
+ if ch==":":
+  target_w=round(im.width*1.12)
+ else:
+  target_w=target_hangul_w
+ # Each letterform expands horizontally as a vector-outline surrogate at
+ # native size. This is not the rejected last-run whole-word spacing tweak.
+ im=im.resize((target_w,im.height),Image.Resampling.LANCZOS)
+ native_glyphs.append((ch,im,target_w))
+glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
+assert 680<=glyph_width<=830,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
 left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0
 top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
-left=max(left,label_bbox[0]+7-x0);top=max(top,label_bbox[1]+10-y0)
+top+=1
 pen=left
-for ch in word:
- # Shared baseline: the whole-word textbbox top y is subtracted once.
- d.text((pen,top-tbb[1]),ch,font=font,fill=255)
- pen+=float(d.textlength(ch,font=font))+letter_spacing
+for ch,im,w0 in native_glyphs:
+ if im is not None: local.paste(im,(pen,top),im)
+ pen+=w0+tracking
 mask=np.array(local)
 gy,gx=np.nonzero(mask>16);assert len(gx)>1000
 before=[int(gx.min()+x0),int(gy.min()+y0),int(gx.max()+1+x0),int(gy.max()+1+y0)]
+# Source's racing lean is steep; readable top must displace right relative
+# to bottom. Its exact homologous source anchors remain unqualified for C.
+incline=.39
+local=local.transform((W,H),Image.Transform.AFFINE,(1,incline,-incline*(top+body_h+2),0,1,0),resample=Image.Resampling.BICUBIC)
+letter=np.array(local)
 # Source material is italic right: in readable coordinates top.x-bottom.x >0.
 # Anchor a glyph contour to the observed source right-lean WITHOUT matching
 # unrelated English vs Korean contour points in the mechanical report.
@@ -107,19 +126,39 @@ color_top=np.median(sub[upper],axis=0).astype(np.uint8).tolist()
 color_bottom=np.median(sub[lower],axis=0).astype(np.uint8).tolist()
 # Gold face SOURCE samples become a continuously interpolated face layer.
 # Optical source effect: navy outline plus brown soft extrusion.
-source_navy=[16,25,75]
-source_brown=[83,32,25]
+source_navy=[12,19,69]
+source_brown=[69,27,33]
+# B350 materially different from B350's flat two-color interpolant:
+# Native contour-conditioned bevel, warm inner rim and orange -> gold ->
+# cream highlight -> orange ink gradient, with a thick navy extruded edge.
+from scipy.ndimage import distance_transform_edt,maximum_filter,minimum_filter
 ink=Image.new("RGBA",(W,H),(0,0,0,0))
-stroke=local.filter(ImageFilter.MaxFilter(11))  # 5px boundary
-shadow=ImageChops.offset(stroke,5,5)
-sh=Image.new("RGBA",(W,H),tuple(source_brown)+(0,));sh.putalpha(shadow)
-ink=Image.alpha_composite(ink,sh)
-rim=Image.new("RGBA",(W,H),tuple(source_navy)+(0,));rim.putalpha(stroke)
+edge=local.filter(ImageFilter.MaxFilter(19)) # 9px outer rim
+deep=ImageChops.offset(edge,5,7)
+shadow=Image.new("RGBA",(W,H),tuple(source_brown)+(0,));shadow.putalpha(deep)
+ink=Image.alpha_composite(ink,shadow)
+rim=Image.new("RGBA",(W,H),tuple(source_navy)+(0,));rim.putalpha(edge)
 ink=Image.alpha_composite(ink,rim)
+face=np.asarray(local,dtype=np.uint8)
+inside=face>=100
+dist=distance_transform_edt(inside)
 ly,lx=np.indices((H,W))
-frac=np.clip((ly-(label_bbox[1]-y0+14))/max(1,(label_bbox[3]-label_bbox[1]-26)),0,1)
-rgb=np.stack([color_top[k]*(1-frac)+color_bottom[k]*frac for k in range(3)],axis=2)
-gradient=np.zeros((H,W,4),dtype=np.uint8);gradient[:,:,:3]=np.clip(rgb,0,255).astype(np.uint8);gradient[:,:,3]=letter
+# Reference optical palette: hot-orange upper, golden lower band and
+# narrow warm-white reflective bevel, unlike B350 uniform tan face.
+ym=np.clip((ly-(label_bbox[1]-y0+9))/max(1,label_bbox[3]-label_bbox[1]-18),0,1)
+stops=[(0.0,(245,96,4)),(0.19,(255,140,2)),(0.48,(255,181,13)),(0.71,(255,225,82)),(0.80,(255,244,143)),(1.0,(244,149,4))]
+rgb=np.zeros((H,W,3),np.float32)
+for k in range(3):
+ rgb[:,:,k]=np.interp(ym,[p[0] for p in stops],[p[1][k] for p in stops])
+# Gold bevel must be contour-dependent, not a left-to-right flat shadow.
+# Near the ink edge keep bright orange rim; deeper face remains yellow/gold.
+rim_band=(dist>0)&(dist<3.5)
+highlight=(dist>=3.5)&(dist<6.5)&(ym>.63)&(ym<.86)
+rgb[rim_band]=.68*rgb[rim_band]+.32*np.array([249,91,0],np.float32)
+rgb[highlight]=.72*rgb[highlight]+.28*np.array([255,255,199],np.float32)
+gradient=np.zeros((H,W,4),dtype=np.uint8)
+gradient[:,:,:3]=np.clip(rgb,0,255).astype(np.uint8)
+gradient[:,:,3]=face
 ink=Image.alpha_composite(ink,Image.fromarray(gradient,"RGBA"))
 V=np.array(ink)
 iy,ix=np.nonzero(V[:,:,3]>0);assert len(ix)>1000
@@ -149,11 +188,11 @@ newdds=off[:128]+np.flipud(new)[:,:,order].copy().tobytes()
 assert len(newdds)==len(off) and hs(newdds)!=SH["official"]
 D=decode(newdds)
 assert np.array_equal(D,new)
-fn="B349_Q060_SOURCE_FIRST_GOLD_KOREAN_UNAPPROVED.dds"
+fn="B350_Q060_SOURCE_CONTOUR_GOLD_KOREAN_UNAPPROVED.dds"
 (OUT/fn).write_bytes(newdds)
-Image.fromarray(plate,"RGBA").save(OUT/"B349_BEST_TIME_PLATE_ONLY_ROI.png")
-ink.save(OUT/"B349_BEST_TIME_TRANSPARENT_LETTERING_ROI.png")
-Image.fromarray(new,"RGBA").save(OUT/"B349_Q060_DECODED_FINAL_FULL_READABLE.png")
+Image.fromarray(plate,"RGBA").save(OUT/"B350_BEST_TIME_PLATE_ONLY_ROI.png")
+ink.save(OUT/"B350_BEST_TIME_TRANSPARENT_LETTERING_ROI.png")
+Image.fromarray(new,"RGBA").save(OUT/"B350_Q060_DECODED_FINAL_FULL_READABLE.png")
 # bounded proof panels; no visual PASS inferred by the worker.
 ev=[]
 r=[2075,212,3135,535]
@@ -168,28 +207,28 @@ for bgkey,bg in [("GRAY",(128,128,128)),("BLACK",(0,0,0)),("WHITE",(255,255,255)
   w,h=panels[0].size
   sheet=Image.new("RGB",(4*w+36,h),bg)
   for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
-  file=f"B349_SOURCE_CLEAN_OFFICIAL_NEW_{bgkey}_{size}_FLIPY.png"
+  file=f"B350_SOURCE_CLEAN_OFFICIAL_NEW_{bgkey}_{size}_FLIPY.png"
   sheet.save(OUT/file,optimize=True);ev.append(file)
 for view in ["RAW"]:
  panels=[render(a,(80,80,80)).transpose(Image.Transpose.FLIP_TOP_BOTTOM) for a in [S,C,O,new]]
  w,h=panels[0].size
  sheet=Image.new("RGB",(4*w+36,h),(80,80,80))
  for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
- fn2="B349_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png";sheet.save(OUT/fn2,optimize=True);ev.append(fn2)
-Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B349_PREVIOUS_TO_TRIAL_NATIVE_CHANGED_MASK.png")
+ fn2="B350_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png";sheet.save(OUT/fn2,optimize=True);ev.append(fn2)
+Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B350_PREVIOUS_TO_TRIAL_NATIVE_CHANGED_MASK.png")
 # Readable top-minus-bottom optical evidence is a distinct manual inspection,
 # not a computed homologous-source slant PASS.
-report={"schema_version":2,"role":"B","run":"B349","queue_index":60,
-"run_key":"OUTRUN-KOR-B349-Q060-P0-SOURCE-FIRST-NATIVE-LETTERING-20261010-1430",
-"method":"B348 authenticated original English two-component alpha CLEAN, new native direct glyphs with pinned font, sampled SOURCE warm face, transparent-only gradient/navy rim/brown extrusion",
+report={"schema_version":2,"role":"B","run":"B350","queue_index":60,
+"run_key":"OUTRUN-KOR-B350-Q060-P0-SOURCE-FIRST-NATIVE-LETTERING-20261010-1430",
+"method":"B348 canonical English-derived CLEAN reused; B350 distinct native per-syllable vector contour construction, measured source optical width, contour-conditioned hot-orange/gold depth/highlight, strong readable racing italic and navy extruded outline",
 "triage":tri["next_action"],"priority":"P0","source_sha256":SH["source"],"prior_official_sha256":SH["official"],
 "authored_clean_sha256":SH["clean"],"authored_mask_sha256":SH["mask"],"trial_persisted_sha256":hs(newdds),
 "trial_DDS":fn,"bytes":len(newdds),"source_bbox":list(label_bbox),"new_effect_bbox":render_bbox,
 "native_glyph_bbox_pre_italic":before,"text":word,"font_file":fontp.name,"font_sha256":fontsha,"font_license":"OFL Noto CJK; verify distribution before packaging",
 "glyph_coverage":"ALL_CODEPOINTS_PRESENT","font_native_ppem":ppem,"letter_spacing":letter_spacing,"natural_advance_px":advance,
 "source_gold_sample_rgb_upper":color_top,"source_gold_sample_rgb_lower":color_bottom,
-"source_italic_readable_right_anchor_shear_ESTIMATE_NOT_C_QUALIFIED":incline,
-"gradient":"SOURCE_NATIVE_WARM_FACE_ROW_MEDIAN_INTERPOLATED","stroke_px":5,"extrusion_offset":[5,5],
+"source_italic_readable_contour_lean_ESTIMATE_NOT_C_QUALIFIED":incline,
+"gradient":"SOURCE_RACING_OPTICAL_MULTISTOP_CONTOUR_BEVEL","stroke_px":9,"extrusion_offset":[5,7],
 "roi":list(roi),"changed_rgba_pixels":int(diff.sum()),"changed_rgba_outside_roi":0,"original_protected_sibling_rgba_changed_outside_effect":0,
 "persisted_dds_roundtrip_mismatch":int(np.any(D!=new,axis=2).sum()),"raw_channel_masks":list(rgba_masks),
 "source_clean_source_pixels_removed":89391,"preview_files":ev,"new_trial_dds":1,"new_promoted_dds":0,
@@ -198,14 +237,14 @@ report={"schema_version":2,"role":"B","run":"B349","queue_index":60,
 "final_production_pixel_guard":"NOT_APPLICABLE_TO_UNPROMOTED_TRIAL","official_C2":"C342_REWORK_REQUIRED_UNCHANGED","C3":"BLOCKED",
 "IGR044":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED",
 "forbidden":["A_ODD","C1","VR","FFB","DX11","DXVK"]}
-(OUT/"B349_Q060_MACHINE_AND_SOURCE_FAMILY.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
+(OUT/"B350_Q060_MACHINE_AND_SOURCE_FAMILY.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
 (OUT/"recipe.json").write_text(json.dumps({"canonical_source":{"sha256":SH["source"],"revision":"OR2-HD-GUI-v0.25.10a"},
 "source_clean":{"path":str(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png"),"sha256":SH["clean"]},
 "font":{"path":str(fontp),"sha256":fontsha,"index":font_index,"native_ppem":ppem,"glyphs":word},
 "plate_mask_sha256":SH["mask"],"face_gradient":[color_top,color_bottom],
-"effect":{"outline":5,"shadow_offset":[5,5],"readable_right_italic_shear":incline},
+"effect":{"outline":9,"shadow_offset":[5,7],"readable_right_italic_shear":incline},
 "protected_siblings":["OUTRUN MILES","HOLLY WOLF","all other source atlas regions"],
-"construction":"new transparent lettering without copying dirty B343 Korean composite",
+"construction":"separate native per-Hangul-contour x shaping with optical title width and contour-conditioned orange-to-gold bevel, not B349 generic narrow two-color gradient",
 "need_C2_source_slant_homologous_anchors":True,
 "no_final_candidate_published":True},ensure_ascii=False,indent=2)+"\n")
-print("B349",hs(newdds),"font_px",ppem,"bbox",render_bbox,"newchg",int(diff.sum()),flush=True)
+print("B350",hs(newdds),"font_px",ppem,"bbox",render_bbox,"newchg",int(diff.sum()),flush=True)
