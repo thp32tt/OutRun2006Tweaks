@@ -5,7 +5,9 @@ root = Path(__file__).resolve().parents[1]
 source = (root / "src/vr/d3d11/native_indexed_uav_eye_guard.hpp").read_text(encoding="utf-8")
 probe = (root / "tools/dx11_indexed_draw_probe_r186.cpp").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
-r229 = source.split("// R229: R219 proves sole-eye OM ownership", 1)[1]
+r229 = source.split("// R229: R219 proves sole-eye OM ownership", 1)[1].split(
+    "// R231: a retained stream-output buffer", 1
+)[0]
 guards = (
     "verified_indexed_unpredicated_eye_ready(",
     "!verified_indexed_uav_isolated_eye_ready(",
