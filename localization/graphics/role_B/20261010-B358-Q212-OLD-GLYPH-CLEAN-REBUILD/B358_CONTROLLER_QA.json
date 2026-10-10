@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B358",
+  "run_key": "OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
+  "timestamp_kst": "2026-10-10T20:37:00+09:00",
+  "queue_index": 212,
+  "asset_key": "BA0147DA",
+  "owner_shard": "EVEN",
+  "priority": "P1_IGR029",
+  "triage": "MATERIAL_REWORK",
+  "execution_backend": "GITHUB_ACTIONS_CPU_WORKER",
+  "worker_run_id": 38048868897,
+  "worker_status": "SUCCESS",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "official_unchanged_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "previous_failed_trial_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+  "new_trial_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "new_physical_trial_dds": 1,
+  "official_promoted_dds": 0,
+  "candidate_path": "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds",
+  "machine_report": "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_MACHINE.json",
+  "root_cause": "B357 constructed zero-alpha CLEAN but placed letters into an official-atlas copy without actually replacing complete two sprite ROIs; original Korean outside English core persisted and overlapped new labels.",
+  "material_correction": "P1 scoped transparent CLEAN is used as actual persisted composite base for complete r43/r44 source sprite cells, clearing the prior Korean layer before text. No replacement of unrelated 10 atlas cells.",
+  "pixel_evidence": {
+    "native_size": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mips": 1,
+    "orientation": "RAW_MIRROR_Y/FLIPY_READABLE",
+    "r43_old_alpha_outside_source_bbox": 5832,
+    "r43_new_alpha_outside_source_bbox": 0,
+    "r44_old_alpha_outside_source_bbox": 741,
+    "r44_new_alpha_outside_source_bbox": 0,
+    "affected_two_sprite_regions_rgba_changed": 29668,
+    "unaffected_ten_cells_rgba_changed": 0,
+    "decoded_persisted_mismatch_pixels": 0,
+    "r43_source_width": 395,
+    "r43_trial_width": 284,
+    "r43_width_ratio": 0.719,
+    "r44_source_width": 209,
+    "r44_trial_width": 200,
+    "r44_width_ratio": 0.9569
+  },
+  "visual_review": {
+    "scope": "Source / scoped CLEAN / old official / B358 persisted new at FLIP-Y GRAY 100/50 and RAW GRAY 100; native human visible render reviewed.",
+    "native_original_vs_candidate": "r43 original orange bold PROFESSIONAL spans 395px, Korean 284px and visibly lacks source weight/condensed stylistic proportions. r44 source red condensed bold OUTRUN vs Korean + unapproved added '모드'; optical equivalence not yet established.",
+    "plate_only": "PASS_TWO_SCOPED_TRANSPARENT_ROIS_ZERO_ALPHA",
+    "composite_contamination": "PASS_OLD_HANGUL_REMOVED_FROM_SOURCE_BBOX_EXTERIOR_IN_BOTH_ROIS",
+    "eight_gate": {
+      "english_removal_plate": "PASS_SCOPED_TRANSPARENT_CLEAN",
+      "readable_slant": "HOLD_SOURCE_ANCHORS_NOT_MEASURED",
+      "text_scale": "FAIL_R43_OPTICAL_SOURCE_HIERARCHY_UNDERFILL",
+      "weight_outline_effect": "HOLD_SOURCE_FAMILY_NEEDS_VECTOR_RECONSTRUCTION",
+      "clipping": "PASS_POSITIVE_MARGIN_WITHIN_SOURCE_BBOX",
+      "protected_artwork": "PASS_OTHER_10_CELLS_UNCHANGED",
+      "raw_flipy": "PASS_NATIVE_GRAY_HUMAN_VIEW",
+      "immediate_readability": "HOLD_50_PERCENT_QA_SOURCE_FAMILY_NOT_ACCEPTED"
+    },
+    "controller_decision": "B358_UNAPPROVED_MATERIAL_P3_GHOST_FIX_VALIDATED_BUT_PRODUCER_SOURCE_FAMILY_HOLD",
+    "independent_C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_ingame_regression": "IGR029_OPEN",
+    "runtime_validation": "UNTESTED",
+    "next": "Source-character native custom condensed/weight/edge profile and semantic policy verification for both slots. After material source-family repair run producer numeric + native/practical visual, independent C2/C3 and NEW user actual-game retest. Do not promote current trial or repeat same Noto Bold settings."
+  },
+  "evidence_previews": [
+    "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png",
+    "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_r44_outrun_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png"
+  ],
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "temp_cleanup": "GitHub-hosted ephemeral workspace; no persistent N100 scratch created"
+}
