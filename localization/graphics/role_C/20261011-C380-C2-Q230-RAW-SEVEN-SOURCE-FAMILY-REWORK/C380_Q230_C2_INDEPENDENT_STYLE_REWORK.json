@@ -1,0 +1,598 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "schema": "C2_independent_visual_rework_v1",
+  "review_id": "C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-FIRSTLOOK-20261011",
+  "reviewer": "C2",
+  "shard": "EVEN",
+  "queue_index": 230,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "canonical_source": {
+    "sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+    "physical_download_verified": true
+  },
+  "official_candidate": {
+    "sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+    "unchanged": true
+  },
+  "source_and_candidate": {
+    "native_wh": [
+      2048,
+      1024
+    ],
+    "DDS_header_equal": true,
+    "RAW_Y_FLIP": true,
+    "mip_levels": 1
+  },
+  "rework_triage_before": {
+    "action": "EVIDENCE_ONLY_HOLD",
+    "queue_status": "c341_c2_hold_exact_current_source_clean_final_scoped_full_atlas_blind_pending"
+  },
+  "new_firsthand_scope": "Exactly seven previously uninspected native saved DDS RAW row segments reported in C378, each compared SOURCE/FINAL RAW and true FLIPY with local bboxes; additional 50-percent black-ground style checks",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_RAW_SEVEN_MACHINE.json",
+    "changed_source_final_inside_13": 164105,
+    "changed_outside_all13": 0,
+    "alpha_outside_all13": 0
+  },
+  "observed_root_cause": "SOURCE_FAMILY_SCALE_HIERARCHY_UNDERFILL",
+  "findings": {
+    "left01a_unavailable": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01a_unavailable_GRAY_NATIVE.png",
+        "sha256": "59df090c791850c5a4db2e571f26aa5f53824defa4400ea2b11da8b8a648fa3d"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Native side-by-side inspect complete; no source-derived stroke/family blind calibration to certify left01a_unavailable."
+      },
+      "readability": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "Direct native RAW/FLIPY Korean label visible; not evidence of full UI-family correctness."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 8636 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [94,936,447,977], readable bbox [94,47,447,88]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "left01a_unavailable",
+        "bbox_source_gt16": [
+          0,
+          0,
+          353,
+          41
+        ],
+        "bbox_trial_gt16": [
+          0,
+          0,
+          353,
+          41
+        ],
+        "bbox_source_gt128": [
+          0,
+          0,
+          353,
+          41
+        ],
+        "bbox_trial_gt128": [
+          0,
+          0,
+          353,
+          41
+        ],
+        "width_ratio_pct": 100,
+        "source_ink_alpha_gt16": 14473,
+        "trial_ink_alpha_gt16": 14473
+      }
+    },
+    "left01b_sold": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01b_sold_GRAY_NATIVE.png",
+        "sha256": "f6ae6098076bbd9a47afed899228f9d305ea393350a9f18416c5d5ae6ae368da"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Native side-by-side inspect complete; no source-derived stroke/family blind calibration to certify left01b_sold."
+      },
+      "readability": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "Direct native RAW/FLIPY Korean label visible; not evidence of full UI-family correctness."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 3569 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [624,936,745,977], readable bbox [624,47,745,88]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "left01b_sold",
+        "bbox_source_gt16": [
+          0,
+          0,
+          121,
+          41
+        ],
+        "bbox_trial_gt16": [
+          0,
+          0,
+          121,
+          41
+        ],
+        "bbox_source_gt128": [
+          0,
+          0,
+          121,
+          41
+        ],
+        "bbox_trial_gt128": [
+          0,
+          0,
+          121,
+          41
+        ],
+        "width_ratio_pct": 100,
+        "source_ink_alpha_gt16": 4961,
+        "trial_ink_alpha_gt16": 4961
+      }
+    },
+    "left03_courses": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left03_courses_GRAY_NATIVE.png",
+        "sha256": "357395bffc34282cc5aa67a77722d7390e91872d5cda57ae1cda9d31d01215d3"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Native and black-background 50% pixels show original bold wide white text family versus much narrower lightweight Korean (31.4% source alpha-visible width). Source hierarchy visibly lost."
+      },
+      "readability": {
+        "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+        "observation": "At practical 50% Korean remains decipherable but loses the much more dominant original heading hierarchy."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 10437 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [0,644,280,696], readable bbox [0,328,280,380]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "left03_courses",
+        "bbox_source_gt16": [
+          0,
+          0,
+          280,
+          52
+        ],
+        "bbox_trial_gt16": [
+          2,
+          5,
+          90,
+          46
+        ],
+        "bbox_source_gt128": [
+          4,
+          4,
+          280,
+          52
+        ],
+        "bbox_trial_gt128": [
+          3,
+          6,
+          89,
+          45
+        ],
+        "width_ratio_pct": 31.4,
+        "source_ink_alpha_gt16": 10080,
+        "trial_ink_alpha_gt16": 1761
+      }
+    },
+    "left04_game_modes": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left04_game_modes_GRAY_NATIVE.png",
+        "sha256": "ba216be1de54b42aa904c994a2bcfa4889291a50e40d2e43b57bef78a16bfae7"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Native side-by-side inspect complete; no source-derived stroke/family blind calibration to certify left04_game_modes."
+      },
+      "readability": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "Direct native RAW/FLIPY Korean label visible; not evidence of full UI-family correctness."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 15126 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [4,568,408,620], readable bbox [4,404,408,456]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "left04_game_modes",
+        "bbox_source_gt16": [
+          0,
+          0,
+          404,
+          52
+        ],
+        "bbox_trial_gt16": [
+          3,
+          2,
+          192,
+          50
+        ],
+        "bbox_source_gt128": [
+          0,
+          0,
+          400,
+          52
+        ],
+        "bbox_trial_gt128": [
+          3,
+          2,
+          191,
+          49
+        ],
+        "width_ratio_pct": 46.8,
+        "source_ink_alpha_gt16": 14416,
+        "trial_ink_alpha_gt16": 4245
+      }
+    },
+    "right01_bg_music": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right01_bg_music_GRAY_NATIVE.png",
+        "sha256": "80489af417e09dc59fafa5a2f53a7cda59a79f237b56ceb5ccac0c9d4b2b3f1a"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "Native and black-background 50% pixels show original bold wide white text family versus much narrower lightweight Korean (38% source alpha-visible width). Source hierarchy visibly lost."
+      },
+      "readability": {
+        "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+        "observation": "At practical 50% Korean remains decipherable but loses the much more dominant original heading hierarchy."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 10403 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [960,720,1236,772], readable bbox [960,252,1236,304]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "right01_bg_music",
+        "bbox_source_gt16": [
+          0,
+          0,
+          276,
+          52
+        ],
+        "bbox_trial_gt16": [
+          2,
+          7,
+          107,
+          45
+        ],
+        "bbox_source_gt128": [
+          4,
+          0,
+          272,
+          52
+        ],
+        "bbox_trial_gt128": [
+          2,
+          7,
+          107,
+          45
+        ],
+        "width_ratio_pct": 38,
+        "source_ink_alpha_gt16": 10560,
+        "trial_ink_alpha_gt16": 2559
+      }
+    },
+    "right02_car_colours": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right02_car_colours_GRAY_NATIVE.png",
+        "sha256": "d07ee8a3973ba62b78e5117dbf534358ba06ce547076b805eaf9c83a3f35f8b1"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Native side-by-side inspect complete; no source-derived stroke/family blind calibration to certify right02_car_colours."
+      },
+      "readability": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "Direct native RAW/FLIPY Korean label visible; not evidence of full UI-family correctness."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 15846 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [960,640,1376,704], readable bbox [960,320,1376,384]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "right02_car_colours",
+        "bbox_source_gt16": [
+          0,
+          12,
+          416,
+          64
+        ],
+        "bbox_trial_gt16": [
+          2,
+          8,
+          192,
+          56
+        ],
+        "bbox_source_gt128": [
+          4,
+          12,
+          412,
+          64
+        ],
+        "bbox_trial_gt128": [
+          3,
+          8,
+          192,
+          55
+        ],
+        "width_ratio_pct": 45.7,
+        "source_ink_alpha_gt16": 14128,
+        "trial_ink_alpha_gt16": 4506
+      }
+    },
+    "right05_ferrari_cars": {
+      "ref": {
+        "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right05_ferrari_cars_GRAY_NATIVE.png",
+        "sha256": "a5f111c21dbcb33585d776841c20d803f190691f13f343f982c063061679f0b5"
+      },
+      "slant": {
+        "result": "HOLD",
+        "observation": "Homologous slant anchors not established; RAW vertical flip verified but no fabricated dx"
+      },
+      "clean_plate": {
+        "result": "HOLD",
+        "observation": "B228 inherited CLEAN not newly authenticated as blank SOURCE-only plate for this pre-localized region"
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Native side-by-side inspect complete; no source-derived stroke/family blind calibration to certify right05_ferrari_cars."
+      },
+      "readability": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "Direct native RAW/FLIPY Korean label visible; not evidence of full UI-family correctness."
+      },
+      "glyph_integrity": {
+        "result": "PASS_SCOPED_VISIBLE",
+        "observation": "At native 100% no isolated tofu/missing syllables visible in this specific ROI; not whole-atlas PASS"
+      },
+      "protected_art": {
+        "result": "PASS_SCOPED_DELTA",
+        "observation": "Actual source-vs-final changed 11455 RGBA pixels in ROI. Whole-atlas all13 outside change 0; no conclusion about unrelated in-game overlay."
+      },
+      "placement": {
+        "result": "HOLD_SOURCE_GLYPH_STYLE",
+        "observation": "No new pixel crossed the 13 source source-text ROIs; source-relative location/style remains uncalibrated."
+      },
+      "orientation": {
+        "result": "PASS_SCOPED",
+        "observation": "True native RAW bbox [972,185,1375,236], readable bbox [972,788,1375,839]; SOURCE and FINAL both decoded RAW and flip_y independently inspected"
+      },
+      "measurement": {
+        "id": "right05_ferrari_cars",
+        "bbox_source_gt16": [
+          0,
+          0,
+          403,
+          51
+        ],
+        "bbox_trial_gt16": [
+          2,
+          2,
+          232,
+          49
+        ],
+        "bbox_source_gt128": [
+          0,
+          1,
+          403,
+          50
+        ],
+        "bbox_trial_gt128": [
+          2,
+          2,
+          232,
+          48
+        ],
+        "width_ratio_pct": 57.1,
+        "source_ink_alpha_gt16": 11263,
+        "trial_ink_alpha_gt16": 5594
+      }
+    }
+  },
+  "image_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01a_unavailable_GRAY_NATIVE.png",
+      "sha256": "59df090c791850c5a4db2e571f26aa5f53824defa4400ea2b11da8b8a648fa3d",
+      "bytes": 15670
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01b_sold_GRAY_NATIVE.png",
+      "sha256": "f6ae6098076bbd9a47afed899228f9d305ea393350a9f18416c5d5ae6ae368da",
+      "bytes": 8807
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left03_courses_GRAY_NATIVE.png",
+      "sha256": "357395bffc34282cc5aa67a77722d7390e91872d5cda57ae1cda9d31d01215d3",
+      "bytes": 7213
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left04_game_modes_GRAY_NATIVE.png",
+      "sha256": "ba216be1de54b42aa904c994a2bcfa4889291a50e40d2e43b57bef78a16bfae7",
+      "bytes": 9171
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right01_bg_music_GRAY_NATIVE.png",
+      "sha256": "80489af417e09dc59fafa5a2f53a7cda59a79f237b56ceb5ccac0c9d4b2b3f1a",
+      "bytes": 8915
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right02_car_colours_GRAY_NATIVE.png",
+      "sha256": "d07ee8a3973ba62b78e5117dbf534358ba06ce547076b805eaf9c83a3f35f8b1",
+      "bytes": 13815
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right05_ferrari_cars_GRAY_NATIVE.png",
+      "sha256": "a5f111c21dbcb33585d776841c20d803f190691f13f343f982c063061679f0b5",
+      "bytes": 16101
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left03_courses_DARK50.png",
+      "sha256": "888e216b9d7a3c584f13b145b799e012a7eafdcf7c5c47b22b5dbe2456c203be",
+      "bytes": 6963
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right01_bg_music_DARK50.png",
+      "sha256": "5a156786b76c0a9890a17de478f65160418c9c494bea31ea29ca907394420d26",
+      "bytes": 7422
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_RAW_SEVEN_NATIVE_CONTACT.png",
+      "sha256": "7ec40d351c0233a3b60ff2462d9ba9683bb844749281e2593abfd0c691f8312c",
+      "bytes": 82694
+    }
+  ],
+  "visual_notes": {
+    "courses": "Persisted source COURSES fills 280px readable-width and 52px height; Korean 코스 occupies 88px alpha-positive width (31.4%). Direct native and dark50 views show large source hierarchy reduced to a small flat Hangul title.",
+    "bgmusic": "Persisted source BGMUSIC uses 276px alpha-positive width; translated BGM uses 105px (38.0%) with smaller/flatter face at native and dark50. This is a source-relative presentation failure, not an allegation about preserved song titles.",
+    "other_five": "RAW formerly unreviewed label pairs native observed. Five ROIs do not receive current-policy whole-atlas C PASS; source-family anchors and CLEAN plate remain unqualified.",
+    "changed_protection": "Every source->final changed pixel within mapped 13 translation boxes, zero outside even by 1px. Mechanical difference does not overrule size/style defect."
+  },
+  "review_metadata": {
+    "firstlook_before_producer_verdict": false,
+    "reason": "Prior C378/C369 reports read to locate never-inspected RAW segments; do not claim blind approval",
+    "source_clean_blank_11_prior_regions": "NOT_INDEPENDENTLY_QUALIFIED",
+    "slant_source_anchors": "UNTESTED",
+    "C3": "NOT_RUN",
+    "user_game": "UNTESTED",
+    "runtime_validation": "UNTESTED",
+    "approval_record_written": false,
+    "new_DDS_produced": 0,
+    "same_candidate_SHA_reapproved": false,
+    "already_assessed_sha_previously": "Prior C378 is still HOLD; new distinct RAW-seven/50% optical verdict; do not count revalidation of unchanged candidate as new production."
+  },
+  "decision": "REWORK_REQUIRED_SOURCE_FAMILY_HIERARCHY",
+  "scope_decision": "C2 independent visible FAIL in 2 of 7 newly inspected RAW source-family rows; overall q230 official candidate to REWORK_REQUIRED, no C3 or game PASS",
+  "producer_handoff": "B owner: source-derived native font profile to restore COURSES and BGMUSIC original heading hierarchy without violating source bbox. CLEAN SOURCE-only and independently verified plate first, then full 13-label native RAW/FLIPY/50/75 and pixel guard, fresh C2/C3. Do not change protected music title images.",
+  "prohibited_domains_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

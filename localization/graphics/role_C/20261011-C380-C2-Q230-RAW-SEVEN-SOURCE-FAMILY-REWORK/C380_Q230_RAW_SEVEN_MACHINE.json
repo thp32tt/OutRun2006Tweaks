@@ -1,0 +1,381 @@
+{
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "size": [
+    2048,
+    1024
+  ],
+  "source_header_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+  "candidate_header_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+  "source_candidate_header_equal": true,
+  "changed_inside_all13": 164105,
+  "changed_outside_all13": 0,
+  "alpha_changed_outside_all13": 0,
+  "unchanged_full_atlas_pixels": 1933047,
+  "seven_rows": [
+    {
+      "id": "left01a_unavailable",
+      "bbox_readable": [
+        94,
+        47,
+        447,
+        88
+      ],
+      "bbox_raw": [
+        94,
+        936,
+        447,
+        977
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 8636,
+      "region_alpha_changed": 0,
+      "source_alpha_count": 14473,
+      "candidate_alpha_count": 14473
+    },
+    {
+      "id": "left01b_sold",
+      "bbox_readable": [
+        624,
+        47,
+        745,
+        88
+      ],
+      "bbox_raw": [
+        624,
+        936,
+        745,
+        977
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 3569,
+      "region_alpha_changed": 0,
+      "source_alpha_count": 4961,
+      "candidate_alpha_count": 4961
+    },
+    {
+      "id": "left03_courses",
+      "bbox_readable": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "bbox_raw": [
+        0,
+        644,
+        280,
+        696
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 10437,
+      "region_alpha_changed": 10437,
+      "source_alpha_count": 10320,
+      "candidate_alpha_count": 1793
+    },
+    {
+      "id": "left04_game_modes",
+      "bbox_readable": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "bbox_raw": [
+        4,
+        568,
+        408,
+        620
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 15126,
+      "region_alpha_changed": 15126,
+      "source_alpha_count": 14672,
+      "candidate_alpha_count": 4272
+    },
+    {
+      "id": "right01_bg_music",
+      "bbox_readable": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "bbox_raw": [
+        960,
+        720,
+        1236,
+        772
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 10403,
+      "region_alpha_changed": 10403,
+      "source_alpha_count": 10752,
+      "candidate_alpha_count": 2624
+    },
+    {
+      "id": "right02_car_colours",
+      "bbox_readable": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "bbox_raw": [
+        960,
+        640,
+        1376,
+        704
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 15846,
+      "region_alpha_changed": 15846,
+      "source_alpha_count": 14736,
+      "candidate_alpha_count": 4613
+    },
+    {
+      "id": "right05_ferrari_cars",
+      "bbox_readable": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "bbox_raw": [
+        972,
+        185,
+        1375,
+        236
+      ],
+      "raw_xy_transform": "x unchanged; yraw = 1024-yflip",
+      "region_rgba_changed": 11455,
+      "region_alpha_changed": 11455,
+      "source_alpha_count": 11669,
+      "candidate_alpha_count": 5741
+    }
+  ],
+  "new_alpha_bbox_source_family": [
+    {
+      "id": "left01a_unavailable",
+      "bbox_source_gt16": [
+        0,
+        0,
+        353,
+        41
+      ],
+      "bbox_trial_gt16": [
+        0,
+        0,
+        353,
+        41
+      ],
+      "bbox_source_gt128": [
+        0,
+        0,
+        353,
+        41
+      ],
+      "bbox_trial_gt128": [
+        0,
+        0,
+        353,
+        41
+      ],
+      "width_ratio_pct": 100,
+      "source_ink_alpha_gt16": 14473,
+      "trial_ink_alpha_gt16": 14473
+    },
+    {
+      "id": "left01b_sold",
+      "bbox_source_gt16": [
+        0,
+        0,
+        121,
+        41
+      ],
+      "bbox_trial_gt16": [
+        0,
+        0,
+        121,
+        41
+      ],
+      "bbox_source_gt128": [
+        0,
+        0,
+        121,
+        41
+      ],
+      "bbox_trial_gt128": [
+        0,
+        0,
+        121,
+        41
+      ],
+      "width_ratio_pct": 100,
+      "source_ink_alpha_gt16": 4961,
+      "trial_ink_alpha_gt16": 4961
+    },
+    {
+      "id": "left03_courses",
+      "bbox_source_gt16": [
+        0,
+        0,
+        280,
+        52
+      ],
+      "bbox_trial_gt16": [
+        2,
+        5,
+        90,
+        46
+      ],
+      "bbox_source_gt128": [
+        4,
+        4,
+        280,
+        52
+      ],
+      "bbox_trial_gt128": [
+        3,
+        6,
+        89,
+        45
+      ],
+      "width_ratio_pct": 31.4,
+      "source_ink_alpha_gt16": 10080,
+      "trial_ink_alpha_gt16": 1761
+    },
+    {
+      "id": "left04_game_modes",
+      "bbox_source_gt16": [
+        0,
+        0,
+        404,
+        52
+      ],
+      "bbox_trial_gt16": [
+        3,
+        2,
+        192,
+        50
+      ],
+      "bbox_source_gt128": [
+        0,
+        0,
+        400,
+        52
+      ],
+      "bbox_trial_gt128": [
+        3,
+        2,
+        191,
+        49
+      ],
+      "width_ratio_pct": 46.8,
+      "source_ink_alpha_gt16": 14416,
+      "trial_ink_alpha_gt16": 4245
+    },
+    {
+      "id": "right01_bg_music",
+      "bbox_source_gt16": [
+        0,
+        0,
+        276,
+        52
+      ],
+      "bbox_trial_gt16": [
+        2,
+        7,
+        107,
+        45
+      ],
+      "bbox_source_gt128": [
+        4,
+        0,
+        272,
+        52
+      ],
+      "bbox_trial_gt128": [
+        2,
+        7,
+        107,
+        45
+      ],
+      "width_ratio_pct": 38,
+      "source_ink_alpha_gt16": 10560,
+      "trial_ink_alpha_gt16": 2559
+    },
+    {
+      "id": "right02_car_colours",
+      "bbox_source_gt16": [
+        0,
+        12,
+        416,
+        64
+      ],
+      "bbox_trial_gt16": [
+        2,
+        8,
+        192,
+        56
+      ],
+      "bbox_source_gt128": [
+        4,
+        12,
+        412,
+        64
+      ],
+      "bbox_trial_gt128": [
+        3,
+        8,
+        192,
+        55
+      ],
+      "width_ratio_pct": 45.7,
+      "source_ink_alpha_gt16": 14128,
+      "trial_ink_alpha_gt16": 4506
+    },
+    {
+      "id": "right05_ferrari_cars",
+      "bbox_source_gt16": [
+        0,
+        0,
+        403,
+        51
+      ],
+      "bbox_trial_gt16": [
+        2,
+        2,
+        232,
+        49
+      ],
+      "bbox_source_gt128": [
+        0,
+        1,
+        403,
+        50
+      ],
+      "bbox_trial_gt128": [
+        2,
+        2,
+        232,
+        48
+      ],
+      "width_ratio_pct": 57.1,
+      "source_ink_alpha_gt16": 11263,
+      "trial_ink_alpha_gt16": 5594
+    }
+  ],
+  "outputs_committed": [
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01a_unavailable_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left01b_sold_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left03_courses_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left04_game_modes_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right01_bg_music_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right02_car_colours_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right05_ferrari_cars_GRAY_NATIVE.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_left03_courses_DARK50.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_right01_bg_music_DARK50.png",
+    "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_RAW_SEVEN_NATIVE_CONTACT.png"
+  ]
+}
