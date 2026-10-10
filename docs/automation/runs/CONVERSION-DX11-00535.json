@@ -45,12 +45,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
-  "status": "VALIDATING",
-  "checkpoint": "C4_MATERIAL_CANDIDATE",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "material_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "validation_bearing_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -64,23 +64,81 @@
     "docs/automation/runs/CONVERSION-DX11-00535.json"
   ],
   "evidence": {
-    "static": "PENDING",
-    "targeted_warp": "PENDING",
-    "backend_gate_conclusion": "PENDING"
+    "static": "R238 single focused source proof: 15 protected guard variants, 15 destructive mutations fail; no production header DrawIndexed",
+    "targeted_warp": "R238 exact-SHA Backend Conversion Gate job 114201490847 Verify R238 source integration SUCCESS, Build R238 indexed UP WARP probe SUCCESS, Run R238 WARP probe SUCCESS (INDEX16 red center/black corner; INDEX32 red center; original CPU spans mutated after capture).",
+    "backend_gate_conclusion": "failure",
+    "backend_gate": {
+      "id": 38047742767,
+      "head_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate": {
+        "id": 114200585736,
+        "conclusion": "success"
+      },
+      "smoke": {
+        "id": 114201490847,
+        "conclusion": "failure"
+      },
+      "r238_static": "success",
+      "r238_warp_build": "success",
+      "r238_warp_gpu": "success",
+      "failure_step": "Run DX11 constant buffer probe",
+      "failure_key": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "owner_task": "CONVERSION-DX11-00477"
+    },
+    "other_exact_sha_ci": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 38047742734,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 38047745898,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 38047745892,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 38047745912,
+        "conclusion": "success"
+      }
+    ]
   },
   "pipeline": {
-    "C0": "GitHub HEAD and controller checkpoint recovered; run absent at dispatch",
-    "C1": "R238 independent indexed UP mono native WARP source-to-pixel selected",
-    "C2": "batched header, probe, test, CMake target and exact-sha Gate integration",
-    "C3": "PENDING CI",
-    "C4": "PENDING branch publication",
-    "C5": "NOT_REQUIRED",
-    "C6": "PENDING exact-sha CI"
+    "C0": "PASS: authenticated target HEAD b7ce97e8, controller checkpoint E001, 00535 had no prior run/commit",
+    "C1": "PASS: isolated DX11 R238 D3D9 indexed-UP CPU spans -> immutable D3D11 VB/IB -> exact mono WARP DrawIndexed pixels; no concurrent R235/R237 file overlap",
+    "C2": "PASS: one coherent batch: native indexed UP C++ owner; separate WARP GPU test; negative-contract test; manifest/CMake and exact-sha Gate integration",
+    "C3": "SCOPED_PASS_FULL_GATE_FAIL: 15 mutants and R238 INDEX16/INDEX32 WARP GPU PASS; Win32 Build, fast, HUD, OpenXR PASS; full Backend Gate #38047742767 FAIL only at inherited R175_GENERIC_VARYING_MISMATCH",
+    "C4": "PASS: material [AUTO:CONVERSION-DX11-00535] fef3dd7f on target branch without CI skip; bookkeeping kept separate",
+    "C5": "NOT_REQUIRED: no native gameplay activation, distribution, or HMD promotion",
+    "C6": "BLOCKED_UPSTREAM_R175_FULL_GATE: scoped R238 material preserved, full automatic PASS not claimed, runtime UNTESTED, score +0"
   },
   "blockers": [
-    "R175 shader-varying full-Gate inherited failure owned by CONVERSION-DX11-00477",
-    "Quest3/VDXR live HMD runtime UNTESTED"
+    "Inherited R175 TEXCOORD6 VS/PS varying WARP pixel mismatch, owned separately by CONVERSION-DX11-00477; actual BGRA [128,0,16,255] vs expected [224,128,32,255], exact-SHA Backend Conversion Gate failure",
+    "Quest 3/VDXR live in-game native D3D11 visual and cadence remains UNTESTED"
   ],
-  "next_action": "Inspect exact material SHA GitHub Backend Conversion Gate, do not claim PASS on inherited R175 failure",
-  "score_change": 0
+  "next_action": "Do not replay 00535 material/source/GPU tests or score it. Preserve material result SHA fef3dd7f. R175 owner 00477 must independently resolve full Gate, while controller may allocate only a genuinely independent native DX11 task with disjoint owner/path keys.",
+  "score_change": 0,
+  "summary": "R238 standalone D3D9 DrawIndexedPrimitiveUP transient source to native D3D11 immutable VB/IB and real WARP indexed GPU pixel, INDEX16 and INDEX32; scoped source/WARP tests PASS; full exact-SHA Backend Conversion Gate FAIL from separately owned inherited R175 varying mismatch.",
+  "resume_cursor": "TERMINAL_SCOPED_PASS_INHERITED_R175_FULL_GATE_FAIL",
+  "last_real_activity_at_utc": "2026-10-10T11:26:57.897Z",
+  "last_activity_evidence": "Exact-SHA Backend Conversion Gate #38047742767 R238 GPU PASS, R175 failure; all other exact-SHA applicable workflows completed successfully."
 }
