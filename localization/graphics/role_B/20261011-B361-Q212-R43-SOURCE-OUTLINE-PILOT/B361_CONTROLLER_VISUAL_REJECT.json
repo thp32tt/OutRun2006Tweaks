@@ -1,0 +1,49 @@
+{
+  "role": "B",
+  "index": 212,
+  "region": "r43_professional",
+  "run_key": "OUTRUN-KOR-B361-Q212-R43-NATIVE-STROKED-OUTLINE-20261011-0330",
+  "decision": "PRODUCER_VISUAL_FAIL_REWORK_REQUIRED_UNPROMOTED",
+  "visual_firstlook": "Actual lossless side-by-side canonical English SOURCE/CLEAN/OFFICIAL/B361 persisted DDS in readable FLIPY gray native/50% and RAW native. New 2px outline and 10px tracking expands r43 from previous B358 284px to 325px but collapses Korean interior counter spaces: blocky/stippled visible at 100%, 50% text resembles fused bars, unlike source smooth upright PROFESSIONAL. Optical and glyph integrity FAIL outrank mechanical PASS.",
+  "new_unapproved_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "native": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA32_MIP1",
+  "bbox_source_width": 395,
+  "bbox_new_width": 325,
+  "font_px": 38,
+  "stroke_px": 2,
+  "tracking_px": 10,
+  "source_alpha_external_stale_removed": 5832,
+  "final_alpha_external_bbox": 0,
+  "old_to_new_rgba_in_scope": 23186,
+  "changed_outside_one_roi": 0,
+  "other_11_cells_unchanged": true,
+  "persisted_roundtrip_mismatch": 0,
+  "eight_checks": {
+    "source_clean": "PASS_SCOPED_ZERO_ALPHA",
+    "slant": "HOLD_NO_HOMOLOGOUS_STROKE_NEUTRAL_TITLE",
+    "scale": "HOLD_UNDERFILL_325_OF_395",
+    "weight_effect": "FAIL_OVERHEAVY_NATIVE_STROKE",
+    "counter_spaces": "FAIL_CLOSED_50PCT_GLYPH_INTERIOR_FILLED",
+    "protected_graphics": "PASS_UNRELATED_11_CELLS_EXACT",
+    "RAW_FLIPY": "PASS_NATIVE_SOURCE_AND_STORED_VIEWS",
+    "practical_readability": "FAIL_50PCT_FUSED_BAR_GLYPHS"
+  },
+  "proofs": [
+    "localization/graphics/role_B/20261011-B361-Q212-R43-SOURCE-OUTLINE-PILOT/B361_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_100.png",
+    "localization/graphics/role_B/20261011-B361-Q212-R43-SOURCE-OUTLINE-PILOT/B361_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_FLIPY_GRAY_50.png",
+    "localization/graphics/role_B/20261011-B361-Q212-R43-SOURCE-OUTLINE-PILOT/B361_r43_professional_SOURCE_CLEAN_OFFICIAL_TRIAL_RAW_GRAY_100.png"
+  ],
+  "next": "Second and FINAL safe same-family attempt: reduce glyph outline at final native px and preserve open counters. If still fails, block this generation family and switch genuinely different manual/PSD contours. r44 unchanged, original official unchanged, C2/C3/user-game not run.",
+  "official_promoted": 0,
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "backend": "GITHUB_ACTIONS_WORKER_38076323470"
+}
