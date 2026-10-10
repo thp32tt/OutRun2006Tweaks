@@ -82,7 +82,7 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("s.attempted = true;" in code and
             "if (s.attempted || candidateOrdinal != s.probeSlot) return;" in code and
             "const UINT candidateOrdinal = s.eligibleThisFrame++;" in code and
-            "const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);" in code and
+            "const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);" in code and
             "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;" in code,
             "must bound native GPU work to one sampled live Draw per game frame")
     require("return R30PresentR29Hook.stdcall<HRESULT>(" in caller,
