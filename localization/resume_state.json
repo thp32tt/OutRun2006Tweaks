@@ -6885,7 +6885,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 14:51 KST",
+  "updated_at_kst": "2026-10-10 15:10+ KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15110,6 +15110,31 @@
     "C3": "BLOCKED",
     "evidence_approved_export": false,
     "user_ingame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c1_20261010_q225_nine_authentic_clean_alpha_stage": {
+    "run_key": "OUTRUN-KOR-C1-Q225-NEW-INDEPENDENT-9ALPHA-PLATE-20261010-1510",
+    "role": "C1",
+    "shard": "ODD",
+    "index": 225,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+    "candidate_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "clean_sha256": "1191e5c8287f6385ae34c390c4969eedb1a2c9ad86d0867a4a3192ea0ca102cf",
+    "decision": "HOLD_STRICT_RECHECK",
+    "new_distinct_evidence": "9/9 source CLEAN visible alpha 0 verified independently; exact SOURCE/CLEAN/FINAL stage RGBA/alpha outside source 9 region 0; RAW mirror 0",
+    "source_clean_diff": 61787,
+    "clean_final_diff": 28442,
+    "source_final_diff": 66385,
+    "views_persisted": 18,
+    "views_unpublished_white75": 9,
+    "reason": "New SOURCE-CLEAN stage authenticated but C blind known-defect calibration, paired glyph readable slant, source-family and within-cell protected mask and white75 publication absent; do not promote C/C3 PASS",
+    "qa": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_CONTROLLER_C1_HOLD.json",
+    "machine": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_STRICT_PLATE_MACHINE.json",
+    "new_dds": 0,
+    "C_PASS": false,
+    "C3": "BLOCKED",
+    "APPROVAL": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
