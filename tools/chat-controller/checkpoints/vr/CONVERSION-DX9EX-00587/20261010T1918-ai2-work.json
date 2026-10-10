@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX9EX-00587",
+  "owner": "AI2_CHATGPT2",
+  "work_key": "DX9EX_C_R32_DIRECTGPU_PUBLICATION_COPY_OWNER_00587",
+  "target_branch": "vr-d3d9ex-focus",
+  "validation_bearing_source_sha": "38c286041a5202f88b9033dd322ea5cc190c4d34",
+  "staged_repair_branch": "vr-d3d9ex-wip/CONVERSION-DX9EX-00587",
+  "staged_repair_sha": "9b2366241aa7cec46668c7f24257f6c4f27f2763",
+  "changed_files": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py"
+  ],
+  "local_tests": "R32 runtime support, R32 review, R30 support API, VR refactor PASS at staged repair",
+  "ci_current": "38c286 source Active policy failed legacy exact text; Domain succeeded; Full Source Impact in progress",
+  "next_action": "Wait for already-running Full Source Impact; then publish source repair containing exact old guard string and run exact new source SHA gates. No HMD pass and no R84 full split claim.",
+  "runtime_validation": "UNTESTED",
+  "completion": false
+}
