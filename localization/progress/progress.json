@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 16:00 KST",
+  "updated_at_kst": "2026-10-10 16:22 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -186,6 +186,26 @@
         "status": "HOLD_STRICT_RECHECK_SCOPED_VISUAL_IMPROVEMENT_NOT_APPROVED",
         "source_family_rework": true,
         "RUNTIME_VALIDATION": "UNTESTED"
+      },
+      "latest_c1_q101_trial_rework": {
+        "run_key": "OUTRUN-KOR-C1-Q101-A225-SAVED-CLEAN-45PIXEL-REWORK-20261010-1620",
+        "queue_index": 101,
+        "owner": "C1",
+        "shard": "ODD",
+        "trial_source_run": "A225",
+        "verified_trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+        "official_candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+        "candidate_official_promoted": false,
+        "independent_saved_dds_sha_verified": true,
+        "visible_english_clean_residual_pixels_in_sha_pinned_producer_panel": 45,
+        "result": "TRIAL_REWORK_REQUIRED_INCOMPLETE_CLEAN_PLATE",
+        "changed_rgba_pixels": 114661,
+        "changed_rgba_outside_warning": 0,
+        "approved_C1": 0,
+        "approved_C3": 0,
+        "new_promoted_dds": 0,
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa": "localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A225_INDEPENDENT_PERSISTED_REWORK.json"
       }
     },
     "runtime_text_trace": {
