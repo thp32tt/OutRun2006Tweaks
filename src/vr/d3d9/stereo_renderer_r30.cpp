@@ -11,7 +11,12 @@
 // pretend to be XrCompositionLayerQuad: perspective world draws and fragile
 // perspective effects remain entirely owned by R29/R13.
 
+// Allow R29 to be built as an independent translation unit when the
+// R30/R29 compile-ownership seam is enabled by the build graph.
+// Default behavior retains the validated textual chain until link verification.
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R30_R29
 #include "stereo_renderer_r29.cpp"
+#endif
 #include "../core/r30_support_api.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
