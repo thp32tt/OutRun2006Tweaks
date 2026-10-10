@@ -95,10 +95,10 @@
     "Auxiliary composite b08faccd Backend Conversion Gate #38011167458 R212 static + R186 real WARP PASS but whole Gate FAIL at independent R175_GENERIC_VARYING_MISMATCH TEXCOORD6 ([128,0,16,255] vs [224,128,32,255]); do not claim exact material whole Gate PASS.",
     "No Quest3/VDXR native gameplay HMD/in-game test; RUNTIME_VALIDATION=UNTESTED; gameplay DrawIndexed activation and release NEED_HMD_TEST."
   ],
-  "updated_at_utc": "2026-10-10T01:07:18.473Z",
+  "updated_at_utc": "2026-10-10T01:09:01.276Z",
   "score_change": 0,
   "scoped_automation_validation": "PASS_ON_AUXILIARY_COMPOSITE_SHA_ONLY",
-  "score_previous_ai2": 1066,
-  "score_new_ai2": 1066,
-  "score_reason": "GitHub AI_SCOREBOARD.md AI2 latest confirmed 1066. One R212 material implementation with auxiliary scoped WARP PASS, but required exact material full Gate FAIL independently owned R211 and follow-up composite full Gate FAIL R175; no +1 for incomplete required Gate; 1066 + 0 = 1066."
+  "score_previous_ai2": 1067,
+  "score_new_ai2": 1067,
+  "score_reason": "Live authenticated thp32tt/ai-dev-lab AI_SCOREBOARD.md confirms AI2=1067 as of 2026-10-10 09:58 KST. Independently completed CONVERSION-DX9EX-00561 earned 1066+1=1067 during this task; 00509 has exact material whole Gate FAIL and receives +0. Do not reverse or double-count that other completed score: 1067 + 0 = 1067."
 }
