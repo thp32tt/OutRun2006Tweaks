@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "policy_version": "source-family-native-producer-20261010",
+  "role": "B",
+  "run": "B355",
+  "queue_index": 154,
+  "run_key": "OUTRUN-KOR-B355-Q154-C311-C356-MIDPOINT-VISUAL-FAIL-20261010-1848",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "historical_C311_weak_sha256": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f",
+  "official_C356_overweight_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "new_unapproved_trial_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38042396989",
+  "producer_result": "REWORK_REQUIRED_UNPROMOTED",
+  "first_failed_stage": "P2_NATIVE_GLYPH_CONTOUR_FAMILY",
+  "machine": {
+    "changed_rgba_pixels": 22195,
+    "changed_outside_3_gray_source_bbox": 0,
+    "saved_dds_roundtrip_pixel_mismatch": 0,
+    "format": "4096x1024 RGBA32 mip1 RAW MIRROR_Y",
+    "five_other_red_cells_byte_exact": true
+  },
+  "controller_evidence": [
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_FLIPY.png",
+    "B355_06_single_player_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_FLIPY.png",
+    "B355_07_showroom_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_50_FLIPY.png",
+    "B355_08_multiplayer_gray_SOURCE_CLEAN_C311_C356_NEW_GRAY_100_RAW.png"
+  ],
+  "regions": [
+    {
+      "name": "06_single_player_gray",
+      "visual": "Source uses stronger structured narrow English capitals; historical thick Korean silhouette persists, intermediate alpha lowers edge opacity but does not materially reopen the native internal counters. Practical 50 visual style still drifts."
+    },
+    {
+      "name": "07_showroom_gray",
+      "visual": "Korean 쇼룸 remains source-relative short, block-heavy form. A half-pixel alpha interpolation changes antialias weights but not original 2-syllable face topology/letter anatomy."
+    },
+    {
+      "name": "08_multiplayer_gray",
+      "visual": "Readable and RAW mirrored correctly, but mechanical half-alpha does not resolve prior C356 counter/face family mismatch."
+    }
+  ],
+  "root_cause": "SOURCE_FAMILY_GLANCE_WEIGHT_AND_COUNTER_TOPOLOGY_UNRESOLVED",
+  "evidence_limitations": [
+    "No separately validated same-source homologous top-bottom slant glyph anchors",
+    "Authored full-native CLEAN reference SHA from C344 recorded but this worker derived zero-alpha plate; precise authored CLEAN identical bytes not independently asserted",
+    "In-game composed scene and dynamic text interactions not run",
+    "Mechanical 0px protection does not override visible source-style mismatch"
+  ],
+  "next_action": "Stop automatic gray-family same-contour weight interpolation; manual source-conditioned glyph outline and counter opening required. Do not reuse B354 light text or B355 alpha-only fix as approved DDS.",
+  "official_promoted": 0,
+  "C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
