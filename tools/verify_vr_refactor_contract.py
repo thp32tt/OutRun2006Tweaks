@@ -1576,9 +1576,16 @@ for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
         errors.append(
             f"R32 retained private R29 recovery-safety dependency: {banned}")
-if "void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { ArmStereoRecoverySafety(n); }" not in r32:
+# R32 now compiles independently from R31/R30/R29. Require the same
+# lower-owner mono-recovery side effect through the public R30 ABI rather than
+# accepting the retired private R29 helper in an upper translation unit.
+if "void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { R30SupportArmStereoRecoverySafety(n); }" not in r32:
     errors.append(
-        "R32 split facade must delegate final-draw recovery-safety arming to the lower owner API")
+        "R32 split facade must delegate final-draw recovery-safety arming via R30")
+if "R30SupportArmStereoRecoverySafety(" not in r30:
+    errors.append("R30 missing lower-owned mono-recovery safety delegation")
+if "ArmStereoRecoverySafety(extraPresents);" not in r30:
+    errors.append("R30 recovery facade lost original R29 safety action")
 if "SetStereoRecoverySafetyThroughEpoch(" not in r32:
     errors.append(
         "R32 missing exact-epoch R29 recovery-safety owner API")
