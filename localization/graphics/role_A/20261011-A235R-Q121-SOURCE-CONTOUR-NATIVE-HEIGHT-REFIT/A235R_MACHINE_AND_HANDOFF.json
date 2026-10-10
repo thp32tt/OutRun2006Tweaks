@@ -1,0 +1,79 @@
+{
+  "run": "A235R",
+  "run_key": "OUTRUN-KOR-A235-Q121-REGULAR-SOURCE-CONTOUR-VECTOR-20261011-0700",
+  "role": "A",
+  "index": 121,
+  "P0": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "method_change": "A235 new Regular-vector source sampled face/rim family, then one FINAL optical source-HEIGHT correction of independently observed under-height (34 vs source native face 46) to measured 88% height on freshly rendered native vector before downsample. Earlier Bold 2px rim is not used; no more same-method retries after A235R.",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_crop_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "old_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "new_unpromoted_trial_sha256": "1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98",
+  "new_unpromoted_trial_path": "localization/graphics/role_A/20261011-A235R-Q121-SOURCE-CONTOUR-NATIVE-HEIGHT-REFIT/A235R_Q121_SOURCE_CONTOUR_HEIGHT_REFIT_UNPROMOTED.dds",
+  "native_whole_atlas": [
+    4096,
+    4096
+  ],
+  "source_region_bbox": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "plate_background_support": 0.4428219563687544,
+  "plate_edge_support": 0.8451957295373665,
+  "new_alpha_visible_pixels": 6352,
+  "glyph_bbox_inside_source": [
+    11,
+    5,
+    221,
+    44
+  ],
+  "english_face_profile": {
+    "source_white_pixels": 3901,
+    "source_dark_rim_pixels": 1729,
+    "source_face_rgb": [
+      255,
+      255,
+      255
+    ],
+    "source_rim_rgb": [
+      0,
+      17,
+      24
+    ],
+    "face_bbox": [
+      1,
+      0,
+      229,
+      46
+    ],
+    "english_G_top_left_x7pct": 7.940000000000001,
+    "english_G_bottom_left_x7pct": 3.0,
+    "english_G_top_minus_bottom_dx": 4.940000000000001,
+    "optical_lean_hint_not_homologous": 0.198,
+    "source_anchor_not_independently_homologous": true
+  },
+  "source_face_height_refit_to_native": 40,
+  "non_target_pixels_exact": true,
+  "dds_header_exact": true,
+  "saved_DDS_decode_exact": true,
+  "changed_outside_source_region": 0,
+  "other_29_regions_byte_exact": true,
+  "P1_independent_plate_observation": "NOT_PERFORMED_BY_C1",
+  "P2_source_slant_blind_anchors": "NOT_INDEPENDENTLY_CALIBRATED",
+  "P3_mechanical": "SCOPED_SAVED_ROUNDTRIP_PASS",
+  "producer_visual": "PENDING_DIRECT_SAVED_DDS_VIEW_NO_PRODUCER_PASS",
+  "whole_atlas": "REWORK_REQUIRED_29_OTHER_REGIONS_NOT_REAPPROVED",
+  "official_candidate_changed": false,
+  "new_unpromoted_dds": 1,
+  "C1": "NOT_RUN_NEW_BYTES",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_ingame_backlog": "OPEN",
+  "required_next": "Review SOURCE/CLEAN/FINAL 100/75/50 RAW and source typography independently; then C1 review if producer visual qualifies; keep official DDS unchanged"
+}

@@ -1,0 +1,25 @@
+{
+  "source_white_pixels": 3901,
+  "source_dark_rim_pixels": 1729,
+  "source_face_rgb": [
+    255,
+    255,
+    255
+  ],
+  "source_rim_rgb": [
+    0,
+    17,
+    24
+  ],
+  "face_bbox": [
+    1,
+    0,
+    229,
+    46
+  ],
+  "english_G_top_left_x7pct": 7.940000000000001,
+  "english_G_bottom_left_x7pct": 3.0,
+  "english_G_top_minus_bottom_dx": 4.940000000000001,
+  "optical_lean_hint_not_homologous": 0.198,
+  "source_anchor_not_independently_homologous": true
+}
