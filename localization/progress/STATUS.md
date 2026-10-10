@@ -1,3 +1,8 @@
+## 2026-10-10 16:41:36 KST — C366 C2 q230 unchanged candidate independent protected-music atlas QA (HOLD)
+
+- Verified canonical English 33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81, B228 CLEAN 738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914, current persisted a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f (2048×1024 RGBA32). New strict 7 music/album/BGM source-preserve ROIs have zero original→CLEAN and original→current changed RGBA. Outside both q230 HELP regions, SOURCE→CLEAN has 137,224 RGBA / 125,019 alpha changes from historical atlas localization, now separated in 12 exact row/column bands. CLEAN→current outside HELP changed RGBA/alpha 0/0. Native, 75%, 50%, RAW and FLIP-Y inspection stored.
+- Same current SHA C341/C360: **HOLD_STRICT_RECHECK remains**, no repeated PASS, no newly produced/promoted DDS, no independent C3/current approval/real-game closure. Blind source-family calibration and full mask inventory still pending. `RUNTIME_VALIDATION=UNTESTED`. Evidence `localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_C2_INDEPENDENT_PROTECTED_MUSIC_HOLD.json`; OUTRUN-KOR-C366-C2-Q230-PROTECTED-MUSIC-PIXEL-20261010.
+
 ## 2026-10-10 16:38 KST — B351 q060 P0 source-original gold material reconstruction (VISUAL REJECT)
 
 - **1 new persisted, unapproved trial DDS**: q060 exact SHA-256 `ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd`, native RGBA32 4096×2048 (33,554,560 bytes); [GitHub CPU run #38034823172](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38034823172) SUCCESS.

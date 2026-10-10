@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C366 C2 2026-10-10 16:41:36 KST q230 same-SHA independent 7 protected music ROIs zero SOURCE/CLEAN/current differences; 137224 out-of-HELP SOURCE->CLEAN pixels now grouped in 12 measured bands, CLEAN->CURRENT outside HELP zero, exact 2048x1024 saved DDS FLIPY/RAW + 100/75/50; HOLD (unqualified blind/full inventory), C3/approval/game UNTESTED, promoted DDS 0. localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_C2_INDEPENDENT_PROTECTED_MUSIC_HOLD.json OUTRUN-KOR-C366-C2-Q230-PROTECTED-MUSIC-PIXEL-20261010",
     "B351 2026-10-10 16:38 KST even q060 P0 distinct NEW 4096x2048 saved DDS SHA ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd GitHub CPU #38034823172 SUCCESS, 46849 English original face pixels/113 source rows/33028 navy pixels sampled. Reused B348 source-clean, replaced B350 double affine/manual red-gold stops with SOURCE-row statistics + one shear, effect width771/849 source versus B350 794/849; scoped changed outside0, persisted roundtrip0. First-hand SOURCE/CLEAN/OFFICIAL/NEW 100/50/RAW optical shows source gold material improved but heavy broad and nearly upright Hangul, navy/keyline vs original condensed strong italic failure; producer visual REJECT, official DDS d81d0d14 unchanged C342 C2 REWORK; new trial C2 NOT RUN/C3 and real game UNTESTED, IGR044 OPEN. QA localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B351-Q060-SOURCE-PERROW-ORIGINAL-FACE-NATIVE-20261010-1635",
     "C1 2026-10-10 16:20 KST ODD q101 newly distinct saved A225 trial SHA 5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86 independently hash/decode authenticated; official 939ac217 unchanged. Old->trial 114661 RGBA inside-only outside0; 45 exact-source RGB residual pixels in saved SOURCE/CLEAN/A38/A225 contact adjacent to icon prove incomplete CLEAN plate, trial REWORK_REQUIRED. No new C1 DDS/current C PASS/C3/APPROVAL/game, RUNTIME_VALIDATION=UNTESTED. Correct English-remnant CLEAN and icon protected mask/canonical wording, rerender materially distinct SHA for fresh C1. QA localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A225_INDEPENDENT_PERSISTED_REWORK.json RUN_KEY=OUTRUN-KOR-C1-Q101-A225-SAVED-CLEAN-45PIXEL-REWORK-20261010-1620",
     "A225 q101 2026-10-10 16:00 KST worker #38029810272 SUCCESS new physically persisted 4096x4096 RGBA32 trial SHA 5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86, source/clean/old/final and RAW directly viewed, scoped improved italic 100/50, outside changed0; producer HOLD on unmeasured source slant/approved Korean line ordering/near-icon clean boundary, official SHA 939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb unchanged and C1/C3/game untested. localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_CONTROLLER_VISUAL_QA.json RUN_KEY=OUTRUN-KOR-A225-Q101-C1-ITALIC-SOURCE-CONTOUR-20261010-1500",
@@ -15197,5 +15198,14 @@
       "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_FINAL_RAW_NATIVE_RGBA.png"
     ],
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c366_c2_q230_protected_music_20261010": {
+    "run_key": "OUTRUN-KOR-C366-C2-Q230-PROTECTED-MUSIC-PIXEL-20261010",
+    "sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "result": "HOLD_STRICT_RECHECK_NEW_INDEPENDENT_EVIDENCE",
+    "report": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_C2_INDEPENDENT_PROTECTED_MUSIC_HOLD.json",
+    "protected_rois_pixel_exact": 7,
+    "dds_produced": 0,
+    "runtime_validation": "UNTESTED"
   }
 }

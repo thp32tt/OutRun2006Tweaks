@@ -1,0 +1,244 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C366-Q230-NEW-PROTECTED-ATLAS-PIXEL-CLASSIFICATION",
+  "run_key": "OUTRUN-KOR-C366-C2-Q230-PROTECTED-MUSIC-PIXEL-20261010",
+  "reviewed_at_kst": "2026-10-10 16:41:36 KST",
+  "queue_index": 230,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "canonical_source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "same_sha_prior_C341_C360": true,
+  "new_C_candidate_APPROVAL": false,
+  "result": "HOLD_STRICT_RECHECK",
+  "new_independent_proof": "First exact saved-source/CLEAN/current pixel-level seven protected music/album/BGM ROIs unmodified, plus complete 137224 outside-HELP changed-pixel column-band table with all 12 group counts",
+  "firstlook_before_producer_verdict": false,
+  "firstlook_note": "Prior C341/C360 reports consulted before image generation; do not claim blind visual calibration.",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "machine_report": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_INDEPENDENT_PROTECTION_MACHINE.json",
+  "plate_observation": "B228 CLEAN inherits earlier localization; its SOURCE vs CLEAN changed 137224 RGBA /125019 alpha outside two q230 HELP boxes. The new per-band diagnostic and protected seven ROIs do NOT imply clean entire atlas is original or mark changed UI as source residue.",
+  "protected_music_conclusion": "All seven tested ROIs have zero SOURCE-to-CLEAN and SOURCE-to-CURRENT changed RGBA; this is direct source-preservation evidence not complete approved segment inventory.",
+  "current_edit_conclusion": "CLEAN to current 15398 RGBA changes, all strictly inside HELP source boxes; 0 RGBA/alpha outside.",
+  "new_bytes": false,
+  "existing_candidate_SHA_unchanged": true,
+  "stages": {
+    "C": {
+      "review_id": "C366",
+      "pixels_before_producer_verdict": false,
+      "reviewer": "ChatGPT C2 same controller",
+      "calibration": "NOT_QUALIFIED",
+      "findings": {
+        "20_unavailable_help": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "Neither original nor Hangul glyph has a qualified matched readable stem-anchor slant measurement; no guessed numeric direction.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG128_100.png",
+              "sha256": "b9f21560c6aeeb13668c1d3504578d6d43e83895d5286279d91f174de053b9da"
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Exact source/clean/new saved RGBA native views compared; clean alpha absent in both help source boxes, previous C341, while the other source-to-clean modifications belong to older text-layer atlas localization. Missing whole-atlas provenance remains HOLD.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_FULL_ATLAS_FIRSTLOOK.png",
+              "sha256": "b130adc159dae258ed04d28258d3e73b71ecb0f7b29a8a420c14e01f7cc258c6"
+            }
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Native 100%, practical 75/50 compared side-by-side; readable dark-gray bold family appears similar but blind control and source-family weight/counter-space calibration absent.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG255_75.png",
+              "sha256": "353b195805eef623e23dfcb33f81dbcc6db25465a959187a5bea77ea773c352f"
+            }
+          },
+          "readability": {
+            "result": "SCOPED_READABLE",
+            "observation": "No newly confirmed visible unreadability in actual decoded 100%, white 75% and black 50% independent contacts. In-game consumer unknown.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG0_50.png",
+              "sha256": "11995c4a5d8ac0eced70f35b6022bd0d274e47e4e18fa684488fc78d671b7b62"
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_CONFIRMED_DEFECT",
+            "observation": "Visible Hangul strokes are continuous in native and practical panels; this is not a calibrated full approval.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG128_100.png",
+              "sha256": "b9f21560c6aeeb13668c1d3504578d6d43e83895d5286279d91f174de053b9da"
+            }
+          },
+          "protected_art": {
+            "result": "NEW_SCOPED_PIXEL_PASS",
+            "observation": "New independent named seven protected music/album/BGM ROIs 0 RGBA pixels changed from English SOURCE to CLEAN and current saved DDS; all 137224 SOURCE-to-CLEAN changes outside HELP classified by 12 row/column bins; CLEAN-to-FINAL outside HELP 0 RGBA/alpha.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_UI_DELTA_AND_PROTECTED_MASK.png",
+              "sha256": "8a95008aebf30abd7ff782d9b6eacf892f3ff320045c0d9b1fdde97c13f7d317"
+            }
+          },
+          "placement": {
+            "result": "SCOPED_PASS_PRIOR_GEOMETRY",
+            "observation": "Current same-SHA Korean fits original help source boxes; source-tight margins previously measured C360 and no new bbox enlargement proven.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG128_100.png",
+              "sha256": "b9f21560c6aeeb13668c1d3504578d6d43e83895d5286279d91f174de053b9da"
+            }
+          },
+          "orientation": {
+            "result": "SCOPED_PASS",
+            "observation": "Saved native RAW plus correct FLIP-Y readable views examined; source/current canonical 128-byte DDS headers identical, single mip.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_RAW_NATIVE_2REGIONS.png",
+              "sha256": "efffcffcb477e15f2244ac7fade9dbc4302d404586e7abb6aad9647f988eb1d3"
+            }
+          }
+        },
+        "21_owned_help": {
+          "slant": {
+            "result": "HOLD",
+            "observation": "Neither original nor Hangul glyph has a qualified matched readable stem-anchor slant measurement; no guessed numeric direction.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG128_100.png",
+              "sha256": "6e287c3b80b881f483a867bd4af731a311c7961623f13e5f13e2aed8e6c46400"
+            }
+          },
+          "clean_plate": {
+            "result": "SCOPED_PASS",
+            "observation": "Exact source/clean/new saved RGBA native views compared; clean alpha absent in both help source boxes, previous C341, while the other source-to-clean modifications belong to older text-layer atlas localization. Missing whole-atlas provenance remains HOLD.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_FULL_ATLAS_FIRSTLOOK.png",
+              "sha256": "b130adc159dae258ed04d28258d3e73b71ecb0f7b29a8a420c14e01f7cc258c6"
+            }
+          },
+          "style": {
+            "result": "HOLD",
+            "observation": "Native 100%, practical 75/50 compared side-by-side; readable dark-gray bold family appears similar but blind control and source-family weight/counter-space calibration absent.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG255_75.png",
+              "sha256": "a7e75538c3c1c92e700665648b3c815c73c2c16bc65907dac7c6c290aa8d47cc"
+            }
+          },
+          "readability": {
+            "result": "SCOPED_READABLE",
+            "observation": "No newly confirmed visible unreadability in actual decoded 100%, white 75% and black 50% independent contacts. In-game consumer unknown.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG0_50.png",
+              "sha256": "25a5a989a94ee68eced25955bd0c092ac9ce6c4d4da73b0fb3debdfed82a4b6d"
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_CONFIRMED_DEFECT",
+            "observation": "Visible Hangul strokes are continuous in native and practical panels; this is not a calibrated full approval.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG128_100.png",
+              "sha256": "6e287c3b80b881f483a867bd4af731a311c7961623f13e5f13e2aed8e6c46400"
+            }
+          },
+          "protected_art": {
+            "result": "NEW_SCOPED_PIXEL_PASS",
+            "observation": "New independent named seven protected music/album/BGM ROIs 0 RGBA pixels changed from English SOURCE to CLEAN and current saved DDS; all 137224 SOURCE-to-CLEAN changes outside HELP classified by 12 row/column bins; CLEAN-to-FINAL outside HELP 0 RGBA/alpha.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_UI_DELTA_AND_PROTECTED_MASK.png",
+              "sha256": "8a95008aebf30abd7ff782d9b6eacf892f3ff320045c0d9b1fdde97c13f7d317"
+            }
+          },
+          "placement": {
+            "result": "SCOPED_PASS_PRIOR_GEOMETRY",
+            "observation": "Current same-SHA Korean fits original help source boxes; source-tight margins previously measured C360 and no new bbox enlargement proven.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG128_100.png",
+              "sha256": "6e287c3b80b881f483a867bd4af731a311c7961623f13e5f13e2aed8e6c46400"
+            }
+          },
+          "orientation": {
+            "result": "SCOPED_PASS",
+            "observation": "Saved native RAW plus correct FLIP-Y readable views examined; source/current canonical 128-byte DDS headers identical, single mip.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_RAW_NATIVE_2REGIONS.png",
+              "sha256": "efffcffcb477e15f2244ac7fade9dbc4302d404586e7abb6aad9647f988eb1d3"
+            }
+          }
+        }
+      }
+    },
+    "C3": {
+      "result": "NOT_RUN",
+      "reason": "C HOLD, separate C3 review ID and calibration missing; no inferred C3 PASS"
+    }
+  },
+  "historical_reviews": [
+    "C341-Q230-SOURCE-CLEAN-DELTA-ATLAS",
+    "C360-Q230-NEW-INDEPENDENT-GLYPH-GEOMETRY"
+  ],
+  "evidence_images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_UI_DELTA_AND_PROTECTED_MASK.png",
+      "sha256": "8a95008aebf30abd7ff782d9b6eacf892f3ff320045c0d9b1fdde97c13f7d317"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_FULL_READABLE_50.png",
+      "sha256": "b7075aca3340d76667e21560237df0461e7db7591b2dffb050c693e1fe3496b6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_FULL_ATLAS_FIRSTLOOK.png",
+      "sha256": "b130adc159dae258ed04d28258d3e73b71ecb0f7b29a8a420c14e01f7cc258c6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_MUSIC_CAR_PROTECTED_DETAIL.png",
+      "sha256": "23b715bf2f6a74ea5f7d817e61d98bfc48f2e9f159da3898e3a53f7d63ba9643"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG128_100.png",
+      "sha256": "b9f21560c6aeeb13668c1d3504578d6d43e83895d5286279d91f174de053b9da"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG128_100.png",
+      "sha256": "6e287c3b80b881f483a867bd4af731a311c7961623f13e5f13e2aed8e6c46400"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG0_50.png",
+      "sha256": "11995c4a5d8ac0eced70f35b6022bd0d274e47e4e18fa684488fc78d671b7b62"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG0_50.png",
+      "sha256": "25a5a989a94ee68eced25955bd0c092ac9ce6c4d4da73b0fb3debdfed82a4b6d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_RAW_NATIVE_2REGIONS.png",
+      "sha256": "efffcffcb477e15f2244ac7fade9dbc4302d404586e7abb6aad9647f988eb1d3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG255_75.png",
+      "sha256": "353b195805eef623e23dfcb33f81dbcc6db25465a959187a5bea77ea773c352f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG255_75.png",
+      "sha256": "a7e75538c3c1c92e700665648b3c815c73c2c16bc65907dac7c6c290aa8d47cc"
+    }
+  ],
+  "blockers": [
+    "Full original-segment mask inventory and blind calibration of source-family stem/weight/spacing",
+    "Whole-atlas independent source-to-final protected-art isolation beyond seven ROIs",
+    "Distinct exact-SHA C3 only after qualified C approval",
+    "User real-game retest for game-composited views"
+  ],
+  "C_pass": false,
+  "C3_strict_pass": false,
+  "pre_ingame_approved": false,
+  "real_game_user_acceptance": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub repository SSOT + N100 MCP fallback for 8MB exact DDS materialization/PNG due ChatGPT local no network",
+  "no_new_dds": true,
+  "exclusions": [
+    "ODD_SHARD",
+    "UNINDEXED_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

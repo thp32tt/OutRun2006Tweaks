@@ -1,0 +1,344 @@
+{
+  "sha256": {
+    "source_dds": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "clean_png": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+    "current_dds": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f"
+  },
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "persisted_header_128_identical": true,
+  "source_clean": {
+    "total_rgba": 159051,
+    "outside_two_help_rgba": 137224,
+    "outside_two_help_alpha": 125019
+  },
+  "clean_final": {
+    "total_rgba": 15398,
+    "outside_two_help_rgba": 0,
+    "outside_two_help_alpha": 0
+  },
+  "source_clean_outside_help_grouped_pixels": 137224,
+  "source_clean_changed_pixel_bands": [
+    {
+      "column": "left_half",
+      "row_range": [
+        47,
+        88
+      ],
+      "pixels": 12205,
+      "actual_pixel_extent": [
+        94,
+        47,
+        745,
+        88
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        252,
+        304
+      ],
+      "pixels": 21561,
+      "actual_pixel_extent": [
+        4,
+        252,
+        1024,
+        304
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        328,
+        384
+      ],
+      "pixels": 12970,
+      "actual_pixel_extent": [
+        0,
+        328,
+        1024,
+        384
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        404,
+        456
+      ],
+      "pixels": 17666,
+      "actual_pixel_extent": [
+        4,
+        404,
+        1024,
+        456
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        484,
+        536
+      ],
+      "pixels": 2315,
+      "actual_pixel_extent": [
+        964,
+        484,
+        1024,
+        536
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        709,
+        760
+      ],
+      "pixels": 10290,
+      "actual_pixel_extent": [
+        12,
+        709,
+        363,
+        760
+      ]
+    },
+    {
+      "column": "left_half",
+      "row_range": [
+        790,
+        837
+      ],
+      "pixels": 1474,
+      "actual_pixel_extent": [
+        972,
+        790,
+        1024,
+        837
+      ]
+    },
+    {
+      "column": "right_half",
+      "row_range": [
+        252,
+        304
+      ],
+      "pixels": 7988,
+      "actual_pixel_extent": [
+        1024,
+        252,
+        1236,
+        304
+      ]
+    },
+    {
+      "column": "right_half",
+      "row_range": [
+        320,
+        384
+      ],
+      "pixels": 13313,
+      "actual_pixel_extent": [
+        1024,
+        320,
+        1376,
+        384
+      ]
+    },
+    {
+      "column": "right_half",
+      "row_range": [
+        404,
+        456
+      ],
+      "pixels": 9014,
+      "actual_pixel_extent": [
+        1024,
+        404,
+        1280,
+        456
+      ]
+    },
+    {
+      "column": "right_half",
+      "row_range": [
+        484,
+        536
+      ],
+      "pixels": 18447,
+      "actual_pixel_extent": [
+        1024,
+        484,
+        1528,
+        536
+      ]
+    },
+    {
+      "column": "right_half",
+      "row_range": [
+        788,
+        839
+      ],
+      "pixels": 9981,
+      "actual_pixel_extent": [
+        1024,
+        788,
+        1375,
+        839
+      ]
+    }
+  ],
+  "protected_exact_pixel_regions": [
+    {
+      "label": "alberto_left_volumes",
+      "bbox": [
+        0,
+        542,
+        925,
+        698
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "alberto_right_volumes",
+      "bbox": [
+        930,
+        542,
+        1750,
+        696
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "song_keep_your_heart",
+      "bbox": [
+        0,
+        779,
+        900,
+        844
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "song_magical_sound_shower",
+      "bbox": [
+        0,
+        851,
+        938,
+        927
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "song_life_was_a_bore",
+      "bbox": [
+        930,
+        851,
+        1700,
+        929
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "song_night_flight",
+      "bbox": [
+        790,
+        930,
+        1580,
+        1024
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    },
+    {
+      "label": "original_BGM_heading",
+      "bbox": [
+        935,
+        702,
+        1180,
+        777
+      ],
+      "source_clean_rgba": 0,
+      "source_current_rgba": 0,
+      "clean_current_rgba": 0
+    }
+  ],
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_UI_DELTA_AND_PROTECTED_MASK.png",
+      "sha256": "8a95008aebf30abd7ff782d9b6eacf892f3ff320045c0d9b1fdde97c13f7d317"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_FULL_READABLE_50.png",
+      "sha256": "b7075aca3340d76667e21560237df0461e7db7591b2dffb050c693e1fe3496b6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_FULL_ATLAS_FIRSTLOOK.png",
+      "sha256": "b130adc159dae258ed04d28258d3e73b71ecb0f7b29a8a420c14e01f7cc258c6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_MUSIC_CAR_PROTECTED_DETAIL.png",
+      "sha256": "23b715bf2f6a74ea5f7d817e61d98bfc48f2e9f159da3898e3a53f7d63ba9643"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG128_100.png",
+      "sha256": "b9f21560c6aeeb13668c1d3504578d6d43e83895d5286279d91f174de053b9da"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG128_100.png",
+      "sha256": "6e287c3b80b881f483a867bd4af731a311c7961623f13e5f13e2aed8e6c46400"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG0_50.png",
+      "sha256": "11995c4a5d8ac0eced70f35b6022bd0d274e47e4e18fa684488fc78d671b7b62"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG0_50.png",
+      "sha256": "25a5a989a94ee68eced25955bd0c092ac9ce6c4d4da73b0fb3debdfed82a4b6d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C366_Q230_SOURCE_CURRENT_RAW_NATIVE_2REGIONS.png",
+      "sha256": "efffcffcb477e15f2244ac7fade9dbc4302d404586e7abb6aad9647f988eb1d3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_unavailable_FIRSTLOOK_BG255_75.png",
+      "sha256": "353b195805eef623e23dfcb33f81dbcc6db25465a959187a5bea77ea773c352f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C366-C2-Q230-PROTECTED-MUSIC-ATLAS/C2_Q230_help_owned_FIRSTLOOK_BG255_75.png",
+      "sha256": "a7e75538c3c1c92e700665648b3c815c73c2c16bc65907dac7c6c290aa8d47cc"
+    }
+  ],
+  "limitations": [
+    "Named protected ROIs only; not a whole-atlas source-protected proof",
+    "SOURCE->CLEAN outside help groups include previous localization and are not new q230 source glyphs",
+    "Source/CLEAN alpha-only area is not proof of color/weight/style matching",
+    "Blind control, slant stem anchor and C3 currently missing"
+  ],
+  "policy_version": "visual-evidence-v1-20261008",
+  "shard": "EVEN",
+  "review_id": "C366",
+  "queue_index": 230,
+  "run_key": "OUTRUN-KOR-C366-C2-Q230-PROTECTED-MUSIC-PIXEL-20261010",
+  "source_context": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "clean_context": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_E95_HELP_CLEAN_PLATE.png",
+  "candidate_context": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "evidence_status": "INDEPENDENT_SCOPE_PROTECTION_PASS_NOT_C_APPROVAL",
+  "operation_limits": "Only 7 explicitly tested music/BGM protected ROIs certified, not entire atlas.",
+  "runtime_validation": "UNTESTED",
+  "C3": "NOT_RUN_HOLD",
+  "machine_approval": "NOT_ISSUED"
+}
