@@ -1,0 +1,20 @@
+{
+  "schema": 2,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "material_repair_exact_sha",
+  "task_id": "CONVERSION-DX11-00524",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00524",
+  "work_key": "DX11:R227:INDEXED_EYE_COLOR_RTV_ONLY_BACKING",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "05ebb4e2cf3aba9767128851229241961f03ce2c",
+  "initial_material_sha": "efdcf1a91615a7c8f010d803d2351693a3c0fd2a",
+  "initial_gate_id": 38032871336,
+  "initial_gate_result": "FAIL R187 static numeric index false mutation after R227 guard inserted",
+  "validation_bearing_result_sha": "8b833f2a89abddbff20e26cae01ab5b9ff8ec89c",
+  "repair_gate_id": 38033484794,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "source_mutants": "PASS 13 after test repair",
+  "checkpoint": "C3_REPAIR_WAIT_EXACT_SHA_CI",
+  "next_action": "Do not start concurrent source editing or cancel exact-SHA #38033484794. Inspect current Gate; R175 inherited independent owner is known. C6 separate record after CI."
+}
