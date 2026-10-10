@@ -1,0 +1,148 @@
+{
+  "queue_index": 154,
+  "role": "C2",
+  "review_lane": "EVEN",
+  "timestamp_kst": "2026-10-10T19:35:24+09:00",
+  "source_claimed_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "source_independently_authenticated_this_run": false,
+  "official": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "header": {
+      "w": 4096,
+      "h": 1024,
+      "bytes": 16777344,
+      "mips": 1,
+      "format": "BGRA32"
+    }
+  },
+  "new_B355_unapproved": {
+    "path": "localization/graphics/role_B/20261010-B355-Q154-HISTORIC-NATIVE-COUNTER-INTERPOLATION/B355_Q154_GRAY_FAMILY_HALF_PIXEL_UNAPPROVED.dds",
+    "sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+    "header": {
+      "w": 4096,
+      "h": 1024,
+      "bytes": 16777344,
+      "mips": 1,
+      "format": "BGRA32"
+    }
+  },
+  "other_B354_unapproved": {
+    "path": "localization/graphics/role_B/20261010-B354-Q154-THIN-NATIVE-GRAY-SOURCE-FAMILY/B354_Q154_NATIVE_REGULAR_GRAY_UNAPPROVED.dds",
+    "sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+    "header": {
+      "w": 4096,
+      "h": 1024,
+      "bytes": 16777344,
+      "mips": 1,
+      "format": "BGRA32"
+    }
+  },
+  "region_scope": [
+    [
+      "single_player",
+      [
+        1610,
+        286,
+        2197,
+        350
+      ]
+    ],
+    [
+      "showroom",
+      [
+        2674,
+        288,
+        3094,
+        350
+      ]
+    ],
+    [
+      "multiplayer",
+      [
+        2566,
+        952,
+        3086,
+        1014
+      ]
+    ]
+  ],
+  "pixel_differences": [
+    {
+      "candidate": "B355",
+      "orientation": "READABLE_FLIPY",
+      "rgba_changed": 22195,
+      "alpha_changed": 22195,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    {
+      "candidate": "B355",
+      "orientation": "RAW",
+      "rgba_changed": 22195,
+      "alpha_changed": 22195,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    {
+      "candidate": "B354",
+      "orientation": "READABLE_FLIPY",
+      "rgba_changed": 65222,
+      "alpha_changed": 41891,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    {
+      "candidate": "B354",
+      "orientation": "RAW",
+      "rgba_changed": 65222,
+      "alpha_changed": 41891,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    }
+  ],
+  "per_region": [
+    {
+      "id": "single_player",
+      "source_bbox_from_B355": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "new_vs_official_changed_rgba": 9275,
+      "new_vs_official_changed_alpha": 9275
+    },
+    {
+      "id": "showroom",
+      "source_bbox_from_B355": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "new_vs_official_changed_rgba": 4430,
+      "new_vs_official_changed_alpha": 4430
+    },
+    {
+      "id": "multiplayer",
+      "source_bbox_from_B355": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "new_vs_official_changed_rgba": 8490,
+      "new_vs_official_changed_alpha": 8490
+    }
+  ],
+  "scope_limits": [
+    "B355 is unapproved and NOT official DDS; original official C356 REWORK persists",
+    "exact English source/CLEAN authorization relies on earlier C344; not independently re-authenticated in this run",
+    "blind defect calibration not executed",
+    "C3 and real game not executed"
+  ],
+  "approvals_created": 0,
+  "dds_promoted": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 19:23:00 KST",
+  "updated_at_kst": "2026-10-10T19:35:24+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11344,5 +11344,18 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "new_independent_qa_holds": 1,
     "approval_count_changed": 0
+  },
+  "c2_q154_b355_independent_visual_20261010": {
+    "timestamp_kst": "2026-10-10T19:35:24+09:00",
+    "role": "C2",
+    "queue_index": 154,
+    "reviewed_unapproved_candidate_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+    "official_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "status": "C2_REWORK_REQUIRED_B355_UNPROMOTED_OFFICIAL_UNCHANGED",
+    "machine_rgba_delta": 22195,
+    "outside_rgba_pixels": 0,
+    "qa": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_CONTROLLER_INDEPENDENT_VISUAL_REWORK.json",
+    "runtime_validation": "UNTESTED",
+    "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935"
   }
 }

@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C2 2026-10-10 B355 q154 independent SHA 4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87 visually rejected for original-family counter/stem anatomy; official C356 REWORK unchanged. No current QA approval/real-game closure. OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935.",
     "C1 q101 A226 new SHA ea145aa5 independent saved-DDS 2/2 glyph source bbox, protected external RGBA/alpha 0, 1246x210 PNG saved byte-exact, 13 BLACK/GRAY/WHITE 100/75/50 + RAW evidence; HOLD until independently SHA-pinned full English source, blind controls and source-specific italic anchors; official remains REWORK; C3/game UNTESTED. OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920.",
     "C1 q237 2026-10-10 18:55 KST candidate SHA39f66e75 unchanged: 9/9 exact SOURCE/CLEAN/FINAL alpha bboxes, source-region-exterior RGBA/alpha=0, 15 genuine lossless native BGW/RAW/FLIP-Y evidence refs. HOLD pending blind calibration/style all9 cross-background and independent C3; real game UNTESTED. OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855.",
     "B354/B355 q154 2026-10-10 18:47 KST 2 new exact persisted unapproved trial DDS, both source-family visual FAIL (first too thin, second retains tight counters). C356 official REWORK untouched, independent C2/C3/game not passed, no repeated method; manual vector source-conditioned counter reconstruction required. RUN_KEY=OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847.",
@@ -15353,5 +15354,18 @@
     "C3": "NOT_RUN",
     "APPROVALS": "NONE",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c2_q154_b355_independent_visual_20261010": {
+    "timestamp_kst": "2026-10-10T19:35:24+09:00",
+    "role": "C2",
+    "queue_index": 154,
+    "reviewed_unapproved_candidate_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+    "official_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "status": "C2_REWORK_REQUIRED_B355_UNPROMOTED_OFFICIAL_UNCHANGED",
+    "machine_rgba_delta": 22195,
+    "outside_rgba_pixels": 0,
+    "qa": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_CONTROLLER_INDEPENDENT_VISUAL_REWORK.json",
+    "runtime_validation": "UNTESTED",
+    "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935"
   }
 }

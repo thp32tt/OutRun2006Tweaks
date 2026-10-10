@@ -1,3 +1,11 @@
+## 2026-10-10T19:35:24+09:00 — C2 EVEN q154 new B355 persisted trial independent visual rejection
+
+- **C2 asset_queue index 154 only**; earlier q232 SHA dc76 was already C241 C/C3 and is excluded from publication/scoring. q154 official c4d6c1515716 remains C356 REWORK, unmodified.
+- Independent direct 4096×1024 decoded B355 saved trial 4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87 versus official: **22,195 changed RGBA/alpha; outside three declared gray source regions 0/0**; B354 independent contrasting thin trial 65,222 RGBA changes outside0. Exact SHA, RAW/FLIP-Y verified.
+- Directly rendered first-hand native100 GRAY/WHITE/BLACK and practical50 source-family comparator and decoded RAW for all three rows. B354 thin/undersized; **B355 retains B298-style broad slab contours and counter-space compression**; alpha interpolation does not repair source-condensed family. C2 visual **REWORK_REQUIRED for new unpromoted B355**, not C3/approval. Machine bounded PASS cannot overrule visual FAIL.
+- No blind defect calibration or new canonical English source authentication this run (prior C344 evidence remains provenance); explicitly not an approval. **Official DDS 0 replaced, C PASS 0, C3 0, user game retest UNTESTED.** Next: true source-derived manual vector/contour family prototype, not repeat alpha midpoint.
+- New lossless PNG ×18 plus machine and eight-check per-region C2 report at `localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/`; RUN_KEY=`OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935`. Backend N100 MCP fallback for actual repo binary because ChatGPT local checkout/network did not have mounted DDS. VR/FFB/DX11/DXVK untouched.
+
 ## 2026-10-10 19:22 KST — C1 q101 A226 fresh unpromoted candidate exact persisted DDS independent QA (HOLD)
 
 - **C1 odd q101 only**, not repeated q237/A225 SHA. Latest GitHub queue `41f2ab68f3a487ec0c13d7b8ddb47ed11a6f63e8` selected q101 A226 **new exact candidate** `ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06`; official DDS `939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb` unchanged and remains **REWORK_REQUIRED**. `rework_triage.py --index 101` returned `MATERIAL_REWORK` from actual queue. No new DDS/approval/promotion by C1.

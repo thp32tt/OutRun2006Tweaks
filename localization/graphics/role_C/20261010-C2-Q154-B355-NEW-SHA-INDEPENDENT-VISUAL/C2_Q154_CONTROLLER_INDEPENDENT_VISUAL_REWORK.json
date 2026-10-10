@@ -1,0 +1,203 @@
+{
+  "role": "C2",
+  "queue_index": 154,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-10T19:35:24+09:00",
+  "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935",
+  "result": "REWORK_REQUIRED_UNPROMOTED_B355",
+  "official_status_kept": "c356_c2_rework_required_gray_family_overweight_counterspace",
+  "official_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "unpromoted_test_candidate_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+  "second_distinct_comparator_B354_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+  "canonical_source_sha256_previous_C344_only": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "direct_saved_binary_checksum_verified": true,
+  "independent_machine_report": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_INDEPENDENT_MACHINE.json",
+  "machine_evidence": {
+    "B355_vs_official_changed_rgba": 22195,
+    "B355_vs_official_changed_alpha": 22195,
+    "B355_changed_outside_three_source_boxes_rgba": 0,
+    "B355_changed_outside_alpha": 0,
+    "B354_vs_official_changed_rgba": 65222,
+    "B354_changed_outside_three_source_boxes_rgba": 0,
+    "saved_format": "4096x1024 BGRA32 mip1 mirror_y"
+  },
+  "first_look_blind_calibration_completed": false,
+  "pixels_before_producer_verdict": false,
+  "blind_calibration_limitation": "Producer report had already been read; fail-closed independent visual reject only, never current-policy PASS",
+  "regions": [
+    {
+      "id": "single_player",
+      "reported_source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "independent_old_vs_B355_rgba_changed": 9275,
+      "native_100_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_NATIVE100.png",
+      "practical_50_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_PRACTICAL50.png",
+      "raw_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_B355_PERSISTED_RAW_RGBA.png",
+      "eight_independent_observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "original source homologous slant anchors not measured afresh"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "canonical authored CLEAN certified in earlier C344, not re-authenticated now; current same official base held unchanged"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "B355 retains B298/C356 slab-like Hangul counters and source-condensed uppercase family mismatch; alpha midpoint is not a new glyph contour",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_NATIVE100.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "at 50 percent dense stroke and collapsed internal counter shape remain relative to original English family",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_PRACTICAL50.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "no independently proved missing Unicode glyph but squeezed native counters remain visually unsafe",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_NATIVE100.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "full 4096x1024 official-vs-trial RGBA and alpha pixel delta zero outside three reported gray source boxes; canonical-source to final not retested",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_GRAY_NATIVE100.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "other five red regions bitwise unchanged; source-derived precise text anchor/face not re-authenticated"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "independent exact persisted RAW and FLIPY decode; 22195 changed RGBA and alpha within reported 3 gray source ROIs",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SINGLE_PLAYER_B355_PERSISTED_RAW_RGBA.png"
+        }
+      }
+    },
+    {
+      "id": "showroom",
+      "reported_source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "independent_old_vs_B355_rgba_changed": 4430,
+      "native_100_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_NATIVE100.png",
+      "practical_50_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_PRACTICAL50.png",
+      "raw_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_B355_PERSISTED_RAW_RGBA.png",
+      "eight_independent_observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "original source homologous slant anchors not measured afresh"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "canonical authored CLEAN certified in earlier C344, not re-authenticated now; current same official base held unchanged"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "B355 retains B298/C356 slab-like Hangul counters and source-condensed uppercase family mismatch; alpha midpoint is not a new glyph contour",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_NATIVE100.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "at 50 percent dense stroke and collapsed internal counter shape remain relative to original English family",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_PRACTICAL50.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "no independently proved missing Unicode glyph but squeezed native counters remain visually unsafe",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_NATIVE100.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "full 4096x1024 official-vs-trial RGBA and alpha pixel delta zero outside three reported gray source boxes; canonical-source to final not retested",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_GRAY_NATIVE100.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "other five red regions bitwise unchanged; source-derived precise text anchor/face not re-authenticated"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "independent exact persisted RAW and FLIPY decode; 22195 changed RGBA and alpha within reported 3 gray source ROIs",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_SHOWROOM_B355_PERSISTED_RAW_RGBA.png"
+        }
+      }
+    },
+    {
+      "id": "multiplayer",
+      "reported_source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "independent_old_vs_B355_rgba_changed": 8490,
+      "native_100_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_NATIVE100.png",
+      "practical_50_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_PRACTICAL50.png",
+      "raw_png": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_B355_PERSISTED_RAW_RGBA.png",
+      "eight_independent_observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "original source homologous slant anchors not measured afresh"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "canonical authored CLEAN certified in earlier C344, not re-authenticated now; current same official base held unchanged"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "B355 retains B298/C356 slab-like Hangul counters and source-condensed uppercase family mismatch; alpha midpoint is not a new glyph contour",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_NATIVE100.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "at 50 percent dense stroke and collapsed internal counter shape remain relative to original English family",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_PRACTICAL50.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "no independently proved missing Unicode glyph but squeezed native counters remain visually unsafe",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_NATIVE100.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "full 4096x1024 official-vs-trial RGBA and alpha pixel delta zero outside three reported gray source boxes; canonical-source to final not retested",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_GRAY_NATIVE100.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "other five red regions bitwise unchanged; source-derived precise text anchor/face not re-authenticated"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "independent exact persisted RAW and FLIPY decode; 22195 changed RGBA and alpha within reported 3 gray source ROIs",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL/C2_Q154_MULTIPLAYER_B355_PERSISTED_RAW_RGBA.png"
+        }
+      }
+    }
+  ],
+  "source_family_visual_observation": "Compared separately decoded official/B354/B355 saved DDS at native gray100, white100, black100 and gray50. B354 is materially thin/underfilled. B355 reuses thick official glyph silhouette: native single-player Hangul becomes broad slab; half-size showroom and multiplayer counters remain compressed. The failed P2 contour was not replaced; half-alpha interpolation changes edge opacity only. Earlier independently authenticated English source family in C344 is narrow heavy uppercase; source SHA not independently reverified this run.",
+  "required_rework": "MANUAL_SOURCE_CONDITIONED_VECTOR_COUNTER_AND_CONDENSED_STEM_RECONSTRUCTION; do not promote B354 or B355 and do not retry identical alpha-weight method",
+  "official_unchanged": true,
+  "DDS_PRODUCED": 0,
+  "DDS_PROMOTED": 0,
+  "C_PASS": 0,
+  "C3_STRICT_PASS": 0,
+  "CURRENT_EVIDENCE_APPROVAL": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "USER_IN_GAME_CLOSURE": false,
+  "execution_backend": "GitHub SSOT, ChatGPT local no direct repo binary access; N100 MCP fallback for independent DDS decode and evidence",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
