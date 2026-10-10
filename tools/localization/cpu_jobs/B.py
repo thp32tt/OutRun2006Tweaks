@@ -33,7 +33,7 @@ source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6
 with urllib.request.urlopen(source_url,timeout=90) as rr:sb=rr.read()
 assert sha(sb)==SOURCE_SHA,("SOURCE_NOT_CANONICAL",sha(sb))
 assert len(sb)==len(old)==16777344 and sb[:128]==old[:128], "HEADER_SIZE_MISMATCH"
-clean_path=G/"role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CLEAN_PLATE.png"
+clean_path=G/"role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_P1_CLEAN_SOURCE_ONLY.png"
 cp=clean_path.read_bytes()
 assert sha(cp)==CLEAN_SHA,("CLEAN_NOT_EXACT",sha(cp))
 def decode(b):
