@@ -156,6 +156,15 @@ namespace OutRunVRStereo
     void R30SupportSetActiveDirectTransportSlot(std::uint32_t slot) noexcept;
     void R30SupportMarkDirectTransportSlotPending(
         std::uint32_t slot, std::uint32_t frameId) noexcept;
+    // The DirectGPU ring owns textures, fences and publication lifetime.
+    // R32 consumes only a borrowed value snapshot after producer polling.
+    struct R30SupportDirectTransportSlotPublication
+    {
+        bool published = false;
+        std::uint32_t frameId = 0;
+    };
+    R30SupportDirectTransportSlotPublication
+    R30SupportGetDirectTransportSlotPublication(std::uint32_t slot) noexcept;
     HRESULT R30SupportPollDirectTransportSlotProducer(
         std::uint32_t slot) noexcept;
     void R30SupportRetireDirectTransportSlotPublication(
@@ -176,6 +185,17 @@ namespace OutRunVRStereo
     };
     bool R30SupportTryGetDirectTransportSourceSurfaces(
         R30SupportDirectTransportSourceSurfaces& out) noexcept;
+    // Preserve one guarded left/right StretchRect and producer EVENT issue.
+    // R32 remains responsible for rejection and ACK/fail-close decisions.
+    struct R30SupportDirectTransportCopyResult
+    {
+        HRESULT hr = D3D_OK;
+        bool copyFailed = false;
+    };
+    R30SupportDirectTransportCopyResult
+    R30SupportCopyDirectTransportEyesAndIssueFence(
+        IDirect3DDevice9* device, std::uint32_t slot,
+        const R30SupportDirectTransportSourceSurfaces& source) noexcept;
     // Borrowed, no AddRef: preserve the former R32 direct right-eye lookup.
     // Borrowed tracked game RT/depth pointers: no ownership transfer or AddRef.
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept;

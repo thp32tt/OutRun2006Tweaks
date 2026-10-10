@@ -57,6 +57,10 @@ required = (
     "R30SupportEnsureDirectTransportResources",
     "R30SupportDirectTransportSourceSurfaces",
     "R30SupportTryGetDirectTransportSourceSurfaces",
+    "R30SupportDirectTransportSlotPublication",
+    "R30SupportGetDirectTransportSlotPublication",
+    "R30SupportDirectTransportCopyResult",
+    "R30SupportCopyDirectTransportEyesAndIssueFence",
     "R30SupportReleaseDirectAckState",
     "R30SupportReleaseDirectTransportInterop",
     "R30SupportTryGetDirectTransportIdentity",
@@ -287,6 +291,48 @@ if resolve_direct.count("R30SupportRetireDirectTransportSlotPublication(index)")
 for raw_retire in ("candidate.frameId = 0;", "candidate.published = false;"):
     if raw_retire in resolve_direct:
         errors.append(f"R32 DirectGPU resolve retained raw lower publication retirement: {raw_retire}")
+if re.search(r"\bDirectTransportSlots\b|\bInternalPassScope\b|\.fence->Issue", resolve_direct):
+    errors.append("R32 still accesses lower DirectGPU ring/physical fence or scope")
+if "R30SupportGetDirectTransportSlotPublication(index)" not in resolve_direct:
+    errors.append("R32 DirectGPU scan lost lower publication snapshot")
+if ("copy.copyFailed" not in resolve_direct or
+        "R32DirectCopyRejectHr = copy.hr;" not in resolve_direct):
+    errors.append("R32 copy/fence failure no longer rejects the DirectGPU path")
+
+# Execute one bounded source inspection plus negative mutations, not a
+# thousand identical static audits.
+def direct_copy_contract_ok(c):
+    required_order = (
+        "if (!device || !source.left || !source.right ||",
+        "index >= OutRunVR::RenderFrameRingSize",
+        "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+        "InternalPassScope guard;",
+        "source.left, nullptr, slot.leftSurface",
+        "source.right, nullptr, slot.rightSurface",
+        "if (FAILED(leftCopy) || FAILED(rightCopy))",
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+    )
+    pos = [c.find(x) for x in required_order]
+    return all(v >= 0 for v in pos) and pos == sorted(pos)
+
+copy_body = body(r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+if not direct_copy_contract_ok(copy_body):
+    errors.append("R30 direct transport copy lost guarded eye/fence ordering")
+for label, mutant in (
+    ("scope", copy_body.replace("InternalPassScope guard;", "", 1)),
+    ("eye", copy_body.replace("source.left, nullptr, slot.leftSurface",
+                                "source.right, nullptr, slot.leftSurface", 1)),
+    ("fence", copy_body.replace(
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+        "return {D3D_OK, false};", 1)),
+):
+    if direct_copy_contract_ok(mutant):
+        errors.append("DirectGPU owner negative mutation survived: " + label)
+publication = body(r30, "R30SupportGetDirectTransportSlotPublication(")
+if ("if (slot >= OutRunVR::RenderFrameRingSize)" not in publication or
+        "return {candidate.published, candidate.frameId};" not in publication):
+    errors.append("lower publication snapshot lost bounds or status/ID pair")
+
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:
@@ -304,8 +350,7 @@ source_order = (
     "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
     "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
     "const std::uint32_t preferred =",
-    "device->StretchRect(\n                    sourceSurfaces.left",
-    "device->StretchRect(sourceSurfaces.right",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(\n                device, selected, sourceSurfaces)",
 )
 ack_snapshot_order = (
     "R30SupportGpuCompletionSnapshot ackSnapshot{};",

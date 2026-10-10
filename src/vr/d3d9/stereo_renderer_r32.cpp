@@ -475,7 +475,8 @@ namespace OutRunVRStereo
             {
                 const std::uint32_t index =
                     (preferred + offset) % OutRunVR::RenderFrameRingSize;
-                auto& candidate = DirectTransportSlots[index];
+                const auto candidate =
+                    R30SupportGetDirectTransportSlotPublication(index);
 
                 // DirectTransportFrameReadyAfterPresent() may leave an
                 // unpublished slot quarantined on S_FALSE. Reclaim it only
@@ -537,21 +538,14 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            auto& slot = DirectTransportSlots[selected];
+            const auto copy = R30SupportCopyDirectTransportEyesAndIssueFence(
+                device, selected, sourceSurfaces);
+            if (FAILED(copy.hr))
             {
-                InternalPassScope guard;
-                const HRESULT leftCopy = device->StretchRect(
-                    sourceSurfaces.left, nullptr,
-                    slot.leftSurface, nullptr, D3DTEXF_NONE);
-                const HRESULT rightCopy = SUCCEEDED(leftCopy)
-                    ? device->StretchRect(sourceSurfaces.right, nullptr,
-                        slot.rightSurface, nullptr, D3DTEXF_NONE)
-                    : leftCopy;
-                if (FAILED(leftCopy) || FAILED(rightCopy))
+                R32DirectCopyPathRejected = true;
+                R32DirectCopyRejectHr = copy.hr;
+                if (copy.copyFailed)
                 {
-                    R32DirectCopyPathRejected = true;
-                    R32DirectCopyRejectHr = FAILED(leftCopy)
-                        ? leftCopy : rightCopy;
                     if (!R32FirstDirectCopyRejectLogged)
                     {
                         R32FirstDirectCopyRejectLogged = true;
@@ -559,20 +553,14 @@ namespace OutRunVRStereo
                             "VR R32 D3D9Ex: shared-eye StretchRect rejected hr=0x{:08X}; DirectGPU copy path is disabled until Reset/interop revalidation instead of retrying every Present",
                             static_cast<unsigned>(R32DirectCopyRejectHr));
                     }
-                    return false;
                 }
-                const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);
-                if (FAILED(issueHr))
+                else
                 {
-                    // StretchRect commands are already queued. Without a valid
-                    // EVENT we cannot prove when this producer slot is reusable,
-                    // so quarantine the whole DirectGPU path until reset/interop
-                    // revalidation rather than cycling back into this slot.
-                    R32DirectCopyPathRejected = true;
-                    R32DirectCopyRejectHr = issueHr;
+                    // Copies are already queued: a failed producer EVENT must
+                    // quarantine DirectGPU until Reset/interop revalidation.
                     if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;
-                    return false;
                 }
+                return false;
             }
 
             // Do not spin on the producer EVENT before Present. Present is the
