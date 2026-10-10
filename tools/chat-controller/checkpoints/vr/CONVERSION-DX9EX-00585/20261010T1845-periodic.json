@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-10T18:48:33.403895+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "873443e0c5a4033be13e783c21f4abd82bdc573f",
+  "record": {
+    "task_id": "CONVERSION-DX9EX-00585",
+    "production_id": "CONVERSION-DX9EX-00585",
+    "event_id": "CONVERSION-DX9EX-00585-E002",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "slot": "C",
+    "branch": "vr-d3d9ex-focus",
+    "base_sha": "f18223548865f2252063527583e08e76b4dd425e",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 1,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-10T18:39:21.184894+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-10T18:39:21.184894+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
