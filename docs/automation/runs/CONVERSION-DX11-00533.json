@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00533",
+  "production_id": "CONVERSION-DX11-00533",
+  "event_id": "CONVERSION-DX11-00533-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "d77424aa9d722548e423880b548dc0ff2c3af018",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00533",
+  "lease_epoch": 1,
+  "work_key": "DX11:R236:D3D9_NONINDEXED_WINDOW_TO_WARP_MONO_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "DX11:R236:DRAWPRIMITIVE_MONO"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 DrawPrimitive triangle-list source start and primitive count",
+      "R183 device-generation/immutable VB owner and native IA binding",
+      "R209 exact shader and R199 viewport/RTV binding plus OM isolation",
+      "real WARP Draw(3,3) green? no: red center and black corner GPU readback"
+    ],
+    "batch_components": [
+      "native_linear_target_viewport.hpp R236 D3D9 command-to-mono owner preflight",
+      "dx11_linear_buffer_mirror_probe.cpp actual offset WARP Draw/readback and foreign-eye negatives",
+      "test_dx11_native_linear_draw_r185.py source mutants and WARP assertions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "nonzero start=3, count=1 red WARP center and black corner actual GPU readback",
+      "negative_regression": "11 isolated source mutations; empty/overflow/stale/foreign shader/MRT/released VB; source triangle at 0 renders black",
+      "component_integration": "D3D9 DrawPrimitive parameters -> owned VB native IA and exact shader/target -> WARP Draw(3,3) red pixel"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_linear_target_viewport.hpp",
+      "tools/dx11_linear_buffer_mirror_probe.cpp",
+      "tools/test_dx11_native_linear_draw_r185.py",
+      "DX11:R236:DRAWPRIMITIVE_MONO"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "changed_files": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "docs/automation/runs/CONVERSION-DX11-00533.json"
+  ],
+  "summary": "R236 dormant D3D9 non-indexed DrawPrimitive source command to owned mono D3D11 IA/RTV/shaders and real WARP pixel; no gameplay activation.",
+  "evidence": {
+    "static": "R236 11 negative mutants scoped to own helper; R185 source guard preserved",
+    "probe": "Existing R183 WARP executable exercised by Backend Conversion Gate; actual Windows GPU readback pending CI",
+    "backend_gate_conclusion": "pending",
+    "inherited_failure": "R175 varying mismatch owned separately by 00477 may cause full Gate failure"
+  },
+  "pipeline": {
+    "C0": "PASS: branch d77424aa and checkpoint WAIT_CHAT",
+    "C1": "PASS: independent source-to-WARP nonindexed path; disjoint from 00532 indexed owner",
+    "C2": "source+probe+mutant grouped edit prepared",
+    "C3": "scoped static contract checked; Windows WARP+full Gate pending",
+    "C4": "commit planned",
+    "C5": "NOT_REQUIRED",
+    "C6": "PENDING_CI"
+  },
+  "score_change": 0,
+  "next_action": "Check validation-bearing exact-SHA Backend Conversion Gate; if inherited R175 fails mark FULL_GATE_FAIL without PASS; no HMD tested."
+}

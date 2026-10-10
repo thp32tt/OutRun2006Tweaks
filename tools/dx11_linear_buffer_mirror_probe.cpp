@@ -876,6 +876,91 @@ int main() {
         linearCorner[0]==0 && linearCorner[1]==0 && linearCorner[2]==0;
     ctx->Unmap(staging.Get(),0);
     require(linearOk,"linear Draw GPU pixel readback");
+
+    // R236: nonzero D3D9 DrawPrimitive start vertex -> owned mono WARP
+    // Draw(3,3) pixel. The first triangle is off-screen intentionally.
+    const Vertex r236Vertices[] = {
+        {3.f,3.f},{3.f,4.f},{4.f,3.f},
+        {-.9f,-.9f},{0.f,.9f},{.9f,-.9f}
+    };
+    constexpr std::uint64_t r236Version = 236;
+    NativeLinearBufferMirror r236VB;
+    require(r236VB.initialize(dev.Get(), outrun::vr::dx11::ResourceRole::Vertex,
+            D3DPOOL_DEFAULT, D3DUSAGE_WRITEONLY, D3DFMT_UNKNOWN,
+            r236Vertices, sizeof(r236Vertices), sizeof(Vertex),
+            generation, r236Version), "R236 D3D9 source owns six vertices");
+    require(r236VB.bind(ctx.Get(),generation,r236Version),
+            "R236 D3D9 source VB native IA binding");
+    ctx->IASetInputLayout(layout.Get());
+    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ctx->VSSetShader(vs.Get(),nullptr,0);
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    ctx->RSSetState(rs.Get());
+    ctx->RSSetViewports(1,&vp);
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    ctx->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    const auto r236Ready = [&](D3DPRIMITIVETYPE primitive, UINT first,
+                               UINT count, std::uint64_t sourceVersion) {
+        return outrun::vr::dx11::verified_d3d9_nonindexed_triangles_ready(
+            r236VB, ctx.Get(), primitive, first, count, generation,
+            sourceVersion, 32u, 32u, DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(), vs.Get(), ps.Get(), rtv.Get());
+    };
+    require(r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
+            "R236 valid nonzero D3D9 DrawPrimitive source command");
+    require(!r236Ready(D3DPT_TRIANGLESTRIP,3u,1u,r236Version),
+            "R236 reject non-triangle-list source topology");
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,0u,r236Version),
+            "R236 reject empty D3D9 primitive command");
+    require(!r236Ready(D3DPT_TRIANGLELIST,4u,1u,r236Version),
+            "R236 reject D3D9 source VB overrun");
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,0xffffffffu,r236Version),
+            "R236 reject D3D9 primitive overflow");
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version+1u),
+            "R236 reject stale source version");
+    ctx->PSSetShader(nullptr,nullptr,0);
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
+            "R236 reject missing native PS");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    ID3D11RenderTargetView* r236TwoEyes[] = {rtv.Get(), secondEyeView.Get()};
+    ctx->OMSetRenderTargets(2,r236TwoEyes,nullptr);
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
+            "R236 reject foreign second eye");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    require(r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
+            "R236 restore exact mono native pipeline");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3u,0u);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE r236Offscreen{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &r236Offscreen)) && r236Offscreen.pData,
+            "R236 map offscreen source GPU pixel");
+    const auto* r236Miss = static_cast<const unsigned char*>(
+            r236Offscreen.pData)+16*r236Offscreen.RowPitch+16*4;
+    const bool r236Black = r236Miss[0]==0 && r236Miss[1]==0 &&
+                          r236Miss[2]==0 && r236Miss[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(r236Black,"R236 first source triangle misses WARP eye");
+    ctx->Draw(3u,3u);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE r236Mapped{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &r236Mapped)) && r236Mapped.pData,
+            "R236 map native DrawPrimitive WARP pixels");
+    const auto* r236Pixels = static_cast<const unsigned char*>(r236Mapped.pData);
+    const auto* r236Center = r236Pixels+16*r236Mapped.RowPitch+16*4;
+    const auto* r236Corner = r236Pixels+1*r236Mapped.RowPitch+1*4;
+    const bool r236Red = r236Center[0]==255 && r236Center[1]==0 &&
+                         r236Center[2]==0 && r236Center[3]==255 &&
+                         r236Corner[0]==0 && r236Corner[1]==0 &&
+                         r236Corner[2]==0 && r236Corner[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(r236Red,"R236 D3D9 DrawPrimitive -> WARP Draw(3,3) red pixel");
+    r236VB.shutdown();
+    require(!r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
+            "R236 reject released source VB ownership");
+
     ib.shutdown();
     require(!ib.binding_exact(ctx.Get(),generation,version),
             "retired index owner cannot validate stale IA object");

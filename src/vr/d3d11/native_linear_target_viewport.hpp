@@ -174,4 +174,59 @@ namespace outrun::vr::dx11 {
         desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0;
 }
 
+
+// R236: one D3D9 non-indexed DrawPrimitive triangle-list source command,
+// composed with actual native IA, shader identities and one exact color eye.
+// This is a dormant, color-only mono contract: no gameplay Draw dispatch.
+[[nodiscard]] inline bool verified_d3d9_nonindexed_triangles_ready(
+    const NativeLinearBufferMirror& vb, ID3D11DeviceContext* context,
+    D3DPRIMITIVETYPE primitiveType, UINT startVertex, UINT primitiveCount,
+    std::uint64_t generation, std::uint64_t snapshotVersion,
+    UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout, ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv) noexcept {
+    if (!context || primitiveType != D3DPT_TRIANGLELIST || !primitiveCount ||
+        primitiveCount > (std::numeric_limits<UINT>::max)() / 3u)
+        return false;
+    const UINT vertexCount = primitiveCount * 3u;
+    if (!verified_linear_pipeline_identity_ready(
+            vb, context, startVertex, vertexCount, generation,
+            snapshotVersion, expectedLayout, expectedVs, expectedPs,
+            expectedRtv) ||
+        !verified_linear_full_target_draw_ready(
+            vb, context, startVertex, vertexCount, generation,
+            snapshotVersion, width, height, format, expectedRtv))
+        return false;
+
+    // No second-eye RTV or foreign depth is allowed in a color-only command.
+    ID3D11RenderTargetView* outputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depth;
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                outputs, depth.GetAddressOf());
+    bool isolated = outputs[0] == expectedRtv && !depth;
+    for (UINT slot = 1; slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++slot)
+        if (outputs[slot]) isolated = false;
+    for (auto* output : outputs)
+        if (output) output->Release();
+    if (!isolated) return false;
+
+    // Reject silently suppressed/rewritten mono pixels from retained OM and
+    // command-predicate state; the source D3D9 command has no such owners.
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blend;
+    UINT sampleMask = 0;
+    context->OMGetBlendState(blend.GetAddressOf(), nullptr, &sampleMask);
+    if (blend || sampleMask != D3D11_DEFAULT_SAMPLE_MASK) return false;
+    Microsoft::WRL::ComPtr<ID3D11Predicate> predicate;
+    BOOL predicateValue = FALSE;
+    context->GetPredication(predicate.GetAddressOf(), &predicateValue);
+    if (predicate) return false;
+    ID3D11Buffer* streamTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    context->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, streamTargets);
+    bool noStreamOutput = true;
+    for (auto* target : streamTargets)
+        if (target) { noStreamOutput = false; target->Release(); }
+    return noStreamOutput;
+}
+
 } // namespace outrun::vr::dx11

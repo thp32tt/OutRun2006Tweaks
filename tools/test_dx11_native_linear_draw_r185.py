@@ -38,3 +38,44 @@ for token in (
 ):
     assert token in probe, "missing isolated WARP proof: " + token
 print("R185 native linear Draw readiness + 3 mutants + isolated WARP dispatch: PASS")
+
+
+# R236 source-to-WARP mono path: the existing full-Gate R183 executable builds
+# and executes the new source adapter without enabling the live game hook.
+target = (root/"src/vr/d3d11/native_linear_target_viewport.hpp").read_text(encoding="utf-8")
+r236 = target.split("// R236: one D3D9 non-indexed DrawPrimitive",1)[1].split(
+    "} // namespace outrun::vr::dx11",1)[0]
+r236_guards = (
+    "primitiveType != D3DPT_TRIANGLELIST",
+    "primitiveCount > (std::numeric_limits<UINT>::max)() / 3u",
+    "const UINT vertexCount = primitiveCount * 3u;",
+    "verified_linear_pipeline_identity_ready(",
+    "verified_linear_full_target_draw_ready(",
+    "outputs[0] == expectedRtv && !depth",
+    "if (outputs[slot]) isolated = false;",
+    "if (output) output->Release();",
+    "sampleMask != D3D11_DEFAULT_SAMPLE_MASK",
+    "if (predicate) return false;",
+    "context->SOGetTargets(",
+)
+def r236_contract(source):
+    return all(term in source for term in r236_guards)
+assert r236_contract(r236), "R236 D3D9 source/native mono integration incomplete"
+for token in r236_guards:
+    assert not r236_contract(r236.replace(token,"",1)), "R236 negative mutant survived: " + token
+for token in (
+    "R236 valid nonzero D3D9 DrawPrimitive source command",
+    "R236 reject D3D9 source VB overrun",
+    "R236 reject D3D9 primitive overflow",
+    "R236 reject stale source version",
+    "R236 reject missing native PS",
+    "R236 reject foreign second eye",
+    "ctx->Draw(3u,0u);",
+    "R236 first source triangle misses WARP eye",
+    "ctx->Draw(3u,3u);",
+    "R236 D3D9 DrawPrimitive -> WARP Draw(3,3) red pixel",
+    "R236 reject released source VB ownership",
+):
+    assert token in probe, "missing R236 WARP integration proof: " + token
+assert "->Draw(" not in r236 and "->DrawIndexed(" not in r236, "gameplay native Draw forbidden"
+print("R236 nonindexed D3D9 source to native mono Draw WARP + 11 mutants: PASS")
