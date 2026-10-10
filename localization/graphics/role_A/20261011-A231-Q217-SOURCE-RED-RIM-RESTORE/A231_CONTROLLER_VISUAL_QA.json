@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "A231",
+  "run_key": "OUTRUN-KOR-A231-Q217-C1-RED-BADGE-425-PROTECTED-RGB-RESTORE-20261011-0310",
+  "role": "A",
+  "index": 217,
+  "semantic": [
+    "START→출발",
+    "GOAL→골"
+  ],
+  "original_canonical_source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "previous_official_dds_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "new_unpromoted_saved_dds_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "new_native_clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+  "plate_manifest_sha256": "d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+  "plate_library_status": "REGISTERED_UNREVIEWED_C1_PLATE_PASS_NOT_GRANTED",
+  "inspection": "Controller directly opened exact worker-persisted SOURCE/OLD_CLEAN/RESTORED_CLEAN/OLD_KO/NEW_KO BGW native/practical and saved RAW images from GitHub; this is producer visual QA, not independent C1 review",
+  "firsthand": {
+    "source_vs_restored_clean": "Both red START and GOAL strip contours/upper and bottom highlights are restored to canonical English source colors outside the exact English glyph boxes; new CLEAN no visible Korean/English engraving or source residue in these localized banner cells",
+    "new_vs_old": "At native and 50/75, Hangul retained and appears unchanged except source red-badge 425 RGB edge/rim values. Original backdrop edge color continuity looks closer than OLD_CLEAN",
+    "glyph_slant_and_source_family": "Previous Korean short/narrow scale and source-family bevel/slant concerns remain; this change intentionally does NOT requalify typography. START English 81x23 vs current 39x21, GOAL English 77x24 vs current 21x22",
+    "protected_art": "All 425 C1-confirmed opaque full-alpha red art pixels exactly source-restored; 0 change outside those pixels relative old official, no collateral sprite modifications",
+    "orientation": "RAW mirror-Y and readable aligned; saved A231_start_RAW.png and A231_goal_RAW.png directly viewed",
+    "all_mips": "DDS mip count 1 (only native mip)",
+    "decoded": "Full stored DDS roundtrip equality established by A231 machine QA",
+    "practical_views": "SOURCE/CLEAN/OFFICIAL/TRIAL on GRAY100/BLACK50/WHITE75 examined for both labels; no new visual defects at those zooms"
+  },
+  "tests": {
+    "source_clean_rgba_outside_two_english_text_bboxes": 0,
+    "source_new_dds_rgba_outside_two_english_text_bboxes": 0,
+    "previous_official_to_trial_rgba_changes": 425,
+    "previous_official_to_trial_alpha_changes": 0,
+    "previous_official_to_trial_outside_restored_art": 0,
+    "persisted_decode_mismatch": 0,
+    "mechanical": "SCOPED_PASS",
+    "p1_plate": "SCOPED_PRODUCER_VISUAL_PASS_PENDING_INDEPENDENT_C1",
+    "p2_lettering": "PRESERVED_UNCHANGED_STILL_OPTICAL_HOLD",
+    "p3_composite": "SCOPED_PRODUCER_VISUAL_PASS_NOT_WHOLE_ASSET"
+  },
+  "eight_visual_checks": {
+    "slant": "HOLD_INHERITED_SOURCE_KO_MATCH_UNQUALIFIED",
+    "scale": "HOLD_INHERITED_KOREAN_UNDERFILL_NOT_CORRECTED",
+    "weight": "HOLD_INHERITED_SOURCE_BEVEL_UNQUALIFIED",
+    "glyph_integrity": "SCOPED_PASS_UNCHANGED",
+    "clean_plate": "PASS_PRODUCER_SCOPE_SOURCE_PROTECTED_RGB_RESTORED",
+    "protected_art": "PASS_PRODUCER_SCOPE_C1_425_RESTORED",
+    "orientation": "PASS_SCOPED_RAW_READABLE",
+    "usability": "UNTESTED_ACTUAL_GAME"
+  },
+  "verdict": "SCOPED_SOURCE_RED_RIM_REPAIR_PASS_PENDING_FRESH_C1_PLATE_AND_C1_FINAL_WITH_STYLE_HOLD",
+  "official_DDS_promoted": 0,
+  "new_trial_DDS": 1,
+  "c1": "PENDING_CURRENT_BYTES",
+  "c3": "NOT_RUN",
+  "approval": "BLOCKED_NO_PLATE_C1_REVIEW",
+  "actual_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence_paths": [
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_MACHINE_QA.json",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_start_GRAY_100.png",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_goal_GRAY_100.png",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_start_BLACK_50.png",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_goal_WHITE_75.png",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_start_RAW.png",
+    "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_goal_RAW.png"
+  ],
+  "restrictions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
