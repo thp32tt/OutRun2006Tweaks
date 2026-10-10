@@ -9,15 +9,15 @@ a.add_argument('--official-dds',required=True)
 a.add_argument('--english-source-png',required=True)
 a.add_argument('--font',required=True)
 a.add_argument('--output-dir',required=True)
-p=a.parse_args()
-b=p.output_dir.rstrip('/')+'/'
+params=a.parse_args()
+b=params.output_dir.rstrip('/')+'/'
 os.makedirs(b,exist_ok=True)
-for path,expected in [(p.psd,'cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024'),(p.official_dds,'d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01'),(p.english_source_png,'9f4a4c114a306bd039304415dce32d1a6addd9274e5f57b4ed2ee9372f0f3d72'),(p.font,'3cffb10242b4b7e6edd439ebf3bd7e392345525e093ea08149e0a0158a1b5151')]:
+for path,expected in [(params.psd,'cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024'),(params.official_dds,'d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01'),(params.english_source_png,'9f4a4c114a306bd039304415dce32d1a6addd9274e5f57b4ed2ee9372f0f3d72'),(params.font,'3cffb10242b4b7e6edd439ebf3bd7e392345525e093ea08149e0a0158a1b5151')]:
  assert hashlib.sha256(open(path,'rb').read()).hexdigest()==expected, 'source SHA mismatch: '+path
-font_path=p.font
-psd=PSDImage.open(p.psd)
+font_path=params.font
+psd=PSDImage.open(params.psd)
 flat=psd[1][0][2][1][0].topil().convert('RGBA')
-raw=bytearray(open(p.official_dds,'rb').read())
+raw=bytearray(open(params.official_dds,'rb').read())
 assert len(raw)==128+4096*2048*4 and raw[:4]==b'DDS '
 original=np.frombuffer(raw,dtype=np.uint8,offset=128).reshape((2048,4096,4)).copy()
 readable=original[::-1].copy()
@@ -62,7 +62,7 @@ r=np.full((H,W),255,dtype=np.float32)
 g=225-105*t+9*np.sin(x/37.0)
 bb=121-117*t+7*np.sin(x/24.0)
 # Use nearby source English material to condition glint warmth, with bounded range.
-src=np.array(Image.open(p.english_source_png).convert('RGBA').crop((x0,y0,x1,y1)))
+src=np.array(Image.open(params.english_source_png).convert('RGBA').crop((x0,y0,x1,y1)))
 bright=(src[:,:,0].astype(float)-src[:,:,2].astype(float))/255.0
 warm=np.clip(bright,0,1)
 g+=np.clip(warm*7,0,7)
@@ -100,13 +100,13 @@ plate_img=Image.fromarray(plate,'RGBA');plate_img.save(b+'Q060_PSD_PLATE_ONLY.pn
 layer.save(b+'Q060_PSD_KOREAN_LETTERING_ONLY.png')
 Image.fromarray(fa,'RGBA').save(b+'Q060_PSD_FINAL_ROI.png')
 preview=Image.new('RGB',(W*3,H*3),'#858585')
-original_source=Image.open(p.english_source_png).convert('RGBA').crop((x0,y0,x1,y1))
+original_source=Image.open(params.english_source_png).convert('RGBA').crop((x0,y0,x1,y1))
 for i,img in enumerate((original_source,Image.fromarray(prior[y0:y1,x0:x1,:],'RGBA'),Image.fromarray(fa,'RGBA'))):
  p=Image.new('RGB',(W,H),'#777777');p.paste(img,mask=img.getchannel('A'))
  for j,scale in enumerate((1.0,.75,.5)):
   tw,th=round(W*scale),round(H*scale)
   preview.paste(p.resize((tw,th),Image.Resampling.LANCZOS),(i*W,j*H))
 preview.save(b+'Q060_PSD_3WAY_ORIGINAL_OFFICIAL_TRIAL_100_75_50.jpg',quality=93)
-report={'asset':'q060 A064FDFC','candidate_status':'TRIAL_UNAPPROVED_C2_NOT_RUN','runtime_validation':'UNTESTED','source_psd_sha256':hashlib.sha256(open(p.psd,'rb').read()).hexdigest(),'psd_layer':'objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 0','english_source_sha256':'6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc','old_official_sha256':hashlib.sha256(open(p.official_dds,'rb').read()).hexdigest(),'new_trial_sha256':hashlib.sha256(open(out,'rb').read()).hexdigest(),'source_bbox':[x0,y0,x1,y1],'localized_text':msg,'glyph_mask_bbox_native':[ox,oy,ox+mask.width,oy+mask.height],'change_pixels':changed,'outside_source_bbox_change_pixels':0,'persisted_decoder_roundtrip_mismatch':0,'original_header_equal':open(out,'rb').read(128)==open(p.official_dds,'rb').read(128),'psd_text_independent':False,'psd_background_rgb_recovered':True,'source_family_optical':'UNQUALIFIED_VISUAL_REVIEW_REQUIRED'}
+report={'asset':'q060 A064FDFC','candidate_status':'TRIAL_UNAPPROVED_C2_NOT_RUN','runtime_validation':'UNTESTED','source_psd_sha256':hashlib.sha256(open(params.psd,'rb').read()).hexdigest(),'psd_layer':'objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 0','english_source_sha256':'6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc','old_official_sha256':hashlib.sha256(open(params.official_dds,'rb').read()).hexdigest(),'new_trial_sha256':hashlib.sha256(open(out,'rb').read()).hexdigest(),'source_bbox':[x0,y0,x1,y1],'localized_text':msg,'glyph_mask_bbox_native':[ox,oy,ox+mask.width,oy+mask.height],'change_pixels':changed,'outside_source_bbox_change_pixels':0,'persisted_decoder_roundtrip_mismatch':0,'original_header_equal':open(out,'rb').read(128)==open(params.official_dds,'rb').read(128),'psd_text_independent':False,'psd_background_rgb_recovered':True,'source_family_optical':'UNQUALIFIED_VISUAL_REVIEW_REQUIRED'}
 open(b+'Q060_PSD_PILOT_REPORT.json','w').write(json.dumps(report,indent=2,ensure_ascii=False))
 print(json.dumps(report,ensure_ascii=False))
