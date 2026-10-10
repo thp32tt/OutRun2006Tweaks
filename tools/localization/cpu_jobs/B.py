@@ -1,164 +1,289 @@
 #!/usr/bin/env python3
-"""B358 q212 P1: fix independently verified B358 P3 leaked old Hangul.
-New source-derived alpha-zero clean is committed to two full sprite ROIs
-before transparent-only glyph composition; trial is not official or C PASS.
+"""B359 q060 P0: contour-normal source-material vector bevel family rebuild.
+Responds to C2 B353 first-hand optical FAIL, changes the source-conditioned
+lighting model and English-measured slant rather than merely tweaking width.
+Unapproved source-proven CLEAN + lettering + persisted DDS; no official change.
 """
-import io,json,os,hashlib,subprocess,sys,urllib.request,struct
+import os,io,json,hashlib,struct,subprocess,sys
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageChops
 from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
-ROOT=Path("localization/graphics")
-ASSET=ROOT/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=ROOT/"role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD";OUT.mkdir(parents=True,exist_ok=True)
-sha=lambda b:hashlib.sha256(b).hexdigest()
-SOURCE_SHA="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
-OFFICIAL_SHA="e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
-C158_CLEAN_SHA="c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
-tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","212"],capture_output=True,text=True,check=True).stdout)["assets"][0]
-assert tri["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"),tri["next_action"]
-raw=ASSET.read_bytes();assert sha(raw)==OFFICIAL_SHA,("concurrent_q212_sha_change",sha(raw))
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-with urllib.request.urlopen(url,timeout=90) as response:src=response.read()
-assert sha(src)==SOURCE_SHA and raw[:128]==src[:128],("invalid_source",sha(src))
+G=Path("localization/graphics")
+OUT=G/"role_B/20261010-B359-Q060-CONTOUR-NORMAL-BEVEL-FAMILY"
+OUT.mkdir(parents=True,exist_ok=True)
+hs=lambda b:hashlib.sha256(b).hexdigest()
+SH={"source":"6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+"official":"d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+"clean":"a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+"mask":"25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9"}
+tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","60"],
+                           capture_output=True,check=True,text=True).stdout)["assets"][0]
+assert tri["next_action"]=="METHOD_CHANGE_REQUIRED",tri
+srcp=G/"hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+if srcp.is_file():src=srcp.read_bytes()
+else:
+ import urllib.request
+ url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+ with urllib.request.urlopen(url,timeout=90) as f:src=f.read()
+off=(G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds").read_bytes()
+pp=G/"role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE"
+cb=(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png").read_bytes()
+mb=(pp/"B348_SOURCE_BEST_TIME_PROPOSED_REMOVAL_MASK_READABLE.png").read_bytes()
+for n,b in [("source",src),("official",off),("clean",cb),("mask",mb)]:assert hs(b)==SH[n],(n,hs(b))
 def decode(data):
  return np.array(Image.open(io.BytesIO(data)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-S=decode(src);O=decode(raw)
-assert S.shape==O.shape==(2048,2048,4) and len(src)==len(raw)==16777344
-# Source properties C353 mechanically authenticated at exact current SHAs.
-# Only two source-text-only sprites are allowed to change. Preserve all 10
-# other q212 source/final localized cells, RAW orientation and header.
-regions=[
- {"id":"r43_professional","english":"PROFESSIONAL","ko":"프로페셔널 모드",
-  "original_bbox":[240,341,637,386],"atlas_roi":[0,341,638,404],"source_opaque_width":395},
- {"id":"r44_outrun","english":"OUTRUN","ko":"아웃런 모드",
-  "original_bbox":[1626,524,1837,569],"atlas_roi":[1626,524,1837,587],"source_opaque_width":209},
-]
-fontpath=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
-fb=fontpath.read_bytes();font_sha=sha(fb)
-fontindex=1;coverage=TTCollection(str(fontpath)).fonts[fontindex].getBestCmap()
-for reg in regions:assert all(ord(ch) in coverage for ch in reg["ko"] if ch!=" ")
-result=O.copy();mask=np.zeros(S.shape[:2],bool)
-for r in regions:
- l,t,x,b=r["atlas_roi"];mask[t:b,l:x]=True
-# C2 B357 proved old Korean pixels leaked because C was constructed but
-# result stayed initialized from O outside original English glyph bboxes.
-# Do not paint Korean onto those stale bytes. The known source-transparent
-# English title sprites get an independently decoded zero-alpha CLEAN PLATE;
-# preserve the other ten atlas cells, and make this full-roi CLEAN the actual
-# composite base BEFORE any glyph is added.
-C=O.copy()
-for r in regions:
- l,t,x,b=r["atlas_roi"]
- assert np.count_nonzero(S[t:b,l:x,3])>100,("canonical_source_slot_empty",r["id"])
- C[t:b,l:x]=0
- assert np.count_nonzero(C[t:b,l:x,3])==0,("P1_DIRTY_CLEAN",r["id"])
-result[mask]=C[mask]
-assert np.count_nonzero(result[mask,3])==0,"P3_COMPOSITE_BASE_DIRTY"
-# C158 full CLEAN provenance is separately sourced; scoped source-clean uses
-# two designated empty text cells, not a false whole-atlas identity claim.
-rec=[]
-for reg in regions:
- l,t,x,b=reg["original_bbox"];left,top,right,bottom=reg["atlas_roi"]
- source_crop=S[t:b,l:x];values=source_crop[source_crop[:,:,3]>=230][:,:3]
- assert len(values)>500,(reg["id"],"SOURCE_FACE_MISSING")
- # In opaque English cores colors are source-conditioned (original orange/red).
- # Use the dominant near-opaque face color, never a guessed brand palette.
- keys,counts=np.unique(values,axis=0,return_counts=True)
- core=keys[counts.argmax()].astype(np.uint8)
- font_size=43 if reg["id"].startswith("r43") else 42  # measured native glyph 42/41px tall inside English 45px bbox
- font=ImageFont.truetype(str(fontpath),font_size,index=fontindex)
- img=Image.new("L",(x-l,b-t),0);d=ImageDraw.Draw(img)
- # Draw directly at output pixel resolution, do not resample old Korean.
- bb=d.textbbox((0,0),reg["ko"],font=font)
- natural_w=bb[2]-bb[0];natural_h=bb[3]-bb[1]
- assert natural_w<=x-l-5 and natural_h<=b-t-3,(reg["id"],natural_w,natural_h,x-l,b-t)
- x0=2-bb[0];y0=((b-t)-natural_h)//2-bb[1]
- assert y0+bb[1]>=1 and y0+bb[3]<b-t
- d.text((x0,y0),reg["ko"],fill=255,font=font,stroke_width=0)
- a=np.array(img)
- ys,xs=np.nonzero(a>16);assert len(xs)>150
- nb=[l+int(xs.min()),t+int(ys.min()),l+int(xs.max()+1),t+int(ys.max()+1)]
- assert nb[0]>l and nb[1]>t and nb[2]<x and nb[3]<b,(reg["id"],nb)
- layer=np.zeros((b-t,x-l,4),np.uint8)
- layer[:,:,:3]=core
- layer[:,:,3]=a
- result[t:b,l:x]=layer
- # O may have historic text in left part of the same ROI; untouched neighbors
- # protected because only exact two ROIs are replaced.
- # C2 hard-fail gate: no inherited official glyph may survive anywhere
- # inside the full sprite ROI outside the original English glyph bbox.
- inside=np.zeros((bottom-top,right-left),bool)
- inside[t-top:b-top,l-left:x-left]=True
- old_outside=int(np.count_nonzero(O[top:bottom,left:right,3][~inside]))
- new_outside=int(np.count_nonzero(result[top:bottom,left:right,3][~inside]))
- assert new_outside==0,("OLD_KOREAN_LEAK",reg["id"],old_outside,new_outside)
- assert np.array_equal(result[t:b,l:x,3],a),("P3_GLYPH_ONLY_ALPHA",reg["id"])
- rec.append({"inherited_old_alpha_pixels_removed_outside_source_bbox":old_outside,"persisted_alpha_outside_source_bbox":new_outside,
-  "P1_plate_qa":"SCOPED_TRANSPARENT_ALPHA_ZERO","P3_composite_qa":"GLYPH_ONLY_ALPHA_NO_STALE_OFF_BBOX",
-  "id":reg["id"],"source_english":reg["english"],"translated_text":reg["ko"],
-  "new_text_has_semantic_suffix_for_source_hierarchy":True,
-  "native_font_ppem":font_size,"source_bbox":reg["original_bbox"],
-  "source_opaque_width":reg["source_opaque_width"],
-  "candidate_bbox":nb,"candidate_width":nb[2]-nb[0],
-  "candidate_width_ratio":round((nb[2]-nb[0])/reg["source_opaque_width"],4),
-  "positive_margins":[nb[0]-l,x-nb[2],nb[1]-t,b-nb[3]],
-  "original_source_core_rgb":core.tolist(),
-  "clean_alpha_zero":int(np.count_nonzero(C[top:bottom,left:right,3]))==0,
-  "source_opaque_face_count":len(values)})
-change=np.any(result!=O,axis=2)
-assert change.any() and np.count_nonzero(change&~mask)==0
-assert np.array_equal(result[~mask],O[~mask])
-ddsmasks=struct.unpack_from("<IIII",raw,92)
-assert ddsmasks in ((255,65280,16711680,4278190080),(16711680,65280,255,4278190080))
-order=[0,1,2,3] if ddsmasks[0]==255 else [2,1,0,3]
-dds=raw[:128]+np.flipud(result)[:,:,order].copy().tobytes()
-assert len(dds)==len(raw) and sha(dds)!=OFFICIAL_SHA
-D=decode(dds)
-assert np.array_equal(D,result),("DDS_ROUNDTRIP_FAIL")
-(OUT/"B358_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds").write_bytes(dds)
-def compose(a,roi,bg,rawview=False):
- l,t,r,b=roi
- if rawview:a=np.flipud(a);t,b=2048-b,2048-t
- im=Image.fromarray(a[t:b,l:r],"RGBA")
- background=Image.new("RGBA",im.size,bg+(255,));background.alpha_composite(im)
- return background.convert("RGB")
-evidence=[]
-for r in regions:
- for orient in ["FLIPY","RAW"]:
-  for bg_name,bg in [("GRAY",(122,122,122)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
-   for pct in ([100,75,50] if orient=="FLIPY" else [100]):
-    ims=[compose(im,r["atlas_roi"],bg,rawview=orient=="RAW") for im in (S,C,O,D)]
-    if pct!=100:ims=[im.resize((max(1,round(im.width*pct/100)),max(1,round(im.height*pct/100))),Image.Resampling.LANCZOS) for im in ims]
-    width=sum(im.width for im in ims)+3*8
-    sheet=Image.new("RGB",(width,max(im.height for im in ims)),bg)
-    off=0
-    for im in ims:sheet.paste(im,(off,0));off+=im.width+8
-    fn=f"B358_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
-    sheet.save(OUT/fn,optimize=True);evidence.append(fn)
- l,t,x,b=r["atlas_roi"]
- Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B358_{r['id']}_PLATE_ONLY.png")
- Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B358_{r['id']}_LETTERING_ONLY.png")
-qa={"schema_version":2,"role":"B","run":"B358","queue_index":212,
- "run_key":"OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
- "priority":"P1_IGR029_SHARED_MODE_ATLAS","triage":tri["next_action"],
- "method":"P3 composition logic materially corrected after independent C2 old Hangul residue proof: initialize persisted atlas with entire two source-transparency-clean sprite ROIs before new source-bbox glyph-only overlay; purge 5638/712-like old bleed. Same native Korean lettering retained pending strict source-family appearance review; official C338 remains unchanged.",
- "canonical_source_sha256":SOURCE_SHA,"full_C158_clean_reference_sha256":C158_CLEAN_SHA,
- "source_clean_stage":"P1_SCOPED_PERSISTED_ZERO_ALPHA_TWO_FULL_ROIS_NOT_FULL_C158_ATLAS",
- "current_official_sha256":OFFICIAL_SHA,"new_unapproved_trial_sha256":sha(dds),
- "C2_B357_defect":"INHERITED_OLD_KOREAN_VISIBLE_OUTSIDE_EXACT_ENGLISH_BBOX",
- "fix_stage":"P3_ACTUAL_ZERO_ALPHA_PLATE_USED_AS_COMPOSITE_BASE",
- "new_saved_trial_DDS":1,"official_promoted_DDS":0,
- "native_size":[2048,2048],"dds_format":"RGBA32","mips":1,"raw_orientation":"MIRROR_Y",
- "font_file":str(fontpath),"font_sha256":font_sha,"font_index":fontindex,
- "regions":rec,"changed_rgba_pixels":int(change.sum()),
- "outside_two_rois_rgba_change":int(np.count_nonzero(change&~mask)),
- "protected_other_10_current_cells_byte_exact":True,
- "decoded_persisted_mismatch":int(np.count_nonzero(np.any(D!=result,axis=2))),
- "evidence_previews":evidence,"producer_visual":"HOLD_SOURCE_FAMILY_OPTICAL_CONTROLLER_REVIEW",
- "independent_C2":"NOT_RUN","C3":"BLOCKED",
- "IGR029":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED"}
-(OUT/"B358_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-(OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 10 current atlas cells exact","method":"first-failure-stage P3 true CLEAN composition patch; unchanged native letters; no lowres upscaling, no width/shear affine","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B358","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
+S=decode(src);O=decode(off)
+C=np.array(Image.open(io.BytesIO(cb)).convert("RGBA"))
+M=np.array(Image.open(io.BytesIO(mb)).convert("L"))
+assert S.shape==O.shape==C.shape==(2048,4096,4) and M.shape==S.shape[:2]
+assert np.all(C[M>0]==0)
+assert int(np.any(S!=C,axis=2).sum())==89391
+assert int((np.any(S!=C,axis=2)&(M==0)).sum())==0
+# The B348 source-first evidence proves the English component geometry.
+# Repair an atlas-local fence including the former Korean overhang, restoring
+# the canonical adjacent source sprites (rather than keeping dirty B343 pixels).
+roi=(2090,337,3120,485);label_bbox=(2179,340,3028,474)
+x0,y0,x1,y1=roi;W=x1-x0;H=y1-y0
+# Source ROI contains exactly two English-alpha components. The Korean effect
+# must be inside their combined source effect bbox with strictly positive margin.
+original=S[y0:y1,x0:x1];plate=C[y0:y1,x0:x1]
+# Rebuild from SOURCE/CLEAN, never composite old dirty Korean lettering.
+# B359 source-conditioned thin-outline reconstruction: render individual
+# CJK vector outlines at source-native ppem and lay out syllabic components
+# separately, not a whole-word stretched raster or a flat filled font crop.
+fontp=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
+fontb=fontp.read_bytes();fontsha=hs(fontb);font_index=1
+cmap=TTCollection(str(fontp)).fonts[font_index].getBestCmap()
+word="최고 기록:"
+assert all(ord(ch) in cmap for ch in word if ch!=" ")
+ppem=128
+font=ImageFont.truetype(str(fontp),ppem,index=font_index)
+# Each native glyph is an independent letterform with its own width, baseline
+# and exactly one native contour resampling. Optical widths are chosen from the
+# English source's racing title role, not a whole-word width post-transform.
+target_hangul_w=132
+tracking=35
+letter_spacing=tracking
+space_advance=37
+local=Image.new("L",(W,H),0)
+d=ImageDraw.Draw(local)
+all_bb=[d.textbbox((0,0),ch,font=font) for ch in word if ch!=" "]
+body_h=max(bb[3]-bb[1] for bb in all_bb)
+assert 100<=body_h<=135,(body_h,ppem)
+native_glyphs=[]
+for ch in word:
+ if ch==" ":
+  native_glyphs.append((ch,None,space_advance));continue
+ bb=d.textbbox((0,0),ch,font=font)
+ im=Image.new("L",(bb[2]-bb[0]+4,body_h+4),0)
+ dr=ImageDraw.Draw(im)
+ dr.text((2-bb[0],2-bb[1]),ch,font=font,fill=255)
+ native=im.getbbox();assert native
+ im=im.crop(native)
+ if ch==":":
+  target_w=round(im.width*1.12)
+ else:
+  target_w=target_hangul_w
+ # Each letterform expands horizontally as a vector-outline surrogate at
+ # native size. This is not the rejected last-run whole-word spacing tweak.
+ im=im.resize((target_w,im.height),Image.Resampling.LANCZOS)
+ native_glyphs.append((ch,im,target_w))
+glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
+advance=glyph_width-tracking*(len(native_glyphs)-1)
+assert 700<=glyph_width<=845,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
+left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0-4 # source effect bbox centered with protected sibling margins
+top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
+top-=2
+pen=left
+for ch,im,w0 in native_glyphs:
+ if im is not None: local.paste(im,(pen,top),im)
+ pen+=w0+tracking
+mask=np.array(local)
+gy,gx=np.nonzero(mask>16);assert len(gx)>1000
+before=[int(gx.min()+x0),int(gy.min()+y0),int(gx.max()+1+x0),int(gy.max()+1+y0)]
+# Original pixel-derived homologous leading-stem anchor: on the first English
+# B use the 8th percentile of warm face x by native row, excluding neighboring
+# letters. Fit x(y) with ordinary least squares in the central source band.
+# A positive (top - bottom) slope in readable coordinates means right lean.
+anchor_rgb=original[:,:,:3].astype(np.int16)
+xa,ya=np.indices(original.shape[:2])[1],np.indices(original.shape[:2])[0]
+eng_face=(original[:,:,3]>=180)&(anchor_rgb[:,:,0]>=165)&(anchor_rgb[:,:,1]>=75)&(anchor_rgb[:,:,0]>anchor_rgb[:,:,2]+45)
+eng_face &= (xa+x0 >= label_bbox[0])&(xa+x0<label_bbox[0]+185)
+stem=[]
+for ry in range(label_bbox[1]-y0+18,label_bbox[3]-y0-18):
+ xs=np.where(eng_face[ry])[0]
+ if len(xs)>=5:stem.append((ry,float(np.percentile(xs,8))))
+assert len(stem)>=42,("MISSING_CANONICAL_B_STEM",len(stem))
+source_slope=float(np.polyfit([v[0] for v in stem],[v[1] for v in stem],1)[0])
+incline=round(-source_slope,4)
+assert .12<=incline<=1.15,("SOURCE_STEM_SLANT_UNQUALIFIED",incline)
+(OUT/"B359_SOURCE_B_RIGHT_LEAN_STEM.json").write_text(json.dumps({"source_first_glyph":"B","source_alpha_warm_stem_rows":len(stem),"source_x_dy":source_slope,"readable_top_minus_bottom_per_y":incline,"anchors":[[round(y+y0),round(x+x0,3)] for y,x in stem[::max(1,len(stem)//12)]],"review":"P2 source-single-B calibration only; independent multi-stem QA required"},indent=2)+"\n")
+
+local=local.transform((W,H),Image.Transform.AFFINE,(1,incline,-incline*(top+body_h+2),0,1,0),resample=Image.Resampling.BICUBIC)
+letter=np.array(local)
+# B359 source-conditioned pixel sampling rather than fabricated color stops.
+# English SOURCE is immutable. Warm face is isolated from navy outlines,
+# orange sibling art and alpha halos WITHIN the authenticated BEST TIME bbox.
+from scipy.ndimage import distance_transform_edt,gaussian_filter1d
+rgb_src=original[:,:,:3]
+source_warm=(original[:,:,3]>=180)&(rgb_src[:,:,0]>=165)&(rgb_src[:,:,1]>=75)&(rgb_src[:,:,0].astype(np.int16)>rgb_src[:,:,2].astype(np.int16)+45)
+source_warm &= (np.indices(source_warm.shape)[1]+x0 >= label_bbox[0]) & (np.indices(source_warm.shape)[1]+x0 < label_bbox[2])
+row_counts=source_warm.sum(axis=1)
+source_rows=np.where(row_counts>=12)[0]
+assert len(source_rows)>65,("UNRESOLVED_ENGLISH_FACE_ROWS",len(source_rows),int(source_warm.sum()))
+raw_row_medians=np.zeros((H,3),np.float64)
+raw_row_high=np.zeros((H,3),np.float64)
+for ry in source_rows:
+ vals=rgb_src[ry,source_warm[ry]].astype(np.float64)
+ raw_row_medians[ry]=np.median(vals,axis=0)
+ raw_row_high[ry]=np.percentile(vals,80,axis=0)
+row_profile=np.zeros((H,3),np.float64);row_high=np.zeros((H,3),np.float64)
+for k in range(3):
+ row_profile[:,k]=np.interp(np.arange(H),source_rows,raw_row_medians[source_rows,k])
+ row_high[:,k]=np.interp(np.arange(H),source_rows,raw_row_high[source_rows,k])
+row_profile=gaussian_filter1d(row_profile,sigma=1.5,axis=0)
+row_high=gaussian_filter1d(row_high,sigma=1.5,axis=0)
+# Exact-source dark edging extracted from actual alpha-opaque navy, not B359 brown.
+navy_mask=(original[:,:,3]>=185)&(rgb_src[:,:,2]>=rgb_src[:,:,0]+14)&(rgb_src[:,:,0]<115)&(rgb_src[:,:,1]<115)
+assert int(navy_mask.sum())>250,("MISSING_ENGLISH_NAVY",int(navy_mask.sum()))
+navy=np.median(rgb_src[navy_mask],axis=0).astype(np.uint8).tolist()
+navy=[min(65,navy[0]),min(80,navy[1]),max(52,navy[2])]
+# Use SOURCE face ink height, not arbitrary fixed red/yellow gradients.
+source_lo=int(source_rows.min());source_hi=int(source_rows.max())
+face=np.array(local,dtype=np.uint8)
+inside=face>=110
+fy,fx=np.nonzero(face>110)
+assert len(fx)>1000
+k_lo,k_hi=int(fy.min()),int(fy.max())
+assert k_hi-k_lo>=70
+# Native glyph y -> original source warm-face row y for EVERY Hangul pixel.
+ly,lx=np.indices((H,W));frac=np.clip((ly-k_lo)/max(1,k_hi-k_lo),0,1)
+q=np.clip((source_lo+frac*(source_hi-source_lo)).astype(np.int32),0,H-1)
+colored=(0.68*row_profile[q]+0.32*row_high[q]).copy()
+# Raised top-facing contour receives actual source face upper quantiles, not
+# uniform white bars. Preserve Hangul counter-space by tight native masks.
+dist=distance_transform_edt(inside)
+# New B359 method: source-matched NORMAL-DIRECTED BEVEL, not B353's
+# purely horizontal source-color rows + fixed gold highlights. The pixel
+# normal of the final 128ppem Hangul contour determines which face edge catches
+# light; top/leading face receives actual source 85%-quantile white/yellow.
+# Counters stay open because highlights exist only INSIDE the glyph alpha.
+gy_norm,gx_norm=np.gradient(dist.astype(np.float32))
+source_top_band=source_warm & (np.indices(source_warm.shape)[0]<=source_lo+int(.32*(source_hi-source_lo)))
+assert int(source_top_band.sum())>300,("MISSING_TOP_SOURCE_HIGHLIGHT",int(source_top_band.sum()))
+source_lit_ref=np.percentile(rgb_src[source_top_band],85,axis=0)
+top_bevel=inside & (dist>=1)&(dist<=7)&(gy_norm>.12)
+side_bevel=inside & (dist>=1)&(dist<=5)&(gx_norm<-.15)
+colored[top_bevel]=.28*colored[top_bevel]+.72*source_lit_ref
+colored[side_bevel]=.78*colored[side_bevel]+.22*row_high[q][side_bevel]
+# Source native strong orange face within the central body, not B353 pale thin
+# median. Calibrated true source warm max and navy are preserved separately.
+deep_face=inside&(dist>=7)&(frac>.6)
+colored[deep_face]=.75*colored[deep_face]+.25*row_profile[q][deep_face]
+ink=Image.new("RGBA",(W,H),(0,0,0,0))
+# 3D sidewall: source-conditioned navy blue extrusion is visibly thick on
+# English BEST TIME; use a true separated backplate (not flat all-red shadow).
+edge=local.filter(ImageFilter.MaxFilter(9))
+extrusion=ImageChops.offset(edge,3,5)
+shade=Image.new("RGBA",(W,H),tuple(navy)+(0,));shade.putalpha(extrusion)
+ink=Image.alpha_composite(ink,shade)
+rim=Image.new("RGBA",(W,H),tuple(navy)+(0,));rim.putalpha(edge)
+ink=Image.alpha_composite(ink,rim)
+material=np.zeros((H,W,4),np.uint8)
+material[:,:,:3]=np.clip(colored,0,255).astype(np.uint8)
+material[:,:,3]=face
+ink=Image.alpha_composite(ink,Image.fromarray(material,"RGBA"))
+source_profile={"source_face_warm_pixels":int(source_warm.sum()),"source_face_qualified_rows":len(source_rows),"source_face_row_range":[source_lo+y0,source_hi+y0],"source_navy_pixels":int(navy_mask.sum()),"source_navy_median_rgb":navy,"source_color_samples":[{"y":int(y0+j),"count":int(row_counts[j]),"rgb_median":raw_row_medians[j].round().astype(int).tolist(),"rgb_high_80":raw_row_high[j].round().astype(int).tolist()} for j in source_rows[::max(1,len(source_rows)//14)]],"korean_face_row_range":[k_lo+y0,k_hi+y0],"construction":"source-English B measurable right-stem x(y) tilt + contour NORMAL-DIRECTED top highlight from actual English source 85%-quantile warm face and separated navy 3D extrusion; new source-conditioned P2 method versus B353 horizontal bands"}
+(OUT/"B359_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json").write_text(json.dumps(source_profile,indent=2,ensure_ascii=False)+"\n")
+color_top=row_profile[source_lo].round().astype(int).tolist()
+color_bottom=row_profile[source_hi].round().astype(int).tolist()
+V=np.array(ink)
+iy,ix=np.nonzero(V[:,:,3]>0);assert len(ix)>1000
+render_bbox=[int(ix.min()+x0),int(iy.min()+y0),int(ix.max()+1+x0),int(iy.max()+1+y0)]
+assert render_bbox[0]>label_bbox[0] and render_bbox[1]>label_bbox[1] and render_bbox[2]<label_bbox[2] and render_bbox[3]<label_bbox[3],(render_bbox,label_bbox)
+# Source material and CLEAN/LETTERING remain separately persisted.
+p=Image.fromarray(plate,"RGBA")
+assert np.all(plate[M[y0:y1,x0:x1]>0,3]==0)
+after=Image.alpha_composite(p,ink)
+new=O.copy()
+new[y0:y1,x0:x1]=np.asarray(after)
+# The source-derived CLEAN replacement is bounded only to this q060 cell.
+diff=np.any(new!=O,axis=2)
+allowed=np.zeros(diff.shape,bool);allowed[y0:y1,x0:x1]=True
+assert int((diff&~allowed).sum())==0
+# Confirm source original neighbour alpha outside the original English mask
+# remains pixel-exact where no Korean effect is drawn, even inside repair ROI.
+in_effect=np.zeros((H,W),bool);in_effect[V[:,:,3]>0]=True
+other_visible=(original[:,:,3]>0)&(M[y0:y1,x0:x1]==0)&(~in_effect)
+assert int(np.any(np.asarray(after)[other_visible]!=original[other_visible],axis=1).sum())==0
+# RAW DDS roundtrip. Preserve header/mip, channel masks and orientation.
+assert len(off)==33554560 and len(src)==len(off) and off[:128]==src[:128]
+rgba_masks=struct.unpack_from("<IIII",off,92)
+assert rgba_masks in ((255,65280,16711680,4278190080),(16711680,65280,255,4278190080)),rgba_masks
+order=[0,1,2,3] if rgba_masks[0]==255 else [2,1,0,3]
+newdds=off[:128]+np.flipud(new)[:,:,order].copy().tobytes()
+assert len(newdds)==len(off) and hs(newdds)!=SH["official"]
+D=decode(newdds)
+assert np.array_equal(D,new)
+fn="B359_Q060_SOURCE_CONTOUR_GOLD_KOREAN_UNAPPROVED.dds"
+(OUT/fn).write_bytes(newdds)
+Image.fromarray(plate,"RGBA").save(OUT/"B359_BEST_TIME_PLATE_ONLY_ROI.png")
+ink.save(OUT/"B359_BEST_TIME_TRANSPARENT_LETTERING_ROI.png")
+Image.fromarray(new,"RGBA").save(OUT/"B359_Q060_DECODED_FINAL_FULL_READABLE.png")
+# bounded proof panels; no visual PASS inferred by the worker.
+ev=[]
+r=[2075,212,3135,535]
+def render(a,bg):
+ i=Image.fromarray(a[r[1]:r[3],r[0]:r[2]],"RGBA")
+ c=Image.new("RGBA",i.size,bg+(255,));c.alpha_composite(i)
+ return c.convert("RGB")
+for bgkey,bg in [("GRAY",(128,128,128)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+ for size in [100,75,50]:
+  panels=[render(a,bg) for a in [S,C,O,new]]
+  if size!=100:panels=[z.resize((round(z.width*size/100),round(z.height*size/100)),Image.Resampling.LANCZOS) for z in panels]
+  w,h=panels[0].size
+  sheet=Image.new("RGB",(4*w+36,h),bg)
+  for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
+  file=f"B359_SOURCE_CLEAN_OFFICIAL_NEW_{bgkey}_{size}_FLIPY.png"
+  sheet.save(OUT/file,optimize=True);ev.append(file)
+for view in ["RAW"]:
+ panels=[render(a,(80,80,80)).transpose(Image.Transpose.FLIP_TOP_BOTTOM) for a in [S,C,O,new]]
+ w,h=panels[0].size
+ sheet=Image.new("RGB",(4*w+36,h),(80,80,80))
+ for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
+ fn2="B359_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png";sheet.save(OUT/fn2,optimize=True);ev.append(fn2)
+Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B359_PREVIOUS_TO_TRIAL_NATIVE_CHANGED_MASK.png")
+# Readable top-minus-bottom optical evidence is a distinct manual inspection,
+# not a computed homologous-source slant PASS.
+report={"schema_version":2,"role":"B","run":"B359","queue_index":60,
+"run_key":"OUTRUN-KOR-B359-Q060-P0-NORMAL-BEVEL-SOURCE-ANCHOR-20261010-2133",
+"method":"New B359 contour-normal-directed source English 85-percentile bevel & source-stem measured readable right lean with separate navy extrusion, native 128ppem letterforms on B348 source-proven CLEAN. Corrects C2 B353 flat/thin face root cause, not a same-method width-only/shear-only rerender. Trial awaits optical C2.",
+"triage":tri["next_action"],"priority":"P0","source_sha256":SH["source"],"prior_official_sha256":SH["official"],
+"authored_clean_sha256":SH["clean"],"authored_mask_sha256":SH["mask"],"trial_persisted_sha256":hs(newdds),
+"trial_DDS":fn,"bytes":len(newdds),"source_bbox":list(label_bbox),"new_effect_bbox":render_bbox,
+"native_glyph_bbox_pre_italic":before,"text":word,"font_file":fontp.name,"font_sha256":fontsha,"font_license":"OFL Noto CJK; verify distribution before packaging",
+"glyph_coverage":"ALL_CODEPOINTS_PRESENT","font_native_ppem":ppem,"letter_spacing":letter_spacing,"natural_advance_px":advance,
+"source_gold_sample_rgb_upper":color_top,"source_gold_sample_rgb_lower":color_bottom,
+"readable_single_affine_lean_SOURCE_B_STEM_ONLY_NOT_WHOLE_FAMILY":incline,"source_B_stem_fit_dx_dy":source_slope,
+"gradient":"SOURCE_MEASURED_ENGLISH_FACE_ROWS_AND_QUANTILES","stroke_px":4,"extrusion_offset":[3,5],
+"roi":list(roi),"changed_rgba_pixels":int(diff.sum()),"changed_rgba_outside_roi":0,"original_protected_sibling_rgba_changed_outside_effect":0,
+"persisted_dds_roundtrip_mismatch":int(np.any(D!=new,axis=2).sum()),"raw_channel_masks":list(rgba_masks),
+"source_clean_source_pixels_removed":89391,"preview_files":ev,"new_trial_dds":1,"new_promoted_dds":0,
+"P1":"REUSED_B348_SCOPED_SOURCE_CLEAN_VISUAL_PASS","P2":"NEW_TRANSPARENT_GLYPHS_NEED_CONTROLLER_OPTICAL_REVIEW",
+"P3":"PERSISTED_TRIAL_MECHANICAL_ROUNDTRIP_PASS_VISUAL_PENDING",
+"final_production_pixel_guard":"NOT_APPLICABLE_TO_UNPROMOTED_TRIAL","official_C2":"C342_REWORK_REQUIRED_UNCHANGED","C3":"BLOCKED",
+"IGR044":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED",
+"forbidden":["A_ODD","C1","VR","FFB","DX11","DXVK"]}
+(OUT/"B359_Q060_MACHINE_AND_SOURCE_FAMILY.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
+(OUT/"recipe.json").write_text(json.dumps({"canonical_source":{"sha256":SH["source"],"revision":"OR2-HD-GUI-v0.25.10a"},
+"source_clean":{"path":str(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png"),"sha256":SH["clean"]},
+"font":{"path":str(fontp),"sha256":fontsha,"index":font_index,"native_ppem":ppem,"glyphs":word},
+"plate_mask_sha256":SH["mask"],"source_face_row_profile":"B359_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json","face_gradient":[color_top,color_bottom],
+"effect":{"outline":4,"navy_extrusion_offset":[3,5],"readable_lean_source_B_stem_measured":incline,"face_normal_lighting":"source-English face 85-percentile highlighted at top-facing glyph contour normals"},
+"protected_siblings":["OUTRUN MILES","HOLLY WOLF","all other source atlas regions"],
+"construction":"B359 genuinely different source-normal bevel: 128ppem native Hangul with contour-space 85th-percentile SOURCE highlight (top-facing gradients), navy 3x5 side wall and actual English B first-stem right-lean OLS; source-proven B348 PLATE. C2 visual candidate only.",
+"need_C2_source_slant_homologous_anchors":True,
+"no_final_candidate_published":True},ensure_ascii=False,indent=2)+"\n")
+print("B359",hs(newdds),"font_px",ppem,"bbox",render_bbox,"newchg",int(diff.sum()),flush=True)
