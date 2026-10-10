@@ -2061,7 +2061,7 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
-            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget;
+            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
@@ -2911,7 +2911,7 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
-            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget;
+            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
@@ -3721,7 +3721,7 @@ namespace OutRunVRStereo
 
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept
     {
-        return R29OwnerBorrowTrackedRenderTarget;
+        return R29OwnerBorrowTrackedRenderTarget();
     }
 
     IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept
