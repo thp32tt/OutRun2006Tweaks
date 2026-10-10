@@ -17,37 +17,91 @@
     ".github/workflows/backend-conversion-gate.yml:R226"
   ],
   "base_sha": "de0331e7cd85e66da5012e7d70e7ecffe8c1b90c",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "automation_validation": "PENDING",
+  "material_result_sha": "6f35d444c2609e2870df1755680b4c1bcc16d686",
+  "validation_bearing_result_sha": "6f35d444c2609e2870df1755680b4c1bcc16d686",
+  "result_sha": "6f35d444c2609e2870df1755680b4c1bcc16d686",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
-  "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
   "pipeline": {
-    "C0": "PASS: branch GitHub HEAD and controller checkpoint; 00523 run absent; predecessor 00522 terminal upstream R175 block",
-    "C1": "PASS: indexed D32 texture accepts auxiliary bind/misc flags under R218; R175 separate owner",
-    "C2": "PASS: production readiness source, real indexed WARP fixture, 5 negative source mutations and workflow hookup",
-    "C3": "SCOPED_LOCAL_STATIC_PASS; EXACT_SHA_GATE_PENDING",
-    "C4": "MATERIAL_COMMIT_IN_THIS_TRANSACTION",
-    "C5": "NOT_REQUIRED: game DrawIndexed dormant, no HMD package",
-    "C6": "PENDING_EXACT_SHA_CI_RESULT"
+    "C0": "PASS GitHub HEAD, checkpoint and 00522 terminal predecessor; 00523 separate owner and R226 work_key",
+    "C1": "PASS R218 dedicated depth backing lacked exact BindFlags and zero MiscFlags, R175 separately owned",
+    "C2": "PASS substantive native C++ guarded D32 indexed depth backing, indexed real WARP DrawIndexed proof, 5 R226 and 20 R218 scoped mutants",
+    "C3": "SCOPED_PASS R218/R226 source tests and R186 GPU WARP; FULL_GATE_FAIL exact-SHA 38031979217 inherited independent R175 TEXCOORD6 VS/PS varying",
+    "C4": "PASS 11b71392 initial material and 6f35d444 scoped R218 test repair; both correctly [AUTO:CONVERSION-DX11-00523] no CI-skip on material",
+    "C5": "NOT_REQUIRED native gameplay DrawIndexed still dormant, Quest3/VDXR HMD validation UNTESTED",
+    "C6": "BLOCKED_DEPENDENCY_R175 material SHA 6f35d444 sealed, global Gate FAIL, runtime UNTESTED, no score or promotion"
   },
   "changed_files": [
     "src/vr/d3d11/native_indexed_target_viewport.hpp",
     "tools/dx11_indexed_draw_probe_r186.cpp",
-    ".github/workflows/backend-conversion-gate.yml",
     "tools/test_dx11_indexed_depth_dedicated_r226.py",
+    "tools/test_dx11_indexed_sealed_eye_r218.py",
+    ".github/workflows/backend-conversion-gate.yml",
     "docs/automation/runs/CONVERSION-DX11-00523.json"
   ],
   "static_validation": "PASS 5 source negative mutants simulated by contract; formal Python test in CI",
   "blockers": [
-    "Inherited R175 WARP generic-varying BGRA mismatch independently owned by DX11-00477",
-    "Quest3 VDXR untested"
+    "Inherited R175 TEXCOORD6 generic VS/PS varying WARP mismatch BGRA [128,0,16,255] expected [224,128,32,255], task 00477 owns tools/dx11_constant_buffer_probe.cpp; this is a confirmed upstream failure, do not bypass.",
+    "Quest3/VDXR gameplay not tested, native gameplay DrawIndex activation forbidden."
   ],
-  "resume_cursor": "READ_EXACT_SHA_BACKEND_CONVERSION_GATE",
-  "next_action": "If exact-SHA Gate passes mark automation PASS in follow-up no-CI status commit; if inherited R175 failure distinguish scoped R226 vs global FAIL and seal truthfully, not as runtime PASS.",
+  "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER",
+  "next_action": "Do not redispatch 00523 or count a point. Prior R226 C++ depth-only descriptor and R186 WARP DrawIndexed GPU pixel PASS on exact material 6f35; full gate blocked at independently owned R175 VS/PS generic TEXCOORD6 WARP mismatch (00477), which requires separate fenced owner to resolve; proceed only to an unrelated DX11 work_key, no DXVK or native game Draw promotion.",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
-  "timestamp_kst": "2026-10-10T15:36:00+09:00"
+  "timestamp_kst": "2026-10-10T15:55:27+09:00",
+  "first_material_sha": "11b71392c2608763e8b06e62f6b28170f0d83b2e",
+  "scoped_automation_validation": "PASS_R218_R226_R186_WARP",
+  "terminal": true,
+  "validation_run_id": 38031979217,
+  "validation_job_id": 114154654474,
+  "readiness_smoke_job_id": 114155590818,
+  "retry_count": 0,
+  "repair_commits": 1,
+  "gate_repair_count": 1,
+  "validation_bearing_result_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/6f35d444c2609e2870df1755680b4c1bcc16d686",
+  "state_persisted": true,
+  "summary": "R226 indexed D32 per-eye backing resource exact BindFlags and zero MiscFlags fail-closed C++ implementation; 5 scoped source mutants and actual WARP DrawIndexed green pixel PASS. Repaired inherited R218 source test expected legacy loose mask. Full exact-SHA Gate FAIL solely at existing independently owned R175 varying WARP pixel mismatch; no HMD/game test.",
+  "evidence": {
+    "source_guard": "R226 depthDesc.MiscFlags != 0 and depthDesc.BindFlags != D3D11_BIND_DEPTH_STENCIL fail-closed",
+    "inherited_r218_mutation_repair": "tools/test_dx11_indexed_sealed_eye_r218.py now checks stricter exact depth descriptor (20 mutants); no relaxed check",
+    "first_gate": {
+      "id": 38031580594,
+      "head_sha": "11b71392c2608763e8b06e62f6b28170f0d83b2e",
+      "conclusion": "failure",
+      "reason": "R218 static contract still expected old loose BindFlags mask"
+    },
+    "final_gate": {
+      "id": 38031979217,
+      "head_sha": "6f35d444c2609e2870df1755680b4c1bcc16d686",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114154654474,
+      "validate": "success",
+      "smoke_job_id": 114155590818,
+      "smoke": "failure",
+      "r218_static": "success",
+      "r226_static": "success",
+      "r186_warp_build": "success",
+      "r186_warp_run": "success",
+      "failed_step": "Run DX11 constant buffer probe",
+      "failure_class": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "issue14_comment_id": 6094725294,
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false
+  }
 }
