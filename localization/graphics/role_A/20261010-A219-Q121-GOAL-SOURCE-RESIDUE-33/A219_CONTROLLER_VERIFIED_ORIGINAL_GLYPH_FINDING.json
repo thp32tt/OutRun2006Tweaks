@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "run": "A219",
+  "role": "A",
+  "run_key": "OUTRUN-KOR-A219-Q121-GOAL-33-SOURCE-RESIDUE-20261010",
+  "queue_index": 121,
+  "owner_lane": "A",
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "user_ingame_open": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "old_approved_status": "C335_C1_HOLD_STRICT_RECHECK",
+  "basis": "A215 independently readable saved-native component19 SOURCE/CLEAN/FINAL PNG inspected via connected GitHub bytes; separate lightweight Pillow/NumPy pixel examination; full current DDS re-check delegated to A219 Actions",
+  "source_png": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_19_SOURCE_NATIVE_RGBA.png",
+  "clean_png": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_19_CLEAN_NATIVE_RGBA.png",
+  "official_png": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_19_FINAL_NATIVE_RGBA.png",
+  "readable_crop": [
+    3184,
+    651,
+    3391,
+    756
+  ],
+  "language_context": "English source word 'goal.' from source-bound Korean string 'For Experts & Long distance to the goal' / '상급자용 · 골까지 장거리'; only isolated source text removal, not inferred Ferrari art or overlay.",
+  "calibration": {
+    "crop_px": [
+      207,
+      105
+    ],
+    "original_alpha_nonzero": 9686,
+    "original_alpha_gt16": 9672,
+    "clean_alpha_nonzero": 33,
+    "clean_alpha_gt16": 33,
+    "final_alpha_nonzero": 33,
+    "final_alpha_gt16": 33,
+    "clean_final_RGBA_pixel_diff": 0,
+    "source_clean_RGBA_pixel_diff": 9653,
+    "residual_RGBA": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "residual_all_identical_to_source_and_final": true,
+    "residual_readable_local_x_range": [
+      26,
+      123
+    ],
+    "residual_readable_local_y_range": [
+      39,
+      70
+    ]
+  },
+  "corrective_action": "Remove exactly 33 inherited orphan English glyph pixels within authenticated goal region; generate unpromoted DDS with exact 33-pixel changed mask, persistence/mirror-Y QA and native/practical comparison; do not replace official until independent C1/C3 and full 29-segment original/protected semantic masks.",
+  "producer_findings": "CONFIRMED_VISIBLE_SOURCE_RESIDUE_ON_SAVED_CURRENT_Q121_EVIDENCE",
+  "current_approval": "HOLD_REWORK_REQUIRED_NOT_PROMOTED",
+  "actual_game": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
