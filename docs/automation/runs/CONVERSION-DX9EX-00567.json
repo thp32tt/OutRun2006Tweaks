@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00567",
+  "production_id": "CONVERSION-DX9EX-00567",
+  "event_id": "CONVERSION-DX9EX-00567-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "2d1258d0c83e852dc144c0479f53f6c6db3ac8bb",
+  "checkpoint_branch": "chat-controller-downloads",
+  "checkpoint_path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX9EX-00567/20261010T1245-pre-rollover-0001.json",
+  "checkpoint_verified": true,
+  "prior_result_record_exists": false,
+  "material_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
+  "validation_bearing_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00567]",
+  "status": "WAIT_EXACT_SHA_CI",
+  "controller_terminal": false,
+  "retry_allowed": false,
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "work_key": "DX9EX:P1P2:XR_FOV_SIGNED_SPAN_ATOMIC_FINITE_PROJECTION",
+  "conflict_keys": [
+    "src/vr/core/matrix.hpp:ProjectionFromOpenXrFov",
+    "vrhost/tests/core_math_smoke.cpp:negative-FOV-regression"
+  ],
+  "changed_paths": [
+    "src/vr/core/matrix.hpp",
+    "vrhost/tests/core_math_smoke.cpp"
+  ],
+  "summary": "Reject negative-width/height XR per-eye FOV instead of mirroring stereo; publish candidate projection only after MatrixFinite validation. Add Release-active checks for zero, inverted axes, NaN, Infinity base, asymmetric valid FOV.",
+  "source_review": "Confirmed independent from 00566 R32 diagnostic and smoke paths; no files overlap 00566; no previous 00567 result. Preserved FFB v0.2, immutable DX9Ex baseline and isolated DX11/DXVK/localization.",
+  "static_validation": "GITHUB_DIFF_REVIEWED_WITH_NEGATIVE_CASES; Actions exact-SHA pending",
+  "ci_runs": {
+    "dx9ex_active": 38022025928,
+    "domain_isolation": 38022025870,
+    "full_source_impact": 38022025968
+  },
+  "package": {
+    "status": "WAIT_CI_NO_HMD_APPROVAL"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD/checkpoint 00567 E002 and no result record",
+    "C1_REVIEW": "PASS unique inverted-FOV and partial-publication defect; independent 00566 file ownership",
+    "C2_IMPLEMENT": "PASS two-file source change and Release-active smoke negative cases",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
+    "C4_COMMIT": "PASS material 54cc213f19da with exact marker, remote ref verified",
+    "C5_PACKAGE": "PENDING CI artifacts",
+    "C6_RESULT": "INTERIM await CI; do not mark COMPLETE"
+  },
+  "next_action": "Check exact-SHA CI results, build and test logs, then update this record terminal only on success. Apply AI 2 +1 once only if work meets rubric; same TASK_ID rollover/retry never duplicates."
+}
