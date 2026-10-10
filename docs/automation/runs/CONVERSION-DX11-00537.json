@@ -2,7 +2,7 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_id": "CONVERSION-DX11-00537-E008",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
@@ -300,5 +300,66 @@
     "runtime_validation": "UNTESTED",
     "score_change": 0,
     "next_action": "Controller promote approved feature source only after ownership and lease recheck, run target exact-SHA Backend Conversion Gate; user run opt-in artifact to establish native_draws/desktop_insets/game controls. Do not label WARP or static output as gameplay native complete."
+  },
+  "rollover_8": {
+    "event_id": "CONVERSION-DX11-00537-E008",
+    "event_type": "rollover",
+    "chat_rollover": 8,
+    "attempt": "1/3",
+    "reviewed_at_kst": "2026-10-11T04:14:51+09:00",
+    "controller_checkpoint": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0410-pre-rollover-0007.json",
+    "controller_checkpoint_verified": true,
+    "checkpoint_stale_blocker": "ACCEPTANCE_ITEM_PENDING:DX11-LIVE-CALLSITE",
+    "recovery_status": "FEATURE_READY_PENDING_CONTROLLER_PROMOTION",
+    "target_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "feature_head_before_review": "4a00f8a0086fa6c42b29d4937f45042ab7bb85d9",
+    "validation_bearing_material_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+    "source_diff_since_material": "2 commits ahead; docs/automation/runs/CONVERSION-DX11-00537.json only, no C++/workflow/test source changes",
+    "acceptance_items": {
+      "DX11-LIVE-CALLSITE": "PASS_SOURCE_BUILD__RUNTIME_UNTESTED",
+      "DX11-NATIVE-DRAW": "PASS_SOURCE_BUILD__RUNTIME_UNTESTED",
+      "DX11-VISIBLE-FRAME": "PASS_SOURCE_BUILD__RUNTIME_UNTESTED",
+      "DX11-SAFE-RETURN": "PASS_SOURCE_BUILD__RUNTIME_UNTESTED",
+      "DX11-TEST-BUNDLE": "PASS_REAL_X86_X64_BUNDLE__RUNTIME_UNTESTED"
+    },
+    "latest_exact_head_ci": {
+      "Build": {
+        "run_id": 38077073346,
+        "head_sha": "4a00f8a0086fa6c42b29d4937f45042ab7bb85d9",
+        "conclusion": "SUCCESS",
+        "steps": "4 feature acceptance steps and Win32 Release build all successful"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38077073320,
+        "head_sha": "4a00f8a0086fa6c42b29d4937f45042ab7bb85d9",
+        "conclusion": "SUCCESS",
+        "steps": "5 x86 game variants, x64 host and diagnostic bundle jobs successful"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38077073315,
+        "head_sha": "4a00f8a0086fa6c42b29d4937f45042ab7bb85d9",
+        "conclusion": "SUCCESS"
+      }
+    },
+    "pr": {
+      "number": 114,
+      "state": "OPEN",
+      "mergeable": true,
+      "head_sha": "4a00f8a0086fa6c42b29d4937f45042ab7bb85d9",
+      "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba"
+    },
+    "ownership": "R175 00477 already owns translator/parity fix, untouched; TARGET is controller-only",
+    "status_note": "Stale checkpoint LIVE-CALLSITE blocker is superseded by GitHub run-record accepted C6 and latest exact-feature-HEAD CI. Do not redo completed implementation or synthesize a new WARP feature.",
+    "remaining": [
+      "Controller-only promotion with lease/ownership recheck",
+      "Post-promotion target Backend Conversion Gate validate and DX11 readiness smoke",
+      "User OR2006C2C.EXE game pixel/diagnostic inset/input + Quest3/VDXR runtime verification"
+    ],
+    "next_action": "Controller advances PR #114/target only after ownership check. User tests existing opt-in artifact 11678470577 (or rebuilt artifact with identical source) and collects game_tri_draws/native_draws/desktop_insets/failed and input observations.",
+    "runtime_validation": "UNTESTED",
+    "hmd_test_performed": false,
+    "new_feature_material": false,
+    "duplicate_acceptance_implementation": false,
+    "score_change": 0
   }
 }
