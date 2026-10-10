@@ -432,6 +432,34 @@ int main() {
     context->DrawIndexed(3u,0u,0);
     require(r217ReadCenter(true),"R219 restored WARP indexed green pixel");
 
+    // R229: live same-device GPU predication is invisible to R219 OM checks.
+    const auto r229Ready = [&] {
+        return outrun::vr::dx11::verified_indexed_unpredicated_eye_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),r217Dsv.Get(),
+            r217State.Get(),rs.Get());
+    };
+    require(r229Ready(),"R229 initial unpredicated indexed eye");
+    D3D11_QUERY_DESC r229QueryDesc{};
+    r229QueryDesc.Query=D3D11_QUERY_OCCLUSION_PREDICATE;
+    ComPtr<ID3D11Predicate> r229Predicate;
+    require(SUCCEEDED(device->CreatePredicate(
+        &r229QueryDesc,r229Predicate.GetAddressOf())) && r229Predicate,
+        "R229 create same-device occlusion predicate");
+    context->SetPredication(r229Predicate.Get(),FALSE);
+    require(r219NewReady(ps.Get()),"R229 predecessor accepts active predicate");
+    require(!r229Ready(),"R229 reject false-polarity predication");
+    context->SetPredication(r229Predicate.Get(),TRUE);
+    require(!r229Ready(),"R229 reject true-polarity predication");
+    context->SetPredication(nullptr,FALSE);
+    require(r229Ready(),"R229 restore unpredicated indexed eye");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),
+        "R229 unpredicated WARP DrawIndexed restores green pixel");
+
     context->OMSetRenderTargets(1,&rawTarget,nullptr);
     context->OMSetDepthStencilState(nullptr,0u);
 

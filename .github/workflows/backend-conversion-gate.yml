@@ -401,6 +401,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_indexed_uav_eye_r219.py
 
+      # R229: no live conditional GPU query during owned DrawIndexed.
+      - name: Verify R229 indexed GPU predication fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_predication_r229.py
+
       - name: Build R186 owned indexed Draw WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186

@@ -44,4 +44,30 @@ namespace outrun::vr::dx11 {
     }
     return isolated;
 }
+
+// R229: R219 proves sole-eye OM ownership, but a live GPU predicate can
+// silently skip this otherwise owned DrawIndexed. No game draw dispatch here.
+[[nodiscard]] inline bool verified_indexed_unpredicated_eye_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, UINT firstIndex, UINT indexCount,
+    INT baseVertex, std::uint64_t generation, std::uint64_t vbVersion,
+    std::uint64_t ibVersion, UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv, ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !verified_indexed_uav_isolated_eye_ready(
+            vb, ib, context, firstIndex, indexCount, baseVertex,
+            generation, vbVersion, ibVersion, width, height, format,
+            expectedLayout, expectedVs, expectedPs, expectedRtv,
+            expectedDsv, expectedDepthState, expectedRaster))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Predicate> livePredicate;
+    BOOL predicatePolarity = FALSE;
+    context->GetPredication(livePredicate.GetAddressOf(), &predicatePolarity);
+    // Both polarities can suppress a native draw until a query-result
+    // ownership contract is implemented. Do not assume a stale result.
+    return !livePredicate;
+}
 } // namespace outrun::vr::dx11

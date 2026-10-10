@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00526",
+  "production_id": "CONVERSION-DX11-00526",
+  "event_id": "CONVERSION-DX11-00526-E001",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "0de08549888cf36ba5ccdd3e29d5ab220167f742",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00526",
+  "lease_epoch": 1,
+  "work_key": "DX11:R229:INDEXED_GPU_PREDICATION_EXECUTION_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_predication_r229.py"
+  ],
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "terminal": false,
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R229 live D3D11 GPU predication fence for owned indexed sole-eye DrawIndexed readiness; both predicate polarities rejected and WARP GPU pixel restored. No game draw activation.",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_predication_r229.py",
+    "docs/automation/runs/CONVERSION-DX11-00526.json"
+  ],
+  "static_validation": "PENDING_CHANGED_SOURCE_CHECK",
+  "pipeline": {
+    "C0": "PASS GitHub 0de0854 and 00525 terminal C6, no prior 00526",
+    "C1": "PASS R229 independent native draw execution-state gap; R175 owner excluded",
+    "C2": "PASS C++ composed sole-eye guard + WARP true/false negative/restore + four source mutants",
+    "C3": "PENDING exact SHA CI",
+    "C4": "MATERIAL_COMMIT_PENDING_CAS",
+    "C5": "NOT_REQUIRED no HMD package",
+    "C6": "PENDING"
+  },
+  "blockers": [
+    "Inherited unrelated R175 constant-buffer WARP failure possible; do not bypass."
+  ],
+  "next_action": "Run one exact-SHA Backend Conversion Gate then record C6; preserve RUNTIME_VALIDATION=UNTESTED",
+  "timestamp_kst": "2026-10-10 16:43+09:00"
+}
