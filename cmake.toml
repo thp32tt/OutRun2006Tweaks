@@ -146,6 +146,27 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R31_R30=1)
     message(STATUS "OutRun VR refactor gate: R30 compiled separately below R31")
 endif()
+# R84 bounded compile-ownership integration gate. Enable only for the integrated
+# Win32 full-chain validation; comparison modes keep their known-good owners.
+option(OUTRUN_VR_R84_FULL_TU_SPLIT "Compile R29/R30/R31/R32/R33 as independent translation units" OFF)
+if(OUTRUN_VR_R84_FULL_TU_SPLIT)
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R84 full TU split cannot be combined with comparison builds")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r29.cpp
+        src/vr/d3d9/stereo_renderer_r30.cpp
+        src/vr/d3d9/stereo_renderer_r31.cpp
+        src/vr/d3d9/stereo_renderer_r32.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(
+        OUTRUN_VR_REFACTOR_SPLIT_R30_R29=1
+        OUTRUN_VR_REFACTOR_SPLIT_R31_R30=1
+        OUTRUN_VR_REFACTOR_SPLIT_R32_R31=1
+        OUTRUN_VR_REFACTOR_SPLIT_R33_R32=1)
+    message(STATUS "R84 integrated R29-R33 translation-unit ownership enabled")
+endif()
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
