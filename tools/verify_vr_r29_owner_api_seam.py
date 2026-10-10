@@ -59,6 +59,22 @@ FRAME_DELEGATIONS = {
 }
 
 
+LOWER_SERVICES = {
+    "R29OwnerEnsureStereoResources(": "return EnsureStereoResources(device);",
+    "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device);",
+    "R29OwnerDepthTestActive(": "return DepthTestActive(device);",
+    "R29OwnerStencilTestActive(": "return StencilTestActive(device);",
+    "R29OwnerLeftDrawMayWriteDepth(": "return LeftDrawMayWriteDepth(device);",
+    "R29OwnerLeftDrawMayWriteStencil(": "return LeftDrawMayWriteStencil(device);",
+    "R29OwnerNoteMainDepthContentWrite(": "R9NoteMainDepthContentWrite();",
+    "R29OwnerNoteStereoDrawWithoutMonoBackup(": "R9NoteStereoDrawWithoutMonoBackup();",
+    "R29OwnerUndoStereoDrawCount(": "R9UndoStereoDrawCount();",
+    "R29OwnerBorrowTrackedRenderTarget(": "return TrackedRenderTarget;",
+    "R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(": "InvalidateRightDepthStencilIfLeftMayWrite(device);",
+    "R29OwnerNoteRestoreFailure(": "NoteRestoreFailure(site);",
+}
+
+
 def check(r29: str, r30: str, header: str) -> None:
     for signature, delegation in OWNER_CALLS.items():
         implementation = body(r29, signature)
@@ -103,21 +119,7 @@ def check(r29: str, r30: str, header: str) -> None:
         assert api in header, f"R29 owner header missing: {api}"
         assert api in r30, f"R30 missing lower owner ABI use: {api}"
     assert not re.search(r"\bSharedState\b", r30), "R30 still owns lower shared IPC pointer"
-    lower_services = {
-        "R29OwnerEnsureStereoResources(": "return EnsureStereoResources(device);",
-        "R29OwnerTryBootstrapRightDepth(": "return TryBootstrapRightDepthFromRecentClear(device);",
-        "R29OwnerDepthTestActive(": "return DepthTestActive(device);",
-        "R29OwnerStencilTestActive(": "return StencilTestActive(device);",
-        "R29OwnerLeftDrawMayWriteDepth(": "return LeftDrawMayWriteDepth(device);",
-        "R29OwnerLeftDrawMayWriteStencil(": "return LeftDrawMayWriteStencil(device);",
-        "R29OwnerNoteMainDepthContentWrite(": "R9NoteMainDepthContentWrite();",
-        "R29OwnerNoteStereoDrawWithoutMonoBackup(": "R9NoteStereoDrawWithoutMonoBackup();",
-        "R29OwnerUndoStereoDrawCount(": "R9UndoStereoDrawCount();",
-        "R29OwnerBorrowTrackedRenderTarget(": "return TrackedRenderTarget;",
-        "R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(": "InvalidateRightDepthStencilIfLeftMayWrite(device);",
-        "R29OwnerNoteRestoreFailure(": "NoteRestoreFailure(site);",
-    }
-    for signature, forwarding in lower_services.items():
+    for signature, forwarding in LOWER_SERVICES.items():
         assert signature in header, f"R29 header lacks lower service: {signature}"
         assert signature in r30, f"R30 retained lower-symbol dependency: {signature}"
         assert forwarding in body(r29, signature), (
@@ -194,7 +196,7 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {marker}")
-    for signature, delegation in lower_services.items():
+    for signature, delegation in LOWER_SERVICES.items():
         pos = r29.find(signature)
         assert pos >= 0
         mutated = r29[:pos] + r29[pos:].replace(
