@@ -184,6 +184,106 @@ int main() {
     context->PSSetShader(ps.Get(),nullptr,0);
     require(exactReady(), "R212 recovered original shader");
 
+    // R217: opt-in exact indexed opaque depth-eye proof. Keep this WARP-only:
+    // the game-native DrawIndexed activation boundary remains unchanged.
+    D3D11_TEXTURE2D_DESC r217DepthDesc{};
+    r217DepthDesc.Width=32; r217DepthDesc.Height=32;
+    r217DepthDesc.MipLevels=1; r217DepthDesc.ArraySize=1;
+    r217DepthDesc.Format=DXGI_FORMAT_D32_FLOAT;
+    r217DepthDesc.SampleDesc.Count=1;
+    r217DepthDesc.Usage=D3D11_USAGE_DEFAULT;
+    r217DepthDesc.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> r217DepthTex;
+    ComPtr<ID3D11DepthStencilView> r217Dsv, r217ForeignDsv;
+    require(SUCCEEDED(device->CreateTexture2D(&r217DepthDesc,nullptr,
+        r217DepthTex.GetAddressOf())), "R217 owned D32 eye depth surface");
+    require(SUCCEEDED(device->CreateDepthStencilView(r217DepthTex.Get(),
+        nullptr,r217Dsv.GetAddressOf())), "R217 owned D32 eye DSV");
+    require(SUCCEEDED(device->CreateDepthStencilView(r217DepthTex.Get(),
+        nullptr,r217ForeignDsv.GetAddressOf())) &&
+        r217ForeignDsv.Get()!=r217Dsv.Get(),
+        "R217 independent same-device DSV identity");
+
+    D3D11_DEPTH_STENCIL_DESC r217StateDesc{};
+    r217StateDesc.DepthEnable=TRUE;
+    r217StateDesc.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ALL;
+    r217StateDesc.DepthFunc=D3D11_COMPARISON_LESS;
+    r217StateDesc.StencilEnable=FALSE;
+    ComPtr<ID3D11DepthStencilState> r217State, r217NoDepth;
+    require(SUCCEEDED(device->CreateDepthStencilState(&r217StateDesc,
+        r217State.GetAddressOf())), "R217 opaque LESS/write-all state");
+    D3D11_DEPTH_STENCIL_DESC r217InvalidDesc=r217StateDesc;
+    r217InvalidDesc.DepthEnable=FALSE;
+    require(SUCCEEDED(device->CreateDepthStencilState(&r217InvalidDesc,
+        r217NoDepth.GetAddressOf())), "R217 disabled depth negative state");
+
+    context->OMSetRenderTargets(1,&rawTarget,r217Dsv.Get());
+    context->OMSetDepthStencilState(r217State.Get(),0u);
+    const auto r217Ready=[&] {
+        return outrun::vr::dx11::verified_indexed_opaque_depth_single_eye_ready(
+            vb,ib,context.Get(),0u,3u,0,
+            generation,vbVersion,ibVersion,layout.Get(),vs.Get(),ps.Get(),
+            rtv.Get(),r217Dsv.Get(),r217State.Get());
+    };
+    require(r217Ready(),"R217 owned opaque depth-eye initial ready");
+
+    context->OMSetRenderTargets(1,&rawTarget,r217ForeignDsv.Get());
+    require(!r217Ready(),"R217 same-device foreign DSV rejected");
+    context->OMSetRenderTargets(1,&rawTarget,r217Dsv.Get());
+    context->OMSetDepthStencilState(r217NoDepth.Get(),0u);
+    require(!r217Ready(),"R217 disabled depth state rejected");
+    context->OMSetDepthStencilState(r217State.Get(),0u);
+    context->OMSetRenderTargets(1,&rawTarget,nullptr);
+    require(!r217Ready(),"R217 missing DSV rejected");
+    context->OMSetRenderTargets(1,&rawTarget,r217Dsv.Get());
+
+    D3D11_BLEND_DESC r217BlendDesc{};
+    r217BlendDesc.RenderTarget[0].RenderTargetWriteMask=
+        D3D11_COLOR_WRITE_ENABLE_ALL;
+    ComPtr<ID3D11BlendState> r217ForeignBlend;
+    require(SUCCEEDED(device->CreateBlendState(
+        &r217BlendDesc,r217ForeignBlend.GetAddressOf())),
+        "R217 foreign blend object");
+    context->OMSetBlendState(r217ForeignBlend.Get(),nullptr,
+                             D3D11_DEFAULT_SAMPLE_MASK);
+    require(!r217Ready(),"R217 retained blend object rejected");
+    context->OMSetBlendState(nullptr,nullptr,0u);
+    require(!r217Ready(),"R217 zero OM coverage rejected");
+    context->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(r217Ready(),"R217 opaque OM restored");
+
+    // Three real indexed GPU submissions establish a depth-negative and
+    // restored positive pixel, not just a descriptor / pointer assertion.
+    const float r217Clear[]={0,0,0,1};
+    const auto r217ReadCenter=[&](bool green){
+        context->CopyResource(readback.Get(),color.Get());
+        D3D11_MAPPED_SUBRESOURCE m{};
+        require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,
+            0,&m)) && m.pData,"R217 GPU indexed depth staging map");
+        const auto* px=static_cast<const unsigned char*>(m.pData)
+            +16*m.RowPitch+16*4;
+        const bool ok=green
+            ? px[0]==0u && px[1]==255u && px[2]==0u && px[3]==255u
+            : px[0]==0u && px[1]==0u && px[2]==0u && px[3]==255u;
+        context->Unmap(readback.Get(),0);
+        return ok;
+    };
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.0f,0u);
+    require(r217Ready(),"R217 ready prior to GPU positive");
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),"R217 WARP depth=1 draws green");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,0.0f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(false),"R217 WARP depth=0 rejects indexed pixels");
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.0f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),"R217 restored WARP indexed green pixel");
+    context->OMSetRenderTargets(1,&rawTarget,nullptr);
+    context->OMSetDepthStencilState(nullptr,0u);
+
+
 
     require(!ready(context.Get(),0,0,0,generation,vbVersion,ibVersion), "reject zero indices");
     require(!ready(context.Get(),0,2,0,generation,vbVersion,ibVersion), "reject partial triangle");

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00514",
+  "production_id": "CONVERSION-DX11-00514",
+  "event_id": "CONVERSION-DX11-00514-E001",
+  "attempt": 1,
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "c16e7694af0d98d71055d4684b9e4ecbc4cd5dd1",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R217:INDEXED_OPAQUE_DEPTH_EYE_GPU",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp:R217",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R217"
+  ],
+  "status": "WAITING_FOR_EXACT_SHA_CI",
+  "summary": "R217 strict live D3D11 indexed DrawIndexed opaque single-eye depth ownership and actual WARP positive/negative/restore GPU pixels; no gameplay activation.",
+  "pipeline": {
+    "C0_RECOVER": "PASS branch HEAD and remote checkpoints/00513 C6 read",
+    "C1_REVIEW": "PASS R175 existing 00477 foreign claim; selected disjoint indexed depth-eye R217",
+    "C2_IMPLEMENT": "PASS production C++ indexed exact DSV/DS/blend/sample-mask/device guard and WARP real indexed depth negative/restoration proof",
+    "C3_VALIDATE": "Local 1x related static assertions PASS; exact-SHA Backend Conversion Gate pending",
+    "C4_COMMIT": "material [AUTO:CONVERSION-DX11-00514] commit prepared",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant preflight only, no Quest3/VDXR gameplay promotion",
+    "C6_STATE": "PENDING exact-SHA gate and followup durable result"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00514.json"
+  ],
+  "evidence": {
+    "previous_00513_material": "3647e5d82dc7103d32570f64818aec0eecef455b",
+    "previous_00513_gate": 38020216016,
+    "prior_R175_owner_task": "CONVERSION-DX11-00477",
+    "prior_R175_gate_failure": "R175_GENERIC_VARYING_MISMATCH",
+    "local_static_check": "PASS",
+    "expected_real_WARP_pixels": "green(0,255,0,255), black(0,0,0,255), restored-green(0,255,0,255)",
+    "old_header_blob": "e505c5154955a40207939e4da9872c547856e131",
+    "old_probe_blob": "5f9d7d232f54b1788047f488631b0985b49fbe44"
+  },
+  "next_action": "Read exact-SHA Backend Conversion Gate. If unrelated R175 red remains, preserve R217 scoped evidence and mark overall FAIL, without claiming Quest3 runtime."
+}
