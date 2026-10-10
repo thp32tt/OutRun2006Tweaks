@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX9EX-00589",
+  "event_id": "CONVERSION-DX9EX-00589-E001",
+  "phase": "C3_CANDIDATE_EXACT_BUILD",
+  "work_key": "DX9EX:R84:UPPER_4TU_CMAKE_SPLIT",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_original_base": "ab33a12011d2e53ff3b9f42a4fe06898e0d27958",
+  "candidate_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-00589-r84-upper-tu",
+  "candidate_sha": "bacb75aeb9857cee01fe7137b4adc505b3b6755d",
+  "gate": {
+    "run_id": 38048371231,
+    "policy": "SUCCESS",
+    "full_chain": "IN_PROGRESS"
+  },
+  "prev_candidates": [
+    {
+      "sha": "cfc67b8a",
+      "fail": "obsolete R30 verifier"
+    },
+    {
+      "sha": "8615c46a",
+      "fail": "R32 private lower owner identifiers compilation"
+    },
+    {
+      "sha": "41d77cad",
+      "fail": "legacy R32 recovery verifier exact literal"
+    }
+  ],
+  "source_changes": [
+    "R33/R32/R31/R30 independent translation-unit Win32 graph in cmake.toml+generated CMakeLists",
+    "R30 typed lower facades for exact R9/R29 state, wrap-safe ACK and recovery semantics",
+    "R31/R32 explicit standalone include sets, pass policy and source/ABI contracts",
+    "Active CI policy/verifier coherence and combo gate"
+  ],
+  "status": "WIP_NOT_TARGET_RESULT",
+  "next": "Inspect #38048371231 full-chain actual compile result; on success recheck remote focus HEAD/claim and compose a *single* final validation-bearing target material commit with [AUTO:CONVERSION-DX9EX-00589]. Do not lose WIP or incorrectly claim R29 textual split fully done. After exact target Active+Domain+FullSource success write C6 separately and score only once.",
+  "runtime_validation": "UNTESTED"
+}
