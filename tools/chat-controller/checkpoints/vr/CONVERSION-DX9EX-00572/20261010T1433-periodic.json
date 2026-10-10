@@ -1,0 +1,48 @@
+{
+  "task_id": "CONVERSION-DX9EX-00572",
+  "event_id": "CONVERSION-DX9EX-00572-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "work_key": "DX9EX:P1:V2_SHADOW_ATOMIC_PUBLICATION",
+  "base_sha": "cfea26b8cb7a50b1bdcbdbdd7686ebb3c29522a5",
+  "initial_material_sha": "3355ae2c4e1664e7c6615502853198da328a0f17",
+  "initial_host_ci": "FAIL C3861 test-only namespace",
+  "corrected_material_sha": "b045413aeaac4cb47d5e00ec8f7c462a7b4f7d8c",
+  "validation_bearing_result_sha": "b045413aeaac4cb47d5e00ec8f7c462a7b4f7d8c",
+  "latest_source_change": "VR v2 shadow pose/frame ring candidate-staged fail-closed atomic publication; smoke qualified ShadowV2 namespace",
+  "changed_paths": [
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp"
+  ],
+  "ci_runs": {
+    "dx9ex_active": 38027582325,
+    "domain_isolation": 38027582297,
+    "full_source_impact": 38027582370
+  },
+  "ci_confirmed": {
+    "domain_isolation": "SUCCESS",
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "fullsource_host": "SUCCESS",
+    "fullsource_crossdomain": "SUCCESS"
+  },
+  "ci_waiting": [
+    "dx9ex_game",
+    "dx9ex_full_chain",
+    "dx9ex_package",
+    "fullsource_active_game"
+  ],
+  "runtime_validation": "UNTESTED",
+  "pipeline": {
+    "C0": "PASS",
+    "C1": "PASS",
+    "C2": "PASS",
+    "C3": "PARTIAL",
+    "C4": "PASS",
+    "C5": "PENDING",
+    "C6": "PENDING"
+  },
+  "scoreboard": "DO_NOT_SCORE_UNTIL_EXACT_SHA_GATES_SUCCESS",
+  "next_action": "Inspect run conclusions; after all three required exact SHA gates succeed create C6 on game branch and update AI2 score once. No repeated source/CI rerun if green."
+}
