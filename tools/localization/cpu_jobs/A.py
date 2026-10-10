@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""A223 q103 source-family lighter italic stroke rework, scoped NON-PROMOTED DDS.
-New method: native Regular Korean glyph contours, not shrinking A197 Bold pixels.
+"""A224 q103 original-typography optical-density contour pilot, scoped NON-PROMOTED DDS.
+New method: Regular 65ppem outline/low tracking, once-resampled to native English height 43px from canonical source, not resizing an older Korean bitmap.
 """
 import hashlib, io, json, os, subprocess, urllib.request
 from pathlib import Path
@@ -10,7 +10,7 @@ from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
 repo=Path.cwd()
-run="20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR"
+run="20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -64,9 +64,9 @@ collection=TTCollection(str(font_path),lazy=True)
 coverage=collection.fonts[1].getBestCmap()
 assert all(ord(c) in coverage for c in charset if c!=" "),"Font glyph coverage missing"
 # Source-fitted native lettering using the Regular face; not scaling rejected A222 glyph raster.
-font=ImageFont.truetype(str(font_path),49,index=1)
+font=ImageFont.truetype(str(font_path),65,index=1)
 # Native spacing, source italic lean (positive top-minus-bottom x).
-tracking=11
+tracking=2
 parts=[]
 for ch in charset:
     if ch==" ":
@@ -91,7 +91,15 @@ slanted=glyph.transform((gW+pad,gH),Image.Transform.AFFINE,
                      (1,shear,-shear*(gH-1)+2,0,1,0),resample=Image.Resampling.BICUBIC)
 sb=slanted.getbbox();assert sb, "Empty glyph"
 slanted=slanted.crop(sb)
+# Source optical family: 65ppem true outlines are downsampled once to measured English 43px body.
+# Resize the new independent glyph-mask only; old Korean DDS and CLEAN plate never rescaled.
+prefit_height=slanted.height
+assert prefit_height>=43, prefit_height
+slanted=slanted.resize((slanted.width,43),Image.Resampling.LANCZOS)
+sb2=slanted.getbbox();assert sb2
+slanted=slanted.crop(sb2)
 w,h=slanted.size
+assert 295<=w<=354 and h<=43,(w,h)
 # C1 newly identified EXACT source-effect bbox 354x45, stricter than yellow plate bbox 390x72.
 # Fail closed if a single pixel of Korean glyph exceeds original English source height.
 exact_source_effect=(1432,1980,1786,2025)
@@ -120,7 +128,7 @@ for row in range(72):
     newdata[off:off+390*4]=edited[row].tobytes()
 newdata=bytes(newdata)
 assert newdata[:128]==prior[:128] and sha(newdata)!=prior_sha
-dds=out/"A223_Q103_SOURCE_HEIGHT45_UNPROMOTED.dds"
+dds=out/"A224_Q103_OPTICAL_CONTOUR_UNPROMOTED.dds"
 dds.write_bytes(newdata)
 persisted=Image.open(dds).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 actual=np.asarray(persisted.crop(source_bbox),dtype=np.uint8)
@@ -151,33 +159,33 @@ rect=(1376,1943,1830,2048)
 def graybg(im,bg):
     return Image.alpha_composite(Image.new("RGBA",im.size,bg),im.convert("RGBA")).convert("RGB")
 for label,img in (("SOURCE",source),("CLEAN",clean),("OLD",before),("TRIAL",persisted)):
-    img.crop(rect).save(out/f"A223_{label}_NATIVE_RGBA.png")
+    img.crop(rect).save(out/f"A224_{label}_NATIVE_RGBA.png")
 for bgname,bg in (("BLACK",(0,0,0,255)),("GRAY",(110,110,110,255)),("WHITE",(255,255,255,255))):
     ims=[graybg(im.crop(rect),bg) for im in (source,clean,before,persisted)]
     for pct in (100,75,50):
         w2,h2=(round(rect[2]-rect[0])*pct//100,round(rect[3]-rect[1])*pct//100)
         rows=[v if pct==100 else v.resize((w2,h2),Image.Resampling.LANCZOS) for v in ims]
         sheet=Image.new("RGB",(w2*4,h2+27),bg[:3]);paint=ImageDraw.Draw(sheet)
-        for i,(name,img) in enumerate(zip(("EN SOURCE","CLEAN","A197 REJECT","A222 TRIAL"),rows)):
+        for i,(name,img) in enumerate(zip(("EN SOURCE","CLEAN","A197 REJECT","A224 OPTICAL PILOT"),rows)):
             sheet.paste(img,(w2*i,27));paint.text((i*w2+5,5),name,fill=(255,255,255) if bgname!="WHITE" else (0,0,0))
-        sheet.save(out/f"A223_COMPARE_{bgname}_{pct}.png")
+        sheet.save(out/f"A224_COMPARE_{bgname}_{pct}.png")
 raw=Image.open(dds).convert("RGBA")
-raw.crop((rect[0],H-rect[3],rect[2],H-rect[1])).save(out/"A223_TRIAL_RAW_NATIVE_RGBA.png")
-Image.fromarray(gl[:,:,3],mode="L").save(out/"A223_LETTERING_NATIVE_ALPHA.png")
-report={"schema_version":2,"run":"A222","run_key":"OUTRUN-KOR-A223-Q103-C1-SOURCE-45PX-BOUNDARY-20261010-1300","role":"A","queue_index":103,
+raw.crop((rect[0],H-rect[3],rect[2],H-rect[1])).save(out/"A224_TRIAL_RAW_NATIVE_RGBA.png")
+Image.fromarray(gl[:,:,3],mode="L").save(out/"A224_LETTERING_NATIVE_ALPHA.png")
+report={"schema_version":2,"run":"A224","run_key":"OUTRUN-KOR-A224-Q103-C1-SOURCE-45PX-BOUNDARY-20261010-1300","role":"A","queue_index":103,
 "triage":triage[:2600],"independent_C1_rework":"OUTRUN-KOR-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL-20261010",
 "source_sha256":source_sha,"source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
 "source_bbox":list(source_bbox),"exact_source_effect_bbox":[1432,1980,1786,2025],"source_family":{"en":"Normal Balance","ko":"일반 밸런스","english_font":"medium-light condensed right-italic","en_source_color":list(rgb)},
 "old_sha256":prior_sha,"new_trial_sha256":sha(newdata),"trial_dds_path":str(dds.relative_to(repo)),
 "font_file":str(font_path),"font_sha256":font_sha,"font_face_index":1,"font_coverage":True,
-"method_change":"A222 Regular 65px was 60px tall and rejected C1: rebuild 49px native Regular 11px natural tracking / same source olive, exact source EFFECT bbox 354x45 pixel fail-closed. No resizing A222 raster.",
+"method_change":"A223 49px + 11 tracking had 284x45 but loose/small source optics. New 65ppem genuine Regular outlines + 2px tracking, once downsampled glyph mask to 43px source-optical target within original English 354x45 exact effect; no reuse/resizing of prior raster.",
 "output_bbox":global_bbox,"output_margins":margins,"letters_layer_only":True,"clean_plate_type":"OPAQUE_GRADIENT_SOURCE_PLATE_PRESERVED",
 "full_other_atlas_preservation":True,"changed_rgba_pixels_vs_A197":beyond,"changed_bytes":int(len(changed)),
 "outside_source_bbox_changed_rgba":0,"outside_source_bbox_changed_alpha":0,
-"source_glyph_size_limit":True,"original_exact_effect_bbox":[1432,1980,1786,2025],"new_glyph_width":w,"new_glyph_height":h,"C1_A222_rejected_height":60,"raw_y_mirror":True,"source_clean_final_images":"SOURCE/CLEAN/OLD/TRIAL native, black/gray/white100/75/50, RAW, lettering transparent",
+"source_glyph_size_limit":True,"original_exact_effect_bbox":[1432,1980,1786,2025],"new_glyph_width":w,"new_glyph_height":h,"pre_fit_native_mask_height":prefit_height,"fit":"1x native glyph-mask-only Lanczos height 43, english 45px source ceiling","tracking_px":tracking,"C1_A222_rejected_height":60,"raw_y_mirror":True,"source_clean_final_images":"SOURCE/CLEAN/OLD/TRIAL native, black/gray/white100/75/50, RAW, lettering transparent",
 "native":[2048,2048],"DDS":"RGBA32 mip1","firstlook":"PENDING_CONTROLLER_VISUAL","strict_source_effect_gate":"PASS_SOURCE_354x45_CONTAINED",
 "producer_scope":"SINGLE_NORMAL_BALANCE_LABEL_TRIAL_UNPROMOTED","hd_candidates_changed":False,
 "new_trial_dds":1,"new_promoted_dds":0,"C1":"FRESH_INDEPENDENT_REQUIRED","C3":"NOT_RUN","user_ingame":"UNTESTED","RUNTIME_VALIDATION":"UNTESTED",
 "exclusions":["VR","FFB","DX11","DXVK"]}
-(out/"A223_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"A224_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"sha":sha(newdata),"width_height":[w,h],"bbox":global_bbox,"margins":margins,"changed_pixels":beyond},ensure_ascii=False))
