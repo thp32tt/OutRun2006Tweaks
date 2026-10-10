@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "run": "A235",
+  "run_key": "OUTRUN-KOR-A235-Q121-REGULAR-SOURCE-CONTOUR-VECTOR-20261011-0700",
+  "source": "canonical SHA f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "new_trial_sha256": "571bf039e8d6a0ee1d56f2df543a68ba960b510875e1662e09b9a8a6e52750f6",
+  "source_face_rgb": [
+    255,
+    255,
+    255
+  ],
+  "source_navy_rgb": [
+    0,
+    17,
+    24
+  ],
+  "source_native_face_bbox": [
+    1,
+    0,
+    229,
+    46
+  ],
+  "source_face_h": 46,
+  "new_candidate_bounding_box": [
+    11,
+    7,
+    221,
+    41
+  ],
+  "new_candidate_height": 34,
+  "source_ink_area": 6334,
+  "candidate_positive_alpha_pixels": 5804,
+  "source_to_clean": "SOURCE->CLEAN visually transparent alpha0, no English residual shown",
+  "sheets": [
+    "A235_COMPARE_GRAY_100.png",
+    "A235_COMPARE_BLACK_50.png",
+    "A235_PERSISTED_FINAL_RAW.png"
+  ],
+  "first_look": "Regular true-native glyph has clearly lighter/thinner 1px dark rim versus rejected Bold+2px and is legible. It is 34px tall against source face ~46px, visibly undersized at 50% display. Do not promote.",
+  "decision": "PRODUCER_VISUAL_REWORK_REQUIRED_UNPROMOTED",
+  "first_failed_gate": "SOURCE_RELATIVE_NATIVE_GLYPH_HEIGHT",
+  "corrective_limit": "one further same-method adjustment to original measured optical face height, then stop and switch source-conditioned hand vector topology if still mismatched",
+  "other29": "EXACT",
+  "outside_bbox_pixels": 0,
+  "official_changed": false,
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
