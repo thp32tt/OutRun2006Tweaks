@@ -395,6 +395,19 @@ def queue_rollover_prompt(active: dict) -> str:
     ]
     if CONTROLLER_MODE == "conversion":
         lines = [GAME_MOD_CONTEXT, ""] + lines
+    if str(active.get("lane", "")).upper() == "DX11":
+        task_match = re.fullmatch(r"CONVERSION-DX11-([0-9]{5,})", str(active.get("task_id") or ""))
+        if task_match and int(task_match.group(1)) >= 537:
+            lines += [
+                "DX11_DIRECTION=R175_UNBLOCK_OR_FIRST_VISIBLE_GAME_FRAME",
+                "롤오버 후에도 동일 FEATURE_ID와 실게임 통합 목표를 보존해. "
+                "독립 Rxxx WARP 프로브나 readiness guard를 새 기능으로 전환하지 마.",
+                "R175 TEXCOORD6 색상 불일치는 CI 확인 후 실제 원인 수정이 우선. "
+                "기존 00477 소유권이 미해제면 중복 작업 금지, 독립 live D3D9 Draw→"
+                "D3D11 Draw→가시적인 게임 프레임 연결을 계속 구현해. "
+                "fail-closed 진단 opt-in 및 DX9Ex 폴백은 반드시 보존해.",
+                "테스트용 GPU 도형만 성공했다고 게임이 플레이 가능하다고 선언하지 마.",
+            ]
     if str(active.get("lane", "")).startswith("LOCALIZATION_"):
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     lines.append("RESUME_REASON=" + str(active.get("last_rollover_reason") or active.get("failure_context") or "conversation recovery"))
