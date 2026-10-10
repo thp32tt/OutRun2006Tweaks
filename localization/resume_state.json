@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B354/B355 q154 2026-10-10 18:47 KST 2 new exact persisted unapproved trial DDS, both source-family visual FAIL (first too thin, second retains tight counters). C356 official REWORK untouched, independent C2/C3/game not passed, no repeated method; manual vector source-conditioned counter reconstruction required. RUN_KEY=OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847.",
     "A226 q101 2026-10-10 18:12 KST NEW physically persisted 4096x4096 unpromoted DDS ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06 worker #38040234772 SUCCESS; newly repaired C1 45-pixel original residue by x3002..3005, protected x3000..3001 blank, canonical translated warning restored; saved SOURCE/CLEAN/A38/A226 gray100 black50 RAW firsthand scoped PASS, protected outside0; producer HOLD_STRICT_RECHECK source glyph slant anchor & full mask, official still REWORK, C1/C3/game UNTESTED. localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800.",
     "B352/B353 q060 2026-10-10 17:43 KST: two distinct saved unapproved DDS with visual FAIL on native/50% source-family weight and racing-italic depth; official C342 REWORK unchanged; IGR044 OPEN; no further same-method trial; manual vector/source contour and homologous slant needed. RUNTIME_VALIDATION=UNTESTED.",
     "C368 C2 2026-10-10 17:27:07 KST q214 NEW independently source-authenticated SHA source 9a2e428bdb87 CLEAN 5beb411d1692, original→CLEAN 3210 inside source START/GOAL, 0 outside, preserved alpha; B339 same trial SHA d273a208d521 GOAL visually REWORK, no re-completion, C3/game UNTESTED. localization/graphics/role_C/20261010-C368-C2-Q214-EXACT-CANONICAL-SOURCE-PLATE/C368_Q214_C2_INDEPENDENT_SOURCE_PLATE_REWORK.json OUTRUN-KOR-C368-C2-Q214-CANONICAL-SOURCE-CLEAN-20261010",
@@ -319,6 +320,38 @@
     "QA_B352": "localization/graphics/role_B/20261010-B352-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B352_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
     "QA_B353": "localization/graphics/role_B/20261010-B353-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B353_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
   },
+  "b354_b355_q154_native_gray_visual_fail_20261010": {
+    "role": "B",
+    "queue_index": 154,
+    "priority": "C356_C2_REWORK_REQUIRED",
+    "run_key": "OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "C344_authored_clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "unchanged_official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+    "B354_new_native_Regular_trial_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+    "B355_new_historical_contour_trial_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+    "new_distinct_saved_trial_DDS": 2,
+    "promoted_DDS": 0,
+    "mechanical_off_target_rgba_pixels": [
+      0,
+      0
+    ],
+    "persisted_decode_mismatch_pixels": [
+      0,
+      0
+    ],
+    "B354_visual": "FAIL_SOURCE_FAMILY_UNDERWEIGHT_AND_SCALE",
+    "B355_visual": "FAIL_COUNTER_TOPOLOGY_NOT_CORRECTED_BY_HALF_ALPHA",
+    "C2": "C356_REWORK_REQUIRED_UNCHANGED",
+    "C3": "BLOCKED",
+    "next_action": "SOURCE_CONDITIONED_MANUAL_VECTOR_CONTOUR_AND_COUNTERSPACE; DO_NOT_REPEAT_REGULAR_OR_MIDPOINT_ALPHA_TRIALS",
+    "game_validation": "UNTESTED",
+    "execution_backend": "GITHUB_ACTIONS + CHATGPT_NATIVE_CONTROLLER_VISUAL",
+    "reports": [
+      "localization/graphics/role_B/20261010-B354-Q154-THIN-NATIVE-GRAY-SOURCE-FAMILY/B354_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
+      "localization/graphics/role_B/20261010-B355-Q154-HISTORIC-NATIVE-COUNTER-INTERPOLATION/B355_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+    ]
+  },
   "prototype_history": {
     "branch": "korean-localization-prototype",
     "k1_ci_run_id": 35981045694,
@@ -384,7 +417,7 @@
     "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
     "strict_qa_reset": {
-      "updated_at_kst": "2026-10-10 17:43:00 KST",
+      "updated_at_kst": "2026-10-10 18:47:00 KST",
       "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
       "package_assets_scanned": 32,
       "rework_required": 24,
