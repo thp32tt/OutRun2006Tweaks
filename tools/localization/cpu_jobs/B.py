@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B356 q212 P1 IGR029: new native Korean source-family two-label pilot.
+"""B357 q212 P1 IGR029: new native Korean source-family two-label pilot.
 Producer must inspect actual DDS and maintain C2 official REWORK unless pass.
 """
 import io,json,os,hashlib,subprocess,sys,urllib.request,struct
@@ -10,7 +10,7 @@ from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 ROOT=Path("localization/graphics")
 ASSET=ROOT/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=ROOT/"role_B/20261010-B356-Q212-NATIVE-SOURCE-MODE-FAMILY";OUT.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/"role_B/20261010-B357-Q212-NATIVE-SOURCE-MODE-FAMILY";OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SOURCE_SHA="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 OFFICIAL_SHA="e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
@@ -31,7 +31,7 @@ assert S.shape==O.shape==(2048,2048,4) and len(src)==len(raw)==16777344
 regions=[
  {"id":"r43_professional","english":"PROFESSIONAL","ko":"프로페셔널 모드",
   "original_bbox":[240,341,637,386],"atlas_roi":[0,341,638,404],"source_opaque_width":395},
- {"id":"r44_outrun","english":"OUTRUN","ko":"아웃런",
+ {"id":"r44_outrun","english":"OUTRUN","ko":"아웃런 모드",
   "original_bbox":[1626,524,1837,569],"atlas_roi":[1626,524,1837,587],"source_opaque_width":209},
 ]
 fontpath=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
@@ -58,7 +58,7 @@ for reg in regions:
  # Use the dominant near-opaque face color, never a guessed brand palette.
  keys,counts=np.unique(values,axis=0,return_counts=True)
  core=keys[counts.argmax()].astype(np.uint8)
- font_size=43  # exact native source height ceiling: prior 47 produced 46px > 45px English
+ font_size=43 if reg["id"].startswith("r43") else 42  # measured native glyph 42/41px tall inside English 45px bbox
  font=ImageFont.truetype(str(fontpath),font_size,index=fontindex)
  img=Image.new("L",(x-l,b-t),0);d=ImageDraw.Draw(img)
  # Draw directly at output pixel resolution, do not resample old Korean.
@@ -79,7 +79,7 @@ for reg in regions:
  # O may have historic text in left part of the same ROI; untouched neighbors
  # protected because only exact two ROIs are replaced.
  rec.append({"id":reg["id"],"source_english":reg["english"],"translated_text":reg["ko"],
-  "new_text_has_semantic_suffix_for_source_hierarchy":reg["id"].startswith("r43"),
+  "new_text_has_semantic_suffix_for_source_hierarchy":True,
   "native_font_ppem":font_size,"source_bbox":reg["original_bbox"],
   "source_opaque_width":reg["source_opaque_width"],
   "candidate_bbox":nb,"candidate_width":nb[2]-nb[0],
@@ -98,7 +98,7 @@ dds=raw[:128]+np.flipud(result)[:,:,order].copy().tobytes()
 assert len(dds)==len(raw) and sha(dds)!=OFFICIAL_SHA
 D=decode(dds)
 assert np.array_equal(D,result),("DDS_ROUNDTRIP_FAIL")
-(OUT/"B356_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds").write_bytes(dds)
+(OUT/"B357_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds").write_bytes(dds)
 def compose(a,roi,bg,rawview=False):
  l,t,r,b=roi
  if rawview:a=np.flipud(a);t,b=2048-b,2048-t
@@ -116,15 +116,15 @@ for r in regions:
     sheet=Image.new("RGB",(width,max(im.height for im in ims)),bg)
     off=0
     for im in ims:sheet.paste(im,(off,0));off+=im.width+8
-    fn=f"B356_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
+    fn=f"B357_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
     sheet.save(OUT/fn,optimize=True);evidence.append(fn)
  l,t,x,b=r["atlas_roi"]
- Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B356_{r['id']}_PLATE_ONLY.png")
- Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B356_{r['id']}_LETTERING_ONLY.png")
-qa={"schema_version":2,"role":"B","run":"B356","queue_index":212,
- "run_key":"OUTRUN-KOR-B356-Q212-P1-SOURCE-FAMILY-SEMANTIC-NATIVE-20261010-1935",
+ Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B357_{r['id']}_PLATE_ONLY.png")
+ Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B357_{r['id']}_LETTERING_ONLY.png")
+qa={"schema_version":2,"role":"B","run":"B357","queue_index":212,
+ "run_key":"OUTRUN-KOR-B357-Q212-P1-SOURCE-FAMILY-SEMANTIC-NATIVE-20261010-1935",
  "priority":"P1_IGR029_SHARED_MODE_ATLAS","triage":tri["next_action"],
- "method":"Complete ROI source-text removal plus native vector Bold English-source-palette Korean titles. For PROFESSIONAL add semantic mode qualifier to fit source hierarchy without single-word stretch or artificial overtracking; OUTRUN title retained Korean established rendering.",
+ "method":"Second and final source-bbox-native family pilot: semantic Korean mode qualifier on PROFESSIONAL and OUTRUN improves source hierarchy without forced glyph stretching, preserving native vector Bold 43/42px, original English sampled face palette, and positive source-mask margins; language expansion is UNAPPROVED pending producer/C2.",
  "canonical_source_sha256":SOURCE_SHA,"full_C158_clean_reference_sha256":C158_CLEAN_SHA,
  "source_clean_stage":"TWO_REGION_SCOPED_ZERO_ALPHA_NOT_FULL_C158_ATLAS",
  "current_official_sha256":OFFICIAL_SHA,"new_unapproved_trial_sha256":sha(dds),
@@ -138,6 +138,6 @@ qa={"schema_version":2,"role":"B","run":"B356","queue_index":212,
  "evidence_previews":evidence,"producer_visual":"CONTROLLER_REQUIRED",
  "independent_C2":"NOT_RUN","C3":"BLOCKED",
  "IGR029":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED"}
-(OUT/"B356_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"B357_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
 (OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 10 current atlas cells exact","method":"source native single-pass letters, no lowres upscaling, no width/shear affine","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B356","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
+print(json.dumps({"run":"B357","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
