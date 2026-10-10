@@ -1,0 +1,413 @@
+{
+  "schema": "C1_INDEPENDENT_HOLD_EVIDENCE",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 237,
+  "shard": "C1_ODD",
+  "run_key": "OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855",
+  "result": "HOLD_STRICT_RECHECK",
+  "candidate_promoted": false,
+  "approval_written": false,
+  "reviewer": "ChatGPT AI1 C1; same agent inspected visuals, NOT independent different identity",
+  "execution_backend": "N100 MCP fallback (binary DDS unavailable in ChatGPT local; GitHub connector used for Git SSOT and atomic publication)",
+  "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "clean_sha256": "8ca0e291e745b176f18a626c76ee54339031643ebb395e293af77804d0aa00f0",
+  "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+  "source_mask_sha256": "4d6a466073b18f09f5e92c708408e030b254c03c14ebe45dc091aa51f8e4c426",
+  "dds_dimensions": [
+    2048,
+    2048
+  ],
+  "dds_format": "BGRA32 mip1",
+  "input_lineage": "Current asset_queue q237 (A195 persisted candidate; previous C306 HOLD), exact local source/CLEAN/current DDS verified by SHA256; N100 script actual_check.py re-executed",
+  "machine_report": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/C1_Q237_MACHINE_EXACT.json",
+  "measured_whole_atlas_deltas": {
+    "SOURCE_to_CLEAN": {
+      "changed_RGBA": 402833,
+      "changed_ALPHA": 402833,
+      "changed_outside_source_9": 0,
+      "changed_ALPHA_outside_source_9": 0
+    },
+    "CLEAN_to_FINAL": {
+      "changed_RGBA": 270913,
+      "changed_ALPHA": 270913,
+      "changed_outside_source_9": 0,
+      "changed_ALPHA_outside_source_9": 0
+    },
+    "SOURCE_to_FINAL": {
+      "changed_RGBA": 470207,
+      "changed_ALPHA": 470203,
+      "changed_outside_source_9": 0,
+      "changed_ALPHA_outside_source_9": 0
+    }
+  },
+  "region_count": 9,
+  "regions": [
+    {
+      "id": "small_create",
+      "source_bbox": [
+        14,
+        775,
+        536,
+        838
+      ],
+      "final_native_alpha_bbox": [
+        16,
+        777,
+        300,
+        835
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 17841,
+      "final_alpha_nonzero": 8496,
+      "changed_source_clean": 17841,
+      "changed_clean_final": 8496,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/small_create_GRAY100.png",
+          "sha256": "a160dd300caba958575539e9183ec42a2d7dfbf197a9edd1df93ea48e1a8261a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/small_create_WHITE75.png",
+          "sha256": "bc17a2c006f019927c500f6c134103ad84b04fd51332c5fcff8511e975c43836"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "small_custom",
+      "source_bbox": [
+        12,
+        863,
+        521,
+        926
+      ],
+      "final_native_alpha_bbox": [
+        14,
+        865,
+        298,
+        923
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 18662,
+      "final_alpha_nonzero": 8013,
+      "changed_source_clean": 18662,
+      "changed_clean_final": 8013,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/small_custom_GRAY100.png",
+          "sha256": "d53f4cf05b410d736d3c6375cf16f25f29debcde952457291635da014d5b0a41"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "small_quick",
+      "source_bbox": [
+        13,
+        951,
+        469,
+        1018
+      ],
+      "final_native_alpha_bbox": [
+        15,
+        955,
+        243,
+        1013
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 16111,
+      "final_alpha_nonzero": 7349,
+      "changed_source_clean": 16111,
+      "changed_clean_final": 7349,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/small_quick_GRAY100.png",
+          "sha256": "fb87d7ff2512dfedb3a7e3ed1db6322a8c985ab886d896160c7dcba059103ff5"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "help_create",
+      "source_bbox": [
+        8,
+        1015,
+        1160,
+        1101
+      ],
+      "final_native_alpha_bbox": [
+        10,
+        1020,
+        1091,
+        1095
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 26724,
+      "final_alpha_nonzero": 39461,
+      "changed_source_clean": 26724,
+      "changed_clean_final": 39461,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/help_create_GRAY100.png",
+          "sha256": "2264243455dbec480689c02f8074b36ec9b2c96791815df78b8e620140b9d59b"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/help_create_BLACK50.png",
+          "sha256": "fdf0c54c1c6995ade18a14ba54e8b9ffd7e9c037554f1704b0e1a70df90382d8"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "help_custom",
+      "source_bbox": [
+        0,
+        1175,
+        1263,
+        1272
+      ],
+      "final_native_alpha_bbox": [
+        2,
+        1185,
+        1082,
+        1261
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 30944,
+      "final_alpha_nonzero": 41723,
+      "changed_source_clean": 30944,
+      "changed_clean_final": 41723,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/help_custom_GRAY100.png",
+          "sha256": "401a806cbaabef98743251a71e7eede0a004fe09370e7877c767dd37862ccbe3"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/help_custom_WHITE75.png",
+          "sha256": "3a1e2cfbb781961112c331f7a86465e6bd8e12a4dc525aee77b3d951b725fc49"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "help_quick",
+      "source_bbox": [
+        4,
+        1344,
+        1047,
+        1419
+      ],
+      "final_native_alpha_bbox": [
+        6,
+        1346,
+        963,
+        1417
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 25374,
+      "final_alpha_nonzero": 33842,
+      "changed_source_clean": 25374,
+      "changed_clean_final": 33842,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/help_quick_GRAY100.png",
+          "sha256": "e67f238db6f4b87a0f0e4c15fd3a51eba36e860712a684f1dc68571cdae9077f"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "big_create",
+      "source_bbox": [
+        17,
+        1517,
+        1243,
+        1662
+      ],
+      "final_native_alpha_bbox": [
+        19,
+        1520,
+        709,
+        1659
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 90495,
+      "final_alpha_nonzero": 47159,
+      "changed_source_clean": 90495,
+      "changed_clean_final": 47159,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/big_create_GRAY100.png",
+          "sha256": "a0d87e5f624db00d14da6bbac86a72b348bf4a2024b4d654138063563e9c12eb"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/big_create_BLACK50.png",
+          "sha256": "ebc8448cef3ddf5f78dfc387be7d12c55b4f1e94ba0dd9887131cdf064ba7a0d"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "big_quick",
+      "source_bbox": [
+        17,
+        1695,
+        1086,
+        1849
+      ],
+      "final_native_alpha_bbox": [
+        19,
+        1702,
+        571,
+        1841
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 82512,
+      "final_alpha_nonzero": 40786,
+      "changed_source_clean": 82512,
+      "changed_clean_final": 40786,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/big_quick_GRAY100.png",
+          "sha256": "b7e3d11a033d604cbe9775349c9bb68bf5bdfdd68b44360298a8861b73a4c4d0"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    },
+    {
+      "id": "big_custom",
+      "source_bbox": [
+        15,
+        1894,
+        1260,
+        2040
+      ],
+      "final_native_alpha_bbox": [
+        17,
+        1897,
+        705,
+        2036
+      ],
+      "positive_margin": true,
+      "clean_alpha_nonzero": 0,
+      "source_alpha_nonzero": 94194,
+      "final_alpha_nonzero": 44084,
+      "changed_source_clean": 94194,
+      "changed_clean_final": 44084,
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/evidence/big_custom_GRAY100.png",
+          "sha256": "05a8d49f47ad262a9fee9254b37a756a56200cabcd7cc4cce266f101eece6861"
+        }
+      ],
+      "observations": {
+        "slant": "HOLD: no independently pinned homologous source/candidate top-minus-bottom anchors",
+        "clean_plate": "SCOPED_PASS: decoded clean alpha is zero throughout exact source label bbox; source-to-clean external RGBA delta zero",
+        "style": "HOLD: source-family black/condensed Hangul morphology not blind-calibrated against independent accepted controls",
+        "readability": "SCOPED_VISUAL: original and Korean readable on native gray; only representative black50/white75 available",
+        "glyph_integrity": "SCOPED_VISUAL: no obvious broken strokes in viewed native contacts; all authored mip/cross-background cases not certified",
+        "protected_art": "SCOPED_PASS: whole atlas outside union of 9 labels RGBA and alpha change zero",
+        "placement": "SCOPED_PASS: candidate alpha bounds strictly inside source regions",
+        "orientation": "SCOPED_PASS: RAW and readable full-atlas contacts generated from saved BGRA DDS; consumer runtime untested"
+      }
+    }
+  ],
+  "visual_review": {
+    "observed": "SOURCE/CLEAN/CURRENT aligned contacts independently opened for small create/custom/quick, three help lines, large red CREATE/QUICK/CUSTOM at native gray100; selected white75 and black50; full readable atlas50. Saved DDS red big labels show solid red face rather than earlier rejected displaced bevel. Gray help Korean appears materially heavy versus source condensed English but no independently blinded family-control decision; keep style HOLD, do not invent confirmed REWORK from ambiguous cross-script face.",
+    "first_look_before_producer_verdict": false,
+    "reason": "Machine results inspected before first-look, hence no blind PASS; independent known-defect calibration incomplete",
+    "unresolved": [
+      "documented blind control and four defect exemplars",
+      "independent source-family stem/counter and readable slant anchors",
+      "all 9 regions in each black/white/gray practical size and full mip policy coverage",
+      "separate C3 strict review with distinct review_id",
+      "USER_REVIEW_NOT_APPROVED/game consumer and user real-game test"
+    ]
+  },
+  "c3_status": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "actual_game_regression_closed": false,
+  "new_dds_count": 0,
+  "new_evidence_png_count": 15,
+  "previous_review": "C306 q237 HOLD; candidate SHA unchanged; no duplicate completed/PASS claim"
+}
