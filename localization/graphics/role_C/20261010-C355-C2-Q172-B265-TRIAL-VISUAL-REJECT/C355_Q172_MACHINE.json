@@ -1,0 +1,209 @@
+{
+  "run": "C355",
+  "index": 172,
+  "role": "C2",
+  "data_not_dds": "B265 trial DDS SHA declared by producer but its DDS bytes are absent from Git tree, only FINAL_DECODED/RAW PNG; no independent trial SHA or DDS roundtrip claim permitted",
+  "input_sha256": {
+    "SOURCE": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "OFFICIAL": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "CLEAN": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+    "TRIAL_PNG": "24ad58c41e82c32438d9bdda27c4ec0c204b5daa9571d9b40cae363b7fe3f626",
+    "TRIAL_RAW_PNG": "2c8a2020fa6dc7088dd7768e779aae31ab298a2ac27fcd3e0c86e38cba561714"
+  },
+  "source_and_official_header_match": true,
+  "dims": [
+    1024,
+    1024
+  ],
+  "orientation_checks": {
+    "trial_png_equals_flip_of_raw_png": true,
+    "trial_png_equals_raw_png": false,
+    "chosen_clean": "AS_SAVED",
+    "chosen_trial": "AS_SAVED",
+    "cross_comparisons": {
+      "CLEAN_AS_SAVED_SOURCE_OUTSIDE": 0,
+      "CLEAN_FLIPPED_SOURCE_OUTSIDE": 724393,
+      "TRIAL_AS_SAVED_OFFICIAL_OUTSIDE": 0,
+      "TRIAL_FLIPPED_OFFICIAL_OUTSIDE": 724393
+    }
+  },
+  "pairwise_scoped": {
+    "SOURCE_to_CLEAN": {
+      "rgba_total": 3496,
+      "rgba_outside": 0,
+      "rgba_inside": 3496,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "CLEAN_to_TRIAL_PNG": {
+      "rgba_total": 1409,
+      "rgba_outside": 0,
+      "rgba_inside": 1409,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "OFFICIAL_to_TRIAL_PNG": {
+      "rgba_total": 1572,
+      "rgba_outside": 0,
+      "rgba_inside": 1572,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "SOURCE_to_TRIAL_PNG": {
+      "rgba_total": 3530,
+      "rgba_outside": 0,
+      "rgba_inside": 3530,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    }
+  },
+  "regions": [
+    {
+      "id": "START",
+      "roi": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "visible_source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "visible_official_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "visible_trial_png_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "sizes": {
+        "source": [
+          81,
+          23
+        ],
+        "official": [
+          81,
+          23
+        ],
+        "trial": [
+          81,
+          23
+        ]
+      },
+      "trial_source_width_ratio": 1.0,
+      "clean_roi_alpha_nonzero": 1863,
+      "trial_bbox_inside_source_bbox": true,
+      "trial_margin_in_source_box": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "GOAL",
+      "roi": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "visible_source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "visible_official_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "visible_trial_png_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "sizes": {
+        "source": [
+          77,
+          24
+        ],
+        "official": [
+          77,
+          24
+        ],
+        "trial": [
+          77,
+          24
+        ]
+      },
+      "trial_source_width_ratio": 1.0,
+      "clean_roi_alpha_nonzero": 1848,
+      "trial_bbox_inside_source_bbox": true,
+      "trial_margin_in_source_box": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "lossless_images": [
+    {
+      "name": "C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245",
+      "bytes": 7498
+    },
+    {
+      "name": "C355_Q172_START_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "8823f340260f866b5af4d1bd3ba9530c3920cd85c92103540e9d6e19cb26b481",
+      "bytes": 10202
+    },
+    {
+      "name": "C355_Q172_START_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "fb3aeb219bcf318e1e38e1a1e0a949253e4af1349e948833a32164cc0a751aa3",
+      "bytes": 5662
+    },
+    {
+      "name": "C355_Q172_START_RAW_GRAY_100.png",
+      "sha256": "12878f46435b1fe24703020e092dadb503c15d2d1cda0ef2fb4785db0ecf1544",
+      "bytes": 7534
+    },
+    {
+      "name": "C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7",
+      "bytes": 5954
+    },
+    {
+      "name": "C355_Q172_GOAL_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "f705a9a7813e3ed7a3aa6817b9dc91a458818980045cd5a034c1b5b24e56186a",
+      "bytes": 8053
+    },
+    {
+      "name": "C355_Q172_GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "d5c3cacdcea963df70a91a9ef41d5c11453cad3d85e648d2943c1682ea4996c8",
+      "bytes": 4729
+    },
+    {
+      "name": "C355_Q172_GOAL_RAW_GRAY_100.png",
+      "sha256": "3b8b4a08ddcb33445536bb3eb33d155f42e5994125dee5a36a46cd58d3d565ad",
+      "bytes": 6086
+    },
+    {
+      "name": "C355_Q172_WHOLE_SOURCE_OFFICIAL_TRIAL_CLEAN_FLIPY_25.png",
+      "sha256": "ff41239ddf5a8811a1989342220908ba33c5b8ab24cd8b3a20bafc2948d14a13",
+      "bytes": 84292
+    }
+  ]
+}

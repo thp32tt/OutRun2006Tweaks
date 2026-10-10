@@ -14690,5 +14690,30 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "machine_report": "localization/graphics/role_C/20261010-C1-Q137-EXACT-SOURCE-CLEAN-6REGION/C1_Q137_MACHINE.json",
     "qa_report": "localization/graphics/role_C/20261010-C1-Q137-EXACT-SOURCE-CLEAN-6REGION/C1_Q137_CONTROLLER_HOLD.json"
+  },
+  "c355_c2_q172_b265_unpersisted_trial_vision_rework": {
+    "run_key": "OUTRUN-KOR-C355-C2-Q172-B265-INDEPENDENT-TRIAL-VISUAL-20261010",
+    "role": "C2",
+    "shard": "EVEN",
+    "queue_index": 172,
+    "decision": "REWORK_REQUIRED_B265_UNPROMOTED_VISUAL_FAIL_EXACT_DDS_HOLD",
+    "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+    "official_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+    "trial_producer_claimed_sha256_unverified": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+    "trial_png_sha256": "24ad58c41e82c32438d9bdda27c4ec0c204b5daa9571d9b40cae363b7fe3f626",
+    "source_clean_rgb_changed_inside": 3496,
+    "source_clean_rgb_changed_outside": 0,
+    "clean_final_png_rgb_changed_inside": 1409,
+    "clean_final_png_rgb_changed_outside": 0,
+    "trial_dds_persisted": false,
+    "trial_dds_verified": false,
+    "official_C2": "C295_REWORK_UNCHANGED",
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "promoted_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence_controller": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_C2_CONTROLLER_VISUAL_REWORK.json",
+    "evidence_machine": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_MACHINE.json",
+    "timestamp_kst": "2026-10-10 11:59 KST"
   }
 }

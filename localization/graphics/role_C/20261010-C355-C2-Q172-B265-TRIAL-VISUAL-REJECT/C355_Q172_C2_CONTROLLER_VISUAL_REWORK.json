@@ -1,0 +1,314 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C355",
+  "review_id": "C355-C2-Q172-B265-FIRST-INDEPENDENT-PNG-PIXEL",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 172,
+  "run_key": "OUTRUN-KOR-C355-C2-Q172-B265-INDEPENDENT-TRIAL-VISUAL-20261010",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "producer_trial_sha256_unverified": "2f797ca0fd5f7be40c593555793a1e414c740d43ad364cf0f195ec41cce418da",
+  "candidate_sha256": "812373b09831dd2886ab5e6f3a74adc5d357e9e5871ac37752e91b24871a950a",
+  "english_source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "verified_producer_clean_png_sha256": "9a0750d0db62345a21dbf4006f2da0b2fe7e96151f40dd5e3d1f5e422bd1d809",
+  "verified_trial_final_png_sha256": "24ad58c41e82c32438d9bdda27c4ec0c204b5daa9571d9b40cae363b7fe3f626",
+  "verified_trial_raw_png_sha256": "2c8a2020fa6dc7088dd7768e779aae31ab298a2ac27fcd3e0c86e38cba561714",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "selection_guard": "B265 new distinct unpromoted producer FAIL visual test had independent C=NOT_RUN. Earlier C295 review was on official 8123... not this B265 output; do not re-PASS or count same SHA.",
+  "triage": "METHOD_CHANGE_REQUIRED (previous independently repeated source bevel root cause); producer's proposed SDF method itself visually failed.",
+  "source_and_official_verified_sha": true,
+  "trial_DDS_present_in_repository": false,
+  "trial_DDS_sha_verified": false,
+  "trial_DDS_roundtrip": "NOT_TESTED_MISSING_BYTES",
+  "current_official_dds_unchanged": true,
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_MACHINE.json",
+    "sha_blob": "adb99f117afca2a4ccdd976edbc30401b995bd3f",
+    "result": "SCOPED_PNG_RGB_0_OUTSIDE_NO_DDS_APPROVAL"
+  },
+  "full_atlas_rgba_alphas": {
+    "SOURCE_to_CLEAN": {
+      "rgba_total": 3496,
+      "rgba_outside": 0,
+      "rgba_inside": 3496,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "CLEAN_to_TRIAL_PNG": {
+      "rgba_total": 1409,
+      "rgba_outside": 0,
+      "rgba_inside": 1409,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "OFFICIAL_to_TRIAL_PNG": {
+      "rgba_total": 1572,
+      "rgba_outside": 0,
+      "rgba_inside": 1572,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    },
+    "SOURCE_to_TRIAL_PNG": {
+      "rgba_total": 3530,
+      "rgba_outside": 0,
+      "rgba_inside": 3530,
+      "alpha_outside": 0,
+      "alpha_inside": 0
+    }
+  },
+  "raw_flipy_exact_trial_png": true,
+  "pixels_before_producer_verdict": false,
+  "blind_calibration_completed": false,
+  "visual_first_look_caveat": "Producer visual FAIL prose and native screenshots already known at selection; new independent SHA authenticated files, decoder and direct views assessed, not blind.",
+  "per_region": {
+    "START": {
+      "native_source_box": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "source_visible_alpha_bbox": "opaque plaque fills region; cannot derive glyph-only bbox from alpha",
+      "reported_producer_source_effect_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "unapproved_B265_PNG_reported_effect_bbox": [
+        66,
+        374,
+        126,
+        395
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "FAIL_VISUAL_SOURCE_FAMILY_LEAN",
+          "observation": "START original is bright motorsport right-lean italic lettering. B265 trial glyphs look horizontal segmented/stair-step, not source-faithful.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245"
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS_RGB_ONLY_SOURCE_TO_CLEAN",
+          "observation": "Producer CLEAN SHA authenticated; source to CLEAN changes only within these two sign-banner boxes. Opaque red plaque alpha==255 for full ROI; cannot certify glyph removal by alpha==0. Readable SOURCE/CLEAN compared independently.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245"
+          }
+        },
+        "style": {
+          "result": "FAIL_CREAM_GOLD_CHROME_SOURCE_FAMILY",
+          "observation": "B265 trial has broken horizontal cream/copper face and stacked streaks compared to continuous slanted English START glow and bevel.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245"
+          }
+        },
+        "readability": {
+          "result": "FAIL_PRACTICAL_50",
+          "observation": "START in trial: 출발 has closely layered horizontal cream lines; source relative instant readability damaged.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "fb3aeb219bcf318e1e38e1a1e0a949253e4af1349e948833a32164cc0a751aa3"
+          }
+        },
+        "glyph_integrity": {
+          "result": "FAIL_FACE_TOPOLOGY_AT_VIEW_ONLY",
+          "observation": "Native saved trial PNG shows horizontal glyph-face discontinuities/overlaid stripes; no verified trial DDS available to exclude producer-to-encode artifacts.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245"
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS_PNG_NOT_DDS",
+          "observation": "Exact FULL 1024² source→CLEAN, CLEAN→trial PNG and official→trial PNG changed RGBA+alpha outside two original title rectangles=0; not a verified persisted trial DDS mask.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_WHOLE_SOURCE_OFFICIAL_TRIAL_CLEAN_FLIPY_25.png",
+            "sha256": "ff41239ddf5a8811a1989342220908ba33c5b8ab24cd8b3a20bafc2948d14a13"
+          }
+        },
+        "placement": {
+          "result": "HOLD_NO_TEXT_GLYPH_BBOX_DECODE",
+          "observation": "Plausible producer glyph bbox inside source, but decoded alpha covers entire opaque red plate so full original text bbox containment cannot be independently reconstructed from alpha; source hierarchy fails visually.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245"
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_PNG_RAW_FLIP_Y",
+          "observation": "Saved B265 FINAL_RAW.png flipped exactly matches FINAL_DECODED.png for every pixel; source and official DDS use RAW mirror Y. Trial DDS not retained, so this does not verify DDS roundtrip.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_RAW_GRAY_100.png",
+            "sha256": "12878f46435b1fe24703020e092dadb503c15d2d1cda0ef2fb4785db0ecf1544"
+          }
+        }
+      }
+    },
+    "GOAL": {
+      "native_source_box": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "source_visible_alpha_bbox": "opaque plaque fills region; cannot derive glyph-only bbox from alpha",
+      "reported_producer_source_effect_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "unapproved_B265_PNG_reported_effect_bbox": [
+        617,
+        636,
+        651,
+        658
+      ],
+      "eight_checks": {
+        "slant": {
+          "result": "FAIL_VISUAL_SOURCE_FAMILY_LEAN",
+          "observation": "GOAL original is bright motorsport right-lean italic lettering. B265 trial glyphs look horizontal segmented/stair-step, not source-faithful.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7"
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS_RGB_ONLY_SOURCE_TO_CLEAN",
+          "observation": "Producer CLEAN SHA authenticated; source to CLEAN changes only within these two sign-banner boxes. Opaque red plaque alpha==255 for full ROI; cannot certify glyph removal by alpha==0. Readable SOURCE/CLEAN compared independently.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7"
+          }
+        },
+        "style": {
+          "result": "FAIL_CREAM_GOLD_CHROME_SOURCE_FAMILY",
+          "observation": "B265 trial has broken horizontal cream/copper face and stacked streaks compared to continuous slanted English GOAL glow and bevel.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7"
+          }
+        },
+        "readability": {
+          "result": "FAIL_PRACTICAL_50",
+          "observation": "GOAL in trial: 골 resembles parallel plate stripes; syllable hard to parse.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "d5c3cacdcea963df70a91a9ef41d5c11453cad3d85e648d2943c1682ea4996c8"
+          }
+        },
+        "glyph_integrity": {
+          "result": "FAIL_FACE_TOPOLOGY_AT_VIEW_ONLY",
+          "observation": "Native saved trial PNG shows horizontal glyph-face discontinuities/overlaid stripes; no verified trial DDS available to exclude producer-to-encode artifacts.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7"
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS_PNG_NOT_DDS",
+          "observation": "Exact FULL 1024² source→CLEAN, CLEAN→trial PNG and official→trial PNG changed RGBA+alpha outside two original title rectangles=0; not a verified persisted trial DDS mask.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_WHOLE_SOURCE_OFFICIAL_TRIAL_CLEAN_FLIPY_25.png",
+            "sha256": "ff41239ddf5a8811a1989342220908ba33c5b8ab24cd8b3a20bafc2948d14a13"
+          }
+        },
+        "placement": {
+          "result": "HOLD_NO_TEXT_GLYPH_BBOX_DECODE",
+          "observation": "Plausible producer glyph bbox inside source, but decoded alpha covers entire opaque red plate so full original text bbox containment cannot be independently reconstructed from alpha; source hierarchy fails visually.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+            "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7"
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_PNG_RAW_FLIP_Y",
+          "observation": "Saved B265 FINAL_RAW.png flipped exactly matches FINAL_DECODED.png for every pixel; source and official DDS use RAW mirror Y. Trial DDS not retained, so this does not verify DDS roundtrip.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_RAW_GRAY_100.png",
+            "sha256": "3b8b4a08ddcb33445536bb3eb33d155f42e5994125dee5a36a46cd58d3d565ad"
+          }
+        }
+      }
+    }
+  },
+  "decision": "REWORK_REQUIRED_VISUAL_B265_TRIAL_WITH_MISSING_DDS_HOLD_FOR_EXACT_BYTE_GATE",
+  "official_queue_status": "b265_producer_visual_fail_restored_c295_manual_vector_required",
+  "C2_PASSED": false,
+  "C3": "BLOCKED",
+  "approval": "NOT_GRANTED",
+  "IGR": "No user screenshot closure claimed",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "source_to_clean_limited": "All source and CLEAN full atlas RGBA differs only inside START and GOAL rectangles (3496 RGB pixels, alpha unchanged). CLEAN is opaque red plate, so cleaned alpha is not 0 and alpha cannot measure glyph.",
+  "further_required": [
+    "Stop same per-stroke SDF chrome method",
+    "Design source-anchored continuous italic cream/copper bevel native vector",
+    "Save actual updated trial DDS bytes, exact SHA and verified decode",
+    "Full SOURCE vs CLEAN and CLEAN vs persisted final with RAW/FLIP-Y and 50-100% in all authored mips",
+    "Follow source-family blind calibration and independent C2 then C3 and user game when appropriate"
+  ],
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "983e4aa38a836261dfa36088ca4f4d4d79f0fcadb4b99a88ca4cb05d48efb245",
+      "bytes": 7498
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "8823f340260f866b5af4d1bd3ba9530c3920cd85c92103540e9d6e19cb26b481",
+      "bytes": 10202
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "fb3aeb219bcf318e1e38e1a1e0a949253e4af1349e948833a32164cc0a751aa3",
+      "bytes": 5662
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_START_RAW_GRAY_100.png",
+      "sha256": "12878f46435b1fe24703020e092dadb503c15d2d1cda0ef2fb4785db0ecf1544",
+      "bytes": 7534
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "af565db41977d31d7ce4ef0baf710dedacd99d2f31d82e585bba8f27483b6ce7",
+      "bytes": 5954
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "f705a9a7813e3ed7a3aa6817b9dc91a458818980045cd5a034c1b5b24e56186a",
+      "bytes": 8053
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B265.png",
+      "sha256": "d5c3cacdcea963df70a91a9ef41d5c11453cad3d85e648d2943c1682ea4996c8",
+      "bytes": 4729
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_GOAL_RAW_GRAY_100.png",
+      "sha256": "3b8b4a08ddcb33445536bb3eb33d155f42e5994125dee5a36a46cd58d3d565ad",
+      "bytes": 6086
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C355-C2-Q172-B265-TRIAL-VISUAL-REJECT/C355_Q172_WHOLE_SOURCE_OFFICIAL_TRIAL_CLEAN_FLIPY_25.png",
+      "sha256": "ff41239ddf5a8811a1989342220908ba33c5b8ab24cd8b3a20bafc2948d14a13",
+      "bytes": 84292
+    }
+  ],
+  "backend": "GitHub SSOT and N100 MCP auxiliary exact source and PNG decode (local raw.githubusercontent.com download unavailable)",
+  "new_DDS": 0,
+  "promoted_DDS": 0,
+  "excluded": [
+    "C1_ODD",
+    "UNINDEXED_SPECIAL_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_OR_QUEUE"
+  ]
+}
