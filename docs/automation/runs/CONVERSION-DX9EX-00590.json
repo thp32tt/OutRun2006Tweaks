@@ -16,7 +16,10 @@
     "targeted_checks": [
       "In-memory source RED/GREEN static contract PASS",
       "6 targeted negative source mutations rejected",
-      "Python regression verifier wired into DX9Ex Active Gate; runner execution pending"
+      "Python regression verifier wired into DX9Ex Active Gate; runner execution pending",
+      "R31 real Apply handler declaration and NoteApply call verified against current GitHub source",
+      "Target SHA bd81283b9a4c exact-SHA DX9Ex Active #38062457504 SUCCESS incl Win32 full-chain/game/host/package; Domain #38062457557 SUCCESS; Full Source Impact #38062457527 SUCCESS",
+      "Reconciled target R31 static callback with feature verifier; original source contract and all six negative cases rechecked against target via in-memory logic"
     ],
     "integration_contract": "R29 effect cache and telemetry reuse only if R22/R31 StateBlock events are reliable, global Apply generation matches, Present epoch and age match. All 5 live render-state getters are bracketed by global generation; setters do not revive fields from before Apply; unsafe reads fail closed to legacy R13."
   },
@@ -26,14 +29,47 @@
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00590.json"
   ],
-  "automation_validation": "PENDING_CONTROLLER_EXACT_SHA",
+  "automation_validation": "BASE_TARGET_EXACT_SHA_PASS_FINAL_FEATURE_SHA_PENDING",
   "runtime_validation": "UNTESTED",
-  "status": "FEATURE_READY_AWAIT_CONTROLLER_FAST_FORWARD_AND_EXACT_SHA_GATES",
+  "status": "FEATURE_READY_MERGED_ON_LATEST_TARGET_AWAIT_CONTROLLER_FF",
   "hmd_test": "NOT_RUN",
   "ffb_release": "v0.2",
   "ffb_source_changed": false,
   "dxvk_status": "FROZEN",
   "r84_convergence": "INCOMPLETE_R30_R29_TU_SPLIT",
   "feature_final_promotion": "CONTROLLER_FAST_FORWARD_AFTER_READY",
-  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1"
+  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+  "previous_candidate_sha": "dbf6678e543b636858a4cbb1bc8ae847af82597e",
+  "previous_ci_failure": {
+    "run_id": 38051682030,
+    "stage": "policy",
+    "reason": "verifier incorrectly required static declaration of R31OnStateBlockApply",
+    "classification": "VERIFIER_DEFECT",
+    "status": "CORRECTED"
+  },
+  "reconciliation": {
+    "target_verified_sha": "bd81283b9a4c2207d42a2b5c573119600b2c024d",
+    "original_feature_sha": "a93b38d90c092a5eecab5f1e399b92f0d03440f0",
+    "method": "two-parent merge with target HEAD as first parent; preserve target R31/HUD/code; adopt feature verifier and feature run record",
+    "target_ci": {
+      "dx9ex_active": {
+        "run_id": 38062457504,
+        "status": "success"
+      },
+      "domain_isolation": {
+        "run_id": 38062457557,
+        "status": "success"
+      },
+      "full_source_impact": {
+        "run_id": 38062457527,
+        "status": "success"
+      }
+    },
+    "local_contract": "PASS",
+    "negative_mutations_rejected": "6/6",
+    "controller_action": "fast-forward feature result to target then run exact-SHA CI",
+    "source_patch": "no preserved uncommitted source patch identified in 5-minute checkpoint; preserve only Git-recorded material",
+    "attempt": "2/3 unchanged",
+    "rollover": "not retry"
+  }
 }
