@@ -111,11 +111,38 @@ namespace OutRunVR::IpcV3
         return true;
     }
 
+    // Only publish fields marked valid by the HostState flags. The HostState
+    // reader may receive arbitrary bytes in absent optional fields; keep
+    // them out of the game-facing snapshot even after the required pose passed
+    // HostStateUsable. Caller validates the wire state before using this helper.
+    inline HostPoseSnapshot SnapshotFromValidatedHostState(
+        const HostState& state) noexcept
+    {
+        HostPoseSnapshot candidate{};
+        candidate.poseId = state.poseId;
+        candidate.hostPid = state.hostPid;
+        candidate.referenceSpaceGeneration = state.referenceSpaceGeneration;
+        candidate.positionValid = (state.flags & PositionValid) != 0;
+        candidate.stereoValid = (state.flags & StereoViewsValid) != 0;
+        std::copy_n(state.headOrientation, 4, candidate.headOrientation);
+        if (candidate.positionValid)
+            std::copy_n(state.headPositionMeters, 3, candidate.headPositionMeters);
+        if (candidate.stereoValid)
+        {
+            candidate.eyes[0] = state.eyes[0];
+            candidate.eyes[1] = state.eyes[1];
+        }
+        return candidate;
+    }
+
     class HostPoseV3Source
     {
     public:
         bool Read(HostPoseSnapshot& out) noexcept
         {
+            // Failure must never leave the previous successful frame visible
+            // to a caller that accidentally inspects out after false.
+            out = {};
             HostState state{};
             if (!reader_.Read(state))
                 return false;
@@ -143,16 +170,7 @@ namespace OutRunVR::IpcV3
                     return false;
             }
 
-            out = {};
-            out.poseId = state.poseId;
-            out.hostPid = state.hostPid;
-            out.referenceSpaceGeneration = state.referenceSpaceGeneration;
-            out.positionValid = (state.flags & PositionValid) != 0;
-            out.stereoValid = (state.flags & StereoViewsValid) != 0;
-            std::copy_n(state.headOrientation, 4, out.headOrientation);
-            std::copy_n(state.headPositionMeters, 3, out.headPositionMeters);
-            out.eyes[0] = state.eyes[0];
-            out.eyes[1] = state.eyes[1];
+            out = SnapshotFromValidatedHostState(state);
             return true;
         }
 

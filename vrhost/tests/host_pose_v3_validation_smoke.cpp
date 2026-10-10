@@ -104,6 +104,31 @@ int main()
     state.flags &= ~StereoViewsValid;
     ok &= Expect(HostStateUsable(state, now, frequency), "mono-valid pose remains usable");
 
+    // Invalid optional fields must never reach an otherwise valid published
+    // game-side snapshot (including NaNs in unflagged wire state fields).
+    state = MakeValid();
+    auto candidate = SnapshotFromValidatedHostState(state);
+    ok &= Expect(candidate.poseId == state.poseId && candidate.hostPid == state.hostPid &&
+        candidate.referenceSpaceGeneration == state.referenceSpaceGeneration &&
+        candidate.positionValid && candidate.stereoValid &&
+        candidate.headPositionMeters[0] == 1.0f &&
+        candidate.eyes[1].positionMeters[0] == 0.032f,
+        "validated stereo and position fields copied");
+
+    state.flags &= ~(PositionValid | StereoViewsValid);
+    state.headPositionMeters[0] = std::numeric_limits<float>::quiet_NaN();
+    state.eyes[0].orientation[0] = std::numeric_limits<float>::quiet_NaN();
+    ok &= Expect(HostStateUsable(state, now, frequency),
+        "absent optional field poison does not invalidate valid head pose");
+    candidate = SnapshotFromValidatedHostState(state);
+    ok &= Expect(!candidate.positionValid && !candidate.stereoValid &&
+        candidate.headPositionMeters[0] == 0.0f &&
+        candidate.headPositionMeters[1] == 0.0f &&
+        candidate.eyes[0].orientation[0] == 0.0f &&
+        candidate.eyes[1].positionMeters[0] == 0.0f &&
+        candidate.headOrientation[3] == 1.0f,
+        "absent optional position/eyes sanitized before publication");
+
     if (!ok)
         return 1;
     std::cout << "HostState.v3 pose validation rules passed.\n";
