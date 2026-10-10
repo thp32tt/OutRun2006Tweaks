@@ -1,0 +1,210 @@
+{
+  "run_key": "OUTRUN-KOR-C1-Q225-FIVE-BLIND-CALIBRATION-20261011-0424",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 225,
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "triage_recomputed_on_branch_queue_sha": "80dd814245ab9a032c46dd0de6d5005b8db62a9f",
+  "canonical_source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+  "official_dds_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+  "same_candidate_sha_no_duplicate_pass": true,
+  "blind_training": {
+    "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/C1_Q225_BLIND_CALIBRATION.json",
+    "score": "5/5",
+    "first_look_recorded_before_key": true
+  },
+  "visual_new": {
+    "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/q225_NINE_GRAY_CONTACT.png",
+    "sha256": "ab727f20bd72e094fc4c525c2dced787395f067c1713a6eaa3065e62c01ae6b3"
+  },
+  "region_observations": [
+    {
+      "id": "game_lobby",
+      "actual_native_gray_observation": "GAME LOBBY→게임 로비 legible dark on gray, smaller span; style HOLD",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "game_list",
+      "actual_native_gray_observation": "GAME LIST→게임 목록 no clear native-gray corrupt glyph, effect unresolved",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "setup",
+      "actual_native_gray_observation": "SETUP→설정 high contrast on native-gray; white-on-white not game reference",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "course_type",
+      "actual_native_gray_observation": "COURSE TYPE→코스 유형 clean plate blank; narrower, family effect unresolved",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "course",
+      "actual_native_gray_observation": "COURSE→코스 shorter wording and cell blank right; no scale PASS inferred",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "car_type",
+      "actual_native_gray_observation": "CAR TYPE→차량 유형 source region aligned, protected interior unqualified",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "catch_up",
+      "actual_native_gray_observation": "CATCH-UP→추격 보정 readable with no obvious duplicate English on gray",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "collision",
+      "actual_native_gray_observation": "COLLISION→충돌 readable but shorter, source family unqualified",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    },
+    {
+      "id": "players",
+      "actual_native_gray_observation": "PLAYERS→플레이어 readable and inside source-area crop",
+      "evidence": {
+        "path": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png",
+        "status": "existing exact-SHA lossless image re-inspected"
+      },
+      "eight_checks": {
+        "slant": "HOLD: paired readable glyph anchors missing",
+        "clean_plate": "SCOPED_PASS: C345 previously verified clean alpha zero/outside9 zero, this gray panel re-inspected",
+        "style": "HOLD: source condensed/weight family unqualified",
+        "readability": "SCOPED_PASS: glyphs legible at native gray, not game",
+        "glyph_integrity": "HOLD: no clear gray defect but multiscale B/W not re-inspected",
+        "protected_art": "SCOPED_PASS outside 9 historical unchanged; interior unqualified",
+        "placement": "HOLD: source glyph anchor hierarchy incomplete",
+        "orientation": "HOLD new pass inspected readable gray only; RAW previous C345 historical"
+      }
+    }
+  ],
+  "source_clean_provenance": {
+    "historical_independent_C1": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_CONTROLLER_C1_HOLD.json",
+    "source_to_clean_changed_rgba": 61787,
+    "clean_to_final_changed_rgba": 28442,
+    "nine_clean_alpha_zero": true,
+    "changed_outside_nine": 0,
+    "caution": "Numerics inherited C345; NOT recomputed here."
+  },
+  "reviewer": "Same ChatGPT C1; no fabricated independent C3",
+  "pixels_before_producer_verdict": false,
+  "pixels_first_note": "Existing C1/producer notes were seen before q225 gray reinspection; synthetic calibration alone blind.",
+  "final_verdict": "HOLD_STRICT_RECHECK",
+  "remaining": [
+    "9/9 exact DDS source-family and paired slant anchors",
+    "first-look current policy per-region BGW 100/75/50 RAW+FLIPY",
+    "protected art within bboxes",
+    "separate C3 stage",
+    "actual user in-game retest"
+  ],
+  "new_c_pass": 0,
+  "c3_pass": 0,
+  "dds_produced": 0,
+  "dds_promoted": 0,
+  "approval": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_game": "UNTESTED"
+}

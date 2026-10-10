@@ -1,0 +1,35 @@
+{
+  "stage": "blind_first_look_before_answer_key",
+  "reviewer": "C1-AI1",
+  "sheet_sha256": "bd3a99917d6ff90db08fa19338701e9db5c4311960c9022febc1768922efb234",
+  "decisions": {
+    "A": {
+      "observed": "FAIL",
+      "diagnosis": "residue",
+      "reason": "Duplicated/offset gold glyph edges in both rows"
+    },
+    "B": {
+      "observed": "FAIL",
+      "diagnosis": "opposite_slant",
+      "reason": "Strong reverse lean and cropped start versus source right italic"
+    },
+    "C": {
+      "observed": "FAIL",
+      "diagnosis": "excessive_weight",
+      "reason": "Overthick face and collapsed counters"
+    },
+    "D": {
+      "observed": "PASS",
+      "diagnosis": "normal",
+      "reason": "Readable coherent source-family italic without extra ghost"
+    },
+    "E": {
+      "observed": "FAIL",
+      "diagnosis": "clipped_stroke",
+      "reason": "Missing vertical fragments near participate and mode"
+    }
+  },
+  "producer_notes_consulted_before_first_look": false,
+  "answer_key_read_before_first_look": false,
+  "production_approval_asserted": false
+}

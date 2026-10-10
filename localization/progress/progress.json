@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T03:58:00+09:00",
+  "updated_at_kst": "2026-10-11T04:24:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "c1_q225_blind_calibration_20261011": {"run_key":"OUTRUN-KOR-C1-Q225-FIVE-BLIND-CALIBRATION-20261011-0424","index":225,"blind_correct":5,"blind_total":5,"official_sha256":"f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333","qa":"HOLD_STRICT_RECHECK","C3":"NOT_RUN","game":"UNTESTED","dds_produced":0,"report":"localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/C1_Q225_CALIBRATED_CONTROLLER_HOLD.json"},
       "latest_b_q212_B356_B357_mode_native_two_trials": {
         "index": 212,
         "role": "B",

@@ -1,0 +1,74 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "C1-ChatGPT",
+  "blind_review_completed": true,
+  "first_look_before_key": true,
+  "normal_source": {
+    "path": "localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_SOURCE_READABLE_NATIVE_RGBA.png",
+    "sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48"
+  },
+  "sheet": {
+    "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/BLIND_FIVE_CASES.png",
+    "sha256": "bd3a99917d6ff90db08fa19338701e9db5c4311960c9022febc1768922efb234"
+  },
+  "cases": [
+    {
+      "kind": "normal",
+      "image": {
+        "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/case_D.png",
+        "sha256": "f597d4640d01730718171dab87dc251c00ab05f11989741e7bc7244ad7d66acf"
+      },
+      "observed": "PASS",
+      "observation": "Readable coherent source-family italic without extra ghost",
+      "prediction": "normal",
+      "correct": true
+    },
+    {
+      "kind": "opposite_slant",
+      "image": {
+        "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/case_B.png",
+        "sha256": "ee8415cda5898d89294234883971eb2c839abc399b399fa6313926f1c7a4fcc0"
+      },
+      "observed": "FAIL",
+      "observation": "Strong reverse lean and cropped start versus source right italic",
+      "prediction": "opposite_slant",
+      "correct": true
+    },
+    {
+      "kind": "clipped_stroke",
+      "image": {
+        "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/case_E.png",
+        "sha256": "44a02f2d87c8c28d465476af6ea6237822e1cfc7c9780b086fe24291d7e569c5"
+      },
+      "observed": "FAIL",
+      "observation": "Missing vertical fragments near participate and mode",
+      "prediction": "clipped_stroke",
+      "correct": true
+    },
+    {
+      "kind": "residue",
+      "image": {
+        "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/case_A.png",
+        "sha256": "ef696cea84bf6284751e1c2a1dafd93f2eafe927887adac36593a5145a7fd125"
+      },
+      "observed": "FAIL",
+      "observation": "Duplicated/offset gold glyph edges in both rows",
+      "prediction": "residue",
+      "correct": true
+    },
+    {
+      "kind": "excessive_weight",
+      "image": {
+        "path": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/case_C.png",
+        "sha256": "a972eccdebbe758c9031747aff9bbe1118e3847999dd8bd027cd7296b03d1d6c"
+      },
+      "observed": "FAIL",
+      "observation": "Overthick face and collapsed counters",
+      "prediction": "excessive_weight",
+      "correct": true
+    }
+  ],
+  "result": "5_OF_5_CORRECT",
+  "synthetic_controls_not_production_dds": true,
+  "limit": "q101 English family defect calibration only; q225 whole-atlas approval independent and still HOLD."
+}

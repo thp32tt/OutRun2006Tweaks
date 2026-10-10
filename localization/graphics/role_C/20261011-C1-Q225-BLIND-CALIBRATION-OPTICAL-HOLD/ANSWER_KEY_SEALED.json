@@ -1,0 +1,12 @@
+{
+  "mapping": {
+    "A": "residue",
+    "B": "opposite_slant",
+    "C": "excessive_weight",
+    "D": "normal",
+    "E": "clipped_stroke"
+  },
+  "reference": "(55, 0, 1246, 210)",
+  "source_file": "work/c1_q101_a226_1910/A226_SOURCE_READABLE_NATIVE_RGBA.png",
+  "synthetic_only": true
+}
