@@ -31,11 +31,13 @@ assert official_sha=="38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59e
 assert dds_bytes[:4]==b"DDS " and len(dds_bytes)==128+4096*4096*4
 source_path=root/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_20_SOURCE_NATIVE_RGBA.png"
 src_bytes=source_path.read_bytes()
-src=np.array(Image.open(io.BytesIO(src_bytes)).convert("RGBA"),dtype=np.uint8)
+source_expanded=np.array(Image.open(io.BytesIO(src_bytes)).convert("RGBA"),dtype=np.uint8)
 x0,y0,x1,y1=(3490,391,3722,440)
 W,H=x1-x0,y1-y0
-assert src.shape==(H,W,4),src.shape
 qa=json.loads((root/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_COMPONENT_QA.json").read_text())
+assert qa["regions"][19]["expanded_crop_readable"]==[3478,379,3734,452]
+assert source_expanded.shape==(H+24,W+24,4),source_expanded.shape
+src=source_expanded[12:12+H,12:12+W].copy()
 assert qa["source_sha256"]=="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
 assert qa["regions"][19]["bbox_readable"]==[x0,y0,x1,y1]
 # Recreate original English-free plate from SOURCE background, not from corrupt
