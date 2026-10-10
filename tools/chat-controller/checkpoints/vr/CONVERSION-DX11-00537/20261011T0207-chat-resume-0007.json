@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "5minute_feature_progress",
+  "captured_at_kst": "2026-10-11T02:07:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+  "feature_stage": "CI_COMPILED_PACKAGE_RUNNING",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_unchanged": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "real_source_work": "Rotating eligible Draw sampling; Win32 min macro C2589 fixed; source/negative tests and 5 named acceptance CI steps",
+  "validation": {
+    "exact_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+    "build_run": 38069889292,
+    "build": "SUCCESS",
+    "openxr_run": 38069889239,
+    "openxr_game_x86": "SUCCESS",
+    "openxr_game_r26_hud_x86": "SUCCESS",
+    "openxr_host_x64": "SUCCESS",
+    "openxr_other_x86": "SUCCESS",
+    "DX11_TEST_BUNDLE": "RUNNING_ASSEMBLY",
+    "backend_conversion_gate": "PENDING_CONTROLLER_PROMOTION"
+  },
+  "acceptance_static": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN"
+  ],
+  "incomplete_acceptance_ids": [
+    "DX11-LIVE-CALLSITE_RUNTIME_PROOF",
+    "DX11-NATIVE-DRAW_LIVE_GPU_PROOF",
+    "DX11-VISIBLE-FRAME_RUNTIME_PROOF",
+    "DX11-SAFE-RETURN_RUNTIME_PROOF",
+    "DX11-TEST-BUNDLE_ARTIFACT_PENDING"
+  ],
+  "next_action": "Verify DX11-TEST-BUNDLE job SUCCESS and exact-SHA real ZIP artifact, then persist C3/C5/C6 acceptance on feature run record with source/build-vs-runtime split, submit FEATURE_READY for diagnostic-only if requirements met; do not alter target branch; runtime remains UNTESTED.",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_ready": false,
+  "score_change": 0
+}
