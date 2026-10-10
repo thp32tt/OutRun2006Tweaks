@@ -10185,5 +10185,25 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "updated_at_kst": "2026-10-10 09:20 KST"
   },
-  "updated_at": "2026-10-10 09:20 KST"
+  "updated_at": "2026-10-10 09:20 KST",
+  "c350_c1_q035_source_effect_footprint": {
+    "run_key": "OUTRUN-KOR-C350-C1-Q035-A196-SOURCE-EFFECT-FOOTPRINT-20261010-0910",
+    "role": "C1",
+    "queue_index": 35,
+    "shard": "ODD",
+    "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "source_clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+    "source_clean_outside_two_legacy_bboxes": 14182,
+    "source_final_outside_two_legacy_bboxes": 14182,
+    "source_final_alpha_outside": 13551,
+    "clean_final_outside": 0,
+    "whole_atlas": "HOLD_STRICT_RECHECK",
+    "c3": "NOT_RUN",
+    "approval": "BLOCKED",
+    "new_promoted_dds": 0,
+    "new_png": 15,
+    "qa_report": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_CONTROLLER_C1_HOLD.json",
+    "runtime_validation": "UNTESTED"
+  }
 }

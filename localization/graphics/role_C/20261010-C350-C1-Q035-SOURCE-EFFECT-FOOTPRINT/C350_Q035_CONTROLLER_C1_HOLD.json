@@ -1,0 +1,330 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C350-C1-Q035-A196-EXACT-SOURCE-EFFECT-FOOTPRINT",
+  "run_key": "OUTRUN-KOR-C350-C1-Q035-A196-SOURCE-EFFECT-FOOTPRINT-20261010-0910",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "triage": "EVIDENCE_ONLY_HOLD; python tools/localization/rework_triage.py --index 35 executed against fresh branch queue",
+  "execution_backend": "GitHub SSOT; ChatGPT local URL DNS failed; N100 MCP bounded binary download+array crop/read only; new artifacts GitHub",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "format": "4096x4096 RGB32 RGBA raw mirror_y; 1 mip"
+  },
+  "candidate": {
+    "sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "same_sha_as_C308": true,
+    "dds_changed": false
+  },
+  "clean": {
+    "repo_path": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CLEAN_PLATE.png",
+    "sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+    "readable_orientation_independently_verified": true
+  },
+  "machine_evidence": {
+    "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_INDEPENDENT_MACHINE.json",
+    "sha256": "d9e14a39029cf410bd792d05135af0958c669c9f067ad070d72f1070f498f34f"
+  },
+  "effect_provenance": {
+    "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_OUTSIDE_PROVENANCE.json",
+    "sha256": "71db266a1ab185dac18894918367e390fe4ad59c3b7a3cb7b59d132d3ed14fca"
+  },
+  "fresh_distinct_measurement": {
+    "old_C308_reported_outside_target_source_change": 0,
+    "exact_source_to_clean_rgba_change_outside_two_legacy_source_bboxes": 14182,
+    "exact_source_to_final_rgba_change_outside_two_legacy_source_bboxes": 14182,
+    "source_to_current_alpha_changed_outside": 13551,
+    "clean_to_current_changed_outside_two_legacy_source_bboxes": 0,
+    "outside_component_clusters": 15,
+    "outside_change_extent_readable": [
+      600,
+      342,
+      2785,
+      448
+    ],
+    "largest_components": [
+      {
+        "pixels": 4709,
+        "bbox": [
+          2266,
+          363,
+          2785,
+          447
+        ]
+      },
+      {
+        "pixels": 2724,
+        "bbox": [
+          855,
+          429,
+          1103,
+          444
+        ]
+      },
+      {
+        "pixels": 1917,
+        "bbox": [
+          2319,
+          442,
+          2734,
+          448
+        ]
+      },
+      {
+        "pixels": 1150,
+        "bbox": [
+          873,
+          342,
+          955,
+          357
+        ]
+      },
+      {
+        "pixels": 727,
+        "bbox": [
+          1055,
+          342,
+          1106,
+          357
+        ]
+      },
+      {
+        "pixels": 726,
+        "bbox": [
+          812,
+          342,
+          863,
+          357
+        ]
+      }
+    ],
+    "interpretation": "Pixel-exact SOURCE-to-CLEAN effects extend beyond the previous C308 declared source title effect bboxes, especially the navy italic outline/AA top and bottom. The 14,182 outside-difference pixels are located adjoining the SOURCE title shapes; contact images show source stroke/effect removal, not an independently confirmed damage to protected graphics. Do not equate source-to-clean outside0 from the old narrow scope with zero actual changed pixels.",
+    "open_question": "Exact pre-removal source effect boundary/gradient/negative control has not been independently family calibrated. Expanding a region to cover changed pixels would be circular and cannot prove protected-art nonintrusion."
+  },
+  "regions": [
+    {
+      "id": "pink",
+      "source_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "source_clean_changed_inside": 32656,
+      "clean_current_changed_inside": 14596,
+      "source_current_changed_inside": 33260,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "SOURCE compact strong readable-right italic versus current Hangul comparatively upright with generous tracking in native/p50; exact per-glyph paired anchors and family acceptance not established"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Visually clear English within previously declared rectangle, but exact source outline/AA removal also changes pixels outside old bbox; full effect footprint and protected no-touch mask unqualified"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "SOURCE white/navy high-contrast strongly italic optical family; Korean narrower, more separated and visually less italic; source-family calibration outstanding"
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean readable in gray 100/75/50; 327px vs English 504/505px and 70px high vs 72px; source-family balance not certified"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct destroyed syllable seen at reviewed native/50; only 1px source vertical clearance and independent glyph-alpha proof incomplete"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "CLEAN-to-FINAL outside old bbox zero, but SOURCE-to-CLEAN extends beyond previous source effect bbox; new protected-art classification needed, no proven foreign object lost"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Both Korean captions centered within old source title boxes, positive x88/89 and y1px margins; more exact effects need accounting"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_ONLY",
+          "observation": "Saved source/final uncompressed DDS header identical, full PNG original CLEAN orientation matched directly, RAW mirrors FLIP-Y readable; not a game PASS"
+        }
+      }
+    },
+    {
+      "id": "green",
+      "source_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "source_clean_changed_inside": 35931,
+      "clean_current_changed_inside": 14596,
+      "source_current_changed_inside": 35931,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "SOURCE compact strong readable-right italic versus current Hangul comparatively upright with generous tracking in native/p50; exact per-glyph paired anchors and family acceptance not established"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Visually clear English within previously declared rectangle, but exact source outline/AA removal also changes pixels outside old bbox; full effect footprint and protected no-touch mask unqualified"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "SOURCE white/navy high-contrast strongly italic optical family; Korean narrower, more separated and visually less italic; source-family calibration outstanding"
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean readable in gray 100/75/50; 327px vs English 504/505px and 70px high vs 72px; source-family balance not certified"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct destroyed syllable seen at reviewed native/50; only 1px source vertical clearance and independent glyph-alpha proof incomplete"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "CLEAN-to-FINAL outside old bbox zero, but SOURCE-to-CLEAN extends beyond previous source effect bbox; new protected-art classification needed, no proven foreign object lost"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Both Korean captions centered within old source title boxes, positive x88/89 and y1px margins; more exact effects need accounting"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_ONLY",
+          "observation": "Saved source/final uncompressed DDS header identical, full PNG original CLEAN orientation matched directly, RAW mirrors FLIP-Y readable; not a game PASS"
+        }
+      }
+    }
+  ],
+  "image_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_GRAY_100.png",
+      "sha256": "9954fdcbf42575f41face1c59663d917c1f913d549379e7892d7c418ed1bbf68",
+      "bytes": 60589,
+      "region": "pink",
+      "view": "GRAY_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_GRAY_75.png",
+      "sha256": "3d7235f2bdbac001f706faf540ad2a9bf3add0445d44a44fe1423045a86b9a53",
+      "bytes": 68526,
+      "region": "pink",
+      "view": "GRAY_75"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_GRAY_50.png",
+      "sha256": "0635970fc44f39b62803bae8b6bc56435ccc2fe26dc350a8288a0f3a22e60a63",
+      "bytes": 38198,
+      "region": "pink",
+      "view": "GRAY_50"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_BLACK_100.png",
+      "sha256": "8c3948efa64f8ac50e1528e535e4050bb32afab70125fc70eadb46f81ef1230f",
+      "bytes": 61978,
+      "region": "pink",
+      "view": "BLACK_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_WHITE_100.png",
+      "sha256": "2dc147fd5dd96c4dc8a83c2a1c5d005345c8f129dddcfa20acf11b105968e523",
+      "bytes": 59229,
+      "region": "pink",
+      "view": "WHITE_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_pink_RAW_NATIVE.png",
+      "sha256": "f9f2efa6a7439385c4dc7ad6874df66cc9081a7dd2b5ea3a09f317d72711f4f4",
+      "bytes": 57402,
+      "region": "pink",
+      "view": "RAW_NATIVE"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_GRAY_100.png",
+      "sha256": "be373d49440310fb395f51b73b2f8024adc4f7ce86647a7463742713655f2b12",
+      "bytes": 55769,
+      "region": "green",
+      "view": "GRAY_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_GRAY_75.png",
+      "sha256": "04b8700a5cde0f05a5e820e5dd46bbed78b47b6d8c4519677e7c985a22540451",
+      "bytes": 66201,
+      "region": "green",
+      "view": "GRAY_75"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_GRAY_50.png",
+      "sha256": "bab063fd052efe954b24c23c820e433198f7cc316f69b925bfdc4ba4b485089d",
+      "bytes": 37220,
+      "region": "green",
+      "view": "GRAY_50"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_BLACK_100.png",
+      "sha256": "135b3cdc86e53e4491d6510ff204de8884c748146a9685582edc80f1f4e4bdf9",
+      "bytes": 56837,
+      "region": "green",
+      "view": "BLACK_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_WHITE_100.png",
+      "sha256": "5d379d2b04262ebd6e1870186d231068a72b2f5493dca683ef06e92b80179160",
+      "bytes": 56050,
+      "region": "green",
+      "view": "WHITE_100"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_green_RAW_NATIVE.png",
+      "sha256": "a10a9757bc24df6694cb09ee453ae862924579e6841b1b83b6b1f2c9ab1a2077",
+      "bytes": 54550,
+      "region": "green",
+      "view": "RAW_NATIVE"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_OUTSIDE_COMPONENT_1.png",
+      "sha256": "37482df4d8ba47aaddc4c47c061f689317411b3923194170f02fdc4981bdfcb9",
+      "bytes": 43178,
+      "region": "outside_source_effect",
+      "view": "component1"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_OUTSIDE_COMPONENT_2.png",
+      "sha256": "c0a56ffb7607e78cc6972226682888dbd478cf42fc96e2c1600ab54416ca6574",
+      "bytes": 6388,
+      "region": "outside_source_effect",
+      "view": "component2"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_OUTSIDE_COMPONENT_3.png",
+      "sha256": "9bc5ca99ffeadfb8108456813aa325195a3d3dc79b53bb4d9152262c24892018",
+      "bytes": 8528,
+      "region": "outside_source_effect",
+      "view": "component3"
+    }
+  ],
+  "firstlook_before_producer_notes": false,
+  "known_defect_blind_calibration": "NOT_RUN",
+  "qualified_slant_anchors": "NOT_RUN",
+  "separate_C3": "NOT_RUN",
+  "whole_atlas_C1": "HOLD_STRICT_RECHECK",
+  "visual_defect_confirmed": "UNDETERMINED; SOURCE outline effect footprint under-classified, current font/style source-family concern unresolved",
+  "do_not_rework_without_material_defect": true,
+  "official_queue_status_remains": "c308_c1_hold_a196_native_source_style_calibration_required",
+  "APPROVAL": "BLOCKED",
+  "USER_PRE_INGAME": "NOT_APPROVED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_promoted_dds": 0,
+  "new_independent_full_pass": 0,
+  "C3": "NOT_RUN",
+  "next_actions": [
+    "Rebuild exact source title effect/AA mask from canonical English and classify adjacent source shapes independently",
+    "Pin per-glyph readable-coordinate paired anchors on English/Korean italics and select original family reference",
+    "Re-evaluate CLEAN continuity/protected-art separate from effect mask; fresh pixels-first C1 and distinct C3; user real game remains separate"
+  ]
+}

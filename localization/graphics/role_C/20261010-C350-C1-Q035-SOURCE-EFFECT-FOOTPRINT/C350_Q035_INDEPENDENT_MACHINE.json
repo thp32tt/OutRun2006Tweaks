@@ -1,0 +1,107 @@
+{
+  "run": "C350",
+  "queue_index": 35,
+  "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+  "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+  "regions": [
+    {
+      "region": "pink",
+      "source_bbox": [
+        609,
+        357,
+        1113,
+        429
+      ],
+      "pixel_count": 36288,
+      "source_clean_changed": 32656,
+      "clean_current_changed": 14596,
+      "source_current_changed": 33260,
+      "source_clean_alpha": 32437,
+      "clean_current_alpha": 14577,
+      "source_current_alpha": 22284,
+      "source_rgba_minmax": [
+        [
+          8,
+          16,
+          57,
+          128
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "current_rgba_minmax": [
+        [
+          6,
+          8,
+          45,
+          128
+        ],
+        [
+          250,
+          251,
+          250,
+          255
+        ]
+      ]
+    },
+    {
+      "region": "green",
+      "source_bbox": [
+        2273,
+        370,
+        2778,
+        442
+      ],
+      "pixel_count": 36360,
+      "source_clean_changed": 35931,
+      "clean_current_changed": 14596,
+      "source_current_changed": 35931,
+      "source_clean_alpha": 35763,
+      "clean_current_alpha": 14578,
+      "source_current_alpha": 24913,
+      "source_rgba_minmax": [
+        [
+          8,
+          16,
+          57,
+          191
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "current_rgba_minmax": [
+        [
+          6,
+          8,
+          45,
+          180
+        ],
+        [
+          250,
+          251,
+          250,
+          255
+        ]
+      ]
+    }
+  ],
+  "outside": {
+    "source_clean_changed_outside": 14182,
+    "source_current_changed_outside": 14182,
+    "clean_current_changed_outside": 0,
+    "source_current_alpha_outside": 13551
+  },
+  "header_exact": true,
+  "mips": 1,
+  "raw_transform": "mirror_y",
+  "runtime_validation": "UNTESTED"
+}
