@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B345",
+  "queue_index": 176,
+  "run_key": "OUTRUN-KOR-B345-Q176-HEAVY-SOURCE-BLOCK-GLYPH-20261010",
+  "github_actions_run": 38009742225,
+  "worker_output_head": "5085e36670cddf38ce9c6c3f75768a03ab8cd8ea",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "prior_candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "new_trial_sha256": "34edd2aa06eb8dc8611c8b67738d147e3197325e1af6e54347439b491838075f",
+  "direct_visual_basis": [
+    "B345_jennifer_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B345_clarissa_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B345_holly_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B345_flagman4_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "provenance": "Full 16,777,344-byte DDS from GitHub-hosted CPU role B. I directly inspected independent source/CLEAN/old/new gray100 SHA-pinned persisted contact images; GitHub worker roundtrip exact and zero outside declared original source boxes. N100 MCP fetched only four small native contacts for controller direct visual.",
+  "stage_check": {
+    "source_to_clean": "SCOPED_VISUAL_PASS_FULL_RGBA_ZERO_IN_FOUR_ORIGINAL_TEXT_BBOX, outside0; protected ???/route atlas unchanged",
+    "lettering": "VISUAL_REJECT: Noto CJK Bold native+3px extra stroke creates cramped horizontal counters in 홀리 and 클라리사, bulky letterheads vs flat red English source, not enough internal white space",
+    "composite": "SCOPED_MECHANICAL_PASS_SOURCE_OUTSIDE_ZERO, Korean stays within four original boxes; no final family approval",
+    "persisted": "DDS native2048x2048 RGB32 alpha/mip1 BGRA mirror-y roundtrip exact; comparison exports include FLIPY/RAW gray black white 100/75/50 but native four-row direct review rejects"
+  },
+  "checks": {
+    "clean_plate": "PASS_SCOPED",
+    "slant": "HOLD_NO_MATCHED_STEM_ANCHORS_BOTH_VISUALLY_UPRIGHT",
+    "size": "PASS_NUMERIC_4_OF_4_POSITIVE_MARGINS",
+    "weight_style": "FAIL_COUNTER_SPACE_COLLAPSE_HOLLY_CLARISSA",
+    "clipping": "PASS_NUMERIC_NO_NEW_ROI_BBOX_ESCAPE",
+    "protected_art": "PASS_OUTSIDE_FOUR_SOURCE_BBOX",
+    "orientation": "MACHINE_PASS_VIEWS_SAVED_DIRECT_NATIVE_ONLY",
+    "readability": "FAIL_UNNECESSARY_HEAVY_COUNTERS_AT_SOURCE_SCALE"
+  },
+  "decision": "PRODUCER_VISUAL_REJECT_TRIAL_UNAPPROVED",
+  "next_trial": "Run source-pinned vector Noto CJK Bold native stroke1 (single controlled correction) with per-glyph counter preservation and no silent font replacement; max 2 same-method attempts across B345/B346, stop if still not source-faithful.",
+  "new_material_trial_dds": 1,
+  "official_candidate_promoted": 0,
+  "C2": "C343_REWORK_REQUIRED_OFFICIAL",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden": [
+    "A_ODD",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
