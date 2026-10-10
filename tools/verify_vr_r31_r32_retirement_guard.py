@@ -341,8 +341,8 @@ owner_evidence = {
     ),
     "R32ReviewRestoreRightPassState": (
         r32, "bool R32RestoreRightPassState(",
-        ("SetRenderTargetHook.stdcall<HRESULT>",
-         "SetDepthStencilSurfaceHook",
+        ("R30SupportCallOriginalSetRenderTarget(",
+         "R30SupportCallOriginalSetDepthStencilSurface(",
          "device->SetViewport(&savedViewport)",
          "R32SetWvpBatch(device, originalConstants)"),
     ),
@@ -433,8 +433,8 @@ require(
 require(
     function_body(r32, "bool R32RestoreRightPassState("),
     "R32 right-pass restore owner",
-    "SetRenderTargetHook.stdcall<HRESULT>",
-    "SetDepthStencilSurfaceHook",
+    "R30SupportCallOriginalSetRenderTarget(",
+    "R30SupportCallOriginalSetDepthStencilSurface(",
     "device->SetViewport(&savedViewport)",
     "R32SetWvpBatch(device, originalConstants)",
 )
