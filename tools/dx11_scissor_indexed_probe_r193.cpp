@@ -102,6 +102,31 @@ int main() {
     require(!verified_indexed_scissor_draw_ready(vb,ib,ctx.Get(),0,3,0,
         gen+1,vv,iv,40,40,DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get(),
         clipped.Get(),rect),"reject wrong generation");
+    // R220: a single-eye color contract must reject an additional live MRT,
+    // even though RTV0 still matches the expected eye exactly.
+    ComPtr<ID3D11Texture2D> secondEye;
+    ComPtr<ID3D11RenderTargetView> secondRtv;
+    require(SUCCEEDED(dev->CreateTexture2D(&td,nullptr,secondEye.GetAddressOf())),
+        "secondary eye target");
+    require(SUCCEEDED(dev->CreateRenderTargetView(secondEye.Get(),nullptr,
+        secondRtv.GetAddressOf())), "secondary eye RTV");
+    ID3D11RenderTargetView* bothEyes[]={rtv.Get(),secondRtv.Get()};
+    ctx->OMSetRenderTargets(2,bothEyes,nullptr);
+    require(!ready(),"reject retained secondary-eye MRT");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
+    require(ready(),"restore after secondary-eye MRT");
+    D3D11_TEXTURE2D_DESC depthDesc=td;
+    depthDesc.Format=DXGI_FORMAT_D32_FLOAT;
+    depthDesc.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> foreignDepth;
+    ComPtr<ID3D11DepthStencilView> foreignDsv;
+    require(SUCCEEDED(dev->CreateTexture2D(&depthDesc,nullptr,
+        foreignDepth.GetAddressOf())),"foreign depth target");
+    require(SUCCEEDED(dev->CreateDepthStencilView(foreignDepth.Get(),nullptr,
+        foreignDsv.GetAddressOf())),"foreign DSV");
+    ctx->OMSetRenderTargets(1,&raw,foreignDsv.Get());
+    require(!ready(),"reject unexpected retained DSV");
+    ctx->OMSetRenderTargets(1,&raw,nullptr);
     require(ready(),"restored exact scissor");
     const FLOAT blue[]={0,0,1,1};
     ctx->ClearRenderTargetView(rtv.Get(),blue);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R193 one-pass static guard with four targeted negative mutations."""
+"""R193/R220 one-pass static guard with scoped fail-closed mutations."""
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 h = (root/"src/vr/d3d11/native_indexed_scissor_binding.hpp").read_text(encoding="utf-8")
@@ -9,7 +9,12 @@ w = (root/".github/workflows/backend-conversion-gate.yml").read_text(encoding="u
 guards = (
     "verified_indexed_linear_draw_ready(vb, ib, context",
     "rasterOwner.Get() != device.Get()",
-    "liveTarget.Get() != expectedRtv",
+    "bool isolated = !liveDepth && liveTargets[0] == expectedRtv;",
+    "context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,",
+    "if (liveTargets[slot]) isolated = false;",
+    "for (auto* target : liveTargets)",
+    "if (target) target->Release();",
+    "if (!isolated) return false;",
     "liveRaster.Get() != expectedRaster",
     "if (rectCount != 1) return false;",
     "liveRect.right == expectedRect.right",
@@ -18,13 +23,15 @@ guards = (
 def intact(s):
     return all(g in s for g in guards)
 assert intact(h), "missing live native scissor object/extent/readback guard"
-for guard in guards[1:5]:
+for guard in guards[1:]:
     assert not intact(h.replace(guard,"",1)), "negative mutation survived "+guard
 assert "->Draw(" not in h and "->DrawIndexed(" not in h
 for phrase in (
     "reject caller stale scissor", "reject rebound scissor",
     "reject wrong raster state owner", "reject scissor-disabled state",
     "reject wrong generation", "reject retired IB owner",
+    "reject retained secondary-eye MRT", "reject unexpected retained DSV",
+    "restore after secondary-eye MRT",
     "ctx->DrawIndexed(3,0,0);", "GPU red inside owned left clip and blue outside"):
     assert phrase in p, "missing real WARP proof: "+phrase
 assert "[target.dx11_scissor_indexed_probe_r193]" in m

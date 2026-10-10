@@ -29,9 +29,20 @@ namespace outrun::vr::dx11 {
     expectedRaster->GetDevice(rasterOwner.GetAddressOf());
     if (!device || rasterOwner.Get() != device.Get()) return false;
 
-    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveTarget;
-    context->OMGetRenderTargets(1, liveTarget.GetAddressOf(), nullptr);
-    if (liveTarget.Get() != expectedRtv) return false;
+    // R220: an RTV0-only query hides retained MRT eye targets, and a
+    // retained DSV is not covered by this color-only scissor contract.
+    // Query *all* RTV slots and DSV, then release each OMGet-owned reference
+    // before any fail-closed return.
+    ID3D11RenderTargetView* liveTargets[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> liveDepth;
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                liveTargets, liveDepth.GetAddressOf());
+    bool isolated = !liveDepth && liveTargets[0] == expectedRtv;
+    for (UINT slot = 1; slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++slot)
+        if (liveTargets[slot]) isolated = false;
+    for (auto* target : liveTargets)
+        if (target) target->Release();
+    if (!isolated) return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     expectedRtv->GetDesc(&view);
     if (view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D ||
