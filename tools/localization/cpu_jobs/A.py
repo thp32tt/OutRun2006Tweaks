@@ -1,177 +1,105 @@
 #!/usr/bin/env python3
-"""A228 q059 BC3 index-only interior glyph-face de-stipple TRIAL.
-C1 independently rejected persisted q059 for gold Korean face perforations.
-Only attempt palette-index substitutions in source-bounded gold-face holes.
-Preserve all 16-byte blocks except specific color-index bits; never promote
-without controller visual review, exact source/CLEAN and full pilot signoff.
+"""A229: P0 q121 source-exact visual atlas inventory for unsafe unclassified remnant cells.
+Perform a new scoped native source/official/A220 audit over all 30 A215 component
+ROIs, rather than blindly repeating A221's two no-remnant rework attempts.
+Do not alter candidate bytes until exact user-failed label/neighbor identity
+and its protected pixels can be separated in a follow-up real production step.
 """
-import hashlib, io, json, os, subprocess, urllib.request
+import hashlib,io,json,os,urllib.request
 from pathlib import Path
 import numpy as np
-from scipy import ndimage as ndi
-from PIL import Image, ImageDraw
-
-assert os.environ.get("OUTRUN_CPU_WORKER") == "github-actions"
-assert os.environ.get("OUTRUN_CPU_ROLE") == "A"
-root=Path.cwd()
-run="20261010-A228-Q059-BC3-INDEX-INTERIOR-REPAIR-TRIAL"
-out=root/"localization/graphics/role_A"/run
+from PIL import Image,ImageDraw,ImageFont
+assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
+assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
+repo=Path.cwd()
+out=repo/"localization/graphics/role_A/20261010-A229-Q121-P0-ALL30-SOURCE-REMAINDER-INVENTORY"
 out.mkdir(parents=True,exist_ok=True)
-def sha(b): return hashlib.sha256(b).hexdigest()
-def dump(obj,name): (out/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+"\n")
-tri=subprocess.run(["python","tools/localization/rework_triage.py","--index","59","--require-safe-rerender"],capture_output=True,text=True)
-dump({"command":"rework_triage.py --index 59 --require-safe-rerender","exit":tri.returncode,
-      "stdout":tri.stdout[:5000],"stderr":tri.stderr[:2000]},"A228_TRIAGE.json")
-assert tri.returncode==0, "triage blocks ordinary new candidate; do not silently override"
-q=json.loads(tri.stdout)["assets"][0]
-assert q["index"]==59 and ("REWORK" in q["current_status"].upper() or
-  "REWORK" in q.get("next_action","").upper()),q
-review=json.loads((root/"localization/graphics/role_C/20261010-C1-Q059-PERSISTED-GLYPH-FACE-DEFECT/C1_Q059_INDEPENDENT_4REGION_VISUAL_REJECT.json").read_text())
-assert review["decision"]=="REWORK_REQUIRED"
-assert "BC3_KOREAN_GLYPH_FACE_DARK_STIPPLE" in review["defect_codes"]
-target=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
-original=target.read_bytes()
-expected="261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a"
-assert sha(original)==expected,(sha(original),expected)
-assert len(original)==128+2048*512 and original[:4]==b"DDS "
-assert original[84:88]==b"DXT5" or original[88:92]==b"DXT5", "Check exact DXT5 FourCC header"
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
-with urllib.request.urlopen(url,timeout=120) as resp: source_bytes=resp.read()
-source_sha="9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f"
-assert sha(source_bytes)==source_sha
-source_img=Image.open(io.BytesIO(source_bytes)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-previous_img=Image.open(io.BytesIO(original)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-assert source_img.size==previous_img.size==(2048,512)
-arr=np.array(previous_img,dtype=np.uint8)
-after=bytearray(original)
-areas=[
- ("race_rivals",(75,222,625,304)),
- ("drift_score",(119,53,609,137)),
- ("slipstream_score",(717,225,1408,320)),
-]
-def rgb565(v):
- return np.array([((v>>11)&31)*255//31,((v>>5)&63)*255//63,(v&31)*255//31],dtype=np.int32)
-def palette(base):
- c0=int.from_bytes(original[base+8:base+10],"little")
- c1=int.from_bytes(original[base+10:base+12],"little")
- a,b=rgb565(c0),rgb565(c1)
- return np.stack([a,b,(2*a+b+1)//3,(a+2*b+1)//3])
-changes=[]
-regions={}
-for name,rect in areas:
- x0,y0,x1,y1=rect
- rgb=arr[y0:y1,x0:x1,:3].astype(np.int16)
- al=arr[y0:y1,x0:x1,3]
- # Gold face derived from the original golden face colour family; no changes
- # to large NEXT MISSION, borders, text mask, alpha, gradients or protected art.
- gold=(rgb[:,:,0]>165)&(rgb[:,:,1]>90)&(rgb[:,:,2]<158)&(rgb[:,:,0]>rgb[:,:,2]*1.65)&(al>=192)
- n=ndi.convolve(gold.astype(np.uint8),np.ones((3,3),dtype=np.uint8),mode="constant",cval=0)
- # Target only enclosed, opaque dark interior freckles. A dotted outline/edge
- # is NOT a gold-face hole and is protected by this narrow rule.
- dark=(rgb[:,:,0]<120)&(rgb[:,:,1]<125)&(rgb[:,:,2]<165)
- eligible=dark&(n>=5)&(al>=220)
- pending=np.transpose(np.nonzero(eligible))
- selected=0;no_gold_palette=0;no_quality_gain=0;edge_block=0
- for yy,xx in pending:
-  X,Y=x0+int(xx),y0+int(yy)
-  raw_y=511-Y
-  bx=X//4;by=raw_y//4
-  # block must sit entirely inside source English glyph/effect region.
-  if not (x0<=bx*4 and (bx+1)*4<=x1 and y0<=511-(by*4+3) and 512-by*4<=y1):
-   edge_block+=1;continue
-  base=128+(by*512+bx)*16
-  colors=palette(base)
-  local=rgb[max(0,int(yy)-1):min(rgb.shape[0],int(yy)+2),max(0,int(xx)-1):min(rgb.shape[1],int(xx)+2)]
-  nearby=gold[max(0,int(yy)-1):min(rgb.shape[0],int(yy)+2),max(0,int(xx)-1):min(rgb.shape[1],int(xx)+2)]
-  if nearby.sum()<5:continue
-  target_rgb=np.median(local[nearby],axis=0)
-  dist=((colors-target_rgb)**2).sum(axis=1)
-  gold_choices=[j for j in range(4) if int(colors[j,0])>150 and int(colors[j,1])>85
-      and int(colors[j,2])<165 and colors[j,0]>colors[j,2]*1.6]
-  if not gold_choices:
-   no_gold_palette+=1;continue
-  j=min(gold_choices,key=lambda v:dist[v])
-  old_rgb=rgb[int(yy),int(xx)]
-  # Reject unchanged or a replacement that is not clearly closer to source gold.
-  if np.sum((colors[j]-target_rgb)**2)>=np.sum((old_rgb-target_rgb)**2)*0.5:
-   no_quality_gain+=1;continue
-  k=(raw_y%4)*4+(X%4)
-  idxoff=base+12
-  packed=int.from_bytes(after[idxoff:idxoff+4],"little")
-  origidx=(packed>>(2*k))&3
-  if origidx==j:continue
-  updated=(packed&~(3<<(2*k)))|(j<<(2*k))
-  after[idxoff:idxoff+4]=updated.to_bytes(4,"little")
-  changes.append({"region":name,"x":X,"y":Y,"from":old_rgb.tolist(),
-       "to_palette":colors[j].tolist(),"old_index":origidx,"new_index":j})
-  selected+=1
- regions[name]={"dark_gold_enclosed_candidates":int(eligible.sum()),
-  "selected_index_repair":selected,"skipped_no_gold_palette":no_gold_palette,
-  "skipped_no_quality_gain":no_quality_gain,"skipped_edge_block":edge_block}
-newbytes=bytes(after)
-# Even when no repair is possible, publish truthful method diagnosis, not
-# an artificial new candidate or a rerun pretending to have repaired a DDS.
-modified=sha(newbytes)!=expected
-saved=None
-if modified:
- trial=out/"A228_Q059_GOLD_FACE_BC3_INDEX_TRIAL_UNPROMOTED.dds"
- trial.write_bytes(newbytes)
- saved=np.array(Image.open(trial).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),dtype=np.uint8)
- assert np.array_equal(saved[:,:,3],arr[:,:,3]),"BC3 alpha mutation"
- changed=np.any(saved!=arr,axis=2)
- allowed=np.zeros(changed.shape,dtype=bool)
- for name,(x0,y0,x1,y1) in areas:allowed[y0:y1,x0:x1]=True
- assert int((changed&~allowed).sum())==0,"protected/outside source bbox altered"
- assert int(changed.sum())==len(changes),(int(changed.sum()),len(changes))
- assert newbytes[:128]==original[:128] and len(newbytes)==len(original)
- # Index bits are the only changed bytes; block endpoints and alpha exact.
- blockbytes=np.frombuffer(original[128:],np.uint8).reshape(-1,16)
- blocknew=np.frombuffer(newbytes[128:],np.uint8).reshape(-1,16)
- byte_diff=blockbytes!=blocknew
- assert not byte_diff[:,:12].any()
- assert int(byte_diff[:,12:].sum())>0
- for name,rect in areas:
-  x0,y0,x1,y1=rect
-  # Full source/candidate/trial ROI comparisons across opaque practical backgrounds.
-  crops=[np.array(source_img.crop(rect)),arr[y0:y1,x0:x1],saved[y0:y1,x0:x1]]
-  for bgname,bg in [("BLACK",(0,0,0)),("GRAY",(105,105,105)),("WHITE",(255,255,255))]:
-   panels=[]
-   for raw in crops:
-    rgba=Image.fromarray(raw,mode="RGBA")
-    canvas=Image.new("RGBA",rgba.size,bg+(255,))
-    panels.append(Image.alpha_composite(canvas,rgba).convert("RGB"))
-   for pct in (100,50):
-    scale=pct/100
-    if pct!=100:
-     panels=[p.resize((round(p.width*scale),round(p.height*scale)),Image.Resampling.LANCZOS) for p in panels]
-    w,h=panels[0].size
-    sheet=Image.new("RGB",(w*3,h+24),bg)
-    d=ImageDraw.Draw(sheet)
-    for j,(s,p) in enumerate(zip(["SOURCE","OFFICIAL_C1_FAIL","A228_INDEX_TRIAL"],panels)):
-     sheet.paste(p,(j*w,24))
-     d.text((j*w+2,2),s,fill=(0,0,0) if bgname=="WHITE" else (255,255,255))
-    sheet.save(out/f"A228_{name}_{bgname}_{pct}.png")
- else:
-  changed=np.zeros((512,2048),dtype=bool)
-else:
- changed=np.zeros((512,2048),dtype=bool)
-report={"run":"A228","run_key":"OUTRUN-KOR-A228-Q059-C1-BC3-FACE-INDEX-SCOPED-20261010-2100",
- "role":"A","index":59,"source_sha256":source_sha,"source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
- "official_sha256":expected,"current_official_unchanged":True,
- "trial_sha256":sha(newbytes) if modified else None,
- "trial_path":str(trial.relative_to(root)) if modified else None,
- "source_format":"DXT5/BC3 2048x512 mip1 RAW-mirror_y",
- "mechanism":"4x4 BC3 palette index substitution for gold-encircled alpha-opaque dark flecks; preserve palette endpoints/alpha and source-bbox outside all pixels",
- "region_counters":regions,"modified_pixels":len(changes),"modified_bytes":sum(a!=b for a,b in zip(original,newbytes)),
- "all_source_bbox_outside_identical":True,"all_alpha_exact":True,"header_and_format_preserved":True,
- "persisted_DDS_redecoded":bool(modified),"production_stage":"NEW_COMPRESSED_FACE_METHOD_EXPLORATORY_TRIAL",
- "producer_self_qa":"PENDING_CONTROLLER_OPTICAL_REVIEW","C1":"REQUIRED_NEW_BYTES",
- "official_promotion":False,"candidate_published":False,
- "fresh_source_clean_composite_gate":"NOT_YET_COMPLETE_NO_PASS",
- "C3":"NOT_RUN","USER_INGAME":"NOT_TESTED","RUNTIME_VALIDATION":"UNTESTED",
- "next_action":"Review persisted BGW 100/50 before considering promotion; if dark dot texture remains, method fails and switch to native source-family renderer/BC encoder",
- "exclusions":["VR","FFB","DX11","DXVK"]}
-dump(report,"A228_MACHINE_AND_SCOPE_REPORT.json")
-dump({"pixel_substitutions":changes},"A228_INDEX_CHANGE_LIST.json")
-print(json.dumps({"index":59,"trial_sha":report["trial_sha256"],"pixel_repairs":len(changes),
- "regions":regions,"promoted":False},ensure_ascii=False))
+sha=lambda b:hashlib.sha256(b).hexdigest()
+diag=json.loads((repo/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_COMPONENT_QA.json").read_text())
+assert diag["source_sha256"]=="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+assert len(diag["regions"])==30
+prior=json.loads((repo/"localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json").read_text())
+assert prior["reason_for_no_new_dds"].startswith("Candidate exact-source pixel mask is empty")
+b=repo/"localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_Q121_THE_RESIDUE_PLUS_GOAL33_UNPROMOTED.dds"
+trial=b.read_bytes();assert sha(trial)==prior["previous_A219_A220_trial_sha256"]
+official_path=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+official=official_path.read_bytes();assert sha(official)==prior["official_candidate_sha256"]
+with urllib.request.urlopen(diag["source_url"],timeout=180) as res: src=res.read()
+assert sha(src)==prior["source_dds_sha256"]
+assert len(src)==len(trial)==len(official)==128+4096*4096*4
+assert src[:4]==trial[:4]==official[:4]==b"DDS "
+def im(data):
+ return Image.open(io.BytesIO(data)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+source,off,t=im(src),im(official),im(trial)
+assert source.size==off.size==t.size==(4096,4096)
+# This is a detection/inventory experiment, not a source-to-clean QA approval:
+# source identical alpha-positive candidate pixels may be legitimate preserved art.
+rows=[]
+for reg in diag["regions"]:
+ rank=reg["rank"]; x0,y0,x1,y1=reg["bbox_readable"]
+ assert 0<=x0<x1<=4096 and 0<=y0<y1<=4096
+ sa=np.array(source.crop((x0,y0,x1,y1)))
+ ca=np.array(t.crop((x0,y0,x1,y1)))
+ oa=np.array(off.crop((x0,y0,x1,y1)))
+ src_alpha=sa[:,:,3]>0
+ exact=src_alpha & (ca[:,:,3]>0) & np.all(sa==ca,axis=2)
+ prev_exact=src_alpha & (oa[:,:,3]>0) & np.all(sa==oa,axis=2)
+ changed=np.any(oa!=ca,axis=2)
+ # Pixel-complete exact-sha comparison, not heuristic 'it looks like English'.
+ only_src=np.count_nonzero(src_alpha&~(ca[:,:,3]>0))
+ added=np.count_nonzero(~src_alpha&(ca[:,:,3]>0))
+ ys,xs=np.nonzero(exact)
+ contact_bbox=[int(x0+xs.min()),int(y0+ys.min()),int(x0+xs.max()+1),int(y0+ys.max()+1)] if len(xs) else None
+ regions_extra=(int(y1-y0),int(x1-x0))
+ cells={"rank":rank,"source_bbox":[x0,y0,x1,y1],"roi_hw":regions_extra,
+  "source_visible_alpha":int(src_alpha.sum()),
+  "official_exact_source_rgba_alpha_positive":int(prev_exact.sum()),
+  "a220_exact_source_rgba_alpha_positive":int(exact.sum()),
+  "exact_source_remaining_bbox":contact_bbox,
+  "official_to_trial_changed_rgba_pixels":int(changed.sum()),
+  "a220_nonoriginal_alpha_positive":int(added),
+  "source_removed_alpha_positive":int(only_src),
+  "semantic":"UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+  "machine_verdict":"SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL" if len(xs) else "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"}
+ rows.append(cells)
+ # Persist contacts for novel remaining exact source >0 and the two known ambiguous
+ # boundary ROIs; cap to avoid clutter. Visual observation must classify neighbors.
+ if len(xs)>0 or rank in (21,26):
+  comps=[]
+  for img in (source,off,t):
+   layer=img.crop((x0,y0,x1,y1))
+   bg=Image.new("RGBA",layer.size,(95,95,95,255))
+   comps.append(Image.alpha_composite(bg,layer).convert("RGB"))
+  w,h=comps[0].size
+  # cap size for first 30 full atlas cells, yet preserve a truly native proof.
+  if w>900 or h>400:
+   k=min(900/w,400/h)
+   preview=[e.resize((round(w*k),round(h*k)),Image.Resampling.LANCZOS) for e in comps]
+   scale=f"PREVIEW_ONLY_{k:.3f}"
+  else:preview=comps;scale="NATIVE"
+  pw,ph=preview[0].size
+  sheet=Image.new("RGB",(3*pw,ph+28),(95,95,95))
+  d=ImageDraw.Draw(sheet)
+  for col,(name,img) in enumerate(zip(("ENGLISH SOURCE","CURRENT OFFICIAL","UNPROMOTED A220"),preview)):
+   sheet.paste(img,(col*pw,28))
+   d.text((col*pw+4,4),name,fill="white")
+  sheet.save(out/f"A229_rank{rank:02d}_SOURCE_OFFICIAL_A220_{scale}.png")
+  if rank in (21,26):
+   Image.fromarray((exact.astype(np.uint8)*255),mode="L").save(out/f"A229_rank{rank:02d}_EXACT_SOURCE_MATCH_MASK_NATIVE.png")
+# Unchanged original/current bytes; no unqualified remediation.
+report={"run":"A229","run_key":"OUTRUN-KOR-A229-Q121-P0-ALL30-SOURCE-EXACT-20261010-2200",
+ "role":"A","queue_index":121,"priority":"P0","owner_lane":"A",
+ "triage":"A221 rework blocked unsafe same-region rerender; expanded genuine-source classification to other 28 native source ROIs",
+ "source_sha256":sha(src),"official_sha256":sha(official),"a220_trial_sha256":sha(trial),
+ "sha_verified_all_three":True,"native":"4096x4096 RGBA32 mip1 readable=FLIP_TOP_BOTTOM",
+ "regions_total":len(rows),"rows_with_exact_source_rgba":sum(i["a220_exact_source_rgba_alpha_positive"]>0 for i in rows),
+ "sum_exact_source_rgba_by_overlapping_ROIs_not_distinct_pixels":sum(i["a220_exact_source_rgba_alpha_positive"] for i in rows),
+ "source_defects_inferred":False,"candidate_changed":False,"new_DDS":0,
+ "decision":"MAPPING_AND_PROTECTED_NEIGHBOR_TRIAGE_ONLY_NO_PIXEL_FIX",
+ "C1":"NOT_RUN","C3":"NOT_RUN","user_regressions":["IGR-030","IGR-031","IGR-040"],
+ "RUNTIME_VALIDATION":"UNTESTED","next_action":"Visually classify residual contours in each rank-specific source/current contact first, then reconstruct only confirmed English lettering from true source CLEAN; protect neighboring artwork. A221 rank21/26 no blind deletion.",
+ "rows":rows}
+(out/"A229_ALL30_SOURCE_EXACT_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"rows":len(rows),"source_exact_remaining":report["rows_with_exact_source_rgba"],
+"top":sorted([{"rank":r["rank"],"pixels":r["a220_exact_source_rgba_alpha_positive"]}
+ for r in rows if r["a220_exact_source_rgba_alpha_positive"]],key=lambda x:-x["pixels"])[:12]},ensure_ascii=False))
