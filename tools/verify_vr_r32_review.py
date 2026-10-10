@@ -58,7 +58,7 @@ r32 = require(
     "R32EffectIsFragileLive",
     "draw is forced to stock-WVP zero disparity",
     "R32SetWvpBatch",
-    "OutRunWvpRegisterCount",
+    "R30SupportWvpRegisterCount",
     "QueryPerformanceCounter",
     "R32DirectIdentityMatches",
     "R32DirectCopyPathRejected",
