@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-11T03:05:02.765729+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "a5a5b4d5eda3a7a15717898e8644a7279701727b",
+  "record": {
+    "task_id": "CONVERSION-DX9EX-00591",
+    "production_id": "CONVERSION-DX9EX-00591",
+    "event_id": "CONVERSION-DX9EX-00591-E004",
+    "event_type": "rollover",
+    "lane": "DX9EX",
+    "slot": "C",
+    "branch": "vr-d3d9ex-focus",
+    "base_sha": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 4,
+    "rollover_count": 4,
+    "chat_rollovers": 4,
+    "sent_at": "2026-10-11T03:01:30.948901+09:00",
+    "last_rollover_at": "2026-10-11T03:01:30.948901+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-11T03:01:30.948901+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null,
+    "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+    "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+    "feature_stage": "FEATURE_READY",
+    "feature_goal": "R33→R32→R31→R30→R29 전체 구조 분리, 명시 ABI와 CMake 일치, 전체 Win32/host 링크를 완성한다.",
+    "feature_contract": {
+      "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:R84_RENDERER_GRAPH",
+      "goal": "R33→R32→R31→R30→R29 전체 구조 분리, 명시 ABI와 CMake 일치, 전체 Win32/host 링크를 완성한다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "R84-OWNERS",
+          "expected": "All remaining R33/R32/R31/R30/R29 independent translation-unit owners",
+          "paths": [
+            "src/vr/d3d9/"
+          ],
+          "ci_step": "Feature acceptance: R84-OWNERS"
+        },
+        {
+          "id": "R84-ABI",
+          "expected": "Explicit interfaces remove textual cpp ownership and private-symbol leakage",
+          "paths": [
+            "src/vr/d3d9/"
+          ],
+          "ci_step": "Feature acceptance: R84-ABI"
+        },
+        {
+          "id": "R84-BUILD-GRAPH",
+          "expected": "cmake.toml and generated CMakeLists ownership agree; no stale HEADER_FILE_ONLY",
+          "paths": [
+            "cmake.toml",
+            "CMakeLists.txt"
+          ],
+          "ci_step": "Feature acceptance: R84-BUILD-GRAPH"
+        },
+        {
+          "id": "R84-REGRESSION",
+          "expected": "Focused producer/consumer and protected baseline regressions execute",
+          "paths": [
+            "tools/",
+            "tests/"
+          ],
+          "ci_step": "Feature acceptance: R84-REGRESSION"
+        },
+        {
+          "id": "R84-TEST-BUNDLE",
+          "expected": "Complete host/game/full-chain binaries plus manifest and collector",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: R84-TEST-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-r84-",
+      "policy_blob_sha": "7b61519aa94193a883e86735a9ba4ebacc93f4aa"
+    },
+    "feature_base_sha": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
+    "feature_last_head": "8b9a179a8506be368443514fd8c219e0ec10796d",
+    "feature_last_real_activity_at": "2026-10-11T03:04:51.886653+09:00",
+    "feature_work_key": "DX9EX:R84_RENDERER_GRAPH",
+    "feature_blocker": "ACCEPTANCE_ITEM_PENDING:R84-OWNERS"
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
