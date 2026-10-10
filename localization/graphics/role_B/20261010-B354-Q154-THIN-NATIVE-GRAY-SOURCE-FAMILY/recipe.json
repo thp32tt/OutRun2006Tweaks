@@ -1,0 +1,159 @@
+{
+  "source": {
+    "sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "revision": "Sonic-TV OR2006Sprites 3ce344e7",
+    "bbox": {
+      "01_create_new_license": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "02_select_license": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "03_single_player_red": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "04_default_license": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "05_multiplayer_red": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "06_single_player_gray": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "07_showroom_gray": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "08_multiplayer_gray": [
+        2566,
+        952,
+        3086,
+        1014
+      ]
+    }
+  },
+  "clean": {
+    "reference_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "derived_full_native_sha256": "074d6a378413215e565ba552782f4e68b15ee8eb505693add22f983a41644e9a"
+  },
+  "font": {
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+    "index": 1,
+    "ppem": 62
+  },
+  "normal": "CJK native Regular vector no dilation, English left anchor, source-gray [78,96,100]",
+  "targets": [
+    {
+      "id": "06_single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "new_bbox": [
+        1615,
+        289,
+        1927,
+        347
+      ],
+      "text": "싱글 플레이",
+      "source_gray_pixels": 16263,
+      "new_opaque_pixels": 3910,
+      "new_alpha_pixels": 5515,
+      "native_tracking": 10,
+      "advance": 312,
+      "margins": [
+        5,
+        270,
+        3,
+        3
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "new_bbox": [
+        2679,
+        291,
+        2793,
+        346
+      ],
+      "text": "쇼룸",
+      "source_gray_pixels": 12826,
+      "new_opaque_pixels": 1619,
+      "new_alpha_pixels": 2193,
+      "native_tracking": 12,
+      "advance": 114,
+      "margins": [
+        5,
+        301,
+        3,
+        4
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "new_bbox": [
+        2571,
+        954,
+        2844,
+        1012
+      ],
+      "text": "멀티플레이",
+      "source_gray_pixels": 14773,
+      "new_opaque_pixels": 4004,
+      "new_alpha_pixels": 5583,
+      "native_tracking": 10,
+      "advance": 273,
+      "margins": [
+        5,
+        242,
+        2,
+        2
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    }
+  ],
+  "protected": "other five original red cells byte-exact",
+  "repair_of": "C356 SOURCE_FAMILY_STROKE_OVERWEIGHT|COUNTERSPACE_COMPRESSION",
+  "independent_controller_optical_required": true
+}

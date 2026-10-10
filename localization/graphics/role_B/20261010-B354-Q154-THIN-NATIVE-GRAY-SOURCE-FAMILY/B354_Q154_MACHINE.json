@@ -1,0 +1,138 @@
+{
+  "role": "B",
+  "run": "B354",
+  "index": 154,
+  "run_key": "OUTRUN-KOR-B354-Q154-NEW-NATIVE-REGULAR-GRAY-20261010-1830",
+  "triage": "MATERIAL_REWORK",
+  "method": "New per-character vector Regular CJK at native ppem62 with unscaled glyph contours and real source-gray RGB; replaced C356-rejected Bold 1px dilation and tight counters, retained canonical SOURCE/CLEAN and five red source-family rows.",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "original_clean_sha256_recorded_by_C344": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+  "source_derived_alpha_zero_clean_rgba_sha256": "074d6a378413215e565ba552782f4e68b15ee8eb505693add22f983a41644e9a",
+  "original_official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "new_unapproved_trial_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+  "native": [
+    4096,
+    1024
+  ],
+  "codec": "RGBA32",
+  "mip_count": 1,
+  "raw_transform": "MIRROR_Y",
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+  "font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "font_index": 1,
+  "ppem": 62,
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "new_bbox": [
+        1615,
+        289,
+        1927,
+        347
+      ],
+      "text": "싱글 플레이",
+      "source_gray_pixels": 16263,
+      "new_opaque_pixels": 3910,
+      "new_alpha_pixels": 5515,
+      "native_tracking": 10,
+      "advance": 312,
+      "margins": [
+        5,
+        270,
+        3,
+        3
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    },
+    {
+      "id": "07_showroom_gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "new_bbox": [
+        2679,
+        291,
+        2793,
+        346
+      ],
+      "text": "쇼룸",
+      "source_gray_pixels": 12826,
+      "new_opaque_pixels": 1619,
+      "new_alpha_pixels": 2193,
+      "native_tracking": 12,
+      "advance": 114,
+      "margins": [
+        5,
+        301,
+        3,
+        4
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "new_bbox": [
+        2571,
+        954,
+        2844,
+        1012
+      ],
+      "text": "멀티플레이",
+      "source_gray_pixels": 14773,
+      "new_opaque_pixels": 4004,
+      "new_alpha_pixels": 5583,
+      "native_tracking": 10,
+      "advance": 273,
+      "margins": [
+        5,
+        242,
+        2,
+        2
+      ],
+      "glyph_coverage": true,
+      "source_to_clean_alpha_remainder": 0
+    }
+  ],
+  "changed_pixels": 65222,
+  "outside_3_regions": 0,
+  "protected_other_five_unchanged": true,
+  "persisted_decode_mismatch": 0,
+  "evidence": [
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_FLIPY.png",
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_75_FLIPY.png",
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_50_FLIPY.png",
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_RAW.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_FLIPY.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_75_FLIPY.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_50_FLIPY.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_RAW.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_FLIPY.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_75_FLIPY.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_50_FLIPY.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_RAW.png"
+  ],
+  "producer_stage": "PERSISTED_MECHANICAL_PASS_CONTROLLER_VISUAL_PENDING",
+  "fresh_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "official_promoted_dds": 0,
+  "IGR_STATUS": "NO_NEW_INGAME_EVIDENCE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
