@@ -1,0 +1,38 @@
+{
+  "task_id": "CONVERSION-DX11-00520",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "d3a479fc4d6f746cf46e70fdfe755fe2c1a85871",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R223 dormant indexed textured R188 native preflight rejects hidden OM UAV outputs; real WARP same-device typed UAV negative and restoration; no game DrawIndexed activation.",
+  "evidence": {
+    "scope": "R188 texture-only OM UAV; distinct from R219 indexed depth and R222 linear DSV",
+    "local_static": "PASS 7 focused source negative mutants and WARP fixture wiring",
+    "ci": "AWAIT_FINAL_EXACT_SHA_GATE"
+  },
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00520-E001",
+  "work_key": "DX11:R223:R188_TEXTURED_INDEXED_OM_UAV_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00520",
+  "checkpoint": "C4_COMMIT",
+  "status": "WAIT_EXACT_SHA_GATE",
+  "terminal": false,
+  "pipeline": {
+    "C0": "PASS remote claim cbb42c86 and branch head",
+    "C1": "PASS R188 OM UAV gap verified; R187 RTV/DSV preflight already safe",
+    "C2": "PASS one coherent 3-file batch",
+    "C3": "Local static mutation PASS; full exact-SHA CI PENDING",
+    "C4": "MATERIAL_COMMIT_PENDING",
+    "C5": "NOT_REQUIRED dormant backend",
+    "C6": "PENDING full Gate"
+  },
+  "timestamp_kst": "2026-10-10 14:38:45+09:00"
+}

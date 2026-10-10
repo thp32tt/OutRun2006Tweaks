@@ -108,6 +108,30 @@ int main() {
             DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get(),slot,expected,expectedState,fmt);
     };
     require(ready(srv.Get(),sampler.Get()), "baseline bound texture ownership");
+    // R223: a pixel UAV can write a side-eye buffer without occupying RTV1.
+    // Keep it on the same WARP device; the failure must be OM ownership,
+    // not a foreign-device or missing-texture shortcut.
+    D3D11_BUFFER_DESC sideDesc{};
+    sideDesc.ByteWidth=16;sideDesc.Usage=D3D11_USAGE_DEFAULT;
+    sideDesc.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
+    ComPtr<ID3D11Buffer> sideBuffer;
+    require(SUCCEEDED(dev->CreateBuffer(&sideDesc,nullptr,sideBuffer.GetAddressOf())) &&
+        sideBuffer, "R223 side-eye UAV buffer");
+    D3D11_UNORDERED_ACCESS_VIEW_DESC sideViewDesc{};
+    sideViewDesc.Format=DXGI_FORMAT_R32_UINT;
+    sideViewDesc.ViewDimension=D3D11_UAV_DIMENSION_BUFFER;
+    sideViewDesc.Buffer.FirstElement=0;sideViewDesc.Buffer.NumElements=4;
+    ComPtr<ID3D11UnorderedAccessView> sideUav;
+    require(SUCCEEDED(dev->CreateUnorderedAccessView(
+        sideBuffer.Get(),&sideViewDesc,sideUav.GetAddressOf())) && sideUav,
+        "R223 side-eye typed UAV");
+    ID3D11UnorderedAccessView* boundUav=sideUav.Get();
+    const UINT keepCounter=static_cast<UINT>(-1);
+    ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+        1,&target,nullptr,1,1,&boundUav,&keepCounter);
+    require(!ready(srv.Get(),sampler.Get()), "reject hidden side-eye OM UAV");
+    ctx->OMSetRenderTargets(1,&target,nullptr);
+    require(ready(srv.Get(),sampler.Get()), "restore UAV-free indexed texture eye");
     require(!ready(otherSrv.Get(),sampler.Get()), "reject wrong expected SRV");
     require(!ready(srv.Get(),alternate.Get()), "reject wrong expected sampler");
     require(!ready(srv.Get(),sampler.Get(),1), "reject wrong PS slot");

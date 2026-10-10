@@ -57,13 +57,29 @@ namespace outrun::vr::dx11 {
         !(desc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
         return false;
 
-    // A shader read of the active render target is undefined. D3D11 may
-    // silently unbind a conflicting SRV: enforce both identity and no alias.
-    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
-    context->OMGetRenderTargets(1, rtv.GetAddressOf(), nullptr);
+    // R223: R187 seals the indexed color RTV and optional DSV, but R188
+    // has no pixel UAV owner. A hidden OM UAV can write a second-eye resource
+    // during a textured DrawIndexed even when the only RTV is owned.
+    ID3D11RenderTargetView* liveRtv[1]{};
+    ID3D11DepthStencilView* liveDsv = nullptr;
+    ID3D11UnorderedAccessView* liveUavs[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+    context->OMGetRenderTargetsAndUnorderedAccessViews(
+        1u, liveRtv, &liveDsv, 0u, D3D11_PS_CS_UAV_REGISTER_COUNT, liveUavs);
+    bool isolated = liveRtv[0] == expectedTarget && !liveDsv;
+    if (liveRtv[0]) liveRtv[0]->Release();
+    if (liveDsv) liveDsv->Release();
+    // Each OMGet result owns one reference, including rejection paths.
+    for (auto* uav : liveUavs) {
+        if (uav) {
+            isolated = false;
+            uav->Release();
+        }
+    }
+    if (!isolated) return false;
+    // A shader read of the active render target is undefined. D3D11 can
+    // silently unbind an aliased SRV; require separate source/eye resources.
     Microsoft::WRL::ComPtr<ID3D11Resource> output;
-    if (!rtv) return false;
-    rtv->GetResource(output.GetAddressOf());
+    expectedTarget->GetResource(output.GetAddressOf());
     return output && output.Get() != source.Get();
 }
 } // namespace outrun::vr::dx11
