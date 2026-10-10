@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_recovery_c3_validation",
+  "captured_at_kst": "2026-10-10T17:06:25+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX11-00526",
+  "event_id": "CONVERSION-DX11-00526-E003",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "verified_game_branch_head": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+  "first_material_sha": "7260cc7800c9caf423aca9b8138cc6b099c2fd98",
+  "validation_bearing_result_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+  "exact_sha_gate": {
+    "run_id": 38036279467,
+    "head_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+    "status": "in_progress",
+    "validate": "success",
+    "dx11_readiness_smoke": "in_progress"
+  },
+  "resume_cursor": "C3_WAIT_EXACT_SHA_GATE_THEN_C6",
+  "do_not_duplicate": true,
+  "static_validation": "PASS_R219_10_GUARDS_R229_4_GUARDS_WARP_MARKERS_11",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "work_key": "DX11:R229:INDEXED_GPU_PREDICATION_EXECUTION_FENCE",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00526",
+  "blockers": [
+    "Do not push game branch while Gate is in progress; inherited separately owned R175 TEXCOORD6 probe may fail."
+  ],
+  "next_action": "Inspect exact-SHA Gate 38036279467, on terminal result update docs/automation/runs/CONVERSION-DX11-00526.json in a distinct bookkeeping commit without replacing validation-bearing SHA."
+}
