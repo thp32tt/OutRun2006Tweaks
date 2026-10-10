@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 q237 2026-10-10 18:55 KST candidate SHA39f66e75 unchanged: 9/9 exact SOURCE/CLEAN/FINAL alpha bboxes, source-region-exterior RGBA/alpha=0, 15 genuine lossless native BGW/RAW/FLIP-Y evidence refs. HOLD pending blind calibration/style all9 cross-background and independent C3; real game UNTESTED. OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855.",
     "B354/B355 q154 2026-10-10 18:47 KST 2 new exact persisted unapproved trial DDS, both source-family visual FAIL (first too thin, second retains tight counters). C356 official REWORK untouched, independent C2/C3/game not passed, no repeated method; manual vector source-conditioned counter reconstruction required. RUN_KEY=OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847.",
     "A226 q101 2026-10-10 18:12 KST NEW physically persisted 4096x4096 unpromoted DDS ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06 worker #38040234772 SUCCESS; newly repaired C1 45-pixel original residue by x3002..3005, protected x3000..3001 blank, canonical translated warning restored; saved SOURCE/CLEAN/A38/A226 gray100 black50 RAW firsthand scoped PASS, protected outside0; producer HOLD_STRICT_RECHECK source glyph slant anchor & full mask, official still REWORK, C1/C3/game UNTESTED. localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800.",
     "B352/B353 q060 2026-10-10 17:43 KST: two distinct saved unapproved DDS with visual FAIL on native/50% source-family weight and racing-italic depth; official C342 REWORK unchanged; IGR044 OPEN; no further same-method trial; manual vector/source contour and homologous slant needed. RUNTIME_VALIDATION=UNTESTED.",
@@ -15307,6 +15308,24 @@
     "status": "SCOPED_MATERIAL_REPAIR_PROVED_HOLD_STRICT_RECHECK",
     "independent_C1": "PENDING",
     "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c1_20261010_q237_9region_exact_evidence": {
+    "queue_index": 237,
+    "shard": "C1_ODD",
+    "role": "C1",
+    "run_key": "OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+    "regions_scoped_native": 9,
+    "region_source_bbox_pass": 9,
+    "outside_rgba_alpha": 0,
+    "new_lossless_png": 15,
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/C1_Q237_CONTROLLER_EVIDENCE_HOLD.json",
+    "blind_calibration": "PENDING",
+    "C3": "PENDING",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

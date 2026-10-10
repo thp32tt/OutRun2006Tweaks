@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 18:47:00 KST",
+  "updated_at_kst": "2026-10-10 18:59:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11297,5 +11297,25 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa_status": "SCOPED_SOURCE_RESIDUE_REPAIR_HOLD",
     "producer_firsthand_inspection": true
+  },
+  "c1_20261010_q237_9region_exact_evidence": {
+    "queue_index": 237,
+    "shard": "C1_ODD",
+    "role": "C1",
+    "run_key": "OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855",
+    "decision": "HOLD_STRICT_RECHECK",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "candidate_sha256": "39f66e75e8e2e4e9f57b12dc2bc75d44dfee9ccdd5b95ee4be1c98ba1034f8d2",
+    "regions_scoped_native": 9,
+    "region_source_bbox_pass": 9,
+    "outside_rgba_alpha": 0,
+    "new_lossless_png": 15,
+    "new_dds": 0,
+    "qa": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/C1_Q237_CONTROLLER_EVIDENCE_HOLD.json",
+    "blind_calibration": "PENDING",
+    "C3": "PENDING",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "reviewed_actual_bgws": true,
+    "approval_count_changed": 0
   }
 }
