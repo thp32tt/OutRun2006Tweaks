@@ -1,0 +1,162 @@
+{
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 101,
+  "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+  "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "candidate_status": "UNPROMOTED",
+  "dds": {
+    "width": 4096,
+    "height": 4096,
+    "pitch": 16384,
+    "mip": 1,
+    "masks": [
+      255,
+      65280,
+      16711680,
+      4278190080
+    ]
+  },
+  "source_provenance_claim_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "source_original_dds_independently_available": false,
+  "source_png_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+  "clean_png_sha256": "49855c9ea9a4d1428802822acc58550351930f25384465f26a8f1923d4e76f7b",
+  "producer_final_png_sha256": "6f6f098d53d7622dcfd2593d651c70eb6257281a082e1e1a456216460a100a1d",
+  "candidate_readable_png_match": {
+    "search_points": 11,
+    "matched_points": 11,
+    "readable_crop_origin": [
+      2850,
+      0
+    ],
+    "pixels_different_all_rgba": 0,
+    "pixels_different_where_alpha_nonzero": 0
+  },
+  "candidate_vs_official": {
+    "modified_rgba_inside_warning_source_rectangle": 121345,
+    "modified_rgba_outside_warning_source_rectangle": 0,
+    "modified_alpha_inside_warning_source_rectangle": 65934,
+    "modified_alpha_outside_warning_source_rectangle": 0,
+    "protected_icon_numbers_byte_exact_outside_region": true
+  },
+  "candidate_regions": [
+    {
+      "id": "warning_line_1",
+      "source_box": [
+        3002,
+        25,
+        3729,
+        92
+      ],
+      "candidate_alpha_box": [
+        3028,
+        27,
+        3703,
+        90
+      ],
+      "positive_margins": true,
+      "alpha_pixels": 31107
+    },
+    {
+      "id": "warning_line_2",
+      "source_box": [
+        3062,
+        92,
+        3931,
+        168
+      ],
+      "candidate_alpha_box": [
+        3074,
+        98,
+        3919,
+        161
+      ],
+      "positive_margins": true,
+      "alpha_pixels": 38284
+    }
+  ],
+  "evidence": {
+    "Q101_SOURCE_CLEAN_PERSISTED_BLACK_100.png": {
+      "sha256": "963335fefbefd5b1b943d0d5068600b02e08ad0c325e8f11e85cdb6fe9dd48fb",
+      "bytes": 111272,
+      "width": 3758,
+      "height": 210
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_BLACK_75.png": {
+      "sha256": "9a088c8181866d3d5aa9c84ab077c2ad693a17f012b106fe1117411b118294eb",
+      "bytes": 169112,
+      "width": 2822,
+      "height": 158
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_BLACK_50.png": {
+      "sha256": "18e81ae9ac70ba954051470e3269b49f133536ae87d3df057ce0774713d5ae2c",
+      "bytes": 80848,
+      "width": 1889,
+      "height": 105
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_GRAY_100.png": {
+      "sha256": "1e1504f87d1a0cb4d3f1f7ce10cf82e10e82e048d6d939ad9c5dba140afa6128",
+      "bytes": 122695,
+      "width": 3758,
+      "height": 210
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_GRAY_75.png": {
+      "sha256": "f9aa17ff65d2cfb836a631849f160ea412ceb2c9ff62e91ff1efa65daf7daa63",
+      "bytes": 194288,
+      "width": 2822,
+      "height": 158
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_GRAY_50.png": {
+      "sha256": "d1dbad4f0c9da58856558675de465323966826a2f4ddf4e0205b5d0c27194697",
+      "bytes": 92997,
+      "width": 1889,
+      "height": 105
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_WHITE_100.png": {
+      "sha256": "9347c2a317964462921c3764a1676c47b103685dd6b2e679be15b4264416d46f",
+      "bytes": 126597,
+      "width": 3758,
+      "height": 210
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_WHITE_75.png": {
+      "sha256": "87b06e0ccf28d3b38ee49a9fa106d4eaf0713f8e1e80998236dfda64fbfa3d08",
+      "bytes": 203435,
+      "width": 2822,
+      "height": 158
+    },
+    "Q101_SOURCE_CLEAN_PERSISTED_WHITE_50.png": {
+      "sha256": "50ba200f7b5efbdd715ee09cef5f76c96c606fe48256b3e344cf0b7ba8a2b7e6",
+      "bytes": 95889,
+      "width": 1889,
+      "height": 105
+    },
+    "Q101_RAW_PERSISTED_ALPHA_NATIVE.png": {
+      "sha256": "4e4eaf3ed3e4c315d55614aaab48be9e53e60ae0d660abbbfcbb4eb18b46b7df",
+      "bytes": 93591,
+      "width": 1246,
+      "height": 210
+    },
+    "Q101_FLIPY_PERSISTED_ALPHA_NATIVE.png": {
+      "sha256": "2087d2e0ddb15db5819c5f0d8e36c7a5d7095c2185b1aa09a468df38b1f799cf",
+      "bytes": 90029,
+      "width": 1246,
+      "height": 210
+    },
+    "Q101_LINE1_SOURCE_CLEAN_FINAL_GRAY_NATIVE.png": {
+      "sha256": "4c75f254cc3a7d59dc60f568950e66308a65d174ecd97786520d66f31f47dfbe",
+      "bytes": 44972,
+      "width": 2291,
+      "height": 75
+    },
+    "Q101_LINE2_SOURCE_CLEAN_FINAL_GRAY_NATIVE.png": {
+      "sha256": "582189ea365adb7477fe6bc2eadc4def6b66b622e2d5e0500f02524465b92168",
+      "bytes": 66102,
+      "width": 2717,
+      "height": 84
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "notes": "No false whole-asset source/clean PASS: PNG source is producer-published crop, original full source DDS SHA not independently rehashed; slant paired anchors and family calibration pending.",
+  "independent_source_dds_verified": false,
+  "source_crop_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48"
+}

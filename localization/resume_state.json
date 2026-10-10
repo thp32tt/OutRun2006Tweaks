@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 q101 A226 new SHA ea145aa5 independent saved-DDS 2/2 glyph source bbox, protected external RGBA/alpha 0, 1246x210 PNG saved byte-exact, 13 BLACK/GRAY/WHITE 100/75/50 + RAW evidence; HOLD until independently SHA-pinned full English source, blind controls and source-specific italic anchors; official remains REWORK; C3/game UNTESTED. OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920.",
     "C1 q237 2026-10-10 18:55 KST candidate SHA39f66e75 unchanged: 9/9 exact SOURCE/CLEAN/FINAL alpha bboxes, source-region-exterior RGBA/alpha=0, 15 genuine lossless native BGW/RAW/FLIP-Y evidence refs. HOLD pending blind calibration/style all9 cross-background and independent C3; real game UNTESTED. OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855.",
     "B354/B355 q154 2026-10-10 18:47 KST 2 new exact persisted unapproved trial DDS, both source-family visual FAIL (first too thin, second retains tight counters). C356 official REWORK untouched, independent C2/C3/game not passed, no repeated method; manual vector source-conditioned counter reconstruction required. RUN_KEY=OUTRUN-KOR-B354-B355-Q154-TWO-SOURCE-FAMILY-TRIALS-20261010-1847.",
     "A226 q101 2026-10-10 18:12 KST NEW physically persisted 4096x4096 unpromoted DDS ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06 worker #38040234772 SUCCESS; newly repaired C1 45-pixel original residue by x3002..3005, protected x3000..3001 blank, canonical translated warning restored; saved SOURCE/CLEAN/A38/A226 gray100 black50 RAW firsthand scoped PASS, protected outside0; producer HOLD_STRICT_RECHECK source glyph slant anchor & full mask, official still REWORK, C1/C3/game UNTESTED. localization/graphics/role_A/20261010-A226-Q101-SOURCE-45PIXEL-CLEAN-CANONICAL/A226_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800.",
@@ -15326,6 +15327,31 @@
     "qa": "localization/graphics/role_C/20261010-C1-Q237-NATIVE-NINE-REGION-EVIDENCE/C1_Q237_CONTROLLER_EVIDENCE_HOLD.json",
     "blind_calibration": "PENDING",
     "C3": "PENDING",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c1_20261010_q101_a226_saved_independent": {
+    "index": 101,
+    "shard": "C1_ODD",
+    "run_key": "OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920",
+    "role": "C1",
+    "source_claim_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "full_source_english_verified": false,
+    "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "candidate_current_approved": false,
+    "official_unchanged": true,
+    "machine_full_atlas_outside_rgba": 0,
+    "machine_full_atlas_outside_alpha": 0,
+    "modified_inside_rgba": 121345,
+    "affected_warning_regions": 2,
+    "regions_strict_containment": 2,
+    "new_lossless_png": 13,
+    "dds_produced": 0,
+    "status": "HOLD_STRICT_RECHECK",
+    "reason": "full source origin DDS not independently verified, blind calibration and italic stem anchors pending",
+    "qa": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/C1_Q101_A226_CONTROLLER_HOLD.json",
+    "C3": "NOT_RUN",
+    "APPROVALS": "NONE",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

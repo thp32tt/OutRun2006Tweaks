@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 18:59:00 KST",
+  "updated_at_kst": "2026-10-10 19:23:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11316,6 +11316,33 @@
     "C3": "PENDING",
     "RUNTIME_VALIDATION": "UNTESTED",
     "reviewed_actual_bgws": true,
+    "approval_count_changed": 0
+  },
+  "c1_20261010_q101_a226_saved_independent": {
+    "index": 101,
+    "shard": "C1_ODD",
+    "run_key": "OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920",
+    "role": "C1",
+    "source_claim_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "full_source_english_verified": false,
+    "candidate_sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "candidate_current_approved": false,
+    "official_unchanged": true,
+    "machine_full_atlas_outside_rgba": 0,
+    "machine_full_atlas_outside_alpha": 0,
+    "modified_inside_rgba": 121345,
+    "affected_warning_regions": 2,
+    "regions_strict_containment": 2,
+    "new_lossless_png": 13,
+    "dds_produced": 0,
+    "status": "HOLD_STRICT_RECHECK",
+    "reason": "full source origin DDS not independently verified, blind calibration and italic stem anchors pending",
+    "qa": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/C1_Q101_A226_CONTROLLER_HOLD.json",
+    "C3": "NOT_RUN",
+    "APPROVALS": "NONE",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_independent_qa_holds": 1,
     "approval_count_changed": 0
   }
 }

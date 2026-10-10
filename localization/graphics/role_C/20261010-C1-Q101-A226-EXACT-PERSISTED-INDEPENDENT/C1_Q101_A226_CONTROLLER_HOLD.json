@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "role": "C1",
+  "shard": "ODD_ONLY",
+  "queue_index": 101,
+  "mode": "independent_candidate_review",
+  "result": "HOLD_STRICT_RECHECK",
+  "reason_codes": [
+    "UNVERIFIED_FULL_CANONICAL_SOURCE",
+    "UNCALIBRATED_SOURCE_FAMILY_SLANT",
+    "BLIND_CALIBRATION_NOT_PERFORMED"
+  ],
+  "run_key": "OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920",
+  "reviewer": "ChatGPT AI1; independent C1 run relative to producer, no separate human reviewer claimed",
+  "review_id": "C1_Q101_A226_SHA_ea145aa5_20261010_1920",
+  "pixels_before_producer_verdict": false,
+  "calibration": {
+    "blind_review_completed": false,
+    "observations": "Producer report was consulted before source-family review; cannot qualify as blind first look; calibration normal/opposite_slant/clipped_stroke/residue/excessive_weight incomplete"
+  },
+  "source_provenance": {
+    "producer_reported_full_source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "english_source_png_sha256": "d5ef3a28041ff3f21c52d7ffacaf1bc27aa01efd94e1d3f265be74d5ec0e5b48",
+    "clean_png_sha256": "49855c9ea9a4d1428802822acc58550351930f25384465f26a8f1923d4e76f7b",
+    "independent_canonical_full_source_dds_sha_verified": false,
+    "limitation": "Published lossless source/CLEAN crops directly inspected; canonical full source DDS unprovided to this independent run"
+  },
+  "candidate": {
+    "sha256": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "official_unchanged": true,
+    "unpromoted": true,
+    "format": "4096x4096 RGBA32 mip1 RAW mirror_y",
+    "persisted_crop_matched_producer_png_pixels": 0,
+    "persisted_visible_readable_crop_origin": [
+      2850,
+      0
+    ]
+  },
+  "machine_evidence": {
+    "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/C1_Q101_A226_EXACT_MACHINE.json"
+  },
+  "metrics": {
+    "modified_rgba_inside_warning_source_rectangle": 121345,
+    "modified_rgba_outside_warning_source_rectangle": 0,
+    "modified_alpha_inside_warning_source_rectangle": 65934,
+    "modified_alpha_outside_warning_source_rectangle": 0,
+    "protected_icon_numbers_byte_exact_outside_region": true
+  },
+  "regions": [
+    {
+      "id": "warning_line_1",
+      "english_source_bbox": [
+        3002,
+        25,
+        3729,
+        92
+      ],
+      "korean_candidate_alpha_bbox": [
+        3028,
+        27,
+        3703,
+        90
+      ],
+      "strict_containment": true,
+      "source_slant_stem_top_minus_bottom_dx": null,
+      "korean_slant_stem_top_minus_bottom_dx": null,
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Producer positive-readable lean is visible in both texts, but source top-minus-bottom matched italic stem anchors are not independently measurable from supplied crop."
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Producer SOURCE vs CLEAN lossless crop visually removes two-line English lettering, including left edge 45 pixels; CLEAN alpha=0 in full warning source rectangle for supplied crop, but full English DDS SHA was not independently verified."
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Navy edge/yellow fill visible at native/75/50. Original compressed italic face and Korean sans rendering have differing letterform proportions; independent source-family control/accepted face not documented."
+        },
+        "readability": {
+          "result": "SCOPED_PASS",
+          "observation": "Both actual saved-DDS Korean lines readable in practical 75/50% overlays on black, gray and white; not an in-game acceptance."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "No visually evident clipped Hangul strokes or raster holes in viewed native/p75/p50 saved-DDS samples. Single authored MIP verified."
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact official/new DDS RGBA comparisons: zero changed pixels outside [3002,25,3932,168]; protected icon and 3/2 numbers byte-exact outside region."
+        },
+        "placement": {
+          "result": "SCOPED_PASS",
+          "observation": "Line1 [3028,27,3703,90] strictly inside [3002,25,3729,92]; line2 [3074,98,3919,161] strictly inside [3062,92,3931,168]. No 1px source-box escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Full persisted raw crop is exactly flipped vertically into published readable crop at offset [2850,0], 0 pixel mismatch."
+        }
+      },
+      "evidence": {
+        "native": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_LINE1_SOURCE_CLEAN_FINAL_GRAY_NATIVE.png",
+          "sha256": "4c75f254cc3a7d59dc60f568950e66308a65d174ecd97786520d66f31f47dfbe"
+        },
+        "composites": [
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_100.png",
+            "sha256": "963335fefbefd5b1b943d0d5068600b02e08ad0c325e8f11e85cdb6fe9dd48fb"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_75.png",
+            "sha256": "9a088c8181866d3d5aa9c84ab077c2ad693a17f012b106fe1117411b118294eb"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_50.png",
+            "sha256": "18e81ae9ac70ba954051470e3269b49f133536ae87d3df057ce0774713d5ae2c"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_100.png",
+            "sha256": "1e1504f87d1a0cb4d3f1f7ce10cf82e10e82e048d6d939ad9c5dba140afa6128"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_75.png",
+            "sha256": "f9aa17ff65d2cfb836a631849f160ea412ceb2c9ff62e91ff1efa65daf7daa63"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_50.png",
+            "sha256": "d1dbad4f0c9da58856558675de465323966826a2f4ddf4e0205b5d0c27194697"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_100.png",
+            "sha256": "9347c2a317964462921c3764a1676c47b103685dd6b2e679be15b4264416d46f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_75.png",
+            "sha256": "87b06e0ccf28d3b38ee49a9fa106d4eaf0713f8e1e80998236dfda64fbfa3d08"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_50.png",
+            "sha256": "50ba200f7b5efbdd715ee09cef5f76c96c606fe48256b3e344cf0b7ba8a2b7e6"
+          }
+        ],
+        "raw": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_RAW_PERSISTED_ALPHA_NATIVE.png",
+          "sha256": "4e4eaf3ed3e4c315d55614aaab48be9e53e60ae0d660abbbfcbb4eb18b46b7df"
+        },
+        "flip_y": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_FLIPY_PERSISTED_ALPHA_NATIVE.png",
+          "sha256": "2087d2e0ddb15db5819c5f0d8e36c7a5d7095c2185b1aa09a468df38b1f799cf"
+        }
+      }
+    },
+    {
+      "id": "warning_line_2",
+      "english_source_bbox": [
+        3062,
+        92,
+        3931,
+        168
+      ],
+      "korean_candidate_alpha_bbox": [
+        3074,
+        98,
+        3919,
+        161
+      ],
+      "strict_containment": true,
+      "source_slant_stem_top_minus_bottom_dx": null,
+      "korean_slant_stem_top_minus_bottom_dx": null,
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Producer positive-readable lean is visible in both texts, but source top-minus-bottom matched italic stem anchors are not independently measurable from supplied crop."
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Producer SOURCE vs CLEAN lossless crop visually removes two-line English lettering, including left edge 45 pixels; CLEAN alpha=0 in full warning source rectangle for supplied crop, but full English DDS SHA was not independently verified."
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Navy edge/yellow fill visible at native/75/50. Original compressed italic face and Korean sans rendering have differing letterform proportions; independent source-family control/accepted face not documented."
+        },
+        "readability": {
+          "result": "SCOPED_PASS",
+          "observation": "Both actual saved-DDS Korean lines readable in practical 75/50% overlays on black, gray and white; not an in-game acceptance."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "No visually evident clipped Hangul strokes or raster holes in viewed native/p75/p50 saved-DDS samples. Single authored MIP verified."
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact official/new DDS RGBA comparisons: zero changed pixels outside [3002,25,3932,168]; protected icon and 3/2 numbers byte-exact outside region."
+        },
+        "placement": {
+          "result": "SCOPED_PASS",
+          "observation": "Line1 [3028,27,3703,90] strictly inside [3002,25,3729,92]; line2 [3074,98,3919,161] strictly inside [3062,92,3931,168]. No 1px source-box escape."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Full persisted raw crop is exactly flipped vertically into published readable crop at offset [2850,0], 0 pixel mismatch."
+        }
+      },
+      "evidence": {
+        "native": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_LINE2_SOURCE_CLEAN_FINAL_GRAY_NATIVE.png",
+          "sha256": "582189ea365adb7477fe6bc2eadc4def6b66b622e2d5e0500f02524465b92168"
+        },
+        "composites": [
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_100.png",
+            "sha256": "963335fefbefd5b1b943d0d5068600b02e08ad0c325e8f11e85cdb6fe9dd48fb"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_75.png",
+            "sha256": "9a088c8181866d3d5aa9c84ab077c2ad693a17f012b106fe1117411b118294eb"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_BLACK_50.png",
+            "sha256": "18e81ae9ac70ba954051470e3269b49f133536ae87d3df057ce0774713d5ae2c"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_100.png",
+            "sha256": "1e1504f87d1a0cb4d3f1f7ce10cf82e10e82e048d6d939ad9c5dba140afa6128"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_75.png",
+            "sha256": "f9aa17ff65d2cfb836a631849f160ea412ceb2c9ff62e91ff1efa65daf7daa63"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_GRAY_50.png",
+            "sha256": "d1dbad4f0c9da58856558675de465323966826a2f4ddf4e0205b5d0c27194697"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_100.png",
+            "sha256": "9347c2a317964462921c3764a1676c47b103685dd6b2e679be15b4264416d46f"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_75.png",
+            "sha256": "87b06e0ccf28d3b38ee49a9fa106d4eaf0713f8e1e80998236dfda64fbfa3d08"
+          },
+          {
+            "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_SOURCE_CLEAN_PERSISTED_WHITE_50.png",
+            "sha256": "50ba200f7b5efbdd715ee09cef5f76c96c606fe48256b3e344cf0b7ba8a2b7e6"
+          }
+        ],
+        "raw": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_RAW_PERSISTED_ALPHA_NATIVE.png",
+          "sha256": "4e4eaf3ed3e4c315d55614aaab48be9e53e60ae0d660abbbfcbb4eb18b46b7df"
+        },
+        "flip_y": {
+          "path": "localization/graphics/role_C/20261010-C1-Q101-A226-EXACT-PERSISTED-INDEPENDENT/evidence/Q101_FLIPY_PERSISTED_ALPHA_NATIVE.png",
+          "sha256": "2087d2e0ddb15db5819c5f0d8e36c7a5d7095c2185b1aa09a468df38b1f799cf"
+        }
+      }
+    }
+  ],
+  "source_clean_findings": {
+    "plate_only": "SUPPLIED_CROP_CLEAN_VISUAL_SCOPE_ONLY",
+    "source_remnant_45": "Producer-published crop shows removed English ink; no line text visibly remains in checked mask, but independently hashed full source not available",
+    "new_rectangular_composite_trace": "NONE_VISIBLE_ON_INDEPENDENT_BLACK_GRAY_WHITE_PREVIEWS",
+    "alpha_edges": "No apparent alpha halo over checked 9 backgrounds/scales"
+  },
+  "composite_only_findings": {
+    "new_dds_persisted_redecoded": true,
+    "full_asset_official_to_candidate_outside_pixel_delta": 0,
+    "alpha_outside": 0,
+    "source_row_positive_margins": "2/2",
+    "practical_scale_review": "native/75/50 black/gray/white; 13 new lossless PNGs"
+  },
+  "status_effect": {
+    "official_qa_status": "REWORK_REQUIRED_UNCHANGED",
+    "a226_trial": "C1_SCOPED_NATIVE_HOLD",
+    "c3": "NOT_RUN",
+    "approval": "NOT_CREATED",
+    "user_in_game": "OPEN_IF_ANY;NOT_CLOSED",
+    "runtime_validation": "UNTESTED",
+    "candidate_promoted": false,
+    "new_dds": 0,
+    "archival_evidence_images": 13
+  },
+  "next_required": [
+    "Obtain and SHA256-verify exact full canonical English DDS matching producer reference",
+    "Independent paired source/candidate slant-anchor and source-family stem/counter calibration",
+    "Actual blind visual known-defect controls first-look on later review",
+    "Distinct C3 review ID and current policy gate",
+    "User actual-game retest after official material promotion; not established by this test"
+  ]
+}
