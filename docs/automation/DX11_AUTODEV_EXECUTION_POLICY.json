@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "effective_from_task_number": 531,
-  "mission": "Complete end-to-end D3D9-command-to-native-D3D11-output integration rather than accumulating isolated readiness guards.",
+  "mission": "User-visible DX11 game rendering first: unblock R175 exact shader output, then route a real OutRun D3D9 draw through guarded D3D11 into a visible game frame; discontinue stand-alone dormant WARP probe expansion.",
   "policy_status": "repository-enforced-at-exact-sha-ci; external controller runtime adoption requires separate verification",
   "no_automatic_gameplay_promotion": true,
   "allowed_work_classes": [
@@ -23,36 +23,58 @@
       "note": "Do not duplicate an active/blocked owner without fenced release or new evidence."
     },
     {
-      "id": "mono_native_draw",
+      "id": "first_live_game_draw",
       "rank": 2,
       "work_class": "vertical_slice",
+      "owner_conflict_key": "DX11:REAL_GAME_DRAW",
+      "done_when": "Intercept a real game-authored D3D9 draw; bind live D3D11 resources, shader, IA/OM; issue guarded native Draw/DrawIndexed into a game-visible diagnostic target, record pixel/frame evidence and DX9Ex fallback. CI/WARP is not sufficient to claim in-game PASS."
+    },
+    {
+      "id": "gameplay_draw_activation",
+      "rank": 3,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:GAME_DRAW_ACTIVATION",
+      "done_when": "Controlled opt-in/fail-closed routing of supported game draws to the native frame output with fallback for unsupported states; capture a game frame and input-safe return path."
+    },
+    {
+      "id": "menu_to_race_native_frame",
+      "rank": 4,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:MENU_RACE_FRAME",
+      "done_when": "Actual game menu/vehicle selection/race draw path and presentation validated against DX9Ex reference, with Quest 3 testing separately tracked."
+    },
+    {
+      "id": "mono_native_draw",
+      "rank": 5,
+      "work_class": "vertical_slice",
       "owner_conflict_key": "DX11:MONO_NATIVE_DRAW",
-      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled"
+      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled",
+      "note": "Historical pre-00537 dormant WARP milestone; no longer an independent new task"
     },
     {
       "id": "live_resource_capture",
-      "rank": 3,
+      "rank": 7,
       "work_class": "integration",
       "owner_conflict_key": "DX11:LIVE_RESOURCE_CAPTURE",
       "done_when": "Actual D3D9 creation/lock/unlock/mutation/reset/release lifetimes connect to D3D11 mirrors in fail-closed scoped test"
     },
     {
       "id": "programmable_shader_path",
-      "rank": 4,
+      "rank": 8,
       "work_class": "integration",
       "owner_conflict_key": "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
       "done_when": "Representative observed VS/PS pair materialized and bound with correct constants/input layout and GPU pixel result"
     },
     {
       "id": "native_stereo_eye_transport",
-      "rank": 5,
+      "rank": 9,
       "work_class": "integration",
       "owner_conflict_key": "DX11:EYE_XR_HANDOFF",
       "done_when": "D3D11 eye target producer -> shared ring/host consumes exact generation with fence and ACK proof"
     },
     {
       "id": "dx11_build_acceleration",
-      "rank": 6,
+      "rank": 10,
       "work_class": "ci_acceleration",
       "owner_conflict_key": "DX11:FAST_VALIDATION",
       "done_when": "Measured change-specific FAST/TARGETED probe plus single final exact-SHA Gate, no reduced mandatory coverage"
@@ -71,7 +93,12 @@
     "no_score_on_full_gate_failure": true,
     "preserve_runtime_validation_untested": true,
     "no_ci_skip_on_validation_bearing_commit": true,
-    "no_implicit_draw_activation": true
+    "no_implicit_draw_activation": true,
+    "prohibit_new_dormant_warp_only_tasks": true,
+    "require_game_created_draw_for_native_feature": true,
+    "require_explicit_gameplay_outcome_since_00537": true,
+    "prioritize_r175_and_game_frame_before_more_readiness_guards": true,
+    "never_bypass_r175_or_visual_fail_closed_gate": true
   },
   "required_task_strategy_fields": [
     "work_class",
@@ -96,5 +123,25 @@
     "TARGETED_WARP",
     "FULL_EXACT_SHA_GATE",
     "RUNTIME_HMD_IF_PROMOTING"
+  ],
+  "gameplay_direction_effective_from_task_number": 537,
+  "gameplay_delivery_targets": [
+    "R175_CI_UNBLOCK",
+    "FIRST_GAME_DRAW_FRAME",
+    "MENU_TO_RACE_NATIVE_FRAME",
+    "NATIVE_STEREO_EYE_OUTPUT"
+  ],
+  "gameplay_gate": {
+    "immediate_blocker": "R175 TEXCOORD6 VS-PS varying pixel/color mismatch; measure the real failing CI output and repair actual shared shader path, never bypass or weaken the assertion",
+    "next_goal": "Render at least one captured game-authored D3D9 draw via the integrated native D3D11 path, in a controlled diagnostic/opt-in visible game frame",
+    "production_default": "Keep NativeDrawPathActive=false by default; use fail-closed diagnostic activation only for proven supported draws with DX9Ex fallback",
+    "success_evidence": "Source-level live interception and resource/shader/draw/RT/presentation linkage plus measured in-game frame or honest NEED_HMD_TEST; WARP fixture success alone cannot close the feature",
+    "owner_safety": "R175 owner 00477 must be checked and formally released/handed off before writes; if owner is live, pursue disjoint live-game-draw integration and explicitly preserve R175 blocker"
+  },
+  "gameplay_strategy_fields": [
+    "gameplay_delivery_target",
+    "live_game_draw_path",
+    "visible_frame_acceptance",
+    "activation_guard_and_fallback"
   ]
 }
