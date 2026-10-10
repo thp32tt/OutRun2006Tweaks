@@ -104,6 +104,26 @@ int main() {
             DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get(),slot,expected,expectedState,fmt);
     };
     require(ready(srv.Get(),sampler.Get()), "baseline bound texture ownership");
+    // R222: depth is intentionally unowned by this opt-in textured preflight.
+    // A same-device DSV is still an inter-eye rejection, not a free pass.
+    D3D11_TEXTURE2D_DESC depthDesc{};
+    depthDesc.Width=40;depthDesc.Height=40;
+    depthDesc.MipLevels=1;depthDesc.ArraySize=1;
+    depthDesc.Format=DXGI_FORMAT_D32_FLOAT;
+    depthDesc.SampleDesc.Count=1;
+    depthDesc.Usage=D3D11_USAGE_DEFAULT;
+    depthDesc.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> retainedDepth;
+    ComPtr<ID3D11DepthStencilView> retainedDsv;
+    require(SUCCEEDED(dev->CreateTexture2D(&depthDesc,nullptr,
+        retainedDepth.GetAddressOf())) && retainedDepth, "create retained depth");
+    require(SUCCEEDED(dev->CreateDepthStencilView(retainedDepth.Get(),
+        nullptr,retainedDsv.GetAddressOf())) && retainedDsv,
+        "create retained DSV");
+    ctx->OMSetRenderTargets(1,&target,retainedDsv.Get());
+    require(!ready(srv.Get(),sampler.Get()), "reject unowned retained depth view");
+    ctx->OMSetRenderTargets(1,&target,nullptr);
+    require(ready(srv.Get(),sampler.Get()), "restore depth-free textured eye");
     require(!ready(otherSrv.Get(),sampler.Get()), "reject wrong expected SRV");
     require(!ready(srv.Get(),alternate.Get()), "reject wrong expected sampler");
     require(!ready(srv.Get(),sampler.Get(),1), "reject wrong PS slot");

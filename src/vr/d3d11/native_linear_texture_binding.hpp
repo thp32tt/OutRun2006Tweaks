@@ -61,8 +61,13 @@ namespace outrun::vr::dx11 {
     // Even an unrelated stale RTV in slot 1+ would receive this Draw:
     // reject all extra eye/MRT bindings, not just a slot-0 SRV alias.
     ID3D11RenderTargetView* liveOutputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
-    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, liveOutputs, nullptr);
-    bool singleEyeTarget = liveOutputs[0] == expectedTarget;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> liveDepth;
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                liveOutputs, liveDepth.GetAddressOf());
+    // R222: R203 has no depth-owner parameter. A retained DSV can suppress
+    // fragments or couple eyes even with an exact RTV/SRV pair. Fail closed
+    // rather than treating an unowned depth surface as proven readiness.
+    bool singleEyeTarget = liveOutputs[0] == expectedTarget && !liveDepth;
     for (UINT index = 1; index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++index)
         if (liveOutputs[index]) singleEyeTarget = false;
     for (auto* boundView : liveOutputs)
