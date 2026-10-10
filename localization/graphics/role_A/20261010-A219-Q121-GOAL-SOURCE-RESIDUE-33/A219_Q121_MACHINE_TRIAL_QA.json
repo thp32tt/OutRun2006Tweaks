@@ -1,0 +1,816 @@
+{
+  "run": "A219",
+  "run_key": "OUTRUN-KOR-A219-Q121-GOAL-33-SOURCE-RESIDUE-20261010",
+  "role": "A",
+  "queue_index": 121,
+  "priority": "P0",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "status": "ISOLATED_TRIAL_PRODUCER_SCOPED_ONLY_FULL_ATLAS_C1_HOLD",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "canonical_english_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_before_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "unpromoted_trial_candidate_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+  "official_hd_candidate_changed": false,
+  "native_dimensions": [
+    4096,
+    4096
+  ],
+  "dds_format": "RGBA32 uncompressed mip1 exact header reused",
+  "readable_crop": [
+    3184,
+    651,
+    3391,
+    756
+  ],
+  "source_clean_crop_exact_verified": true,
+  "saved_candidate_crop_exact_verified": true,
+  "residue_mechanism": "33 fully opaque SOURCE-identical white glyph specks incorrectly retained on CLEAN+FINAL from 'goal.'",
+  "source_residue_pixels_removed": 33,
+  "changed_pixel_count": 33,
+  "changed_byte_count": 132,
+  "outside_33_pixels_changed": 0,
+  "previous_dds_byte_identical_outside_33_pixels": true,
+  "persisted_DDS_decoded_matches_intended_pixel_edit": true,
+  "native_raw_y_transform": "readable y -> 4095-y",
+  "machine_decision": "SCOPED_REMOVE_SOURCE_REMAINDER_VERIFIED_NO_FULL_ATLAS_APPROVAL",
+  "triage_before": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"EVIDENCE_ONLY_HOLD\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 121,\n      \"path\": \"textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds\",\n      \"current_status\": \"c335_c1_hold_a202_native_alpha_calibration_pending_igr_open\",\n      \"next_action\": \"EVIDENCE_ONLY_HOLD\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
+  "new_pixel_writes": [
+    {
+      "readable_xy": [
+        3280,
+        690
+      ],
+      "native_raw_xy": [
+        3280,
+        3405
+      ],
+      "byte_offset": 55800768,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3283,
+        690
+      ],
+      "native_raw_xy": [
+        3283,
+        3405
+      ],
+      "byte_offset": 55800780,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3236,
+        691
+      ],
+      "native_raw_xy": [
+        3236,
+        3404
+      ],
+      "byte_offset": 55784208,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3280,
+        691
+      ],
+      "native_raw_xy": [
+        3280,
+        3404
+      ],
+      "byte_offset": 55784384,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        691
+      ],
+      "native_raw_xy": [
+        3306,
+        3404
+      ],
+      "byte_offset": 55784488,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3236,
+        692
+      ],
+      "native_raw_xy": [
+        3236,
+        3403
+      ],
+      "byte_offset": 55767824,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3280,
+        692
+      ],
+      "native_raw_xy": [
+        3280,
+        3403
+      ],
+      "byte_offset": 55768000,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        692
+      ],
+      "native_raw_xy": [
+        3306,
+        3403
+      ],
+      "byte_offset": 55768104,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3236,
+        693
+      ],
+      "native_raw_xy": [
+        3236,
+        3402
+      ],
+      "byte_offset": 55751440,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3280,
+        693
+      ],
+      "native_raw_xy": [
+        3280,
+        3402
+      ],
+      "byte_offset": 55751616,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        693
+      ],
+      "native_raw_xy": [
+        3306,
+        3402
+      ],
+      "byte_offset": 55751720,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        694
+      ],
+      "native_raw_xy": [
+        3306,
+        3401
+      ],
+      "byte_offset": 55735336,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        695
+      ],
+      "native_raw_xy": [
+        3306,
+        3400
+      ],
+      "byte_offset": 55718952,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3306,
+        696
+      ],
+      "native_raw_xy": [
+        3306,
+        3399
+      ],
+      "byte_offset": 55702568,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3284,
+        708
+      ],
+      "native_raw_xy": [
+        3284,
+        3387
+      ],
+      "byte_offset": 55505872,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3212,
+        709
+      ],
+      "native_raw_xy": [
+        3212,
+        3386
+      ],
+      "byte_offset": 55489200,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3284,
+        709
+      ],
+      "native_raw_xy": [
+        3284,
+        3386
+      ],
+      "byte_offset": 55489488,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3212,
+        710
+      ],
+      "native_raw_xy": [
+        3212,
+        3385
+      ],
+      "byte_offset": 55472816,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3284,
+        710
+      ],
+      "native_raw_xy": [
+        3284,
+        3385
+      ],
+      "byte_offset": 55473104,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3213,
+        712
+      ],
+      "native_raw_xy": [
+        3213,
+        3383
+      ],
+      "byte_offset": 55440052,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3282,
+        712
+      ],
+      "native_raw_xy": [
+        3282,
+        3383
+      ],
+      "byte_offset": 55440328,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3281,
+        713
+      ],
+      "native_raw_xy": [
+        3281,
+        3382
+      ],
+      "byte_offset": 55423940,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3210,
+        714
+      ],
+      "native_raw_xy": [
+        3210,
+        3381
+      ],
+      "byte_offset": 55407272,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        715
+      ],
+      "native_raw_xy": [
+        3307,
+        3380
+      ],
+      "byte_offset": 55391276,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3211,
+        716
+      ],
+      "native_raw_xy": [
+        3211,
+        3379
+      ],
+      "byte_offset": 55374508,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        716
+      ],
+      "native_raw_xy": [
+        3307,
+        3379
+      ],
+      "byte_offset": 55374892,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3212,
+        717
+      ],
+      "native_raw_xy": [
+        3212,
+        3378
+      ],
+      "byte_offset": 55358128,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        717
+      ],
+      "native_raw_xy": [
+        3307,
+        3378
+      ],
+      "byte_offset": 55358508,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3213,
+        718
+      ],
+      "native_raw_xy": [
+        3213,
+        3377
+      ],
+      "byte_offset": 55341748,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        718
+      ],
+      "native_raw_xy": [
+        3307,
+        3377
+      ],
+      "byte_offset": 55342124,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        719
+      ],
+      "native_raw_xy": [
+        3307,
+        3376
+      ],
+      "byte_offset": 55325740,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        720
+      ],
+      "native_raw_xy": [
+        3307,
+        3375
+      ],
+      "byte_offset": 55309356,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "readable_xy": [
+        3307,
+        721
+      ],
+      "native_raw_xy": [
+        3307,
+        3374
+      ],
+      "byte_offset": 55292972,
+      "prior_readable_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "new_readable_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "visual_review": "PENDING_CONTROLLER_100_75_50_RAW_AND_BGW",
+  "plate_gate": "SCOPED_ORIGINAL_REMNANT_CORRECTION_NOT_FULL_ATLAS_PLATE_PASS",
+  "composite_gate": "NOT_APPLICABLE_NO_NEW_LETTERING",
+  "final_manifest": "NOT_PUBLISHED_OFFICIAL_CANDIDATE_UNCHANGED_NO_HD_CANDIDATES_WRITE",
+  "candidate_approval": "BLOCKED_NEEDS_FULL_29_SEGMENT_SOURCE_ART_MASK_AND_C1_C3",
+  "user_ingame_regressions": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions CPU worker; no N100 heavy",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
