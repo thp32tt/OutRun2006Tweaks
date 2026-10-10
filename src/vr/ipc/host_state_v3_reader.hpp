@@ -10,11 +10,19 @@ namespace OutRunVR::IpcV3
     public:
         bool Read(HostState& out) noexcept
         {
+            // Never publish a partially copied seqlock snapshot, an invalid
+            // protocol header, or a previous successful pose on failure.
+            // A default HostState has structSize=0 and is not wire-valid.
+            out = HostState{};
             if (!mapping_.EnsureOpen(HostStateName))
                 return false;
-            if (!Ipc::StableRead(mapping_.Get(), out))
+
+            HostState snapshot{};
+            if (!Ipc::StableRead(mapping_.Get(), snapshot) ||
+                !HeaderValid(snapshot))
                 return false;
-            return HeaderValid(out);
+            out = snapshot;
+            return true;
         }
 
         void Reset() noexcept

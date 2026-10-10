@@ -120,6 +120,52 @@ int main()
         "reference-space generation did not advance"))
         return 16;
 
+    // Exercise the named-mapping reader with an invalid header and an
+    // in-progress seqlock. Restore the mapping before evaluating failures.
+    HANDLE writableMapping = OpenFileMappingW(FILE_MAP_WRITE, FALSE, IpcV3::HostStateName);
+    if (!Check(writableMapping != nullptr, "cannot open writer mapping for negative controls"))
+        return 17;
+    auto* writable = static_cast<IpcV3::HostState*>(
+        MapViewOfFile(writableMapping, FILE_MAP_WRITE, 0, 0, sizeof(IpcV3::HostState)));
+    if (!writable)
+    {
+        CloseHandle(writableMapping);
+        return 18;
+    }
+
+    Ipc::BeginSeqlockWrite(writable->sequence);
+    writable->version = 0;
+    Ipc::EndSeqlockWrite(writable->sequence);
+    IpcV3::HostState invalidHeaderOutput = observed2;
+    const bool invalidHeaderRejected = !reader.Read(invalidHeaderOutput) &&
+        invalidHeaderOutput.structSize == 0 && invalidHeaderOutput.flags == 0 &&
+        invalidHeaderOutput.poseId == 0;
+
+    Ipc::BeginSeqlockWrite(writable->sequence);
+    writable->version = IpcV3::ProtocolVersion;
+    Ipc::EndSeqlockWrite(writable->sequence);
+
+    Ipc::BeginSeqlockWrite(writable->sequence);
+    IpcV3::HostState pendingWriteOutput = observed2;
+    const bool pendingWriteRejected = !reader.Read(pendingWriteOutput) &&
+        pendingWriteOutput.structSize == 0 && pendingWriteOutput.flags == 0 &&
+        pendingWriteOutput.poseId == 0;
+    Ipc::EndSeqlockWrite(writable->sequence);
+
+    IpcV3::HostState recovered{};
+    const bool recoveredRead = reader.Read(recovered) &&
+        recovered.poseId == first.poseId &&
+        recovered.referenceSpaceGeneration == writer.ReferenceSpaceGeneration();
+    UnmapViewOfFile(writable);
+    CloseHandle(writableMapping);
+
+    if (!Check(invalidHeaderRejected, "invalid header leaked stale host pose"))
+        return 19;
+    if (!Check(pendingWriteRejected, "odd seqlock leaked stale host pose"))
+        return 20;
+    if (!Check(recoveredRead, "reader did not recover after negative controls"))
+        return 21;
+
     std::cout << "HostState.v3 named mapping + seqlock round-trip passed.\n";
     return 0;
 }
