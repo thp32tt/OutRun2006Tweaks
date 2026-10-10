@@ -1,0 +1,56 @@
+{
+  "schema": "source-family-recipe-v1",
+  "run": "A223",
+  "canonical_source": {
+    "ref": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+  },
+  "source_English": "Normal Balance",
+  "target_Korean": "일반 밸런스",
+  "reference_C1": "Q103 C1 A222 exact glyph effect 354x45 versus bad 325x60",
+  "clean": "localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CLEAN_PLATE.png",
+  "source_effect_bbox": [
+    1432,
+    1980,
+    1786,
+    2025
+  ],
+  "source_edit_plate_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "source_color_rgb": [
+    143,
+    137,
+    84
+  ],
+  "font": {
+    "family": "Noto Sans CJK Regular",
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+    "face_index": 1,
+    "point_size_native": 49,
+    "tracking_native_px": 11,
+    "license": "SIL Open Font License",
+    "glyph_coverage_verified": true
+  },
+  "renderer": "Pillow FreeType native size 49px, alpha-only glyph, affine 0.265 rightward lean, Pillow Bicubic, no previous raster scale",
+  "script": "tools/localization/cpu_jobs/A.py",
+  "script_trigger_SHA": "e6c52e403b803c0a45c34829c628709aa9af3d1c",
+  "new_bbox": [
+    1467,
+    1980,
+    1751,
+    2025
+  ],
+  "orientation": "raw DDS y mirrored, FLIP-Y readable",
+  "format": "RGBA32 2048x2048 1 mip",
+  "protected_masks": "Outside original source bbox byte-identical; source-inner semantic style remains uncalibrated",
+  "letter_mask": "localization/graphics/role_A/20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR/A223_LETTERING_NATIVE_ALPHA.png",
+  "plate": "opaque source-derived yellow plate unchanged outside transparent glyph mask",
+  "candidate_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+  "render_state": "UNPROMOTED_VISUAL_HOLD_C1_C3_GAME_PENDING"
+}

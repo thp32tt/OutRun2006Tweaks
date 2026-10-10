@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 12:58 KST",
+  "updated_at_kst": "2026-10-10 13:10 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10678,5 +10678,41 @@
     "new_C1_DDS": 0,
     "machine_report": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_MACHINE.json",
     "report": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_REWORK.json"
+  },
+  "a223_q103_strict_height_trial": {
+    "run": "A223",
+    "run_key": "OUTRUN-KOR-A223-Q103-C1-EXACT-SOURCE-HEIGHT45-20261010-1300",
+    "queue_index": 103,
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "new_trial_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+    "new_trial_dds": 1,
+    "promoted_dds": 0,
+    "source_exact_effect_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "new_glyph_bbox": [
+      1467,
+      1980,
+      1751,
+      2025
+    ],
+    "old_A222_height": 60,
+    "new_height": 45,
+    "height_excess_px": 0,
+    "changed_rgba_pixels": 10548,
+    "changed_bytes": 31642,
+    "changed_outside_source_edit": 0,
+    "machine": "PASS",
+    "producer_visual": "HOLD_TOO_SMALL_AND_LOOSE_TRACKING_AT_50PC",
+    "C1": "NOT_SENT_AFTER_VISUAL_HOLD",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 38022895710,
+    "qa_path": "localization/graphics/role_A/20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR/A223_CONTROLLER_SELF_QA.json",
+    "updated_at_kst": "2026-10-10 13:10 KST"
   }
 }

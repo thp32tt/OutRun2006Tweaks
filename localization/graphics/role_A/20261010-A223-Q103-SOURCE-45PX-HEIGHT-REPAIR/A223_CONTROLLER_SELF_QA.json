@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "run": "A223",
+  "run_key": "OUTRUN-KOR-A223-Q103-C1-EXACT-SOURCE-HEIGHT45-20261010-1300",
+  "role": "A",
+  "index": 103,
+  "owner_lane": "A",
+  "priority": "C1_EXACT_SOURCE_EFFECT_HEIGHT_REWORK",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_text": "Normal Balance",
+  "target_text": "일반 밸런스",
+  "official_candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "official_modified": false,
+  "old_A222_trial_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+  "new_trial_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+  "trial_path": "localization/graphics/role_A/20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR/A223_Q103_SOURCE_HEIGHT45_UNPROMOTED.dds",
+  "review_causing_change": "localization/graphics/role_C/20261010-C1-Q103-A222-STRICT-SOURCE-HEIGHT-FAIL/Q103_C1_REWORK.json",
+  "C1_old_failure": "STRICT_ORIGINAL_GLYPH_EFFECT_HEIGHT_EXCEED_15PX",
+  "method_change": "A222 native Regular65 glyph height60=>new Regular49 rendered at native size + 11px spacing, not scaled old raster; stricter full-source effect 354x45 region instead of plate390x72",
+  "recipe_source_effect_bbox": [
+    1432,
+    1980,
+    1786,
+    2025
+  ],
+  "glyph_bbox_readable": [
+    1467,
+    1980,
+    1751,
+    2025
+  ],
+  "glyph_width": 284,
+  "glyph_height": 45,
+  "source_width": 354,
+  "source_height": 45,
+  "source_vertical_excess": 0,
+  "glyph_margins_within_source_effect": [
+    35,
+    35,
+    0,
+    0
+  ],
+  "machine": {
+    "worker": "GitHub Actions 38022895710",
+    "conclusion": "SUCCESS",
+    "saved_dds_size": "2048x2048_RGBA32_mip1",
+    "source_sha_pinned": true,
+    "dds_persisted_redecode": true,
+    "raw_mirrorY": true,
+    "changed_pixels_since_official": 10548,
+    "changed_bytes_since_official": 31642,
+    "outside_source_bbox_rgba_changed": 0,
+    "source_glyph_effect_overflow": 0,
+    "protected_art_changed_outside_bbox": 0
+  },
+  "views_inspected": [
+    "A223_COMPARE_GRAY_100.png",
+    "A223_COMPARE_BLACK_50.png",
+    "A223_TRIAL_RAW_NATIVE_RGBA.png"
+  ],
+  "firsthand_visual": {
+    "source": "original source medium-light condensed italic fill 354x45 on yellow plate",
+    "previous": "A222 thinner but 60px tall source overflow +15",
+    "trial": "No source height overflow and source plate undamaged; Korean native face 284x45 appears small relative to English 354x45; at 50% separated Hangul syllables and low optical density compared with source",
+    "decision": "PRODUCER_VISUAL_HOLD_NOT_FULL_PASS",
+    "improvement": "STRICT_ORIGINAL_HEIGHT_FIXED",
+    "defect_remaining": "FONT_OPTICAL_SIZE_AND_LOOSE_TRACKING_SOURCE_STYLE_MISMATCH",
+    "next_action": "Different source-family contour method to use available 45px height while reducing intersyllable gaps without arbitrary horizontal raster scaling; remeasure original source glyph strokes/anchors before resubmission to C1",
+    "image_contact_issue": "Contact sheet fourth printed label inherited A222 TRIAL, actual file is A223 and SHA independently verified; label is not candidate identity"
+  },
+  "promoted_dds": 0,
+  "new_trial_dds": 1,
+  "qa_level": "MACHINE_SCOPED_PASS_CONTROLLER_VISUAL_HOLD",
+  "C1": "WAIT_NEW_PRODUCER_VISUAL",
+  "C3": "NOT_RUN",
+  "approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
