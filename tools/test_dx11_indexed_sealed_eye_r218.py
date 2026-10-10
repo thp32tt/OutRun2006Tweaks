@@ -21,7 +21,8 @@ guards = (
     "depthDesc.SampleDesc.Count != 1",
     "depthDesc.Format != DXGI_FORMAT_D32_FLOAT",
     "depthDesc.Usage != D3D11_USAGE_DEFAULT",
-    "depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL",
+    "depthDesc.MiscFlags != 0",
+    "depthDesc.BindFlags != D3D11_BIND_DEPTH_STENCIL",
     "liveRaster.Get() != expectedRaster",
     "liveDevice.Get() != rasterDevice.Get()",
     "rasterDesc.CullMode == D3D11_CULL_NONE",
@@ -45,4 +46,4 @@ for phrase in (
 step = "python tools/test_dx11_indexed_sealed_eye_r218.py"
 assert workflow.count(step) == 1
 assert workflow.index(step) < workflow.index("Build R186 owned indexed Draw WARP probe")
-print("R218 sealed indexed depth-eye: PASS 19 guard mutants, WARP cases wired")
+print("R218/R226 sealed indexed depth-eye: PASS 20 guard mutants, WARP cases wired")
