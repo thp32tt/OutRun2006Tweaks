@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "index": 228,
+  "run": "C354",
+  "review_id": "C354-C2-Q228-B337R-NEW-SAVED-BYTE-CHROME",
+  "run_key": "OUTRUN-KOR-C354-C2-Q228-B337R-INDEPENDENT-CHROME-20261010-1121",
+  "queue_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "official": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+    "trial": "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a",
+    "clean": "a8052f2f872f1d4305a56d236c621204d9170a2ae348dea1982084d91de7f7fa",
+    "clean_region": "fb427492815817cfb8076ed8bfb9d9174557b0548c6d7f835392517cd3f8344e"
+  },
+  "selection": "NEW_B337R_UNPROMOTED_SHA_NOT_PREVIOUS_C327_OFFICIAL_REVIEW",
+  "producer_trial_prose_known": true,
+  "reviewer_independent_bytes": true,
+  "pixels_before_producer_verdict": false,
+  "blind_calibration_completed": false,
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_MACHINE.json",
+    "result": "SCOPED_SOURCE_CLEAN_CONTAINMENT_PASS_NO_FULL_13_CERTIFICATION"
+  },
+  "evidence_backend": "GitHub SSOT, ChatGPT LOCAL_ATTEMPT_GITHUB_NETWORK_UNAVAILABLE, N100 MCP fallback exact public downloads + PIL/numpy independent native decode, GitHub REST direct publication",
+  "exact_metadata": {
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mips": 1,
+    "header_match": true,
+    "raw_to_readable": "FLIP_Y",
+    "source_dds_bytes": 16777344,
+    "trial_dds_bytes": 16777344
+  },
+  "scene_trace": "IGR-038 user-reported car selection chrome title; target rCAR SELECT within shared 13-label Exst atlas; only static atlas audited, loaded in game unknown",
+  "pixel_scope": {
+    "source_to_clean_inside_target": 75785,
+    "source_to_clean_outside_target": 969076,
+    "clean_to_trial_outside_target": 562662,
+    "source_to_trial_outside_target": 1223689,
+    "official_to_trial_changed_rgba": 45783,
+    "official_to_trial_changed_alpha": 34078,
+    "official_to_trial_rgba_outside_target": 0,
+    "official_to_trial_alpha_outside_target": 0,
+    "source_family_other_12_unverified": "SOURCE->CLEAN outside single target nonzero due other original labels erased by B68 CLEAN; do NOT claim protected artwork zero outside target on SOURCE baseline"
+  },
+  "region": {
+    "id": "CAR_SELECT",
+    "english": "CAR SELECT",
+    "korean": "차량 선택",
+    "bbox_source": [
+      5,
+      182,
+      1124,
+      301
+    ],
+    "bbox_saved": [
+      12,
+      188,
+      430,
+      296
+    ],
+    "allowed_bbox": [
+      5,
+      182,
+      1124,
+      301
+    ],
+    "source_width": 1119,
+    "trial_width": 418,
+    "trial_width_ratio": 0.37355,
+    "min_margin_px": 5,
+    "eight_checks": {
+      "slant": {
+        "result": "SCOPED_VISUAL_HOLD",
+        "observation": "Both readable SOURCE and trial have a right-edge slanted/italic impression; source curved chrome and trial glyph stems cannot be matched to anchor dx without calibrated source glyph family.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "cebfcf59d53f94958e782c442ddecd14b75fc4cd8e7a603a2e00523a5f5afbe6"
+        }
+      },
+      "clean_plate": {
+        "result": "SCOPED_PASS_ALPHA0_NOT_ATLAS_APPROVAL",
+        "observation": "Exact B68 CLEAN full PNG and B337R authored region CLEAN are alpha zero inside rCAR SELECT. B68 CLEAN removes many original atlas labels outside region (969,076 changed SOURCE RGBA pixels), not a full source-preservation certification.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_PLATE_ONLY_GRAY_NATIVE.png",
+          "sha256": "19e38be650972d8d2cf83f167418354fcc2e21c80c516974331b995f90773819"
+        }
+      },
+      "style": {
+        "result": "FAIL_SOURCE_FAMILY_METALLIC_CHROME_AND_HIERARCHY",
+        "observation": "English 1119px horizontally linked wide rounded chrome logo vs trial 418px disconnected compact Hangul. Contrast, chrome gradients, continuous silver extrusion and visual hierarchy are not source-matched; glyph bevel appears rough/disjointed.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "cebfcf59d53f94958e782c442ddecd14b75fc4cd8e7a603a2e00523a5f5afbe6"
+        }
+      },
+      "readability": {
+        "result": "FAIL_SOURCE_RELATIVE_UNDERSIZED",
+        "observation": "Text 차량 선택 remains decipherable at static 50% but is far too narrow/weak relative to large CAR SELECT original, failing immediate source-scale hierarchy.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_BLACK_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "0ece17c903efac0cba0f06bc8a8079fb1e2f99a3a4973cd7dc8780476118beda"
+        }
+      },
+      "glyph_integrity": {
+        "result": "HOLD_NO_CONFIRMED_CLIP_SCOPED",
+        "observation": "No definite cropped syllable at native image; rough disconnected metallic fill pattern is visual construction failure, not falsely classified as a one-pixel clip.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_WHITE_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "67ff8ca5df7afacfa770401e62afd0e5454df59d792ae32666dca347df4df52f"
+        }
+      },
+      "protected_art": {
+        "result": "SCOPED_PASS_TRIAL_ONLY",
+        "observation": "Current official to B337R changed RGBA/alpha exclusively inside target ROI, 0 outside. Source→CLEAN/FINAL differs outside ROI from earlier localized sibling labels. Other 12 source glyph baseline not independently full-certified.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_SOURCE_OFFICIAL_TRIAL_WHOLE_FLIPY_25.png",
+          "sha256": "a83b29d0e86d79968d370368c94501748f9e0065051ea595fcec46a05af28c8d"
+        }
+      },
+      "placement": {
+        "result": "FAIL_HIERARCHY_NOT_CONTAINMENT",
+        "observation": "Korean 418x108 within original 1119x119 bbox, positive margins [7,694,6,5], but leaves majority of original title hierarchy empty. Numeric containment cannot override underfill.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "593f0e4917fec37a5f0b0d1f941fe33f95aab6e1bb35a9f46223666371630821"
+        }
+      },
+      "orientation": {
+        "result": "SCOPED_PASS_STATIC_RAW_AND_FLIPY",
+        "observation": "Source and B337R DDS raw are Y-mirrored and FLIP-Y readable; native 2048x2048 one MIP/identical first128 bytes; no game sampling.",
+        "evidence": {
+          "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+          "sha256": "69d488ceeb018f4a23eed9457487ab99d9c50f8213ce0939fb087dfe1e12cb51"
+        }
+      }
+    }
+  },
+  "direct_visual": "Independent controller visually inspected fresh lossless decoded FLIP-Y gray100/black50 and RAW gray100 from exact source/clean/official/new B337R. Producer verdict was already known: do not claim blind calibrated C PASS.",
+  "decision": "REWORK_REQUIRED_B337R_NEW_UNPROMOTED_TRIAL",
+  "failure_codes": [
+    "SOURCE_FAMILY_METALLIC_FACE_MISMATCH",
+    "SOURCE_RELATIVE_UNDERFILL",
+    "CHROME_CONTINUITY_FRACTURED"
+  ],
+  "official_queue_decision_preserved": "b337r_producer_visual_fail_chrome_manual_reconstruction_required_igr038_open",
+  "official_current_sha_unmodified": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+  "new_trial_sha": "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a",
+  "previous_official_C327": "REWORK_REQUIRED_UNCHANGED",
+  "C3": "BLOCKED_NOT_RUN",
+  "APPROVAL": false,
+  "user_image_acceptance": "NOT_GRANTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "IGR038": "OPEN_USER_INGAME_FAIL",
+  "remediations": [
+    "Stop Noto-plus-bevel repeated method",
+    "Reconstruct native connected/rounded chrome source-family Hangul vector and reflect/extrude matched source glass/chrome",
+    "Preserve original glyph bbox and only touch identified text effect mask",
+    "Producer plate and new persisted DDS exact-SHA plus final publication pixel guard",
+    "Independent fresh C2, separate C3, new user game screenshot matching exact build"
+  ],
+  "new_promoted_dds": 0,
+  "new_generated_dds_by_C": 0,
+  "duplicate_review_of_same_sha": false,
+  "lossless_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "cebfcf59d53f94958e782c442ddecd14b75fc4cd8e7a603a2e00523a5f5afbe6",
+      "size": 83554
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "593f0e4917fec37a5f0b0d1f941fe33f95aab6e1bb35a9f46223666371630821",
+      "size": 81565
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "18123f74cda9ee6729070cb9819057cb89308e5e02e8fd557cb5241e7ebcf7af",
+      "size": 45717
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_BLACK_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "86a4ebd3bf2405ffdd59b37c4bf7e8be8f0fa9a25aca51bf9455fa6986892f4a",
+      "size": 72826
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_BLACK_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "909890f0a9515825dbbd80f9d87f617a8392d59b292f42b2e68c9bfbcc633c7f",
+      "size": 69369
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_BLACK_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "0ece17c903efac0cba0f06bc8a8079fb1e2f99a3a4973cd7dc8780476118beda",
+      "size": 38901
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_WHITE_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "67ff8ca5df7afacfa770401e62afd0e5454df59d792ae32666dca347df4df52f",
+      "size": 87968
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_WHITE_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "abd57b668bf7de83dcf80c7f4aaa9d4c9144a5fe83319bc6c24999cfee8c7fba",
+      "size": 84429
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_FLIPY_WHITE_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "e87151f434bc03c59de0681c042798dbfdfb6b04ef6801bf4239fac143a8b0b1",
+      "size": 47048
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "69d488ceeb018f4a23eed9457487ab99d9c50f8213ce0939fb087dfe1e12cb51",
+      "size": 78704
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_PLATE_ONLY_GRAY_NATIVE.png",
+      "sha256": "19e38be650972d8d2cf83f167418354fcc2e21c80c516974331b995f90773819",
+      "size": 38288
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_COMPOSITE_ONLY_GRAY_NATIVE.png",
+      "sha256": "6f81c54f656b0a81035bd93651f696fb518e9e0458efda233b2b0b2c645fe565",
+      "size": 13624
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C354-C2-Q228-B337R-NEW-CHROME-VISUAL-REJECT/C354_Q228_SOURCE_OFFICIAL_TRIAL_WHOLE_FLIPY_25.png",
+      "sha256": "a83b29d0e86d79968d370368c94501748f9e0065051ea595fcec46a05af28c8d",
+      "size": 179649
+    }
+  ],
+  "excluded": [
+    "ODD_C1",
+    "UNINDEXED_SPECIAL_C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_ID_OR_QUEUE"
+  ]
+}

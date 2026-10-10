@@ -1,0 +1,192 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "index": 228,
+  "policy": "visual-evidence-v1-20261008",
+  "exact_sha256": {
+    "source": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "official": "cab1ce0802739fdbe9f40df412bd3d469fe16630dad25a28873ccb81016df473",
+    "trial": "7e5209c4fdfe48620e6b3b7bdeab675800e999113a902fdfa3a5a10b88689e2a",
+    "clean": "a8052f2f872f1d4305a56d236c621204d9170a2ae348dea1982084d91de7f7fa",
+    "clean_region": "fb427492815817cfb8076ed8bfb9d9174557b0548c6d7f835392517cd3f8344e"
+  },
+  "size_bytes": {
+    "source": 16777344,
+    "official": 16777344,
+    "trial": 16777344,
+    "clean": 84792,
+    "clean_region": 5215
+  },
+  "native_dds": [
+    2048,
+    2048
+  ],
+  "mips": 1,
+  "format": "RGBA32",
+  "header_first_128_identical": true,
+  "readable_orientation": "MIRROR_Y_FROM_RAW_DDS",
+  "clean_orientation_test_rgba_outside_roi": {
+    "PNG_AS_READABLE": 969076,
+    "PNG_FLIPPED": 1514151
+  },
+  "chosen_clean_orientation": "PNG_AS_READABLE",
+  "source_text": "CAR SELECT",
+  "korean_text": "차량 선택",
+  "roi_readable": [
+    5,
+    182,
+    1124,
+    301
+  ],
+  "region": {
+    "bbox_visible": [
+      5,
+      182,
+      1124,
+      301
+    ],
+    "bbox_official": [
+      9,
+      186,
+      522,
+      297
+    ],
+    "bbox_trial": [
+      12,
+      188,
+      430,
+      296
+    ],
+    "source_size": [
+      1119,
+      119
+    ],
+    "official_size": [
+      513,
+      111
+    ],
+    "trial_size": [
+      418,
+      108
+    ],
+    "source_to_trial_width_ratio": 0.37355,
+    "left_right_top_bottom_margins": [
+      7,
+      694,
+      6,
+      5
+    ],
+    "clean_alpha_nonzero_roi": 0,
+    "clean_region_alpha_nonzero": 0
+  },
+  "pixel_pairs": {
+    "source_clean": {
+      "rgba_total": 1044861,
+      "rgba_inside_roi": 75785,
+      "rgba_outside_roi": 969076,
+      "alpha_total": 1044861,
+      "alpha_inside_roi": 75785,
+      "alpha_outside_roi": 969076
+    },
+    "clean_trial": {
+      "rgba_total": 589951,
+      "rgba_inside_roi": 27289,
+      "rgba_outside_roi": 562662,
+      "alpha_total": 589951,
+      "alpha_inside_roi": 27289,
+      "alpha_outside_roi": 562662
+    },
+    "source_trial": {
+      "rgba_total": 1313306,
+      "rgba_inside_roi": 89617,
+      "rgba_outside_roi": 1223689,
+      "alpha_total": 1159638,
+      "alpha_inside_roi": 84298,
+      "alpha_outside_roi": 1075340
+    },
+    "official_trial": {
+      "rgba_total": 45783,
+      "rgba_inside_roi": 45783,
+      "rgba_outside_roi": 0,
+      "alpha_total": 34078,
+      "alpha_inside_roi": 34078,
+      "alpha_outside_roi": 0
+    },
+    "source_official": {
+      "rgba_total": 1317661,
+      "rgba_inside_roi": 93972,
+      "rgba_outside_roi": 1223689,
+      "alpha_total": 1159398,
+      "alpha_inside_roi": 84058,
+      "alpha_outside_roi": 1075340
+    }
+  },
+  "lossless_images": [
+    {
+      "name": "C354_Q228_FLIPY_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "cebfcf59d53f94958e782c442ddecd14b75fc4cd8e7a603a2e00523a5f5afbe6",
+      "bytes": 83554
+    },
+    {
+      "name": "C354_Q228_FLIPY_GRAY_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "593f0e4917fec37a5f0b0d1f941fe33f95aab6e1bb35a9f46223666371630821",
+      "bytes": 81565
+    },
+    {
+      "name": "C354_Q228_FLIPY_GRAY_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "18123f74cda9ee6729070cb9819057cb89308e5e02e8fd557cb5241e7ebcf7af",
+      "bytes": 45717
+    },
+    {
+      "name": "C354_Q228_FLIPY_BLACK_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "86a4ebd3bf2405ffdd59b37c4bf7e8be8f0fa9a25aca51bf9455fa6986892f4a",
+      "bytes": 72826
+    },
+    {
+      "name": "C354_Q228_FLIPY_BLACK_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "909890f0a9515825dbbd80f9d87f617a8392d59b292f42b2e68c9bfbcc633c7f",
+      "bytes": 69369
+    },
+    {
+      "name": "C354_Q228_FLIPY_BLACK_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "0ece17c903efac0cba0f06bc8a8079fb1e2f99a3a4973cd7dc8780476118beda",
+      "bytes": 38901
+    },
+    {
+      "name": "C354_Q228_FLIPY_WHITE_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "67ff8ca5df7afacfa770401e62afd0e5454df59d792ae32666dca347df4df52f",
+      "bytes": 87968
+    },
+    {
+      "name": "C354_Q228_FLIPY_WHITE_75_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "abd57b668bf7de83dcf80c7f4aaa9d4c9144a5fe83319bc6c24999cfee8c7fba",
+      "bytes": 84429
+    },
+    {
+      "name": "C354_Q228_FLIPY_WHITE_50_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "e87151f434bc03c59de0681c042798dbfdfb6b04ef6801bf4239fac143a8b0b1",
+      "bytes": 47048
+    },
+    {
+      "name": "C354_Q228_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_B337R.png",
+      "sha256": "69d488ceeb018f4a23eed9457487ab99d9c50f8213ce0939fb087dfe1e12cb51",
+      "bytes": 78704
+    },
+    {
+      "name": "C354_Q228_PLATE_ONLY_GRAY_NATIVE.png",
+      "sha256": "19e38be650972d8d2cf83f167418354fcc2e21c80c516974331b995f90773819",
+      "bytes": 38288
+    },
+    {
+      "name": "C354_Q228_COMPOSITE_ONLY_GRAY_NATIVE.png",
+      "sha256": "6f81c54f656b0a81035bd93651f696fb518e9e0458efda233b2b0b2c645fe565",
+      "bytes": 13624
+    },
+    {
+      "name": "C354_Q228_SOURCE_OFFICIAL_TRIAL_WHOLE_FLIPY_25.png",
+      "sha256": "a83b29d0e86d79968d370368c94501748f9e0065051ea595fcec46a05af28c8d",
+      "bytes": 179649
+    }
+  ],
+  "generated_image_count": 13
+}
