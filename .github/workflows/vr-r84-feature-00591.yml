@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: R29 owner ABI regression and 5 mutation checks
+      - name: R29 IPC owner ABI and 21 negative mutation checks
         run: python3 tools/verify_vr_r29_owner_api_seam.py
   r84-win32:
     needs: r84-local
