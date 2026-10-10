@@ -14,16 +14,16 @@
     "tools/dx11_constant_buffer_probe.cpp:R172",
     "src/vr/d3d11/pipeline_translation.cpp:R172"
   ],
-  "status": "BLOCKED",
+  "status": "COMPLETE_R175_SOURCE_WARP_PARITY",
   "checkpoint": "C6_STATE",
   "base_sha": "7972c38de2d7f93c71959985fdb84eff8aac3d50",
-  "material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-  "validation_bearing_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-  "result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-  "automation_validation": "FAIL",
+  "material_result_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+  "validation_bearing_result_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+  "result_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+  "automation_validation": "PASS_EXACT_SHA_FULL_GATE",
   "runtime_validation": "UNTESTED",
-  "selected_work_item": "R172 genuine D3D9 FVF XYZ|DIFFUSE COLOR0 input and generated VS/PS WARP BGRA pixel proof, discriminate R170 no-DIFFUSE regression",
-  "summary": "R172 source-accurate D3D9 packed DIFFUSE FVF WARP probe exposed stable incorrect BGRA [128,0,16,255] for expected [224,128,32,255]. Distinct global TEXCOORD8 generator remap broke preserved R92 COLOR0 linkage; isolated remap restored R92 but left same BGRA corruption. Backend remains dormant; quarantined unresolved and original R171 proven smoke fixture restored in this blocking C6 commit. No parity or promotion claimed.",
+  "selected_work_item": "R175 exact VS/PS register signature and FVF COLOR0/TEXCOORD6 pixel BGRA WARP parity",
+  "summary": "R175 repaired: canonical interstage VS/PS POSITION,COLOR0,COLOR1,TEXCOORD0..7, optional FVF NORMAL0 moved after common fields, PS signature occupancy, R92 Register+Mask reflection checks, R176 wrong-register negative. R87 disabled-alpha no-discard preserved. Expected BGRA [224,128,32,255] equals direct/generated/constant VS and TEXCOORD6 WARP pixels at material SHA. Native gameplay Draw remains dormant and runtime UNTESTED.",
   "pipeline": {
     "C0_RECOVER": "PASS: 00476 exact-SHA Gate 37901281938 SUCCESS and C6 COMPLETE; no 00477 record at initial HEAD.",
     "C1_REVIEW": "PASS: R170 TFACTOR control hides actual COLOR0/D3DTA_DIFFUSE corruption; source-accurate R172 selected.",
@@ -33,8 +33,8 @@
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic only; no gameplay-native draw activation, runtime package or HMD promotion.",
     "C6_STATE": "BLOCKED: durable failure ledger sealed and original R171 smoke source restored; no success score."
   },
-  "next_action": "Open a distinct independent task to inspect VS/PS DXBC signatures and live IA/OM/vertex COLOR0 bytes vs PS interpolation (or add a controlled passthrough PS). Do not retry the same R172 TEXCOORD8 substitution or enable gameplay Draw; preserve frozen DXVK and protected DX9Ex.",
-  "resume_cursor": "TERMINAL_BLOCKED_AWAIT_NEW_EVIDENCE",
+  "next_action": "Start distinct FIRST_GAME_DRAW_FRAME integration through captured game-authored D3D9 draw -> guarded D3D11 native Draw -> visible diagnostic game frame with explicit opt-in and DX9Ex fallback; do not promote until real game/Quest3 proof.",
+  "resume_cursor": "R175_FIXED_NEXT_FIRST_GAME_DRAW_FRAME",
   "state_persisted": true,
   "last_real_activity_at": "2026-10-09T17:37:00+09:00",
   "last_activity_evidence": "Backend Gate 37905148948 Windows validate SUCCESS; readiness smoke failed with R172 BGRA [128,0,16,255]; source baseline restoration pending Gate.",
@@ -76,19 +76,20 @@
     "rollback_gate_head_sha": "d07035fc40fb04633b5ba8f5975bd5f540b577f6"
   },
   "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.cpp",
     "tools/dx11_constant_buffer_probe.cpp",
-    "src/vr/d3d11/pipeline_translation.cpp"
+    "tools/dx11_shader_linkage_probe.cpp"
   ],
-  "static_validation": "R172 scoped static source contract passed; required exact-SHA CI failed three times with isolated WARP pixel/semantic evidence; protected 00476 source fixture restored by exact blob.",
-  "validation_run_id": 37905148948,
+  "static_validation": "DX11 Fast Structural #38051637935 SUCCESS; Backend Conversion Gate #38051638025 validate/Win32 SUCCESS and DX11 readiness smoke SUCCESS (R87 R92 R176 R173 R175 all PASS)",
+  "validation_run_id": 38051638025,
   "validation_job_id": 113736718179,
-  "readiness_smoke_job_id": 113738591904,
+  "readiness_smoke_job_id": 114212826153,
   "rollback_material_source": "00476 tool blob restored; pipeline translator equals 00476",
   "rollback_gate_status": "PASS",
   "continuation": {
     "event_id": "CONVERSION-DX11-00477-CONTINUE-20261009-1853",
-    "status": "IN_PROGRESS_R175_REPAIR_AFTER_R87_SEMANTIC_FAIL",
-    "checkpoint": "C2_IMPLEMENT",
+    "status": "COMPLETE_R175_WARP_PARITY",
+    "checkpoint": "C6_STATE",
     "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
     "lease_epoch": 3,
     "work_key": "DX11:R175:SHARED_VS_PS_SIGNATURE_AND_BGRA_WARP_ROOT_CAUSE",
@@ -98,15 +99,15 @@
       "tools/dx11_shader_linkage_probe.cpp"
     ],
     "base_sha": "d07035fc40fb04633b5ba8f5975bd5f540b577f6",
-    "material_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
-    "validation_bearing_result_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
-    "ci_run_id": 37927656851,
-    "resume_cursor": "CHECK_R87_SEMANTIC_THEN_R92_R176_R175_GPU",
+    "material_result_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+    "validation_bearing_result_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+    "ci_run_id": 38051638025,
+    "resume_cursor": "R175_FIXED_NEXT_FIRST_GAME_DRAW_FRAME",
     "runtime_validation": "UNTESTED",
-    "automation_validation": "RETRY_PENDING",
+    "automation_validation": "PASS_EXACT_SHA_FULL_GATE",
     "reason": "Preserve R87 no-pixel-kill when alpha test disabled. Invalid-signature payload now returns transparent output instead of discard; retain PS register occupancy, R92 register negative checks and R175 fail-closed pixel tests.",
     "prior_blocked_material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
-    "last_real_activity_at": "2026-10-10T21:04:00+09:00",
+    "last_real_activity_at": "2026-10-10T21:32:05+09:00",
     "evidence": "Exact-SHA Gate 37925304067 validate SUCCESS, DX11 smoke 113804628002 FAILURE. Direct VS BGRA [128,0,16,255]; generated VS BGRA [128,0,16,255]; expected [224,128,32,255]. Same mismatch in both branches; cannot attribute to generated VS alone.",
     "prior_gate_evidence": "Gate 37926530851 validate SUCCESS, DX11 smoke FAILED: R174 direct VS/generated VS/constant VS all [128,0,16,255] vs expected [224,128,32,255], red solid-PS correctly [0,0,255,255].",
     "previous_failed_gate": {
@@ -114,7 +115,9 @@
       "run_id": 38051097858,
       "smoke_job_id": 114211187735,
       "first_failure": "R87 semantic smoke: disabled alpha test injected pixel-kill semantics (new signature-retention discard). Win32 validate PASS, Fast Structural PASS; R175 not reached."
-    }
+    },
+    "ci_smoke_job_id": 114212826153,
+    "next_action": "Start distinct FIRST_GAME_DRAW_FRAME integration through captured game-authored D3D9 draw -> guarded D3D11 native Draw -> visible diagnostic game frame with explicit opt-in and DX9Ex fallback; do not promote until real game/Quest3 proof."
   },
   "direct_chat_checkpoints": [
     {
@@ -242,6 +245,78 @@
       "validation": "PENDING_EXACT_SHA",
       "runtime_validation": "UNTESTED",
       "next_action": "Check R87, R92, R176, R175 WARP exact gate; do not bypass any assertion."
+    },
+    {
+      "checkpoint_id": "DX11-00477-R175-WARP-PARITY-SUCCESS-20261010",
+      "at_kst": "2026-10-10 21:32 KST",
+      "checkpoint": "C6_STATE",
+      "validation_bearing_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+      "run_id": 38051638025,
+      "validation": "SUCCESS_ALL_EXACT_SHA",
+      "result": "R87 R92 R176 R173 R175 PASS expected WARP BGRA [224,128,32,255]",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Start distinct FIRST_GAME_DRAW_FRAME integration through captured game-authored D3D9 draw -> guarded D3D11 native Draw -> visible diagnostic game frame with explicit opt-in and DX9Ex fallback; do not promote until real game/Quest3 proof."
     }
-  ]
+  ],
+  "previous_blocked_status": {
+    "status": "BLOCKED_R172_20261009",
+    "material_result_sha": "e054326bb1d25d2f4d264b7b403ad95842de97a1",
+    "note": "Original negative evidence retained in evidence and 2026-10-09 checkpoints."
+  },
+  "completion_20261010": {
+    "owner_id": "ChatGPT2:CONVERSION-DX11-00477",
+    "lease_epoch": 3,
+    "source_mode": "CHAT_DIRECT",
+    "validation_bearing_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+    "exact_sha_gate_run_id": 38051638025,
+    "gate_conclusion": "SUCCESS",
+    "win32_validate": "SUCCESS",
+    "dx11_warp_smoke": "SUCCESS",
+    "r87": "PASS",
+    "r92": "PASS",
+    "r176": {
+      "vs_register": 1,
+      "ps_register": 1,
+      "wrong_register": "REJECT"
+    },
+    "r173": {
+      "direct_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "generated_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "constant_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "r175": {
+      "observed_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "classification": "ALL_R175_CONTROLS_MATCH"
+    },
+    "runtime_validation": "UNTESTED",
+    "native_game_draw_activated": false,
+    "gameplay_status": "NOT_PROVEN",
+    "scoring": "ELIGIBLE_ONCE_IF_NOT_PREVIOUSLY_SCORED"
+  }
 }
