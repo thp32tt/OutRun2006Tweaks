@@ -1,0 +1,86 @@
+{
+  "role": "A",
+  "index": 103,
+  "run": "A224",
+  "run_key": "OUTRUN-KOR-A224-Q103-SOURCE-OPTICAL-DENSITY-20261010-1400",
+  "artifact_kind": "UNPROMOTED_ACTUAL_DDS_TRIAL",
+  "worker_run_id": 38026411248,
+  "worker_conclusion": "SUCCESS",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "english": "Normal Balance",
+  "korean": "일반 밸런스",
+  "english_effect_bbox": [
+    1432,
+    1980,
+    1786,
+    2025
+  ],
+  "english_effect_wh": [
+    354,
+    45
+  ],
+  "trial_glyph_bbox": [
+    1451,
+    1981,
+    1766,
+    2024
+  ],
+  "trial_glyph_wh": [
+    315,
+    43
+  ],
+  "exact_effect_margins": [
+    19,
+    20,
+    1,
+    1
+  ],
+  "old_A223_trial_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+  "new_trial_sha256": "2ad5e25e03bc1c9598548ef64ec397be91eae86f0b4f8d4cc161438c9e354c31",
+  "official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "source_clean_sha256": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942",
+  "official_modified": false,
+  "trial_dds": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_Q103_OPTICAL_CONTOUR_UNPROMOTED.dds",
+  "machine_qa": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_MACHINE_TRIAL_QA.json",
+  "method": "Actual fresh Noto Sans CJK Regular 65ppem Korean outlines, 2px native tracking, source-effect measured one vertical glyph-mask fit to 43px, 0 scaling of prior Korean DDS; 0 rectangular plate crops",
+  "comparison": [
+    "A224_COMPARE_GRAY_100.png",
+    "A224_COMPARE_BLACK_50.png",
+    "A224_TRIAL_RAW_NATIVE_RGBA.png"
+  ],
+  "inspected_by": "producer controller firsthand visual using persisted exact new DDS images, not simulation",
+  "visual_8_checks": {
+    "clean_plate": "SCOPED_VISIBLE_PASS_SOURCE_VS_CLEAN",
+    "source_lean": "SCOPED_VISUAL_RIGHT_TILT_PASS_BUT_EXACT_ANCHORS_PENDING",
+    "scale": "315x43 versus source354x45; improved A223 284x45 underfill",
+    "source_style": "Improved size/spacing; independent family style calibration still pending",
+    "glyph_clipping": "NO_VISIBLE_CLIPPING_POSITIVE_SOURCE_MARGINS",
+    "protected_art": "ZERO_OUTSIDE_SOURCE_REGION_PERSISTED_PIXELS; exact protected source-mask publication pending",
+    "raw_flip_y": "RAW mirroring observed expected; FLIP-Y and 50pct readable",
+    "immediate_readability": "SCOPED_VISUAL_PASS_AT_NATIVE_AND_50PCT"
+  },
+  "compositing": {
+    "source_to_clean": "Yellow plate continuous with no visually confirmed English residue",
+    "clean_to_final": "Transparent Korean layer only in source box; no visible rectangle seam",
+    "changed_outside_bbox_rgba": 0,
+    "dds_format": "RGBA32 2048x2048 mip1 RAW mirrored"
+  },
+  "status": "SCOPED_VISUAL_IMPROVEMENT_UNPROMOTED_C1_PENDING",
+  "whole_atlas_producer_PASS": false,
+  "full_production_pixel_guard_final_manifest": false,
+  "independent_C1": "PENDING",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "pre_ingame": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "reason_for_hold": "Source-derived per-glyph slant anchors, exact source-mask/protected-pixel final manifest, independent C1 family pilot and whole-atlas consistency not complete; do not publish as final accepted candidate",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
