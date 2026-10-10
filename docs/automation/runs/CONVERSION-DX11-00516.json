@@ -16,19 +16,81 @@
     "tools/test_dx11_indexed_uav_eye_r219.py",
     ".github/workflows/backend-conversion-gate.yml:R219"
   ],
-  "checkpoint": "C2_IMPLEMENT",
-  "status": "WAITING_CI",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_INDEPENDENT_R175_GATE",
+  "result_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
+  "material_result_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
+  "validation_bearing_result_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "summary": "R219 isolates indexed D3D11 eye from retained OM UAV outputs; real WARP shader writes second texture (negative) and restores single eye (positive). No native gameplay activation.",
   "changed_files": [
     "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
     "tools/dx11_indexed_draw_probe_r186.cpp",
     "tools/test_dx11_indexed_uav_eye_r219.py",
-    ".github/workflows/backend-conversion-gate.yml"
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00516.json"
   ],
-  "next_action": "Verify exact material SHA Backend Conversion Gate; distinguish scoped R219 from independently owned inherited R175 failure."
+  "next_action": "Keep R219 material b13bfe4e and RUNTIME_VALIDATION=UNTESTED; separate R175 owner/lease must reconcile shader varying; do not rerun 00516 or award score on retry. New independent DX11 work requires nonconflicting allocation.",
+  "initial_material_sha": "5bbfb8d12d5c8d02dd8fad6e290aaa11fbfa8d79",
+  "validation_run_id": 38024618918,
+  "validation_job_id": 114132693059,
+  "readiness_smoke_job_id": 114133327435,
+  "score_change": 0,
+  "score_previous_confirmed": 1074,
+  "score_new_confirmed": 1074,
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD/AGENTS/100-review index/controller checkpoint, 00515 C6",
+    "C1_REVIEW": "PASS independent R219 OM UAV write leak chosen; prior R175 owner excluded",
+    "C2_IMPLEMENT": "PASS new native indexed OM UAV resource guard, actual GPU WARP second-eye proof and restoration, targeted static mutations",
+    "C3_VALIDATE": "SCOPED_R219_PASS, complete exact-SHA Gate FAIL at independent R175 shader varying",
+    "C4_COMMIT": "PASS 5bbfb8d material and b13bfe4 scoped test repair, both exact AUTO marker",
+    "C5_PACKAGE": "NOT_REQUIRED; native gameplay DrawIndexed remains dormant, no Quest3 promotion",
+    "C6_STATE": "PASS durable blocked status, material SHA and exact two Gate runs recorded"
+  },
+  "evidence": {
+    "initial_gate_run_id": 38024063021,
+    "initial_gate_status": "failure",
+    "initial_gate_validate": "success",
+    "initial_gate_smoke": "failure R219 unit test guard typo corrected",
+    "initial_failed_static": "tools/test_dx11_indexed_uav_eye_r219.py wrongly checked ID3D11_PS_CS_UAV_REGISTER_COUNT",
+    "repair_material_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
+    "canonical_gate_run_id": 38024618918,
+    "canonical_gate_head_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
+    "canonical_gate_status": "failure",
+    "validate": "SUCCESS",
+    "readiness_smoke": "FAILURE",
+    "scoped_r218_static_step": 42,
+    "scoped_r219_static_step": 43,
+    "scoped_r186_build_step": 44,
+    "scoped_r186_warp_step": 45,
+    "scoped_r218_static": "SUCCESS",
+    "scoped_r219_static": "SUCCESS",
+    "scoped_r186_warp_compile": "SUCCESS",
+    "scoped_r186_warp_execution": "SUCCESS",
+    "inherited_failed_step": "Run DX11 constant buffer probe",
+    "inherited_failed_step_number": 84,
+    "inherited_failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "inherited_owner_task": "CONVERSION-DX11-00477",
+    "issue14_initial_progress_comment": 6093781918,
+    "controller_checkpoint_retry": "CONVERSION-DX11-00516-E003 retry detected; treated same TASK_ID, no duplicate achievement",
+    "native_gameplay_activation": false,
+    "hmd_test_performed": false
+  },
+  "blockers": [
+    "Exact SHA Backend Conversion Gate #38024618918 failed at separately owned R175 TEXCOORD6 generic varying (CONVERSION-DX11-00477); R219 scoped test and real WARP pass; do not edit R175 without owner fencing",
+    "Quest3/VDXR HMD/game runtime UNTESTED; no native draw promotion"
+  ]
 }
