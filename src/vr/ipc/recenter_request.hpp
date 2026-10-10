@@ -120,6 +120,15 @@ namespace OutRunVR::RecenterIpc
             if (requestedAfter != requested)
                 return false;
 
+            // A new publisher can clear requesterPid to zero after the first
+            // PID sample but before advancing requestId. Observe the sentinel
+            // again before handing the snapshot to OpenXR. A changed PID also
+            // rejects a cross-process/reconnect mixed publication.
+            const DWORD publishedPidAfter = static_cast<DWORD>(
+                InterlockedCompareExchange(&state_->requesterPid, 0, 0));
+            if (publishedPidAfter == 0 || publishedPidAfter != publishedPid)
+                return false;
+
             requestId = requested;
             requesterPid = publishedPid;
             return true;

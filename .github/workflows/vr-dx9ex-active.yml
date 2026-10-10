@@ -81,6 +81,7 @@ on:
       - 'tools/verify_vr_hud_exact_callsite_contract.py'
       - 'tools/verify_vr_r31_r32_retirement_guard.py'
       - 'tools/verify_vr_recenter_contract.py'
+      - 'tools/verify_vr_recenter_publication_snapshot.py'
       - 'tools/verify_vr_dx9ex_reset_transport_contract.py'
       - 'tools/verify_vr_final_submission_contract.py'
       - 'docs/VR_REFACTOR_STATE.json'
@@ -182,6 +183,7 @@ jobs:
             'tools/verify_vr_texture_scene_contract.py',
             'tools/verify_vr_r31_r32_retirement_guard.py',
             'tools/verify_vr_recenter_contract.py',
+            'tools/verify_vr_recenter_publication_snapshot.py',
             'tools/verify_vr_dx9ex_reset_transport_contract.py',
             'tools/verify_vr_final_submission_contract.py'
           )
