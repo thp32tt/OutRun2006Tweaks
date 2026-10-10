@@ -201,4 +201,33 @@ namespace outrun::vr::dx11 {
         if (output) output->Release();
     return singleEye;
 }
+
+// R214: strict opaque non-indexed native Draw requires one exact depth eye,
+// exact IA/VS/PS/RTV/DSV and unmodified live OM sample coverage. R211 alone
+// allows a retained blend to erase pixels or a zero sample mask to suppress
+// all samples. This is readiness-only; no gameplay Draw is dispatched here.
+[[nodiscard]] inline bool verified_linear_opaque_single_eye_draw_ready(
+    const NativeLinearBufferMirror& vertexOwner,
+    ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t deviceGeneration, std::uint64_t sourceSnapshotVersion,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState) noexcept {
+    if (!context || !verified_linear_single_eye_depth_draw_ready(
+            vertexOwner, context, startVertex, vertexCount,
+            deviceGeneration, sourceSnapshotVersion,
+            expectedLayout, expectedVs, expectedPs,
+            expectedRtv, expectedDsv, expectedDepthState))
+        return false;
+    // No explicit blend object is accepted, even if it currently happens to
+    // disable blending: an exact opaque path must not borrow foreign OM state.
+    Microsoft::WRL::ComPtr<ID3D11BlendState> liveBlend;
+    UINT sampleMask = 0;
+    context->OMGetBlendState(liveBlend.GetAddressOf(), nullptr, &sampleMask);
+    return !liveBlend && sampleMask == D3D11_DEFAULT_SAMPLE_MASK;
+}
 } // namespace outrun::vr::dx11

@@ -328,6 +328,12 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_index_slice_r195.py
 
+      # R214: strict opaque non-indexed OM blend/mask identity plus real WARP.
+      - name: Verify R214 linear exact opaque OM ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_opaque_om_r214.py
+
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe

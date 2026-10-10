@@ -17,8 +17,8 @@
     "tools/test_dx11_linear_opaque_om_r214.py",
     ".github/workflows/backend-conversion-gate.yml:R214"
   ],
-  "status": "RUNNING",
-  "checkpoint": "C1_REVIEW",
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -26,20 +26,26 @@
   "pipeline": {
     "C0_RECOVER": "PASS authenticated GitHub branch HEAD; 00510 blocked R175 dependency, no 00511 record; checkpoint WAIT_CHAT verified",
     "C1_REVIEW": "PASS R211 single-eye/depth/VS/PS pipeline permits unowned OM blend state or zero sample mask",
-    "C2_IMPLEMENT": "PENDING source + GPU test",
-    "C3_VALIDATE": "PENDING scoped static + exact SHA Gate",
-    "C4_COMMIT": "PENDING material commit",
+    "C2_IMPLEMENT": "PASS: R214 dormant C++ exact opaque OM single-eye preflight plus negative/restore real WARP Draw pixels and one-shot seven-mutant static test",
+    "C3_VALIDATE": "SCOPED_SOURCE_PREFLIGHT_PASS; PENDING GitHub exact-SHA Win32 + WARP (independent inherited R175 may block whole Gate)",
+    "C4_COMMIT": "MATERIAL_RESULT_SHA_FROM_GIT; no CI-skip on result",
     "C5_PACKAGE": "NOT_REQUIRED dormant native Draw",
     "C6_STATE": "PENDING exact-SHA verdict"
   },
-  "last_real_activity_at": "2026-10-10T02:06:44.304Z",
-  "last_activity_evidence": "R214 source gap identified from R211 vs R213; owner claim new task",
-  "resume_cursor": "IMPLEMENT_R214_NATIVE_LINEAR_OM_FAIL_CLOSED",
-  "next_action": "Modify R214 C++ source, isolated linear WARP pixel probe, one-shot static contract and exact-SHA Actions Gate; do not touch R175, DXVK, DX9Ex or game native Draw activation",
+  "last_real_activity_at": "2026-10-10T02:08:05.486Z",
+  "last_activity_evidence": "R214 source+actual WARP negative and restoration proof implemented, one-shot Python mutation test wired",
+  "resume_cursor": "WAIT_EXACT_SHA_GATE_R214",
+  "next_action": "Fetch exact-SHA Gate and separate scoped R214 static+real WARP from inherited R175 outcome; persist C6",
   "blockers": [
     "Inherited independent R175 TEXCOORD6 probe fails full DX11 readiness CI; no HMD test"
   ],
-  "changed_paths": [],
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_opaque_om_r214.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00511.json"
+  ],
   "material_result_sha": null,
   "validation_bearing_result_sha": null
 }

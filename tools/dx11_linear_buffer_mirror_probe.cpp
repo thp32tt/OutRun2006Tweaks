@@ -311,6 +311,71 @@ int main() {
     ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
     require(singleEyeDepthReady(), "R211 restore one eye before real WARP Draw");
 
+    // R214: even with exact depth/shaders and only one OM eye, a retained
+    // non-opaque blend or zero sample mask must refuse native Draw readiness.
+    // Prove the rejected states actually suppress the isolated WARP Draw.
+    const auto exactOpaqueEyeReady = [&] {
+        return outrun::vr::dx11::verified_linear_opaque_single_eye_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            ownDsv.Get(),depthState.Get());
+    };
+    ctx->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(exactOpaqueEyeReady(), "R214 opaque linear single-eye OM ready");
+    D3D11_BLEND_DESC keepColorDesc{};
+    auto& keep = keepColorDesc.RenderTarget[0];
+    keep.BlendEnable = TRUE;
+    keep.SrcBlend = D3D11_BLEND_ZERO;
+    keep.DestBlend = D3D11_BLEND_ONE;
+    keep.BlendOp = D3D11_BLEND_OP_ADD;
+    keep.SrcBlendAlpha = D3D11_BLEND_ZERO;
+    keep.DestBlendAlpha = D3D11_BLEND_ONE;
+    keep.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    keep.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    ComPtr<ID3D11BlendState> keepColorBlend;
+    require(SUCCEEDED(dev->CreateBlendState(
+            &keepColorDesc,keepColorBlend.GetAddressOf())),
+            "R214 create actual WARP color-preserving blend");
+    const auto samplePixelEquals = [&](unsigned char r, unsigned char g,
+                                       unsigned char b) {
+        ctx->CopyResource(staging.Get(),color.Get());
+        D3D11_MAPPED_SUBRESOURCE pixelMap{};
+        if (FAILED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&pixelMap)) ||
+            !pixelMap.pData) return false;
+        const auto* p = static_cast<const unsigned char*>(pixelMap.pData)
+            +16*pixelMap.RowPitch+16*4;
+        const bool matches = p[0]==r && p[1]==g && p[2]==b && p[3]==255;
+        ctx->Unmap(staging.Get(),0);
+        return matches;
+    };
+    ctx->OMSetBlendState(keepColorBlend.Get(),nullptr,
+                         D3D11_DEFAULT_SAMPLE_MASK);
+    require(singleEyeDepthReady(), "R214 R211 still accepts foreign OM blend");
+    require(!exactOpaqueEyeReady(), "R214 reject stale nonopaque OM blend");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(0,0,0),
+            "R214 real WARP Draw suppressed by retained blend");
+    ctx->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(exactOpaqueEyeReady(), "R214 recover exact default OM blend");
+    ctx->OMSetBlendState(nullptr,nullptr,0u);
+    require(singleEyeDepthReady(), "R214 R211 still accepts zero sample mask");
+    require(!exactOpaqueEyeReady(), "R214 reject zero live sample mask");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(0,0,0),
+            "R214 real WARP Draw suppressed by zero mask");
+    ctx->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(exactOpaqueEyeReady(), "R214 restore fully owned opaque OM state");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0),
+            "R214 real WARP Draw restored red pixel after OM repair");
+
+
     require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
             vb,ctx.Get(),0,3,generation,version,
             layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
