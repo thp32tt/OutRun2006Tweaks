@@ -1,0 +1,293 @@
+{
+  "run": "B346",
+  "role": "B",
+  "queue_index": 176,
+  "run_key": "OUTRUN-KOR-B346-Q176-HEAVY-SOURCE-BLOCK-GLYPH-20261010",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "current_candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "new_trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+  "new_trial_bytes": 16777344,
+  "format": "RGBA32",
+  "native": [
+    2048,
+    2048
+  ],
+  "mips": 1,
+  "source_clean_lettering_final": true,
+  "P1": "MECHANICAL_SOURCE_CLEAN_CANDIDATE_SAVED_DIRECT_CONTROLLER_VISUAL_PENDING",
+  "P2": "NATIVE_FONT_BOLD_VECTOR_SOURCE_RED_FACE_STROKE3_DIRECT_CONTROLLER_VISUAL_PENDING",
+  "P3": "DDS_ROUNDTRIP_EXACT_NO_OFFICIAL_PROMOTION",
+  "source_clean_outside_rgba": 0,
+  "clean_final_outside_rgba": 0,
+  "source_final_outside_rgba": 0,
+  "prior_final_outside_rgba": 0,
+  "protected_unchanged": true,
+  "zero_source_alpha_in_4_clean": true,
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_face_index": 1,
+  "font_license": "fonts-noto-cjk packaged OFL: /usr/share/doc/fonts-noto-cjk/copyright",
+  "glyph_coverage_all": true,
+  "native_font_raster_not_resized": true,
+  "per_region": [
+    {
+      "id": "jennifer",
+      "english": "JENNIFER",
+      "korean": "제니퍼",
+      "source_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 156,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        11,
+        379,
+        425,
+        527
+      ],
+      "source_size_ceiling": [
+        838,
+        158
+      ],
+      "final_size": [
+        414,
+        148
+      ],
+      "four_margins": [
+        11,
+        413,
+        5,
+        5
+      ],
+      "source_alpha_positive": 72799,
+      "current_alpha_positive": 31464,
+      "new_alpha_positive": 28352
+    },
+    {
+      "id": "clarissa",
+      "english": "CLARISSA",
+      "korean": "클라리사",
+      "source_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 157,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        919,
+        377,
+        1490,
+        527
+      ],
+      "source_size_ceiling": [
+        840,
+        160
+      ],
+      "final_size": [
+        571,
+        150
+      ],
+      "four_margins": [
+        14,
+        255,
+        5,
+        5
+      ],
+      "source_alpha_positive": 68689,
+      "current_alpha_positive": 43528,
+      "new_alpha_positive": 39097
+    },
+    {
+      "id": "holly",
+      "english": "HOLLY",
+      "korean": "홀리",
+      "source_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 146,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        22,
+        218,
+        272,
+        359
+      ],
+      "source_size_ceiling": [
+        533,
+        151
+      ],
+      "final_size": [
+        250,
+        141
+      ],
+      "four_margins": [
+        13,
+        270,
+        5,
+        5
+      ],
+      "source_alpha_positive": 41097,
+      "current_alpha_positive": 21834,
+      "new_alpha_positive": 19625
+    },
+    {
+      "id": "flagman4",
+      "english": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "source_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 152,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        22,
+        54,
+        698,
+        199
+      ],
+      "source_size_ceiling": [
+        980,
+        155
+      ],
+      "final_size": [
+        676,
+        145
+      ],
+      "four_margins": [
+        14,
+        290,
+        5,
+        5
+      ],
+      "source_alpha_positive": 75687,
+      "current_alpha_positive": 49663,
+      "new_alpha_positive": 44976
+    }
+  ],
+  "comparisons": [
+    "B346_jennifer_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_jennifer_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_clarissa_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_holly_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_GRAY_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_GRAY_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_GRAY_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_BLACK_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_BLACK_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_BLACK_50_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_WHITE_100_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_WHITE_75_SOURCE_CLEAN_OLD_NEW.png",
+    "B346_flagman4_RAW_WHITE_50_SOURCE_CLEAN_OLD_NEW.png"
+  ],
+  "same_SHA_repeated": false,
+  "producer_visual": "PENDING_DIRECT_CONTROLLER",
+  "new_material_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "C2": "C343_CURRENT_REWORK_REQUIRED",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GITHUB_ACTIONS_CPU_WORKER",
+  "exclusions": [
+    "ODD_A",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "family": "red-flat-heavy-block-menu",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "protected": "Entire unedited atlas including original ??? and route",
+  "source_regions": [
+    {
+      "id": "jennifer",
+      "english": "JENNIFER",
+      "korean": "제니퍼",
+      "source_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 156,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        11,
+        379,
+        425,
+        527
+      ],
+      "source_size_ceiling": [
+        838,
+        158
+      ],
+      "final_size": [
+        414,
+        148
+      ],
+      "four_margins": [
+        11,
+        413,
+        5,
+        5
+      ],
+      "source_alpha_positive": 72799,
+      "current_alpha_positive": 31464,
+      "new_alpha_positive": 28352
+    },
+    {
+      "id": "clarissa",
+      "english": "CLARISSA",
+      "korean": "클라리사",
+      "source_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 157,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        919,
+        377,
+        1490,
+        527
+      ],
+      "source_size_ceiling": [
+        840,
+        160
+      ],
+      "final_size": [
+        571,
+        150
+      ],
+      "four_margins": [
+        14,
+        255,
+        5,
+        5
+      ],
+      "source_alpha_positive": 68689,
+      "current_alpha_positive": 43528,
+      "new_alpha_positive": 39097
+    },
+    {
+      "id": "holly",
+      "english": "HOLLY",
+      "korean": "홀리",
+      "source_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 146,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        22,
+        218,
+        272,
+        359
+      ],
+      "source_size_ceiling": [
+        533,
+        151
+      ],
+      "final_size": [
+        250,
+        141
+      ],
+      "four_margins": [
+        13,
+        270,
+        5,
+        5
+      ],
+      "source_alpha_positive": 41097,
+      "current_alpha_positive": 21834,
+      "new_alpha_positive": 19625
+    },
+    {
+      "id": "flagman4",
+      "english": "FLAGMAN 4",
+      "korean": "플래그맨 4",
+      "source_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "font_size_px": 152,
+      "native_stroke_width": 1,
+      "native_lettering_bbox": [
+        22,
+        54,
+        698,
+        199
+      ],
+      "source_size_ceiling": [
+        980,
+        155
+      ],
+      "final_size": [
+        676,
+        145
+      ],
+      "four_margins": [
+        14,
+        290,
+        5,
+        5
+      ],
+      "source_alpha_positive": 75687,
+      "current_alpha_positive": 49663,
+      "new_alpha_positive": 44976
+    }
+  ],
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_face_index": 1,
+  "stroke_width": 1,
+  "render_method": "Pillow native pinned font Bold FreeType face with calibrated 1px native vector stroke; source sampled flat red face; no bitmap resize or fallback",
+  "earlier_reject": "C343 optical source red-block face visibly thicker than B201 saved",
+  "source_to_clean": "zero exact canonical English source bboxes, preserve outside",
+  "clean_to_final": "replace each clean bbox with isolated native glyph pixels",
+  "RAW_FLIPY": "same exact source/current mirror-Y orientation",
+  "producer": "UNAPPROVED TRIAL / visual self-QA pending",
+  "runtime": "UNTESTED"
+}
