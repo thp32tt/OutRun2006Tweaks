@@ -120,6 +120,23 @@ namespace OutRunVRHelperExProbe
                 return 0;
             }
 
+            // Pin the host identity before allocating helper resources. A reconnect
+            // can replace the PID/LUID while CreateDeviceEx or the fence waits.
+            const std::uint32_t expectedHostPid = shared.state->hostPid;
+            const LUID wanted{
+                shared.state->hostAdapterLuidLow,
+                static_cast<LONG>(shared.state->hostAdapterLuidHigh)
+            };
+            const auto hostIdentityUnchanged = [&]() noexcept
+            {
+                return shared.Valid() &&
+                    shared.state->hostPid == expectedHostPid &&
+                    (shared.state->flags & OutRunVR::HostAdapterLuidValid) != 0 &&
+                    shared.state->hostAdapterLuidLow == wanted.LowPart &&
+                    shared.state->hostAdapterLuidHigh ==
+                        static_cast<std::uint32_t>(wanted.HighPart);
+            };
+
             HMODULE d3d9Module = LoadSystemD3D9();
             if (!d3d9Module)
             {
@@ -143,10 +160,6 @@ namespace OutRunVRHelperExProbe
                 return 0;
             }
 
-            const LUID wanted{
-                shared.state->hostAdapterLuidLow,
-                static_cast<LONG>(shared.state->hostAdapterLuidHigh)
-            };
             UINT adapter = D3DADAPTER_DEFAULT;
             bool found = false;
             const UINT adapterCount = d3dEx->GetAdapterCount();
@@ -226,6 +239,15 @@ namespace OutRunVRHelperExProbe
                 return 0;
             }
 
+            // Never publish a shared handle for an obsolete OpenXR host.
+            if (!hostIdentityUnchanged())
+            {
+                spdlog::warn("VR helper D3D9Ex probe: host identity changed before publication; discard diagnostic handle");
+                ReleaseCom(fence); ReleaseCom(surface); ReleaseCom(texture);
+                ReleaseCom(helper); ReleaseCom(d3dEx); FreeLibrary(d3d9Module);
+                return 0;
+            }
+
             const std::uint32_t token =
                 (static_cast<std::uint32_t>(GetTickCount()) ^ GetCurrentProcessId() ^ 0x48585042u) | 1u;
             InterlockedExchange(reinterpret_cast<volatile LONG*>(&shared.state->clientAdapterLuidLow),
@@ -241,6 +263,10 @@ namespace OutRunVRHelperExProbe
             bool verified = false;
             for (int i = 0; i < 200; ++i)
             {
+                // A stale acknowledgement from a replaced host is not proof
+                // that the new OpenXR adapter accepted the old shared handle.
+                if (!hostIdentityUnchanged())
+                    break;
                 if (shared.state->hostInteropProbeAckToken == token)
                 {
                     verified = true;
@@ -248,6 +274,7 @@ namespace OutRunVRHelperExProbe
                 }
                 Sleep(10);
             }
+            verified = verified && hostIdentityUnchanged();
 
             if (verified)
             {

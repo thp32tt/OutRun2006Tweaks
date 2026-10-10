@@ -55,6 +55,7 @@ on:
       - 'tools/verify_vr_policy_alignment.py'
       - 'tools/verify_vr_r31_live_wvp_consistency.py'
       - 'tools/verify_vr_r31_window_telemetry.py'
+      - 'tools/verify_vr_helper_probe_host_identity.py'
       - 'tools/verify_vr_ffb_controller_routing.py'
       - 'tools/verify_vr_ffb_release_ini_contract.py'
       - 'tools/verify_vr_r32_r31_tu_split.py'
@@ -162,6 +163,7 @@ jobs:
             'tools/verify_vr_policy_alignment.py',
             'tools/verify_vr_r31_live_wvp_consistency.py',
             'tools/verify_vr_r31_window_telemetry.py',
+            'tools/verify_vr_helper_probe_host_identity.py',
             'tools/verify_vr_ffb_controller_routing.py',
             'tools/verify_vr_ffb_release_ini_contract.py',
             'tools/verify_vr_r32_r31_tu_split.py',
