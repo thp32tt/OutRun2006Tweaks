@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00520",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00520",
+  "work_key": "DX11:R223:R188_TEXTURED_INDEXED_OM_UAV_FAIL_CLOSED",
+  "stage": "C3_VALIDATE",
+  "status": "WAITING_CI",
+  "base_sha": "d3a479fc4d6f746cf46e70fdfe755fe2c1a85871",
+  "material_result_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+  "validation_bearing_result_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+  "ci_run_id": 38028218021,
+  "ci_status": "in_progress",
+  "ci_conclusion": null,
+  "local_static": "PASS 7 negative mutants",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Inspect exact-SHA R188 static+WARP and full Gate; C6 outcome. Do not modify game branch until exact CI outcome.",
+  "last_real_activity_at": "2026-10-10T05:42:42.542Z"
+}
