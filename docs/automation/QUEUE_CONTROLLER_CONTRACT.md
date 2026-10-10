@@ -1,16 +1,20 @@
 # Queue Controller Automation Contract
 
-## Docker production-controller override — 2026-10-07
+## Effective multi-lane dispatch authority — 2026-10-10
+
+- A DX11 Native first-priority ACTIVE on `vr-dx11-native-r71`, C DX9Ex ACTIVE concurrently on `vr-d3d9ex-focus` (50% engineering-effort target), B DXVK FROZEN until explicit user reopening. DX12 reference-only.
+- C follows `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`: P0 released FFB v0.2 integration -> P1 R84/refactor -> P2 OpenXR recommended per-eye extent/VD High -> P3 measured native 120FPS Quest3/RTX4070, with frozen baseline `fcd18ddd89f6dd40a8246fcf8591f086811149f1` untouched.
+- HMD/wheel hardware-only acceptance gates do not block other independent C source work, and DX9Ex Architecture v3 live-IPC HMD gate never blocks independent DX11 A. DXVK B must NOT automatically thaw after any DX9Ex gate.
+- The 2026-10-07 DX9Ex-only Gate0/R84 selection order below is **historical/non-executable**; Gate0 and inventory were already completed. Keep original architecture/defect evidence, distinct work_keys, exact-SHA validation, GitHub C6 records and no needless CI cancellation.
+- Actual external Docker controller deployment, A/C parallel processes and leases require direct runtime confirmation; writing GitHub policy does not prove jobs are running.
+
+## Historical Docker production-controller override — 2026-10-07 (superseded)
 
 The active production automation runs outside ChatGPT in the user's Docker queue controller.
 
 - Before every dispatch, fetch the latest `vr-d3d9ex-focus` HEAD and read `AGENTS.md`, `docs/VR_AUTODEV_STATE.json`, `docs/VR_WORK_QUEUE.json`, and `docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md`.
 - Do not rely on historical ChatGPT automation IDs, old clock schedules, a local clone, or an R84 cycle counter to select work.
-- Current selection order is:
-  1. finish/repair an immutable in-progress task and its exact validation;
-  2. `DX9EX-R84-PORT-GATE0-00505`;
-  3. the highest-priority executable `DX9EX-R84-PORT-*` item whose dependencies are DONE;
-  4. only after convergence closeout, return to normal DX9Ex queue / HMD-gated Architecture v3 rules.
+- HISTORICAL DX9Ex-only order was: recover earlier task -> Gate0 00505 -> R84 seams -> queue. Current C worker uses P0-P3 and must not rerun completed Gate0/inventory.
 - `vr-refactor-r84-2000c-20261001` is read-only donor/reference. Never write new work there and never wholesale merge it into focus.
 - One material structure seam per task. No filler/no-op cycles merely to increase a campaign count.
 - Keep the existing `[AUTO:<TASK_ID>]` marker and durable run-record requirements.

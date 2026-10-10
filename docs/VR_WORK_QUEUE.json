@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex focus; USER-REQUESTED PRIORITY: finish R84 compile/TU structural convergence while protecting restored HUD; F11 user reports normal (exact tested SHA unprovided); HMD-only visual issues remain open.",
+    "primaryBackend": "DX9Ex C ACTIVE; independent global-first DX11 Native A ACTIVE concurrently; DXVK B FROZEN. C priorities P0 FFB/P1 R84/P2 XR extent/P3 native 120fps.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -20,13 +20,14 @@
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
     },
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-    "parallelBackendDevelopment": false,
-    "backendReplacementGate": "DX11 Native and DXVK remain downstream/frozen while DX9Ex stabilization and Architecture v3 migration are incomplete. Reopen downstream porting only after the v3-primary DX9Ex runtime is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
+    "parallelBackendDevelopment": true,
+    "backendReplacementGate": "DX9Ex Architecture v3 HMD gate only DX9Ex live IPC promotion, never independent DX11 Native A source development. DXVK B remains user-FROZEN.",
     "parallelTracks": {
       "HUD": "SOURCE_REPAIRS_BUILD_VERIFIED_NEED_MATCHING_HMD: F11 user reports normal; rest of visual acceptance remains separately tracked; protect working rival/DDS/world.",
-      "PERFORMANCE": "FROZEN_BEHIND_P0_VISUAL: preserve evidence only until the visual-composition static gate is green.",
-      "DXVK": "FROZEN_BY_USER: keep evidence/history only; no implementation or validation scheduling.",
-      "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work."
+      "PERFORMANCE": "P3 after P0-P2, or independent instrumentation while earlier stage waits only on hardware. Native FPS requires exact Quest3/VD High/RTX4070 proof.",
+      "DXVK": "FROZEN_BY_USER_2026_10_08: no automatic build/development/distribution/promotion.",
+      "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work.",
+      "DX11_NATIVE": "ACTIVE_EXTERNAL_A_FIRST_PRIORITY: independent branch, commits, claims and CI."
     },
     "pcRunnerAuthorization": {
       "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
@@ -40,8 +41,7 @@
       "rule": "Parallel HMD experiment preparation is allowed from one TEST_MATRIX_BASE; experiment slots are test-only until HMD evidence and exact-tree validation.",
       "frozenPrimaryWork": [
         "broad EXE-map expansion unrelated to active HUD/flare/backend work",
-        "generic dependency/toolchain cleanup unrelated to active builds",
-        "PS2/FFB runtime"
+        "generic dependency/toolchain cleanup unrelated to active builds"
       ],
       "requiredSlots": [
         "A_CONTROL",
@@ -52,24 +52,22 @@
         "F_DX12"
       ],
       "nonBlockingRule": "Within DX9Ex, HUD/FLARE/PERF work may proceed independently. E_DXVK/F_DX12 slots are dormant while DX9Ex stabilization is the active goal.",
-      "disabledReason": "Frozen by user while DX9Ex structural refactor is the exclusive active track."
+      "disabledReason": "Historical evening HMD matrix disabled, not active A/C source execution."
     },
     "automationCycle": {
-      "mode": "DX9EX_R84_PRODUCTION_STRUCTURAL_CONVERGENCE",
+      "mode": "DX9EX_C_ACTIVE_P0_P3_WITH_DX11_A_PARALLEL",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
         "AGENTS.md",
+        "docs/DX9EX_AUTODEV_PRIORITY_20261010.md",
         "docs/VR_AUTODEV_STATE.json",
         "docs/VR_WORK_QUEUE.json",
-        "docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md",
         "docs/automation/QUEUE_CONTROLLER_CONTRACT.md"
       ],
-      "activeTaskIds": [
-        "DX9EX-R84-PORT-SEAMS-001"
-      ],
+      "activeTaskIds": [],
       "productionIntegrationWip": 1,
-      "rule": "Reconcile latest validated seam before dispatch; finish only remaining independent textual TU/CMake ownership boundaries and exact SHA Windows CI. Do not count old refactor cycles or duplicate completed tasks; leave user HMD results separate."
+      "rule": "Inspect remote HEAD and task work_key lease; perform next independent C P0 FFB integration then P1 structural then P2 XR per-eye then P3 native 120fps; hardware only gates acceptance. DX11 A active concurrently, DXVK B frozen."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -86,19 +84,17 @@
       "endOfCycleGate": "Scan actionable states and continue useful independent work until only HMD gates, active immutable CI, ownership conflict, or hard capability blockers remain."
     },
     "exclusiveFocus": {
-      "enabled": true,
-      "mode": "DX9EX_R84_PRODUCTION_CONVERGENCE",
+      "enabled": false,
+      "mode": "HISTORICAL_R84_EXCLUSIVE_SUPERSEDED",
       "lane": "DX9EX",
       "branch": "vr-d3d9ex-focus",
-      "track": "R84_REMAINING_TU_COMPILE_OWNERSHIP_CLEANUP",
+      "track": "R84_REMAINING_SEAMS_AS_P1",
       "frozenTracks": [
-        "ARCH_V3",
-        "DX9EX_GENERAL_PERF_TUNING",
         "DXVK",
-        "HMD_MATRIX"
+        "DX12"
       ],
-      "reopenRule": "Resume R84/architecture/performance only after the P0 visual-composition verifier and canonical exact-SHA DX9Ex gates are green. HMD reopens only after static completion.",
-      "reason": "User 2026-10-09: F11 is normal; prioritize finishing structural improvement. Previously proven R84 Gate0 and Inventory must be reconciled as DONE, not repeated. Do not claim all-screen HMD success."
+      "reopenRule": "No exclusive lane freeze; source P0-P3 active, HMD gates only acceptance.",
+      "reason": "2026-10-10 A/C parallel policy supersedes exclusive R84"
     },
     "architectureV3Transition": {
       "enabled": true,
@@ -108,7 +104,7 @@
       "firstMigrationItem": "ARCH-V3-001",
       "autoTransition": true,
       "rule": "Keep DX9Ex stabilization authoritative until ARCH-V3-GATE-001 is satisfied by exact Quest3/VDXR baseline evidence. Then D promotes ARCH-V3-001 to READY and executes ARCH-V3-001..008 in dependency order. IPC v2 remains live authority until staged v3 cutover evidence permits promotion.",
-      "downstreamPortGate": "Do not automatically reopen DX11 Native or DXVK before ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 legacy-retirement/handoff readiness.",
+      "downstreamPortGate": "DX9Ex live IPC v3 promotion gated by exact HMD; independent DX11 A continues, DXVK B remains user-frozen.",
       "precondition": "Complete DX9EX-R84 production convergence closeout first, then satisfy ARCH-V3-GATE-001 with exact Quest3/VDXR baseline evidence."
     },
     "r84ProductionConvergence": {
@@ -122,6 +118,38 @@
       "cycleTargetAuthoritative": false,
       "requiredCloseout": "SUPERSEDED_BY_DX9EX_FOCUS",
       "closeoutStatus": "INCOMPLETE_PENDING_R32_R31_TU_AND_CMAKE_CLEANUP"
+    },
+    "executionAuthority": {
+      "effective": "2026-10-10",
+      "priorityDocument": "docs/DX9EX_AUTODEV_PRIORITY_20261010.md",
+      "roles": {
+        "A": {
+          "backend": "DX11_NATIVE",
+          "branch": "vr-dx11-native-r71",
+          "status": "ACTIVE",
+          "globalPriority": 0
+        },
+        "C": {
+          "backend": "DX9EX",
+          "branch": "vr-d3d9ex-focus",
+          "status": "ACTIVE",
+          "effortTargetPercent": 50
+        },
+        "B": {
+          "backend": "DXVK",
+          "branch": "vr-dxvk-r71-disasm",
+          "status": "FROZEN"
+        }
+      },
+      "dx9exPriority": [
+        "P0_FFB_V0_2_INTEGRATION",
+        "P1_R84_STRUCTURAL",
+        "P2_XR_PER_EYE_RESOLUTION",
+        "P3_NATIVE_120FPS"
+      ],
+      "protectedBaseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+      "hmdScope": "DX9EX_RUNTIME_ACCEPTANCE_NOT_DX11_SOURCE_GATE",
+      "autoThawDxvk": false
     }
   },
   "candidateWip": {
@@ -196,9 +224,9 @@
         "asset analyzer packaged",
         "DX9Ex Active + Domain Isolation + HUD Inspector green"
       ],
-      "nextAction": "After R84 structural closure, resume independent P0 visual GOAL/+TIME/lens/marker work. Do not confuse F11 user PASS or source-only CI with complete visual acceptance.",
+      "nextAction": "Independent C optical source fixes may proceed while retaining P0-P3 direction and known-good runtime guards.",
       "blockedBy": "USER_PRIORITIZED_R84_PRODUCTION_CONVERGENCE",
-      "blockReason": "2026-10-09 user explicitly prioritized finishing R84 structural improvements. Existing P0 visual defects are preserved in regression ledger; not resolved or deleted."
+      "blockReason": "Optical HMD acceptance only, not a global source freeze. Preserve proven regressions and exact HMD user evidence."
     },
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
@@ -457,7 +485,7 @@
         "Post-copy SHA256 verification detects installation mismatch.",
         "Hosted synthetic-PE contract test covers DXVK SAFE, DXVK MULTIVIEW and x64-provider rejection."
       ],
-      "nextAction": "No action in the DX9Ex stabilization project. Resume Quest3/VDXR DXVK SAFE validation only after the stable DX9Ex reference is accepted or the user explicitly reopens downstream porting.",
+      "nextAction": "No DXVK development/build/distribution/promotion until explicit user reopening.",
       "validationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
       "providerReleaseTag": "v3.1.1",
       "providerSourceCommit": "b1a1c99ab52b687cf950d62c88bc2fa316b41663",
@@ -473,7 +501,7 @@
         "Packaged selector activated DXVK_X86_SAFE and installed a d3d9.dll whose SHA256 exactly matches the pinned provider identity.",
         "SAFE package contains no multiviewpatcher.dll."
       ],
-      "blockReason": "Deferred by user direction on 2026-09-30: stabilize DX9Ex first, then use this already build-verified DXVK SAFE work as downstream port evidence."
+      "blockReason": "2026-10-08 user DXVK B FROZEN regardless of DX9Ex/ARCH-V3 completion."
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",
@@ -504,7 +532,7 @@
       "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence.",
       "parallelIndependent": true,
       "blockedByHud": false,
-      "nextAction": "Resume after DX9EX-R84 production convergence closeout unless this item becomes a concrete blocker or regression for a convergence seam.",
+      "nextAction": "P3 independent C source instrumentation only after P0-P2 or while higher stages await hardware; never claim native 120FPS without Quest3/VD High/4070 measurement.",
       "blockedBy": "DX9EX-R84-PRODUCTION-CONVERGENCE"
     },
     {
@@ -590,7 +618,7 @@
       "priority": 1,
       "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "DXVK/multiview/DX12 implementation/build/smoke is re-enabled. Release/promotion matrix remains gated until backend parity with protected R51 is demonstrated.",
+      "summary": "HISTORICAL DXVK/DX12 reactivation plan, not executable under 2026-10-10 DXVK B FROZEN and DX12 reference-only.",
       "testLevel": "LEVEL4",
       "dependencies": [
         "DXVK-REACTIVATE-001",
@@ -599,7 +627,7 @@
       ],
       "attempts": 0,
       "runtimeCandidate": false,
-      "blockReason": "Development/build/smoke is allowed; only release/promotion is blocked pending Quest3/VDXR parity with the protected R51 baseline."
+      "blockReason": "DXVK B frozen until explicit user decision; prior release matrix auto-unlock invalid."
     },
     {
       "id": "ARCH-V3-GATE-001",
@@ -713,7 +741,7 @@
       ],
       "runtimeCandidate": false,
       "blockReason": "Requires ARCH-V3-007 USER_RUNTIME_VERIFIED.",
-      "nextAction": "Remove semantic reserved[] transport use and duplicate ownership paths, retain v3 ABI/regression gates, then reopen DX11/DXVK porting on the common interfaces."
+      "nextAction": "DX9Ex live IPC handoff only after own HMD proof. Independent DX11 A ACTIVE; DXVK B remains FROZEN."
     },
     {
       "id": "DX9EX-R84-PORT-GATE0-00505",
