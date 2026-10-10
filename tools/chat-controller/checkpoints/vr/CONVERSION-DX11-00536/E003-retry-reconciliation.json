@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "kind": "chat_worker_reconciliation",
+  "task_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "target_branch": "vr-dx11-native-r71",
+  "observed_target_head": "9f27f5f664b34793e7aa4abf323717876ac25841",
+  "original_material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "original_work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+  "original_material_commit_has_required_marker": true,
+  "existing_record_path": "docs/automation/runs/CONVERSION-DX11-00536.json",
+  "exact_backend_gate": {
+    "run_id": 38048751349,
+    "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "conclusion": "failure",
+    "validate_job": {
+      "id": 114203448745,
+      "conclusion": "success"
+    },
+    "readiness_smoke_job": {
+      "id": 114204079683,
+      "conclusion": "failure",
+      "failed_step": "Run DX11 constant buffer probe"
+    }
+  },
+  "accepted_scoped_proofs": {
+    "R239_STATIC": "PASS",
+    "R239_BUILD": "PASS",
+    "R239_GPU_INDEX16_INDEX32": "PASS"
+  },
+  "inherited_failure": {
+    "key": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "owner_task": "CONVERSION-DX11-00477",
+    "owner_conflict_paths": [
+      "tools/dx11_constant_buffer_probe.cpp",
+      "src/vr/d3d11/pipeline_translation.cpp"
+    ],
+    "note": "Generated, direct and constant VS produce identical bad BGRA; solid-PS fixture passes. Repeated identical R239 revision cannot fix unrelated R175."
+  },
+  "controller_reconciliation": {
+    "decision": "BLOCKED_INHERITED_FAILURE_NO_DUPLICATE",
+    "feature_ready": false,
+    "task_material_already_committed": true,
+    "new_material_commit": false,
+    "new_feature_branch": false,
+    "c0": "PASS: HEAD, task run, checkpoint, exact failed Gate and owner verified",
+    "c1": "PASS: R175 remains reserved to independent 00477 continuation; R239 already achieved scoped acceptance",
+    "c2": "NOT_REPEATED: task source work already committed at original SHA; no new safe nonconflicting fix to inherited Gate",
+    "c3": "REUSED_EXISTING: exact Gate fails R175 only, no retry on unchanged SHA",
+    "c4": "NO_NEW_TARGET_WRITE: feature-based policy prohibits premature target push; avoid bogus bookkeeping-only material",
+    "c5": "NOT_REQUIRED",
+    "c6": "BLOCKED: owner conflict; resume only after fenced release and material root-cause change; controller should stop repeat dispatch of 00536 and allocate separately authorized disjoint live-game-draw integration",
+    "score_change": 0,
+    "next_action": "Reconcile 00477 owner/fencing and assign different conflict-free feature under a newly authorized task, or wait for genuine R175 source fix and resulting new material SHA before re-evaluating full Gate. Do not claim 00536 PASS.",
+    "runtime_validation": "UNTESTED",
+    "automation_validation": "FAIL"
+  }
+}
