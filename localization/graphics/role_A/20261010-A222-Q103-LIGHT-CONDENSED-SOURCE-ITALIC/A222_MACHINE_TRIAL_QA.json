@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "run": "A222",
+  "run_key": "OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200",
+  "role": "A",
+  "queue_index": 103,
+  "triage": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"MATERIAL_REWORK\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 103,\n      \"path\": \"textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds\",\n      \"current_status\": \"c1_20261010_q103_rework_required_source_family_stroke_overweight\",\n      \"next_action\": \"MATERIAL_REWORK\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Current candidate has an actionable defect; rebuild the failed source-style stage\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
+  "independent_C1_rework": "OUTRUN-KOR-C1-Q103-A197-FAMILY-WEIGHT-REJECT-20261010-1110",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_bbox": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "source_family": {
+    "en": "Normal Balance",
+    "ko": "일반 밸런스",
+    "english_font": "medium-light condensed right-italic",
+    "en_source_color": [
+      143,
+      137,
+      84
+    ]
+  },
+  "old_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "new_trial_sha256": "a6959102af3392a9a057ad660b282f3c1761516b8aa12ae5077514e87c0b2a07",
+  "trial_dds_path": "localization/graphics/role_A/20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC/A222_Q103_LIGHT_RIGHT_ITALIC_UNPROMOTED.dds",
+  "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+  "font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "font_face_index": 1,
+  "font_coverage": true,
+  "method_change": "A197 Bold 68px block => licensed native Noto Sans CJK Regular 65px no stroke, actual glyph counters preserved; 0.265 top-right slant without width-image resizing; 4px tracked native glyphs; RGB sampled original.",
+  "output_bbox": [
+    1443,
+    1974,
+    1768,
+    2034
+  ],
+  "output_margins": [
+    32,
+    33,
+    6,
+    6
+  ],
+  "letters_layer_only": true,
+  "clean_plate_type": "OPAQUE_GRADIENT_SOURCE_PLATE_PRESERVED",
+  "full_other_atlas_preservation": true,
+  "changed_rgba_pixels_vs_A197": 9049,
+  "changed_bytes": 27145,
+  "outside_source_bbox_changed_rgba": 0,
+  "outside_source_bbox_changed_alpha": 0,
+  "source_glyph_size_limit": true,
+  "raw_y_mirror": true,
+  "source_clean_final_images": "SOURCE/CLEAN/OLD/TRIAL native, black/gray/white100/75/50, RAW, lettering transparent",
+  "native": [
+    2048,
+    2048
+  ],
+  "DDS": "RGBA32 mip1",
+  "firstlook": "PENDING_CONTROLLER_VISUAL",
+  "producer_scope": "SINGLE_NORMAL_BALANCE_LABEL_TRIAL_UNPROMOTED",
+  "hd_candidates_changed": false,
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "C1": "FRESH_INDEPENDENT_REQUIRED",
+  "C3": "NOT_RUN",
+  "user_ingame": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
