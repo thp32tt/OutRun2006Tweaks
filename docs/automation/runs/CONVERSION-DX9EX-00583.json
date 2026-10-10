@@ -13,9 +13,9 @@
   "result_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00583]",
   "work_key": "DX9EX:P1:SDL_TERMINAL_HOTPLUG_FENCE",
-  "status": "WAIT_EXACT_SHA_CI",
-  "controller_terminal": false,
-  "retry_allowed": true,
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
   "changed_paths": [
     "src/input_manager.hpp",
     "tools/verify_vr_ffb_controller_routing.py"
@@ -28,34 +28,34 @@
   },
   "ci_results": [
     {
-      "gate": "policy",
-      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "gate": "dx9ex_active",
+      "id": 38038968852,
+      "head_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
       "conclusion": "success",
-      "run_id": 38038968852
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
     },
     {
       "gate": "domain_isolation",
-      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "id": 38038968893,
+      "head_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+      "conclusion": "success"
+    },
+    {
+      "gate": "full_source_impact",
+      "id": 38038968844,
+      "head_sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
       "conclusion": "success",
-      "run_id": 38038968893
-    },
-    {
-      "gate": "source_cross_domain",
-      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
-      "conclusion": "success",
-      "run_id": 38038968844
-    },
-    {
-      "gate": "game_host_full_chain",
-      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
-      "conclusion": "in_progress",
-      "run_id": 38038968852
-    },
-    {
-      "gate": "msvc_static_analysis",
-      "sha": "0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
-      "conclusion": "in_progress",
-      "run_id": 38038968844
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game"
+      ]
     }
   ],
   "static_validation": "PASS: 4 injected lifetime mutants rejected within VR FFB routing verifier exact-SHA policy job",
@@ -77,6 +77,20 @@
     "dxvk": "FROZEN",
     "localization": "UNMODIFIED"
   },
-  "score_applied": false,
-  "note": "This preliminary durable record is not C6 completion. Exact source SHA is pinned independently of the bookkeeping HEAD. Finalize after the running CI results."
+  "score_applied": true,
+  "note": "Exact source SHA was validated by all three success workflows. This JSON is C6 documentation only; RUNTIME_VALIDATION remains UNTESTED, never a Quest3 or wheel-hardware acceptance.",
+  "automation_validation": "PASS_EXACT_SHA",
+  "package": {
+    "artifact_id": 11664663025,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-0d8f92a2c31fcc8d90bfdc15c65f5d93b42184cd",
+    "digest": "sha256:db710c1705978b43fc304f251e8116b8cd9aac03cef713bf9d64f4092660d6db",
+    "hmd_approved": false
+  },
+  "score": {
+    "previous": 1088,
+    "delta": 1,
+    "accumulated": 1089,
+    "run_key": "CONVERSION-DX9EX-00583",
+    "scoreboard_commit": "cfe0d8f34c17d894b007e983ac997837e4c56c87"
+  }
 }
