@@ -311,44 +311,78 @@
       "region": "players",
       "view": "BLACK",
       "scale": 50
-    }
-  ],
-  "unpublished_views": [
+    },
     {
       "path": "C1_Q225_game_lobby_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "a9857f02ef1fc1a5e7973e67eef4c4e3a2777427cb5bf6ad6cac98312511c446",
+      "bytes": 17054,
+      "region": "game_lobby",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_game_list_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "c56d3870d9572d17e2587998f2b8991b507dd8259ce2cbb520e96146231ad929",
+      "bytes": 14842,
+      "region": "game_list",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_setup_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "a36ddf7d6c9ae4becb6c9712c718a2392447b4236cad4ee4ef826ca68908d5d4",
+      "bytes": 1216,
+      "region": "setup",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_course_type_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "798a8aff04221c5d46f351c2a893bb5d64a450841a1e5125f1bf2c2bba87dbf7",
+      "bytes": 11987,
+      "region": "course_type",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_course_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "2a5ccc4450048f9f939d9758b01ef0e28ee54f49d05cb94eda9c324e92da8895",
+      "bytes": 7649,
+      "region": "course",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_car_type_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "d33945a2df564a67672b8677ae413c73d4ba08ea3747694641e4fa096444f0e9",
+      "bytes": 10468,
+      "region": "car_type",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_catch_up_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "a549fdaab290723c482be4e45a6a82d4ef5a0496cf0b2d6009c810d5e73e682d",
+      "bytes": 9569,
+      "region": "catch_up",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_collision_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "6156c32334dd566229b171577806719d27a54b6008d374bc4b2d4778025620db",
+      "bytes": 8814,
+      "region": "collision",
+      "view": "WHITE",
+      "scale": 75
     },
     {
       "path": "C1_Q225_players_WHITE.png",
-      "publication": "NOT_GITHUB_PERSISTED; excluded from approval evidence"
+      "sha256": "92673d261c7f4a969ad4343cea314cfcf81e1cbe63ba19cceaec1b9ffc926217",
+      "bytes": 9868,
+      "region": "players",
+      "view": "WHITE",
+      "scale": 75
     }
   ],
   "kind": "NEW_INDEPENDENT_SOURCE_TO_CLEAN_PER_REGION_ALPHA_PROOF",
@@ -360,6 +394,8 @@
     "source_clean_changed_outside_original_bboxes": 0,
     "clean_final_changed_outside_original_bboxes": 0,
     "black_50_gray_100_persisted": true,
-    "white_75_persisted": false
-  }
+    "white_75_persisted": true,
+    "total_saved_png": 27
+  },
+  "publication": "27 of 27 newly produced SHA256-pinned GRAY100 BLACK50 WHITE75 SOURCE/CLEAN/FINAL PNG contact assets committed to same branch; RAW native verified independently (previous C298 RAW evidence reused by reference)"
 }
