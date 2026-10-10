@@ -41,19 +41,19 @@ jobs:
 
       # These are source/CI acceptance guards, not live game/HMD success.
       # Each gate must be individually visible to FEATURE acceptance tooling.
-      - name: Feature acceptance: DX11-LIVE-CALLSITE
+      - name: "Feature acceptance: DX11-LIVE-CALLSITE"
         shell: pwsh
         run: python tools/verify_dx11_first_game_frame_boundary.py
 
-      - name: Feature acceptance: DX11-NATIVE-DRAW
+      - name: "Feature acceptance: DX11-NATIVE-DRAW"
         shell: pwsh
         run: python tools/verify_dx11_first_game_frame_boundary.py
 
-      - name: Feature acceptance: DX11-VISIBLE-FRAME
+      - name: "Feature acceptance: DX11-VISIBLE-FRAME"
         shell: pwsh
         run: python tools/verify_dx11_first_game_frame_boundary.py
 
-      - name: Feature acceptance: DX11-SAFE-RETURN
+      - name: "Feature acceptance: DX11-SAFE-RETURN"
         shell: pwsh
         run: python tools/test_dx11_first_game_frame_regressions.py
 
