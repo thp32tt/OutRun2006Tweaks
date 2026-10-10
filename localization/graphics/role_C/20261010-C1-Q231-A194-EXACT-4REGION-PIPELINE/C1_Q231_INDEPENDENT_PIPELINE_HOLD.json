@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "shard": "ODD",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "index": 231,
+  "review_id": "C1-20261010-Q231-A194-4REGION-PIPELINE-1722",
+  "run_key": "OUTRUN-KOR-C1-Q231-A194-INDEPENDENT-4REGION-BGRA-CLEAN-20261010-1722",
+  "time_kst": "2026-10-10 17:22 KST",
+  "reviewer": "ChatGPT AI1; independent C3 reviewer not claimed",
+  "material": "VERIFY_EXISTING_SHA_EVIDENCE_ONLY_NO_NEW_DDS",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+  "verified_identity": {
+    "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 Release/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "clean_sha256": "1e1c5f5472a4c69b1c16392073c35ac26aa7b4e2e734ca759b811bbf4da0926a",
+    "mask_sha256": "1f9984e3f90f88e3e1e794f0061e219baa1e197f24ea126e04a01e2e14f3a8b8",
+    "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+    "source_header": "2048x1024 BGRA32 one mip RAW mirror-Y",
+    "candidate_header": "2048x1024 BGRA32 one mip RAW mirror-Y",
+    "source_candidate_exact_sha_verified": true
+  },
+  "machine_report": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_EXACT_PIPELINE_MACHINE.json",
+  "plate_only": {
+    "result": "PASS_SCOPED_MACHINE_AND_VISUAL",
+    "source_to_clean_changed_RGBA": 121288,
+    "changed_outside_four_source_bboxes_RGBA": 0,
+    "alpha_outside": 0,
+    "original_text_mask_covered": 121288,
+    "source_mask_uncleared": 0,
+    "clean_alpha_in_all_4_source_bboxes": 0
+  },
+  "composite_only": {
+    "result": "PASS_SCOPED_MACHINE_AND_VISUAL",
+    "clean_to_persisted_final_changed_RGBA": 90590,
+    "changed_outside_four_source_bboxes_RGBA": 0,
+    "alpha_outside": 0
+  },
+  "source_final": {
+    "result": "PASS_SCOPED_MACHINE",
+    "changed_RGBA": 140523,
+    "changed_outside_RGBA": 0,
+    "changed_outside_alpha": 0,
+    "preserved_LAN_source_art": true
+  },
+  "bug_prevented": "Initial naive DDS BGRA to PNG RGBA comparison produced false 29151 outside changes. Explicit per-pixel BGRA->RGBA reorder [2,1,0,3] fixed this: authoritative outside all 0. Do not report false protected damage.",
+  "regions": {
+    "help_online": {
+      "source_bbox": [
+        7,
+        371,
+        1446,
+        437
+      ],
+      "candidate_bbox": [
+        9,
+        376,
+        1441,
+        431
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_removed_rgba": 35514,
+      "composite_added_rgba": 38778,
+      "checks": {
+        "slant": {
+          "result": "HOLD_MEASUREMENT",
+          "observation": "Source/final appear near-upright in native imagery; top-minus-bottom glyph anchors not independently measured, no calibrated numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_SOURCE_GRAY100.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Source glyph pixels are erased in exact English bbox and CLEAN alpha=0; no visible outline/plate seam, protected art unchanged outside union.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_CLEAN_GRAY100.png"
+        },
+        "style": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "Original Play OutRun Online... dark condensed upright full row; Korean 아웃런 온라인에서 친구나 다른 플레이어와 함께 플레이하세요! dark solid without doubled edge; near source extent; clean transparent",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_GRAY100.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_50_NOT_GAME",
+          "observation": "Native and practical black background at 50% legible for this segment, not a game capture.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_BLACK50.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "No directly observed Hangul tofu, clipped syllable or double-stroke in reviewed lossless region.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_GRAY100.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Across all 4 native original glyph bboxes, source->CLEAN, CLEAN->final and SOURCE->final independently had exactly 0 changed RGBA/alpha outside union; preserved LAN-specific original elements outside target cells.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_SOURCE_GRAY100.png"
+        },
+        "placement": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Current nonzero alpha box within original source box with positive margins; bounds: 9,376,1441,431",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_GRAY100.png"
+        },
+        "orientation": {
+          "result": "PASS_STATIC_SCOPED",
+          "observation": "DDS RAW mirrored vertically; FLIP-Y native readable. No actual game texture loader validation.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/FINAL_RAW_GRAY_50.png"
+        }
+      }
+    },
+    "help_lan": {
+      "source_bbox": [
+        2,
+        531,
+        1122,
+        597
+      ],
+      "candidate_bbox": [
+        4,
+        536,
+        957,
+        591
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_removed_rgba": 26651,
+      "composite_added_rgba": 24453,
+      "checks": {
+        "slant": {
+          "result": "HOLD_MEASUREMENT",
+          "observation": "Source/final appear near-upright in native imagery; top-minus-bottom glyph anchors not independently measured, no calibrated numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_SOURCE_GRAY100.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Source glyph pixels are erased in exact English bbox and CLEAN alpha=0; no visible outline/plate seam, protected art unchanged outside union.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_CLEAN_GRAY100.png"
+        },
+        "style": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "Join or Create a LAN game of OutRun! dark condensed; Korean 아웃런 LAN 게임에 참가하거나 만드세요! dark single face; no apparent clipping, preserved separate LAN emblem art",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_GRAY100.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_50_NOT_GAME",
+          "observation": "Native and practical black background at 50% legible for this segment, not a game capture.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_BLACK50.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "No directly observed Hangul tofu, clipped syllable or double-stroke in reviewed lossless region.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_GRAY100.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Across all 4 native original glyph bboxes, source->CLEAN, CLEAN->final and SOURCE->final independently had exactly 0 changed RGBA/alpha outside union; preserved LAN-specific original elements outside target cells.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_SOURCE_GRAY100.png"
+        },
+        "placement": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Current nonzero alpha box within original source box with positive margins; bounds: 4,536,957,591",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_GRAY100.png"
+        },
+        "orientation": {
+          "result": "PASS_STATIC_SCOPED",
+          "observation": "DDS RAW mirrored vertically; FLIP-Y native readable. No actual game texture loader validation.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/FINAL_RAW_GRAY_50.png"
+        }
+      }
+    },
+    "online_big": {
+      "source_bbox": [
+        6,
+        867,
+        640,
+        1012
+      ],
+      "candidate_bbox": [
+        8,
+        874,
+        369,
+        1004
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_removed_rgba": 49596,
+      "composite_added_rgba": 22876,
+      "checks": {
+        "slant": {
+          "result": "HOLD_MEASUREMENT",
+          "observation": "Source/final appear near-upright in native imagery; top-minus-bottom glyph anchors not independently measured, no calibrated numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_SOURCE_GRAY100.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Source glyph pixels are erased in exact English bbox and CLEAN alpha=0; no visible outline/plate seam, protected art unchanged outside union.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_CLEAN_GRAY100.png"
+        },
+        "style": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "ONLINE large solid red with no displaced bevel; 온라인 large solid red single face, no double offset/pink rail, natural shorter Korean",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_GRAY100.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_50_NOT_GAME",
+          "observation": "Native and practical black background at 50% legible for this segment, not a game capture.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_BLACK50.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "No directly observed Hangul tofu, clipped syllable or double-stroke in reviewed lossless region.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_GRAY100.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Across all 4 native original glyph bboxes, source->CLEAN, CLEAN->final and SOURCE->final independently had exactly 0 changed RGBA/alpha outside union; preserved LAN-specific original elements outside target cells.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_SOURCE_GRAY100.png"
+        },
+        "placement": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Current nonzero alpha box within original source box with positive margins; bounds: 8,874,369,1004",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_GRAY100.png"
+        },
+        "orientation": {
+          "result": "PASS_STATIC_SCOPED",
+          "observation": "DDS RAW mirrored vertically; FLIP-Y native readable. No actual game texture loader validation.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/FINAL_RAW_GRAY_50.png"
+        }
+      }
+    },
+    "online_small": {
+      "source_bbox": [
+        1298,
+        949,
+        1560,
+        1011
+      ],
+      "candidate_bbox": [
+        1300,
+        951,
+        1454,
+        1008
+      ],
+      "clean_alpha_nonzero": 0,
+      "source_removed_rgba": 9527,
+      "composite_added_rgba": 4483,
+      "checks": {
+        "slant": {
+          "result": "HOLD_MEASUREMENT",
+          "observation": "Source/final appear near-upright in native imagery; top-minus-bottom glyph anchors not independently measured, no calibrated numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_SOURCE_GRAY100.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED",
+          "observation": "Source glyph pixels are erased in exact English bbox and CLEAN alpha=0; no visible outline/plate seam, protected art unchanged outside union.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_CLEAN_GRAY100.png"
+        },
+        "style": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "ONLINE dark smaller block upright; 온라인 dark block, legible but shorter, no extra outline",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_GRAY100.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_50_NOT_GAME",
+          "observation": "Native and practical black background at 50% legible for this segment, not a game capture.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_BLACK50.png"
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED_VISUAL",
+          "observation": "No directly observed Hangul tofu, clipped syllable or double-stroke in reviewed lossless region.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_GRAY100.png"
+        },
+        "protected_art": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Across all 4 native original glyph bboxes, source->CLEAN, CLEAN->final and SOURCE->final independently had exactly 0 changed RGBA/alpha outside union; preserved LAN-specific original elements outside target cells.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_SOURCE_GRAY100.png"
+        },
+        "placement": {
+          "result": "PASS_MACHINE_SCOPED",
+          "observation": "Current nonzero alpha box within original source box with positive margins; bounds: 1300,951,1454,1008",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_GRAY100.png"
+        },
+        "orientation": {
+          "result": "PASS_STATIC_SCOPED",
+          "observation": "DDS RAW mirrored vertically; FLIP-Y native readable. No actual game texture loader validation.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/FINAL_RAW_GRAY_50.png"
+        }
+      }
+    }
+  },
+  "source_style_profile": "Condensed upright gray/help, flat red ONLINE and smaller upright gray ONLINE. Per-glyph measured slant/palette-luminance reference and blind calibration outstanding.",
+  "calibration": {
+    "known_defect_blind_calibration_completed": false,
+    "pixels_before_producer_verdict": false,
+    "why": "Producer A194 and C303 notes were already reviewed; no fabricated blind reference/score."
+  },
+  "C1": "HOLD_STRICT_RECHECK",
+  "reason_codes": [
+    "MISSING_BLIND_DEFECT_CALIBRATION",
+    "SOURCE_FAMILY_ANCHOR_MEASUREMENT_PENDING",
+    "C3_INDEPENDENT_STAGE_MISSING"
+  ],
+  "new_independent_evidence": "First native independent actual SOURCE/CLEAN/SAVED DDS full four-region per-channel BGRA-normalized pixel and alpha audit, beyond C303 producer-JPG only.",
+  "same_candidate_sha_prior_review": "C303 historical visual HOLD; same bytes are NOT a new candidate/C PASS; new machine and 26 SHA-bound PNG proof only.",
+  "C_PASS": false,
+  "C3": "NOT_RUN",
+  "approval": "BLOCKED",
+  "PRE_INGAME": "BLOCKED",
+  "IGR": null,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS_count": 0,
+  "official_candidate_changed": false,
+  "consumer_proof": "Source-to-persisted-byte verified; asset load, atlas selection, in-game composition, user acceptance NOT_TESTED",
+  "backend": "GitHub connector source-of-truth, local container DNS failed on source fetch; N100 MCP bounded raw DDS decode/PNG generation fallback; source and official candidate downloaded with exact SHA; no N100 Git mutation",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "evidence_png": {
+    "FINAL_RAW_GRAY_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/FINAL_RAW_GRAY_50.png",
+      "sha256": "ae2d5899b54b965ad7f9a866bc10a9af1885b4ca73ab4bda2e0578102e4c1043",
+      "bytes": 40145
+    },
+    "SOURCE_RAW_GRAY_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/SOURCE_RAW_GRAY_50.png",
+      "sha256": "db4eb237342f8811509f1b8693a60a1052719d96c1f5d70765e889e52e561d2a",
+      "bytes": 38873
+    },
+    "help_lan_CLEAN_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_CLEAN_BLACK50.png",
+      "sha256": "4a9045d814cabcd0cc5d64c7ead49f5ae037c12cb9bf0f8c900bfd713385590a",
+      "bytes": 149
+    },
+    "help_lan_CLEAN_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_CLEAN_GRAY100.png",
+      "sha256": "44f3e6cec24e8204c13ffac148a01aed88e3ad4479ecd5f9500e5f02a548943a",
+      "bytes": 480
+    },
+    "help_lan_FINAL_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_BLACK50.png",
+      "sha256": "8265f3c0c153959f579377c224430d546ffa590d7129dd43c2a05381904d4428",
+      "bytes": 11371
+    },
+    "help_lan_FINAL_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_FINAL_GRAY100.png",
+      "sha256": "c3c1b53624568d2a87ad2b0894235a7a798b3ed94d14417a272d5092fc4648a5",
+      "bytes": 10180
+    },
+    "help_lan_SOURCE_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_SOURCE_BLACK50.png",
+      "sha256": "98994a72039935709922b2b0f0712f3bd9045c685b4dfdeec8d63106b09bd521",
+      "bytes": 11387
+    },
+    "help_lan_SOURCE_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_lan_SOURCE_GRAY100.png",
+      "sha256": "3e275257d87eb7571a0c4a945f04e8a72fefe0fc1e26d4ccc2e434dd36a62c5e",
+      "bytes": 10059
+    },
+    "help_online_CLEAN_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_CLEAN_BLACK50.png",
+      "sha256": "3673861970aa859d436bdffeafb6cb01d4843405fb42da0ba86723189d42711e",
+      "bytes": 169
+    },
+    "help_online_CLEAN_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_CLEAN_GRAY100.png",
+      "sha256": "597ff2897a7faf3da66f67f0cd50bd3a7ca692f148705f078e3ca6f3745a76b9",
+      "bytes": 629
+    },
+    "help_online_FINAL_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_BLACK50.png",
+      "sha256": "79ede6680fcd58c472bc62a9f138a96edeaebe398ff8d6e6a3750578e7302263",
+      "bytes": 15494
+    },
+    "help_online_FINAL_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_FINAL_GRAY100.png",
+      "sha256": "aaae1c447c87838656739e0b54e2b57fefe1c19cbf1cc06f8debec3ce219bb08",
+      "bytes": 13648
+    },
+    "help_online_SOURCE_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_SOURCE_BLACK50.png",
+      "sha256": "1494b1d4e10e5dd48a2f206f88eb681813905804a734b01a90f2a0ccf907d7a1",
+      "bytes": 12062
+    },
+    "help_online_SOURCE_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/help_online_SOURCE_GRAY100.png",
+      "sha256": "640300d85c0a6e476b39ee7b5b2e4e6076b88d046edf3de852529a2f23fa579c",
+      "bytes": 11469
+    },
+    "online_big_CLEAN_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_CLEAN_BLACK50.png",
+      "sha256": "c4d1a6d8e8d92980991a4ef51a93046c35ff8ed5a553a731bd7cc3a1eafd9aa1",
+      "bytes": 158
+    },
+    "online_big_CLEAN_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_CLEAN_GRAY100.png",
+      "sha256": "6a364b77db5abe82c445966b70278137c81a4fec778068c024486aaf31676f8f",
+      "bytes": 600
+    },
+    "online_big_FINAL_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_BLACK50.png",
+      "sha256": "fde9eaf525e7f737e854ff734ab1c866b1f6cc1dde056ff1d30880656ab00b71",
+      "bytes": 3916
+    },
+    "online_big_FINAL_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_FINAL_GRAY100.png",
+      "sha256": "7258a4c39796572aade15f00bb4848720bd8744b9c0bf016ed6f92b3f275c25c",
+      "bytes": 5330
+    },
+    "online_big_SOURCE_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_SOURCE_BLACK50.png",
+      "sha256": "85489aa534cd8b4bd9c9e3be525b7af260994d2d7da042b6a14849ddec9f45ae",
+      "bytes": 4738
+    },
+    "online_big_SOURCE_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_big_SOURCE_GRAY100.png",
+      "sha256": "24ed1f32fcba37e61108c6f2b8344fe08ea3c73d78d448d99f3975b612dd4ede",
+      "bytes": 6090
+    },
+    "online_small_CLEAN_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_CLEAN_BLACK50.png",
+      "sha256": "de52eb2ad3b926b1d1aee430036394e7a3ac2fcb5f0bdd2d58b55f2f4fac5212",
+      "bytes": 97
+    },
+    "online_small_CLEAN_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_CLEAN_GRAY100.png",
+      "sha256": "20951d52c6fcd45ac33317fa597a581c3ee32e9f2d8aa41574a6af17a573ee2c",
+      "bytes": 245
+    },
+    "online_small_FINAL_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_BLACK50.png",
+      "sha256": "5c34dcf897b2384451170a307857cf2623b2d7b7e9583efb7d99942fa494e88f",
+      "bytes": 2300
+    },
+    "online_small_FINAL_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_FINAL_GRAY100.png",
+      "sha256": "b3f888aefc395629de5f4e5d6cc43a22de3c1fd85e4a6712143fdc60672fc29b",
+      "bytes": 1994
+    },
+    "online_small_SOURCE_BLACK50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_SOURCE_BLACK50.png",
+      "sha256": "544543c591d22040623b7159d58ddb6cbb7a3218d29f103be3b3f4de4ae5e0b9",
+      "bytes": 2358
+    },
+    "online_small_SOURCE_GRAY100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/evidence/online_small_SOURCE_GRAY100.png",
+      "sha256": "62b3676f67e9b8617b9b9ed5804b41f53130b2546668de10e3a6fe4b39d42c6b",
+      "bytes": 2247
+    }
+  }
+}

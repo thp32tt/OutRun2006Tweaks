@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 17:02:20 KST",
+  "updated_at_kst": "2026-10-10 17:22 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -259,6 +259,26 @@
         "RUNTIME_VALIDATION": "UNTESTED",
         "IGR025": "OPEN",
         "report": "localization/graphics/role_C/20261010-C1-Q219-A217-EXACT-NATIVE-CHROME-REJECT/C1_Q219_CONTROLLER_INDEPENDENT_REWORK.json"
+      },
+      "latest_c1_q231_evidence": {
+        "run_key": "OUTRUN-KOR-C1-Q231-A194-INDEPENDENT-4REGION-BGRA-CLEAN-20261010-1722",
+        "index": 231,
+        "role": "C1",
+        "candidate_sha256": "7344442504e2786140445542671f9236bee4fd173e612f41cbf293ed663c5b76",
+        "same_sha_candidate_no_production": true,
+        "source_clean_changed_rgba": 121288,
+        "clean_final_changed_rgba": 90590,
+        "source_final_changed_rgba": 140523,
+        "source_clean_outside": 0,
+        "clean_final_outside": 0,
+        "source_final_outside": 0,
+        "clean_alpha_nonzero_in_four_source_regions": 0,
+        "lossless_evidence_pngs": 26,
+        "decision": "HOLD_STRICT_RECHECK_PENDING_CALIBRATION_ANCHORS_C3",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "dds_promoted": 0,
+        "independent_C_PASS": 0,
+        "qa": "localization/graphics/role_C/20261010-C1-Q231-A194-EXACT-4REGION-PIPELINE/C1_Q231_INDEPENDENT_PIPELINE_HOLD.json"
       }
     },
     "runtime_text_trace": {
