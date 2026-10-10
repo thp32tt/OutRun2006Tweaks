@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-11T01:00:15.144432+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "record": {
+    "task_id": "CONVERSION-DX11-00537",
+    "production_id": "CONVERSION-DX11-00537",
+    "event_id": "CONVERSION-DX11-00537-E002",
+    "event_type": "retry",
+    "lane": "DX11",
+    "slot": "A",
+    "branch": "vr-dx11-native-r71",
+    "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 1,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-11T00:39:00.868634+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-11T00:39:00.868634+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null,
+    "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+    "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+    "feature_stage": "IMPLEMENTING",
+    "feature_goal": "실제 게임 D3D9 Draw에서 D3D11 출력까지 연결하고 진단 opt-in 테스트 빌드를 제공한다. WARP 전용 프로브는 완료가 아니다.",
+    "feature_contract": {
+      "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+      "lane": "DX11",
+      "work_key": "DX11:FIRST_GAME_DRAW_FRAME",
+      "goal": "실제 게임 D3D9 Draw에서 D3D11 출력까지 연결하고 진단 opt-in 테스트 빌드를 제공한다. WARP 전용 프로브는 완료가 아니다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "DX11-LIVE-CALLSITE",
+          "expected": "Game-authored Draw/DrawIndexed captures live resources with lifetime/reset ownership",
+          "paths": [
+            "src/vr/"
+          ],
+          "ci_step": "Feature acceptance: DX11-LIVE-CALLSITE"
+        },
+        {
+          "id": "DX11-NATIVE-DRAW",
+          "expected": "Live resources, shaders and supported state issue native Draw/DrawIndexed",
+          "paths": [
+            "src/vr/"
+          ],
+          "ci_step": "Feature acceptance: DX11-NATIVE-DRAW"
+        },
+        {
+          "id": "DX11-VISIBLE-FRAME",
+          "expected": "Native draw target reaches game-visible diagnostic frame output",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: DX11-VISIBLE-FRAME"
+        },
+        {
+          "id": "DX11-SAFE-RETURN",
+          "expected": "Unsupported state falls back; input-safe return and default-off diagnostic guard",
+          "paths": [
+            "src/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: DX11-SAFE-RETURN"
+        },
+        {
+          "id": "DX11-TEST-BUNDLE",
+          "expected": "Build real game/host binaries, selector, SHA manifest and log collector",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: DX11-TEST-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "Backend Conversion Gate",
+          "jobs": [
+            "validate",
+            "DX11 readiness smoke probes"
+          ]
+        },
+        {
+          "name": "Build",
+          "jobs": []
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "jobs": []
+        }
+      ],
+      "artifact_prefix": "feature-dx11-first-game-frame-",
+      "policy_blob_sha": "7b61519aa94193a883e86735a9ba4ebacc93f4aa"
+    },
+    "feature_base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "feature_last_head": "77c215781d3ef3d47d15052a86fc8e168397d8f3",
+    "feature_last_real_activity_at": "2026-10-11T00:56:14.868844+09:00"
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
