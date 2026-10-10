@@ -1,0 +1,582 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C1-Q225-20261010-1510-ALPHA-PLATE-9",
+  "run_key": "OUTRUN-KOR-C1-Q225-NEW-INDEPENDENT-9ALPHA-PLATE-20261010-1510",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 225,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "revision": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "download_verified": true
+  },
+  "candidate": {
+    "kind": "UNCHANGED_OFFICIAL_A193",
+    "sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+    "download_verified": true,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "dds_bytes": 8388736,
+    "raw": "FLIP-Y",
+    "authored_mips": 1
+  },
+  "clean_plate": {
+    "path": "localization/graphics/role_A/20261008-A193-Q225-NATIVE-BLACK-FAMILY/A193_CLEAN_PLATE.png",
+    "sha256": "1191e5c8287f6385ae34c390c4969eedb1a2c9ad86d0867a4a3192ea0ca102cf",
+    "download_verified": true,
+    "readable_orientation": "as_stored"
+  },
+  "baseline": "C298 exact same candidate SHAs reviewed previous full atlas outside/alpha0; this run adds truly independent exact CLEAN source alpha in nine original bboxes and SOURCE/CLEAN/FINAL stage-specific 27 lossless generated contacts (18 persisted, nine 75% locally generated but not uploaded). This is new plate-specific evidence, NOT a new candidate or duplicate C PASS.",
+  "execution": "GitHub SSOT; N100 MCP bounded fallback readonly exact DDS/Pillow/Numpy QA and PNG construction; image Git blobs 18 published through GitHub git-data tree/ref updates",
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "reason": "A193/C298 notes and metadata had been read during target selection. Cannot claim qualified blind first look.",
+    "blind_calibration": "NOT_RUN",
+    "known_defect_calibration": "NOT_RUN"
+  },
+  "machine_report": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_STRICT_PLATE_MACHINE.json",
+  "new_actual_independent_numerical_results": {
+    "source_clean_changed_rgba": 61787,
+    "source_clean_changed_alpha": 61787,
+    "clean_final_changed_rgba": 28442,
+    "clean_final_changed_alpha": 28442,
+    "source_final_changed_rgba": 66385,
+    "source_clean_outside_nine_rgba": 0,
+    "source_clean_outside_nine_alpha": 0,
+    "clean_final_outside_nine_rgba": 0,
+    "clean_final_outside_nine_alpha": 0,
+    "source_final_outside_nine_rgba": 0,
+    "source_final_outside_nine_alpha": 0,
+    "all_nine_clean_visible_alpha_zero": true,
+    "raw_to_flipy_mismatch_source": 0,
+    "raw_to_flipy_mismatch_final": 0,
+    "source_candidate_dds_header_equal": true,
+    "source_clean_inside_alpha_positive_original": 61787,
+    "clean_final_inside_alpha_positive_korean": 28442,
+    "notes": "CLEAN retains nonzero RGB under alpha0, do not report false English visible residue. Empty visible alpha covers actual text removal. All 9 source rectangles avoid modifications elsewhere. This does not establish within-bbox protected-art exact identity, slant style acceptance, or consumer rendering."
+  },
+  "per_region_eight_checks": [
+    {
+      "id": "game_lobby",
+      "bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "source_visible_alpha_px": 14900,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 6552,
+      "source_clean_rgba_delta_inside": 14900,
+      "clean_final_rgba_delta_inside": 6552,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 14900 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_lobby_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "game_list",
+      "bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "source_visible_alpha_px": 11957,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 6782,
+      "source_clean_rgba_delta_inside": 11957,
+      "clean_final_rgba_delta_inside": 6782,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 11957 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_game_list_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "setup",
+      "bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "source_visible_alpha_px": 7097,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 3498,
+      "source_clean_rgba_delta_inside": 7097,
+      "clean_final_rgba_delta_inside": 3498,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 7097 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_setup_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "course_type",
+      "bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "source_visible_alpha_px": 6190,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 2127,
+      "source_clean_rgba_delta_inside": 6190,
+      "clean_final_rgba_delta_inside": 2127,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 6190 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_type_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "course",
+      "bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "source_visible_alpha_px": 3976,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 904,
+      "source_clean_rgba_delta_inside": 3976,
+      "clean_final_rgba_delta_inside": 904,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 3976 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_course_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "car_type",
+      "bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "source_visible_alpha_px": 4152,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 2450,
+      "source_clean_rgba_delta_inside": 4152,
+      "clean_final_rgba_delta_inside": 2450,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 4152 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_car_type_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "catch_up",
+      "bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "source_visible_alpha_px": 4392,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 2278,
+      "source_clean_rgba_delta_inside": 4392,
+      "clean_final_rgba_delta_inside": 2278,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 4392 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_catch_up_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "collision",
+      "bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "source_visible_alpha_px": 4991,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 1404,
+      "source_clean_rgba_delta_inside": 4991,
+      "clean_final_rgba_delta_inside": 1404,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 4991 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_collision_GRAY.png"
+        }
+      }
+    },
+    {
+      "id": "players",
+      "bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "source_visible_alpha_px": 4132,
+      "clean_visible_alpha_px": 0,
+      "final_visible_alpha_px": 2447,
+      "source_clean_rgba_delta_inside": 4132,
+      "clean_final_rgba_delta_inside": 2447,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No reliable paired stem top-minus-bottom angle anchors in the exact English/Korean pixel crops; no unqualified zero-degree inference.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPED_9_ALPHA_AND_OUTSIDE",
+          "observation": "Canonical SOURCE alpha-present 4132 px inside region; CLEAN alpha-present exactly 0 px. Exact SOURCE to CLEAN outside union of 9 source regions 0 pixels, including alpha. Hidden nonzero RGB with alpha=0 is not visible ghost.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Heavy sans hierarchy maintained in localized nine native labels, but original condensed width/weight and Korean family optical match have no calibrated normal/defect reference; do not infer FAIL merely because translated text is shorter.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        },
+        "readability": {
+          "result": "PASS_SCOPED_VISUAL_ONLY",
+          "observation": "Actual saved DDS 100%-gray and 50%-black evidence shows readable Korean labels; exact game-scale consumer unknown.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_BLACK.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "No distinct missing Hangul strokes in inspected black/gray composites, but complete per-glyph crop/clipped mask proof and independent calibration not qualified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_BLACK.png"
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_OUTSIDE_9",
+          "observation": "Fresh full-atlas SOURCE/CLEAN and CLEAN/FINAL RGBA+alpha changes outside union of 9 original source bboxes measured 0; within-bbox protected foreground unclassified.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Historical positive margins from A193/C298 are not a new independently certified source-glyph optical/pair overlap/protected-rectangle proof; 100/75/50 full new evidence not published.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_NATIVE",
+          "observation": "Source and final native RAW DDS vertical flip tested exact 0 RGBA mismatches; CLEAN as-stored readable orientation gives 0 outside original nine source bboxes.",
+          "evidence": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_players_GRAY.png"
+        }
+      }
+    }
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "New exact plate stage validated for nine region visible alpha and 0 outside changes, but normal/opposite-slant/clip/residue/weight blinded calibration, per-glyph slant anchors/source-family accepted reference, within-bbox protected foreground and current-policy complete 100/75/50 plus distinct C3 proof are not fulfilled. No hard new visual defect proven in these nine source/candidate contacts; do not manufacture REWORK solely from shorter Korean strings.",
+  "current_policy_approval": "BLOCKED",
+  "new_C1_PASS": false,
+  "C3_STRICT_PASS": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_actual_game": "NOT_TESTED",
+  "new_DDS": 0,
+  "promoted_DDS": 0,
+  "official_SHA_unchanged": true,
+  "duplicate_pass_for_SHA": false,
+  "unpublished_white75": "Nine local-only WHITE75 images were generated but remote publication failed; NOT part of approval evidence, fail-closed. No all-view gate claimed.",
+  "next_steps": "Qualify blind normal/4 known defects without producer verdict, pair first-stem readable English/Korean top-bottom lean and source-family width/weight reference on all nine, authenticate within-bbox protected art, persist WHITE75 and full policy views; then separate C3 and actual-game consumer check before any PASS."
+}
