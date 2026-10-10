@@ -249,6 +249,116 @@ int main() {
     ctx->PSSetShader(ps.Get(),nullptr,0);
     require(exactLinearReady(), "R209 restore exact linear pipeline PS");
 
+
+    // R210: same-device foreign OM DSV defeats an otherwise exact R209
+    // pipeline: depth LESS against 0 discards the actual WARP red pixel.
+    D3D11_TEXTURE2D_DESC depthDesc{};
+    depthDesc.Width=depthDesc.Height=32;
+    depthDesc.MipLevels=depthDesc.ArraySize=1;
+    depthDesc.Format=DXGI_FORMAT_D32_FLOAT;
+    depthDesc.SampleDesc.Count=1;
+    depthDesc.Usage=D3D11_USAGE_DEFAULT;
+    depthDesc.BindFlags=D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> ownDepth, foreignDepth;
+    ComPtr<ID3D11DepthStencilView> ownDsv, foreignDsv;
+    require(SUCCEEDED(dev->CreateTexture2D(&depthDesc,nullptr,
+            ownDepth.GetAddressOf())), "R210 owned depth texture");
+    require(SUCCEEDED(dev->CreateTexture2D(&depthDesc,nullptr,
+            foreignDepth.GetAddressOf())), "R210 alien depth texture");
+    require(SUCCEEDED(dev->CreateDepthStencilView(ownDepth.Get(),nullptr,
+            ownDsv.GetAddressOf())), "R210 owned depth view");
+    require(SUCCEEDED(dev->CreateDepthStencilView(foreignDepth.Get(),nullptr,
+            foreignDsv.GetAddressOf())), "R210 alien same-device depth view");
+    D3D11_DEPTH_STENCIL_DESC depthStateDesc{};
+    depthStateDesc.DepthEnable=TRUE;
+    depthStateDesc.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStateDesc.DepthFunc=D3D11_COMPARISON_LESS;
+    depthStateDesc.StencilEnable=FALSE;
+    ComPtr<ID3D11DepthStencilState> depthState, alienDepthState;
+    require(SUCCEEDED(dev->CreateDepthStencilState(&depthStateDesc,
+            depthState.GetAddressOf())), "R210 owned depth state");
+    ctx->OMSetDepthStencilState(depthState.Get(),0);
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    const auto exactDepthReady = [&] {
+        return outrun::vr::dx11::verified_linear_depth_om_identity_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            ownDsv.Get(),depthState.Get());
+    };
+    require(exactDepthReady(), "R210 exact owned OM DSV and depth state");
+    require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            nullptr,depthState.Get()), "R210 reject absent DSV owner");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE ownedDepthMap{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &ownedDepthMap)) && ownedDepthMap.pData,
+            "R210 map owned-depth WARP pixels");
+    const auto* ownedDepthPixel =
+        static_cast<const unsigned char*>(ownedDepthMap.pData)
+        +16*ownedDepthMap.RowPitch+16*4;
+    const bool ownedDepthRed=ownedDepthPixel[0]==255 &&
+        ownedDepthPixel[1]==0 && ownedDepthPixel[2]==0 &&
+        ownedDepthPixel[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(ownedDepthRed, "R210 owned depth passes real WARP red pixel");
+
+    ctx->OMSetRenderTargets(1,&rawRTV,foreignDsv.Get());
+    ctx->ClearDepthStencilView(foreignDsv.Get(),D3D11_CLEAR_DEPTH,0.f,0);
+    require(exactLinearReady(), "R210 R209 accepts foreign same-device DSV");
+    require(!exactDepthReady(), "R210 reject foreign live OM DSV");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE foreignDepthMap{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &foreignDepthMap)) && foreignDepthMap.pData,
+            "R210 map alien-depth WARP pixels");
+    const auto* foreignDepthPixel =
+        static_cast<const unsigned char*>(foreignDepthMap.pData)
+        +16*foreignDepthMap.RowPitch+16*4;
+    const bool foreignDepthBlack=foreignDepthPixel[0]==0 &&
+        foreignDepthPixel[1]==0 && foreignDepthPixel[2]==0 &&
+        foreignDepthPixel[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(foreignDepthBlack, "R210 alien DSV suppresses real WARP pixel");
+
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    ctx->OMSetDepthStencilState(nullptr,0);
+    require(!exactDepthReady(), "R210 reject unowned depth state");
+    ctx->OMSetDepthStencilState(depthState.Get(),1);
+    require(!exactDepthReady(), "R210 reject different stencil reference");
+    ctx->OMSetDepthStencilState(depthState.Get(),0);
+    depthStateDesc.DepthFunc=D3D11_COMPARISON_ALWAYS;
+    require(SUCCEEDED(dev->CreateDepthStencilState(&depthStateDesc,
+            alienDepthState.GetAddressOf())), "R210 alien depth state");
+    ctx->OMSetDepthStencilState(alienDepthState.Get(),0);
+    require(!exactDepthReady(), "R210 reject different depth state object");
+    ctx->OMSetDepthStencilState(depthState.Get(),0);
+    require(exactDepthReady(), "R210 restore exact depth-state identity");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE restoreDepthMap{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &restoreDepthMap)) && restoreDepthMap.pData,
+            "R210 map restored-depth WARP pixels");
+    const auto* restoreDepthPixel =
+        static_cast<const unsigned char*>(restoreDepthMap.pData)
+        +16*restoreDepthMap.RowPitch+16*4;
+    const bool restoredDepthRed=restoreDepthPixel[0]==255 &&
+        restoreDepthPixel[1]==0 && restoreDepthPixel[2]==0 &&
+        restoreDepthPixel[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(restoredDepthRed, "R210 recovered owned DSV WARP red pixel");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    ctx->OMSetDepthStencilState(nullptr,0);
+
     // R199 independent non-indexed RTV/viewport ownership contract.
     const auto fullTargetReady = [&] {
         return outrun::vr::dx11::verified_linear_full_target_draw_ready(

@@ -117,4 +117,54 @@ namespace outrun::vr::dx11 {
            ps.Get() == expectedPs &&
            rtv.Get() == expectedRtv;
 }
+
+// R210: dormant depth-aware non-indexed Draw additionally seals live OM DSV
+// and depth-stencil state identity. Same-device but foreign depth views may
+// reject pixels while the R209 IA/VS/PS/RTV evidence remains unchanged.
+// Deliberately narrow: only explicit LESS/write-all/no-stencil passes.
+// No game-native Draw dispatch or implicit activation occurs here.
+[[nodiscard]] inline bool verified_linear_depth_om_identity_ready(
+    const NativeLinearBufferMirror& vertexOwner,
+    ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t deviceGeneration,
+    std::uint64_t sourceSnapshotVersion,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState) noexcept {
+    if (!context || !expectedDsv || !expectedDepthState ||
+        !verified_linear_pipeline_identity_ready(
+            vertexOwner, context, startVertex, vertexCount,
+            deviceGeneration, sourceSnapshotVersion,
+            expectedLayout, expectedVs, expectedPs, expectedRtv))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> liveRtv;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> liveDsv;
+    context->OMGetRenderTargets(1, liveRtv.GetAddressOf(), liveDsv.GetAddressOf());
+    if (liveRtv.Get() != expectedRtv || liveDsv.Get() != expectedDsv)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> liveDepthState;
+    UINT stencilRef = ~0u;
+    context->OMGetDepthStencilState(liveDepthState.GetAddressOf(), &stencilRef);
+    if (liveDepthState.Get() != expectedDepthState || stencilRef != 0)
+        return false;
+    D3D11_DEPTH_STENCIL_DESC desc{};
+    expectedDepthState->GetDesc(&desc);
+    if (!desc.DepthEnable || desc.DepthWriteMask != D3D11_DEPTH_WRITE_MASK_ALL ||
+        desc.DepthFunc != D3D11_COMPARISON_LESS || desc.StencilEnable)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, ownerDevice;
+    context->GetDevice(contextDevice.GetAddressOf());
+    if (!contextDevice) return false;
+    expectedDsv->GetDevice(ownerDevice.GetAddressOf());
+    if (ownerDevice.Get() != contextDevice.Get()) return false;
+    ownerDevice.Reset();
+    expectedDepthState->GetDevice(ownerDevice.GetAddressOf());
+    return ownerDevice.Get() == contextDevice.Get();
+}
 } // namespace outrun::vr::dx11

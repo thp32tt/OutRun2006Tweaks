@@ -17,8 +17,8 @@
     "tools/test_dx11_linear_depth_om_r210.py",
     ".github/workflows/backend-conversion-gate.yml:R210"
   ],
-  "status": "ACTIVE",
-  "checkpoint": "C1_REVIEW",
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
   "result_sha": null,
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
@@ -26,25 +26,31 @@
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "summary": "R210 opt-in dormant native non-indexed depth-aware live OM DSV and depth-state exact ownership, independent of R175.",
-  "last_real_activity_at": "2026-10-10T00:19:57.542Z",
-  "last_activity_evidence": "Authenticated branch e94efbe..., 00507 C6 blocked by owned R175; 00508 absent; header/CI/WARP reviewed.",
-  "resume_cursor": "C2_IMPLEMENT_R210",
-  "next_action": "Implement exact live DSV+depth state helper and same-device wrong DSV real WARP counterexample. Commit material with exact Gate.",
+  "last_real_activity_at": "2026-10-10T00:21:12.886Z",
+  "last_activity_evidence": "R210 exact OM DSV and depth-state C++ + WARP alien depth pixels implementation; precommit source checks.",
+  "resume_cursor": "C3_EXACT_SHA_CI",
+  "next_action": "Check Backend Conversion Gate for material commit and record exact job/step outcomes. R175 previously fails independently.",
   "score_change": 0,
   "pipeline": {
     "C0_RECOVER": "PASS: branch e94efbe; 00507 C6 and R175 separate owner; no 00508 run/checkpoint.",
     "C1_REVIEW": "PASS: R209 exact IA/VS/PS/RTV guard leaves bound DSV object and active depth state unauthenticated.",
-    "C2_IMPLEMENT": "PENDING",
-    "C3_VALIDATE": "PENDING",
-    "C4_COMMIT": "PENDING",
+    "C2_IMPLEMENT": "PASS: Added opt-in nonindexed exact OM DSV and DepthStencilState owner with same-device and LESS/write-all/no-stencil fail-closed; no gameplay Draw.",
+    "C3_VALIDATE": "PENDING: targeted R210 static + live WARP probe in exact-SHA GitHub Gate.",
+    "C4_COMMIT": "PENDING: material + exact Gate owner SHA.",
     "C5_PACKAGE": "NOT_REQUIRED_NEED_HMD_TEST",
     "C6_STATE": "PENDING"
   },
-  "changed_paths": [],
+  "changed_paths": [
+    "src/vr/d3d11/native_linear_draw_submit.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_linear_depth_om_r210.py",
+    "docs/automation/runs/CONVERSION-DX11-00508.json"
+  ],
   "evidence": {},
   "blockers": [
     "Quest3/VDXR native gameplay visual test not run; runtime UNTESTED.",
     "R175 independent workflow failure in prior 00507; do not touch its source."
   ],
-  "updated_at_utc": "2026-10-10T00:19:57.542Z"
+  "updated_at_utc": "2026-10-10T00:21:12.886Z"
 }
