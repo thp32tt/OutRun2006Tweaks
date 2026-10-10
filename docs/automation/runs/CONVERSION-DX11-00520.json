@@ -2,16 +2,50 @@
   "task_id": "CONVERSION-DX11-00520",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "d3a479fc4d6f746cf46e70fdfe755fe2c1a85871",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "result_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+  "material_result_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+  "validation_bearing_result_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "summary": "R223 dormant indexed textured R188 native preflight rejects hidden OM UAV outputs; real WARP same-device typed UAV negative and restoration; no game DrawIndexed activation.",
   "evidence": {
     "scope": "R188 texture-only OM UAV; distinct from R219 indexed depth and R222 linear DSV",
     "local_static": "PASS 7 focused source negative mutants and WARP fixture wiring",
-    "ci": "AWAIT_FINAL_EXACT_SHA_GATE"
+    "ci": "AWAIT_FINAL_EXACT_SHA_GATE",
+    "material_commit": "7ad33043764d082ac0f0183d94f664294fba493e",
+    "gate_run_id": 38028218021,
+    "gate_head_sha": "7ad33043764d082ac0f0183d94f664294fba493e",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 114143501262,
+    "validate_conclusion": "success",
+    "dx11_smoke_job_id": 114144327331,
+    "dx11_smoke_conclusion": "failure",
+    "r223_static_step": 53,
+    "r223_static": "success",
+    "r223_warp_build_step": 54,
+    "r223_warp_build": "success",
+    "r223_warp_execute_step": 55,
+    "r223_warp_execute": "success",
+    "r175_failed_step": 85,
+    "r175_failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false,
+    "checkpoint_branch_claim": "cbb42c860ba5252d3bd583e9f4799f84aebd40a3",
+    "checkpoint_branch_progress": "4944b520edb88d6708c4dad959de431071747b22"
   },
   "attempt": "1/3",
   "event_id": "CONVERSION-DX11-00520-E001",
@@ -22,17 +56,34 @@
     "tools/test_dx11_textured_indexed_r188.py"
   ],
   "owner_id": "ChatGPT2:CONVERSION-DX11-00520",
-  "checkpoint": "C4_COMMIT",
-  "status": "WAIT_EXACT_SHA_GATE",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_DEPENDENCY_R175",
   "terminal": false,
   "pipeline": {
-    "C0": "PASS remote claim cbb42c86 and branch head",
-    "C1": "PASS R188 OM UAV gap verified; R187 RTV/DSV preflight already safe",
-    "C2": "PASS one coherent 3-file batch",
-    "C3": "Local static mutation PASS; full exact-SHA CI PENDING",
-    "C4": "MATERIAL_COMMIT_PENDING",
-    "C5": "NOT_REQUIRED dormant backend",
-    "C6": "PENDING full Gate"
+    "C0": "PASS authenticated GitHub HEAD and CAS controller claim cbb42c86",
+    "C1": "PASS R188 hidden OM UAV output missing; R187 already seals RTV/DSV",
+    "C2": "PASS 3-file coherent actual C++ / WARP / static test batch",
+    "C3": "SCOPED_PASS full exact-SHA CI FAIL: validate job114143501262 SUCCESS; smoke job114144327331 R188 steps53-55 SUCCESS; inherited R175 step85 FAIL",
+    "C4": "PASS material 7ad33043764d082ac0f0183d94f664294fba493e",
+    "C5": "NOT_REQUIRED dormant preflight, gameplay native DrawIndexed remains OFF",
+    "C6": "PASS durable exact-SHA scoped-R223 success / full Gate failure / independent R175 blocker recorded"
   },
-  "timestamp_kst": "2026-10-10 14:38:45+09:00"
+  "timestamp_kst": "2026-10-10 14:49:54+09:00",
+  "retry_count": 0,
+  "score_previous_confirmed": 1078,
+  "score_change": 0,
+  "score_new_confirmed": 1078,
+  "score_run_key": "CONVERSION-DX11-00520",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py"
+  ],
+  "blockers": [
+    "Full exact-SHA Backend Conversion Gate 38028218021 failed at independently-owned R175 generic TEXCOORD6 varying: observed BGRA [128,0,16,255] != expected [224,128,32,255]",
+    "R175 tools/dx11_constant_buffer_probe.cpp belongs to CONVERSION-DX11-00477; no bypass, no duplicate source modification under 00520",
+    "Actual Quest3/VDXR HMD runtime not executed"
+  ],
+  "resume_cursor": "WAIT_INDEPENDENT_R175_OWNER_RELEASE",
+  "next_action": "Keep R223 material SHA 7ad33043 as scoped-PASS/full-FAIL diagnostic. Repair R175 only in its authorized owner work_key. Reconcile new exact-SHA full Gate after a legitimate separate material fix, never rerun same unchanged failed SHA. Quest3/VDXR exact build runtime remains UNTESTED."
 }
