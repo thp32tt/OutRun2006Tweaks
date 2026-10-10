@@ -1,0 +1,29 @@
+{
+  "source": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "clean": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "trial": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+  "renderer": "Pillow native OpenType Sans NanumGothicBold",
+  "font": "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
+  "font_sha": "454eb3f503f377782a99eb84fc4bb7dde22a0f075d41b47427737f2985053bc9",
+  "font_size": 153,
+  "glyph": "플래그맨 4",
+  "source_bbox": [
+    8,
+    49,
+    988,
+    204
+  ],
+  "new_bbox": [
+    14,
+    54,
+    720,
+    199
+  ],
+  "color_source": [
+    186,
+    0,
+    0
+  ],
+  "orientation": "RAW_MIRROR_Y",
+  "no_font_raster_rescale": true
+}

@@ -1,0 +1,58 @@
+{
+  "run": "B365",
+  "role": "B",
+  "index": 176,
+  "candidate": "UNAPPROVED_SINGLE_FLAGMAN_ROW",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "clean_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "official_sha256_unchanged": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "trial_sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+  "font_sha256": "454eb3f503f377782a99eb84fc4bb7dde22a0f075d41b47427737f2985053bc9",
+  "font_license": "Ubuntu fonts-nanum packaged open licensed font",
+  "font": "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
+  "font_glyph_coverage": "ALL_VERIFIED",
+  "native_ppem": 153,
+  "renderer": "Pillow FreeType BASIC native no outline no postscale",
+  "method_change": "Replace Noto CJK Bold synthetic 1-3px stroke family with authentic NanumGothicBold native geometric glyph contours and exact red source ink; preserve each glyph counter",
+  "bbox_original": [
+    8,
+    49,
+    988,
+    204
+  ],
+  "bbox_trial": [
+    14,
+    54,
+    720,
+    199
+  ],
+  "native_wh": [
+    2048,
+    2048
+  ],
+  "dds": "RGBA32_MIP1_RAW_MIRROR_Y",
+  "changed_rgba": 80387,
+  "outside_region": 0,
+  "roundtrip_difference": 0,
+  "other_three_labels_unchanged": true,
+  "plate_qa": "SOURCE_PINNED_AND_CLEAN_ALPHA_ZERO_FLAGMAN",
+  "producer_visual": "PENDING_FIRSTHAND_NATIVE",
+  "family_gate": "C2_NEW_PILOT_PENDING",
+  "whole_atlas": "C343_REWORK_UNCHANGED",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_promoted": 0,
+  "new_trial": 1,
+  "evidence": [
+    "B365_SOURCE_CLEAN_OFFICIAL_NANUM_FLIPY_BG128_100.png",
+    "B365_SOURCE_CLEAN_OFFICIAL_NANUM_FLIPY_BG0_75.png",
+    "B365_SOURCE_CLEAN_OFFICIAL_NANUM_FLIPY_BG255_50.png",
+    "B365_SOURCE_CLEAN_OFFICIAL_NANUM_RAW_BG128_100.png"
+  ],
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
