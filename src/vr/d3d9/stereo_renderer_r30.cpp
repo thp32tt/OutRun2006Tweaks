@@ -17,6 +17,7 @@
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R30_R29
 #include "stereo_renderer_r29.cpp"
 #endif
+#include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -1376,7 +1377,7 @@ namespace OutRunVRStereo
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
-            if (!R29StableStereoBase(device) ||
+            if (!R29OwnerStableStereoBase(device) ||
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
                 return false;
 
@@ -2026,7 +2027,7 @@ namespace OutRunVRStereo
             {
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
                 return leftHr;
             }
 
@@ -2057,7 +2058,7 @@ namespace OutRunVRStereo
 
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
-            ++R29StableTwoEyeDraws;
+            R29OwnerNoteStableTwoEyeDraw();
             if (state.worldEffect)
             {
                 ++R30XyzrhwWorldEffectDraws;
@@ -2097,13 +2098,13 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 NoteRestoreFailure("R30.2 XYZRHW right-eye draw");
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
             }
             return leftHr;
         }
@@ -2338,7 +2339,7 @@ namespace OutRunVRStereo
                         0, vb, streamOffset, stride)))
                 {
                     NoteRestoreFailure("R30.6 VB stream restore");
-                    R29ArmMonoSafety();
+                    R29OwnerArmMonoSafety();
                 }
             }
             vb->Release();
@@ -2595,7 +2596,7 @@ namespace OutRunVRStereo
                 if (!restoreOk)
                 {
                     NoteRestoreFailure("R30.6 VB/IB restore");
-                    R29ArmMonoSafety();
+                    R29OwnerArmMonoSafety();
                 }
             }
             ib->Release();
@@ -2743,7 +2744,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, ActualDraw&& actualDraw,
             const char* site)
         {
-            if (!R29StableStereoBase(device))
+            if (!R29OwnerStableStereoBase(device))
                 return E_NOTIMPL;
 
             const R30ScreenSpaceKind screenKind =
@@ -2835,7 +2836,7 @@ namespace OutRunVRStereo
                 {
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback");
-                    R29ArmMonoSafety();
+                    R29OwnerArmMonoSafety();
                     return E_FAIL;
                 }
                 R9UndoStereoDrawCount();
@@ -2862,7 +2863,7 @@ namespace OutRunVRStereo
                 {
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-scissor");
-                    R29ArmMonoSafety();
+                    R29OwnerArmMonoSafety();
                 }
             }
             if (FAILED(leftHr))
@@ -2876,7 +2877,7 @@ namespace OutRunVRStereo
                     site, leftHr);
                 if (!restored)
                     NoteRestoreFailure("R30 HUD left draw c64");
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
                 return leftHr;
             }
 
@@ -2924,7 +2925,7 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
+            R29OwnerNoteStableTwoEyeDraw();
             ++R30ScreenSpaceFovDraws;
 
             if (!R30FirstScreenSpaceLogged)
@@ -2948,13 +2949,13 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 NoteRestoreFailure("R30 HUD right-eye draw");
-                R29ArmMonoSafety();
+                R29OwnerArmMonoSafety();
             }
             return leftHr;
         }
@@ -3102,8 +3103,7 @@ namespace OutRunVRStereo
                 if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
                     R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
 
-                const auto r29 = R29StereoInstallState.load(
-                    std::memory_order_acquire);
+                const auto r29 = R29OwnerInstallStatus();
                 if (r29 == State::Failed)
                 {
                     R30RollbackBufferShadowHooks();
@@ -3545,18 +3545,18 @@ namespace OutRunVRStereo
 
     bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept
     {
-        return R29StableStereoBase(device);
+        return R29OwnerStableStereoBase(device);
     }
 
     bool R30SupportFragileEffectCached(IDirect3DDevice9* device,
         bool& fragile) noexcept
     {
-        return R29FragileEffectCached(device, fragile);
+        return R29OwnerFragileEffectCached(device, fragile);
     }
 
     void R30SupportNoteStableTwoEyeDraw() noexcept
     {
-        R29TelemetryNoteStableTwoEyeDraw();
+        R29OwnerNoteStableTwoEyeDraw();
     }
 
     bool R30SupportOverlayReadyForTransport() noexcept

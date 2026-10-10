@@ -14,6 +14,7 @@
 // a third mono replay.
 
 #include "stereo_renderer_r26.cpp"
+#include "../core/r29_owner_api.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
@@ -656,5 +657,33 @@ namespace OutRunVRStereo
         std::uint64_t throughEpoch) noexcept
     {
         R29MonoSafetyThroughEpoch = throughEpoch;
+    }
+    // Export R29 semantics from their only definition TU. R30 must never
+    // import R29 anonymous-namespace state via textual .cpp inclusion.
+    bool R29OwnerStableStereoBase(IDirect3DDevice9* device) noexcept
+    {
+        return R29StableStereoBase(device);
+    }
+
+    bool R29OwnerFragileEffectCached(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R29FragileEffectCached(device, fragile);
+    }
+
+    void R29OwnerArmMonoSafety(std::uint64_t extraPresents) noexcept
+    {
+        R29ArmMonoSafety(extraPresents);
+    }
+
+    void R29OwnerNoteStableTwoEyeDraw() noexcept
+    {
+        R29TelemetryNoteStableTwoEyeDraw();
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    R29OwnerInstallStatus() noexcept
+    {
+        return R29StereoInstallState.load(std::memory_order_acquire);
     }
 }
