@@ -102,7 +102,7 @@ def check(r29: str, r30: str, header: str) -> None:
                 "R29OwnerTransportIdentity"):
         assert api in header, f"R29 owner header missing: {api}"
         assert api in r30, f"R30 missing lower owner ABI use: {api}"
-    assert not re.search(r"\\bSharedState\\b", r30), "R30 still owns lower shared IPC pointer"
+    assert not re.search(r"\bSharedState\b", r30), "R30 still owns lower shared IPC pointer"
     assert "R30ScopedInternalPass" in r30
     assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
     assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
