@@ -30,7 +30,10 @@ namespace OutRunVR::Ipc
     bool StableRead(const T* shared, T& out, int attempts = 6) noexcept
     {
         if (!shared || attempts <= 0)
+        {
+            out = T{};
             return false;
+        }
 
         for (int attempt = 0; attempt < attempts; ++attempt)
         {
@@ -38,14 +41,22 @@ namespace OutRunVR::Ipc
             if (before & 1u)
                 continue;
 
+            // Do not let an interrupted writer leak a torn snapshot through
+            // the caller's reference before the seqlock is validated.
+            T snapshot{};
             MemoryBarrier();
-            std::memcpy(&out, shared, sizeof(T));
+            std::memcpy(&snapshot, shared, sizeof(T));
             MemoryBarrier();
 
             const std::uint32_t after = shared->sequence;
             if (before == after && !(after & 1u))
+            {
+                out = snapshot;
                 return true;
+            }
         }
+        // Fail closed even when the caller reused a prior successful value.
+        out = T{};
         return false;
     }
 
