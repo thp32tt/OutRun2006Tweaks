@@ -698,6 +698,8 @@ private:
 			const int removedIndex = int(std::distance(controllers.begin(), it));
 			const bool removedPrimary = (removedIndex == primaryControllerIndex);
 
+			// Cancel the timed effect before closing the pad under hotplug mutex.
+			SDL_RumbleGamepad(*it, 0, 0, 0);
 			SDL_CloseGamepad(*it);
 			controllers.erase(it);
 
@@ -736,7 +738,11 @@ public:
 		// Serialize teardown with VR/FFB rumble and SDL hot-unplug.
 		std::lock_guard<std::mutex> lock(mtx);
 		for (auto controller : controllers)
+		{
+			// Explicit zero keeps the old timed effect from surviving teardown.
+			SDL_RumbleGamepad(controller, 0, 0, 0);
 			SDL_CloseGamepad(controller);
+		}
 		controllers.clear();
 		for (auto& device : devices)
 			SDL_CloseJoystick(device.joystick);
@@ -755,10 +761,15 @@ public:
 
 	void setPrimaryGamepad(int index)
 	{
-		if (index < 0 || index >= controllers.size())
-			primaryControllerIndex = -1;
-		else
-			primaryControllerIndex = index;
+		const int nextIndex = (index >= 0 && index < int(controllers.size())) ? index : -1;
+		if (nextIndex != primaryControllerIndex)
+		{
+			// Do not leave the old primary's timed rumble running after switch.
+			// Hotplug callers already own mtx, matching setVibration().
+			if (auto* previous = getPrimaryGamepad())
+				SDL_RumbleGamepad(previous, 0, 0, 0);
+		}
+		primaryControllerIndex = nextIndex;
 
 		spdlog::debug("InputManager::primaryControllerIndex = {}", primaryControllerIndex);
 

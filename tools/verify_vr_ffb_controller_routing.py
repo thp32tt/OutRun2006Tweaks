@@ -32,6 +32,37 @@ def lifetime_violations(source: str) -> list[str]:
     return failures
 
 
+
+def primary_handoff_violations(source: str) -> list[str]:
+    """SDL timed rumble must stop before primary switch, unplug and shutdown."""
+    try:
+        handoff = source.split("void setPrimaryGamepad(int index)", 1)[1].split("void init(HWND hwnd);", 1)[0]
+        removal = source.split("void onControllerRemoved(SDL_JoystickID instanceId)", 1)[1].split("public:", 1)[0]
+        shutdown = source.split("void shutdown()", 1)[1].split("SDL_Gamepad* getPrimaryGamepad()", 1)[0]
+    except IndexError:
+        return ["missing primary pad lifecycle boundary"]
+    errors: list[str] = []
+    ordered = (
+        "const int nextIndex = (index >= 0 && index < int(controllers.size())) ? index : -1;",
+        "if (nextIndex != primaryControllerIndex)",
+        "if (auto* previous = getPrimaryGamepad())",
+        "SDL_RumbleGamepad(previous, 0, 0, 0);",
+        "primaryControllerIndex = nextIndex;",
+    )
+    if any(s not in handoff for s in ordered) or (
+        all(s in handoff for s in ordered) and
+        [handoff.index(s) for s in ordered] != sorted(handoff.index(s) for s in ordered)
+    ):
+        errors.append("primary switch fails to stop previously selected pad")
+    for section, stop, close, label in (
+        (removal, "SDL_RumbleGamepad(*it, 0, 0, 0);", "SDL_CloseGamepad(*it);", "unplug"),
+        (shutdown, "SDL_RumbleGamepad(controller, 0, 0, 0);", "SDL_CloseGamepad(controller);", "shutdown"),
+    ):
+        if stop not in section or close not in section or section.index(stop) > section.index(close):
+            errors.append(label + " must stop rumble before SDL close")
+    return errors
+
+
 def violations(source: str) -> list[str]:
     errors: list[str] = []
     try:
@@ -124,6 +155,17 @@ def main() -> None:
     source_input = INPUT_SOURCE.read_text(encoding="utf-8")
     if lifetime_violations(source_input):
         raise SystemExit("VR FFB SDL LIFETIME FAIL: " + "; ".join(lifetime_violations(source_input)))
+    if primary_handoff_violations(source_input):
+        raise SystemExit("VR FFB SDL HANDOFF FAIL: " + "; ".join(primary_handoff_violations(source_input)))
+    negative_handoffs = (
+        ("SDL_RumbleGamepad(previous, 0, 0, 0);", "/* primary stop removed */"),
+        ("SDL_RumbleGamepad(*it, 0, 0, 0);", "/* unplug stop removed */"),
+        ("SDL_RumbleGamepad(controller, 0, 0, 0);", "/* shutdown stop removed */"),
+        ("if (nextIndex != primaryControllerIndex)", "if (false)"),
+    )
+    for original, mutated in negative_handoffs:
+        if source_input.count(original) != 1 or not primary_handoff_violations(source_input.replace(original, mutated, 1)):
+            raise SystemExit("VR FFB SDL HANDOFF mutation escaped: " + original)
     negative_lifetimes = (
         ("std::lock_guard<std::mutex> lock(mtx);\n\t\tauto* controller = getPrimaryGamepad();",
          "auto* controller = getPrimaryGamepad();\n\t\tstd::lock_guard<std::mutex> lock(mtx);"),
@@ -134,7 +176,8 @@ def main() -> None:
         if source_input.count(original) != 1 or not lifetime_violations(source_input.replace(original, mutated, 1)):
             raise SystemExit("VR FFB SDL LIFETIME mutation escaped: " + original[:60])
     print(f"VR FFB ROUTING PASS: selected legacy ID, wheel handoff, FFB post-physics, "
-          f"{len(mutations)} routing + {len(negative_lifetimes)} lifetime negative mutations")
+          f"{len(mutations)} routing + {len(negative_lifetimes)} lifetime + "
+          f"{len(negative_handoffs)} handoff negative mutations")
 
 
 if __name__ == "__main__":
