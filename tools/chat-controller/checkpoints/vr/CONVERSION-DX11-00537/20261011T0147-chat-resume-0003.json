@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_resume_material_validation_pending",
+  "captured_at_kst": "2026-10-11T01:47:36+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
+  "chat_rollover": 3,
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head": "e929a792cf4f73b5591ae9572ea11188156baea9",
+  "stage": "IMPLEMENTING_CI_RUNNING",
+  "source_material_commits": [
+    "b208fe663d2f766307c3f6ecb1bfa3e0b85164bf",
+    "f297818ecaa0b956d41abd9d37afb50a0db1e41c",
+    "e929a792cf4f73b5591ae9572ea11188156baea9"
+  ],
+  "work_done": "Opt-in live game Draw sampler rotates through eligible per-frame candidates rather than starving at earliest offscreen draw; negative regression and activation checker updated. Original D3D9/Reset/default-off behavior retained.",
+  "ci": {
+    "known_good_previous_sha": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+    "previous_build": "SUCCESS",
+    "previous_openxr": "SUCCESS",
+    "previous_diagnostic_bundle": "SUCCESS",
+    "current_sha": "e929a792cf4f73b5591ae9572ea11188156baea9",
+    "current_build_run": 38069026944,
+    "current_openxr_run": 38069026994,
+    "status": "IN_PROGRESS",
+    "backend_conversion_gate": "NOT_RUN_FEATURE_BRANCH"
+  },
+  "incomplete_acceptance_ids": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "next_action": "Verify current exact-SHA Build/OpenXR results, then inspect diagnostic bundle artifact, preserve real runtime/HMD UNTESTED, add Issue #14 material ledger event and update feature run record. Do not change target; controller promotes only after FEATURE_READY and required gate.",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_ready": false,
+  "score_change": 0
+}
