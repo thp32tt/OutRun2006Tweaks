@@ -1,0 +1,9082 @@
+{
+  "pixel_substitutions": [
+    {
+      "region": "race_rivals",
+      "x": 250,
+      "y": 238,
+      "from": [
+        101,
+        90,
+        68
+      ],
+      "to_palette": [
+        178,
+        148,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 349,
+      "y": 238,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 350,
+      "y": 238,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 256,
+      "y": 239,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 401,
+      "y": 239,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 240,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 240,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 241,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 233,
+      "y": 242,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 375,
+      "y": 242,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 436,
+      "y": 242,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 281,
+      "y": 244,
+      "from": [
+        82,
+        74,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 288,
+      "y": 244,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 374,
+      "y": 244,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 389,
+      "y": 244,
+      "from": [
+        98,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 244,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 244,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 245,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 441,
+      "y": 245,
+      "from": [
+        115,
+        101,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 290,
+      "y": 246,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 297,
+      "y": 246,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 294,
+      "y": 247,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 184,
+      "y": 248,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 229,
+      "y": 248,
+      "from": [
+        95,
+        86,
+        68
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 240,
+      "y": 248,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 331,
+      "y": 248,
+      "from": [
+        62,
+        59,
+        71
+      ],
+      "to_palette": [
+        156,
+        129,
+        65
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 389,
+      "y": 248,
+      "from": [
+        98,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 248,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 435,
+      "y": 248,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 248,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 492,
+      "y": 248,
+      "from": [
+        49,
+        52,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 493,
+      "y": 248,
+      "from": [
+        49,
+        52,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 249,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 275,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 281,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 224,
+      "y": 252,
+      "from": [
+        93,
+        81,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 241,
+      "y": 252,
+      "from": [
+        99,
+        85,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 389,
+      "y": 252,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 252,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 428,
+      "y": 252,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 444,
+      "y": 252,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 445,
+      "y": 252,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 252,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 395,
+      "y": 253,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 253,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 428,
+      "y": 253,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 496,
+      "y": 253,
+      "from": [
+        85,
+        75,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 184,
+      "y": 254,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 275,
+      "y": 254,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 281,
+      "y": 254,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 290,
+      "y": 254,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 297,
+      "y": 254,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 174,
+      "y": 255,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 178,
+      "y": 255,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 182,
+      "y": 255,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 278,
+      "y": 255,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 489,
+      "y": 255,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 212,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 224,
+      "y": 256,
+      "from": [
+        24,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 352,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 388,
+      "y": 256,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 256,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 439,
+      "y": 256,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 444,
+      "y": 256,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 256,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 477,
+      "y": 256,
+      "from": [
+        115,
+        98,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 491,
+      "y": 256,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 500,
+      "y": 256,
+      "from": [
+        104,
+        93,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 522,
+      "y": 256,
+      "from": [
+        99,
+        89,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 257,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 428,
+      "y": 257,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 501,
+      "y": 257,
+      "from": [
+        104,
+        93,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 505,
+      "y": 259,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 213,
+      "y": 260,
+      "from": [
+        90,
+        79,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 224,
+      "y": 260,
+      "from": [
+        98,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 305,
+      "y": 260,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 337,
+      "y": 260,
+      "from": [
+        82,
+        77,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 260,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 260,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 495,
+      "y": 260,
+      "from": [
+        98,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 508,
+      "y": 260,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 261,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 439,
+      "y": 261,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 381,
+      "y": 262,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 199,
+      "y": 264,
+      "from": [
+        82,
+        74,
+        68
+      ],
+      "to_palette": [
+        213,
+        174,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 225,
+      "y": 264,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 334,
+      "y": 264,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 337,
+      "y": 264,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 264,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 264,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 477,
+      "y": 264,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 502,
+      "y": 264,
+      "from": [
+        90,
+        79,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 265,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 235,
+      "y": 266,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 235,
+      "y": 267,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 179,
+      "y": 268,
+      "from": [
+        57,
+        56,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 240,
+      "y": 268,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 322,
+      "y": 268,
+      "from": [
+        0,
+        12,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 380,
+      "y": 268,
+      "from": [
+        41,
+        44,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 268,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 444,
+      "y": 268,
+      "from": [
+        84,
+        75,
+        68
+      ],
+      "to_palette": [
+        222,
+        178,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 268,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 386,
+      "y": 269,
+      "from": [
+        74,
+        69,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 392,
+      "y": 269,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 269,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 329,
+      "y": 270,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        169,
+        139,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 338,
+      "y": 270,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 297,
+      "y": 271,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 318,
+      "y": 271,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 340,
+      "y": 271,
+      "from": [
+        85,
+        81,
+        68
+      ],
+      "to_palette": [
+        161,
+        137,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 223,
+      "y": 272,
+      "from": [
+        95,
+        86,
+        68
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 234,
+      "y": 272,
+      "from": [
+        41,
+        44,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 382,
+      "y": 272,
+      "from": [
+        66,
+        65,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 392,
+      "y": 272,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 272,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 441,
+      "y": 272,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 272,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 522,
+      "y": 272,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 524,
+      "y": 272,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 340,
+      "y": 273,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 342,
+      "y": 273,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 392,
+      "y": 273,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 273,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 342,
+      "y": 274,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 304,
+      "y": 276,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 314,
+      "y": 276,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        169,
+        144,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "race_rivals",
+      "x": 318,
+      "y": 276,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 326,
+      "y": 276,
+      "from": [
+        101,
+        89,
+        68
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 343,
+      "y": 276,
+      "from": [
+        90,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 276,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 276,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 277,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 282,
+      "y": 278,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 282,
+      "y": 279,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 280,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 454,
+      "y": 280,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 470,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 474,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 478,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 482,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 486,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 490,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 494,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 498,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 502,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 506,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 510,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 281,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 398,
+      "y": 284,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        213,
+        174,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 284,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "race_rivals",
+      "x": 412,
+      "y": 285,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 240,
+      "y": 70,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 390,
+      "y": 70,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        137,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 397,
+      "y": 70,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 426,
+      "y": 71,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 288,
+      "y": 74,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 206,
+      "y": 76,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 289,
+      "y": 76,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 366,
+      "y": 78,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 376,
+      "y": 78,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 432,
+      "y": 78,
+      "from": [
+        95,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 389,
+      "y": 79,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 478,
+      "y": 79,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 522,
+      "y": 79,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 532,
+      "y": 79,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 165,
+      "y": 80,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 167,
+      "y": 80,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 218,
+      "y": 80,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 258,
+      "y": 80,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        222,
+        174,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 309,
+      "y": 80,
+      "from": [
+        82,
+        74,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 432,
+      "y": 80,
+      "from": [
+        87,
+        79,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 433,
+      "y": 80,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 476,
+      "y": 80,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 545,
+      "y": 81,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 436,
+      "y": 83,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 165,
+      "y": 84,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 424,
+      "y": 84,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 476,
+      "y": 84,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 572,
+      "y": 84,
+      "from": [
+        93,
+        81,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 377,
+      "y": 85,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 572,
+      "y": 85,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 444,
+      "y": 86,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 532,
+      "y": 86,
+      "from": [
+        90,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 210,
+      "y": 87,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 214,
+      "y": 87,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 218,
+      "y": 87,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 389,
+      "y": 87,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 165,
+      "y": 88,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 438,
+      "y": 88,
+      "from": [
+        49,
+        48,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 444,
+      "y": 88,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 445,
+      "y": 88,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 476,
+      "y": 88,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 542,
+      "y": 88,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        180,
+        149,
+        65
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 572,
+      "y": 88,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 371,
+      "y": 89,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        175,
+        145,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 372,
+      "y": 89,
+      "from": [
+        98,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 545,
+      "y": 89,
+      "from": [
+        98,
+        89,
+        68
+      ],
+      "to_palette": [
+        172,
+        145,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 311,
+      "y": 90,
+      "from": [
+        82,
+        74,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 478,
+      "y": 90,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 519,
+      "y": 90,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 167,
+      "y": 91,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 358,
+      "y": 91,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 482,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 486,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 490,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 494,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 498,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 502,
+      "y": 91,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 527,
+      "y": 91,
+      "from": [
+        115,
+        101,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 536,
+      "y": 91,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 524,
+      "y": 92,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 275,
+      "y": 93,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        140,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 285,
+      "y": 93,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        137,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 254,
+      "y": 94,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 289,
+      "y": 96,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 362,
+      "y": 96,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 390,
+      "y": 96,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 396,
+      "y": 96,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 471,
+      "y": 96,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 521,
+      "y": 96,
+      "from": [
+        90,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 192,
+      "y": 97,
+      "from": [
+        93,
+        86,
+        68
+      ],
+      "to_palette": [
+        169,
+        144,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 482,
+      "y": 98,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 491,
+      "y": 98,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 539,
+      "y": 98,
+      "from": [
+        104,
+        93,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 213,
+      "y": 100,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 306,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 310,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 314,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 318,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 322,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 326,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 330,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 334,
+      "y": 100,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 489,
+      "y": 100,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 422,
+      "y": 103,
+      "from": [
+        98,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 431,
+      "y": 103,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 522,
+      "y": 103,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        178,
+        144,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 210,
+      "y": 104,
+      "from": [
+        115,
+        97,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 429,
+      "y": 104,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 489,
+      "y": 104,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 550,
+      "y": 104,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 552,
+      "y": 104,
+      "from": [
+        90,
+        82,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 482,
+      "y": 106,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 491,
+      "y": 106,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 572,
+      "y": 106,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 158,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 162,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 166,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 170,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 174,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 178,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 182,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 186,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 190,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 194,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 254,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 258,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 262,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 266,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 270,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 274,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 278,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 282,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 286,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 290,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 302,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 306,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 310,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 314,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 318,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 322,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 326,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 330,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 334,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 338,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 466,
+      "y": 107,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 470,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 474,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 478,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 494,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 498,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 502,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 506,
+      "y": 107,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 196,
+      "y": 108,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 292,
+      "y": 108,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 340,
+      "y": 108,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 429,
+      "y": 108,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 373,
+      "y": 111,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 389,
+      "y": 111,
+      "from": [
+        33,
+        40,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 530,
+      "y": 111,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 155,
+      "y": 112,
+      "from": [
+        101,
+        91,
+        68
+      ],
+      "to_palette": [
+        255,
+        210,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 158,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 162,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 166,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 170,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 174,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 178,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 182,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 186,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 190,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 194,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 197,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 251,
+      "y": 112,
+      "from": [
+        101,
+        91,
+        68
+      ],
+      "to_palette": [
+        255,
+        210,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 254,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 258,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 262,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 266,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 270,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 274,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 278,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 282,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 286,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 290,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 293,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 299,
+      "y": 112,
+      "from": [
+        101,
+        87,
+        68
+      ],
+      "to_palette": [
+        255,
+        206,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 340,
+      "y": 112,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        175,
+        147,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 429,
+      "y": 112,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 466,
+      "y": 112,
+      "from": [
+        101,
+        91,
+        68
+      ],
+      "to_palette": [
+        178,
+        151,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 470,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 474,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 478,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 482,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 486,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 490,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 494,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 498,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 502,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 506,
+      "y": 112,
+      "from": [
+        95,
+        89,
+        68
+      ],
+      "to_palette": [
+        175,
+        149,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "drift_score",
+      "x": 566,
+      "y": 112,
+      "from": [
+        98,
+        86,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 241,
+      "y": 116,
+      "from": [
+        95,
+        83,
+        68
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 366,
+      "y": 116,
+      "from": [
+        90,
+        79,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 428,
+      "y": 116,
+      "from": [
+        79,
+        74,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "drift_score",
+      "x": 429,
+      "y": 116,
+      "from": [
+        0,
+        16,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 248,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 249,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1082,
+      "y": 250,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 982,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 986,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 990,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 994,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 998,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1002,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1006,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1010,
+      "y": 251,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 251,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        169,
+        139,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1195,
+      "y": 251,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        169,
+        139,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 252,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 252,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1152,
+      "y": 252,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 252,
+      "from": [
+        74,
+        69,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 253,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 253,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 856,
+      "y": 254,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 842,
+      "y": 256,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 893,
+      "y": 256,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 256,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 256,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1089,
+      "y": 256,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1097,
+      "y": 256,
+      "from": [
+        82,
+        73,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1099,
+      "y": 256,
+      "from": [
+        82,
+        73,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 256,
+      "from": [
+        74,
+        69,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1206,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1210,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1214,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1218,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1222,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1242,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1258,
+      "y": 256,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 850,
+      "y": 257,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        172,
+        143,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 860,
+      "y": 257,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 257,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 257,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1112,
+      "y": 257,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1201,
+      "y": 257,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1245,
+      "y": 257,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        140,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1255,
+      "y": 257,
+      "from": [
+        41,
+        48,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 832,
+      "y": 258,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 864,
+      "y": 258,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 893,
+      "y": 258,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 986,
+      "y": 258,
+      "from": [
+        87,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1143,
+      "y": 258,
+      "from": [
+        98,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1156,
+      "y": 258,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 834,
+      "y": 259,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 868,
+      "y": 259,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1110,
+      "y": 259,
+      "from": [
+        95,
+        86,
+        68
+      ],
+      "to_palette": [
+        175,
+        144,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1143,
+      "y": 259,
+      "from": [
+        98,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1268,
+      "y": 259,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 844,
+      "y": 260,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 845,
+      "y": 260,
+      "from": [
+        90,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 260,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 260,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 985,
+      "y": 260,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1158,
+      "y": 260,
+      "from": [
+        74,
+        65,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 260,
+      "from": [
+        74,
+        69,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1253,
+      "y": 260,
+      "from": [
+        49,
+        48,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1254,
+      "y": 260,
+      "from": [
+        49,
+        48,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1287,
+      "y": 260,
+      "from": [
+        87,
+        79,
+        68
+      ],
+      "to_palette": [
+        230,
+        182,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 900,
+      "y": 261,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 261,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1160,
+      "y": 262,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1100,
+      "y": 263,
+      "from": [
+        87,
+        78,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1164,
+      "y": 263,
+      "from": [
+        95,
+        86,
+        68
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 886,
+      "y": 264,
+      "from": [
+        115,
+        101,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 264,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 938,
+      "y": 264,
+      "from": [
+        49,
+        52,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1101,
+      "y": 264,
+      "from": [
+        33,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1110,
+      "y": 264,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1144,
+      "y": 264,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1145,
+      "y": 264,
+      "from": [
+        90,
+        79,
+        68
+      ],
+      "to_palette": [
+        238,
+        190,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1154,
+      "y": 264,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1158,
+      "y": 264,
+      "from": [
+        90,
+        81,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 264,
+      "from": [
+        74,
+        69,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 265,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1112,
+      "y": 265,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1168,
+      "y": 265,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1256,
+      "y": 265,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 956,
+      "y": 266,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1031,
+      "y": 266,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 904,
+      "y": 267,
+      "from": [
+        24,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 934,
+      "y": 267,
+      "from": [
+        87,
+        78,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 935,
+      "y": 267,
+      "from": [
+        87,
+        78,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1104,
+      "y": 267,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1268,
+      "y": 267,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 268,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 954,
+      "y": 268,
+      "from": [
+        90,
+        77,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 960,
+      "y": 268,
+      "from": [
+        0,
+        12,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 985,
+      "y": 268,
+      "from": [
+        87,
+        79,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1028,
+      "y": 268,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1029,
+      "y": 268,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1031,
+      "y": 268,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1194,
+      "y": 268,
+      "from": [
+        74,
+        69,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1201,
+      "y": 268,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1249,
+      "y": 268,
+      "from": [
+        98,
+        86,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1254,
+      "y": 268,
+      "from": [
+        66,
+        65,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 269,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1250,
+      "y": 269,
+      "from": [
+        98,
+        86,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1260,
+      "y": 269,
+      "from": [
+        24,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 927,
+      "y": 270,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1261,
+      "y": 270,
+      "from": [
+        24,
+        36,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 927,
+      "y": 271,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1238,
+      "y": 271,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1239,
+      "y": 271,
+      "from": [
+        87,
+        80,
+        68
+      ],
+      "to_palette": [
+        230,
+        186,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 830,
+      "y": 272,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 870,
+      "y": 272,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 914,
+      "y": 272,
+      "from": [
+        115,
+        97,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 955,
+      "y": 272,
+      "from": [
+        90,
+        81,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1026,
+      "y": 272,
+      "from": [
+        49,
+        52,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1048,
+      "y": 272,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1089,
+      "y": 272,
+      "from": [
+        90,
+        83,
+        68
+      ],
+      "to_palette": [
+        238,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1254,
+      "y": 272,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 865,
+      "y": 276,
+      "from": [
+        82,
+        77,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1212,
+      "y": 276,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1213,
+      "y": 276,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1260,
+      "y": 276,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        255,
+        202,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1293,
+      "y": 276,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 910,
+      "y": 278,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        169,
+        141,
+        63
+      ],
+      "old_index": 3,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 278,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        175,
+        144,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1090,
+      "y": 278,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 279,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        175,
+        144,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1030,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1034,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1038,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1042,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1046,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1050,
+      "y": 279,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1054,
+      "y": 279,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 865,
+      "y": 280,
+      "from": [
+        82,
+        77,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 893,
+      "y": 280,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 908,
+      "y": 280,
+      "from": [
+        90,
+        85,
+        66
+      ],
+      "to_palette": [
+        194,
+        160,
+        60
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 280,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1130,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1134,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1138,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1142,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1152,
+      "y": 280,
+      "from": [
+        93,
+        83,
+        68
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1158,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1162,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1166,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1170,
+      "y": 280,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        189,
+        157,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1212,
+      "y": 280,
+      "from": [
+        98,
+        87,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 281,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1145,
+      "y": 281,
+      "from": [
+        104,
+        90,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1152,
+      "y": 281,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1154,
+      "y": 281,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 859,
+      "y": 282,
+      "from": [
+        104,
+        93,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1292,
+      "y": 282,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1294,
+      "y": 283,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        194,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 865,
+      "y": 284,
+      "from": [
+        82,
+        77,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 284,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1205,
+      "y": 284,
+      "from": [
+        87,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1212,
+      "y": 284,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1214,
+      "y": 284,
+      "from": [
+        24,
+        32,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 285,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 930,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 934,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 938,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 942,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 946,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 950,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 954,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 958,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 962,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 966,
+      "y": 285,
+      "from": [
+        107,
+        93,
+        66
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1112,
+      "y": 285,
+      "from": [
+        49,
+        52,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 893,
+      "y": 287,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 908,
+      "y": 287,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 288,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 842,
+      "y": 289,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 893,
+      "y": 289,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 908,
+      "y": 289,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        140,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 289,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1036,
+      "y": 289,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1096,
+      "y": 289,
+      "from": [
+        93,
+        82,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1112,
+      "y": 289,
+      "from": [
+        57,
+        56,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1253,
+      "y": 289,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        169,
+        140,
+        63
+      ],
+      "old_index": 1,
+      "new_index": 2
+    },
+    {
+      "region": "slipstream_score",
+      "x": 842,
+      "y": 290,
+      "from": [
+        87,
+        79,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1276,
+      "y": 290,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 846,
+      "y": 291,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 850,
+      "y": 291,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 854,
+      "y": 291,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 858,
+      "y": 291,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 862,
+      "y": 291,
+      "from": [
+        8,
+        20,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 292,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1276,
+      "y": 292,
+      "from": [
+        93,
+        85,
+        68
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 3,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 916,
+      "y": 293,
+      "from": [
+        16,
+        28,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 838,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 842,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 846,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 850,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 854,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 858,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 862,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 866,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        246,
+        198,
+        57
+      ],
+      "old_index": 1,
+      "new_index": 0
+    },
+    {
+      "region": "slipstream_score",
+      "x": 1246,
+      "y": 296,
+      "from": [
+        16,
+        24,
+        74
+      ],
+      "to_palette": [
+        172,
+        141,
+        65
+      ],
+      "old_index": 1,
+      "new_index": 0
+    }
+  ]
+}

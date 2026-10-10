@@ -1,0 +1,59 @@
+{
+  "run": "A228",
+  "run_key": "OUTRUN-KOR-A228-Q059-C1-BC3-FACE-INDEX-SCOPED-20261010-2100",
+  "role": "A",
+  "index": 59,
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "current_official_unchanged": true,
+  "trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+  "trial_path": "localization/graphics/role_A/20261010-A228-Q059-BC3-INDEX-INTERIOR-REPAIR-TRIAL/A228_Q059_GOLD_FACE_BC3_INDEX_TRIAL_UNPROMOTED.dds",
+  "source_format": "DXT5/BC3 2048x512 mip1 RAW-mirror_y",
+  "mechanism": "4x4 BC3 palette index substitution for gold-encircled alpha-opaque dark flecks; preserve palette endpoints/alpha and source-bbox outside all pixels",
+  "region_counters": {
+    "race_rivals": {
+      "dark_gold_enclosed_candidates": 152,
+      "selected_index_repair": 151,
+      "skipped_no_gold_palette": 1,
+      "skipped_no_quality_gain": 0,
+      "skipped_edge_block": 0
+    },
+    "drift_score": {
+      "dark_gold_enclosed_candidates": 183,
+      "selected_index_repair": 182,
+      "skipped_no_gold_palette": 1,
+      "skipped_no_quality_gain": 0,
+      "skipped_edge_block": 0
+    },
+    "slipstream_score": {
+      "dark_gold_enclosed_candidates": 201,
+      "selected_index_repair": 201,
+      "skipped_no_gold_palette": 0,
+      "skipped_no_quality_gain": 0,
+      "skipped_edge_block": 0
+    }
+  },
+  "modified_pixels": 534,
+  "modified_bytes": 514,
+  "all_source_bbox_outside_identical": true,
+  "all_alpha_exact": true,
+  "header_and_format_preserved": true,
+  "persisted_DDS_redecoded": true,
+  "production_stage": "NEW_COMPRESSED_FACE_METHOD_EXPLORATORY_TRIAL",
+  "producer_self_qa": "PENDING_CONTROLLER_OPTICAL_REVIEW",
+  "C1": "REQUIRED_NEW_BYTES",
+  "official_promotion": false,
+  "candidate_published": false,
+  "fresh_source_clean_composite_gate": "NOT_YET_COMPLETE_NO_PASS",
+  "C3": "NOT_RUN",
+  "USER_INGAME": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Review persisted BGW 100/50 before considering promotion; if dark dot texture remains, method fails and switch to native source-family renderer/BC encoder",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
