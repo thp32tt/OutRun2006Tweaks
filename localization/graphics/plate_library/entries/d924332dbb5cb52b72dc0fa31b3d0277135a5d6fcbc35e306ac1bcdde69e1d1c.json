@@ -1,0 +1,27 @@
+{
+  "schema": "clean-plate-library-v1",
+  "queue_index": 217,
+  "region_id": "START_GOAL",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "orientation": "readable_flip_y",
+  "size": [
+    2048,
+    2048
+  ],
+  "background": "opaque_red_badge",
+  "source_task_id": "OUTRUN-KOR-A231-Q217-C1-RED-BADGE-425-PROTECTED-RGB-RESTORE-20261011-0310",
+  "provenance_commit": "6ec9505cadce3a7bdfc5a932328d3ed55f5f3305",
+  "producer_evidence": {
+    "path": "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_MACHINE_QA.json",
+    "sha256": "b14cc9c7d0b3cf5d7aa4033d09e8bd713eb3cda2705307de969739d5a87dfdeb"
+  },
+  "clean": {
+    "path": "localization/graphics/plate_library/objects/015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9.png",
+    "sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9"
+  },
+  "removal": {
+    "path": "localization/graphics/plate_library/objects/24985d0baa4281ede7c415279b3fa921fa41c0c257c2602333692fc8892d1a20.png",
+    "sha256": "24985d0baa4281ede7c415279b3fa921fa41c0c257c2602333692fc8892d1a20"
+  },
+  "scope": "START/GOAL only, source-exact rim restoration 425, trial only; no independent C1 review/approval"
+}

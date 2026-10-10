@@ -1,0 +1,9 @@
+{
+  "manifest_sha256": "d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+  "entry": "localization/graphics/plate_library/entries/d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c.json",
+  "plate_C1": "UNREVIEWED",
+  "candidate_C1": "UNREVIEWED",
+  "source_exact_protected_rgb_restored": 425,
+  "trial": "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_Q217_RED_RIM_RESTORED_UNPROMOTED.dds",
+  "trial_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b"
+}

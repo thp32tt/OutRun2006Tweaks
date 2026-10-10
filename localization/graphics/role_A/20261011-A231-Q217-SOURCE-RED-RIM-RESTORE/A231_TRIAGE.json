@@ -1,0 +1,22 @@
+{
+  "cmd": "python tools/localization/rework_triage.py --index 217",
+  "json": {
+    "queue_file": "localization/graphics/asset_queue.csv",
+    "escalation_file": "localization/graphics/REWORK_ESCALATIONS.json",
+    "counts": {
+      "MATERIAL_REWORK": 1
+    },
+    "assets": [
+      {
+        "index": 217,
+        "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+        "current_status": "c1_20261011_q217_red_badge_protected_425_rework_required",
+        "next_action": "MATERIAL_REWORK",
+        "repeated_root_causes": [],
+        "reason": "Current candidate has an actionable defect; rebuild the failed source-style stage",
+        "runtime_validation": "UNTESTED"
+      }
+    ],
+    "note": "No state transition or game QA is inferred by this read-only diagnosis."
+  }
+}
