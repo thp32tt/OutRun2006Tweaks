@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 14:27 KST",
+  "updated_at_kst": "2026-10-10 14:39 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q060_material_trial": {"index":60,"role":"B","run":"B349","run_key":"OUTRUN-KOR-B349-Q060-SOURCE-FIRST-PERSISTED-TRIAL-20261010-1430","new_trial_dds":1,"new_promoted_dds":0,"trial_sha256":"0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159","new_rgba_changed_pixels":87512,"changed_outside_roi":0,"persisted_roundtrip_mismatch":0,"source_width":849,"new_width":512,"source_family_result":"PRODUCER_VISUAL_REJECT_UNDERFILL_AND_FLAT_GOLD","official_status":"C342_REWORK_REQUIRED_UNCHANGED","IGR044":"OPEN_USER_INGAME_FAIL","runtime_validation":"UNTESTED","qa":"localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_CONTROLLER_VISUAL_REJECT.json"},
       "latest_b_p1_source_first_plate_q060": {
         "run": "B348",
         "index": 60,
