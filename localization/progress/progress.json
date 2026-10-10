@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T04:24:00+09:00",
+  "updated_at_kst": "2026-10-11T04:47:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,7 +50,18 @@
       "total": 243
     },
     "graphics_localization": {
-      "c1_q225_blind_calibration_20261011": {"run_key":"OUTRUN-KOR-C1-Q225-FIVE-BLIND-CALIBRATION-20261011-0424","index":225,"blind_correct":5,"blind_total":5,"official_sha256":"f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333","qa":"HOLD_STRICT_RECHECK","C3":"NOT_RUN","game":"UNTESTED","dds_produced":0,"report":"localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/C1_Q225_CALIBRATED_CONTROLLER_HOLD.json"},
+      "c1_q225_blind_calibration_20261011": {
+        "run_key": "OUTRUN-KOR-C1-Q225-FIVE-BLIND-CALIBRATION-20261011-0424",
+        "index": 225,
+        "blind_correct": 5,
+        "blind_total": 5,
+        "official_sha256": "f054219a427ea91ae1f5230eb1842fc05edb8900e2a6da08f67e4afbd81c2333",
+        "qa": "HOLD_STRICT_RECHECK",
+        "C3": "NOT_RUN",
+        "game": "UNTESTED",
+        "dds_produced": 0,
+        "report": "localization/graphics/role_C/20261011-C1-Q225-BLIND-CALIBRATION-OPTICAL-HOLD/C1_Q225_CALIBRATED_CONTROLLER_HOLD.json"
+      },
       "latest_b_q212_B356_B357_mode_native_two_trials": {
         "index": 212,
         "role": "B",
@@ -11936,5 +11947,36 @@
     "IGR029": "OPEN",
     "qa": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_C2_B362_INDEPENDENT_REWORK.json",
     "review_id": "C373-C2-Q212-B362-FIRST-INDEPENDENT"
+  },
+  "b363_q092_source_diffuse_glow_unapproved": {
+    "run_key": "OUTRUN-KOR-B363-Q092-SOURCE-DIFFUSE-GLOW-FIRST-20261011-0432",
+    "timestamp_kst": "2026-10-11T04:47:00+09:00",
+    "role": "B",
+    "queue_index": 92,
+    "triage": "MATERIAL_REWORK",
+    "priority": "C364_C2_STRICT_REWORK",
+    "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+    "clean_sha256": "1a06b6ce304337b9487f4c130ea5e68c8fa6cd24dc460a2b03acef56a0187a35",
+    "official_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+    "new_unapproved_trial_sha256": "f113c3aafff77ef3ace10246975dbf199188077a3b08541dddae8a612ba028c3",
+    "produced_trial_DDS": 1,
+    "official_promoted_DDS": 0,
+    "format": "DXT5_BC3_2048x256_mip1_MIRROR_Y",
+    "worker_success_id": 38080848707,
+    "failed_before_dds_preflight": 38080680838,
+    "source_original_translucent": 16391,
+    "before_official_translucent": 4480,
+    "new_trial_translucent": 24156,
+    "changed_bc3_blocks": 2274,
+    "changed_decoded_rgba_pixels": 31867,
+    "changed_outside_original_source_bbox": 0,
+    "second_row_exact": true,
+    "producer_optical": "REWORK_REQUIRED_THIN_DOTTED_HOLLOW_ORANGE_NAVY_BODY_DESPITE_SOFT_HALO_IMPROVEMENT",
+    "independent_C2": "NOT_RUN",
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "current_official_status": "C364_C2_C3_STRICT_REWORK",
+    "QA": "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_CONTROLLER_PRODUCER_VISUAL_REWORK.json",
+    "excluded_domains": []
   }
 }
