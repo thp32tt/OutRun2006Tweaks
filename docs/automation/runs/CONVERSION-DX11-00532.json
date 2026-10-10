@@ -2,10 +2,10 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00532",
   "production_id": "CONVERSION-DX11-00532",
-  "event_id": "CONVERSION-DX11-00532-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00532-E003",
+  "event_type": "retry",
   "lane": "DX11",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "1e2be1173699f7c7c0356acc9c0fe869c9af9130",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00532",
@@ -47,10 +47,10 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
-  "status": "BLOCKED_DEPENDENCY_R175",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
   "checkpoint": "C6_STATE",
   "result_sha": "8f834f30f238e62abf61652064ebbf33e3e70e87",
-  "material_result_sha": "8f834f30f238e62abf61652064ebbf33e3e70e87",
+  "material_result_sha": "90861185e4771b80725efa3b18206fda376de658",
   "validation_bearing_result_sha": "8f834f30f238e62abf61652064ebbf33e3e70e87",
   "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
@@ -67,16 +67,16 @@
   ],
   "summary": "R235 dormant D3D9 DIP declared source window to WARP DrawIndexed exact GPU pixels. No gameplay activation.",
   "pipeline": {
-    "C0": "PASS GitHub HEAD, controller checkpoint, AGENTS, DX11 policy, regression and 00531 ownership",
-    "C1": "PASS independent R235 indexed D3D9 source -> D3D11 exact owned IA/OM -> WARP DrawIndexed GPU pixel",
-    "C2": "PASS original grouped material SHA 90861185 plus necessary R184/R195 negative mutation repair SHA 8f834f30; [AUTO:CONVERSION-DX11-00532]",
-    "C3": "SCOPED_PASS/FULL_GATE_FAIL. At exact 8f834f30 Gate #38044741569 validate SUCCESS, R184/R195 static SUCCESS, R186 indexed WARP build/run SUCCESS, inherited R175 probe FAIL.",
-    "C4": "PASS exact material/result SHA 8f834f30f238e62abf61652064ebbf33e3e70e87. C6 bookkeeping committed separately after Gate completion without replacing result SHA.",
-    "C5": "NOT_REQUIRED native gameplay Draw dormant; no runtime/HMD package",
-    "C6": "BLOCKED_DEPENDENCY_R175, no repeat/score; RUNTIME_VALIDATION=UNTESTED."
+    "C0": "PASS: recovered 90861185 original R235 source and failed Gate #38044154406; source owner unchanged and exact branch SHA checked",
+    "C1": "PASS: R184 deletion mutant had false-negative because R235 duplicated the slice guard; R195 tree guards also repeated",
+    "C2": "PASS: original R235 grouped D3D9 indexed command-to-D3D11 WARP pixel source remains material at 90861185; repair 8f834f30 changes two R184/R195 mutation verifiers only",
+    "C3": "SCOPED_PASS_FULL_GATE_FAIL: JS 7 negative mutants PASS; exact 8f834f30 Gate #38044741569 validate SUCCESS, R184 SUCCESS, R195 SUCCESS, R186 static and WARP GPU pixel SUCCESS; late R175 constant buffer varying mismatch FAILED",
+    "C4": "PASS: exact validation-bearing 8f834f30 descendant of material 90861185, both bearing [AUTO:CONVERSION-DX11-00532]; no source rewrite during gate",
+    "C5": "NOT_REQUIRED: native game Draw stays dormant; no runtime package or promotion",
+    "C6": "BLOCKED_UPSTREAM_R175_FULL_GATE: complete Gate failed at pre-existing R175 owned by 00477; do not rerun 00532 or award score as PASS"
   },
   "evidence": {
-    "static": "R235 guard assertions and mutation verifier included in mandatory Gate",
+    "static": "Exact 8f834f30 JS static check: R184 3/3 and R195 4/4 fail-closed mutant guards PASS",
     "backend_gate_conclusion": "failure",
     "inherited_failure": "R175 varying mismatch separately owned by 00477; never treat FAIL as PASS",
     "backend_gate": {
@@ -131,13 +131,48 @@
         "result": "success"
       }
     ],
-    "validation_bearing_sha": "8f834f30f238e62abf61652064ebbf33e3e70e87"
+    "validation_bearing_sha": "8f834f30f238e62abf61652064ebbf33e3e70e87",
+    "original_gate": {
+      "id": 38044154406,
+      "sha": "90861185e4771b80725efa3b18206fda376de658",
+      "validate": "success",
+      "readiness_smoke": "failure",
+      "failure_step": "Verify DX11 native VB/IB R184 indexed bounds contract"
+    },
+    "repair_gate": {
+      "id": 38044741569,
+      "sha": "8f834f30f238e62abf61652064ebbf33e3e70e87",
+      "validate": "success",
+      "r184": "success",
+      "r195": "success",
+      "r186_static": "success",
+      "r186_warp_pixel": "success",
+      "readiness_smoke": "failure",
+      "failed_step": "Run DX11 constant buffer probe",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "failure_key": "R175_GENERIC_VARYING_MISMATCH"
+    },
+    "scoped_r235_conclusion": "success",
+    "hmd_test_performed": false
   },
   "blockers": [
-    "Inherited R175 TEXCOORD6 VS/PS varying mismatch independently owned by CONVERSION-DX11-00477",
-    "HMD/Quest3/VDXR not performed; native gameplay Draw not activated"
+    "R175 TEXCOORD6 VS/PS generic varying WARP readback mismatch owned by CONVERSION-DX11-00477; full exact-SHA Gate FAIL",
+    "Quest 3/VDXR exact-build gameplay runtime UNTESTED"
   ],
   "score_change": 0,
-  "next_action": "Do not retry or score 00532; select next independently owned DX11 native integration item only after remote owner/work_key claim. Do not duplicate R175 00477.",
-  "resume_cursor": "TERMINAL_SCOPED_PASS_INHERITED_R175_GATE_FAIL"
+  "next_action": "Do not re-run completed R235 material/WARP/negative checks or count success. Distinct R175 owner 00477 must resolve generic varying mismatch (BGRA 128,0,16,255 != 224,128,32,255). Only after an independently fixed integrated descendant SHA passes full required Gate can conversion be reconsidered. Continue a separately claimed nonconflicting native DX11 work_key; do not touch DXVK or DX9Ex.",
+  "resume_cursor": "TERMINAL_SCOPED_PASS_INHERITED_R175_GATE_FAIL",
+  "last_real_activity_at": "2026-10-10T19:34:00+09:00",
+  "last_activity_evidence": "Exact 8f834f30 Backend Conversion Gate #38044741569 validate PASS R184/R195/R186 WARP PASS, R175 constant-buffer FAIL"
 }
