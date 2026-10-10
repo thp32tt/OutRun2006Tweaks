@@ -100,7 +100,7 @@ if all_accepted:
         for _, gate, _, owner in seams:
             if "option(OUTRUN_VR_REFACTOR_SPLIT_" + gate not in build:
                 errors.append(label + " missing R84 independent owner gate: " + gate)
-            if (owner + "\\n        PROPERTIES HEADER_FILE_ONLY FALSE)") not in build:
+            if ("src/vr/d3d9/" + owner + "\n        PROPERTIES HEADER_FILE_ONLY FALSE)") not in build:
                 errors.append(label + " missing R84 independent compilation: " + owner)
     if cmake != generated and (
         cmake[cmake.find("option(OUTRUN_VR_REFACTOR_SPLIT_R33_R32"):cmake.find("set(OUTRUN_VR_COMPARE_COUNT")]
