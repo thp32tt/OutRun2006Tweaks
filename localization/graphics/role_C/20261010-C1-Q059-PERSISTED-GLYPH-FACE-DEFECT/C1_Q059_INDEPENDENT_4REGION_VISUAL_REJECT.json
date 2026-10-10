@@ -1,0 +1,245 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q059-PERSISTED-GLYPH-FACE-20261010-1418",
+  "review_id": "C1-Q059-20261010-1418",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 59,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "source_canonical_provenance": "Existing C279/C302 SHA-authenticated DXT5 source and readable lossless source crops. Source DDS not independently re-downloaded in this invocation; SOURCE PNGs independently SHA checked.",
+  "reviewed_at_kst": "2026-10-10 14:18 KST",
+  "decision": "REWORK_REQUIRED",
+  "defect_codes": [
+    "BC3_KOREAN_GLYPH_FACE_DARK_STIPPLE",
+    "SOURCE_FAMILY_FILL_INTERRUPTION"
+  ],
+  "priority": "P1_USER_JPG_PJR019",
+  "triage_before": {
+    "action": "EVIDENCE_ONLY_HOLD",
+    "command": "python tools/localization/rework_triage.py --repo /home/chatgpt-runner2/work/c1q059_triage_20261010 --index 59",
+    "read_only_output": "c302_c1_hold_lossless_published_pending_calibrated_c3"
+  },
+  "firsthand_visual": {
+    "first_look_before_producer_verdict": false,
+    "reason": "Prior producer, user JPG PJR-019 and C302 notes were available before this inspection; no blind claim.",
+    "source_native": "Reviewed saved SOURCE RGB/alpha pixels, opaque composites and 2x previews for four title regions.",
+    "final_native": "Downloaded and SHA-verified current persisted DXT5 saved DDS. Independently opened DDS and reconstructed FLIP-Y readable crops; each matches C302 saved lossless PNG exactly for 4/4 native regions.",
+    "raw_vs_readable": "DDS uses source RAW mirror-Y; decoded flipped readable equivalent verified. No unsupported actual-game result inferred.",
+    "visible_defect": "Three golden/yellow Korean letters show dense tiny navy/dark pin-dot interruptions in the filled strokes compared to the smoother original English source. Race Rivals, Drift Score and Slipstream Score affected. This persists in exact decoded DDS, not merely JPG sharpening. Pixel metrics in machine report only support the visual fail, not a claimed complete glyph topology proof.",
+    "unrendered_english_warning": "Native uncomposited RGBA includes English-looking hidden RGB from alpha0; black/gray/white opaque comps do not show such English, so no SOURCE_RESIDUE_UNDER_KOREAN visual FAIL is asserted."
+  },
+  "machine_report": "localization/graphics/role_C/20261010-C1-Q059-PERSISTED-GLYPH-FACE-DEFECT/C1_Q059_EXACT_PERSISTED_FACE_MACHINE.json",
+  "regions": [
+    {
+      "id": "next_mission",
+      "label": "다음 미션",
+      "result": "HOLD_UNVERIFIED",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable visual inclination and corresponding English source available, but no accepted paired original/Korean top-minus-bottom slant anchors measured; cannot certify full slant family.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Historical CLEAN retained, but new independent exact SOURCE/CLEAN plate-only QA was not completed during this invocation.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__clean_native.png"
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Next Mission legible in opaque views but old PJR-019 excessive inner shading / source family acceptance remains open; no fresh full source-family approval.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_gray.png"
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Hangul readable in existing practical50 view, but user-in-game and PJR review outstanding.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__practical_50.png"
+        },
+        "glyph_integrity": {
+          "result": "HOLD",
+          "observation": "This pixel heuristic did not find the same inner dark pattern in Next Mission; other glyph-integrity conditions unverified.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_black.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "Exact source current and original masks not recomputed against whole atlas protected layer; do not reuse stale zero counters as a fresh PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Previous bounding-box counters are historical; no newly accepted anchor/inside protected margin or neighboring atlas audit.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__final_native.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted DDS was independently decoded and FLIP-Y cropped to each original saved readable reference. Four of four RGBA differences zero. RAW coordinate mapping known; no actual game-render test.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__final_native.png"
+        }
+      }
+    },
+    {
+      "id": "race_rivals",
+      "label": "라이벌과 레이스!",
+      "result": "REWORK_REQUIRED",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable visual inclination and corresponding English source available, but no accepted paired original/Korean top-minus-bottom slant anchors measured; cannot certify full slant family.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Historical CLEAN retained, but new independent exact SOURCE/CLEAN plate-only QA was not completed during this invocation.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__clean_native.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source smooth gold/yellow title face versus new Hangul visibly dotted/dark in opaque composite. This is a glyph-face effect and edge fidelity regression, irrespective of prior source bbox numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_gray.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "Visible dotted interruptions in some native text face pixels at practical title scale; cannot claim full fidelity.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__practical_50.png"
+        },
+        "glyph_integrity": {
+          "result": "FAIL",
+          "observation": "Independently decoded exact saved BC3 DDS, same RGBA as archived lossless source-final reference; dark pixel punctures/stipples scattered through Korean gold face. Pixel-mask diagnostic not a full classifier.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_black.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "Exact source current and original masks not recomputed against whole atlas protected layer; do not reuse stale zero counters as a fresh PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Previous bounding-box counters are historical; no newly accepted anchor/inside protected margin or neighboring atlas audit.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__final_native.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted DDS was independently decoded and FLIP-Y cropped to each original saved readable reference. Four of four RGBA differences zero. RAW coordinate mapping known; no actual game-render test.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__final_native.png"
+        }
+      }
+    },
+    {
+      "id": "drift_score",
+      "label": "드리프트 점수 도전!",
+      "result": "REWORK_REQUIRED",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable visual inclination and corresponding English source available, but no accepted paired original/Korean top-minus-bottom slant anchors measured; cannot certify full slant family.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Historical CLEAN retained, but new independent exact SOURCE/CLEAN plate-only QA was not completed during this invocation.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__clean_native.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source smooth gold/yellow title face versus new Hangul visibly dotted/dark in opaque composite. This is a glyph-face effect and edge fidelity regression, irrespective of prior source bbox numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_gray.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "Visible dotted interruptions in some native text face pixels at practical title scale; cannot claim full fidelity.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__practical_50.png"
+        },
+        "glyph_integrity": {
+          "result": "FAIL",
+          "observation": "Independently decoded exact saved BC3 DDS, same RGBA as archived lossless source-final reference; dark pixel punctures/stipples scattered through Korean gold face. Pixel-mask diagnostic not a full classifier.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_black.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "Exact source current and original masks not recomputed against whole atlas protected layer; do not reuse stale zero counters as a fresh PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Previous bounding-box counters are historical; no newly accepted anchor/inside protected margin or neighboring atlas audit.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__final_native.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted DDS was independently decoded and FLIP-Y cropped to each original saved readable reference. Four of four RGBA differences zero. RAW coordinate mapping known; no actual game-render test.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__final_native.png"
+        }
+      }
+    },
+    {
+      "id": "slipstream_score",
+      "label": "슬립스트림 점수 도전!",
+      "result": "REWORK_REQUIRED",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Readable visual inclination and corresponding English source available, but no accepted paired original/Korean top-minus-bottom slant anchors measured; cannot certify full slant family.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png"
+        },
+        "clean_plate": {
+          "result": "HOLD",
+          "observation": "Historical CLEAN retained, but new independent exact SOURCE/CLEAN plate-only QA was not completed during this invocation.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__clean_native.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source smooth gold/yellow title face versus new Hangul visibly dotted/dark in opaque composite. This is a glyph-face effect and edge fidelity regression, irrespective of prior source bbox numeric PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_gray.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "Visible dotted interruptions in some native text face pixels at practical title scale; cannot claim full fidelity.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__practical_50.png"
+        },
+        "glyph_integrity": {
+          "result": "FAIL",
+          "observation": "Independently decoded exact saved BC3 DDS, same RGBA as archived lossless source-final reference; dark pixel punctures/stipples scattered through Korean gold face. Pixel-mask diagnostic not a full classifier.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_black.png"
+        },
+        "protected_art": {
+          "result": "HOLD",
+          "observation": "Exact source current and original masks not recomputed against whole atlas protected layer; do not reuse stale zero counters as a fresh PASS.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png"
+        },
+        "placement": {
+          "result": "HOLD",
+          "observation": "Previous bounding-box counters are historical; no newly accepted anchor/inside protected margin or neighboring atlas audit.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__final_native.png"
+        },
+        "orientation": {
+          "result": "PASS_SCOPED",
+          "observation": "Exact persisted DDS was independently decoded and FLIP-Y cropped to each original saved readable reference. Four of four RGBA differences zero. RAW coordinate mapping known; no actual game-render test.",
+          "evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__final_native.png"
+        }
+      }
+    }
+  ],
+  "calibration": {
+    "blind_review_completed": false,
+    "result": "NOT_QUALIFIED",
+    "future": "A new known-defect calibration with independent first-look is required before any PASS."
+  },
+  "prior_C3": {
+    "review": "C302 HOLD, no current-policy C3 approved",
+    "status": "NOT_RUN_THIS_INVOCATION"
+  },
+  "next_action": "A-owned q59 materially revise the yellow/gold face/BC3 encoding to remove dark stipples while preserving source-specific original gradient/outline/slant and exact source glyph bbox; inspect CLEAN-only and composite-only, verify RAW/FLIP-Y persisted all authored mips and native/75/50; fresh independent C1 on changed SHA, distinct C3, then JPG/user game retest. PJR-019 remains OPEN; do not rerender same unmodified SHA as a new DDS.",
+  "new_DDS": 0,
+  "modified_candidate_bytes": false,
+  "independent_C_PASS": false,
+  "C3_STRICT_PASS": false,
+  "approved_export": false,
+  "user_jpg_approval": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C2_untouched": true,
+  "vr_ffb_dx11_dxvk_untouched": true
+}
