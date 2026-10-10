@@ -337,7 +337,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         }
         s.pending = false;
         s.attempted = false;
-        const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);
+        const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);
         s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;
         s.eligibleThisFrame = 0;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
