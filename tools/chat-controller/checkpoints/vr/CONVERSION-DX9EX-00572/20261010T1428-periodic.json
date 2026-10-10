@@ -1,0 +1,37 @@
+{
+  "task_id": "CONVERSION-DX9EX-00572",
+  "event_id": "CONVERSION-DX9EX-00572-E001",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "work_key": "DX9EX:P1:V2_SHADOW_ATOMIC_PUBLICATION",
+  "material_sha": "3355ae2c4e1664e7c6615502853198da328a0f17",
+  "validation_sha": "3355ae2c4e1664e7c6615502853198da328a0f17",
+  "target_head_observed": "3355ae2c4e1664e7c6615502853198da328a0f17",
+  "changed_paths": [
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp"
+  ],
+  "static_check": "PASS",
+  "pipeline": {
+    "C0": "PASS",
+    "C1": "PASS",
+    "C2": "PASS",
+    "C3": "IN_PROGRESS exact SHA Actions",
+    "C4": "PASS material commit",
+    "C5": "PENDING",
+    "C6": "PENDING"
+  },
+  "ci_runs": {
+    "dx9ex_active": 38027371693,
+    "domain_isolation": 38027371594,
+    "full_source_impact": 38027371652
+  },
+  "confirmed_ci": {
+    "domain_isolation": "SUCCESS",
+    "dx9ex_policy": "SUCCESS"
+  },
+  "runtime_validation": "UNTESTED",
+  "ffb_release_tag": "v0.2",
+  "dxvk": "FROZEN",
+  "next": "Observe exact SHA three mandatory CI conclusions; if all success create separate C6 run JSON and score once; no duplicate source/CI or invalid HMD PASS."
+}
