@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "chat_worker_result",
+  "task_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E001",
+  "lane": "DX11",
+  "work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+  "target_branch": "vr-dx11-native-r71",
+  "validation_bearing_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "bookkeeping_sha": "5fac2d1ade6f2511c879cb4366fed8c9e00403cc",
+  "ci_run_id": 38048751349,
+  "scope": {
+    "r239_static": "PASS",
+    "r239_build": "PASS",
+    "r239_gpu": "PASS"
+  },
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "status": "BLOCKED_INHERITED_R175_FULL_GATE_FAILURE",
+  "blocker": "R175_GENERIC_VARYING_MISMATCH owned by CONVERSION-DX11-00477, measured BGRA 128/0/16/255 expected 224/128/32/255",
+  "score_change": 0,
+  "next_action": "Do not re-run 00536 as complete; preserve R239 scoped GPU result, R175 owner independent; next different non-conflicting task once controller reconciles ownership"
+}
