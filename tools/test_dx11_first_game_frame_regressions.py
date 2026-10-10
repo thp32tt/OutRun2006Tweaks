@@ -76,7 +76,7 @@ def main() -> None:
         "const UINT candidateOrdinal = s.eligibleThisFrame++;",
         "++s.eligible;",
         "if (s.attempted || candidateOrdinal != s.probeSlot) return;",
-        "const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);",
+        "const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);",
         "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;",
         "s.eligibleThisFrame = 0;",
     )
