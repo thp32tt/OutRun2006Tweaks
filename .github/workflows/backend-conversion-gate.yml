@@ -318,6 +318,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_linear_depth_om_r210.py
 
+      # R211: depth-aware non-indexed eye must reject unexpected MRT outputs.
+      - name: Verify R211 linear single-eye OM target ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_single_eye_mrt_r211.py
+
       # R195: exact immutable IB sub-slice bounds, no duplicate WARP target.
       - name: Verify R195 native indexed slice ownership
         if: github.ref_name == 'vr-dx11-native-r71'

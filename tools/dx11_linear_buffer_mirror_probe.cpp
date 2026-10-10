@@ -286,6 +286,31 @@ int main() {
             ownDsv.Get(),depthState.Get());
     };
     require(exactDepthReady(), "R210 exact owned OM DSV and depth state");
+
+    // R211: old R210 verifies OM slot 0 only; a second same-device eye
+    // attachment must not be accepted as an isolated non-indexed eye.
+    const auto singleEyeDepthReady = [&] {
+        return outrun::vr::dx11::verified_linear_single_eye_depth_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            ownDsv.Get(),depthState.Get());
+    };
+    require(singleEyeDepthReady(), "R211 isolated single-eye depth ready");
+    D3D11_TEXTURE2D_DESC secondEyeDesc{};
+    color->GetDesc(&secondEyeDesc);
+    ComPtr<ID3D11Texture2D> secondEyeTexture;
+    ComPtr<ID3D11RenderTargetView> secondEyeView;
+    require(SUCCEEDED(dev->CreateTexture2D(&secondEyeDesc,nullptr,
+            secondEyeTexture.GetAddressOf())), "R211 create second-eye texture");
+    require(SUCCEEDED(dev->CreateRenderTargetView(secondEyeTexture.Get(),nullptr,
+            secondEyeView.GetAddressOf())), "R211 create second-eye RTV");
+    ID3D11RenderTargetView* twoEyes[] = {rawRTV,secondEyeView.Get()};
+    ctx->OMSetRenderTargets(2,twoEyes,ownDsv.Get());
+    require(exactDepthReady(), "R211 R210 slot-zero guard admits extra eye MRT");
+    require(!singleEyeDepthReady(), "R211 reject same-device secondary eye RTV");
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    require(singleEyeDepthReady(), "R211 restore one eye before real WARP Draw");
+
     require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
             vb,ctx.Get(),0,3,generation,version,
             layout.Get(),vs.Get(),ps.Get(),rtv.Get(),

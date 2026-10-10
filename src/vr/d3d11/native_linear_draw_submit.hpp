@@ -167,4 +167,38 @@ namespace outrun::vr::dx11 {
     expectedDepthState->GetDevice(ownerDevice.GetAddressOf());
     return ownerDevice.Get() == contextDevice.Get();
 }
+
+// R211: an exact depth-aware linear eye cannot have another OM color output.
+// R210 verifies RTV slot 0, but a retained MRT slot 1+ can receive an
+// unintended native shader SV_TargetN write into a different eye. Opt-in,
+// fail-closed; all OMGetRenderTargets references are released on every path.
+// Still no production D3D11 Draw dispatch or gameplay activation.
+[[nodiscard]] inline bool verified_linear_single_eye_depth_draw_ready(
+    const NativeLinearBufferMirror& vertexOwner,
+    ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t deviceGeneration,
+    std::uint64_t sourceSnapshotVersion,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState) noexcept {
+    if (!verified_linear_depth_om_identity_ready(
+            vertexOwner, context, startVertex, vertexCount,
+            deviceGeneration, sourceSnapshotVersion,
+            expectedLayout, expectedVs, expectedPs,
+            expectedRtv, expectedDsv, expectedDepthState))
+        return false;
+    ID3D11RenderTargetView* outputs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+    context->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                outputs, nullptr);
+    bool singleEye = outputs[0] == expectedRtv;
+    for (UINT slot = 1; slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++slot)
+        if (outputs[slot]) singleEye = false;
+    for (auto* output : outputs)
+        if (output) output->Release();
+    return singleEye;
+}
 } // namespace outrun::vr::dx11

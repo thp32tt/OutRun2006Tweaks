@@ -90,5 +90,26 @@
   "native_draw_path_activation_changed": false,
   "score_previous_ai2": 1066,
   "score_new_ai2": 1066,
-  "score_reason": "GitHub AI_SCOREBOARD.md AI2=1066 at 2026-10-10 09:14 KST; whole exact-SHA Gate failed independently owned R175, so no task-success point. 1066 + 0 = 1066."
+  "score_reason": "GitHub AI_SCOREBOARD.md AI2=1066 at 2026-10-10 09:14 KST; whole exact-SHA Gate failed independently owned R175, so no task-success point. 1066 + 0 = 1066.",
+  "retry_e004": {
+    "event_id": "CONVERSION-DX11-00508-E004",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "status": "WAITING_CI",
+    "checkpoint": "C4_COMMIT",
+    "work_key": "DX11:R211:NONINDEXED_DEPTH_OM_SINGLE_EYE_MRT_ISOLATION",
+    "conflict_keys": [
+      "src/vr/d3d11/native_linear_draw_submit.hpp:R211",
+      "tools/dx11_linear_buffer_mirror_probe.cpp:R211",
+      "tools/test_dx11_linear_single_eye_mrt_r211.py",
+      ".github/workflows/backend-conversion-gate.yml:R211"
+    ],
+    "prior_r210_validation_bearing_sha": "a1178f9c1e4d13a17ae097215054c408efcf078a",
+    "new_validation_bearing_sha": "PENDING_RESULT_COMMIT",
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "implementation": "R211 opt-in nonindexed depth OM guard refuses live RTV slots 1..7, retains R210 depth and R209 exact pipeline, restores bound one-eye state after WARP negative; no gameplay Draw",
+    "blocked_upstream": "R175 source owner 00477 remains separate; full exact SHA may fail prior TEXCOORD6 mismatch",
+    "next_action": "Await exact GitHub Backend Conversion Gate for R211 material result, record scoped/whole distinction"
+  }
 }
