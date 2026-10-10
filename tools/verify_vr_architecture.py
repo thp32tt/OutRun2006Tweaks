@@ -236,10 +236,21 @@ require(
     "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockTracker::Reliable()",
 )
+# R84 keeps projection provenance in R29 while R30 consumes only the
+# public lower-owner ABI. Require both sides so a missing forwarding edge fails.
 require(
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "R30SupportGetVerifiedProjection",
-    "OutRunVRRenderer::GetR28VerifiedProjection",
+    "R29OwnerGetR28VerifiedProjection(",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "bool R29OwnerGetR28VerifiedProjection(",
+    "OutRunVRRenderer::GetR28VerifiedProjection(",
+)
+require(
+    "src/vr/core/r29_owner_api.hpp",
+    "R29OwnerGetR28VerifiedProjection(",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
