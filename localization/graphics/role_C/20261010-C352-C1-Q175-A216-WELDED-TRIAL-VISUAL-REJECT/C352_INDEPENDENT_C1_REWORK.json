@@ -1,0 +1,206 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C352",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run_key": "OUTRUN-KOR-C352-C1-Q175-A216-NEW-WELDED-TRIAL-VISUAL-REJECT-20261010",
+  "review_id": "C352-C1-Q175-A216-EXACT-WELDED-GLYPH-FAIL",
+  "index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
+  },
+  "existing_official_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+  "new_trial_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+  "prior_official_C1": "C286_REWORK_REQUIRED for official SHA (not double-reviewed or reinstated)",
+  "exact_saved_DDS": {
+    "size_bytes": 8388736,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32_RGB32",
+    "mip_count": 1,
+    "header_identical": true,
+    "raw_to_readable": "FLIP_Y",
+    "official_to_trial_rgba_changed": 73078,
+    "official_to_trial_alpha_changed": 69961,
+    "official_to_trial_rgba_outside_original_bbox": 0,
+    "official_to_trial_alpha_outside_original_bbox": 0,
+    "trial_visible_alpha_bbox_readable": [
+      56,
+      400,
+      866,
+      527
+    ],
+    "source_original_effect_bbox_readable": [
+      6,
+      397,
+      956,
+      529
+    ],
+    "margins_source_relative": [
+      50,
+      90,
+      3,
+      2
+    ]
+  },
+  "scope_caveats": {
+    "full_atlas_source_to_official_outside_original_bbox_changed": 247717,
+    "full_atlas_source_to_trial_outside_original_bbox_changed": 247717,
+    "interpretation": "247717 source-to-current outside differences are INHERITED from official, byte-identical outside source bbox in the newly tested trial. Cannot treat all as newly changed/protected art loss without semantic sprite mapping. No independent exact SOURCE-to-CLEAN source-family proof was established."
+  },
+  "review_sequence": {
+    "pixels_first_before_producer_report": false,
+    "reason": "Producer JSON was consulted to identify new exact unpromoted candidate. Independent actual DDS visual and machine findings are separate, not inherited producer PASS.",
+    "triage": "MATERIAL_REWORK (read-only tool, refreshed queue)"
+  },
+  "observed_views": [
+    "canonical SOURCE / current OFFICIAL / A216 trial actual saved decoded native FLIP-Y gray/black/white 100/75/50",
+    "actual stored RAW view native",
+    "source/trial nearest 2x glyph silhouette and changed-pixel map"
+  ],
+  "visual": {
+    "original": "Readable original lowercase 'showroom' uses rounded connected welded-tech chrome contours and continuous curved letter bowls at 100%, 75%, 50%.",
+    "current_official": "Official Hangul 쇼룸 compact and distinguishable but stylized family remains known C286 REWORK; official is not being approved.",
+    "new_trial": "Trial hugely expands two syllable forms to a peaked roof with dangling posts (쇼) and detached long stacked horizontal tracks (룸), glyph identity is not immediately legible at native and 50%; does not preserve rounded connected source wordmark character/counter geometry.",
+    "contrast": "50% gray and black independently observed: source and official remain readable words, trial appears graphic roof and stacked bars rather than identifiable 쇼룸. White background does not cure topology mismatch. RAW orientation mirrors expected Y; orientation correct but not legibility.",
+    "conclusion": "Material glyph-contour and Korean syllable legibility FAIL outweighs positive bbox/alpha and source-width coverage."
+  },
+  "eight_gate_findings": [
+    {
+      "gate": "English/source cleanup",
+      "result": "HOLD_SCOPE",
+      "evidence": "Authoritative native CLEAN not separately authenticated; no claim of full original plate repair"
+    },
+    {
+      "gate": "Source-aligned slant",
+      "result": "FAIL_VISUAL_SOURCE_STYLE",
+      "evidence": "Joined rounded English techno face vs disjoint rail/roof trial lacks corresponding stroke geometry and anchors; cannot infer matched italic"
+    },
+    {
+      "gate": "Size/readability",
+      "result": "FAIL_VISUAL_READABILITY",
+      "evidence": "Trial bbox 810x127 within source 950x132, but two enlarged horizontal graphic shapes do not read promptly as Hangul at 50%"
+    },
+    {
+      "gate": "Font/fill/outline/shadow",
+      "result": "FAIL_VISUAL_SOURCE_FAMILY",
+      "evidence": "Source smooth connected rounded welded chrome vs trial straight stacked rails and angular roof, spatial/optical character mismatch"
+    },
+    {
+      "gate": "Clip/glyph completeness",
+      "result": "HOLD_TIGHT_MARGIN",
+      "evidence": "No change escaped source bbox; trial top3/bottom2px clearance, topology FAIL is not counted as clipping PASS"
+    },
+    {
+      "gate": "Protected graphics / collision",
+      "result": "PASS_SCOPED_DELTA",
+      "evidence": "Official-to-trial changed RGB/alpha outside exact source bbox both0; inherited source-original differences outside may require semantic inspection"
+    },
+    {
+      "gate": "RAW/FLIPY/mips",
+      "result": "PASS_SCOPED_STATIC",
+      "evidence": "Same 128-byte RGB32 DDS headers and mip1, actual RAW mirror Y corresponds to readable; no runtime claim"
+    },
+    {
+      "gate": "Immediate source-relative readability",
+      "result": "FAIL",
+      "evidence": "Trial horizontal bars/roof not immediately decodable as two Korean syllables next to source/showroom and official/쇼룸 at 100,75,50"
+    }
+  ],
+  "manifest": [
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_GRAY_100.png",
+      "sha256": "09b937ec1a0715c344d96d11f1b148af5bafb8c91dc74ccac83880fe08063a02",
+      "bytes": 75781
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_GRAY_75.png",
+      "sha256": "2530201a3d1b050429e0cb2952ed4cdd96d63486d30d073a1b3e1637349ac94c",
+      "bytes": 57542
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_GRAY_50.png",
+      "sha256": "8847b29a2c0870479a3dd005d8e7019d83b55650da021b1fb85a840d178752e4",
+      "bytes": 31350
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_BLACK_100.png",
+      "sha256": "3c83339858ef6568ddfd122a402a451c74a745ba717a130977fcfa1d63dbb791",
+      "bytes": 72806
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_BLACK_75.png",
+      "sha256": "4a7a7040f13bc842a6a7ca3d4b76b1340d554b2582bb0aec00302c2ec342e0d1",
+      "bytes": 53854
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_BLACK_50.png",
+      "sha256": "5d62e33e42ff55f3b7af4d84086f539e645d75caf94cdd70fec662ff47800890",
+      "bytes": 29205
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_WHITE_100.png",
+      "sha256": "21b1df69129ca02a53134a4bdcf204fd0d92bc6d141f5adb509d9e1399660cef",
+      "bytes": 78662
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_WHITE_75.png",
+      "sha256": "acb32c86214402cdb07f6f2f94a4092ae95678f3a4fe89e5c4fd30835cfc1186",
+      "bytes": 58827
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_WHITE_50.png",
+      "sha256": "78b18df67e219ccecfa976dbf151e527babeb866945a57e3edf1b54cd0099701",
+      "bytes": 31478
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_RAW_100.png",
+      "sha256": "0d51b5e8272dbd1b6c8093e03963a3fdf7f83d4f3fffea2c6af4a67c92b21351",
+      "bytes": 76919
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_SOURCE_NEAREST_2X.png",
+      "sha256": "d080c2f2ff6b979250035a5e2379302a245afbdd84aa003aaaa1f6624f734197",
+      "bytes": 37776
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_TRIAL_NEAREST_2X.png",
+      "sha256": "4706798e250cfd185716ab1d4bbdec1219c61f83dabc4a36355f67f55e44233d",
+      "bytes": 27754
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_Q175_OLD_TO_TRIAL_DELTA_MASK_2X.png",
+      "sha256": "2ddd0755f74a0a0b3c1a623946d3c69efa52b6af872c0173ee80cb2ad30f9a1f",
+      "bytes": 3124
+    }
+  ],
+  "machine_report": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_INDEPENDENT_MACHINE.json",
+  "verdict": "REWORK_REQUIRED_NEW_TRIAL_SHA_ONLY",
+  "official_queue_status": "c286_rework_required_chrome_glyph_family (unchanged official SHA)",
+  "method_change": "Stop rail/roof approach; redesign properly formed native Korean syllable component topology and source-rounded connected chrome counters BEFORE extrusion/material, ensure legible at 50% and independent source-family slant/clean proof. Do not recast same shape via scale/color.",
+  "full_current_official_C1": "C286_REWORK_REQUIRED_PRESERVED",
+  "C3": "BLOCKED_BY_C1_VISUAL_FAIL",
+  "APPROVALS": "NOT_GRANTED",
+  "USER_REVIEW": "IGR-032_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "promoted_dds": 0,
+  "new_dds_by_C": 0,
+  "scope_exclusions": [
+    "C2_EVEN",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_ID_QUEUE"
+  ]
+}

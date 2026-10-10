@@ -14482,5 +14482,29 @@
     "worker_run": 38011800333,
     "qa_report": "localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json",
     "updated_at_kst": "2026-10-10 10:12 KST"
+  },
+  "c352_c1_q175_a216_new_welded_trial_rework": {
+    "run_key": "OUTRUN-KOR-C352-C1-Q175-A216-NEW-WELDED-TRIAL-VISUAL-REJECT-20261010",
+    "role": "C1",
+    "shard": "ODD",
+    "index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "official_sha256": "b9f60b4582ddb4db525806454078471e1045f30a2d65e6da4d4681b87ee6ba73",
+    "new_unpromoted_trial_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+    "independent_trial_C1": "REWORK_REQUIRED_VISUAL_TOPOLOGY_AND_READABILITY",
+    "official_C1": "C286_REWORK_REQUIRED_UNCHANGED",
+    "official_to_trial_changed_rgba": 73078,
+    "official_to_trial_changed_alpha": 69961,
+    "official_to_trial_changed_rgba_outside_source_bbox": 0,
+    "official_to_trial_changed_alpha_outside_source_bbox": 0,
+    "report": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_INDEPENDENT_C1_REWORK.json",
+    "machine_report": "localization/graphics/role_C/20261010-C352-C1-Q175-A216-WELDED-TRIAL-VISUAL-REJECT/C352_INDEPENDENT_MACHINE.json",
+    "evidence_png": 13,
+    "promoted_dds": 0,
+    "C3": "BLOCKED",
+    "APPROVALS": "NOT_GRANTED",
+    "user_ingame": "IGR032_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
