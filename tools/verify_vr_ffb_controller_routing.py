@@ -84,7 +84,9 @@ def violations(source: str) -> list[str]:
         "InputManager_StopVibration();\n        sdlRumbleOutputActive = false;\n    }" not in route
     ):
         errors.append("SDL-to-XInput handoff must cancel the previously timed SDL rumble")
-    wheel = route.split("if (WheelFFB_IsOutputOwnerActive())", 1)[1].split("wheelOwnedLastCall = false;", 1)[0]
+    wheel = (route.split("if (WheelFFB_IsOutputOwnerActive())", 1)[1]
+             .split("wheelOwnedLastCall = false;", 1)[0]
+             if "if (WheelFFB_IsOutputOwnerActive())" in route else "")
     disabled_stop = route.split("if (!Settings::VibrationMode)", 1)[1].split("rumbleDisabledLastCall = true;", 1)[0]
     if "InputManager_StopVibration();\n            sdlRumbleOutputActive = false;" not in wheel or (
         "InputManager_StopVibration();\n            sdlRumbleOutputActive = false;" not in disabled_stop
