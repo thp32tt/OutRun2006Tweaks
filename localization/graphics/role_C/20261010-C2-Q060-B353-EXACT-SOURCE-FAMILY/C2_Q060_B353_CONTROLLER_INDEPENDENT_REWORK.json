@@ -1,0 +1,128 @@
+{
+  "role": "C2",
+  "shard": "EVEN",
+  "index": 60,
+  "run_key": "OUTRUN-KOR-C2-Q060-B353-NEW-SHA-SOURCE-FAMILY-20261010-2020",
+  "timestamp_kst": "2026-10-10T20:30:08+09:00",
+  "result": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_OPTICAL_FAIL",
+  "exact_sha256": {
+    "source": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "official": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "trial": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+    "clean": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
+  },
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "machine_report": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_INDEPENDENT_MACHINE.json",
+  "new_sha_distinct_from_previously_reviewed_B351": true,
+  "independent_inspection_firstlook": "Compared saved source/clean/official/B353 at native and 50 percent before reading producer QA, then directly decoded originals for fresh independent screenshots.",
+  "blind_calibration": "NOT_QUALIFIED_FOR_PASS",
+  "region": "BEST TIME:",
+  "translation": "최고 기록:",
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "trial_effect_bbox": [
+    2245,
+    348,
+    2983,
+    472
+  ],
+  "checks": {
+    "slant": {
+      "result": "HOLD",
+      "observation": "Original racing right italic visual direction stronger than Korean; homologous top-bottom stem anchors not measured, no numeric slant PASS.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_GRAY_100.png"
+    },
+    "clean_plate": {
+      "result": "PASS_SCOPED",
+      "observation": "Canonical source and authored B348 CLEAN independently SHA authenticated. 89391 source->clean changes inside English source textbox, outside 0, CLEAN alpha0 inside textbox.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_SOURCE_TO_CLEAN_CHANGED_MASK.png"
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Korean gold lettering has substantially flatter face, weaker source orange/navy depth and forward italic dynamics than BEST TIME racing logo.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_GRAY_100.png"
+    },
+    "readability": {
+      "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+      "observation": "Korean legible at 50 percent, but lacks thick racing header emphasis relative to original. English box 849x134 and Korean effect 738x124; no arbitrary width threshold.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_BLACK_50.png"
+    },
+    "glyph_integrity": {
+      "result": "PASS_SCOPED",
+      "observation": "Saved glyph strokes look intact on direct 100/75/50 source-cell crop; no new clipped Hangul fragment identified.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_B353_TRIAL_GRAY_SOURCE_ROI_NATIVE.png"
+    },
+    "protected_art": {
+      "result": "PASS_SCOPED",
+      "observation": "Official-to-B353 direct persisted RGBA deltas 88852 all inside worker ROI, outside rgba and alpha 0. 9027 deltas outside original source text core are inside same worker ROI and cannot be classified as new damage without old-candidate attribution.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_OFFICIAL_TO_B353_CHANGED_MASK.png"
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "Korean effect bbox within source bbox with positive margins [66,45,8,2]; source-relative anchors and full in-game composition are unqualified.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_GRAY_100.png"
+    },
+    "orientation": {
+      "result": "PASS_SCOPED",
+      "observation": "Independent decoded 4096x2048 one-mip RGBA32 RAW and readable FLIPY both checked; visual style issue persists.",
+      "evidence": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_TRIAL_RAW_NATIVE.png"
+    }
+  },
+  "views": {
+    "native": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_GRAY_100.png",
+    "raw": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_TRIAL_RAW_NATIVE.png",
+    "flip_y": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_TRIAL_FLIPY_NATIVE.png",
+    "black_50": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_BLACK_50.png",
+    "gray_75": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_GRAY_75.png",
+    "white_100": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_FOUR_WHITE_100.png"
+  },
+  "pixel_findings": {
+    "SOURCE_TO_CLEAN": {
+      "rgba_full": 89391,
+      "alpha_full": 89391,
+      "rgba_outside_sourcebox": 0,
+      "alpha_outside_sourcebox": 0,
+      "rgba_outside_worker_roi": 0,
+      "alpha_outside_worker_roi": 0
+    },
+    "CLEAN_TO_TRIAL": {
+      "rgba_full": 1546241,
+      "alpha_full": 1131020,
+      "rgba_outside_sourcebox": 1505149,
+      "alpha_outside_sourcebox": 1089928,
+      "rgba_outside_worker_roi": 1505149,
+      "alpha_outside_worker_roi": 1089928
+    },
+    "OFFICIAL_TO_TRIAL": {
+      "rgba_full": 88852,
+      "alpha_full": 56629,
+      "rgba_outside_sourcebox": 9027,
+      "alpha_outside_sourcebox": 6357,
+      "rgba_outside_worker_roi": 0,
+      "alpha_outside_worker_roi": 0
+    },
+    "SOURCE_TO_TRIAL": {
+      "rgba_full": 1595252,
+      "alpha_full": 1151447,
+      "rgba_outside_sourcebox": 1505149,
+      "alpha_outside_sourcebox": 1089928,
+      "rgba_outside_worker_roi": 1505149,
+      "alpha_outside_worker_roi": 1089928
+    }
+  },
+  "rework_instruction": "Manual source-derived angular Hangul vector contours + original deep orange/blue bevel and measured forward lean. Do not repeat same generic Bold/shear method.",
+  "limits": "Full authored CLEAN is source baseline for other English texts, while saved official and B353 contain other Korean areas. CLEAN-to-trial full-atlas delta outside BEST TIME is not new unauthorized edit; measure official-to-trial worker ROI separately.",
+  "official_status_unchanged": "c342_c2_rework_required_native_best_time_orange_overlap",
+  "new_DDS_promoted": 0,
+  "C2_PASS": 0,
+  "C3": "BLOCKED_NOT_RUN",
+  "APPROVAL": "NONE",
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub SSOT; N100 MCP fallback exact checked-out SOURCE/CLEAN and DDS persisted native decode",
+  "VR_FFB_DX11_DXVK_touched": false
+}

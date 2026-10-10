@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C2 q060 new trial B353 optical source-family REWORK, same-method rerender blocked, old C342 official unchanged; OUTRUN-KOR-C2-Q060-B353-NEW-SHA-SOURCE-FAMILY-20261010-2020",
     "A227 2026-10-10 20:08 KST measured English E vs Korean 이 first-glyph native source-family alpha outline: -0.33202 versus -0.31126 dx/dy, 23 rows, 12 threshold/window evidence and native 4x plot. Prior A226 exact DDS unchanged, official still REWORK, C1 HOLD until full source + blind multi-glyph, C3/game UNTESTED. localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json RUN_KEY=OUTRUN-KOR-A227-Q101-FIRSTGLYPH-SOURCE-ANCHOR-20261010-2000",
     "C2 q212 B357 independent persisted SHA pixel visual FAIL: old official Hangul visible alpha32 source-core overflow r43 5638, r44 712; official C338 unchanged and IGR029 OPEN; OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000.",
     "C1 q119 first-glyph DXT5 native source T right-lean +13px/34, Korean 타 right-lean +9px/34; 2 native annotated PNG and machine proof; boundary outside visible0 and source-final RGBA/alpha0; independent C1 HOLD pending blind full family/C3/user game. DDS 0. OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
@@ -15457,5 +15458,16 @@
     "QA": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json",
     "machine": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
     "figure": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png"
+  },
+  "c2_q060_b353_new_sha_independent_20261010": {
+    "run_key": "OUTRUN-KOR-C2-Q060-B353-NEW-SHA-SOURCE-FAMILY-20261010-2020",
+    "timestamp_kst": "2026-10-10T20:30:08+09:00",
+    "role": "C2",
+    "queue_index": 60,
+    "candidate_sha256": "a44bf0ade48f6f82dc50e2df739ba9ee7339ac1b5d3557e5ea6e30f8d798e9cc",
+    "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "result": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_OPTICAL_FAIL",
+    "report": "localization/graphics/role_C/20261010-C2-Q060-B353-EXACT-SOURCE-FAMILY/C2_Q060_B353_CONTROLLER_INDEPENDENT_REWORK.json",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
