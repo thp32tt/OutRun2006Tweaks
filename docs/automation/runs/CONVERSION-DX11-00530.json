@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00530",
+  "production_id": "CONVERSION-DX11-00530",
+  "event_id": "CONVERSION-DX11-00530-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "585869bdcccf21f7fa97f241d678345ff0921d9f",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00530",
+  "lease_epoch": 1,
+  "work_key": "DX11:R233:NATIVE_LINEAR_SINGLE_IA_STREAM_OWNERSHIP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+    "tools/test_dx11_linear_buffer_owner_r183.py"
+  ],
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R233 actual D3D11 IA stream 1..31 clearing during owned VB binding and same-context foreign stream detection with complete COM Release on every failure path.",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+    "tools/test_dx11_linear_buffer_owner_r183.py",
+    "docs/automation/runs/CONVERSION-DX11-00530.json"
+  ],
+  "pipeline": {
+    "C0": "PASS GitHub current HEAD, AGENTS, campaign index, controller contract and 00530 checkpoint recovered; 00529 terminal R175 dependency separated",
+    "C1": "PASS independent R233 single-stream owner; does not modify R232/R175 source",
+    "C2": "PASS actual native IA extra-stream unbinding plus live bound-object cleanup and R183 8-mutant static regression",
+    "C3": "Precommit single-run 8 deletion mutants all rejected; exact SHA Windows CI PENDING",
+    "C4": "One material source/test/record batch without CI skip",
+    "C5": "NOT_REQUIRED dormant conversion; no gameplay activation/package",
+    "C6": "WAIT_EXACT_SHA_GATE; may be blocked by pre-existing R175"
+  },
+  "blockers": [
+    "Inherited R175 WARP constant buffer varying failure owned by CONVERSION-DX11-00477 may fail entire Gate",
+    "Quest3/VDXR HMD test not performed"
+  ],
+  "evidence": {
+    "precommit_static": "8 deletion mutants rejected; existing R183 generation and WARP contract preserved",
+    "inherited_gate_run": 38040255183,
+    "predecessor_terminal_doc_commit": "585869bdcccf21f7fa97f241d678345ff0921d9f",
+    "controller_checkpoint": "chat-controller-downloads/tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00530/20261010T1815-periodic.json"
+  },
+  "resume_cursor": "WAIT_EXACT_SHA_GATE",
+  "next_action": "Inspect Backend Conversion Gate exact SHA; retain separate R175 and HMD outcomes.",
+  "score_change": 0
+}

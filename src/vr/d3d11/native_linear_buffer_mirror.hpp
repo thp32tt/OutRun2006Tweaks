@@ -163,6 +163,14 @@ public:
             ID3D11Buffer* raw = buffer_.Get();
             const UINT offset = 0;
             context->IASetVertexBuffers(0, 1, &raw, &stride_, &offset);
+            // R233: translated input layout consumes stream zero only.
+            // Clear surviving unrelated IA buffers before owned Draw usage.
+            ID3D11Buffer* nullStreams[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            UINT zeroStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            UINT zeroOffsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            context->IASetVertexBuffers(
+                1, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1,
+                nullStreams, zeroStrides, zeroOffsets);
         } else {
             context->IASetIndexBuffer(buffer_.Get(), format_, 0);
         }
@@ -181,8 +189,24 @@ public:
             UINT liveStride = 0, offset = 1;
             context->IAGetVertexBuffers(0, 1, live.GetAddressOf(),
                                          &liveStride, &offset);
+            // R233: IAGetVertexBuffers AddRefs all returned stream buffers.
+            // Reject unexpected live IA streams and release every reference.
+            ID3D11Buffer* extraStreams[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            UINT extraStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            UINT extraOffsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};
+            context->IAGetVertexBuffers(
+                1, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1,
+                extraStreams, extraStrides, extraOffsets);
+            bool soleOwnedStream = true;
+            for (auto* stream : extraStreams) {
+                if (stream) {
+                    soleOwnedStream = false;
+                    stream->Release();
+                }
+            }
             return live.Get() == buffer_.Get() &&
-                liveStride == stride_ && offset == 0;
+                liveStride == stride_ && offset == 0 &&
+                soleOwnedStream;
         }
         DXGI_FORMAT liveFormat = DXGI_FORMAT_UNKNOWN;
         UINT offset = 1;

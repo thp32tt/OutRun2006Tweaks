@@ -28,6 +28,27 @@ for a,b in (
     mutant_h=h.replace(a,b,1)
     mutant_p=p.replace(a,b,1)
     assert (mutant_h!=h or mutant_p!=p) and not valid(mutant_h,mutant_p),a
+
+# R233: real IA binding clears all unowned streams; later live mutation
+# cannot masquerade as a single-stream snapshot. Getters AddRef buffers.
+single_stream_guards = (
+    "ID3D11Buffer* nullStreams[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};",
+    "nullStreams, zeroStrides, zeroOffsets);",
+    "ID3D11Buffer* extraStreams[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1]{};",
+    "extraStreams, extraStrides, extraOffsets);",
+    "for (auto* stream : extraStreams)",
+    "soleOwnedStream = false;",
+    "stream->Release();",
+    "soleOwnedStream;",
+)
+def r233_intact(code):
+    return all(token in code for token in single_stream_guards)
+assert r233_intact(h), "R233 IA stream 1..31 clear/live-check/COM cleanup missing"
+for token in single_stream_guards:
+    negative = h.replace(token, "/* intentionally removed */", 1)
+    assert negative != h and not r233_intact(negative), (
+        "R233 negative mutation survived: " + token)
+
 assert "[target.dx11_linear_buffer_mirror_probe]" in cm
 assert "add_executable(dx11_linear_buffer_mirror_probe)" in generated
 assert gate.index("Run DX11 linear VB/IB mirror R183 WARP probe") < gate.index("Build DX11 constant buffer probe")
