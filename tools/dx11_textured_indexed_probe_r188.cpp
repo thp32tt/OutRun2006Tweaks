@@ -119,7 +119,7 @@ int main() {
         &mutableDesc,&redData,mutableSource.GetAddressOf())),
         "R228 create writable-revision DEFAULT indexed source");
     require(SUCCEEDED(dev->CreateShaderResourceView(
-        mutableSource.Get(),nullptr,mutableSrv.Get())),
+        mutableSource.Get(),nullptr,mutableSrv.GetAddressOf())),
         "R228 create DEFAULT indexed SRV");
     ID3D11ShaderResourceView* rawMutable=mutableSrv.Get();
     ctx->PSSetShaderResources(0,1,&rawMutable);
@@ -132,7 +132,7 @@ int main() {
         &mutableDesc,&redData,aliasedSource.GetAddressOf())),
         "R228 create writable RTV-SRV indexed alias");
     require(SUCCEEDED(dev->CreateShaderResourceView(
-        aliasedSource.Get(),nullptr,aliasedSrv.Get())),
+        aliasedSource.Get(),nullptr,aliasedSrv.GetAddressOf())),
         "R228 create RTV-SRV indexed source view");
     ID3D11ShaderResourceView* rawAliased=aliasedSrv.Get();
     ctx->PSSetShaderResources(0,1,&rawAliased);
