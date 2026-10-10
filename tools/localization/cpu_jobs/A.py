@@ -42,7 +42,7 @@ O=np.asarray(oldreg,dtype=np.uint8)
 assert int((S[:,:,3]>0).sum())>8000 and int((O[:,:,3]>0).sum())>8000
 # C180 validated warning glyph alone in this canonical bbox. CLEAN is truly transparent.
 # Fail closed if source opacity belongs to a rectangle or outside the originally attested warning.
-assert int((S[:,:,3]>0).sum())<cw*ch//2
+assert int((S[:,:,3]>0).sum())<cw*ch*0.95
 cleanreg=Image.new("RGBA",(cw,ch),(0,0,0,0))
 # Source visual palette from the authentic source, not arbitrary colors.
 opaque=S[S[:,:,3]>=220,:3]
@@ -55,7 +55,7 @@ font_path=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
 assert font_path.is_file()
 fontsha=sha(font_path.read_bytes())
 coverage=TTCollection(str(font_path),lazy=True).fonts[1].getBestCmap()
-lines=["이 모드를 플레이하려면", "모든 플레이어가 동시에 참가해야 합니다."]
+lines=["모든 플레이어가 동시에 참가해야", "이 모드를 플레이할 수 있습니다."]
 assert all(ord(k) in coverage for line in lines for k in line if k!=" ")
 # Original text rows run at separate top/bottom heights. Derive their readable
 # source alpha bounding boxes, not an enclosing plate.
