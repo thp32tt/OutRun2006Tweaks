@@ -339,6 +339,20 @@ int main() {
     require(r218Ready(r217Dsv.Get()),"R218 ready before restored WARP DrawIndexed");
     context->DrawIndexed(3u,0u,0);
     require(r217ReadCenter(true),"R218 restored WARP green indexed pixel");
+    // R226: actual indexed WARP GPU draw under the new dedicated depth
+    // resource preflight; no game-native DrawIndexed activation.
+    D3D11_TEXTURE2D_DESC r226Backing{};
+    r217DepthTex->GetDesc(&r226Backing);
+    require(r226Backing.BindFlags == D3D11_BIND_DEPTH_STENCIL &&
+            r226Backing.MiscFlags == 0u,
+            "R226 WARP D32 dedicated backing descriptor");
+    require(r218Ready(r217Dsv.Get()), "R226 dedicated D32 ready");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),
+            "R226 dedicated D32 indexed DrawIndexed green pixel");
+
 
     // R219: an OM UAV does not occupy a second RTV slot. The old composed
     // full-eye guard accepts it even though a real indexed PS can write it.

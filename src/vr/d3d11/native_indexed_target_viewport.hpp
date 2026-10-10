@@ -132,8 +132,12 @@ namespace outrun::vr::dx11 {
         depthDesc.SampleDesc.Quality != 0 ||
         depthDesc.Format != DXGI_FORMAT_D32_FLOAT ||
         depthDesc.Usage != D3D11_USAGE_DEFAULT ||
+        // R226: a typed D32 DSV is not a dedicated depth eye if the
+        // backing texture admits auxiliary bindings or alias-capable flags.
+        // Readiness-only: game DrawIndexed stays dormant.
         depthDesc.CPUAccessFlags != 0 ||
-        !(depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL))
+        depthDesc.MiscFlags != 0 ||
+        depthDesc.BindFlags != D3D11_BIND_DEPTH_STENCIL)
         return false;
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> liveRaster;
     context->RSGetState(liveRaster.GetAddressOf());

@@ -390,6 +390,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
         run: python tools/test_dx11_indexed_sealed_eye_r218.py
+      - name: Verify DX11 R226 indexed D32 depth-only ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_indexed_depth_dedicated_r226.py
+
 
       # R219: no hidden OM UAV/second-eye writes during indexed DrawIndexed.
       - name: Verify R219 indexed OM UAV isolation

@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00523",
+  "production_id": "CONVERSION-DX11-00523",
+  "event_id": "CONVERSION-DX11-00523-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00523",
+  "lease_epoch": 1,
+  "work_key": "DX11:R226:INDEXED_D32_DEPTH_DEDICATED_BIND_MISC_GUARD",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R226",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R226",
+    "tools/test_dx11_indexed_depth_dedicated_r226.py",
+    ".github/workflows/backend-conversion-gate.yml:R226"
+  ],
+  "base_sha": "de0331e7cd85e66da5012e7d70e7ecffe8c1b90c",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "WAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "pipeline": {
+    "C0": "PASS: branch GitHub HEAD and controller checkpoint; 00523 run absent; predecessor 00522 terminal upstream R175 block",
+    "C1": "PASS: indexed D32 texture accepts auxiliary bind/misc flags under R218; R175 separate owner",
+    "C2": "PASS: production readiness source, real indexed WARP fixture, 5 negative source mutations and workflow hookup",
+    "C3": "SCOPED_LOCAL_STATIC_PASS; EXACT_SHA_GATE_PENDING",
+    "C4": "MATERIAL_COMMIT_IN_THIS_TRANSACTION",
+    "C5": "NOT_REQUIRED: game DrawIndexed dormant, no HMD package",
+    "C6": "PENDING_EXACT_SHA_CI_RESULT"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_depth_dedicated_r226.py",
+    "docs/automation/runs/CONVERSION-DX11-00523.json"
+  ],
+  "static_validation": "PASS 5 source negative mutants simulated by contract; formal Python test in CI",
+  "blockers": [
+    "Inherited R175 WARP generic-varying BGRA mismatch independently owned by DX11-00477",
+    "Quest3 VDXR untested"
+  ],
+  "resume_cursor": "READ_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "next_action": "If exact-SHA Gate passes mark automation PASS in follow-up no-CI status commit; if inherited R175 failure distinguish scoped R226 vs global FAIL and seal truthfully, not as runtime PASS.",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "timestamp_kst": "2026-10-10T15:36:00+09:00"
+}
