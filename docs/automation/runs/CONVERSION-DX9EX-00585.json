@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00585",
+  "production_id": "CONVERSION-DX9EX-00585",
+  "event_id": "CONVERSION-DX9EX-00585-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "slot": "C",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "base_sha": "4aed2883e0829376b4accea508f9650fe8fb28c9",
+  "first_material_sha": "873443e0c5a4033be13e783c21f4abd82bdc573f",
+  "validation_bearing_result_sha": "ca6893e7d8c95ec0920418c41d388b1ad9ac4ab9",
+  "result_sha": "ca6893e7d8c95ec0920418c41d388b1ad9ac4ab9",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00585]",
+  "work_key": "DX9EX:P1:R84_R31_SHADER_EPOCH_OWNER",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "source_mode": "CHAT_DIRECT",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "tools/verify_vr_r31_support_api_seam.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "summary": "R31 shader-epoch provenance now uses explicitly declared R30 ABI, maintaining the same lower shader identity+serial gate. The R31 verifier rejects old textual-chain dependency. Existing R32 retirement guard corrected to require R30 support target facade and original R30 hook destinations. Existing full R84 textual include / CMake translation-unit convergence is still incomplete.",
+  "validation": {
+    "dx9ex_active": {
+      "run_id": 38042705464,
+      "sha": "ca6893e7d8c95ec0920418c41d388b1ad9ac4ab9",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38042705358,
+      "sha": "ca6893e7d8c95ec0920418c41d388b1ad9ac4ab9",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38042595052,
+      "sha": "873443e0c5a4033be13e783c21f4abd82bdc573f",
+      "conclusion": "success",
+      "note": "First source material SHA; final SHA only changes structural policy verifier. Do not report Full Source as final exact-SHA run."
+    },
+    "failed_prior_material": {
+      "run_id": 38042594969,
+      "sha": "873443e0c5a4033be13e783c21f4abd82bdc573f",
+      "cause": "Stale R31/R32 retirement guard insisted on retired private physical trampoline access; repaired in validation-bearing SHA."
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_AND_DOMAIN; FULL_SOURCE_PASS_ON_FIRST_SOURCE_SHA",
+  "package_artifact": {
+    "id": 11665818130,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-ca6893e7d8c95ec0920418c41d388b1ad9ac4ab9",
+    "digest": "sha256:b0b9e290ed258c7b22fbdc643afc5a0f7865078f72916db58b769e06e1771558"
+  },
+  "runtime_validation": "UNTESTED",
+  "hmd_test": "NOT_RUN",
+  "native_120fps": "NOT_MEASURED",
+  "ffb_release": "v0.2",
+  "ffb_source_changed": false,
+  "dxvk_status": "FROZEN",
+  "baseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+  "baseline_changed": false,
+  "r84_convergence": "INCOMPLETE_PENDING_R32_R31_R30_R29_TU_AND_CMAKE_CLEANUP",
+  "success_scope": "Owner ABI seam and regression protections only; not R84 full completion and not Quest3 optical acceptance",
+  "next_action": "Continue full bounded R84 TU graph cleanup on next independent work_key; preserve FFB/input and VR HUD hook/device-loss/domain regression; measure on Quest3/VDXR before runtime PASS.",
+  "result_identity": {
+    "material_commit_role": "VALIDATION_BEARING_RESULT",
+    "bookkeeping_commit_role": "BOOKKEEPING_ONLY"
+  }
+}
