@@ -1136,6 +1136,18 @@ def queue_dynamic_prefix() -> str:
             "다른 작업자와 같은 work_key/파일/Task를 중복 수정하지 말고 원격 claim/HEAD를 확인해. 이미 진행 중인 CI는 새 상태 커밋으로 취소하지 마.",
             "배포/실기 PASS는 실제 Quest3/VDXR 검증 이후에만 선언해. 완료한 C0~C6+정확한 GitHub Gate가 확인되면 기존 TASK_ID를 재실행하지 말고 다음 독립 항목을 진행해.",
         ]
+    if lane in {"DX11", "DX9EX"}:
+        lines += [
+            "BATCH_COMPILE_POLICY=GROUPED: 작은 소스 수정마다 전체 컴파일·Win32/WARP·호스트/게임 CI를 돌리지 마. "
+            "같은 TASK_ID/work_key/소유 코드의 관련된 2~5개 수정(또는 완성 가능한 한 기능)을 약 20분 이내 한 배치로 묶어. "
+            "중간 수정은 문법/국소 정적·단위 검사만 필요시 시행하고, 최종 material commit 한 번에 필수 exact-SHA GitHub Actions 전체 검증을 수행해. "
+            "실패 시 필요한 부분만 고친 새 SHA에 대해 Gate를 다시 실행하며 ABI·hook·메모리 위험은 조기 검증할 수 있다.",
+            "5분 컨트롤러 GitHub 체크포인트와 30분 대화 롤오버를 유지하되 게임 브랜치에 미완성 소스를 한 줄씩 push하지 마. "
+            "미완성 변경이 롤오버로 소실될 위험이 있다면 TASK_ID 전용 GitHub 임시 브랜치에 보존하고 "
+            "재개 시 HEAD/owner/work_key를 확인해 최종 배치 커밋에 통합해. "
+            "임시 브랜치는 final material [AUTO:TASK_ID] 및 완료 판정이 아니다. "
+            "최종 결과는 exact-SHA 필수 CI PASS 이후에만 PASS, 실기 미검증은 RUNTIME_VALIDATION=UNTESTED다.",
+        ]
     if lane.startswith("LOCALIZATION_"):
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
