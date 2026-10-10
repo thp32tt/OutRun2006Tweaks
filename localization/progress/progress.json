@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 09:10 KST",
+  "updated_at_kst": "2026-10-10 09:45 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10205,5 +10205,21 @@
     "new_png": 15,
     "qa_report": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_CONTROLLER_C1_HOLD.json",
     "runtime_validation": "UNTESTED"
+  },
+  "b346_q176_source_red_heavy_pilot": {
+    "date_kst": "2026-10-10 09:45 KST",
+    "role": "B",
+    "queue_index": 176,
+    "previous_official_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "failed_trial_sha256": "34edd2aa06eb8dc8611c8b67738d147e3197325e1af6e54347439b491838075f",
+    "new_trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+    "workflow_run_id": 38009996777,
+    "trial_dds": 1,
+    "promoted_dds": 0,
+    "current_C2": "REWORK_REQUIRED",
+    "C3": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "producer_visual": "SCOPED_ACCEPT_AFTER_COUNTER_FIX",
+    "evidence": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json"
   }
 }
