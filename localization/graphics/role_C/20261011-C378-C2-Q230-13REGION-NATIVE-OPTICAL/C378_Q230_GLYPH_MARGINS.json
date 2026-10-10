@@ -1,0 +1,496 @@
+[
+  {
+    "id": "unavailable",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        2,
+        353,
+        41
+      ],
+      "margin_ltrb": [
+        0,
+        2,
+        0,
+        0
+      ],
+      "glyph_pixels": 6545,
+      "right_edge_filled": 7,
+      "left_edge_filled": 29
+    },
+    "final": {
+      "bbox_relative": [
+        109,
+        5,
+        243,
+        38
+      ],
+      "margin_ltrb": [
+        109,
+        5,
+        110,
+        3
+      ],
+      "glyph_pixels": 1925,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "sold",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        1,
+        121,
+        41
+      ],
+      "margin_ltrb": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "glyph_pixels": 2516,
+      "right_edge_filled": 18,
+      "left_edge_filled": 1
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        6,
+        118,
+        35
+      ],
+      "margin_ltrb": [
+        3,
+        6,
+        3,
+        6
+      ],
+      "glyph_pixels": 1544,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "bonus",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        0,
+        532,
+        52
+      ],
+      "margin_ltrb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "glyph_pixels": 15168,
+      "right_edge_filled": 12,
+      "left_edge_filled": 44
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        2,
+        236,
+        49
+      ],
+      "margin_ltrb": [
+        3,
+        2,
+        296,
+        3
+      ],
+      "glyph_pixels": 4303,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "courses",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        4,
+        0,
+        280,
+        52
+      ],
+      "margin_ltrb": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "glyph_pixels": 7728,
+      "right_edge_filled": 20,
+      "left_edge_filled": 0
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        6,
+        89,
+        45
+      ],
+      "margin_ltrb": [
+        3,
+        6,
+        191,
+        7
+      ],
+      "glyph_pixels": 1516,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "game_modes",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        0,
+        404,
+        52
+      ],
+      "margin_ltrb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "glyph_pixels": 11712,
+      "right_edge_filled": 8,
+      "left_edge_filled": 28
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        2,
+        191,
+        49
+      ],
+      "margin_ltrb": [
+        3,
+        2,
+        213,
+        3
+      ],
+      "glyph_pixels": 3749,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "carcolors",
+    "family": "dark",
+    "source": {
+      "bbox_relative": [
+        0,
+        1,
+        351,
+        50
+      ],
+      "margin_ltrb": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "glyph_pixels": 9015,
+      "right_edge_filled": 8,
+      "left_edge_filled": 22
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        2,
+        188,
+        49
+      ],
+      "margin_ltrb": [
+        3,
+        2,
+        163,
+        2
+      ],
+      "glyph_pixels": 4144,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "bgmusic",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        4,
+        0,
+        276,
+        52
+      ],
+      "margin_ltrb": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "glyph_pixels": 8320,
+      "right_edge_filled": 8,
+      "left_edge_filled": 0
+    },
+    "final": {
+      "bbox_relative": [
+        2,
+        7,
+        107,
+        45
+      ],
+      "margin_ltrb": [
+        2,
+        7,
+        169,
+        7
+      ],
+      "glyph_pixels": 2409,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "carcolours",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        4,
+        12,
+        412,
+        64
+      ],
+      "margin_ltrb": [
+        4,
+        12,
+        4,
+        0
+      ],
+      "glyph_pixels": 10704,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        8,
+        192,
+        55
+      ],
+      "margin_ltrb": [
+        3,
+        8,
+        224,
+        9
+      ],
+      "glyph_pixels": 4003,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "ferraris",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        4,
+        320,
+        52
+      ],
+      "margin_ltrb": [
+        0,
+        4,
+        0,
+        0
+      ],
+      "glyph_pixels": 8816,
+      "right_edge_filled": 20,
+      "left_edge_filled": 44
+    },
+    "final": {
+      "bbox_relative": [
+        2,
+        2,
+        131,
+        49
+      ],
+      "margin_ltrb": [
+        2,
+        2,
+        189,
+        3
+      ],
+      "glyph_pixels": 3115,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "showroom",
+    "family": "light",
+    "source": {
+      "bbox_relative": [
+        0,
+        0,
+        560,
+        52
+      ],
+      "margin_ltrb": [
+        0,
+        0,
+        4,
+        0
+      ],
+      "glyph_pixels": 15424,
+      "right_edge_filled": 0,
+      "left_edge_filled": 8
+    },
+    "final": {
+      "bbox_relative": [
+        3,
+        2,
+        234,
+        49
+      ],
+      "margin_ltrb": [
+        3,
+        2,
+        330,
+        3
+      ],
+      "glyph_pixels": 5068,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "ferraricars",
+    "family": "dark",
+    "source": {
+      "bbox_relative": [
+        0,
+        1,
+        403,
+        50
+      ],
+      "margin_ltrb": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "glyph_pixels": 10923,
+      "right_edge_filled": 8,
+      "left_edge_filled": 47
+    },
+    "final": {
+      "bbox_relative": [
+        2,
+        2,
+        232,
+        49
+      ],
+      "margin_ltrb": [
+        2,
+        2,
+        171,
+        2
+      ],
+      "glyph_pixels": 5330,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "help20",
+    "family": "dark",
+    "source": {
+      "bbox_relative": [
+        0,
+        0,
+        617,
+        49
+      ],
+      "margin_ltrb": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "glyph_pixels": 9925,
+      "right_edge_filled": 11,
+      "left_edge_filled": 1
+    },
+    "final": {
+      "bbox_relative": [
+        2,
+        2,
+        463,
+        47
+      ],
+      "margin_ltrb": [
+        2,
+        2,
+        154,
+        3
+      ],
+      "glyph_pixels": 7382,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  },
+  {
+    "id": "help21",
+    "family": "dark",
+    "source": {
+      "bbox_relative": [
+        0,
+        0,
+        555,
+        49
+      ],
+      "margin_ltrb": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "glyph_pixels": 8968,
+      "right_edge_filled": 24,
+      "left_edge_filled": 1
+    },
+    "final": {
+      "bbox_relative": [
+        2,
+        2,
+        365,
+        47
+      ],
+      "margin_ltrb": [
+        2,
+        2,
+        190,
+        3
+      ],
+      "glyph_pixels": 5738,
+      "right_edge_filled": 0,
+      "left_edge_filled": 0
+    }
+  }
+]

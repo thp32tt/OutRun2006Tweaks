@@ -1,0 +1,845 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C378-C2-Q230-NATIVE13-FIRST-OPTICAL-20261011-0636",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 230,
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "native": [
+    2048,
+    1024
+  ],
+  "dds_saved_bytes_all_3_sha_verified": true,
+  "source_clean_final_images_native": true,
+  "orientation": "RAW mirror-Y to readable flipY",
+  "firstlook_before_producer": false,
+  "blind_calibration": false,
+  "novelty": "First all 13 exact-source/CLEAN/saved-DDS per-segment native gray100 plus white50 readable optical views and original-relative candidate glyph ink margins. Previous C369 was source-clean change-location inventory only; its counts are reproduced, not scored twice.",
+  "source_clean_changed_13": 159051,
+  "clean_final_changed_13": 15398,
+  "candidate_positive_margin_regions": 13,
+  "legacy_clean_contains_korean_regions": 11,
+  "help_clean_blank_regions": 2,
+  "regions": [
+    {
+      "index": 1,
+      "id": "left01a_unavailable",
+      "english_source_bbox": [
+        94,
+        47,
+        447,
+        88
+      ],
+      "source_clean_rgba": 8636,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 8636,
+      "ink_margin_ltrb": [
+        109,
+        5,
+        110,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 109/5/110/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 2,
+      "id": "left01b_sold",
+      "english_source_bbox": [
+        624,
+        47,
+        745,
+        88
+      ],
+      "source_clean_rgba": 3569,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 3569,
+      "ink_margin_ltrb": [
+        3,
+        6,
+        3,
+        6
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/6/3/6; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 3,
+      "id": "left02_bonus",
+      "english_source_bbox": [
+        4,
+        252,
+        536,
+        304
+      ],
+      "source_clean_rgba": 19146,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 19146,
+      "ink_margin_ltrb": [
+        3,
+        2,
+        296,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/2/296/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    },
+    {
+      "index": 4,
+      "id": "left03_courses",
+      "english_source_bbox": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "source_clean_rgba": 10437,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 10437,
+      "ink_margin_ltrb": [
+        3,
+        6,
+        191,
+        7
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/6/191/7; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 5,
+      "id": "left04_game_modes",
+      "english_source_bbox": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "source_clean_rgba": 15126,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 15126,
+      "ink_margin_ltrb": [
+        3,
+        2,
+        213,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/2/213/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 6,
+      "id": "left05_car_colors",
+      "english_source_bbox": [
+        12,
+        709,
+        363,
+        760
+      ],
+      "source_clean_rgba": 10290,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 10290,
+      "ink_margin_ltrb": [
+        3,
+        2,
+        163,
+        2
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/2/163/2; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    },
+    {
+      "index": 7,
+      "id": "right01_bg_music",
+      "english_source_bbox": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "source_clean_rgba": 10403,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 10403,
+      "ink_margin_ltrb": [
+        2,
+        7,
+        169,
+        7
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 2/7/169/7; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 8,
+      "id": "right02_car_colours",
+      "english_source_bbox": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "source_clean_rgba": 15846,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 15846,
+      "ink_margin_ltrb": [
+        3,
+        8,
+        224,
+        9
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/8/224/9; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 9,
+      "id": "right03_ferraris",
+      "english_source_bbox": [
+        960,
+        404,
+        1280,
+        456
+      ],
+      "source_clean_rgba": 11554,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 11554,
+      "ink_margin_ltrb": [
+        2,
+        2,
+        189,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 2/2/189/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    },
+    {
+      "index": 10,
+      "id": "right04_showroom_items",
+      "english_source_bbox": [
+        964,
+        484,
+        1528,
+        536
+      ],
+      "source_clean_rgba": 20762,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 20762,
+      "ink_margin_ltrb": [
+        3,
+        2,
+        330,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 3/2/330/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    },
+    {
+      "index": 11,
+      "id": "right05_ferrari_cars",
+      "english_source_bbox": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "source_clean_rgba": 11455,
+      "clean_final_rgba": 0,
+      "source_final_rgba": 11455,
+      "ink_margin_ltrb": [
+        2,
+        2,
+        171,
+        2
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "HOLD_LEGACY_LOCALIZED_CLEAN",
+          "note": "B228 CLEAN already has Korean text in this region; not original blank independent plate"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 2/2/171/2; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "HOLD_RAW_FOR_THIS_ROW",
+          "note": "This particular region not among six RAW samples"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+        "raw": null
+      }
+    },
+    {
+      "index": 12,
+      "id": "help20_cannot_buy",
+      "english_source_bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source_clean_rgba": 11407,
+      "clean_final_rgba": 8584,
+      "source_final_rgba": 13948,
+      "ink_margin_ltrb": [
+        2,
+        2,
+        154,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "SCOPED_HELP_CLEAN",
+          "note": "Help text removed in inherited CLEAN; source removal fully qualified separately only by earlier C341"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 2/2/154/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    },
+    {
+      "index": 13,
+      "id": "help21_already_owned",
+      "english_source_bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source_clean_rgba": 10420,
+      "clean_final_rgba": 6814,
+      "source_final_rgba": 12933,
+      "ink_margin_ltrb": [
+        2,
+        2,
+        190,
+        3
+      ],
+      "calibration_heuristic": "composited gray128: white RGB>190 or dark RGB<110; screening not source mask",
+      "observations": {
+        "slant": {
+          "status": "HOLD",
+          "note": "Source-candidate homologous native slant anchors not blind-calibrated"
+        },
+        "clean_plate": {
+          "status": "SCOPED_HELP_CLEAN",
+          "note": "Help text removed in inherited CLEAN; source removal fully qualified separately only by earlier C341"
+        },
+        "style": {
+          "status": "HOLD",
+          "note": "Native source-family stroke weight, counter spacing and brightness not calibrated blind"
+        },
+        "readability": {
+          "status": "PASS_SCOPED_GRAY_NATIVE",
+          "note": "Actual persisted Korean visible at neutral native100; white50 is not a valid contrast test for white lettering"
+        },
+        "glyph_integrity": {
+          "status": "PASS_SCOPED_NATIVE",
+          "note": "No obvious missing syllable/fragment in directly decoded native visible glyph"
+        },
+        "protected_art": {
+          "status": "HOLD_FULL_ATLAS",
+          "note": "Per-ROI source-clean-final exact counts computed; no new entire atlas protected-foreground proof"
+        },
+        "placement": {
+          "status": "PASS_HEURISTIC_BBOX",
+          "note": "New candidate ink-positive L/T/R/B margins: 2/2/190/3; no touch at measured candidate ink edges"
+        },
+        "orientation": {
+          "status": "PASS_SCOPED_RAW_SAMPLE",
+          "note": "RAW/FLIPY crop both directly viewed"
+        }
+      },
+      "evidence": {
+        "native": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_GRAY100.png",
+        "practical": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_WHITE50.png",
+        "raw": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_GRAY100.png",
+      "sha256": "071fcd2dffb48a99da39c689569d8fd4bfb72e8c2f0d87a4ab500660287898f7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_LEFT_WHITE50.png",
+      "sha256": "0c31f25a6165f1094a08181976d7d1d574de71ab881f507a803c373dd05b1d94"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_GRAY100.png",
+      "sha256": "70068511bf2884070c1a09b28c80622c0df0a7a1009e942ac0382df773e2e204"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RIGHT_WHITE50.png",
+      "sha256": "dc45ba085776de9446fb86baf539aa44c19c3c711c578f7ec005416fbcefb4b3"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_GRAY100.png",
+      "sha256": "d3a92f023ac68133c1ee4b3718135ff42a3de5f17895ba2e87afe0807e63bba7"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_HELP_WHITE50.png",
+      "sha256": "2b95e94acf5bcdf2b1343cc126f4d10b68c1931451ff1c59e48285a9798e947c"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_NATIVE13_RAW_SIX.png",
+      "sha256": "b56945beeb3712d55e6275dadbad8dd93f262209307f6954d2675d11424f6e77"
+    }
+  ],
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_REGION_NATIVE_PIXEL.json",
+    "margin_path": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_GLYPH_MARGINS.json"
+  },
+  "result": "HOLD_STRICT_RECHECK_NATIVE13_EVIDENCE_EXTENDED",
+  "full_C_PASS": false,
+  "C3": "NOT_RUN",
+  "APPROVAL": "BLOCKED",
+  "USER_GAME": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "unchanged_official_sha": true,
+  "actual_new_dds": 0,
+  "open_items": [
+    "Blank SOURCE-conditioned CLEAN provenance for 11 already-localized regions",
+    "Blind font family and slant-anchor calibration",
+    "RAW per-cell review of remaining 7 regions",
+    "Complete protected title inventory and separate strict C3",
+    "Actual user in-game retest"
+  ],
+  "explicit_limit": "No current-policy approval, no image acceptance, no fake original missing-text correction; original CLEAN B228 is a partial layered plate."
+}

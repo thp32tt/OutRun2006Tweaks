@@ -7027,7 +7027,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11T05:56:00+09:00",
+  "updated_at_kst": "2026-10-11T06:36:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15684,5 +15684,24 @@
     "qa": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/C1_Q195_INDEPENDENT_AUDIT.json",
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c378_c2_q230_first_native_13_optical": {
+    "review_id": "C378-C2-Q230-NATIVE13-FIRST-OPTICAL-20261011-0636",
+    "role": "C2",
+    "index": 230,
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+    "scope": "13REGION_NATIVE_FIRST_OPTICAL_AND_MARGIN",
+    "outcome": "HOLD_STRICT_RECHECK",
+    "C_PASS": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "source_segment_count": 13,
+    "positive_ink_margin_count": 13,
+    "legacy_clean_korean_segments": 11,
+    "help_clean_blank": 2,
+    "new_dds": 0,
+    "evidence": "localization/graphics/role_C/20261011-C378-C2-Q230-13REGION-NATIVE-OPTICAL/C378_Q230_C2_NATIVE13_EVIDENCE_HOLD.json"
   }
 }

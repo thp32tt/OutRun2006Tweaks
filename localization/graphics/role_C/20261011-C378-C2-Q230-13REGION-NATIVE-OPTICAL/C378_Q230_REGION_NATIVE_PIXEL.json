@@ -1,0 +1,324 @@
+{
+  "review": "C378",
+  "method": "SHA-verified canonical SOURCE DDS+B228 layered CLEAN PNG+saved FINAL DDS; independent exact native per-region crop, small-ROI pixel comparisons only",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "final_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "orientation": "DDS RAW mirrorY -> readable flipY",
+  "regions": [
+    {
+      "id": "left01a_unavailable",
+      "bbox": [
+        94,
+        47,
+        447,
+        88
+      ],
+      "source_clean_rgba_changed": 8636,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 8636,
+      "source_clean_alpha_changed": 0,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_01_left01a_unavailable_GRAY100.png",
+        "C378_Q230_01_left01a_unavailable_WHITE50.png"
+      ]
+    },
+    {
+      "id": "left01b_sold",
+      "bbox": [
+        624,
+        47,
+        745,
+        88
+      ],
+      "source_clean_rgba_changed": 3569,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 3569,
+      "source_clean_alpha_changed": 0,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_02_left01b_sold_GRAY100.png",
+        "C378_Q230_02_left01b_sold_WHITE50.png"
+      ]
+    },
+    {
+      "id": "left02_bonus",
+      "bbox": [
+        4,
+        252,
+        536,
+        304
+      ],
+      "source_clean_rgba_changed": 19146,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 19146,
+      "source_clean_alpha_changed": 19146,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_03_left02_bonus_GRAY100.png",
+        "C378_Q230_03_left02_bonus_WHITE50.png",
+        "C378_Q230_03_left02_bonus_RAW.png"
+      ]
+    },
+    {
+      "id": "left03_courses",
+      "bbox": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "source_clean_rgba_changed": 10437,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 10437,
+      "source_clean_alpha_changed": 10437,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_04_left03_courses_GRAY100.png",
+        "C378_Q230_04_left03_courses_WHITE50.png"
+      ]
+    },
+    {
+      "id": "left04_game_modes",
+      "bbox": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "source_clean_rgba_changed": 15126,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 15126,
+      "source_clean_alpha_changed": 15126,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_05_left04_game_modes_GRAY100.png",
+        "C378_Q230_05_left04_game_modes_WHITE50.png"
+      ]
+    },
+    {
+      "id": "left05_car_colors",
+      "bbox": [
+        12,
+        709,
+        363,
+        760
+      ],
+      "source_clean_rgba_changed": 10290,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 10290,
+      "source_clean_alpha_changed": 10290,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_06_left05_car_colors_GRAY100.png",
+        "C378_Q230_06_left05_car_colors_WHITE50.png",
+        "C378_Q230_06_left05_car_colors_RAW.png"
+      ]
+    },
+    {
+      "id": "right01_bg_music",
+      "bbox": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "source_clean_rgba_changed": 10403,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 10403,
+      "source_clean_alpha_changed": 10403,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_07_right01_bg_music_GRAY100.png",
+        "C378_Q230_07_right01_bg_music_WHITE50.png"
+      ]
+    },
+    {
+      "id": "right02_car_colours",
+      "bbox": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "source_clean_rgba_changed": 15846,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 15846,
+      "source_clean_alpha_changed": 15846,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_08_right02_car_colours_GRAY100.png",
+        "C378_Q230_08_right02_car_colours_WHITE50.png"
+      ]
+    },
+    {
+      "id": "right03_ferraris",
+      "bbox": [
+        960,
+        404,
+        1280,
+        456
+      ],
+      "source_clean_rgba_changed": 11554,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 11554,
+      "source_clean_alpha_changed": 11554,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_09_right03_ferraris_GRAY100.png",
+        "C378_Q230_09_right03_ferraris_WHITE50.png",
+        "C378_Q230_09_right03_ferraris_RAW.png"
+      ]
+    },
+    {
+      "id": "right04_showroom_items",
+      "bbox": [
+        964,
+        484,
+        1528,
+        536
+      ],
+      "source_clean_rgba_changed": 20762,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 20762,
+      "source_clean_alpha_changed": 20762,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_10_right04_showroom_items_GRAY100.png",
+        "C378_Q230_10_right04_showroom_items_WHITE50.png",
+        "C378_Q230_10_right04_showroom_items_RAW.png"
+      ]
+    },
+    {
+      "id": "right05_ferrari_cars",
+      "bbox": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "source_clean_rgba_changed": 11455,
+      "clean_final_rgba_changed": 0,
+      "source_final_rgba_changed": 11455,
+      "source_clean_alpha_changed": 11455,
+      "clean_final_alpha_changed": 0,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_11_right05_ferrari_cars_GRAY100.png",
+        "C378_Q230_11_right05_ferrari_cars_WHITE50.png"
+      ]
+    },
+    {
+      "id": "help20_cannot_buy",
+      "bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source_clean_rgba_changed": 11407,
+      "clean_final_rgba_changed": 8584,
+      "source_final_rgba_changed": 13948,
+      "source_clean_alpha_changed": 11407,
+      "clean_final_alpha_changed": 8584,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_12_help20_cannot_buy_GRAY100.png",
+        "C378_Q230_12_help20_cannot_buy_WHITE50.png",
+        "C378_Q230_12_help20_cannot_buy_RAW.png"
+      ]
+    },
+    {
+      "id": "help21_already_owned",
+      "bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source_clean_rgba_changed": 10420,
+      "clean_final_rgba_changed": 6814,
+      "source_final_rgba_changed": 12933,
+      "source_clean_alpha_changed": 10420,
+      "clean_final_alpha_changed": 6814,
+      "full_source_look": false,
+      "actual_Git_DDS_decode": true,
+      "status": "UNDECIDED_VISUAL",
+      "images": [
+        "C378_Q230_13_help21_already_owned_GRAY100.png",
+        "C378_Q230_13_help21_already_owned_WHITE50.png",
+        "C378_Q230_13_help21_already_owned_RAW.png"
+      ]
+    }
+  ],
+  "outputs": [
+    "C378_Q230_01_left01a_unavailable_GRAY100.png",
+    "C378_Q230_01_left01a_unavailable_WHITE50.png",
+    "C378_Q230_02_left01b_sold_GRAY100.png",
+    "C378_Q230_02_left01b_sold_WHITE50.png",
+    "C378_Q230_03_left02_bonus_GRAY100.png",
+    "C378_Q230_03_left02_bonus_WHITE50.png",
+    "C378_Q230_03_left02_bonus_RAW.png",
+    "C378_Q230_04_left03_courses_GRAY100.png",
+    "C378_Q230_04_left03_courses_WHITE50.png",
+    "C378_Q230_05_left04_game_modes_GRAY100.png",
+    "C378_Q230_05_left04_game_modes_WHITE50.png",
+    "C378_Q230_06_left05_car_colors_GRAY100.png",
+    "C378_Q230_06_left05_car_colors_WHITE50.png",
+    "C378_Q230_06_left05_car_colors_RAW.png",
+    "C378_Q230_07_right01_bg_music_GRAY100.png",
+    "C378_Q230_07_right01_bg_music_WHITE50.png",
+    "C378_Q230_08_right02_car_colours_GRAY100.png",
+    "C378_Q230_08_right02_car_colours_WHITE50.png",
+    "C378_Q230_09_right03_ferraris_GRAY100.png",
+    "C378_Q230_09_right03_ferraris_WHITE50.png",
+    "C378_Q230_09_right03_ferraris_RAW.png",
+    "C378_Q230_10_right04_showroom_items_GRAY100.png",
+    "C378_Q230_10_right04_showroom_items_WHITE50.png",
+    "C378_Q230_10_right04_showroom_items_RAW.png",
+    "C378_Q230_11_right05_ferrari_cars_GRAY100.png",
+    "C378_Q230_11_right05_ferrari_cars_WHITE50.png",
+    "C378_Q230_12_help20_cannot_buy_GRAY100.png",
+    "C378_Q230_12_help20_cannot_buy_WHITE50.png",
+    "C378_Q230_12_help20_cannot_buy_RAW.png",
+    "C378_Q230_13_help21_already_owned_GRAY100.png",
+    "C378_Q230_13_help21_already_owned_WHITE50.png",
+    "C378_Q230_13_help21_already_owned_RAW.png"
+  ],
+  "runtime": "UNTESTED"
+}
