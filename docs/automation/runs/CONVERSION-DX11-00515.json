@@ -16,35 +16,75 @@
     "tools/test_dx11_indexed_sealed_eye_r218.py",
     ".github/workflows/backend-conversion-gate.yml:R218"
   ],
-  "status": "WAITING_FOR_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_INDEPENDENT_R175_GATE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "4fb33ff2bee1e950564bfeb5d26362bd40e04956",
+  "material_result_sha": "4fb33ff2bee1e950564bfeb5d26362bd40e04956",
+  "validation_bearing_result_sha": "4fb33ff2bee1e950564bfeb5d26362bd40e04956",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
-  "summary": "R218 opt-in exact indexed full-eye D32 resource/mip/raster ownership, GPU/WARP negative and restored pixel assertions; native game DrawIndexed remains dormant",
+  "summary": "R218 indexed D32 full-eye/RTV/DSV mip/raster provenance C++ and actual WARP negative/restore proof; R187 test scope repaired. Scoped R218/R186/R187 and validate PASS but full exact-SHA Gate FAIL due inherited independently owned R175.",
   "pipeline": {
-    "C0_RECOVER": "PASS remote head, checkpoint, AGENTS, index, contract",
-    "C1_REVIEW": "PASS independent R218 WARP indexed composed-owner gap",
-    "C2_IMPLEMENT": "PASS C++ plus WARP negative and restoration, one-shot mutation checker",
-    "C3_VALIDATE": "Source-scoped static guard PASS once; exact-SHA Gate pending",
-    "C4_COMMIT": "One final material batch commit pending",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact-SHA CI"
+    "C0_RECOVER": "PASS branch/checkpoint/AGENTS/index/contract/00514 C6 and owner reconciled",
+    "C1_REVIEW": "PASS R218 disjoint indexed full-eye composed readiness gap",
+    "C2_IMPLEMENT": "PASS R218 native C++ plus actual WARP indexed GPU negatives/restoration; R187 static scope repair",
+    "C3_VALIDATE": "R218 scoped static PASS, R186/R187 indexed WARP SUCCESS, Win32 validate SUCCESS; full exact-SHA Gate FAIL due independent pre-existing R175 varying",
+    "C4_COMMIT": "PASS material commit 4fb33ff2bee1e950564bfeb5d26362bd40e04956 with [AUTO:CONVERSION-DX11-00515] after initial a41f88a3 repair",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant preflight, no game-native Draw dispatch or Quest3 promotion",
+    "C6_STATE": "PASS durable canonical material SHA and full-Gate blocker separated"
   },
   "changed_files": [
     "src/vr/d3d11/native_indexed_target_viewport.hpp",
     "tools/dx11_indexed_draw_probe_r186.cpp",
     "tools/test_dx11_indexed_sealed_eye_r218.py",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00515.json"
+    "docs/automation/runs/CONVERSION-DX11-00515.json",
+    "tools/test_dx11_viewport_draw_r187.py"
   ],
   "evidence": {
-    "previous_00514_C6_sha": "75947d8a85a781f5725cc0f13bb958fae69bccaf",
-    "local_static_check": "PASS",
-    "known_inherited_r175_gate": "FAIL under independently owned work_key",
-    "hmd": "UNTESTED"
+    "initial_material_sha": "a41f88a3d1af8e545344f77a6c3d227ddd6c15a6",
+    "initial_gate_run_id": 38022770623,
+    "initial_gate_validate": "SUCCESS",
+    "initial_gate_smoke": "FAIL R187 source test included additive R218 raster text; R218 static and R186 WARP PASS",
+    "exact_material_sha": "4fb33ff2bee1e950564bfeb5d26362bd40e04956",
+    "canonical_exact_sha_gate_run": 38023314324,
+    "validate": "SUCCESS",
+    "indexed_r218_static": "SUCCESS smoke step 42",
+    "indexed_r186_warp": "SUCCESS smoke step 44",
+    "indexed_r187_static": "SUCCESS smoke step 45",
+    "indexed_r187_warp": "SUCCESS smoke step 47",
+    "smoke": "FAIL constant-buffer probe R175 independent TEXCOORD6",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "artifact_id": 11659680649,
+    "artifact_digest": "sha256:48856c1da2766498458e1b3e3afde94ede965da1fa11a9eb83560ec4f0fff473",
+    "issue14_comments": [
+      6093586257,
+      6093653818
+    ],
+    "runtime_gameplay": "UNTESTED"
   },
-  "next_action": "Verify exact SHA Backend Conversion Gate and R218 probe evidence; never equate scoped PASS with total Gate PASS."
+  "next_action": "Hold this TASK at BLOCKED_INDEPENDENT_R175_GATE; owner of CONVERSION-DX11-00477 R175 should repair varying mismatch on its own work_key, then re-evaluate exact-SHA Gate using new legitimate material SHA (no duplicate task/score). Continue only independently allocated DX11 native work, not DXVK.",
+  "initial_implementation_sha": "a41f88a3d1af8e545344f77a6c3d227ddd6c15a6",
+  "validation_run_id": 38023314324,
+  "validation_job_id": 114128778411,
+  "smoke_job_id": 114129434855,
+  "validation_artifact_id": 11659680649,
+  "blockers": [
+    "Exact-SHA Backend Conversion Gate #38023314324 FAILED at independently owned R175 TEXCOORD6 generic varying WARP path; do not overwrite separate CONVERSION-DX11-00477 work_key",
+    "Quest3/VDXR real HMD/visual test UNTESTED; no DX11 native draw activation"
+  ],
+  "score_change": 0,
+  "score_policy": "Full exact-SHA required Gate FAIL; no success point; no rollover/retry duplicate."
 }
