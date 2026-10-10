@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX11-00514",
+  "production_id": "CONVERSION-DX11-00514",
+  "event_id": "CONVERSION-DX11-00514-E001",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R217:INDEXED_OPAQUE_DEPTH_EYE_GPU",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "c16e7694af0d98d71055d4684b9e4ecbc4cd5dd1",
+  "material_result_sha": "7ad0be9b22a5bc59b1dcd99ff1d3293f14719bf0",
+  "validation_bearing_result_sha": "7ad0be9b22a5bc59b1dcd99ff1d3293f14719bf0",
+  "CI_run": 38021355703,
+  "ci_validate_job": 114122843388,
+  "ci_validate_result": "SUCCESS",
+  "ci_smoke_result": "IN_PROGRESS_CONFIGURE_WIN32",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "state": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "C2": "R217 strict native indexed opaque depth-eye owner + actual WARP DrawIndexed depth negative/restore",
+  "C4": "MATERIAL_COMMIT_DONE",
+  "C5": "NOT_REQUIRED: no runtime activation or deployment",
+  "issue14_comment_id": 6093414061,
+  "next_action": "Consume current exact-SHA DX11 smoke from CI 38021355703; if R217 scoped probe success and inherited R175 fails, finalize blocked C6 without claiming full PASS. Never push bookkeeping onto active game branch before Gate completion.",
+  "conflicts": [
+    "CONVERSION-DX11-00477 owns R175 constant buffer probe",
+    "CONVERSION-DX11-00513 owns R216 target header"
+  ]
+}
