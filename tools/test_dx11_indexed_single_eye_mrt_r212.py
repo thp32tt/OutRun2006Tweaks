@@ -5,7 +5,8 @@ root=Path(__file__).resolve().parents[1]
 h=(root/"src/vr/d3d11/native_indexed_draw_submit.hpp").read_text(encoding="utf-8")
 p=(root/"tools/dx11_indexed_draw_probe_r186.cpp").read_text(encoding="utf-8")
 w=(root/".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
-s=h.split("// R212: indexed DrawIndexed exact OM eye ownership",1)[1]
+s=h.split("// R212: indexed DrawIndexed exact OM eye ownership",1)[1].split("// R217: exact depth-aware indexed opaque single-eye DrawIndexed readiness.",1)[0]
+r217=h.split("// R217: exact depth-aware indexed opaque single-eye DrawIndexed readiness.",1)[1]
 guards=(
     "!context || !expectedRtv",
     "!verified_indexed_pipeline_identity_ready(",
@@ -21,6 +22,23 @@ assert all(s.count(g)==1 for g in guards), "R212 exact guard missing/duplicate"
 for g in guards:
     mutant=s.replace(g,"",1)
     assert not all(x in mutant for x in guards), "R212 source mutation survived: "+g
+r217_guards=(
+    "!context || !expectedDsv || !expectedDepthState",
+    "!verified_indexed_single_eye_output_ready(",
+    "context->OMGetRenderTargets(",
+    "liveDsv.Get() != expectedDsv",
+    "context->OMGetDepthStencilState(",
+    "liveState.Get() != expectedDepthState || stencilRef != 0u",
+    "depthDesc.DepthFunc != D3D11_COMPARISON_LESS",
+    "context->OMGetBlendState(",
+    "mask != D3D11_DEFAULT_SAMPLE_MASK",
+    "expectedDsv->GetDevice(",
+    "expectedDepthState->GetDevice("
+)
+assert all(r217.count(g)==1 for g in r217_guards), "R217 exact indexed depth-eye guard missing/duplicate"
+for g in r217_guards:
+    mutant=r217.replace(g,"",1)
+    assert not all(x in mutant for x in r217_guards), "R217 source mutation survived: "+g
 assert "->DrawIndexed(" not in h and "->Draw(" not in h
 for e in (
     "R212 compile dual PS","R212 second eye RTV",
@@ -32,4 +50,4 @@ for e in (
     assert e in p, "missing WARP evidence: "+e
 step="python tools/test_dx11_indexed_single_eye_mrt_r212.py"
 assert w.count(step)==1 and w.index(step)<w.index("Build R186 owned indexed Draw WARP probe")
-print("R212 indexed MRT PASS: nine negative mutants and real WARP leak wired")
+print("R212/R217 PASS: nine indexed MRT and eleven opaque depth-eye mutants plus WARP probes wired")
