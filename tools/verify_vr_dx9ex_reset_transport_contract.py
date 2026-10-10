@@ -461,12 +461,37 @@ forbid(
     "StretchRect(BackBuffer",
     "StretchRect(RightEyeSurface",
 )
+# R32 now selects/ACK-gates the slot, while the lower R30 API owns the
+# physical copy/fence and internal-pass scope. Check BOTH sides of the seam.
 require_order(
     resolve_direct_r32,
-    "R32 DirectGPU left/right source copy order",
-    "device->StretchRect(\n                    sourceSurfaces.left",
-    "device->StretchRect(sourceSurfaces.right",
-    "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);",
+    "R32 lower-owned DirectGPU copy/fence dispatch",
+    "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
+    "R32DirectCopyRejectHr = copy.hr;",
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
+)
+forbid(
+    resolve_direct_r32,
+    "R32 regained lower DirectGPU slot or internal pass ownership",
+    "DirectTransportSlots[",
+    "InternalPassScope guard;",
+    "slot.fence->Issue(",
+)
+copy_fence_owner_r30 = body(
+    r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+require_order(
+    copy_fence_owner_r30,
+    "R30 lower-owned left/right source copy and EVENT issuance",
+    "if (!device || !source.left || !source.right ||",
+    "index >= OutRunVR::RenderFrameRingSize",
+    "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+    "InternalPassScope guard;",
+    "source.left, nullptr, slot.leftSurface",
+    "source.right, nullptr, slot.rightSurface",
+    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    "return {slot.fence->Issue(D3DISSUE_END), false};",
 )
 require_order(
     resolve_direct_r32,
@@ -485,8 +510,8 @@ require_order(
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "R30SupportNoteDirectTransportRingBackpressure();",
-    "auto& slot = DirectTransportSlots[selected];",
-    "slot.fence->Issue(D3DISSUE_END)",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
     "DirectTransportFrameReadyAfterPresent() is",
     "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
@@ -823,24 +848,39 @@ forbid(
     "candidate.published = false;",
 )
 
-issue_marker = "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);"
-issue_pos = resolve_direct_r32.find(issue_marker)
-pending_publish_pos = resolve_direct_r32.find(
-    "R30SupportMarkDirectTransportSlotPending(selected, frameId);", issue_pos
+# R30 issues the exact producer EVENT under the same internal-pass scope as
+# both eye copies. R32 only inspects the returned HRESULT and fails closed
+# before publishing pending frame metadata.
+issue_r30 = body(r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+require_order(
+    issue_r30,
+    "R30 producer EVENT issued only after guarded successful eye copies",
+    "InternalPassScope guard;",
+    "const HRESULT leftCopy = device->StretchRect(",
+    "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
+    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    "return {slot.fence->Issue(D3DISSUE_END), false};",
 )
-if min(issue_pos, pending_publish_pos) < 0:
-    fail("R32 producer EVENT issue scope missing")
-issue_r32 = resolve_direct_r32[issue_pos:pending_publish_pos]
+copy_pos = resolve_direct_r32.find(
+    "R30SupportCopyDirectTransportEyesAndIssueFence(")
+pending_publish_pos = resolve_direct_r32.find(
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);", copy_pos)
+if min(copy_pos, pending_publish_pos) < 0:
+    fail("R32 lower-owned DirectGPU copy/fence publication scope missing")
+issue_r32 = resolve_direct_r32[copy_pos:pending_publish_pos]
 require_order(
     issue_r32,
     "R32 producer EVENT issue failure fail-closed",
-    issue_marker,
-    "if (FAILED(issueHr))",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
     "R32DirectCopyPathRejected = true;",
-    "R32DirectCopyRejectHr = issueHr;",
+    "R32DirectCopyRejectHr = copy.hr;",
+    "if (copy.copyFailed)",
     "if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;",
     "return false;",
 )
+forbid(issue_r32, "R32 regained physical producer EVENT ownership",
+       "slot.fence->Issue(", "InternalPassScope guard;")
 
 forbid(
     resolve_direct_r32,
