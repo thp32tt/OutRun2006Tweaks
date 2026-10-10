@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_chat_direct_checkpoint",
+  "captured_at_kst": "2026-10-11T02:46:00+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "feature_head_sha": "307845ea12739c5728988ce3ef4386294756a3ca",
+  "previous_feature_head": "4a872760b46641c70dead0f73833ddf5fa7403c6",
+  "target_branch": "vr-dx11-native-r71",
+  "target_branch_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "target_branch_unchanged": true,
+  "material_change": "Fail-closed D3D9 fixed-function stage-1 COLOROP check; two static negative mutations",
+  "changed_paths": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "static_feature_acceptance_previously_passed_sha": "12f136940f165c6b9c37f5bae9aace20e17634f9",
+  "new_exact_sha_validation": {
+    "sha": "307845ea12739c5728988ce3ef4386294756a3ca",
+    "build_run": 38072972466,
+    "openxr_run": 38072972462,
+    "status": "IN_PROGRESS",
+    "positive_source_checks": "DX11-LIVE-CALLSITE,DX11-NATIVE-DRAW,DX11-VISIBLE-FRAME,DX11-SAFE-RETURN steps PASS on new SHA, native build pending"
+  },
+  "remaining_acceptance_ids": [
+    "DX11-LIVE-CALLSITE:live-runtime-observation-UNTESTED",
+    "DX11-NATIVE-DRAW:live-runtime-observation-UNTESTED",
+    "DX11-VISIBLE-FRAME:live-runtime-observation-UNTESTED",
+    "DX11-SAFE-RETURN:input-runtime-observation-UNTESTED",
+    "DX11-TEST-BUNDLE:NEW-SHA-WINDOWS-CI_PENDING"
+  ],
+  "next_action": "Finish exact-SHA Build/OpenXR CI, update feature docs/automation/runs/CONVERSION-DX11-00537.json with validation evidence. Only controller may promote target and run Backend Conversion Gate. User must compare opt-in native_draws/desktop_insets/input on game/Quest3; RUNTIME_VALIDATION=UNTESTED.",
+  "guard": "default-off diagnostic; fail-closed unsupported state; untouched DX9Ex fallback",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "score_ssot": 956,
+  "score_run_key": "CONVERSION-DX11-00537",
+  "issue14_comment_id": 6100402471
+}
