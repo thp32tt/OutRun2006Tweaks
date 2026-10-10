@@ -1,0 +1,81 @@
+{
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "B341_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_face": 1,
+  "method": "native source-conditioned 45px high-alpha core glyph vector, original matched x, P1 clean before P2 native",
+  "regions": [
+    {
+      "id": 43,
+      "english": "PROFESSIONAL",
+      "korean": "프로페셔널",
+      "roi": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_core_height": 45,
+      "old_trial_core_height": 55,
+      "font_size": 46,
+      "source_opaque_RGB": [
+        241,
+        147,
+        49
+      ],
+      "new_high_alpha_bbox": [
+        244,
+        341,
+        450,
+        385
+      ],
+      "new_high_alpha_height": 44,
+      "new_left_anchor_dx": 4,
+      "count_alpha_visible": 4227,
+      "P1_clean_alpha_nonzero": 0
+    },
+    {
+      "id": 44,
+      "english": "OUTRUN",
+      "korean": "아웃런",
+      "roi": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "source_core_height": 45,
+      "old_trial_core_height": 52,
+      "font_size": 46,
+      "source_opaque_RGB": [
+        186,
+        0,
+        0
+      ],
+      "new_high_alpha_bbox": [
+        1630,
+        524,
+        1752,
+        568
+      ],
+      "new_high_alpha_height": 44,
+      "new_left_anchor_dx": 4,
+      "count_alpha_visible": 2543,
+      "P1_clean_alpha_nonzero": 0
+    }
+  ],
+  "note": "source family only producer pilot, C hold retained"
+}

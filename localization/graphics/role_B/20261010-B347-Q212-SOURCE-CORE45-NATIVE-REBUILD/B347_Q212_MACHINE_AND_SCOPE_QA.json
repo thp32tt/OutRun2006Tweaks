@@ -1,0 +1,153 @@
+{
+  "role": "B",
+  "run": "B347",
+  "queue_index": 212,
+  "run_key": "OUTRUN-KOR-B347-Q212-C349-SOURCE-CORE45-REBUILD-20261010",
+  "reason": "C349 scoped C2 HOLD high-alpha Korean r43=55,r44=52 vs English native core45; reconstruct new native vectors, preserve B341 source-matched horizontal anchors",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "B341_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "new_trial_sha256": "9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa",
+  "new_trial_bytes": 16777344,
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "font_family": "NotoSansCJK-Bold.ttc Korean index1, native raster, zero stroke, source sampled RGBA",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "DDS": "RGBA32 1mip",
+  "raw_orientation": "Y-mirror; FLIP-Y readable",
+  "changed_pixels_vs_B341": 41644,
+  "outside_two_regions_changed_RGBA": 0,
+  "clean_source_12_region_baseline": "C349 independently verified unchanged; this trial only alters r43+r44",
+  "P1": "SHA_VERIFIED_C158_SOURCE_CLEAN_NATIVE_TWO_CELLS",
+  "P2": "NATIVE_SOURCE_45PX_CORE_FONT_PILOT_UNAPPROVED",
+  "P3": "PERSISTED_DDS_DECODE_VERIFIED_UNAPPROVED",
+  "regions": [
+    {
+      "id": 43,
+      "english": "PROFESSIONAL",
+      "korean": "프로페셔널",
+      "roi": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "source_core_height": 45,
+      "old_trial_core_height": 55,
+      "font_size": 46,
+      "source_opaque_RGB": [
+        241,
+        147,
+        49
+      ],
+      "new_high_alpha_bbox": [
+        244,
+        341,
+        450,
+        385
+      ],
+      "new_high_alpha_height": 44,
+      "new_left_anchor_dx": 4,
+      "count_alpha_visible": 4227,
+      "P1_clean_alpha_nonzero": 0
+    },
+    {
+      "id": 44,
+      "english": "OUTRUN",
+      "korean": "아웃런",
+      "roi": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "source_core_height": 45,
+      "old_trial_core_height": 52,
+      "font_size": 46,
+      "source_opaque_RGB": [
+        186,
+        0,
+        0
+      ],
+      "new_high_alpha_bbox": [
+        1630,
+        524,
+        1752,
+        568
+      ],
+      "new_high_alpha_height": 44,
+      "new_left_anchor_dx": 4,
+      "count_alpha_visible": 2543,
+      "P1_clean_alpha_nonzero": 0
+    }
+  ],
+  "view_files": [
+    "B347_R43_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_GRAY_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_GRAY_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_BLACK_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_BLACK_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_BLACK_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_WHITE_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_WHITE_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R43_RAW_WHITE_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_GRAY_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_GRAY_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_BLACK_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_BLACK_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_WHITE_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_WHITE_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_FLIPY_WHITE_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_GRAY_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_GRAY_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_BLACK_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_BLACK_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_BLACK_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_WHITE_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_WHITE_75_SOURCE_CLEAN_OLD_B341_NEW.png",
+    "B347_R44_RAW_WHITE_50_SOURCE_CLEAN_OLD_B341_NEW.png"
+  ],
+  "producer_direct_visual": "PENDING_CONTROLLER",
+  "new_trial_DDS": 1,
+  "new_promoted_DDS": 0,
+  "C2": "C338_OFFICIAL_REWORK_B341_C349_HOLD",
+  "C3": "BLOCKED",
+  "APPROVAL": false,
+  "IGR029": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "A_ODD",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
