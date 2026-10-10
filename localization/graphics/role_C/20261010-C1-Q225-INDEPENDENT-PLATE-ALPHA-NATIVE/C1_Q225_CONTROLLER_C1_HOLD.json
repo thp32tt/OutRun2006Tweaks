@@ -31,8 +31,8 @@
     "download_verified": true,
     "readable_orientation": "as_stored"
   },
-  "baseline": "C298 exact same candidate SHAs reviewed previous full atlas outside/alpha0; this run adds truly independent exact CLEAN source alpha in nine original bboxes and SOURCE/CLEAN/FINAL stage-specific 27 lossless generated contacts (18 persisted, nine 75% locally generated but not uploaded). This is new plate-specific evidence, NOT a new candidate or duplicate C PASS.",
-  "execution": "GitHub SSOT; N100 MCP bounded fallback readonly exact DDS/Pillow/Numpy QA and PNG construction; image Git blobs 18 published through GitHub git-data tree/ref updates",
+  "baseline": "C298 exact same candidate SHAs reviewed previous full atlas outside/alpha0; this run adds truly independent exact CLEAN source alpha in nine original bboxes and SOURCE/CLEAN/FINAL stage-specific 27 lossless generated contacts (27 persisted: gray native100/black50/white75 across nine labels). This is new plate-specific evidence, NOT a new candidate or duplicate C PASS.",
+  "execution": "GitHub SSOT, N100 MCP fallback for bounded exact DDS/Pillow/Numpy pixel QA; all 27 SHA-bound lossless PNGs persisted to GitHub git-data tree/branch.",
   "first_look": {
     "pixels_before_producer_verdict": false,
     "reason": "A193/C298 notes and metadata had been read during target selection. Cannot claim qualified blind first look.",
@@ -58,7 +58,13 @@
     "source_candidate_dds_header_equal": true,
     "source_clean_inside_alpha_positive_original": 61787,
     "clean_final_inside_alpha_positive_korean": 28442,
-    "notes": "CLEAN retains nonzero RGB under alpha0, do not report false English visible residue. Empty visible alpha covers actual text removal. All 9 source rectangles avoid modifications elsewhere. This does not establish within-bbox protected-art exact identity, slant style acceptance, or consumer rendering."
+    "notes": "CLEAN retains nonzero RGB under alpha0, do not report false English visible residue. Empty visible alpha covers actual text removal. All 9 source rectangles avoid modifications elsewhere. This does not establish within-bbox protected-art exact identity, slant style acceptance, or consumer rendering.",
+    "persisted_new_lossless_png": 27,
+    "view_group": [
+      "GRAY100",
+      "BLACK50",
+      "WHITE75"
+    ]
   },
   "per_region_eight_checks": [
     {
@@ -577,6 +583,6 @@
   "promoted_DDS": 0,
   "official_SHA_unchanged": true,
   "duplicate_pass_for_SHA": false,
-  "unpublished_white75": "Nine local-only WHITE75 images were generated but remote publication failed; NOT part of approval evidence, fail-closed. No all-view gate claimed.",
-  "next_steps": "Qualify blind normal/4 known defects without producer verdict, pair first-stem readable English/Korean top-bottom lean and source-family width/weight reference on all nine, authenticate within-bbox protected art, persist WHITE75 and full policy views; then separate C3 and actual-game consumer check before any PASS."
+  "unpublished_white75": "RESOLVED: Nine WHITE75 images subsequently committed; all 27 generated native lossless contacts now published (one gray100/black50/white75 per nine source cells).",
+  "next_steps": "Qualify blind normal/4 known defects without producer verdict, pair first-stem readable English/Korean top-bottom lean and source-family width/weight reference on all nine, authenticate within-bbox protected art, add any other required zoom/RAW-specific segment proof not covered by existing C298 historical RAW, plus full policy calibrated observations; then separate C3 and actual-game consumer check before any PASS."
 }
