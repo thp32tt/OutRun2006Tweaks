@@ -337,10 +337,12 @@ namespace OutRunVRStereo
                 !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
                 return false;
 
-            std::memcpy(draw.originalConstants,
-                liveValidated ? live : verified, sizeof(verified));
+            // A successful live WVP sample may differ within the verified epsilon.
+            // Original eye restoration and stereo transforms must use one exact source.
+            const float* originalWvp = liveValidated ? live : verified;
+            std::memcpy(draw.originalConstants, originalWvp, sizeof(verified));
             D3DMATRIX uploadedT{};
-            std::memcpy(&uploadedT, verified, sizeof(uploadedT));
+            std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));
             const D3DMATRIX currentWvp = R30SupportTransposeMatrix(uploadedT);
             const D3DMATRIX correctedWorldView = R30SupportMultiplyMatrix(
                 currentWvp, R31EyeCache.inverseProjection);
