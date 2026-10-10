@@ -40,12 +40,51 @@ OWNER_CALLS = {
 }
 
 
+
+FRAME_DELEGATIONS = {
+    "view.width": "BackBufferDesc.Width",
+    "view.height": "BackBufferDesc.Height",
+    "view.backBuffer": "BackBuffer",
+    "view.rightEyeSurface": "RightEyeSurface",
+    "view.rightEyeDepth": "RightEyeDepth",
+    "view.trackedDepthStencil": "TrackedDepthStencil",
+    "view.presentEpoch": "PresentEpoch",
+    "view.poseSequence": "FrameStereoPoseSequence",
+    "view.hadWorldStereo": "FrameHadWorldStereo",
+    "view.hadDuplicatedDraw": "FrameHadDuplicatedDraw",
+    "view.rightDrawFailed": "FrameRightDrawFailed",
+    "view.stereoIncomplete": "FrameStereoIncomplete",
+    "view.rightDepthSynchronized": "RightDepthSynchronized",
+    "view.rightStencilSynchronized": "RightStencilSynchronized",
+}
+
+
 def check(r29: str, r30: str, header: str) -> None:
     for signature, delegation in OWNER_CALLS.items():
         implementation = body(r29, signature)
         assert delegation in implementation, f"R29 delegation changed: {signature}"
         exported = signature.split("R29Owner", 1)[1].split("(", 1)[0]
         assert "R29Owner" + exported in header, f"header missing {exported}"
+    snapshot = body(r29, "R29OwnerCaptureFrameSnapshot() noexcept")
+    for field, provider in FRAME_DELEGATIONS.items():
+        assert f"{field} = {provider};" in snapshot, (
+            f"R29 frame snapshot changed: {field}"
+        )
+        assert field.split(".", 1)[1] in header, (
+            f"R29 frame ABI declaration lost: {field}"
+        )
+    for method, required in {
+        "R29OwnerStereoWanted() noexcept": "return StereoWanted();",
+        "R29OwnerTargetIsBackBuffer() noexcept": "return TargetIsBackBuffer();",
+        "R29OwnerExchangeInternalStereoPass(bool active) noexcept":
+            "InternalStereoPass = active;",
+    }.items():
+        assert required in body(r29, method), f"R29 owner method broken: {method}"
+    assert "R30ScopedInternalPass" in r30
+    assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
+    assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
+    assert "R29OwnerCaptureFrameSnapshot().rightEyeSurface" in r30
+    assert "R29OwnerCaptureFrameSnapshot().presentEpoch" in r30
     assert '#include "../core/r29_owner_api.hpp"' in r29
     assert '#include "../core/r29_owner_api.hpp"' in r30
     for pattern in (
@@ -84,7 +123,18 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {signature}")
-    print("R29/R30 owner ABI regression PASS (5 negative mutations)")
+
+    for field, provider in FRAME_DELEGATIONS.items():
+        old = f"{field} = {provider};"
+        mutated = r29.replace(old, "/* snapshot poison */", 1)
+        assert mutated != r29, f"missing snapshot mutation target: {field}"
+        try:
+            check(mutated, r30, header)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"negative mutation unexpectedly PASS: {field}")
+    print("R29/R30 owner ABI regression PASS (19 negative mutations)")
 
 
 if __name__ == "__main__":

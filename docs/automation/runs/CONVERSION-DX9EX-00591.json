@@ -1,0 +1,158 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00591",
+  "production_id": "CONVERSION-DX9EX-00591",
+  "event_id": "CONVERSION-DX9EX-00591-E001",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+  "target_branch": "vr-d3d9ex-focus",
+  "work_key": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_status": "IMPLEMENTING",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C2_IMPLEMENT",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
+  "last_implemented_source_sha": "486110a65d0b197819006667d291231dcf166a1d",
+  "validation_bearing_result_sha": null,
+  "material_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+    "lane": "DX9EX",
+    "work_key": "DX9EX:R84_RENDERER_GRAPH",
+    "goal": "R33→R32→R31→R30→R29 전체 구조 분리, 명시 ABI와 CMake 일치, 전체 Win32/host 링크를 완성한다.",
+    "depends_on": [],
+    "acceptance_items": [
+      {
+        "id": "R84-OWNERS",
+        "expected": "All remaining R33/R32/R31/R30/R29 independent translation-unit owners",
+        "paths": [
+          "src/vr/d3d9/"
+        ],
+        "ci_step": "Feature acceptance: R84-OWNERS"
+      },
+      {
+        "id": "R84-ABI",
+        "expected": "Explicit interfaces remove textual cpp ownership and private-symbol leakage",
+        "paths": [
+          "src/vr/d3d9/"
+        ],
+        "ci_step": "Feature acceptance: R84-ABI"
+      },
+      {
+        "id": "R84-BUILD-GRAPH",
+        "expected": "cmake.toml and generated CMakeLists ownership agree; no stale HEADER_FILE_ONLY",
+        "paths": [
+          "cmake.toml",
+          "CMakeLists.txt"
+        ],
+        "ci_step": "Feature acceptance: R84-BUILD-GRAPH"
+      },
+      {
+        "id": "R84-REGRESSION",
+        "expected": "Focused producer/consumer and protected baseline regressions execute",
+        "paths": [
+          "tools/",
+          "tests/"
+        ],
+        "ci_step": "Feature acceptance: R84-REGRESSION"
+      },
+      {
+        "id": "R84-TEST-BUNDLE",
+        "expected": "Complete host/game/full-chain binaries plus manifest and collector",
+        "paths": [
+          "tools/",
+          ".github/workflows/"
+        ],
+        "ci_step": "Feature acceptance: R84-TEST-BUNDLE"
+      }
+    ],
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "jobs": [
+          "policy",
+          "host",
+          "game",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "jobs": [
+          "domain-isolation"
+        ]
+      }
+    ],
+    "artifact_prefix": "feature-dx9ex-r84-",
+    "policy_blob_sha": "7b61519aa94193a883e86735a9ba4ebacc93f4aa"
+  },
+  "feature_acceptance": {
+    "implementation_complete": false,
+    "targeted_checks": [
+      "R29/R30 owner seam mutations PASS 19 on local validation pending run",
+      "R30 support seam adjusted for explicit owner getter pending run"
+    ],
+    "integration_contract": "PENDING: independent R29-R33 Win32 game/host full-chain link, accepted steps, exact SHA gates and binary bundle"
+  },
+  "acceptance_results": [
+    {
+      "id": "R84-OWNERS",
+      "status": "PENDING",
+      "evidence_paths": [],
+      "validation_command": "PENDING"
+    },
+    {
+      "id": "R84-ABI",
+      "status": "PENDING",
+      "evidence_paths": [],
+      "validation_command": "PENDING"
+    },
+    {
+      "id": "R84-BUILD-GRAPH",
+      "status": "PENDING",
+      "evidence_paths": [],
+      "validation_command": "PENDING"
+    },
+    {
+      "id": "R84-REGRESSION",
+      "status": "PENDING",
+      "evidence_paths": [],
+      "validation_command": "PENDING"
+    },
+    {
+      "id": "R84-TEST-BUNDLE",
+      "status": "PENDING",
+      "evidence_paths": [],
+      "validation_command": "PENDING"
+    }
+  ],
+  "dev_ci_history": [
+    {
+      "sha": "b9f903fba91e155760d2c91001d17704302b6329",
+      "run_id": 38066317237,
+      "status": "FAIL_WIN32"
+    },
+    {
+      "sha": "65f8666c3b107795e87da7d09f88040525a79e8a",
+      "run_id": 38066804281,
+      "status": "FAIL_WIN32_PRIVATE_SYMBOLS"
+    },
+    {
+      "sha": "486110a65d0b197819006667d291231dcf166a1d",
+      "run_id": 38067357264,
+      "status": "IN_PROGRESS"
+    }
+  ],
+  "outstanding": [
+    "R29 lower-owner callback and typed facade conversion beyond frame snapshot",
+    "R30 lower private symbol replacement and Win32 full-chain link",
+    "CMake parity and mandatory acceptance steps",
+    "Required gate exact result SHA",
+    "Feature artifact package with x86/x64 binaries/config/manifest/collector",
+    "Controller-only target fast-forward and C6 bookkeeping"
+  ],
+  "next_action": "Read newest feature HEAD and exact R84 isolated Win32 run logs; repair remaining R30->R29 lower owner service boundaries, without target branch write; rerun targeted tests and new-SHA Win32 compiler. Preserve HMD UNTESTED."
+}
