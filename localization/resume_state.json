@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A221 2026-10-10 11:13 KST: q121 P0 NEW exact-source boundary safety: rank21 CLEAN alpha738 but no original-equal removable pixels, rank26 81 original alpha all below outside English Do bbox. Worker #38015566261 safety-aborted, no DDS, no source mask invented, official/A220 unchanged. QA localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json OUTRUN-KOR-A221-Q121-P0-ADJACENT-PROTECTED-REGION-20261010-1100; q121 still REWORK_REQUIRED/IGR030/031/040 OPEN, runtime UNTESTED. Switch to safe distinct asset work rather than blind deletion.",
     "B347 2026-10-10 B q212 P1 canonical SOURCE f83f5848 / C158 CLEAN c13a2492 / B341 already C349 HOLD fa0acb56. GitHub CPU #38013622393 SUCCESS created 16,777,344-byte new trial DDS SHA 9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa, r43+r44 core height corrected 55/52 -> 44 vs English45, 41644 changed pixels outside2 ROIs0; other10 exact. Controller source/CLEAN/old/B341/new native gray and black50/RAW visual REJECT due PRO r43 source width397 vs new206 (visual hierarchy too narrow); trial not promoted, C338 official REWORK, C349 scoped HOLD, IGR029 OPEN, C3/approval/game UNTESTED. Source-condensed family width/stroke/optical 2D reconstruction required before next candidate. QA role_B/20261010-B347-Q212-SOURCE-CORE45-NATIVE-REBUILD/B347_CONTROLLER_PRODUCER_VISUAL_REJECT.json RUN_KEY=OUTRUN-KOR-B347-Q212-C349-SOURCE-CORE45-REBUILD-20261010",
     "A220 2026-10-10 10:12 KST q121 P0 NEW distinct 24 source-matching English 'the' stray visible pixels repaired into unpromoted saved 4096x4096 DDS trial SHA256 6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06 from A219 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb; preserves previously repaired 33 'goal.' pixels; total 57. Native SHA-pinned SOURCE/CLEAN/OFFICIAL/TRIAL, BGW100/75/50 and RAW scoped visual + exact changed bytes95 (pixels24) PASS. Official 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844 unchanged REWORK_REQUIRED, whole atlas/C1/C3/APPROVAL/game IGR030/031/040 untested. Evidence localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json RUN_KEY=OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
     "B346 2026-10-10 09:45 KST B EVEN q176 made real 2048x2048 trial DDS SHA eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45 from exact English source with native Bold stroke1 after B345 trial SHA 34edd2aa rejected for narrow counters. GitHub CPU #38009996777 SUCCESS; source/CLEAN/FINAL outside original 4 bboxes RGBA0 and RAW/FLIP-Y practical direct scoped visual improved. Official 494d42c0... stays C343 REWORK, no promoted DDS, C2/C3/game pending, runtime UNTESTED. Complete final manifest+pixel guard, fresh C2/C3 before publication. QA role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-B346-Q176-SOURCE-CALIBRATED-COUNTERS-20261010",
@@ -6875,7 +6876,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 10:39 KST",
+  "updated_at_kst": "2026-10-10 11:13 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14596,5 +14597,19 @@
     "machine_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_INDEPENDENT_MACHINE.json",
     "qa_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_CONTROLLER_C2_REWORK.json",
     "updated_at_kst": "2026-10-10 11:10 KST"
+  },
+  "a221_q121_source_boundary_hold": {
+    "run": "A221",
+    "run_key": "OUTRUN-KOR-A221-Q121-P0-ADJACENT-PROTECTED-REGION-20261010-1100",
+    "queue_index": 121,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "new_dds": 0,
+    "status": "PREFLIGHT_ONLY_SOURCE_PROTECTION_HOLD",
+    "distinct_evidence": "rank26 81 original-alpha pixels strictly outside text bbox; rank21 no exact source remnants inside bbox",
+    "trial_candidate_changed": false,
+    "qa_report": "localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "updated_at_kst": "2026-10-10 11:13 KST"
   }
 }

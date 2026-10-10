@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "run": "A221",
+  "run_key": "OUTRUN-KOR-A221-Q121-P0-ADJACENT-PROTECTED-REGION-20261010-1100",
+  "role": "A",
+  "owner_lane": "A",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "priority": "P0",
+  "selection": "MATERIAL_REWORK_FROM_REWORK_TRIAGE",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "previous_A219_A220_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "reason_for_no_new_dds": "Candidate exact-source pixel mask is empty within both source text bboxes; next adjacent pixels are not proven removable. Safety abort rather than artificial new DDS.",
+  "failed_worker": {
+    "run_id": 38015566261,
+    "trigger_commit": "5edfb1d2c01655d4d889660236c1e1c6ab15b515",
+    "step": "Run heavy localization compute off N100",
+    "actual_result": "AssertionError: No new source-exact residual found; fail closed.",
+    "failure_scope": "No candidate published, downstream actions skipped"
+  },
+  "sha_bound_existing_lossless_images": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/",
+  "specific_regions": [
+    {
+      "rank": 21,
+      "source_label": "race?",
+      "source_bbox_readable": [
+        1683,
+        657,
+        1849,
+        724
+      ],
+      "expanded_bbox": [
+        1671,
+        645,
+        1861,
+        736
+      ],
+      "source_visible": 7928,
+      "clean_visible": 738,
+      "source_equals_clean_alpha_inside_bbox": 0,
+      "source_equals_clean_alpha_outside_bbox": 0,
+      "other_unchanged_source_alpha": 0,
+      "clean_alpha_not_in_source": 542,
+      "lossless_png_sha256": {
+        "SOURCE": "2f117990f1f384c5ef2d1888d4bc12f4b16c294a1dc58409c5803cec07339f37",
+        "CLEAN": "5b66c16ce056418daae63039dc0190fd542218d656cf33934aeba52d196bfcb0",
+        "FINAL": "5b66c16ce056418daae63039dc0190fd542218d656cf33934aeba52d196bfcb0"
+      },
+      "finding": "Visible left-crop mark remains, but not an exact-source remnant inside the English text bbox; neighbor/plate semantic classification required."
+    },
+    {
+      "rank": 26,
+      "source_label": "Do",
+      "source_bbox_readable": [
+        14,
+        659,
+        101,
+        724
+      ],
+      "expanded_bbox": [
+        2,
+        647,
+        113,
+        736
+      ],
+      "source_visible": 4629,
+      "clean_visible": 81,
+      "source_equals_clean_alpha_inside_bbox": 0,
+      "source_equals_clean_alpha_outside_bbox": 81,
+      "outside_points_bbox": [
+        98,
+        730,
+        112,
+        735
+      ],
+      "clean_alpha_not_in_source": 0,
+      "lossless_png_sha256": {
+        "SOURCE": "edc8ecefff410ffb74da27dbbbcb60a928cafc6630d688ca9ff97c7a497c7049",
+        "CLEAN": "ac938f097016a25500d9d0afb20816df1e43297638aabd8c924f85cba3107b18",
+        "FINAL": "ac938f097016a25500d9d0afb20816df1e43297638aabd8c924f85cba3107b18"
+      },
+      "finding": "81 unmodified original pixels outside declared English text bbox; preserve until source semantic/neighbor-art relationship is proven."
+    }
+  ],
+  "independent_execution": {
+    "backend": "GitHub Actions source-verified read-only failure + N100 MCP lightweight six 190x91/111x89 PNG exact byte inspection (ChatGPT sandbox cannot fetch raw GitHub)",
+    "N100_CPU_heavy": false
+  },
+  "current_official_asset": "REWORK_REQUIRED_UNCHANGED",
+  "source_plate_gate": "HOLD_UNRESOLVED_NEIGHBOR_ART_MASK",
+  "production": "PREFLIGHT_ONLY_NO_MATERIAL_FIX",
+  "new_promoted_dds": 0,
+  "new_trial_dds": 0,
+  "new_independent_C_approval": 0,
+  "not_duplicate_of": [
+    "A219: goal 33",
+    "A220: the 24",
+    "C353: A220 exact trial"
+  ],
+  "C1": "NO_NEW_CANDIDATE",
+  "C3": "NOT_RUN",
+  "unresolved_user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_safe_action": "Independent source-derived per-pixel neighbor-protection segmentation for source rank21/cropped question mark vs rank26 lower-boundary art; no blind alpha deletion. If A P0 cannot safely advance, move to genuinely new P1/REWORK producer target.",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

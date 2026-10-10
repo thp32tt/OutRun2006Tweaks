@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 11:10 KST",
+  "updated_at_kst": "2026-10-10 11:13 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10406,5 +10406,19 @@
     "machine_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_INDEPENDENT_MACHINE.json",
     "qa_report": "localization/graphics/role_C/20261010-C353-C2-Q212-B347-INDEPENDENT-STYLE-FAIL/C353_Q212_CONTROLLER_C2_REWORK.json",
     "updated_at_kst": "2026-10-10 11:10 KST"
+  },
+  "a221_q121_source_boundary_hold": {
+    "run": "A221",
+    "run_key": "OUTRUN-KOR-A221-Q121-P0-ADJACENT-PROTECTED-REGION-20261010-1100",
+    "queue_index": 121,
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "new_dds": 0,
+    "status": "PREFLIGHT_ONLY_SOURCE_PROTECTION_HOLD",
+    "distinct_evidence": "rank26 81 original-alpha pixels strictly outside text bbox; rank21 no exact source remnants inside bbox",
+    "trial_candidate_changed": false,
+    "qa_report": "localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "updated_at_kst": "2026-10-10 11:13 KST"
   }
 }
