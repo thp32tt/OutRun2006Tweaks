@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B346 2026-10-10 09:45 KST B EVEN q176 made real 2048x2048 trial DDS SHA eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45 from exact English source with native Bold stroke1 after B345 trial SHA 34edd2aa rejected for narrow counters. GitHub CPU #38009996777 SUCCESS; source/CLEAN/FINAL outside original 4 bboxes RGBA0 and RAW/FLIP-Y practical direct scoped visual improved. Official 494d42c0... stays C343 REWORK, no promoted DDS, C2/C3/game pending, runtime UNTESTED. Complete final manifest+pixel guard, fresh C2/C3 before publication. QA role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-B346-Q176-SOURCE-CALIBRATED-COUNTERS-20261010",
     "A219 2026-10-10 09:20 KST A q121 P0 exact English source residue 33px fixed in unpromoted saved DDS trial SHA 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb. Source/CLEAN/current white 255 x33; saved DDS 132 bytes only, outside 0, RAW/FLIPY native/75/50 producer scoped visual PASS. OFFICIAL current A202 SHA 38d5c2c3 unchanged; q121 REWORK_REQUIRED, IGR030/031/040 OPEN, no C1/C3/new game acceptance; RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_CONTROLLER_SELF_QA.json",
     "C349 C2 2026-10-10 09:10 KST EVEN q212 distinct B341 unpromoted trial SHA fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7 vs unchanged official SHA e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea. Independently fetched SHA verified canonical English source f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61, full authored C158 CLEAN c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67, official and trial native 2048x2048 RGBA32 mip1; true RGBA channel/order and RAW=flipY stored confirmed. Full 12 source inventory bboxes SOURCE/CLEAN, SOURCE/TRIAL, CLEAN/TRIAL all RGBA+alpha outside0; all12 CLEAN original alpha0. Official→trial changes only r43/r44 within their source ROIs 37978 RGBA, other10 unchanged exact. r43 ORIGINAL PROFESSIONAL visible alpha>32 x240, official Korean x5, B341 trial x241 (dx+1); r44 OUTRUN x1626, official Korean x1689, B341 trial x1628 (dx+2). Native+practical50 visual shows layout improves without obvious ghost/box/glyph break; persists RAW orientation. But alpha>32 English glyph height r43=45 vs trial55, r44=45 vs trial52 (source alpha>0 effect envelope=63, so this is an optical high-opacity hierarchy HOLD, NOT proven literal source-effect-bbox pixel escape); qualified blind calibration/complete source-family slant/effect review and producer P1/P2/P3 manifest missing, trial not promoter nor full C2 PASS. C2 scoped placement PASS / overall HOLD_STRICT_RECHECK on trial only; official remains C338 REWORK_REQUIRED, C3/APPROVAL/IGR029 user game BLOCKED UNTESTED. New 10 lossless evidence PNG 2 machine JSON C2 report localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_C2_TRIAL_HOLD.json, DDS officially promoted0. OUTRUN-KOR-C349-C2-Q212-B341-SOURCE-CLEAN-PERSISTED-20261010-0850.",
     "C348 C2 2026-10-10 08:31 KST EVEN q214 NEW independent persisted DDS official SHA ace42cb3d539df7c538c6d93b6c3f001e3d18e4f41aaa29bdab1466fe412fc30 vs B339 unapproved trial SHA d273a208d52150396084df4a2655491f7f26b6be882abd20874d12e4dddf4bf8. Downloaded and SHA-verified both 2048x2048 BC3 DXT5 DDS. Independently decoded raw/FLIPY + native/75/50/400% START/GOAL, 10 new lossless PNG+2 JSON. 1821 RGBA pixels changed within B339 declared two source ROIs, outside0. Crucial: persisted old and trial alpha channels byte-identical across entire decoded atlas; START and GOAL source ROIs are fully alpha255. B339 alpha-core coverage1.0 is vacuous for glyph quality on these opaque panels; only RGB/bevel glyph topology visibly changes. Native gray/black/white and 50% show GOAL 골 trial still visually horizontally smeared/weak-vowel unreadable, while START 출발 is more recognizable but chrome mismatch not qualified. Fresh trial C2 scoped VISUAL_FAIL, method-change required from C285/C289 true C rejects; old official and current producer REWORK maintained, trial not promoted, full SOURCE/CLEAN exact independent provenance and blind calibration missing so no C PASS/C3/approval/user game. Source from B339 producer visual only (not independently SHA verified). RUNTIME_VALIDATION=UNTESTED; no new promoted DDS. localization/graphics/role_C/20261010-C348-C2-Q214-B339-OPAQUE-ALPHA/C348_Q214_CONTROLLER_C2_TRIAL_FAIL.json. RUN_KEY=OUTRUN-KOR-C348-C2-Q214-B339-OPAQUE-ALPHA-20261010-0820.",
@@ -6872,7 +6873,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10",
+  "updated_at_kst": "2026-10-10 09:45 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14399,6 +14400,24 @@
     "new_promoted_dds": 0,
     "new_png": 15,
     "qa_report": "localization/graphics/role_C/20261010-C350-C1-Q035-SOURCE-EFFECT-FOOTPRINT/C350_Q035_CONTROLLER_C1_HOLD.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b346_q176_source_red_heavy_pilot": {
+    "role": "B",
+    "queue_index": 176,
+    "run_key": "OUTRUN-KOR-B346-Q176-SOURCE-CALIBRATED-COUNTERS-20261010",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "prior_official_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "rejected_B345_sha256": "34edd2aa06eb8dc8611c8b67738d147e3197325e1af6e54347439b491838075f",
+    "new_B346_trial_sha256": "eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45",
+    "workflow_run": 38009996777,
+    "trial_dds_created": 1,
+    "official_dds_promoted": 0,
+    "producer_scoped_visual": "ACCEPT_NATIVE_COUNTERS_IMPROVED",
+    "independent_C2": "C343_REWORK_REQUIRED_OFFICIAL",
+    "C3": "BLOCKED",
+    "evidence": "localization/graphics/role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json",
+    "next": "Full final source-derived mask and manifest plus production_pixel_guard before any official promotion; then independent exact-SHA C2, C3 and user in-game; do not repeat B345/B346 same method",
     "runtime_validation": "UNTESTED"
   }
 }
