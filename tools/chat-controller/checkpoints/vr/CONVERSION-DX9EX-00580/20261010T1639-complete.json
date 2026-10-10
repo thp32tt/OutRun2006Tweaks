@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "worker_terminal_result",
+  "captured_at_kst": "2026-10-10T16:39:00+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX9EX-00580",
+  "event_id": "CONVERSION-DX9EX-00580-E001",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "game_branch_head": "b35e39f7011d7234bfb8fd2d7cc95057cf511e70",
+  "validation_bearing_result_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "material_marker": "[AUTO:CONVERSION-DX9EX-00580]",
+  "c6_bookkeeping_sha": "b35e39f7011d7234bfb8fd2d7cc95057cf511e70",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "phase": "C6_RESULT",
+  "terminal": true,
+  "retry_allowed": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "required_ci": {
+    "dx9ex_active": {
+      "run_id": 38034625458,
+      "conclusion": "success"
+    },
+    "domain_isolation": {
+      "run_id": 38034625492,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38034625521,
+      "conclusion": "success"
+    }
+  },
+  "package_artifact_id": 11663840398,
+  "runtime_validation": "UNTESTED",
+  "wheel_hardware": "UNTESTED",
+  "hmd_approved": false,
+  "native_120fps": "NOT_MEASURED",
+  "ai2_scoreboard": {
+    "previous": 1085,
+    "increment": 1,
+    "cumulative": 1086,
+    "commit": "cc7c02ed44cb065f70d4e246f9a7c0ea888f7e9a"
+  },
+  "next_action": "Do not rerun CONVERSION-DX9EX-00580; dispatch next independent DX9Ex P0/P1 item, DX11 A active and DXVK B frozen."
+}
