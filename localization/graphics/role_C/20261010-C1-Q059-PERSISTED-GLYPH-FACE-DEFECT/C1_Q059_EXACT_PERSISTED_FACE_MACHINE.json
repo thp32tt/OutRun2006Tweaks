@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C1-Q059-PERSISTED-GLYPH-FACE-20261010-1418",
+  "review_id": "C1-Q059-20261010-1418",
+  "role": "C1",
+  "shard": "ODD",
+  "index": 59,
+  "kind": "INDEPENDENT_PERSISTED_DDS_GLYPH_FACE_AUDIT",
+  "execution_backend": "GitHub SSOT and N100 MCP fallback for exact public DDS download and bounded Pillow/numpy read-only pixel inspection (ChatGPT local GitHub DNS fails)",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+    "size_bytes": 1048704,
+    "decoded_size": [
+      2048,
+      512
+    ],
+    "format": "DXT5/BC3",
+    "authentic_persisted_bytes_sha256_verified": true,
+    "raw_to_readable": "vertical flip",
+    "mips": 1
+  },
+  "source_and_final_proof_manifest": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/C302_Q059_LOSSLESS_MANIFEST.json",
+  "method": {
+    "scope": "Exact published lossless per-region SOURCE and saved FINAL; independently regenerated readable RGBA from the exact current persisted DDS and compared to published saved FINAL RGBA",
+    "comparison": "pixel-for-pixel all channels",
+    "gold_mask": "R>150 && G>85 && B<165 && alpha>180",
+    "navy_mask": "R<90 && G<100 && B<150 && alpha>180",
+    "dark_interior_heuristic": "For d=2..4 pixels, a dark opaque candidate pixel with thresholded gold on x±d and y±d in same image; count in source and current separately. Counts indicate suspicious interior dark pixels, NOT mathematically proved holes nor comprehensive exact glyph QA.",
+    "note": "Source and final glyph strings differ; absolute counts and percentage ratios are diagnostic only. Visual comparison, not threshold alone, determines REWORK. Historical source/clean/outside numeric PASS is not recomputed as new PASS."
+  },
+  "regions": [
+    {
+      "id": "next_mission",
+      "bbox_readable": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "actual_DDS_vs_published_RGBA_mismatch_pixels": 0,
+      "source_lossless_sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815",
+      "final_lossless_sha256": "37535572fe6f44d73185b98981d909ce61103b3faedc0a57542378380511c0a4",
+      "source_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png",
+      "final_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__final_native.png",
+      "black_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_black.png",
+      "gray_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__on_gray.png",
+      "practical_50_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__practical_50.png",
+      "gold_face_threshold_source": 54438,
+      "gold_face_threshold_final": 10616,
+      "dark_interior_heuristic_source": 7,
+      "dark_interior_heuristic_final": 0
+    },
+    {
+      "id": "race_rivals",
+      "bbox_readable": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "actual_DDS_vs_published_RGBA_mismatch_pixels": 0,
+      "source_lossless_sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6",
+      "final_lossless_sha256": "5c383096a27da32edcb5bbe624029afc10f25ebd31ade92978fed4c765c7052c",
+      "source_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png",
+      "final_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__final_native.png",
+      "black_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_black.png",
+      "gray_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__on_gray.png",
+      "practical_50_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__practical_50.png",
+      "gold_face_threshold_source": 10854,
+      "gold_face_threshold_final": 7593,
+      "dark_interior_heuristic_source": 2,
+      "dark_interior_heuristic_final": 17
+    },
+    {
+      "id": "drift_score",
+      "bbox_readable": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "actual_DDS_vs_published_RGBA_mismatch_pixels": 0,
+      "source_lossless_sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5",
+      "final_lossless_sha256": "b8086e70d8fffa99dad00f13bf4381ec8870bdddec4cce5559c575eeb2d510bc",
+      "source_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png",
+      "final_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__final_native.png",
+      "black_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_black.png",
+      "gray_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__on_gray.png",
+      "practical_50_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__practical_50.png",
+      "gold_face_threshold_source": 9087,
+      "gold_face_threshold_final": 8361,
+      "dark_interior_heuristic_source": 1,
+      "dark_interior_heuristic_final": 5
+    },
+    {
+      "id": "slipstream_score",
+      "bbox_readable": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "actual_DDS_vs_published_RGBA_mismatch_pixels": 0,
+      "source_lossless_sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292",
+      "final_lossless_sha256": "1d0e4302eb826283e3ca5b665aecbe3c3d5d61c5a908396a472fc3a57f0c528f",
+      "source_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png",
+      "final_lossless_path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__final_native.png",
+      "black_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_black.png",
+      "gray_composite_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__on_gray.png",
+      "practical_50_evidence": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__practical_50.png",
+      "gold_face_threshold_source": 13331,
+      "gold_face_threshold_final": 9905,
+      "dark_interior_heuristic_source": 2,
+      "dark_interior_heuristic_final": 27
+    }
+  ],
+  "results": {
+    "all_four_persisted_vs_published_RGBA_exact": true,
+    "pixel_face_defect_observed_regions": [
+      "race_rivals",
+      "drift_score",
+      "slipstream_score"
+    ],
+    "visible_observation": "Opaque black/gray composite reveals repeated navy/dark dotted interruption within the yellow/gold Korean character face and its effects in three labels; original English yellow face is comparatively smooth. In source/final native raw RGB, original English text may remain in fully transparent RGB and MUST NOT be counted as visible ghost without alpha-positive proof.",
+    "independent_decision": "VISUAL_GLYPH_FACE_STIPPLE_REWORK_REQUIRED",
+    "authoritative_complete_machine_qa": false,
+    "changed_outside": "NOT_REMEASURED",
+    "protected_changed": "NOT_REMEASURED",
+    "source_residue_visible": "NOT_ASSERTED",
+    "approved": false
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "c3": "NOT_PERFORMED",
+  "candidate_modified": false
+}
