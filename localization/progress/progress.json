@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T04:47:00+09:00",
+  "updated_at_kst": "2026-10-11T04:55:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_c1_q121_a230_independent_20261011": {"run_key":"OUTRUN-KOR-C1-Q121-A230-FIRST-INDEPENDENT-EXACT-DDS-20261011","index":121,"official_unchanged":"38d5c2c3","trial_sha256":"339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e","prior_sha256":"6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06","changed_rgba":30,"outside_changed":0,"source_matches_remaining":236,"C1":"REWORK_REQUIRED","C3":"NOT_RUN","runtime":"UNTESTED","new_dds":0,"approval":0,"evidence":"localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_INDEPENDENT_QA.json"},
       "c1_q225_blind_calibration_20261011": {
         "run_key": "OUTRUN-KOR-C1-Q225-FIVE-BLIND-CALIBRATION-20261011-0424",
         "index": 225,

@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C1-Q121-A230-FIRST-INDEPENDENT-EXACT-DDS-20261011",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 121,
+  "priority": "P0",
+  "execution_backend": "GitHub SSOT + N100 MCP binary-only fallback; ChatGPT local DNS unavailable",
+  "source_full_dds_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "reported_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "note": "Prior verified A215 canonical reference; entire English DDS not independently fetched in this run"
+  },
+  "source_lossless_roi": {
+    "path": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_20_SOURCE_NATIVE_RGBA.png",
+    "sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+    "region_readable_native": [
+      3478,
+      379,
+      3734,
+      452
+    ]
+  },
+  "legacy_clean_roi": {
+    "path": "localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS/A215_component_20_CLEAN_NATIVE_RGBA.png",
+    "sha256": "4d5a090b3fbe1ec9f307ba5992d636b1017b73f83852cf037bbf71ae6be8da88",
+    "warning": "NOT a text-free CLEAN plate; visible Korean and 5765 alpha-positive pixels. Cannot qualify as plate_only. Its name is historical, not current-policy approval."
+  },
+  "official_sha256_unchanged": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "prior_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "candidate_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "source_region": "rank20_gas_pedal",
+  "source_text_bbox": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "readable_roi": [
+    3478,
+    379,
+    3734,
+    452
+  ],
+  "candidate_new_sha_first_independent_c1": true,
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "reason": "Producer A230 metadata read during target discovery; blind pixels-before-producer cannot truthfully be asserted.",
+    "independent_native_visual": "Source has thin slanted white/gray racing italic Gas Pedal; new Korean thick near-upright navy-edged 가속 페달. Native GRAY100 and BLACK50 show detached short white original-shaped flecks to left of Korean despite removed 30 pixels."
+  },
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_INDEPENDENT_MACHINE.json",
+    "verified_exact_A220_A230": true,
+    "full_atlas_changed_RGBA": 30,
+    "full_atlas_changed_alpha": 30,
+    "outside_rank20_RGBA": 0,
+    "outside_rank20_alpha": 0,
+    "removed_source_matching_alpha_positive": 30,
+    "prior_source_matching": 266,
+    "current_source_matching": 236,
+    "raw_flip_mismatch": 0,
+    "authored_mips": 1,
+    "note": "Source-matching count measures byte-equivalent positive alpha, not independent visual proof that every matching pixel is English residue"
+  },
+  "view_evidence": {
+    "gray100": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_100.png",
+      "sha256": "1c961a40e40b88acc547137854261743cb2479ff7845a884d84bb2177200476e"
+    },
+    "black50": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_50.png",
+      "sha256": "88496b83ca59b4576f1cb1085302c5fda5934136937cd06dc840325354ec92f3"
+    },
+    "raw": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_RAW_100.png",
+      "sha256": "f40ec8f13715b0ae7a9dc6a0c1bb0737fedc3fef345097be01e883aac2da027f"
+    },
+    "marked_remnants": {
+      "path": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_A230_SOURCE_MATCH_REMAINDERS_4X.png",
+      "sha256": "45f8b8a73df0e2698168e35d0d03b8292ae494ea4fd5db491773206c87bb7ab8"
+    }
+  },
+  "views_per_region": {
+    "native100": "reviewed BGW",
+    "practical75": "reviewed BGW",
+    "practical50": "reviewed BGW",
+    "raw": "reviewed",
+    "flip_y": "reviewed",
+    "mips": "one authored level inspected",
+    "zoom": "reviewed 4x exact remnant + change masks"
+  },
+  "eight_visual_checks": {
+    "slant": {
+      "result": "FAIL_VISUAL",
+      "observation": "Original readable Gas Pedal is racing right italic; Korean 가속 페달 is substantially closer to upright/block family. Paired top-bottom stem displacement not independently measured, so no fabricated numeric anchor.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_100.png"
+    },
+    "clean_plate": {
+      "result": "FAIL",
+      "observation": "Detached white original-shaped fragments remain before Korean in new persisted DDS on native gray and practical black50; historical A215 CLEAN image itself contains Korean, not approved text-free CLEAN. Requires reconstruction.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_50.png",
+      "codes": [
+        "SOURCE_RESIDUE_UNDER_KOREAN",
+        "INCOMPLETE_CLEAN_PLATE"
+      ]
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Heavy navy outline and thick front face visually unlike thin italic light original even without source residue.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_100.png"
+    },
+    "readability": {
+      "result": "FAIL_COMPOSITE",
+      "observation": "Korean is legible at 50% alone but isolated remnant beside label makes source-vs-final visually dirty; readable-only does not approve.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_50.png"
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "No clear Korean stroke broken in inspected ROI; per-glyph style and overlap proof incomplete, original remnants still present.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_A230_SOURCE_MATCH_REMAINDERS_4X.png"
+    },
+    "protected_art": {
+      "result": "PASS_SCOPED_CHANGE_ONLY",
+      "observation": "Full atlas A220 vs A230 changed 30 alpha/RGBA pixels, all inside native rank20 expanded bbox; DOES NOT prove canonical source vs A230 safety over other 29 regions.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_A220_TO_A230_CHANGED_4X.png"
+    },
+    "placement": {
+      "result": "FAIL_VISUAL",
+      "observation": "Detached source-shaped fleck(s) adjacent to left edge of Korean label; cannot accept full label placement as clean independent element.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_100.png"
+    },
+    "orientation": {
+      "result": "PASS_SCOPED",
+      "observation": "Persisted RAW mirror_y and readable FLIP-Y agree exactly when mapped, mismatch 0 in native rank20 ROI; real consumer/game NOT run.",
+      "evidence": "localization/graphics/role_C/20261011-C1-Q121-A230-INDEPENDENT-P0-SAVED/C1_Q121_SOURCE_CLEAN_A220_A230_RAW_100.png"
+    }
+  },
+  "calibration_reference": "Historical C1 q225 synthetic blind control 5/5 on q101 racing italic; not q121 specific current-family certification.",
+  "triage": "MATERIAL_REWORK (q121 existing official status); new trial inspection only, NOT official promotion",
+  "decision": "REWORK_REQUIRED",
+  "reason": "VISIBLE_SOURCE_GHOST_AND_SOURCE_ITALIC_MISMATCH",
+  "independent_C1_pass": 0,
+  "C3": "NOT_RUN",
+  "new_dds_by_C1": 0,
+  "promoted_dds": 0,
+  "official_candidate_changed": false,
+  "game_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "user_in_game_fail": "OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "approval": false,
+  "next_action": "A must make source-authenticated no-text CLEAN plate in region rank20, separate Korean glyph/effect mask; remove visibly detached source fragments without erasing legitimate Korean; source-family italic/font/outline geometry profile; rerun native decoded mechanical guard, independent C1 and distinct C3; user same-version game screenshot needed. Do not blindly remove all 236 source-matching pixels."
+}

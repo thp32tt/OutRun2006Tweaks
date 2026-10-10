@@ -1,0 +1,111 @@
+{
+  "source_roi_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "clean_roi_sha256": "4d5a090b3fbe1ec9f307ba5992d636b1017b73f83852cf037bbf71ae6be8da88",
+  "prior_dds_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "new_dds_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "header_prior": {
+    "width": 4096,
+    "height": 4096,
+    "mip_count": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "rgb_mask": "0xff",
+    "g_mask": "0xff00",
+    "b_mask": "0xff0000",
+    "a_mask": "0xff000000"
+  },
+  "header_new": {
+    "width": 4096,
+    "height": 4096,
+    "mip_count": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "rgb_mask": "0xff",
+    "g_mask": "0xff00",
+    "b_mask": "0xff0000",
+    "a_mask": "0xff000000"
+  },
+  "source_crop_readable": [
+    3478,
+    379,
+    3734,
+    452
+  ],
+  "source_roi_size": [
+    256,
+    73
+  ],
+  "CLEAN_source_alpha_pixels": 6395,
+  "CLEAN_alpha_pixels": 5765,
+  "source_to_clean_rgba_changed": 8490,
+  "A220_to_A230_changed_full_rgba_pixels": 30,
+  "A220_to_A230_changed_full_alpha_pixels": 30,
+  "A220_to_A230_changed_outside_20_region": 0,
+  "A220_to_A230_alpha_changed_outside_20_region": 0,
+  "A220_to_A230_raw_changed_bbox": [
+    3493,
+    3660,
+    3701,
+    3705
+  ],
+  "A220_to_A230_readable_changed_bbox_roi": [
+    15,
+    12,
+    223,
+    57
+  ],
+  "prior_exact_source_visible_positive_rgba": 266,
+  "new_exact_source_visible_positive_rgba": 236,
+  "source_exact_removed": 30,
+  "source_exact_added": 0,
+  "raw_yflip_mismatch": 0,
+  "pngs": {
+    "C1_Q121_A220_TO_A230_CHANGED_4X.png": {
+      "sha256": "726ab0ebca0c5981bc90e8b75aa2e4b1a5055a3cf61362046290612dd9067e85",
+      "bytes": 1756
+    },
+    "C1_Q121_A230_SOURCE_MATCH_REMAINDERS_4X.png": {
+      "sha256": "45f8b8a73df0e2698168e35d0d03b8292ae494ea4fd5db491773206c87bb7ab8",
+      "bytes": 19196
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_100.png": {
+      "sha256": "6aa25f599658bf821f5bc842b5bfbf7300762eb3d70f3e2bd2fc8bf78a3aa1fe",
+      "bytes": 20885
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_50.png": {
+      "sha256": "88496b83ca59b4576f1cb1085302c5fda5934136937cd06dc840325354ec92f3",
+      "bytes": 11634
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_BLACK_75.png": {
+      "sha256": "1c03fe8cf9ce4e5257936beb6964d9ec6bcd60f7a7c582e2c6313a26b2f6c8cc",
+      "bytes": 22136
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_100.png": {
+      "sha256": "1c961a40e40b88acc547137854261743cb2479ff7845a884d84bb2177200476e",
+      "bytes": 22059
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_50.png": {
+      "sha256": "6402070c57476b850d046cf0fc6aaf6f9be882b35a7101db0651a7dbb2b0c0ba",
+      "bytes": 13062
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_GRAY_75.png": {
+      "sha256": "5c100ee8ad643db09e239f29d245cae26e87569b37c87092cb1c476521a54252",
+      "bytes": 24233
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_RAW_100.png": {
+      "sha256": "f40ec8f13715b0ae7a9dc6a0c1bb0737fedc3fef345097be01e883aac2da027f",
+      "bytes": 22769
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_WHITE_100.png": {
+      "sha256": "08b6a73619e5cd71116824f64f94032b28c75feb990d196610a0b1ced3545df9",
+      "bytes": 22574
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_WHITE_50.png": {
+      "sha256": "3b1bc867467bd0fbbe477a4671b4dc3e1a880e829ba3564d56c838ee532acb28",
+      "bytes": 11737
+    },
+    "C1_Q121_SOURCE_CLEAN_A220_A230_WHITE_75.png": {
+      "sha256": "d3527ceb361465d2fa7183337b5f41c9e05fcd3e280617213b5d6d713d03842c",
+      "bytes": 22573
+    }
+  },
+  "note": "Source ROI PNG only; canonical 67MB English source DDS not re-downloaded. Reference source image SHA is authenticated prior A215 artifact; this run downloads full A220 and A230 DDS and independently decodes native."
+}
