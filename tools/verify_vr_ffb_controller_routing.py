@@ -66,7 +66,7 @@ def violations(source: str) -> list[str]:
     if "static bool legacyXInputOutputActive = false;" not in route or route.count("legacyXInputOutputActive = false;") != 4:
         errors.append("legacy rumble state must reset after wheel, disable and SDL handoff")
     disabled = route.split("if (!Settings::VibrationMode)", 1)[1].split("rumbleDisabledLastCall = true;", 1)[0]
-    if "if (legacyXInputOutputActive)" not in disabled or "XInputSetState(userId, &zero);" not in disabled:
+    if "if (legacyXInputOutputActive || !Settings::UseNewInput)" not in disabled or "XInputSetState(userId, &zero);" not in disabled:
         errors.append("disable must stop previously driven XInput even after SDL switch")
     handoff = "if (Settings::UseNewInput && legacyXInputOutputActive)"
     if handoff not in route or route.index(handoff) > route.index("InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);"):
@@ -96,7 +96,7 @@ def main() -> None:
         ("VibrationUserId = Settings::VibrationControllerId;", "VibrationUserId = 0;"),
         ("Range<int>{ 0, 3 }", "Range<int>{ 0, 4 }"),
         ("if (Settings::UseNewInput && legacyXInputOutputActive)", "if (false)"),
-        ("if (legacyXInputOutputActive)", "if (!Settings::UseNewInput)"),
+        ("if (legacyXInputOutputActive || !Settings::UseNewInput)", "if (legacyXInputOutputActive)"),
         ("legacyXInputOutputActive = true;", "legacyXInputOutputActive = false;"),
         ("legacyXInputOutputActive = false;\n    }\n\n    void InputManager_SetVibration", "/* handoff state clear removed */\n    }\n\n    void InputManager_SetVibration"),
     )

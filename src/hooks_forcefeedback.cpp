@@ -63,7 +63,7 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
             void InputManager_StopVibration();
             InputManager_StopVibration();
             // Even after switching to SDL, stop a previously driven XInput port.
-            if (legacyXInputOutputActive)
+            if (legacyXInputOutputActive || !Settings::UseNewInput)
             {
                 XINPUT_VIBRATION zero{};
                 XInputSetState(userId, &zero);
