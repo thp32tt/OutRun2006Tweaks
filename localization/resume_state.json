@@ -14611,5 +14611,24 @@
     "qa_report": "localization/graphics/role_A/20261010-A221-Q121-SOURCE-BOUNDARY-HOLD/A221_SOURCE_BOUNDARY_FAIL_CLOSED.json",
     "RUNTIME_VALIDATION": "UNTESTED",
     "updated_at_kst": "2026-10-10 11:13 KST"
+  },
+  "c1_20261010_q103_source_family_overweight": {
+    "role": "C",
+    "lane": "C1",
+    "index": 103,
+    "run_key": "OUTRUN-KOR-C1-Q103-A197-FAMILY-WEIGHT-REJECT-20261010-1110",
+    "decision": "REWORK_REQUIRED",
+    "reason_code": "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+    "candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "source_vs_final": "Native/GRAY100/GRAY50 source medium-light condensed right italic, Korean overly heavy angular glyphs, source-family mismatch; C312 HOLD visual suspicion now confirmed without a new DDS",
+    "previous_C312": "HOLD_STRICT_RECHECK",
+    "prior_numerical": "C312 0 rgba/alpha outside source bbox, does not override style failure",
+    "C3": "BLOCKED_PENDING_PRODUCER_REWORK",
+    "APPROVAL": false,
+    "USER_INGAME": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "DDS_CHANGED": false,
+    "qa_report": "localization/graphics/role_C/20261010-C1-Q103-SOURCE-FAMILY-WEIGHT-REJECT/C1_Q103_CONTROLLER_REWORK.json"
   }
 }
