@@ -1,0 +1,81 @@
+{
+  "schema_version": "psd-pilot-recipe-v1-20261011",
+  "role": "B",
+  "queue_index": 60,
+  "asset": "A064FDFC_1024x512.dds",
+  "status": "TRIAL_UNAPPROVED_PRODUCER_VISUAL_HOLD",
+  "first_unverified_link": "INDEPENDENT_C2_SOURCE_FAMILY_VISUAL",
+  "source_psd": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_game_cvt_Exst/A064FDFC_1024x512-v02.psd",
+    "sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+    "bytes": 44136566,
+    "layer_path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 0",
+    "best_time_text_is_separate_psd_layer": false,
+    "provenance": "community source, not verified developer original"
+  },
+  "source_english": {
+    "canonical_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "reference_png_sha256": "9f4a4c114a306bd039304415dce32d1a6addd9274e5f57b4ed2ee9372f0f3d72"
+  },
+  "official_base": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01"
+  },
+  "renderer": {
+    "script": "reproduce_psd_q060_trial.py",
+    "backend": "N100_MCP_FALLBACK_FOR_44MB_BINARY_PSD",
+    "psd_tools": "1.10.8",
+    "pillow": "10.2.0",
+    "numpy": "2.5.3",
+    "font": "NotoSansCJK-Black.ttc",
+    "font_sha256": "3cffb10242b4b7e6edd439ebf3bd7e392345525e093ea08149e0a0158a1b5151",
+    "font_face_index": 1,
+    "native_size_px": 116,
+    "source_readable_top_minus_bottom_dx_per_dy": 0.3421
+  },
+  "region": {
+    "source_bbox_readable": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "korean": "최고 주행 시간",
+    "glyph_mask_bbox_relative": [
+      65,
+      11,
+      784,
+      122
+    ],
+    "alpha_policy": "PSD RGB with zero alpha for source glyph area; transparent-only Korean lettering/effects",
+    "protected_policy": "Outside canonical source text bbox unchanged"
+  },
+  "result": {
+    "dds": "Q060_PSD_SOURCE_PLATE_TRIAL_UNAPPROVED.dds",
+    "sha256": "bab8dc25bc900d6806adf0462adb2046321353b78e29bdc82885ec9feef33255",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "pixel_format": "RGBA32",
+    "mips": 1,
+    "raw_transform": "mirror_y",
+    "changed_pixels": 104704,
+    "changed_outside_source_bbox": 0,
+    "header_same": true,
+    "persisted_decode_differences": 0
+  },
+  "qa": {
+    "producer_mechanical": "PASS_SCOPED",
+    "producer_optical": "HOLD_SOURCE_FAMILY_REWORK",
+    "visual_reason": "Original BEST TIME is more condensed with stronger racing italic and more source-specific depth than trial Hangul",
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "official_promoted_dds": 0,
+    "user_review_build": "NOT_INCLUDED"
+  },
+  "publish_commit": "cb2834f5d9093ced002b0fd044e2336a4acaf4e4"
+}
