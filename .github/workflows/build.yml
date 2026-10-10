@@ -190,6 +190,7 @@ jobs:
             src/hooks_wheel_vehicle_dynamics.hpp
             src/wheel_ffb_math.hpp
             src/wheel_ffb_runtime.hpp
+            src/wheel_ffb_ps2.hpp
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
             src/hooks_forcefeedback.cpp
@@ -218,5 +219,6 @@ jobs:
             THIRD_PARTY_NOTICES.md
             src/vr/d3d9/shader_fingerprint_gpl.hpp
             tools/verify_wheel_ffb_current.py
+            tools/verify_vr_ffb_controller_routing.py
             .github/workflows/build.yml
           include-hidden-files: true

@@ -17,7 +17,7 @@ namespace Settings
 	Setting<int> VibrationControllerId{ "Controls", "VibrationControllerId", 0,
 		"XInput device to send vibration to, default should work fine in most cases, but if you don't notice any vibration "
 		"you can try increasing this. Ignored when using UseNewInput, vibration will be sent to the active controller.",
-		Range<int>{ 0, 4 } };
+		Range<int>{ 0, 3 } };
 }
 
 int VibrationUserId = 0;
