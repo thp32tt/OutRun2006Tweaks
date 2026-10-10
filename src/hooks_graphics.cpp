@@ -372,7 +372,9 @@ class VRLensFlareProjected2D : public Hook
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
-        OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+        // This is an original 0xC993 non-queued call; do not let a prior
+        // SpriteNode's ScreenHud/WorldBillboard scope hijack the centre sun.
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }

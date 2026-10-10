@@ -910,7 +910,8 @@ class UIScaling : public Hook
         // Post-call SpriteNode tagging remains necessary for queued siblings.
         int result = 0;
         {
-            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(scope);
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
+                scope, marker);
             result = Game::sprani_play_ae_auth_alpha(
                 spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
                 a4, a5, alpha);
@@ -949,7 +950,8 @@ class UIScaling : public Hook
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard);
         int result = 0;
         {
-            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(scope);
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
+                scope, projected ? &RankMarkerProjectedInfo : nullptr);
             result = Game::put_clip_sprite(
                 xstnum, x, y, flags, priority, color);
         }

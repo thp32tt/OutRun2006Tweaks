@@ -1880,7 +1880,7 @@ require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semanti
 def verify_rank_producer_time_scopes(source):
     for name in ('RankMarker_sprani(', 'RankMarker_putClipSprite('):
         body = function_body(source, 'static int __cdecl ' + name)
-        require('ScopedRenderSemantic producerScope(', body,
+        require('ScopedExactProducerSemantic producerScope(', body,
                 'rank semantic while game producer actually executes')
         require('RankMarkerSubScreenHudDepth != 0', body,
                 'NaviPub ScreenHud must not become a vehicle billboard')
@@ -1891,15 +1891,39 @@ def verify_rank_producer_time_scopes(source):
 verify_rank_producer_time_scopes(ui)
 for fn in ('RankMarker_sprani(', 'RankMarker_putClipSprite('):
     start = ui.index('static int __cdecl ' + fn)
-    pos = ui.index('ScopedRenderSemantic producerScope(', start)
+    pos = ui.index('ScopedExactProducerSemantic producerScope(', start)
     corrupted = ui[:pos] + ui[pos:].replace(
-        'ScopedRenderSemantic producerScope(', 'ScopedRenderSemanticLost producerScope(', 1)
+        'ScopedExactProducerSemantic producerScope(', 'ScopedExactProducerSemanticLost producerScope(', 1)
     try:
         verify_rank_producer_time_scopes(corrupted)
     except SystemExit:
         pass
     else:
         raise SystemExit('rank producer-time scope regression escaped: ' + fn)
+
+# Immediate, original-game-only raster draws must override stale queued
+# scope AND projected payload, while a currently rendering SpriteNode retains
+# full authority. Negative mutations guard this exact state ownership split.
+def verify_direct_producer_restore(source):
+    k = function_body(source, 'class ScopedExactProducerSemantic final')
+    for required in ('SpriteQueueDepth == 0',
+                     'CurrentQueueExactScope = RenderScope::None;',
+                     'CurrentQueueProjectedMarker =',
+                     'marker && marker->valid',
+                     'CurrentQueueExactScope = savedQueueScope_;',
+                     'CurrentQueueProjectedMarker = savedProjectedMarker_;'):
+        require(required, k, 'direct-source node/scope/anchor restoration')
+verify_direct_producer_restore(sem)
+for bad in ('CurrentQueueExactScope = savedQueueScope_;',
+            'CurrentQueueProjectedMarker = savedProjectedMarker_;',
+            'SpriteQueueDepth == 0'):
+    corrupt = sem.replace(bad, '/* removed immediate semantic guard */', 1)
+    try:
+        verify_direct_producer_restore(corrupt)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('direct producer semantic regression survived: ' + bad)
 
 # Lens P0: R73 HMD proved scalar disparity tuning was not a fix.
 # The canonical CALL at 0xCABE is in the PRE-0xCAE0 region; Calc3D2D
@@ -2007,7 +2031,7 @@ def verify_centre_actual_draw_owner(source):
     section = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
     section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
     for required in ('static void __cdecl DrawObjectAlphaCentre(',
-                     'ScopedRenderSemantic semantic(',
+                     'ScopedExactProducerSemantic semantic(',
                      'RenderScope::ProjectedScreenEffect2D',
                      'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
                      'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):

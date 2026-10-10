@@ -304,6 +304,52 @@ namespace OutRunVR::GameSemantic
         return SpriteQueueDepth != 0;
     }
 
+    // A direct original-game source CALL may rasterize before it appends any
+    // SpriteNode. ScopedRenderSemantic alone changes CurrentScope, but the
+    // previously selected queue node still wins EffectiveScope() and its old
+    // projected anchor still wins CurrentProjectedMarker(). Rebind BOTH only
+    // for a non-queue direct producer, then restore them unconditionally.
+    // Already selected SpriteNodes remain the authority during queue draws.
+    class ScopedExactProducerSemantic final
+    {
+        RenderScope savedScope_ = RenderScope::None;
+        RenderScope savedQueueScope_ = RenderScope::None;
+        ProjectedMarkerInfo savedProjectedMarker_{};
+        bool active_ = false;
+
+    public:
+        explicit ScopedExactProducerSemantic(
+            RenderScope scope,
+            const ProjectedMarkerInfo* marker = nullptr) noexcept
+            : active_(SpriteQueueDepth == 0 && scope != RenderScope::None)
+        {
+            if (!active_)
+                return;
+            savedScope_ = CurrentScope;
+            savedQueueScope_ = CurrentQueueExactScope;
+            savedProjectedMarker_ = CurrentQueueProjectedMarker;
+            CurrentQueueExactScope = RenderScope::None;
+            CurrentQueueProjectedMarker =
+                scope == RenderScope::ProjectedWorldMarker2D &&
+                marker && marker->valid ? *marker : ProjectedMarkerInfo{};
+            CurrentScope = scope;
+        }
+
+        ~ScopedExactProducerSemantic()
+        {
+            if (!active_)
+                return;
+            CurrentScope = savedScope_;
+            CurrentQueueExactScope = savedQueueScope_;
+            CurrentQueueProjectedMarker = savedProjectedMarker_;
+        }
+
+        ScopedExactProducerSemantic(
+            const ScopedExactProducerSemantic&) = delete;
+        ScopedExactProducerSemantic& operator=(
+            const ScopedExactProducerSemantic&) = delete;
+    };
+
     inline void RegisterSpriteNodeScope(
         const void* node, RenderScope scope,
         ProducerToken producer = ProducerToken::None,
