@@ -88,7 +88,8 @@ def verify(blob):
         if names != expected:
             raise ValueError("missing or unexpected package files")
         lines = z.read("SHA256SUMS.txt").decode("ascii").splitlines()
-        checks = dict(line.split("  ", 1) for line in lines)
+        checks = {filename: digest for digest, filename in
+                  (line.split("  ", 1) for line in lines)}
         if set(checks) != set(REQUIRED) or any(
             checks[name] != sha(z.read(name)) for name in REQUIRED
         ):
