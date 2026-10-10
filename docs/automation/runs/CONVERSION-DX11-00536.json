@@ -2,9 +2,9 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00536",
   "production_id": "CONVERSION-DX11-00536",
-  "event_id": "CONVERSION-DX11-00536-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00536-E006",
+  "event_type": "rollover",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "e3f49c2496ff82319dad2d64facc30fefea2f65f",
@@ -44,17 +44,17 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
-  "status": "BLOCKED_INHERITED_R175_FULL_GATE_FAILURE",
+  "status": "COMPLETE_R239_SCOPED_NATIVE_WARP_ON_R175_FIXED_DESCENDANT",
   "checkpoint": "C6_STATE",
   "result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
   "material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
   "validation_bearing_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
-  "automation_validation": "FAIL",
+  "automation_validation": "PASS_EXACT_SHA_DESCENDANT_FULL_GATE",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
   "score_change": 0,
-  "summary": "R239 adds a production-safe dormant strip-to-triangle-list winding adapter on top of R238's owned native VB/IB path, with INDEX16/INDEX32 WARP pixel readback and 12 fail-closed negative source guards. R239 static+compile+GPU proofs PASS. Full exact-SHA Gate FAILs only on inherited R175 TEXCOORD6 shader varying mismatch, held by independent owner 00477; no score.",
+  "summary": "R239's previously published [AUTO:CONVERSION-DX11-00536] source commit 096f11f remains an ancestor of game branch HEAD 3e7d0a06; no source replay needed. The inherited R175 VS/PS TEXCOORD6 interstage defect was independently repaired by 00477. Exact-SHA Backend Conversion Gate #38052342312 at 3e7d0a06 succeeds, including R239 guard/static, compilation, WARP DrawIndexed pixel probe, shader linkage and constant-buffer smoke. This completes only the existing R239 dormant scoped slice. Real OutRun-authored live D3D9 Draw -> native game-visible frame, gameplay input, and Quest3/VDXR remain UNTESTED / inactive. No new task achievement or AI score increment on rollover.",
   "changed_files": [
     "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
     "tools/dx11_indexed_up_strip_probe_r239.cpp",
@@ -65,13 +65,13 @@
     "docs/automation/runs/CONVERSION-DX11-00536.json"
   ],
   "pipeline": {
-    "C0": "PASS: authenticated Github HEAD e3f49c; controller checkpoint and no existing 00536 run",
-    "C1": "PASS: independent R239 source ownership; R238 untouched and 00477 R175 separately owned",
+    "C0": "PASS: controller GitHub-verified checkpoint 20261010T2140-pre-rollover-0002 at chat-controller-downloads; game HEAD 3e7d0a06; original material 096f11f remains ancestor",
+    "C1": "PASS: R239 source exists unchanged at 3e7d0a06; independent R175 owner 00477 resolved parity at 2aae633d, no ownership/source collision",
     "C2": "PASS: coherent 7-file batch, native C++ strip winding expansion -> R238 immutable resource/bind pipeline -> real mono WARP DrawIndexed + test integration",
-    "C3": "SCOPED_PASS/FULL_GATE_FAIL: 12 source mutation guards + R239 static/build/WARP all SUCCESS at material SHA; Backend Gate validate SUCCESS, smoke FAILURE inherited R175",
-    "C4": "PASS: [AUTO:CONVERSION-DX11-00536] material commit 096f11f2d1ddc035e23e05a1864ce2ca6c52792c published without CI-skip, exact-SHA validated; following bookkeeping not promoted",
-    "C5": "NOT_REQUIRED: no gameplay draw activation/HMD package",
-    "C6": "BLOCKED_INHERITED_R175_FULL_GATE_FAILURE: R239 scoped GPU PASS but full Gate FAIL; runtime UNTESTED; score +0"
+    "C3": "PASS_LATER_DESCENDANT: exact-SHA Backend Conversion Gate #38052342312 at HEAD 3e7d0a06 SUCCESS; DX11 smoke R239 verify/build/run all SUCCESS, shader linkage and constant-buffer PASS. Original R239 material SHA #38048751349 was FAIL due to inherited R175 and must not be relabeled as PASS",
+    "C4": "PASS_EXISTING_SOURCE: [AUTO:CONVERSION-DX11-00536] material source commit 096f11f2d1ddc035e23e05a1864ce2ca6c52792c already in target ancestry; no duplicate source commit. Closure review published once on feature branch for controller fast-forward",
+    "C5": "NOT_REQUIRED: dormant diagnostic only; no game frame, input path, Quest3 runtime or release package",
+    "C6": "COMPLETE_R239_SCOPED_ONLY: R175 independently fixed; later exact-SHA full gate green; next independent task must deliver first live game frame; retry/rollover earns +0"
   },
   "evidence": {
     "backend_gate_conclusion": "failure",
@@ -157,14 +157,47 @@
         "status": "completed",
         "conclusion": "skipped"
       }
-    ]
+    ],
+    "later_full_gate": {
+      "run_id": 38052342312,
+      "head_sha": "3e7d0a0677a2b61f419e6044f7aa2c743cce8ef1",
+      "conclusion": "success",
+      "validate_job_id": 114213818393,
+      "smoke_job_id": 114214503145,
+      "steps": {
+        "r239_static": "success",
+        "r239_build": "success",
+        "r239_warp_pixels": "success",
+        "dx11_shader_linkage": "success",
+        "dx11_constant_buffer": "success"
+      },
+      "r175_fixed_by_task": "CONVERSION-DX11-00477",
+      "r175_source_commit": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+      "material_ancestor": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+      "original_material_gate_id": 38048751349,
+      "original_material_gate_conclusion": "failure"
+    }
   },
-  "resume_cursor": "R239_GPU_PASS_FULL_GATE_FAIL_R175_INDEPENDENT_OWNER",
-  "next_action": "Preserve R239 material as scoped verified only; R175 TEXCOORD6 upstream mismatch remains owned by CONVERSION-DX11-00477. Do not replay 00536 or classify it PASS until exact-SHA full Gate passes on a future independently authorized material SHA.",
+  "resume_cursor": "COMPLETE_R239_NO_REPLAY_NEXT_TASK_FIRST_GAME_DRAW_FRAME",
+  "next_action": "Do not replay 00536: source already material in target branch and scoped/full CI green at later exact SHA. Allocate 00537+ FIRST_GAME_DRAW_FRAME, actual game-authored draw interception -> guarded D3D11 draw -> visible diagnostic game frame; retain default-off and DX9Ex fail-closed fallback.",
   "blockers": [
-    "Inherited R175_GENERIC_VARYING_MISMATCH at constant buffer probe; owner CONVERSION-DX11-00477, not modified by this task",
-    "Quest3/VDXR HMD or gameplay was not executed; RUNTIME_VALIDATION=UNTESTED"
+    "First live game-authored Draw and native game-visible frame not implemented (next feature, not R239 completion)",
+    "No actual Quest3/VDXR gameplay/HMD run; RUNTIME_VALIDATION=UNTESTED"
   ],
   "last_real_activity_at": "2026-10-10T20:40:00+09:00",
-  "last_activity_evidence": "Exact-SHA Gate #38048751349 validate SUCCESS, R239 scoped 3/3 SUCCESS, full smoke failed R175; source material 096f11f2 confirmed"
+  "last_activity_evidence": "Exact-SHA Gate #38048751349 validate SUCCESS, R239 scoped 3/3 SUCCESS, full smoke failed R175; source material 096f11f2 confirmed",
+  "reconciliation": {
+    "event_id": "CONVERSION-DX11-00536-E006",
+    "reason": "30-minute rollover; verification-only closure of existing material, not new code or achievement",
+    "controller_checkpoint": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00536/20261010T2140-pre-rollover-0002.json",
+    "feature_branch": "feature/dx11-00536-r239-closure-20261010",
+    "feature_base_sha": "3e7d0a0677a2b61f419e6044f7aa2c743cce8ef1",
+    "source_commit_not_replayed": true,
+    "feature_ready": true,
+    "fast_forward_by_controller_required": true,
+    "final_gate_existing_exact_sha": "3e7d0a0677a2b61f419e6044f7aa2c743cce8ef1",
+    "gate_run_id": 38052342312,
+    "runtime_validation": "UNTESTED",
+    "score_change": 0
+  }
 }
