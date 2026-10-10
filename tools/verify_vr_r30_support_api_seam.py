@@ -98,7 +98,7 @@ legacy = (
     "OutRunWvpRegisterCount",
     "VerifiedWvpEpsilon",
     "FloatArrayNear(",
-    "OutRunVRRenderer::GetR28VerifiedProjection(",
+    "R29OwnerGetR28VerifiedProjection(",
     "CurrentVertexShaderIdentity",
     "VertexShaderSerial",
     "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore(",
@@ -135,14 +135,14 @@ delegations = {
     "R30SupportValidateVerifiedWvp(": (
         "R29OwnerValidateVerifiedWvp(device, verified, live)",
     ),
-    "R30SupportGetVerifiedProjection(": ("OutRunVRRenderer::GetR28VerifiedProjection(",),
+    "R30SupportGetVerifiedProjection(": ("R29OwnerGetR28VerifiedProjection(",),
     "R30SupportResynchronizeShaderEpoch(": (
         "R29OwnerResynchronizeShaderEpoch(device)",
     ),
     "R30SupportInvalidateRendererStateAfterExternalRestore(": (
-        "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore()",
+        "R29OwnerInvalidateRendererStateAfterExternalRestore()",
     ),
-    "R30SupportRendererInstallStatus(": ("OutRunVRRenderer::R29RendererState()",),
+    "R30SupportRendererInstallStatus(": ("R29OwnerRendererInstallStatus()",),
     "R30SupportPrimeTrackedRasterShadow(": ("PrimeTrackedRasterShadow(device)",),
 }
 for marker, expected in delegations.items():
@@ -347,6 +347,17 @@ for forbidden in (
 for kind in ("Hud2D", "FlatPerspectiveEffect", "None"):
     if f"R30SupportScreenSpaceKind::{kind}" not in r30 or f"R30SupportScreenSpaceKind::{kind}" not in r32:
         errors.append(f"R32 screen-space semantic mapping lost: {kind}")
+
+# R84 independent R29/R30 owner inventory: a consumer call without both
+# a public declaration and a physical lower definition is a link failure.
+# Validate the full set, not only manually selected ABI names.
+r29_owner_calls = set(re.findall(r"\b(R29Owner[A-Za-z0-9_]+)\s*\(", r30))
+for symbol in sorted(r29_owner_calls):
+    name = symbol + "("
+    if name not in owner_header:
+        errors.append(f"R30/R29 undeclared owner ABI: {symbol}")
+    if name not in r29:
+        errors.append(f"R30/R29 missing physical owner definition: {symbol}")
 
 if errors:
     for error in errors:

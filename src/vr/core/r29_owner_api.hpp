@@ -228,4 +228,12 @@ namespace OutRunVRStereo
     bool R29OwnerValidateVerifiedWvp(
         IDirect3DDevice9* device,
         const float* verified, float* live) noexcept;
+
+    // R28/R29 renderer semantic queries are lower-TU only. R30 receives
+    // explicit responses instead of relying on lower .cpp forward declarations.
+    bool R29OwnerGetR28VerifiedProjection(float outProjection[16],
+        std::uint32_t& generation, std::uint32_t& poseSequence) noexcept;
+    void R29OwnerInvalidateRendererStateAfterExternalRestore() noexcept;
+    OutRunVR::RuntimeEligibility::InstallState
+    R29OwnerRendererInstallStatus() noexcept;
 }

@@ -3864,7 +3864,7 @@ namespace OutRunVRStereo
         float outProjection[16], std::uint32_t& generation,
         std::uint32_t& poseSequence) noexcept
     {
-        return OutRunVRRenderer::GetR28VerifiedProjection(
+        return R29OwnerGetR28VerifiedProjection(
             outProjection, generation, poseSequence);
     }
 
@@ -3882,13 +3882,13 @@ namespace OutRunVRStereo
 
     void R30SupportInvalidateRendererStateAfterExternalRestore() noexcept
     {
-        OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+        R29OwnerInvalidateRendererStateAfterExternalRestore();
     }
 
     OutRunVR::RuntimeEligibility::InstallState
     R30SupportRendererInstallStatus() noexcept
     {
-        return OutRunVRRenderer::R29RendererState();
+        return R29OwnerRendererInstallStatus();
     }
 
     bool R30SupportPrimeTrackedRasterShadow(

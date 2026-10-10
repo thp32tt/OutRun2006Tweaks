@@ -1277,4 +1277,20 @@ namespace OutRunVRStereo
                 OutRunWvpRegister, live, OutRunWvpRegisterCount)) &&
             FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon);
     }
+
+    bool R29OwnerGetR28VerifiedProjection(float outProjection[16],
+        std::uint32_t& generation, std::uint32_t& poseSequence) noexcept
+    {
+        return OutRunVRRenderer::GetR28VerifiedProjection(
+            outProjection, generation, poseSequence);
+    }
+    void R29OwnerInvalidateRendererStateAfterExternalRestore() noexcept
+    {
+        OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+    }
+    OutRunVR::RuntimeEligibility::InstallState
+    R29OwnerRendererInstallStatus() noexcept
+    {
+        return OutRunVRRenderer::R29RendererState();
+    }
 }
