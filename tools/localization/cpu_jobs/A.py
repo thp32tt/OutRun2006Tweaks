@@ -38,8 +38,10 @@ assert before.crop((1411,1968,1801,2040)).tobytes()!=clean.crop(source_bbox).tob
 sarr=np.asarray(source.crop(source_bbox),dtype=np.uint8)
 carr=np.asarray(clean.crop(source_bbox),dtype=np.uint8)
 barr=np.asarray(before.crop(source_bbox),dtype=np.uint8)
-# CLEAN must be truly alpha transparent in the original source-letter region.
-assert np.count_nonzero(carr[:,:,3])==0,("nontransparent CLEAN: don't overlay glyphs",int(np.count_nonzero(carr[:,:,3])))
+# This q103 yellow selector is an OPAQUE source-family plate, not a transparent sprite.
+# A197 CLEAN must restore English text while preserving the original yellow frame.
+# No assertion of alpha0: validate source/CLEAN/original persisted native separately.
+assert np.count_nonzero(carr[:,:,3])>0,"Expected opaque yellow source plate; do not render on blank canvas"
 # All final pixels outside source glyph bbox remain byte-exact as prior.
 font_path=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 assert font_path.is_file(),"Required Noto CJK Regular font unavailable; no fallback"
@@ -90,9 +92,11 @@ color=Image.new("RGBA",slanted.size,rgb+(0,))
 color.putalpha(slanted)
 glyph_layer.alpha_composite(color,(x-1411,y-1968))
 # Existing CLEAN verified alpha0 in this region; composite-only lettering.
-edited=np.array(carr,copy=True)
 gl=np.asarray(glyph_layer,dtype=np.uint8)
-edited[:,:,:]=gl
+edited=np.array(Image.alpha_composite(clean.crop(source_bbox),glyph_layer),dtype=np.uint8)
+# Fully preserved clean plate outside the new letter/effect mask.
+outside=(gl[:,:,3]==0)
+assert np.array_equal(edited[outside],carr[outside]),"New text changed CLEAN outside lettering"
 # Restrict changed pixels to source exact bbox; original already CLEAN from A108.
 newdata=bytearray(prior)
 for row in range(72):
@@ -118,7 +122,8 @@ local_bbox=[int(min(nz[1])),int(min(nz[0])),int(max(nz[1]))+1,int(max(nz[0]))+1]
 global_bbox=[1411+local_bbox[0],1968+local_bbox[1],1411+local_bbox[2],1968+local_bbox[3]]
 margins=[global_bbox[0]-1411,1801-global_bbox[2],global_bbox[1]-1968,2040-global_bbox[3]]
 assert min(margins)>=1,(margins,global_bbox)
-assert not np.any((edited[:,:,3]>0)&(carr[:,:,3]>0))
+# On the opaque plate both background and lettering have alpha; verify no foreign blocks.
+assert np.array_equal(edited[gl[:,:,3]==0],carr[gl[:,:,3]==0])
 # Single-family native source/CLEAN/old/new evidence without hiding other atlas.
 rect=(1376,1943,1830,2048)
 def graybg(im,bg):
@@ -144,7 +149,7 @@ report={"schema_version":2,"run":"A222","run_key":"OUTRUN-KOR-A222-Q103-C1-WEIGH
 "old_sha256":prior_sha,"new_trial_sha256":sha(newdata),"trial_dds_path":str(dds.relative_to(repo)),
 "font_file":str(font_path),"font_sha256":font_sha,"font_face_index":1,"font_coverage":True,
 "method_change":"A197 Bold 68px block => licensed native Noto Sans CJK Regular 65px no stroke, actual glyph counters preserved; 0.265 top-right slant without width-image resizing; 4px tracked native glyphs; RGB sampled original.",
-"output_bbox":global_bbox,"output_margins":margins,"letters_layer_only":True,"clean_plate_alpha0_in_source_bbox":True,
+"output_bbox":global_bbox,"output_margins":margins,"letters_layer_only":True,"clean_plate_type":"OPAQUE_GRADIENT_SOURCE_PLATE_PRESERVED",
 "full_other_atlas_preservation":True,"changed_rgba_pixels_vs_A197":beyond,"changed_bytes":int(len(changed)),
 "outside_source_bbox_changed_rgba":0,"outside_source_bbox_changed_alpha":0,
 "source_glyph_size_limit":True,"raw_y_mirror":True,"source_clean_final_images":"SOURCE/CLEAN/OLD/TRIAL native, black/gray/white100/75/50, RAW, lettering transparent",
