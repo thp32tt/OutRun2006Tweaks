@@ -44,17 +44,17 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
-  "status": "VALIDATING",
-  "checkpoint": "C4_COMMIT",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_INHERITED_R175_FULL_GATE_FAILURE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "validation_bearing_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
   "score_change": 0,
-  "summary": "R239 complete dormant indexed-UP strip-to-WARP pixel integration; exact-SHA CI pending",
+  "summary": "R239 adds a production-safe dormant strip-to-triangle-list winding adapter on top of R238's owned native VB/IB path, with INDEX16/INDEX32 WARP pixel readback and 12 fail-closed negative source guards. R239 static+compile+GPU proofs PASS. Full exact-SHA Gate FAILs only on inherited R175 TEXCOORD6 shader varying mismatch, held by independent owner 00477; no score.",
   "changed_files": [
     "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
     "tools/dx11_indexed_up_strip_probe_r239.cpp",
@@ -65,16 +65,106 @@
     "docs/automation/runs/CONVERSION-DX11-00536.json"
   ],
   "pipeline": {
-    "C0": "PASS: remote head/owner/recent run reconciliation",
-    "C1": "PASS: independent R239 strip path; R175 owned by 00477, R238 preserved",
-    "C2": "IMPLEMENTED: source adapter+WARP GPU probe+static proof+build/CI integration",
-    "C3": "PENDING: exact-SHA full Backend Conversion Gate",
-    "C4": "PENDING material SHA publication",
-    "C5": "NOT_REQUIRED: standalone dormant WARP; no package",
-    "C6": "PENDING exact-SHA CI"
+    "C0": "PASS: authenticated Github HEAD e3f49c; controller checkpoint and no existing 00536 run",
+    "C1": "PASS: independent R239 source ownership; R238 untouched and 00477 R175 separately owned",
+    "C2": "PASS: coherent 7-file batch, native C++ strip winding expansion -> R238 immutable resource/bind pipeline -> real mono WARP DrawIndexed + test integration",
+    "C3": "SCOPED_PASS/FULL_GATE_FAIL: 12 source mutation guards + R239 static/build/WARP all SUCCESS at material SHA; Backend Gate validate SUCCESS, smoke FAILURE inherited R175",
+    "C4": "PASS: [AUTO:CONVERSION-DX11-00536] material commit 096f11f2d1ddc035e23e05a1864ce2ca6c52792c published without CI-skip, exact-SHA validated; following bookkeeping not promoted",
+    "C5": "NOT_REQUIRED: no gameplay draw activation/HMD package",
+    "C6": "BLOCKED_INHERITED_R175_FULL_GATE_FAILURE: R239 scoped GPU PASS but full Gate FAIL; runtime UNTESTED; score +0"
   },
   "evidence": {
-    "backend_gate_conclusion": "pending",
-    "runtime": "UNTESTED: no Quest3/VDXR gameplay"
-  }
+    "backend_gate_conclusion": "failure",
+    "runtime": "UNTESTED; no Quest3/VDXR game trial",
+    "validation_bearing_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "backend_gate_run_id": 38048751349,
+    "backend_gate_head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "backend_gate_validate_job": {
+      "id": 114203448745,
+      "conclusion": "success"
+    },
+    "backend_gate_smoke_job": {
+      "id": 114204079683,
+      "conclusion": "failure",
+      "failed_step": "Run DX11 constant buffer probe"
+    },
+    "r239_static": {
+      "result": "PASS",
+      "scope": "12 source mutant guard checks; separate R239 GPU proof integration",
+      "job_id": 114204079683
+    },
+    "r239_warp_build": {
+      "result": "PASS",
+      "job_id": 114204079683
+    },
+    "r239_warp_gpu": {
+      "result": "PASS",
+      "job_id": 114204079683,
+      "tests": [
+        "INDEX16 two-triangle strip red GPU pixels and black corner after caller pointer mutation",
+        "INDEX32 two-triangle strip red GPU pixels and black corner after caller pointer mutation"
+      ]
+    },
+    "inherited_failure": {
+      "key": "R175_GENERIC_VARYING_MISMATCH",
+      "owner_task": "CONVERSION-DX11-00477",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "other_exact_sha_ci": [
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 38048754843,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 38048754780,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 38048754802,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 38048751364,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "id": 38048751342,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "resume_cursor": "R239_GPU_PASS_FULL_GATE_FAIL_R175_INDEPENDENT_OWNER",
+  "next_action": "Preserve R239 material as scoped verified only; R175 TEXCOORD6 upstream mismatch remains owned by CONVERSION-DX11-00477. Do not replay 00536 or classify it PASS until exact-SHA full Gate passes on a future independently authorized material SHA.",
+  "blockers": [
+    "Inherited R175_GENERIC_VARYING_MISMATCH at constant buffer probe; owner CONVERSION-DX11-00477, not modified by this task",
+    "Quest3/VDXR HMD or gameplay was not executed; RUNTIME_VALIDATION=UNTESTED"
+  ],
+  "last_real_activity_at": "2026-10-10T20:40:00+09:00",
+  "last_activity_evidence": "Exact-SHA Gate #38048751349 validate SUCCESS, R239 scoped 3/3 SUCCESS, full smoke failed R175; source material 096f11f2 confirmed"
 }
