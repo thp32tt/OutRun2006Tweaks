@@ -17,28 +17,28 @@
     "tools/test_dx11_linear_pipeline_identity_r209.py",
     ".github/workflows/backend-conversion-gate.yml:R209"
   ],
-  "status": "WAITING_FOR_CI",
-  "checkpoint": "C3_VALIDATE",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "f0cbf7e99284874a28d8008ac8d3dae71670d318",
+  "material_result_sha": "f0cbf7e99284874a28d8008ac8d3dae71670d318",
+  "validation_bearing_result_sha": "f0cbf7e99284874a28d8008ac8d3dae71670d318",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "summary": "R209 opt-in exact non-indexed IA/VS/PS/RTV identity protects dormant Draw from same-device wrong shader/eye; WARP negative and source mutants wired.",
-  "resume_cursor": "C3_WAIT_EXACT_SHA_GATE",
-  "next_action": "Resolve material SHA and exact Backend Conversion Gate; record scoped/WARP results and full run conclusion.",
-  "last_real_activity_at": "2026-10-10T00:02:20.949Z",
-  "last_activity_evidence": "R209 source/test/workflow prepared and 6 negative contracts checked before GitHub material publication",
+  "summary": "R209 dormant non-indexed exact live IA/VS/PS/RTV object provenance gate and real WARP GPU alien same-device PS/eye negative proof PASS. Full exact-SHA Backend Conversion Gate FAILURE at independently owned pre-existing R175 TEXCOORD6 varying mismatch; Win32 validate SUCCESS, targeted R209 static+WARP SUCCESS. Gameplay native Draw remains inactive and Quest3/VDXR UNTESTED.",
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "next_action": "Do not rerun/rescore unchanged 00507. Distinct DX11 task may proceed only with new remotely claimed work_key and no collision. R175 owner 00477 must separately repair TEXCOORD6 varying mismatch before full Gate can PASS.",
+  "last_real_activity_at": "2026-10-10T00:13:36.383Z",
+  "last_activity_evidence": "Exact Gate 38007279599 final failure R175; R209 static 6 mutants and real WARP PASS; Win32 validate success; Issue14 log 6091366231.",
   "score_change": 0,
   "pipeline": {
-    "C0_RECOVER": "PASS: branch exact remote HEAD, controller contract, index, active owner and 00506 terminal checked.",
-    "C1_REVIEW": "PASS: distinct R209 linear non-indexed same-device identity gap; independent R175 owned by 00477 untouched.",
-    "C2_IMPLEMENT": "R209 native_linear_draw_submit.hpp opt-in exact pipeline identity; real WARP alien same-device PS green pixel and wrong-eye RTV negative, restore original; 6 mutation static test and Gate hook.",
-    "C3_VALIDATE": "LOCAL_SOURCE_CONTRACT_PASS; exact GitHub SHA Gate pending after publication.",
-    "C4_COMMIT": "MATERIAL_COMMIT_IN_PROGRESS: [AUTO:CONVERSION-DX11-00507] no CI skip.",
-    "C5_PACKAGE": "NOT_REQUIRED: gameplay native Draw remains dormant and Quest3/VDXR UNTESTED.",
-    "C6_STATE": "PENDING exact-SHA CI conclusion; do not promote runtime."
+    "C0_RECOVER": "PASS: original GitHub branch head 1c8eea362e83286f653a73de29ca956d909aa730; 00507 absent before CAS claim 91124d6127ab42b3917bfabdcc00aa15ffc0920c; contract/AGENTS.md/backend index read; 00506 terminal, distinct work_key.",
+    "C1_REVIEW": "PASS: R185 non-indexed same-device pipeline guard admitted wrong same-device PS/RTV; indexed R207 and separately owned R175 were not modified.",
+    "C2_IMPLEMENT": "PASS: R209 production C++ opt-in exact IA/VS/PS/RTV identity plus 6 source-negative mutation test, same-device alien-PS WARP green-pixel rejection and wrong-eye RTV reject/restore, exact Gate hook. Native gameplay activation unchanged.",
+    "C3_VALIDATE": "SCOPED PASS: exact SHA Backend Conversion Gate 38007279599: Win32 validate 114078862280 SUCCESS; readiness smoke 114080199420 R209 Python static 6 negative mutations SUCCESS, R183 WARP native linear Draw GPU actual alien green pixels + wrong-eye RTV negative/restoration SUCCESS. WHOLE GATE FAILED exclusively at inherited independent R175_GENERIC_VARYING_MISMATCH actual BGRA [128,0,16,255], expected [224,128,32,255] (Run DX11 constant buffer probe).",
+    "C4_COMMIT": "PASS: material/validation-bearing SHA f0cbf7e99284874a28d8008ac8d3dae71670d318 [AUTO:CONVERSION-DX11-00507] (no CI skip); C6 bookkeeping on a separate [skip ci] commit only after Gate finished.",
+    "C5_PACKAGE": "NOT_REQUIRED: native gameplay D3D11 Draw remains dormant; exact Quest3/VDXR runtime/release promotion NEED_HMD_TEST.",
+    "C6_STATE": "SEALED: material/validation-bearing SHA f0cbf7e99284874a28d8008ac8d3dae71670d318; scoped R209 Win32/WARP PASS, whole Gate FAILED inherited R175, RUNTIME_VALIDATION=UNTESTED; independent owner 00477 must repair before full PASS."
   },
   "changed_paths": [
     "src/vr/d3d11/native_linear_draw_submit.hpp",
@@ -48,8 +48,47 @@
     "docs/automation/runs/CONVERSION-DX11-00507.json"
   ],
   "evidence": {
-    "local_source_contract": "PASS_6_MUTANTS_DECLARATIVE_JS",
-    "isolated_warp_probe": "PENDING_GITHUB_ACTIONS",
-    "known_upstream_blocker": "R175_GENERIC_VARYING_MISMATCH owned by 00477"
-  }
+    "local_source_negative_mutants": 6,
+    "exact_sha_gate_run_id": 38007279599,
+    "exact_sha_gate_head_sha": "f0cbf7e99284874a28d8008ac8d3dae71670d318",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "win32_validate_job_id": 114078862280,
+    "win32_validate_conclusion": "success",
+    "smoke_job_id": 114080199420,
+    "smoke_conclusion": "failure",
+    "r209_source_static_step": "SUCCESS six guards/mutations",
+    "r209_real_warp_step": "SUCCESS Run DX11 linear VB/IB mirror R183 WARP probe, includes real nonindexed red-to-green alien PS pixels, alien eye reject, original restored",
+    "failed_step": "Run DX11 constant buffer probe",
+    "upstream_signature": "R175_GENERIC_VARYING_MISMATCH TEXCOORD6",
+    "upstream_actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "upstream_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task_id": "CONVERSION-DX11-00477",
+    "artifact_id": 11651653523,
+    "artifact_digest": "sha256:b504dc33f56281d6f09bbeb6fcb70d7d2b54c175f504a87f446b350f7e9c370f",
+    "issue14_material_comment_id": 6091366231
+  },
+  "scoped_automation_validation": "PASS_R209_SIX_STATIC_NEGATIVES_AND_REAL_WARP_LINEAR_GREEN_ALIEN_PS_PLUS_FOREIGN_RTV_RESTORE",
+  "native_draw_path_activation_changed": false,
+  "validation_run_id": 38007279599,
+  "validation_job_id": 114078862280,
+  "readiness_smoke_job_id": 114080199420,
+  "blockers": [
+    "Required full exact-SHA Backend Conversion Gate failed at independently owned R175_GENERIC_VARYING_MISMATCH (owner 00477); scoped R209 source/WARP PASS must not be misreported as whole Gate PASS.",
+    "No Quest3/VDXR gameplay/HMD test. Native draw activation and runtime promotion NEED_HMD_TEST."
+  ],
+  "score_previous_ai2": 1065,
+  "score_new_ai2": 1065,
+  "score_reason": "Authenticated AI_SCOREBOARD.md latest AI2=1065; full exact-SHA Gate FAILED inherited R175. No +1 for partially scoped WARP PASS and no double counting: 1065 + 0 = 1065.",
+  "updated_at_utc": "2026-10-10T00:13:36.383Z"
 }
