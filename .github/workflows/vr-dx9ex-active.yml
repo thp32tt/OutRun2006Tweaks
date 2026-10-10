@@ -51,6 +51,7 @@ on:
       - 'tools/verify_vr_r30_support_api_seam.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
       - 'tools/verify_vr_r31_support_api_seam.py'
+      - 'tools/verify_vr_r31_eye_tail_cache.py'
       - 'tools/verify_vr_r32_r31_tu_split.py'
       - 'tools/verify_vr_r32_review_api_seam.py'
       - 'tools/verify_vr_r33_r32_tu_split.py'
@@ -152,6 +153,7 @@ jobs:
             'tools/verify_vr_r30_support_api_seam.py',
             'tools/verify_vr_r32_runtime_support_seam.py',
             'tools/verify_vr_r31_support_api_seam.py',
+            'tools/verify_vr_r31_eye_tail_cache.py',
             'tools/verify_vr_r32_r31_tu_split.py',
             'tools/verify_vr_r32_review_api_seam.py',
             'tools/verify_vr_r33_r32_tu_split.py',

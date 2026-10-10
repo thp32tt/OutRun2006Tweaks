@@ -57,6 +57,11 @@ namespace OutRunVRStereo
             float worldScale = 0.0f;
             D3DMATRIX projection{};
             D3DMATRIX inverseProjection{};
+            // Recenter/reconnect can change a view before poseSequence advances.
+            // Include exact eye geometry in the fast-path cache identity.
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeOrientation) eyeOrientation{};
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeOffset) eyeOffset{};
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeFov) eyeFov{};
             D3DMATRIX eyeTail[2]{};
         };
         R31EyeTailCache R31EyeCache{};
@@ -235,7 +240,14 @@ namespace OutRunVRStereo
             if (R31EyeCache.valid &&
                 R31EyeCache.poseSequence == stereo.poseSequence &&
                 R31EyeCache.worldScale == worldScale &&
-                R31ProjectionMatches(R31EyeCache.projection, projection))
+                R31ProjectionMatches(R31EyeCache.projection, projection) &&
+                R31ProjectionMatches(R31EyeCache.inverseProjection, inverseProjection) &&
+                std::memcmp(R31EyeCache.eyeOrientation, stereo.eyeOrientation,
+                    sizeof(stereo.eyeOrientation)) == 0 &&
+                std::memcmp(R31EyeCache.eyeOffset, stereo.eyeOffset,
+                    sizeof(stereo.eyeOffset)) == 0 &&
+                std::memcmp(R31EyeCache.eyeFov, stereo.eyeFov,
+                    sizeof(stereo.eyeFov)) == 0)
                 return true;
 
             R31EyeTailCache next{};
@@ -243,6 +255,11 @@ namespace OutRunVRStereo
             next.worldScale = worldScale;
             next.projection = projection;
             next.inverseProjection = inverseProjection;
+            std::memcpy(next.eyeOrientation, stereo.eyeOrientation,
+                sizeof(stereo.eyeOrientation));
+            std::memcpy(next.eyeOffset, stereo.eyeOffset,
+                sizeof(stereo.eyeOffset));
+            std::memcpy(next.eyeFov, stereo.eyeFov, sizeof(stereo.eyeFov));
             for (int eye = 0; eye < 2; ++eye)
             {
                 const D3DMATRIX eyePose = R30SupportMatrixFromQuaternionTranslation(
