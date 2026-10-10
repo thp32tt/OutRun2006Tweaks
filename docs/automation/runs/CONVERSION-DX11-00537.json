@@ -2,7 +2,7 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E012",
+  "event_id": "CONVERSION-DX11-00537-E013",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
@@ -170,7 +170,7 @@
   "last_real_activity_evidence": "Game material a2255b977fcfec16b75e93b32a0857c46879e1c3 validated unchanged at feature head 2cf69905c2adc4ebd495c373f1a67d64fbe32417, synthetic PR merge 0e355699723d376eaac1b7796f66b76fdd544ed8 identical tree ecfc4932f098c8a0e26c2d35d6d132532a7c224c; Build #38085544687, OpenXR #38085544613, HUD #38085544668 SUCCESS; package artifact 11682327338; real game/HMD UNTESTED.",
   "blocker": "Controller-only TARGET promotion and Backend Conversion Gate; game-authored actual pixels, diagnostic inset, controls and Quest3/VDXR runtime all UNTESTED.",
   "resume_cursor": "FEATURE_READY_AWAIT_CONTROLLER_PROMOTION_BACKEND_GATE_AND_USER_GAME_TEST",
-  "next_action": "Controller alone may promote PR #114 after ownership/lease check, then validate target exact-SHA Backend Conversion Gate; game Draw pixel/inset/controls and Quest3/VDXR remain untested",
+  "next_action": "Controller alone may promote PR #114 after ownership/lease check, then validate target exact-SHA Backend Conversion Gate; real game Draw pixel/inset/controls and Quest3/VDXR remain UNTESTED",
   "score_change": 0,
   "validation_gates": {
     "build": {
@@ -655,5 +655,71 @@
     "blocked_next": "Controller alone may promote PR #114 after ownership/lease check, then validate target exact-SHA Backend Conversion Gate; game Draw pixel/inset/controls and Quest3/VDXR remain untested",
     "score_change": 0,
     "no_target_branch_write": true
+  },
+  "rollover_13": {
+    "event_id": "CONVERSION-DX11-00537-E013",
+    "event_type": "rollover",
+    "chat_rollover": 13,
+    "attempt": "1/3",
+    "reviewed_at_kst": "2026-10-11T06:50:11+09:00",
+    "recovery_checkpoint": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0645-pre-rollover-0012.json",
+    "recovery_checkpoint_verified": true,
+    "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+    "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+    "feature_head_before_review": "c29a697ff557c93ffff5d9ce79ca5e5b6c1cb698",
+    "target_branch": "vr-dx11-native-r71",
+    "target_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "last_game_material_sha": "a2255b977fcfec16b75e93b32a0857c46879e1c3",
+    "no_source_changes_since_material": "GitHub compare a2255b9..c29a697: only docs/automation/runs/CONVERSION-DX11-00537.json changed in two commits",
+    "owner_review": "00477 R175 run record COMPLETE_R175_SOURCE_WARP_PARITY; related translator/probe files untouched",
+    "stale_controller_blocker": "ACCEPTANCE_ITEM_PENDING:DX11-LIVE-CALLSITE conflicts with source/build checked 5/5 PASS; do not redo",
+    "acceptance_source_build": {
+      "DX11-LIVE-CALLSITE": "PASS_STATIC_BUILD_RUNTIME_UNTESTED",
+      "DX11-NATIVE-DRAW": "PASS_STATIC_BUILD_RUNTIME_UNTESTED",
+      "DX11-VISIBLE-FRAME": "PASS_STATIC_BUILD_RUNTIME_UNTESTED",
+      "DX11-SAFE-RETURN": "PASS_STATIC_BUILD_RUNTIME_UNTESTED",
+      "DX11-TEST-BUNDLE": "PASS_BINARY_PACKAGE_RUNTIME_UNTESTED"
+    },
+    "checked_exact_sha_ci": {
+      "checked_feature_commit": "2cf69905c2adc4ebd495c373f1a67d64fbe32417",
+      "source_identity": "Only the run record changed after a2255b9 material, CI validates same C++ and workflow inputs",
+      "build": {
+        "run": 38085544687,
+        "conclusion": "SUCCESS",
+        "steps": "four named DX11 feature acceptance jobs PASS and Win32 Release build success"
+      },
+      "openxr": {
+        "run": 38085544613,
+        "conclusion": "SUCCESS",
+        "steps": "five Win32 game jobs, x64 OpenXR host, DX11 diagnostic bundle and DX11-TEST-BUNDLE acceptance PASS"
+      },
+      "hud_inspector": {
+        "run": 38085544668,
+        "conclusion": "SUCCESS"
+      },
+      "test_bundle": {
+        "artifact_id": 11682327338,
+        "name": "feature-dx11-first-game-frame-2cf69905c2adc4ebd495c373f1a67d64fbe32417",
+        "expired": false
+      }
+    },
+    "pr": {
+      "number": 114,
+      "state": "OPEN",
+      "draft": true,
+      "mergeable": true,
+      "base": "vr-dx11-native-r71"
+    },
+    "feature_stage": "FEATURE_READY",
+    "completion_boundary": "Diagnostic opt-in source/build/test bundle only; not demonstrated game-visible pixel on OR2006C2C.EXE, not playable native DX11",
+    "incomplete_acceptance_ids": [],
+    "pending": [
+      "Controller-only ownership/lease recheck and PR #114 target promotion",
+      "Target branch exact-SHA Backend Conversion Gate validate and DX11 readiness smoke",
+      "Physical OR2006 game-origin pixel/inset/controls and Quest3/VDXR validation"
+    ],
+    "next_action": "Controller alone may promote the already verified feature after ownership review; TARGET stays unchanged here; then run target Backend Conversion Gate. User game/HMD evidence still required.",
+    "runtime_validation": "UNTESTED",
+    "score_change": 0
   }
 }
