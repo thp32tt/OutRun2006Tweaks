@@ -2,10 +2,10 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00529",
   "production_id": "CONVERSION-DX11-00529",
-  "event_id": "CONVERSION-DX11-00529-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00529-E004",
+  "event_type": "retry",
   "lane": "DX11",
-  "attempt": "1/3",
+  "attempt": "3/3",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "f8ba4814ba891ed419c84ccacff1f7c3dc9d2496",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00529",
@@ -17,13 +17,13 @@
     "tools/test_dx11_linear_stream_output_r232.py",
     ".github/workflows/backend-conversion-gate.yml"
   ],
-  "status": "REVALIDATING",
-  "checkpoint": "C3_VALIDATE",
-  "terminal": false,
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
+  "terminal": true,
+  "result_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+  "material_result_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+  "validation_bearing_result_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -40,21 +40,21 @@
     "C0": "PASS authenticated GitHub base HEAD + controller checkpoint WAIT_CHAT; 00528 terminal scoped PASS/full Gate FAIL R175 independent owner; refreshed 00528 descendant docs-only f8ba4814 and preserved changes via parent rebase",
     "C1": "PASS independent R232 linear SO side-effect fence, distinct from R231 indexed SO and R175 constant buffer",
     "C2": "PASS production C++ SOGetTargets/COM cleanup; same-device slot-zero/slot-three WARP tests; nine static mutations; workflow registration",
-    "C3": "INITIAL_EXACT_SHA_FAILURE 5645b66d Gate 38039708614: Win32 validate SUCCESS, readiness smoke FAIL at R230 source mutation false duplicate induced by R232 successor; R232 static/WARP SKIPPED. Scoped R230 verifier now excludes R232 caller, local five mutation variants PASS. New exact-SHA Gate PENDING.",
-    "C4": "R232 production 5645b66d material published; separate focused R230 mutator repair commit PENDING [AUTO:CONVERSION-DX11-00529].",
-    "C5": "NOT_REQUIRED: dormant readiness only; no gameplay native Draw or HMD candidate package",
-    "C6": "WAIT_GATE; retain RUNTIME_VALIDATION=UNTESTED; preserve R175 known independent Gate blocker"
+    "C3": "SCOPED_PASS exact SHA 057b45a0 Win32 validate, R230/R232 guards and R183 real WARP build/run all SUCCESS; FULL_GATE_FAIL 38040255183 inherited independent R175 constant buffer WARP varying mismatch.",
+    "C4": "PASS real R232 production C+++WARP commit 5645b66d and R230 false-positive verifier repair 057b45a0, both [AUTO:CONVERSION-DX11-00529]; validation-bearing SHA 057b45a0.",
+    "C5": "NOT_REQUIRED: dormant DX11 native Draw readiness only; no gameplay activation or HMD package",
+    "C6": "BLOCKED_DEPENDENCY_R175 after exact-SHA Gate finished; scoped R230/R232+WARP success preserved, full Gate FAIL; owner 00477 must repair R175 independently. RUNTIME_VALIDATION=UNTESTED. Attempt 3/3 terminal without relaunch."
   },
   "blockers": [
-    "Inherited R175 constant-buffer pixel mismatch is independently owned by 00477; may fail full Gate",
-    "Quest3/VDXR runtime not tested; gameplay native activation dormant"
+    "Exact-SHA Backend Conversion Gate 38040255183 on 057b45a0: Win32 validate SUCCESS; readiness smoke FAIL at Run DX11 constant buffer probe. R175_GENERIC_VARYING_MISMATCH observed BGRA [128,0,16,255] vs expected [224,128,32,255]. R175 belongs to CONVERSION-DX11-00477; do not modify under R232 work_key.",
+    "Quest3/VDXR runtime not tested; dormant native Draw activation unproven."
   ],
-  "resume_cursor": "WAIT_REPAIR_EXACT_SHA_GATE",
-  "next_action": "After focused R230 mutator repair, verify exact-SHA Gate including R230/R232, WARP linear probe and full inherited R175; no PASS until whole Gate success",
+  "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER_RETRY_3_OF_3",
+  "next_action": "Do not replay completed R232 source/static/CI. Controller should reconcile and release 00529 terminal blocked, then assign a nonconflicting new DX11 native implementation work_key; separately R175 owner 00477 resolves original varying pixel mismatch. Maintain validation-bearing 057b45a0.",
   "static_validation": "R232_JS_9_MUTANTS_PASS + R230_SCOPED_JS_5_MUTANTS_PASS; WINDOWS_NEW_GATE_PENDING",
   "score_change": 0,
   "score_run_key": "CONVERSION-DX11-00529",
-  "last_real_activity_evidence": "R232 Git objects saved; rebasing onto 00528 docs-only HEAD while preserving source-only batch",
+  "last_real_activity_evidence": "CI #38040255183 full failure independently diagnosed via job logs. R230/R232/R183 WARP scoped PASS. No source replay after 057b45a0.",
   "state_persisted": true,
   "dispatch_base_sha": "65dfe1d8c194fe49632d88eb28894752fd255e18",
   "rebased_over_prior_task_checkpoint": "CONVERSION-DX11-00528 HEAD f8ba4814 docs-only",
@@ -71,6 +71,50 @@
       "r232_steps": "skipped"
     },
     "repair": "Scope prior R230 mutation section before R232, preserve full-header native Draw ban",
-    "repair_static": "PASS all 5 R230 scoped negative mutations"
-  }
+    "repair_static": "PASS all 5 R230 scoped negative mutations",
+    "exact_sha_gate": {
+      "id": 38040255183,
+      "head_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38040255183",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114178896919,
+      "validate": "success",
+      "readiness_smoke_job_id": 114179833748,
+      "readiness_smoke": "failure",
+      "failed_step": "Run DX11 constant buffer probe",
+      "r175_classification": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "verified_steps": {
+        "Verify R230 non-indexed predication guard": "success",
+        "Verify R232 non-indexed stream-output isolation": "success",
+        "Build DX11 linear VB/IB mirror R183 WARP probe": "success",
+        "Run DX11 linear VB/IB mirror R183 WARP probe": "success"
+      },
+      "full_gate_failure_independent_of_r232": true
+    },
+    "material_commits": [
+      "5645b66df11c8aa8460029ed3e5af60223e0ce28",
+      "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f"
+    ],
+    "controller_checkpoints": [
+      "chat-controller-downloads/tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00529/20261010T1811-chat-e004.json",
+      "chat-controller-downloads/tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00529/20261010T1816-chat-e004.json"
+    ]
+  },
+  "scoped_automation_validation": "PASS_R230_R232_R183_WARP_WIN32",
+  "score_previous_confirmed": 949,
+  "score_new_confirmed": 949,
+  "timestamp_kst": "2026-10-10 18:17 KST"
 }
