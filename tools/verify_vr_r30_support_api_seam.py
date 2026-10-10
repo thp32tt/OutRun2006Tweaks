@@ -225,6 +225,17 @@ for leak in ("DirectTransportSlots[", "R13GpuCompletionSnapshot lower",
     if leak in r30:
         errors.append(f"R30 lower storage ownership leak: {leak}")
 
+# Strict R30->R29 lower install address consumers, four independent hooks.
+for target in ("ResetR22", "PresentR13", "DirectTransportR13",
+               "SetRenderStateR29"):
+    owner = "R29Owner" + target + "Target"
+    if owner not in owner_header or owner not in r29 or owner not in r30:
+        errors.append(f"R84 missing lower install target owner: {owner}")
+for leaked in ("&ResetDestR22", "&PresentDestR13",
+               "&ResolveDirectTransportR13", "&SetRenderStateDestR29"):
+    if leaked in r30:
+        errors.append(f"R30 retained private install target: {leaked}")
+
 # R84 source split must keep original lower hook addresses and c64..c67
 # register uploads, never create duplicate R30 physical owners.
 for owner in ("R29OwnerPresentTarget", "R29OwnerResetTarget",

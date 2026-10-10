@@ -1293,4 +1293,22 @@ namespace OutRunVRStereo
     {
         return OutRunVRRenderer::R29RendererState();
     }
+
+    // R84 strict one-owner physical-hook target exports.
+    void* R29OwnerResetR22Target() noexcept
+    {
+        return reinterpret_cast<void*>(&ResetDestR22);
+    }
+    void* R29OwnerPresentR13Target() noexcept
+    {
+        return reinterpret_cast<void*>(&PresentDestR13);
+    }
+    void* R29OwnerDirectTransportR13Target() noexcept
+    {
+        return reinterpret_cast<void*>(&ResolveDirectTransportR13);
+    }
+    void* R29OwnerSetRenderStateR29Target() noexcept
+    {
+        return reinterpret_cast<void*>(&SetRenderStateDestR29);
+    }
 }

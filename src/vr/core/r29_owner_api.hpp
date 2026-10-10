@@ -236,4 +236,10 @@ namespace OutRunVRStereo
     void R29OwnerInvalidateRendererStateAfterExternalRestore() noexcept;
     OutRunVR::RuntimeEligibility::InstallState
     R29OwnerRendererInstallStatus() noexcept;
+
+    // Borrow lower hook entry addresses; the R30 TU never resolves them.
+    void* R29OwnerResetR22Target() noexcept;
+    void* R29OwnerPresentR13Target() noexcept;
+    void* R29OwnerDirectTransportR13Target() noexcept;
+    void* R29OwnerSetRenderStateR29Target() noexcept;
 }

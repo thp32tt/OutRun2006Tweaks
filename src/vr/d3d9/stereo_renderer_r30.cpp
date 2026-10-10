@@ -3723,22 +3723,22 @@ namespace OutRunVRStereo
 
     void* R30SupportResetTarget() noexcept
     {
-        return reinterpret_cast<void*>(&ResetDestR22);
+        return R29OwnerResetR22Target();
     }
 
     void* R30SupportPresentTarget() noexcept
     {
-        return reinterpret_cast<void*>(&PresentDestR13);
+        return R29OwnerPresentR13Target();
     }
 
     void* R30SupportDirectTransportTarget() noexcept
     {
-        return reinterpret_cast<void*>(&ResolveDirectTransportR13);
+        return R29OwnerDirectTransportR13Target();
     }
 
     void* R30SupportSetRenderStateTarget() noexcept
     {
-        return reinterpret_cast<void*>(&SetRenderStateDestR29);
+        return R29OwnerSetRenderStateR29Target();
     }
 
     IDirect3DDevice9* R30SupportInstalledDevice() noexcept
