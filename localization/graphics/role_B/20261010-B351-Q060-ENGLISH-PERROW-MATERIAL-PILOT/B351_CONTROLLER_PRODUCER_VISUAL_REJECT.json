@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B351",
+  "queue_index": 60,
+  "owner": "EVEN",
+  "priority": "P0",
+  "run_key": "OUTRUN-KOR-B351-Q060-SOURCE-PERROW-ORIGINAL-FACE-NATIVE-20261010-1635",
+  "execution_backend": "GITHUB_ACTIONS",
+  "worker_run_id": 38034823172,
+  "worker_result": "SUCCESS",
+  "exact_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "canonical_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "current_official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_distinct_unapproved_saved_dds_sha256": "ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd",
+  "new_saved_native_dds": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_Q060_SOURCE_CONTOUR_GOLD_KOREAN_UNAPPROVED.dds",
+  "new_persisted_trial_dds": 1,
+  "official_promoted_dds": 0,
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "dds_bytes": 33554560,
+  "source_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "persisted_effect_bbox": [
+    2221,
+    351,
+    2992,
+    470
+  ],
+  "source_effect_px": [
+    849,
+    134
+  ],
+  "trial_effect_px": [
+    771,
+    119
+  ],
+  "source_bbox_margins_px": {
+    "left": 42,
+    "right": 36,
+    "top": 11,
+    "bottom": 4
+  },
+  "changed_rgba_vs_official": 97359,
+  "changed_outside_roi_rgba": 0,
+  "source_sibling_pixel_changed_outside_effect": 0,
+  "roundtrip_rgba_mismatch": 0,
+  "real_source_profile": {
+    "warm_face_pixels": 46849,
+    "qualified_source_rows": 113,
+    "original_navy_pixels": 33028,
+    "original_navy_rgb_median": [
+      16,
+      24,
+      74
+    ],
+    "source_profile_json": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json"
+  },
+  "method_difference": "Replaced B350's hand-coded red/yellow stop shader and dual cumulative affine shears with actual English-original per-row measured face median/highlight and source-sampled navy outline plus one readable affine on separate native Korean glyph contours. No old low-res Korean raster resized.",
+  "visual": {
+    "firsthand_native_persisted_images_inspected": true,
+    "views": [
+      {
+        "path": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+        "git_blob_sha": "8a51cd2191f1def3158185d11f0a28fb677d2732"
+      },
+      {
+        "path": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_50_FLIPY.png",
+        "git_blob_sha": "72ea6fb789d18f27930501519b3e2db79106342e"
+      },
+      {
+        "path": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png",
+        "git_blob_sha": "954cf61e713c643efca92fb625c7552ab9711d20"
+      }
+    ],
+    "source_clean": "SCOPED PASS from B348 source-derived original English CLEAN: source title removed with alpha clean, other source sibling art unchanged in declared scope; no false full-atlas approval",
+    "composition": "CLEAN-to-FINAL visually lacks opaque imported rectangle or old English lettering inside title in reviewed native/50/RAW panels",
+    "source_relative_style": "FAIL: Korean face now has direct original orange/yellow/cream vertical material, but the large uncondensed broad Hangul joins, nearly upright silhouette and heavy solid navy stroke/extrusion differ visibly from slender condensed strongly italic English BEST TIME at same native/practical size.",
+    "readability": "SCOPED PASS: legible Hangul at native and 50%; glyph counters visible in inspected panels but weight/style not source-faithful",
+    "slant": "HOLD: single readable transform 0.32 is documented; source-homologous top-minus-bottom anchors not measured; no visual PASS inferred for source lean",
+    "glyph_integrity": "SCOPED: no obvious missing Hangul syllables, partial strokes or clipping observed in reviewed panels, not a claim of game rendered font integrity",
+    "protected_art": "Scoped machine saved-image comparison from official shows 0 changes outside authorized ROI and 0 unchanged-source sibling changes outside text effect; full canonical source vs all-cell nontext mask approval not performed",
+    "layout": "Saved effect bounding box inside source effect with [42,36,11,4] margins, but final right/left anchoring and font silhouette remain C2 unapproved",
+    "orientation": "FLIP-Y native100 and RAW native100 compared directly, mirror-Y contents correct in saved proof; DDS author mips1 per worker",
+    "reason_codes": [
+      "SOURCE_FAMILY_CONDENSED_ITALIC_GLYPH_SILHOUETTE_MISMATCH",
+      "HEAVY_NAVY_OUTLINE_STROKE",
+      "SOURCE_HOMOLOGOUS_SLANT_ANCHORS_UNQUALIFIED"
+    ],
+    "decision": "PRODUCER_VISUAL_REJECT_DO_NOT_PROMOTE",
+    "numeric_gate": "SCOPED_MECHANICAL_PASS_ONLY",
+    "C2_new_trial": "NOT_INDEPENDENTLY_REVIEWED",
+    "C3": "BLOCKED",
+    "current_approval": false,
+    "official_queue_status": "C342_C2_REWORK_REQUIRED_UNCHANGED",
+    "user_ingame_IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "next_method": "Manual/vector Korean condensed racing silhouette matched to canonical English strokewidth/contrast and readable slant anchors, preserving source-derived warm gold pixel material; do not repeat B351's glyph shaping or arbitrarily recolor/space.",
+  "machine_report": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_Q060_MACHINE_AND_SOURCE_FAMILY.json",
+  "exclusions": [
+    "ODD_A",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
