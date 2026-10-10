@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "run": "A230",
+  "run_key": "OUTRUN-KOR-A230-Q121-P0-GAS-PEDAL-ISOLATED-SOURCE-REMAINDER-20261010-2220",
+  "role": "A",
+  "review_time": "2026-10-10 22:22 KST",
+  "execution_backend": "GitHub-hosted CPU due native container DNS and 67MB external canonical English request timeout; retried from SHA-bound canonical A215 in-repo lossless native source ROI",
+  "prior_trial_failure": "GitHub Actions 38054673562 direct external source timeout before computation; retry with existing exact lossless source, not independent score event",
+  "successful_worker_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38055096754",
+  "queue_index": 121,
+  "priority": "P0",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 (native rank20 source lossless from A215; current full source SHA certified in A229)",
+  "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_native_png_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "prior_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "new_trial_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "current_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "source_text_bbox": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "first_hand_native_gray100": "A230_GAS_PEDAL_GRAY_100.png",
+  "first_hand_practical_black50": "A230_GAS_PEDAL_BLACK_50.png",
+  "first_hand_raw": "A230_FINAL_PERSISTED_RAW_GAS_PEDAL.png",
+  "pixels": {
+    "old_exact_visible_source": 266,
+    "isolated_old_source_removed_to_alpha0": 30,
+    "unproven_proximity_source_exact_remaining": 236,
+    "protected_korean_2px": "KEEP",
+    "off_bbox_or_other_atlas_changed": 0,
+    "alpha_outside_changed": 0,
+    "header_raw_orientation_exact": true,
+    "codec": "RGBA32 4096x4096 mip1 raw Y-mirrored",
+    "original_Sha_and_trial_pixels_from_A229": true
+  },
+  "producer_visual_observations": {
+    "independent_of_machine": "Direct looked at actual persisted four-panel SOURCE/OFFICIAL/A220/A230 gray100, black50, standalone RAW",
+    "clean_plate": "English-source bright/white detached stipple visible at left of Korean has reduced; source-shaped alpha-positive flecks remain near Hangul and are not clean",
+    "letter_style": "Korean label remains visually substantially heavier/upright than slanted white English source, no source-family acceptance",
+    "collision": "No visible new overlap caused by 30-pixel deletion in reviewed crop; 2px safety protected Hangul",
+    "protected_art": "Other source regions preserved byte-exact versus A220; complete 29-cell semantic source-protected mask not individually reapproved here",
+    "raw_and_readable": "RAW Y-mirror-native and readable gray/black direct view shows correct orientation/alpha, not actual game",
+    "practical50": "Korean readable but source ghosts remain visible as light speckles"
+  },
+  "decision": "REWORK_REQUIRED_PARTIAL_SOURCE_GHOST_REMOVAL_TRIAL_NOT_PROMOTED",
+  "first_failed_gate": "SOURCE_TO_CLEAN_INCOMPLETE_CLEAN_PLATE",
+  "next_method": "Reconstruct exact native clean plate and separate Korean glyph layer from verified source, then remove remaining 236 original-remnant-proximate pixels without damaging Korean stroke; no blind deletion.",
+  "official_candidate_changed": false,
+  "promoted_dds_count": 0,
+  "new_trial_dds_count": 1,
+  "independent_C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "evidence_approved": false,
+  "ingame_regressions": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}
