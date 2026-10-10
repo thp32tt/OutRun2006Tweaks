@@ -80,6 +80,29 @@ def check(r29: str, r30: str, header: str) -> None:
             "InternalStereoPass = active;",
     }.items():
         assert required in body(r29, method), f"R29 owner method broken: {method}"
+    extent = body(r29, "R29OwnerRecommendedEyeExtent(")
+    for token in (
+        "eye >= 2", "SharedState->magic != OutRunVR::SharedMagic",
+        "SharedState->protocolVersion != OutRunVR::SharedProtocolVersion",
+        "SharedState->recommendedWidth[eye]",
+        "SharedState->recommendedHeight[eye]",
+        "return width != 0 && height != 0;",
+    ):
+        assert token in extent, f"R29 eye extent guard lost: {token}"
+    identity = body(r29, "R29OwnerTryGetDirectTransportIdentity(")
+    for token in (
+        "out = {};", "!SharedState || !DirectInteropVerified",
+        "out.hostPid = SharedState->hostPid;",
+        "out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;",
+        "out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;",
+    ):
+        assert token in identity, f"R29 transport identity guard lost: {token}"
+    for api in ("R29OwnerRecommendedEyeExtent",
+                "R29OwnerTryGetDirectTransportIdentity",
+                "R29OwnerTransportIdentity"):
+        assert api in header, f"R29 owner header missing: {api}"
+        assert api in r30, f"R30 missing lower owner ABI use: {api}"
+    assert not re.search(r"\\bSharedState\\b", r30), "R30 still owns lower shared IPC pointer"
     assert "R30ScopedInternalPass" in r30
     assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
     assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
@@ -134,7 +157,24 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {field}")
-    print("R29/R30 owner ABI regression PASS (19 negative mutations)")
+    for marker, poison in (
+        ("R29OwnerRecommendedEyeExtent(",
+         "SharedState->magic != OutRunVR::SharedMagic"),
+        ("R29OwnerTryGetDirectTransportIdentity(",
+         "!SharedState || !DirectInteropVerified"),
+    ):
+        pos = r29.find(marker)
+        assert pos >= 0
+        mutated = r29[:pos] + r29[pos:].replace(
+            poison, "/* removed owner guard */ false", 1)
+        assert mutated != r29
+        try:
+            check(mutated, r30, header)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"negative mutation unexpectedly PASS: {marker}")
+    print("R29/R30 owner ABI regression PASS (21 negative mutations)")
 
 
 if __name__ == "__main__":
