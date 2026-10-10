@@ -14,7 +14,7 @@
   "automation_validation": "IN_PROGRESS",
   "runtime_validation": "UNTESTED",
   "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
-  "last_implemented_source_sha": "f94c051af75bc320c96e53c94939028fa441f3fc",
+  "last_implemented_source_sha": "339ddffe8baa98baa9680817235a45645d53b727",
   "validation_bearing_result_sha": null,
   "material_result_sha": null,
   "feature_contract": {
@@ -98,7 +98,9 @@
       "R29/R30 negative mutation regression expanded 19 -> 21 and R84 feature workflow updated; GitHub Actions after SHA b9c1bd91 pending confirmation, no CI PASS assumed.",
       "R29 owner API expands 12 lower draw/depth/resource/state services, R30 callsites 39 replacements; 33 negative mutation regression authored and workflow labeled; no exact-SHA Win32 PASS confirmed.",
       "N100 worktree feature-branch exact SHA f94c051: python3 tools/verify_vr_r29_owner_api_seam.py PASS (33 negative mutations), python3 tools/verify_vr_r30_support_api_seam.py PASS.",
-      "R84 package workflow feature SHA 9d0554b: Win32 split x86, baseline x86, host x64, manifest, collector, SHA/PE checks; N100 python3 tools/verify_vr_r84_feature_bundle.py PASS (5 negative mutations), workflow not yet Windows-run verified."
+      "R84 package workflow feature SHA 9d0554b: Win32 split x86, baseline x86, host x64, manifest, collector, SHA/PE checks; N100 python3 tools/verify_vr_r84_feature_bundle.py PASS (5 negative mutations), workflow not yet Windows-run verified.",
+      "R29 lower failure/original-hook/RT restore typed ABI 5 methods + R30 18 callsites; N100 owner seam PASS (38 negative mutations) and R30 support API PASS after feature SHA e95e00c.",
+      "R84 complete-feature packaging workflow static suite PASS (5 negative mutations) after PowerShell path fixes; no Win32 successful game/host/fullchain build/link or published ZIP verified."
     ],
     "integration_contract": "PENDING: independent R29-R33 Win32 game/host full-chain link, accepted steps, exact SHA gates and binary bundle"
   },
@@ -152,14 +154,15 @@
     }
   ],
   "outstanding": [
-    "R30 unresolved lower R29/R26/R23 owner services (R9 draw accounting, hooks, matrices, stereo resources and reset) from isolated Win32 failure",
-    "R29-R33 independent Win32 host/game/full-chain compile/link; no completion until exact source SHA checked",
-    "R84-OWNERS/R84-ABI/R84-BUILD-GRAPH/R84-REGRESSION/R84-TEST-BUNDLE acceptance evidence and required same-SHA gates",
-    "Feature artifact host/game/full-chain package with binaries/config/manifest/collector",
-    "Controller-only target fast-forward and C6 bookkeeping; HMD UNTESTED"
+    "R30 remaining lower anonymous frame counters/pose metadata/vertex and shader/matrix bindings not yet independent under split",
+    "R84 same-SHA Win32 complete game x86, host x64, baseline comparison, full-chain link and feature ZIP CI logs unverified",
+    "R84-OWNERS, R84-ABI, R84-BUILD-GRAPH, R84-REGRESSION, R84-TEST-BUNDLE acceptance items PENDING",
+    "DX9Ex Active Validation and Domain Isolation Guard exact-sha gates PENDING",
+    "Controller-only promotion of feature branch to target after concurrent P0 crash/HUD commit is reconciled",
+    "Quest3/VDXR HMD runtime UNTESTED"
   ],
-  "next_action": "Continue R30->R29 typed ABI for remaining private frame/hook/RT/restore symbols and examine next actual Win32 workflow log. Confirm R84 complete Win32 game/host/fullchain package and required exact-SHA gates. No FEATURE_READY before acceptance all PASS. Target branch controller-only.",
-  "feature_last_head": "9d0554b813e39be1c9373d6cac5a32870867334f",
+  "next_action": "Resume from e95e00c9, not task restart. Inspect current R84 isolated Win32 compile failure log. Implement missing lower-owned frame counters, pose metadata, original draw hooks and matrix ABI through R29 while preserving R26/HUD behavior. Rerun 38-case owner tests and bundled host/baseline/full-chain CI; only then FEATURE_READY; reconcile target via controller.",
+  "feature_last_head": "e95e00c9ac3d49a238ed34f6f35c0a179a6eb644",
   "checkpoint_history": [
     {
       "at_kst": "2026-10-11T01:35:05+09:00",
@@ -202,17 +205,31 @@
       ],
       "next_action": "Continue R30->R29 typed ABI for remaining private frame/hook/RT/restore symbols and examine next actual Win32 workflow log. Confirm R84 complete Win32 game/host/fullchain package and required exact-SHA gates. No FEATURE_READY before acceptance all PASS. Target branch controller-only.",
       "runtime_validation": "UNTESTED"
+    },
+    {
+      "at_kst": "2026-10-11T01:55:45+09:00",
+      "event_id": "CONVERSION-DX9EX-00591-E003",
+      "feature_sha": "e95e00c9ac3d49a238ed34f6f35c0a179a6eb644",
+      "incomplete_acceptance_ids": [
+        "R84-OWNERS",
+        "R84-ABI",
+        "R84-BUILD-GRAPH",
+        "R84-REGRESSION",
+        "R84-TEST-BUNDLE"
+      ],
+      "next_action": "Resume from e95e00c9, not task restart. Inspect current R84 isolated Win32 compile failure log. Implement missing lower-owned frame counters, pose metadata, original draw hooks and matrix ABI through R29 while preserving R26/HUD behavior. Rerun 38-case owner tests and bundled host/baseline/full-chain CI; only then FEATURE_READY; reconcile target via controller.",
+      "runtime_validation": "UNTESTED"
     }
   ],
   "concurrent_target_status": {
     "base_sha": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
     "status": "ahead",
     "ahead_by": 1,
-    "files": [
+    "paths": [
       "docs/automation/reviews/DX9EX_MINIDUMP_97E75_R57_HISTORICAL_RESTORE_20261011.md",
       "src/hooks_uiscaling.cpp",
       "tools/verify_vr_visual_composition_p0.py"
     ],
-    "note": "Concurrent P0 HUD crash fix in target; controller-only target promotion after rebase/merge."
+    "note": "Controller-only target; concurrent HUD/crash source changes not overwritten"
   }
 }
