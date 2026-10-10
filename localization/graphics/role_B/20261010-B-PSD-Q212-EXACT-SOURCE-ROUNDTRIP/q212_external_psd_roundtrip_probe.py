@@ -18,7 +18,7 @@ def main():
  assert sha(psd_bytes)==PSD_SHA,"PSD identity mismatch"
  assert sha(source)==DDS_SHA,"canonical source identity mismatch"
  assert source[:4]==b"DDS " and len(source)==16777344,"unexpected DDS header/length"
- width,height=struct.unpack_from("<II",source,16)
+ height,width=struct.unpack_from("<II",source,12)
  assert (width,height)==(2048,2048),"unexpected source dimensions"
  masks=struct.unpack_from("<4I",source,92)
  assert masks==(255,65280,16711680,4278190080),"unexpected channel masks"
