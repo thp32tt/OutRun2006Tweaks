@@ -1164,6 +1164,25 @@ def queue_dynamic_prefix() -> str:
                 "FEATURE_MODE=IMPLEMENT_ON_FEATURE_BRANCH_ONLY",
                 "FEATURE_FINAL_PROMOTION=CONTROLLER_FAST_FORWARD_AFTER_READY",
             ]
+    if lane == "DX11" and re.fullmatch(r"CONVERSION-DX11-[0-9]{5,}", task_id):
+        if int(task_id.rsplit("-", 1)[-1]) >= 537:
+            lines += [
+                "DX11_DIRECTION=FIRST_VISIBLE_GAME_FRAME: 신생 Rxxx WARP 픽셀/guard/probe 전용 작업을 중지한다. "
+                "작은 테스트 확장이 아니라 실제 OutRun D3D9 Draw 호출→라이브 resource/shader→D3D11 Draw→"
+                "실제 게임 프레임 출력 기능 하나를 완성해. 같은 FEATURE_ID를 계속 유지한다.",
+                "DX11_GATE_BLOCKER=R175: TEXCOORD6 셰이더 varying 색상 오류를 코드로 해결하는 것이 0순위다. "
+                "단 CONVERSION-DX11-00477 기존 claim/lease가 여전히 소유 중이면 중복 수정 금지. "
+                "원격으로 명시적 해제·fencing된 takeover를 확인한 경우에만 해당 work_key를 건드리고, "
+                "아니면 독립된 live game draw integration을 구현하되 R175 CI를 우회하지 마.",
+                "DX11_FEATURE_ACCEPTANCE=FIRST_GAME_DRAW_FRAME: 실제 게임 D3D9 호출·D3D11 네이티브 실행·"
+                "안전한 프레임 출력 코드가 한 기능으로 연결되어야 FEATURE_READY다. "
+                "일반 NativeDrawPathActive=false와 DX9Ex fallback을 보존하고 진단 opt-in만 사용해. "
+                "WARP fixture 단독 PASS로 기능 완료 선언 금지. "
+                "메뉴/주행/입력/Quest3 실기가 미검증이면 RUNTIME_VALIDATION=UNTESTED.",
+                "정책 파일 docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json gameplay_delivery_target "
+                "및 live_game_draw_path / owner handoff 증거를 새 run record에 기록해. "
+                "독립적인 다음 R240/R241 준비 guard는 실제 게임 프레임 연결 필수 요소가 아니면 작업 선정 금지.",
+            ]
     if lane.startswith("LOCALIZATION_"):
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
