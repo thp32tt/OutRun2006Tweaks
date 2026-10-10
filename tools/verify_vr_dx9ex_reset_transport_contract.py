@@ -461,12 +461,37 @@ forbid(
     "StretchRect(BackBuffer",
     "StretchRect(RightEyeSurface",
 )
+# R32 now selects/ACK-gates the slot, while the lower R30 API owns the
+# physical copy/fence and internal-pass scope. Check BOTH sides of the seam.
 require_order(
     resolve_direct_r32,
-    "R32 DirectGPU left/right source copy order",
-    "device->StretchRect(\n                    sourceSurfaces.left",
-    "device->StretchRect(sourceSurfaces.right",
-    "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);",
+    "R32 lower-owned DirectGPU copy/fence dispatch",
+    "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
+    "R32DirectCopyPathRejected = true;",
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
+)
+forbid(
+    resolve_direct_r32,
+    "R32 regained lower DirectGPU slot or internal pass ownership",
+    "DirectTransportSlots[",
+    "InternalPassScope guard;",
+    "slot.fence->Issue(",
+)
+copy_fence_owner_r30 = body(
+    r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+require_order(
+    copy_fence_owner_r30,
+    "R30 lower-owned left/right source copy and EVENT issuance",
+    "if (!device || !source.left || !source.right ||",
+    "index >= OutRunVR::RenderFrameRingSize",
+    "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+    "InternalPassScope guard;",
+    "source.left, nullptr, slot.leftSurface",
+    "source.right, nullptr, slot.rightSurface",
+    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    "return {slot.fence->Issue(D3DISSUE_END), false};",
 )
 require_order(
     resolve_direct_r32,
@@ -485,8 +510,8 @@ require_order(
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "R30SupportNoteDirectTransportRingBackpressure();",
-    "auto& slot = DirectTransportSlots[selected];",
-    "slot.fence->Issue(D3DISSUE_END)",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
     "DirectTransportFrameReadyAfterPresent() is",
     "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
