@@ -1,0 +1,59 @@
+{
+  "role": "B",
+  "run": "B364",
+  "queue_index": 236,
+  "priority": "C358_CONFIRMED_REWORK_AFTER_P0_P1_METHOD_BLOCKERS",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+  "official_unchanged_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "new_unapproved_saved_dds_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+  "source_box": [
+    255,
+    1356,
+    1056,
+    1451
+  ],
+  "new_bbox": [
+    278,
+    1358,
+    1052,
+    1449
+  ],
+  "method": "Independent row05 new native Bold TTC with 1px source-family stroke; target 91px source height, original English sampled ink; no prior Korean raster scaling.",
+  "native_ppem": 94,
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "text": "스카이스크레이퍼스",
+  "native": [
+    2048,
+    2048
+  ],
+  "dds": "BGRA32",
+  "mips": 1,
+  "orientation": "RAW_FLIP_Y",
+  "machine_bbox_containment": "PASS_SCOPED",
+  "changed_rgba": 56558,
+  "changed_outside_row05": 0,
+  "persisted_roundtrip_mismatch": 0,
+  "source_family": "PILOT_UNQUALIFIED_NEEDS_FIRST_LOOK",
+  "producer_visual": "PENDING_FIRST_HAND_EXACT_PIXEL_REVIEW",
+  "plate_stage": "REUSED_C340_PINNED_SOURCE_B80_CLEAN_SCOPED",
+  "remaining13": "UNCHANGED_FROM_C2_REJECTED_OFFICIAL",
+  "official_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence": [
+    "B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG0_100.png",
+    "B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG128_100.png",
+    "B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG128_75.png",
+    "B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_FLIPY_BG255_50.png",
+    "B364_ROW05_SOURCE_CLEAN_CURRENT_PILOT_RAW_BG128_100.png"
+  ],
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
