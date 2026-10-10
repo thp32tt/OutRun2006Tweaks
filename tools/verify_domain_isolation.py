@@ -38,6 +38,7 @@ OWNED_PATTERNS = {
         "docs/reverse/C2C_STAGE_FFB_MAP.md",
         "docs/reverse/LINDBERGH_FFB_MAP.md",
         "docs/reverse/PS2_FFB_MAP.md",
+        "docs/reverse/FFB_MODEL_MODES.md",
         "reverse/ps2/**",
         "src/hooks_wheel_ffb.cpp",
         "src/hooks_wheel_ffb_build.cpp",
@@ -56,7 +57,8 @@ OWNED_PATTERNS = {
 }
 
 # Immutable, user-approved v0.2 FFB payload imported into DX9Ex VR.
-# Only exact release blobs are exempt; edits to FFB-owned files still fail.
+# Only exact release blobs (including verified provenance maps) are exempt;
+# edited FFB-owned content still fails, and no other domain exception is relaxed.
 VR_PINNED_FFB_V02_BLOBS = {
     "src/hooks_wheel_ffb.cpp": "3042d5ef4abafbe71f3f21443175ed68ce6704d3",
     "src/hooks_wheel_ffb_build.cpp": "713257433cdbf11ace6e99998825c12fe29b95b5",
@@ -67,6 +69,9 @@ VR_PINNED_FFB_V02_BLOBS = {
     "src/wheel_profile_store.hpp": "0a97c97d568d8dc88212740905efdbb2b0c77d0e",
     "tools/test_wheel_ffb_current.cpp": "43be2b172d83ef89718180034357809d2a8b5cc1",
     "tools/verify_wheel_ffb_current.py": "893c531a86e01caba10601dd7fbbcd01e2914353",
+    "docs/reverse/LINDBERGH_FFB_MAP.md": "89078dcd26115beb9e32349f651ac036cdd63eda",
+    "docs/reverse/C2C_STAGE_FFB_MAP.md": "74ab37bc8a992148f016f8ef7904070578aefd1a",
+    "docs/reverse/FFB_MODEL_MODES.md": "8781d0927e7bff410e3845f1ccf61d31727d7809",
 }
 
 SHARED_PREFIX = "docs/shared-knowledge/"
