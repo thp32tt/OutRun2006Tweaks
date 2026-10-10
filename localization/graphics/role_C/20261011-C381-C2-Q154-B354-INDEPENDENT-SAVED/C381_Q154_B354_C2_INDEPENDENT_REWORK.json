@@ -1,0 +1,370 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 154,
+  "review_id": "C381-C2-Q154-B354-FIRST-INDEPENDENT-NATIVE-20261011",
+  "reviewed_at_kst": "2026-10-11 07:55:49 KST",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "scope": "FIRST C2 independent B354 saved DDS native optical review, distinct SHA from C2 already reviewed B355; official C356 REWORK unchanged",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "canonical_source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "official_candidate_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "unpromoted_trial_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+  "trial_path": "localization/graphics/role_B/20261010-B354-Q154-THIN-NATIVE-GRAY-SOURCE-FAMILY/B354_Q154_NATIVE_REGULAR_GRAY_UNAPPROVED.dds",
+  "physical_sha_verified": [
+    "source",
+    "official",
+    "B354_trial"
+  ],
+  "backend_note": "GitHub files/commits SSOT; N100 MCP only for large DDS binary SHA-pinned transfer, native decode, image QA because local VM network DNS unavailable",
+  "firstlook_pixels_before_producer_verdict": false,
+  "firstlook_note": "Producer details read to identify original/B354 SHA and region bounds, so blind-condition C PASS not claimed.",
+  "calibration": "UNQUALIFIED_FOR_PASS",
+  "plate_independent": "HOLD",
+  "eight_region_findings": {
+    "single_player": {
+      "korean": "싱글 플레이",
+      "measurements": {
+        "id": "single_player",
+        "korean": "싱글 플레이",
+        "source_bbox_readable": [
+          1610,
+          286,
+          2197,
+          350
+        ],
+        "trial_alpha_bbox_local": [
+          5,
+          3,
+          317,
+          61
+        ],
+        "source_alpha_bbox_local": [
+          0,
+          0,
+          587,
+          64
+        ],
+        "source_alpha_positive": 18819,
+        "trial_alpha_positive": 5381,
+        "trial_width_vs_source_pct": 53.15,
+        "trial_height_vs_source_pct": 90.62,
+        "local_original_official_changes": 22001,
+        "local_official_trial_changed": 26908,
+        "margin_ltrb": [
+          5,
+          270,
+          3,
+          3
+        ],
+        "raw_bbox": [
+          1610,
+          674,
+          2197,
+          738
+        ]
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Readable source/trial slants look predominantly upright; homologous top-minus-bottom anchors and blind calibration not independently performed. No numeric slant value invented."
+        },
+        "clean_plate": {
+          "result": "HOLD_INDEPENDENT_CLEAN",
+          "observation": "B354 inherited source/CLEAN from earlier source profile; CLEAN PNG not independently source-sha-verified as blank plate in this review. Native source-vs-trial shows no definite double-draw but PLATE_ONLY certification not claimed."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Actual source thick filled gray block capitals vs much thinner, weaker Korean characters in persisted B354, native/50%. Alpha-visible width ratio 53.15% and visible ink area 5381/18819 corroborate, but Latin/Hangul width alone does not determine failure."
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+          "observation": "Text readable in native and black50, but weak/narrow strokes and source-original visual hierarchy conspicuously lost, particularly SHOWROOM."
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "No visibly broken/missing Korean syllables seen in saved native decoded cropped labels; not a whole-atlas current-policy PASS."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_DELTA",
+          "observation": "Official->B354 26908 changed RGBA pixels scoped to gray source ROI. Full official->B354 changed 65222 RGBA, zero RGBA/alpha outside these three; 5 sibling source-colored regions unchanged."
+        },
+        "placement": {
+          "result": "PASS_BBOX_WITH_OPTICAL_FAIL",
+          "observation": "Source bbox [1610,286,2197,350], candidate glyph local [5,3,317,61], margins [5,270,3,3] positive. No source ROI escape, but far weaker source-relative placement/hierarchy."
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Actual decoded RAW mirrored bbox [1610,674,2197,738] and readable FLIP-Y inspected on same SHA; DDS header/source/official equal, 4096x1024 1 MIP."
+        }
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_GRAY100.png",
+          "sha256": "70bea4e46870dc82c24ce0423670cbc23041344ee520050afc17cf2146fd79b5",
+          "bytes": 41520
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_BLACK50.png",
+          "sha256": "8cdec7c5ca3f91aefd122e2fcbc9dbfa21d6efebe01fa6bb68644352095d72ad",
+          "bytes": 43672
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_WHITE75.png",
+          "sha256": "e21bb87ce5959f120ef6fcffa6c48a0853be115ba7c66ac2609e2772403ba741",
+          "bytes": 75428
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_RAWGRAY100.png",
+          "sha256": "7b6a8e922826866eda7bef3e1b1fb770cefdf3a72ca9d24246c79f3c605bb13d",
+          "bytes": 40996
+        }
+      ]
+    },
+    "showroom": {
+      "korean": "쇼룸",
+      "measurements": {
+        "id": "showroom",
+        "korean": "쇼룸",
+        "source_bbox_readable": [
+          2674,
+          288,
+          3094,
+          350
+        ],
+        "trial_alpha_bbox_local": [
+          5,
+          3,
+          119,
+          58
+        ],
+        "source_alpha_bbox_local": [
+          0,
+          0,
+          420,
+          62
+        ],
+        "source_alpha_positive": 14953,
+        "trial_alpha_positive": 2115,
+        "trial_width_vs_source_pct": 27.14,
+        "trial_height_vs_source_pct": 88.71,
+        "local_original_official_changes": 15669,
+        "local_official_trial_changed": 16148,
+        "margin_ltrb": [
+          5,
+          301,
+          3,
+          4
+        ],
+        "raw_bbox": [
+          2674,
+          674,
+          3094,
+          736
+        ]
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Readable source/trial slants look predominantly upright; homologous top-minus-bottom anchors and blind calibration not independently performed. No numeric slant value invented."
+        },
+        "clean_plate": {
+          "result": "HOLD_INDEPENDENT_CLEAN",
+          "observation": "B354 inherited source/CLEAN from earlier source profile; CLEAN PNG not independently source-sha-verified as blank plate in this review. Native source-vs-trial shows no definite double-draw but PLATE_ONLY certification not claimed."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Actual source thick filled gray block capitals vs much thinner, weaker Korean characters in persisted B354, native/50%. Alpha-visible width ratio 27.14% and visible ink area 2115/14953 corroborate, but Latin/Hangul width alone does not determine failure."
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+          "observation": "Text readable in native and black50, but weak/narrow strokes and source-original visual hierarchy conspicuously lost, particularly SHOWROOM."
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "No visibly broken/missing Korean syllables seen in saved native decoded cropped labels; not a whole-atlas current-policy PASS."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_DELTA",
+          "observation": "Official->B354 16148 changed RGBA pixels scoped to gray source ROI. Full official->B354 changed 65222 RGBA, zero RGBA/alpha outside these three; 5 sibling source-colored regions unchanged."
+        },
+        "placement": {
+          "result": "PASS_BBOX_WITH_OPTICAL_FAIL",
+          "observation": "Source bbox [2674,288,3094,350], candidate glyph local [5,3,119,58], margins [5,301,3,4] positive. No source ROI escape, but far weaker source-relative placement/hierarchy."
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Actual decoded RAW mirrored bbox [2674,674,3094,736] and readable FLIP-Y inspected on same SHA; DDS header/source/official equal, 4096x1024 1 MIP."
+        }
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_GRAY100.png",
+          "sha256": "70bea4e46870dc82c24ce0423670cbc23041344ee520050afc17cf2146fd79b5",
+          "bytes": 41520
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_BLACK50.png",
+          "sha256": "8cdec7c5ca3f91aefd122e2fcbc9dbfa21d6efebe01fa6bb68644352095d72ad",
+          "bytes": 43672
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_WHITE75.png",
+          "sha256": "e21bb87ce5959f120ef6fcffa6c48a0853be115ba7c66ac2609e2772403ba741",
+          "bytes": 75428
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_RAWGRAY100.png",
+          "sha256": "7b6a8e922826866eda7bef3e1b1fb770cefdf3a72ca9d24246c79f3c605bb13d",
+          "bytes": 40996
+        }
+      ]
+    },
+    "multiplayer": {
+      "korean": "멀티플레이",
+      "measurements": {
+        "id": "multiplayer",
+        "korean": "멀티플레이",
+        "source_bbox_readable": [
+          2566,
+          952,
+          3086,
+          1014
+        ],
+        "trial_alpha_bbox_local": [
+          5,
+          2,
+          278,
+          60
+        ],
+        "source_alpha_bbox_local": [
+          0,
+          0,
+          520,
+          62
+        ],
+        "source_alpha_positive": 17239,
+        "trial_alpha_positive": 5457,
+        "trial_width_vs_source_pct": 52.5,
+        "trial_height_vs_source_pct": 93.55,
+        "local_original_official_changes": 20277,
+        "local_official_trial_changed": 22166,
+        "margin_ltrb": [
+          5,
+          242,
+          2,
+          2
+        ],
+        "raw_bbox": [
+          2566,
+          10,
+          3086,
+          72
+        ]
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Readable source/trial slants look predominantly upright; homologous top-minus-bottom anchors and blind calibration not independently performed. No numeric slant value invented."
+        },
+        "clean_plate": {
+          "result": "HOLD_INDEPENDENT_CLEAN",
+          "observation": "B354 inherited source/CLEAN from earlier source profile; CLEAN PNG not independently source-sha-verified as blank plate in this review. Native source-vs-trial shows no definite double-draw but PLATE_ONLY certification not claimed."
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+          "observation": "Actual source thick filled gray block capitals vs much thinner, weaker Korean characters in persisted B354, native/50%. Alpha-visible width ratio 52.5% and visible ink area 5457/17239 corroborate, but Latin/Hangul width alone does not determine failure."
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+          "observation": "Text readable in native and black50, but weak/narrow strokes and source-original visual hierarchy conspicuously lost, particularly SHOWROOM."
+        },
+        "glyph_integrity": {
+          "result": "PASS_SCOPED",
+          "observation": "No visibly broken/missing Korean syllables seen in saved native decoded cropped labels; not a whole-atlas current-policy PASS."
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED_DELTA",
+          "observation": "Official->B354 22166 changed RGBA pixels scoped to gray source ROI. Full official->B354 changed 65222 RGBA, zero RGBA/alpha outside these three; 5 sibling source-colored regions unchanged."
+        },
+        "placement": {
+          "result": "PASS_BBOX_WITH_OPTICAL_FAIL",
+          "observation": "Source bbox [2566,952,3086,1014], candidate glyph local [5,2,278,60], margins [5,242,2,2] positive. No source ROI escape, but far weaker source-relative placement/hierarchy."
+        },
+        "orientation": {
+          "result": "PASS_SCOPED_RAW_FLIPY",
+          "observation": "Actual decoded RAW mirrored bbox [2566,10,3086,72] and readable FLIP-Y inspected on same SHA; DDS header/source/official equal, 4096x1024 1 MIP."
+        }
+      },
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_GRAY100.png",
+          "sha256": "70bea4e46870dc82c24ce0423670cbc23041344ee520050afc17cf2146fd79b5",
+          "bytes": 41520
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_BLACK50.png",
+          "sha256": "8cdec7c5ca3f91aefd122e2fcbc9dbfa21d6efebe01fa6bb68644352095d72ad",
+          "bytes": 43672
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_WHITE75.png",
+          "sha256": "e21bb87ce5959f120ef6fcffa6c48a0853be115ba7c66ac2609e2772403ba741",
+          "bytes": 75428
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_RAWGRAY100.png",
+          "sha256": "7b6a8e922826866eda7bef3e1b1fb770cefdf3a72ca9d24246c79f3c605bb13d",
+          "bytes": 40996
+        }
+      ]
+    }
+  },
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_MACHINE.json",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "candidate_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+    "changed_rgba": 65222,
+    "changed_alpha": 41891,
+    "outside_rgba": 0,
+    "outside_alpha": 0,
+    "original_to_trial_outside_three": 623882,
+    "head_equal": true
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_GRAY100.png",
+      "sha256": "70bea4e46870dc82c24ce0423670cbc23041344ee520050afc17cf2146fd79b5",
+      "bytes": 41520
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_BLACK50.png",
+      "sha256": "8cdec7c5ca3f91aefd122e2fcbc9dbfa21d6efebe01fa6bb68644352095d72ad",
+      "bytes": 43672
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_WHITE75.png",
+      "sha256": "e21bb87ce5959f120ef6fcffa6c48a0853be115ba7c66ac2609e2772403ba741",
+      "bytes": 75428
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_ALL3_RAWGRAY100.png",
+      "sha256": "7b6a8e922826866eda7bef3e1b1fb770cefdf3a72ca9d24246c79f3c605bb13d",
+      "bytes": 40996
+    }
+  ],
+  "independent_visual_conclusion": "REWORK_REQUIRED_UNPROMOTED_B354_THIN_GRAY_SOURCE_FAMILY",
+  "official_status": "C356_REWORK_REQUIRED_UNCHANGED",
+  "new_approved_dds": 0,
+  "C3": "NOT_RUN",
+  "user_actual_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "unreviewed": "source/CLEAN PLATE_ONLY, independent blank-family proof, homologous slant anchors, blind calibration, separate C3, actual user-game retest",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

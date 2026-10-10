@@ -1,0 +1,141 @@
+{
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "trial_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+  "header_same_source_trial": true,
+  "header_same_official_trial": true,
+  "size": [
+    4096,
+    1024
+  ],
+  "mips": 1,
+  "format": "DDS_RGBA32",
+  "orientation": "RAW_mirror_Y, readable=flip_Y",
+  "official_to_trial_rgba_changed": 65222,
+  "official_to_trial_alpha_changed": 41891,
+  "changed_outside_three_boxes": 0,
+  "alpha_outside_three_boxes": 0,
+  "source_to_trial_rgba_outside_three_boxes": 623882,
+  "region_metrics": [
+    {
+      "id": "single_player",
+      "korean": "싱글 플레이",
+      "source_bbox_readable": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "trial_alpha_bbox_local": [
+        5,
+        3,
+        317,
+        61
+      ],
+      "source_alpha_bbox_local": [
+        0,
+        0,
+        587,
+        64
+      ],
+      "source_alpha_positive": 18819,
+      "trial_alpha_positive": 5381,
+      "trial_width_vs_source_pct": 53.15,
+      "trial_height_vs_source_pct": 90.62,
+      "local_original_official_changes": 22001,
+      "local_official_trial_changed": 26908,
+      "margin_ltrb": [
+        5,
+        270,
+        3,
+        3
+      ],
+      "raw_bbox": [
+        1610,
+        674,
+        2197,
+        738
+      ]
+    },
+    {
+      "id": "showroom",
+      "korean": "쇼룸",
+      "source_bbox_readable": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "trial_alpha_bbox_local": [
+        5,
+        3,
+        119,
+        58
+      ],
+      "source_alpha_bbox_local": [
+        0,
+        0,
+        420,
+        62
+      ],
+      "source_alpha_positive": 14953,
+      "trial_alpha_positive": 2115,
+      "trial_width_vs_source_pct": 27.14,
+      "trial_height_vs_source_pct": 88.71,
+      "local_original_official_changes": 15669,
+      "local_official_trial_changed": 16148,
+      "margin_ltrb": [
+        5,
+        301,
+        3,
+        4
+      ],
+      "raw_bbox": [
+        2674,
+        674,
+        3094,
+        736
+      ]
+    },
+    {
+      "id": "multiplayer",
+      "korean": "멀티플레이",
+      "source_bbox_readable": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "trial_alpha_bbox_local": [
+        5,
+        2,
+        278,
+        60
+      ],
+      "source_alpha_bbox_local": [
+        0,
+        0,
+        520,
+        62
+      ],
+      "source_alpha_positive": 17239,
+      "trial_alpha_positive": 5457,
+      "trial_width_vs_source_pct": 52.5,
+      "trial_height_vs_source_pct": 93.55,
+      "local_original_official_changes": 20277,
+      "local_official_trial_changed": 22166,
+      "margin_ltrb": [
+        5,
+        242,
+        2,
+        2
+      ],
+      "raw_bbox": [
+        2566,
+        10,
+        3086,
+        72
+      ]
+    }
+  ]
+}
