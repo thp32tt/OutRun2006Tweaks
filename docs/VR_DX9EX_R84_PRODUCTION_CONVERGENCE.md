@@ -1,5 +1,16 @@
 # DX9Ex R84 -> Production Convergence Plan
 
+## 2026-10-10 user override: one R84 functional acceptance unit (ACTIVE)
+
+This section supersedes the historical Gate 2 "one seam per material task", one child AUTO task per seam, and sequential independent seam compile rules below. Those instructions describe earlier investigation/checkpoints, not new production terminal task boundaries. `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`, `AGENTS.md` and `docs/automation/QUEUE_CONTROLLER_CONTRACT.md` are the current dispatch and terminal authority.
+
+**Single feature acceptance:** finish the remaining R33→R32→R31→R30→R29 textual `.cpp` implementation extraction into independently compiled translation units and linkable header/owner contracts; reconcile `cmake.toml` and generated `CMakeLists.txt`, remove obsolete `HEADER_FILE_ONLY` and textual `.cpp` includes, preserve StateBlock/Reset/DirectGPU/stereo/HUD/FFB semantics, add fail-closed structural regression guards, then run a full Win32 compile/link and debug/rebuild until the required exact-SHA DX9Ex Active and Domain Isolation workflows succeed. Reuse existing APPLIED_EQUIVALENT/SUPERSEDED runtime modules; R84 donor stays read-only.
+
+**No micro-finish:** R32/R31 helper extraction, one static test, isolated seam commit, `FEATURE_READY`, CI pending/failed, or a 30-minute chat rollover is a checkpoint, NOT functional DONE. Keep the stable R84 feature/work_key/TASK_ID across all related repairs and multiple bounded commits. Do not skip remaining compilation/debugging by closing a subtask and selecting an unrelated small one. If a real non-HMD blocker cannot be resolved, persist BLOCKED with specific job/error and resume cursor, never SUPERSEDED/DONE.
+
+**Closeout:** Only after the complete source/build ownership change and exact-SHA full-chain/Active/Domain gates are green, set `SUPERSEDED_BY_DX9EX_FOCUS` with material SHA and run IDs. A separate Quest3/VDXR hardware acceptance remains UNTESTED unless actually verified. The Docker worker reads updated GitHub policy at next dispatch; user deploys/reloads the controller separately.
+
+
 Status: **ACTIVE**  
 Canonical production branch: `vr-d3d9ex-focus`  
 Plan base HEAD: `bd32098ce0be130aa3a64ca2d507275bf08ab69f`  
