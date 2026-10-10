@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "feature_intermediate_checkpoint",
+  "captured_at_kst": "2026-10-11T01:20:15.115+09:00",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_stage": "IMPLEMENTING",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head_sha": "d847ae73530f529699601f32fdc6a064c22cd022",
+  "target_branch": "vr-dx11-native-r71",
+  "target_last_observed_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "source_commits": [
+    "2023e751c784b2463788bbe637f5a7f55c4229fb",
+    "d847ae73530f529699601f32fdc6a064c22cd022"
+  ],
+  "source_changes": [
+    "Remove pre-GetDesc iDesc.Format reads in both real game R30 draw variants",
+    "Add opt-in game_tri_draws/native_draws/desktop_insets diagnostic progress counters",
+    "Wire Windows Build negative static controls for uninitialized D3D9 index descriptor",
+    "Add PR artifact packaging job consuming compiled x86 game and x64 OpenXR host",
+    "Add package PE architecture, SHA256 integrity, opt-in/control selector and collected run logs"
+  ],
+  "validation": {
+    "static_js_preflight": "PASS",
+    "negative_ci": "PENDING",
+    "build_ci": "PENDING",
+    "openxr_ci": "PENDING",
+    "package_ci": "PENDING",
+    "gpu_live_game": "UNTESTED",
+    "hmd": "UNTESTED",
+    "draft_pr": "https://github.com/thp32tt/OutRun2006Tweaks/pull/114",
+    "build_run_id": 38067168834,
+    "openxr_run_id": 38067168842
+  },
+  "incomplete_acceptance_ids": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "next_action": "Await and inspect exact-feature HEAD GitHub PR checks (CI not hardware proof), repair any failed build/test on FEATURE_BRANCH only; verify uploaded artifact manifest/PE/source SHA. Preserve production DX9Ex and default-off native diagnostic; then update feature run state and FEATURE_READY only after all source acceptance genuinely met; actual game/HMD must remain UNTESTED.",
+  "completion_claim": false,
+  "score_change": 0
+}
