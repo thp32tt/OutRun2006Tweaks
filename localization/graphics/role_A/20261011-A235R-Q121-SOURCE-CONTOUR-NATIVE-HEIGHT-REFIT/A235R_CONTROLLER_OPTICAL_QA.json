@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A235R",
+  "run_key": "OUTRUN-KOR-A235-Q121-REGULAR-SOURCE-CONTOUR-VECTOR-20261011-0700",
+  "index": 121,
+  "priority": "P0",
+  "user_reports": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "stage": "SCOPED_NATIVE_VECTOR_FAMILY_PILOT",
+  "source": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "crop_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+    "family_actual_pixels": {
+      "face": 3901,
+      "dark_rim": 1729,
+      "face_rgb": [
+        255,
+        255,
+        255
+      ],
+      "dark_rgb": [
+        0,
+        17,
+        24
+      ],
+      "english_face_bbox": [
+        1,
+        0,
+        229,
+        46
+      ],
+      "english_g_lean_optical_dx": 4.94
+    }
+  },
+  "official_candidate": {
+    "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "byte_unchanged": true
+  },
+  "rejected_first_trial": {
+    "sha256": "571bf039e8d6a0ee1d56f2df543a68ba960b510875e1662e09b9a8a6e52750f6",
+    "reason": "SOURCE_RELATIVE_NATIVE_GLYPH_HEIGHT 34px vs English 46px; C1 did not inspect this trial"
+  },
+  "new_trial": {
+    "sha256": "1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98",
+    "path": "localization/graphics/role_A/20261011-A235R-Q121-SOURCE-CONTOUR-NATIVE-HEIGHT-REFIT/A235R_Q121_SOURCE_CONTOUR_HEIGHT_REFIT_UNPROMOTED.dds",
+    "native": [
+      4096,
+      4096
+    ],
+    "compression": "uncompressed RGBA32",
+    "mips": 1,
+    "source_bbox": [
+      3490,
+      391,
+      3722,
+      440
+    ],
+    "ink_bbox_local": [
+      11,
+      5,
+      221,
+      44
+    ],
+    "ink_size": [
+      210,
+      39
+    ],
+    "visible_alpha_pixels": 6352,
+    "source_comparison_alpha_pixels": 6334,
+    "other_29_cells_exact": true,
+    "modified_outside_source_bbox_pixels": 0,
+    "persisted_DDS_roundtrip_mismatch_pixels": 0,
+    "origin_image_raw_y_flipped": true
+  },
+  "producer_direct_saved_visual": {
+    "inspected": [
+      "A235R_COMPARE_GRAY_100.png",
+      "A235R_COMPARE_BLACK_50.png",
+      "A235R_COMPARE_WHITE_75.png",
+      "A235R_PERSISTED_FINAL_RAW.png"
+    ],
+    "source_vs_clean": "Full source Gas Pedal English glyph and navy shadow disappear from true transparent CLEAN; no visual English residue. Reused earlier exact authenticated A215 source PNG, not contaminated A215 historical labelled CLEAN.",
+    "clean_vs_final": "Only newly rendered Korean face/narrow dark rim in source text box; no added opaque rectangle; no foreign art or outside-pixel alteration.",
+    "source_vs_final": "New 가속 페달 is 210x39 and readable; original effect family smooth racing italic while Korean has more geometric forms and slightly rougher stepped blue-black rim at 75% white. Cannot call family visual PASS without source-homologous contour/slant and independent C1 review.",
+    "raw": "RAW y-mirror corresponds to original sprite RAW; 100% decoded crop no disappearance.",
+    "practical_50": "Black background 50% Hangul visible, complete and legible; no tofu/erased jamo seen."
+  },
+  "ordered_eight": {
+    "01_english_plate": "SCOPED_VISUAL_PASS",
+    "02_slant": "HOLD_ONLY_ENGLISH_G_OPTICAL_HINT_NOT_HOMOLOGOUS_MATCH",
+    "03_native_relative_size": "IMPROVED_A235_34_TO_A235R_39_VS_SOURCE_46_HOLD_FAMILY",
+    "04_weight_outline_effect": "HOLD_WHITE_75_SOURCE_SMOOTHER_AND_DARK_RIM_PIXEL_JAGGIES",
+    "05_clipping": "SCOPED_VISUAL_PASS_POSITIVE_MARGIN",
+    "06_protected_art": "SCOPED_PASS_29_OTHER_CELLS_EXACT",
+    "07_raw_and_flipy": "SCOPED_PASS",
+    "08_source_readability": "SCOPED_PASS_50PCT_BUT_STYLE_HOLD"
+  },
+  "ten_stage_tracking": {
+    "source_sha": "PASS",
+    "protected_regions": "SCOPED_RANK20_ONLY",
+    "clean_plate": "SOURCE_DERIVED_SCOPED_PASS_NO_C1_LIBRARY_APPROVAL",
+    "plate_only": "SCOPED_VISUAL_PASS",
+    "native_font_and_glyph": "NATIVE_REGULAR_HANGUL_GLYPH_COVERAGE_PASS",
+    "composition": "SRC_OVER_ALPHA_AND_NATIVE_NARROW_EFFECT_PASS",
+    "composite_only": "SCOPED_PASS_NO_RECTANGULAR_TRACE",
+    "dds_header_and_roundtrip": "SCOPED_PASS",
+    "native_practical_and_raw": "PASS_IN_REVIEWED_CROPS",
+    "whole_atlas_shared_consumers": "HOLD_OTHER_29_CELLS_NOT_REAPPROVED"
+  },
+  "decision": "SCOPED_SOURCE_FAMILY_MATERIAL_IMPROVEMENT_HOLD_NOT_PRODUCER_PASS",
+  "stop_rule": "A235 first + A235R final optical adjustment; do not repeat Noto Regular width/height/1px-shadow method after this run",
+  "independent_C1": "NOT_RUN_FOR_NEW_SHA",
+  "independent_C3": "NOT_RUN",
+  "approval": false,
+  "ingame_report_status": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_dds_promoted": 0,
+  "unpromoted_saved_trials_in_same_work": 2,
+  "new_scoped_method_pilot": true,
+  "backend": "github-actions-ubuntu-latest",
+  "worker_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38090213884",
+  "next": "C1 assess new SHA independently, with full original and source-compatible stroke contour. If C1 rejects same style, switch to real source-conditioned hand/PSD vector topology rather than third Noto Regular retry."
+}
