@@ -1,0 +1,191 @@
+{
+  "review_id": "C374-C2-Q060-PSD-PILOT-FIRST-INDEPENDENT-20261011-0430",
+  "role": "C2",
+  "queue_index": 60,
+  "ownership": "EVEN",
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "target": "20261011 external-PSD derived B pilot, separate unpromoted saved DDS",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "trial_sha256": "bab8dc25bc900d6806adf0462adb2046321353b78e29bdc82885ec9feef33255",
+  "source_psd_sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+  "source_psd_provenance": "community layered asset, not verified game development original",
+  "backend": "GitHub SSOT; N100 MCP fallback for exact DDS binary because ChatGPT local DNS cannot fetch GitHub",
+  "byte_checks": {
+    "source_file_bytes": 33554560,
+    "official_file_bytes": 33554560,
+    "trial_file_bytes": 33554560,
+    "all_sha256_independently_verified": true,
+    "dds_decoded_dimensions": [
+      4096,
+      2048
+    ],
+    "orientation": "RAW DDS stored mirror-Y; separate true saved decoded RAW and flip-Y readable contact PNG"
+  },
+  "machine_observations": {
+    "region_readable_xyxy": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "official_to_trial_changed_rgba_pixels": 104704,
+    "official_to_trial_changed_alpha_pixels": 48402,
+    "outside_region_rgba_changed": 0,
+    "outside_region_alpha_changed": 0,
+    "protected_OUTRUN_MILES_upper_rgba_changed": 0,
+    "protected_OUTRUN_MILES_upper_alpha_changed": 0,
+    "protected_HOLLY_WOLF_lower_rgba_changed": 0,
+    "protected_HOLLY_WOLF_lower_alpha_changed": 0,
+    "method": "independent SHA-verified persisted DDS Pillow decode, full 4096x2048 per-pixel numpy RGBA comparison",
+    "unmeasured": "no independent source-conditioned CLEAN pixel equality, eight-region inventory, glyph anchors or all authored mip assessments; no invented zero values"
+  },
+  "first_look_before_producer_verdict": true,
+  "findings": {
+    "slant": {
+      "result": "FAIL",
+      "observation": "SOURCE BEST TIME is strongly condensed forward racing italic; PSD Hangul appears broader and less source-conditioned in readable view; matching numeric slant anchors not yet verified.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_BLACK75.png",
+          "sha256": "0b4d7dcccf95fa0b01475113daf8eb03bc91bcd011275bdc91453942b618951a"
+        }
+      ]
+    },
+    "clean_plate": {
+      "result": "HOLD",
+      "observation": "External PSD plate crop and source removal not independently decoded/verified against full canonical source+same saved trial; cannot grant reusable plate PASS or deny a hidden ghost.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        }
+      ]
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Persisted PSD trial has orange/yellow bevel and dark navy backing but the original glossy cream/orange face, narrow right-sloping motorsport contours and dimensional depth are visibly different at native and 75%.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_BLACK75.png",
+          "sha256": "0b4d7dcccf95fa0b01475113daf8eb03bc91bcd011275bdc91453942b618951a"
+        }
+      ]
+    },
+    "readability": {
+      "result": "PASS",
+      "observation": "Korean '최고 주행 시간' is recognizable on saved DDS at native gray, practical black75 and white50; visual pass is scoped and cannot override family mismatch.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_BLACK75.png",
+          "sha256": "0b4d7dcccf95fa0b01475113daf8eb03bc91bcd011275bdc91453942b618951a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_WHITE50.png",
+          "sha256": "2ae3f4b9b4254075dd824139ed1a6506b2c2e766bfc43e7f9c184d3c01aa136f"
+        }
+      ]
+    },
+    "glyph_integrity": {
+      "result": "PASS",
+      "observation": "No obvious broken Korean syllable or clipped stroke in the inspected BEST_TIME contact views; complete mask/effect proof and game composition remain unverified.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_WHITE50.png",
+          "sha256": "2ae3f4b9b4254075dd824139ed1a6506b2c2e766bfc43e7f9c184d3c01aa136f"
+        }
+      ]
+    },
+    "protected_art": {
+      "result": "PASS",
+      "observation": "All 104704 RGBA changes confined to original BEST_TIME readable bbox, no outside changes; native OUTRUN MILES and HOLLY WOLF protection regions show 0 RGBA/alpha changes.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_RAW100.png",
+          "sha256": "465d504f5bb884ae34ddab1fb19d91e93851d641d13bf3b7284e2acaceecb65b"
+        }
+      ]
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "No title-bbox escape; candidate horizontal hierarchy and positive visual isolation from adjacent sprites still require source-style/anchor qualification.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_WHITE50.png",
+          "sha256": "2ae3f4b9b4254075dd824139ed1a6506b2c2e766bfc43e7f9c184d3c01aa136f"
+        }
+      ]
+    },
+    "orientation": {
+      "result": "PASS",
+      "observation": "Both raw intentionally upside-down and readable flip-Y actual saved DDS views inspected; no source-vs-candidate transform mismatch observed.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+          "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_RAW100.png",
+          "sha256": "465d504f5bb884ae34ddab1fb19d91e93851d641d13bf3b7284e2acaceecb65b"
+        }
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_READABLE100.png",
+      "sha256": "a3382673aff7dc9603adab53a3594fcf3ebe343f2b8e2844e15df10c3d2ec75a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_BLACK75.png",
+      "sha256": "0b4d7dcccf95fa0b01475113daf8eb03bc91bcd011275bdc91453942b618951a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_WHITE50.png",
+      "sha256": "2ae3f4b9b4254075dd824139ed1a6506b2c2e766bfc43e7f9c184d3c01aa136f"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C374-C2-Q060-PSD-INDEPENDENT-SAVED/C374_Q060_PSD_SOURCE_OFFICIAL_TRIAL_RAW100.png",
+      "sha256": "465d504f5bb884ae34ddab1fb19d91e93851d641d13bf3b7284e2acaceecb65b"
+    }
+  ],
+  "conclusion": {
+    "candidate_result": "REWORK_REQUIRED_UNPROMOTED_PSD_TRIAL",
+    "reason_codes": [
+      "SOURCE_FAMILY_CONDENSED_ITALIC_MISMATCH",
+      "SOURCE_FAMILY_GOLD_NAVY_BEVEL_DEPTH_MISMATCH"
+    ],
+    "official_queue_status_unchanged": "c342_c2_rework_required_native_best_time_orange_overlap",
+    "official_candidate_unchanged": true,
+    "C_PASS": false,
+    "C3": "NOT_RUN",
+    "qa_evidence_gate": "HOLD_NO_APPROVAL_RECORD",
+    "user_ingame_backlog": "IGR044 OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "next_step": "B requires source-conditioned manual/vector typography over independently qualified PSD CLEAN; then new exact-byte C2, separate C3 and new user in-game retest"
+  }
+}
