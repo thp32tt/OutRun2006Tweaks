@@ -124,6 +124,7 @@ report={
  "new_DDS_CANDIDATE":False,"next":"Controller view native/practical contacts, C1 independently review reusable CLEAN manifest; A218 existing glyph trials not approved"}
 write(report,"A236_SOURCE_CLEAN_MACHINE.json")
 # New exact immutable library entry, C1 reviews separately; NEVER write reviews.
+sys.path.insert(0,str(root))
 from tools.localization.plate_library import canonical,put,load,LIB
 clean_ref=put(root,clean_png,".png")
 mask_ref=put(root,mask_png,".png")
