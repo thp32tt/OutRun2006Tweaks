@@ -890,24 +890,6 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
-        // Reestablish the historically working producer-time spatial scope.
-        // A sprani may draw synchronously before its SpriteNode siblings are
-        // published; a post-CALL TagAppendedNodes alone cannot own that draw.
-        // NaviPub's four exact caller exceptions remain screen HUD.
-        const auto immediateScope = RankMarkerSubScreenHudDepth != 0
-            ? OutRunVR::GameSemantic::RenderScope::ScreenHud
-            : (RankMarkerProjectedInfo.valid
-                ? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-                : OutRunVR::GameSemantic::RenderScope::WorldBillboard);
-        int result = 0;
-        {
-            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(
-                immediateScope);
-            result = Game::sprani_play_ae_auth_alpha(
-                spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
-                a4, a5, alpha);
-        }
-
 		OutRunVR::GameSemantic::RenderScope scope{};
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
 		if (RankMarkerSubScreenHudDepth != 0)
@@ -922,6 +904,17 @@ class UIScaling : public Hook
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
 			marker = projected ? &RankMarkerProjectedInfo : nullptr;
 		}
+
+        // Scope the actual original draw AFTER determining NaviPub vs
+        // vehicle owner; this preserves the historical precedence contract.
+        // Post-call SpriteNode tagging remains necessary for queued siblings.
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(scope);
+            result = Game::sprani_play_ae_auth_alpha(
+                spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
+                a4, a5, alpha);
+        }
 
 		// These four exact producer callsites own the vehicle-relative rank
 		// markers. Prefer the recovered Calc3D2D anchor; retain the current
@@ -947,22 +940,6 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
-        // The original kind-0 digit producer may perform immediate draws
-        // before its delayed queued nodes are registered. Preserve the
-        // exact car anchor during the original call as well as afterward.
-        const auto immediateScope = RankMarkerSubScreenHudDepth != 0
-            ? OutRunVR::GameSemantic::RenderScope::ScreenHud
-            : (RankMarkerProjectedInfo.valid
-                ? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-                : OutRunVR::GameSemantic::RenderScope::WorldBillboard);
-        int result = 0;
-        {
-            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(
-                immediateScope);
-            result = Game::put_clip_sprite(
-                xstnum, x, y, flags, priority, color);
-        }
-
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
 		const bool projected = !screenHud && RankMarkerProjectedInfo.valid;
 		const auto scope = screenHud
@@ -970,6 +947,13 @@ class UIScaling : public Hook
 			: (projected
 				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+        int result = 0;
+        {
+            OutRunVR::GameSemantic::ScopedRenderSemantic producerScope(scope);
+            result = Game::put_clip_sprite(
+                xstnum, x, y, flags, priority, color);
+        }
+
 		// put_clip_sprite normally queues one glyph. If an animation/mask
 		// expands it to sibling nodes (even at another priority), every child
 		// needs the original fractional offset and the same spatial owner.
