@@ -68,6 +68,32 @@ def main() -> None:
         assert evidence in bridge, "missing diagnostic safety/telemetry: " + evidence
     assert bridge.count("ctx->DrawIndexed(") == 1
     assert bridge.count("ctx->Draw(") == 1
+    # A live stage-1 operation must not silently modify stage-0 DIFFUSE.
+    # The old boundary accepted such draws while the native shader ignored
+    # the extra stage. These are fail-closed static mutation checks, not GPU proof.
+    def fixed_function_stage_gate(code: str) -> bool:
+        start = code.find("bool supported_game_state(")
+        end = code.find("bool translate_vertices(", start)
+        if start < 0 or end <= start:
+            return False
+        section = code[start:end]
+        return (
+            "GetTextureStageState(0, D3DTSS_COLOROP, &op)" in section
+            and "GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)" in section
+            and "nextColorOp != D3DTOP_DISABLE" in section
+        )
+
+    assert fixed_function_stage_gate(bridge)
+    for original, wrong in (
+        ("GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)",
+         "GetTextureStageState(0, D3DTSS_COLOROP, &nextColorOp)"),
+        ("nextColorOp != D3DTOP_DISABLE", "nextColorOp == D3DTOP_DISABLE"),
+    ):
+        mutated = bridge.replace(original, wrong, 1)
+        assert mutated != bridge and not fixed_function_stage_gate(mutated), (
+            "stage-1 fail-closed negative control was missed: " + original
+        )
+
 
     # A static guard plus a deterministic negative mutation for sampling.
     # It is not GPU/Quest3 evidence. Each frame is still limited to one

@@ -143,10 +143,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
         FAILED(game->GetRenderState(D3DRS_CLIPPING, &clip)) ||
         blend || alpha || stencil || depth || !clip)
         return false;
-    DWORD op=0, arg=0;
+    DWORD op=0, arg=0, nextColorOp=0;
+    // A later fixed-function texture stage can still change the result even
+    // when stage 0 selects DIFFUSE. Reject it rather than mislabel an altered
+    // game draw as native color parity; the original DX9Ex draw still runs.
     if (FAILED(game->GetTextureStageState(0, D3DTSS_COLOROP, &op)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &arg)) ||
-        op != D3DTOP_SELECTARG1 || (arg & D3DTA_SELECTMASK) != D3DTA_DIFFUSE)
+        FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
+        op != D3DTOP_SELECTARG1 || (arg & D3DTA_SELECTMASK) != D3DTA_DIFFUSE ||
+        nextColorOp != D3DTOP_DISABLE)
         return false;
     return true;
 }
