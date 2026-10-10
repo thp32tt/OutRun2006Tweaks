@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A234R",
+  "run_key": "OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
+  "index": 121,
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "previous_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "first_trial_rejected_sha256": "dd1cb811cf449f108913906cd2ef47d2c46fabe1bd1cafb0f5c611fe2ca7de29",
+  "new_exact_unpromoted_sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+  "reviewed": [
+    "A234_COMPARE_GRAY_100.png",
+    "A234_COMPARE_BLACK_50.png",
+    "A234_PERSISTED_FINAL_RAW.png"
+  ],
+  "actual_visual_observations": {
+    "source": "English Gas Pedal is smooth white right-leaning italic on transparent teal sprite with blue-black depth rim.",
+    "plate_only": "Exact source-derived CLEAN visibly lacks English letter residue across rank20; 100% gray preview shows empty alpha area and no new rectangular opacity.",
+    "final_native": "Repaired Hangul 가속 페달 is visible and complete; source-row baseline/source footprint remains bounded. Korean appears blockier and heavier than English source. Italic geometry and weight not independently source-contour-calibrated.",
+    "practical_50": "Black background 50% saved-DDS FLIPY view shows complete visible Hangul, unlike first A234 alpha-zero failed trial. Label legible but family similarity not proven.",
+    "raw": "RAW preview contains mirrored lettering, consistent with other flipped-Y atlas rows.",
+    "alpha": "A234R machine evidence 6672 newly visible alpha pixels; persisted saved DDS decode exact; new trial first failure alpha0 is not approved.",
+    "protected": "Rank20 source-bbox outside change 0; other 29 atlas cells byte exact according to generated machine report."
+  },
+  "eight_ordered_gates": {
+    "english_source_removal": "SCOPED_VISUAL_PASS_FOR_RANK20_ONLY",
+    "slant": "HOLD_SOURCE_MATCHING_ANCHORS_UNCALIBRATED",
+    "source_size_hierarchy": "HOLD_FAMILY_TYPE_WEIGHT_MISMATCH",
+    "effect_weight": "HOLD_BLOCKIER_WHITE_NAVY_THAN_ORIGINAL_SMOOTH_ITALIC",
+    "clipping": "SCOPED_VISUAL_PASS",
+    "protected_pixel_intrusion": "SCOPED_MACHINE_ZERO_AND_VISUAL_NO_INTRUSION",
+    "raw_flipy": "SCOPED_PASS",
+    "readability": "SCOPED_PASS_NATIVE_AND_50_PERCENT"
+  },
+  "decision": "SCOPED_MATERIAL_IMPROVEMENT_HOLD_NOT_PRODUCER_PASS",
+  "reason": "Saved alpha and removal corrected; source-family font/effect/slant evidence insufficient for producer PASS. No independent C1 source+plate decision and other 29 atlas areas incomplete.",
+  "mechanical_saved_decode": "SCOPED_PASS",
+  "full_10_stage": "HOLD_NOT_COMPLETE",
+  "official_candidate_updated": false,
+  "c1": "NOT_RUN",
+  "c3": "NOT_RUN",
+  "user_game": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "execution_backend": "github_actions_ubuntu_latest",
+  "workflow_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38086752101",
+  "next": "Use source glyph optical anchors/contours and effect reference to narrow style mismatch; independent C1 plate and saved-DDS review before any official candidate promotion. Avoid reusing rejected A234 no-alpha trial."
+}
