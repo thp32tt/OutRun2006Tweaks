@@ -1,5 +1,17 @@
 OutRun 2006 DX11 전환 자동 작업을 진행해줘.
 
+[2026-10-10 20:39 KST 사용자 최신 개발방향 — DX11_FIRST_PLAYABLE_GAME_FRAME / 00537 이후 신규 작업부터]
+목표는 더 많은 Rxxx 테스트·독립 WARP 프로브를 만드는 것이 아니라, 실제 OutRun 2006 게임이 네이티브 DX11로 그린 화면을 보이고 이후 조작 가능한 상태로 만드는 것이다. 기능 단위로 개발하고 완성 시 한 번 통합 검증한다. 00536 이전 미완료 TASK는 기존 소유권을 존중하고 무리하게 새 작업으로 갈아타지 마.
+
+0순위 R175 TEXCOORD6 VS/PS varying 색상 불일치를 실제 실패한 CI 단계와 소스/셰이더 연결에서 해결한다. 기존 작업자 CONVERSION-DX11-00477의 claim·lease·work_key를 원격으로 먼저 조회하고, 명시적 해제 또는 fencing된 소유권 이관 증거 없이는 그 파일을 중복 수정하지 마. 소유권 이관이 불가능하면 막힌 R175를 근거와 함께 유지하되, 충돌하지 않는 live game Draw 연결 작업으로 진행하고 임의로 R175 검사/게이트를 우회하지 마.
+
+다음 최우선 기능은 'FIRST_GAME_DRAW_FRAME'이다. 게임에서 실제 발생한 D3D9 Draw/DrawIndexed 한 건을 캡처하고, 라이브 resource/vertex/index/shader/target 소유권을 D3D11 명령에 연결하여, fail-closed 진단 opt-in에서 눈으로 확인 가능한 게임 프레임 경로까지 완성한다. 미지원 draw는 DX9Ex로 폴백한다. 단순 테스트 도형의 WARP GPU 픽셀 PASS는 이 기능의 완료가 아니다. NativeDrawPathActive의 일반 사용자 기본값은 계속 false이며 실기/시각 동등성 증거 없이는 배포 모드 활성화·성공 선언하지 마.
+
+FIRST_GAME_DRAW_FRAME 이후 메뉴/차량선택/실제 주행 화면 → 입력 → Quest3 양안·HUD·OpenXR 순서로 확장한다. R240, R241 등 새로운 독립 WARP 프로브, guard, counter, readiness만 만들고 별도 TASK를 완료하는 방식은 중단한다. 직접적인 live-game-frame 결함을 제거하고 실제 hook/renderer/submit 경로를 연결하는 최소 하위 테스트만 기능 내부에서 허용한다.
+
+새 TASK_ID>=CONVERSION-DX11-00537부터 docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json의 gameplay_delivery_target을 필수로 지정한다. R175 작업은 R175_CI_UNBLOCK+소유권 이관 증거, 게임 드로우 통합은 FIRST_GAME_DRAW_FRAME+실제 D3D9_CALLSITE→D3D11_NATIVE_DRAW→VISIBLE_FRAME_OUTPUT 단계·안전한 DX9Ex fallback·실기 검증 계획을 기록한다. 기능을 끝내기 전 신규 TASK나 전체 빌드 반복을 만들지 마. 실제 화면을 테스트 못 했다면 FRAME_PATH_CODE_COMPLETE와 RUNTIME_VALIDATION=UNTESTED를 구분해 기록한다.
+
+
 [2026-10-10 최신 사용자 확정 — FEATURE_BASED_DEVELOPMENT]
 20분/2~5개 사소한 수정 묶음 정책은 폐기한다. 작업 단위는 작은 패치가 아니라 하나의 완결된 기능이다. 기본 1~3시간 규모를 상정하되 시간·커밋 수로 완료 여부를 판단하거나 쪼개지 마. 기능 정의는 미완료인 최우선 실제 문제·구현 경로·완료 조건·변경 대상·부정 회귀로 명확히 한정한다. 조사만 하고 끝내거나 이미 해결된 패치를 재검토하는 신규 TASK_ID를 만들지 마.
 컨트롤러가 준 FEATURE_ID와 FEATURE_BRANCH(보통 vr-feature/<lane>/<task-id>)를 확인해. 기능 미완료 중에는 컨트롤러 체크포인트 브랜치에 소스 패치를 저장하고 FEATURE_BRANCH 및 TARGET_BRANCH에는 중간 push하지 마. 기능 개발 중 변경은 5분마다 소스 패치로 보존하고 최종 기능 완성 시 FEATURE_BRANCH에 결합해. 5분 간격으로 실제 변경 패치와 남은 TODO를 GitHub 컨트롤러 체크포인트에 보존하고, 30분 채팅 롤오버에서는 같은 FEATURE_ID/TASK_ID와 브랜치를 계속 사용해. 점수·완료를 중간 커밋마다 증가시키지 마.
@@ -7,9 +19,9 @@ OutRun 2006 DX11 전환 자동 작업을 진행해줘.
 TARGET_BRANCH의 Actions가 완료되기 전에는 FEATURE_READY가 PASS가 아니다. 실제 CI 실패 시 실패한 원인만 같은 FEATURE_BRANCH에서 수리하고 변경된 최종 SHA를 다시 제출해. 실패한 동일 SHA를 검증·재시도 반복하지 마. CI PASS 뒤 C6 결과만 별도 bookkeeping 커밋으로 기입하고 필수 검증을 재실행하지 마. HMD 실기 미수행은 언제나 RUNTIME_VALIDATION=UNTESTED.
 DX11 A와 DX9Ex C는 서로 독립, DXVK B는 FROZEN. 기능별 원격 work_key/owner/경로 충돌을 먼저 확인하고 타 작업자 변경에 force-push·강제 reset·덮어쓰기 하지 마.
 
-TARGET_BRANCH는 vr-dx11-native-r71이다. 기존 검증된 VR 기준은 참조만 하고 vr-d3d9ex-focus를 직접 수정하지 마. 시작 즉시 현재 branch HEAD, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, VR 자동화/상태 문서를 읽고 가장 우선순위가 높은 실행 가능한 DX11 전환 작업 하나만 선택해 끝까지 처리해.
+TARGET_BRANCH는 vr-dx11-native-r71이다. 기존 검증된 VR 기준은 참조만 하고 vr-d3d9ex-focus를 직접 수정하지 마. 시작 즉시 branch HEAD, 소유권/기존 작업, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, 최신 정책을 확인한 뒤 R175 해제 또는 FIRST_GAME_DRAW_FRAME 완성 경로를 선택해. 이미 검증된 독립 프로브를 신규 작업으로 반복하지 마.
 
-[네이티브 구현 우선 / HMD 대기 비차단] 실기 테스트가 필요한 항목은 해당 런타임 검증·배포 승격만 NEED_HMD_TEST로 남기고 다음 독립 DX11 네이티브 C++ 구현으로 즉시 전환해. 현재 소스 기준 live D3D9/D3D11 device-object ownership → 리소스/VB/IB·셰이더 바인딩 → Draw/DrawIndexed 연결 → OpenXR 제출·프레임 페이싱 순으로 실질적인 구현 장애물을 제거해. 활성화 안전 게이트는 임의로 우회하지 마. 준비 상태 scalar/hash/receipt 재확인만 무한 반복하지 말고 실제 렌더 경로의 원인 코드 수정에 우선 배정해. 동일 HUD 소스 1000/5000회 반복 정적검사는 하지 말고 변경 관련 검사 1회와 GitHub CI만 수행해. 작업은 작은 패치가 아니라 완결 가능한 큰 네이티브 기능 단위로 유지하며, 세부 소스/테스트는 FEATURE_BRANCH에 누적하고 기능 완료 후 TARGET_BRANCH에서 통합 검증해. 실제 HMD/게임 화면 확인이 필요한 항목은 RUNTIME_VALIDATION=UNTESTED 또는 BLOCKED_RUNTIME으로 남기고 자동 검증 통과와 실기 정상 동작을 혼동하지 마.
+[네이티브 구현 우선 / HMD 대기 비차단] 실기 테스트가 필요한 항목은 런타임 결론만 NEED_HMD_TEST로 남겨. 다음 작은 독립 구현으로 도피하지 말고 동일 FIRST_GAME_DRAW_FRAME 기능에서 실제 코드/연결 작업을 계속해. 현재 소스 기준 live D3D9/D3D11 device-object ownership → 리소스/VB/IB·셰이더 바인딩 → Draw/DrawIndexed 연결 → OpenXR 제출·프레임 페이싱 순으로 실질적인 구현 장애물을 제거해. 활성화 안전 게이트는 임의로 우회하지 마. 준비 상태 scalar/hash/receipt 재확인만 무한 반복하지 말고 실제 렌더 경로의 원인 코드 수정에 우선 배정해. 동일 HUD 소스 1000/5000회 반복 정적검사는 하지 말고 변경 관련 검사 1회와 GitHub CI만 수행해. 작업은 작은 패치가 아니라 완결 가능한 큰 네이티브 기능 단위로 유지하며, 세부 소스/테스트는 FEATURE_BRANCH에 누적하고 기능 완료 후 TARGET_BRANCH에서 통합 검증해. 실제 HMD/게임 화면 확인이 필요한 항목은 RUNTIME_VALIDATION=UNTESTED 또는 BLOCKED_RUNTIME으로 남기고 자동 검증 통과와 실기 정상 동작을 혼동하지 마.
 
 반드시 docs/automation/QUEUE_CONTROLLER_CONTRACT.md를 적용하고 해당 TASK_ID의 자동화 결과 기록을 갱신해. 실제 변경 또는 검토 기록을 남긴 뒤 커밋 메시지에 컨트롤러가 지정한 [AUTO:TASK_ID] 표식을 정확히 포함해.
 
