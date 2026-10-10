@@ -1,0 +1,201 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C1",
+  "shard": "ODD",
+  "index": 103,
+  "run_key": "OUTRUN-KOR-C1-Q103-A224-EXACT-PERSISTED-SOURCE-CLEAN-20261010-1451",
+  "review_id": "C1-Q103-A224-NATIVE-20261010-1451",
+  "candidate_kind": "NEW_DISTINCT_A224_UNPROMOTED_TRIAL",
+  "candidate_sha256": "2ad5e25e03bc1c9598548ef64ec397be91eae86f0b4f8d4cc161438c9e354c31",
+  "prior_C1_rejected_A223_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+  "official_A197_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_repository": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "clean_png_sha256": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942",
+  "backend": "GitHub SSOT/read current; GPT local raw Github DNS unavailable; N100 MCP SHA-pinned bounded auxiliary download and Pillow/NumPy exact persisted DDS pixel decoder. No build or C2 lane.",
+  "input_paths": {
+    "source": "Remakes and Reskins/UI/Menus/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds (Sonic-TV/OR2006Sprites)",
+    "clean": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+    "official": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+    "trial": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_Q103_OPTICAL_CONTOUR_UNPROMOTED.dds"
+  },
+  "source_labels": {
+    "english": "Normal Balance",
+    "korean": "일반 밸런스"
+  },
+  "machine": {
+    "verified_input_sha256_all_four": true,
+    "source_dds": {
+      "size_bytes": 16777344,
+      "dimensions": [
+        2048,
+        2048
+      ]
+    },
+    "official_dds": {
+      "size_bytes": 16777344,
+      "dimensions": [
+        2048,
+        2048
+      ]
+    },
+    "trial_dds": {
+      "size_bytes": 16777344,
+      "dimensions": [
+        2048,
+        2048
+      ]
+    },
+    "same_128_byte_dds_headers": true,
+    "dds_format": "RGBA32",
+    "dds_mip_count": 1,
+    "raw_to_readable": "FLIP_Y",
+    "independently_detected_clean_orientation": "as_stored readable (flipped clean yields 2911310 false outside pixels)",
+    "authored_edit_bbox": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "true_source_effect_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "true_source_effect_size": [
+      354,
+      45
+    ],
+    "a224_korean_effect_bbox": [
+      1451,
+      1981,
+      1766,
+      2024
+    ],
+    "a224_effect_size": [
+      315,
+      43
+    ],
+    "relative_to_source_effect_margins_px": [
+      19,
+      20,
+      1,
+      1
+    ],
+    "source_to_clean": {
+      "changed_rgba": 7439,
+      "changed_alpha": 0,
+      "outside_source_edit_rgba": 0,
+      "outside_source_edit_alpha": 0
+    },
+    "clean_to_trial": {
+      "changed_rgba": 5435,
+      "changed_alpha": 0,
+      "outside_source_edit_rgba": 0,
+      "outside_source_edit_alpha": 0
+    },
+    "source_to_trial": {
+      "changed_rgba": 9379,
+      "changed_alpha": 0,
+      "outside_source_edit_rgba": 0,
+      "outside_source_edit_alpha": 0
+    },
+    "official_to_trial": {
+      "changed_rgba": 11089,
+      "changed_alpha": 0,
+      "outside_source_edit_rgba": 0,
+      "outside_source_edit_alpha": 0
+    },
+    "saved_source_to_clean_original_effect_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "saved_clean_to_trial_effect_bbox": [
+      1451,
+      1981,
+      1766,
+      2024
+    ],
+    "bbox_height_excess": 0,
+    "mask_changed_pixels_outside": false,
+    "source_effect_changed_outside": 0,
+    "clean_vs_trial_changed_outside": 0
+  },
+  "verified_lossless_controller_visuals": {
+    "source_clean_current_gray_100": {
+      "path": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_COMPARE_GRAY_100.png",
+      "sha_git_blob": "193c96b5fc5f54ae8cbc86d3cfe3fd6134acf943"
+    },
+    "source_clean_current_black_50": {
+      "path": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_COMPARE_BLACK_50.png",
+      "sha_git_blob": "97266441c96ac8e76384a67b9cfbd7507217ae8c"
+    },
+    "trial_RAW": {
+      "path": "localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/A224_TRIAL_RAW_NATIVE_RGBA.png",
+      "sha_git_blob": "b3427a5fad5fe0f6041954f1794c317a9b4ca8b7"
+    }
+  },
+  "visual_firsthand": "Independently Pillow-decoded four verified saved files, composited source/CLEAN/official/A224 on gray, black, white at native/75/50, and RAW mirror-Y. New A224 glyph is lighter and has tighter spacing than A223, appears legible on the yellow selector; source plate does not have visually obvious English ghost or rectangle seam. Protected angled border looks continuous in reviewed crops. Full source-derived family comparison remains unresolved, so there is no positive C PASS.",
+  "slope_exploration": {
+    "method": "First-glyph threshold-free exact SOURCE XOR CLEAN / TRIAL XOR CLEAN scanline first-left-change boundary in readable coordinates. NOT calibrated paired glyph anchor metric; top and bottom glyph shape differs, do not treat as definitive italic fail/pass.",
+    "english_N_leftmost_change_y1980": 1448,
+    "english_N_leftmost_change_y2020": 1433,
+    "top_minus_bottom_dx_proxy_english": 15,
+    "korean_first_il_leftmost_change_y1984": 1459,
+    "korean_first_il_leftmost_change_y2020": 1452,
+    "top_minus_bottom_dx_proxy_korean": 7,
+    "conclusion": "Likely weaker Korean forward lean, insufficient comparable character-stem anchors; HOLD."
+  },
+  "independent_previews": {
+    "generated_ephemeral": [
+      "Q103_C1_GRAY_FLIPY_100.png",
+      "Q103_C1_GRAY_FLIPY_75.png",
+      "Q103_C1_GRAY_FLIPY_50.png",
+      "Q103_C1_BLACK_FLIPY_100.png",
+      "Q103_C1_BLACK_FLIPY_75.png",
+      "Q103_C1_BLACK_FLIPY_50.png",
+      "Q103_C1_WHITE_FLIPY_100.png",
+      "Q103_C1_WHITE_FLIPY_75.png",
+      "Q103_C1_WHITE_FLIPY_50.png",
+      "Q103_C1_RAW_NATIVE.png"
+    ],
+    "published_to_GitHub": false,
+    "qualification": "Native lossless panels inspected in this QA run; only exact referenced A224 producer lossless contacts persist on GitHub at this stage. Do not treat ephemeral view paths as repository-approved lossless evidence."
+  },
+  "decision": "HOLD_STRICT_RECHECK",
+  "decision_reason": "New A224 distinct persisted SHA materially addresses previous A223 tracking/height issue with proven pixel isolation. Current-policy blind defect calibration, true paired glyph slant/family anchor profile, complete source-derived segment inventory and independent protected-pixel category are not qualified; approval requires full C + separately identifiable C3. Do not invent PASS or convert uncertain slant to visual hard FAIL.",
+  "calibration": {
+    "blind_known_defect_cases_completed": false,
+    "pixels_before_producer_verdict": false,
+    "explanation": "A224 producer and past C review history were seen prior to viewing persisted pixels. Honest non-blind status prevents C PASS."
+  },
+  "eight_checks": {
+    "slant": "HOLD: English N left-face proxy +15 and Korean first IL +7, shapes not paired or calibrated; both lean readable right but family conformity not certified",
+    "clean_plate": "SCOPED_MACHINE_AND_VISUAL_PASS: source/CLEAN changed 7439 RGBA only in English source glyph, no alpha delta and no visible plate ghost; independent clean full-family continuity unqualified",
+    "style": "HOLD: A224 optical weight/spacing better than A223, but source medium condensed font-family/counterspace not calibrated",
+    "readability": "SCOPED_PASS: Korean immediately readable 100/75/50 in saved DDS comparison, not proof of in-game scale",
+    "glyph_integrity": "SCOPED_PASS: 315x43 entirely inside original English effect 354x45, no visible cut syllable, no authored additional MIPs",
+    "protected_art": "SCOPED_MACHINE_PASS: all whole-atlas changed pixel masks outside text edit rect zero, alpha zero; independent in-box protected source mask not authored",
+    "placement": "SCOPED_MACHINE_PASS: 19/20/1/1 positive true source-effect bbox margins, yellow selector border visually continuous",
+    "orientation": "SCOPED_PASS: native readable vs RAW mirror-Y consistent; runtime not tested"
+  },
+  "approval": {
+    "C1_PASS": false,
+    "C3_STRICT_PASS": false,
+    "APPROVAL": false,
+    "PRE_INGAME": false,
+    "USER_ACCEPTANCE": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "old_official_still_REWORK_REQUIRED": true,
+    "promoted_trial": false,
+    "new_produced_dds": 0,
+    "trial_material_production_new_DDS_in_this_C1_run": 0,
+    "shard_even_C2_modified": false,
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "next": "A and C1 obtain source-conditioned quantitative paired per-glyph slant anchors and independently blind calibration (normal/opposite slant/clipping/residue/weight), published persisted native CLEAN/FINAL/mips and source-derived protected masks for all consumer regions; fresh qualified C1 and distinct C3 before promoting A224; user real-game remains untested."
+}
