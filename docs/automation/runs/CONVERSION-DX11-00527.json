@@ -18,7 +18,7 @@
     ".github/workflows/backend-conversion-gate.yml"
   ],
   "status": "WAITING_CI",
-  "checkpoint": "C4_COMMIT",
+  "checkpoint": "C4_REPAIR_COMMIT",
   "terminal": false,
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
@@ -26,20 +26,21 @@
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
-  "static_validation": "PASS_R230_FIVE_SOURCE_MUTANT_CONTROLS_LOCAL",
+  "static_validation": "PASS_R221_10_AND_R230_5_MUTANTS_SCOPED",
   "changed_files": [
     "src/vr/d3d11/native_linear_uav_eye_guard.hpp",
     "tools/dx11_linear_buffer_mirror_probe.cpp",
     ".github/workflows/backend-conversion-gate.yml",
     "tools/test_dx11_linear_predication_r230.py",
-    "docs/automation/runs/CONVERSION-DX11-00527.json"
+    "docs/automation/runs/CONVERSION-DX11-00527.json",
+    "tools/test_dx11_linear_uav_eye_r221.py"
   ],
   "pipeline": {
     "C0": "PASS recovered branch/checkpoint/00526 terminal",
     "C1": "PASS independent R230 linear predication owned-eye path",
     "C2": "PASS production C++ readiness fence and non-indexed WARP GPU restoration probe",
-    "C3": "PENDING exact SHA CI, inherited R175 may block",
-    "C4": "PENDING commit CAS",
+    "C3": "INITIAL_GATE_FAIL R221 old full-file deletion test falsely matched R230 composition; run 38037301902 Win32 SUCCESS; focused R221 owner-scoped mutation test PASS; new exact-SHA Gate pending",
+    "C4": "R230 first material 4b3f8715; R221 static scope repair pending CAS",
     "C5": "NOT_REQUIRED",
     "C6": "PENDING"
   },
@@ -47,5 +48,19 @@
     "Existing independently owned R175 constant-buffer WARP mismatch may block full Gate."
   ],
   "score_change": 0,
-  "resume_cursor": "EXACT_SHA_CI_POLL"
+  "resume_cursor": "EXACT_SHA_CI_POLL",
+  "initial_material_sha": "4b3f87156894e8ff8ff37f01f17575b67e53dc10",
+  "evidence": {
+    "initial_gate": {
+      "id": 38037301902,
+      "head_sha": "4b3f87156894e8ff8ff37f01f17575b67e53dc10",
+      "validate": "success",
+      "smoke": "failure",
+      "failed_step": "Verify R221 linear OM UAV isolation",
+      "failure_class": "R221_FALSE_DUPLICATE_ON_R230_COMPOSED_CALLER"
+    },
+    "focused_repair": "R221 mutator scope only; native R230 C++/WARP untouched."
+  },
+  "repair_commits": 1,
+  "gate_repair_count": 1
 }

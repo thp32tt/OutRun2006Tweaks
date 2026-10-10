@@ -3,6 +3,9 @@
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 h=(root/"src/vr/d3d11/native_linear_uav_eye_guard.hpp").read_text()
+# R230 composes this R221 guard, so exclude downstream callers from
+# R221 single-function deletion-mutation checks (retain full-header Draw ban).
+r221=h.split("// R230: a live D3D11 predicate",1)[0]
 p=(root/"tools/dx11_linear_buffer_mirror_probe.cpp").read_text()
 w=(root/".github/workflows/backend-conversion-gate.yml").read_text()
 guards=(
@@ -17,9 +20,9 @@ guards=(
     "isolated = false;",
     "uav->Release();",
 )
-assert all(x in h for x in guards)
+assert all(x in r221 for x in guards)
 for g in guards:
-    assert not all(x in h.replace(g,"",1) for x in guards),g
+    assert not all(x in r221.replace(g,"",1) for x in guards),g
 assert "->Draw(" not in h and "->DrawIndexed(" not in h
 for phrase in (
     "R221 old R216 admits hidden OM UAV",
