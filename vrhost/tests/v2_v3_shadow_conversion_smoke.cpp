@@ -197,25 +197,25 @@ int main()
     // leave the previously accepted frame visible after a failed read.
     SharedPoseState stablePose = pose;
     SharedPoseState capturedPose{};
-    if (!StableReadPose(&stablePose, capturedPose) ||
+    if (!ShadowV2::StableReadPose(&stablePose, capturedPose) ||
         capturedPose.sequence != stablePose.sequence ||
         capturedPose.hostPid != stablePose.hostPid)
         return 6;
     stablePose.sequence |= 1u;
-    if (StableReadPose(&stablePose, capturedPose, 2) ||
+    if (ShadowV2::StableReadPose(&stablePose, capturedPose, 2) ||
         capturedPose.hostPid != 0 || capturedPose.sequence != 0)
         return 7;
     stablePose.sequence = 42;
     stablePose.magic = 0;
     capturedPose.hostPid = 999;
-    if (StableReadPose(&stablePose, capturedPose) ||
+    if (ShadowV2::StableReadPose(&stablePose, capturedPose) ||
         capturedPose.hostPid != 0)
         return 8;
     capturedPose.hostPid = 999;
-    if (StableReadPose(nullptr, capturedPose) || capturedPose.hostPid != 0)
+    if (ShadowV2::StableReadPose(nullptr, capturedPose) || capturedPose.hostPid != 0)
         return 9;
     capturedPose.hostPid = 999;
-    if (StableReadPose(&stablePose, capturedPose, 0) ||
+    if (ShadowV2::StableReadPose(&stablePose, capturedPose, 0) ||
         capturedPose.hostPid != 0)
         return 10;
 
@@ -227,25 +227,25 @@ int main()
     stableRing.publishSequence = 2;
     stableRing.latestSlot = 1;
     SharedRenderFrameRing capturedRing{};
-    if (!StableReadFrameRing(&stableRing, capturedRing) ||
+    if (!ShadowV2::StableReadFrameRing(&stableRing, capturedRing) ||
         capturedRing.publishSequence != 2 || capturedRing.latestSlot != 1)
         return 11;
     stableRing.publishSequence = 3;
-    if (StableReadFrameRing(&stableRing, capturedRing, 2) ||
+    if (ShadowV2::StableReadFrameRing(&stableRing, capturedRing, 2) ||
         capturedRing.publishSequence != 0 || capturedRing.latestSlot != 0)
         return 12;
     stableRing.publishSequence = 2;
     stableRing.slotCount = 0;
     capturedRing.latestSlot = 3;
-    if (StableReadFrameRing(&stableRing, capturedRing) ||
+    if (ShadowV2::StableReadFrameRing(&stableRing, capturedRing) ||
         capturedRing.latestSlot != 0)
         return 13;
     capturedRing.latestSlot = 3;
-    if (StableReadFrameRing(nullptr, capturedRing) ||
+    if (ShadowV2::StableReadFrameRing(nullptr, capturedRing) ||
         capturedRing.latestSlot != 0)
         return 14;
     capturedRing.latestSlot = 3;
-    if (StableReadFrameRing(&stableRing, capturedRing, 0) ||
+    if (ShadowV2::StableReadFrameRing(&stableRing, capturedRing, 0) ||
         capturedRing.latestSlot != 0)
         return 15;
 
