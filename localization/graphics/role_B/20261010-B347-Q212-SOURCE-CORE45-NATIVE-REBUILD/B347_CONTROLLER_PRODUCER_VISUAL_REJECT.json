@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "run": "B347",
+  "role": "B",
+  "owner_shard": "EVEN",
+  "queue_index": 212,
+  "asset_hash": "BA0147DA",
+  "run_key": "OUTRUN-KOR-B347-Q212-C349-SOURCE-CORE45-REBUILD-20261010",
+  "workflow_run_id": 38013622393,
+  "workflow_conclusion": "SUCCESS",
+  "worker_output_commit": "a3aa19bbbe40ef398f027c06efb087d124c2aa65",
+  "exact_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "exact_clean_png_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "current_official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "B341_previous_unapproved_trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+  "B347_new_unapproved_trial_sha256": "9118856ae3e1492a278332905c8b6310b6421d57358cb92733ebb2bce6367daa",
+  "producer_prep": "Exact C158 SOURCE-derived full CLEAN checked and alpha0 in r43+r44. B341 persisted parent DDS is independent C349 previous HOLD; only two regions can change; all 10 other menu/help regions remain unchanged.",
+  "quantitative": {
+    "native": [
+      2048,
+      2048
+    ],
+    "DDS": "RGBA32/mip1",
+    "bytes": 16777344,
+    "oldB341_to_trial_changed_pixels": 41644,
+    "outside_r43r44_rgba": 0,
+    "source_core_height": 45,
+    "B341_core_height_r43": 55,
+    "B341_core_height_r44": 52,
+    "new_core_height_r43": 44,
+    "new_core_height_r44": 44,
+    "source_core_width_r43": 397,
+    "new_opaque_width_r43": 206,
+    "source_core_width_r44": 211,
+    "new_opaque_width_r44": 122,
+    "source_family_rgba_r43": [
+      241,
+      147,
+      49
+    ],
+    "source_family_rgba_r44": [
+      186,
+      0,
+      0
+    ],
+    "source_correspondence": "SOURCE/OFFICIAL/B341/TRIAL verified SHA-pin, CLEAN cell alpha0, orientation RAW->FLIP-Y exact"
+  },
+  "direct_visual": {
+    "images_native": [
+      "B347_R43_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+      "B347_R44_FLIPY_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png",
+      "B347_R43_FLIPY_BLACK_50_SOURCE_CLEAN_OLD_B341_NEW.png",
+      "B347_R44_RAW_GRAY_100_SOURCE_CLEAN_OLD_B341_NEW.png"
+    ],
+    "observations": [
+      "At native100 gray, original PROFESSIONAL heavy orange glyph spans ~397px; B347 native Hangul source-red ~206px, old B341 Korean approx316px; B347 is visually too compact horizontally and reduces source-title optical hierarchy.",
+      "Source core height45px matched new Korean core44px; B341 Korean 55px (r43) and 52px (r44) were taller; vertical baseline and source matching x about +4px remain within original source effect area.",
+      "Clean PLATE shown empty and new shape has no visible English residue or rectangular donor composite in scoped 5-way source/CLEAN/official/B341/B347 views.",
+      "At black50 PROFL->프로페셔널 remains legible but visibly undersized relative to English source; RAW mirrored R44 matches expected orientation, no obvious clipped 아웃런 pixels.",
+      "Producers must source-calibrate full 2D glyph hierarchy and condensed font family; width-only forced stretch/tracking may create a different mismatch, so no blind B348 rerender or promotion."
+    ],
+    "visual_decision": "REJECT_SOURCE_HIERARCHY_UNDERFILL_R43",
+    "known_defect_not_misreported": "C349 scoped height mismatch was corrected numerically, but width/style defect remains and visual result overrides it."
+  },
+  "production_gates": {
+    "P1": "SCOPED_PASS_SHA_PINNED_SOURCE_C158_CLEAN",
+    "P2": "REWORK_REQUIRED_STYLE_HIERARCHY_WIDTH",
+    "P3": "UNAPPROVED_TRIAL",
+    "pixel_guard": "NOT_APPLICABLE_TO_UNPROMOTED_HD_CANDIDATE; full manifest REQUIRED before publication",
+    "protected_atlas": "NEW_VS_B341_FULL_ATLAS_DIFFERENCE_OUTSIDE_R43_R44_ZERO",
+    "source_family_qualified": false
+  },
+  "decision": "PRODUCER_VISUAL_REJECT_NO_PROMOTION",
+  "trial_dds_created": 1,
+  "new_promoted_dds": 0,
+  "C2": "C338_OFFICIAL_REWORK_REQUIRED_B341_C349_TRIAL_HOLD_UNCHANGED",
+  "C3": "BLOCKED",
+  "APPROVALS": "BLOCKED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "method_next": "Replace generic Noto compact same-height approach with a genuine independently measured source-glyph condensed wide optical profile (glyph width, stroke thickness, counterspace, baseline, slant). Must preserve PRO start x240 and OUTRUN x1626, whole 12 inventory, clean P1 and full production_pixel_guard; no arbitrary resize of B341 or B347.",
+  "evidence_machine": "localization/graphics/role_B/20261010-B347-Q212-SOURCE-CORE45-NATIVE-REBUILD/B347_Q212_MACHINE_AND_SCOPE_QA.json",
+  "backend": "GITHUB_ACTIONS",
+  "forbidden_untouched": [
+    "A_ODD",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
