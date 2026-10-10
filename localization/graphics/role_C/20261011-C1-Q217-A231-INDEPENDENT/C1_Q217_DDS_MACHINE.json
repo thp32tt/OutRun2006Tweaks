@@ -1,0 +1,40 @@
+{
+  "official_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "trial_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "header_equal": true,
+  "meta": {
+    "width": 2048,
+    "height": 2048,
+    "mip_count_header": 1,
+    "pixel_flags": 65,
+    "rgb_bitcount": 32,
+    "size": 16777344
+  },
+  "changed_rgba_raw": 425,
+  "changed_alpha_raw": 0,
+  "changed_outside_source_boxes_raw": 425,
+  "trial_readable_vs_clean_changed_total": 1141,
+  "trial_vs_source_changed_outside_source_boxes": 0,
+  "trial_readable_vs_clean_changed_outside_source_boxes": 0,
+  "trial_readable_vs_clean_alpha_changed": 0,
+  "official_to_trial_exact_source_rgb_restore": 425,
+  "official_to_trial_not_exact_source_restore": 0,
+  "rows": [
+    {
+      "id": "start",
+      "new_vs_official_pixels": 195,
+      "composite_clean_vs_trial_pixels": 725,
+      "composite_outside_glyph_box": 0,
+      "image_file": "C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+      "image_sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+    },
+    {
+      "id": "goal",
+      "new_vs_official_pixels": 230,
+      "composite_clean_vs_trial_pixels": 416,
+      "composite_outside_glyph_box": 0,
+      "image_file": "C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+      "image_sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+    }
+  ]
+}

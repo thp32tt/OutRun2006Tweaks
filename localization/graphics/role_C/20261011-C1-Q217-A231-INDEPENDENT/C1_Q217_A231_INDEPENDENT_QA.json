@@ -1,0 +1,254 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
+  "role": "C1",
+  "reviewer": "ChatGPT C1, distinct producer A231; no fictitious human or blind calibration",
+  "shard": "ODD",
+  "queue_index": 217,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_DDS_to_PNG_raw_flip_y_mismatch_pixels": 0,
+  "clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+  "plate_manifest_sha256": "d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+  "new_saved_candidate_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "official_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "inspection_backend": "N100 MCP fallback only (ChatGPT local sandbox GitHub DNS unavailable), independently SHA downloaded canonical public English DDS, 3 PNG plates, official and new persisted native DDS; numpy/Pillow image proof",
+  "pixels_before_producer_verdict": false,
+  "blind_calibration": "NOT_RUN",
+  "observations": "Independently viewed lossless native x4 SOURCE/old/new CLEAN and native decoded SOURCE/new CLEAN/official/new DDS. Source-colored START/GOAL protected rim restored; inherited compact pale Korean cannot yet match larger source gold beveled family. No final PASS.",
+  "machine": {
+    "canonical_dds_sha_verified": true,
+    "source_raw_flipy_png_mismatch": 0,
+    "native": [
+      2048,
+      2048
+    ],
+    "mip_count": 1,
+    "header_equal": true,
+    "source_to_clean_changed": 3496,
+    "source_to_clean_outside_glyph": 0,
+    "source_to_clean_alpha_changed": 0,
+    "source_to_clean_outside_original_removal_mask": 0,
+    "old_clean_to_new_clean_changed": 425,
+    "restored_exact_canonical_source_rgba": 425,
+    "old_official_to_new_trial_changed": 425,
+    "old_official_to_trial_alpha_changed": 0,
+    "trial_readable_to_canonical_source_changed_outside_glyph_bbox": 0,
+    "trial_readable_to_clean_changed_outside_glyph_bbox": 0,
+    "clean_to_new_trial_glyph_pixels": 1141
+  },
+  "regions": [
+    {
+      "id": "start",
+      "source_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+          "sha256": "d27f776ebf4d06b08214a73f485cdc09b47dac1f73c7340ee35c75df287a6a27"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+          "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+        }
+      ],
+      "source_to_clean_rgba_pixels": 1744,
+      "restored_opaque_protected_rgb_pixels": 195,
+      "clean_to_final_native_changed": 725,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Matching native stroke anchor dx not independently measured; visual lean alone insufficient",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "English glyph removed; old red rim restored source-exact, no visible remnant/plate seam at 4x, full source to CLEAN pixel delta only within original glyph bbox",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+            "sha256": "d27f776ebf4d06b08214a73f485cdc09b47dac1f73c7340ee35c75df287a6a27"
+          }
+        },
+        "style": {
+          "result": "REWORK_REQUIRED",
+          "observation": "English source face is large cream/gold racing beveled; Korean is compact pale/flat and does not yet reproduce source font/effect hierarchy",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean readable in x4 screenshot, but proportional hierarchy and actual game size unresolved",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "Native persisted glyph appears intact in independent image; no new clipping compared with unchanged existing Korean lettering",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS",
+          "observation": "195 opaque RGB border pixels now exactly original SOURCE, alpha unchanged; unrelated atlas unchanged",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+            "sha256": "d27f776ebf4d06b08214a73f485cdc09b47dac1f73c7340ee35c75df287a6a27"
+          }
+        },
+        "placement": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "New trial composite changed only within exact English glyph region, intentional red source-art restoration lies outside glyph region",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Verified canonical SOURCE and current DDS 2048² RAW-to-FLIP-Y readable transform; header/mip1 unchanged",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+          }
+        }
+      }
+    },
+    {
+      "id": "goal",
+      "source_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+          "sha256": "049d007ba8aee9988bd5201be637ecb531d0dc57e4e69c74131904ae08b723df"
+        },
+        {
+          "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+          "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+        }
+      ],
+      "source_to_clean_rgba_pixels": 1752,
+      "restored_opaque_protected_rgb_pixels": 230,
+      "clean_to_final_native_changed": 416,
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Matching native stroke anchor dx not independently measured; visual lean alone insufficient",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "English glyph removed; old red rim restored source-exact, no visible remnant/plate seam at 4x, full source to CLEAN pixel delta only within original glyph bbox",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+            "sha256": "049d007ba8aee9988bd5201be637ecb531d0dc57e4e69c74131904ae08b723df"
+          }
+        },
+        "style": {
+          "result": "REWORK_REQUIRED",
+          "observation": "English source face is large cream/gold racing beveled; Korean is compact pale/flat and does not yet reproduce source font/effect hierarchy",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        },
+        "readability": {
+          "result": "HOLD",
+          "observation": "Korean readable in x4 screenshot, but proportional hierarchy and actual game size unresolved",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_PASS",
+          "observation": "Native persisted glyph appears intact in independent image; no new clipping compared with unchanged existing Korean lettering",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS",
+          "observation": "230 opaque RGB border pixels now exactly original SOURCE, alpha unchanged; unrelated atlas unchanged",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+            "sha256": "049d007ba8aee9988bd5201be637ecb531d0dc57e4e69c74131904ae08b723df"
+          }
+        },
+        "placement": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "New trial composite changed only within exact English glyph region, intentional red source-art restoration lies outside glyph region",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Verified canonical SOURCE and current DDS 2048² RAW-to-FLIP-Y readable transform; header/mip1 unchanged",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+            "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+          }
+        }
+      }
+    }
+  ],
+  "independent_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+      "sha256": "d27f776ebf4d06b08214a73f485cdc09b47dac1f73c7340ee35c75df287a6a27"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+      "sha256": "049d007ba8aee9988bd5201be637ecb531d0dc57e4e69c74131904ae08b723df"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_START_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+      "sha256": "cb0f0f51d8f97ec8e9cb763939a0132ea193f5910cf24e9fc12ebabb4e0ff19b"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_GOAL_INDEPENDENT_PERSISTED_DDS_4PANEL.png",
+      "sha256": "34bf99f7fa6b6a3df3a7804a30ad1418a19dfbd2c870927981815ac2a5386516"
+    }
+  ],
+  "plate_stage": "SCOPED_PASS_SOURCE_RESTORATION",
+  "plate_library_review": "HOLD_NO_BLIND_CALIBRATION",
+  "fresh_C1_trial_decision": "REWORK_REQUIRED_INHERITED_SOURCE_STYLE_WIDTH",
+  "official_status": "REWORK_REQUIRED_UNCHANGED",
+  "new_DDS_produced_by_C1": 0,
+  "official_promoted": false,
+  "C_PASS": false,
+  "C3": "NOT_RUN",
+  "user_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

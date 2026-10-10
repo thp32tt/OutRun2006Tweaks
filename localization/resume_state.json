@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 q217 ODD new A231 CLEAN+trial independently reviewed: canonical original SOURCE DDS SHA d3d2d155 and raw-to-PNG mismatch0; 3496 exact glyph-only CLEAN change outside0, 425 opaque original RGB rim restored (START195 GOAL230), alpha unchanged; same source native 2048 DDS; plate scope pixel PASS but blind calibration pending so library HOLD; new distinct trial 8043bd79 inheritance small pale Korean/gold bevel mismatch REWORK; official SHA a4d817 unchanged, C3/game UNTESTED. OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
     "A231 A ODD q217 new trial DDS SHA8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b; canonical source red badge opaque original 425px START195 GOAL230 restored, outside tight original source text bboxes zero RGBA, alpha/hangul glyph unchanged. New shared CLEAN manifest d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c UNREVIEWED requires independent C1 PLATE_PASS. Official q217 source-family C1 REWORK unchanged, new C1/C3/style calibration/real game UNTESTED. RUN_KEY=OUTRUN-KOR-A231-Q217-C1-RED-BADGE-425-PROTECTED-RGB-RESTORE-20261011-0310",
     "C1 q217 ODD C348 HOLD superseded by verified FIRST material red badge RGB protected failure: source+CLEAN+official exact SHA; 425 opaque alpha255 outside original glyph bounds (START195 GOAL230), source->CLEAN=color recolor, CLEAN->final preserved. RETURN A for source-conditioned rim-safe CLEAN, no old SHA C PASS, C3/game UNTESTED. OUTRUN-KOR-C1-Q217-OUTER-RED-BADGE-PROTECTED-425-20261011-0240 localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_CONTROLLER_REWORK.json",
     "C1 q227 ODD NEW first SHA-authenticated canonical DDS source + A96R CLEAN all16 independent RGBA/alpha source/CLEAN/final 0 outside boxes and clean alpha0 16/16; min1px high risk; HOLD calibrated slant/width and separate C3, IGR034/035/036 OPEN, game UNTESTED. OUTRUN-KOR-C1-Q227-16-INDEPENDENT-CANONICAL-SOURCE-CLEAN-20261010-2340 localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_INDEPENDENT_CONTROLLER_HOLD.json",
@@ -15573,5 +15574,22 @@
     "qa": "localization/graphics/role_C/20261010-C2-Q060-B359-INDEPENDENT-NATIVE-FAMILY/C2_Q060_B359_CONTROLLER_INDEPENDENT_REWORK.json",
     "RUNTIME_VALIDATION": "UNTESTED",
     "IGR044": "OPEN"
+  },
+  "c1_20261011_q217_a231_independent_plate_trial": {
+    "run_key": "OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
+    "role": "C1",
+    "queue_index": 217,
+    "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+    "trial_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+    "official_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+    "restored_original_red_RGB": 425,
+    "independent_clean_outside_source_bbox": 0,
+    "plate_review": "HOLD_CALIBRATION",
+    "C1_trial": "REWORK_REQUIRED_INHERITED_STYLE",
+    "official": "REWORK_REQUIRED_UNCHANGED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_Q217_A231_INDEPENDENT_QA.json"
   }
 }

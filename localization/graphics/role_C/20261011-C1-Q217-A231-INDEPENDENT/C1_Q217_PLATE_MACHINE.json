@@ -1,0 +1,68 @@
+{
+  "size": [
+    2048,
+    2048
+  ],
+  "source_png_sha256": "0c16fc19ff97916a84464c896f355aa552440645e0253072847261e2e9bb4b56",
+  "clean_png_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+  "old_clean_png_sha256": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "original_mask_sha256": "24985d0baa4281ede7c415279b3fa921fa41c0c257c2602333692fc8892d1a20",
+  "changed_source_to_restored_clean_total": 3496,
+  "changed_source_to_restored_clean_outside_glyph_bbox": 0,
+  "changed_source_to_restored_clean_alpha": 0,
+  "changed_old_clean_to_restored_clean_total": 425,
+  "changed_old_clean_to_restored_clean_outside_glyph_bbox": 425,
+  "changed_old_clean_to_restored_clean_alpha": 0,
+  "restored_pixels_source_exact": 425,
+  "old_clean_to_new_not_source_exact": 0,
+  "original_mask_positive": 3496,
+  "source_to_clean_changed_unmasked": 0,
+  "rows": [
+    {
+      "id": "start",
+      "source_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "scope": [
+        785,
+        492,
+        903,
+        549
+      ],
+      "new_source_to_clean_changed": 1744,
+      "old_to_new_restored": 195,
+      "old_to_new_alpha_changed": 0,
+      "new_to_source_unrestored_restoration_pixels": 0,
+      "independent_crop": {
+        "file": "C1_START_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+        "sha256": "d27f776ebf4d06b08214a73f485cdc09b47dac1f73c7340ee35c75df287a6a27"
+      }
+    },
+    {
+      "id": "goal",
+      "source_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "scope": [
+        1324,
+        751,
+        1442,
+        812
+      ],
+      "new_source_to_clean_changed": 1752,
+      "old_to_new_restored": 230,
+      "old_to_new_alpha_changed": 0,
+      "new_to_source_unrestored_restoration_pixels": 0,
+      "independent_crop": {
+        "file": "C1_GOAL_INDEPENDENT_SOURCE_OLD_RESTORED_4X.png",
+        "sha256": "049d007ba8aee9988bd5201be637ecb531d0dc57e4e69c74131904ae08b723df"
+      }
+    }
+  ]
+}
