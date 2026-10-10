@@ -1,0 +1,777 @@
+{
+  "run": "A229",
+  "run_key": "OUTRUN-KOR-A229-Q121-P0-ALL30-SOURCE-EXACT-20261010-2200",
+  "role": "A",
+  "queue_index": 121,
+  "priority": "P0",
+  "owner_lane": "A",
+  "triage": "A221 rework blocked unsafe same-region rerender; expanded genuine-source classification to other 28 native source ROIs",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "a220_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "sha_verified_all_three": true,
+  "native": "4096x4096 RGBA32 mip1 readable=FLIP_TOP_BOTTOM",
+  "regions_total": 30,
+  "rows_with_exact_source_rgba": 17,
+  "sum_exact_source_rgba_by_overlapping_ROIs_not_distinct_pixels": 48753,
+  "source_defects_inferred": false,
+  "candidate_changed": false,
+  "new_DDS": 0,
+  "decision": "MAPPING_AND_PROTECTED_NEIGHBOR_TRIAGE_ONLY_NO_PIXEL_FIX",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_regressions": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Visually classify residual contours in each rank-specific source/current contact first, then reconstruct only confirmed English lettering from true source CLEAN; protect neighboring artwork. A221 rank21/26 no blind deletion.",
+  "rows": [
+    {
+      "rank": 1,
+      "source_bbox": [
+        63,
+        1199,
+        2113,
+        1484
+      ],
+      "roi_hw": [
+        285,
+        2050
+      ],
+      "source_visible_alpha": 265832,
+      "official_exact_source_rgba_alpha_positive": 16,
+      "a220_exact_source_rgba_alpha_positive": 16,
+      "exact_source_remaining_bbox": [
+        773,
+        1199,
+        789,
+        1200
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 118428,
+      "source_removed_alpha_positive": 186001,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 2,
+      "source_bbox": [
+        3008,
+        1304,
+        4034,
+        1995
+      ],
+      "roi_hw": [
+        691,
+        1026
+      ],
+      "source_visible_alpha": 234717,
+      "official_exact_source_rgba_alpha_positive": 21196,
+      "a220_exact_source_rgba_alpha_positive": 21196,
+      "exact_source_remaining_bbox": [
+        3038,
+        1334,
+        4024,
+        1981
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 134851,
+      "source_removed_alpha_positive": 127443,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 3,
+      "source_bbox": [
+        1563,
+        755,
+        2589,
+        1092
+      ],
+      "roi_hw": [
+        337,
+        1026
+      ],
+      "source_visible_alpha": 169200,
+      "official_exact_source_rgba_alpha_positive": 9296,
+      "a220_exact_source_rgba_alpha_positive": 9296,
+      "exact_source_remaining_bbox": [
+        1813,
+        767,
+        2547,
+        1074
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 55077,
+      "source_removed_alpha_positive": 117172,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 4,
+      "source_bbox": [
+        1907,
+        602,
+        3338,
+        752
+      ],
+      "roi_hw": [
+        150,
+        1431
+      ],
+      "source_visible_alpha": 148061,
+      "official_exact_source_rgba_alpha_positive": 242,
+      "a220_exact_source_rgba_alpha_positive": 185,
+      "exact_source_remaining_bbox": [
+        2030,
+        659,
+        3048,
+        736
+      ],
+      "official_to_trial_changed_rgba_pixels": 57,
+      "a220_nonoriginal_alpha_positive": 13643,
+      "source_removed_alpha_positive": 133010,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 5,
+      "source_bbox": [
+        1764,
+        2360,
+        2720,
+        2573
+      ],
+      "roi_hw": [
+        213,
+        956
+      ],
+      "source_visible_alpha": 100994,
+      "official_exact_source_rgba_alpha_positive": 653,
+      "a220_exact_source_rgba_alpha_positive": 653,
+      "exact_source_remaining_bbox": [
+        1810,
+        2362,
+        2561,
+        2540
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 27474,
+      "source_removed_alpha_positive": 64716,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 6,
+      "source_bbox": [
+        0,
+        499,
+        1370,
+        632
+      ],
+      "roi_hw": [
+        133,
+        1370
+      ],
+      "source_visible_alpha": 104790,
+      "official_exact_source_rgba_alpha_positive": 16687,
+      "a220_exact_source_rgba_alpha_positive": 16687,
+      "exact_source_remaining_bbox": [
+        0,
+        499,
+        922,
+        598
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 25631,
+      "source_removed_alpha_positive": 68268,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 7,
+      "source_bbox": [
+        2226,
+        1263,
+        2946,
+        1486
+      ],
+      "roi_hw": [
+        223,
+        720
+      ],
+      "source_visible_alpha": 69926,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 26750,
+      "source_removed_alpha_positive": 47388,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 8,
+      "source_bbox": [
+        415,
+        631,
+        1371,
+        730
+      ],
+      "roi_hw": [
+        99,
+        956
+      ],
+      "source_visible_alpha": 45214,
+      "official_exact_source_rgba_alpha_positive": 144,
+      "a220_exact_source_rgba_alpha_positive": 144,
+      "exact_source_remaining_bbox": [
+        448,
+        666,
+        1357,
+        705
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 27104,
+      "source_removed_alpha_positive": 25133,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 9,
+      "source_bbox": [
+        1680,
+        1097,
+        2611,
+        1213
+      ],
+      "roi_hw": [
+        116,
+        931
+      ],
+      "source_visible_alpha": 47566,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 21940,
+      "source_removed_alpha_positive": 35775,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 10,
+      "source_bbox": [
+        2816,
+        1183,
+        3394,
+        1367
+      ],
+      "roi_hw": [
+        184,
+        578
+      ],
+      "source_visible_alpha": 32199,
+      "official_exact_source_rgba_alpha_positive": 3,
+      "a220_exact_source_rgba_alpha_positive": 3,
+      "exact_source_remaining_bbox": [
+        3120,
+        1205,
+        3151,
+        1302
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 37046,
+      "source_removed_alpha_positive": 20149,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 11,
+      "source_bbox": [
+        2613,
+        755,
+        3285,
+        864
+      ],
+      "roi_hw": [
+        109,
+        672
+      ],
+      "source_visible_alpha": 57065,
+      "official_exact_source_rgba_alpha_positive": 80,
+      "a220_exact_source_rgba_alpha_positive": 80,
+      "exact_source_remaining_bbox": [
+        2622,
+        762,
+        3155,
+        856
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 1116,
+      "source_removed_alpha_positive": 44501,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 12,
+      "source_bbox": [
+        3525,
+        517,
+        3893,
+        730
+      ],
+      "roi_hw": [
+        213,
+        368
+      ],
+      "source_visible_alpha": 22939,
+      "official_exact_source_rgba_alpha_positive": 51,
+      "a220_exact_source_rgba_alpha_positive": 51,
+      "exact_source_remaining_bbox": [
+        3566,
+        587,
+        3848,
+        706
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 25783,
+      "source_removed_alpha_positive": 19338,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 13,
+      "source_bbox": [
+        1151,
+        374,
+        1678,
+        449
+      ],
+      "roi_hw": [
+        75,
+        527
+      ],
+      "source_visible_alpha": 34133,
+      "official_exact_source_rgba_alpha_positive": 3,
+      "a220_exact_source_rgba_alpha_positive": 3,
+      "exact_source_remaining_bbox": [
+        1202,
+        378,
+        1485,
+        380
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 1355,
+      "source_removed_alpha_positive": 15811,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 14,
+      "source_bbox": [
+        1776,
+        374,
+        2232,
+        449
+      ],
+      "roi_hw": [
+        75,
+        456
+      ],
+      "source_visible_alpha": 29350,
+      "official_exact_source_rgba_alpha_positive": 3,
+      "a220_exact_source_rgba_alpha_positive": 3,
+      "exact_source_remaining_bbox": [
+        1833,
+        380,
+        1983,
+        383
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 1243,
+      "source_removed_alpha_positive": 13502,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 15,
+      "source_bbox": [
+        1365,
+        614,
+        1773,
+        736
+      ],
+      "roi_hw": [
+        122,
+        408
+      ],
+      "source_visible_alpha": 22894,
+      "official_exact_source_rgba_alpha_positive": 98,
+      "a220_exact_source_rgba_alpha_positive": 98,
+      "exact_source_remaining_bbox": [
+        1385,
+        669,
+        1668,
+        705
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 9839,
+      "source_removed_alpha_positive": 15774,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 16,
+      "source_bbox": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "roi_hw": [
+        72,
+        415
+      ],
+      "source_visible_alpha": 28028,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 18965,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 17,
+      "source_bbox": [
+        98,
+        631,
+        419,
+        730
+      ],
+      "roi_hw": [
+        99,
+        321
+      ],
+      "source_visible_alpha": 14835,
+      "official_exact_source_rgba_alpha_positive": 65,
+      "a220_exact_source_rgba_alpha_positive": 65,
+      "exact_source_remaining_bbox": [
+        243,
+        680,
+        411,
+        701
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 7092,
+      "source_removed_alpha_positive": 10294,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 18,
+      "source_bbox": [
+        1326,
+        748,
+        1611,
+        843
+      ],
+      "roi_hw": [
+        95,
+        285
+      ],
+      "source_visible_alpha": 9877,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 6407,
+      "source_removed_alpha_positive": 7081,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 19,
+      "source_bbox": [
+        3196,
+        663,
+        3379,
+        744
+      ],
+      "roi_hw": [
+        81,
+        183
+      ],
+      "source_visible_alpha": 9448,
+      "official_exact_source_rgba_alpha_positive": 33,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 33,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 9448,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 20,
+      "source_bbox": [
+        3490,
+        391,
+        3722,
+        440
+      ],
+      "roi_hw": [
+        49,
+        232
+      ],
+      "source_visible_alpha": 6334,
+      "official_exact_source_rgba_alpha_positive": 266,
+      "a220_exact_source_rgba_alpha_positive": 266,
+      "exact_source_remaining_bbox": [
+        3493,
+        391,
+        3704,
+        436
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 2361,
+      "source_removed_alpha_positive": 2930,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 21,
+      "source_bbox": [
+        1683,
+        657,
+        1849,
+        724
+      ],
+      "roi_hw": [
+        67,
+        166
+      ],
+      "source_visible_alpha": 7646,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 76,
+      "source_removed_alpha_positive": 7646,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 22,
+      "source_bbox": [
+        3702,
+        637,
+        3830,
+        730
+      ],
+      "roi_hw": [
+        93,
+        128
+      ],
+      "source_visible_alpha": 3125,
+      "official_exact_source_rgba_alpha_positive": 5,
+      "a220_exact_source_rgba_alpha_positive": 5,
+      "exact_source_remaining_bbox": [
+        3723,
+        688,
+        3751,
+        694
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 4550,
+      "source_removed_alpha_positive": 2690,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 23,
+      "source_bbox": [
+        3200,
+        378,
+        3334,
+        445
+      ],
+      "roi_hw": [
+        67,
+        134
+      ],
+      "source_visible_alpha": 6664,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 226,
+      "source_removed_alpha_positive": 5300,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 24,
+      "source_bbox": [
+        3068,
+        663,
+        3193,
+        731
+      ],
+      "roi_hw": [
+        68,
+        125
+      ],
+      "source_visible_alpha": 6672,
+      "official_exact_source_rgba_alpha_positive": 24,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 24,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 6672,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 25,
+      "source_bbox": [
+        3537,
+        1822,
+        3660,
+        1889
+      ],
+      "roi_hw": [
+        67,
+        123
+      ],
+      "source_visible_alpha": 0,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 5921,
+      "source_removed_alpha_positive": 0,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 26,
+      "source_bbox": [
+        14,
+        659,
+        101,
+        724
+      ],
+      "roi_hw": [
+        65,
+        87
+      ],
+      "source_visible_alpha": 4230,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 4230,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 27,
+      "source_bbox": [
+        3001,
+        872,
+        3171,
+        896
+      ],
+      "roi_hw": [
+        24,
+        170
+      ],
+      "source_visible_alpha": 3519,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 3519,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 28,
+      "source_bbox": [
+        3296,
+        800,
+        3354,
+        868
+      ],
+      "roi_hw": [
+        68,
+        58
+      ],
+      "source_visible_alpha": 3514,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 0,
+      "source_removed_alpha_positive": 3514,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    },
+    {
+      "rank": 29,
+      "source_bbox": [
+        3801,
+        632,
+        3882,
+        730
+      ],
+      "roi_hw": [
+        98,
+        81
+      ],
+      "source_visible_alpha": 1817,
+      "official_exact_source_rgba_alpha_positive": 2,
+      "a220_exact_source_rgba_alpha_positive": 2,
+      "exact_source_remaining_bbox": [
+        3842,
+        701,
+        3848,
+        702
+      ],
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 2394,
+      "source_removed_alpha_positive": 1700,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "SOURCE_EXACT_RESIDUE_CANDIDATE_NOT_ERASURE_APPROVAL"
+    },
+    {
+      "rank": 30,
+      "source_bbox": [
+        1602,
+        748,
+        1654,
+        843
+      ],
+      "roi_hw": [
+        95,
+        52
+      ],
+      "source_visible_alpha": 1674,
+      "official_exact_source_rgba_alpha_positive": 0,
+      "a220_exact_source_rgba_alpha_positive": 0,
+      "exact_source_remaining_bbox": null,
+      "official_to_trial_changed_rgba_pixels": 0,
+      "a220_nonoriginal_alpha_positive": 875,
+      "source_removed_alpha_positive": 1145,
+      "semantic": "UNCLASSIFIED_NEIGHBOR_AND_TEXT_MAY_COEXIST",
+      "machine_verdict": "NO_SOURCE_EXACT_RGBA_CANDIDATE_IN_ROI"
+    }
+  ]
+}
