@@ -38,7 +38,8 @@ for target in (
     "high >= low && high < vertices",
     "!index.binding_exact(context, currentGeneration, currentIndexSnapshotVersion)",
 ):
-    mutant = h.replace(target, "false", 1)
+    # R235 independently repeats the slice bound; remove all occurrences.
+    mutant = h.replace(target, "false")
     assert mutant != h and not valid(mutant, p), f"R184 mutant survived: {target}"
 assert "python tools/test_dx11_linear_buffer_range_r184.py" in w
 assert w.index("Verify DX11 native VB/IB R184 indexed bounds contract") < w.index("Build DX11 linear VB/IB mirror R183 WARP probe")

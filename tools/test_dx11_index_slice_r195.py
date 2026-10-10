@@ -18,7 +18,7 @@ def intact(x):
     return all(g in x for g in guards)
 assert intact(h),"R195 immutable index slice tree/live IA contract missing"
 for guard in (guards[0],guards[2],guards[3],guards[4]):
-    assert not intact(h.replace(guard,"",1)),"negative mutant survived "+guard
+    assert not intact(h.replace(guard,"")),"negative mutant survived "+guard
 assert "ctx->DrawIndexed(" not in h,"R195 must not enable gameplay Draw"
 for proof in (
     "const std::uint16_t indices[] = {0,1,2,99,100,101};",
