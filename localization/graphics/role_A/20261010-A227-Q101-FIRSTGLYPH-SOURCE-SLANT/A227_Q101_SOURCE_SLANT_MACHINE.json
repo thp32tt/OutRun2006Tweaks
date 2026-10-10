@@ -244,6 +244,5 @@
   "note": "A-lane source-family pilot evidence only; C1 exact-source and blind verification not completed. No new DDS. No C3 or game acceptance.",
   "source_full_dds_independently_verified": false,
   "new_dds": 0,
-  "promoted_dds": 0,
-  "RUNTlME_VALIDATION": "UNTESTED"
+  "promoted_dds": 0
 }
