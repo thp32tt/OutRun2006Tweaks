@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "feature_ci_repair_checkpoint",
+  "task_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E003",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_stage": "C3_VALIDATE",
+  "feature_head_sha": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_unchanged": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "pr": 114,
+  "pr_draft": true,
+  "prior_full_build": {
+    "source_sha": "d847ae73530f529699601f32fdc6a064c22cd022",
+    "build_run": 38067168834,
+    "build_result": "SUCCESS",
+    "openxr_run": 38067168842,
+    "game_host_builds": "ALL_SIX_SUCCESS",
+    "bundle_job_result": "FAILURE",
+    "bundle_failure": "file-to-SHA checksum dict reversed; ValueError: SHA256 integrity mismatch"
+  },
+  "ci_repair": {
+    "commit": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+    "files": [
+      "tools/package_dx11_first_game_frame.py"
+    ],
+    "description": "Map filename->digest from SHA256SUMS before ZIP integrity readback; no C++ change",
+    "new_openxr_run": 38067788205,
+    "new_build_run": 38067788260,
+    "current": "IN_PROGRESS"
+  },
+  "acceptance_incomplete": [
+    "DX11-LIVE-CALLSITE",
+    "DX11-NATIVE-DRAW",
+    "DX11-VISIBLE-FRAME",
+    "DX11-SAFE-RETURN",
+    "DX11-TEST-BUNDLE"
+  ],
+  "runtime_validation": "UNTESTED",
+  "feature_ready": false,
+  "next_action": "Inspect exact source SHA f8a5... GitHub Action OpenXR package job and produced ZIP. If packaging fails again, repair tools-only on feature. Keep original DX9Ex and target HEAD. Do not claim live gameplay frame without logs/HMD evidence.",
+  "score_change": 0
+}
