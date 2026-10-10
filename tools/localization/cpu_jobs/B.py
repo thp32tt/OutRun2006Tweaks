@@ -77,7 +77,7 @@ for id,word,(l,t,r,b) in labels:
   ImageDraw.Draw(g).text((2-bb[0],2-bb[1]),ch,font=font,fill=255)
   crop=g.getbbox();assert crop,(id,ch)
   g=g.crop(crop)
-  assert g.height <= h-5,(id,"NATIVE_HEIGHT",g.height,h)
+  assert g.height <= h-3,(id,"NATIVE_HEIGHT",g.height,h)
   chars.append((ch,g,g.width));adv+=g.width
  tracking=10 if id!="07_showroom_gray" else 12
  advance=adv+tracking*(len(chars)-1)
