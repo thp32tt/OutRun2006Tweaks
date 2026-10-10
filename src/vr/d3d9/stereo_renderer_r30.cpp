@@ -1425,7 +1425,7 @@ namespace OutRunVRStereo
                 (fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
                 return false;
 
-            if (!EnsureStereoResources(device) ||
+            if (!R29OwnerEnsureStereoResources(device) ||
                 FAILED(device->GetViewport(&state.viewport)) ||
                 state.viewport.Width == 0 || state.viewport.Height == 0 ||
                 !std::isfinite(state.viewport.MinZ) ||
@@ -1537,12 +1537,12 @@ namespace OutRunVRStereo
 
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
                 (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
-                TryBootstrapRightDepthFromRecentClear(device);
+                R29OwnerTryBootstrapRightDepth(device);
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized && DepthTestActive(device))
+                !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized && R29OwnerDepthTestActive(device))
                 return false;
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized && StencilTestActive(device))
+                !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized && R29OwnerStencilTestActive(device))
                 return false;
 
             if (!haveBaseProjection)
@@ -2047,10 +2047,10 @@ namespace OutRunVRStereo
             if (!state.worldEffect)
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
-            R9NoteStereoDrawWithoutMonoBackup();
-            if (LeftDrawMayWriteDepth(device) ||
-                LeftDrawMayWriteStencil(device))
-                R9NoteMainDepthContentWrite();
+            R29OwnerNoteStereoDrawWithoutMonoBackup();
+            if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                R29OwnerLeftDrawMayWriteStencil(device))
+                R29OwnerNoteMainDepthContentWrite();
 
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
@@ -2061,7 +2061,7 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
-            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget;
             IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
@@ -2126,14 +2126,14 @@ namespace OutRunVRStereo
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
                 R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
             {
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
-                NoteRestoreFailure("R30.2 XYZRHW right-eye draw");
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerNoteRestoreFailure("R30.2 XYZRHW right-eye draw");
                 R29OwnerArmMonoSafety();
             }
             return leftHr;
@@ -2368,7 +2368,7 @@ namespace OutRunVRStereo
                 if (FAILED(device->SetStreamSource(
                         0, vb, streamOffset, stride)))
                 {
-                    NoteRestoreFailure("R30.6 VB stream restore");
+                    R29OwnerNoteRestoreFailure("R30.6 VB stream restore");
                     R29OwnerArmMonoSafety();
                 }
             }
@@ -2625,7 +2625,7 @@ namespace OutRunVRStereo
                 restoreOk = SUCCEEDED(device->SetIndices(ib)) && restoreOk;
                 if (!restoreOk)
                 {
-                    NoteRestoreFailure("R30.6 VB/IB restore");
+                    R29OwnerNoteRestoreFailure("R30.6 VB/IB restore");
                     R29OwnerArmMonoSafety();
                 }
             }
@@ -2782,17 +2782,17 @@ namespace OutRunVRStereo
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
-            if (!EnsureStereoResources(device))
+            if (!R29OwnerEnsureStereoResources(device))
                 return E_NOTIMPL;
 
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
                 (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
-                TryBootstrapRightDepthFromRecentClear(device);
+                R29OwnerTryBootstrapRightDepth(device);
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized &&
-                DepthTestActive(device))
+                R29OwnerDepthTestActive(device))
                 return E_NOTIMPL;
             if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized &&
-                StencilTestActive(device))
+                R29OwnerStencilTestActive(device))
                 return E_NOTIMPL;
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
@@ -2844,10 +2844,10 @@ namespace OutRunVRStereo
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
-            R9NoteStereoDrawWithoutMonoBackup();
-            if (LeftDrawMayWriteDepth(device) ||
-                LeftDrawMayWriteStencil(device))
-                R9NoteMainDepthContentWrite();
+            R29OwnerNoteStereoDrawWithoutMonoBackup();
+            if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                R29OwnerLeftDrawMayWriteStencil(device))
+                R29OwnerNoteMainDepthContentWrite();
 
             bool leftWvpOk = false;
             {
@@ -2869,7 +2869,7 @@ namespace OutRunVRStereo
                     R29OwnerArmMonoSafety();
                     return E_FAIL;
                 }
-                R9UndoStereoDrawCount();
+                R29OwnerUndoStereoDrawCount();
                 return E_NOTIMPL;
             }
 
@@ -2906,12 +2906,12 @@ namespace OutRunVRStereo
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 if (!restored)
-                    NoteRestoreFailure("R30 HUD left draw c64");
+                    R29OwnerNoteRestoreFailure("R30 HUD left draw c64");
                 R29OwnerArmMonoSafety();
                 return leftHr;
             }
 
-            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget;
             IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
@@ -2948,7 +2948,7 @@ namespace OutRunVRStereo
                     FAILED(device->SetScissorRect(&savedScissor)))
                 {
                     restoreOk = false;
-                    NoteRestoreFailure("R30/HUD-right-scissor-restore");
+                    R29OwnerNoteRestoreFailure("R30/HUD-right-scissor-restore");
                 }
             }
 
@@ -2977,14 +2977,14 @@ namespace OutRunVRStereo
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
                 R29OwnerArmMonoSafety();
             }
             if (!restoreOk)
             {
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
-                NoteRestoreFailure("R30 HUD right-eye draw");
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerNoteRestoreFailure("R30 HUD right-eye draw");
                 R29OwnerArmMonoSafety();
             }
             return leftHr;
@@ -3463,17 +3463,17 @@ namespace OutRunVRStereo
 
     bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept
     {
-        return LeftDrawMayWriteDepth(device);
+        return R29OwnerLeftDrawMayWriteDepth(device);
     }
 
     bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept
     {
-        return LeftDrawMayWriteStencil(device);
+        return R29OwnerLeftDrawMayWriteStencil(device);
     }
 
     void R30SupportNoteMainDepthContentWrite() noexcept
     {
-        R9NoteMainDepthContentWrite();
+        R29OwnerNoteMainDepthContentWrite();
     }
 
     HRESULT R30SupportCallRawDrawPrimitive(
@@ -3514,7 +3514,7 @@ namespace OutRunVRStereo
 
     void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept
     {
-        R9NoteStereoDrawWithoutMonoBackup();
+        R29OwnerNoteStereoDrawWithoutMonoBackup();
     }
 
     void R30SupportReportStereoFailure(
@@ -3721,7 +3721,7 @@ namespace OutRunVRStereo
 
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept
     {
-        return TrackedRenderTarget;
+        return R29OwnerBorrowTrackedRenderTarget;
     }
 
     IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept
@@ -3741,22 +3741,22 @@ namespace OutRunVRStereo
 
     bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept
     {
-        return EnsureStereoResources(device);
+        return R29OwnerEnsureStereoResources(device);
     }
 
     bool R30SupportTryBootstrapRightDepth(IDirect3DDevice9* device) noexcept
     {
-        return TryBootstrapRightDepthFromRecentClear(device);
+        return R29OwnerTryBootstrapRightDepth(device);
     }
 
     bool R30SupportDepthTestActive(IDirect3DDevice9* device) noexcept
     {
-        return DepthTestActive(device);
+        return R29OwnerDepthTestActive(device);
     }
 
     bool R30SupportStencilTestActive(IDirect3DDevice9* device) noexcept
     {
-        return StencilTestActive(device);
+        return R29OwnerStencilTestActive(device);
     }
 
     HRESULT R30SupportCallOriginalSetRenderTarget(
@@ -4026,6 +4026,6 @@ namespace OutRunVRStereo
     }
     void R30SupportNoteRestoreFailure(const char* what) noexcept
     {
-        NoteRestoreFailure(what);
+        R29OwnerNoteRestoreFailure(what);
     }
 }
