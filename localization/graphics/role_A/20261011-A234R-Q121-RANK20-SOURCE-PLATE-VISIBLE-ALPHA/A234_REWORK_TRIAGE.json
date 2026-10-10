@@ -1,0 +1,5 @@
+{
+  "returncode": 0,
+  "stdout": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"NORMAL_QUEUE_SELECTION\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 121,\n      \"path\": \"textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds\",\n      \"current_status\": \"c1_20261011_q121_a230_p0_new_sha_independent_rework_official_unchanged\",\n      \"next_action\": \"NORMAL_QUEUE_SELECTION\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"No source-visible defect determined from queue state\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
+  "stderr": ""
+}

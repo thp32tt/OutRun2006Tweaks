@@ -1,0 +1,53 @@
+{
+  "run": "A234R",
+  "run_key": "OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
+  "role": "A",
+  "index": 121,
+  "P0": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "method_change": "Source-derived rank20 CLEAN before lettering; separate transparent glyph/outline/offset with alpha; optical width fit corrected prior invisible-alpha trial; A230 ghost subtraction abandoned",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_crop_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "old_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "new_unpromoted_trial_sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+  "new_unpromoted_trial_path": "localization/graphics/role_A/20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA/A234_Q121_RANK20_REBUILT_SOURCE_PLATE_UNPROMOTED.dds",
+  "native_whole_atlas": [
+    4096,
+    4096
+  ],
+  "source_region_bbox": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "plate_background_support": 0.4428219563687544,
+  "plate_edge_support": 0.8451957295373665,
+  "new_alpha_visible_pixels": 6672,
+  "glyph_bbox_inside_source": [
+    22,
+    8,
+    211,
+    41
+  ],
+  "non_target_pixels_exact": true,
+  "dds_header_exact": true,
+  "saved_DDS_decode_exact": true,
+  "changed_outside_source_region": 0,
+  "other_29_regions_byte_exact": true,
+  "P1_independent_plate_observation": "NOT_PERFORMED_BY_C1",
+  "P2_source_slant_blind_anchors": "NOT_INDEPENDENTLY_CALIBRATED",
+  "P3_mechanical": "SCOPED_SAVED_ROUNDTRIP_PASS",
+  "producer_visual": "PENDING_DIRECT_SAVED_DDS_VIEW_NO_PRODUCER_PASS",
+  "whole_atlas": "REWORK_REQUIRED_29_OTHER_REGIONS_NOT_REAPPROVED",
+  "official_candidate_changed": false,
+  "new_unpromoted_dds": 1,
+  "C1": "NOT_RUN_NEW_BYTES",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "user_ingame_backlog": "OPEN",
+  "required_next": "Review SOURCE/CLEAN/FINAL 100/75/50 RAW and source typography independently; then C1 review if producer visual qualifies; keep official DDS unchanged"
+}
