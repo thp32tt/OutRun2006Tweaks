@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B354",
+  "queue_index": 154,
+  "run_key": "OUTRUN-KOR-B354-Q154-REGULAR-SLENDER-PRODUCER-REJECT-20261010-1845",
+  "saved_trial_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "previous_official_sha256": "c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524",
+  "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38042052215",
+  "machine_qa": {
+    "changed_pixels": 65222,
+    "outside_three_gray_source_bboxes": 0,
+    "raw_mip_preserved": true,
+    "persisted_dds_decode_difference": 0,
+    "original_five_red_art_preserved": true
+  },
+  "firsthand_visual": [
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_FLIPY.png",
+    "B354_06_single_player_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_50_FLIPY.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_FLIPY.png",
+    "B354_07_showroom_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_75_FLIPY.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_50_FLIPY.png",
+    "B354_08_multiplayer_gray_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_RAW.png"
+  ],
+  "producer_decision": "REWORK_REQUIRED_UNPROMOTED",
+  "observations": [
+    {
+      "region": "06_single_player_gray",
+      "english_width": 587,
+      "korean_width": 312,
+      "ratio": 0.532,
+      "defect": "Noto Regular becomes unacceptably thin and underfills source type family at practical 50%"
+    },
+    {
+      "region": "07_showroom_gray",
+      "english_width": 420,
+      "korean_width": 114,
+      "ratio": 0.271,
+      "defect": "Source showroom chrome-gray header much wider and stronger than new tiny two-syllable form; optical underfill"
+    },
+    {
+      "region": "08_multiplayer_gray",
+      "english_width": 520,
+      "korean_width": 273,
+      "ratio": 0.525,
+      "defect": "Thin Korean at native and 50% vs original condensed heavy English; RAW inverse same as source"
+    }
+  ],
+  "root_cause": "SOURCE_FAMILY_STROKE_UNDERWEIGHT_AND_HIERARCHY_UNDERFILL",
+  "next": "B355 exact historic native subpixel alpha interpolation between source-family documented C311 weak and C356 overweight styles; no third same-method retry if rejected",
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
