@@ -139,6 +139,18 @@ Do not rerun a completed batch unless a relevant input changed. Mark only affect
 - Record every component SHA used by a package; integration HEAD alone is not package identity.
 - Do not silently substitute fallback backends or fake A-F variants.
 
+
+## DX11 integration-first auto-development (effective from CONVERSION-DX11-00531, 2026-10-10)
+
+This section is an **operative DX11 task-selection and acceptance rule**, overriding the generic "one small coherent fix" advice for choosing independent new DX11 production achievements. It does not relax isolation, C0-C6, exact-SHA GitHub Actions, dormant gameplay Draw, runtime proof, single-writer CAS or other safety rules.
+
+1. Before allocating a NEW DX11 work_key, read `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json`, `docs/VR_DX11_NATIVE_PLAN.md`, the latest task record and active owner/lease. The existing task 00530 is grandfathered; do not restart or steal it. Prefer a complete mono D3D9-command-to-D3D11-WARP-draw-to-pixel vertical slice over another unrelated per-state guard.
+2. Prioritize the R175 known independent WARP blocker **only when its owner is released or safely fenced**. While it is actively owned or blocked without new evidence, select a nonconflicting path that connects at least two real producer-to-consumer components. Do not reopen 00477 or duplicate R175 ownership on another task ID simply to satisfy priority.
+3. For every new DX11 task >=00531, add `development_strategy` to its durable run record before the validation-bearing commit: `work_class`, `milestone_id`, `integration_path` (>=2 connected stages), `batch_components` (>=2 substantive components), `acceptance_proof` (positive GPU/source proof, negative regression, component integration), `conflict_keys`, and `full_gate_plan=one_validation_bearing_sha`. For blocker/safety/CI work add concrete `blocking_evidence`.
+4. Reject new independent tasks that only add one readiness flag, one defensive guard, a static test string, one compile, bookkeeping, or a review; allow a safety repair only with a reproducible failure and explicit integration/unblocking proof. Complete one cohesive source+test+integration batch before scheduling its final exact-SHA full Gate; lightweight static and targeted WARP checks may run while developing. Do not repeatedly compile every micro-edit.
+5. Run `python tools/dx11_autodev_policy.py --check-run docs/automation/runs/<TASK_ID>.json` before publication, and record its result. The DX11 `Backend Conversion Gate` and lightweight workflow recheck the newest task from this threshold; do not delete/skip either gate. A scoped WARP PASS with inherited R175 Gate FAIL is `SCOPED_PASS/FULL_GATE_FAIL`, not automation PASS, and gets no score. Keep `RUNTIME_VALIDATION=UNTESTED` absent a genuine HMD/game test.
+6. Do **not** enable native gameplay Draw or intercept extra live hooks until explicit production admission and Quest 3/VDXR parity evidence. DX9Ex remains protected. If an external Docker/Portainer controller does not consume this policy, mark its runtime adoption NOT_VERIFIED: repository policy does not silently hot-patch the running controller.
+
 ## Backend development priority override — 2026-09-29
 
 This section is the current backend-allocation policy and overrides older backend-priority text elsewhere in this repository when the two conflict.

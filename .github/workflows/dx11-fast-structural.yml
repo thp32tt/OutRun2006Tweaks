@@ -1,0 +1,43 @@
+name: DX11 Fast Structural Checks
+
+on:
+  push:
+    branches:
+      - vr-dx11-native-r71
+    paths:
+      - 'src/vr/d3d11/**'
+      - 'tools/dx11_autodev_policy.py'
+      - 'tools/test_dx11_*.py'
+      - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      - '.github/workflows/dx11-fast-structural.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dx11-fast-structural-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Validate DX11 development work allocation
+        run: |
+          python tools/test_dx11_autodev_policy.py
+          python tools/dx11_autodev_policy.py --check-latest
+      - name: Run focused DX11 source-only regression checks
+        run: |
+          python tools/test_dx11_linear_predication_r230.py
+          python tools/test_dx11_linear_stream_output_r232.py
+          python tools/test_dx11_linear_buffer_owner_r183.py
+      - name: Verify source graph and dormant runtime activation
+        run: |
+          python tools/verify_dx11_source_graph.py
+          python tools/verify_dx11_activation_boundary.py

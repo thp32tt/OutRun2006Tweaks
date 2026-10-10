@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "effective_from_task_number": 531,
+  "mission": "Complete end-to-end D3D9-command-to-native-D3D11-output integration rather than accumulating isolated readiness guards.",
+  "policy_status": "repository-enforced-at-exact-sha-ci; external controller runtime adoption requires separate verification",
+  "no_automatic_gameplay_promotion": true,
+  "allowed_work_classes": [
+    "blocker_resolution",
+    "vertical_slice",
+    "integration",
+    "safety_regression",
+    "ci_acceleration"
+  ],
+  "milestones": [
+    {
+      "id": "shader_parity_r175",
+      "rank": 1,
+      "work_class": "blocker_resolution",
+      "owner_conflict_key": "DX11:R175:existing-00477",
+      "done_when": "Exact WARP TEXCOORD6/VS-PS varying color matches expected; no unrelated probe bypass",
+      "note": "Do not duplicate an active/blocked owner without fenced release or new evidence."
+    },
+    {
+      "id": "mono_native_draw",
+      "rank": 2,
+      "work_class": "vertical_slice",
+      "owner_conflict_key": "DX11:MONO_NATIVE_DRAW",
+      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled"
+    },
+    {
+      "id": "live_resource_capture",
+      "rank": 3,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:LIVE_RESOURCE_CAPTURE",
+      "done_when": "Actual D3D9 creation/lock/unlock/mutation/reset/release lifetimes connect to D3D11 mirrors in fail-closed scoped test"
+    },
+    {
+      "id": "programmable_shader_path",
+      "rank": 4,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
+      "done_when": "Representative observed VS/PS pair materialized and bound with correct constants/input layout and GPU pixel result"
+    },
+    {
+      "id": "native_stereo_eye_transport",
+      "rank": 5,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:EYE_XR_HANDOFF",
+      "done_when": "D3D11 eye target producer -> shared ring/host consumes exact generation with fence and ACK proof"
+    },
+    {
+      "id": "dx11_build_acceleration",
+      "rank": 6,
+      "work_class": "ci_acceleration",
+      "owner_conflict_key": "DX11:FAST_VALIDATION",
+      "done_when": "Measured change-specific FAST/TARGETED probe plus single final exact-SHA Gate, no reduced mandatory coverage"
+    }
+  ],
+  "selection_rules": {
+    "forbid_guard_only_new_task": true,
+    "prefer_complete_vertical_slice": true,
+    "skip_conflicting_active_owner": true,
+    "use_independent_milestone_if_top_blocker_owned": true,
+    "forbid_bookkeeping_only_material_commit": true,
+    "require_two_substantive_components_per_task": true,
+    "only_one_final_full_gate_per_coherent_batch_when_possible": true,
+    "maintain_full_exact_sha_gate": true,
+    "scope_failed_gate_causes_separately": true,
+    "no_score_on_full_gate_failure": true,
+    "preserve_runtime_validation_untested": true,
+    "no_ci_skip_on_validation_bearing_commit": true,
+    "no_implicit_draw_activation": true
+  },
+  "required_task_strategy_fields": [
+    "work_class",
+    "milestone_id",
+    "integration_path",
+    "batch_components",
+    "acceptance_proof",
+    "conflict_keys",
+    "full_gate_plan"
+  ],
+  "allowed_full_gate_plan": "one_validation_bearing_sha",
+  "minimum_integration_path_stages": 2,
+  "minimum_batch_components": 2,
+  "mandatory_acceptance_proof_fields": [
+    "positive_probe",
+    "negative_regression",
+    "component_integration"
+  ],
+  "exception_rules": "Independent blocker, safety regression, or CI acceleration work is eligible only with source-root-cause evidence and a measurable unblocking outcome, not a new readiness guard without an integration path.",
+  "validation_layers": [
+    "FAST_STATIC",
+    "TARGETED_WARP",
+    "FULL_EXACT_SHA_GATE",
+    "RUNTIME_HMD_IF_PROMOTING"
+  ]
+}

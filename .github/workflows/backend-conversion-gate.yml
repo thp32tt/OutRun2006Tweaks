@@ -28,6 +28,13 @@ jobs:
         shell: pwsh
         run: python tools/verify_queue_controller_contract.py
 
+      - name: Verify DX11 integration-first auto-development acceptance
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          python tools/test_dx11_autodev_policy.py
+          python tools/dx11_autodev_policy.py --check-latest
+
       - name: Verify HMD-proven baseline
         shell: pwsh
         run: python tools/verify_vr_proven_baseline.py

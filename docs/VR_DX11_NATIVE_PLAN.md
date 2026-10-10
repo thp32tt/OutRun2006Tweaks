@@ -159,3 +159,9 @@ These are **engineering targets, not proven minimum requirements or released per
 - **Acceptance:** no entry may be called "RTX 2060 supported" or "RTX 3060 supported" until a user or tester validates the exact candidate package on that GPU with Quest 3/VDXR and representative scenes, visual parity and measured sustainable frame pacing. CI/WARP/static gate passing and RTX 4070 measurements alone cannot prove lower-tier support.
 - **Backend sequencing:** native draw dispatch must remain fail-closed while inactive/unsupported; prioritize performance changes only inside the branch's currently allowed native-resource/shader/draw correctness gates and do not opportunistically switch DX9Ex or DXVK behavior.
 
+
+## 2026-10-10 integration-first production milestones (effective from DX11 task 00531)
+
+The automated DX11 queue follows `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json`. High-value increments are (a) resolve inherited R175 TEXCOORD6 shader-varying output mismatch with explicit owner handoff; (b) prove one end-to-end **dormant** D3D9 source command -> native D3D11 resource/shader -> actual mono WARP Draw -> output pixel, including negative cases; (c) link live resource/mutation/reset lifecycle; (d) expand dominant programmable-shader translation; (e) connect native eye targets to host transport with exact GPU fence/consumer ACK. No task may claim in-game native Draw activation from an isolated WARP probe.
+
+Batch related source, interface, test and integration changes; use FAST_STATIC / TARGETED_WARP during development and ONE final exact-SHA FULL_GATE for the material batch when possible. The new lightweight GitHub workflow gives early static feedback but does not substitute for the full Windows build, DX11 smoke checks or actual Quest 3/VDXR parity. Preserve failed R175 as a separate failure until it is truly corrected. Progress means an observed connected rendering milestone, not number of Rxxx guard commits or total compiled runs.
