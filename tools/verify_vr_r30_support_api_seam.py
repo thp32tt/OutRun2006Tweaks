@@ -164,6 +164,67 @@ if "'tools/verify_vr_r30_support_api_seam.py'" not in workflow:
 if "'src/vr/core/r30_support_api.hpp'" not in workflow:
     errors.append("DX9Ex workflow path filter does not track the R30 support API")
 
+# Exact owner-boundary regression: R32 must never reintroduce lower
+# anonymous state/screen-space/XYZRHW symbols after this extraction.
+r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
+extracted = {
+    "R30SupportClassifyScreenSpacePass": ("R30ClassifyScreenSpacePass(device)",),
+    "R30SupportBuildScreenSpaceEyeConstants": (
+        "R30ScreenSpaceKind::Hud2D", "R30ScreenSpaceKind::FlatPerspectiveEffect",
+        "default:", "return false;", "R30BuildScreenSpaceEyeConstants("),
+    "R30SupportNoteScreenSpaceFovDraw": ("R30TelemetryNoteScreenSpaceFovDraw()",),
+    "R30SupportTryXyzrhwPrimitiveVB": ("R30TryXyzrhwPrimitiveVB(",),
+    "R30SupportTryXyzrhwIndexedPrimitiveVB": ("R30TryXyzrhwIndexedPrimitiveVB(",),
+    "R30SupportTryXyzrhwPrimitiveUP": ("R30TryXyzrhwPrimitiveUP(",),
+    "R30SupportTryXyzrhwIndexedPrimitiveUP": ("R30TryXyzrhwIndexedPrimitiveUP(",),
+    "R30SupportCallLowerDrawPrimitive": ("R30CallLowerDrawPrimitive(",),
+    "R30SupportCallLowerDrawIndexedPrimitive": ("R30CallLowerDrawIndexedPrimitive(",),
+    "R30SupportCallLowerDrawPrimitiveUP": ("R30CallLowerDrawPrimitiveUP(",),
+    "R30SupportCallLowerDrawIndexedPrimitiveUP": ("R30CallLowerDrawIndexedPrimitiveUP(",),
+    "R30SupportRunRasterReplayGuardCallback": (
+        "if (!draw) return E_INVALIDARG;",
+        "R22RasterReplayGuard replay(device, site);",
+        "if (!replay.StateValid()) return draw(drawContext);",
+        "if (active) active(activeContext);",
+        "return draw(drawContext);"),
+    "R30SupportLowerPrerequisiteStatus": (
+        "R22InstallStatus()", "R13InstallStatus()",
+        "State::Failed", "State::Ready", "State::Pending"),
+    "R30SupportDrawPrimitiveTarget": ("&DrawPrimitiveDestR30",),
+    "R30SupportDrawIndexedPrimitiveTarget": ("&DrawIndexedPrimitiveDestR30",),
+    "R30SupportDrawPrimitiveUPTarget": ("&DrawPrimitiveUPDestR30",),
+    "R30SupportDrawIndexedPrimitiveUPTarget": ("&DrawIndexedPrimitiveUPDestR30",),
+}
+for marker, delegated in extracted.items():
+    if marker not in header or marker not in r32:
+        errors.append(f"R32/R30 public declaration or consumer missing: {marker}")
+    try:
+        body = function_body(r30, marker + "(")
+    except ValueError as exc:
+        errors.append(str(exc))
+        continue
+    for token in delegated:
+        if token not in body:
+            errors.append(f"R30 owner {marker} lost delegation: {token}")
+
+for forbidden in (
+    "R30ClassifyScreenSpacePass(", "R30BuildScreenSpaceEyeConstants(",
+    "R30TelemetryNoteScreenSpaceFovDraw(", "R30TryXyzrhwPrimitiveVB(",
+    "R30TryXyzrhwIndexedPrimitiveVB(", "R30TryXyzrhwPrimitiveUP(",
+    "R30TryXyzrhwIndexedPrimitiveUP(", "R30CallLowerDrawPrimitive(",
+    "R30CallLowerDrawIndexedPrimitive(", "R30CallLowerDrawPrimitiveUP(",
+    "R30CallLowerDrawIndexedPrimitiveUP(", "R22RasterReplayGuard replay(",
+    "R22InstallStatus()", "R13InstallStatus()", "R13InstallStatusValue::",
+    "&DrawPrimitiveDestR30", "&DrawIndexedPrimitiveDestR30",
+    "&DrawPrimitiveUPDestR30", "&DrawIndexedPrimitiveUPDestR30",
+):
+    if forbidden in r32:
+        errors.append(f"R32 regained lower anonymous owner: {forbidden}")
+
+for kind in ("Hud2D", "FlatPerspectiveEffect", "None"):
+    if f"R30SupportScreenSpaceKind::{kind}" not in r30 or f"R30SupportScreenSpaceKind::{kind}" not in r32:
+        errors.append(f"R32 screen-space semantic mapping lost: {kind}")
+
 if errors:
     for error in errors:
         print(f"R30 support API seam FAIL: {error}")

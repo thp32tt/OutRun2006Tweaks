@@ -27,7 +27,13 @@ def violations(state, queue, docs):
         ("Architecture v3" in queue["policy"]["backendReplacementGate"], "Architecture v3 lane-local gate missing"),
         ("## Effective multi-lane dispatch authority" in docs["controller"], "controller precedence missing"),
         ("# Effective backend execution policy" in docs["agents"], "AGENTS precedence missing"),
-        ("## Global concurrency and supersession" in docs["priority"], "priority-policy precedence missing"),
+        (all(phrase in docs["priority"] for phrase in (
+            "# DX9Ex VR defect-first execution policy",
+            "DX11 Native A remains global conversion priority",
+            "DXVK B FROZEN",
+            "FFB v0.2 and currently working gamepad/input are FROZEN",
+            "R84/structural optimization",
+        )), "priority-policy precedence missing"),
     )
     return [message for good, message in checks if not good]
 
@@ -57,6 +63,15 @@ def main():
         mutation(ss, qq)
         if not violations(ss, qq, docs):
             raise SystemExit(f"VR POLICY FAIL: negative mutation {index} escaped")
+    for phrase in (
+        "DX11 Native A remains global conversion priority",
+        "DXVK B FROZEN",
+        "FFB v0.2 and currently working gamepad/input are FROZEN",
+    ):
+        mutated_docs = dict(docs)
+        mutated_docs["priority"] = docs["priority"].replace(phrase, "RETRACTED_POLICY")
+        if not violations(state, queue, mutated_docs):
+            raise SystemExit(f"VR POLICY FAIL: priority text mutation escaped: {phrase}")
     print(f"VR POLICY PASS: DX11 A + DX9Ex C ACTIVE / DXVK B FROZEN; {len(negative_cases)} negative cases")
 
 

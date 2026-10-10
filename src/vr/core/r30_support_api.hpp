@@ -23,6 +23,60 @@ namespace OutRunVRStereo
 {
     OutRunVR::RuntimeEligibility::InstallState R30InstallStatus() noexcept;
 
+    // Stable R30-owned render routing, not the anonymous R30 private enum.
+    enum class R30SupportScreenSpaceKind : std::uint8_t
+    {
+        None, Hud2D, FlatPerspectiveEffect
+    };
+    R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
+        IDirect3DDevice9* device) noexcept;
+    bool R30SupportBuildScreenSpaceEyeConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        R30SupportScreenSpaceKind kind,
+        float original[16], float eyeConstants[2][16],
+        float eyeScale[2], float eyeOffset[2]) noexcept;
+    void R30SupportNoteScreenSpaceFovDraw() noexcept;
+
+    // R30 owns the four XYZRHW paths and four R29 lower replay families.
+    HRESULT R30SupportTryXyzrhwPrimitiveVB(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
+    HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
+    HRESULT R30SupportTryXyzrhwPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept;
+    HRESULT R30SupportTryXyzrhwIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        UINT m, UINT n, UINT p, const void* idx,
+        D3DFORMAT f, const void* v, UINT st) noexcept;
+    HRESULT R30SupportCallLowerDrawPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
+    HRESULT R30SupportCallLowerDrawIndexedPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
+    HRESULT R30SupportCallLowerDrawPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept;
+    HRESULT R30SupportCallLowerDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT m, UINT n, UINT p,
+        const void* idx, D3DFORMAT f, const void* v, UINT st) noexcept;
+
+    // Preserve lower R22 raster guard lifetime and exact callback ordering.
+    using R30SupportVoidCallback = void (*)(void*) noexcept;
+    using R30SupportHResultCallback = HRESULT (*)(void*) noexcept;
+    HRESULT R30SupportRunRasterReplayGuardCallback(
+        IDirect3DDevice9* device, const char* site,
+        R30SupportVoidCallback active, void* activeContext,
+        R30SupportHResultCallback draw, void* drawContext) noexcept;
+    OutRunVR::RuntimeEligibility::InstallState
+    R30SupportLowerPrerequisiteStatus() noexcept;
+    void* R30SupportDrawPrimitiveTarget() noexcept;
+    void* R30SupportDrawIndexedPrimitiveTarget() noexcept;
+    void* R30SupportDrawPrimitiveUPTarget() noexcept;
+    void* R30SupportDrawIndexedPrimitiveUPTarget() noexcept;
+
     bool R30SupportTelemetryEnabled() noexcept;
     bool R30SupportIsGameDevice(IDirect3DDevice9* device) noexcept;
     bool R30SupportInternalStereoPassActive() noexcept;

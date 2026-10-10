@@ -3248,6 +3248,144 @@ namespace OutRunVRStereo
         ++R30ScreenSpaceFovDraws;
     }
 
+
+    // R32-to-R30 structural seam: preserve the current live lower-owner
+    // classification, XYZRHW fallback and hook dispatch without transferring
+    // any physical hook or shadow device state into R32.
+    R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
+        IDirect3DDevice9* device) noexcept
+    {
+        switch (R30ClassifyScreenSpacePass(device))
+        {
+        case R30ScreenSpaceKind::Hud2D:
+            return R30SupportScreenSpaceKind::Hud2D;
+        case R30ScreenSpaceKind::FlatPerspectiveEffect:
+            return R30SupportScreenSpaceKind::FlatPerspectiveEffect;
+        default:
+            return R30SupportScreenSpaceKind::None;
+        }
+    }
+
+    bool R30SupportBuildScreenSpaceEyeConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        R30SupportScreenSpaceKind kind,
+        float original[16], float eyeConstants[2][16],
+        float eyeScale[2], float eyeOffset[2]) noexcept
+    {
+        R30ScreenSpaceKind lower = R30ScreenSpaceKind::None;
+        switch (kind)
+        {
+        case R30SupportScreenSpaceKind::Hud2D:
+            lower = R30ScreenSpaceKind::Hud2D;
+            break;
+        case R30SupportScreenSpaceKind::FlatPerspectiveEffect:
+            lower = R30ScreenSpaceKind::FlatPerspectiveEffect;
+            break;
+        default:
+            return false;
+        }
+        return R30BuildScreenSpaceEyeConstants(
+            device, stereo, lower, original, eyeConstants, eyeScale, eyeOffset);
+    }
+
+    void R30SupportNoteScreenSpaceFovDraw() noexcept
+    {
+        R30TelemetryNoteScreenSpaceFovDraw();
+    }
+
+    HRESULT R30SupportTryXyzrhwPrimitiveVB(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
+    {
+        return R30TryXyzrhwPrimitiveVB(d,t,s,p);
+    }
+    HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept
+    {
+        return R30TryXyzrhwIndexedPrimitiveVB(d,t,b,m,n,s,p);
+    }
+    HRESULT R30SupportTryXyzrhwPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept
+    {
+        return R30TryXyzrhwPrimitiveUP(d,t,p,data,st);
+    }
+    HRESULT R30SupportTryXyzrhwIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        UINT m, UINT n, UINT p, const void* idx,
+        D3DFORMAT f, const void* v, UINT st) noexcept
+    {
+        return R30TryXyzrhwIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);
+    }
+
+    HRESULT R30SupportCallLowerDrawPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
+    {
+        return R30CallLowerDrawPrimitive(d,t,s,p);
+    }
+    HRESULT R30SupportCallLowerDrawIndexedPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept
+    {
+        return R30CallLowerDrawIndexedPrimitive(d,t,b,m,n,s,p);
+    }
+    HRESULT R30SupportCallLowerDrawPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept
+    {
+        return R30CallLowerDrawPrimitiveUP(d,t,p,data,st);
+    }
+    HRESULT R30SupportCallLowerDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        UINT m, UINT n, UINT p, const void* idx,
+        D3DFORMAT f, const void* v, UINT st) noexcept
+    {
+        return R30CallLowerDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);
+    }
+
+    HRESULT R30SupportRunRasterReplayGuardCallback(
+        IDirect3DDevice9* device, const char* site,
+        R30SupportVoidCallback active, void* activeContext,
+        R30SupportHResultCallback draw, void* drawContext) noexcept
+    {
+        if (!draw) return E_INVALIDARG;
+        R22RasterReplayGuard replay(device, site);
+        if (!replay.StateValid()) return draw(drawContext);
+        if (active) active(activeContext);
+        return draw(drawContext);
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    R30SupportLowerPrerequisiteStatus() noexcept
+    {
+        using State = OutRunVR::RuntimeEligibility::InstallState;
+        const auto r22 = R22InstallStatus();
+        const auto r13 = R13InstallStatus();
+        if (r22 == State::Failed || r13 == R13InstallStatusValue::Failed)
+            return State::Failed;
+        if (r22 == State::Ready && r13 == R13InstallStatusValue::Ready)
+            return State::Ready;
+        return State::Pending;
+    }
+
+    void* R30SupportDrawPrimitiveTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawPrimitiveDestR30);
+    }
+    void* R30SupportDrawIndexedPrimitiveTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30);
+    }
+    void* R30SupportDrawPrimitiveUPTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawPrimitiveUPDestR30);
+    }
+    void* R30SupportDrawIndexedPrimitiveUPTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30);
+    }
+
     bool R30SupportTelemetryEnabled() noexcept
     {
         return Settings::VRTelemetry;

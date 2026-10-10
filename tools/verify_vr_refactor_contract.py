@@ -1561,7 +1561,7 @@ for banned in ("R22ReplayScope", "R22FailClosedReplayState"):
             f"R33 final dispatcher retained private R22 raster-replay dependency: {banned}")
 if "class R22RasterReplayGuard" not in r22:
     errors.append("R22 missing public raster-replay owner guard")
-if "R22RasterReplayGuard replay(" not in r32:
+if "R22RasterReplayGuard replay(" not in r30:
     errors.append("R32 split facade missing R22 raster-replay owner guard delegation")
 if "R32ReviewRunRasterReplayGuard(" not in r33:
     errors.append("R33 final dispatcher missing R32 raster-replay split facade")
