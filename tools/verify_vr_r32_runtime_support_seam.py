@@ -27,6 +27,8 @@ def body(source: str, marker: str) -> str:
 
 header = read("src/vr/core/r30_support_api.hpp")
 r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
+r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
+modern = "R29OwnerReleaseDirectTransportInterop();" in r30
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 workflow = read(".github/workflows/vr-dx9ex-active.yml")
 errors = []
@@ -223,6 +225,63 @@ delegations = {
         "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();",
     ),
 }
+
+# R84: R29 is the physical owner; R30 is a typed forwarding facade.
+# Validate both layers rather than searching for retired private R9 state in R30.
+if modern:
+    delegations = {
+        "R30SupportTelemetryEnabled()": ("return Settings::VRTelemetry;",),
+        "R30SupportIsGameDevice(": ("return R29OwnerIsGameDevice(device);",),
+        "R30SupportInternalStereoPassActive()": ("return R29OwnerInternalStereoPassActive();",),
+        "R30SupportExchangeInternalStereoPass(": ("return R29OwnerExchangeInternalStereoPass(active);",),
+        "R30SupportPresentEpoch()": ("return R29OwnerCaptureFrameSnapshot().presentEpoch;",),
+        "R30SupportStereoWanted()": ("return R29OwnerStereoWanted();",),
+        "R30SupportStereoBaselineSeeded()": ("return R29OwnerStereoBaselineSeeded();",),
+        "R30SupportTargetIsBackBuffer()": ("return R29OwnerTargetIsBackBuffer();",),
+        "R30SupportTryGetEffectTelemetrySnapshot(": (
+            "R29OwnerEffectTelemetrySnapshot lower{};",
+            "R29OwnerTryGetEffectTelemetrySnapshot(lower)",
+            "out.alphaBlend = lower.alphaBlend;",
+            "out.alphaTest = lower.alphaTest;",
+            "out.zWrite = lower.zWrite;",
+        ),
+        "R30SupportOverlayReadyForTransport()": ("return R29OwnerOverlayReadyForTransport();",),
+        "R30SupportNoteSafeAckBackpressure()": ("R29OwnerNoteSafeAckBackpressure();",),
+        "R30SupportNoteDirectTransportRingBackpressure()": ("R29OwnerNoteDirectTransportRingBackpressure();",),
+        "R30SupportDirectTransportRingBackpressureCount()": ("return R29OwnerDirectTransportRingBackpressureCount();",),
+        "R30SupportSetActiveDirectTransportSlot(": ("R29OwnerSetActiveDirectTransportSlot(slot);",),
+        "R30SupportMarkDirectTransportSlotPending(": ("R29OwnerMarkDirectTransportSlotPending(slot, frameId);",),
+        "R30SupportPollDirectTransportSlotProducer(": ("return R29OwnerPollDirectTransportSlotProducer(slot);",),
+        "R30SupportRetireDirectTransportSlotPublication(": ("R29OwnerRetireDirectTransportSlotPublication(slot);",),
+        "R30SupportTryGetGpuCompletionSnapshot(": (
+            "out = {};", "R29OwnerTryGetGpuCompletionSnapshot(out.completedFrameId);",
+        ),
+        "R30SupportDirectTransportResourcesReady()": ("return R29OwnerDirectTransportResourcesReady();",),
+        "R30SupportEnsureDirectTransportResources(": ("return R29OwnerEnsureDirectTransportResources(device);",),
+        "R30SupportTryGetDirectTransportSourceSurfaces(": (
+            "out.left = R29OwnerCaptureFrameSnapshot().backBuffer;",
+            "out.right = R29OwnerCaptureFrameSnapshot().rightEyeSurface;",
+            "return out.left != nullptr && out.right != nullptr;",
+        ),
+        "R30SupportReleaseDirectAckState()": ("R29OwnerReleaseDirectAckState();",),
+        "R30SupportReleaseDirectTransportInterop()": ("R29OwnerReleaseDirectTransportInterop();",),
+        "R30SupportTryGetDirectTransportIdentity(": (
+            "R29OwnerTransportIdentity identity{};",
+            "R29OwnerTryGetDirectTransportIdentity(identity)",
+            "out.hostPid = identity.hostPid;",
+            "out.hostAdapterLuidLow = identity.hostAdapterLuidLow;",
+            "out.hostAdapterLuidHigh = identity.hostAdapterLuidHigh;",
+        ),
+        "R30SupportInvalidateEffectStateCache()": ("R29OwnerInvalidateEffectStateCache();",),
+        "R30SupportInvalidateLiveStateSample()": ("R29OwnerInvalidateLiveStateSample();",),
+        "R30SupportCurrentVertexShaderIdentity()": ("return R29OwnerCurrentVertexShaderIdentity();",),
+        "R30SupportExchangeVertexShaderIdentity(": ("return R29OwnerExchangeVertexShaderIdentity(identity);",),
+        "R30SupportRestoreVertexShaderIdentityIfEmpty(": ("R29OwnerRestoreVertexShaderIdentityIfEmpty(identity);",),
+        "R30SupportInvalidateRendererStateAfterExternalRestore()": (
+            "R29OwnerInvalidateRendererStateAfterExternalRestore();",
+        ),
+    }
+
 for marker, tokens in delegations.items():
     try:
         fn = body(r30, marker)
@@ -233,7 +292,10 @@ for marker, tokens in delegations.items():
         if token not in fn:
             errors.append(f"{marker} lost lower delegation: {token}")
 
-release_transport = body(r30, "R30SupportReleaseDirectTransportInterop()")
+release_transport = body(
+    r29 if modern else r30,
+    "R29OwnerReleaseDirectTransportInterop(" if modern
+    else "R30SupportReleaseDirectTransportInterop()")
 if release_transport.find("ReleaseDirectTransportSlots();") >= release_transport.find("ReleaseDirectInteropProbe();"):
     errors.append("R30 DirectGPU release facade changed slots -> probe ordering")
 
@@ -302,6 +364,18 @@ if ("copy.copyFailed" not in resolve_direct or
 # Execute one bounded source inspection plus negative mutations, not a
 # thousand identical static audits.
 def direct_copy_contract_ok(c):
+    if modern:
+        required_order = (
+            "if (!device || !left || !right ||",
+            "index >= OutRunVR::RenderFrameRingSize",
+            "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+            "left, nullptr, slot.leftSurface",
+            "right, nullptr, slot.rightSurface",
+            "if (FAILED(leftCopy) || FAILED(rightCopy))",
+            "return {slot.fence->Issue(D3DISSUE_END), false};",
+        )
+        pos = [c.find(x) for x in required_order]
+        return all(v >= 0 for v in pos) and pos == sorted(pos)
     required_order = (
         "if (!device || !source.left || !source.right ||",
         "index >= OutRunVR::RenderFrameRingSize",
@@ -315,20 +389,31 @@ def direct_copy_contract_ok(c):
     pos = [c.find(x) for x in required_order]
     return all(v >= 0 for v in pos) and pos == sorted(pos)
 
-copy_body = body(r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+copy_body = body(
+    r29 if modern else r30,
+    "R29OwnerCopyDirectTransportEyesAndIssueFence(" if modern
+    else "R30SupportCopyDirectTransportEyesAndIssueFence(")
 if not direct_copy_contract_ok(copy_body):
     errors.append("R30 direct transport copy lost guarded eye/fence ordering")
 for label, mutant in (
-    ("scope", copy_body.replace("InternalPassScope guard;", "", 1)),
-    ("eye", copy_body.replace("source.left, nullptr, slot.leftSurface",
-                                "source.right, nullptr, slot.leftSurface", 1)),
+    ("input guard", copy_body.replace(
+        "if (!device || !left || !right ||" if modern else "InternalPassScope guard;",
+        "if (false ||" if modern else "", 1)),
+    ("eye", copy_body.replace(
+        "left, nullptr, slot.leftSurface" if modern
+        else "source.left, nullptr, slot.leftSurface",
+        "right, nullptr, slot.leftSurface" if modern
+        else "source.right, nullptr, slot.leftSurface", 1)),
     ("fence", copy_body.replace(
         "return {slot.fence->Issue(D3DISSUE_END), false};",
         "return {D3D_OK, false};", 1)),
 ):
     if direct_copy_contract_ok(mutant):
         errors.append("DirectGPU owner negative mutation survived: " + label)
-publication = body(r30, "R30SupportGetDirectTransportSlotPublication(")
+publication = body(
+    r29 if modern else r30,
+    "R29OwnerGetDirectTransportSlotPublication(" if modern
+    else "R30SupportGetDirectTransportSlotPublication(")
 if ("if (slot >= OutRunVR::RenderFrameRingSize)" not in publication or
         "return {candidate.published, candidate.frameId};" not in publication):
     errors.append("lower publication snapshot lost bounds or status/ID pair")
@@ -418,13 +503,24 @@ if re.search(r"\b(?:SetRenderTargetHook|SetDepthStencilSurfaceHook)\b", r32):
     errors.append("R32 still directly owns private R9 render-target/depth hooks")
 for signature, delegation in (
     ("HRESULT R30SupportCallOriginalSetRenderTarget(",
-     "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);"),
+     "return R29OwnerCallOriginalSetRenderTarget(device, index, surface);"
+     if modern else "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);"),
     ("HRESULT R30SupportCallOriginalSetDepthStencilSurface(",
-     "SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)"),
+     "return R29OwnerCallOriginalSetDepthStencilSurface(device, surface);"
+     if modern else "SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)"),
 ):
     if delegation not in body(r30, signature):
         errors.append("R30 hook facade no longer delegates unchanged: " + signature)
-if "device->SetDepthStencilSurface(surface)" not in body(
+if modern:
+    if "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);" not in body(
+            r29, "R29OwnerCallOriginalSetRenderTarget("):
+        errors.append("R29 lost original RT hook/slot/surface forwarding")
+    lower_ds = body(r29, "R29OwnerCallOriginalSetDepthStencilSurface(")
+    if ("SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)" not in lower_ds
+            or "device->SetDepthStencilSurface(surface)" not in lower_ds):
+        errors.append("R29 lost original depth hook/fallback")
+
+if not modern and "device->SetDepthStencilSurface(surface)" not in body(
         r30, "HRESULT R30SupportCallOriginalSetDepthStencilSurface("):
     errors.append("R30 depth fallback lost original direct-device path")
 

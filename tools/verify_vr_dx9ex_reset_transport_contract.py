@@ -8,6 +8,7 @@ R7_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r7.inc"
 R13_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r13.cpp"
 R22_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r22.cpp"
 R30_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+R29_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r29.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 HOST_BUNDLE_PATH = ROOT / "vrhost/src/runtime/r23_verified_bundle.hpp"
 HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
@@ -82,6 +83,8 @@ r7 = load(R7_PATH)
 r13 = load(R13_PATH)
 r22 = load(R22_PATH)
 r30 = load(R30_PATH)
+r29 = load(R29_PATH)
+r84_split = "R29OwnerCopyDirectTransportEyesAndIssueFence(" in r30
 r32 = load(R32_PATH)
 host_bundle = load(HOST_BUNDLE_PATH)
 host_cache = load(HOST_CACHE_PATH)
@@ -481,18 +484,40 @@ forbid(
 )
 copy_fence_owner_r30 = body(
     r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
-require_order(
-    copy_fence_owner_r30,
-    "R30 lower-owned left/right source copy and EVENT issuance",
-    "if (!device || !source.left || !source.right ||",
-    "index >= OutRunVR::RenderFrameRingSize",
-    "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
-    "InternalPassScope guard;",
-    "source.left, nullptr, slot.leftSurface",
-    "source.right, nullptr, slot.rightSurface",
-    "if (FAILED(leftCopy) || FAILED(rightCopy))",
-    "return {slot.fence->Issue(D3DISSUE_END), false};",
-)
+if r84_split:
+    require_order(
+        copy_fence_owner_r30,
+        "R30 scoped DirectGPU copy delegated to R29 physical owner",
+        "R30ScopedInternalPass guard;",
+        "R29OwnerCopyDirectTransportEyesAndIssueFence(",
+        "return {result.hr, result.copyFailed};",
+    )
+    copy_fence_owner_r29 = body(
+        r29, "R29OwnerCopyDirectTransportEyesAndIssueFence(")
+    require_order(
+        copy_fence_owner_r29,
+        "R29 lower-owned eye copy and EVENT issuance",
+        "if (!device || !left || !right ||",
+        "index >= OutRunVR::RenderFrameRingSize",
+        "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+        "left, nullptr, slot.leftSurface",
+        "right, nullptr, slot.rightSurface",
+        "if (FAILED(leftCopy) || FAILED(rightCopy))",
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+    )
+else:
+    require_order(
+        copy_fence_owner_r30,
+        "R30 lower-owned left/right source copy and EVENT issuance",
+        "if (!device || !source.left || !source.right ||",
+        "index >= OutRunVR::RenderFrameRingSize",
+        "if (!slot.leftSurface || !slot.rightSurface || !slot.fence)",
+        "InternalPassScope guard;",
+        "source.left, nullptr, slot.leftSurface",
+        "source.right, nullptr, slot.rightSurface",
+        "if (FAILED(leftCopy) || FAILED(rightCopy))",
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+    )
 require_order(
     resolve_direct_r32,
     "R32 final-owner free-slot scan",
@@ -521,13 +546,27 @@ ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
 if ack_retire_pos < 0:
     fail("R32 ACK-completed publication retirement marker missing")
 retire_publication_r30 = body(r30, "R30SupportRetireDirectTransportSlotPublication(")
-require_order(
-    retire_publication_r30,
-    "R30 ACK-completed slot publication metadata owner",
-    "auto& target = DirectTransportSlots[slot];",
-    "target.frameId = 0;",
-    "target.published = false;",
-)
+if r84_split:
+    require(
+        retire_publication_r30,
+        "R30 ACK retirement forwarding into R29",
+        "R29OwnerRetireDirectTransportSlotPublication(slot);",
+    )
+    require_order(
+        body(r29, "R29OwnerRetireDirectTransportSlotPublication("),
+        "R29 physical ACK publication retirement",
+        "auto& target = DirectTransportSlots[slot];",
+        "target.frameId = 0;",
+        "target.published = false;",
+    )
+else:
+    require_order(
+        retire_publication_r30,
+        "R30 ACK-completed slot publication metadata owner",
+        "auto& target = DirectTransportSlots[slot];",
+        "target.frameId = 0;",
+        "target.published = false;",
+    )
 if resolve_direct_r32.count("R30SupportRetireDirectTransportSlotPublication(index)") != 1:
     fail("R32 ACK publication retirement must use one R30 owner call")
 forbid(resolve_direct_r32, "R32 raw ACK publication retirement reintroduced",
@@ -790,19 +829,36 @@ require(
     "R30SupportPollDirectTransportSlotProducer(index)",
 )
 producer_poll_r30 = body(r30, "R30SupportPollDirectTransportSlotProducer(")
-require_order(
-    producer_poll_r30,
-    "R30 producer EVENT poll owner semantics",
-    "if (!target.producerPending)",
-    "target.fence",
-    "target.fence->GetData(nullptr, 0, 0)",
-    "if (ready == S_OK)",
-    "target.producerPending = false;",
-    "target.pendingFrameId = 0;",
-    "if (!target.published)",
-    "target.frameId = 0;",
-    "return ready;",
-)
+if r84_split:
+    require(producer_poll_r30, "R30 EVENT poll forwarding",
+            "R29OwnerPollDirectTransportSlotProducer(slot)")
+    require_order(
+        body(r29, "R29OwnerPollDirectTransportSlotProducer("),
+        "R29 physical producer EVENT poll owner semantics",
+        "if (!target.producerPending)",
+        "target.fence",
+        "target.fence->GetData(nullptr, 0, 0)",
+        "if (ready == S_OK)",
+        "target.producerPending = false;",
+        "target.pendingFrameId = 0;",
+        "if (!target.published)",
+        "target.frameId = 0;",
+        "return ready;",
+    )
+else:
+    require_order(
+        producer_poll_r30,
+        "R30 producer EVENT poll owner semantics",
+        "if (!target.producerPending)",
+        "target.fence",
+        "target.fence->GetData(nullptr, 0, 0)",
+        "if (ready == S_OK)",
+        "target.producerPending = false;",
+        "target.pendingFrameId = 0;",
+        "if (!target.published)",
+        "target.frameId = 0;",
+        "return ready;",
+    )
 
 # A producer EVENT hard error is not equivalent to ordinary ring pressure.
 # Once GetData can no longer prove completion, the shared-eye slot must not be
@@ -852,15 +908,31 @@ forbid(
 # both eye copies. R32 only inspects the returned HRESULT and fails closed
 # before publishing pending frame metadata.
 issue_r30 = body(r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
-require_order(
-    issue_r30,
-    "R30 producer EVENT issued only after guarded successful eye copies",
-    "InternalPassScope guard;",
-    "const HRESULT leftCopy = device->StretchRect(",
-    "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
-    "if (FAILED(leftCopy) || FAILED(rightCopy))",
-    "return {slot.fence->Issue(D3DISSUE_END), false};",
-)
+if r84_split:
+    require_order(
+        issue_r30, "R30 internal-pass scoped forwarding",
+        "R30ScopedInternalPass guard;",
+        "R29OwnerCopyDirectTransportEyesAndIssueFence(",
+        "return {result.hr, result.copyFailed};",
+    )
+    require_order(
+        copy_fence_owner_r29,
+        "R29 producer EVENT only after successful eye copies",
+        "const HRESULT leftCopy = device->StretchRect(",
+        "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
+        "if (FAILED(leftCopy) || FAILED(rightCopy))",
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+    )
+else:
+    require_order(
+        issue_r30,
+        "R30 producer EVENT issued only after guarded successful eye copies",
+        "InternalPassScope guard;",
+        "const HRESULT leftCopy = device->StretchRect(",
+        "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
+        "if (FAILED(leftCopy) || FAILED(rightCopy))",
+        "return {slot.fence->Issue(D3DISSUE_END), false};",
+    )
 copy_pos = resolve_direct_r32.find(
     "R30SupportCopyDirectTransportEyesAndIssueFence(")
 pending_publish_pos = resolve_direct_r32.find(

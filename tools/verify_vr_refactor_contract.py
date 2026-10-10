@@ -2,6 +2,7 @@
 """Deterministic guards for the staged VR R-series flattening."""
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,797 +48,827 @@ r30_support_api = text("src/vr/core/r30_support_api.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
 
-# R84 R32 lower target pointer and installed-device ownership preflight.
-# Returning the wrong target replaces a physical hook and is a hard fail.
-# The installed device is borrowed via the original atomic acquire load.
-def r32_target_address_owner_ok(api, lower, upper):
-    contracts = (
-        ("ResetTarget", "ResetDestR22"),
-        ("PresentTarget", "PresentDestR13"),
-        ("DirectTransportTarget", "ResolveDirectTransportR13"),
-        ("SetRenderStateTarget", "SetRenderStateDestR29"),
-    )
-    for suffix, original in contracts:
-        if ("void* R30Support" + suffix + "() noexcept;") not in api:
-            return False
-        if not re.search(
-            r"void\* R30Support" + suffix +
-            r"\(\) noexcept\s*\{\s*return reinterpret_cast<void\*>\(&" +
-            original + r"\);\s*\}", lower):
-            return False
-        if ("void* R32Review" + suffix +
-            "() noexcept{return R30Support" + suffix + "();}") not in upper:
-            return False
-    return all((
-        "IDirect3DDevice9* R30SupportInstalledDevice() noexcept;" in api,
-        bool(re.search(
-            r"IDirect3DDevice9\* R30SupportInstalledDevice\(\) noexcept"
-            r"\s*\{\s*return StereoInstalledDevice.load\("
-            r"std::memory_order_acquire\);\s*\}", lower)),
-        "IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return R30SupportInstalledDevice();}" in upper,
-    ))
+# R84 migrated the physical R9/R13/R22 ownership from R30 to R29.
+# Detect the actual forwarding edge, never a JSON claim alone. Historical
+# contract and mutations remain active for the old textual-owner layout.
+R84_MODERN_OWNER_LAYOUT = all((
+    "R29OwnerCaptureFrameSnapshot(" in r30,
+    "R29OwnerCallOriginalSetRenderTarget(" in r30,
+    "R29OwnerCallOriginalSetRenderTarget(" in r29,
+    "R29OwnerRunRasterReplayGuardCallback(" in r30,
+    "option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29" in cmake,
+    "option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29" in cmake_toml,
+))
 
-if not r32_target_address_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 hook targets or installed-device original acquire owner lost")
-for label, edited_lower, edited_upper in (
-    ("Reset target replaced with present", r30.replace(
-        "return reinterpret_cast<void*>(&ResetDestR22);",
-        "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
-    ("Present target replaced with Reset", r30.replace(
-        "return reinterpret_cast<void*>(&PresentDestR13);",
-        "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
-    ("Direct transport target replaced", r30.replace(
-        "return reinterpret_cast<void*>(&ResolveDirectTransportR13);",
-        "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
-    ("render state target replaced", r30.replace(
-        "return reinterpret_cast<void*>(&SetRenderStateDestR29);",
-        "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
-    ("installed device relaxed load", r30.replace(
-        "return StereoInstalledDevice.load(std::memory_order_acquire);",
-        "return StereoInstalledDevice.load(std::memory_order_relaxed);", 1), r32),
-    ("installed device fabricated null", r30.replace(
-        "return StereoInstalledDevice.load(std::memory_order_acquire);",
-        "return nullptr;", 1), r32),
-    ("R32 bypasses Reset owner", r30, r32.replace(
-        "R30SupportResetTarget();", "reinterpret_cast<void*>(&ResetDestR22);", 1)),
-    ("R32 bypasses Present owner", r30, r32.replace(
-        "R30SupportPresentTarget();", "reinterpret_cast<void*>(&PresentDestR13);", 1)),
-    ("R32 bypasses transport owner", r30, r32.replace(
-        "R30SupportDirectTransportTarget();", "reinterpret_cast<void*>(&ResolveDirectTransportR13);", 1)),
-    ("R32 bypasses renderstate owner", r30, r32.replace(
-        "R30SupportSetRenderStateTarget();", "reinterpret_cast<void*>(&SetRenderStateDestR29);", 1)),
-    ("R32 bypasses device owner", r30, r32.replace(
-        "R30SupportInstalledDevice();",
-        "StereoInstalledDevice.load(std::memory_order_acquire);", 1)),
-):
-    if edited_lower == r30 and edited_upper == r32:
-        errors.append("R84 lower target negative mutation not applied: " + label)
-    elif r32_target_address_owner_ok(r30_support_api, edited_lower, edited_upper):
-        errors.append("R84 lower target negative mutation survived: " + label)
-
-# R84: R32 no longer directly mutates R9 frame stereo accounting.
-# The old source wrote the four world flags/counters before latching pose only
-# when 0, the HUD path increments its own counter, and right failure is sticky.
-# Preserve that exact order/condition, with no new WVP, shader or HUD policy.
-def r32_frame_duplicate_lower_owner_ok(api, r30_impl, r32_impl):
-    expected_world = """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-"""
-    expected_hud = """    void R30SupportRecordHudStereoDuplicate() noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        ++DuplicatedDraws;
-        ++NonWorldDuplicatedDraws;
-    }
-"""
-    expected_fail = """    void R30SupportMarkFrameRightDrawFailed() noexcept
-    {
-        FrameRightDrawFailed = true;
-    }
-"""
-    return all((
-        "void R30SupportRecordWorldStereoDuplicate(" in api,
-        "const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;" in api,
-        "void R30SupportRecordHudStereoDuplicate() noexcept;" in api,
-        "void R30SupportMarkFrameRightDrawFailed() noexcept;" in api,
-        expected_world in r30_impl,
-        expected_hud in r30_impl,
-        expected_fail in r30_impl,
-        """    void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
-    {
-        R30SupportRecordWorldStereoDuplicate(p, s);
-    }
-    void R32ReviewRecordHudStereoDuplicate() noexcept { R30SupportRecordHudStereoDuplicate(); }
-    void R32ReviewMarkFrameRightDrawFailed() noexcept { R30SupportMarkFrameRightDrawFailed(); }
-""" in r32_impl,
-    ))
-
-if not r32_frame_duplicate_lower_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 R9 frame duplicate owner lost flags/counters/first pose latch")
-for label, mutated_r30, mutated_r32 in (
-    ("world duplicate flag lost", r30.replace(
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""",
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = false;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""", 1), r32),
-    ("world stereo flag lost", r30.replace(
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""",
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = false;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""", 1), r32),
-    ("world increment lost", r30.replace(
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""",
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        (void)0;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""", 1), r32),
-    ("pose first write only broken", r30.replace(
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""",
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence != 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""", 1), r32),
-    ("world pose metadata lost", r30.replace(
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            FrameStereoMetadata = stereo;
-        }
-    }
-""",
-        """    void R30SupportRecordWorldStereoDuplicate(
-        std::uint32_t poseSequence,
-        const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        FrameHadWorldStereo = true;
-        ++DuplicatedDraws;
-        ++WorldStereoDraws;
-        if (FrameStereoPoseSequence == 0)
-        {
-            FrameStereoPoseSequence = poseSequence;
-            (void)stereo;
-        }
-    }
-""", 1), r32),
-    ("HUD duplicate count lost", r30.replace(
-        """    void R30SupportRecordHudStereoDuplicate() noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        ++DuplicatedDraws;
-        ++NonWorldDuplicatedDraws;
-    }
-""",
-        """    void R30SupportRecordHudStereoDuplicate() noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        (void)0;
-        ++NonWorldDuplicatedDraws;
-    }
-""", 1), r32),
-    ("HUD nonworld count lost", r30.replace(
-        """    void R30SupportRecordHudStereoDuplicate() noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        ++DuplicatedDraws;
-        ++NonWorldDuplicatedDraws;
-    }
-""",
-        """    void R30SupportRecordHudStereoDuplicate() noexcept
-    {
-        FrameHadDuplicatedDraw = true;
-        ++DuplicatedDraws;
-        (void)0;
-    }
-""", 1), r32),
-    ("right draw failure flag lost", r30.replace(
-        """    void R30SupportMarkFrameRightDrawFailed() noexcept
-    {
-        FrameRightDrawFailed = true;
-    }
-""",
-        """    void R30SupportMarkFrameRightDrawFailed() noexcept
-    {
-        FrameRightDrawFailed = false;
-    }
-""", 1), r32),
-    ("R32 direct world frame write restored", r30, r32.replace(
-        "R30SupportRecordWorldStereoDuplicate(p, s);",
-        "FrameHadWorldStereo = true;", 1)),
-    ("R32 HUD owner bypass", r30, r32.replace(
-        "R30SupportRecordHudStereoDuplicate();",
-        "++NonWorldDuplicatedDraws;", 1)),
-    ("R32 right failure owner bypass", r30, r32.replace(
-        "R30SupportMarkFrameRightDrawFailed();",
-        "FrameRightDrawFailed = true;", 1)),
-):
-    if mutated_r30 == r30 and mutated_r32 == r32:
-        errors.append("R84 frame owner negative mutation not applied: " + label)
-    elif r32_frame_duplicate_lower_owner_ok(
-            r30_support_api, mutated_r30, mutated_r32):
-        errors.append("R84 frame owner negative mutation survived: " + label)
-
-# R84 raw draw and Present trampoline owner: R30 invokes exact stock hooks,
-# never the higher R30 stereo/hud lower-draw override (double dispatch risk).
-# All arguments and HRESULT must pass unchanged; no zero-count "success".
-def r32_raw_trampoline_owner_ok(api, lower, upper):
-    contracts = (
-        ("DrawPrimitive", "DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p)",
-         "R30SupportCallRawDrawPrimitive(d,t,s,p)"),
-        ("DrawIndexedPrimitive", "DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p)",
-         "R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p)"),
-        ("DrawPrimitiveUP", "DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st)",
-         "R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st)"),
-        ("DrawIndexedPrimitiveUP",
-         "DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st)",
-         "R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st)"),
-        ("Present", "PresentHook.stdcall<HRESULT>(d,s,dst,w,r)",
-         "R30SupportCallRawPresent(d,s,dst,w,r)"),
-    )
-    for suffix, original_hook, delegated_call in contracts:
-        lower_api = "R30SupportCallRaw" + suffix
-        review_api = "R32ReviewCallRaw" + suffix
-        if lower_api + "(" not in api:
-            return False
-        if not re.search(
-            r"HRESULT\s+" + lower_api +
-            r"\([^{};]*\) noexcept\s*\{\s*return " +
-            re.escape(original_hook) + r";\s*\}", lower):
-            return False
-        if not re.search(
-            r"HRESULT\s+" + review_api +
-            r"\([^{};]*\) noexcept\s*\{\s*return " +
-            re.escape(delegated_call) + r";\s*\}", upper):
-            return False
-    return True
-
-if not r32_raw_trampoline_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 raw draw/Present dispatch must forward exact R9 hooks via R30")
-for label, changed_r30, changed_r32 in (
-    ("primitive silently succeeds", r30.replace(
-        "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", "return S_OK;", 1), r32),
-    ("indexed base vertex discarded", r30.replace(
-        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);",
-        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,0,m,n,s,p);", 1), r32),
-    ("primitive UP stride discarded", r30.replace(
-        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);",
-        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,0);", 1), r32),
-    ("indexed UP index format changed", r30.replace(
-        # Target the raw R9 trampoline, not an earlier lower-draw wrapper.
-        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st);",
-        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
-    ("Present region dropped", r30.replace(
-        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);",
-        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,nullptr);", 1), r32),
-    ("R32 primitive bypass", r30, r32.replace(
-        "return R30SupportCallRawDrawPrimitive(d,t,s,p);",
-        "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", 1)),
-    ("R32 indexed bypass", r30, r32.replace(
-        "return R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);",
-        "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);", 1)),
-    ("R32 UP bypass", r30, r32.replace(
-        "return R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st);",
-        "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);", 1)),
-    ("R32 indexed UP bypass", r30, r32.replace(
-        "return R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);",
-        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(d,t,m,n,p,idx,f,v,st);", 1)),
-    ("R32 Present bypass", r30, r32.replace(
-        "return R30SupportCallRawPresent(d,s,dst,w,r);",
-        "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R84 raw trampoline mutation not applied: " + label)
-    elif r32_raw_trampoline_owner_ok(r30_support_api, changed_r30, changed_r32):
-        errors.append("R84 raw trampoline negative mutation survived: " + label)
-
-# R84 R32 stereo RT/depth-stencil switch invokes the original lower
-# hook trampolines. R30 must preserve slot index, borrowed surface and HRESULT.
-# An absent DS hook has a DIFFERENT original fallback: call the D3D9 device.
-def r32_original_target_hooks_ok(api, lower, upper):
-    return all((
-        "HRESULT R30SupportCallOriginalSetRenderTarget(\n        IDirect3DDevice9* device, DWORD index,\n        IDirect3DSurface9* surface) noexcept;" in api,
-        "HRESULT R30SupportCallOriginalSetDepthStencilSurface(\n        IDirect3DDevice9* device,\n        IDirect3DSurface9* surface) noexcept;" in api,
-        bool(re.search(
-            r"HRESULT R30SupportCallOriginalSetRenderTarget\(\s*"
-            r"IDirect3DDevice9\* device, DWORD index,\s*IDirect3DSurface9\* surface\)"
-            r" noexcept\s*\{\s*return SetRenderTargetHook.stdcall<HRESULT>"
-            r"\(device, index, surface\);\s*\}", lower)),
-        bool(re.search(
-            r"HRESULT R30SupportCallOriginalSetDepthStencilSurface\(\s*"
-            r"IDirect3DDevice9\* device,\s*IDirect3DSurface9\* surface\)"
-            r" noexcept\s*\{\s*return SetDepthStencilSurfaceHook\s*\?"
-            r"\s*SetDepthStencilSurfaceHook.stdcall<HRESULT>\(device, surface\)"
-            r"\s*:\s*device->SetDepthStencilSurface\(surface\);\s*\}", lower)),
-        "R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetRenderTarget(d,i,s); }" in upper,
-        "R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetDepthStencilSurface(d,s); }" in upper,
-    ))
-
-if not r32_original_target_hooks_ok(r30_support_api, r30, r32):
-    errors.append("R32 target/depth-stencil original hooks or fallback lost R30 lower owner")
-for label, changed_r30, changed_r32 in (
-    ("RT original hook bypass", r30.replace(
-        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
-        "return device->SetRenderTarget(index, surface);", 1), r32),
-    ("RT index zeroed", r30.replace(
-        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
-        "return SetRenderTargetHook.stdcall<HRESULT>(device, 0u, surface);", 1), r32),
-    ("RT surface erased", r30.replace(
-        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
-        "return SetRenderTargetHook.stdcall<HRESULT>(device, index, nullptr);", 1), r32),
-    ("DS absent-hook fallback removed", r30.replace(
-        "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
-        "            : device->SetDepthStencilSurface(surface);",
-        "return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);", 1), r32),
-    ("DS hook bypass", r30.replace(
-        "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
-        "            : device->SetDepthStencilSurface(surface);",
-        "return device->SetDepthStencilSurface(surface);", 1), r32),
-    ("R32 RT direct-owner bypass", r30, r32.replace(
-        "return R30SupportCallOriginalSetRenderTarget(d,i,s);",
-        "return SetRenderTargetHook.stdcall<HRESULT>(d,i,s);", 1)),
-    ("R32 DS direct-owner bypass", r30, r32.replace(
-        "return R30SupportCallOriginalSetDepthStencilSurface(d,s);",
-        "return d->SetDepthStencilSurface(s);", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R84 original target-hook negative mutation not applied: " + label)
-    elif r32_original_target_hooks_ok(r30_support_api, changed_r30, changed_r32):
-        errors.append("R84 original target-hook negative mutation survived: " + label)
-
-# R84 R32 resource/depth readiness: keep lower allocation, recent-clear depth
-# bootstrap and independent depth/stencil live D3D9 state predicates. A forced
-# success could expose an incomplete right eye; swapped predicates suppress
-# stencil-only validation. Do not mutate per-frame state in this interface.
-def r32_resource_depth_owner_ok(api, lower, upper):
-    services = (
-        ("EnsureStereoResources", "EnsureStereoResources"),
-        ("TryBootstrapRightDepth", "TryBootstrapRightDepthFromRecentClear"),
-        ("DepthTestActive", "DepthTestActive"),
-        ("StencilTestActive", "StencilTestActive"),
-    )
-    for name, original in services:
-        if ("bool R30Support" + name +
-                "(IDirect3DDevice9* device) noexcept;") not in api:
-            return False
-        if not re.search(
-            r"bool R30Support" + name +
-            r"\(IDirect3DDevice9\* device\) noexcept\s*\{\s*return " +
-            original + r"\(device\);\s*\}", lower):
-            return False
-        if ("bool R32Review" + name +
-            "(IDirect3DDevice9* d) noexcept { return R30Support" + name +
-            "(d); }") not in upper:
-            return False
-    return True
-
-if not r32_resource_depth_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 stereo-resource/depth readiness no longer delegates original lower owners")
-for label, altered_r30, altered_r32 in (
-    ("resource allocation false success", r30.replace(
-        "return EnsureStereoResources(device);", "return true;", 1), r32),
-    ("right-depth bootstrap erased", r30.replace(
-        "return TryBootstrapRightDepthFromRecentClear(device);", "return false;", 1), r32),
-    ("depth test forced off", r30.replace(
-        "return DepthTestActive(device);", "return false;", 1), r32),
-    ("stencil test forced on", r30.replace(
-        "return StencilTestActive(device);", "return true;", 1), r32),
-    ("depth and stencil swapped", r30.replace(
-        "return DepthTestActive(device);", "return StencilTestActive(device);", 1), r32),
-    ("R32 resource bypass", r30, r32.replace(
-        "return R30SupportEnsureStereoResources(d);", "return EnsureStereoResources(d);", 1)),
-    ("R32 bootstrap bypass", r30, r32.replace(
-        "return R30SupportTryBootstrapRightDepth(d);", "return TryBootstrapRightDepthFromRecentClear(d);", 1)),
-    ("R32 depth bypass", r30, r32.replace(
-        "return R30SupportDepthTestActive(d);", "return DepthTestActive(d);", 1)),
-    ("R32 stencil bypass", r30, r32.replace(
-        "return R30SupportStencilTestActive(d);", "return StencilTestActive(d);", 1)),
-):
-    if altered_r30 == r30 and altered_r32 == r32:
-        errors.append("R84 resource/depth readiness mutation was not applied: " + label)
-    elif r32_resource_depth_owner_ok(r30_support_api, altered_r30, altered_r32):
-        errors.append("R84 resource/depth readiness negative mutation survived: " + label)
-
-# R84 R32/R31 compile-ownership follow-up: borrowed right-eye surface reads
-# must stay in the R30/lower owner, not R32's private textual include chain.
-# The API preserves raw pointer identity and lifetime (no AddRef/release).
-if "IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;" not in r30_support_api:
-    errors.append("R30 right-eye borrowed surface owner declaration missing")
-if not re.search(
-    r"IDirect3DSurface9\* R30SupportBorrowedRightEyeSurface\(\) noexcept"
-    r"\s*\{\s*return RightEyeSurface;\s*\}", r30):
-    errors.append("R30 borrowed right-eye surface owner must return original lower pointer")
-if not re.search(
-    r"IDirect3DSurface9\* R32ReviewRightEyeSurface\(\) noexcept"
-    r"\s*\{\s*return R30SupportBorrowedRightEyeSurface\(\);\s*\}", r32):
-    errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
-
-# R84: right-eye depth is a borrowed lower resource, not the color surface.
-# Move only the R32 lookup across R30; do not AddRef, Release, cache or
-# mask a null/failed allocation. Use negative controls for swapped identity,
-# a forced null pointer and a bypass of the independent-TU owner facade.
-def r32_borrowed_right_depth_boundary_ok(api, owner, consumer):
-    return (
-        "IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept;" in api
-        and bool(re.search(
-            r"IDirect3DSurface9\*\s+R30SupportBorrowedRightEyeDepth"
-            r"\(\) noexcept\s*\{\s*return RightEyeDepth;\s*\}", owner))
-        and bool(re.search(
-            r"IDirect3DSurface9\*\s+R32ReviewRightEyeDepth"
-            r"\(\) noexcept\s*\{\s*return R30SupportBorrowedRightEyeDepth\(\);\s*\}",
-            consumer))
-    )
-
-if not r32_borrowed_right_depth_boundary_ok(r30_support_api, r30, r32):
-    errors.append("R32 right-eye depth must borrow original R9 depth through R30 owner")
-for label, mutated_r30, mutated_r32 in (
-    ("depth confused with color surface", r30.replace(
-        "return RightEyeDepth;", "return RightEyeSurface;", 1), r32),
-    ("depth incorrectly forced null", r30.replace(
-        "return RightEyeDepth;", "return nullptr;", 1), r32),
-    ("R32 bypasses depth owner", r30, r32.replace(
-        "return R30SupportBorrowedRightEyeDepth();", "return RightEyeDepth;", 1)),
-):
-    if mutated_r30 == r30 and mutated_r32 == r32:
-        errors.append("R84 right-depth negative mutation not applied: " + label)
-    elif r32_borrowed_right_depth_boundary_ok(
-            r30_support_api, mutated_r30, mutated_r32):
-        errors.append("R84 right-depth negative mutation survived: " + label)
-
-# R84 borrowed tracked RT/depth owner seam. These are two reads from the same
-# tracked-surface ownership domain, never COM AddRef/release or value copies.
-def check_r32_tracked_surface_borrow(source_h, source_r30, source_r32):
-    for suffix, raw in (
-        ("TrackedRenderTarget", "TrackedRenderTarget"),
-        ("TrackedDepthStencil", "TrackedDepthStencil"),
+# The pre-R84 tests below matched private R30 bodies. On a physical R29
+# owner graph these negative mutations would mutate no bytes and report
+# false failures. Execute the new producer/consumer and negative-mutation
+# contracts instead. The independent legacy checks after this block stay on.
+if R84_MODERN_OWNER_LAYOUT:
+    for verifier in (
+        "tools/verify_vr_r29_owner_api_seam.py",
+        "tools/verify_vr_r30_support_api_seam.py",
+        "tools/verify_vr_r32_runtime_support_seam.py",
+        "tools/verify_vr_r84_focus_inventory.py",
     ):
-        owner = "R30SupportBorrowed" + suffix
-        consumer = "R32Review" + suffix
-        if f"IDirect3DSurface9* {owner}() noexcept;" not in source_h:
+        outcome = subprocess.run(
+            [sys.executable, str(ROOT / verifier)], cwd=ROOT,
+            text=True, capture_output=True, check=False)
+        if outcome.returncode:
+            errors.append("R84 migrated refactor regression failed: " + verifier
+                          + " / " + (outcome.stdout + outcome.stderr)[-1600:])
+else:
+    # R84 R32 lower target pointer and installed-device ownership preflight.
+    # Returning the wrong target replaces a physical hook and is a hard fail.
+    # The installed device is borrowed via the original atomic acquire load.
+    def r32_target_address_owner_ok(api, lower, upper):
+        contracts = (
+            ("ResetTarget", "ResetDestR22"),
+            ("PresentTarget", "PresentDestR13"),
+            ("DirectTransportTarget", "ResolveDirectTransportR13"),
+            ("SetRenderStateTarget", "SetRenderStateDestR29"),
+        )
+        for suffix, original in contracts:
+            if ("void* R30Support" + suffix + "() noexcept;") not in api:
+                return False
+            if not re.search(
+                r"void\* R30Support" + suffix +
+                r"\(\) noexcept\s*\{\s*return reinterpret_cast<void\*>\(&" +
+                original + r"\);\s*\}", lower):
+                return False
+            if ("void* R32Review" + suffix +
+                "() noexcept{return R30Support" + suffix + "();}") not in upper:
+                return False
+        return all((
+            "IDirect3DDevice9* R30SupportInstalledDevice() noexcept;" in api,
+            bool(re.search(
+                r"IDirect3DDevice9\* R30SupportInstalledDevice\(\) noexcept"
+                r"\s*\{\s*return StereoInstalledDevice.load\("
+                r"std::memory_order_acquire\);\s*\}", lower)),
+            "IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return R30SupportInstalledDevice();}" in upper,
+        ))
+
+    if not r32_target_address_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 hook targets or installed-device original acquire owner lost")
+    for label, edited_lower, edited_upper in (
+        ("Reset target replaced with present", r30.replace(
+            "return reinterpret_cast<void*>(&ResetDestR22);",
+            "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
+        ("Present target replaced with Reset", r30.replace(
+            "return reinterpret_cast<void*>(&PresentDestR13);",
+            "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
+        ("Direct transport target replaced", r30.replace(
+            "return reinterpret_cast<void*>(&ResolveDirectTransportR13);",
+            "return reinterpret_cast<void*>(&PresentDestR13);", 1), r32),
+        ("render state target replaced", r30.replace(
+            "return reinterpret_cast<void*>(&SetRenderStateDestR29);",
+            "return reinterpret_cast<void*>(&ResetDestR22);", 1), r32),
+        ("installed device relaxed load", r30.replace(
+            "return StereoInstalledDevice.load(std::memory_order_acquire);",
+            "return StereoInstalledDevice.load(std::memory_order_relaxed);", 1), r32),
+        ("installed device fabricated null", r30.replace(
+            "return StereoInstalledDevice.load(std::memory_order_acquire);",
+            "return nullptr;", 1), r32),
+        ("R32 bypasses Reset owner", r30, r32.replace(
+            "R30SupportResetTarget();", "reinterpret_cast<void*>(&ResetDestR22);", 1)),
+        ("R32 bypasses Present owner", r30, r32.replace(
+            "R30SupportPresentTarget();", "reinterpret_cast<void*>(&PresentDestR13);", 1)),
+        ("R32 bypasses transport owner", r30, r32.replace(
+            "R30SupportDirectTransportTarget();", "reinterpret_cast<void*>(&ResolveDirectTransportR13);", 1)),
+        ("R32 bypasses renderstate owner", r30, r32.replace(
+            "R30SupportSetRenderStateTarget();", "reinterpret_cast<void*>(&SetRenderStateDestR29);", 1)),
+        ("R32 bypasses device owner", r30, r32.replace(
+            "R30SupportInstalledDevice();",
+            "StereoInstalledDevice.load(std::memory_order_acquire);", 1)),
+    ):
+        if edited_lower == r30 and edited_upper == r32:
+            errors.append("R84 lower target negative mutation not applied: " + label)
+        elif r32_target_address_owner_ok(r30_support_api, edited_lower, edited_upper):
+            errors.append("R84 lower target negative mutation survived: " + label)
+
+    # R84: R32 no longer directly mutates R9 frame stereo accounting.
+    # The old source wrote the four world flags/counters before latching pose only
+    # when 0, the HUD path increments its own counter, and right failure is sticky.
+    # Preserve that exact order/condition, with no new WVP, shader or HUD policy.
+    def r32_frame_duplicate_lower_owner_ok(api, r30_impl, r32_impl):
+        expected_world = """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """
+        expected_hud = """    void R30SupportRecordHudStereoDuplicate() noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            ++NonWorldDuplicatedDraws;
+        }
+    """
+        expected_fail = """    void R30SupportMarkFrameRightDrawFailed() noexcept
+        {
+            FrameRightDrawFailed = true;
+        }
+    """
+        return all((
+            "void R30SupportRecordWorldStereoDuplicate(" in api,
+            "const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;" in api,
+            "void R30SupportRecordHudStereoDuplicate() noexcept;" in api,
+            "void R30SupportMarkFrameRightDrawFailed() noexcept;" in api,
+            expected_world in r30_impl,
+            expected_hud in r30_impl,
+            expected_fail in r30_impl,
+            """    void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
+        {
+            R30SupportRecordWorldStereoDuplicate(p, s);
+        }
+        void R32ReviewRecordHudStereoDuplicate() noexcept { R30SupportRecordHudStereoDuplicate(); }
+        void R32ReviewMarkFrameRightDrawFailed() noexcept { R30SupportMarkFrameRightDrawFailed(); }
+    """ in r32_impl,
+        ))
+
+    if not r32_frame_duplicate_lower_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 R9 frame duplicate owner lost flags/counters/first pose latch")
+    for label, mutated_r30, mutated_r32 in (
+        ("world duplicate flag lost", r30.replace(
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """,
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = false;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """, 1), r32),
+        ("world stereo flag lost", r30.replace(
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """,
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = false;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """, 1), r32),
+        ("world increment lost", r30.replace(
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """,
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            (void)0;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """, 1), r32),
+        ("pose first write only broken", r30.replace(
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """,
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence != 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """, 1), r32),
+        ("world pose metadata lost", r30.replace(
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                FrameStereoMetadata = stereo;
+            }
+        }
+    """,
+            """    void R30SupportRecordWorldStereoDuplicate(
+            std::uint32_t poseSequence,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = poseSequence;
+                (void)stereo;
+            }
+        }
+    """, 1), r32),
+        ("HUD duplicate count lost", r30.replace(
+            """    void R30SupportRecordHudStereoDuplicate() noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            ++NonWorldDuplicatedDraws;
+        }
+    """,
+            """    void R30SupportRecordHudStereoDuplicate() noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            (void)0;
+            ++NonWorldDuplicatedDraws;
+        }
+    """, 1), r32),
+        ("HUD nonworld count lost", r30.replace(
+            """    void R30SupportRecordHudStereoDuplicate() noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            ++NonWorldDuplicatedDraws;
+        }
+    """,
+            """    void R30SupportRecordHudStereoDuplicate() noexcept
+        {
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            (void)0;
+        }
+    """, 1), r32),
+        ("right draw failure flag lost", r30.replace(
+            """    void R30SupportMarkFrameRightDrawFailed() noexcept
+        {
+            FrameRightDrawFailed = true;
+        }
+    """,
+            """    void R30SupportMarkFrameRightDrawFailed() noexcept
+        {
+            FrameRightDrawFailed = false;
+        }
+    """, 1), r32),
+        ("R32 direct world frame write restored", r30, r32.replace(
+            "R30SupportRecordWorldStereoDuplicate(p, s);",
+            "FrameHadWorldStereo = true;", 1)),
+        ("R32 HUD owner bypass", r30, r32.replace(
+            "R30SupportRecordHudStereoDuplicate();",
+            "++NonWorldDuplicatedDraws;", 1)),
+        ("R32 right failure owner bypass", r30, r32.replace(
+            "R30SupportMarkFrameRightDrawFailed();",
+            "FrameRightDrawFailed = true;", 1)),
+    ):
+        if mutated_r30 == r30 and mutated_r32 == r32:
+            errors.append("R84 frame owner negative mutation not applied: " + label)
+        elif r32_frame_duplicate_lower_owner_ok(
+                r30_support_api, mutated_r30, mutated_r32):
+            errors.append("R84 frame owner negative mutation survived: " + label)
+
+    # R84 raw draw and Present trampoline owner: R30 invokes exact stock hooks,
+    # never the higher R30 stereo/hud lower-draw override (double dispatch risk).
+    # All arguments and HRESULT must pass unchanged; no zero-count "success".
+    def r32_raw_trampoline_owner_ok(api, lower, upper):
+        contracts = (
+            ("DrawPrimitive", "DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p)",
+             "R30SupportCallRawDrawPrimitive(d,t,s,p)"),
+            ("DrawIndexedPrimitive", "DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p)",
+             "R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p)"),
+            ("DrawPrimitiveUP", "DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st)",
+             "R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st)"),
+            ("DrawIndexedPrimitiveUP",
+             "DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st)",
+             "R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st)"),
+            ("Present", "PresentHook.stdcall<HRESULT>(d,s,dst,w,r)",
+             "R30SupportCallRawPresent(d,s,dst,w,r)"),
+        )
+        for suffix, original_hook, delegated_call in contracts:
+            lower_api = "R30SupportCallRaw" + suffix
+            review_api = "R32ReviewCallRaw" + suffix
+            if lower_api + "(" not in api:
+                return False
+            if not re.search(
+                r"HRESULT\s+" + lower_api +
+                r"\([^{};]*\) noexcept\s*\{\s*return " +
+                re.escape(original_hook) + r";\s*\}", lower):
+                return False
+            if not re.search(
+                r"HRESULT\s+" + review_api +
+                r"\([^{};]*\) noexcept\s*\{\s*return " +
+                re.escape(delegated_call) + r";\s*\}", upper):
+                return False
+        return True
+
+    if not r32_raw_trampoline_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 raw draw/Present dispatch must forward exact R9 hooks via R30")
+    for label, changed_r30, changed_r32 in (
+        ("primitive silently succeeds", r30.replace(
+            "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", "return S_OK;", 1), r32),
+        ("indexed base vertex discarded", r30.replace(
+            "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);",
+            "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,0,m,n,s,p);", 1), r32),
+        ("primitive UP stride discarded", r30.replace(
+            "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);",
+            "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,0);", 1), r32),
+        ("indexed UP index format changed", r30.replace(
+            # Target the raw R9 trampoline, not an earlier lower-draw wrapper.
+            "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st);",
+            "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
+        ("Present region dropped", r30.replace(
+            "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);",
+            "return PresentHook.stdcall<HRESULT>(d,s,dst,w,nullptr);", 1), r32),
+        ("R32 primitive bypass", r30, r32.replace(
+            "return R30SupportCallRawDrawPrimitive(d,t,s,p);",
+            "return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);", 1)),
+        ("R32 indexed bypass", r30, r32.replace(
+            "return R30SupportCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);",
+            "return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);", 1)),
+        ("R32 UP bypass", r30, r32.replace(
+            "return R30SupportCallRawDrawPrimitiveUP(d,t,p,data,st);",
+            "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);", 1)),
+        ("R32 indexed UP bypass", r30, r32.replace(
+            "return R30SupportCallRawDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);",
+            "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(d,t,m,n,p,idx,f,v,st);", 1)),
+        ("R32 Present bypass", r30, r32.replace(
+            "return R30SupportCallRawPresent(d,s,dst,w,r);",
+            "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R84 raw trampoline mutation not applied: " + label)
+        elif r32_raw_trampoline_owner_ok(r30_support_api, changed_r30, changed_r32):
+            errors.append("R84 raw trampoline negative mutation survived: " + label)
+
+    # R84 R32 stereo RT/depth-stencil switch invokes the original lower
+    # hook trampolines. R30 must preserve slot index, borrowed surface and HRESULT.
+    # An absent DS hook has a DIFFERENT original fallback: call the D3D9 device.
+    def r32_original_target_hooks_ok(api, lower, upper):
+        return all((
+            "HRESULT R30SupportCallOriginalSetRenderTarget(\n        IDirect3DDevice9* device, DWORD index,\n        IDirect3DSurface9* surface) noexcept;" in api,
+            "HRESULT R30SupportCallOriginalSetDepthStencilSurface(\n        IDirect3DDevice9* device,\n        IDirect3DSurface9* surface) noexcept;" in api,
+            bool(re.search(
+                r"HRESULT R30SupportCallOriginalSetRenderTarget\(\s*"
+                r"IDirect3DDevice9\* device, DWORD index,\s*IDirect3DSurface9\* surface\)"
+                r" noexcept\s*\{\s*return SetRenderTargetHook.stdcall<HRESULT>"
+                r"\(device, index, surface\);\s*\}", lower)),
+            bool(re.search(
+                r"HRESULT R30SupportCallOriginalSetDepthStencilSurface\(\s*"
+                r"IDirect3DDevice9\* device,\s*IDirect3DSurface9\* surface\)"
+                r" noexcept\s*\{\s*return SetDepthStencilSurfaceHook\s*\?"
+                r"\s*SetDepthStencilSurfaceHook.stdcall<HRESULT>\(device, surface\)"
+                r"\s*:\s*device->SetDepthStencilSurface\(surface\);\s*\}", lower)),
+            "R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetRenderTarget(d,i,s); }" in upper,
+            "R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return R30SupportCallOriginalSetDepthStencilSurface(d,s); }" in upper,
+        ))
+
+    if not r32_original_target_hooks_ok(r30_support_api, r30, r32):
+        errors.append("R32 target/depth-stencil original hooks or fallback lost R30 lower owner")
+    for label, changed_r30, changed_r32 in (
+        ("RT original hook bypass", r30.replace(
+            "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+            "return device->SetRenderTarget(index, surface);", 1), r32),
+        ("RT index zeroed", r30.replace(
+            "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+            "return SetRenderTargetHook.stdcall<HRESULT>(device, 0u, surface);", 1), r32),
+        ("RT surface erased", r30.replace(
+            "return SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);",
+            "return SetRenderTargetHook.stdcall<HRESULT>(device, index, nullptr);", 1), r32),
+        ("DS absent-hook fallback removed", r30.replace(
+            "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
+            "            : device->SetDepthStencilSurface(surface);",
+            "return SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);", 1), r32),
+        ("DS hook bypass", r30.replace(
+            "return SetDepthStencilSurfaceHook\n            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)\n"
+            "            : device->SetDepthStencilSurface(surface);",
+            "return device->SetDepthStencilSurface(surface);", 1), r32),
+        ("R32 RT direct-owner bypass", r30, r32.replace(
+            "return R30SupportCallOriginalSetRenderTarget(d,i,s);",
+            "return SetRenderTargetHook.stdcall<HRESULT>(d,i,s);", 1)),
+        ("R32 DS direct-owner bypass", r30, r32.replace(
+            "return R30SupportCallOriginalSetDepthStencilSurface(d,s);",
+            "return d->SetDepthStencilSurface(s);", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R84 original target-hook negative mutation not applied: " + label)
+        elif r32_original_target_hooks_ok(r30_support_api, changed_r30, changed_r32):
+            errors.append("R84 original target-hook negative mutation survived: " + label)
+
+    # R84 R32 resource/depth readiness: keep lower allocation, recent-clear depth
+    # bootstrap and independent depth/stencil live D3D9 state predicates. A forced
+    # success could expose an incomplete right eye; swapped predicates suppress
+    # stencil-only validation. Do not mutate per-frame state in this interface.
+    def r32_resource_depth_owner_ok(api, lower, upper):
+        services = (
+            ("EnsureStereoResources", "EnsureStereoResources"),
+            ("TryBootstrapRightDepth", "TryBootstrapRightDepthFromRecentClear"),
+            ("DepthTestActive", "DepthTestActive"),
+            ("StencilTestActive", "StencilTestActive"),
+        )
+        for name, original in services:
+            if ("bool R30Support" + name +
+                    "(IDirect3DDevice9* device) noexcept;") not in api:
+                return False
+            if not re.search(
+                r"bool R30Support" + name +
+                r"\(IDirect3DDevice9\* device\) noexcept\s*\{\s*return " +
+                original + r"\(device\);\s*\}", lower):
+                return False
+            if ("bool R32Review" + name +
+                "(IDirect3DDevice9* d) noexcept { return R30Support" + name +
+                "(d); }") not in upper:
+                return False
+        return True
+
+    if not r32_resource_depth_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 stereo-resource/depth readiness no longer delegates original lower owners")
+    for label, altered_r30, altered_r32 in (
+        ("resource allocation false success", r30.replace(
+            "return EnsureStereoResources(device);", "return true;", 1), r32),
+        ("right-depth bootstrap erased", r30.replace(
+            "return TryBootstrapRightDepthFromRecentClear(device);", "return false;", 1), r32),
+        ("depth test forced off", r30.replace(
+            "return DepthTestActive(device);", "return false;", 1), r32),
+        ("stencil test forced on", r30.replace(
+            "return StencilTestActive(device);", "return true;", 1), r32),
+        ("depth and stencil swapped", r30.replace(
+            "return DepthTestActive(device);", "return StencilTestActive(device);", 1), r32),
+        ("R32 resource bypass", r30, r32.replace(
+            "return R30SupportEnsureStereoResources(d);", "return EnsureStereoResources(d);", 1)),
+        ("R32 bootstrap bypass", r30, r32.replace(
+            "return R30SupportTryBootstrapRightDepth(d);", "return TryBootstrapRightDepthFromRecentClear(d);", 1)),
+        ("R32 depth bypass", r30, r32.replace(
+            "return R30SupportDepthTestActive(d);", "return DepthTestActive(d);", 1)),
+        ("R32 stencil bypass", r30, r32.replace(
+            "return R30SupportStencilTestActive(d);", "return StencilTestActive(d);", 1)),
+    ):
+        if altered_r30 == r30 and altered_r32 == r32:
+            errors.append("R84 resource/depth readiness mutation was not applied: " + label)
+        elif r32_resource_depth_owner_ok(r30_support_api, altered_r30, altered_r32):
+            errors.append("R84 resource/depth readiness negative mutation survived: " + label)
+
+    # R84 R32/R31 compile-ownership follow-up: borrowed right-eye surface reads
+    # must stay in the R30/lower owner, not R32's private textual include chain.
+    # The API preserves raw pointer identity and lifetime (no AddRef/release).
+    if "IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept;" not in r30_support_api:
+        errors.append("R30 right-eye borrowed surface owner declaration missing")
+    if not re.search(
+        r"IDirect3DSurface9\* R30SupportBorrowedRightEyeSurface\(\) noexcept"
+        r"\s*\{\s*return RightEyeSurface;\s*\}", r30):
+        errors.append("R30 borrowed right-eye surface owner must return original lower pointer")
+    if not re.search(
+        r"IDirect3DSurface9\* R32ReviewRightEyeSurface\(\) noexcept"
+        r"\s*\{\s*return R30SupportBorrowedRightEyeSurface\(\);\s*\}", r32):
+        errors.append("R32 must consume R30 borrowed right-eye surface owner, not lower private state")
+
+    # R84: right-eye depth is a borrowed lower resource, not the color surface.
+    # Move only the R32 lookup across R30; do not AddRef, Release, cache or
+    # mask a null/failed allocation. Use negative controls for swapped identity,
+    # a forced null pointer and a bypass of the independent-TU owner facade.
+    def r32_borrowed_right_depth_boundary_ok(api, owner, consumer):
+        return (
+            "IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept;" in api
+            and bool(re.search(
+                r"IDirect3DSurface9\*\s+R30SupportBorrowedRightEyeDepth"
+                r"\(\) noexcept\s*\{\s*return RightEyeDepth;\s*\}", owner))
+            and bool(re.search(
+                r"IDirect3DSurface9\*\s+R32ReviewRightEyeDepth"
+                r"\(\) noexcept\s*\{\s*return R30SupportBorrowedRightEyeDepth\(\);\s*\}",
+                consumer))
+        )
+
+    if not r32_borrowed_right_depth_boundary_ok(r30_support_api, r30, r32):
+        errors.append("R32 right-eye depth must borrow original R9 depth through R30 owner")
+    for label, mutated_r30, mutated_r32 in (
+        ("depth confused with color surface", r30.replace(
+            "return RightEyeDepth;", "return RightEyeSurface;", 1), r32),
+        ("depth incorrectly forced null", r30.replace(
+            "return RightEyeDepth;", "return nullptr;", 1), r32),
+        ("R32 bypasses depth owner", r30, r32.replace(
+            "return R30SupportBorrowedRightEyeDepth();", "return RightEyeDepth;", 1)),
+    ):
+        if mutated_r30 == r30 and mutated_r32 == r32:
+            errors.append("R84 right-depth negative mutation not applied: " + label)
+        elif r32_borrowed_right_depth_boundary_ok(
+                r30_support_api, mutated_r30, mutated_r32):
+            errors.append("R84 right-depth negative mutation survived: " + label)
+
+    # R84 borrowed tracked RT/depth owner seam. These are two reads from the same
+    # tracked-surface ownership domain, never COM AddRef/release or value copies.
+    def check_r32_tracked_surface_borrow(source_h, source_r30, source_r32):
+        for suffix, raw in (
+            ("TrackedRenderTarget", "TrackedRenderTarget"),
+            ("TrackedDepthStencil", "TrackedDepthStencil"),
+        ):
+            owner = "R30SupportBorrowed" + suffix
+            consumer = "R32Review" + suffix
+            if f"IDirect3DSurface9* {owner}() noexcept;" not in source_h:
+                return False
+            if not re.search(
+                r"IDirect3DSurface9\*\s+" + owner +
+                r"\(\) noexcept\s*\{\s*return " + raw + r";\s*\}",
+                source_r30):
+                return False
+            if not re.search(
+                r"IDirect3DSurface9\*\s+" + consumer +
+                r"\(\) noexcept\s*\{\s*return " + owner + r"\(\);\s*\}",
+                source_r32):
+                return False
+        return True
+
+    if not check_r32_tracked_surface_borrow(r30_support_api, r30, r32):
+        errors.append("R32 tracked RT/depth borrowed owner facade is missing, swapped or bypassed")
+    for label, altered_r30, altered_r32 in (
+        ("direct R32 tracked RT bypass", r30,
+         r32.replace("return R30SupportBorrowedTrackedRenderTarget();",
+                     "return TrackedRenderTarget;", 1)),
+        ("wrong tracked depth owner", r30.replace(
+            "return TrackedDepthStencil;", "return TrackedRenderTarget;", 1), r32),
+        ("wrong tracked RT owner", r30.replace(
+            "return TrackedRenderTarget;", "return TrackedDepthStencil;", 1), r32),
+    ):
+        if altered_r30 == r30 and altered_r32 == r32:
+            errors.append("R84 tracked surface test mutation not applied: " + label)
+        elif check_r32_tracked_surface_borrow(r30_support_api, altered_r30, altered_r32):
+            errors.append("R84 tracked surface regression mutation survived: " + label)
+
+    # R32 reads the same latched pose sequence through the R30 owner boundary.
+    if "std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;" not in r30_support_api:
+        errors.append("R30 missing frame stereo pose sequence owner declaration")
+    if not re.search(r"R30SupportFrameStereoPoseSequence\(\) noexcept\s*\{\s*return FrameStereoPoseSequence;\s*\}", r30):
+        errors.append("R30 frame pose-sequence query lost exact original value")
+    if not re.search(r"R32ReviewFrameStereoPoseSequence\(\) noexcept\s*\{\s*return R30SupportFrameStereoPoseSequence\(\);\s*\}", r32):
+        errors.append("R32 bypassed R30 frame pose-sequence owner query")
+
+    # R84 R29 effect/stereo boundary is R30-owned, while R32 is hook-free.
+    # Exact delegation preserves lower stereo readiness, cached fragile classification,
+    # output-by-reference and one-per-stereo-pair telemetry without new policy.
+    def r29_effect_boundary_ok(api, producer, consumer):
+        required_header = (
+            "bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept;",
+            "bool R30SupportFragileEffectCached(IDirect3DDevice9* device,\n        bool& fragile) noexcept;",
+            "void R30SupportNoteStableTwoEyeDraw() noexcept;",
+        )
+        required_owner = (
+            "return R29StableStereoBase(device);",
+            "return R29FragileEffectCached(device, fragile);",
+            "R29TelemetryNoteStableTwoEyeDraw();",
+        )
+        required_consumer = (
+            "R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R30SupportStableStereoBase(d); }",
+            "R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R30SupportFragileEffectCached(d,f); }",
+            "R32ReviewNoteStableTwoEyeDraw() noexcept { R30SupportNoteStableTwoEyeDraw(); }",
+        )
+        return (all(x in api for x in required_header) and
+                all(x in producer for x in required_owner) and
+                all(x in consumer for x in required_consumer))
+
+    if not r29_effect_boundary_ok(r30_support_api, r30, r32):
+        errors.append("R30/R32 R29-effect owner delegates or API signatures changed")
+    for label, altered_owner, altered_consumer in (
+        ("stereo-readiness forced true", r30.replace(
+            "return R29StableStereoBase(device);", "return true;", 1), r32),
+        ("fragile output lost", r30.replace(
+            "return R29FragileEffectCached(device, fragile);", "return true;", 1), r32),
+        ("telemetry omitted", r30.replace(
+            "R29TelemetryNoteStableTwoEyeDraw();", "(void)0;", 1), r32),
+        ("R32 bypassed owner", r30, r32.replace(
+            "return R30SupportStableStereoBase(d);", "return R29StableStereoBase(d);", 1)),
+    ):
+        if altered_owner == r30 and altered_consumer == r32:
+            errors.append("R29 owner mutation failed to apply: " + label)
+        elif r29_effect_boundary_ok(r30_support_api, altered_owner, altered_consumer):
+            errors.append("R29 effect/stereo negative mutation survived: " + label)
+
+    # R84 R9 depth/stencil metadata must remain read-only and owned by R30.
+    # A missing generation or invented stencil flag would poison R33's depth cache.
+    def r9_main_depth_boundary_ok(api, producer, consumer):
+        decls = (
+            "std::uint64_t R30SupportMainDepthGeneration() noexcept;",
+            "bool R30SupportMainDepthHasStencil() noexcept;",
+        )
+        owners = (
+            "std::uint64_t R30SupportMainDepthGeneration() noexcept\n    {\n        return R9MainDepthGenerationValue();\n    }",
+            "bool R30SupportMainDepthHasStencil() noexcept\n    {\n        return R9TrackedMainDepthHasStencil();\n    }",
+        )
+        callers = (
+            "R32ReviewMainDepthGeneration() noexcept { return R30SupportMainDepthGeneration(); }",
+            "R32ReviewMainDepthHasStencil() noexcept { return R30SupportMainDepthHasStencil(); }",
+        )
+        return (all(x in api for x in decls) and
+                all(x in producer for x in owners) and
+                all(x in consumer for x in callers))
+
+    if not r9_main_depth_boundary_ok(r30_support_api, r30, r32):
+        errors.append("R30/R32 R9 main depth generation/stencil read-only facade missing")
+    for label, mutated_owner, mutated_consumer in (
+        ("generation zeroed", r30.replace(
+            "return R9MainDepthGenerationValue();", "return 0;", 1), r32),
+        ("stencil forced true", r30.replace(
+            "return R9TrackedMainDepthHasStencil();", "return true;", 1), r32),
+        ("R32 generation bypass", r30, r32.replace(
+            "return R30SupportMainDepthGeneration();",
+            "return R9MainDepthGenerationValue();", 1)),
+    ):
+        if mutated_owner == r30 and mutated_consumer == r32:
+            errors.append("R9 depth owner mutation not applied: " + label)
+        elif r9_main_depth_boundary_ok(r30_support_api, mutated_owner, mutated_consumer):
+            errors.append("R9 depth owner mutation survived: " + label)
+
+    # R84 R9 right-depth/stencil synchronization remains lower-owned. Both
+    # invalidation flags must be forwarded unchanged, and the two readiness
+    # queries must never be conflated or forced true.
+    def r9_right_sync_boundary_ok(api, producer, consumer):
+        decl = (
+            "void R30SupportInvalidateRightDepthStencilSync(\n        bool invalidateDepth, bool invalidateStencil) noexcept;",
+            "bool R30SupportRightDepthInSync() noexcept;",
+            "bool R30SupportRightStencilInSync() noexcept;",
+        )
+        owner = (
+            "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
+            "return R9IsRightDepthInSync();",
+            "return R9IsRightStencilInSync();",
+        )
+        caller = (
+            "R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R30SupportInvalidateRightDepthStencilSync(d, s); }",
+            "R32ReviewRightDepthInSync() noexcept { return R30SupportRightDepthInSync(); }",
+            "R32ReviewRightStencilInSync() noexcept { return R30SupportRightStencilInSync(); }",
+        )
+        return (all(x in api for x in decl) and all(x in producer for x in owner) and
+                all(x in consumer for x in caller))
+
+    if not r9_right_sync_boundary_ok(r30_support_api, r30, r32):
+        errors.append("R30/R32 right depth/stencil sync API no longer preserves lower R9 contract")
+    for label, changed_r30, changed_r32 in (
+        ("invalidation flags swapped", r30.replace(
+            "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
+            "R9InvalidateRightDepthStencilSync(invalidateStencil, invalidateDepth);", 1), r32),
+        ("depth falsely in sync", r30.replace(
+            "return R9IsRightDepthInSync();", "return true;", 1), r32),
+        ("stencil falsely in sync", r30.replace(
+            "return R9IsRightStencilInSync();", "return true;", 1), r32),
+        ("R32 bypasses R30", r30, r32.replace(
+            "return R30SupportRightDepthInSync();", "return R9IsRightDepthInSync();", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R9 right-sync mutation not applied: " + label)
+        elif r9_right_sync_boundary_ok(r30_support_api, changed_r30, changed_r32):
+            errors.append("R9 right-sync mutation survived: " + label)
+
+
+    # R84 R9 left-draw depth/stencil write eligibility must remain independent.
+    # False flags incorrectly preserve stale right-eye depth; true flags can force
+    # unnecessary invalidation. The R30 owner forwards the exact original queries.
+    def r9_left_write_eligibility_owner_ok(api, producer, consumer):
+        return all((
+            "bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;" in api,
+            "bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;" in api,
+            bool(re.search(
+                r"bool R30SupportLeftDrawMayWriteDepth\(IDirect3DDevice9\* device\) noexcept"
+                r"\s*\{\s*return LeftDrawMayWriteDepth\(device\);\s*\}", producer)),
+            bool(re.search(
+                r"bool R30SupportLeftDrawMayWriteStencil\(IDirect3DDevice9\* device\) noexcept"
+                r"\s*\{\s*return LeftDrawMayWriteStencil\(device\);\s*\}", producer)),
+            "R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteDepth(d); }" in consumer,
+            "R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteStencil(d); }" in consumer,
+        ))
+
+    if not r9_left_write_eligibility_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 left-draw depth/stencil write eligibility must delegate via R30")
+    for label, changed_r30, changed_r32 in (
+        ("depth falsely always writeable", r30.replace(
+            "return LeftDrawMayWriteDepth(device);", "return true;", 1), r32),
+        ("stencil falsely never writeable", r30.replace(
+            "return LeftDrawMayWriteStencil(device);", "return false;", 1), r32),
+        ("depth/stencil swapped", r30.replace(
+            "return LeftDrawMayWriteDepth(device);",
+            "return LeftDrawMayWriteStencil(device);", 1), r32),
+        ("R32 depth bypasses R30", r30, r32.replace(
+            "return R30SupportLeftDrawMayWriteDepth(d);",
+            "return LeftDrawMayWriteDepth(d);", 1)),
+        ("R32 stencil bypasses R30", r30, r32.replace(
+            "return R30SupportLeftDrawMayWriteStencil(d);",
+            "return LeftDrawMayWriteStencil(d);", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R84 write-eligibility negative mutation not applied: " + label)
+        elif r9_left_write_eligibility_owner_ok(
+                r30_support_api, changed_r30, changed_r32):
+            errors.append("R84 write-eligibility negative mutation survived: " + label)
+
+    # The original R9 depth-content write event remains R9-owned. R32's R30
+    # boundary is behavior-neutral: one call in, one exact R9 notification out.
+    def r9_depth_content_write_boundary_ok(api, producer, consumer):
+        signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
+        if api.count(signature + ";") != 1 or producer.count(signature) != 1:
             return False
-        if not re.search(
-            r"IDirect3DSurface9\*\s+" + owner +
-            r"\(\) noexcept\s*\{\s*return " + raw + r";\s*\}",
-            source_r30):
-            return False
-        if not re.search(
-            r"IDirect3DSurface9\*\s+" + consumer +
-            r"\(\) noexcept\s*\{\s*return " + owner + r"\(\);\s*\}",
-            source_r32):
-            return False
-    return True
+        owned_body = producer.split(signature, 1)[1].split("}", 1)[0]
+        return (
+            "".join(owned_body.split()) == "{R9NoteMainDepthContentWrite();"
+            and consumer.count(
+                "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }"
+            ) == 1
+        )
 
-if not check_r32_tracked_surface_borrow(r30_support_api, r30, r32):
-    errors.append("R32 tracked RT/depth borrowed owner facade is missing, swapped or bypassed")
-for label, altered_r30, altered_r32 in (
-    ("direct R32 tracked RT bypass", r30,
-     r32.replace("return R30SupportBorrowedTrackedRenderTarget();",
-                 "return TrackedRenderTarget;", 1)),
-    ("wrong tracked depth owner", r30.replace(
-        "return TrackedDepthStencil;", "return TrackedRenderTarget;", 1), r32),
-    ("wrong tracked RT owner", r30.replace(
-        "return TrackedRenderTarget;", "return TrackedDepthStencil;", 1), r32),
-):
-    if altered_r30 == r30 and altered_r32 == r32:
-        errors.append("R84 tracked surface test mutation not applied: " + label)
-    elif check_r32_tracked_surface_borrow(r30_support_api, altered_r30, altered_r32):
-        errors.append("R84 tracked surface regression mutation survived: " + label)
-
-# R32 reads the same latched pose sequence through the R30 owner boundary.
-if "std::uint32_t R30SupportFrameStereoPoseSequence() noexcept;" not in r30_support_api:
-    errors.append("R30 missing frame stereo pose sequence owner declaration")
-if not re.search(r"R30SupportFrameStereoPoseSequence\(\) noexcept\s*\{\s*return FrameStereoPoseSequence;\s*\}", r30):
-    errors.append("R30 frame pose-sequence query lost exact original value")
-if not re.search(r"R32ReviewFrameStereoPoseSequence\(\) noexcept\s*\{\s*return R30SupportFrameStereoPoseSequence\(\);\s*\}", r32):
-    errors.append("R32 bypassed R30 frame pose-sequence owner query")
-
-# R84 R29 effect/stereo boundary is R30-owned, while R32 is hook-free.
-# Exact delegation preserves lower stereo readiness, cached fragile classification,
-# output-by-reference and one-per-stereo-pair telemetry without new policy.
-def r29_effect_boundary_ok(api, producer, consumer):
-    required_header = (
-        "bool R30SupportStableStereoBase(IDirect3DDevice9* device) noexcept;",
-        "bool R30SupportFragileEffectCached(IDirect3DDevice9* device,\n        bool& fragile) noexcept;",
-        "void R30SupportNoteStableTwoEyeDraw() noexcept;",
-    )
-    required_owner = (
-        "return R29StableStereoBase(device);",
-        "return R29FragileEffectCached(device, fragile);",
-        "R29TelemetryNoteStableTwoEyeDraw();",
-    )
-    required_consumer = (
-        "R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R30SupportStableStereoBase(d); }",
-        "R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R30SupportFragileEffectCached(d,f); }",
-        "R32ReviewNoteStableTwoEyeDraw() noexcept { R30SupportNoteStableTwoEyeDraw(); }",
-    )
-    return (all(x in api for x in required_header) and
-            all(x in producer for x in required_owner) and
-            all(x in consumer for x in required_consumer))
-
-if not r29_effect_boundary_ok(r30_support_api, r30, r32):
-    errors.append("R30/R32 R29-effect owner delegates or API signatures changed")
-for label, altered_owner, altered_consumer in (
-    ("stereo-readiness forced true", r30.replace(
-        "return R29StableStereoBase(device);", "return true;", 1), r32),
-    ("fragile output lost", r30.replace(
-        "return R29FragileEffectCached(device, fragile);", "return true;", 1), r32),
-    ("telemetry omitted", r30.replace(
-        "R29TelemetryNoteStableTwoEyeDraw();", "(void)0;", 1), r32),
-    ("R32 bypassed owner", r30, r32.replace(
-        "return R30SupportStableStereoBase(d);", "return R29StableStereoBase(d);", 1)),
-):
-    if altered_owner == r30 and altered_consumer == r32:
-        errors.append("R29 owner mutation failed to apply: " + label)
-    elif r29_effect_boundary_ok(r30_support_api, altered_owner, altered_consumer):
-        errors.append("R29 effect/stereo negative mutation survived: " + label)
-
-# R84 R9 depth/stencil metadata must remain read-only and owned by R30.
-# A missing generation or invented stencil flag would poison R33's depth cache.
-def r9_main_depth_boundary_ok(api, producer, consumer):
-    decls = (
-        "std::uint64_t R30SupportMainDepthGeneration() noexcept;",
-        "bool R30SupportMainDepthHasStencil() noexcept;",
-    )
-    owners = (
-        "std::uint64_t R30SupportMainDepthGeneration() noexcept\n    {\n        return R9MainDepthGenerationValue();\n    }",
-        "bool R30SupportMainDepthHasStencil() noexcept\n    {\n        return R9TrackedMainDepthHasStencil();\n    }",
-    )
-    callers = (
-        "R32ReviewMainDepthGeneration() noexcept { return R30SupportMainDepthGeneration(); }",
-        "R32ReviewMainDepthHasStencil() noexcept { return R30SupportMainDepthHasStencil(); }",
-    )
-    return (all(x in api for x in decls) and
-            all(x in producer for x in owners) and
-            all(x in consumer for x in callers))
-
-if not r9_main_depth_boundary_ok(r30_support_api, r30, r32):
-    errors.append("R30/R32 R9 main depth generation/stencil read-only facade missing")
-for label, mutated_owner, mutated_consumer in (
-    ("generation zeroed", r30.replace(
-        "return R9MainDepthGenerationValue();", "return 0;", 1), r32),
-    ("stencil forced true", r30.replace(
-        "return R9TrackedMainDepthHasStencil();", "return true;", 1), r32),
-    ("R32 generation bypass", r30, r32.replace(
-        "return R30SupportMainDepthGeneration();",
-        "return R9MainDepthGenerationValue();", 1)),
-):
-    if mutated_owner == r30 and mutated_consumer == r32:
-        errors.append("R9 depth owner mutation not applied: " + label)
-    elif r9_main_depth_boundary_ok(r30_support_api, mutated_owner, mutated_consumer):
-        errors.append("R9 depth owner mutation survived: " + label)
-
-# R84 R9 right-depth/stencil synchronization remains lower-owned. Both
-# invalidation flags must be forwarded unchanged, and the two readiness
-# queries must never be conflated or forced true.
-def r9_right_sync_boundary_ok(api, producer, consumer):
-    decl = (
-        "void R30SupportInvalidateRightDepthStencilSync(\n        bool invalidateDepth, bool invalidateStencil) noexcept;",
-        "bool R30SupportRightDepthInSync() noexcept;",
-        "bool R30SupportRightStencilInSync() noexcept;",
-    )
-    owner = (
-        "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
-        "return R9IsRightDepthInSync();",
-        "return R9IsRightStencilInSync();",
-    )
-    caller = (
-        "R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R30SupportInvalidateRightDepthStencilSync(d, s); }",
-        "R32ReviewRightDepthInSync() noexcept { return R30SupportRightDepthInSync(); }",
-        "R32ReviewRightStencilInSync() noexcept { return R30SupportRightStencilInSync(); }",
-    )
-    return (all(x in api for x in decl) and all(x in producer for x in owner) and
-            all(x in consumer for x in caller))
-
-if not r9_right_sync_boundary_ok(r30_support_api, r30, r32):
-    errors.append("R30/R32 right depth/stencil sync API no longer preserves lower R9 contract")
-for label, changed_r30, changed_r32 in (
-    ("invalidation flags swapped", r30.replace(
-        "R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);",
-        "R9InvalidateRightDepthStencilSync(invalidateStencil, invalidateDepth);", 1), r32),
-    ("depth falsely in sync", r30.replace(
-        "return R9IsRightDepthInSync();", "return true;", 1), r32),
-    ("stencil falsely in sync", r30.replace(
-        "return R9IsRightStencilInSync();", "return true;", 1), r32),
-    ("R32 bypasses R30", r30, r32.replace(
-        "return R30SupportRightDepthInSync();", "return R9IsRightDepthInSync();", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R9 right-sync mutation not applied: " + label)
-    elif r9_right_sync_boundary_ok(r30_support_api, changed_r30, changed_r32):
-        errors.append("R9 right-sync mutation survived: " + label)
-
-
-# R84 R9 left-draw depth/stencil write eligibility must remain independent.
-# False flags incorrectly preserve stale right-eye depth; true flags can force
-# unnecessary invalidation. The R30 owner forwards the exact original queries.
-def r9_left_write_eligibility_owner_ok(api, producer, consumer):
-    return all((
-        "bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept;" in api,
-        "bool R30SupportLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept;" in api,
-        bool(re.search(
-            r"bool R30SupportLeftDrawMayWriteDepth\(IDirect3DDevice9\* device\) noexcept"
-            r"\s*\{\s*return LeftDrawMayWriteDepth\(device\);\s*\}", producer)),
-        bool(re.search(
-            r"bool R30SupportLeftDrawMayWriteStencil\(IDirect3DDevice9\* device\) noexcept"
-            r"\s*\{\s*return LeftDrawMayWriteStencil\(device\);\s*\}", producer)),
-        "R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteDepth(d); }" in consumer,
-        "R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return R30SupportLeftDrawMayWriteStencil(d); }" in consumer,
-    ))
-
-if not r9_left_write_eligibility_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 left-draw depth/stencil write eligibility must delegate via R30")
-for label, changed_r30, changed_r32 in (
-    ("depth falsely always writeable", r30.replace(
-        "return LeftDrawMayWriteDepth(device);", "return true;", 1), r32),
-    ("stencil falsely never writeable", r30.replace(
-        "return LeftDrawMayWriteStencil(device);", "return false;", 1), r32),
-    ("depth/stencil swapped", r30.replace(
-        "return LeftDrawMayWriteDepth(device);",
-        "return LeftDrawMayWriteStencil(device);", 1), r32),
-    ("R32 depth bypasses R30", r30, r32.replace(
-        "return R30SupportLeftDrawMayWriteDepth(d);",
-        "return LeftDrawMayWriteDepth(d);", 1)),
-    ("R32 stencil bypasses R30", r30, r32.replace(
-        "return R30SupportLeftDrawMayWriteStencil(d);",
-        "return LeftDrawMayWriteStencil(d);", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R84 write-eligibility negative mutation not applied: " + label)
-    elif r9_left_write_eligibility_owner_ok(
-            r30_support_api, changed_r30, changed_r32):
-        errors.append("R84 write-eligibility negative mutation survived: " + label)
-
-# The original R9 depth-content write event remains R9-owned. R32's R30
-# boundary is behavior-neutral: one call in, one exact R9 notification out.
-def r9_depth_content_write_boundary_ok(api, producer, consumer):
-    signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
-    if api.count(signature + ";") != 1 or producer.count(signature) != 1:
-        return False
-    owned_body = producer.split(signature, 1)[1].split("}", 1)[0]
-    return (
-        "".join(owned_body.split()) == "{R9NoteMainDepthContentWrite();"
-        and consumer.count(
-            "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }"
-        ) == 1
-    )
-
-if not r9_depth_content_write_boundary_ok(r30_support_api, r30, r32):
-    errors.append("R32 main-depth write lost the R30 -> R9 owner notification contract")
-_owner_signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
-_owner_tail = r30.split(_owner_signature, 1)[1].split("}", 1)[0] + "}"
-_owner_block = _owner_signature + _owner_tail
-for label, changed_r30, changed_r32 in (
-    ("R9 depth write side effect erased", r30.replace(
-        _owner_block, _owner_block.replace("R9NoteMainDepthContentWrite();", "(void)0;"), 1), r32),
-    ("R32 bypasses R30 depth write owner", r30, r32.replace(
-        "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }",
-        "void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R9 depth-write negative mutation not applied: " + label)
-    elif r9_depth_content_write_boundary_ok(r30_support_api, changed_r30, changed_r32):
-        errors.append("R9 depth-write negative mutation survived: " + label)
+    if not r9_depth_content_write_boundary_ok(r30_support_api, r30, r32):
+        errors.append("R32 main-depth write lost the R30 -> R9 owner notification contract")
+    _owner_signature = "void R30SupportNoteMainDepthContentWrite() noexcept"
+    _owner_tail = r30.split(_owner_signature, 1)[1].split("}", 1)[0] + "}"
+    _owner_block = _owner_signature + _owner_tail
+    for label, changed_r30, changed_r32 in (
+        ("R9 depth write side effect erased", r30.replace(
+            _owner_block, _owner_block.replace("R9NoteMainDepthContentWrite();", "(void)0;"), 1), r32),
+        ("R32 bypasses R30 depth write owner", r30, r32.replace(
+            "void R32ReviewNoteMainDepthContentWrite() noexcept { R30SupportNoteMainDepthContentWrite(); }",
+            "void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R9 depth-write negative mutation not applied: " + label)
+        elif r9_depth_content_write_boundary_ok(r30_support_api, changed_r30, changed_r32):
+            errors.append("R9 depth-write negative mutation survived: " + label)
 
 # F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
 # consume a pending game semantic token, and it must enter the already-proven
@@ -921,8 +952,11 @@ for rel, source in (("R20", r20), ("R23", r23)):
         errors.append(f"{rel} missing R9 depth-content synchronization owner API")
 
 for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
-    if "R9NoteMainDepthContentWrite()" not in source:
-        errors.append(f"{rel} missing R9 main-depth write owner API")
+    expected = ("R29OwnerNoteMainDepthContentWrite()" if
+                R84_MODERN_OWNER_LAYOUT and rel == "R30" else
+                "R9NoteMainDepthContentWrite()")
+    if expected not in source:
+        errors.append(f"{rel} missing main-depth write owner API: {expected}")
 
 for rel, source in (("R20", r20), ("R23", r23)):
     if re.search(r"\bR9MainDepthGeneration\b", source):
@@ -1016,7 +1050,8 @@ if seed_start < 0 or seed_end < 0 or \
 support_seed_start = r30.find("R30SupportStereoBaselineSeeded()")
 support_seed_end = r30.find("\n    }", support_seed_start)
 if support_seed_start < 0 or support_seed_end < 0 or \
-        "return R9StereoBaselineSeeded();" not in r30[support_seed_start:support_seed_end]:
+        ("return R29OwnerStereoBaselineSeeded();" if R84_MODERN_OWNER_LAYOUT
+         else "return R9StereoBaselineSeeded();") not in r30[support_seed_start:support_seed_end]:
     errors.append("R30 stereo-seed support facade lost exact R9 owner delegation")
 
 # Post-1000 R33 owner-boundary continuation: the final dispatcher may ask R9
@@ -1094,8 +1129,11 @@ if "R9DrawCallCount()" not in r9:
 for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
     if "--R9DrawCalls;" in source:
         errors.append(f"{rel} retained direct R9 draw-count rollback")
-    if "R9UndoStereoDrawCount();" not in source:
-        errors.append(f"{rel} missing R9 draw-count rollback owner API")
+    expected = ("R29OwnerUndoStereoDrawCount();" if
+                R84_MODERN_OWNER_LAYOUT and rel == "R30" else
+                "R9UndoStereoDrawCount();")
+    if expected not in source:
+        errors.append(f"{rel} missing draw-count rollback owner API: {expected}")
 if "R9UndoStereoDrawCount()" not in r9:
     errors.append("R9 missing draw-count rollback owner API")
 
@@ -1328,49 +1366,52 @@ if "R29TelemetryNoteStableTwoEyeDraw()" not in r29:
 if "R30TelemetryNoteScreenSpaceFovDraw()" not in r30:
     errors.append("R30 missing screen-space telemetry owner API")
 
-# R84 R9 mono-backup gap and stereo failure poisoning are fail-closed side effects.
-# R32 must call the original lower owner through R30 without suppressing the
-# counter/gap transition or erasing the reported failure reason/site/HRESULT.
-def r9_mono_failure_owner_ok(api, owner, consumer):
-    return all((
-        "void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept;" in api,
-        "void R30SupportReportStereoFailure(\n        OutRunVR::StereoFailureReason reason,\n        const char* site, HRESULT hr) noexcept;" in api,
-        bool(re.search(r"void R30SupportNoteStereoDrawWithoutMonoBackup\(\) noexcept"
-                       r"\s*\{\s*R9NoteStereoDrawWithoutMonoBackup\(\);\s*\}", owner)),
-        bool(re.search(
-            r"void R30SupportReportStereoFailure\(\s*"
-            r"OutRunVR::StereoFailureReason reason,\s*const char\* site,\s*HRESULT hr\)"
-            r" noexcept\s*\{\s*R9Poison\(reason, site, hr\);\s*\}", owner)),
-        "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }" in consumer,
-        "R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R30SupportReportStereoFailure(r,s,hr); }" in consumer,
-    ))
+# This side effect moved to R29 in R84 and is covered by R29 38-mutation
+# producer contract. Retain the exact historical check on pre-R84 layouts.
+if not R84_MODERN_OWNER_LAYOUT:
+    # R84 R9 mono-backup gap and stereo failure poisoning are fail-closed side effects.
+    # R32 must call the original lower owner through R30 without suppressing the
+    # counter/gap transition or erasing the reported failure reason/site/HRESULT.
+    def r9_mono_failure_owner_ok(api, owner, consumer):
+        return all((
+            "void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept;" in api,
+            "void R30SupportReportStereoFailure(\n        OutRunVR::StereoFailureReason reason,\n        const char* site, HRESULT hr) noexcept;" in api,
+            bool(re.search(r"void R30SupportNoteStereoDrawWithoutMonoBackup\(\) noexcept"
+                           r"\s*\{\s*R9NoteStereoDrawWithoutMonoBackup\(\);\s*\}", owner)),
+            bool(re.search(
+                r"void R30SupportReportStereoFailure\(\s*"
+                r"OutRunVR::StereoFailureReason reason,\s*const char\* site,\s*HRESULT hr\)"
+                r" noexcept\s*\{\s*R9Poison\(reason, site, hr\);\s*\}", owner)),
+            "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R30SupportNoteStereoDrawWithoutMonoBackup(); }" in consumer,
+            "R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R30SupportReportStereoFailure(r,s,hr); }" in consumer,
+        ))
 
-if not r9_mono_failure_owner_ok(r30_support_api, r30, r32):
-    errors.append("R32 R9 mono-backup/failure owner lost exact R30 delegations")
-_mono_body = ("void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept\n"
-              "    {\n        R9NoteStereoDrawWithoutMonoBackup();\n    }")
-for label, changed_r30, changed_r32 in (
-    ("mono backup gap side effect erased", r30.replace(
-        _mono_body, _mono_body.replace(
-            "R9NoteStereoDrawWithoutMonoBackup();", "(void)0;"), 1), r32),
-    ("poison reason discarded", r30.replace(
-        "R9Poison(reason, site, hr);",
-        "R9Poison(OutRunVR::StereoFailureNone, site, hr);", 1), r32),
-    ("poison site discarded", r30.replace(
-        "R9Poison(reason, site, hr);", "R9Poison(reason, nullptr, hr);", 1), r32),
-    ("poison HRESULT discarded", r30.replace(
-        "R9Poison(reason, site, hr);", "R9Poison(reason, site, S_OK);", 1), r32),
-    ("R32 bypasses mono owner", r30, r32.replace(
-        "R30SupportNoteStereoDrawWithoutMonoBackup();",
-        "R9NoteStereoDrawWithoutMonoBackup();", 1)),
-    ("R32 bypasses poison owner", r30, r32.replace(
-        "R30SupportReportStereoFailure(r,s,hr);",
-        "R9Poison(r,s,hr);", 1)),
-):
-    if changed_r30 == r30 and changed_r32 == r32:
-        errors.append("R9 mono failure owner mutation not applied: " + label)
-    elif r9_mono_failure_owner_ok(r30_support_api, changed_r30, changed_r32):
-        errors.append("R9 mono failure owner negative mutation survived: " + label)
+    if not r9_mono_failure_owner_ok(r30_support_api, r30, r32):
+        errors.append("R32 R9 mono-backup/failure owner lost exact R30 delegations")
+    _mono_body = ("void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept\n"
+                  "    {\n        R9NoteStereoDrawWithoutMonoBackup();\n    }")
+    for label, changed_r30, changed_r32 in (
+        ("mono backup gap side effect erased", r30.replace(
+            _mono_body, _mono_body.replace(
+                "R9NoteStereoDrawWithoutMonoBackup();", "(void)0;"), 1), r32),
+        ("poison reason discarded", r30.replace(
+            "R9Poison(reason, site, hr);",
+            "R9Poison(OutRunVR::StereoFailureNone, site, hr);", 1), r32),
+        ("poison site discarded", r30.replace(
+            "R9Poison(reason, site, hr);", "R9Poison(reason, nullptr, hr);", 1), r32),
+        ("poison HRESULT discarded", r30.replace(
+            "R9Poison(reason, site, hr);", "R9Poison(reason, site, S_OK);", 1), r32),
+        ("R32 bypasses mono owner", r30, r32.replace(
+            "R30SupportNoteStereoDrawWithoutMonoBackup();",
+            "R9NoteStereoDrawWithoutMonoBackup();", 1)),
+        ("R32 bypasses poison owner", r30, r32.replace(
+            "R30SupportReportStereoFailure(r,s,hr);",
+            "R9Poison(r,s,hr);", 1)),
+    ):
+        if changed_r30 == r30 and changed_r32 == r32:
+            errors.append("R9 mono failure owner mutation not applied: " + label)
+        elif r9_mono_failure_owner_ok(r30_support_api, changed_r30, changed_r32):
+            errors.append("R9 mono failure owner negative mutation survived: " + label)
 
 # A duplicated stereo draw without a complete independent mono replay has one
 # R9-owned accounting transition: increment draw calls + mark the mono backup
@@ -1384,7 +1425,10 @@ for rel, source in (
                 f"{rel} retained direct R9 stereo-draw accounting mutation: {banned}")
     expected = (
         "R32ReviewNoteStereoDrawWithoutMonoBackup();"
-        if rel == "R33" else "R9NoteStereoDrawWithoutMonoBackup();")
+        if rel == "R33" else
+        "R29OwnerNoteStereoDrawWithoutMonoBackup();"
+        if R84_MODERN_OWNER_LAYOUT and rel == "R30" else
+        "R9NoteStereoDrawWithoutMonoBackup();")
     if expected not in source:
         errors.append(
             f"{rel} missing stereo-draw accounting owner API use: {expected}")
@@ -1563,8 +1607,9 @@ for banned in ("R22ReplayScope", "R22FailClosedReplayState"):
             f"R33 final dispatcher retained private R22 raster-replay dependency: {banned}")
 if "class R22RasterReplayGuard" not in r22:
     errors.append("R22 missing public raster-replay owner guard")
-if "R22RasterReplayGuard replay(" not in r30:
-    errors.append("R32 split facade missing R22 raster-replay owner guard delegation")
+if (("R29OwnerRunRasterReplayGuardCallback(" if R84_MODERN_OWNER_LAYOUT
+     else "R22RasterReplayGuard replay(") not in r30):
+    errors.append("R32 split facade missing lower raster-replay owner guard delegation")
 if "R32ReviewRunRasterReplayGuard(" not in r33:
     errors.append("R33 final dispatcher missing R32 raster-replay split facade")
 
@@ -1643,9 +1688,16 @@ for marker, source, owner in (
 # R13/R22 move to the R30 lower-owner prerequisite aggregation; R32
 # consumes only the R31 status plus the aggregated lower status.  Requiring
 # direct R13/R22 references in R32 would undo the new TU ownership seam.
-for marker in ("R13InstallStatus()", "R22InstallStatus()"):
-    if marker not in r30:
-        errors.append(f"R30 lower owner missing prerequisite query: {marker}")
+if R84_MODERN_OWNER_LAYOUT:
+    if "R29OwnerLowerPrerequisiteStatus()" not in r30:
+        errors.append("R30 lower prerequisite status lost R29 owner forwarding")
+    for marker in ("R13InstallStatus()", "R22InstallStatus()"):
+        if marker not in r29:
+            errors.append(f"R29 lower owner missing prerequisite query: {marker}")
+else:
+    for marker in ("R13InstallStatus()", "R22InstallStatus()"):
+        if marker not in r30:
+            errors.append(f"R30 lower owner missing prerequisite query: {marker}")
 if "R30SupportLowerPrerequisiteStatus() noexcept" not in r30_support_api:
     errors.append("R30 API missing lower prerequisite status declaration")
 if "R30SupportLowerPrerequisiteStatus() noexcept" not in r30:
