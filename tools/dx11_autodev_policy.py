@@ -31,12 +31,23 @@ def validate_policy(policy: dict) -> list[str]:
         errors.append("missing or duplicate milestone IDs")
     if "mono_native_draw" not in ids or "shader_parity_r175" not in ids:
         errors.append("missing end-to-end native Draw or known R175 dependency")
+    if "first_live_game_draw" not in ids:
+        errors.append("missing actual game Draw milestone")
+    if policy.get("gameplay_direction_effective_from_task_number") != 537:
+        errors.append("gameplay-first threshold missing or changed")
+    if not policy.get("gameplay_delivery_targets") or "FIRST_GAME_DRAW_FRAME" not in policy["gameplay_delivery_targets"]:
+        errors.append("no real game frame delivery goal")
     rules = policy.get("selection_rules", {})
     for key in (
         "forbid_guard_only_new_task", "prefer_complete_vertical_slice",
         "skip_conflicting_active_owner", "maintain_full_exact_sha_gate",
         "no_score_on_full_gate_failure", "preserve_runtime_validation_untested",
         "no_ci_skip_on_validation_bearing_commit", "no_implicit_draw_activation",
+        "prohibit_new_dormant_warp_only_tasks",
+        "require_game_created_draw_for_native_feature",
+        "require_explicit_gameplay_outcome_since_00537",
+        "prioritize_r175_and_game_frame_before_more_readiness_guards",
+        "never_bypass_r175_or_visual_fail_closed_gate",
     ):
         if rules.get(key) is not True:
             errors.append("safety/progress rule disabled: " + key)
@@ -86,8 +97,35 @@ def validate_task(task: dict, policy: dict) -> list[str]:
     if kind in {"blocker_resolution", "safety_regression", "ci_acceleration"}:
         if not isinstance(strategy.get("blocking_evidence"), str) or not strategy["blocking_evidence"].strip():
             errors.append("blocker/regression/CI work requires measurable evidence")
-    if kind == "vertical_slice" and milestone not in {"mono_native_draw", "programmable_shader_path"}:
+    if kind == "vertical_slice" and milestone not in {
+        "mono_native_draw", "programmable_shader_path", "first_live_game_draw",
+    }:
         errors.append("vertical slice does not lead toward an actual native draw")
+    # From 00537 onwards, a tiny dormant WARP probe is not a feature.
+    # Older in-flight 00531..00536 records remain grandfathered unchanged.
+    if int(found.group(1)) >= policy.get("gameplay_direction_effective_from_task_number", 537):
+        delivery = strategy.get("gameplay_delivery_target")
+        if delivery not in policy["gameplay_delivery_targets"]:
+            errors.append("gameplay_delivery_target must close a real game-frame milestone")
+        if milestone == "mono_native_draw":
+            errors.append("dormant mono WARP fixture is no longer a new task milestone")
+        if delivery == "R175_CI_UNBLOCK":
+            if milestone != "shader_parity_r175" or kind != "blocker_resolution":
+                errors.append("R175 repair must resolve the shader parity blocker")
+            if not isinstance(strategy.get("r175_owner_handoff_evidence"), str) or not strategy["r175_owner_handoff_evidence"].strip():
+                errors.append("R175 owner must be released or handed off explicitly before edits")
+        elif delivery in {"FIRST_GAME_DRAW_FRAME", "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}:
+            stages = strategy.get("live_game_draw_path")
+            expected = ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"]
+            if not isinstance(stages, list) or any(stage not in stages for stage in expected) or [stages.index(stage) for stage in expected] != sorted(stages.index(stage) for stage in expected):
+                errors.append("gameplay path must connect real D3D9 callsite through native Draw to visible frame output")
+            for field in ("visible_frame_acceptance", "activation_guard_and_fallback"):
+                if not isinstance(strategy.get(field), str) or not strategy[field].strip():
+                    errors.append("missing game-frame acceptance or safe DX9Ex fallback: " + field)
+            terminal = str(task.get("status") or "").upper().startswith(("COMPLETE", "PASS"))
+            changes = task.get("changed_files") or []
+            if terminal and not any(str(p).startswith(("src/", "vrhost/")) for p in changes):
+                errors.append("completed game-frame work requires real renderer or hook source change")
     if task.get("runtime_validation") == "PASS" and not task.get("runtime_evidence"):
         errors.append("runtime PASS without actual HMD/game evidence")
     if task.get("automation_validation") == "PASS" and task.get("evidence", {}).get("backend_gate_conclusion") == "failure":
