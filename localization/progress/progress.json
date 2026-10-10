@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T19:35:24+09:00",
+  "updated_at_kst": "2026-10-10T19:59:54+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11399,22 +11399,37 @@
     "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935"
   },
   "c1_q119_firstglyph_direction_20261010": {
-  "queue_index": 119,
-  "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
-  "result": "HOLD_STRICT_RECHECK",
-  "new_annotated_native_png": 2,
-  "source_firstglyph_dx": 13,
-  "final_firstglyph_dx": 9,
-  "source_candidate_outside_rgba": 0,
-  "source_candidate_outside_alpha": 0,
-  "source_clean_outside_alpha0_hidden_rgb": 2484,
-  "unverified": [
-    "blind calibration",
-    "all homologous source/final stems",
-    "C3",
-    "user actual game"
-  ],
-  "new_dds": 0,
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
+    "queue_index": 119,
+    "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
+    "result": "HOLD_STRICT_RECHECK",
+    "new_annotated_native_png": 2,
+    "source_firstglyph_dx": 13,
+    "final_firstglyph_dx": 9,
+    "source_candidate_outside_rgba": 0,
+    "source_candidate_outside_alpha": 0,
+    "source_clean_outside_alpha0_hidden_rgb": 2484,
+    "unverified": [
+      "blind calibration",
+      "all homologous source/final stems",
+      "C3",
+      "user actual game"
+    ],
+    "new_dds": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c2_q212_b357_saved_composite_old_glyph_fail_20261010": {
+    "timestamp_kst": "2026-10-10T19:59:54+09:00",
+    "role": "C2",
+    "index": 212,
+    "run_key": "OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000",
+    "trial_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+    "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "C2_REWORK_REQUIRED": true,
+    "inherited_old_glyph_core_overflow_pixels": {
+      "r43": 5638,
+      "r44": 712
+    },
+    "report": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_CONTROLLER_C2_REWORK.json",
+    "runtime_validation": "UNTESTED"
+  }
 }

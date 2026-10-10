@@ -1,0 +1,164 @@
+{
+  "role": "C2",
+  "index": 212,
+  "shard": "EVEN",
+  "mode": "B357_NEW_UNAPPROVED_TRIAL_INDEPENDENT",
+  "timestamp_kst": "2026-10-10T19:55:06+09:00",
+  "sha256": {
+    "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "clean": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "trial": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d"
+  },
+  "canonical_source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "canonical_source_directly_downloaded_sha_verified": true,
+  "C158_authored_clean_sha_verified": true,
+  "persisted_dds_header_identical": true,
+  "native_dims": [
+    2048,
+    2048
+  ],
+  "codec": "RGBA32",
+  "mip_count": 1,
+  "raw_transform": "mirror_y",
+  "official_to_B357_rgba_changed_total": 12899,
+  "official_to_B357_alpha_changed_total": 10471,
+  "official_to_B357_changed_rgba_outside_two_source_regions": 0,
+  "official_to_B357_changed_alpha_outside_two_source_regions": 0,
+  "other_ten_cells_official_exact": true,
+  "regions": [
+    {
+      "id": "r43_professional",
+      "source_label": "PROFESSIONAL",
+      "candidate_label": "프로페셔널 모드",
+      "source_full_bbox": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_native_alpha32_bbox_measured": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "candidate_native_alpha32_bbox_full_scope": [
+        5,
+        342,
+        527,
+        400
+      ],
+      "candidate_within_english_core_bbox": false,
+      "candidate_strict_positive_margins": [
+        -235,
+        1,
+        110,
+        -14
+      ],
+      "source_to_authored_clean_rgba_changes_cell": 40194,
+      "clean_alpha_nonzero_in_cell": 0,
+      "clean_to_trial_rgba_changes_cell": 40194,
+      "official_to_trial_rgba_changes_cell": 6670,
+      "native_source_width": 397,
+      "native_trial_width": 522
+    },
+    {
+      "id": "r44_outrun",
+      "source_label": "OUTRUN",
+      "candidate_label": "아웃런 모드",
+      "source_full_bbox": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_native_alpha32_bbox_measured": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "candidate_native_alpha32_bbox_full_scope": [
+        1630,
+        526,
+        1832,
+        581
+      ],
+      "candidate_within_english_core_bbox": false,
+      "candidate_strict_positive_margins": [
+        4,
+        2,
+        5,
+        -12
+      ],
+      "source_to_authored_clean_rgba_changes_cell": 13293,
+      "clean_alpha_nonzero_in_cell": 0,
+      "clean_to_trial_rgba_changes_cell": 13293,
+      "official_to_trial_rgba_changes_cell": 6229,
+      "native_source_width": 211,
+      "native_trial_width": 202
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C3_approval": "NOT_RUN",
+  "additional_core_overlap_audit": [
+    {
+      "id": "r43_professional",
+      "source_alpha32_core_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "trial_alpha32_full_bbox": [
+        5,
+        342,
+        527,
+        400
+      ],
+      "candidate_alpha32_outside_source_core_pixels": 5638,
+      "candidate_alpha32_not_supported_by_source_alpha32_pixels": 5638,
+      "candidate_alpha32_source_core_overflow_bbox": [
+        5,
+        345,
+        321,
+        400
+      ],
+      "inherited_official_visible_pixels_unchanged_in_trial_inside_cell": 6032,
+      "inherited_old_visible_pixels_unchanged_outside_source_core": 5638,
+      "original_source_alpha32_pixels_in_cell": 9871,
+      "trial_alpha32_pixels_in_cell": 10564
+    },
+    {
+      "id": "r44_outrun",
+      "source_alpha32_core_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "trial_alpha32_full_bbox": [
+        1630,
+        526,
+        1832,
+        581
+      ],
+      "candidate_alpha32_outside_source_core_pixels": 712,
+      "candidate_alpha32_not_supported_by_source_alpha32_pixels": 712,
+      "candidate_alpha32_source_core_overflow_bbox": [
+        1698,
+        569,
+        1832,
+        581
+      ],
+      "inherited_official_visible_pixels_unchanged_in_trial_inside_cell": 1403,
+      "inherited_old_visible_pixels_unchanged_outside_source_core": 712,
+      "original_source_alpha32_pixels_in_cell": 5417,
+      "trial_alpha32_pixels_in_cell": 3984
+    }
+  ],
+  "conclusion": "HARD_FAIL_SOURCE_GLYPH_CORE_OVERFLOW_AND_INHERITED_OLD_KOREAN_IN_SAVED_TRIAL",
+  "outside_full_source_original_roi_rgba_changed": 0,
+  "visual_approval_not_inferred": true
+}

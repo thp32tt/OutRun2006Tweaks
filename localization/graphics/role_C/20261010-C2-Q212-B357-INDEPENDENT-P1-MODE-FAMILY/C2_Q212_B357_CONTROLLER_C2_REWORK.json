@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 212,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "run_key": "OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000",
+  "timestamp_kst": "2026-10-10T19:59:54+09:00",
+  "result": "REWORK_REQUIRED_UNPROMOTED_B357_PERSISTED_OLD_KOREAN_OVERLAP_AND_SOURCE_BBOX_OVERFLOW",
+  "independently_verified_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "canonical_source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "independently_verified_authored_clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+  "official_sha256_unchanged": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "new_unapproved_B357_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+  "machine_report": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_EXACT_BYTES_MACHINE.json",
+  "machine_summary": {
+    "native": [
+      2048,
+      2048
+    ],
+    "format": "BGRA32",
+    "mips": 1,
+    "official_to_B357_rgba_changed": 12899,
+    "official_to_B357_alpha_changed": 10471,
+    "changed_rgba_outside_two_full_source_cells": 0,
+    "changed_alpha_outside_two_full_source_cells": 0,
+    "old_korean_visible_alpha32_outside_source_core_r43": 5638,
+    "old_korean_visible_alpha32_outside_source_core_r44": 712
+  },
+  "regions": {
+    "r43_professional": {
+      "source_alpha32_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "persisted_trial_aggregate_alpha32_bbox": [
+        5,
+        342,
+        527,
+        400
+      ],
+      "old_korean_visible_pixels_inherited_unchanged_outside_source_core": 5638,
+      "source_core_overflow_evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No separately proven same-stem upper/lower readable slant anchors.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_GRAY_100_4VIEW.png"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Independently SHA-pinned original English source and C158 authored CLEAN inspected. CLEAN alpha zero in both affected source cells.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_GRAY_100_4VIEW.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Saved DDS composites new Korean over still-visible old glyph layer, compromising original typography.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "Duplicate/layered Korean text remains at 50% game proxy.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_GRAY_50_4VIEW.png"
+        },
+        "glyph_integrity": {
+          "result": "FAIL",
+          "observation": "Old and new visible Hangul strokes layer together; forbidden overlap.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "protected_art": {
+          "result": "FAIL",
+          "observation": "Outside both complete source sprite regions official-to-trial RGBA/alpha change zero, yet 5638 inherited visible glyph pixels extend beyond original English alpha32 core.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "placement": {
+          "result": "FAIL",
+          "observation": "Source core [240, 341, 637, 386] versus saved aggregate [5, 342, 527, 400]; old glyphs remain at the prior official position.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Independent exact saved RAW and FLIP-Y decode matches Y-mirror semantics; compositing defect persists.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R43_PROFESSIONAL_RAW_NATIVE.png"
+        }
+      }
+    },
+    "r44_outrun": {
+      "source_alpha32_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "persisted_trial_aggregate_alpha32_bbox": [
+        1630,
+        526,
+        1832,
+        581
+      ],
+      "old_korean_visible_pixels_inherited_unchanged_outside_source_core": 712,
+      "source_core_overflow_evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png",
+      "observations": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "No separately proven same-stem upper/lower readable slant anchors.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_GRAY_100_4VIEW.png"
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Independently SHA-pinned original English source and C158 authored CLEAN inspected. CLEAN alpha zero in both affected source cells.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_GRAY_100_4VIEW.png"
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Saved DDS composites new Korean over still-visible old glyph layer, compromising original typography.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "readability": {
+          "result": "FAIL",
+          "observation": "Duplicate/layered Korean text remains at 50% game proxy.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_GRAY_50_4VIEW.png"
+        },
+        "glyph_integrity": {
+          "result": "FAIL",
+          "observation": "Old and new visible Hangul strokes layer together; forbidden overlap.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "protected_art": {
+          "result": "FAIL",
+          "observation": "Outside both complete source sprite regions official-to-trial RGBA/alpha change zero, yet 712 inherited visible glyph pixels extend beyond original English alpha32 core.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "placement": {
+          "result": "FAIL",
+          "observation": "Source core [1626, 524, 1837, 569] versus saved aggregate [1630, 526, 1832, 581]; old glyphs remain at the prior official position.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_ALPHA32_SOURCE_CORE_OVERFLOW_3X.png"
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Independent exact saved RAW and FLIP-Y decode matches Y-mirror semantics; compositing defect persists.",
+          "evidence": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_R44_OUTRUN_RAW_NATIVE.png"
+        }
+      }
+    }
+  },
+  "pixels_before_detailed_producer_verdict": true,
+  "blind_defect_calibration_completed": false,
+  "failure_codes": [
+    "OLD_KOREAN_LAYER_NOT_CLEARED",
+    "DUPLICATE_LOCALIZED_TEXT_OVERLAP",
+    "SOURCE_BBOX_OVERFLOW_1PX_HARD_FAIL",
+    "COMPOSITE_LAYER_CONTAMINATION"
+  ],
+  "root_cause": "P3 stage constructed trial over existing official localized glyph layer instead of rebuilding two cells from canonical source-derived clean plate; new glyph-only bbox hides old pixels in saved DDS.",
+  "translation_extra_semantic_word": "B357 adds 모드 to two labels; source/consumer semantics independently unapproved and must not be added solely to fill text width.",
+  "next_fix": "Rebuild two target cells from certified C158 CLEAN and transparent lettering; full persisted atlas raw/readable source-core containment and all12 protected regions; redo C2/C3 and pixel manifest before promotion.",
+  "official_status_kept": "c338_c2_rework_required_r43_r44_original_anchor_shift",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "C2_PASS": 0,
+  "C3": "BLOCKED",
+  "APPROVAL": "NONE",
+  "DDS_PRODUCED_BY_C2": 0,
+  "DDS_PROMOTED": 0,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "execution_backend": "GitHub SSOT + N100 MCP fallback exact native DDS decode because ChatGPT local cannot download source",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

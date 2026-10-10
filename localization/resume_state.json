@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C2 q212 B357 independent persisted SHA pixel visual FAIL: old official Hangul visible alpha32 source-core overflow r43 5638, r44 712; official C338 unchanged and IGR029 OPEN; OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000.",
     "C1 q119 first-glyph DXT5 native source T right-lean +13px/34, Korean 타 right-lean +9px/34; 2 native annotated PNG and machine proof; boundary outside visible0 and source-final RGBA/alpha0; independent C1 HOLD pending blind full family/C3/user game. DDS 0. OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
     "B356/B357 q212 2026-10-10 19:47 KST TWO new native P1 mode-title DDS saved SHA db72a9b5 and 6d0098dc, r44 source ratio 54.1%->95.7%, r43 71.9%; official unchanged, B357 semantic qualifier/C2 HOLD, IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-B356-B357-Q212-P1-NEW-SOURCE-MODE-TRIALS-20261010-1947.",
     "C2 2026-10-10 B355 q154 independent SHA 4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87 visually rejected for original-family counter/stem anatomy; official C356 REWORK unchanged. No current QA approval/real-game closure. OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935.",
@@ -15407,16 +15408,31 @@
     "run_key": "OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935"
   },
   "c1_q119_firstglyph_direction_20261010": {
-  "queue_index": 119,
-  "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
-  "result": "HOLD_STRICT_RECHECK",
-  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
-  "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
-  "first_glyph_source_dx": 13,
-  "first_glyph_korean_dx": 9,
-  "qa": "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/C1_Q119_CONTROLLER_HOLD.json",
-  "C3": "NOT_RUN",
-  "RUNTIME_VALIDATION": "UNTESTED",
-  "new_dds": 0
-}
+    "queue_index": 119,
+    "run_key": "OUTRUN-KOR-C1-Q119-FIRSTGLYPH-LEAN-20261010-1949",
+    "result": "HOLD_STRICT_RECHECK",
+    "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "candidate_sha256": "b29c0bb092f94f39b424ebf7af631b265f7059519edf56bd28fb5a319bbf9907",
+    "first_glyph_source_dx": 13,
+    "first_glyph_korean_dx": 9,
+    "qa": "localization/graphics/role_C/20261010-C1-Q119-NATIVE-FIRSTGLYPH-SLANT/C1_Q119_CONTROLLER_HOLD.json",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_dds": 0
+  },
+  "c2_q212_b357_saved_composite_old_glyph_fail_20261010": {
+    "timestamp_kst": "2026-10-10T19:59:54+09:00",
+    "role": "C2",
+    "index": 212,
+    "run_key": "OUTRUN-KOR-C2-Q212-B357-OLD-GLYPH-OVERLAP-20261010-2000",
+    "trial_sha256": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+    "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "C2_REWORK_REQUIRED": true,
+    "inherited_old_glyph_core_overflow_pixels": {
+      "r43": 5638,
+      "r44": 712
+    },
+    "report": "localization/graphics/role_C/20261010-C2-Q212-B357-INDEPENDENT-P1-MODE-FAMILY/C2_Q212_B357_CONTROLLER_C2_REWORK.json",
+    "runtime_validation": "UNTESTED"
+  }
 }
