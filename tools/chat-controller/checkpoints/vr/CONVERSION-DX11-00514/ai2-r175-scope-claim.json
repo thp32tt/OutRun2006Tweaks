@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX11-00514",
+  "work_key": "DX11/R175/constant-buffer-WARP-varying-stage-isolation",
+  "conflict_keys": [
+    "tools/dx11_constant_buffer_probe.cpp",
+    "DX11/R175/WARP-stage-state"
+  ],
+  "owner_id": "AI2-ChatGPT2",
+  "lane": "DX11",
+  "state": "C2_IMPLEMENT",
+  "base_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+  "target_branch": "vr-dx11-native-r71",
+  "checkpoint": "C1_REVIEW",
+  "evidence": {
+    "inherited_failing_gate": 38020216016,
+    "failed_job": 114120381816,
+    "validated_job": 114119343904,
+    "cause": "R175 TEXCOORD6 interpolation control mismatches [128,0,16,255] vs [224,128,32,255]; all R173 varying controls fail, solid PS coverage succeeds",
+    "other_task_00513_files": [
+      "src/vr/d3d11/native_linear_target_viewport.hpp",
+      "tools/dx11_linear_buffer_mirror_probe.cpp",
+      "tools/test_dx11_float_depth_eye_r216.py",
+      "tools/test_dx11_sealed_opaque_eye_r215.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ]
+  },
+  "resume_cursor": "Implement isolated D3D11 device context ClearState plus full explicit pipeline rebind after R170 and before R173; local static check then one material commit",
+  "runtime_validation": "UNTESTED"
+}
