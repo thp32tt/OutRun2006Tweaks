@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_recovery_read_only",
+  "captured_at_kst": "2026-10-10T18:11:38+09:00",
+  "task_id": "CONVERSION-DX11-00529",
+  "production_id": "CONVERSION-DX11-00529",
+  "event_id": "CONVERSION-DX11-00529-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "work_key": "DX11:R232:LINEAR_STREAM_OUTPUT_SIDE_EFFECT_FENCE",
+  "observed_owner_id": "ChatGPT2:CONVERSION-DX11-00529",
+  "observed_lease_epoch": 1,
+  "state": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "terminal": false,
+  "code_commit": "5645b66df11c8aa8460029ed3e5af60223e0ce28",
+  "current_material_candidate": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+  "previous_failed_gate": {
+    "id": 38039708614,
+    "sha": "5645b66df11c8aa8460029ed3e5af60223e0ce28",
+    "conclusion": "failure",
+    "cause": "R230 mutation source match false positive due to R232 successor"
+  },
+  "observed_gate": {
+    "id": 38040255183,
+    "head_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+    "status": "in_progress",
+    "conclusion": null,
+    "active_step": "Build Win32"
+  },
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "duplicate_source_edits_avoided": true,
+  "score_change": 0,
+  "next_action": "Observe exact-SHA Backend Conversion Gate 38040255183; if SUCCESS reconcile C6 with writer lease; if FAILURE inspect step and do not touch independently owned R175."
+}
