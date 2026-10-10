@@ -58,8 +58,6 @@
   "known_blocker": "R175 TEXCOORD6 independent WARP VS/PS varying control [128,0,16,255] != [224,128,32,255] in tools/dx11_constant_buffer_probe.cpp; owner CONVERSION-DX11-00477, no modification here.",
   "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER",
   "score_change": 0,
-  "score_previous_confirmed": 1087,
-  "score_new_confirmed": 1087,
   "score_run_key": "CONVERSION-DX11-00526",
   "last_real_activity_at": "2026-10-10T08:08:58Z",
   "last_activity_evidence": "GitHub Backend Conversion Gate 38036279467 validate SUCCESS; R219/R229 static and R186 real WARP DrawIndexed SUCCESS; R175 constant-buffer FAIL",
@@ -104,5 +102,6 @@
       ]
     },
     "runtime": "UNTESTED"
-  }
+  },
+  "score_reference": "Current AI2 cumulative score is maintained exclusively in thp32tt/ai-dev-lab/AI_SCOREBOARD.md; this blocked retry awards +0 and does not freeze a cross-lane concurrent score snapshot."
 }
