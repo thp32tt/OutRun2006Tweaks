@@ -3,6 +3,7 @@
 Status: latest explicit user priority override. This file supersedes conflicting priorities in AGENTS.md and older DX9Ex queue/controller contracts; retain safety, branch isolation and baseline protections. Docker controller runtime deployment must be verified separately.
 
 ## Immediate focus
+- DXVK B FROZEN: no new DXVK implementation, build, packaging or promotion until an explicit user decision; DX11 A and DX9Ex C continue independently.
 - DX11 Native A remains global conversion priority. DX9Ex C work is limited to unresolved user-visible VR defects, stereoscopic correctness, OpenXR runtime interoperability, and measured VR performance. Do not fill a 50% allocation quota with low-value work.
 - P0: fix only outstanding confirmed optics: central lens flare dot doubled/headlocked (preserve other discs), stage +TIME and GOAL progress title/time doubled/headlocked (preserve completed results), car-detached rank markers, remaining shadow/HUD attachment issues confirmed by HMD feedback. Preserve all previously user-accepted optical PASS paths.
 - P1: stereo/camera/pose/recenter correctness, VD/OpenXR per-eye resolution and reset lifecycle where needed to fix observed VR issues; GPU/CPU frame pacing in dense buildings/sand/particles. 72 Hz stable is the immediate user-visible performance gate; higher 90/120 FPS are subsequent measured optimization targets, not substitutes for correctness.
