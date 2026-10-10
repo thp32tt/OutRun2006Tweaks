@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "A233",
+  "run_key": "OUTRUN-KOR-A233-Q217-NATIVE-SOURCE-DEPTH-SHEAR-RETRY-20261011-0500",
+  "role": "A",
+  "index": 217,
+  "antecedent_C1": "OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
+  "canonical_source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "official_candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "reused_clean_manifest": "d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+  "reused_clean_review_status": "HOLD_C1_NO_PLATE_PASS",
+  "prior_A231_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "failed_A232_sha256": "3a9739b923625526e53ba32634459a85d12d208e6a9625ae4b01891d94ed0a53",
+  "A233_new_trial_sha256": "84753cf3dd7c5d187b14056e86ef18522ca54536691b1541f335192dcb5618ad",
+  "A232_A233_two_trial_limit_consumed": true,
+  "corrections": [
+    "A232 inverse italic direction/center corrected",
+    "Original English RGB orange bevel depth independently sampled, START 523 and GOAL 499 native pixels",
+    "Extrusion shortened to 1 native pixel"
+  ],
+  "mechanical": {
+    "A233_old_to_new_changed_rgba_pixels": 1352,
+    "outside_original_two_source_text_bboxes": 0,
+    "clean_outside_original": 0,
+    "alpha_changes": 0,
+    "original_protected_red_rim_restored_from_A231_exact": true,
+    "header_and_mip_preserved": true,
+    "persisted_DDS_roundtrip_equal": true,
+    "positive_margins_both": true
+  },
+  "firsthand": {
+    "direct_views": [
+      "A233_start_GRAY_100.png",
+      "A233_goal_GRAY_100.png",
+      "A233_start_BLACK_50.png",
+      "A233_goal_WHITE_75.png",
+      "A233_start_RAW.png",
+      "A232_start_GRAY_100.png",
+      "A232_goal_GRAY_100.png"
+    ],
+    "start": "The new source-conditioned bevel is more orange and lean placement centered compared with A232, but Hangul 출발 at actual native/50 still too compact, with visually busy internal stripe/face segmentation unlike original smooth wide cream/orange bevel START. New 38x19 face vs original 81x23. This is NOT qualified source typography.",
+    "goal": "The new 골 face 19x20 stays visually much narrower and has layered edges unlike the coherent 77x24 original GOAL source; visual family mismatch remains at 50 and 100.",
+    "source_plate": "A231 exact source-red original rim remains protected and retained. The registered C1 HOLD CLEAN source bounds are unchanged.",
+    "orientation": "Readable FLIP-Y & actual persisted RAW images viewed; RAW horizontal read mirroring is as intended; not real gameplay.",
+    "source_style": "Noto Sans Bold source material sampling did not recreate original connected racing display lettering. A different construction method rather than an Noto recolor is required.",
+    "collision": "Outside English original bboxes 0 pixel differences; no new protected art damage."
+  },
+  "ordered_eight_checks": {
+    "english_clean_plate": "SOURCE_GLYPH_CLEAN_SCOPED_MACHINE_PASS_BUT_INDEPENDENT_C1_HOLD",
+    "typography_direction": "SCOPED_MECHANICAL_REPAIR_SOURCE_ANCHORS_NOT_BLIND_CALIBRATED",
+    "glyph_style": "FAIL_SOURCE_FAMILY",
+    "size": "FAIL_OPTICAL_HIERARCHY_UNDERFILL",
+    "glyph_integrity": "HOLD_INNER_CONTOUR_VISUAL_CROWDED",
+    "protected_art": "PASS_SOURCE_RED_RIM_PRESERVED",
+    "RAW_FLIPY": "SCOPED_PASS",
+    "game_readability": "UNTESTED"
+  },
+  "verdict": "PRODUCER_REWORK_REQUIRED_SOURCE_FAMILY_AFTER_TWO_TRIALS",
+  "first_failed_stage": "P2_SOURCE_GLYPH_FACE_AND_3D_EFFECT_SHAPE",
+  "next_action": "METHOD_CHANGE_REQUIRED: source-authored PSD vector layers or manual native contour design for START/GOAL Korean face, counter and highlight/extrusion; do not iterate same Noto source-color renderer again. Preserve verified A231 CLEAN and original red RGB 425 pixels. C1 review of new exact candidate would only be requested after actual producer P2 passes.",
+  "official_promoted": false,
+  "new_unpromoted_trials_this_run": 2,
+  "independent_C1_new_SHA": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}
