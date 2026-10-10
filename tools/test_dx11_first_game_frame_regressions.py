@@ -95,6 +95,38 @@ def main() -> None:
         )
 
 
+    # Fixed-function modifiers (COMPLEMENT/ALPHAREPLICATE) change the
+    # stage-0 color even when the SELECTMASK bits still equal DIFFUSE.
+    # Fog and scissor also cannot be reproduced by this narrow native shader.
+    # Static negative controls are not live-device parity evidence.
+    def exact_diffuse_state_gate(code: str) -> bool:
+        start = code.find("bool supported_game_state(")
+        end = code.find("bool translate_vertices(", start)
+        if start < 0 or end <= start:
+            return False
+        section = code[start:end]
+        return all(token in section for token in (
+            "arg != D3DTA_DIFFUSE",
+            "GetRenderState(D3DRS_FOGENABLE, &fog)",
+            "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
+            "|| fog || scissor",
+        ))
+
+    assert exact_diffuse_state_gate(bridge)
+    for bad, replacement in (
+        ("arg != D3DTA_DIFFUSE",
+         "(arg & D3DTA_SELECTMASK) != D3DTA_DIFFUSE"),
+        ("GetRenderState(D3DRS_FOGENABLE, &fog)",
+         "GetRenderState(D3DRS_FOGENABLE, &clip)"),
+        ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
+         "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
+        ("|| fog || scissor", "|| fog"),
+    ):
+        mutated = bridge.replace(bad, replacement, 1)
+        assert mutated != bridge and not exact_diffuse_state_gate(mutated), (
+            "untranslated game-state negative control missed: " + bad
+        )
+
     # A static guard plus a deterministic negative mutation for sampling.
     # It is not GPU/Quest3 evidence. Each frame is still limited to one
     # native submit but cannot permanently pick only the first eligible Draw.
