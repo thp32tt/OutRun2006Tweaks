@@ -7,7 +7,7 @@
   "phase": "DX9Ex C ACTIVE P0-P3 alongside first-priority DX11 Native A; R84 P1 only; HMD runtime acceptance distinct",
   "checkpoint": "R84_PORT_SEAMS_PENDING",
   "policy": {
-    "primaryBackend": "DX9Ex C ACTIVE parallel to first-priority DX11 A; DXVK B FROZEN. C priority P0 FFB -> P1 R84 -> P2 XR per-eye -> P3 native 120fps.",
+    "primaryBackend": "DX9Ex C ACTIVE parallel to first-priority DX11 A; DXVK B FROZEN. C priority P0 unresolved optics/HUD + P1 finite R84 (non-overlapping work keys) -> P2 XR per-eye -> P3 measured native performance; FFB v0.2 frozen.",
     "blockedBackends": [
       "DXVK_B_NEW_DEVELOPMENT_BUILD_RELEASE_PROMOTION",
       "DX12_D3D9ON12_REFERENCE_ONLY"
@@ -194,7 +194,7 @@
         }
       },
       "dx9exPriority": [
-        "P0_FFB_V0_2_INTEGRATION",
+        "P0_UNRESOLVED_OPTICS_HUD",
         "P1_R84_STRUCTURAL",
         "P2_XR_PER_EYE_RESOLUTION",
         "P3_NATIVE_120FPS"
@@ -225,7 +225,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "C strict P0 FFB release integration -> P1 R84/refactor -> P2 automatic OpenXR per-eye extent -> P3 native 120FPS; HMD-only blockage does not suspend independent source work; A DX11 concurrent, B frozen.",
+  "nextAction": "C P0 unresolved optics/HUD and finite R84 structural work continue in parallel only with independent active claims; FFB v0.2 frozen. After R84 exact-SHA Active+Domain/full-chain green, continue P2 XR per-eye and P3 measured native performance. HMD gates only runtime acceptance/live IPC v3; A DX11 remains active, B DXVK frozen.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",

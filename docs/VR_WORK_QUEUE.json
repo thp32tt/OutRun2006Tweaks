@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex C ACTIVE; independent global-first DX11 Native A ACTIVE concurrently; DXVK B FROZEN. C priorities P0 FFB/P1 R84/P2 XR extent/P3 native 120fps.",
+    "primaryBackend": "DX9Ex C ACTIVE; independent global-first DX11 Native A ACTIVE concurrently; DXVK B FROZEN. C priorities P0 unresolved optics/HUD, P1 finite R84, P2 XR per-eye, P3 measured 120fps; FFB v0.2 frozen.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -146,7 +146,7 @@
         }
       },
       "dx9exPriority": [
-        "P0_FFB_V0_2_INTEGRATION",
+        "P0_UNRESOLVED_OPTICS_HUD",
         "P1_R84_STRUCTURAL",
         "P2_XR_PER_EYE_RESOLUTION",
         "P3_NATIVE_120FPS"
@@ -210,7 +210,7 @@
     {
       "id": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
       "priority": 100,
-      "status": "BLOCKED",
+      "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "P0 visual-composition convergence: original mod + fork R65-R74/R73-era evidence + canonical disassembly -> menu textures, all HUD families, projected rank/rival markers, arrows/YES-NO, +TIME/results, lens flare/SceneEffect -> complete static gate before HMD.",
       "testLevel": "LEVEL0",
@@ -228,9 +228,9 @@
         "asset analyzer packaged",
         "DX9Ex Active + Domain Isolation + HUD Inspector green"
       ],
-      "nextAction": "Independent C optical source fixes may proceed while retaining P0-P3 direction and known-good runtime guards.",
-      "blockedBy": "USER_PRIORITIZED_R84_PRODUCTION_CONVERGENCE",
-      "blockReason": "Optical HMD acceptance only, not a global source freeze. Preserve proven regressions and exact HMD user evidence."
+      "nextAction": "Continue independent, concrete P0 optics/HUD source fixes under a distinct FEATURE_ID/work_key and non-overlapping active claim; preserve CONVERSION-DX9EX-00591 R84 ownership and current HMD PASS. Quest3 acceptance remains separate.",
+      "blockedBy": null,
+      "blockReason": "Source implementation is READY when ownership and path isolation are satisfied; only exact-build Quest3/VDXR visual acceptance remains HMD-gated. Do not treat R84's active claim or CI as globally blocking unrelated P0 source work."
     },
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
