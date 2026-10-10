@@ -1169,28 +1169,18 @@ namespace OutRunVRStereo
             // but on Quest/VDXR it leaves circular HUD elements slightly tall.
             float targetAspectSum = 0.0f;
             int targetEyes = 0;
-            if (SharedState &&
-                SharedState->magic == OutRunVR::SharedMagic &&
-                SharedState->protocolVersion ==
-                    OutRunVR::SharedProtocolVersion)
+            for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
-                for (int eye = 0; eye < 2; ++eye)
-                {
-                    const std::uint32_t w =
-                        SharedState->recommendedWidth[eye];
-                    const std::uint32_t h =
-                        SharedState->recommendedHeight[eye];
-                    if (!w || !h)
-                        continue;
-                    const float aspect =
-                        static_cast<float>(w) /
-                        static_cast<float>(h);
-                    if (!std::isfinite(aspect) ||
-                        aspect < 0.25f || aspect > 4.0f)
-                        continue;
-                    targetAspectSum += aspect;
-                    ++targetEyes;
-                }
+                std::uint32_t w = 0, h = 0;
+                if (!R29OwnerRecommendedEyeExtent(eye, w, h))
+                    continue;
+                const float aspect =
+                    static_cast<float>(w) / static_cast<float>(h);
+                if (!std::isfinite(aspect) ||
+                    aspect < 0.25f || aspect > 4.0f)
+                    continue;
+                targetAspectSum += aspect;
+                ++targetEyes;
             }
 
             // Fall back to the old angular estimate only if the host has not
@@ -3857,12 +3847,13 @@ namespace OutRunVRStereo
         R30SupportDirectTransportIdentity& out) noexcept
     {
         out = {};
-        if (!SharedState || !DirectInteropVerified)
+        R29OwnerTransportIdentity identity{};
+        if (!R29OwnerTryGetDirectTransportIdentity(identity))
             return false;
 
-        out.hostPid = SharedState->hostPid;
-        out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;
-        out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;
+        out.hostPid = identity.hostPid;
+        out.hostAdapterLuidLow = identity.hostAdapterLuidLow;
+        out.hostAdapterLuidHigh = identity.hostAdapterLuidHigh;
         return true;
     }
 
