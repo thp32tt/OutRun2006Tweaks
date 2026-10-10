@@ -1,0 +1,130 @@
+{
+  "queue_index": 201,
+  "shard": "C1_ODD",
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "producer_source_png_sha256": "04755e9ac3d3048c7fdef59afd82457820c8851321d1d2c6e01195e78f818673",
+  "producer_clean_png_sha256": "2a0dd81aad88977a591c84a320b6077fdb5e7760def0346165577e0fc02047f0",
+  "producer_final_png_sha256": "f54a3b814184c80a68935678ec4037f2af45085883d6770ff07d58c6752b11a7",
+  "format": {
+    "size": [
+      2048,
+      2048
+    ],
+    "format": "BGRA/RGBA32 decoded via Pillow DDS",
+    "mips": 1,
+    "header_original_current_identical": true,
+    "orientation": "RAW vertical mirror -> FLIP-Y readable"
+  },
+  "authenticated_producer_roi": {
+    "source_exact_equals_raw_dds_flipy": true,
+    "final_exact_equals_raw_dds_flipy": true,
+    "native_rgba_exact_matched_pixels": 8976,
+    "roi_bbox_readable": [
+      1079,
+      1734,
+      1255,
+      1785
+    ],
+    "source_original_bbox_from_alpha": [
+      1079,
+      1734,
+      1255,
+      1785
+    ],
+    "candidate_alpha_bbox": [
+      1084,
+      1739,
+      1160,
+      1780
+    ],
+    "candidate_strictly_inside_source_alpha_bbox": true,
+    "source_alpha_pixels": 5053,
+    "clean_alpha_pixels": 0,
+    "candidate_alpha_pixels": 2133
+  },
+  "local_protection": {
+    "context_readable_rect": [
+      1039,
+      1702,
+      1295,
+      1817
+    ],
+    "full_rgba_changed_outside_GOALS_bbox_within_context": 393,
+    "alpha_changed_outside_GOALS_bbox_within_context": 393,
+    "note": "only local context checked. Other 16 source/final translated cells not included in this local protection claim.",
+    "outside_bbox_detail": {
+      "external_diff_bbox_readable": [
+        1039,
+        1702,
+        1049,
+        1817
+      ],
+      "near_source_alpha": 392,
+      "near_final_alpha": 25,
+      "interpretation": "All 393 changed pixels outside GOALS window within the larger local context occur at the context's far left edge x1039..1048, at least 30 px to the left of GOALS native x1079. Full source/final atlas visual shows adjacent translated stage title there, therefore do NOT classify as protected damage or claim global 0 outside; whole 17-label inventory audit remains pending."
+    }
+  },
+  "stage_deltas": {
+    "source_to_clean_rgba_in_roi": 5053,
+    "clean_to_final_rgba_in_roi": 2947,
+    "source_to_final_rgba_in_roi": 5600,
+    "source_to_final_alpha_in_roi": 5273
+  },
+  "views": {
+    "q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_100.png",
+      "sha256": "04527a7e634c452f9984c0bbc1a91a3014fff4ef2da7bfda3e0eb75d58097c2d"
+    },
+    "q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_black_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_black_100.png",
+      "sha256": "f2b55d738b17e01aa5fd0aecea1826b7b42d4029747b4722449757cae76cd3fe"
+    },
+    "q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_white_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_white_100.png",
+      "sha256": "cd1f8234ae3c75c368e2ba3ab59b1d4036e132eedf4d5dfe2ef45e637ebcdeec"
+    },
+    "q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_50.png",
+      "sha256": "ac8d81c941cf4c32c8fd4eff0a15fabffeacdbd4eea209bc04eee0090dc60c9f"
+    },
+    "q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_2x.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_2x.png",
+      "sha256": "b32252cf37bf9ea29e91d35a58622b7753103176f52b8652fb53af910fc44053"
+    },
+    "q201_GOALS_SOURCE_RAW_gray_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_RAW_gray_100.png",
+      "sha256": "400a1f6aeb3295756c1e99c816d675d6c33e8eb92af8946352748c724e975adc"
+    },
+    "q201_GOALS_FINAL_RAW_gray_100.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_FINAL_RAW_gray_100.png",
+      "sha256": "994b64f52be87cd2a881c4a9dd1dff37ab56e9d980e337d5ecd14f5e063e6883"
+    },
+    "q201_SOURCE_FLIPY_ATLAS_25.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_SOURCE_FLIPY_ATLAS_25.png",
+      "sha256": "a221103d44a7bb06fb4dac3beccac4b44c3ce2383dd46f6929d78e1c534d5067"
+    },
+    "q201_FINAL_FLIPY_ATLAS_25.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_FINAL_FLIPY_ATLAS_25.png",
+      "sha256": "4c322c968d7f3124907a86418345fde6038439be5a502c94ad6f020bc79b5edb"
+    },
+    "q201_GOALS_NEIGHBOR_CONTEXT_SOURCE_FINAL_OUTSIDE_DIFF.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_NEIGHBOR_CONTEXT_SOURCE_FINAL_OUTSIDE_DIFF.png",
+      "sha256": "464924fdb003186132579f4e773a865a3a33018cbae84c610157372392bbdcd8"
+    }
+  },
+  "C1_result": "HOLD_STRICT_RECHECK",
+  "closed_gap": "C340 source-authentication blocker resolved: directly downloaded canonical original DDS with expected SHA and independently decoded persisted candidate DDS exact SHA; both 176x51 source/current producer PNGs pixel-identical 8976/8976 in FLIP-Y. CLEAN producer ROI itself verified content SHA and alpha=0, but full 17-cell cleaned atlas remains unverified.",
+  "unresolved": [
+    "complete 17-source-cells source-derived CLEAN atlas and original protected-art audit",
+    "blind calibrated style and per-glyph source lean",
+    "distinct C3 review",
+    "new user actual-game screenshot for IGR037"
+  ],
+  "C3": "NOT_RUN",
+  "USER_INGAME": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "qa_evidence_scope": "GOALS region only; do not generalize to remaining sixteen cells or actual-game acceptance"
+}

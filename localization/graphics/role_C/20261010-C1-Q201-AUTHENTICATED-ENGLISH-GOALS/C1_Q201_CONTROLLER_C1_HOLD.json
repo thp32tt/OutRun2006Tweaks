@@ -1,0 +1,157 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "schema": "C1_AUTHENTICATED_SOURCE_SCOPED_QA_HOLD",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 201,
+  "run_key": "OUTRUN-KOR-C1-Q201-EXACT-ENGLISH-ROI-20261010-2040",
+  "reviewer": "AI1 ChatGPT independent C1; one reviewer, not distinct C3",
+  "reviewed_at_kst": "2026-10-10 20:40+ KST",
+  "backend": "GitHub SSOT + N100 lightweight DDS decode fallback because local container network DNS unavailable; no Actions build",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "candidate_sha256": "d9b2a67baf772409da91c4a8c0d0b275f33f6d7a4546a6030b8065566f5ea5f8",
+  "source_archive": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/C1_Q201_CANONICAL_SOURCE_ROI_MACHINE.json",
+    "git_blob_sha": "03c439c3675e80ffa1b2a8956985cc26dfee80b8"
+  },
+  "source_clean_roi_sha256": "2a0dd81aad88977a591c84a320b6077fdb5e7760def0346165577e0fc02047f0",
+  "trial_sha_unchanged": true,
+  "previous_review": "C340 C1 previous-only source-unverified HOLD; this run authentically resolves exact SOURCE identity, not re-approval of same candidate",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "decision": "HOLD_STRICT_RECHECK",
+  "actual_observations": {
+    "source_authentication": {
+      "result": "PASS_EXACT_SOURCE",
+      "observation": "English SOURCE DDS downloaded and SHA256 verified 6ac5ffd...; persisted candidate sha256 d9b2a67... verified; both 176x51 FLIP-Y decoded ROIs match producer source and final PNG exactly 8976/8976 pixels; RAW does not match (expected mirror Y)",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_100.png",
+          "sha256": "04527a7e634c452f9984c0bbc1a91a3014fff4ef2da7bfda3e0eb75d58097c2d"
+        }
+      ]
+    },
+    "slant": {
+      "result": "HOLD",
+      "observation": "Original GOALS and candidate 목표 seen as near-upright small gray titles; source-conditioned glyph stem top-minus-bottom anchors and style-family blind calibration not performed. No fabricated 0 angle.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_2x.png",
+          "sha256": "b32252cf37bf9ea29e91d35a58622b7753103176f52b8652fb53af910fc44053"
+        }
+      ]
+    },
+    "clean_plate": {
+      "result": "SCOPED_SOURCE_REMOVAL_PASS_NOT_FULL_ATLAS",
+      "observation": "Producer actual 176x51 CLEAN RGBA has 0 positive-alpha pixels; independently verified source and final ROIs match persisted DDS. No English residue in GOALS producer CLEAN viewed black/gray/white; other 16 cells' CLEAN source identity not yet validated.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_black_100.png",
+          "sha256": "f2b55d738b17e01aa5fd0aecea1826b7b42d4029747b4722449757cae76cd3fe"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_white_100.png",
+          "sha256": "cd1f8234ae3c75c368e2ba3ab59b1d4036e132eedf4d5dfe2ef45e637ebcdeec"
+        }
+      ]
+    },
+    "style": {
+      "result": "HOLD",
+      "observation": "Original GOALS 176×51 bbox, Korean 목표 76×41; shape, hierarchy and font weight require independently calibrated family comparison. Native Hangul visually readable; no automatic PASS from numeric containment.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_100.png",
+          "sha256": "04527a7e634c452f9984c0bbc1a91a3014fff4ef2da7bfda3e0eb75d58097c2d"
+        }
+      ]
+    },
+    "readability": {
+      "result": "SCOPED_STATIC_PASS",
+      "observation": "Directly viewed saved final GOALS region at native gray and 50% black and atlas overview; 목표 discernible, no game scene composite tested.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_50.png",
+          "sha256": "ac8d81c941cf4c32c8fd4eff0a15fabffeacdbd4eea209bc04eee0090dc60c9f"
+        }
+      ]
+    },
+    "glyph_integrity": {
+      "result": "SCOPED_NATIVE_NO_CLEAR_FAIL",
+      "observation": "Inspected native lossless and 2x nearest decoded candidate; Korean 목표 glyph face appears intact without visible clipping, no hidden tiny defect certified for all display consumers.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_2x.png",
+          "sha256": "b32252cf37bf9ea29e91d35a58622b7753103176f52b8652fb53af910fc44053"
+        }
+      ]
+    },
+    "protected_art": {
+      "result": "SCOPED_PASS_WITH_ADJACENT_STAGE_CHANGE",
+      "observation": "Within GOALS ROI original bbox [1079,1734,1255,1785] contains candidate [1084,1739,1160,1780]. Broader local context has 393 outside-GOALS changes exclusively x1039..1048 (left edge of stage title area), 30px gap; context discrepancy documented and excluded from false global outside-zero claim. Whole 17-cell protected audit pending.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_NEIGHBOR_CONTEXT_SOURCE_FINAL_OUTSIDE_DIFF.png",
+          "sha256": "464924fdb003186132579f4e773a865a3a33018cbae84c610157372392bbdcd8"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_SOURCE_FLIPY_ATLAS_25.png",
+          "sha256": "a221103d44a7bb06fb4dac3beccac4b44c3ce2383dd46f6929d78e1c534d5067"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_FINAL_FLIPY_ATLAS_25.png",
+          "sha256": "4c322c968d7f3124907a86418345fde6038439be5a502c94ad6f020bc79b5edb"
+        }
+      ]
+    },
+    "placement": {
+      "result": "SCOPED_PIXEL_BBOX_PASS",
+      "observation": "Source bbox [1079,1734,1255,1785], current alpha bbox [1084,1739,1160,1780] margins L5/R95/T5/B5; no source-sized overflow in this ROI.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_CLEAN_FINAL_FLIPY_gray_100.png",
+          "sha256": "04527a7e634c452f9984c0bbc1a91a3014fff4ef2da7bfda3e0eb75d58097c2d"
+        }
+      ]
+    },
+    "orientation": {
+      "result": "SCOPED_PASS",
+      "observation": "Persisted DDS RAW vertically flips to FLIP-Y readable source/current 8976/8976 exact pixels; native RAW source and final separately exported and visually cross-checked.",
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_SOURCE_RAW_gray_100.png",
+          "sha256": "400a1f6aeb3295756c1e99c816d675d6c33e8eb92af8946352748c724e975adc"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q201-AUTHENTICATED-ENGLISH-GOALS/evidence/q201_GOALS_FINAL_RAW_gray_100.png",
+          "sha256": "994b64f52be87cd2a881c4a9dd1dff37ab56e9d980e337d5ecd14f5e063e6883"
+        }
+      ]
+    }
+  },
+  "calibration": {
+    "blind_known_defect_suite": "NOT_COMPLETED",
+    "firstlook_blind_to_producer": "NO, prior C340/prod inspected during selection; cannot declare fresh blind independent PASS"
+  },
+  "C3": {
+    "review_id": null,
+    "result": "NOT_RUN",
+    "note": "separate C3 required"
+  },
+  "user_ingame_regression": {
+    "id": "IGR-037",
+    "status": "OPEN_USER_INGAME_FAIL",
+    "closure": "BLOCKED_PENDING_NEW_REAL_GAME_MATCHED_BUILD"
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "approval_record_written": false,
+  "approved_dds": 0,
+  "new_dds_produced": 0,
+  "modified_candidate": false,
+  "missing": [
+    "full source-pinned 17-cell CLEAN atlas QA and protected-art inventory",
+    "blind known-defect calibration and source family/homologous slant anchors",
+    "distinct C3 review plus evidence gate approval",
+    "new actual game screenshot for IGR-037 on matching repaired package"
+  ]
+}
