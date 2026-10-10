@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B350",
+  "queue_index": 60,
+  "shard": "EVEN",
+  "priority": "P0",
+  "run_key": "OUTRUN-KOR-B350-Q060-P0-CONTOUR-OPTICAL-TRIAL-20261010-1535",
+  "execution_backend": "GITHUB_ACTIONS",
+  "worker_run_id": 38031651627,
+  "worker_status": "SUCCESS",
+  "canonical_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_first_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_unapproved_persisted_dds_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
+  "materially_new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "source_effect_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "new_persisted_effect_bbox": [
+    2227,
+    350,
+    3021,
+    473
+  ],
+  "source_effect_width": 849,
+  "new_effect_width": 794,
+  "prior_B349_effect_width": 512,
+  "changed_rgba_pixels": 99951,
+  "changed_rgba_outside_scoped_roi": 0,
+  "preserved_source_sibling_rgba_changes_outside_effect": 0,
+  "persisted_dds_roundtrip_mismatch": 0,
+  "producer_visual_inspection": {
+    "directly_inspected": true,
+    "views": [
+      "localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+      "localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_SOURCE_CLEAN_OFFICIAL_NEW_BLACK_50_FLIPY.png",
+      "localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png"
+    ],
+    "clean_plate": "SCOPED_PASS: canonical source-derived B348 plate reused, former English opaque title mask removed (89,391 source pixels); full-asset plate beyond q060 target not certified",
+    "slant": "HOLD: native racing right lean visibly improved over B349 but source/translated homologous anchor measurement not established; script records 0.22 final lean, not source-approved",
+    "style": "FAIL: persisted native and practical 50% show new orange-red comparatively dark and flat central letter faces, thin yellow low band and red/brown extrusion, whereas English source has bright cream/yellow deep bevel, navy deep silhouette and stronger condensed optical face",
+    "readability": "SCOPED_PASS: glyphs '최고 기록:' legible and width 794/849 source, materially improving B349 width 512/849; still not a source-family style approval",
+    "glyph_integrity": "SCOPED_PASS: no obvious broken Hangul strokes in inspected native/50 panels; authoring font/outlines remain unapproved",
+    "protected_art": "SCOPED_MACHINE_PASS: changes versus official outside bounded ROI zero, sibling regions unchanged versus official; not an independently validated full source-to-final protected-art proof",
+    "placement": "SCOPED_MACHINE_PASS: within exact English bbox, margins left48/right7/top10/bottom1; tight lower/right spacing needs source-eye verification",
+    "orientation": "SCOPED_PASS: readable FLIP-Y and native RAW views were directly inspected, persisted RGBA roundtrip mismatch zero"
+  },
+  "reason_codes": [
+    "SOURCE_FAMILY_GOLD_FACE_DEPTH_MISMATCH",
+    "SOURCE_FAMILY_CONDENSED_RACING_FACE_MISMATCH",
+    "READABLE_SLANT_SOURCE_ANCHORS_UNQUALIFIED"
+  ],
+  "decision": "PRODUCER_VISUAL_REJECT_UNAPPROVED_TRIAL",
+  "next_corrective_method": "Retain source-first clean and native expanded contour width; condition gold/cream face and dark navy extrusion from individual English source bevel bands and measured homologous source-relative right-lean anchors before another persisted trial. Do not simply stretch B350 or arbitrarily recolor the entire face.",
+  "state": {
+    "q060": "C342_C2_REWORK_REQUIRED_OFFICIAL_UNCHANGED",
+    "C2": "NOT_REVIEWED_NEW_B350",
+    "C3": "BLOCKED",
+    "approval": false,
+    "IGR044": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "machine_report": "localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_Q060_MACHINE_AND_SOURCE_FAMILY.json",
+  "exclusions": [
+    "ODD_A",
+    "C1",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
