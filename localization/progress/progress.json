@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T03:31:00+09:00",
+  "updated_at_kst": "2026-10-11T03:44:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11857,5 +11857,44 @@
     "IGR044": "OPEN",
     "review_path": "localization/graphics/plate_library/reviews/6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a.json",
     "review_id": "C372-C2-Q060-BEST-TIME-PLATE-20261011"
+  },
+  "b361_b362_q212_source_native_counter_rework": {
+    "run_key": "OUTRUN-KOR-B361-B362-Q212-R43-NATIVE-COUNTER-SOURCE-20261011-0330",
+    "timestamp_kst": "2026-10-11T03:44:00+09:00",
+    "role": "B",
+    "queue_index": 212,
+    "priority": "P1_IGR029",
+    "triage": "MATERIAL_REWORK",
+    "backend": "GITHUB_ACTIONS_WORKER_38076323470_38076601477",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "old_official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "B361_unapproved_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+    "B361_visual": "FAIL_STROKE_COUNTER_COLLAPSE",
+    "B362_unapproved_sha256": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+    "B362_visual": "SCOPED_COUNTER_IMPROVEMENT_SOURCE_FAMILY_HOLD",
+    "new_trial_DDS_count": 2,
+    "official_promoted_DDS": 0,
+    "affected_r43_label_width_pre_B358": 284,
+    "affected_r43_label_width_B361": 325,
+    "affected_r43_label_width_B362": 337,
+    "original_source_width": 395,
+    "native": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mips": 1,
+    "old_stale_alpha_outside_r43_bbox_removed": 5832,
+    "changed_rgba_px_r43_only": 22434,
+    "other_11_cells_unchanged": true,
+    "persisted_DDS_decode_mismatch": 0,
+    "plate_library_status": "NOT_REGISTERED_REUSE_B358_SOURCE_ALPHA_ZERO_SCOPED_PROOF",
+    "current_official": "C338_REWORK_REQUIRED",
+    "independent_C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "IGR029": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_CONTROLLER_PRODUCER_QA.json",
+    "excluded_domains": []
   }
 }
