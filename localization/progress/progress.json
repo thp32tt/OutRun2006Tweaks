@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T06:36:00+09:00",
+  "updated_at_kst": "2026-10-11T06:46:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,32 @@
       "total": 243
     },
     "graphics_localization": {
+      "b365_q176_nanum_native_alternate_rework_20261011": {
+        "run_key": "OUTRUN-KOR-B365-Q176-NANUM-ALT-FAMILY-20261011-0644",
+        "role": "B",
+        "index": 176,
+        "scope": "FLAGMAN4_SINGLE_REGION_ONLY",
+        "official_status": "C343_REWORK_REQUIRED_UNCHANGED",
+        "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+        "clean_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+        "official_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+        "new_unapproved_dds_sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+        "renderer": "NanumGothicBold_native_ppem153_no_postscale_no_stroke",
+        "changed_rgba_pixels": 80387,
+        "outside_source_bbox": 0,
+        "dds_format": "RGBA32",
+        "decoded_mismatch": 0,
+        "protected_3_siblings": "UNCHANGED",
+        "producer_qa": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+        "independent_C2": "NOT_RUN",
+        "C3": "BLOCKED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "new_saved_trial_dds": 1,
+        "promoted_dds": 0,
+        "backend": "GITHUB_ACTIONS",
+        "run_id": 38088552871,
+        "qa": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+      },
       "latest_a234r_q121_source_derived_transparent_rank20_20261011": {
         "run_key": "OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
         "role": "A",
