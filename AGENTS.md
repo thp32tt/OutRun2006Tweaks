@@ -1,5 +1,11 @@
 # OutRun2 VR Development Execution Contract
 
+## DX11 first real game frame — latest user directive, 2026-10-10
+
+For DX11 production tasks starting at CONVERSION-DX11-00537, the feature outcome is **R175 unblocked and a real OutRun D3D9 Draw routed to a safely enabled native D3D11 visible game frame**, not more independent WARP/guard/Rxxx tasks. This DX11-specific priority supersedes the generic C2 guidance to commit a small fix and move on. Keep C0-C6, 5-minute GitHub checkpoints, 30-minute chat rollover, source owner/lease isolation, exact-SHA final CI, and RUNTIME_VALIDATION=UNTESTED without actual game/HMD evidence.
+
+First inspect R175 existing owner CONVERSION-DX11-00477; fix the real shader parity bug only after verifiable release/transfer, never bypass or weaken CI. Otherwise continue the disjoint live Draw callsite→resource/shader→D3D11 Draw→visible frame integration in a single feature. Treat individual WARP fixtures as necessary internal evidence only, not completed deliverables. Controlled diagnostic opt-in and DX9Ex fallback are mandatory until real gameplay parity is established. The governing machine-readable acceptance contract is docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json.
+
 ## Execution location and N100 disk budget policy — 2026-10-08
 
 This policy applies to all AI agents, chats, scheduled automation and retries working on this branch. It restricts **where** work happens; it does not supersede backend/domain isolation, exact-SHA validation, GitHub-only job contracts or runtime test requirements.
