@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "review_id": "C1-Q101-20261010-1350",
+  "reviewer": "ChatGPT AI1 C1 (same reviewer; no separate C3 reviewer claimed)",
+  "reviewed_at_kst": "2026-10-10 13:50 KST",
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 101,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "candidate_sha_verification": {
+    "backend": "N100 MCP auxiliary fallback: inspect_dds on existing SHA-matched native candidate; no DDS changed",
+    "actual_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "file_size_bytes": 67108992,
+    "readable_orientation": "FLIP-Y",
+    "raw_orientation": "mirror-Y"
+  },
+  "exact_historical_comparison": {
+    "legacy_review": "C180",
+    "legacy_result": "C180_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "source_clean_final_image": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt",
+    "raw_source_final_image": "localization/graphics/role_C/20261005-C180-560FA536/C180_RAW_B64.txt",
+    "legacy_machine_report": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json",
+    "evidence_format": "Tracked base64-encoded JPEG. Firsthand readable source/clean/final and full RAW source/final pixels visually inspected. Historical JPEG is not new lossless/source-authentication or in-game proof.",
+    "source_warning_bbox": [
+      3006,
+      25,
+      3932,
+      168
+    ],
+    "localized_warning_bbox": [
+      3027,
+      36,
+      3911,
+      156
+    ],
+    "legacy_mechanical_boundary_result": "13/13 source bbox and positive-margin PASS claimed by earlier C180; historical, not rerun as a new machine pass"
+  },
+  "firsthand_review": {
+    "region_id": "warning",
+    "readable_text_source": "Every player must participate at the same time to play this mode.",
+    "readable_text_candidate": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+    "source_observation": "Both English lines have a pronounced italic/right-forward visual inclination and heavy navy outer contour around yellow face.",
+    "candidate_observation": "Corresponding Korean lettering in both lines is substantially more upright (near-vertical Hangul stems) with an inconsistent italic-family silhouette relative to the English source. This mismatch is visible in the SOURCE/CLEAN/FINAL comparison at native presentation and survives RAW orientation review.",
+    "decision": "FAIL",
+    "reason_code": "SOURCE_FAMILY_RIGHT_ITALIC_MISMATCH",
+    "severity": "REWORK_REQUIRED",
+    "first_look_before_producer_verdict": false
+  },
+  "eight_checks": {
+    "slant": {
+      "result": "FAIL",
+      "observation": "Strong source right italic is not reproduced in the near-upright Hangul warning.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "clean_plate": {
+      "result": "HOLD",
+      "observation": "Archived cleaned source panel appears free of obvious warning ghost; new-policy independent exact source/CLEAN lossless pixel authentication remains missing.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "style": {
+      "result": "FAIL",
+      "observation": "Visible italic letterface direction and shape family of the warning differ materially despite broadly retained yellow/navy colors.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "readability": {
+      "result": "PASS_SCOPED_VISUAL_ONLY",
+      "observation": "Korean warning words are readable in archived enlarged regional contact; this cannot override slant/style FAIL or certify game-scale readability.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "glyph_integrity": {
+      "result": "HOLD",
+      "observation": "No obvious broken warning stroke in reviewed JPEG, but compressed JPEG is inadequate to certify all persisted glyph fringe and authored mips.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "protected_art": {
+      "result": "HOLD",
+      "observation": "Warning icon and adjacent red/white numeric sprites appear retained; no independent current-policy protected-pixel mask/count verification performed in this run.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt"
+    },
+    "placement": {
+      "result": "HOLD",
+      "observation": "Legacy machine source/localized bboxes remain within historical safe extents, but new placement proof/anchor measurement was not performed.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json"
+    },
+    "orientation": {
+      "result": "PASS_SCOPED_VISUAL_ONLY",
+      "observation": "C180 RAW source/final overview and readable FLIP-Y comparison are semantically consistent; no additional live-game render observed.",
+      "evidence": "localization/graphics/role_C/20261005-C180-560FA536/C180_RAW_B64.txt"
+    }
+  },
+  "calibration": {
+    "blind_known_defect_calibration_completed": false,
+    "why": "Legacy producer/C180 data was known beforehand; do not fabricate blind calibration or a positive approval."
+  },
+  "status_before": "c180_pixel_visual_policy_pass_pending_ingame",
+  "status_after": "c1_20261010_q101_rework_required_source_italic_mismatch",
+  "decision": "REWORK_REQUIRED",
+  "fresh_C_pass": false,
+  "C3": "BLOCKED_UNTIL_MATERIAL_REWORK_AND_NEW_INDEPENDENT_C",
+  "current_policy_approval": "BLOCKED",
+  "user_game_regression_closure": "NOT_CLAIMED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_produced_dds": 0,
+  "modified_candidate_bytes": false,
+  "duplicate_same_sha_pass": false,
+  "required_next": "A/B material source-conditioned right-italic warning font reconstruction based on English top-minus-bottom readable anchors; separately validate source CLEAN; persist DDS RAW/FLIP-Y and 100/75/50 lossless views and every region; fresh C1 independent review, then separate C3, then user in-game confirmation. Preserve protected warning icon/numeric sprites; do not reuse old C180 PASS as current-policy authorization."
+}
