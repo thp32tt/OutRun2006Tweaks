@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00566",
+  "production_id": "CONVERSION-DX9EX-00566",
+  "event_id": "CONVERSION-DX9EX-00566-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "52d14a5b6ccbd3fad9ca1428fcc181bce6653d52",
+  "material_result_sha": "574b7dfa8dbb92ea16230618430e120f331b9177",
+  "validation_bearing_result_sha": "574b7dfa8dbb92ea16230618430e120f331b9177",
+  "result_sha": "574b7dfa8dbb92ea16230618430e120f331b9177",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00566]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:R32_PERF_DIAGNOSTIC_OVERFLOW_AND_RELEASE_SMOKE",
+  "conflict_keys": [
+    "src/vr/d3d9/r32_policy.hpp:R32-spike-EMA",
+    "vrhost/tests/r32_policy_smoke.cpp:NDEBUG-smoke"
+  ],
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "integrated_files": "PREEXISTING_APPROVED_V0_2",
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "summary": "R32 diagnostics now compare relative spike thresholds without uint64 overflow and compute the original integer EMA floor without wrap; x64 Release/NDEBUG smoke now uses fail-exit R32_CHECK rather than compiled-out assert, adding 7 extreme-value regression checks.",
+  "changed_paths": [
+    "src/vr/d3d9/r32_policy.hpp",
+    "vrhost/tests/r32_policy_smoke.cpp"
+  ],
+  "static_contract": {
+    "verifier": "vrhost/tests/r32_policy_smoke.cpp",
+    "single_focused_check": "PASS",
+    "checks": 20,
+    "release_build": true,
+    "hud_1000_5000_repeated": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 38019441125,
+    "domain_isolation": 38019441058,
+    "full_source_impact": 38019441160
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "host_smoke": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11657373704,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-574b7dfa8dbb92ea16230618430e120f331b9177",
+    "digest": "sha256:a9bf9d22813a6db683189b1a4ad791ef0c6eca063f660825fe09ee7a31411e49"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest branch HEAD and 00566 periodic controller checkpoint, priority/AGENTS/state/queue/history, Issue #13/#14 and release tag verified; no previous 00566 result",
+    "C1_REVIEW": "PASS: independent R32 diagnostic uint64 wrap and NDEBUG release-smoke false pass, no overlapping 00563/00564/00565 paths",
+    "C2_IMPLEMENT": "PASS: bounded R32 C++ diagnostic fix plus Release-active x64 host smoke 20 checks",
+    "C3_VALIDATE": "PASS: exact SHA 574b7dfa; DX9Ex Active #38019441125, Domain #38019441058, Full Source #38019441160 all SUCCESS",
+    "C4_COMMIT": "PASS: validation-bearing material SHA 574b7dfa8dbb92ea16230618430e120f331b9177 marked [AUTO:CONVERSION-DX9EX-00566], no skip",
+    "C5_PACKAGE": "PASS: artifact 11657373704 published at exact SHA, not HMD approved",
+    "C6_RESULT": "PASS: durable result record separate from material source commit"
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "native_120fps_target": "NOT_MEASURED",
+  "parallel_policy": "DX11 A ACTIVE independent; DX9Ex C ACTIVE; DXVK B FROZEN; localization untouched",
+  "next_action": "Proceed to another independent DX9Ex P1 R84 seam or verified P2 OpenXR eye extent without retrying 00566. Never claim HMD 120FPS until real Quest3/VDXR evidence."
+}
