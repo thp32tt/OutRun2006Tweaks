@@ -3451,7 +3451,7 @@ namespace OutRunVRStereo
         return R29OwnerCaptureFrameSnapshot().presentEpoch;
     }
 
-    bool R30SupportR29OwnerStereoWanted() noexcept
+    bool R30SupportStereoWanted() noexcept
     {
         return R29OwnerStereoWanted();
     }
@@ -3550,7 +3550,7 @@ namespace OutRunVRStereo
         return R9IsRightStencilInSync();
     }
 
-    bool R30SupportR29OwnerTargetIsBackBuffer() noexcept
+    bool R30SupportTargetIsBackBuffer() noexcept
     {
         return R29OwnerTargetIsBackBuffer();
     }
