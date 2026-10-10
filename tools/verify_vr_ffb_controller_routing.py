@@ -75,8 +75,21 @@ def violations(source: str) -> list[str]:
         errors.append("legacy rumble output must be tracked after XInput send")
     if "if (!Settings::UseNewInput)\n\t{\n\t\tXInputSetState(userId, &vib);" not in route:
         errors.append("legacy XInput output must use selected controller")
-    if "InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);" not in route:
-        errors.append("SDL output forwarding lost")
+    sdl_only = ("if (Settings::UseNewInput)\n    {\n"
+                "        InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);\n"
+                "        sdlRumbleOutputActive = true;\n    }")
+    if sdl_only not in route or route.count("InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);") != 1:
+        errors.append("SDL rumble must only run on the selected SDL input backend")
+    if "else if (sdlRumbleOutputActive)\n    {\n" not in route or (
+        "InputManager_StopVibration();\n        sdlRumbleOutputActive = false;\n    }" not in route
+    ):
+        errors.append("SDL-to-XInput handoff must cancel the previously timed SDL rumble")
+    wheel = route.split("if (WheelFFB_IsOutputOwnerActive())", 1)[1].split("wheelOwnedLastCall = false;", 1)[0]
+    disabled_stop = route.split("if (!Settings::VibrationMode)", 1)[1].split("rumbleDisabledLastCall = true;", 1)[0]
+    if "InputManager_StopVibration();\n            sdlRumbleOutputActive = false;" not in wheel or (
+        "InputManager_StopVibration();\n            sdlRumbleOutputActive = false;" not in disabled_stop
+    ):
+        errors.append("wheel acquisition and disabled rumble must reset SDL ownership state")
     if "if (!Settings::VibrationMode)" not in route:
         errors.append("disabled-rumble transition lost")
     return errors
@@ -97,6 +110,9 @@ def main() -> None:
         ("Range<int>{ 0, 3 }", "Range<int>{ 0, 4 }"),
         ("if (Settings::UseNewInput && legacyXInputOutputActive)", "if (false)"),
         ("if (legacyXInputOutputActive || !Settings::UseNewInput)", "if (legacyXInputOutputActive)"),
+        ("if (Settings::UseNewInput)\n    {\n        InputManager_SetVibration(", "if (true)\n    {\n        InputManager_SetVibration("),
+        ("else if (sdlRumbleOutputActive)", "else if (false)"),
+        ("InputManager_StopVibration();\n        sdlRumbleOutputActive = false;", "sdlRumbleOutputActive = false;"),
         ("legacyXInputOutputActive = true;", "legacyXInputOutputActive = false;"),
         ("legacyXInputOutputActive = false;\n    }\n\n    void InputManager_SetVibration", "/* handoff state clear removed */\n    }\n\n    void InputManager_SetVibration"),
     )

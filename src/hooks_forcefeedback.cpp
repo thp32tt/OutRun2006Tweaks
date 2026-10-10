@@ -27,6 +27,7 @@ float VibrationLeftMotor = 0.f;
 float VibrationRightMotor = 0.f;
 
 bool WheelFFB_IsOutputOwnerActive();
+void InputManager_StopVibration();
 
 void SetVibration(int userId, float leftMotor, float rightMotor)
 {
@@ -37,12 +38,14 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     static bool rumbleDisabledLastCall = false;
     // A live UseNewInput switch must release previously driven legacy rumble.
     static bool legacyXInputOutputActive = false;
+    // Track a live SDL rumble command so a switch back to XInput can cancel it.
+    static bool sdlRumbleOutputActive = false;
     if (WheelFFB_IsOutputOwnerActive())
     {
         if (!wheelOwnedLastCall)
         {
-            void InputManager_StopVibration();
             InputManager_StopVibration();
+            sdlRumbleOutputActive = false;
             XINPUT_VIBRATION zero{};
             XInputSetState(userId, &zero);
             legacyXInputOutputActive = false;
@@ -60,8 +63,8 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
         // leaves a previously active motor running on some XInput devices.
         if (!rumbleDisabledLastCall)
         {
-            void InputManager_StopVibration();
             InputManager_StopVibration();
+            sdlRumbleOutputActive = false;
             // Even after switching to SDL, stop a previously driven XInput port.
             if (legacyXInputOutputActive || !Settings::UseNewInput)
             {
@@ -99,7 +102,17 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     }
 
     void InputManager_SetVibration(WORD, WORD);
-    InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);
+    if (Settings::UseNewInput)
+    {
+        InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);
+        sdlRumbleOutputActive = true;
+    }
+    else if (sdlRumbleOutputActive)
+    {
+        // The previous timed SDL rumble must not survive SDL -> XInput handoff.
+        InputManager_StopVibration();
+        sdlRumbleOutputActive = false;
+    }
 
 	if (!Settings::UseNewInput)
 	{
