@@ -2,8 +2,8 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00537-E005",
+  "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00537",
@@ -70,56 +70,73 @@
   },
   "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
   "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
-  "feature_status": "IMPLEMENTING",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C2_IMPLEMENT",
+  "feature_status": "FEATURE_READY",
+  "status": "FEATURE_READY_PENDING_CONTROLLER_PROMOTION",
+  "checkpoint": "C6_STATE",
   "feature_acceptance": {
-    "implementation_complete": false,
-    "targeted_checks": [],
-    "integration_contract": "D3D9_CALLSITE→D3D11_NATIVE_DRAW→VISIBLE_FRAME_OUTPUT (source path implemented, CI/runtime pending)"
+    "implementation_complete": true,
+    "targeted_checks": [
+      "Build run 38069889292 exact feature SHA fa55a1d4; 4 named static acceptance steps PASS, Win32 release game DLL PASS",
+      "OpenXR run 38069889239 exact feature SHA fa55a1d4; Win32 x86 game/R26 HUD, host x64 and comparison builds PASS",
+      "DX11-TEST-BUNDLE named acceptance PASS; real ZIP artifact 11677140344, embedded SHA256 integrity and PE negative tests PASS",
+      "Rotation sampler negative mutation and Windows macro-safe compile PASS"
+    ],
+    "integration_contract": "GAME_AUTHORED_D3D9_DRAW→D3D11_NATIVE_DRAW→GAME_D3D9_PRESENT_INSET (source/build/packaging verified only; live game GPU pixel proof pending)",
+    "runtime_evidence": "UNTESTED: no OR2006C2C.EXE playback, on-screen native diagnostic inset, game input, Quest3 or VDXR runtime measured",
+    "ready_scope": "DIAGNOSTIC_OPT_IN_TEST_BUNDLE_ONLY__NOT_PRODUCTION_DX11_GAMEPLAY"
   },
   "acceptance_results": [
     {
       "id": "DX11-LIVE-CALLSITE",
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
       "evidence_paths": [
         "src/vr/d3d9/stereo_renderer_r30.cpp",
         "src/vr/d3d11/live_game_frame_bridge.hpp"
       ],
-      "validation_command": "PENDING_WIN32_GAME_BUILD_AND_DYNAMIC_CALLEE_TEST"
+      "validation_command": "Build 38069889292: Feature acceptance: DX11-LIVE-CALLSITE; Win32 Release SUCCESS",
+      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "runtime_observation": "UNTESTED"
     },
     {
       "id": "DX11-NATIVE-DRAW",
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "PENDING_NATIVE_DRAW_GPU_INTEGRATION_TEST"
+      "validation_command": "Build 38069889292: Feature acceptance: DX11-NATIVE-DRAW; Win32 Release SUCCESS",
+      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "runtime_observation": "UNTESTED"
     },
     {
       "id": "DX11-VISIBLE-FRAME",
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d9/stereo_renderer_r30.cpp"
       ],
-      "validation_command": "PENDING_BACKBUFFER_PIXEL_READBACK_TEST"
+      "validation_command": "Build 38069889292: Feature acceptance: DX11-VISIBLE-FRAME; Win32 Release SUCCESS",
+      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "runtime_observation": "UNTESTED"
     },
     {
       "id": "DX11-SAFE-RETURN",
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "PENDING_NEGATIVE_RUNTIME_TESTS"
+      "validation_command": "Build 38069889292: Feature acceptance: DX11-SAFE-RETURN; Win32 Release SUCCESS",
+      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "runtime_observation": "UNTESTED"
     },
     {
       "id": "DX11-TEST-BUNDLE",
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA_BINARY_PACKAGE",
       "evidence_paths": [
         "CMakeLists.txt"
       ],
-      "validation_command": "PENDING_WIN32_GAME_HOST_PACKAGE_BUILD"
+      "validation_command": "OpenXR 38069889239: Feature acceptance: DX11-TEST-BUNDLE; artifact 11677140344",
+      "validation_level": "REAL_X86_X64_BINARIES_SHA_PACKAGE",
+      "runtime_observation": "UNTESTED"
     }
   ],
   "required_gates": [
@@ -140,17 +157,55 @@
     }
   ],
   "artifact_prefix": "feature-dx11-first-game-frame-",
-  "material_result_sha": "70fb68fbb071c2d72bfb372d842c8103c2ef519b",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+  "validation_bearing_result_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
   "result_sha": null,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS_FEATURE_BUILD_OPENXR_BUNDLE_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_draw_path_production_default": false,
-  "source_stage": "Game callsite/native draw/readback path coded but not compiled or validated",
-  "last_real_activity_evidence": "feature commits 724bf572, 68f7e26a, e5ee29ac, 70fb68fb",
-  "blocker": "Native game subset currently limited to untextured FVF XYZRHW|DIFFUSE triangles; no general shader/texture/VS path; Windows build, GPU/backbuffer live proof and game/Quest3 still pending.",
-  "resume_cursor": "C2_REVIEW_COMPILER_WARNINGS_THEN_C3_WIN32_BUILD_AND_INTEGRATION_TESTS",
-  "next_action": "Validate Win32 compilation via draft feature PR; repair source failures on feature branch; add genuine live draw/visible pixel and negative controls; package exact SHA; only then FEATURE_READY and controller promotion.",
-  "score_change": 0
+  "source_stage": "SOURCE_BUILD_BUNDLE_VERIFIED__LIVE_GAME_PIXEL_AND_HMD_UNTESTED",
+  "last_real_activity_evidence": "f2e95be2/91be3ecc/fa55a1d4 Windows min macro fix and exact-SHA Build 38069889292 SUCCESS + OpenXR 38069889239 SUCCESS + package artifact 11677140344 SHA256 ff3122...; Issue #14 log present.",
+  "blocker": "No actual real-game GPU pixel/backbuffer inset or Quest3/VDXR runtime evidence; only FVF XYZRHW|DIFFUSE no-depth/no-blend diagnostic subset; Backend Conversion Gate requires controller target promotion.",
+  "resume_cursor": "FEATURE_READY_AWAIT_CONTROLLER_PROMOTION_AND_BACKEND_GATE__RUNTIME_UNTESTED",
+  "next_action": "Controller: fast-forward or otherwise promote feature branch to vr-dx11-native-r71 after conflict/ownership checks, execute exact target Backend Conversion Gate validate+DX11 readiness smoke, preserve binary test bundle artifact 11677140344. User runtime: default DX9Ex control vs explicit opt-in diagnostic and compare native_draws/desktop_insets/input. No gameplay/HMD success until actual observations.",
+  "score_change": 0,
+  "validation_gates": {
+    "build": {
+      "workflow": "Build",
+      "run_id": 38069889292,
+      "head_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+      "conclusion": "SUCCESS",
+      "scope": "Win32 release x86 + source acceptance"
+    },
+    "openxr": {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38069889239,
+      "head_sha": "fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+      "conclusion": "SUCCESS",
+      "scope": "Win32 game and x64 host builds + real package"
+    },
+    "backend_conversion": {
+      "workflow": "Backend Conversion Gate",
+      "conclusion": "PENDING_CONTROLLER_TARGET_BRANCH_PROMOTION",
+      "target_branch": "vr-dx11-native-r71"
+    }
+  },
+  "test_bundle": {
+    "artifact_id": 11677140344,
+    "artifact_name": "feature-dx11-first-game-frame-fa55a1d4dd07d03c9856072f0ab1f94f7277637a",
+    "zip_sha256": "ff3122f15b8728a9488aead1cf91cf2c2db1ee2d1804057a1907ebf24670c4be",
+    "game_dinput8_sha256": "fd1b340e2c99333474d5edd637e8bb5948cdb1816c33edac29fac981b7abd418",
+    "host_sha256": "c7f6ad517a30c5e2ca09367e1263fcecbf24f32e65e451acbe452fa80aab8bb8",
+    "build_source_is_feature_head": "CHECK_BUILD_IDENTITY_JSON"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: verified target SHA 8fb3d860, feature f8a5a44e, original C2 run ledger and controller checkpoint; E005 rollover attempt retained 1/3.",
+    "C1_REVIEW": "PASS: original bounded live-game Draw selection could starve after offscreen first accepted Draw. R175 ownership 00477 preserved; unrelated DX9Ex/DXVK untouched.",
+    "C2_IMPLEMENT": "PASS: rotate max 64 eligible game Draw candidates, one opt-in D3D11 draw per Present, reset/fail-closed, static negative; fix Win32 min macro C2589; add 5 named feature CI checks.",
+    "C3_VALIDATE": "PASS (SOURCE+BUILD): exact fa55a1d4 Build 38069889292 and OpenXR 38069889239 SUCCESS; four static acceptance steps plus real binary package acceptance PASS. NO LIVE GAME/HMD.",
+    "C4_COMMIT": "PASS: real source and tool/workflow material feature commits b208fe66, f297818e, e929a792, 341bb329, 59a8ce82, c89bb181, fa55a1d4; Issue #14 comments 6099914081 and 6099980082.",
+    "C5_PACKAGE": "PASS: exact fa55a1d4 real game-x86/host-x64 selector, logs and SHA manifest ZIP artifact 11677140344; package SHA256 ff3122f15b8728a9488aead1cf91cf2c2db1ee2d1804057a1907ebf24670c4be.",
+    "C6_STATE": "FEATURE_READY for optional game diagnostic integration only; controller must update target and run Backend Conversion Gate; OR2006C2C.EXE/Quest3 runtime UNTESTED; full game DX11 production activation forbidden."
+  }
 }
