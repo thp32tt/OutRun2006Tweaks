@@ -1,262 +1,158 @@
 #!/usr/bin/env python3
-"""B353 even q060: second/final bold-condensed family pilot after B352 visual thin-stroke rejection.
-Unapproved scoped producer trial; P1 B348 is reused verbatim. Does not alter
-hd_candidates nor queue; the controller must review persisted pixels first.
+"""B354 q154 C356 gray-menu optical-stroke REWORK: native Regular Korean glyph reconstruction.
+Three C2-rejected gray labels ONLY; exact canonical HD English SOURCE, preserved
+other five rows. Unapproved DDS trial until source-vs-final optical producer QA.
 """
-import os,io,json,hashlib,struct,subprocess,sys
+import os,io,json,hashlib,struct,tempfile,urllib.request,subprocess,sys
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageChops
+from PIL import Image,ImageFont,ImageDraw
 from fontTools.ttLib import TTCollection
-assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
+assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
 G=Path("localization/graphics")
-OUT=G/"role_B/20261010-B353-Q060-ENGLISH-PERROW-MATERIAL-PILOT"
-OUT.mkdir(parents=True,exist_ok=True)
-hs=lambda b:hashlib.sha256(b).hexdigest()
-SH={"source":"6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
-"official":"d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
-"clean":"a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
-"mask":"25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9"}
-tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","60"],
-                           capture_output=True,check=True,text=True).stdout)["assets"][0]
-assert tri["next_action"]=="METHOD_CHANGE_REQUIRED",tri
-srcp=G/"hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-if srcp.is_file():src=srcp.read_bytes()
+OUT=G/"role_B/20261010-B354-Q154-THIN-NATIVE-GRAY-SOURCE-FAMILY";OUT.mkdir(parents=True,exist_ok=True)
+ASSET=G/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+SOURCE_SHA="15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf"
+OFFICIAL_SHA="c4d6c1515716476123b69dfb645dcc27a3cc7a69f31a1368a831004a0b40d524"
+AUTHORED_CLEAN_SHA="a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380"
+sha=lambda b:hashlib.sha256(b).hexdigest()
+tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","154"],check=True,capture_output=True,text=True).stdout)["assets"][0]
+assert tri["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"),tri["next_action"]
+p=ASSET.read_bytes();assert sha(p)==OFFICIAL_SHA,("CONCURRENT_BRANCH_DRIFT",sha(p))
+source_path=G/"hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+if source_path.exists():s=source_path.read_bytes()
 else:
- import urllib.request
- url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
- with urllib.request.urlopen(url,timeout=90) as f:src=f.read()
-off=(G/"hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds").read_bytes()
-pp=G/"role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE"
-cb=(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png").read_bytes()
-mb=(pp/"B348_SOURCE_BEST_TIME_PROPOSED_REMOVAL_MASK_READABLE.png").read_bytes()
-for n,b in [("source",src),("official",off),("clean",cb),("mask",mb)]:assert hs(b)==SH[n],(n,hs(b))
-def decode(data):
- return np.array(Image.open(io.BytesIO(data)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-S=decode(src);O=decode(off)
-C=np.array(Image.open(io.BytesIO(cb)).convert("RGBA"))
-M=np.array(Image.open(io.BytesIO(mb)).convert("L"))
-assert S.shape==O.shape==C.shape==(2048,4096,4) and M.shape==S.shape[:2]
-assert np.all(C[M>0]==0)
-assert int(np.any(S!=C,axis=2).sum())==89391
-assert int((np.any(S!=C,axis=2)&(M==0)).sum())==0
-# The B348 source-first evidence proves the English component geometry.
-# Repair an atlas-local fence including the former Korean overhang, restoring
-# the canonical adjacent source sprites (rather than keeping dirty B343 pixels).
-roi=(2090,337,3120,485);label_bbox=(2179,340,3028,474)
-x0,y0,x1,y1=roi;W=x1-x0;H=y1-y0
-# Source ROI contains exactly two English-alpha components. The Korean effect
-# must be inside their combined source effect bbox with strictly positive margin.
-original=S[y0:y1,x0:x1];plate=C[y0:y1,x0:x1]
-# Rebuild from SOURCE/CLEAN, never composite old dirty Korean lettering.
-# B353 source-conditioned thin-outline reconstruction: render individual
-# CJK vector outlines at source-native ppem and lay out syllabic components
-# separately, not a whole-word stretched raster or a flat filled font crop.
-fontp=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
-fontb=fontp.read_bytes();fontsha=hs(fontb);font_index=1
-cmap=TTCollection(str(fontp)).fonts[font_index].getBestCmap()
-word="최고 기록:"
-assert all(ord(ch) in cmap for ch in word if ch!=" ")
-ppem=122
-font=ImageFont.truetype(str(fontp),ppem,index=font_index)
-# Each native glyph is an independent letterform with its own width, baseline
-# and exactly one native contour resampling. Optical widths are chosen from the
-# English source's racing title role, not a whole-word width post-transform.
-target_hangul_w=116
-tracking=34
-letter_spacing=tracking
-space_advance=37
-local=Image.new("L",(W,H),0)
-d=ImageDraw.Draw(local)
-all_bb=[d.textbbox((0,0),ch,font=font) for ch in word if ch!=" "]
-body_h=max(bb[3]-bb[1] for bb in all_bb)
-assert 100<=body_h<=130,(body_h,ppem)
-native_glyphs=[]
-for ch in word:
- if ch==" ":
-  native_glyphs.append((ch,None,space_advance));continue
- bb=d.textbbox((0,0),ch,font=font)
- im=Image.new("L",(bb[2]-bb[0]+4,body_h+4),0)
- dr=ImageDraw.Draw(im)
- dr.text((2-bb[0],2-bb[1]),ch,font=font,fill=255)
- native=im.getbbox();assert native
- im=im.crop(native)
- if ch==":":
-  target_w=round(im.width*1.12)
- else:
-  target_w=target_hangul_w
- # Each letterform expands horizontally as a vector-outline surrogate at
- # native size. This is not the rejected last-run whole-word spacing tweak.
- im=im.resize((target_w,im.height),Image.Resampling.LANCZOS)
- native_glyphs.append((ch,im,target_w))
-glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
-advance=glyph_width-tracking*(len(native_glyphs)-1)
-assert 620<=glyph_width<=830,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
-left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0-18 # native contour overhang: shift 18px left to keep 1px+ right source margin
-top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
-top+=1
-pen=left
-for ch,im,w0 in native_glyphs:
- if im is not None: local.paste(im,(pen,top),im)
- pen+=w0+tracking
-mask=np.array(local)
-gy,gx=np.nonzero(mask>16);assert len(gx)>1000
-before=[int(gx.min()+x0),int(gy.min()+y0),int(gx.max()+1+x0),int(gy.max()+1+y0)]
-# B353: ONE readable right-lean affine placement after native per-glyph shaping.
-# B353 applied two stacked transforms (0.39 + 0.22), an unmeasured optical
-# distortion. Single 0.32 source-oriented matrix only; final anchors remain
-# C2-review-required, not mechanically certified source-homologous strokes.
-incline=.40
-local=local.transform((W,H),Image.Transform.AFFINE,(1,incline,-incline*(top+body_h+2),0,1,0),resample=Image.Resampling.BICUBIC)
-letter=np.array(local)
-# B353 source-conditioned pixel sampling rather than fabricated color stops.
-# English SOURCE is immutable. Warm face is isolated from navy outlines,
-# orange sibling art and alpha halos WITHIN the authenticated BEST TIME bbox.
-from scipy.ndimage import distance_transform_edt,gaussian_filter1d
-rgb_src=original[:,:,:3]
-source_warm=(original[:,:,3]>=180)&(rgb_src[:,:,0]>=165)&(rgb_src[:,:,1]>=75)&(rgb_src[:,:,0].astype(np.int16)>rgb_src[:,:,2].astype(np.int16)+45)
-source_warm &= (np.indices(source_warm.shape)[1]+x0 >= label_bbox[0]) & (np.indices(source_warm.shape)[1]+x0 < label_bbox[2])
-row_counts=source_warm.sum(axis=1)
-source_rows=np.where(row_counts>=12)[0]
-assert len(source_rows)>65,("UNRESOLVED_ENGLISH_FACE_ROWS",len(source_rows),int(source_warm.sum()))
-raw_row_medians=np.zeros((H,3),np.float64)
-raw_row_high=np.zeros((H,3),np.float64)
-for ry in source_rows:
- vals=rgb_src[ry,source_warm[ry]].astype(np.float64)
- raw_row_medians[ry]=np.median(vals,axis=0)
- raw_row_high[ry]=np.percentile(vals,80,axis=0)
-row_profile=np.zeros((H,3),np.float64);row_high=np.zeros((H,3),np.float64)
-for k in range(3):
- row_profile[:,k]=np.interp(np.arange(H),source_rows,raw_row_medians[source_rows,k])
- row_high[:,k]=np.interp(np.arange(H),source_rows,raw_row_high[source_rows,k])
-row_profile=gaussian_filter1d(row_profile,sigma=1.5,axis=0)
-row_high=gaussian_filter1d(row_high,sigma=1.5,axis=0)
-# Exact-source dark edging extracted from actual alpha-opaque navy, not B353 brown.
-navy_mask=(original[:,:,3]>=185)&(rgb_src[:,:,2]>=rgb_src[:,:,0]+14)&(rgb_src[:,:,0]<115)&(rgb_src[:,:,1]<115)
-assert int(navy_mask.sum())>250,("MISSING_ENGLISH_NAVY",int(navy_mask.sum()))
-navy=np.median(rgb_src[navy_mask],axis=0).astype(np.uint8).tolist()
-navy=[min(65,navy[0]),min(80,navy[1]),max(52,navy[2])]
-# Use SOURCE face ink height, not arbitrary fixed red/yellow gradients.
-source_lo=int(source_rows.min());source_hi=int(source_rows.max())
-face=np.array(local,dtype=np.uint8)
-inside=face>=110
-fy,fx=np.nonzero(face>110)
-assert len(fx)>1000
-k_lo,k_hi=int(fy.min()),int(fy.max())
-assert k_hi-k_lo>=70
-# Native glyph y -> original source warm-face row y for EVERY Hangul pixel.
-ly,lx=np.indices((H,W));frac=np.clip((ly-k_lo)/max(1,k_hi-k_lo),0,1)
-q=np.clip((source_lo+frac*(source_hi-source_lo)).astype(np.int32),0,H-1)
-colored=(0.68*row_profile[q]+0.32*row_high[q]).copy()
-# Raised top-facing contour receives actual source face upper quantiles, not
-# uniform white bars. Preserve Hangul counter-space by tight native masks.
-dist=distance_transform_edt(inside)
-bevel_high=(dist>1.5)&(dist<5.5)&(frac>.45)&(frac<.9)
-colored[bevel_high]=.55*colored[bevel_high]+.45*row_high[q][bevel_high]
-# 1-2px inner lip sampled from source's warmer low-quantile tone.
-inner_lip=(dist>0)&(dist<2.5)
-colored[inner_lip]=.82*colored[inner_lip]+.18*np.array([254,118,17],dtype=np.float64)
-ink=Image.new("RGBA",(W,H),(0,0,0,0))
-# Source navy modeled with separate long lower extrusion and compact dark rim.
-edge=local.filter(ImageFilter.MaxFilter(7))
-extrusion=ImageChops.offset(edge,2,3)
-shade=Image.new("RGBA",(W,H),tuple(navy)+(0,));shade.putalpha(extrusion)
-ink=Image.alpha_composite(ink,shade)
-rim=Image.new("RGBA",(W,H),tuple(navy)+(0,));rim.putalpha(edge)
-ink=Image.alpha_composite(ink,rim)
-material=np.zeros((H,W,4),np.uint8)
-material[:,:,:3]=np.clip(colored,0,255).astype(np.uint8)
-material[:,:,3]=face
-ink=Image.alpha_composite(ink,Image.fromarray(material,"RGBA"))
-source_profile={"source_face_warm_pixels":int(source_warm.sum()),"source_face_qualified_rows":len(source_rows),"source_face_row_range":[source_lo+y0,source_hi+y0],"source_navy_pixels":int(navy_mask.sum()),"source_navy_median_rgb":navy,"source_color_samples":[{"y":int(y0+j),"count":int(row_counts[j]),"rgb_median":raw_row_medians[j].round().astype(int).tolist(),"rgb_high_80":raw_row_high[j].round().astype(int).tolist()} for j in source_rows[::max(1,len(source_rows)//14)]],"korean_face_row_range":[k_lo+y0,k_hi+y0],"construction":"real source warm-face row-median/80th material bound to native glyph face depth, single readable affine; not B353 manual hot-orange stops and double transform"}
-(OUT/"B353_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json").write_text(json.dumps(source_profile,indent=2,ensure_ascii=False)+"\n")
-color_top=row_profile[source_lo].round().astype(int).tolist()
-color_bottom=row_profile[source_hi].round().astype(int).tolist()
-V=np.array(ink)
-iy,ix=np.nonzero(V[:,:,3]>0);assert len(ix)>1000
-render_bbox=[int(ix.min()+x0),int(iy.min()+y0),int(ix.max()+1+x0),int(iy.max()+1+y0)]
-assert render_bbox[0]>label_bbox[0] and render_bbox[1]>label_bbox[1] and render_bbox[2]<label_bbox[2] and render_bbox[3]<label_bbox[3],(render_bbox,label_bbox)
-# Source material and CLEAN/LETTERING remain separately persisted.
-p=Image.fromarray(plate,"RGBA")
-assert np.all(plate[M[y0:y1,x0:x1]>0,3]==0)
-after=Image.alpha_composite(p,ink)
-new=O.copy()
-new[y0:y1,x0:x1]=np.asarray(after)
-# The source-derived CLEAN replacement is bounded only to this q060 cell.
-diff=np.any(new!=O,axis=2)
-allowed=np.zeros(diff.shape,bool);allowed[y0:y1,x0:x1]=True
-assert int((diff&~allowed).sum())==0
-# Confirm source original neighbour alpha outside the original English mask
-# remains pixel-exact where no Korean effect is drawn, even inside repair ROI.
-in_effect=np.zeros((H,W),bool);in_effect[V[:,:,3]>0]=True
-other_visible=(original[:,:,3]>0)&(M[y0:y1,x0:x1]==0)&(~in_effect)
-assert int(np.any(np.asarray(after)[other_visible]!=original[other_visible],axis=1).sum())==0
-# RAW DDS roundtrip. Preserve header/mip, channel masks and orientation.
-assert len(off)==33554560 and len(src)==len(off) and off[:128]==src[:128]
-rgba_masks=struct.unpack_from("<IIII",off,92)
-assert rgba_masks in ((255,65280,16711680,4278190080),(16711680,65280,255,4278190080)),rgba_masks
-order=[0,1,2,3] if rgba_masks[0]==255 else [2,1,0,3]
-newdds=off[:128]+np.flipud(new)[:,:,order].copy().tobytes()
-assert len(newdds)==len(off) and hs(newdds)!=SH["official"]
-D=decode(newdds)
-assert np.array_equal(D,new)
-fn="B353_Q060_SOURCE_CONTOUR_GOLD_KOREAN_UNAPPROVED.dds"
-(OUT/fn).write_bytes(newdds)
-Image.fromarray(plate,"RGBA").save(OUT/"B353_BEST_TIME_PLATE_ONLY_ROI.png")
-ink.save(OUT/"B353_BEST_TIME_TRANSPARENT_LETTERING_ROI.png")
-Image.fromarray(new,"RGBA").save(OUT/"B353_Q060_DECODED_FINAL_FULL_READABLE.png")
-# bounded proof panels; no visual PASS inferred by the worker.
-ev=[]
-r=[2075,212,3135,535]
-def render(a,bg):
- i=Image.fromarray(a[r[1]:r[3],r[0]:r[2]],"RGBA")
- c=Image.new("RGBA",i.size,bg+(255,));c.alpha_composite(i)
- return c.convert("RGB")
-for bgkey,bg in [("GRAY",(128,128,128)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
- for size in [100,75,50]:
-  panels=[render(a,bg) for a in [S,C,O,new]]
-  if size!=100:panels=[z.resize((round(z.width*size/100),round(z.height*size/100)),Image.Resampling.LANCZOS) for z in panels]
-  w,h=panels[0].size
-  sheet=Image.new("RGB",(4*w+36,h),bg)
-  for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
-  file=f"B353_SOURCE_CLEAN_OFFICIAL_NEW_{bgkey}_{size}_FLIPY.png"
-  sheet.save(OUT/file,optimize=True);ev.append(file)
-for view in ["RAW"]:
- panels=[render(a,(80,80,80)).transpose(Image.Transpose.FLIP_TOP_BOTTOM) for a in [S,C,O,new]]
- w,h=panels[0].size
- sheet=Image.new("RGB",(4*w+36,h),(80,80,80))
- for k,panel in enumerate(panels):sheet.paste(panel,(k*(w+12),0))
- fn2="B353_SOURCE_CLEAN_OFFICIAL_NEW_RAW_GRAY_100.png";sheet.save(OUT/fn2,optimize=True);ev.append(fn2)
-Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B353_PREVIOUS_TO_TRIAL_NATIVE_CHANGED_MASK.png")
-# Readable top-minus-bottom optical evidence is a distinct manual inspection,
-# not a computed homologous-source slant PASS.
-report={"schema_version":2,"role":"B","run":"B353","queue_index":60,
-"run_key":"OUTRUN-KOR-B353-Q060-P0-CONTOUR-OPTICAL-PILOT-20261010-1635",
-"method":"B353 second and last native source-derived font-family pilot. Correct B352 optical underweight and height with Bold 122ppem native contours while preserving slim 3px source-navy edge, high-percentile original face, bounded readable lean and B348 CLEAN. Unlike rejected B351 huge 8px rim and broad glyphs; trial is not promoted without controller source review.",
-"triage":tri["next_action"],"priority":"P0","source_sha256":SH["source"],"prior_official_sha256":SH["official"],
-"authored_clean_sha256":SH["clean"],"authored_mask_sha256":SH["mask"],"trial_persisted_sha256":hs(newdds),
-"trial_DDS":fn,"bytes":len(newdds),"source_bbox":list(label_bbox),"new_effect_bbox":render_bbox,
-"native_glyph_bbox_pre_italic":before,"text":word,"font_file":fontp.name,"font_sha256":fontsha,"font_license":"OFL Noto CJK; verify distribution before packaging",
-"glyph_coverage":"ALL_CODEPOINTS_PRESENT","font_native_ppem":ppem,"letter_spacing":letter_spacing,"natural_advance_px":advance,
-"source_gold_sample_rgb_upper":color_top,"source_gold_sample_rgb_lower":color_bottom,
-"readable_single_affine_lean_UNQUALIFIED_SOURCE_HOMOLOGY":incline,
-"gradient":"SOURCE_MEASURED_ENGLISH_FACE_ROWS_AND_QUANTILES","stroke_px":3,"extrusion_offset":[2,3],
-"roi":list(roi),"changed_rgba_pixels":int(diff.sum()),"changed_rgba_outside_roi":0,"original_protected_sibling_rgba_changed_outside_effect":0,
-"persisted_dds_roundtrip_mismatch":int(np.any(D!=new,axis=2).sum()),"raw_channel_masks":list(rgba_masks),
-"source_clean_source_pixels_removed":89391,"preview_files":ev,"new_trial_dds":1,"new_promoted_dds":0,
-"P1":"REUSED_B348_SCOPED_SOURCE_CLEAN_VISUAL_PASS","P2":"NEW_TRANSPARENT_GLYPHS_NEED_CONTROLLER_OPTICAL_REVIEW",
-"P3":"PERSISTED_TRIAL_MECHANICAL_ROUNDTRIP_PASS_VISUAL_PENDING",
-"final_production_pixel_guard":"NOT_APPLICABLE_TO_UNPROMOTED_TRIAL","official_C2":"C342_REWORK_REQUIRED_UNCHANGED","C3":"BLOCKED",
-"IGR044":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED",
-"forbidden":["A_ODD","C1","VR","FFB","DX11","DXVK"]}
-(OUT/"B353_Q060_MACHINE_AND_SOURCE_FAMILY.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
-(OUT/"recipe.json").write_text(json.dumps({"canonical_source":{"sha256":SH["source"],"revision":"OR2-HD-GUI-v0.25.10a"},
-"source_clean":{"path":str(pp/"B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png"),"sha256":SH["clean"]},
-"font":{"path":str(fontp),"sha256":fontsha,"index":font_index,"native_ppem":ppem,"glyphs":word},
-"plate_mask_sha256":SH["mask"],"source_face_row_profile":"B353_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json","face_gradient":[color_top,color_bottom],
-"effect":{"outline":3,"shadow_offset":[2,3],"readable_right_italic_shear":incline},
-"protected_siblings":["OUTRUN MILES","HOLLY WOLF","all other source atlas regions"],
-"construction":"Second/final native contour test: Bold 122ppem glyph silhouette, slender 116px individual glyph width, 3px navy contour and 2x3 extrusion, original face row gradient plus high percentile highlights, 0.40 readable lean; fixes B352 too-thin/short Regular and avoids B351 swollen 8px outline",
-"need_C2_source_slant_homologous_anchors":True,
-"no_final_candidate_published":True},ensure_ascii=False,indent=2)+"\n")
-print("B353",hs(newdds),"font_px",ppem,"bbox",render_bbox,"newchg",int(diff.sum()),flush=True)
+ url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+ with urllib.request.urlopen(url,timeout=90) as rr:s=rr.read()
+assert sha(s)==SOURCE_SHA and p[:128]==s[:128],("CANONICAL_ENGLISH_FAIL",sha(s))
+def dec(b):return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+source,old=dec(s),dec(p)
+assert source.shape==old.shape==(1024,4096,4) and len(p)==16777344
+# The C344 independently byte-authenticated eight original regions, and all
+# target regions are source-text-only transparency. Never paste any OLD Korean
+# glyph beneath a new glyph or modify a non-gray row.
+c344=json.loads((G/"role_C/20261010-C344-C2-Q154-EXACT-FULL-CLEAN-PLATE/C344_Q154_EXACT_FULL_CLEAN_MACHINE.json").read_text())
+assert c344["sha256"]["SOURCE"]==SOURCE_SHA and c344["sha256"]["FINAL"]==OFFICIAL_SHA
+all_regions={r["id"]:tuple(r["bbox"]) for r in c344["regions"]}
+assert len(all_regions)==8
+all_mask=np.zeros(source.shape[:2],bool)
+for l,t,r,b in all_regions.values():all_mask[t:b,l:r]=True
+clean=source.copy()
+for l,t,r,b in all_regions.values():clean[t:b,l:r]=0
+assert not np.any(clean[:,:,3][all_mask])
+assert not np.any(np.any(source!=clean,axis=2)&~all_mask)
+# C344 authored clean SHA is reported separately and not falsely relabeled
+# when a source-derived transparent plate differs in alpha-zero RGB channels.
+CLEAN_DERIVED_SHA=sha(Image.fromarray(clean,"RGBA").tobytes())
+labels=[
+ ("06_single_player_gray","싱글 플레이",(1610,286,2197,350)),
+ ("07_showroom_gray","쇼룸",(2674,288,3094,350)),
+ ("08_multiplayer_gray","멀티플레이",(2566,952,3086,1014)),
+]
+fontpath=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
+fontsha=sha(fontpath.read_bytes());font_index=1;ppem=62
+font=ImageFont.truetype(str(fontpath),ppem,index=font_index)
+cm=TTCollection(str(fontpath)).fonts[font_index].getBestCmap()
+for _,word,_ in labels:
+ assert all(ord(x) in cm for x in word if x!=" "),("MISSING_GLYPH",word)
+# Native-size REGULAR glyph strokes and larger open Korean counters, NOT
+# previous Bold silhouette/dilate-by-1 or downscaled/reinflated old raster.
+# Source flat gray face is sampled and pinned instead of invented gradient.
+face=np.array([78,96,100],np.uint8)
+out=old.copy();regions=[];glyph_evidence=[]
+for id,word,(l,t,r,b) in labels:
+ native_source=source[t:b,l:r]
+ sample=(native_source[:,:,3]>=245)&(np.max(np.abs(native_source[:,:,:3].astype(np.int16)-face.astype(np.int16)),axis=2)<=3)
+ assert int(sample.sum())>1500,(id,"NO_SOURCE_GRAY_FACE")
+ h=b-t;w=r-l
+ # Shape each native vector glyph independently with measured ppem, no affine
+ # width stretch / shear, and preserve English left baseline anchor.
+ d=ImageDraw.Draw(Image.new("L",(10,10)))
+ chars=[];adv=0
+ for ch in word:
+  if ch==" ":
+   chars.append((ch,None,22));adv+=22;continue
+  bb=d.textbbox((0,0),ch,font=font)
+  g=Image.new("L",(bb[2]-bb[0]+4,bb[3]-bb[1]+4),0)
+  ImageDraw.Draw(g).text((2-bb[0],2-bb[1]),ch,font=font,fill=255)
+  crop=g.getbbox();assert crop,(id,ch)
+  g=g.crop(crop)
+  assert g.height <= h-5,(id,"NATIVE_HEIGHT",g.height,h)
+  chars.append((ch,g,g.width));adv+=g.width
+ tracking=10 if id!="07_showroom_gray" else 12
+ advance=adv+tracking*(len(chars)-1)
+ assert advance < w-8,(id,"SOURCE_WIDTH_LIMIT",advance,w)
+ layer=Image.new("L",(w,h),0)
+ cursor=5;top=(h-max(z[1].height for z in chars if z[1] is not None))//2
+ assert top>=2
+ for ch,g,gw in chars:
+  if g is not None:layer.paste(g,(cursor,top))
+  cursor+=gw+tracking
+ mask=np.asarray(layer)
+ yy,xx=np.nonzero(mask)
+ bb=[l+int(xx.min()),t+int(yy.min()),l+int(xx.max()+1),t+int(yy.max()+1)]
+ assert bb[0]>l and bb[1]>t and bb[2]<r and bb[3]<b,(id,bb)
+ new=np.zeros_like(old[t:b,l:r])
+ new[mask>0,:3]=face;new[:,:,3]=mask
+ out[t:b,l:r]=new
+ # Source and CLEAN are independently compared before glyph visibility.
+ assert np.count_nonzero(clean[t:b,l:r,3])==0
+ regions.append({"id":id,"source_bbox":[l,t,r,b],"new_bbox":bb,"text":word,
+  "source_gray_pixels":int(sample.sum()),"new_opaque_pixels":int(np.sum(mask>=245)),
+  "new_alpha_pixels":int(np.sum(mask>0)),"native_tracking":tracking,
+  "advance":advance,"margins":[bb[0]-l,r-bb[2],bb[1]-t,b-bb[3]],
+  "glyph_coverage":True,"source_to_clean_alpha_remainder":0})
+allowed=np.zeros(old.shape[:2],bool)
+for _,_,(l,t,r,b) in labels:allowed[t:b,l:r]=True
+changed=np.any(old!=out,axis=2)
+assert int((changed&~allowed).sum())==0
+assert np.array_equal(old[~allowed],out[~allowed])
+# DDS masks/order validated, mirror-Y preserved exactly, decoded persisted.
+masks=struct.unpack_from("<IIII",p,92)
+assert masks in ((255,65280,16711680,4278190080),(16711680,65280,255,4278190080)),masks
+order=[0,1,2,3] if masks[0]==255 else [2,1,0,3]
+saved=p[:128]+np.flipud(out)[:,:,order].copy().tobytes()
+assert len(saved)==len(p) and sha(saved)!=OFFICIAL_SHA
+persist=dec(saved);assert np.array_equal(persist,out),("DDS_ROUNDTRIP_MISMATCH")
+(OUT/"B354_Q154_NATIVE_REGULAR_GRAY_UNAPPROVED.dds").write_bytes(saved)
+def vis(a,box,bg=(110,110,110)):
+ l,t,r,b=box
+ im=Image.fromarray(a[t:b,l:r],"RGBA")
+ back=Image.new("RGBA",im.size,bg+(255,));back.alpha_composite(im)
+ return back.convert("RGB")
+evidence=[]
+for name,word,box in labels:
+ for scale in (100,75,50):
+  panels=[vis(a,box) for a in (source,clean,old,persist)]
+  if scale!=100:panels=[a.resize((max(1,round(a.width*scale/100)),max(1,round(a.height*scale/100))),Image.Resampling.LANCZOS) for a in panels]
+  W=sum(a.width for a in panels)+30;H=max(a.height for a in panels)
+  canvas=Image.new("RGB",(W,H),(110,110,110));offset=0
+  for a in panels:canvas.paste(a,(offset,0));offset+=a.width+10
+  fn=f"B354_{name}_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_{scale}_FLIPY.png"
+  canvas.save(OUT/fn,optimize=True);evidence.append(fn)
+ panels=[vis(np.flipud(a),[box[0],1024-box[3],box[2],1024-box[1]]) for a in (source,clean,old,persist)]
+ W=sum(a.width for a in panels)+30;H=max(a.height for a in panels)
+ sheet=Image.new("RGB",(W,H),(110,110,110));offset=0
+ for a in panels:sheet.paste(a,(offset,0));offset+=a.width+10
+ fn=f"B354_{name}_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY_100_RAW.png"
+ sheet.save(OUT/fn,optimize=True);evidence.append(fn)
+ # Preserve lossless isolated CLEAN and Korean-only compositing evidence.
+ l,t,r,b=box
+ Image.fromarray(clean[t:b,l:r],"RGBA").save(OUT/f"B354_{name}_PLATE_ONLY.png")
+ Image.fromarray(out[t:b,l:r],"RGBA").save(OUT/f"B354_{name}_COMPOSITE_ONLY.png")
+qa={"role":"B","run":"B354","index":154,"run_key":"OUTRUN-KOR-B354-Q154-NEW-NATIVE-REGULAR-GRAY-20261010-1830",
+ "triage":tri["next_action"],"method":"New per-character vector Regular CJK at native ppem62 with unscaled glyph contours and real source-gray RGB; replaced C356-rejected Bold 1px dilation and tight counters, retained canonical SOURCE/CLEAN and five red source-family rows.",
+ "source_sha256":SOURCE_SHA,"source_provenance":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+ "original_clean_sha256_recorded_by_C344":AUTHORED_CLEAN_SHA,"source_derived_alpha_zero_clean_rgba_sha256":CLEAN_DERIVED_SHA,
+ "original_official_sha256":OFFICIAL_SHA,"new_unapproved_trial_sha256":sha(saved),
+ "native":[4096,1024],"codec":"RGBA32","mip_count":1,"raw_transform":"MIRROR_Y",
+ "font_path":str(fontpath),"font_sha256":fontsha,"font_index":font_index,"ppem":ppem,
+ "regions":regions,"changed_pixels":int(changed.sum()),"outside_3_regions":int((changed&~allowed).sum()),
+ "protected_other_five_unchanged":bool(np.array_equal(old[~allowed],out[~allowed])),
+ "persisted_decode_mismatch":int(np.any(persist!=out,axis=2).sum()),
+ "evidence":evidence,"producer_stage":"PERSISTED_MECHANICAL_PASS_CONTROLLER_VISUAL_PENDING",
+ "fresh_C2":"NOT_RUN","C3":"BLOCKED","official_promoted_dds":0,
+ "IGR_STATUS":"NO_NEW_INGAME_EVIDENCE","RUNTIME_VALIDATION":"UNTESTED"}
+(OUT/"B354_Q154_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"recipe.json").write_text(json.dumps({"source":{"sha256":SOURCE_SHA,"revision":"Sonic-TV OR2006Sprites 3ce344e7","bbox":all_regions},"clean":{"reference_sha256":AUTHORED_CLEAN_SHA,"derived_full_native_sha256":CLEAN_DERIVED_SHA},"font":{"file":str(fontpath),"sha256":fontsha,"index":font_index,"ppem":ppem},"normal":"CJK native Regular vector no dilation, English left anchor, source-gray [78,96,100]","targets":regions,"protected":"other five original red cells byte-exact","repair_of":"C356 SOURCE_FAMILY_STROKE_OVERWEIGHT|COUNTERSPACE_COMPRESSION","independent_controller_optical_required":True},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B354","saved_sha256":sha(saved),"changed":int(changed.sum()),"outside":0,"regions":regions},ensure_ascii=False),flush=True)
