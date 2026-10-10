@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-10T12:35:16.560659+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "c16e7694af0d98d71055d4684b9e4ecbc4cd5dd1",
+  "record": {
+    "task_id": "CONVERSION-DX11-00514",
+    "production_id": "CONVERSION-DX11-00514",
+    "event_id": "CONVERSION-DX11-00514-E002",
+    "event_type": "retry",
+    "lane": "DX11",
+    "slot": "A",
+    "branch": "vr-dx11-native-r71",
+    "base_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 1,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-10T12:33:04.790117+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-10T12:33:04.790117+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
