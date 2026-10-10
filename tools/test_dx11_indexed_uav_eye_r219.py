@@ -3,6 +3,10 @@
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 src = (root / "src/vr/d3d11/native_indexed_uav_eye_guard.hpp").read_text(encoding="utf-8")
+# R229 composes R219; do not let its caller name mask an R219 removal mutant.
+# Keep all ten original R219 guards mandatory within the R219 definition alone.
+assert src.count("// R229: R219 proves sole-eye OM ownership") == 1, "R229 guard section missing"
+src = src.split("// R229: R219 proves sole-eye OM ownership", 1)[0]
 probe = (root / "tools/dx11_indexed_draw_probe_r186.cpp").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
 guards = (
