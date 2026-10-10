@@ -27,6 +27,8 @@ def function_body(source: str, marker: str) -> str:
 header = read("src/vr/core/r31_support_api.hpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
+r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
+r29_api = read("src/vr/core/r29_owner_api.hpp")
 r30_api = read("src/vr/core/r30_support_api.hpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 workflow = read(".github/workflows/vr-dx9ex-active.yml")
@@ -63,10 +65,14 @@ if epoch_api not in r30_api or epoch_api not in r30 or epoch_api not in r31:
 else:
     try:
         body = function_body(r30, epoch_api)
-        if "return GetCurrentShaderEpoch(identity, serial);" not in body:
+        if "return R29OwnerCurrentShaderEpoch(identity, serial);" not in body:
             errors.append("R30 shader epoch facade lost lower owner delegation")
     except ValueError as exc:
         errors.append(str(exc))
+if ("R29OwnerCurrentShaderEpoch(" not in r29_api or
+        "return GetCurrentShaderEpoch(identity, serial);" not in function_body(
+            r29, "R29OwnerCurrentShaderEpoch(")):
+    errors.append("R29 independent shader epoch physical owner lost")
 if "if (!GetCurrentShaderEpoch(" in r31:
     errors.append("R31 still uses private shader epoch textual dependency")
 if "if (!R30SupportCurrentShaderEpoch(currentShader, currentShaderSerial) ||" not in r31:

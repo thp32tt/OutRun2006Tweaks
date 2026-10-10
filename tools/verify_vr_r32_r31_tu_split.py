@@ -66,6 +66,8 @@ for boundary in ("R31_R30", "R30_R29", "RESET_PRESENT_DIRECTGPU"):
 
 r30_api = read("src/vr/core/r30_support_api.hpp")
 r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
+r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
+r29_api = read("src/vr/core/r29_owner_api.hpp")
 if "R30SupportSetStereoRecoverySafetyThroughEpoch(" not in r30_api:
     errors.append("R30 lower recovery epoch facade declaration missing")
 if "SetStereoRecoverySafetyThroughEpoch(throughEpoch);" not in r30:
@@ -77,7 +79,7 @@ if "            SetStereoRecoverySafetyThroughEpoch(" in r32:
 if '#include "vr_pass_policy.hpp"' not in r32:
     errors.append("R32 standalone translation unit lacks shared effect policy")
 for public, lower in (
-    ("FrameIdAtOrAfter", "return FrameIdAtOrAfter(candidate, reference);"),
+    ("FrameIdAtOrAfter", "return R29OwnerFrameIdAtOrAfter(candidate, reference);"),
     ("FailClosedResetBaselineState", "FailClosedResetBaselineState();"),
     ("ArmStereoRecoverySafety", "ArmStereoRecoverySafety(extraPresents);"),
     ("NoteRestoreFailure", "NoteRestoreFailure(what);"),
@@ -87,6 +89,9 @@ for public, lower in (
         errors.append("missing isolated lower-owner facade: " + facade)
     if lower not in r30:
         errors.append("R30 lower-owner delegation drifted: " + lower)
+if ("R29OwnerFrameIdAtOrAfter(" not in r29_api or
+        "return FrameIdAtOrAfter(candidate, reference);" not in r29):
+    errors.append("R29 physical frame-ordering semantics missing")
 for old in (
     "!FrameIdAtOrAfter(gpuCompleted, candidate.frameId)",
     "{ FailClosedResetBaselineState(); }",

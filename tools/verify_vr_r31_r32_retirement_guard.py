@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 R30_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+R29_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r29.cpp"
+R29_API_PATH = ROOT / "src/vr/core/r29_owner_api.hpp"
 R31_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r31.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 R33_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -499,12 +501,18 @@ require(
     "StateBlockRecovery::Clear();",
     "StateBlockTracker::MarkCoverageLost();",
 )
+# The R84 split puts the original renderer status in R29, not R30.
+require(function_body(load(R29_PATH), "R29OwnerRendererInstallStatus()"),
+        "R29 renderer-status physical owner",
+        "return OutRunVRRenderer::R29RendererState();")
+require(load(R29_API_PATH), "R29 renderer-status declaration",
+        "R29OwnerRendererInstallStatus()")
 r30_renderer_status = function_body(
     r30, "R30SupportRendererInstallStatus() noexcept")
 require(
     r30_renderer_status,
     "R30 renderer-status support",
-    "return OutRunVRRenderer::R29RendererState();",
+    "return R29OwnerRendererInstallStatus();",
 )
 
 forbid(
