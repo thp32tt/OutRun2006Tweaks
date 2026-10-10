@@ -235,5 +235,70 @@
     "source_tree_sha": "4ea3bfabd13985a0b81f9bd37c133af644234fef",
     "runtime_validation": "UNTESTED",
     "score_change": 0
+  },
+  "rollover_7": {
+    "event_id": "CONVERSION-DX11-00537-E006",
+    "event_type": "rollover",
+    "chat_rollover": 7,
+    "attempt": "1/3",
+    "review_at_kst": "2026-10-11T03:44:52+09:00",
+    "source_of_truth": "Authenticated GitHub branch, current CI and PR #114; local/N100 not authoritative",
+    "target_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "feature_head_reviewed": "38e337909e6eb8605d6bc9a3fcaa998103701b4a",
+    "material_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+    "scope": "C0/C1 evidence reconciliation: no duplicate C2 material and no repeat C3 compilation; complete opt-in diagnostic is not native gameplay admission",
+    "stale_controller_blocker": "ACCEPTANCE_ITEM_PENDING:DX11-LIVE-CALLSITE conflicts with reviewed C6 acceptance_results and latest Build steps; do not restart acceptance implementation",
+    "live_callsite_review": "R30 Game-authored DrawPrimitive/DrawIndexedPrimitive and UP access actual D3D9 stream/index buffers or UP pointer; CPU Lock/Unlock shadow and primitive-bounded indices; original R29/DX9Ex HRESULT and input preserved",
+    "native_visible_review": "Guarded FVF XYZ/RHW|DIFFUSE, shader/texture/fog/scissor and texture-stage state; native D3D11 VB/IB Draw/DrawIndexed; staging CopyResource+Map; changed-pixel check then D3D9 UpdateSurface 256x144 inset; opt-in only",
+    "ownership_review": "R175 CONVERSION-DX11-00477 owner record COMPLETE_R175_SOURCE_WARP_PARITY, existing material 2aae633d; 00537 did not modify translator or R175 probes; TARGET is controller-only",
+    "exact_sha_ci": {
+      "feature_head_build": {
+        "run": 38075606091,
+        "head": "38e337909e6eb8605d6bc9a3fcaa998103701b4a",
+        "conclusion": "SUCCESS",
+        "source_acceptance": [
+          "DX11-LIVE-CALLSITE",
+          "DX11-NATIVE-DRAW",
+          "DX11-VISIBLE-FRAME",
+          "DX11-SAFE-RETURN"
+        ]
+      },
+      "feature_head_openxr": {
+        "run": 38075606080,
+        "head": "38e337909e6eb8605d6bc9a3fcaa998103701b4a",
+        "conclusion": "SUCCESS",
+        "acceptance": "DX11-TEST-BUNDLE",
+        "jobs": "5 x86 game variants + x64 host + bundle successful"
+      },
+      "material_build": {
+        "run": 38074993048,
+        "head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+        "conclusion": "SUCCESS"
+      },
+      "material_openxr": {
+        "run": 38074993038,
+        "head": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+        "conclusion": "SUCCESS"
+      }
+    },
+    "source_unchanged_since_material": true,
+    "code_diff_since_material": "only docs/automation/runs/CONVERSION-DX11-00537.json changed; compare 4c9ccac8..38e33790 ahead 1",
+    "pr": {
+      "number": 114,
+      "state": "OPEN",
+      "mergeable": true,
+      "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+      "head_sha": "38e337909e6eb8605d6bc9a3fcaa998103701b4a"
+    },
+    "diagnostic_bundle_artifact_id": 11678470577,
+    "feature_status": "FEATURE_READY_PENDING_CONTROLLER_PROMOTION",
+    "pending": [
+      "Controller-only PR #114 / TARGET promotion with lease+ownership recheck",
+      "Post-promotion target Backend Conversion Gate validate and DX11 readiness smoke",
+      "Actual OR2006 game pixel/inset/input and Quest3/VDXR testing"
+    ],
+    "runtime_validation": "UNTESTED",
+    "score_change": 0,
+    "next_action": "Controller promote approved feature source only after ownership and lease recheck, run target exact-SHA Backend Conversion Gate; user run opt-in artifact to establish native_draws/desktop_insets/game controls. Do not label WARP or static output as gameplay native complete."
   }
 }
