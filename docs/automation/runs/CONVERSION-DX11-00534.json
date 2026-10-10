@@ -2,10 +2,10 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00534",
   "production_id": "CONVERSION-DX11-00534",
-  "event_id": "CONVERSION-DX11-00534-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX11-00534-E004",
+  "event_type": "retry",
   "lane": "DX11",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "chat_rollover": 2,
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "e0a1cdd326542fe3cb28392ee95bc481cb88084a",
@@ -45,12 +45,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
-  "status": "C4_MATERIAL_COMMITTED_C3_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "result_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "status": "BLOCKED_INHERITED_GATE_FAILURE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5",
+  "material_result_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5",
+  "validation_bearing_result_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -61,21 +61,72 @@
     "docs/automation/runs/CONVERSION-DX11-00534.json"
   ],
   "blockers": [
-    "R175 full gate programmable varying pixel mismatch remains owned by CONVERSION-DX11-00477; do not alter ownership",
-    "Quest 3/VDXR gameplay native path not user-tested"
+    "Exact-SHA Backend Conversion Gate 38046680130 failed R175 TEXCOORD6 varying pixel BGRA [128,0,16,255] expected [224,128,32,255]; owner CONVERSION-DX11-00477; do not trespass",
+    "Quest3/VDXR gameplay validation not performed; RUNTIME_VALIDATION=UNTESTED"
   ],
   "pipeline": {
-    "C0": "PASS: GitHub checkpoint 20261010T1950, HEAD e0a1cdd3, previous 00533 R236 frozen; 00534 no prior material",
-    "C1": "PASS: R175 00477 blocked independent owner; mono DrawPrimitiveUP path R237 independent from R235/R236 source ownership",
-    "C2": "Prepared coherent CPU UP->immutable IA->R236 WARP GPU pixel batch",
-    "C3": "PENDING exact-SHA GitHub full backend Gate and targeted WARP static",
-    "C4": "Publishing source/test batch as atomic material Git commit",
-    "C5": "NOT_REQUIRED, dormant probe only",
-    "C6": "PENDING GitHub CI results"
+    "C0": "PASS: recovered 00534 R237 material SHA and current GitHub HEAD; same work_key, no duplicate implementation",
+    "C1": "PASS: R237 isolated native UP capture path, R175 existing 00477 ownership retained",
+    "C2": "PASS: original exact-SHA material source and related tests already implemented; no duplicate modifications",
+    "C3": "SCOPED_PASS/FULL_GATE_FAIL: R237 + 9 mutants PASS, R183 WARP PASS, DX11 structural checks PASS; Backend Conversion Gate 38046680130 FAILED at inherited R175 TEXCOORD6 pixel mismatch",
+    "C4": "PASS: existing material [AUTO:CONVERSION-DX11-00534] commit 8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5 preserved; later bookkeeping SHA is not a validation-bearing result",
+    "C5": "NOT_REQUIRED: isolated WARP diagnostic; no gameplay activation or packaging",
+    "C6": "BLOCKED_INHERITED_GATE_FAILURE: exact-SHA full Gate failed; separate owner 00477; no CI-skip masquerading as material PASS; no score increment"
   },
-  "resume_cursor": "AWAIT_EXACT_SHA_CI",
+  "resume_cursor": "BLOCKED_R175_OTHER_OWNER_FULL_GATE_FAIL_R237_SCOPED_PASS",
   "score_change": 0,
-  "next_action": "Check exact material SHA Gate (R183 static and WARP; R237 red readback). Inherited R175 failure remains independent. Publish C6 without promoting full Gate or score unless all mandatory gates pass.",
+  "next_action": "Do not recompile/replay 00534 R237 same SHA. Await controller fenced ownership and a different independent work_key or verified R175 owner release; 00534 cannot be scored PASS until exact-SHA full gate PASS.",
   "last_real_activity_at": "2026-10-10T19:53:00+09:00",
-  "last_activity_evidence": "GitHub checkpoint recovered, previous 00533 scoped WARP pass and inherited 00477 R175 failure reviewed"
+  "last_activity_evidence": "GitHub checkpoint recovered, previous 00533 scoped WARP pass and inherited 00477 R175 failure reviewed",
+  "summary": "R237 captured a caller-attested D3D9 DrawPrimitiveUP CPU span into an immutable owned D3D11 VB and verified mono WARP pixel output after original CPU source mutation. R237 source/9 mutants passed exact-SHA structural static checks, and owned R183 WARP probe ran successfully. Full Backend Conversion Gate failed in independent R175 TEXCOORD6 varying pixel check controlled by task 00477. No backend promotion or score.",
+  "evidence": {
+    "validation_bearing_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5",
+    "backend_gate_run_id": 38046680130,
+    "backend_gate_conclusion": "failure",
+    "backend_gate_head_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5",
+    "backend_gate_validate_job": {
+      "id": 114197515065,
+      "conclusion": "success"
+    },
+    "backend_gate_smoke_job": {
+      "id": 114198418407,
+      "conclusion": "failure",
+      "failed_step": "Run DX11 constant buffer probe"
+    },
+    "blocker_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "blocker_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "blocker_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "blocker_owner_task": "CONVERSION-DX11-00477",
+    "r237_static": {
+      "result": "PASS",
+      "description": "R237 UP source->native VB->WARP mono pixel + 9 mutants",
+      "from_job_id": 114198418407
+    },
+    "r183_warp": {
+      "result": "PASS",
+      "from_job_id": 114198418407,
+      "description": "R183 live D3D11 VB/IB owner IA + GPU DrawIndexed WARP"
+    },
+    "dx11_fast_structural_checks": {
+      "run_id": 38046680127,
+      "conclusion": "success",
+      "head_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5"
+    },
+    "github_build": {
+      "run_id": 38046683846,
+      "conclusion": "success",
+      "head_sha": "8ac6b017ef1a846d8dfd8c2fadec1f9a59a7d1c5"
+    },
+    "runtime": "UNTESTED; no Quest 3/VDXR gameplay run"
+  }
 }
