@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "shard": "EVEN",
+  "queue_index": 92,
+  "asset": "1A43E9D9_512x64.dds",
+  "run_key": "OUTRUN-KOR-B363-Q092-SOURCE-DIFFUSE-GLOW-FIRST-20261011-0432",
+  "timestamp_kst": "2026-10-11T04:46:00+09:00",
+  "priority": "C364_C2_C3_REWORK",
+  "triage": "MATERIAL_REWORK",
+  "backend": "GITHUB_ACTIONS_CPU_WORKER",
+  "run_id": 38080848707,
+  "run_status": "SUCCESS",
+  "initial_preflight": {
+    "run_id": 38080680838,
+    "status": "FAILED_BEFORE_CANDIDATE",
+    "reason": "raw BC3 block mask erroneously checked in readable rather than mirrored RAW ordering; no DDS output, corrected in distinct code commit c8d1bb6f741b8a7b861c33babf40d725c237fa4c"
+  },
+  "canonical_source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "current_official_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "new_unapproved_saved_dds_sha256": "f113c3aafff77ef3ace10246975dbf199188077a3b08541dddae8a612ba028c3",
+  "candidate_path": "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_Q092_OUTRUN_MODE_SOFT_GLOW_UNAPPROVED.dds",
+  "source_clean_sha256": "1a06b6ce304337b9487f4c130ea5e68c8fa6cd24dc460a2b03acef56a0187a35",
+  "source_mask_sha256": "de83ebb2ebd54e23e66b323d397f44fc02887774601f3fc47512816d857e83f3",
+  "plate_library": "EXACT_MANIFEST_NOT_REGISTERED_B221_SOURCE_CLEAN_REUSED_NO_C2_PLATE_LIBRARY_APPROVAL_CLAIM",
+  "source_bbox": [
+    387,
+    13,
+    1318,
+    132
+  ],
+  "preserved_second_row_bbox": [
+    519,
+    132,
+    1589,
+    245
+  ],
+  "material_change": "New 4x4 BC3 alpha/RGB endpoint reconstruction from retained Korean seed using canonical SOURCE white median (255,255,255) and continuous sigma3.5 Gaussian diffusion; separate glow layer composited without resampling old Korean glyph or modifying second source row. Prior B221 hard outer rim/source soft glow loss addressed at P2 source effect stage.",
+  "machine": {
+    "native": [
+      2048,
+      256
+    ],
+    "dds": "BC3_DXT5",
+    "mips": 1,
+    "raw_orientation": "MIRROR_Y",
+    "modified_bc3_blocks": 2274,
+    "changed_decoded_rgba_pixels": 31867,
+    "changed_decoded_rgba_outside_original_source_bbox": 0,
+    "untouched_bc3_blocks_outside_source": true,
+    "other_second_row_decoded_exact": true,
+    "source_translucent_alpha_1_179": 16391,
+    "prior_translucent_alpha_1_179": 4480,
+    "new_translucent_alpha_1_179": 24156,
+    "serialized_dds_sha_verified": true,
+    "persisted_decode_against_new": true
+  },
+  "visual_firstlook": "Controller actually opened native readable 4-column SOURCE/CLEAN/official/B363 at gray, 50% readable and RAW mirror-Y. B363 adds a visibly more diffuse white outer edge to the Korean line compared with the old hard narrow rim. It DOES NOT fix the thin/hollow dotted orange/navy Korean contours against original dense smooth orange racing italic/large navy depth, and at 50% prior internal dotted edges remain visible. Alpha 1..179 increase alone is not evidence of source-faithful glow; new translucent count 24156 exceeds original 16391. Source family and optical style fail closed; cannot promote.",
+  "ordered_eight_checks": [
+    {
+      "stage": "source_english_removal_clean_plate",
+      "result": "PRIOR_EXACT_SCOPED_P1_PASS",
+      "observation": "B221 CLEAN/mask SHA authenticated; current computation SOURCE→CLEAN changed outside authored SOURCE removal mask=0, CLEAN alpha within mask=0; no new plate-library C2 approval"
+    },
+    {
+      "stage": "readable_slant",
+      "result": "HOLD_SOURCE_STEM_ANCHORS",
+      "observation": "B363 does not alter previous Korean geometry; earlier C364 italic-stem equivalence unapproved"
+    },
+    {
+      "stage": "text_size",
+      "result": "HOLD_PRIOR_UNDERSIZED_HIERARCHY",
+      "observation": "retains previous Korean width 725/931 source; halo expansion not a substitute for matching source condensed racing family"
+    },
+    {
+      "stage": "font_fill_outline_shadow",
+      "result": "FAIL_SOURCE_FAMILY_DOTTED_HOLLOW_BODY",
+      "observation": "diffuse rim improves but Korean body still thin, dotted/hollow orange/blue, unlike full thick original and broad smooth white glow"
+    },
+    {
+      "stage": "text_integrity_clipping",
+      "result": "HOLD_NATIVE_RIM_NEEDS_STRICT_REVIEW",
+      "observation": "no confirmed new foreign glyph or visible major clipping, but soft halo against source top margin has not received independent strict approval"
+    },
+    {
+      "stage": "protected_graphics",
+      "result": "PASS_EXACT_NATIVE",
+      "observation": "BC3 blocks outside original first-row source remain byte-identical and second entire Korean row remains decoded exact"
+    },
+    {
+      "stage": "RAW_FLIPY",
+      "result": "PASS_SCOPED",
+      "observation": "persisted RAW vertical mirror and readable FLIPY independently viewed native; format/mip unchanged"
+    },
+    {
+      "stage": "practical_readability",
+      "result": "FAIL_SOURCE_RELATIVE_STYLE",
+      "observation": "Korean remains readable but source headline hierarchy and smooth/natural contours visibly weaker at 50%"
+    }
+  ],
+  "qa_status": "PRODUCER_VISUAL_REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY",
+  "official_candidate_promotion": 0,
+  "new_saved_unapproved_dds": 1,
+  "independent_C2": "NOT_RUN_NEW_SHA",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next": "Do not repeat Gaussian-only gloss/rim work. Need genuinely manual/PSD/vector source-conforming thick orange face, navy side-wall and diffuse glow as distinct layers and independent source-family pilot QA. Re-evaluate second row separately; full asset approval blocked until C2/C3 and user game.",
+  "evidence": [
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_MACHINE.json",
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG128_100.png",
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG128_50.png",
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_SOURCE_CLEAN_OFFICIAL_GLOW_RAW_BG128_100.png",
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_SOURCE_CLEAN_ONLY_ROI.png",
+    "localization/graphics/role_B/20261011-B363-Q092-SOURCE-GLOW-BC3-PILOT/B363_PERSISTED_COMPOSITE_ROI.png"
+  ],
+  "forbidden_domains_touched": [],
+  "cleanup": "GitHub ephemeral CPU workspace auto-disposed; no ChatGPT local scratch or N100 worktrees"
+}
