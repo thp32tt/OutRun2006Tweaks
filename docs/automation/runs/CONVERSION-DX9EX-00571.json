@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00571",
+  "production_id": "CONVERSION-DX9EX-00571",
+  "event_id": "CONVERSION-DX9EX-00571-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "f2460621c77a25c425f1f77bbbac40d1ee4c4fa6",
+  "material_result_sha": "920b1d47296157f8879287aa15504ef18cfdfd27",
+  "validation_bearing_result_sha": "920b1d47296157f8879287aa15504ef18cfdfd27",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00571]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:IPC_STABLE_READ_ATOMIC_PUBLICATION",
+  "conflict_keys": [
+    "src/vr/ipc/win32_channel.hpp:Ipc::StableRead",
+    "vrhost/tests/protocol_v3_smoke.cpp:StableRead negative/positive smoke"
+  ],
+  "changed_paths": [
+    "src/vr/ipc/win32_channel.hpp",
+    "vrhost/tests/protocol_v3_smoke.cpp"
+  ],
+  "summary": "Stage shared seqlock snapshot and publish caller output only on verified matching even sequences; fail closed on odd/unstable/null/invalid-attempt reads; add deterministic smoke tests for success, odd writer, recovery, null and zero attempts.",
+  "static_validation": "PASS_ONE_RELEVANT_SOURCE_CHANGE_CHECK",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38026686752,
+    "domain_isolation": 38026686762,
+    "full_source_impact": 38026686747
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "host": "SUCCESS",
+    "protocol_v3_smoke": "SUCCESS",
+    "game": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11660271989,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-920b1d47296157f8879287aa15504ef18cfdfd27",
+    "digest": "sha256:789e57a49ed29f63d014db3d41df15df831fec4a52d014bae46370927c2b4502",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS HEAD f2460621 and 00571 WAIT_CHAT checkpoint; no earlier 00571 result",
+    "C1_REVIEW": "PASS FFB v0.2 release verified; independent P1 generic IPC snapshot publication seam",
+    "C2_IMPLEMENT": "PASS 2 related code/test files committed together; no repeated HUD static loops",
+    "C3_VALIDATE": "PASS exact material SHA three full Actions gates",
+    "C4_COMMIT": "PASS source commit contains exact task marker without CI-skip",
+    "C5_PACKAGE": "PASS exact-SHA CI artifact published, no HMD test",
+    "C6_RESULT": "PASS separate bookkeeping/run JSON; validation-bearing SHA remains material commit"
+  },
+  "next_action": "Advance independent DX9Ex P1 R84 structural seam or P2 OpenXR per-eye dimensions; HMD/wheel tests remain UNTESTED; DX11 A active and DXVK frozen."
+}
