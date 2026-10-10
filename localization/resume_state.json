@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 q59 new SHA 81502138 A228 BC3 index-only repair trial independent actual visual REWORK, official unchanged; source/clean four exact, native race glyph stipple persists, C3 and game untested; OUTRUN-KOR-C1-Q059-A228-INDEPENDENT-BC3-VISUAL-20261010-2120",
     "C2 EVEN q212 B358 exact saved DDS SHA 38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8 new independent visual C2 REWORK, old B357 ghost cleared 5638+712 to zero, r43 source-family 284px/395px still too weak; no C3/IGR029 game closure. OUTRUN-KOR-C2-Q212-B358-NEW-SHA-GHOST-REPAIR-STYLE-REWORK-20261010",
     "C1 q201 canonical English SOURCE independently authenticated exact DDS, GOALS SOURCE/FINAL ROI 8976/8976; CLEAN alpha0. Full17 calibration/C3/game pending. OUTRUN-KOR-C1-Q201-EXACT-ENGLISH-ROI-20261010-2040",
     "B358 q212 P1 IGR029 source CLEAN P3 correctness repaired: unpromoted persisted DDS 38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8; old official alpha outside English core 5832+741 -> new 0+0; 29668 RGBA change restricted two title ROIs, 10 protected cells and decoded persisted exact. Native/50% source-family optical HOLD (r43 width284/395=71.9%) and semantic 모드 suffix not approved; official C338 REWORK unchanged; C2/C3/USER_GAME UNTESTED. QA localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_CONTROLLER_QA.json RUN_KEY=OUTRUN-KOR-B358-Q212-C2-OLD-GLYPH-ROIs-CLEAN-P3-20261010-2030",
@@ -15521,5 +15522,31 @@
     "IGR029": "OPEN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261010-C2-Q212-B358-PERSISTED-PLATE-FAMILY/C2_Q212_B358_CONTROLLER_C2_VISUAL_REWORK.json"
-  }
+  },
+  "c1_q059_a228_fresh_bc3_trial_review_20261010": {
+  "queue_index": 59,
+  "shard": "C1_ODD",
+  "run_key": "OUTRUN-KOR-C1-Q059-A228-INDEPENDENT-BC3-VISUAL-20261010-2120",
+  "trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+  "official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "C1_trial": "REWORK_REQUIRED",
+  "official": "REWORK_REQUIRED_UNCHANGED",
+  "source_roi_exact": 4,
+  "clean_roi_alpha_zero": 4,
+  "delta_rgba": 534,
+  "delta_outside_source_union": 0,
+  "changed_alpha": 0,
+  "decoding": "DXT5_2048x512_RAW_FLIPY",
+  "artifacts": {
+    "qa": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_VISUAL_REWORK.json",
+    "machine": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_MACHINE.json",
+    "evidence_png_count": 13
+  },
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "PJR019": "OPEN",
+  "new_dds_by_C1": 0,
+  "approval": false
+}
 }

@@ -1,0 +1,38 @@
+{
+  "next_mission": {
+    "source_saved_png_matches_independent_original_DDS_pixels": true,
+    "source_mismatch_rgba_pixels": 0,
+    "source_visible_alpha_px": 160460,
+    "clean_visible_alpha_px": 0,
+    "source_clean_rgba_diff_px": 160460,
+    "source_sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815",
+    "clean_sha256": "6e013c10f871ed1ac4cafe346184418a4eb8ff00841657a725cd13eb2b432bec"
+  },
+  "race_rivals": {
+    "source_saved_png_matches_independent_original_DDS_pixels": true,
+    "source_mismatch_rgba_pixels": 0,
+    "source_visible_alpha_px": 39329,
+    "clean_visible_alpha_px": 0,
+    "source_clean_rgba_diff_px": 39329,
+    "source_sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6",
+    "clean_sha256": "c3d32a81fc0f420382b871a176819900f21e15000b0d9da0dcd8a8c55ac3b7f8"
+  },
+  "drift_score": {
+    "source_saved_png_matches_independent_original_DDS_pixels": true,
+    "source_mismatch_rgba_pixels": 0,
+    "source_visible_alpha_px": 35183,
+    "clean_visible_alpha_px": 0,
+    "source_clean_rgba_diff_px": 35183,
+    "source_sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5",
+    "clean_sha256": "392716079569802749f7bf0fe5a0bbff329f4aaf424514da5d0949424186e84c"
+  },
+  "slipstream_score": {
+    "source_saved_png_matches_independent_original_DDS_pixels": true,
+    "source_mismatch_rgba_pixels": 0,
+    "source_visible_alpha_px": 48463,
+    "clean_visible_alpha_px": 0,
+    "source_clean_rgba_diff_px": 48463,
+    "source_sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292",
+    "clean_sha256": "748f278db378335a5e8d30d7ceeee151f34993c684c1c2ac47b67cc41383ab49"
+  }
+}

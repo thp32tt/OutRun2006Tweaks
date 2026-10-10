@@ -1,0 +1,397 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C1-20261010-Q059-A228-BC3",
+  "run_key": "OUTRUN-KOR-C1-Q059-A228-INDEPENDENT-BC3-VISUAL-20261010-2120",
+  "shard": "ODD_C1_ONLY",
+  "role": "C1",
+  "index": 59,
+  "artifact": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "reviewer": "ChatGPT AI1 independent from A228 producer, first look NOT BLIND due earlier producer records already read",
+  "reviewed_at_kst": "2026-10-10 21:20 KST approx",
+  "triage": "MATERIAL_REWORK",
+  "backend": "N100 MCP fallback for exact DDS native pixel decode; GitHub SSOT",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "official_candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "reviewed_trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+  "trial_path": "localization/graphics/role_A/20261010-A228-Q059-BC3-INDEX-INTERIOR-REPAIR-TRIAL/A228_Q059_GOLD_FACE_BC3_INDEX_TRIAL_UNPROMOTED.dds",
+  "machine": {
+    "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/C1_Q059_A228_INDEPENDENT_MACHINE.json",
+    "git_blob_sha": "b88bb9abce41da6b722e6f609b1f1e05d8c1a71d"
+  },
+  "pixel_measured": {
+    "changed_rgba_pixels": 534,
+    "changed_alpha_pixels": 0,
+    "outside_source_four_rects_rgba": 0,
+    "outside_source_four_rects_alpha": 0
+  },
+  "source_plate_independent": "4 source crops exact canonical English DDS SHA and 4 archived CLEAN alpha0, all 4 reverified",
+  "observations": {
+    "next_mission": {
+      "source_english_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png",
+        "sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815"
+      },
+      "clean_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__clean_native.png",
+        "sha256": "6e013c10f871ed1ac4cafe346184418a4eb8ff00841657a725cd13eb2b432bec"
+      },
+      "bbox_readable": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "trial_changes_rgba": 0,
+      "alpha_changed": 0,
+      "interior_mask_diagnostic": {
+        "source": 5,
+        "official": 0,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "verdict": "HOLD_UNCHANGED_AREA",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Both source/candidate effect inclinations directly visible in readable orientation but no independently calibrated matched stem top-minus-bottom or perspective anchors; does not claim style parity"
+        },
+        "clean_plate": {
+          "result": "SCOPED_SOURCE_CLEAN_PASS",
+          "observation": "Re-authenticated pinned canonical source DDS with SHA and exact stored SOURCE crop RGBA mismatch 0. Historical CLEAN lossless crop clean alpha positive 0, source alpha 160460; clean provenance is a region PNG, not standalone full atlas SHA; no new ghost claim.",
+          "evidence": [
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__source_native.png",
+              "sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815"
+            },
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/next_mission__clean_native.png",
+              "sha256": "6e013c10f871ed1ac4cafe346184418a4eb8ff00841657a725cd13eb2b432bec"
+            }
+          ]
+        },
+        "source_style": {
+          "result": "HOLD",
+          "observation": "Gradient label remains unchanged (0 changed pixels); previous PJR019 style concerns not cleared.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/next_mission_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "b858fccf67dff41fa3d7da7db3da66a1daabb333fcee90ddbc7bb371a7f9f0b8",
+            "git_blob_sha": "fcc4e6de185da33cb7a713f65b108416d2a012a9"
+          }
+        },
+        "scale_readability": {
+          "result": "SCOPED_READABLE",
+          "observation": "Native next mission readable but user 50% context/gradient face acceptance still pending",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/next_mission_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "b858fccf67dff41fa3d7da7db3da66a1daabb333fcee90ddbc7bb371a7f9f0b8",
+            "git_blob_sha": "fcc4e6de185da33cb7a713f65b108416d2a012a9"
+          }
+        },
+        "stroke_integrity": {
+          "result": "NO_NEW_CONFIRMED_FAIL",
+          "observation": "No actual new pixel from A228 in this label; unproven style remains hold",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/next_mission_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "b858fccf67dff41fa3d7da7db3da66a1daabb333fcee90ddbc7bb371a7f9f0b8",
+            "git_blob_sha": "fcc4e6de185da33cb7a713f65b108416d2a012a9"
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Trial–official altered RGBA 0 pixels in this originally bounded region; full union-of-four original bounds outside changed RGBA0/alpha0. No unrelated atlas modifications by trial; previous official historically contains translations."
+        },
+        "placement": {
+          "result": "SCOPED_EXISTING_REGION",
+          "observation": "Pinned original-effect readable rectangle [8,353,1293,500]; trial alpha/header exactly official, index-only interior changed, no new boundary expansion; full per-glyph style/margin calibration not complete."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact persisted DXT5/BC3 source/official/trial decoded RAW and readable FLIP-Y; compared native BGW 100 and 50. RAW source orientation remains mirrored, game consumer UNTESTED."
+        }
+      }
+    },
+    "race_rivals": {
+      "source_english_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png",
+        "sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6"
+      },
+      "clean_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__clean_native.png",
+        "sha256": "c3d32a81fc0f420382b871a176819900f21e15000b0d9da0dcd8a8c55ac3b7f8"
+      },
+      "bbox_readable": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "trial_changes_rgba": 151,
+      "alpha_changed": 0,
+      "interior_mask_diagnostic": {
+        "source": 2,
+        "official": 10,
+        "trial": 10,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "verdict": "REWORK_REQUIRED_TRIAL",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Both source/candidate effect inclinations directly visible in readable orientation but no independently calibrated matched stem top-minus-bottom or perspective anchors; does not claim style parity"
+        },
+        "clean_plate": {
+          "result": "SCOPED_SOURCE_CLEAN_PASS",
+          "observation": "Re-authenticated pinned canonical source DDS with SHA and exact stored SOURCE crop RGBA mismatch 0. Historical CLEAN lossless crop clean alpha positive 0, source alpha 39329; clean provenance is a region PNG, not standalone full atlas SHA; no new ghost claim.",
+          "evidence": [
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__source_native.png",
+              "sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6"
+            },
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/race_rivals__clean_native.png",
+              "sha256": "c3d32a81fc0f420382b871a176819900f21e15000b0d9da0dcd8a8c55ac3b7f8"
+            }
+          ]
+        },
+        "source_style": {
+          "result": "FAIL_SOURCE_FAMILY",
+          "observation": "Original smooth gold face vs current compressed Korean navy dotted/edge texture; new palette-index-only BC3 adjustment does not reconstruct source-family smooth/outlined glyph face.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "533ce2c531e4fd5b3884e43fcf162b87294a4cb875cecf9031cbac14f8a5da74",
+            "git_blob_sha": "f78563ea815b4eaaf2629577e812b303c4e97aaa"
+          }
+        },
+        "scale_readability": {
+          "result": "FAIL_OPTICAL_QUALITY",
+          "observation": "Korean recognizable at practical50 but navy stipple and compressed gold fill sharply degrade text quality vs smoother source; width/weight family acceptance not proven.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_50_SOURCE_OFFICIAL_A228.png",
+            "sha256": "d1e6eae6d2f72fa3265a1e25a55eb1d341ac8e576c3c57047db3df44640b90e0",
+            "git_blob_sha": "fdc386c7a83fce9889bcf99e3f1c0dce4353b180"
+          }
+        },
+        "stroke_integrity": {
+          "result": "FAIL_GOLD_FACE_DARK_STIPPLE",
+          "observation": "Actual trial BC3 native comparison shows residual contour/dot interruptions, especially race_rivals heuristic 10→10; heuristic not sole basis.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "533ce2c531e4fd5b3884e43fcf162b87294a4cb875cecf9031cbac14f8a5da74",
+            "git_blob_sha": "f78563ea815b4eaaf2629577e812b303c4e97aaa"
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Trial–official altered RGBA 151 pixels in this originally bounded region; full union-of-four original bounds outside changed RGBA0/alpha0. No unrelated atlas modifications by trial; previous official historically contains translations."
+        },
+        "placement": {
+          "result": "SCOPED_EXISTING_REGION",
+          "observation": "Pinned original-effect readable rectangle [75,222,625,304]; trial alpha/header exactly official, index-only interior changed, no new boundary expansion; full per-glyph style/margin calibration not complete."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact persisted DXT5/BC3 source/official/trial decoded RAW and readable FLIP-Y; compared native BGW 100 and 50. RAW source orientation remains mirrored, game consumer UNTESTED."
+        }
+      }
+    },
+    "drift_score": {
+      "source_english_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png",
+        "sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5"
+      },
+      "clean_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__clean_native.png",
+        "sha256": "392716079569802749f7bf0fe5a0bbff329f4aaf424514da5d0949424186e84c"
+      },
+      "bbox_readable": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "trial_changes_rgba": 182,
+      "alpha_changed": 0,
+      "interior_mask_diagnostic": {
+        "source": 1,
+        "official": 4,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "verdict": "REWORK_REQUIRED_TRIAL",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Both source/candidate effect inclinations directly visible in readable orientation but no independently calibrated matched stem top-minus-bottom or perspective anchors; does not claim style parity"
+        },
+        "clean_plate": {
+          "result": "SCOPED_SOURCE_CLEAN_PASS",
+          "observation": "Re-authenticated pinned canonical source DDS with SHA and exact stored SOURCE crop RGBA mismatch 0. Historical CLEAN lossless crop clean alpha positive 0, source alpha 35183; clean provenance is a region PNG, not standalone full atlas SHA; no new ghost claim.",
+          "evidence": [
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__source_native.png",
+              "sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5"
+            },
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/drift_score__clean_native.png",
+              "sha256": "392716079569802749f7bf0fe5a0bbff329f4aaf424514da5d0949424186e84c"
+            }
+          ]
+        },
+        "source_style": {
+          "result": "FAIL_SOURCE_FAMILY",
+          "observation": "Original smooth gold face vs current compressed Korean navy dotted/edge texture; new palette-index-only BC3 adjustment does not reconstruct source-family smooth/outlined glyph face.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "9e3d7d9b97aa73ee35228a02c17d1403cdc34a73fedc197102c2031661195256",
+            "git_blob_sha": "7f376742c0aca53471042247886d026a7a51f99e"
+          }
+        },
+        "scale_readability": {
+          "result": "FAIL_OPTICAL_QUALITY",
+          "observation": "Korean recognizable at practical50 but navy stipple and compressed gold fill sharply degrade text quality vs smoother source; width/weight family acceptance not proven.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_50_SOURCE_OFFICIAL_A228.png",
+            "sha256": "17676c6f668b09c2268732d8a593747ec8128e1a46fa7a55734b42ff3c98d931",
+            "git_blob_sha": "5a536c5c05dbea9376a28d780b2590acecd29e8d"
+          }
+        },
+        "stroke_integrity": {
+          "result": "FAIL_GOLD_FACE_DARK_STIPPLE",
+          "observation": "Actual trial BC3 native comparison shows residual contour/dot interruptions, especially race_rivals heuristic 4→0; heuristic not sole basis.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "9e3d7d9b97aa73ee35228a02c17d1403cdc34a73fedc197102c2031661195256",
+            "git_blob_sha": "7f376742c0aca53471042247886d026a7a51f99e"
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Trial–official altered RGBA 182 pixels in this originally bounded region; full union-of-four original bounds outside changed RGBA0/alpha0. No unrelated atlas modifications by trial; previous official historically contains translations."
+        },
+        "placement": {
+          "result": "SCOPED_EXISTING_REGION",
+          "observation": "Pinned original-effect readable rectangle [119,53,609,137]; trial alpha/header exactly official, index-only interior changed, no new boundary expansion; full per-glyph style/margin calibration not complete."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact persisted DXT5/BC3 source/official/trial decoded RAW and readable FLIP-Y; compared native BGW 100 and 50. RAW source orientation remains mirrored, game consumer UNTESTED."
+        }
+      }
+    },
+    "slipstream_score": {
+      "source_english_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png",
+        "sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292"
+      },
+      "clean_native_png": {
+        "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__clean_native.png",
+        "sha256": "748f278db378335a5e8d30d7ceeee151f34993c684c1c2ac47b67cc41383ab49"
+      },
+      "bbox_readable": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "trial_changes_rgba": 201,
+      "alpha_changed": 0,
+      "interior_mask_diagnostic": {
+        "source": 2,
+        "official": 11,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "verdict": "REWORK_REQUIRED_TRIAL",
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Both source/candidate effect inclinations directly visible in readable orientation but no independently calibrated matched stem top-minus-bottom or perspective anchors; does not claim style parity"
+        },
+        "clean_plate": {
+          "result": "SCOPED_SOURCE_CLEAN_PASS",
+          "observation": "Re-authenticated pinned canonical source DDS with SHA and exact stored SOURCE crop RGBA mismatch 0. Historical CLEAN lossless crop clean alpha positive 0, source alpha 48463; clean provenance is a region PNG, not standalone full atlas SHA; no new ghost claim.",
+          "evidence": [
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__source_native.png",
+              "sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292"
+            },
+            {
+              "path": "localization/graphics/role_C/20261008-C302-C1-Q059-LOSSLESS-EVIDENCE-PUBLISH/slipstream_score__clean_native.png",
+              "sha256": "748f278db378335a5e8d30d7ceeee151f34993c684c1c2ac47b67cc41383ab49"
+            }
+          ]
+        },
+        "source_style": {
+          "result": "FAIL_SOURCE_FAMILY",
+          "observation": "Original smooth gold face vs current compressed Korean navy dotted/edge texture; new palette-index-only BC3 adjustment does not reconstruct source-family smooth/outlined glyph face.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "1be69f444f9d3150a2c18dfd78e600a7f2d3a3e2cfec3b7d7ed51df4bd24bd7f",
+            "git_blob_sha": "051096e6af61ca49632415a6f46ca2615c07ed57"
+          }
+        },
+        "scale_readability": {
+          "result": "FAIL_OPTICAL_QUALITY",
+          "observation": "Korean recognizable at practical50 but navy stipple and compressed gold fill sharply degrade text quality vs smoother source; width/weight family acceptance not proven.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_50_SOURCE_OFFICIAL_A228.png",
+            "sha256": "32dacf83d49858d82ea92a80837f42bc452b1d7a4c209c3e99bcbc46a5230fb6",
+            "git_blob_sha": "fbd79ba1b8e028f8ae551b6686b08328d00ac935"
+          }
+        },
+        "stroke_integrity": {
+          "result": "FAIL_GOLD_FACE_DARK_STIPPLE",
+          "observation": "Actual trial BC3 native comparison shows residual contour/dot interruptions, especially race_rivals heuristic 11→0; heuristic not sole basis.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_100_SOURCE_OFFICIAL_A228.png",
+            "sha256": "1be69f444f9d3150a2c18dfd78e600a7f2d3a3e2cfec3b7d7ed51df4bd24bd7f",
+            "git_blob_sha": "051096e6af61ca49632415a6f46ca2615c07ed57"
+          }
+        },
+        "protected_art": {
+          "result": "PASS_SCOPED",
+          "observation": "Trial–official altered RGBA 201 pixels in this originally bounded region; full union-of-four original bounds outside changed RGBA0/alpha0. No unrelated atlas modifications by trial; previous official historically contains translations."
+        },
+        "placement": {
+          "result": "SCOPED_EXISTING_REGION",
+          "observation": "Pinned original-effect readable rectangle [717,225,1408,320]; trial alpha/header exactly official, index-only interior changed, no new boundary expansion; full per-glyph style/margin calibration not complete."
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Exact persisted DXT5/BC3 source/official/trial decoded RAW and readable FLIP-Y; compared native BGW 100 and 50. RAW source orientation remains mirrored, game consumer UNTESTED."
+        }
+      }
+    }
+  },
+  "firstlook": {
+    "source_before_producer_verdict": false,
+    "visual_result": "Native decoded source/official/trial 4/4, with 13 archived BGW/RAW/full atlas proof. Race_rivals distinctly retains severe BC3 stipple; drift/slipstream still visibly pixellated navy contours compared with smooth original. New A228 index-only repair is partial at best."
+  },
+  "decision": "REWORK_REQUIRED_TRIAL_NOT_PROMOTED",
+  "official_status": "REWORK_REQUIRED_ALREADY",
+  "critical_defect": [
+    "SOURCE_FAMILY_GLYPH_FILL_BC3_STIPPLE_REMAINS",
+    "BC3_INDEX_ONLY_REPAIR_INSUFFICIENT"
+  ],
+  "C1_PASS": false,
+  "C3": {
+    "status": "NOT_RUN",
+    "review_id": null
+  },
+  "approval": false,
+  "JPG_EXPORT": "BLOCKED",
+  "PJR019": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "USER_INGAME": "UNTESTED",
+  "new_DDS_generated_by_C1": 0,
+  "existing_official_DDS_changed": false,
+  "changed_SHA_reprocessed_once": true,
+  "fix_guidance": "A owner must rebuild original source-family gold/navy contour from native glyph renderer/CLEAN and BC3 block-aware re-encode with full SOURCE/CLEAN/FINAL proof. Do not rerun same palette-index patch or promote the unapproved A228 trial.",
+  "excludes": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

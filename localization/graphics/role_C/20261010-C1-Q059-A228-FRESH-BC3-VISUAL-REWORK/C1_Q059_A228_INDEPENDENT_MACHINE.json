@@ -1,0 +1,284 @@
+{
+  "queue_index": 59,
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+  "DDS": {
+    "size": [
+      2048,
+      512
+    ],
+    "format": "BC3 DXT5 mip1",
+    "header_exact": true,
+    "raw_readable": "vertical flip"
+  },
+  "delta": {
+    "changed_rgba_pixels": 534,
+    "changed_alpha_pixels": 0,
+    "outside_source_four_rects_rgba": 0,
+    "outside_source_four_rects_alpha": 0
+  },
+  "regions": {
+    "next_mission": {
+      "bbox_readable": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "changed_rgba_pixels": 0,
+      "changed_alpha_pixels": 0,
+      "dark_gold_face_interior_heuristic": {
+        "source": 5,
+        "official": 0,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "visible_alpha_pixels": {
+        "source": 160460,
+        "official": 52144,
+        "trial": 52144
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/next_mission_gray_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "b858fccf67dff41fa3d7da7db3da66a1daabb333fcee90ddbc7bb371a7f9f0b8",
+          "git_blob_sha": "fcc4e6de185da33cb7a713f65b108416d2a012a9"
+        }
+      ]
+    },
+    "race_rivals": {
+      "bbox_readable": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "changed_rgba_pixels": 151,
+      "changed_alpha_pixels": 0,
+      "dark_gold_face_interior_heuristic": {
+        "source": 2,
+        "official": 10,
+        "trial": 10,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "visible_alpha_pixels": {
+        "source": 39329,
+        "official": 24633,
+        "trial": 24633
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "533ce2c531e4fd5b3884e43fcf162b87294a4cb875cecf9031cbac14f8a5da74",
+          "git_blob_sha": "f78563ea815b4eaaf2629577e812b303c4e97aaa"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_50_SOURCE_OFFICIAL_A228.png",
+          "sha256": "d1e6eae6d2f72fa3265a1e25a55eb1d341ac8e576c3c57047db3df44640b90e0",
+          "git_blob_sha": "fdc386c7a83fce9889bcf99e3f1c0dce4353b180"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_black_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "b525e01df346fe53c6c736d8ef5e94bef18de18617ee46215155ddc5206b366b",
+          "git_blob_sha": "be4ccd0bcb5694e20e262a9f1efb64bed46f68ea"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_white_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "49dc29322d54268a5fa796428eca3b0b388e03f169feeaad5aad944cd4cc7fed",
+          "git_blob_sha": "cbf9b2c7f3266855bf9e6e10db3f88b4879efd4c"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_TRIAL_RAW_native.png",
+          "sha256": "a0d1a9f57df0d7f93854b095937f7086767ec171d1c928768b52eff43fceb50f",
+          "git_blob_sha": "7c4cc2b2a12a9bd07fb8fa38ebe5f08b0a1353a7"
+        }
+      ]
+    },
+    "drift_score": {
+      "bbox_readable": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "changed_rgba_pixels": 182,
+      "changed_alpha_pixels": 0,
+      "dark_gold_face_interior_heuristic": {
+        "source": 1,
+        "official": 4,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "visible_alpha_pixels": {
+        "source": 35183,
+        "official": 28159,
+        "trial": 28159
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "9e3d7d9b97aa73ee35228a02c17d1403cdc34a73fedc197102c2031661195256",
+          "git_blob_sha": "7f376742c0aca53471042247886d026a7a51f99e"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_50_SOURCE_OFFICIAL_A228.png",
+          "sha256": "17676c6f668b09c2268732d8a593747ec8128e1a46fa7a55734b42ff3c98d931",
+          "git_blob_sha": "5a536c5c05dbea9376a28d780b2590acecd29e8d"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_black_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "c6736748b128932d9c616f8a654196e0a7ad1b481833217c626c53028871d919",
+          "git_blob_sha": "71f5eb5573813164db47ececd1e607e9d9d2564e"
+        }
+      ]
+    },
+    "slipstream_score": {
+      "bbox_readable": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "changed_rgba_pixels": 201,
+      "changed_alpha_pixels": 0,
+      "dark_gold_face_interior_heuristic": {
+        "source": 2,
+        "official": 11,
+        "trial": 0,
+        "note": "Differing strings; metric is diagnostic only, visual judgment required."
+      },
+      "visible_alpha_pixels": {
+        "source": 48463,
+        "official": 31964,
+        "trial": 31964
+      },
+      "views": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "1be69f444f9d3150a2c18dfd78e600a7f2d3a3e2cfec3b7d7ed51df4bd24bd7f",
+          "git_blob_sha": "051096e6af61ca49632415a6f46ca2615c07ed57"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_50_SOURCE_OFFICIAL_A228.png",
+          "sha256": "32dacf83d49858d82ea92a80837f42bc452b1d7a4c209c3e99bcbc46a5230fb6",
+          "git_blob_sha": "fbd79ba1b8e028f8ae551b6686b08328d00ac935"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_black_100_SOURCE_OFFICIAL_A228.png",
+          "sha256": "15c60f1cb40d88f85fe9493a7bd3aa74321d6c1f7269f79fa3f9bbe833f94018",
+          "git_blob_sha": "371b80afeaa4245c258a72e0e14602c10e2168d3"
+        }
+      ]
+    }
+  },
+  "C1_scope": "independently verified exact 3 persisted DDS, re-decoded 4/4 native SOURCE/OFFICIAL/TRIAL and BGW 100/50, RAW, readable; four original region boxes pinned to C1 previous exact independent source report",
+  "C3": "NOT_RUN",
+  "GAME": "UNTESTED",
+  "views": {
+    "race_rivals_gray_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "533ce2c531e4fd5b3884e43fcf162b87294a4cb875cecf9031cbac14f8a5da74",
+      "git_blob_sha": "f78563ea815b4eaaf2629577e812b303c4e97aaa"
+    },
+    "race_rivals_gray_50_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_gray_50_SOURCE_OFFICIAL_A228.png",
+      "sha256": "d1e6eae6d2f72fa3265a1e25a55eb1d341ac8e576c3c57047db3df44640b90e0",
+      "git_blob_sha": "fdc386c7a83fce9889bcf99e3f1c0dce4353b180"
+    },
+    "race_rivals_black_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_black_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "b525e01df346fe53c6c736d8ef5e94bef18de18617ee46215155ddc5206b366b",
+      "git_blob_sha": "be4ccd0bcb5694e20e262a9f1efb64bed46f68ea"
+    },
+    "race_rivals_white_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_white_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "49dc29322d54268a5fa796428eca3b0b388e03f169feeaad5aad944cd4cc7fed",
+      "git_blob_sha": "cbf9b2c7f3266855bf9e6e10db3f88b4879efd4c"
+    },
+    "drift_score_gray_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "9e3d7d9b97aa73ee35228a02c17d1403cdc34a73fedc197102c2031661195256",
+      "git_blob_sha": "7f376742c0aca53471042247886d026a7a51f99e"
+    },
+    "drift_score_gray_50_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_gray_50_SOURCE_OFFICIAL_A228.png",
+      "sha256": "17676c6f668b09c2268732d8a593747ec8128e1a46fa7a55734b42ff3c98d931",
+      "git_blob_sha": "5a536c5c05dbea9376a28d780b2590acecd29e8d"
+    },
+    "drift_score_black_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/drift_score_black_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "c6736748b128932d9c616f8a654196e0a7ad1b481833217c626c53028871d919",
+      "git_blob_sha": "71f5eb5573813164db47ececd1e607e9d9d2564e"
+    },
+    "slipstream_score_gray_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "1be69f444f9d3150a2c18dfd78e600a7f2d3a3e2cfec3b7d7ed51df4bd24bd7f",
+      "git_blob_sha": "051096e6af61ca49632415a6f46ca2615c07ed57"
+    },
+    "slipstream_score_gray_50_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_gray_50_SOURCE_OFFICIAL_A228.png",
+      "sha256": "32dacf83d49858d82ea92a80837f42bc452b1d7a4c209c3e99bcbc46a5230fb6",
+      "git_blob_sha": "fbd79ba1b8e028f8ae551b6686b08328d00ac935"
+    },
+    "slipstream_score_black_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/slipstream_score_black_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "15c60f1cb40d88f85fe9493a7bd3aa74321d6c1f7269f79fa3f9bbe833f94018",
+      "git_blob_sha": "371b80afeaa4245c258a72e0e14602c10e2168d3"
+    },
+    "next_mission_gray_100_SOURCE_OFFICIAL_A228.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/next_mission_gray_100_SOURCE_OFFICIAL_A228.png",
+      "sha256": "b858fccf67dff41fa3d7da7db3da66a1daabb333fcee90ddbc7bb371a7f9f0b8",
+      "git_blob_sha": "fcc4e6de185da33cb7a713f65b108416d2a012a9"
+    },
+    "race_rivals_TRIAL_RAW_native.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/race_rivals_TRIAL_RAW_native.png",
+      "sha256": "a0d1a9f57df0d7f93854b095937f7086767ec171d1c928768b52eff43fceb50f",
+      "git_blob_sha": "7c4cc2b2a12a9bd07fb8fa38ebe5f08b0a1353a7"
+    },
+    "trial_FULL_FLIPY_gray50.png": {
+      "path": "localization/graphics/role_C/20261010-C1-Q059-A228-FRESH-BC3-VISUAL-REWORK/evidence/trial_FULL_FLIPY_gray50.png",
+      "sha256": "ecaa952324251564c9be0c77394a1bbfe16ad1b3fec9e6b79442941e549ebc12",
+      "git_blob_sha": "44c4f275a85312ce4856ba51b146d2419460a8c1"
+    }
+  },
+  "clean_independent": {
+    "next_mission": {
+      "source_saved_png_matches_independent_original_DDS_pixels": true,
+      "source_mismatch_rgba_pixels": 0,
+      "source_visible_alpha_px": 160460,
+      "clean_visible_alpha_px": 0,
+      "source_clean_rgba_diff_px": 160460,
+      "source_sha256": "8d0347e47492bc99b916a19cb84f6c3411a69cca44c1da4d79bf8bd221ee7815",
+      "clean_sha256": "6e013c10f871ed1ac4cafe346184418a4eb8ff00841657a725cd13eb2b432bec"
+    },
+    "race_rivals": {
+      "source_saved_png_matches_independent_original_DDS_pixels": true,
+      "source_mismatch_rgba_pixels": 0,
+      "source_visible_alpha_px": 39329,
+      "clean_visible_alpha_px": 0,
+      "source_clean_rgba_diff_px": 39329,
+      "source_sha256": "fe4bf8a859e5715f0c491c6c0d81f4df450a15309061a5b1c01790aaf9ef18e6",
+      "clean_sha256": "c3d32a81fc0f420382b871a176819900f21e15000b0d9da0dcd8a8c55ac3b7f8"
+    },
+    "drift_score": {
+      "source_saved_png_matches_independent_original_DDS_pixels": true,
+      "source_mismatch_rgba_pixels": 0,
+      "source_visible_alpha_px": 35183,
+      "clean_visible_alpha_px": 0,
+      "source_clean_rgba_diff_px": 35183,
+      "source_sha256": "65afb8cf8d2df35842cb1b9fa56d4f4b73328c0c8cc60f6041749abea2986ff5",
+      "clean_sha256": "392716079569802749f7bf0fe5a0bbff329f4aaf424514da5d0949424186e84c"
+    },
+    "slipstream_score": {
+      "source_saved_png_matches_independent_original_DDS_pixels": true,
+      "source_mismatch_rgba_pixels": 0,
+      "source_visible_alpha_px": 48463,
+      "clean_visible_alpha_px": 0,
+      "source_clean_rgba_diff_px": 48463,
+      "source_sha256": "6fb0b9cac4465cdcea5dfe1532c560175af8eb5b9b428d946073fd8161b74292",
+      "clean_sha256": "748f278db378335a5e8d30d7ceeee151f34993c684c1c2ac47b67cc41383ab49"
+    }
+  },
+  "unpublished_other_rendered_images": "26 other temporary local PNG contacts created but not published because selected 13 are sufficient for explicitly scoped visual REWORK"
+}
