@@ -143,7 +143,7 @@ assert np.array_equal(D[132:245],O[132:245]),"SECOND_ROW_CHANGED"
 oldblocks=np.frombuffer(old[128:],np.uint8).reshape(h//4,w//4,16)
 newblocks=np.frombuffer(candidate[128:],np.uint8).reshape(h//4,w//4,16)
 bm=np.any(oldblocks!=newblocks,axis=2)
-allowedblocks=np.zeros((h//4,w//4),bool);allowedblocks[16//4:132//4,388//4:1316//4]=True
+allowedblocks=np.zeros((h//4,w//4),bool);allowedblocks[(h-132)//4:(h-16)//4,388//4:1316//4]=True  # DDS block order is raw mirror-Y
 assert not np.any(bm&~allowedblocks)
 # Prove desired phenomenon appears in independently decoded persisted alpha.
 src_trans=int(np.count_nonzero((S[:,:,3]>=1)&(S[:,:,3]<180)&srcmask))
