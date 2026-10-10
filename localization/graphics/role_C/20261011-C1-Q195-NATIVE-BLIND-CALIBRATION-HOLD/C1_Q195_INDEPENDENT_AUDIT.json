@@ -1,0 +1,190 @@
+{
+  "schema_version": 3,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD",
+  "review_id": "C1-Q195-UPRIGHT-BLIND-EXACT-SAVED-FIRST-20261011-0610",
+  "reviewer": "C1-ChatGPT",
+  "lane": "C1",
+  "shard": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 195,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "backend": "GitHub current-branch SSOT; N100 MCP isolated read-only native decode and visual-evidence scratch (local host image environment unable to access GitHub binary via direct network)",
+  "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+  "source_provenance": "Prior C284 independently authenticated canonical source DDS SHA; current run verified prior C284 lossless readable SOURCE PNG SHA3ccae... but did not independently re-fetch complete original DDS bytes.",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "candidate_bytes": 524416,
+  "dds": {
+    "format": "BGRA32",
+    "width": 1024,
+    "height": 128,
+    "mip_count": 1,
+    "orientation": "flip_y",
+    "sha256_exact_download": true,
+    "decoded_vs_prior_bound_png_mismatch_pixels": 0
+  },
+  "source_clean_final_metrics": {
+    "source_bbox_readable": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "final_bbox_readable": [
+      182,
+      82,
+      402,
+      119
+    ],
+    "source_wh": [
+      395,
+      41
+    ],
+    "final_wh": [
+      220,
+      37
+    ],
+    "source_to_clean_rgba_changed": 8042,
+    "clean_to_final_rgba_changed": 4999,
+    "source_to_final_rgba_changed": 10396,
+    "source_to_clean_outside_bbox": 0,
+    "clean_to_final_outside_bbox": 0,
+    "source_to_final_outside_bbox": 0,
+    "source_to_clean_alpha_changes": 0,
+    "clean_to_final_alpha_changes": 0,
+    "protective_scope": "Full 1024x128 visible RGBA source/CLEAN/final images with existing authenticated C284 reference; original source DDS independently not re-fetched this invocation."
+  },
+  "native_machine": {
+    "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/MACHINE_SCOPED.json",
+    "sha256": "d1befb8250ba9ff6e5b3a30cffdbf34d51b4504d420a7185ff81010da35444e9"
+  },
+  "calibration": {
+    "type": "NEW_Q195_UPRIGHT_FAMILY_SYNTHETIC_CONTROLS",
+    "before_answer_key": true,
+    "first_look": {
+      "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/BLIND_FIRST_LOOK.json",
+      "sha256": "13dc7bec3b2a1134fa45bc46c0510ed438472f0e2865df79699e76b2bc527870"
+    },
+    "sealed_answer_key": {
+      "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/ANSWER_KEY_SEALED.json",
+      "sha256": "297aeda07cd710ab9a62ca08573fdb8789ead1baa194d9e5cd10b8d041dbaa9a"
+    },
+    "blind_sheet": {
+      "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/BLIND_FIVE_CASES.png",
+      "sha256": "47a77911c298593f99d5edeb6d65b28f30a8625d9d0c8a7dae2a7b399a509d43"
+    },
+    "case_predictions": {
+      "A": "excessive_weight",
+      "B": "residue",
+      "C": "normal",
+      "D": "opposite_slant",
+      "E": "clipped_stroke"
+    },
+    "matching_answers": 5,
+    "case_count": 5,
+    "independent_identity_claim": false,
+    "variant_scope": "Synthetic intentionally broken images for reviewer sensitivity only; not a candidate DDS or accepted family recipe."
+  },
+  "pixels_before_producer_verdict": true,
+  "regions": [
+    {
+      "id": "not_available_red_pill",
+      "bbox": [
+        95,
+        80,
+        490,
+        121
+      ],
+      "readable_transform": "flip_y",
+      "source_text": "NOT AVAILABLE",
+      "localized_text": "사용할 수 없음",
+      "slant": {
+        "source_top_minus_bottom_dx": null,
+        "candidate_top_minus_bottom_dx": null,
+        "anchor_observation": "Left silhouette edge shows source x95@90/110 and Korean x188@91, x182@109; not same-stem glyph anchors, so no exact-source-lean PASS inferred."
+      },
+      "findings": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Native source reads upright; Korean appears near-upright in readable view, but no unambiguous homologous top/bottom glyph anchors were measured; silhouette edge delta alone is insufficient.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Source English face removed inside original glyph footprint only. Solid-red plate remains visually uniform without ghost; source/CLEAN 8042 RGBA changes, outside0, alpha unchanged.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "style": {
+          "result": "HOLD",
+          "observation": "Source is bold white uppercase upright sans, Korean is bold white and similar height 37 vs 41px, yet source-family stroke/counter reference and independent native English DDS provenance not fully requalified.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "readability": {
+          "result": "PASS",
+          "observation": "Full Korean phrase can be read at 100%, 75%, 50% from the stored lossless view; source bbox contains candidate 220x37 versus 395x41 and positive margins.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261008-C284-C1-Q195-NATIVE-HOLD-EVIDENCE/regions/candidate_practical_50.png",
+            "sha256": "d8e173b06b5999c6b4aa86d3e0c01562d0bf31096eb46cce551fa5d179e79e14"
+          }
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "No distinct truncated jamo, torn strokes, stipple or clipping evident in persisted native and 50%-size image; blind clipped example rejected.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "RED pill and gray side bar continue without visible intrusion, source/CLEAN/FINAL full 1024x128 changes confined to original English bbox; this is pixel scope, not game composition.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "placement": {
+          "result": "PASS",
+          "observation": "Source x95..490 and localized x182..402 share center x292.5, source y80..121 and Korean y82..119 share middle y100.5; positive in-source margins.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "Saved DDS RAW mirror-Y decodes FLIP-Y into the same authenticated C284 visual with 0 mismatched pixels; raw orientation kept. Actual game UV/compositor not run.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/SOURCE_CLEAN_PERSISTED_NATIVE.png",
+            "sha256": "a4eff94a5df7e56270a7af0a699c62e80a725726d1cf804f91f046c7d43effb9"
+          }
+        }
+      }
+    }
+  ],
+  "full_current_policy_approval": "HOLD_STRICT_RECHECK",
+  "C1": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN",
+  "APPROVALS": "NOT_CREATED",
+  "source_to_game_trace": {
+    "persisted_candidate": "VERIFIED",
+    "preview_package_exact_sha": "NOT_NEWLY_TESTED",
+    "consumer_load_transform": "NOT_TESTED",
+    "game_composited_ui": "NOT_TESTED",
+    "user_game": "NOT_TESTED"
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "new_independent_calibration": 1,
+  "duplicate_C284_native_machine_credit": 0,
+  "reason": "Fresh upright-family blinded visual calibration 5/5 and exact persisted DDS/native scoped findings newly documented, but complete canonical original DDS re-authentication, homologous readable slant/typography anchors, separately scoped C3 and user game proof remain missing. Hold unchanged bytes, do not relabel as C PASS or migrate approval."
+}

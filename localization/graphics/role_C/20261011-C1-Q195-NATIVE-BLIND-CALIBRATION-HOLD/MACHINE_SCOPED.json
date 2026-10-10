@@ -1,0 +1,55 @@
+{
+  "queue_index": 195,
+  "source_bound_png_sha256": "3ccae67f95bb115d1e165e799e8f30fe2361c2bb81c262d3f6056c38f1e0f3be",
+  "clean_bound_png_sha256": "3e26ddc0f31892454bf0e42217fc79c986625017cfe0c6a8b4260936cda2d620",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "persisted_native_decoded_sha256": "839e976d9852aa02a3c986595e8d0d5ddf61b26dbe4319784641b2964587e549",
+  "persisted_visual_mismatch_pixels": 0,
+  "format": "BGRA32",
+  "width": 1024,
+  "height": 128,
+  "mips": 1,
+  "readable_transform": "flip_y",
+  "source_bbox_existing": [
+    95,
+    80,
+    490,
+    121
+  ],
+  "candidate_bbox_existing": [
+    182,
+    82,
+    402,
+    119
+  ],
+  "source_clean_changed": 8042,
+  "clean_final_changed": 4999,
+  "source_final_changed": 10396,
+  "source_clean_outside_bbox": 0,
+  "clean_final_outside_bbox": 0,
+  "source_final_outside_bbox": 0,
+  "source_clean_alpha_changes": 0,
+  "clean_final_alpha_changes": 0,
+  "source_edge_diagnostic": {
+    "0.25": {
+      "y": 90,
+      "leftmost_x": 95
+    },
+    "0.75": {
+      "y": 110,
+      "leftmost_x": 95
+    }
+  },
+  "candidate_edge_diagnostic": {
+    "0.25": {
+      "y": 91,
+      "leftmost_x": 188
+    },
+    "0.75": {
+      "y": 109,
+      "leftmost_x": 182
+    }
+  },
+  "edge_diagnostic_is_not_glyph_anchor_approval": true,
+  "no_C3_no_user_game": true
+}

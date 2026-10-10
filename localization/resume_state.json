@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 2026-10-11 06:10+ KST ODD q195 exact unchanged saved BGRA32 DDS b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c native1024x128 mip1/RAW FLIP-Y decoded against C284 SHA-bound PNG mismatch0. New q195 upright-family synthetic blind first-look 5/5 defect controls (normal/opposite lean/clipped stroke/English residue/excessive weight), sealed first-look prior answer reveal; new SOURCE/CLEAN/persisted native lossless sheet. Source->CLEAN8042, CLEAN->FINAL4999, SOURCE->FINAL10396 RGBA changes all original bbox [95,80,490,121] contained, out0 and alpha0; Korean [182,82,402,119] positive margins; 8 per-region C1 optical checks scoped with slant/style HOLD pending homologous glyph anchors/current full English DDS source re-auth, C3 independent review and actual game. NO new candidate DDS, NO current-policy C/C3/APPROVAL PASS; RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/C1_Q195_INDEPENDENT_AUDIT.json; RUN_KEY=OUTRUN-KOR-C1-Q195-UPRIGHT-BLIND-EXACT-DDS-20261011-0610.",
     "A234R odd q121 P0 IGR-030/031/040: true source-derived rank20 Gas Pedal→가속 페달 CLEAN + native 4096² transparent glyph with alpha; NEW unpromoted saved DDS SHA e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1 (A234 alpha-zero dd1cb8 rejected). Visible alpha 6672, source ROI outside0, 29 other atlas cells exact, header/decode exact, native/50/RAW saved previews visually readable; source family glyph weight/italic calibration HOLD. Official 38d5c2c3 unchanged, C1/C3 NOT_RUN, all IGR OPEN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA/A234R_CONTROLLER_OPTICAL_QA.json. OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
     "C1 ODD q217 NEW A233 exact SHA 84753cf3 first independent 2 source regions SOURCE/CLEAN/A231/A233 native BGW 100/75/50 RAW, changed1352 all bbox / alpha0, source family too small and internally striped => REWORK, official unchanged; C3/game UNTESTED. C1-Q217-A233-FIRST-INDEPENDENT-20261011-0541",
     "B364 q236 EVEN single row05 SKYSCRAPERS native source-family pilot new unapproved SHA ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41, B302/current official 9e2069... unchanged; English a1c7f7d6 / B80 CLEAN c202f55e, new native Bold94+1px 91px vs rejected old87px and source95px, 56558 RGBA change inside row05 only outside0, saved DDS roundtrip0, native100/practical50/RAW first-hand visual scoped improvement but blind source-family and all14 pending. Pilot HOLD; C358 whole-atlas REWORK remains, C2/C3/approval0/game UNTESTED; QA localization/graphics/role_B/20261011-B364-Q236-ROW05-SOURCE-NATIVE-PILOT/B364_CONTROLLER_FIRST_HAND_QA.json; RUN_KEY=OUTRUN-KOR-B364-Q236-ROW05-NATIVE-FAMILY-PILOT-20261011-0541",
@@ -15671,5 +15672,17 @@
     "source_clean_exact_reauthenticated": false,
     "whole_atlas_status": "C358_REWORK_REQUIRED",
     "evidence": "localization/graphics/role_C/20261011-C377-C2-Q236-B364-NATIVE-FAMILY-INDEPENDENT/C377_Q236_B364_C2_SCOPED_HOLD.json"
+  },
+  "c1_20261011_q195_upright_blind_exact_dds": {
+    "task_id": "OUTRUN-KOR-C1-Q195-UPRIGHT-BLIND-EXACT-DDS-20261011-0610",
+    "queue_index": 195,
+    "role": "C1",
+    "new_calibration": "5/5_FIRST_LOOK",
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "decision": "HOLD_STRICT_RECHECK",
+    "new_DDS": 0,
+    "qa": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/C1_Q195_INDEPENDENT_AUDIT.json",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

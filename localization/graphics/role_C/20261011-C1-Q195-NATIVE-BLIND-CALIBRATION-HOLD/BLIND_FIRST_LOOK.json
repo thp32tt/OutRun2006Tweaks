@@ -1,0 +1,37 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "C1-ChatGPT",
+  "queue_index": 195,
+  "first_look_before_key": true,
+  "blind_review_completed": true,
+  "sheet": "work/c1_q195_20261011_0610/BLIND_FIVE_CASES.png",
+  "observations": {
+    "A": {
+      "prediction": "excessive_weight",
+      "observed": "FAIL",
+      "observation": "Upper Hangul turns into nearly solid white blocked shapes with collapsed counters."
+    },
+    "B": {
+      "prediction": "residue",
+      "observed": "FAIL",
+      "observation": "Readable English NOT ... BLE visibly coexists with the Korean heading."
+    },
+    "C": {
+      "prediction": "normal",
+      "observed": "PASS",
+      "observation": "Upright white Hangul cleanly aligned within red pill, no visible extra strokes or remnants."
+    },
+    "D": {
+      "prediction": "opposite_slant",
+      "observed": "FAIL",
+      "observation": "Strong diagonal lean differs from upright English family and breaks clean horizontal word alignment."
+    },
+    "E": {
+      "prediction": "clipped_stroke",
+      "observed": "FAIL",
+      "observation": "Compare to control C: missing vertical stroke area of first Hangul block and altered interior stroke integrity."
+    }
+  },
+  "calibration_only": true,
+  "synthetic_cases_never_production_candidates": true
+}

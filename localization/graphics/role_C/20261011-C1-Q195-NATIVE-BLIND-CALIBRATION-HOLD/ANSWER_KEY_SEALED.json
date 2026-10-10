@@ -1,0 +1,11 @@
+{
+  "cases": {
+    "A": "excessive_weight",
+    "B": "residue",
+    "C": "normal",
+    "D": "opposite_slant",
+    "E": "clipped_stroke"
+  },
+  "policy_version": "visual-evidence-v1-20261008",
+  "synthetic_only": true
+}

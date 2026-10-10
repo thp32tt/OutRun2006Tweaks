@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T05:56:00+09:00",
+  "updated_at_kst": "2026-10-11T06:20:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12131,5 +12131,19 @@
     "source_clean_exact_reauthenticated": false,
     "whole_atlas_status": "C358_REWORK_REQUIRED",
     "evidence": "localization/graphics/role_C/20261011-C377-C2-Q236-B364-NATIVE-FAMILY-INDEPENDENT/C377_Q236_B364_C2_SCOPED_HOLD.json"
+  },
+  "c1_20261011_q195_upright_blind_exact_dds": {
+    "run_key": "OUTRUN-KOR-C1-Q195-UPRIGHT-BLIND-EXACT-DDS-20261011-0610",
+    "queue_index": 195,
+    "shard": "ODD",
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "new_lossless_png": 2,
+    "new_blind_calibration": "5/5",
+    "new_DDS": 0,
+    "decision": "HOLD_STRICT_RECHECK",
+    "qa": "localization/graphics/role_C/20261011-C1-Q195-NATIVE-BLIND-CALIBRATION-HOLD/C1_Q195_INDEPENDENT_AUDIT.json",
+    "c3": "NOT_RUN",
+    "approval": false,
+    "user_game": "UNTESTED"
   }
 }
