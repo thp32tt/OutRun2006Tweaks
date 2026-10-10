@@ -1,0 +1,316 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C",
+  "lane": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "index": 205,
+  "priority": "P0",
+  "run_key": "OUTRUN-KOR-C1-Q205-B306-CANONICAL-CLEAN-PIXEL-PROOF-20261010-1210",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "selection": "Read-only tools/localization/rework_triage.py --index 205 on fresh asset_queue.csv: EVIDENCE_ONLY_HOLD. Preserve unchanged B306 DDS.",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Remakes and Reskins/UI/Menus/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "independently_downloaded_verified": true
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "bytes": 33554560,
+    "independently_downloaded_verified": true
+  },
+  "clean_a76": {
+    "path": "localization/graphics/role_A/20261006-A-PRODUCTION76-ACF/A76_ACF_CLEAN_PLATE.png",
+    "sha256": "2e06b0d14f372a5e904ff09e62fb9ed14387fe8b98e49ae385af094a4b0fd73f"
+  },
+  "clean_b303": {
+    "path": "localization/graphics/role_B/20261009-B303-Q205-P0-RED-HEADING-NATIVE-FAMILY/CLEAN_FULL_ATLAS.png",
+    "sha256": "245c66e49b3b4254b5eb7043b3de1364982414ff76e7dc1c68006951f92effac"
+  },
+  "full_clean_content_pixel_identity": "A76 vs B303 CLEAN: 0 RGBA and 0 alpha mismatched pixels across entire 4096x2048 atlas despite distinct PNG byte hashes; source native readable PNG exactly equals independently decoded canonical SOURCE DDS 0 mismatched pixels.",
+  "read_before_firstlook": "Historical C338/B306 notes read before proof; not a blind firstlook; pixels_before_producer_verdict false, never claim calibrated final C PASS.",
+  "previous_C338_missing_evidence": "Canonical English source and genuine authored CLEAN were not independently authenticated in C338. Current step closes only those exact-byte links and directly inspects two P0 user-failed title cells.",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_C1_INDEPENDENT_MACHINE.json",
+    "result": "SCOPED_PIXEL_PROOF_NOT_CURRENT_APPROVAL",
+    "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70"
+  },
+  "independent_machine": {
+    "dds": {
+      "w": 4096,
+      "h": 2048,
+      "masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ],
+      "mips": 1,
+      "bytes": 33554560
+    },
+    "header_byte_equal": true,
+    "source_readable_png_pixel_delta": 0,
+    "raw_misalignment_change_count": 5126710,
+    "allowed_mask_sha256": "4d5abe36b91c78296ac61a02e1d4aa866be4a7800d890271d61f59769764cde8",
+    "protected_mask_sha256": "efc1074449711fc3c75597f02d46067e98380d713c05415fb7de22e6c3d4fb2c",
+    "allowed_mask_pixels": 841737,
+    "protected_mask_pixels": 917104,
+    "source_clean": {
+      "total_rgba": 319471,
+      "total_alpha": 319471,
+      "outside_2_regions_rgba": 194741,
+      "outside_2_regions_alpha": 194741,
+      "outside_all_authored_allowed_rgba": 0,
+      "outside_all_authored_allowed_alpha": 0,
+      "source_protected_changed_rgba": 0,
+      "source_protected_changed_alpha": 0
+    },
+    "clean_final": {
+      "total_rgba": 162672,
+      "total_alpha": 135867,
+      "outside_2_regions_rgba": 99562,
+      "outside_2_regions_alpha": 99562,
+      "outside_all_authored_allowed_rgba": 0,
+      "outside_all_authored_allowed_alpha": 0,
+      "source_protected_changed_rgba": 0,
+      "source_protected_changed_alpha": 0
+    },
+    "source_final": {
+      "total_rgba": 378490,
+      "total_alpha": 366388,
+      "outside_2_regions_rgba": 239435,
+      "outside_2_regions_alpha": 238410,
+      "outside_all_authored_allowed_rgba": 0,
+      "outside_all_authored_allowed_alpha": 0,
+      "source_protected_changed_rgba": 0,
+      "source_protected_changed_alpha": 0
+    },
+    "full_clean_A76_vs_B303": {
+      "total_rgba": 0,
+      "total_alpha": 0,
+      "outside_2_regions_rgba": 0,
+      "outside_2_regions_alpha": 0,
+      "outside_all_authored_allowed_rgba": 0,
+      "outside_all_authored_allowed_alpha": 0,
+      "source_protected_changed_rgba": 0,
+      "source_protected_changed_alpha": 0
+    }
+  },
+  "regions": [
+    {
+      "id": "options",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "persisted_edit_bbox": [
+        1597,
+        1429,
+        1843,
+        1562
+      ],
+      "positive_margins": [
+        6,
+        473,
+        6,
+        6
+      ],
+      "source_to_clean_removed_rgba": 56371,
+      "exact_authored_CLEAN_alpha_positive": 0,
+      "source_alpha_positive": 56371,
+      "candidate_alpha_positive": 18084,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_native_source_A76clean_B303clean_final.png",
+          "sha256": "afd0e7d34e2693cddc18a6867ee2caf07d1b3787f2281def75102cfdc568de32"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_practical50_BGW.png",
+          "sha256": "0b5383930a96789b04afac7084828a7863b12e2971b215e116055ae2e6cbea71"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_raw_persisted_BGW.png",
+          "sha256": "041232ff1e39b14bfa6de726a06b502a2e927eb674ab08d22bd95021f4da9059"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Canonical readable English horizontal stem direction visually upright; no quantitative per-glyph calibrated top-minus-bottom source/Korean anchors; no fabricated measured zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Two independent authored CLEAN PNGs (A76 and B303) are pixel-identical full atlas. Exact source label alpha fully removed in the inspected native region; no visible shadows/glow or ghost on gray/black/white."
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "Source red flat large block sans, current solid red heavier straight-stem Hangul, previous tapered serif corrected; shorter Korean not artificially stretched. No qualified whole-atlas family match or in-game proof."
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "Solid red Korean letters instantly legible native and 50-percent on black/gray/white proof; no newer composed game crop available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "No visibly broken Hangul strokes, pixel cuts or missing counters in inspected saved DDS 100/50 contacts."
+        },
+        "protected_art": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Independent entire 4096x2048 canonical source/CLEAN/final three-way comparison: all RGBA/alpha changes within A76 allowed mask, no changed pixels inside A76 protected-visible mask. Semantic mask beyond the source-authored inventory not certified."
+        },
+        "placement": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Actual source to CLEAN vs persisted B306 change bbox is inside original native English effect box with >=6px margins; no 1px invasion."
+        },
+        "orientation": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Actual saved DDS native RAW mirror_y and readable FLIP-Y agree with exact A76 source readable PNG (0 pixel mismatch), full header byte equal, mip count 1; game not run."
+        }
+      }
+    },
+    {
+      "id": "rankings",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "persisted_edit_bbox": [
+        39,
+        1251,
+        271,
+        1382
+      ],
+      "positive_margins": [
+        6,
+        659,
+        6,
+        6
+      ],
+      "source_to_clean_removed_rgba": 68359,
+      "exact_authored_CLEAN_alpha_positive": 0,
+      "source_alpha_positive": 68359,
+      "candidate_alpha_positive": 18221,
+      "evidence": [
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_native_source_A76clean_B303clean_final.png",
+          "sha256": "4014b2ca6203e6de0cea7c58b3224942249e6339f84029dc457e6e2cb110ca17"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_practical50_BGW.png",
+          "sha256": "d3f58691af4d927bc40b4b62d0966255a83ecc6048e711fb6999418d99daac0c"
+        },
+        {
+          "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_raw_persisted_BGW.png",
+          "sha256": "e0abbac71385976d68e5600b47645fedf942f21d4f21cb33e327f838145faa1f"
+        }
+      ],
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Canonical readable English horizontal stem direction visually upright; no quantitative per-glyph calibrated top-minus-bottom source/Korean anchors; no fabricated measured zero."
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Two independent authored CLEAN PNGs (A76 and B303) are pixel-identical full atlas. Exact source label alpha fully removed in the inspected native region; no visible shadows/glow or ghost on gray/black/white."
+        },
+        "style": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "Source red flat large block sans, current solid red heavier straight-stem Hangul, previous tapered serif corrected; shorter Korean not artificially stretched. No qualified whole-atlas family match or in-game proof."
+        },
+        "readability": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "Solid red Korean letters instantly legible native and 50-percent on black/gray/white proof; no newer composed game crop available."
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_VISUAL_ACCEPT",
+          "observation": "No visibly broken Hangul strokes, pixel cuts or missing counters in inspected saved DDS 100/50 contacts."
+        },
+        "protected_art": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Independent entire 4096x2048 canonical source/CLEAN/final three-way comparison: all RGBA/alpha changes within A76 allowed mask, no changed pixels inside A76 protected-visible mask. Semantic mask beyond the source-authored inventory not certified."
+        },
+        "placement": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Actual source to CLEAN vs persisted B306 change bbox is inside original native English effect box with >=6px margins; no 1px invasion."
+        },
+        "orientation": {
+          "result": "SCOPED_MACHINE_PASS",
+          "observation": "Actual saved DDS native RAW mirror_y and readable FLIP-Y agree with exact A76 source readable PNG (0 pixel mismatch), full header byte equal, mip count 1; game not run."
+        }
+      }
+    }
+  ],
+  "calibration": {
+    "known_defect_normal": "NOT_BLINDLY_CALIBRATED",
+    "opposite_slant": "NOT_BLINDLY_CALIBRATED",
+    "clipped_stroke": "NOT_BLINDLY_CALIBRATED",
+    "residue": "NOT_BLINDLY_CALIBRATED",
+    "excessive_weight": "NOT_BLINDLY_CALIBRATED"
+  },
+  "other_21_atlas_regions": "NOT_NEWLY_INDEPENDENTLY_VISUALLY_REVIEWED",
+  "C1": "HOLD_STRICT_RECHECK",
+  "C1_PASS": false,
+  "C3": "NOT_RUN",
+  "APPROVAL": false,
+  "PRE_INGAME": "BLOCKED",
+  "IGR026": "OPEN_USER_INGAME_FAIL",
+  "IGR027": "OPEN_USER_INGAME_FAIL",
+  "IGR028": "OPEN_MIXED_RUNTIME_MAPPING_UNRESOLVED",
+  "USER_RETEST": "NOT_DONE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "DDS_CHANGED": false,
+  "NEW_DDS": 0,
+  "reason": "Canonical source/A76+B303 clean exact-byte proof and protected-mask zero validated. No genuine new visual defect on two native target titles, but known-defect calibration, full 23-region source-family/consumer audit and separate C3/game evidence unavailable; no PASS, no user case closure.",
+  "next": "Independent blind calibrated region inventory/full atlas (23 localized regions) and distinct C3, runtime consumer trace and new user screenshot on exact candidate. Do not blindly rerender the unchanged candidate on evidence-only HOLD.",
+  "execution_backend": "GitHub connector SSOT; ChatGPT local checked but DNS failed; N100 MCP bounded exact GitHub asset downloads and native Python/visual proof used as fallback; no Actions worker, no prohibited code.",
+  "excluded": [
+    "C2 even indexes",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "separate controller TASK_ID or queue engine"
+  ],
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_native_source_A76clean_B303clean_final.png",
+      "sha256": "afd0e7d34e2693cddc18a6867ee2caf07d1b3787f2281def75102cfdc568de32",
+      "bytes": 20635
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_practical50_BGW.png",
+      "sha256": "0b5383930a96789b04afac7084828a7863b12e2971b215e116055ae2e6cbea71",
+      "bytes": 54196
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_options_raw_persisted_BGW.png",
+      "sha256": "041232ff1e39b14bfa6de726a06b502a2e927eb674ab08d22bd95021f4da9059",
+      "bytes": 13604
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_native_source_A76clean_B303clean_final.png",
+      "sha256": "4014b2ca6203e6de0cea7c58b3224942249e6339f84029dc457e6e2cb110ca17",
+      "bytes": 28447
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_practical50_BGW.png",
+      "sha256": "d3f58691af4d927bc40b4b62d0966255a83ecc6048e711fb6999418d99daac0c",
+      "bytes": 70121
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q205-B306-EXACT-CANONICAL-CLEAN/Q205_rankings_raw_persisted_BGW.png",
+      "sha256": "e0abbac71385976d68e5600b47645fedf942f21d4f21cb33e327f838145faa1f",
+      "bytes": 18236
+    }
+  ]
+}
