@@ -554,45 +554,49 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
                   'ProducerToken::ResultTextB9200',
                   'ResultTextBefore = {};')
     apply = function_body(ui_source, 'bool apply() override')
-    require_order(apply, 'exact original result E8 source enter/leave',
-                  'ResultTextEnterHooks[i] = safetyhook::create_mid(',
-                  'Module::exe_ptr(rva), ResultTextEnter',
-                  'ResultTextLeaveHooks[i] = safetyhook::create_mid(',
-                  'Module::exe_ptr(rva + 5), ResultTextLeave',
-                  'if (!resultTextOk)')
-    # The exact user minidumps fault at EXE+0x97C5F inside the E9 rel32
-    # detour that the old 0x97C57+5 midhook placed at EXE+0x97C5C.
-    # Unlike other E8+5 sites this original control-flow target cannot
-    # be overwritten. Both before/after hooks must be skipped together.
-    # Preserve all 19 original EXE E8 identities; install only 18 safe
-    # scoped parents. An enter-only detour would leak screen HUD ownership.
-    require('static constexpr int ResultTextUnsafeReturnRva = 0x97C57;',
-            ui_source, 'two-minidump result crash signature exclusion')
-    require_order(apply, 'unsafe result E8+5 detour excluded before install',
-                  'if (rva == ResultTextUnsafeReturnRva)',
-                  'continue;',
-                  'ResultTextEnterHooks[i] = safetyhook::create_mid(',
-                  'ResultTextLeaveHooks[i] = safetyhook::create_mid(')
-    require('0x97C5F', apply, 'document exact faulting return target')
+    # 2026-10-11 third minidump: EIP 0x97E75 sits in E9 rel32
+    # inserted at EXE+0x97E72, exactly as earlier 0x97C5F did
+    # in E9 rel32 inserted at EXE+0x97C5C. Excluding one callsite
+    # left 18 equivalent control-flow-corrupting midhooks active.
+    # Preserve 19 original E8 identities and reject ALL rva+5 detours.
+    require('VR P0 RESULT CRASH GUARD 20261011:', apply,
+            'all nineteen B9200 calls must remain original')
+    require('0x97C5F and 0x97E75', apply,
+            'both real result minidump fault locations')
+    for unsafe in ('ResultTextEnterHooks[i] = safetyhook::create_mid(',
+                   'ResultTextLeaveHooks[i] = safetyhook::create_mid(',
+                   'Module::exe_ptr(rva + 5), ResultTextLeave'):
+        if unsafe in apply:
+            raise SystemExit('result EXE+0x97E75 crash: unsafe detour reinstalled')
+    # Still check the standalone original GOAL helpers are preserved.
+    for helper in ('GoalTime_Help020, Memory::HookType::Call',
+                   'GoalTime_Help150, Memory::HookType::Call'):
+        require(helper, apply, 'independent GOAL original helpers')
+
     if any(bad in leave for bad in (
         'SetRenderState(', 'SetTransform(', 'SuppressSprite',
     )):
         raise SystemExit('result text HUD parent may not change game draw/state')
 
 verify_goal_b9200_source(ui, sem, read('tools/analyze_outrun_exe.py'))
-# Explicit negative test: putting the unsafe post-call detour back must FAIL.
-_corrupt_result_guard = ui.replace(
-    'if (rva == ResultTextUnsafeReturnRva)',
-    'if (false)', 1)
-if _corrupt_result_guard == ui:
-    raise SystemExit('result crash negative mutation injection failed')
-try:
-    verify_goal_b9200_source(
-        _corrupt_result_guard, sem, read('tools/analyze_outrun_exe.py'))
-except SystemExit:
-    pass
-else:
-    raise SystemExit('result EXE+0x97C5F crash guard regression escaped')
+# Deliberately reintroducing *either* dangerous midhook must FAIL.
+# The new 0x97E75 dump proves that a single-address exception is not safe.
+for mutation in (
+    'ResultTextEnterHooks[i] = safetyhook::create_mid(',
+    'ResultTextLeaveHooks[i] = safetyhook::create_mid(',
+):
+    corrupt = ui.replace(
+        'VR P0 RESULT CRASH GUARD 20261011:',
+        mutation + ' VR P0 RESULT CRASH GUARD 20261011:', 1)
+    if corrupt == ui:
+        raise SystemExit('result crash test injection not applied')
+    try:
+        verify_goal_b9200_source(
+            corrupt, sem, read('tools/analyze_outrun_exe.py'))
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('unsafe 19-parent result detour escaped verifier')
 
 # The in-game course-extension transient lives in the distinct 0x989xx
 # original sprani animation, not the GOAL 0x97xxx record/percentage.
@@ -1324,6 +1328,33 @@ require_order(
 calc_producer = function_body(ui, 'static void Calc3D2D_dest(')
 require('RankMarkerSubScreenHudDepth == 0', calc_producer,
         'NaviPub screen-HUD Calc3D2D must not overwrite world car anchor')
+
+# The source-tested R57_06 and R62 car marker recovered its anchor at the
+# original ordinal Calc3D2D E8 0xBAEE2. B HUD traces from b913ef69
+# saw actual rank draw and 0 projected anchors. Demand an exact call-edge
+# wrapper; no reliance on incidental _ReturnAddress() from inline trampoline.
+def verify_rank_exact_calc_edge(source):
+    body = function_body(source, 'static void __cdecl Calc3D2D_OrdinalExactCall(')
+    for needle in ('RankMarkerExactCalcEdge = true;',
+                   'Calc3D2D_dest(a1, a2, in, out);',
+                   'RankMarkerExactCalcEdge = previous;'):
+        require(needle, body, 'R57/R62 ordinal exact CALL wrapper')
+    calc = function_body(source, 'static void Calc3D2D_dest(')
+    require('RankMarkerExactCalcEdge) &&', calc,
+            'ordinal exact edge must grant rank projection')
+    apply = function_body(source, 'bool apply() override')
+    require('Module::exe_ptr(0xBAEE2), Calc3D2D_OrdinalExactCall',
+            apply, 'original rank Calc3D2D E8 hook installed')
+verify_rank_exact_calc_edge(ui)
+for drop in ('RankMarkerExactCalcEdge = true;',
+             'Module::exe_ptr(0xBAEE2), Calc3D2D_OrdinalExactCall'):
+    corruption = ui.replace(drop, '/* missing R57 direct call */', 1)
+    try:
+        verify_rank_exact_calc_edge(corruption)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('rank R57 exact edge regression survived')
 
 # Four distinct deterministic regressions: do not repeat the same source
 # contract 1,000/5,000 times.
