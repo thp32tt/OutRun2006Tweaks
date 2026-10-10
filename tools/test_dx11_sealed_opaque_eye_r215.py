@@ -7,7 +7,7 @@ source = (root / "src/vr/d3d11/native_linear_target_viewport.hpp").read_text(enc
 probe = (root / "tools/dx11_linear_buffer_mirror_probe.cpp").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
 assert source.count("// R215: compose the previously independent") == 1
-r215 = source.split("// R215: compose the previously independent", 1)[1]
+r215 = source.split("// R215: compose the previously independent", 1)[1].split("// R216: separate precision/readonly-owner fence", 1)[0]
 guards = (
     "verified_linear_sealed_opaque_eye_draw_ready(",
     "!context || !expectedRaster ||",
