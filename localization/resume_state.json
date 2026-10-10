@@ -14541,5 +14541,32 @@
     "report": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_CONTROLLER_C2_HOLD.json",
     "machine_report": "localization/graphics/role_C/20261010-C352-C2-Q176-B346-INDEPENDENT-NATIVE/C352_Q176_INDEPENDENT_PIXEL_AUDIT.json",
     "updated_at_kst": "2026-10-10 10:39 KST"
+  },
+  "c353_c1_q121_a220_the24_goal33_exact": {
+    "run_key": "OUTRUN-KOR-C353-C1-Q121-A220-NEW-THE24-PLUS-GOAL33-20261010",
+    "role": "C1",
+    "queue_index": 121,
+    "shard": "ODD",
+    "candidate_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+    "prior_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "new_source_identical_remnant_pixels_removed": 24,
+    "new_changed_bytes": 95,
+    "prior_source_residue_goal_pixels_preserved_clear": 33,
+    "total_official_to_trial_changed_pixels": 57,
+    "total_changed_bytes": 227,
+    "changed_outside_two_source_regions": 0,
+    "exact_unpromoted_trial": "SCOPED_SOURCE_RESIDUE_REMOVAL_PASS_ONLY",
+    "whole_atlas_C1": "HOLD_STRICT_RECHECK",
+    "official_queue": "A220_REWORK_REQUIRED_UNCHANGED",
+    "blind_calibration": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "APPROVAL": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_promoted_dds": 0,
+    "evidence_png": 13,
+    "evidence_json": 2,
+    "qa_report": "localization/graphics/role_C/20261010-C353-C1-Q121-A220-THE24-GOAL33-EXACT/C353_Q121_C1_HOLD.json"
   }
 }

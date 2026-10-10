@@ -1,0 +1,229 @@
+{
+  "run": "C353",
+  "index": 121,
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "sha256": {
+    "source": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "prior": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "trial": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06"
+  },
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "mips": 1,
+  "format": "DDS BGRA32/RGBA32 128-byte header, RAW mirror_y",
+  "filesize_each": 67108992,
+  "header_equal": true,
+  "prev_official_to_A219": {
+    "changed_pixels": 33,
+    "changed_bytes": 132,
+    "changed_alpha": 33
+  },
+  "new_A219_to_A220": {
+    "changed_pixels": 24,
+    "changed_bytes": 95,
+    "changed_alpha": 24
+  },
+  "total_official_to_A220": {
+    "changed_pixels": 57,
+    "changed_bytes": 227,
+    "changed_alpha": 57
+  },
+  "new_24_points_readable": [
+    [
+      3169,
+      721
+    ],
+    [
+      3169,
+      720
+    ],
+    [
+      3169,
+      719
+    ],
+    [
+      3169,
+      718
+    ],
+    [
+      3169,
+      717
+    ],
+    [
+      3077,
+      716
+    ],
+    [
+      3169,
+      716
+    ],
+    [
+      3077,
+      715
+    ],
+    [
+      3169,
+      715
+    ],
+    [
+      3076,
+      714
+    ],
+    [
+      3169,
+      714
+    ],
+    [
+      3076,
+      713
+    ],
+    [
+      3128,
+      713
+    ],
+    [
+      3131,
+      711
+    ],
+    [
+      3132,
+      710
+    ],
+    [
+      3135,
+      708
+    ],
+    [
+      3126,
+      707
+    ],
+    [
+      3168,
+      701
+    ],
+    [
+      3168,
+      700
+    ],
+    [
+      3139,
+      699
+    ],
+    [
+      3168,
+      692
+    ],
+    [
+      3168,
+      691
+    ],
+    [
+      3168,
+      690
+    ],
+    [
+      3171,
+      690
+    ]
+  ],
+  "old_33_points_preserved": true,
+  "delta_regions": {
+    "the": [
+      3056,
+      651,
+      3205,
+      743
+    ],
+    "goal": [
+      3184,
+      651,
+      3391,
+      756
+    ]
+  },
+  "new_pixels_identical_to_canonical_source_before_edit": true,
+  "new_pixels_alpha_zero_after_edit": true,
+  "published_A215_component24": {
+    "SOURCE": true,
+    "CLEAN": true,
+    "FINAL": true
+  },
+  "source_matched_visible_count_the": {
+    "source": 6907,
+    "official": 24,
+    "prior": 24,
+    "trial": 0
+  },
+  "trial_changed_pixels_outside_two_regions": 0,
+  "manifest": [
+    {
+      "name": "C353_Q121_THE_GRAY_100.png",
+      "sha256": "dad323b2a55b6ddca81042f8c06478489d81b3d392b2495c1e7151545925ab4d",
+      "size": 6285
+    },
+    {
+      "name": "C353_Q121_THE_GRAY_75.png",
+      "sha256": "108a41f2b4d77397d6538f7db047f698bbac8df7f6951604e7d2adcb0b7b14bf",
+      "size": 11234
+    },
+    {
+      "name": "C353_Q121_THE_GRAY_50.png",
+      "sha256": "80ac13d79f2fd8f0c593e931ec3861d542d90442ca62ce4310dcf8844025dd0f",
+      "size": 7214
+    },
+    {
+      "name": "C353_Q121_THE_BLACK_100.png",
+      "sha256": "8ce91609799cfbb9f277b47f9d5c454a535951efb23ad825a9322c37c2fdced7",
+      "size": 6168
+    },
+    {
+      "name": "C353_Q121_THE_WHITE_100.png",
+      "sha256": "6215e127694f21901543dd6b03e4619a30f08563106629457ec5c258cb83c59c",
+      "size": 6024
+    },
+    {
+      "name": "C353_Q121_THE_RAW_100.png",
+      "sha256": "e3c649da5a37e4a41ca806e44657545d4288511f58a5507ade0d2a18b5771cb3",
+      "size": 6708
+    },
+    {
+      "name": "C353_Q121_THE_SOURCE_CLEAN_OFFICIAL_PRIOR_TRIAL_2X.png",
+      "sha256": "965e35284b7b011a461b4793ce974e911882f54b93aefb0c6f0f858e74ad927d",
+      "size": 9110
+    },
+    {
+      "name": "C353_Q121_GOAL_GRAY_100.png",
+      "sha256": "b696f32a444f8dee042d60473c59a0edeb6bdfe150ec58bd03351624cfd3fdb7",
+      "size": 8089
+    },
+    {
+      "name": "C353_Q121_GOAL_GRAY_75.png",
+      "sha256": "1dae2d769a495f8a97652f1c1e92164b1102657f177cf6767a67ccdb99a7e542",
+      "size": 14786
+    },
+    {
+      "name": "C353_Q121_GOAL_GRAY_50.png",
+      "sha256": "ccd12f63fad14ee358e29516eb9af76d04f33625966fdde1046be5b52a9c8a7d",
+      "size": 9054
+    },
+    {
+      "name": "C353_Q121_GOAL_BLACK_100.png",
+      "sha256": "11fdf7d5168f0e9a3eb5edc9d4d5f4f4e4213a61521c43ee3f99884e21e98631",
+      "size": 7939
+    },
+    {
+      "name": "C353_Q121_GOAL_WHITE_100.png",
+      "sha256": "daab302ef8c6d8a71f05b9d158fe19bb44a7f95d6bea9bfaaec41378d6338c8e",
+      "size": 7854
+    },
+    {
+      "name": "C353_Q121_GOAL_RAW_100.png",
+      "sha256": "8f10abbace6bf6067344e98ff56a67914d97c9284d2e97b4e4560540171fd126",
+      "size": 8634
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
