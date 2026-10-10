@@ -1,0 +1,118 @@
+{
+  "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "candidate_path": "localization/graphics/role_A/20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA/A234_Q121_RANK20_REBUILT_SOURCE_PLATE_UNPROMOTED.dds",
+  "official_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "files": {
+    "source": {
+      "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "w": 4096,
+      "h": 4096,
+      "mip_count": 1,
+      "size": 67108992,
+      "pixel_format_raw": "RGBA32",
+      "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+    },
+    "official": {
+      "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+      "w": 4096,
+      "h": 4096,
+      "mip_count": 1,
+      "size": 67108992,
+      "pixel_format_raw": "RGBA32",
+      "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+    },
+    "trial": {
+      "sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+      "w": 4096,
+      "h": 4096,
+      "mip_count": 1,
+      "size": 67108992,
+      "pixel_format_raw": "RGBA32",
+      "header_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+    }
+  },
+  "region_READABLE": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "region_RAW": [
+    3490,
+    3656,
+    3722,
+    3705
+  ],
+  "orientation_checks": {
+    "source_readable_png_exact_diff": 0,
+    "trial_readable_png_exact_diff": 0,
+    "raw_vs_readable_png_orientation_expected_difference_source": 11368,
+    "raw_vs_readable_png_orientation_expected_difference_trial": 11368,
+    "raw_readable_mapping": "flip_y",
+    "clean_dimensions": [
+      49,
+      232,
+      4
+    ]
+  },
+  "official_to_trial_full_atlas_changed_RGBA": 9174,
+  "official_to_trial_full_atlas_changed_ALPHA": 4835,
+  "official_to_trial_CHANGED_bbox_RAW": [
+    3490,
+    3656,
+    3722,
+    3705
+  ],
+  "outside_exact_source_roi_RGBA": 0,
+  "outside_exact_source_roi_ALPHA": 0,
+  "source_english_ROI": {
+    "opaque": 3422,
+    "positive_alpha": 6334,
+    "alpha_sum": 1398245,
+    "alpha_bbox_local": [
+      0,
+      0,
+      232,
+      49
+    ]
+  },
+  "saved_trial_korean_ROI": {
+    "opaque": 4710,
+    "positive_alpha": 6672,
+    "alpha_sum": 1326018,
+    "alpha_bbox_local": [
+      18,
+      3,
+      217,
+      47
+    ]
+  },
+  "authored_CLEAN_roi": {
+    "opaque": 0,
+    "positive_alpha": 0,
+    "alpha_sum": 0,
+    "alpha_bbox_local": null
+  },
+  "source_to_clean_changed_ROI": 6334,
+  "clean_to_final_changed_ROI": 6672,
+  "source_to_final_changed_ROI": 8482,
+  "candidate_visible_alpha_outside_source_glyph_bbox": 0,
+  "candidate_pixel_bbox_inside_source_positive_margin": true,
+  "runtime_validation": "UNTESTED",
+  "not_claimed": "whole-atlas C approval; actual game compositor; C3",
+  "source_saved_png_diff_detail": {
+    "raw_pixels_changed": 0,
+    "alpha_mismatch": 0,
+    "foreground_rgb_diff": 0,
+    "alpha_weighted_over_black_mismatch": 0,
+    "hidden_rgb_only": 0
+  },
+  "trial_saved_png_diff_detail": {
+    "raw_pixels_changed": 0,
+    "alpha_mismatch": 0,
+    "foreground_rgb_diff": 0,
+    "alpha_weighted_over_black_mismatch": 0,
+    "hidden_rgb_only": 0
+  },
+  "raw_footprint_corrected": "raw y=[3656,3705) not readable y=[391,440), same pixels upside-down"
+}

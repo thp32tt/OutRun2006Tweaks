@@ -1,0 +1,210 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK",
+  "review_id": "C1-Q121-A234R-FIRST-INDEPENDENT-20261011-0640",
+  "run_key": "OUTRUN-KOR-C1-Q121-A234R-INDEPENDENT-SAVED-STYLE-20261011-0640",
+  "reviewer": "C1-ChatGPT",
+  "shard": "ODD",
+  "index": 121,
+  "role": "C1",
+  "execution_backend": "GitHub source-of-truth + N100 MCP restricted scratch for native large-DDS reads; GPT container network DNS unavailable",
+  "triage": "EVIDENCE_ONLY_HOLD",
+  "pixel_first_review": {
+    "inspected_generated_source_clean_final_from_actual_saves": true,
+    "read_producer_result_during_selection": true,
+    "pixels_before_producer_verdict": false,
+    "explanation": "Producer handoff inspected to identify newest distinct SHA; independently adjudicated persisted native 100/75/50 and RAW without treating producer HOLD as proof."
+  },
+  "source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+  },
+  "official": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "unchanged": true
+  },
+  "candidate": {
+    "path": "localization/graphics/role_A/20261011-A234R-Q121-RANK20-SOURCE-PLATE-VISIBLE-ALPHA/A234_Q121_RANK20_REBUILT_SOURCE_PLATE_UNPROMOTED.dds",
+    "sha256": "e87c570f754a79e22126ae9240ba19828637f7f63e22e8a17f6e8b0e3da90ca1",
+    "bytes": 67108992,
+    "promoted": false
+  },
+  "format": {
+    "dimension": [
+      4096,
+      4096
+    ],
+    "pixel_layout": "RGBA32 verified DDS r_mask=0xff, g_mask=0xff00, b_mask=0xff0000, alpha=0xff000000",
+    "mip_count": 1,
+    "original_header_same_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "readable_transform": "FLIP-Y",
+    "source_png_vs_source_dds_decoded_mismatch": 0,
+    "candidate_png_vs_candidate_dds_decoded_mismatch": 0
+  },
+  "machine": {
+    "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/INDEPENDENT_MACHINE.json",
+    "sha256": "4faed5200bde828669df2de7ce9c2c5f5105646527258f421a168ebc52e71ee9"
+  },
+  "rank20_scope": {
+    "text": "Gas Pedal",
+    "translated": "가속 페달",
+    "bbox_readable": [
+      3490,
+      391,
+      3722,
+      440
+    ],
+    "bbox_raw": [
+      3490,
+      3656,
+      3722,
+      3705
+    ],
+    "source_ink_width_height": [
+      232,
+      49
+    ],
+    "candidate_ink_local_bbox": [
+      18,
+      3,
+      217,
+      47
+    ],
+    "candidate_ink_width_height": [
+      199,
+      44
+    ],
+    "margins": [
+      18,
+      15,
+      3,
+      2
+    ],
+    "official_to_trial_rgba_changed": 9174,
+    "official_to_trial_alpha_changed": 4835,
+    "changed_rgba_outside_rank20": 0,
+    "changed_alpha_outside_rank20": 0,
+    "source_to_clean_changed_native": 6334,
+    "clean_to_final_changed_native": 6672,
+    "clean_remaining_alpha": 0,
+    "candidate_alpha_positive": 6672,
+    "source_bbox_alpha_outside": 0,
+    "protected_29_other_cells_exact": true
+  },
+  "actual_visual_first_look": {
+    "source": "Gas Pedal has smooth narrow/right-italic white letter bodies and subtle blue/black offset depth; source glyph silhouette fills 232x49 source bounds.",
+    "clean": "SOURCE->CLEAN yields alpha-clear region, with no leftover English face or outside pixel modification in this scope. The atlas is transparently composited rather than a painted red/teal box.",
+    "current_official": "Official Korean title includes visible detached bright flecks at left and reads differently; left unchanged as baseline, not approved.",
+    "new_candidate": "New 가속 페달 is complete and readable with rightward tilt, no edge clipping at native/50; however strokes and navy outline are visibly thicker and blockier than source display-family, missing subtle source face edge/depth hierarchy.",
+    "raw": "Source/current/trial native RAW mirrored vertical orientation; same FLIP-Y yields readable text. RAW actual source/trial compared in same raw y3656-3705."
+  },
+  "regions": [
+    {
+      "id": "rank20_GAS_PEDAL",
+      "source_text": "Gas Pedal",
+      "target_text": "가속 페달",
+      "bbox": [
+        3490,
+        391,
+        3722,
+        440
+      ],
+      "readable_transform": "flip_y",
+      "slant": {
+        "source_top_minus_bottom_dx": null,
+        "candidate_top_minus_bottom_dx": null,
+        "anchor_observation": "Both have visible rightward lean; homologous source-vs-Korean stem anchors are not calibrated. No false numerical angle PASS."
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD",
+          "observation": "Both visibly lean right, but exact comparable stem anchors and amount of perspective have not been independently measured.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_GRAY_100.png",
+            "sha256": "1ce211f5fe6047bf9476d715fc29f9415598b770a71893555a686cc1743de628"
+          }
+        },
+        "clean_plate": {
+          "result": "PASS",
+          "observation": "Exact canonical source glyph alpha 6334 removed; source-derived CLEAN alpha0, no visible shadow residue in original rank20; alpha/source change outside ROI0.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_GRAY_100.png",
+            "sha256": "1ce211f5fe6047bf9476d715fc29f9415598b770a71893555a686cc1743de628"
+          }
+        },
+        "style": {
+          "result": "FAIL",
+          "observation": "Source is narrower and smoother with light white italic face and restrained blue-black depth; saved A234R Korean strokes/navy rim are broad and heavy, noticeably less source-faithful; family mismatch persists at 100%, 75% and 50%.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_WHITE_75.png",
+            "sha256": "72f39e3659d364cc459601f2c94dfe011d439bae33db97b376c88e9c70c9fe3f"
+          }
+        },
+        "readability": {
+          "result": "PASS",
+          "observation": "All Hangul syllables appear intact in native/75/50, legible at 50% black/gray background.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_BLACK_50.png",
+            "sha256": "7d2871ec75d54f1e48da28a6f1d097af641212cd48b4e46908ed427d9607651e"
+          }
+        },
+        "glyph_integrity": {
+          "result": "PASS",
+          "observation": "Persisted DDS alpha 6672 visible (earlier A234 alpha-zero not re-reviewed as valid); no missing Hangul blocks or clipped strokes seen in scoped BGW zoom/native.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_GRAY_100.png",
+            "sha256": "1ce211f5fe6047bf9476d715fc29f9415598b770a71893555a686cc1743de628"
+          }
+        },
+        "protected_art": {
+          "result": "PASS",
+          "observation": "Independently compared entire official versus saved trial; 9174 RGBA +4835 alpha modified pixels all within original Gas Pedal 232x49 readable source bbox, zero outside (29 other atlas cells unchanged).",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_GRAY_100.png",
+            "sha256": "1ce211f5fe6047bf9476d715fc29f9415598b770a71893555a686cc1743de628"
+          }
+        },
+        "placement": {
+          "result": "PASS",
+          "observation": "Candidate visible ink bbox local [18,3,217,47] is 199x44, positive margins L18/R15/T3/B2 relative to original text bbox.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_SOURCE_CLEAN_OFFICIAL_A234R_GRAY_100.png",
+            "sha256": "1ce211f5fe6047bf9476d715fc29f9415598b770a71893555a686cc1743de628"
+          }
+        },
+        "orientation": {
+          "result": "PASS",
+          "observation": "RAW same y-mirrored footprint aligns English and Korean. Raw source/final images are mirror-Y while FLIP-Y text is readable; exact persisted native PNG diff0.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C1-Q121-A234R-INDEPENDENT-SOURCE-STYLE-REWORK/C1_RAW_ACTUAL_GRAY.png",
+            "sha256": "d8797039b3348f0842218d49e2bb7a5446399305371ca6153e6ee262fb9c34eb"
+          }
+        }
+      }
+    }
+  ],
+  "region_result": "REWORK_REQUIRED",
+  "whole_atlas_result": "REWORK_REQUIRED_UNPROMOTED_A234R",
+  "producer_vs_C": "This first independent C1 C review rejects the distinctive A234R candidate style; not a renewed review of A230, not promotion or C3 approval.",
+  "open_user_ingame": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "c3": {
+    "result": "NOT_RUN",
+    "review_id": null
+  },
+  "approvals": {
+    "created": false
+  },
+  "runtime_validation": "UNTESTED",
+  "user_game_retest": "REQUIRED_NEW_SCREENSHOT_EXACT_COMMIT",
+  "new_production_dds": 0,
+  "new_reviewed_candidate_sha": 1,
+  "concurrent_c2_even_assets_changed": 0,
+  "plate_library": "No exact q121 shared entry in current plate library (entries for q060/q217 only); native per-A234 source-derived CLEAN inspected separately, not registered as independently PLATE_PASS reuse.",
+  "next": "Return source-family glyph shape/rim weight to A. Reconstruct under measured English edge contour; independent source-style/plate review then new exact-SHA C1 + separately reviewed C3 + new user in-game screenshot. Do not repeat already-rejected Noto-style/generic shear."
+}
