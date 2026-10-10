@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00570",
+  "production_id": "CONVERSION-DX9EX-00570",
+  "event_id": "CONVERSION-DX9EX-00570-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "b92875a48176c2b244484bdac6a0a8a7cc961615",
+  "material_result_sha": "f1b3aceb0443ae3e82a83d88d50122ce9b93284f",
+  "validation_bearing_result_sha": "f1b3aceb0443ae3e82a83d88d50122ce9b93284f",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00570]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:HOSTPOSE_V3_OPTIONAL_FIELD_SANITIZATION_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/ipc/host_pose_v3.hpp:HostPoseV3Source::Read+SnapshotFromValidatedHostState",
+    "vrhost/tests/host_pose_v3_validation_smoke.cpp:optional-poison"
+  ],
+  "changed_paths": [
+    "src/vr/ipc/host_pose_v3.hpp",
+    "vrhost/tests/host_pose_v3_validation_smoke.cpp"
+  ],
+  "summary": "Reset game-side HostPoseSnapshot before v3 IPC Read failure paths, atomically publish validated wire state, sanitize optional position/stereo fields when validity flags are absent; add positive and invalid poisoned optional field smoke cases.",
+  "source_review": "Latest FFB formal v0.2 tag -> 0da626463810322a74118d03b10ca0dd195d7cb2; v0.2 VR imported before this task. P1 independent from 00569 HostStateReader and 00567 FOV projection; protected DX9Ex baseline left unchanged; DX11 A/DXVK B/localization unmodified.",
+  "static_validation": "PASS_ONE_RELEVANT_SOURCE_CHANGE_CHECK",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38026029077,
+    "domain_isolation": 38026029010,
+    "full_source_impact": 38026028984
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "host": "SUCCESS",
+    "host_pose_v3_validation_smoke": "SUCCESS",
+    "game": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11660705476,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-f1b3aceb0443ae3e82a83d88d50122ce9b93284f",
+    "digest": "sha256:f32d65faa79b2b22a79c030c1326e79c8d3f6ccb47616e98e2ccacca6e0a54d0",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS game HEAD and 00570 WAIT_CHAT checkpoint, no existing result",
+    "C1_REVIEW": "PASS FFB release provenance and independent P1 fail-closed snapshot boundary",
+    "C2_IMPLEMENT": "PASS C++ header + dedicated host pose smoke in one coherent batch, no 1000/5000 HUD repeats",
+    "C3_VALIDATE": "PASS exact material SHA: Active 38026029077, Domain 38026029010, FullSource 38026028984",
+    "C4_COMMIT": "PASS verified remote material SHA; exact required marker, no CI-skip",
+    "C5_PACKAGE": "PASS CI artifact 11660705476; headset and wheel runtime untested",
+    "C6_RESULT": "PASS separate bookkeeping/run file; validation-bearing SHA remains material SHA"
+  },
+  "next_action": "Continue independent P1 DX9Ex structural/R84 source task or P2 XR per-eye extents; preserve runtime acceptance gate and DX11 A / DXVK B lane isolation."
+}
