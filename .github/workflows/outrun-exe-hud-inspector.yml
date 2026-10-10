@@ -3,7 +3,7 @@ name: OutRun EXE HUD Inspector CI
 on:
   workflow_dispatch:
   push:
-    branches-ignore: [ vr-dx11-native-r71, vr-dxvk-r71-disasm ]
+    branches-ignore: [ vr-dx11-native-r71, vr-dxvk-r71-disasm, 'vr-d3d9ex-review-feature-*' ]
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
       - 'OutRun2006Tweaks.ini'
