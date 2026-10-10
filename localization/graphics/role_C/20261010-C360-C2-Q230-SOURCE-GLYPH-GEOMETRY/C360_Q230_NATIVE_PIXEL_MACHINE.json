@@ -1,0 +1,176 @@
+{
+  "policy": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "queue_index": 230,
+  "date": "2026-10-10 14:27 KST",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "full_native_dimensions": [
+    2048,
+    1024
+  ],
+  "DDS_format": "RGBA32",
+  "mip_count": 1,
+  "source_and_candidate_DDS_header_equal_128_bytes": true,
+  "orientation": "Pillow DDS is RAW mirrored vertically; ImageOps.flip used exactly once before editable readable bbox crop. Authored CLEAN PNG was already readable.",
+  "alpha_threshold": ">16",
+  "roi_mask_is_the_two_canonical_original_source_help_effect_boxes": true,
+  "full_atlas_pairwise_diffs": {
+    "SOURCE_CLEAN": {
+      "within_rgba": 21827,
+      "within_alpha": 21827,
+      "outside_rgba": 137224,
+      "outside_alpha": 125019
+    },
+    "CLEAN_CURRENT": {
+      "within_rgba": 15398,
+      "within_alpha": 15398,
+      "outside_rgba": 0,
+      "outside_alpha": 0
+    },
+    "SOURCE_CURRENT": {
+      "within_rgba": 26881,
+      "within_alpha": 26881,
+      "outside_rgba": 137224,
+      "outside_alpha": 125019
+    }
+  },
+  "source_to_clean_outside_help_nonzero_due_existing_other_atlas_localization": true,
+  "source_to_clean_outside_must_not_be_called_protected_unchanged": true,
+  "per_region": [
+    {
+      "id": "20_unavailable_help",
+      "english": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다",
+      "readable_source_edit_bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source": {
+        "tight_bbox_relative": [
+          0,
+          0,
+          617,
+          50
+        ],
+        "visible_width_px": 617,
+        "visible_height_px": 50,
+        "positive_alpha_gt16": 11130,
+        "alpha_occupancy_tight_bbox": 0.360778
+      },
+      "candidate": {
+        "tight_bbox_relative": [
+          2,
+          2,
+          464,
+          47
+        ],
+        "visible_width_px": 462,
+        "visible_height_px": 45,
+        "positive_alpha_gt16": 8318,
+        "alpha_occupancy_tight_bbox": 0.400096
+      },
+      "relative_native_height_underfill_px": 5,
+      "native_height_pct_of_english": 90.0,
+      "alpha_occupancy_ratio_final_over_source": 1.109,
+      "current_global_visible_bbox": [
+        3,
+        184,
+        465,
+        229
+      ],
+      "margins_lrtb": [
+        2,
+        153,
+        2,
+        3
+      ],
+      "clean_alpha_positive": 0,
+      "evidence_readable_100_50": {
+        "100": {
+          "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_20_unavailable_help_SOURCE_CLEAN_FINAL_READABLE_100.png",
+          "sha256": "3f90d66cca7fb6973633eb3bb774eb86a0ee4551c567eb853f27ddc88c34e7c4",
+          "width": 1887,
+          "height": 155
+        },
+        "50": {
+          "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_20_unavailable_help_SOURCE_CLEAN_FINAL_READABLE_50.png",
+          "sha256": "f5714784e0a87fa9cfebdb3076a2b7ca90fe395d3559a50fe68c7b3d060510fe",
+          "width": 948,
+          "height": 130
+        }
+      },
+      "no_hard_fail": true
+    },
+    {
+      "id": "21_owned_help",
+      "english": "You already own this item",
+      "korean": "이미 보유 중입니다",
+      "readable_source_edit_bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source": {
+        "tight_bbox_relative": [
+          0,
+          0,
+          555,
+          50
+        ],
+        "visible_width_px": 555,
+        "visible_height_px": 50,
+        "positive_alpha_gt16": 10143,
+        "alpha_occupancy_tight_bbox": 0.365514
+      },
+      "candidate": {
+        "tight_bbox_relative": [
+          2,
+          2,
+          366,
+          48
+        ],
+        "visible_width_px": 364,
+        "visible_height_px": 46,
+        "positive_alpha_gt16": 6466,
+        "alpha_occupancy_tight_bbox": 0.386168
+      },
+      "relative_native_height_underfill_px": 4,
+      "native_height_pct_of_english": 92.0,
+      "alpha_occupancy_ratio_final_over_source": 1.0565,
+      "current_global_visible_bbox": [
+        869,
+        184,
+        1233,
+        230
+      ],
+      "margins_lrtb": [
+        2,
+        189,
+        2,
+        2
+      ],
+      "clean_alpha_positive": 0,
+      "evidence_readable_100_50": {
+        "100": {
+          "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_21_owned_help_SOURCE_CLEAN_FINAL_READABLE_100.png",
+          "sha256": "285155b1e684e7a75607314b4d27ee806f6f0d3a464f3b0e0e9d37d507d35fcc",
+          "width": 1701,
+          "height": 155
+        },
+        "50": {
+          "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_21_owned_help_SOURCE_CLEAN_FINAL_READABLE_50.png",
+          "sha256": "c1cbee479bf7a159bba4c12f8d1b9a01c35a59cfbd9ff863478816a9d5f081d8",
+          "width": 858,
+          "height": 130
+        }
+      },
+      "no_hard_fail": true
+    }
+  ],
+  "precision_limit": "Alpha occupancy is script-dependent; an ink density ratio is NOT a source-family PASS/FAIL tolerance and a small native-height difference is not automatically hard failure."
+}

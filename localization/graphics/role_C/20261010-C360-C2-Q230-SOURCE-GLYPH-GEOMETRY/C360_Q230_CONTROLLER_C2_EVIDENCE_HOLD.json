@@ -1,0 +1,127 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C360-Q230-NEW-INDEPENDENT-GLYPH-GEOMETRY",
+  "run_key": "OUTRUN-KOR-C360-C2-Q230-NATIVE-GLYPH-GEOMETRY-20261010-1420",
+  "reviewed_at_kst": "2026-10-10 14:27 KST",
+  "queue_index": 230,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "base_remote_head": "67ce56b34e34a8282609865173eb344af4c77e7c",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "clean_sha256": "738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "result": "HOLD_STRICT_RECHECK",
+  "C2_fresh_PASS": false,
+  "same_candidate_sha_as_C341": true,
+  "material_new_measurements": "First newly independently recorded original vs candidate visible glyph tight alpha pixel geometry: source each 50px, candidate 45/46px; 2 positive-margin regions, candidate density ratios and full native original/CLEAN/current independently rederived. Four new SHA-bound 100/50 readable source/CLEAN/final direct DDS visual proof PNG, fresh full 2048x1024 delta recheck. No runtime test or new candidate.",
+  "machine_report": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_Q230_NATIVE_PIXEL_MACHINE.json",
+  "previous_C341_review": "localization/graphics/role_C/20261010-C341-C2-Q230-SOURCE-CLEAN-DELTA-ATLAS/C341_Q230_CONTROLLER_C2_HOLD.json",
+  "regions_eight_checks": {
+    "20_unavailable_help": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "No blind-calibrated corresponding source/candidate glyph stem anchors; original and localized look broadly upright but not measured to source-family anchor standard."
+      },
+      "clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Fresh authenticated SOURCE vs B228 CLEAN exact pixels; CLEAN alpha0 in whole canonical source help region; no new plate residue shown at 100/50 gray; independent atlas delta matrix recorded."
+      },
+      "style": {
+        "result": "HOLD_UNCALIBRATED",
+        "observation": "New source-tight alpha 50px vs Korean 45px and optical occupancy 1.109; native/50 readable, no proven hard source-family defect or blind normal/excess-weight reference; no pass inferred."
+      },
+      "readability": {
+        "result": "SCOPED_READABLE",
+        "observation": "Directly observed readable Korean at native and 50% on neutral gray, but game-composited HUD/test resolution untested."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_CONFIRMED_DEFECT",
+        "observation": "No observable dislocated/fragmented glyph or clipping in independently SHA-bound lossless native/50 contacts; alternate game states unknown."
+      },
+      "protected_art": {
+        "result": "SCOPED_PIXEL_PASS_HELP_UPDATE",
+        "observation": "Fresh CLEAN->CURRENT full atlas outside two source effect regions 0 changed RGBA/alpha; SOURCE->CLEAN outside nonzero historical B228 atlas edits and explicitly not misclassified as unchanged protection."
+      },
+      "placement": {
+        "result": "SCOPED_CONTAINMENT_PASS",
+        "observation": "Exact source/edit region, full native source vs new alpha bounds, positive L/R/T/B margins [2, 153, 2, 3]; runtime placement unknown."
+      },
+      "orientation": {
+        "result": "SCOPED_RAW_FLIPY_PASS",
+        "observation": "Native persisted DDS and source share byte-identical 128 header, mip1 and vertical RAW orientation, explicitly flipped once for readable comparison; original C341 RAW proof cross-reviewed."
+      }
+    },
+    "21_owned_help": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "No blind-calibrated corresponding source/candidate glyph stem anchors; original and localized look broadly upright but not measured to source-family anchor standard."
+      },
+      "clean_plate": {
+        "result": "SCOPED_PIXEL_PASS",
+        "observation": "Fresh authenticated SOURCE vs B228 CLEAN exact pixels; CLEAN alpha0 in whole canonical source help region; no new plate residue shown at 100/50 gray; independent atlas delta matrix recorded."
+      },
+      "style": {
+        "result": "HOLD_UNCALIBRATED",
+        "observation": "New source-tight alpha 50px vs Korean 46px and optical occupancy 1.0565; native/50 readable, no proven hard source-family defect or blind normal/excess-weight reference; no pass inferred."
+      },
+      "readability": {
+        "result": "SCOPED_READABLE",
+        "observation": "Directly observed readable Korean at native and 50% on neutral gray, but game-composited HUD/test resolution untested."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_CONFIRMED_DEFECT",
+        "observation": "No observable dislocated/fragmented glyph or clipping in independently SHA-bound lossless native/50 contacts; alternate game states unknown."
+      },
+      "protected_art": {
+        "result": "SCOPED_PIXEL_PASS_HELP_UPDATE",
+        "observation": "Fresh CLEAN->CURRENT full atlas outside two source effect regions 0 changed RGBA/alpha; SOURCE->CLEAN outside nonzero historical B228 atlas edits and explicitly not misclassified as unchanged protection."
+      },
+      "placement": {
+        "result": "SCOPED_CONTAINMENT_PASS",
+        "observation": "Exact source/edit region, full native source vs new alpha bounds, positive L/R/T/B margins [2, 189, 2, 2]; runtime placement unknown."
+      },
+      "orientation": {
+        "result": "SCOPED_RAW_FLIPY_PASS",
+        "observation": "Native persisted DDS and source share byte-identical 128 header, mip1 and vertical RAW orientation, explicitly flipped once for readable comparison; original C341 RAW proof cross-reviewed."
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_20_unavailable_help_SOURCE_CLEAN_FINAL_READABLE_100.png",
+      "sha256": "3f90d66cca7fb6973633eb3bb774eb86a0ee4551c567eb853f27ddc88c34e7c4",
+      "width": 1887,
+      "height": 155
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_20_unavailable_help_SOURCE_CLEAN_FINAL_READABLE_50.png",
+      "sha256": "f5714784e0a87fa9cfebdb3076a2b7ca90fe395d3559a50fe68c7b3d060510fe",
+      "width": 948,
+      "height": 130
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_21_owned_help_SOURCE_CLEAN_FINAL_READABLE_100.png",
+      "sha256": "285155b1e684e7a75607314b4d27ee806f6f0d3a464f3b0e0e9d37d507d35fcc",
+      "width": 1701,
+      "height": 155
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_21_owned_help_SOURCE_CLEAN_FINAL_READABLE_50.png",
+      "sha256": "c1cbee479bf7a159bba4c12f8d1b9a01c35a59cfbd9ff863478816a9d5f081d8",
+      "width": 858,
+      "height": 130
+    }
+  ],
+  "source_diagnostic_limit": "Exact alpha 4/5px height difference is measured, but may be intentional source-padding and is NOT a confirmed visual defect. Different-script alphabetic vs Korean glyph density not direct threshold. Do NOT convert HOLD into REWORK or PASS without positive source-family calibration.",
+  "blind_calibration": "NOT_QUALIFIED — C341 prior prose was read first; no fresh blind normal/opposite_slant/clipping/residue/overweight control. Truthful HOLD maintained.",
+  "pixels_before_producer_verdict": false,
+  "C3": "UNTESTED_DISTINCT_REVIEW_REQUIRED",
+  "export": "BLOCKED_NO_CURRENT_APPROVAL",
+  "USER_IN_GAME": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_dds": 0,
+  "no_same_SHA_duplicate_approval": true,
+  "execution_backend": "GITHUB_SSOT_PLUS_N100_MCP_FALLBACK_FOR_CANONICAL_BLOB_AND_NATIVE_ALPHA_INSPECTION"
+}

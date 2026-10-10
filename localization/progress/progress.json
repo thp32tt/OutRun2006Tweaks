@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 14:19 KST",
+  "updated_at_kst": "2026-10-10 14:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -90,14 +90,14 @@
         "new_dds": 0
       },
       "latest_c2_evidence_supplement": {
-        "index": 98,
-        "status": "REWORK_REQUIRED_UNCHANGED",
-        "scope": "NEW_INDEPENDENT_CANONICAL_ENGLISH_DDS_SOURCE_AUTHENTICATION_14_PIXEL_ALPHA_FRINGE",
-        "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
-        "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
-        "report": "localization/graphics/role_C/20261010-C345-C2-Q098-CANONICAL-SOURCE-RECONCILIATION/C345_Q098_CONTROLLER_SOURCE_RECONCILIATION.json",
+        "index": 230,
+        "result": "HOLD_STRICT_RECHECK_UNCHANGED",
+        "scope": "NEW_SOURCE_CURRENT_TIGHT_ALPHA_GLYPH_GEOMETRY_AND_INDEPENDENT_FULL_ATLAS_DIFF",
+        "report": "localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_Q230_CONTROLLER_C2_EVIDENCE_HOLD.json",
+        "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+        "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
         "new_dds": 0,
-        "runtime_validation": "UNTESTED"
+        "RUNTIME_VALIDATION": "UNTESTED"
       },
       "latest_c2_trial_review": {
         "index": 212,

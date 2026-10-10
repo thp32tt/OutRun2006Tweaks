@@ -1,3 +1,9 @@
+## 2026-10-10 14:27 KST — C360 C2 q230 exact source glyph geometry evidence, HOLD unchanged
+
+- Direct C2 even q230 independently downloaded canonical DDS SHA 33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81, authenticated B228 authored CLEAN 738530a50ac1331ebdf3e7ed13b6ddc1dfa6d16064a089fffc3dc89dcf5a1914 and official persisted DDS a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; 2048x1024 native 1 mip, source/candidate exact header, RAW mirror-Y explicitly FLIP-Y for readable evidence.
+- Measured source 50px/50px glyph effect tight height vs current 45px/46px, positive bbox margins, candidate alpha density. Exact full atlas all three SOURCE/CLEAN/CURRENT pixel-delta matrices re-derived, unchanged atlas after CLEAN outside both HELP boxes; SOURCE/CLEAN outside cannot be falsely called protected-unchanged because B228 contains prior other translations. Four new lossless original/CLEAN/current FLIP-Y PNG at native/50.
+- No definitive style rejection or new PASS from 4/5px optical difference; blind stem anchors/source-family calibration still missing. **HOLD_STRICT_RECHECK** same SHA, not a new C completion, DDS0, C3/current export/real game UNTESTED. QA localization/graphics/role_C/20261010-C360-C2-Q230-SOURCE-GLYPH-GEOMETRY/C360_Q230_CONTROLLER_C2_EVIDENCE_HOLD.json; RUN_KEY=OUTRUN-KOR-C360-C2-Q230-NATIVE-GLYPH-GEOMETRY-20261010-1420. C1 and excluded domains untouched.
+
 ## 2026-10-10 14:12 KST — A224 q103 Normal Balance fresh source-optical contour trial (unpromoted)
 
 - GitHub Actions [#38026411248](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38026411248) SUCCESS: new actual 2048x2048 RGBA32 mip1 DDS under [A224 role work](localization/graphics/role_A/20261010-A224-Q103-SOURCE-OPTICAL-CONTOUR/), sha256 `2ad5e25e03bc1c9598548ef64ec397be91eae86f0b4f8d4cc161438c9e354c31`; `hd_candidates` **unchanged**.
