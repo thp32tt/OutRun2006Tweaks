@@ -1,0 +1,52 @@
+{
+  "run": "A230",
+  "run_key": "OUTRUN-KOR-A230-Q121-P0-GAS-PEDAL-ISOLATED-SOURCE-REMAINDER-20261010-2220",
+  "role": "A",
+  "index": 121,
+  "P0_ingame_backlog": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "semantic_binding": "Gas Pedal -> 가속 페달: source text only; 30-region A229 inventory rank20",
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "source_region_png_sha256": "ad0b0a2ff017cc0e31f58c58b41eae5ecba5a7474b9fd5f38490eab4cc24fa4c",
+  "canonical_source_full_dds_reused_from_prior_verified_A229": true,
+  "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+  "A220_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+  "new_trial_sha256": "339966365e33d70c7518a5c12375ca0b14ae2de3eedf4bd98816a42febe3a21e",
+  "trial_path": "localization/graphics/role_A/20261010-A230-Q121-GAS-PEDAL-ORIGINAL-GHOST-CLEAN/A230_Q121_GAS_PEDAL_SOURCE_GHOST_SCOPED_UNPROMOTED.dds",
+  "source_bbox_readable": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "source_exact_remaining_before": 266,
+  "source_exact_isolated_removal_pixels": 30,
+  "source_exact_remaining_after": 236,
+  "remove_rule": "alpha_positive source==trial RGBA EXACT && NOT within 2px dilation of non-original Korean glyph",
+  "unchanged_existing_Korean_foreground": true,
+  "untouched_pixels_raw_exact": true,
+  "alpha_after_removed_pixels_zero": true,
+  "header_raw_mirror_y_preserved": true,
+  "source_to_final_protected_neighbor_intersection": 0,
+  "persisted_DDS_redecoded": true,
+  "production_stage": "P1_SOURCE_CLEAN_ISOLATED_ORIGINAL_REMNANT_PILOT",
+  "visual_qa": "PENDING_CONTROLLER_INDEPENDENT_OPTICAL_EVIDENCE",
+  "C1": "PENDING",
+  "C3": "NOT_RUN",
+  "promoted_DDS": 0,
+  "trial_DDS": 1,
+  "other_29_atlas_text_regions": "NOT_CHANGED",
+  "user_accepted": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Direct native/source/CLEAN/FINAL visual inspection; retain HOLD full atlas, C1 exact-byte independent approval if and only if plate proves clean",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
