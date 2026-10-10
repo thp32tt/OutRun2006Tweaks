@@ -131,4 +131,43 @@ namespace outrun::vr::dx11 {
         !desc.MultisampleEnable && !desc.AntialiasedLineEnable;
 }
 
+
+// R216: separate precision/readonly-owner fence for the dormant WARP eye.
+// R215 proves geometry/OM/RS identity but intentionally admits e.g. D16
+// depth. Only an explicitly typed, writable, dedicated D32_FLOAT texture
+// may be called an exact 32-bit float-depth eye. No gameplay Draw occurs.
+[[nodiscard]] inline bool verified_linear_float_depth_eye_draw_ready(
+    const NativeLinearBufferMirror& vb, ID3D11DeviceContext* context,
+    UINT startVertex, UINT vertexCount,
+    std::uint64_t generation, std::uint64_t snapshotVersion,
+    UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!expectedDsv ||
+        !verified_linear_sealed_opaque_eye_draw_ready(
+            vb, context, startVertex, vertexCount, generation,
+            snapshotVersion, width, height, format, expectedLayout,
+            expectedVs, expectedPs, expectedRtv, expectedDsv,
+            expectedDepthState, expectedRaster))
+        return false;
+
+    D3D11_DEPTH_STENCIL_VIEW_DESC view{};
+    expectedDsv->GetDesc(&view);
+    if (view.Format != DXGI_FORMAT_D32_FLOAT || view.Flags != 0)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    expectedDsv->GetResource(resource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTexture;
+    if (!resource || FAILED(resource.As(&depthTexture)) || !depthTexture)
+        return false;
+    D3D11_TEXTURE2D_DESC desc{};
+    depthTexture->GetDesc(&desc);
+    return desc.Format == DXGI_FORMAT_D32_FLOAT &&
+        desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0;
+}
+
 } // namespace outrun::vr::dx11

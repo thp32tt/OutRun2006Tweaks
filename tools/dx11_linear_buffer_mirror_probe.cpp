@@ -453,6 +453,52 @@ int main() {
     ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
     require(sealedEyeReady(), "R215 original depth eye recovered");
 
+    // R216: R215's DSV identity admits a dedicated same-size D16 depth
+    // texture. A float32 precision contract must reject that legitimate
+    // but lower-precision WARP OM attachment, then restore the owned D32 eye.
+    const auto floatDepthEyeReady = [&](ID3D11DepthStencilView* candidate) {
+        return outrun::vr::dx11::verified_linear_float_depth_eye_draw_ready(
+            vb,ctx.Get(),0,3,generation,version,32,32,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+            candidate,depthState.Get(),rs.Get());
+    };
+    require(floatDepthEyeReady(ownDsv.Get()),
+            "R216 dedicated D32_FLOAT eye initially ready");
+    D3D11_TEXTURE2D_DESC d16DepthDesc=depthDesc;
+    d16DepthDesc.Format=DXGI_FORMAT_D16_UNORM;
+    ComPtr<ID3D11Texture2D> d16Depth;
+    ComPtr<ID3D11DepthStencilView> d16Dsv;
+    require(SUCCEEDED(dev->CreateTexture2D(
+                &d16DepthDesc,nullptr,d16Depth.GetAddressOf())),
+            "R216 create dedicated D16 depth texture");
+    require(SUCCEEDED(dev->CreateDepthStencilView(
+                d16Depth.Get(),nullptr,d16Dsv.GetAddressOf())),
+            "R216 create same-size D16 depth view");
+    ctx->OMSetRenderTargets(1,&rawRTV,d16Dsv.Get());
+    require(outrun::vr::dx11::verified_linear_sealed_opaque_eye_draw_ready(
+                vb,ctx.Get(),0,3,generation,version,32,32,
+                DXGI_FORMAT_R8G8B8A8_UNORM,
+                layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+                d16Dsv.Get(),depthState.Get(),rs.Get()),
+            "R216 R215 admits valid lower-precision D16 eye");
+    require(!floatDepthEyeReady(d16Dsv.Get()),
+            "R216 reject D16 eye masquerading as float depth");
+    ctx->ClearDepthStencilView(d16Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0),
+            "R216 real WARP D16 Draw succeeds but is not D32 precision");
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    require(floatDepthEyeReady(ownDsv.Get()),
+            "R216 exact original D32_FLOAT eye restored");
+    ctx->ClearDepthStencilView(ownDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0),
+            "R216 real WARP restored D32 eye draws red");
+
+
 
     require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
             vb,ctx.Get(),0,3,generation,version,
