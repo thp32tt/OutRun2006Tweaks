@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00532",
+  "production_id": "CONVERSION-DX11-00532",
+  "event_id": "CONVERSION-DX11-00532-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "1e2be1173699f7c7c0356acc9c0fe869c9af9130",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00532",
+  "lease_epoch": 1,
+  "work_key": "DX11:R235:D3D9_INDEXED_WINDOW_TO_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_draw_r186.py",
+    "DX11:R235:DIP_WINDOW_OWNERSHIP"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 DrawIndexedPrimitive source min/count/start/base/primitive command",
+      "R195 immutable source IA index segment tree",
+      "R212 exact native input/shader/single-eye RTV identity",
+      "actual WARP DrawIndexed(3,3,3) green pixel GPU readback"
+    ],
+    "batch_components": [
+      "native_linear_buffer_mirror.hpp declared D3D9 window",
+      "native_indexed_draw_submit.hpp source DIP adapter",
+      "dx11_indexed_draw_probe_r186.cpp GPU positive/negative",
+      "test_dx11_indexed_draw_r186.py negative mutants"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "nonzero StartIndex=3 BaseVertex=3 WARP green pixel black corner",
+      "negative_regression": "D3D9 source range, VB/IB overrun, primitive overflow, stale index owner and deletion mutants",
+      "component_integration": "D3D9 DIP source -> R195 index slice -> R212 D3D11 pipeline -> native DrawIndexed WARP GPU pixels"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+      "src/vr/d3d11/native_indexed_draw_submit.hpp",
+      "tools/dx11_indexed_draw_probe_r186.cpp",
+      "tools/test_dx11_indexed_draw_r186.py",
+      "DX11:R235:DIP_WINDOW_OWNERSHIP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "changed_files": [
+    "src/vr/d3d11/native_linear_buffer_mirror.hpp",
+    "src/vr/d3d11/native_indexed_draw_submit.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_draw_r186.py",
+    "docs/automation/runs/CONVERSION-DX11-00532.json"
+  ],
+  "summary": "R235 dormant D3D9 DIP declared source window to WARP DrawIndexed exact GPU pixels. No gameplay activation.",
+  "pipeline": {
+    "C0": "PASS remote HEAD, 00532 controller checkpoint, AGENTS and 00531 terminal owner",
+    "C1": "PASS R235 independent from R234 and R175",
+    "C2": "PASS grouped source/adapter/GPU probe/negative regression",
+    "C3": "JS scoped preflight PASS; full exact SHA Gate pending",
+    "C4": "material commit with this record; no CI skip",
+    "C5": "NOT_REQUIRED no runtime package",
+    "C6": "WAITING_FOR_CI"
+  },
+  "evidence": {
+    "static": "R235 guard assertions and mutation verifier included in mandatory Gate",
+    "backend_gate_conclusion": "pending",
+    "inherited_failure": "R175 varying mismatch separately owned by 00477; never treat FAIL as PASS"
+  },
+  "blockers": [
+    "Known R175 constant-buffer WARP mismatch",
+    "Quest3/VDXR runtime unavailable"
+  ],
+  "score_change": 0,
+  "next_action": "Check new validation-bearing SHA Gate, R235 indexed WARP scoped results, C6 and no score unless full Gate succeeds."
+}

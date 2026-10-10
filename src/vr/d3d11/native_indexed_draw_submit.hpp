@@ -132,6 +132,27 @@ namespace outrun::vr::dx11 {
     return single;
 }
 
+
+// R235: D3D9 DrawIndexedPrimitive source command to native IA + single-eye.
+// Dormant readiness only; actual DrawIndexed remains WARP probe-exclusive.
+[[nodiscard]] inline bool verified_d3d9_indexed_triangles_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, INT baseVertexIndex,
+    UINT minVertexIndex, UINT numVertices, UINT startIndex, UINT primitiveCount,
+    std::uint64_t generation, std::uint64_t vbVersion, std::uint64_t ibVersion,
+    ID3D11InputLayout* expectedLayout, ID3D11VertexShader* expectedVs,
+    ID3D11PixelShader* expectedPs, ID3D11RenderTargetView* expectedRtv) noexcept {
+    if (!primitiveCount || primitiveCount > (std::numeric_limits<UINT>::max)() / 3u)
+        return false;
+    const UINT indexCount = primitiveCount * 3u;
+    return vb.d3d9_declared_index_window_exact(
+               ib, startIndex, indexCount, baseVertexIndex, minVertexIndex, numVertices) &&
+           verified_indexed_single_eye_output_ready(
+               vb, ib, context, startIndex, indexCount, baseVertexIndex,
+               generation, vbVersion, ibVersion,
+               expectedLayout, expectedVs, expectedPs, expectedRtv);
+}
+
 // R217: exact depth-aware indexed opaque single-eye DrawIndexed readiness.
 // R212 seals only RTV slots: a rebound DSV, foreign depth state, retained
 // blend or zero sample mask can still corrupt/cull pixels while all IA/VS/PS

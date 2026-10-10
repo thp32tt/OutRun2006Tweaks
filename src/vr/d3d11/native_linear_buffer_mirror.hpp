@@ -269,6 +269,52 @@ public:
         return low >= 0 && high >= low && high < vertices;
     }
 
+
+    // R235: D3D9 DIP's MinVertexIndex/NumVertices must enclose the exact
+    // immutable R195 index slice and the declared native VB range.
+    [[nodiscard]] bool d3d9_declared_index_window_exact(
+        const NativeLinearBufferMirror& index, UINT startIndex, UINT indexCount,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices) const noexcept {
+        if (role_ != ResourceRole::Vertex || index.role_ != ResourceRole::Index ||
+            !stride_ || !indexCount || !numVertices ||
+            startIndex >= index.index_count_ ||
+            indexCount > index.index_count_ - startIndex ||
+            !index.index_range_tree_ || !index.index_range_leaves_)
+            return false;
+        const std::uint64_t declaredEnd =
+            static_cast<std::uint64_t>(minVertexIndex) + numVertices;
+        if (declaredEnd >
+            static_cast<std::uint64_t>((std::numeric_limits<UINT>::max)()) + 1u)
+            return false;
+        const std::int64_t firstVertex =
+            static_cast<std::int64_t>(baseVertexIndex) + minVertexIndex;
+        const std::int64_t lastVertex =
+            static_cast<std::int64_t>(baseVertexIndex) +
+            static_cast<std::int64_t>(declaredEnd) - 1;
+        const std::int64_t available = static_cast<std::int64_t>(byte_width_ / stride_);
+        if (firstVertex < 0 || lastVertex < firstVertex || lastVertex >= available)
+            return false;
+        std::size_t left = index.index_range_leaves_ + startIndex;
+        std::size_t right = left + indexCount;
+        UINT lowest = (std::numeric_limits<UINT>::max)(), highest = 0;
+        while (left < right) {
+            if (left & 1u) {
+                const auto& e = index.index_range_tree_[left++];
+                if (e.minimum < lowest) lowest = e.minimum;
+                if (e.maximum > highest) highest = e.maximum;
+            }
+            if (right & 1u) {
+                const auto& e = index.index_range_tree_[--right];
+                if (e.minimum < lowest) lowest = e.minimum;
+                if (e.maximum > highest) highest = e.maximum;
+            }
+            left >>= 1;
+            right >>= 1;
+        }
+        return lowest >= minVertexIndex &&
+            static_cast<std::uint64_t>(highest) < declaredEnd;
+    }
+
     void shutdown() noexcept {
         buffer_.Reset();
         device_.Reset();

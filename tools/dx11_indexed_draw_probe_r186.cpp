@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <iostream>
+#include <limits>
 #include <wrl/client.h>
 
 using Microsoft::WRL::ComPtr;
@@ -570,6 +571,63 @@ int main() {
         center[3]==255 && corner[0]==0 && corner[1]==0 && corner[2]==0;
     context->Unmap(readback.Get(),0);
     require(correct, "R186 actual DrawIndexed green center / black corner pixels");
+
+    // R235: a D3D9 DIP StartIndex 3/BaseVertexIndex 3 must draw a
+    // visible triangle; the first three native VB vertices are offscreen.
+    const Vertex r235Vertices[] = {
+        {2.f,2.f},{2.f,2.f},{2.f,2.f},
+        {-.8f,-.8f},{0.f,.8f},{.8f,-.8f}};
+    const std::uint16_t r235Indices[] = {0,0,0,0,1,2};
+    constexpr std::uint64_t r235VbVersion=2351, r235IbVersion=2352;
+    NativeLinearBufferMirror r235Vb, r235Ib;
+    require(r235Vb.initialize(device.Get(),ResourceRole::Vertex,
+        D3DPOOL_DEFAULT,D3DUSAGE_WRITEONLY,D3DFMT_UNKNOWN,
+        r235Vertices,sizeof(r235Vertices),sizeof(Vertex),
+        generation,r235VbVersion), "R235 own DIP VB");
+    require(r235Ib.initialize(device.Get(),ResourceRole::Index,
+        D3DPOOL_DEFAULT,D3DUSAGE_WRITEONLY,D3DFMT_INDEX16,
+        r235Indices,sizeof(r235Indices),0,
+        generation,r235IbVersion), "R235 own DIP IB");
+    require(r235Vb.bind(context.Get(),generation,r235VbVersion) &&
+            r235Ib.bind(context.Get(),generation,r235IbVersion),
+            "R235 bind owned DIP IA");
+    const auto r235Ready=[&](UINT minVertex, UINT numVertices,
+                              UINT start, UINT primitives, INT baseVertex) {
+        return outrun::vr::dx11::verified_d3d9_indexed_triangles_ready(
+            r235Vb,r235Ib,context.Get(),baseVertex,minVertex,numVertices,
+            start,primitives,generation,r235VbVersion,r235IbVersion,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get());
+    };
+    require(r235Ready(0,3,3,1,3), "R235 valid nonzero DIP source command");
+    require(!r235Ready(1,2,3,1,3), "R235 reject declared minimum excludes index");
+    require(!r235Ready(0,2,3,1,3), "R235 reject declared maximum excludes index");
+    require(!r235Ready(0,4,3,1,3), "R235 reject declared VB end overrun");
+    require(!r235Ready(0,0,3,1,3), "R235 reject zero window");
+    require(!r235Ready(0,3,4,1,3), "R235 reject IB start overrun");
+    require(!r235Ready(0,3,3,0,3), "R235 reject zero primitive count");
+    require(!r235Ready(0,3,3,(std::numeric_limits<UINT>::max)(),3),
+            "R235 reject primitive overflow");
+    require(!r235Ready(0,3,3,1,4), "R235 reject BaseVertex overrun");
+    context->ClearRenderTargetView(rtv.Get(),clear);
+    context->DrawIndexed(3u,3u,3);
+    context->CopyResource(readback.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE r235Map{};
+    require(SUCCEEDED(context->Map(readback.Get(),0,D3D11_MAP_READ,0,&r235Map))
+            && r235Map.pData, "R235 GPU offset readback");
+    const auto* r235Center=static_cast<const unsigned char*>(r235Map.pData)
+        +16*r235Map.RowPitch+16*4;
+    const auto* r235Corner=static_cast<const unsigned char*>(r235Map.pData)
+        +1*r235Map.RowPitch+1*4;
+    const bool r235Pixels=r235Center[0]==0 && r235Center[1]==255 &&
+        r235Center[2]==0 && r235Center[3]==255 &&
+        r235Corner[0]==0 && r235Corner[1]==0 && r235Corner[2]==0;
+    context->Unmap(readback.Get(),0);
+    require(r235Pixels, "R235 nonzero StartIndex/BaseVertex WARP green pixel");
+    r235Ib.shutdown();
+    require(!r235Ready(0,3,3,1,3), "R235 reject retired IB");
+    require(vb.bind(context.Get(),generation,vbVersion) &&
+            ib.bind(context.Get(),generation,ibVersion), "R235 restore original IA");
+
     ib.shutdown();
     require(!ready(context.Get(),0,3,0,generation,vbVersion,ibVersion),
             "reject retired IB owner");
