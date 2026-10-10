@@ -52,8 +52,8 @@ assert np.all(C[scope,3]==0)
 assert np.array_equal(S[~scope],C[~scope])
 # Source and saved candidate preserve unrelated ??? and route art exactly.
 assert np.array_equal(S[~scope],O[~scope]),"old candidate has unrelated source artwork modifications"
-fontp=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc")
-assert fontp.is_file(), "The exact Black face must exist; no hidden fallback"
+fontp=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
+assert fontp.is_file(), "The exact declared licensed Bold face must exist; no hidden fallback"
 fb=fontp.read_bytes()
 faces=TTCollection(str(fontp))
 assert len(faces.fonts)>1
@@ -115,7 +115,7 @@ assert all(min(z["four_margins"])>=3 for z in rows)
 order=[0,1,2,3] if masks[0]==255 else [2,1,0,3]
 output=current[:128]+np.flipud(F)[:,:,order].copy().tobytes()
 assert len(output)==len(current) and np.array_equal(dec(output),F)
-outdds=OUT/"B345_Q176_NATIVE_BLACK_SOURCE_FAMILY_UNAPPROVED.dds"
+outdds=OUT/"B345_Q176_NATIVE_BOLD_SOURCE_FAMILY_UNAPPROVED.dds"
 outdds.write_bytes(output)
 for name,arr in (("P1_CLEAN_SOURCE_ONLY",C),("P2_TRANSPARENT_LETTERING_ONLY",L)):
  Image.fromarray(arr,"RGBA").save(OUT/(f"B345_{name}.png"),optimize=True)
@@ -143,7 +143,7 @@ qa={"run":"B345","role":"B","queue_index":176,
 "new_trial_sha256":sha(output),"new_trial_bytes":len(output),
 "format":"RGBA32","native":[2048,2048],"mips":1,
 "source_clean_lettering_final":True,"P1":"MECHANICAL_SOURCE_CLEAN_CANDIDATE_SAVED_DIRECT_CONTROLLER_VISUAL_PENDING",
-"P2":"NATIVE_FONT_BLACK_VECTOR_WITH_SOURCE_FLAT_RED_FACE_DIRECT_CONTROLLER_VISUAL_PENDING",
+"P2":"NATIVE_FONT_BOLD_VECTOR_SOURCE_RED_FACE_STROKE3_DIRECT_CONTROLLER_VISUAL_PENDING",
 "P3":"DDS_ROUNDTRIP_EXACT_NO_OFFICIAL_PROMOTION",
 "source_clean_outside_rgba":0,"clean_final_outside_rgba":0,
 "source_final_outside_rgba":0,"prior_final_outside_rgba":0,
@@ -163,7 +163,7 @@ qa={"run":"B345","role":"B","queue_index":176,
 "source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
 "protected":"Entire unedited atlas including original ??? and route",
 "source_regions":rows,"font_sha256":sha(fb),"font_face_index":fontindex,
-"stroke_width":3,"render_method":"Pillow native font Black FreeType face; source sampled per-region face color; no resize or fallback",
+"stroke_width":3,"render_method":"Pillow native pinned font Bold FreeType face with calibrated 3px vector stroke; source sampled flat red face; no bitmap resize or fallback",
 "earlier_reject":"C343 optical source red-block face visibly thicker than B201 saved",
 "source_to_clean":"zero exact canonical English source bboxes, preserve outside",
 "clean_to_final":"replace each clean bbox with isolated native glyph pixels",
