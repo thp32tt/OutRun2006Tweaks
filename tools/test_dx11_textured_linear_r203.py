@@ -44,7 +44,7 @@ owner_guards=(
 )
 assert all(g in owner for g in owner_guards), "R234 connected GPU texture owner incomplete"
 for g in owner_guards[:9]:
-    assert not all(x in owner.replace(g,"",1) for x in owner_guards), "R234 owner deletion mutant survived: "+g
+    assert not all(x in owner.replace(g,"") for x in owner_guards), "R234 owner deletion mutant survived: "+g
 assert "->Draw(" not in owner and "->DrawIndexed(" not in owner
 for phrase in (
     "ctx->Draw(3,0);","reject stray second-eye RTV slot 1",
