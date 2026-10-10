@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <d3d9.h>
 #include "../runtime_eligibility.hpp"
+#include "../ipc/protocol.hpp"
 
 namespace OutRunVRStereo
 {
