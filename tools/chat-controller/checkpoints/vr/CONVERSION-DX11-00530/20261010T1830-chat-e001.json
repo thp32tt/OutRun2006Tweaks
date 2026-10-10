@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_material_progress",
+  "captured_at_kst": "2026-10-10T18:30:00+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX11-00530",
+  "event_id": "CONVERSION-DX11-00530-E001",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00530",
+  "work_key": "DX11:R233:NATIVE_LINEAR_SINGLE_IA_STREAM_OWNERSHIP",
+  "status": "WAITING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "terminal": false,
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "585869bdcccf21f7fa97f241d678345ff0921d9f",
+  "material_result_sha": "c7ee8d63c177e6b59ca6de212feebd20c1b083ef",
+  "validation_bearing_result_sha": "c7ee8d63c177e6b59ca6de212feebd20c1b083ef",
+  "ci_run_id": 38041164018,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "evidence": {
+    "r233_production_commit": "c7ee8d63c177e6b59ca6de212feebd20c1b083ef",
+    "win32_validate": "SUCCESS",
+    "r183_source_contract": "SUCCESS",
+    "r183_warp_probe_build_and_run": "SUCCESS",
+    "full_gate": "IN_PROGRESS"
+  },
+  "next_action": "Wait for exact-SHA complete Gate; persist C6 without replacing validation-bearing SHA; isolate inherited R175"
+}
