@@ -1,0 +1,48 @@
+{
+  "canonical_source": {
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "revision": "OR2-HD-GUI-v0.25.10a"
+  },
+  "source_clean": {
+    "path": "localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png",
+    "sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
+  },
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "index": 1,
+    "native_ppem": 128,
+    "glyphs": "최고 기록:"
+  },
+  "plate_mask_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "source_face_row_profile": "B359_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json",
+  "face_gradient": [
+    [
+      247,
+      218,
+      183
+    ],
+    [
+      247,
+      219,
+      171
+    ]
+  ],
+  "effect": {
+    "outline": 3,
+    "navy_extrusion_offset": [
+      2,
+      3
+    ],
+    "readable_lean_source_B_stem_measured": 0.3421,
+    "face_normal_lighting": "source-English face 85-percentile highlighted at top-facing glyph contour normals"
+  },
+  "protected_siblings": [
+    "OUTRUN MILES",
+    "HOLLY WOLF",
+    "all other source atlas regions"
+  ],
+  "construction": "B359 genuine source-normal bevel: 128ppem native Hangul with contour-space SOURCE highlight, bounded navy 2x3 side wall after initial 1px top/right source effect overflow was fail-closed; actual English B first-stem OLS right-lean; source B348 PLATE. C2 review required.",
+  "need_C2_source_slant_homologous_anchors": true,
+  "no_final_candidate_published": true
+}

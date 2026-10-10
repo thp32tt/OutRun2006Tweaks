@@ -1,0 +1,231 @@
+{
+  "source_face_warm_pixels": 46849,
+  "source_face_qualified_rows": 113,
+  "source_face_row_range": [
+    346,
+    458
+  ],
+  "source_navy_pixels": 33028,
+  "source_navy_median_rgb": [
+    16,
+    24,
+    74
+  ],
+  "source_color_samples": [
+    {
+      "y": 346,
+      "count": 24,
+      "rgb_median": [
+        250,
+        226,
+        194
+      ],
+      "rgb_high_80": [
+        253,
+        227,
+        194
+      ]
+    },
+    {
+      "y": 354,
+      "count": 566,
+      "rgb_median": [
+        233,
+        103,
+        0
+      ],
+      "rgb_high_80": [
+        233,
+        103,
+        0
+      ]
+    },
+    {
+      "y": 362,
+      "count": 592,
+      "rgb_median": [
+        246,
+        109,
+        0
+      ],
+      "rgb_high_80": [
+        246,
+        109,
+        0
+      ]
+    },
+    {
+      "y": 370,
+      "count": 326,
+      "rgb_median": [
+        255,
+        127,
+        0
+      ],
+      "rgb_high_80": [
+        255,
+        147,
+        75
+      ]
+    },
+    {
+      "y": 378,
+      "count": 300,
+      "rgb_median": [
+        255,
+        169,
+        17
+      ],
+      "rgb_high_80": [
+        255,
+        171,
+        52
+      ]
+    },
+    {
+      "y": 386,
+      "count": 332,
+      "rgb_median": [
+        255,
+        214,
+        69
+      ],
+      "rgb_high_80": [
+        255,
+        215,
+        79
+      ]
+    },
+    {
+      "y": 394,
+      "count": 462,
+      "rgb_median": [
+        255,
+        233,
+        95
+      ],
+      "rgb_high_80": [
+        255,
+        233,
+        95
+      ]
+    },
+    {
+      "y": 402,
+      "count": 470,
+      "rgb_median": [
+        255,
+        236,
+        105
+      ],
+      "rgb_high_80": [
+        255,
+        236,
+        105
+      ]
+    },
+    {
+      "y": 410,
+      "count": 417,
+      "rgb_median": [
+        255,
+        239,
+        115
+      ],
+      "rgb_high_80": [
+        255,
+        239,
+        128
+      ]
+    },
+    {
+      "y": 418,
+      "count": 305,
+      "rgb_median": [
+        255,
+        233,
+        95
+      ],
+      "rgb_high_80": [
+        255,
+        233,
+        105
+      ]
+    },
+    {
+      "y": 426,
+      "count": 316,
+      "rgb_median": [
+        255,
+        211,
+        66
+      ],
+      "rgb_high_80": [
+        255,
+        211,
+        93
+      ]
+    },
+    {
+      "y": 434,
+      "count": 364,
+      "rgb_median": [
+        255,
+        182,
+        32
+      ],
+      "rgb_high_80": [
+        255,
+        183,
+        57
+      ]
+    },
+    {
+      "y": 442,
+      "count": 510,
+      "rgb_median": [
+        255,
+        151,
+        0
+      ],
+      "rgb_high_80": [
+        255,
+        152,
+        0
+      ]
+    },
+    {
+      "y": 450,
+      "count": 483,
+      "rgb_median": [
+        255,
+        113,
+        0
+      ],
+      "rgb_high_80": [
+        255,
+        113,
+        0
+      ]
+    },
+    {
+      "y": 458,
+      "count": 25,
+      "rgb_median": [
+        250,
+        226,
+        178
+      ],
+      "rgb_high_80": [
+        253,
+        228,
+        178
+      ]
+    }
+  ],
+  "korean_face_row_range": [
+    344,
+    463
+  ],
+  "construction": "source-English B measurable right-stem x(y) tilt + contour NORMAL-DIRECTED top highlight from actual English source 85%-quantile warm face and separated navy 3D extrusion; new source-conditioned P2 method versus B353 horizontal bands"
+}
