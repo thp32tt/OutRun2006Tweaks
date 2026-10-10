@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00078",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "recorded_kst": "2026-09-30T03:21:05+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "8d6d3f3deb063c90fa4f0a9d025ca16bae42447b",
+  "result_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca",
+  "validation_bearing_result_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R111 MANAGED Texture2D mirror descriptor and SRV view exactness.",
+  "summary": "R111 strengthens the R108-R110 managed mirror readiness chain with live D3D11 Texture2D/SRV descriptor and view-identity verification. A mirror is no longer readiness-valid solely because R103 created it: the concrete resource must still match source dimensions, one-mip/one-slice/single-sample shape, translated DXGI format, DEFAULT usage, exact SRV bind flags, zero CPU access/misc flags, Texture2D SRV mip window, expected D3D11 device and the SRV backing Texture2D identity.",
+  "source_commits": [
+    "b6e4ec9e1fbaf481eb8c463fab9bde4594518817",
+    "f861603193e171e719901f170e79e9c8bb52fc0a",
+    "4a8fa9efc58e29788ffe37f3d906b990beb74cde",
+    "bb04b87c1700d68fe9cf92263c5c2799e71a7cca"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_census_calls_r108_r109_r110_r111_observation_api": false,
+    "raw_registry_srv_getter": false,
+    "production_ps_set_shader_resources": false,
+    "native_game_draw_routing": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "Protected R50/R51 D3D9 renderer and startup regression paths were reviewed. R111 changes only dormant DX11 native backend readiness/probe/verifier code and does not modify D3D9 CreateDevice/Reset/Present, DirectGPU transport, HUD ownership, selector flow or vr-d3d9ex-focus. Runtime/HMD correctness is not inferred from hosted CI."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36610599506,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T18:20:13Z",
+      "validated_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; semantic/input-layout/input-signature smoke PASS; object/shader/linkage probes PASS; R111 hosted constant-buffer probe build and run PASS; binary verification and artifact upload PASS. Hosted log emitted DX11 managed Texture2D mirror descriptor exactness R111: PASS."
+    },
+    "build": {
+      "run_id": 36610607939,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T18:18:54Z",
+      "validated_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36610607983,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T18:20:49Z",
+      "validated_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36610607817,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T18:19:45Z",
+      "validated_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36610599578,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T18:14:08Z",
+      "validated_sha": "bb04b87c1700d68fe9cf92263c5c2799e71a7cca"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5895987787,
+    "validation_comment_id": 5896083431,
+    "status": "IMPLEMENTATION_RETRY_AND_VALIDATION_WRITTEN",
+    "retry_comment_id": 5896023830,
+    "latest_validation_comment_id": 5896086785
+  },
+  "evidence": [
+    "Every R111 source-series commit contains the exact controller marker [AUTO:CONVERSION-DX11-00078] and no CI-skip directive; the final validation-bearing tree is bb04b87c1700d68fe9cf92263c5c2799e71a7cca.",
+    "NativeManagedTextureShadow::mirror_descriptor_exact re-queries the concrete D3D11 Texture2D and SRV and fails closed on expected-device, descriptor, SRV dimension/mip or backing-resource identity mismatch.",
+    "NativeManagedTextureMirrorReadiness adds descriptorExact and NativeManagedTextureStageReadiness adds descriptorExactMask; ready requires descriptor exactness.",
+    "R110 snapshot validation recomputes R111-strengthened stage readiness, so a descriptor-inexact resource cannot retain a valid ready snapshot.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R111 is automation-validated but runtime-untested. Managed mirror readiness now proves registry identity, lifetime freshness, concrete descriptor/view exactness and stale-snapshot rejection without exposing an SRV.",
+  "next_action": "Continue F18 with one separate bounded activation prerequisite only if it remains non-routing, or move to the next incomplete DX11 exactness gate. Any raw SRV access, PSSetShaderResources/native draw integration or runtime promotion must be isolated and exact-build Quest3/VDXR gated.",
+  "retry_history": {
+    "failed_run_id": 36610560309,
+    "failed_intermediate_sha": "4a8fa9efc58e29788ffe37f3d906b990beb74cde",
+    "conclusion": "cancelled",
+    "root_cause": "The intermediate Backend Conversion Gate run was cancelled before any job started because a subsequent same-task verifier commit advanced the branch and superseded it under workflow concurrency; this was not a code/test assertion failure.",
+    "recovery": "Held bb04b87c1700d68fe9cf92263c5c2799e71a7cca fixed as the validation-bearing result until Backend Conversion Gate, Build, OpenXR VR architecture and HUD Inspector completed successfully.",
+    "retry_comment_id": 5896023830
+  }
+}

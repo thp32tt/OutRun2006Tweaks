@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00369",
+  "production_id": "CONVERSION-DX11-00369",
+  "event_id": "CONVERSION-DX11-00369-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "6a21989a7f75cfffb2ab52bd8d27176e2c869d56",
+  "result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+  "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+  "validation_bearing_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+  "result_marker": "[AUTO:CONVERSION-DX11-00369]",
+  "selected_work_item": "DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT",
+  "summary": "R248 adds a dormant fail-closed IA primitive-topology binding/readback receipt after validated R247 programmable pipeline-object binding. It accepts only exact direct D3D9->D3D11 primitive translations, explicitly rejects direct TRIANGLEFAN binding, seals the exact immediate-context topology state, and detects external topology drift. It does not issue Draw*, route game draws or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00369.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 6a21989a7f75cfffb2ab52bd8d27176e2c869d56. Read VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, branch conversion state, VR_AUTODEV protocol/state, durable regression knowledge/history and Issue #14. R247 is complete; its durable next action selects exact IA primitive-topology bind/readback as the next bounded programmable unit. Retry E002 recovered exact failed Backend Conversion Gate #37198228411 on material SHA 1694e4e6f436f83454d0589e271a860313cf5f73; validate job passed and DX11 readiness smoke failed specifically in the constant-buffer probe."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R247 seals exact translated VS/PS/InputLayout binding but intentionally stops before IA topology. state_translation::translate_primitive already provides a conservative exact gate for POINTLIST/LINELIST/LINESTRIP/TRIANGLELIST/TRIANGLESTRIP and rejects direct TRIANGLEFAN, so R248 can consume this proven translation without expanding scope. Retry review isolated the failure to probe state hygiene: the R248 fresh-generation TRIANGLESTRIP binding remained live, so later pre-existing R140 complete-bound-draw checks saw the wrong IA topology.",
+      "review_lenses": {
+        "architecture": "Extend only dormant NativeProgrammableShaderPairCache plus hosted source-graph/WARP probe; do not modify vr-d3d9ex-focus or live draw routing.",
+        "ownership_lifetime": "Consume exact R247 snapshot on the same immediate context; store topology/context plus monotonic receipt generation and invalidate on device-generation reset.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter/presentation semantics change; runtime remains UNTESTED.",
+        "performance": "No production hot path and no Draw* call. IA topology set/get is reachable only through dormant observation/probe code.",
+        "adversarial": "Reject stale/missing R247 snapshot, deferred/non-immediate context, TRIANGLEFAN direct binding, changed requested topology and external IA topology drift."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderTopologyBindingReadiness, exact topology bind/readback/snapshot APIs, per-entry context/topology/generation ownership, TRIANGLEFAN fail-closed handling, WARP probe regressions and source-graph drift guards. No Draw* or NativeDrawPath activation. Retry E002 restores the pre-existing exact indexed fixed-function IA geometry after the R248 fresh-generation topology regression and adds a source-graph guard for that restoration; production/native backend semantics are unchanged by the repair."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "previous_failed_run_id": 37198228411,
+      "previous_failed_result_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "previous_failure_signature": "R95 constant-buffer probe failure: R140 complete bound draw includes exact live IA geometry",
+      "validation_run_id": 37198921847,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111426405015,
+      "readiness_smoke_job_id": 111427262863,
+      "artifact_id": 11302097530,
+      "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1",
+      "evidence": "Exact-SHA Backend Conversion Gate #37198921847 for d0d918c0b1cfde8f1648913ced259f14ac3c1334 completed SUCCESS. validate and DX11 readiness smoke jobs both passed, including the repaired R248 constant-buffer probe path and all downstream transport/surface/triangle-fan/pipeline handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "validation_bearing_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "result_marker": "[AUTO:CONVERSION-DX11-00369]",
+      "implementation_commits": [
+        "1694e4e6f436f83454d0589e271a860313cf5f73",
+        "d0d918c0b1cfde8f1648913ced259f14ac3c1334"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable IA-topology readiness/probe unit only; no runtime selector, transport, deployable binary package or HMD candidate changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5979539856,
+      "exact_next_action": "Preserve validated R239-R248 programmable readiness. Under a new TASK_ID, the next bounded static unit may add exact programmable IA vertex/index geometry binding/readback ownership after the R248 topology receipt, still stopping before Draw* routing or NativeDrawPath activation."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable cache and hosted probe only; no production draw/renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00369",
+    "production_id": "CONVERSION-DX11-00369",
+    "event_id": "CONVERSION-DX11-00369-E003",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+    "validation_bearing_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "validation_run_id": 37198921847,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111426405015,
+    "readiness_smoke_job_id": 111427262863,
+    "artifact_id": 11302097530,
+    "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1",
+    "implementation_comment_id": 5979539856,
+    "validation_comment_id": 5979539856,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
+  },
+  "exact_next_action": "Preserve validated R239-R248 programmable readiness. Under a new TASK_ID, the next bounded static unit may add exact programmable IA vertex/index geometry binding/readback ownership after the R248 topology receipt, still stopping before Draw* routing or NativeDrawPath activation.",
+  "retry_history": [
+    {
+      "attempt": "1/3",
+      "result_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "validation_run_id": 37198228411,
+      "automation_validation": "FAIL",
+      "failure_signature": "R95 constant-buffer probe failure: R140 complete bound draw includes exact live IA geometry",
+      "diagnosis": "R248 fresh-generation topology probe left D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP live before downstream fixed-function R140 checks."
+    },
+    {
+      "attempt": "2/3",
+      "result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "validation_run_id": 37198921847,
+      "automation_validation": "PASS",
+      "note": "Repair restored prior exact indexed fixed-function IA geometry after the R248 probe. E003 resumed while this exact-SHA Gate was completing; no second material repair was required."
+    }
+  ],
+  "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37198921847,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "validate_job_id": 111426405015,
+      "readiness_smoke_job_id": 111427262863,
+      "artifact_id": 11302097530,
+      "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5979539856
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00369",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00369",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
+      "event_type": "retry",
+      "attempt": "3/3",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00369",
+        "production_id": "CONVERSION-DX11-00369",
+        "event_id": "CONVERSION-DX11-00369-E002",
+        "event_type": "retry",
+        "attempt": "2/3"
+      }
+    ],
+    "reason": "E003 is the newest explicit controller dispatch. The E002 repair commit had already been published and its exact-SHA Gate completed SUCCESS during this resume, so E003 finalizes the same validated material result without duplicating implementation.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

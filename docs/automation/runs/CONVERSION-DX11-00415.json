@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00415",
+  "production_id": "CONVERSION-DX11-00415",
+  "event_id": "CONVERSION-DX11-00415-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 0,
+  "rollover_is_retry": false,
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R277_PROGRAMMABLE_SEMANTIC_CENSUS",
+  "base_sha": "a4abfc0b241526f7bc6d318c24c74c36175a4ad1",
+  "result_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+  "source_implementation_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+  "material_result_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+  "validation_bearing_result_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R277 wires the source-derived R276 semantic translation plan into production DX11 runtime census for observed programmable shader pairs and composes the typed R275 receipt against an explicitly unavailable R242 object receipt. The census seals plan identity into sampled signatures, logs plan/receipt evidence, counts exact/pending plan and receipt observations, and the analyzer reports those counters while programmable shader translation and native draw remain fail-closed.",
+  "evidence": [
+    "runtime_census.cpp derives R276 from live R271/R268/R273 evidence, seals plan hashes/revision/contract/snapshot into signature identity, and composes R275 with an explicit empty R242 ownership receipt so the remaining object-ownership boundary is observable rather than inferred.",
+    "runtime census exposes unique-signature R276/R275 logs and periodic programmableSemantic[planExact,planPending,receiptExact,receiptPending] counters.",
+    "analyze_dx11_census.py parses the new optional counters and reports ActivationEvidence.ProgrammableSemanticTranslation as diagnostic-only; test_analyze_dx11_census.py adds R277 regression coverage.",
+    "verify_dx11_source_graph.py requires the production R276/R275 census chain, analyzer evidence, regression fixture and shaderTranslationExact=false boundary.",
+    "Exact-SHA Backend Conversion Gate 37478487815: validate 112320127062 SUCCESS and DX11 readiness smoke 112322802327 SUCCESS, including constant-buffer probe.",
+    "Artifact 11420981106 digest sha256:18abfde68321c8f6adc951c5829ae5cd1cc207672146070b0b916749d79f7a76."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD a4abfc0b241526f7bc6d318c24c74c36175a4ad1; read AGENTS.md, review index, QUEUE_CONTROLLER_CONTRACT.md and branch-local conversion state. Selected the persisted R277 next action from 00414."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed runtime_census.cpp plus analyzer/regressions and confirmed R276/R275 existed only in probe/native evidence, not production census observation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added production R276 plan derivation, fail-closed R275 receipt observation, signature hashing, detailed logs, summary counters, analyzer reporting and regression/source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37478487815 SUCCESS. validate 112320127062 and DX11 readiness smoke 112322802327 both SUCCESS; Win32 build/binary and constant-buffer probe passed. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit ff144e7374c360305a4e71296bf4fac0c3b6f581 contains [AUTO:CONVERSION-DX11-00415] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R277 changes diagnostic census/analyzer evidence only and does not create a runtime-test candidate or enable programmable draw ownership."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Run record and branch-local state persist the exact material SHA, Gate evidence, UNTESTED runtime status and R278 analyzer-correlation next action."
+    }
+  },
+  "exact_next_action": "Under CONVERSION-DX11-00416, extend the DX11 census analyzer to parse and correlate per-signature R276 semanticTranslationPlan and R275 translatedSemanticReceipt records with the current programmable shader inventory, explicitly classify the missing R242 object-ownership prerequisite, and keep all evidence diagnostic-only with NativeDrawPath disabled.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "ff144e7374c360305a4e71296bf4fac0c3b6f581"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+    "backend_conversion_gate": {
+      "run_id": 37478487815,
+      "conclusion": "success",
+      "validate_job_id": 112320127062,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112322802327,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11420981106,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-ff144e7374c360305a4e71296bf4fac0c3b6f581",
+      "artifact_digest": "sha256:18abfde68321c8f6adc951c5829ae5cd1cc207672146070b0b916749d79f7a76"
+    }
+  }
+}

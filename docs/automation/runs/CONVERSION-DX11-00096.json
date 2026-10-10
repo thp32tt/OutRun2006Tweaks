@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00096",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T07:35:51+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "f73710fe862cb01a1ac836d498eee4503ace09ee",
+  "initial_result_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+  "result_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+  "validation_bearing_result_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "Generic Build R121 GoalTime compiled-marker reconciliation; clear the highest-priority stale CI blocker before further Set04/F13 runtime semantic work.",
+  "summary": "The current branch inherited R121 GoalTime shared-producer-map runtime code and its protected-baseline/OpenXR guard repairs, but generic Build still rejected the successfully built DLL because .github/workflows/build.yml required the obsolete 'VR R66 GOAL TIME HUD:' marker. This task updates only that generic Build marker to 'VR R121 GOAL TIME HUD: shared producer-map'. No runtime renderer/game source, semantic range, transport, DX11 native activation or protected vr-d3d9ex-focus source is changed.",
+  "source_commits": [
+    "f80dc3e414e4a586129317454481a0636f89ebff"
+  ],
+  "changed_paths": [
+    ".github/workflows/build.yml"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_source_changed": false,
+    "render_semantics_changed": false,
+    "semantic_range_widened": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "workflow_only": true
+  },
+  "blocker_reconciliation": {
+    "previous_sha": "f73710fe862cb01a1ac836d498eee4503ace09ee",
+    "previous_build_run_id": 36637561791,
+    "previous_conclusion": "failure",
+    "failure_signature": "missing compiled marker: VR R66 GOAL TIME HUD:",
+    "root_cause": "Generic Build's compiled-marker list was stale after R121 renamed the exact GoalTime marker and migrated ownership to the shared producer map. The DLL build itself had succeeded before the marker assertion.",
+    "repair": "Replace the one obsolete R66 GoalTime marker expectation in .github/workflows/build.yml with the R121 shared-producer-map marker. No runtime source change.",
+    "repaired_result_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+    "deterministic_failure_recurred": false
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36639860947,
+      "conclusion": "success",
+      "validated_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+      "artifact_id": 11066636053,
+      "artifact_digest": "sha256:99f40dfa03c4b3e83ef9567ab643b5154b2287fd268bff232b1cd7e6b2d2f64c",
+      "evidence": "Queue/baseline/one-click/disassembly/DX11 transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature/object/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36639867480,
+      "conclusion": "success",
+      "validated_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+      "evidence": "Generic Win32 Build and the formerly failing 'Verify built wheel and VR payload' compiled-marker check PASS with the R121 GoalTime marker."
+    },
+    "hud_inspector": {
+      "run_id": 36639867229,
+      "conclusion": "success",
+      "validated_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36639867288,
+      "conclusion": "success",
+      "validated_sha": "f80dc3e414e4a586129317454481a0636f89ebff",
+      "evidence": "All six jobs PASS, including game-x86-r26-hud-safe with the R121 marker contract."
+    },
+    "pc_fast": {
+      "run_id": 36639861193,
+      "conclusion": "skipped",
+      "validated_sha": "f80dc3e414e4a586129317454481a0636f89ebff"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5900320058,
+    "validation_comment_id": 5900400953,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00096] and has no CI-skip directive.",
+    "The task changes exactly one workflow path and does not modify runtime C/C++ source.",
+    "The generic Build run reaches and passes the exact binary-marker step that failed on the preceding SHA.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and OpenXR 6/6 pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Generic Build validation is reconciled with R121 and automation-validated. Set04/F13 remains partially open for other exact producer families; runtime visual correctness remains HMD-gated.",
+  "next_action": "Continue Set04/F13 with one independently proven canonical producer family, preserving exact-RVA fail-closed ownership. Do not widen producer ranges or claim visual correctness without exact-build Quest3/VDXR evidence."
+}

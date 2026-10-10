@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00292",
+  "production_id": "CONVERSION-DX11-00292",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00292-E003",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "e0c1b38015ecddd694b1337b82e0387053645325",
+  "source_implementation_sha": "d772de0c1da335019e8671112e62ad985301aab4",
+  "result_sha": "eccca134d34c135088346d1bd957c120b3dd8608",
+  "validation_bearing_result_sha": "eccca134d34c135088346d1bd957c120b3dd8608",
+  "result_marker": "[AUTO:CONVERSION-DX11-00292]",
+  "selected_work_item": "DX11_FIXED_FUNCTION_PIPELINE_PROBE_POST_R201_CONVERGENCE",
+  "summary": "Reconciled the hosted DX11 fixed-function pipeline probe with retained R201 TEMP semantics and completed the exact-SHA aggregate Backend Conversion Gate. R194/R196 negative ARG0 fixtures no longer misuse supported D3DTA_TEMP as an invalid selector, and the validation-discovered R197 two-stage D3DTA_CONSTANT positive fixture now supplies supported active-stage sampler filter state.",
+  "changed_paths": [
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "d772de0c1da335019e8671112e62ad985301aab4",
+    "eccca134d34c135088346d1bd957c120b3dd8608"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub branch HEAD e0c1b38015ecddd694b1337b82e0387053645325, AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, regression/history files, Issue #14 production ledger, and CONVERSION-DX11-00290 durable result. The prior exact-SHA aggregate Gate blocker was R194 D3DTOP_MULTIPLYADD unsupported ARG0 selector must fail closed."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Issue #14 history showed R198 changed R194/R196 negative ARG0 fixtures from newly supported SPECULAR to then-unsupported TEMP, but R201 later made D3DTA_TEMP an exact default-zero source. Therefore the R194/R196 negative fixtures were stale. Validation of the first repair then exposed a separate latent positive-fixture defect: the R197 two-stage D3DTA_CONSTANT fixture left active-stage MIN/MAG sampler filters at D3DTEXF_NONE even though readiness accepts POINT/LINEAR."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "tools/dx11_fixed_function_pipeline_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commits": [
+        "d772de0c1da335019e8671112e62ad985301aab4",
+        "eccca134d34c135088346d1bd957c120b3dd8608"
+      ],
+      "summary": "Rebased R194/R196 invalid ARG0 tests onto D3DTA_SELECTMASK, an actually invalid selector, while retaining R201 TEMP support. Added source-graph guards for those negative fixtures. Then made the R197 two-stage positive fixture readiness-valid by assigning POINT/POINT/NONE sampler filters to both active stages and guarded the stage-1 filter setup. Production fixed-function semantics and NativeDrawPath activation were unchanged."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "validation_bearing_result_sha": "eccca134d34c135088346d1bd957c120b3dd8608",
+      "backend_conversion_gate_run_id": 37125813273,
+      "validate_job_id": 111210762356,
+      "readiness_smoke_job_id": 111211391656,
+      "prior_repair_gate_run_id": 37125263526,
+      "prior_repair_failure": "The d772de0c1da335019e8671112e62ad985301aab4 Gate retained and passed the R194/R196 repair through source graph, Win32 build and all readiness probes before the final pipeline handoff advanced to R197 and failed because the two-stage positive fixture had unsupported default MIN/MAG filters.",
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test DX11 static surface contract analyzer",
+        "Verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "Build/Run DX11 fixed-function shader semantic smoke",
+        "Build/Run DX11 input-layout semantic smoke",
+        "Build/Run DX11 input-signature semantic smoke",
+        "Build/Run DX11 input-layout object probe",
+        "Build/Run DX11 shader object probe",
+        "Build/Run DX11 shader linkage probe",
+        "Build/Run DX11 constant buffer probe",
+        "Build/Run DX11 native transport probe",
+        "Build/Run DX11 surface mirror probe",
+        "Build/Run DX11 triangle-fan generated index-buffer probe",
+        "Build/Run DX11 fixed-function pipeline handoff probe"
+      ],
+      "aggregate_gate_validation": "PASS",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "d772de0c1da335019e8671112e62ad985301aab4",
+        "eccca134d34c135088346d1bd957c120b3dd8608"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 source/static/probe correctness work only. The hosted gate produced its validation artifact, but no runtime candidate/package was requested or justified."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_ids": [
+        5969485545,
+        5969559231,
+        5969621763,
+        5969628802
+      ],
+      "exact_next_action": "Release CONVERSION-DX11-00292 as automation PASS. Keep NativeDrawPathActive disabled. Continue the next independent DX11 source/static conversion gap from the newest authenticated branch HEAD; retain R194/R196 invalid-selector fixtures, R197 readiness-valid sampler fixture state, and R201 TEMP default-zero semantics. Quest 3/VDXR exact-build runtime parity remains required before runtime activation claims."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37125813273,
+    "head_sha": "eccca134d34c135088346d1bd957c120b3dd8608",
+    "reason": "Both validate and DX11 readiness smoke jobs completed successfully, including Win32 build/binary verification and the final fixed-function pipeline handoff probe."
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_ids": [
+    5969485545,
+    5969559231,
+    5969621763,
+    5969628802
+  ],
+  "exact_next_action": "Release this task and dispatch the next independent DX11 conversion work item from current GitHub HEAD. Do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_resume": {
+    "final_event_id": "CONVERSION-DX11-00292-E003",
+    "final_attempt": "3/3",
+    "note": "Attempt 3 resumed the already-materialized eccca134 repair and closed the task from its successful exact-SHA Gate without repeating implementation."
+  }
+}

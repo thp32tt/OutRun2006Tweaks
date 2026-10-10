@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00074",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T02:18:56+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "4fee8412524ebbbed5ca97fcb007cbbe7e5cafae",
+  "result_sha": "22e43020f2d569ba3053b9632299a58099bc93cf",
+  "validation_bearing_result_sha": "22e43020f2d569ba3053b9632299a58099bc93cf",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R109 MANAGED Texture2D per-stage mirror readiness aggregation.",
+  "summary": "R109 adds a bounded non-routing stage-mask aggregate over R108 managed-mirror readiness. It reports required, registered, CPU-shadow-valid, concrete-resource-owned, lifetime-current, expected-device-match, ready and pending masks without exposing an SRV or creating/binding resources. Invalid input fails closed, and hosted proof covers missing registration, foreign-device ownership, external mutation, LockRect recapture, Reset invalidation and post-Reset recovery.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_census_calls_r108_or_r109_observation_api": false,
+    "r109_creates_mirror_resources": false,
+    "raw_registry_srv_getter": false,
+    "production_ps_set_shader_resources": false,
+    "native_game_draw_routing": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "The durable regression registry was checked before implementation and contained no protected risk path matching the bounded src/vr/d3d11/native_backend.* change. R109 does not modify D3D9 CreateDevice/Reset/Present activation, DirectGPU transport, R30 renderer ownership or selector flow. Runtime/HMD correctness is not inferred from hosted CI."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36603288938,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T17:18:03Z",
+      "validated_sha": "22e43020f2d569ba3053b9632299a58099bc93cf",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; semantic/input-layout/input-signature smoke PASS; input-layout/shader object/linkage probes PASS; R109 constant-buffer probe build and run PASS; binary verification and artifact upload PASS. Hosted log emitted DX11 managed Texture2D stage mirror readiness R109: PASS."
+    },
+    "build": {
+      "run_id": 36603294159,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T17:17:42Z",
+      "validated_sha": "22e43020f2d569ba3053b9632299a58099bc93cf"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36603294227,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T17:18:25Z",
+      "validated_sha": "22e43020f2d569ba3053b9632299a58099bc93cf",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36603294212,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T17:18:15Z",
+      "validated_sha": "22e43020f2d569ba3053b9632299a58099bc93cf",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36603289081,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T17:12:25Z",
+      "validated_sha": "22e43020f2d569ba3053b9632299a58099bc93cf"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5895036388,
+    "validation_comment_id": 5895135752,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "Validation-bearing result commit message contains exact controller marker [AUTO:CONVERSION-DX11-00074] and no CI-skip directive.",
+    "R109 bounds the stage aggregate to at most 32 stages and fails closed for null key arrays, out-of-range required bits and missing expected devices when any stage is required.",
+    "A required stage becomes ready only when its registered R108 shadow is valid, owns concrete mirror device/Texture2D/SRV resources, has current generation/shadow-version lifetime and matches the expected D3D11 device.",
+    "Hosted proof verifies a ready required stage, an unregistered required stage remaining pending, foreign-device rejection, external-mutation invalidation, recapture recovery, Reset invalidation and post-Reset recovery.",
+    "The source-graph verifier fails if runtime_census.cpp calls R108/R109 observation-only registry mirror APIs.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R109 is automation-validated but runtime-untested. Exact per-stage managed-mirror readiness can now be aggregated as fail-closed masks without exposing SRVs or enabling a draw path.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing activation prerequisite after R109. Preserve R107 mutation invalidation plus R108 identity/device/generation/version gates and R109 required-stage pending semantics. Do not add production SRV binding or native draw promotion until the remaining exactness gates and exact-build Quest3/VDXR visual evidence close."
+}

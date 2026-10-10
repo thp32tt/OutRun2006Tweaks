@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00446",
+  "production_id": "CONVERSION-DX11-00446",
+  "event_id": "CONVERSION-DX11-00446-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "319ed4dbc186bf9ca7d5a76a1640f41c1a562099",
+  "result_sha": "aa0b32a10eede75d10273121ae98d005b3c9669b",
+  "material_result_sha": "aa0b32a10eede75d10273121ae98d005b3c9669b",
+  "validation_bearing_result_sha": "aa0b32a10eede75d10273121ae98d005b3c9669b",
+  "selected_work_item": "DX11_R308_R291_PRODUCTION_SEMANTIC_REVIEW_ANALYZER_BRIDGE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R308 adds signature-scoped analyzer ingestion for existing R291 productionSemanticReview telemetry and checks R288 admission, R289 review/input-layout/semantic readiness and snapshot consistency while preserving ActivationProof=false.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "aa0b32a10eede75d10273121ae98d005b3c9669b"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered branch state after 00445 material result and identified R291 as the remaining production evidence gap.",
+    "C1_REVIEW": "PASS: selected R291 because runtime emitted it but analyzer did not consume it.",
+    "C2_IMPLEMENT": "PASS: parser, per-signature evidence, readiness/snapshot correlation, positive/inconsistent fixtures and source-graph guard added.",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37675361755; validate 112977348129 SUCCESS; DX11 readiness smoke 112979652172 SUCCESS.",
+    "C4_COMMIT": "PASS: material result aa0b32a10eede75d10273121ae98d005b3c9669b contains [AUTO:CONVERSION-DX11-00446] and no CI-skip directive.",
+    "C5_PACKAGE": "NOT_REQUIRED: analyzer/static evidence change; CI artifact retained as validation evidence only.",
+    "C6_STATE": "PASS_RECOVERED: exact-SHA validation was complete before the next controller dispatch; durable record restored during 00447 C0."
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37675361755,
+    "validation_job_id": 112977348129,
+    "readiness_smoke_job_id": 112979652172,
+    "artifact_id": 11506403092,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-aa0b32a10eede75d10273121ae98d005b3c9669b",
+    "artifact_digest": "sha256:dbcefc1c36cf17fa254d858c0463bba4f6d2a4f2aa96d9b673bf3e62bc41317e",
+    "issue14_comment_id": 6045522657
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Inspect R287 productionObservation telemetry, which is emitted by runtime_census.cpp but still absent from analyzer ingestion; keep NativeDrawPath/Draw/DrawIndexed fail-closed."
+}

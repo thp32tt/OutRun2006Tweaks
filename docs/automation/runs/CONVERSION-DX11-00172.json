@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00172",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "25ee9d0e9056ef3a44d593b32b02d80e87e583f0",
+  "result_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+  "validation_bearing_result_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R172_8BD20_BOUNDED_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00170 captured exact 0x8BD20 provenance from two independently aligned callers and explicitly left instruction boundaries, function-entry identity, semantics and ownership unresolved. Its durable resume cursor names complete-instruction decode as the next bounded F13 unit. DXVK-00171 independently validated the same exact public-EXE control-flow shape, which is reused only as proof design; DX11 must pass its own exact-result Actions.",
+  "summary": "Completed a fail-closed DX11 exact-EXE proof for the bounded 0x8BD20 routine body. Exact contiguous instructions through both RETs, both short branches to 0x8BD39, four INT3 padding bytes through 0x8BD40 and the next-code 8b 48 08 anchor are independently validated on the DX11 result SHA. Function-entry identity, higher-level callee semantics and ScreenHud/world/render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00171",
+    "source_result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+    "source_proof_status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded instruction/control-flow proof design and the corrected terminal-row guard rows[-3]. DX11 retains independent predecessor provenance and exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00172.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result f8c3564d902d8843d9ac8e7cfd9d589e40ae4153 contains exact marker [AUTO:CONVERSION-DX11-00172] and no CI-skip directive.",
+    "CONVERSION-DX11-00170 validation-bearing result 746461ff82ff29cb3ddaeae7206af7cc1837c324 established EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED from aligned callers 0x284D2 and 0x28390.",
+    "HUD Inspector static job 110103644229 PASS emitted status=EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN, predecessor=EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED, layout_contiguous=True, bytes_match=True, branches=True, terminal_shape=True, padding=True and next_anchor=True.",
+    "The bounded exact instruction map covers 0x8BD20..0x8BD3B inclusive, with RET at 0x8BD38 and 0x8BD3B, both rel8 branches 0x8BD26 and 0x8BD2C targeting 0x8BD39, four INT3 bytes at 0x8BD3C..0x8BD3F and next-code anchor 8b 48 08 at 0x8BD40.",
+    "DXVK-00171 exact result 147b1a7e3a3c56aa5396fa49b633383fb5b2458d independently passed the same bounded proof on the identical public EXE; DX11 validation remained independent.",
+    "Backend Conversion Gate 36778875300, Build 36778881818, OutRun EXE HUD Inspector CI 36778881853 and OpenXR VR architecture 36778881875 all passed on the result SHA; OpenXR jobs passed 6/6.",
+    "VR PC Fast Test Build 36778875200 was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep 0x8BD20 function-entry identity, higher-level callee semantics and ScreenHud/world/render ownership unresolved. A later independent Set04/F13 task may establish the structural function-entry boundary or capture/decode 0x182194 provenance; runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T06:27:43+09:00",
+  "runtime_claim": "NONE",
+  "proof_contract": {
+    "target_rva": "0x0008BD20",
+    "body_end_rva": "0x0008BD3C",
+    "branch_target_rva": "0x0008BD39",
+    "padding_end_rva": "0x0008BD40",
+    "next_code_rva": "0x0008BD40",
+    "status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "predecessor_status": "EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "branch_targets_match": true,
+    "terminal_shape": true,
+    "padding_matches": true,
+    "next_code_anchor_matches": true,
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The proof establishes bounded instruction/control-flow shape only. No ScreenHud/world/render ownership is inferred; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed unless predecessor dual-call provenance is exact, instruction bytes are contiguous and exact, both short branches land at 0x8BD39, both RETs are present, four INT3 padding bytes match and the next-code anchor begins at 0x8BD40."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer path, DX9Ex baseline, HUD/world semantic ownership or open runtime problem state changed. Issue #13 therefore needs no new event."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36778875300,
+      "job_id": 110103621772,
+      "conclusion": "success",
+      "validated_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "artifact_id": 11127122649,
+      "artifact_digest": "sha256:838aba15505ce5058183e3ebc19b840caa4f531bc00404b0fcef9ad69836cd67"
+    },
+    "build": {
+      "run_id": 36778881818,
+      "conclusion": "success",
+      "validated_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "artifact_id": 11127212592,
+      "artifact_digest": "sha256:f01bd8b5b0618fb614ac9f1bad2d7c8da6820541095c2d67ab479ad4ab9f614c",
+      "source_snapshot_artifact_id": 11126957635,
+      "source_snapshot_artifact_digest": "sha256:154e996bed388f2bc9f4ef82d8eb6f1c779a930cd85e515ddba595d44669464e"
+    },
+    "hud_inspector": {
+      "run_id": 36778881853,
+      "conclusion": "success",
+      "validated_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "static_analysis_job_id": 110103644229,
+      "analysis_artifact_id": 11126208875,
+      "analysis_artifact_digest": "sha256:bf2b0576dad3599e2bcd27f6dc9ab49562d07043affd529bb919f3525bf70dd6",
+      "game_artifact_id": 11126698251,
+      "game_artifact_digest": "sha256:7306c6e7550917a89c63f8f65e6f2210981d785242de07ab855bf6521ea3acc7",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_second_callee_prefix=0x0008BD20 status=EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN predecessor=EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED layout_contiguous=True bytes_match=True branches=True terminal_shape=True padding=True next_anchor=True function_entry=UNRESOLVED semantic_effect=BOUNDED_CONTROL_FLOW_ONLY ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36778881875,
+      "conclusion": "success",
+      "validated_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11126772645,
+      "host_artifact_digest": "sha256:a1a661e4ddafcdd07ecd23d9a58b4e4d45d087578ee127cf2e2b5401ef8f0e93"
+    },
+    "pc_fast": {
+      "run_id": 36778875200,
+      "conclusion": "skipped",
+      "validated_sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "f8c3564d902d8843d9ac8e7cfd9d589e40ae4153",
+      "message": "dx11: prove bounded 0x8BD20 control-flow [AUTO:CONVERSION-DX11-00172]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5919954572,
+    "validation_comment_id": 5920043222,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_CALLEE_8BD20_EXACT_PROVENANCE",
+    "after": "PARTIAL_PLUS_8BD20_BOUNDED_CONTROL_FLOW_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "The bounded 0x8BD20 control-flow/padding shape is exact, but function-entry identity still requires independent predecessor-boundary evidence. Higher-level callee semantics and all ScreenHud/world/render ownership remain unresolved. The separate 0x182194 callee is untouched.",
+  "resume_cursor": "Set04/F13 now has independent DX11 exact proof of the bounded 0x8BD20 body through both RETs, its four-byte INT3 padding and 0x8BD40 next-code anchor. Next runnable work may establish a structural function-entry boundary using evidence before 0x8BD20 or independently capture/decode 0x182194. Do not infer runtime/render ownership from this structural proof."
+}

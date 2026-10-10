@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""R187/R204/R205/R225 single-pass contract with targeted negative source mutations."""
+from pathlib import Path
+root=Path(__file__).resolve().parents[1]
+h=(root/"src/vr/d3d11/native_indexed_target_viewport.hpp").read_text(encoding="utf-8")
+p=(root/"tools/dx11_viewport_draw_probe_r187.cpp").read_text(encoding="utf-8")
+manifest=(root/"cmake.toml").read_text(encoding="utf-8")
+workflow=(root/".github/workflows/backend-conversion-gate.yml").read_text(encoding="utf-8")
+guards=(
+    "!verified_indexed_linear_draw_ready(",
+    "view.ViewDimension != D3D11_RTV_DIMENSION_TEXTURE2D",
+    "desc.Width != width || desc.Height != height",
+    "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
+    "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
+    "desc.BindFlags != D3D11_BIND_RENDER_TARGET",
+    "context->RSGetViewports(&boundCount, nullptr)",
+    "boundCount != 1",
+    "rasterDesc.ScissorEnable",
+    "target.Get() != expectedTarget",
+    "!expectedTarget",
+    "Microsoft::WRL::ComPtr<ID3D11DepthStencilView> unownedDepth;",
+    "outputs, unownedDepth.GetAddressOf());",
+    "if (unownedDepth.Get() != expectedDepthTarget || hasExtraOutput ||",
+    "outputs[slot]->Release();",
+    "ID3D11DepthStencilView* expectedDepthTarget = nullptr",
+)
+# R218 adds an independent raster contract in this header; mutation checks
+# must scope to the original R187/R204/R205 helper, never a later helper.
+r187 = h.split("// R218: composed indexed full-eye D32 readiness:", 1)[0]
+def contract(text): return all(g in text for g in guards)
+assert contract(r187), "missing native indexed viewport/target protection"
+# Name the unique mutation targets explicitly. Numeric guard indices shift
+# whenever a new ownership fence is added, and boundCount occurs twice.
+mutation_guards = (
+    "!verified_indexed_linear_draw_ready(",
+    "desc.Width != width || desc.Height != height",
+    "desc.Format != format || desc.Usage != D3D11_USAGE_DEFAULT",
+    "desc.CPUAccessFlags != 0 || desc.MiscFlags != 0",
+    "desc.BindFlags != D3D11_BIND_RENDER_TARGET",
+    "rasterDesc.ScissorEnable",
+    "target.Get() != expectedTarget",
+    "!expectedTarget",
+    "Microsoft::WRL::ComPtr<ID3D11DepthStencilView> unownedDepth;",
+    "outputs, unownedDepth.GetAddressOf());",
+    "if (unownedDepth.Get() != expectedDepthTarget || hasExtraOutput ||",
+    "outputs[slot]->Release();",
+    "ID3D11DepthStencilView* expectedDepthTarget = nullptr",
+)
+for g in mutation_guards:
+    assert not contract(r187.replace(g,"",1)), "source mutation survived: "+g
+assert "->Draw(" not in h and "->DrawIndexed(" not in h, "game Draw activation prohibited"
+for phrase in ("ctx->DrawIndexed(3,0,0);", "reject missing viewport",
+    "reject extra viewport", "reject half viewport", "reject scissor enabled",
+    "reject wrong target width", "reject wrong view format",
+    "reject missing bound RTV", "reject retired IB",
+    "reject null expected RTV", "reject same-sized different RTV",
+    "restore original owned RTV",
+    "reject stale second-eye indexed RTV",
+    "restore sole indexed RTV after MRT",
+    "reject unowned indexed DSV",
+    "restore no-depth indexed owner after DSV",
+    "R225 create same-device typeless indexed eye",
+    "R225 typed RTV over typeless indexed eye",
+    "R225 indexed IA accepts same-device typed view",
+    "R225 reject typeless indexed backing despite typed RTV",
+    "R225 restore exact typed indexed eye",
+    "R227 create same-device RTV SRV indexed eye",
+    "R227 RTV over SRV-capable indexed eye",
+    "R227 indexed IA still accepts shared same-device color",
+    "R227 reject alias-capable indexed eye RTV",
+    "R227 restore dedicated RTV-only indexed eye",
+    "actual DrawIndexed green center / black corner pixels"):
+    assert phrase in p, "missing WARP behavior coverage: "+phrase
+assert "[target.dx11_viewport_draw_probe_r187]" in manifest
+assert '"tools/dx11_viewport_draw_probe_r187.cpp"' in manifest
+assert "python tools/test_dx11_viewport_draw_r187.py" in workflow
+assert workflow.index("Run R187 indexed viewport WARP probe") < workflow.index("Build DX11 constant buffer probe")
+print("R187/R204/R205 indexed viewport, sole RTV/no foreign DSV, 12 source mutations and WARP contract: PASS")

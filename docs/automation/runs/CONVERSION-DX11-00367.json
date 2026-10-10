@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00367",
+  "production_id": "CONVERSION-DXVK-00366",
+  "event_id": "CONVERSION-DXVK-00366-E001",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R247_PROGRAMMABLE_PIPELINE_OBJECT_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "500df9d3198dc1b09b264c5d378ff263bc9912ea",
+  "result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+  "material_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+  "validation_bearing_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+  "result_marker": "[AUTO:CONVERSION-DX11-00367]",
+  "selected_work_item": "DX11_R247_PROGRAMMABLE_PIPELINE_OBJECT_BINDING_RECEIPT",
+  "summary": "R247 adds a dormant fail-closed programmable pipeline-object binding receipt on top of validated R246 constant-slot binding. It binds the R242-owned translated VS/PS objects and R243-owned input layout on the exact immediate D3D11 context, reads all three objects back, seals context/generation state, and rejects stale R246 snapshots, non-immediate contexts and external shader/layout drift. It does not set topology, route Draw*, or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00367.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 500df9d3198dc1b09b264c5d378ff263bc9912ea. Read docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, branch lane state, VR_AUTODEV_STATE/PROTOCOL, VR_DX11_NATIVE_PLAN and regression knowledge/history. Durable DX11 next action explicitly requests a new TASK_ID for exact translated VS/PS plus validated input-layout binding/readback after R246."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R239-R246 provide exact cache/slot/object/input-layout/constant-state/payload/constant-slot receipts but stop before live programmable shader/input-layout binding. The smallest independently executable next boundary is an immediate-context VS/PS/InputLayout bind/readback receipt that consumes the exact R246 snapshot and still stops before topology or Draw*.",
+      "review_lenses": {
+        "architecture": "Extend only dormant NativeProgrammableShaderPairCache and its hosted WARP/source-graph probe; do not touch vr-d3d9ex-focus, D3D9 stereo hooks, transport or Draw* dispatch.",
+        "ownership_lifetime": "Consume exact R246 snapshot and same immediate context; seal one monotonic programmable-binding receipt and invalidate it across device-generation reset.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter/presentation semantics change; RUNTIME_VALIDATION remains UNTESTED.",
+        "performance": "No production hot path; VSSetShader/PSSetShader/IASetInputLayout are reachable only from dormant observation API/probe.",
+        "adversarial": "Fail closed on missing/stale R246 snapshot, deferred context, foreign context/device identity, external shader/input-layout drift and stale device generation."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderPipelineBindingReadiness, exact immediate-context VS/PS/InputLayout binding/readback APIs, snapshot validation, per-entry context/generation receipt ownership, WARP probe coverage and source-graph drift guards. No IA topology, Draw* routing or NativeDrawPath activation introduced."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R247_PROGRAMMABLE_PIPELINE_OBJECT_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37193568418,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111410641901,
+      "readiness_smoke_job_id": 111411435222,
+      "evidence": "Exact-SHA Backend Conversion Gate for f2bd299a1d40b276cb8d4b213415f6e57f6aed76 completed SUCCESS. Source graph, dormant activation boundary, Win32 configure/build/binary, readiness smoke and the R247 constant-buffer probe all passed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+      "material_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+      "validation_bearing_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+      "result_marker": "[AUTO:CONVERSION-DX11-00367]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable pipeline-object binding/readback readiness only; no runtime selector/transport/test package change."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5978801752,
+      "exact_next_action": "Preserve validated R239-R247 programmable readiness chain. Under a new TASK_ID, the next bounded static unit may add exact IA primitive-topology binding/readback ownership after the R247 pipeline receipt, still stopping before Draw* routing or NativeDrawPath activation.",
+      "dispatch_correction_comment_id": 5978821650
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant native_backend programmable-cache readiness plus hosted WARP/source-graph probe only; no production draw/renderer/transport/OpenXR path is changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00367",
+    "production_id": "CONVERSION-DXVK-00366",
+    "event_id": "CONVERSION-DXVK-00366-E001",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+    "source_implementation_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+    "validation_bearing_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+    "validation_run_id": 37193568418,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111410641901,
+    "readiness_smoke_job_id": 111411435222,
+    "artifact_id": 11300410338,
+    "artifact_digest": "sha256:7a21e12d5ea0698096766101a50d918045a62d901750325424470e887bbbbe85",
+    "implementation_comment_id": 5978801752,
+    "validation_comment_id": 5978801752,
+    "dispatch_correction_comment_id": 5978821650,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
+  },
+  "exact_next_action": "Task complete. Preserve R247 exact VS/PS/InputLayout binding/readback receipt and keep topology/Draw* routing outside this task. RUNTIME_VALIDATION remains UNTESTED.",
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37193568418,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+      "validate_job_id": 111410641901,
+      "readiness_smoke_job_id": 111411435222,
+      "artifact_id": 11300410338,
+      "artifact_digest": "sha256:7a21e12d5ea0698096766101a50d918045a62d901750325424470e887bbbbe85"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5978801752,
+    "concurrent_bookkeeping_comment_id": 5978801166,
+    "dispatch_correction_comment_id": 5978821650
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00367",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00367",
+      "production_id": "CONVERSION-DXVK-00366",
+      "event_id": "CONVERSION-DXVK-00366-E001",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00367",
+        "production_id": "CONVERSION-DX11-00367",
+        "event_id": "CONVERSION-DX11-00367-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt"
+      }
+    ],
+    "reason": "The current user-issued automatic queue dispatch is authoritative. This is EVENT_TYPE=retry, not rollover. The correction changes dispatch bookkeeping only; material/result SHA, exact-SHA Backend Conversion Gate #1968 evidence and RUNTIME_VALIDATION=UNTESTED remain unchanged.",
+    "dispatch_correction_comment_id": 5978821650,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

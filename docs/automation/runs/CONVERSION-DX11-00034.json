@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00034",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T09:43:35+09:00",
+  "base_sha": "f319106ca6a2708fba18349e641e0f23ca916f04",
+  "code_result_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+  "result_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R88 F19 descriptor-level D3D9 FVF blend-weight/index input-layout semantics with hosted deterministic smoke coverage.",
+  "summary": "Extended the conservative FVF input-layout translator to cover XYZB1..XYZB5 blend weights and LASTBETA_UBYTE4/LASTBETA_D3DCOLOR blend-index encodings. XYZB1..4 map blend weights to matching float component formats; XYZB5 splits five float weights across BLENDWEIGHT0 float4 and BLENDWEIGHT1 float1. LASTBETA_UBYTE4 maps the last beta slot to BLENDINDICES R8G8B8A8_UINT; LASTBETA_D3DCOLOR maps it to BLENDINDICES B8G8R8A8_UNORM. Blend-position FVF can now carry NORMAL at the correct post-beta offset. Conflicting LASTBETA encodings, LASTBETA on non-blend position encodings and insufficient stride remain fail-closed. A dedicated hosted Win32 smoke executable verifies supported and fail-closed cases. No native shader binding or draw routing was enabled.",
+  "evidence": [
+    "CONVERSION-DX11-00032 completed broader F20 deterministic semantic coverage and selected the remaining F19 blend-weight/index FVF gap as the preferred next runtime-independent activation prerequisite.",
+    "Backend Conversion Gate 36503931780 PASS on exact production SHA, including source graph, production Win32 build, existing fixed-function semantic smoke, and new R88 input-layout semantic smoke build+execution.",
+    "Build 36503935605 PASS on exact production SHA.",
+    "OpenXR VR architecture 36503935574 PASS across host-x64 and all five Win32 comparison/game jobs.",
+    "HUD Inspector 36503935570 PASS.",
+    "PC Fast 36503931848 skipped and N100 was not used.",
+    "No Quest 3/VDXR, in-game runtime, GPU shader binding, or native input-layout execution validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Updated FVF input-layout contract to include R88 blend-weight and LASTBETA index descriptor semantics while keeping F21 shader compatibility separate."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added XYZB1..XYZB5 blend-weight descriptor generation, UBYTE4/D3DCOLOR BLENDINDICES handling, blend-position NORMAL support, and fail-closed invalid combination handling."
+    },
+    {
+      "path": "tools/dx11_input_layout_semantics.cpp",
+      "result": "Added deterministic hosted R88 semantic smoke for blend weights, split XYZB5 weights, UBYTE4/D3DCOLOR indices, NORMAL offsets, dual-LASTBETA/nonblend-LASTBETA/short-stride failures."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_input_layout_semantics executable to cmkr source-of-truth graph."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added checked-in generated CMake target for the R88 semantic smoke."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Builds and runs the R88 input-layout semantic smoke after the existing fixed-function semantic smoke."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for R88 FVF blend translations, smoke cases, CMake target presence, and Backend Conversion Gate execution."
+    }
+  ],
+  "semantic_cases": {
+    "supported": [
+      "D3DFVF_XYZB1 -> POSITION float3 + BLENDWEIGHT0 float1",
+      "D3DFVF_XYZB4 | D3DFVF_NORMAL -> POSITION + BLENDWEIGHT0 float4 + NORMAL at offset 28",
+      "D3DFVF_XYZB5 -> BLENDWEIGHT0 float4 + BLENDWEIGHT1 float1",
+      "D3DFVF_XYZB3 | D3DFVF_LASTBETA_UBYTE4 -> two float weights + BLENDINDICES R8G8B8A8_UINT",
+      "D3DFVF_XYZB2 | D3DFVF_LASTBETA_D3DCOLOR -> one float weight + BLENDINDICES B8G8R8A8_UNORM",
+      "D3DFVF_XYZB1 | D3DFVF_LASTBETA_UBYTE4 -> index-only beta slot with no explicit blend-weight element"
+    ],
+    "fail_closed": [
+      "LASTBETA_UBYTE4 and LASTBETA_D3DCOLOR set simultaneously",
+      "LASTBETA index encoding on non-blend D3DFVF_XYZ position",
+      "D3DFVF_XYZB5 with insufficient stream stride"
+    ]
+  },
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "EXPLICIT_DECLARATION_AND_FVF_XYZ_XYZRHW_XYZW_XYZB1_TO_XYZB5_BLEND_WEIGHT_INDEX_DESCRIPTOR_SUBSET_HOSTED_VERIFIED_SHADER_SIGNATURE_COMPATIBILITY_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "SUPPORTED_SUBSET_HAS_GENERATION_COMPILER_AND_BROADER_DETERMINISTIC_SEMANTIC_SMOKE_NATIVE_BINDING_NOT_ENABLED",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_BLEND_WEIGHT_INDEX_SHADER_SIGNATURE_SEMANTICS_OPEN",
+    "F22_sampling_signature_saturation": "OPEN_RUNTIME_CENSUS_COVERAGE_LIMITS_REMAIN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED_AND_DESCRIPTOR_EVIDENCE_SEPARATED_FROM_SHADER_RUNTIME_PARITY"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R88 proves descriptor-level F19 input-layout semantics for the selected FVF blend-weight/index encodings only. Shader-signature/F21 semantics, native shader/input-layout binding, live D3D11 resource mirrors, GPU execution and exact-build Quest3/VDXR parity remain unproven."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36503931780,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "fixed_function_semantic_smoke_build": "PASS",
+      "fixed_function_semantic_smoke_run": "PASS",
+      "r88_input_layout_semantic_smoke_build": "PASS",
+      "r88_input_layout_semantic_smoke_run": "PASS",
+      "artifact_id": 11006706678,
+      "artifact_digest": "sha256:4364aecd8e5a7e98e5fbcfdb4d17c170a23646156cdd1d82f50834aa7ba5c6f9"
+    },
+    "build": {
+      "run_id": 36503935605,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 11006367470,
+      "binary_artifact_digest": "sha256:84a5ef0146362426c93958495bb2a1823474dc58d79d93eb2f0cfb85494879c5"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36503935574,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 11006581419,
+      "host_artifact_digest": "sha256:1d7f9fd18511d5516040d0be11a9f5c3081cde96edc2bee5eb8d0862e950e6cb"
+    },
+    "hud_inspector": {
+      "run_id": 36503935570,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "c3944ae9f09ff0ac83173466f2dd28c6058a018d",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 11007270921,
+      "artifact_digest": "sha256:dad84cd1b28e2978a9e39c333bb67a7c613b7f1fa16fff27826fc3eaa849cc16"
+    },
+    "pc_fast": {
+      "run_id": 36503931848,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5881383477,
+    "validation_comment_id": 5881452604
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. F19 descriptor-level coverage is stronger; the next bounded runtime-independent DX11 task should add hosted shader-signature/input-contract semantics for the newly supported BLENDWEIGHT/BLENDINDICES layouts or choose another open activation prerequisite. Do not combine that with native draw promotion; F21 programmable translation and exact-build Quest3/VDXR runtime parity remain separate gates.",
+  "finalized_kst": "2026-09-29T09:43:35+09:00"
+}

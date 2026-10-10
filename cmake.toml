@@ -349,7 +349,9 @@ link-libraries = [
     "Winmm.lib",
     "Setupapi.lib",
     "Crypt32.lib",
-    "d3dcompiler.lib"
+    "d3dcompiler.lib",
+    "d3d11.lib",
+    "dxgi.lib"
 ]
 
 [target.outrun2006tweaks.properties]
@@ -361,3 +363,350 @@ LIBRARY_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+
+[target.dx11_fixed_function_shader_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_input_layout_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_input_layout_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_input_signature_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_input_signature_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
+
+[target.dx11_input_layout_object_probe]
+type = "executable"
+sources = [
+    "tools/dx11_input_layout_object_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_shader_object_probe]
+type = "executable"
+sources = [
+    "tools/dx11_shader_object_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_shader_linkage_probe]
+type = "executable"
+sources = [
+    "tools/dx11_shader_linkage_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
+
+[target.dx11_constant_buffer_probe]
+type = "executable"
+sources = [
+    "tools/dx11_constant_buffer_probe.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/resource_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+# R177: keep this target in cmkr's source manifest. Editing only the generated
+# CMakeLists.txt is lost when Win32 CI regenerates the project files.
+[target.dx11_native_target_resize_probe]
+type = "executable"
+sources = [
+    "tools/dx11_native_target_resize_probe.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/resource_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+[target.dx11_native_transport_probe]
+type = "executable"
+sources = [
+    "tools/dx11_native_transport_probe.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+[target.dx11_surface_mirror_probe]
+type = "executable"
+sources = [
+    "tools/dx11_surface_mirror_probe.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib"]
+
+
+[target.dx11_triangle_fan_index_buffer_probe]
+type = "executable"
+sources = [
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_fixed_function_pipeline_probe]
+type = "executable"
+sources = [
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "src/vr/d3d11/fixed_function_pipeline.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_linear_buffer_mirror_probe]
+type = "executable"
+sources = [
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R186 is a real cmkr target, not just generated CMakeLists.txt text.
+[target.dx11_indexed_draw_probe_r186]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R187: native indexed RTV/viewport/scissor exact preflight (isolated WARP only).
+[target.dx11_viewport_draw_probe_r187]
+type = "executable"
+sources = [
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R203: exact non-indexed Draw PS SRV/sampler owner + actual WARP red/blue/red pixel proof.
+[target.dx11_textured_linear_probe_r203]
+type = "executable"
+sources = [
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R188: native indexed PS SRV/sampler ownership; isolated real WARP textured DrawIndexed.
+[target.dx11_textured_indexed_probe_r188]
+type = "executable"
+sources = [
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R202: exact native linear Draw DSV/depth state and real WARP near/far occlusion.
+[target.dx11_depth_linear_probe_r202]
+type = "executable"
+sources = [
+    "tools/dx11_depth_linear_probe_r202.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R189: separate owned DSV/depth-state native indexed Draw; real WARP depth occlusion.
+[target.dx11_depth_indexed_probe_r189]
+type = "executable"
+sources = [
+    "tools/dx11_depth_indexed_probe_r189.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R190: owned native OM alpha blend and actual WARP DrawIndexed pixel readback.
+[target.dx11_blend_indexed_probe_r190]
+type = "executable"
+sources = [
+    "tools/dx11_blend_indexed_probe_r190.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R200: non-indexed native Draw independent alpha OM ownership WARP GPU probe.
+[target.dx11_blend_linear_probe_r200]
+type = "executable"
+sources = [
+    "tools/dx11_blend_linear_probe_r200.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R191: owned immutable VS b0 generations + real WARP translated indexed pixels.
+[target.dx11_vs_constant_indexed_probe_r191]
+type = "executable"
+sources = [
+    "tools/dx11_vs_constant_indexed_probe_r191.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R192: immutable PS b0 source revision ownership + real WARP indexed color pixels.
+[target.dx11_ps_constant_indexed_probe_r192]
+type = "executable"
+sources = [
+    "tools/dx11_ps_constant_indexed_probe_r192.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R193: owned raster scissor and real WARP clipped indexed GPU pixels.
+[target.dx11_scissor_indexed_probe_r193]
+type = "executable"
+sources = [
+    "tools/dx11_scissor_indexed_probe_r193.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+
+# R201: native non-indexed Draw raster cull ownership and real WARP pixel proof.
+[target.dx11_cull_linear_probe_r201]
+type = "executable"
+sources = [
+    "tools/dx11_cull_linear_probe_r201.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R194: dormant indexed cull-mode/front-face ownership and actual WARP pixel proof.
+[target.dx11_cull_indexed_probe_r194]
+type = "executable"
+sources = [
+    "tools/dx11_cull_indexed_probe_r194.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R238 source-owned indexed UP capture, separate WARP-only draw and readback.
+[target.dx11_indexed_up_probe_r238]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_up_probe_r238.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+# R239: native indexed-UP strip winding expansion, WARP GPU test.
+[target.dx11_indexed_up_strip_probe_r239]
+type = "executable"
+sources = [
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

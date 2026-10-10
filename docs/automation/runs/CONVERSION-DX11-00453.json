@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00453",
+  "production_id": "CONVERSION-DX11-00453",
+  "event_id": "CONVERSION-DX11-00453-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R315_R276_EXACT_PRODUCER_PLAN_RECONSTRUCTION",
+  "base_sha": "f853858995109fd0f85719ff98b461be0940b08b",
+  "result_sha": "4ab89e30a37939e0fa03f671b652a41315e75f40",
+  "material_result_sha": "4ab89e30a37939e0fa03f671b652a41315e75f40",
+  "validation_bearing_sha": "4ab89e30a37939e0fa03f671b652a41315e75f40",
+  "validation_bearing_result_sha": "4ab89e30a37939e0fa03f671b652a41315e75f40",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "validation_run_id": 37717999352,
+  "validation_job_id": 113119080658,
+  "readiness_smoke_job_id": 113120547203,
+  "artifact_id": 11524876869,
+  "artifact_digest": "sha256:67b7f10b8b679c41c5ef6a112492c416ff7bc4833fd9fc6f8bb32a080841d283",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00453.json",
+  "implementation_commits": [
+    "fb298dd16e2cd59215cb133018f94c51fc386b9e",
+    "4ab89e30a37939e0fa03f671b652a41315e75f40"
+  ],
+  "issue14_comment_id": 6050950709,
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "state_persisted": true,
+  "summary": "R315 independently reconstructs native C++ R276 target semantic VS/PS hashes, FNV revision/contract identities and 64-bit translation-plan snapshot from exact ordered R271/R272/R273 source producer scalars. Forged/mutated plan/hash/ready/order evidence fails closed; diagnostic-only, no native draw activation.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact branch HEAD f8538589; task 00453 record absent; prior 00452 C6 COMPLETE. E003 chat rollover=2 is not retry; ATTEMPT=1/3, resume_reason preserved.",
+    "C1_REVIEW": "PASS: compared native_backend.cpp R276 derivation (R271 pair semantics, R268 linkage, R273 mapping handoff, source VS/PS hash, FNV literals, domain-tagged 64-bit mixer) and R275 receipt dependencies; R273 was producer-authenticated in R314, but emitted R276 scalar fields had no independent reconstruction. Rechecked Issue #13 and regression knowledge; only analyzer/tests change.",
+    "C2_IMPLEMENT": "PASS: added independent native-equivalent R276 scalar hash/snapshot recomputation and fail-closed diagnostic flags in census analyzer; new R315 positive exact-vector and negative counterfeit VS/PS/revision/contract/snapshot, source/mapping tamper, false ready, absent/duplicate R273 and forged R275 tests. No native backend Draw/DrawIndexed change.",
+    "C3_VALIDATE": "PASS: exact source SHA 4ab89e30 Backend Conversion Gate #37717999352 completed SUCCESS. Validate #113119080658 SUCCESS (source graph, activation boundary, census analyzer, Windows Win32 build, binary and artifact); readiness smoke #113120547203 SUCCESS. Artifact 11524876869 digest sha256:67b7f10b8b679c41c5ef6a112492c416ff7bc4833fd9fc6f8bb32a080841d283. Quest3/VDXR RUNTIME_VALIDATION=UNTESTED.",
+    "C4_COMMIT": "PASS: substantive source commit fb298dd and test commit 4ab89e30 contain [AUTO:CONVERSION-DX11-00453]; Issue #14 event comment 6050950709. Final branch state committed separately after successful exact-SHA gate.",
+    "C5_PACKAGE": "NOT_REQUIRED: R315 is static analyzer/test-only change, no user HMD candidate and no native draw dispatch activation; exact-SHA Win32 CI artifact retained as build proof.",
+    "C6_STATE": "PASS: full pipeline material/validation source SHA, GitHub Actions evidence, artifact digest, rollover metadata, issue14 event and next independent R275 action persisted in branch-local schema-2 record/state; runtime UNTESTED."
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37717999352,
+    "validation_job_id": 113119080658,
+    "readiness_smoke_job_id": 113120547203,
+    "artifact_id": 11524876869,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4ab89e30a37939e0fa03f671b652a41315e75f40",
+    "artifact_digest": "sha256:67b7f10b8b679c41c5ef6a112492c416ff7bc4833fd9fc6f8bb32a080841d283",
+    "issue14_comment_id": 6050950709
+  },
+  "next_action": "Investigate R275 translated-semantic receipt diagnostic binding/provenance visibility against R276 and source/object snapshot inputs; add a new independent source/tool test only when the emitted R275 scalar telemetry suffices, otherwise explicitly mark missing evidence. Keep native Draw/DrawIndexed fail closed and Quest3/VDXR UNTESTED.",
+  "recorded_at_kst": "2026-10-08T11:37:21+09:00"
+}

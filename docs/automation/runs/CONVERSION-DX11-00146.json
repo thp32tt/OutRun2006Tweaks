@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00146",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T01:52:53+09:00",
+  "base_sha": "01e24bcb85c40e62d7d876be48156f9c4017aadb",
+  "initial_result_sha": "12fb538e0f795e9c4eb329879692583ec34b7160",
+  "result_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+  "validation_bearing_result_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R146_HELPER_28460_LOOKUP_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00144 completed all three target-C outbound CALL alignment proofs and explicitly left helper 0x28460/0x28320/0x28800 semantics unresolved. The independently validated DXVK-00143 exact-EXE evidence made helper 0x28460 the smallest runnable next F13 unit; the proof was adapted to the DX11 branch's consolidated target-C alignment contract and independently revalidated.",
+  "summary": "Completed a bounded fail-closed exact-EXE proof for target-C helper 0x28460 through 0x284AF. The proven prefix splits a packed selector, guards the high word to [0x20,0x4B), masks the low word to 0xFFFF, loads the table at 0x009568B8, returns -1 through the local miss cleanup at 0x284A6, and continues at 0x284B0 for a non-null entry. Full helper/callee semantics and render/ScreenHud ownership remain unresolved. No runtime renderer, DX11 transport, OpenXR behavior or vr-d3d9ex-focus source changed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00146.json"
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00143",
+    "source_result_sha": "f70c5f8d719cf5cc4727173380e7137d3578c6c9",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE. Reused reviewed bytes and branch targets only; DX11 performed its own fail-closed analyzer/verifier and GitHub Actions validation."
+  },
+  "repair_history": {
+    "failed_result_sha": "12fb538e0f795e9c4eb329879692583ec34b7160",
+    "failure": "HUD Inspector static-exe-analysis failed with IndentationError at tools/analyze_outrun_exe.py line 1572.",
+    "repair_result_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+    "repair": "Corrected only the accidental indentation of the hud_strings summary print. Helper proof logic/evidence did not change.",
+    "attempts_consumed": "1/3"
+  },
+  "helper_28460_prefix_proof": {
+    "target_rva": "0x00028460",
+    "target_section": ".text",
+    "caller_rva": "0x00065997",
+    "caller_status": "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "caller_link_present": true,
+    "prefix_start_rva": "0x00028460",
+    "prefix_end_exclusive_rva": "0x000284B0",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "selector_high_word_range_min_inclusive": "0x20",
+    "selector_high_word_range_max_exclusive": "0x4B",
+    "selector_low_word_mask": "0xFFFF",
+    "table_base": "0x009568B8",
+    "range_fallback_rva": "0x00028588",
+    "miss_cleanup_rva": "0x000284A6",
+    "miss_return_value": -1,
+    "success_continuation_rva": "0x000284B0",
+    "status": "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN",
+    "semantic_effect": "PARTIAL_LOOKUP_PREFIX_ONLY",
+    "full_helper_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier-only exact-EXE evidence; native DX11 runtime renderer, transport and host code are unchanged.",
+    "ownership": "The proof establishes only packed-selector lookup/control flow. Full helper semantics and ScreenHud/native draw ownership remain UNRESOLVED/NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world/rank/SkyGlow/recenter/menu behavior changed.",
+    "performance": "No runtime hot path, copy, wait, cadence, draw or telemetry policy changed.",
+    "adversarial": "The proof fails closed if exact bytes drift, caller 0x65997 stops resolving to 0x28460, the caller disappears from raw inbound evidence, either high-range branch stops targeting 0x28588, miss branches stop targeting 0x284A6, or the non-null branch stops reaching 0x284B0."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "This change strengthens static provenance only and does not intersect runtime renderer risk paths or claim to fix open visual regressions."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36746613375,
+      "conclusion": "success",
+      "validated_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+      "artifact_id": 11112478286,
+      "artifact_digest": "sha256:d90d625a06fb2c456dbaf84c98596a989b3d5f5516c9c4b441a65cbe44beb53d"
+    },
+    "build": {
+      "run_id": 36746619404,
+      "conclusion": "success",
+      "validated_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+      "artifact_id": 11112483439,
+      "artifact_digest": "sha256:8e65a22bcaebf19c4a989ee6208232192be85656057d8768cb0f20153f473f48",
+      "source_snapshot_artifact_id": 11112868077,
+      "source_snapshot_artifact_digest": "sha256:69ebec05db3ec14c611944f46d86fbfdf21ec4b965f25ae6370ea6bab5495d52"
+    },
+    "hud_inspector": {
+      "run_id": 36746619682,
+      "conclusion": "success",
+      "validated_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+      "analysis_artifact_id": 11112807152,
+      "analysis_artifact_digest": "sha256:238a82262a8c4ff8f0768d6a3925c1de3c6966bfc0460afad3da717c85ef306c",
+      "game_artifact_id": 11112463377,
+      "game_artifact_digest": "sha256:422e5e15e8811b62f84ebe422ecde0acea6798b88a32166dc30128dc88b39051",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_prefix=0x00028460 status=EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN caller=0x00065997 caller_status=EXACT_PREFIX_CALL_ALIGNMENT_PROVEN caller_link=True layout_contiguous=True bytes_match=True high_range=0x20-0x4B low_mask=0xFFFF table_base=0x009568B8 range_fallback=0x00028588/0x00028588 miss_cleanup=0x000284A6 miss_return=-1 success_continuation=0x000284B0 semantic_effect=PARTIAL_LOOKUP_PREFIX_ONLY full_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36746619762,
+      "conclusion": "success",
+      "validated_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11113051195,
+      "host_artifact_digest": "sha256:01815b7d8583a5adb6a214a668570cee2b0cf6adbb0d9afcf75e3d443f3b5bce"
+    },
+    "pc_fast": {
+      "run_id": 36746613341,
+      "conclusion": "skipped",
+      "validated_sha": "68555337cf75b87a135ef72eb32a5986a775b604",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5915659414,
+    "repair_comment_id": 5915676962,
+    "validation_comment_id": 5915787918,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Final validation-bearing result commit contains exact marker [AUTO:CONVERSION-DX11-00146] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "Helper 0x28460 lookup prefix is contiguous and byte-exact through 0x284AF.",
+    "The proven prefix establishes packed selector split/range/table/miss/success-control-flow behavior only.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the final result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used."
+  ],
+  "blocker": "Full helper semantics after 0x284B0, helper callees, helpers 0x28320/0x28800, and all guarded-GF ScreenHud/render ownership remain unresolved. No ownership promotion is justified.",
+  "resume_cursor": "Set04/F13 now has target-C three-CALL alignment plus helper 0x28460 packed-selector lookup-prefix effect proven. The next bounded static unit is helper 0x28460 success path from 0x284B0, or an independent 0x28320/0x28800 helper proof.",
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. A later independent task may continue exact control-flow proof from 0x284B0 or analyze helper 0x28320/0x28800. Runtime-visible claims still require Quest 3/VDXR evidence."
+}

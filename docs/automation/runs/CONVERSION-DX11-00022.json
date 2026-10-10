@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00022",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T04:32:51+09:00",
+  "base_sha": "844ccb21f4f2de75f70fe84294ca71fbf8b26877",
+  "code_result_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+  "result_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R82 conservative F20 fixed-function translation/readiness classifier.",
+  "summary": "Added a bounded readiness classifier for R81-observed fixed-function state. It accepts only SELECTARG1/SELECTARG2/MODULATE with unmodified DIFFUSE/CURRENT/TEXTURE arguments, passthrough texcoords 0..7, disabled texture transforms, point/linear min-mag filters, none/point/linear mip filters and wrap/clamp addressing. Disabled stage chains, unsupported operations/args, generated texcoords, texture transforms, unsupported filters/addresses and active stages >=2 fail closed. Runtime census records readiness mask/active stages and ready/pending counters. No shader generation or native draw activation was added.",
+  "evidence": [
+    "CONVERSION-DX11-00020 completed all-eight-stage/sampler observation and selected a conservative F20 translation/readiness model as the next bounded action.",
+    "Current resource exactness observes source texture descriptors only on stages 0 and 1, so R82 deliberately marks active stages >=2 unsupported instead of overclaiming readiness.",
+    "Backend Conversion Gate 36472301930 PASS on exact production SHA.",
+    "Build 36472307353 PASS on exact production SHA.",
+    "OpenXR VR architecture 36472307328 PASS across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36472307624 PASS.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added FixedFunctionStageState, explicit FixedFunctionUnsupported reason bits and FixedFunctionTranslationReadiness API."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Implemented conservative fixed-function readiness classification with stage-chain, operation/argument, texcoord, transform, sampler and resource-stage fail-closed gates."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Reused shared stage state, classified R82 readiness, hashed/logged reason mask and active-stage count, and added ready/pending counters."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R82 summary/signature compatibility and fixedFunctionReadinessReady/Pending parsing; pending contributes to unsupported evidence."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R82 regression fixture for stage-2 resource-coverage fail-closed evidence."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for the readiness API, conservative supported subset, runtime use and analyzer evidence."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "MANAGED_LIFETIME_STATE_MODELED_LIVE_MIRROR_NOT_ENABLED_TEXTURE_RESOURCE_OBSERVATION_STAGES_0_1_ONLY",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "EIGHT_STAGE_OBSERVED_CONSERVATIVE_READINESS_MODELED_SHADER_EMISSION_NOT_IMPLEMENTED",
+    "F21_shader_translation_readiness": "FAIL_CLOSED_FINGERPRINTED_TRANSLATION_NOT_IMPLEMENTED",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_BY_FAIL_CLOSED_RESOURCE_LAYOUT_SHADER_AND_FFP_READINESS_GATES_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R82 is readiness classification only. It emits no fixed-function shader and active stage >=2 remains unsupported until texture resource exactness expands. Programmable F21 translation, live mirror ownership and exact-build Quest3/VDXR parity also remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36472301930,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10992177603,
+      "artifact_digest": "sha256:1eeca9ffc849be2ce5d3bef39074a41de603ac6de1484058b2d4533b5aefd9a8"
+    },
+    "build": {
+      "run_id": 36472307353,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10992332461,
+      "binary_artifact_digest": "sha256:5e87de5bd176e2c6ac695f7d00d132eabd76254fbca2898c6b5ebcb00b4488e7"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36472307328,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10991738028,
+      "host_artifact_digest": "sha256:58b97a98b1eddf2a8aa544a4f524265f4c066ccd408dfc11ee935f3ab9e0f46d"
+    },
+    "hud_inspector": {
+      "run_id": 36472307624,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "b8ae6794e1dad659fd976bdec315e2a01938e8a2",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10992132790,
+      "artifact_digest": "sha256:204e40ac8fec8036255a82cc98a9a36581f55792aa9b3e794d95f11b4b4d893b"
+    },
+    "pc_fast": {
+      "run_id": 36472301954,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5876945551,
+    "validation_comment_id": 5877036108
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. In the next bounded DX11 task, either extend texture resource exactness/descriptor observation beyond stages 0/1 so R82 can safely classify additional active fixed-function stages, or separately prototype fixed-function shader generation consuming only R82-ready states. Do not combine either task with F21 programmable shader translation. Exact-build Quest3/VDXR parity remains mandatory before native draw promotion.",
+  "finalized_kst": "2026-09-29T04:32:51+09:00"
+}

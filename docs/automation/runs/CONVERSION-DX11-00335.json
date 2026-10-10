@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00335",
+  "production_id": "CONVERSION-DX11-00335",
+  "event_id": "CONVERSION-DX11-00335-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "310b77c74cb9156ec5d205748b0bfffbf49bbf4b",
+  "result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+  "validation_bearing_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+  "result_marker": "[AUTO:CONVERSION-DX11-00335]",
+  "selected_work_item": "DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING",
+  "summary": "R231 prevents an older bootstrap probe/skip outcome in an accumulated source log from being attributed to a newer startup epoch. Historical latest bootstrap outcome remains visible, while LatestStartupBootstrapOutcomeByLog contains only outcomes observed after the latest startup.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00335.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub vr-dx11-native-r71 HEAD 310b77c74cb9156ec5d205748b0bfffbf49bbf4b. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json and VR_RUN_STATE.md. R230 source is present at HEAD and was not repeated. N100 worktree use is prohibited by queue contract; this task uses GitHub repository objects and Actions only.",
+      "resume_evidence": "Rollover resumed from authoritative GitHub material/result state without repeating completed R231 implementation or exact-SHA validation. Current dispatch is CONVERSION-DX11-00335-E002, CHAT_ROLLOVER=2, ATTEMPT=1/3; rollover is not a retry. RESUME_REASON=Retry persisted after one recovery attempt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R230 preserves probe-vs-skip order, but if an accumulated log ends with a newer startup after the latest bootstrap outcome, the historical outcome can still appear available for the current startup. The analyzer needs explicit latest-startup/outcome pairing.",
+      "review_lenses": {
+        "architecture": "Offline census analyzer/test/verifier only; no vr-d3d9ex-focus or runtime renderer modification.",
+        "ownership_lifetime": "No COM/resource/generation/fence/ACK changes.",
+        "stereo_correctness": "No WVP, HUD, projection, recenter, sky/effect or eye rendering changes.",
+        "performance": "No runtime hot-path code changes; only offline log parsing/reporting.",
+        "adversarial": "Fixture proves startupA/outcomeA/startupB is stale while startupA/outcomeA/startupB/outcomeB is current; historical outcome evidence remains separately visible."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-log latest startup/outcome line positions, LatestStartupBootstrapOutcomeByLog, missing-current-outcome logs, current coverage count/boolean, regression fixtures, and source-graph drift guards. Existing historical Bootstrap/BootstrapSkipped/LatestBootstrapOutcomeByLog and diagnostic-only activation policy are preserved."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1902 run 37165628064 completed success for 67b0793beab541d4875cac5f8981700acc03e497. validate job 111327817163 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R231 census analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11289462817. DX11 readiness smoke job 111328512673 also completed success. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "validation_bearing_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "result_marker": "[AUTO:CONVERSION-DX11-00335]",
+      "implementation_commits": [
+        "67b0793beab541d4875cac5f8981700acc03e497"
+      ],
+      "source_implementation_sha": "67b0793beab541d4875cac5f8981700acc03e497"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime package is required."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37165628064,
+      "validation_job_id": 111327817163,
+      "readiness_smoke_job_id": 111328512673,
+      "artifact_id": 11289462817,
+      "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516",
+      "implementation_comment_id": 5975067591,
+      "exact_next_action": "Preserve R225-R231 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+      "rollover_metadata_correction_comment_id": 5975101719
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00335",
+    "production_id": "CONVERSION-DX11-00335",
+    "event_id": "CONVERSION-DX11-00335-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Preserve R225-R231 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37165628064,
+      "run_number": 1902,
+      "result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "conclusion": "success",
+      "validate_job_id": 111327817163,
+      "readiness_smoke_job_id": 111328512673,
+      "artifact_id": 11289462817,
+      "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516"
+    }
+  },
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "authoritative_dispatch_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00334",
+      "event_id": "CONVERSION-DXVK-00334-E003",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00335",
+      "event_id": "CONVERSION-DX11-00335-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "reason": "The current user-supplied controller rollover is authoritative. This rollover is not a retry and does not increment ATTEMPT. Material result, validation-bearing SHA, exact-SHA Backend Conversion Gate result, artifact identity and RUNTIME_VALIDATION remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "issue14_correction_comment_id": 5975101719
+  }
+}

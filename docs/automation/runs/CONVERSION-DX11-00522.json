@@ -1,0 +1,112 @@
+{
+  "task_id": "CONVERSION-DX11-00522",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "3e231cf6cb75d7d9a8a6f59dad654a23866a2c79",
+  "result_sha": "02e95eb879b2042102f7b085e062295329f68743",
+  "material_result_sha": "02e95eb879b2042102f7b085e062295329f68743",
+  "validation_bearing_result_sha": "02e95eb879b2042102f7b085e062295329f68743",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "summary": "R225 dormant DrawIndexed full-eye target now requires exact typed DEFAULT color backing (no CPU/misc aliases), beyond an exact typed RTV. Same-device WARP typeless negative/restore added, gameplay DrawIndexed stays disabled.",
+  "evidence": {
+    "local_static": "PASS 12 scoped negative guard mutations and isolated WARP fixture/workflow wiring",
+    "warp": "PASS scoped R187 WARP build/run on exact-SHA 02e95eb8 (part of full Gate that failed later)",
+    "prior_gate_blocker": "Inherited R175 TEXCOORD6 mismatch owned by CONVERSION-DX11-00477; do not edit/bypass",
+    "first_material_sha": "17924691c1da7cc7be9aee2dfd2c0aa065f50638",
+    "first_gate": {
+      "id": 38030067509,
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_job": "DX11 readiness smoke probes",
+      "reason": "R225 probe CreateRenderTargetView third parameter passed ComPtr.Get() not GetAddressOf(): MSVC C2664"
+    },
+    "local_repair": "PASS exact one-pointer output argument correction (no gameplay C++ guard changes)",
+    "material_commit": "02e95eb879b2042102f7b085e062295329f68743",
+    "gate_run_id": 38030591044,
+    "gate_head_sha": "02e95eb879b2042102f7b085e062295329f68743",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 114150512889,
+    "validate_conclusion": "success",
+    "smoke_job_id": 114151496259,
+    "smoke_conclusion": "failure",
+    "r225_static": "success",
+    "r225_warp_build": "success",
+    "r225_warp_execute": "success",
+    "r175_failed_step": "Run DX11 constant buffer probe",
+    "r175_failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false,
+    "repair_gate": {
+      "id": 38030591044,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38030591044",
+      "head_sha": "02e95eb879b2042102f7b085e062295329f68743",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114150512889,
+      "validate": "success",
+      "smoke_job_id": 114151496259,
+      "smoke": "failure",
+      "r187_source": "success",
+      "r187_warp_build": "success",
+      "r187_warp_run": "success",
+      "failed_step": "Run DX11 constant buffer probe",
+      "failed_step_number": 85,
+      "signature": "R175_GENERIC_VARYING_MISMATCH; observed BGRA=[128,0,16,255], expected=[224,128,32,255]"
+    }
+  },
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00522-E004",
+  "work_key": "DX11:R225:INDEXED_TYPED_RTV_BACKING_RESOURCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "tools/test_dx11_viewport_draw_r187.py"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00522",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED",
+  "terminal": true,
+  "pipeline": {
+    "C0": "PASS: recovered preexisting R225 source material and existing failed first exact-SHA Gate; verified branch HEAD and owner",
+    "C1": "PASS: R225 typed RTV backing resource guard and independent R175 TEXCOORD6 ownership reviewed",
+    "C2": "PASS: material C++ typed DEFAULT backing fence, typeless WARP negative/restore and scoped mutation test in previous same TASK_ID attempt",
+    "C3": "FAIL_FULL_GATE: exact-SHA 02e95eb8 Backend Conversion Gate #38030591044; validate SUCCESS and R187 WARP build/run SUCCESS, inherited independent R175 TEXCOORD6 constant-buffer WARP FAIL",
+    "C4": "PASS_MATERIAL_COMMITTED: 17924691 initial substantive commit and 02e95eb8 exact pointer repair, both [AUTO:CONVERSION-DX11-00522]; no CI-skip on material",
+    "C5": "NOT_REQUIRED: game native DrawIndexed activation remains dormant; Quest3/VDXR runtime not tested",
+    "C6": "BLOCKED (3/3): preserve verified R225 local/CI evidence but no global PASS, no runtime promotion, park existing R175 owned mismatch"
+  },
+  "retry_count": 3,
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "tools/test_dx11_viewport_draw_r187.py"
+  ],
+  "blockers": [
+    "Inherited R175 TEXCOORD6 independent VS/PS varying WARP mismatch, owned by CONVERSION-DX11-00477: needs distinct owner/source task; no bypass",
+    "Quest3/VDXR gameplay runtime UNTESTED"
+  ],
+  "resume_cursor": "TERMINAL_BLOCKED_UPSTREAM_R175",
+  "next_action": "Controller: do not re-dispatch 00522 or add score. Reconcile independent R175 TEXCOORD6 owner CONVERSION-DX11-00477, or atomically assign a distinct nonconflicting DX11 native C++ work item with its own TASK_ID. Do not alter R175 here, do not bypass gates, do not activate native gameplay draw. DXVK frozen.",
+  "timestamp_kst": "2026-10-10T15:31:51+09:00",
+  "score_previous_confirmed": 1080,
+  "score_change": 0,
+  "score_new_confirmed": 1080,
+  "score_run_key": "CONVERSION-DX11-00522",
+  "last_real_activity_at": "2026-10-10T06:30:45Z",
+  "last_activity_evidence": "Exact SHA 02e95eb8 Backend Conversion Gate #38030591044 completed failure at unrelated inherited R175 constant-buffer probe; R187 passed",
+  "state_persisted": true
+}

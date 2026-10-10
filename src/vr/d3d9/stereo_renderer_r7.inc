@@ -16,7 +16,10 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/disasm_render_contract.hpp"
 #include "vr_shared.hpp"
+#include "vr/core/d3d9_draw_state.hpp"
+#include "vr/d3d11/runtime_census.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -73,9 +76,12 @@ namespace OutRunVRStereo
 		constexpr std::size_t SetVertexShaderVtableIndex = 92;
 		constexpr std::size_t CreateQueryVtableIndex = 118;
 		constexpr std::size_t QueryIssueVtableIndex = 6;
-		constexpr UINT OutRunWvpRegister = 64;
-		constexpr UINT OutRunWvpRegisterCount = 4;
-		constexpr std::uintptr_t OutRunProjectionRva = 0x0095D8A0u - 0x00400000u;
+		constexpr UINT OutRunWvpRegister =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegister);
+		constexpr UINT OutRunWvpRegisterCount =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegisterCount);
+		constexpr std::uintptr_t OutRunProjectionRva =
+			OutRunVR::DisasmContract::ProjectionRva;
 		constexpr float VerifiedWvpEpsilon = 1.0e-4f;
 
 		SafetyHookInline ResetHook{};
@@ -911,13 +917,35 @@ namespace OutRunVRStereo
 			if (!device) return;
 			constexpr D3DRENDERSTATETYPE states[] = {
 				D3DRS_ZENABLE, D3DRS_ZWRITEENABLE,
-				D3DRS_ALPHABLENDENABLE, D3DRS_ALPHATESTENABLE,
+				D3DRS_ALPHABLENDENABLE, D3DRS_SRCBLEND,
+				D3DRS_DESTBLEND, D3DRS_BLENDOP,
+				D3DRS_SEPARATEALPHABLENDENABLE,
+				D3DRS_SRCBLENDALPHA, D3DRS_DESTBLENDALPHA,
+				D3DRS_BLENDOPALPHA, D3DRS_ALPHATESTENABLE,
+				D3DRS_TEXTUREFACTOR,
+				D3DRS_SHADEMODE, D3DRS_VERTEXBLEND,
+				D3DRS_INDEXEDVERTEXBLENDENABLE,
 				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
-				D3DRS_STENCILENABLE, D3DRS_STENCILWRITEMASK,
+				D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+				D3DRS_COLORWRITEENABLE3,
+				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
+				D3DRS_DITHERENABLE,
+				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
+				D3DRS_MULTISAMPLEANTIALIAS,
+				D3DRS_WRAP0, D3DRS_WRAP1, D3DRS_WRAP2, D3DRS_WRAP3,
+				D3DRS_WRAP4, D3DRS_WRAP5, D3DRS_WRAP6, D3DRS_WRAP7,
+				D3DRS_POINTSIZE, D3DRS_POINTSIZE_MIN,
+				D3DRS_POINTSIZE_MAX, D3DRS_POINTSPRITEENABLE,
+				D3DRS_POINTSCALEENABLE, D3DRS_POINTSCALE_A,
+				D3DRS_POINTSCALE_B, D3DRS_POINTSCALE_C,
+				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
+				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
+				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
 				D3DRS_STENCILFAIL, D3DRS_STENCILZFAIL,
-				D3DRS_STENCILPASS, D3DRS_TWOSIDEDSTENCILMODE,
+				D3DRS_STENCILPASS, D3DRS_STENCILFUNC,
+				D3DRS_TWOSIDEDSTENCILMODE,
 				D3DRS_CCW_STENCILFAIL, D3DRS_CCW_STENCILZFAIL,
-				D3DRS_CCW_STENCILPASS
+				D3DRS_CCW_STENCILPASS, D3DRS_CCW_STENCILFUNC
 			};
 			for (const auto state : states)
 			{
@@ -1299,10 +1327,75 @@ namespace OutRunVRStereo
 			FrameHadDuplicatedDraw=true;++DuplicatedDraws;if(draw.worldStereo){if(FrameStereoPoseSequence==0){FrameStereoPoseSequence=draw.poseSequence;FrameStereoMetadata=draw.stereoFrame;}else if(FrameStereoPoseSequence!=draw.poseSequence){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);if(!FramePoseMismatchLogged){FramePoseMismatchLogged=true;++PoseSequenceMismatchFrames;spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");}}FrameHadWorldStereo=true;++WorldStereoDraws;if(!FirstWorldStereoLogged){FirstWorldStereoLogged=true;spdlog::info("VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed");}}else ++NonWorldDuplicatedDraws;if(FAILED(rightHr)){FrameRightDrawFailed=true;InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(rightFailure);}if(!restoreOk){InvalidateRightDepthStencilIfLeftMayWrite(device);NoteRestoreFailure("right-eye draw");}return leftHr;
 		}
 
-		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minVertexIndex,UINT numVertices,UINT startIndex,UINT primitiveCount){auto call=[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device,type,baseVertexIndex,minVertexIndex,numVertices,startIndex,primitiveCount);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call);}
+		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+		{
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_nonindexed_source_draw_observation(
+                        type, startVertex, primitiveCount));
+			auto call = [&]() {
+				return DrawPrimitiveHook.stdcall<HRESULT>(
+					device, type, startVertex, primitiveCount);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, INT baseVertexIndex, UINT minVertexIndex,
+			UINT numVertices, UINT startIndex, UINT primitiveCount)
+		{
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_indexed_source_draw_observation(
+                        type, baseVertexIndex, minVertexIndex, numVertices,
+                        startIndex, primitiveCount));
+			auto call = [&]() {
+				return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+					device, type, baseVertexIndex, minVertexIndex, numVertices,
+					startIndex, primitiveCount);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
+			UINT stride)
+		{
+			if (InternalStereoPass)
+				return DrawPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, primitiveCount, data, stride);
+			outrun::vr::dx11::observe_source_draw(
+                device,
+                outrun::vr::dx11::make_nonindexed_up_source_draw_observation(
+                    type, primitiveCount, stride));
+			auto call = [&]() {
+				return DrawPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, primitiveCount, data, stride);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT minVertexIndex, UINT numVertices,
+			UINT primitiveCount, const void* indexData, D3DFORMAT indexFormat,
+			const void* vertexData, UINT stride)
+		{
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_indexed_up_source_draw_observation(
+                        type, minVertexIndex, numVertices, primitiveCount,
+                        indexFormat, stride));
+			auto call = [&]() {
+				return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, minVertexIndex, numVertices, primitiveCount,
+					indexData, indexFormat, vertexData, stride);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
 
 		HRESULT __stdcall ClearDest(IDirect3DDevice9*device,DWORD count,const D3DRECT*rects,DWORD flags,D3DCOLOR color,float z,DWORD stencil)
 		{
@@ -1609,6 +1702,140 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool CaptureTrackedRenderStateSnapshot(
+		IDirect3DDevice9* device,
+		OutRunVR::DrawState::RenderStateSnapshot& out) noexcept
+	{
+		out = {};
+		if (!device || InternalStereoPass || !IsGameDevice(device))
+			return false;
+
+		bool ok = true;
+		auto read = [&](D3DRENDERSTATETYPE state, DWORD& value)
+		{
+			if (!ReadTrackedRenderState(device, state, value))
+				ok = false;
+		};
+
+		read(D3DRS_ZENABLE, out.zEnable);
+		read(D3DRS_ZWRITEENABLE, out.zWriteEnable);
+		read(D3DRS_ZFUNC, out.zFunc);
+
+		read(D3DRS_ALPHABLENDENABLE, out.alphaBlendEnable);
+		read(D3DRS_SRCBLEND, out.srcBlend);
+		read(D3DRS_DESTBLEND, out.destBlend);
+		read(D3DRS_BLENDOP, out.blendOp);
+		read(D3DRS_SEPARATEALPHABLENDENABLE, out.separateAlphaBlendEnable);
+		read(D3DRS_SRCBLENDALPHA, out.srcBlendAlpha);
+		read(D3DRS_DESTBLENDALPHA, out.destBlendAlpha);
+		read(D3DRS_BLENDOPALPHA, out.blendOpAlpha);
+
+		read(D3DRS_ALPHATESTENABLE, out.alphaTestEnable);
+		read(D3DRS_ALPHAREF, out.alphaRef);
+		read(D3DRS_ALPHAFUNC, out.alphaFunc);
+		// R191 observes the global fixed-function texture factor through the
+		// existing tracked render-state shadow; no new D3D9 hook is installed.
+		read(D3DRS_TEXTUREFACTOR, out.textureFactor);
+
+		// R162 captures SHADEMODE as part of the same tracked render-state
+		// snapshot so DX11 readiness cannot silently assume Gouraud shading.
+		read(D3DRS_SHADEMODE, out.shadeMode);
+		// R163 keeps geometry-blend state explicit for the DX11 readiness
+		// gate; the current native VS does not implement matrix palettes.
+		read(D3DRS_VERTEXBLEND, out.vertexBlend);
+		read(D3DRS_INDEXEDVERTEXBLENDENABLE, out.indexedVertexBlendEnable);
+		read(D3DRS_CULLMODE, out.cullMode);
+		read(D3DRS_FILLMODE, out.fillMode);
+		read(D3DRS_DEPTHBIAS, out.depthBiasBits);
+		read(D3DRS_SLOPESCALEDEPTHBIAS, out.slopeScaleDepthBiasBits);
+		// R165 preserves legacy dithering provenance. Native DX11 has no
+		// matching switch, so readiness must see and reject the enabled case.
+		read(D3DRS_DITHERENABLE, out.ditherEnable);
+		// R168 preserves line-raster provenance. LASTPIXEL cannot be directly
+		// represented by D3D11 and therefore remains a separate activation
+		// blocker; ANTIALIASEDLINEENABLE maps to rasterizer state below.
+		read(D3DRS_LASTPIXEL, out.lastPixel);
+		read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);
+		// R171 carries D3D9 multisample-raster intent into native translation.
+		read(D3DRS_MULTISAMPLEANTIALIAS, out.multiSampleAntialias);
+		// R169 captures the full D3D9 point-raster state family. D3D11 has no
+		// fixed-function equivalent for variable-size/scaled point sprites, so
+		// the existing direct POINTLIST readiness gate remains fail-closed.
+		read(D3DRS_POINTSIZE, out.pointSizeBits);
+		read(D3DRS_POINTSIZE_MIN, out.pointSizeMinBits);
+		read(D3DRS_POINTSIZE_MAX, out.pointSizeMaxBits);
+		read(D3DRS_POINTSPRITEENABLE, out.pointSpriteEnable);
+		read(D3DRS_POINTSCALEENABLE, out.pointScaleEnable);
+		read(D3DRS_POINTSCALE_A, out.pointScaleABits);
+		read(D3DRS_POINTSCALE_B, out.pointScaleBBits);
+		read(D3DRS_POINTSCALE_C, out.pointScaleCBits);
+		// R170 preserves all fixed-function texture-coordinate wrap masks.
+		read(D3DRS_WRAP0, out.textureCoordinateWrap[0]);
+		read(D3DRS_WRAP1, out.textureCoordinateWrap[1]);
+		read(D3DRS_WRAP2, out.textureCoordinateWrap[2]);
+		read(D3DRS_WRAP3, out.textureCoordinateWrap[3]);
+		read(D3DRS_WRAP4, out.textureCoordinateWrap[4]);
+		read(D3DRS_WRAP5, out.textureCoordinateWrap[5]);
+		read(D3DRS_WRAP6, out.textureCoordinateWrap[6]);
+		read(D3DRS_WRAP7, out.textureCoordinateWrap[7]);
+		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
+		// readiness instead of silently assuming the D3D11 default.
+		read(D3DRS_CLIPPING, out.clipping);
+		read(D3DRS_CLIPPLANEENABLE, out.clipPlaneEnable);
+		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
+		read(D3DRS_SRGBWRITEENABLE, out.sRGBWriteEnable);
+		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
+		// Preserve independent D3D9 MRT1..3 write masks for native readiness.
+		read(D3DRS_COLORWRITEENABLE1, out.additionalColorWriteEnable[0]);
+		read(D3DRS_COLORWRITEENABLE2, out.additionalColorWriteEnable[1]);
+		read(D3DRS_COLORWRITEENABLE3, out.additionalColorWriteEnable[2]);
+		read(D3DRS_STENCILENABLE, out.stencilEnable);
+		read(D3DRS_STENCILMASK, out.stencilReadMask);
+		read(D3DRS_STENCILWRITEMASK, out.stencilWriteMask);
+		read(D3DRS_STENCILREF, out.stencilRef);
+		read(D3DRS_STENCILFAIL, out.stencilFail);
+		read(D3DRS_STENCILZFAIL, out.stencilZFail);
+		read(D3DRS_STENCILPASS, out.stencilPass);
+		read(D3DRS_STENCILFUNC, out.stencilFunc);
+		read(D3DRS_TWOSIDEDSTENCILMODE, out.twoSidedStencilMode);
+		read(D3DRS_CCW_STENCILFAIL, out.ccwStencilFail);
+		read(D3DRS_CCW_STENCILZFAIL, out.ccwStencilZFail);
+		read(D3DRS_CCW_STENCILPASS, out.ccwStencilPass);
+		read(D3DRS_CCW_STENCILFUNC, out.ccwStencilFunc);
+		read(D3DRS_FOGENABLE, out.fogEnable);
+		read(D3DRS_FOGCOLOR, out.fogColor);
+		read(D3DRS_FOGTABLEMODE, out.fogTableMode);
+		read(D3DRS_FOGSTART, out.fogStartBits);
+		read(D3DRS_FOGEND, out.fogEndBits);
+		read(D3DRS_FOGDENSITY, out.fogDensityBits);
+		read(D3DRS_RANGEFOGENABLE, out.rangeFogEnable);
+		read(D3DRS_FOGVERTEXMODE, out.fogVertexMode);
+		read(D3DRS_LIGHTING, out.lighting);
+		// R202 preserves the post-texture specular-add render state for the
+		// dormant DX11 exactness gate.
+		read(D3DRS_SPECULARENABLE, out.specularEnable);
+
+		// R124 keeps output-state completeness separate from the historical
+		// render-state completeness bit so passive census behavior does not
+		// regress when one dynamic-output query is unavailable.
+		bool outputOk = true;
+		auto readOutput = [&](D3DRENDERSTATETYPE state, DWORD& value)
+		{
+			if (!ReadTrackedRenderState(device, state, value))
+				outputOk = false;
+		};
+		readOutput(D3DRS_BLENDFACTOR, out.blendFactor);
+		readOutput(D3DRS_MULTISAMPLEMASK, out.multiSampleMask);
+		if (FAILED(device->GetViewport(&out.viewport)))
+			outputOk = false;
+		if (FAILED(device->GetScissorRect(&out.scissorRect)))
+			outputOk = false;
+
+		out.complete = ok;
+		out.outputStateComplete = outputOk;
+		return ok;
 	}
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept

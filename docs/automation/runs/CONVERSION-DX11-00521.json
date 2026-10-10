@@ -1,0 +1,85 @@
+{
+  "task_id": "CONVERSION-DX11-00521",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "3d0c3186c04297d82ce6572250f82d27d7153a3d",
+  "result_sha": "4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+  "material_result_sha": "4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+  "validation_bearing_result_sha": "4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "summary": "R224 typed linear RTV must bind exact typed DEFAULT color texture, rejecting typeless backing and CPU/misc alias flags. Same-device WARP negative/restore added; game Draw remains dormant.",
+  "evidence": {
+    "local_static": "PASS focused guards/negative mutants/fixture check",
+    "warp": "PASS exact-SHA Gate #38029104420 R199 source-contract step and native linear VB/IB R183 WARP build/run; R224 WARP typeless negative and restoration included.",
+    "prior_gate_blocker": "R175 TEXCOORD6 varying mismatch is owned by 00477",
+    "controller_claim": "41432628475f73e72399e8d074545470bdb61cd0",
+    "material_commit": "4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+    "gate_run_id": 38029104420,
+    "gate_head_sha": "4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 114146107647,
+    "validate_conclusion": "success",
+    "smoke_job_id": 114147007397,
+    "smoke_conclusion": "failure",
+    "r224_static": "success",
+    "r224_warp_build": "success",
+    "r224_warp_execute": "success",
+    "r175_failed_step": "Run DX11 constant buffer probe",
+    "r175_failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_owner_task": "CONVERSION-DX11-00477",
+    "hmd_test_performed": false,
+    "native_gameplay_activation": false
+  },
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00521-E001",
+  "work_key": "DX11:R224:LINEAR_TYPED_RTV_TYPELESS_RESOURCE_REJECTION",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_target_r199.py"
+  ],
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00521",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "terminal": false,
+  "pipeline": {
+    "C0": "PASS remote claim 41432628475 and exact parent 3d0c3186",
+    "C1": "PASS identified typed RTV over typeless resource owner gap; disjoint from R175/R223",
+    "C2": "PASS coherent 3-file C++/real WARP/source mutation test batch",
+    "C3": "SCOPED_PASS R224 R199 source + R183 WARP; full exact-SHA Gate 38029104420 FAIL inherited R175",
+    "C4": "PASS material 4c89afe5954b95e1ec24fe2ac5a529476f5d1b0a",
+    "C5": "NOT_REQUIRED dormant/native gameplay activation OFF",
+    "C6": "PASS durable record seals scoped R224 validation / independent R175 full-Gate failure / runtime UNTESTED"
+  },
+  "timestamp_kst": "2026-10-10T15:05:37+09:00",
+  "retry_count": 0,
+  "score_previous_confirmed": 1078,
+  "score_change": 0,
+  "score_new_confirmed": 1078,
+  "score_run_key": "CONVERSION-DX11-00521",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_linear_target_r199.py"
+  ],
+  "blockers": [
+    "Exact-SHA Backend Conversion Gate 38029104420 failed solely at independently owned R175 TEXCOORD6 varying constant-buffer smoke: observed BGRA [128,0,16,255] versus expected [224,128,32,255].",
+    "R175 tools/dx11_constant_buffer_probe.cpp owned by CONVERSION-DX11-00477; no bypass or duplicate source edit under 00521.",
+    "Quest 3 / VDXR runtime not tested; native game Draw remains dormant."
+  ],
+  "resume_cursor": "WAIT_INDEPENDENT_R175_OWNER_RESOLUTION",
+  "next_action": "Keep R224 material SHA 4c89afe5 as scoped-PASS/full-Gate-FAIL; repair R175 only by authorized owner or fenced takeover; then validate a NEW distinct material SHA, never rerun unchanged 00521 solely to rescore."
+}

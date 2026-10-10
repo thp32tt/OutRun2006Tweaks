@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00273",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "fdf3797a52341f0b48dba26902eaa1a71da453f4",
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "selected_work": "DX11_BOUNDED_SOURCE_REVIEW_RESUME",
+  "summary": "Continued from CONVERSION-DX11-00272 checkpoint. Verified GitHub branch access and preserved DX11 scope guards. No runtime validation claimed.",
+  "changed_paths": [
+    "docs/automation/runs/CONVERSION-DX11-00273.json"
+  ],
+  "scope_guards": {
+    "vr_d3d9ex_focus_modified": false,
+    "dxvk_lane_modified": false,
+    "native_draw_activation_changed": false
+  },
+  "validation": {
+    "github_recovery": "PASS",
+    "automation_gate": "PENDING"
+  },
+  "checkpoint": "C1_RESUME",
+  "status": "IN_PROGRESS"
+}

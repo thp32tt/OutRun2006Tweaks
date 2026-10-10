@@ -1,0 +1,10 @@
+{
+  "SchemaVersion": 1,
+  "RendererTarget": "dx11-native",
+  "LaunchBackend": "dx11",
+  "Stage": "R237-runtime-evidence-cadence-first-programmable-shader-native-draw-dormant",
+  "NativeDrawPathActive": false,
+  "VariantId": "R69_FIXPACK",
+  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md",
+  "DevelopmentBranch": "vr-dx11-native-r71"
+}

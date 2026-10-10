@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00102",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T09:00:36+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "0a4b27cc990ddc985504101ad351b3e89b39b65f",
+  "initial_result_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+  "result_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+  "validation_bearing_result_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13 R124 bounded live adoption of the shared producer map for the three exact DispGearPosition/REV HUD callsites 0xB9096, 0xB90B3 and 0xB90F6.",
+  "summary": "R124 preserves the existing left-side sprite-spacing correction at all three DispGearPosition/REV mid-hook sites while replacing the remaining generic spacing-only callback with exact caller-RVA templates. Each template derives immediate next-draw ScreenHud ownership from GameSemantic::ClassifyCriticalProducer(CallerRva) and compile-time requires the canonical shared producer map. The three RVAs are already classified consistently as DispGearPosition/SCREEN_HUD by disasm_render_contract.hpp, analyze_outrun_exe.py and hud_semantics.hpp. No producer range was widened.",
+  "source_commits": [
+    "b9c6027fb2a68ecc107be2ea966e5b1384aecd29"
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_range_widened": false,
+    "affected_producer_family": "DispGearPosition exact callsites 0xB9096/0xB90B3/0xB90F6 only",
+    "option_arrow_changed": false,
+    "text_glyph_changed": false,
+    "disp_rank_sprani_0xB9DA6_changed": false,
+    "generic_put_scroll_AdjustPositionLeft_removed": true
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "src/hooks_uiscaling.cpp and render_semantics.hpp are protected runtime-risk paths. This change does not widen SCREEN_HUD ownership, change D3D state heuristics, or activate native draw routing; it converts only three already-canonical HUD callsites. Prior R51 runtime evidence still shows producer ownership can arrive too late for the c64/WVP boundary, so hosted CI cannot establish visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36647607274,
+      "conclusion": "success",
+      "validated_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+      "artifact_id": 11069600920,
+      "artifact_digest": "sha256:1b5534e7dd5df2c31d8468fe6083d1ef00bccb76b07cb6b3f8e919de24eab0c3",
+      "evidence": "Queue/baseline/one-click checks PASS; R124 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36647611884,
+      "conclusion": "success",
+      "validated_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+      "evidence": "Generic Win32 build, built wheel/VR payload verification, binary upload and source snapshot upload PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36647611911,
+      "conclusion": "success",
+      "validated_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36647611941,
+      "conclusion": "success",
+      "validated_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36647607404,
+      "conclusion": "skipped",
+      "validated_sha": "b9c6027fb2a68ecc107be2ea966e5b1384aecd29"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5901295234,
+    "validation_comment_id": 5901358418,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00102] and contains no CI-skip directive.",
+    "0xB9096, 0xB90B3 and 0xB90F6 all lie inside canonical DispGearPosition SCREEN_HUD range 0xB9000-0xB9200.",
+    "The shared producer map, analyzer and hud_semantics catalog agree on that range.",
+    "The R124 callback templates compile-time require ScreenHud and the verifier rejects reintroduction of the removed generic put_scroll_AdjustPositionLeft path.",
+    "No producer range was widened and no unrelated producer family was converted.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and OpenXR 6/6 pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R124 is automation-validated but runtime-untested. TimeAttack, DispRank clip, GoalTime, C2CTestSlipstream, C2CDontLoseGF and DispGearPosition exact families now consume the shared producer map at runtime. Set04/F13 remains partially open.",
+  "next_action": "Continue Set04/F13 with another independently proven canonical producer family. GhostGap is the next bounded candidate, but it spans multiple spacing/position helpers and should be split if needed. Do not widen producer ranges for OptionArrow/TextGlyph/DispRank sprani without separate disassembly provenance. Do not claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

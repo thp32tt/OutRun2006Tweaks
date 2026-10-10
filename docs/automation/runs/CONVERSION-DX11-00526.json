@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00526",
+  "production_id": "CONVERSION-DX11-00526",
+  "event_id": "CONVERSION-DX11-00526-E003",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "0de08549888cf36ba5ccdd3e29d5ab220167f742",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00526",
+  "lease_epoch": 1,
+  "work_key": "DX11:R229:INDEXED_GPU_PREDICATION_EXECUTION_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_predication_r229.py"
+  ],
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
+  "terminal": true,
+  "result_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+  "material_result_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+  "validation_bearing_result_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R229 live D3D11 GPU predication fence for owned indexed sole-eye DrawIndexed readiness; both predicate polarities rejected and WARP GPU pixel restored. No game draw activation.",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_predication_r229.py",
+    "docs/automation/runs/CONVERSION-DX11-00526.json",
+    "tools/test_dx11_indexed_uav_eye_r219.py"
+  ],
+  "static_validation": "PASS_R219_10_AND_R229_4_SOURCE_MUTANTS_AND_11_WARP_MARKERS",
+  "pipeline": {
+    "C0": "PASS branch HEAD, controller checkpoint, run record and prior failed Gate recovered; no duplicate work",
+    "C1": "PASS R229 predication and independently owned R175 classified",
+    "C2": "PASS original R229 C++ and WARP/source mutant implementation 7260cc78; R219 static false positive focused repair a52c0a59",
+    "C3": "SCOPED_PASS exact SHA a52c0a59 Win32 validate + R219/R229 static + real R186 WARP DrawIndexed; FULL_GATE_FAIL existing R175 independent constant-buffer probe",
+    "C4": "PASS source material 7260cc78 and focused verifier repair a52c0a59 with [AUTO:CONVERSION-DX11-00526], no CI-skip",
+    "C5": "NOT_REQUIRED game-native DrawIndexed remains dormant; no HMD package",
+    "C6": "BLOCKED_DEPENDENCY_R175 full Gate not PASS; preserve a52c0a59 validation-bearing SHA; HMD UNTESTED; score +0"
+  },
+  "blockers": [
+    "Full Backend Conversion Gate exact SHA a52c0a59 run 38036279467 FAILED only at inherited R175 TEXCOORD6 native constant-buffer GPU pixel mismatch; independent owner CONVERSION-DX11-00477, do not bypass.",
+    "Quest3/VDXR not tested; backend native game DrawIndexed activation remains dormant."
+  ],
+  "next_action": "No rerun of 00526 and no score; fix independently owned R175 via fenced existing owner before full Gate can PASS. Select only next distinct native DX11 work_key after release.",
+  "timestamp_kst": "2026-10-10 17:09 KST",
+  "event_type": "retry",
+  "scoped_automation_validation": "PASS_R219_R229_R186_SOURCE_WARP_WIN32",
+  "repair_commits": 1,
+  "gate_repair_count": 1,
+  "retry_count": 1,
+  "known_blocker": "R175 TEXCOORD6 independent WARP VS/PS varying control [128,0,16,255] != [224,128,32,255] in tools/dx11_constant_buffer_probe.cpp; owner CONVERSION-DX11-00477, no modification here.",
+  "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER",
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00526",
+  "last_real_activity_at": "2026-10-10T08:08:58Z",
+  "last_activity_evidence": "GitHub Backend Conversion Gate 38036279467 validate SUCCESS; R219/R229 static and R186 real WARP DrawIndexed SUCCESS; R175 constant-buffer FAIL",
+  "evidence": {
+    "initial_material_sha": "7260cc7800c9caf423aca9b8138cc6b099c2fd98",
+    "initial_run": {
+      "id": 38035740763,
+      "head_sha": "7260cc7800c9caf423aca9b8138cc6b099c2fd98",
+      "conclusion": "failure",
+      "failed_step": "Verify R219 indexed OM UAV isolation",
+      "error": "R219 negative mutant escaped due R229 composed caller false duplicate"
+    },
+    "focused_repair_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+    "final_gate": {
+      "id": 38036279467,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38036279467",
+      "head_sha": "a52c0a598a50abf653ef10f763a8a02290a07e88",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114167257053,
+      "validate": "success",
+      "smoke_job_id": 114168251035,
+      "smoke": "failure",
+      "r219_static": "success",
+      "r229_static": "success",
+      "r186_native_ownership": "success",
+      "r186_warp_build": "success",
+      "r186_warp_run": "success",
+      "failed_step": "Run DX11 constant buffer probe",
+      "failure_classification": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "runtime": "UNTESTED"
+  },
+  "score_reference": "Current AI2 cumulative score is maintained exclusively in thp32tt/ai-dev-lab/AI_SCOREBOARD.md; this blocked retry awards +0 and does not freeze a cross-lane concurrent score snapshot."
+}

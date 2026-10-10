@@ -12,6 +12,8 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include "vr/d3d11/runtime_census.hpp"
+#include "vr/d3d11/live_game_frame_bridge.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -66,13 +68,25 @@ namespace OutRunVRStereo
         // Observe the game's own Lock/Unlock writes instead and keep the exact
         // CPU byte ranges that are known current. Draw then consumes only this
         // shadow and fails open to R29 when a range was never observed.
+        constexpr std::size_t R30CreateTextureVtableIndex = 23;
         constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
+        constexpr std::size_t R30UpdateSurfaceVtableIndex = 30;
+        constexpr std::size_t R30UpdateTextureVtableIndex = 31;
         constexpr std::size_t R30BufferReleaseVtableIndex = 2;
+        constexpr std::size_t R30TextureReleaseVtableIndex = 2;
         constexpr std::size_t R30BufferLockVtableIndex = 11;
         constexpr std::size_t R30BufferUnlockVtableIndex = 12;
+        constexpr std::size_t R30TextureLockRectVtableIndex = 19;
+        constexpr std::size_t R30TextureUnlockRectVtableIndex = 20;
         constexpr UINT R30MaxShadowBytes = 16u * 1024u * 1024u;
 
+        SafetyHookInline R30CreateTextureHook{};
+        SafetyHookInline R30UpdateSurfaceHook{};
+        SafetyHookInline R30UpdateTextureHook{};
+        SafetyHookInline R30TextureReleaseHook{};
+        SafetyHookInline R30TextureLockRectHook{};
+        SafetyHookInline R30TextureUnlockRectHook{};
         SafetyHookInline R30CreateVertexBufferHook{};
         SafetyHookInline R30CreateIndexBufferHook{};
         SafetyHookInline R30VertexBufferReleaseHook{};
@@ -372,8 +386,12 @@ namespace OutRunVRStereo
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data)
+            {
+                outrun::vr::dx11::observe_vertex_buffer_lock(
+                    buffer, offset, size, flags);
                 R30BeginObservedLock(
                     R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -387,6 +405,7 @@ namespace OutRunVRStereo
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
                 R30VertexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            outrun::vr::dx11::observe_vertex_buffer_unlock(buffer, hr);
             if (FAILED(hr) && entry)
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
@@ -402,6 +421,7 @@ namespace OutRunVRStereo
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
             if (refs == 0)
             {
+                outrun::vr::dx11::forget_vertex_buffer_mutation(buffer);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 R30VertexShadows.erase(buffer);
             }
@@ -415,8 +435,12 @@ namespace OutRunVRStereo
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data)
+            {
+                outrun::vr::dx11::observe_index_buffer_lock(
+                    buffer, offset, size, flags);
                 R30BeginObservedLock(
                     R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -428,6 +452,7 @@ namespace OutRunVRStereo
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
                 R30IndexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            outrun::vr::dx11::observe_index_buffer_unlock(buffer, hr);
             if (FAILED(hr) && entry)
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
@@ -443,10 +468,73 @@ namespace OutRunVRStereo
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
             if (refs == 0)
             {
+                outrun::vr::dx11::forget_index_buffer_mutation(buffer);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 R30IndexShadows.erase(buffer);
             }
             return refs;
+        }
+
+        ULONG __stdcall R30TextureReleaseDest(
+            IDirect3DTexture9* texture)
+        {
+            const ULONG refs =
+                R30TextureReleaseHook.stdcall<ULONG>(texture);
+            if (refs == 0)
+                outrun::vr::dx11::forget_texture_mutation(texture);
+            return refs;
+        }
+
+        HRESULT __stdcall R30TextureLockRectDest(
+            IDirect3DTexture9* texture, UINT level,
+            D3DLOCKED_RECT* lockedRect, const RECT* rect, DWORD flags)
+        {
+            const HRESULT hr = R30TextureLockRectHook.stdcall<HRESULT>(
+                texture, level, lockedRect, rect, flags);
+            if (SUCCEEDED(hr) && lockedRect && lockedRect->pBits)
+            {
+                outrun::vr::dx11::observe_texture_lock_rect(
+                    texture, level, flags);
+                outrun::vr::dx11::observe_managed_texture_lock_rect(
+                    texture, level, *lockedRect, rect, flags);
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall R30TextureUnlockRectDest(
+            IDirect3DTexture9* texture, UINT level)
+        {
+            outrun::vr::dx11::stage_managed_texture_unlock_rect(
+                texture, level);
+            const HRESULT hr =
+                R30TextureUnlockRectHook.stdcall<HRESULT>(texture, level);
+            outrun::vr::dx11::finish_managed_texture_unlock_rect(
+                texture, level, hr);
+            outrun::vr::dx11::observe_texture_unlock_rect(
+                texture, level, hr);
+            return hr;
+        }
+
+        bool R30EnsureTextureMutationHooks(IDirect3DTexture9* texture)
+        {
+            if (!texture)
+                return false;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            auto** vtable = *reinterpret_cast<void***>(texture);
+            if (!R30TextureReleaseHook)
+                R30TextureReleaseHook = safetyhook::create_inline(
+                    vtable[R30TextureReleaseVtableIndex],
+                    R30TextureReleaseDest);
+            if (!R30TextureLockRectHook)
+                R30TextureLockRectHook = safetyhook::create_inline(
+                    vtable[R30TextureLockRectVtableIndex],
+                    R30TextureLockRectDest);
+            if (!R30TextureUnlockRectHook)
+                R30TextureUnlockRectHook = safetyhook::create_inline(
+                    vtable[R30TextureUnlockRectVtableIndex],
+                    R30TextureUnlockRectDest);
+            return R30TextureReleaseHook &&
+                R30TextureLockRectHook && R30TextureUnlockRectHook;
         }
 
         bool R30EnsureVertexBufferHooks(IDirect3DVertexBuffer9* buffer)
@@ -493,6 +581,42 @@ namespace OutRunVRStereo
                 R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
         }
 
+        HRESULT __stdcall R30CreateTextureDest(
+            IDirect3DDevice9* device, UINT width, UINT height, UINT levels,
+            DWORD usage, D3DFORMAT format, D3DPOOL pool,
+            IDirect3DTexture9** out, HANDLE* shared)
+        {
+            const HRESULT hr = R30CreateTextureHook.stdcall<HRESULT>(
+                device, width, height, levels, usage, format, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+                R30EnsureTextureMutationHooks(*out);
+            return hr;
+        }
+
+        HRESULT __stdcall R30UpdateSurfaceDest(
+            IDirect3DDevice9* device,
+            IDirect3DSurface9* source, const RECT* sourceRect,
+            IDirect3DSurface9* destination, const POINT* destinationPoint)
+        {
+            const HRESULT hr = R30UpdateSurfaceHook.stdcall<HRESULT>(
+                device, source, sourceRect, destination, destinationPoint);
+            outrun::vr::dx11::observe_update_surface(
+                source, destination, hr);
+            return hr;
+        }
+
+        HRESULT __stdcall R30UpdateTextureDest(
+            IDirect3DDevice9* device,
+            IDirect3DBaseTexture9* source,
+            IDirect3DBaseTexture9* destination)
+        {
+            const HRESULT hr = R30UpdateTextureHook.stdcall<HRESULT>(
+                device, source, destination);
+            outrun::vr::dx11::observe_update_texture(
+                source, destination, hr);
+            return hr;
+        }
+
         HRESULT __stdcall R30CreateVertexBufferDest(
             IDirect3DDevice9* device, UINT length, DWORD usage, DWORD fvf,
             D3DPOOL pool, IDirect3DVertexBuffer9** out, HANDLE* shared)
@@ -527,6 +651,18 @@ namespace OutRunVRStereo
             if (!device)
                 return;
             auto** vtable = *reinterpret_cast<void***>(device);
+            if (!R30CreateTextureHook)
+                R30CreateTextureHook = safetyhook::create_inline(
+                    vtable[R30CreateTextureVtableIndex],
+                    R30CreateTextureDest);
+            if (!R30UpdateSurfaceHook)
+                R30UpdateSurfaceHook = safetyhook::create_inline(
+                    vtable[R30UpdateSurfaceVtableIndex],
+                    R30UpdateSurfaceDest);
+            if (!R30UpdateTextureHook)
+                R30UpdateTextureHook = safetyhook::create_inline(
+                    vtable[R30UpdateTextureVtableIndex],
+                    R30UpdateTextureDest);
             if (!R30CreateVertexBufferHook)
                 R30CreateVertexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateVertexBufferVtableIndex],
@@ -535,9 +671,11 @@ namespace OutRunVRStereo
                 R30CreateIndexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateIndexBufferVtableIndex],
                     R30CreateIndexBufferDest);
-            if (!R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
+            if (!R30CreateTextureHook || !R30UpdateSurfaceHook ||
+                !R30UpdateTextureHook ||
+                !R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
                 spdlog::warn(
-                    "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
+                    "VR R30.6 RESOURCE OBSERVER: buffer/texture creation or update hook incomplete; DX11 census remains fail-closed");
         }
 
         void R30RollbackBufferShadowHooks() noexcept
@@ -546,6 +684,12 @@ namespace OutRunVRStereo
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
             // shadow object.
+            R30UpdateTextureHook = {};
+            R30UpdateSurfaceHook = {};
+            R30CreateTextureHook = {};
+            R30TextureUnlockRectHook = {};
+            R30TextureLockRectHook = {};
+            R30TextureReleaseHook = {};
             R30CreateIndexBufferHook = {};
             R30CreateVertexBufferHook = {};
             R30IndexBufferUnlockHook = {};
@@ -560,6 +704,7 @@ namespace OutRunVRStereo
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
             }
+            outrun::vr::dx11::clear_managed_texture_shadows();
         }
 
 
@@ -1083,6 +1228,7 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);
             }
+            outrun::vr::dx11::live_game_frame::before_game_present(device);
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
@@ -1092,14 +1238,19 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+            outrun::vr::dx11::live_game_frame::before_game_reset();
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
-            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr =
+                R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            outrun::vr::dx11::observe_device_reset_generation(hr);
+            return hr;
         }
 
-        // User-adjustable projection-space HUD scale. The per-eye FOV affine
-        // remains automatic; this value is only a common-centre size trim after
-        // the headset-specific mapping.
+        // Optional final VR HUD size trim. hooks_uiscaling.cpp already owns the
+        // canonical 640x480 -> game-canvas layout; production default 1.0
+        // preserves those positions before world-lock/per-eye projection.
+        // Values below 1.0 are explicit user overrides that shrink about centre.
         float R30HudScaleValue() noexcept
         {
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
@@ -1190,26 +1341,16 @@ namespace OutRunVRStereo
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
         {
+            (void)stereo;
             const float userScale = R30HudScaleValue();
-            const float sourceOverTarget =
-                R30HudAspectCompensation(stereo);
 
-            // "Contain" the original desktop HUD canvas inside one eye before
-            // applying the user scale. The old "cover" mapping multiplied X by
-            // source/target aspect; on 3440x1440 -> Quest eye targets that could
-            // make HudScale=0.55 wider than the visible eye and push rank/time
-            // elements off-screen. Contain preserves sprite pixel aspect while
-            // guaranteeing the whole common-centre HUD stays inside the eye.
-            if (sourceOverTarget >= 1.0f)
-            {
-                scaleX = userScale;
-                scaleY = userScale / sourceOverTarget;
-            }
-            else
-            {
-                scaleX = userScale * sourceOverTarget;
-                scaleY = userScale;
-            }
+            // The game's UI Scaling hook has already resolved the canonical
+            // 640x480 layout into the active game canvas. Do not "contain" it
+            // again against the per-eye OpenXR pixel aspect: that second aspect
+            // transform changes menu/HUD placement and sprite proportions.
+            // World-lock and asymmetric eye projection happen after this point.
+            scaleX = userScale;
+            scaleY = userScale;
         }
 
         bool R30TransformHudScissor(
@@ -2976,9 +3117,163 @@ namespace OutRunVRStereo
             return r29Draw();
         }
 
+
+        // DX11:FIRST_GAME_DRAW_FRAME. Called at the real game-authored R30
+        // entrypoints (before stereo replay). All game draws still execute on
+        // the original D3D9 pipeline, regardless of native diagnostic success.
+        void R30ObserveNativeLinearVB(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, UINT firstVertex,
+            UINT primitiveCount) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST ||
+                !primitiveCount || primitiveCount > 512) return;
+            try {
+                IDirect3DVertexBuffer9* vb = nullptr;
+                UINT offset=0, stride=0;
+                if (FAILED(device->GetStreamSource(0, &vb, &offset, &stride)) ||
+                    !vb || stride < 20 || stride > 512) {
+                    if (vb) vb->Release();
+                    return;
+                }
+                const std::uint64_t firstByte =
+                    static_cast<std::uint64_t>(offset) +
+                    static_cast<std::uint64_t>(firstVertex) * stride;
+                const std::uint64_t byteCount =
+                    static_cast<std::uint64_t>(primitiveCount)*3u*stride;
+                D3DVERTEXBUFFER_DESC desc{};
+                std::vector<std::uint8_t> bytes;
+                const bool valid =
+                    SUCCEEDED(vb->GetDesc(&desc)) && firstByte <= desc.Size &&
+                    byteCount <= desc.Size-firstByte && firstByte <= UINT_MAX &&
+                    byteCount <= UINT_MAX &&
+                    R30CopyVertexShadow(vb, static_cast<UINT>(firstByte),
+                                        static_cast<UINT>(byteCount), bytes);
+                vb->Release();
+                if (valid) live::observe_linear(device, topology,
+                                primitiveCount, bytes.data(), stride);
+            } catch (...) { /* Native diagnostic must never alter game HRESULT. */ }
+        }
+
+        void R30ObserveNativeIndexedVB(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, INT baseVertex,
+            UINT minVertex, UINT numVertices, UINT startIndex,
+            UINT primitiveCount) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST || !primitiveCount ||
+                primitiveCount > 512 || !numVertices) return;
+            try {
+                IDirect3DVertexBuffer9* vb = nullptr;
+                IDirect3DIndexBuffer9* ib = nullptr;
+                UINT streamOffset=0, stride=0;
+                if (FAILED(device->GetStreamSource(
+                        0, &vb, &streamOffset, &stride)) || !vb ||
+                    FAILED(device->GetIndices(&ib)) || !ib ||
+                    stride < 20 || stride > 512) {
+                    if (ib) ib->Release();
+                    if (vb) vb->Release();
+                    return;
+                }
+                D3DVERTEXBUFFER_DESC vDesc{};
+                D3DINDEXBUFFER_DESC iDesc{};
+                // Format comes from the live index owner, never from a probe.
+                bool ok = SUCCEEDED(ib->GetDesc(&iDesc)) &&
+                    SUCCEEDED(vb->GetDesc(&vDesc)) &&
+                    (iDesc.Format == D3DFMT_INDEX16 ||
+                     iDesc.Format == D3DFMT_INDEX32);
+                const UINT indexSize = iDesc.Format == D3DFMT_INDEX16 ? 2u : 4u;
+                const UINT count = primitiveCount*3u;
+                const std::uint64_t start =
+                    static_cast<std::uint64_t>(startIndex)*indexSize;
+                const std::uint64_t bytesCount =
+                    static_cast<std::uint64_t>(count)*indexSize;
+                ok = ok && start <= iDesc.Size && bytesCount <= iDesc.Size-start &&
+                    start <= UINT_MAX && bytesCount <= UINT_MAX;
+                std::vector<std::uint8_t> sourceIndices;
+                if (ok) ok = R30CopyIndexShadow(ib, static_cast<UINT>(start),
+                              static_cast<UINT>(bytesCount), sourceIndices);
+                if (!ok) { ib->Release(); vb->Release(); return; }
+                std::vector<std::uint32_t> indices(count);
+                std::uint64_t low = UINT64_MAX, high = 0;
+                const std::uint64_t declaredEnd =
+                    static_cast<std::uint64_t>(minVertex) + numVertices;
+                for (UINT n=0; n<count; ++n) {
+                    std::uint32_t idx=0;
+                    const auto* pos = sourceIndices.data() +
+                        static_cast<std::size_t>(n)*indexSize;
+                    if (indexSize == 2u) {
+                        std::uint16_t shortIndex=0;
+                        std::memcpy(&shortIndex, pos, 2);
+                        idx = shortIndex;
+                    } else std::memcpy(&idx, pos, 4);
+                    const std::int64_t physical =
+                        static_cast<std::int64_t>(baseVertex)+idx;
+                    if (idx < minVertex || idx >= declaredEnd ||
+                        physical < 0 || physical > UINT_MAX) {
+                        ok = false; break;
+                    }
+                    indices[n] = static_cast<std::uint32_t>(physical);
+                    low = std::min(low, static_cast<std::uint64_t>(physical));
+                    high = std::max(high, static_cast<std::uint64_t>(physical));
+                }
+                std::vector<std::uint8_t> vertices;
+                if (ok && high >= low && high-low+1u <= 1536u) {
+                    const std::uint64_t first =
+                        static_cast<std::uint64_t>(streamOffset)+low*stride;
+                    const std::uint64_t vertexBytes=(high-low+1u)*stride;
+                    ok = first <= vDesc.Size &&
+                         vertexBytes <= vDesc.Size-first &&
+                         first <= UINT_MAX && vertexBytes <= UINT_MAX &&
+                         R30CopyVertexShadow(vb, static_cast<UINT>(first),
+                                             static_cast<UINT>(vertexBytes), vertices);
+                    if (ok) for (auto& i : indices)
+                        i -= static_cast<std::uint32_t>(low);
+                } else ok = false;
+                ib->Release();
+                vb->Release();
+                if (ok) live::observe_indexed(device, topology, primitiveCount,
+                    vertices.data(), stride, static_cast<UINT>(high-low+1u),
+                    indices.data(), count);
+            } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
+        }
+
+        void R30ObserveNativeIndexedUP(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, UINT minVertex, UINT numVertices,
+            UINT primitiveCount, const void* indices, D3DFORMAT format,
+            const void* vertices, UINT stride) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST || minVertex != 0 ||
+                !numVertices || numVertices > 1536 ||
+                !primitiveCount || primitiveCount > 512 ||
+                !indices || !vertices || stride < 20 || stride > 512 ||
+                (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
+                return;
+            try {
+                const UINT count=primitiveCount*3u;
+                std::vector<std::uint32_t> unpacked(count);
+                const UINT unit=format == D3DFMT_INDEX16 ? 2u : 4u;
+                for (UINT i=0; i<count; ++i) {
+                    const auto* p=static_cast<const std::uint8_t*>(indices)+
+                        static_cast<std::size_t>(i)*unit;
+                    if (unit == 2) {
+                        std::uint16_t x=0; std::memcpy(&x,p,2); unpacked[i]=x;
+                    } else std::memcpy(&unpacked[i],p,4);
+                    if (unpacked[i] >= numVertices) return;
+                }
+                live::observe_indexed(device, topology, primitiveCount,
+                    vertices, stride, numVertices, unpacked.data(), count);
+            } catch (...) { /* Original UP path remains authoritative. */ }
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R30ObserveNativeLinearVB(device, type, startVertex, primitiveCount);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -3001,6 +3296,8 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R30ObserveNativeIndexedVB(device, type, baseVertexIndex,
+                minVertexIndex, numVertices, startIndex, primitiveCount);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3025,6 +3322,9 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled())
+                outrun::vr::dx11::live_game_frame::observe_linear(
+                    device, type, primitiveCount, data, stride);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -3048,6 +3348,8 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R30ObserveNativeIndexedUP(device, type, minVertexIndex, numVertices,
+                primitiveCount, indexData, indexFormat, vertexData, stride);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);

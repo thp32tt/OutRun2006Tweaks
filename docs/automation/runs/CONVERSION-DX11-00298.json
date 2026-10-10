@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00298",
+  "production_id": "CONVERSION-DXVK-00297",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00297-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "48d3fdc9a5795344e477f5df53da2d37e274cc57",
+  "source_implementation_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+  "result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+  "validation_bearing_result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+  "result_marker": "[AUTO:CONVERSION-DX11-00298]",
+  "selected_work_item": "DX11_R212_RT0_COLOR_WRITE_CENSUS_IDENTITY",
+  "summary": "Selected and completed R212 from branch HEAD 48d3fdc9a5795344e477f5df53da2d37e274cc57: RT0 D3DRS_COLORWRITEENABLE observation completeness and raw write-mask value now participate in sampled DX11 census identity/hash and detailed telemetry, with source-graph guards tying live capture to the already-exact D3D11 RenderTargetWriteMask translation. NativeDrawPath activation was not changed.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "2356c8bc124212c23526ec302df1a5cbef33baf5"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Started from authenticated GitHub branch HEAD 48d3fdc9a5795344e477f5df53da2d37e274cc57. Read AGENTS.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, regression/history files and Issue #14. CONVERSION-DX11-00296 was complete and no CONVERSION-DX11-00298 run record existed."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "RT0 D3DRS_COLORWRITEENABLE was already live-captured and exactly translated to D3D11 RenderTargetWriteMask, but unlike COLORWRITEENABLE1..3 it was absent from sampled SourceSignature identity. Exact draws differing only in RT0 destination-channel writes could therefore alias in census diagnostics.",
+      "review_lenses": {
+        "architecture": "Census-only evidence gap; no selector, transport, packaging, activation, or vr-d3d9ex-focus modification required.",
+        "ownership_lifetime": "No COM/resource ownership, synchronization, reset, or device-generation behavior changed.",
+        "stereo_correctness": "RT0 destination-channel write masks affect visible pixel output, so distinct masks must remain distinguishable in exhaustive sampled evidence.",
+        "performance": "Only two hash mixes per sampled signature plus detail telemetry for admitted unique signatures; no new render-state objects, copies, waits, or per-draw allocations.",
+        "adversarial": "NativeFixedFunctionRenderStateBundle already hashes the translated blend descriptor, so runtime render-state identity was already correct; the defect was limited to census signature evidence."
+      },
+      "regression_history": "No matching runtime regression case or prior RT0 COLORWRITEENABLE census-identity unit was found. Existing COLORWRITEENABLE1..3 MRT fail-closed work remains separate and retained."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commits": [
+        "2356c8bc124212c23526ec302df1a5cbef33baf5"
+      ],
+      "summary": "Added rt0ColorWriteObservationComplete and colorWriteEnable to sampled census identity, hash, propagation and detailed telemetry; added R212 source-graph guards tying live capture, exact D3D11 translation and census identity together. NativeDrawPath activation was not changed."
+    },
+    "C3_VALIDATE": {
+      "status": "PASS",
+      "validation_bearing_result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+      "backend_conversion_gate_run_id": 37132328700,
+      "validate_job_id": 111229737462,
+      "readiness_smoke_job_id": 111230619838,
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test/verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "Build/Run DX11 fixed-function shader semantic smoke",
+        "Build/Run DX11 input-layout semantic smoke",
+        "Build/Run DX11 input-signature semantic smoke",
+        "Build/Run DX11 input-layout object probe",
+        "Build/Run DX11 shader object probe",
+        "Build/Run DX11 shader linkage probe",
+        "Build/Run DX11 constant buffer probe",
+        "Build/Run DX11 native transport probe",
+        "Build/Run DX11 surface mirror probe",
+        "Build/Run DX11 triangle-fan generated index-buffer probe",
+        "Build/Run DX11 fixed-function pipeline handoff probe"
+      ],
+      "artifact_id": 11277347657,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-2356c8bc124212c23526ec302df1a5cbef33baf5",
+      "artifact_digest": "sha256:a33ac4a86821ef348dc9d8f03e3f665cdcf433d1dd203d7fe4f5e34d447c77eb",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "2356c8bc124212c23526ec302df1a5cbef33baf5"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 census/source-static exactness work only. The hosted Gate artifact is validation evidence, not a Quest 3/VDXR runtime candidate package."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5970543154,
+      "exact_next_action": "Release CONVERSION-DX11-00298 as automation PASS under authoritative E001 rollover metadata. Keep NativeDrawPathActive disabled. Preserve R212 RT0 color-write census identity and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims.",
+      "validation_comment_id": 5970519083
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37132328700,
+    "head_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+    "validate_job_id": 111229737462,
+    "readiness_smoke_job_id": 111230619838
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5970543154,
+  "issue14_comment_ids": [
+    5970442665,
+    5970512861,
+    5970519083,
+    5970543154
+  ],
+  "authoritative_metadata_correction_comment_id": 5970543154,
+  "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00297",
+    "event_id": "CONVERSION-DXVK-00297-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  }
+}

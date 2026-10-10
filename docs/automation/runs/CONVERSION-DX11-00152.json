@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00152",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T03:02:10+09:00",
+  "base_sha": "2fb32a704ce98203af6bd7d739b253a686ea5152",
+  "result_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+  "validation_bearing_result_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R152_HELPER_282B0_CONTINUATION_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00150 proved complete instructions through 0x28309 and explicitly left 0x2830A outside the reviewed complete-byte window. DXVK-00151 independently selected and validated the same exact-EXE fresh-boundary provenance capture, so this was the smallest runnable DX11 F13 follow-up without HMD evidence.",
+  "summary": "Completed an independent DX11 fail-closed exact-EXE provenance capture beginning at 0x2830A, the exclusive end of the validated 0x282B0 slot-scan prefix. A fresh 96-byte .text window was captured and raw inbound/outbound rel32 candidates were censused as zero, guarded by the exact predecessor status/end boundary. No continuation instruction semantics or render/ScreenHud ownership were promoted.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00151",
+    "source_result_sha": "64fc46a21384451d939f9c5fd45a717056080d74",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded probe design. DX11 independently bound the capture to its own proven 00150 predecessor and exact-result Actions gate. DXVK hosted analysis independently emitted the same 96 bytes and zero inbound/outbound raw rel32 candidates."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00152.json"
+  ],
+  "first_callee_282b0_continuation_provenance": {
+    "target_rva": "0x0002830A",
+    "target_section": ".text",
+    "probe_len": 96,
+    "predecessor_status": "EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN",
+    "predecessor_end_rva": "0x0002830A",
+    "predecessor_exact": true,
+    "raw_inbound_rel32_candidates": 0,
+    "raw_outbound_rel32_candidates": 0,
+    "probe_bytes": "ff 04 85 58 65 95 00 c1 e0 06 5e 03 c2 5f c3 cc cc cc cc cc cc cc 83 ec 0c 8b 44 24 10 55 56 57 8b f8 c1 ef 10 83 ff 20 c7 44 24 0c ff ff ff ff 0f 8c f3 00 00 00 83 ff 4b 0f 8d ea 00 00 00 33 f6 25 ff ff 00 00 3b fe 7c 12 8b 0c bd b8 68 95 00 3b ce 74 07 8b 2c 81 3b ee 75 0a 5f 5e 83 c8",
+    "status": "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "full_callee_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The fresh window is provenance evidence only; no decoded continuation semantics or ScreenHud/world/render ownership claim is made.",
+    "stereo_correctness": "No WVP, projection, HUD/world/rank/SkyGlow/recenter/menu behavior changed.",
+    "performance": "No runtime hot path, frame pacing, copy, wait, cadence, draw or telemetry policy changed.",
+    "adversarial": "The capture fails closed unless the R150 predecessor remains exact, prefix_end is exactly 0x2830A, the target remains in .text, and all 96 requested bytes are available. Raw rel32 census is recorded without treating arbitrary E8-looking bytes as instruction-boundary proof."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "The change advances static disassembly provenance only and does not touch protected runtime renderer behavior or claim to fix any visual regression."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36754763928,
+      "conclusion": "success",
+      "validated_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "artifact_id": 11115468839,
+      "artifact_digest": "sha256:06f3bee40deb805bf1c8e27978c4e78b200ad7703e9cb4b4dbb5afd06714a8cd"
+    },
+    "build": {
+      "run_id": 36754768439,
+      "conclusion": "success",
+      "validated_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "artifact_id": 11116218281,
+      "artifact_digest": "sha256:48ab5eb08172cea5c7e99e025029978ebf08ec638fa20af1a0158fdfc3b7091c",
+      "source_snapshot_artifact_id": 11116193129,
+      "source_snapshot_artifact_digest": "sha256:c5c1500a5f07a5f3ca913836cfd0a425a31d0bf65ca6cddf09c172def30a23fc"
+    },
+    "hud_inspector": {
+      "run_id": 36754768448,
+      "conclusion": "success",
+      "validated_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "static_analysis_job_id": 110022089934,
+      "analysis_artifact_id": 11115403168,
+      "analysis_artifact_digest": "sha256:43fb5eb2c90f567829111218568669779a59b6861b2a04386fe7404501d283a1",
+      "game_artifact_id": 11115754288,
+      "game_artifact_digest": "sha256:605f5c783cf116d9f56751b299a02ea58754ec5d193d2a75f99f902d3c4498ef",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_first_callee_continuation=0x0002830A status=EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED predecessor_status=EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN predecessor_end=0x0002830A predecessor_exact=True section=.text probe_len=96 inbound_raw=0 outbound_raw=0 outbound=none semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY full_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36754768405,
+      "conclusion": "success",
+      "validated_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11116720858,
+      "host_artifact_digest": "sha256:34f4e834465d4de106ed7472a25ab8d6e17117dcb973dfbf9cce8a5dc8ed5880"
+    },
+    "pc_fast": {
+      "run_id": 36754763802,
+      "conclusion": "skipped",
+      "validated_sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "cb2d0b0ccfa5feab784f0767fe7b094ce798c113",
+      "message": "dx11: capture target C first callee continuation [AUTO:CONVERSION-DX11-00152]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5916745851,
+    "validation_comment_id": 5916864679,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Validation-bearing result commit message contains exact marker [AUTO:CONVERSION-DX11-00152] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "The fresh 96-byte 0x2830A continuation window is in .text and is bound to predecessor status EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN with predecessor_end=0x2830A.",
+    "Raw inbound and outbound rel32 candidate counts in the captured window are both zero; this is provenance/census evidence, not instruction semantic proof.",
+    "DXVK-00151 independently emitted the identical 96-byte window and zero raw rel32 candidate counts on the same exact public EXE.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on cb2d0b0ccfa5feab784f0767fe7b094ce798c113.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game runtime execution was used."
+  ],
+  "blocker": "The 96-byte window is captured but not instruction-decoded in this task. Full callee 0x282B0 semantics, helper 0x8BD20, helper 0x28460 continuation, and all guarded-GF ScreenHud/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has the target-C call alignment, helper 0x28460 lookup/success call-chain, first-callee 0x282B0 slot-scan prefix through 0x28309, and a fresh exact 96-byte continuation window from 0x2830A. The next independent bounded task may decode only complete instructions from this captured window or analyze 0x8BD20.",
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. A later independent task may decode a bounded complete-instruction prefix from the captured 0x2830A window. Runtime-visible claims still require Quest 3/VDXR evidence."
+}

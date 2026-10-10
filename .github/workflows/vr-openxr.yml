@@ -37,6 +37,10 @@ on:
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
+concurrency:
+  group: openxr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   game-x86:
     runs-on: windows-2022
@@ -461,9 +465,8 @@ jobs:
             'VR R30.6 XYZRHW WORLD:',
             'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
             'VR R66 OPTION ARROW: exact node pinned',
-            'VR R66 GOAL TIME HUD:',
-            'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
-            'VR R65 SELECTOR: restored base shadow bypassed'
+            'VR R121 GOAL TIME HUD: shared producer-map',
+            'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes'
           )) {
             if (-not $ascii.Contains($marker)) {
               throw "R26 HUD marker missing: $marker"
@@ -730,6 +733,12 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-r32-policy-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R32 policy regression failed: $LASTEXITCODE" }
 
+      - name: Run direct transport identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-direct-ack-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "direct transport identity regression failed: $LASTEXITCODE" }
+
       - name: Verify x64 R32 host binary
         shell: pwsh
         run: |
@@ -755,4 +764,37 @@ jobs:
         with:
           name: outrun-vr-host-x64
           path: build-vrhost/bin/outrun-vr-host.exe
+          if-no-files-found: error
+  dx11-first-game-frame-bundle:
+    name: DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle
+    if: github.event_name == 'pull_request' && github.head_ref == 'vr-d3d9ex-review-feature-dx11-00537'
+    needs: [game-x86-r26-hud-safe, host-x64]
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: outrun2006-vr-x86-r26-hud-safe
+          path: payload/game
+      - uses: actions/download-artifact@v4
+        with:
+          name: outrun-vr-host-x64
+          path: payload/host
+      - name: Verify opt-in package negatives
+        run: python tools/test_package_dx11_first_game_frame.py
+      - name: "Feature acceptance: DX11-TEST-BUNDLE"
+        shell: pwsh
+        run: >
+          python tools/package_dx11_first_game_frame.py
+          --game payload/game/dinput8.dll
+          --host payload/host/outrun-vr-host.exe
+          --output output/feature-dx11-first-game-frame-${{ github.event.pull_request.head.sha }}.zip
+          --build-sha "${{ github.sha }}"
+          --feature-sha "${{ github.event.pull_request.head.sha }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx11-first-game-frame-${{ github.event.pull_request.head.sha }}
+          path: output/*.zip
           if-no-files-found: error

@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00345",
+  "production_id": "CONVERSION-DXVK-00344",
+  "event_id": "CONVERSION-DXVK-00344-E006",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "rollover_is_retry": false,
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "3dedb688f9f5cd8fb9c0142d100a982ec55f7013",
+  "result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+  "validation_bearing_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+  "result_marker": "[AUTO:CONVERSION-DX11-00345]",
+  "selected_work_item": "DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY",
+  "summary": "R236 separates per-log signature count reconciliation from hash-universe coverage so a current log that exactly accounts for its reported signatures still fails coverage-complete evidence when signatureHashCapHitSamples is nonzero.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00345.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 from 3dedb688f9f5cd8fb9c0142d100a982ec55f7013 and, after chat rollover, re-read current GitHub HEAD plus the durable 00345 record. R235 is complete and was not repeated. The rollover is not a retry and ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R235 reconciles captured signature headers plus detail-cap skips with each current periodic summary, but the reported signatures count itself is bounded by the signature hash cap. Therefore AllCurrentSignatureEvidenceAccounted can be true when signatureHashCapHitSamples>0, which is valid accounting but not complete evidence for the current unique-signature universe.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; vr-d3d9ex-focus and runtime renderer routing remain untouched.",
+        "ownership_lifetime": "No COM/resource/reset/fence lifetime changes.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effects/recenter changes.",
+        "performance": "Offline report construction only; runtime hot path unchanged.",
+        "adversarial": "A log with one captured signature, signatures=1 and hashCapHitSamples=3 remains count-accounted while signature-universe coverage is fail-closed."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-log HashCapHitSamples/HashCapSaturated plus AccountedComplete/CoverageComplete, aggregate CurrentSignatureHashCapSaturatedLogs and AllCurrentSignatureEvidenceCoverageComplete, and an accounted-but-saturated multi-log regression with source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1915 run 37172840640 completed success for 78d816d5e10d7672464fb05ff7d413713707d46a. validate job 111349168197 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R236 census analyzer regressions; it then configured/built Win32, verified the binary and uploaded artifact 11291903001. DX11 readiness smoke job 111350027958 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "validation_bearing_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "result_marker": "[AUTO:CONVERSION-DX11-00345]",
+      "implementation_commits": [
+        "78d816d5e10d7672464fb05ff7d413713707d46a"
+      ],
+      "source_implementation_sha": "78d816d5e10d7672464fb05ff7d413713707d46a"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37172840640,
+      "validation_job_id": 111349168197,
+      "readiness_smoke_job_id": 111350027958,
+      "artifact_id": 11291903001,
+      "artifact_digest": "sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0",
+      "exact_next_action": "Preserve R225-R236 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+      "implementation_comment_id": 5975999744,
+      "validation_comment_id": 5976057483
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F22_SAMPLING_SIGNATURE_SATURATION",
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No protected runtime renderer/transport riskPath is modified; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00345",
+    "production_id": "CONVERSION-DXVK-00344",
+    "event_id": "CONVERSION-DXVK-00344-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "original_controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00345",
+    "production_id": "CONVERSION-DXVK-00344",
+    "event_id": "CONVERSION-DXVK-00344-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00345",
+      "event_id": "CONVERSION-DX11-00345-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DXVK-00344",
+      "event_id": "CONVERSION-DXVK-00344-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "rollover_is_retry": false
+    },
+    "reason": "The current controller-issued queue dispatch in this task is authoritative. The material result and exact-SHA Gate remain unchanged; this bookkeeping correction does not consume an attempt.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00345 as complete; do not repeat R236. The next controller task may select the next independent DX11 source/static exactness gap. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37172840640,
+      "run_number": 1915,
+      "result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "conclusion": "success",
+      "validate_job_id": 111349168197,
+      "readiness_smoke_job_id": 111350027958,
+      "artifact_id": 11291903001,
+      "artifact_digest": "sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5975999744,
+    "validation_comment_id": 5976057483
+  }
+}

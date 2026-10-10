@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00056",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "recorded_kst": "2026-09-29T21:27:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "8ce2c59bfcb3a9bc649c9db0aa6f803ecefd3ede",
+  "initial_code_result_sha": "41fc3fcfa0fc2a4e5f5563745fe8a5ae3dcd0425",
+  "code_result_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+  "validation_bearing_result_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+  "result_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R99 dormant fixed-function Texture2D/SRV ownership readiness for the R84 Texture2D path.",
+  "summary": "Added a dormant NativeFixedFunctionTextureView that accepts an already-created D3D11 Texture2D mirror only when its same-device descriptor matches the exact R73 D3D9 format/pool/usage translation, creates and owns a Texture2D shader-resource view, rejects unsupported managed CPU-shadow semantics and inexact descriptor state, recovers after fail-closed initialization, and shuts down cleanly. No D3D9 texture content mirroring or runtime shader-resource binding is enabled.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added NativeFixedFunctionTextureView dormant Texture2D/SRV ownership API."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Added exact format/behavior, same-device, shape, bind, managed-lifetime and SRV creation gates with fail-closed cleanup."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Extended hosted WARP probe with R99 Texture2D/SRV readiness, descriptor, negative format/managed/bind cases, recovery and shutdown coverage."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Linked resource_translation.cpp into the checked-in R99 probe target."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Repair: linked resource_translation.cpp into the generated-source-of-truth R99 probe target."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added R99 ownership/non-routing/probe guards and requires resource_translation.cpp in both cmake.toml and generated CMakeLists.txt."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R99 proves only descriptor/SRV ownership around an already-existing D3D11 Texture2D. It does not implement D3D9 texture content mirroring, mutation/update synchronization, MANAGED CPU-shadow/reset lifetime, PSSetShaderResources binding, native game draw routing, or Quest3/VDXR visual evidence."
+  },
+  "validation_runs": {
+    "initial_failed_backend_conversion_gate": {
+      "run_id": 36566781614,
+      "status": "completed",
+      "conclusion": "failure",
+      "validated_sha": "41fc3fcfa0fc2a4e5f5563745fe8a5ae3dcd0425",
+      "failure": "Build DX11 constant buffer probe failed to link translate_resource_format and translate_resource_behavior because cmake.toml omitted resource_translation.cpp."
+    },
+    "backend_conversion_gate": {
+      "run_id": 36567478959,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+      "evidence": "Queue/baseline/disassembly/native-transport/source-graph/census checks PASS; production Win32 build PASS; all DX11 semantic/object/linkage probes PASS; Build/Run DX11 constant buffer probe PASS and emitted DX11 fixed-function texture view ownership R99: PASS."
+    },
+    "build": {
+      "run_id": 36567484479,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36567484737,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+      "evidence": "All six architecture jobs PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36567484752,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+      "evidence": "Both static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36567478997,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4"
+    }
+  },
+  "repair_history": [
+    {
+      "controller_attempt": "2/3",
+      "repair_attempt": 1,
+      "prior_result_sha": "41fc3fcfa0fc2a4e5f5563745fe8a5ae3dcd0425",
+      "repair_result_sha": "17c67dee02567fcbcee184805aeb17caf68ad3f4",
+      "failed_run_id": 36566781614,
+      "root_cause": "The probe dependency was added only to checked-in CMakeLists.txt; cmake.toml regenerated the target without resource_translation.cpp, producing unresolved resource translation symbols.",
+      "repair": "Added resource_translation.cpp to cmake.toml and made the source verifier require the dependency in both representations."
+    }
+  ],
+  "evidence": [
+    "Final validation-bearing result commit 17c67dee02567fcbcee184805aeb17caf68ad3f4 contains [AUTO:CONVERSION-DX11-00056] and no CI-skip directive.",
+    "Backend Conversion Gate 36567478959 PASS on exact result SHA; R99 WARP probe emitted DX11 fixed-function texture view ownership R99: PASS.",
+    "Build 36567484479 PASS on exact result SHA.",
+    "OpenXR VR architecture 36567484737 PASS across all six jobs on exact result SHA.",
+    "HUD Inspector 36567484752 PASS across both jobs on exact result SHA.",
+    "VR PC Fast Test Build 36567478997 SKIPPED; no self-hosted PC runner was used.",
+    "No N100 workspace, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5890089085,
+    "repair_comment_id": 5890194699,
+    "validation_comment_id": 5890302863,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R99 is automation-validated but runtime-untested. Native draw remains dormant. The next bounded software prerequisite is texture mirror content/update/lifetime readiness rather than runtime binding.",
+  "next_action": "Continue Set 05 with one bounded non-routing prerequisite for texture mirror content/update/lifetime readiness, especially DEFAULT dynamic mutation telemetry or MANAGED CPU-shadow/reset semantics. Do not enable native draw until remaining exactness gates and exact-build Quest3/VDXR evidence close.",
+  "in_task_repairs": 1
+}

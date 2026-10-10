@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00038",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_kst": "2026-09-29T11:34:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "66a54e7ff38cf3400e992347593ceaa277609ac6",
+  "code_result_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500",
+  "result_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R90 non-routing hosted D3D11 input-layout object creation probe for R88/R89 supported vertex-input contracts.",
+  "summary": "Added a Windows hosted probe that creates a WARP D3D11 device and requires CreateInputLayout success for XYZB5 split blend weights, UBYTE4 blend indices, and blended NORMAL descriptors using matching compiled vertex-shader signatures. The probe is automation-only and does not enable native game draw routing. D3DCOLOR/BGRA IA format support is observed but intentionally remains outside the mandatory R90 PASS subset.",
+  "changes": [
+    {
+      "path": "tools/dx11_input_layout_object_probe.cpp",
+      "result": "New R90 WARP D3D11CreateDevice + CreateInputLayout hosted object probe."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_input_layout_object_probe executable target."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added generated-equivalent dx11_input_layout_object_probe target."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Added build/run steps for the R90 object probe."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R90 source/build/workflow contract guards."
+    }
+  ],
+  "hosted_object_cases": {
+    "mandatory": [
+      "D3DFVF_XYZB5 -> POSITION + BLENDWEIGHT0 float4 + BLENDWEIGHT1 float",
+      "D3DFVF_XYZB3 | LASTBETA_UBYTE4 -> BLENDWEIGHT0 + BLENDINDICES uint4",
+      "D3DFVF_XYZB4 | NORMAL -> blend weights + NORMAL"
+    ],
+    "pending": [
+      "D3DFVF_LASTBETA_D3DCOLOR/B8G8R8A8_UNORM IA object creation is not promoted by R90; format support is only reported."
+    ]
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "Hosted WARP CreateInputLayout success is a prerequisite probe only; it does not create/bind the game's native runtime shader/input-layout path and is not Quest3/VDXR parity evidence."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36512991322,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
+    },
+    "build": {
+      "run_id": 36512995624,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36512995616,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
+    },
+    "hud_inspector": {
+      "run_id": 36512995611,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
+    },
+    "pc_fast": {
+      "run_id": 36512991329,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5882526467
+  },
+  "blocker": null,
+  "resume_cursor": "R90 exact-SHA hosted validation is complete. Preserve NativeDrawPathActivationAllowed=false; continue with the next independent F19/F21 prerequisite without treating hosted object creation as runtime parity.",
+  "next_action": "R90 is automation-verified. Continue the next bounded DX11 shader/input prerequisite; Quest3/VDXR remains required before native runtime promotion.",
+  "finalized_kst": "2026-09-29T13:02:00+09:00",
+  "evidence": [
+    "Backend Conversion Gate 36512991322 PASS on exact code SHA 74386631dd63e04ad5084fe90cbe00e60d8bb500, including Build/Run DX11 input-layout object probe.",
+    "Build 36512995624 PASS on exact code SHA.",
+    "OpenXR VR architecture 36512995616 PASS across all six jobs on exact code SHA.",
+    "HUD Inspector 36512995611 PASS on exact code SHA.",
+    "PC Fast 36512991329 skipped; no HMD/game runtime validation was performed."
+  ]
+}

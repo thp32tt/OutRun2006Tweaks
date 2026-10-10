@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00456",
+  "production_id": "CONVERSION-DX11-00456",
+  "event_id": "CONVERSION-DX11-00456-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_NATIVE_SHARED_EYE_SINGLE_FRAME_SLOT_OWNERSHIP",
+  "work_key": "DX11:NATIVE_SHARED_EYE_RING:UNIQUE_FRAME_ID:src/vr/d3d11/native_shared_eye_ring.cpp",
+  "conflict_keys": [
+    "DX11_NATIVE_TRANSPORT_RING",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "base_sha": "f1b31320660dee41f87a0da297b12a2f9c352d38",
+  "result_sha": "b81b258ac288dea59e2a76474d1644bbf39779e6",
+  "material_result_sha": "b81b258ac288dea59e2a76474d1644bbf39779e6",
+  "validation_bearing_result_sha": "b81b258ac288dea59e2a76474d1644bbf39779e6",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "summary": "Reject duplicate frame_id reservations across acquired, producer-pending and published native DX11 shared-eye ring slots before any fence refresh/ACK mutation; preserve independent frame retirement and add Windows WARP regression coverage.",
+  "changed_paths": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "static_validation": "PASS: one in-memory source/test transformation invariant check; Windows compilation/behavior deferred to exact-SHA Gate",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub branch base f1b31320660dee41f87a0da297b12a2f9c352d38; 00455 COMPLETE; 00456 not previously claimed",
+    "C1_REVIEW": "PASS: native ring accepted duplicate frame_id ownership across different slots; isolated R118 transport concern from dormant Draw routing",
+    "C2_IMPLEMENT": "PASS: real C++ fail-closed single-frame-slot acquisition and Windows WARP duplicate Acquired/Pending/Published plus ACK-retirement regressions",
+    "C3_VALIDATE": "PASS: one scoped source static transformation check; Backend Conversion Gate 37751632073 validate #113226013989 and DX11 readiness smoke #113227425279 SUCCESS on exact material SHA b81b258ac288dea59e2a76474d1644bbf39779e6; WARP native transport probe run SUCCESS; artifact #11537648893 sha256:cd315e62e2924deffcbf9b3a087a1c3176ecb5dd882cdf6c87b3fb274764dd69",
+    "C4_COMMIT": "PASS: b81b258ac288dea59e2a76474d1644bbf39779e6 source+WARP test+run record material commit [AUTO:CONVERSION-DX11-00456]",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD/Quest3 deployment claimed; CI DLL artifact diagnostic only",
+    "C6_STATE": "PASS: canonical validation-bearing material SHA, two job successes, UNTESTED HMD and next independent DX11 native action persisted"
+  },
+  "next_action": "Inspect next independent native DX11 live resource/shader/draw ownership transition without enabling Draw prematurely; validate exact SHA in a new distinct TASK_ID. Quest3/VDXR runtime evidence remains pending.",
+  "validation_bearing_sha": "b81b258ac288dea59e2a76474d1644bbf39779e6",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "validation_run_id": 37751632073,
+  "validation_job_id": 113226013989,
+  "readiness_smoke_job_id": 113227425279,
+  "artifact_id": 11537648893,
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-b81b258ac288dea59e2a76474d1644bbf39779e6",
+  "artifact_digest": "sha256:cd315e62e2924deffcbf9b3a087a1c3176ecb5dd882cdf6c87b3fb274764dd69",
+  "state_persisted": true,
+  "evidence": {
+    "backend_conversion_gate_run_id": 37751632073,
+    "validate_job_id": 113226013989,
+    "readiness_smoke_job_id": 113227425279,
+    "artifact_id": 11537648893,
+    "artifact_digest": "sha256:cd315e62e2924deffcbf9b3a087a1c3176ecb5dd882cdf6c87b3fb274764dd69",
+    "warped_transport_probe": "DX11 native transport probe SUCCESS on exact SHA"
+  },
+  "recorded_at_kst": "2026-10-08 17:50:33"
+}

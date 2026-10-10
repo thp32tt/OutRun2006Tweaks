@@ -588,6 +588,28 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/core/frame_types.hpp"
 	"src/vr/core/matrix.hpp"
 	"src/vr/core/transport.hpp"
+	"src/vr/d3d11/native_backend.cpp"
+	"src/vr/d3d11/native_backend.hpp"
+	"src/vr/d3d11/live_game_frame_bridge.cpp"
+	"src/vr/d3d11/live_game_frame_bridge.hpp"
+	"src/vr/d3d11/native_shared_eye_ring.cpp"
+	"src/vr/d3d11/native_shared_eye_ring.hpp"
+	"src/vr/d3d11/pipeline_translation.cpp"
+	"src/vr/d3d11/pipeline_translation.hpp"
+	"src/vr/d3d11/fixed_function_pipeline.cpp"
+	"src/vr/d3d11/fixed_function_pipeline.hpp"
+	"src/vr/d3d11/resource_translation.cpp"
+	"src/vr/d3d11/resource_translation.hpp"
+	"src/vr/d3d11/surface_mirror.cpp"
+	"src/vr/d3d11/surface_mirror.hpp"
+	"src/vr/d3d11/triangle_fan_index_buffer.cpp"
+	"src/vr/d3d11/triangle_fan_index_buffer.hpp"
+	"src/vr/d3d11/runtime_census.cpp"
+	"src/vr/d3d11/runtime_census.hpp"
+	"src/vr/d3d11/startup_census.cpp"
+	"src/vr/d3d11/startup_census.hpp"
+	"src/vr/d3d11/state_translation.cpp"
+	"src/vr/d3d11/state_translation.hpp"
 	"src/vr/debug/hud_inspector.cpp"
 	"src/vr/hud_semantics.hpp"
 	"src/vr/d3d9/device_probe.cpp"
@@ -690,6 +712,8 @@ target_link_libraries(outrun2006tweaks PUBLIC
 	Setupapi.lib
 	Crypt32.lib
 	d3dcompiler.lib
+	d3d11.lib
+	dxgi.lib
 )
 
 target_link_options(outrun2006tweaks PUBLIC
@@ -716,3 +740,417 @@ set_target_properties(outrun2006tweaks PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO
 		"${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 )
+# Target: dx11_fixed_function_shader_semantics
+set(dx11_fixed_function_shader_semantics_SOURCES
+    "tools/dx11_fixed_function_shader_semantics.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_fixed_function_shader_semantics)
+
+target_sources(dx11_fixed_function_shader_semantics PRIVATE ${dx11_fixed_function_shader_semantics_SOURCES})
+
+target_compile_features(dx11_fixed_function_shader_semantics PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_fixed_function_shader_semantics PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_fixed_function_shader_semantics PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_fixed_function_shader_semantics PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# Target: dx11_input_layout_semantics
+set(dx11_input_layout_semantics_SOURCES
+    "tools/dx11_input_layout_semantics.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_input_layout_semantics)
+
+target_sources(dx11_input_layout_semantics PRIVATE ${dx11_input_layout_semantics_SOURCES})
+
+target_compile_features(dx11_input_layout_semantics PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_input_layout_semantics PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_input_layout_semantics PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_input_layout_semantics PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# Target: dx11_input_signature_semantics
+set(dx11_input_signature_semantics_SOURCES
+    "tools/dx11_input_signature_semantics.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_input_signature_semantics)
+
+target_sources(dx11_input_signature_semantics PRIVATE ${dx11_input_signature_semantics_SOURCES})
+
+target_compile_features(dx11_input_signature_semantics PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_input_signature_semantics PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_input_signature_semantics PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_input_signature_semantics PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+    dxguid.lib
+)
+
+# Target: dx11_input_layout_object_probe
+set(dx11_input_layout_object_probe_SOURCES
+    "tools/dx11_input_layout_object_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_input_layout_object_probe)
+
+target_sources(dx11_input_layout_object_probe PRIVATE ${dx11_input_layout_object_probe_SOURCES})
+
+target_compile_features(dx11_input_layout_object_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_input_layout_object_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_input_layout_object_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_input_layout_object_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# Target: dx11_shader_object_probe
+set(dx11_shader_object_probe_SOURCES
+    "tools/dx11_shader_object_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_shader_object_probe)
+
+target_sources(dx11_shader_object_probe PRIVATE ${dx11_shader_object_probe_SOURCES})
+
+target_compile_features(dx11_shader_object_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_shader_object_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_shader_object_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_shader_object_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# Target: dx11_shader_linkage_probe
+set(dx11_shader_linkage_probe_SOURCES
+    "tools/dx11_shader_linkage_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_shader_linkage_probe)
+
+target_sources(dx11_shader_linkage_probe PRIVATE ${dx11_shader_linkage_probe_SOURCES})
+
+target_compile_features(dx11_shader_linkage_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_shader_linkage_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_shader_linkage_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_shader_linkage_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+    dxguid.lib
+)
+
+# Target: dx11_constant_buffer_probe
+set(dx11_constant_buffer_probe_SOURCES
+    "tools/dx11_constant_buffer_probe.cpp"
+    "src/vr/d3d11/native_backend.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+)
+
+add_executable(dx11_constant_buffer_probe)
+
+target_sources(dx11_constant_buffer_probe PRIVATE ${dx11_constant_buffer_probe_SOURCES})
+
+target_compile_features(dx11_constant_buffer_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_constant_buffer_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_constant_buffer_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_constant_buffer_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+    dxgi.lib
+    dxguid.lib
+)
+
+
+# Target: dx11_native_target_resize_probe (R177 live WARP resource lifetime)
+set(dx11_native_target_resize_probe_SOURCES
+    "tools/dx11_native_target_resize_probe.cpp"
+    "src/vr/d3d11/native_backend.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+)
+add_executable(dx11_native_target_resize_probe)
+target_sources(dx11_native_target_resize_probe PRIVATE ${dx11_native_target_resize_probe_SOURCES})
+target_compile_features(dx11_native_target_resize_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_native_target_resize_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_native_target_resize_probe PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_native_target_resize_probe PUBLIC
+    d3dcompiler.lib d3d11.lib dxgi.lib dxguid.lib
+)
+
+# Target: dx11_native_transport_probe
+set(dx11_native_transport_probe_SOURCES
+    "tools/dx11_native_transport_probe.cpp"
+    "src/vr/d3d11/native_shared_eye_ring.cpp"
+)
+
+add_executable(dx11_native_transport_probe)
+
+target_sources(dx11_native_transport_probe PRIVATE ${dx11_native_transport_probe_SOURCES})
+
+target_compile_features(dx11_native_transport_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_native_transport_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_native_transport_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_native_transport_probe PUBLIC
+    d3d11.lib
+    dxgi.lib
+    dxguid.lib
+)
+
+# Target: dx11_surface_mirror_probe
+set(dx11_surface_mirror_probe_SOURCES
+    "tools/dx11_surface_mirror_probe.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+
+add_executable(dx11_surface_mirror_probe)
+
+target_sources(dx11_surface_mirror_probe PRIVATE ${dx11_surface_mirror_probe_SOURCES})
+
+target_compile_features(dx11_surface_mirror_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_surface_mirror_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_surface_mirror_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_surface_mirror_probe PUBLIC
+    d3d11.lib
+)
+
+
+# Target: dx11_triangle_fan_index_buffer_probe
+set(dx11_triangle_fan_index_buffer_probe_SOURCES
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_triangle_fan_index_buffer_probe)
+
+target_sources(dx11_triangle_fan_index_buffer_probe PRIVATE ${dx11_triangle_fan_index_buffer_probe_SOURCES})
+
+target_compile_features(dx11_triangle_fan_index_buffer_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_triangle_fan_index_buffer_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_triangle_fan_index_buffer_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_triangle_fan_index_buffer_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# Target: dx11_fixed_function_pipeline_probe
+set(dx11_fixed_function_pipeline_probe_SOURCES
+    "tools/dx11_fixed_function_pipeline_probe.cpp"
+    "src/vr/d3d11/fixed_function_pipeline.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_fixed_function_pipeline_probe)
+
+target_sources(dx11_fixed_function_pipeline_probe PRIVATE ${dx11_fixed_function_pipeline_probe_SOURCES})
+
+target_compile_features(dx11_fixed_function_pipeline_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_fixed_function_pipeline_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_fixed_function_pipeline_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_fixed_function_pipeline_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+
+# R183: isolated real WARP VB/IB owner and DrawIndexed probe; no game hook.
+set(dx11_linear_buffer_mirror_probe_SOURCES
+    "tools/dx11_linear_buffer_mirror_probe.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+add_executable(dx11_linear_buffer_mirror_probe)
+target_sources(dx11_linear_buffer_mirror_probe PRIVATE ${dx11_linear_buffer_mirror_probe_SOURCES})
+target_compile_features(dx11_linear_buffer_mirror_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_linear_buffer_mirror_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_linear_buffer_mirror_probe PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_linear_buffer_mirror_probe PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R186: independent dormant indexed Draw readiness; test GPU dispatch stays isolated.
+add_executable(dx11_indexed_draw_probe_r186)
+target_sources(dx11_indexed_draw_probe_r186 PRIVATE
+    "tools/dx11_indexed_draw_probe_r186.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_draw_probe_r186 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_draw_probe_r186 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_draw_probe_r186 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_draw_probe_r186 PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R238: D3D9 transient DrawIndexedPrimitiveUP to immutable native WARP pixels.
+add_executable(dx11_indexed_up_probe_r238)
+target_sources(dx11_indexed_up_probe_r238 PRIVATE
+    "tools/dx11_indexed_up_probe_r238.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_up_probe_r238 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_up_probe_r238 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_up_probe_r238 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_up_probe_r238 PUBLIC d3dcompiler.lib d3d11.lib)
+
+# R239: native indexed-UP strip winding expansion and real WARP pixel integration.
+add_executable(dx11_indexed_up_strip_probe_r239)
+target_sources(dx11_indexed_up_strip_probe_r239 PRIVATE
+    "tools/dx11_indexed_up_strip_probe_r239.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+target_compile_features(dx11_indexed_up_strip_probe_r239 PUBLIC cxx_std_20)
+target_compile_options(dx11_indexed_up_strip_probe_r239 PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_indexed_up_strip_probe_r239 PUBLIC "src/" "shared/" "include/")
+target_link_libraries(dx11_indexed_up_strip_probe_r239 PUBLIC d3dcompiler.lib d3d11.lib)

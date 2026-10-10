@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00294",
+  "production_id": "CONVERSION-DX11-00294",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00294-E004",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "6e3a37876387d8bd2c7d22cf1629bb944fe228a9",
+  "source_implementation_sha": "a492845245e29a404f31fb9636f2fd4e80ee5d74",
+  "result_sha": "99a75a6faaddebaa98aa2805d29eff3dbe23236d",
+  "validation_bearing_result_sha": "99a75a6faaddebaa98aa2805d29eff3dbe23236d",
+  "result_marker": "[AUTO:CONVERSION-DX11-00294]",
+  "selected_work_item": "DX11_R204_SPECULAR_UNSUPPORTED_CENSUS_IDENTITY",
+  "summary": "Preserved D3DRS_SPECULARENABLE as fail-closed while separating its post-texture specular-add demand from generic fixed-function lighting in the dormant DX11 unsupported/census contract. Added a dedicated PipelineUnsupportedSpecular bit, synchronized runtime summary/analyzer/regression/source-graph parity, and validated the exact result through the complete hosted DX11 gate.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "a492845245e29a404f31fb9636f2fd4e80ee5d74",
+    "d4bcf4162da95d7587653ccadd9cd733fd3e2a40",
+    "99a75a6faaddebaa98aa2805d29eff3dbe23236d"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub HEAD 6e3a37876387d8bd2c7d22cf1629bb944fe228a9 and read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, recent durable DX11 task records, regression/history files and Issue #14 history. Stale review blockers were not repeated; current branch source was audited directly."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R202 captures D3DRS_SPECULARENABLE and correctly fails closed, but it reused PipelineUnsupportedLighting. That conflated two distinct fixed-function demands in the mandatory activation census: vertex/fixed-function lighting versus the post-texture SPECULARENABLE add. Exact/exhaustive evidence therefore could not identify which unsupported semantic was actually requested."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
+        "tools/analyze_dx11_census.py",
+        "tools/test_analyze_dx11_census.py",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commits": [
+        "a492845245e29a404f31fb9636f2fd4e80ee5d74",
+        "d4bcf4162da95d7587653ccadd9cd733fd3e2a40",
+        "99a75a6faaddebaa98aa2805d29eff3dbe23236d"
+      ],
+      "summary": "Added PipelineUnsupportedSpecular at bit 20 and advanced PipelineUnsupportedBitCount to 21. Lighting and specular now set independent fail-closed bits. Runtime census labels/arguments, analyzer parser/aggregate accounting, analyzer regression coverage and source-graph parity were extended. Follow-up commits fixed only verifier ordering and a legacy R166 hard-coded tail; no validation rule was weakened. NativeDrawPath activation was not changed."
+    },
+    "C3_VALIDATE": {
+      "status": "PASS",
+      "validation_bearing_result_sha": "99a75a6faaddebaa98aa2805d29eff3dbe23236d",
+      "backend_conversion_gate_run_id": 37127963115,
+      "validate_job_id": 111217077756,
+      "readiness_smoke_job_id": 111218008747,
+      "prior_same_attempt_runs": [
+        {
+          "run_id": 37127688575,
+          "head_sha": "a492845245e29a404f31fb9636f2fd4e80ee5d74",
+          "status": "FAIL",
+          "failure_signature": "Verify DX11 source graph: UnboundLocalError for analyzer before parser load",
+          "correction": "Moved explicit analyzer specular guards into the existing post-load unsupported-schema contract."
+        },
+        {
+          "run_id": 37127890196,
+          "head_sha": "d4bcf4162da95d7587653ccadd9cd733fd3e2a40",
+          "status": "FAIL",
+          "failure_signature": "DX11 R166 unsupported census sentinel drift: MRT color-write log argument for bit 19",
+          "correction": "Extended the legacy R166 fixed tail guard from bits 12..19 through the new specular bit 20."
+        }
+      ],
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test/verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "Build/Run DX11 fixed-function shader semantic smoke",
+        "Build/Run DX11 input-layout semantic smoke",
+        "Build/Run DX11 input-signature semantic smoke",
+        "Build/Run DX11 input-layout object probe",
+        "Build/Run DX11 shader object probe",
+        "Build/Run DX11 shader linkage probe",
+        "Build/Run DX11 constant buffer probe",
+        "Build/Run DX11 native transport probe",
+        "Build/Run DX11 surface mirror probe",
+        "Build/Run DX11 triangle-fan generated index-buffer probe",
+        "Build/Run DX11 fixed-function pipeline handoff probe"
+      ],
+      "artifact_id": 11275890992,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-99a75a6faaddebaa98aa2805d29eff3dbe23236d",
+      "artifact_digest": "sha256:3c81bce25829b02ba528439d3f8f10bc97e8e5b835975d150176b085d2d621c0",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "a492845245e29a404f31fb9636f2fd4e80ee5d74",
+        "d4bcf4162da95d7587653ccadd9cd733fd3e2a40",
+        "99a75a6faaddebaa98aa2805d29eff3dbe23236d"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 source/static/census exactness work only. The hosted Gate artifact is validation evidence, not a Quest 3/VDXR runtime candidate package."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5969933044,
+      "exact_next_action": "Release CONVERSION-DX11-00294 as automation PASS. Keep NativeDrawPathActive disabled. Use the independent lighting/specular blocker counts in future exhaustive exact-build census and continue a new independent DX11 source/static conversion item. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37127963115,
+    "head_sha": "99a75a6faaddebaa98aa2805d29eff3dbe23236d",
+    "validate_job_id": 111217077756,
+    "readiness_smoke_job_id": 111218008747
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5969933044,
+  "exact_next_action": "Continue only with a new independent DX11 conversion task from current GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "chat_rollover": 2,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "controller_resume": {
+    "final_event_id": "CONVERSION-DX11-00294-E004",
+    "final_attempt": "3/3",
+    "note": "Attempt 3 resumed the already-materialized R204 implementation after the controller-reported failed exact-SHA Gate, retained the subsequent repair commits, and closed the task only after exact-SHA Backend Conversion Gate run 37127963115 passed."
+  },
+  "issue14_comment_ids": [
+    5969933044,
+    5969934844
+  ]
+}

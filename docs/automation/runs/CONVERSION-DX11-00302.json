@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00302",
+  "production_id": "CONVERSION-DXVK-00301",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00301-E003",
+  "event_type": "rollover",
+  "rollover_is_retry": false,
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "deb42c3919ae3673dedac20c39b9330b510a75cf",
+  "source_implementation_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+  "result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+  "validation_bearing_result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+  "result_marker": "[AUTO:CONVERSION-DX11-00302]",
+  "selected_work_item": "DX11_R214_CENSUS_IDENTITY_STATIC_GUARD_REPAIR",
+  "summary": "R214 repairs the stale standalone DX11 census identity guard identified during CONVERSION-DX11-00300. The guard no longer depends on the removed 'runtime census' prose fragment and instead checks durable census activation telemetry, signature hashing, sampled signature access, and ExactSamples accounting. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "tools/test_dx11_census_log_contract_r131.py"
+  ],
+  "implementation_commits": [
+    "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Started from authenticated GitHub branch HEAD deb42c3919ae3673dedac20c39b9330b510a75cf. Read AGENTS.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/VR_AUTODEV_STATE.json and docs/VR_RUN_STATE.md. Latest durable DX11 task was CONVERSION-DX11-00300 and no CONVERSION-DX11-00302 run record existed."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "CONVERSION-DX11-00300 explicitly recorded tools/test_dx11_census_log_contract_r131.py as a pre-existing standalone check whose literal 'runtime census' expectation was absent before and after R213. That made the identity guard stale even though durable census behavior remained present.",
+      "review_lenses": {
+        "architecture": "Tool/test contract only; no renderer selector, transport, packaging, or native draw activation change.",
+        "ownership_lifetime": "No COM/resource lifetime, reset, synchronization, or generation ownership change.",
+        "stereo_correctness": "No stereo draw semantics changed; the guard verifies census identity/accounting source anchors only.",
+        "performance": "No runtime code path changed.",
+        "adversarial": "Replaced a brittle prose-string oracle with multiple durable behavior anchors so harmless logging prose changes do not create false failures."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Commit 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84 replaces the stale prose requirement with `VR DX11 R114 census ACTIVE:`, `std::uint64_t hash_signature(`, `hash_mix`, `signature.`, and `ExactSamples.fetch_add`, and updates the guard banner to R131/R214."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "evidence": "Exact-SHA standalone R131/R214 guard execution PASS. Backend Conversion Gate run 37136741723 SUCCESS on SHA 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84: validate job 111242698824 PASS including source graph, dormant activation boundary, census analyzer, Win32 configure/build/binary and artifact upload; readiness smoke job 111243656265 PASS.",
+      "exact_head_contract_check": {
+        "status": "PASS",
+        "required_tokens": [
+          "VR DX11 R114 census ACTIVE:",
+          "std::uint64_t hash_signature(",
+          "hash_mix",
+          "signature.",
+          "ExactSamples.fetch_add"
+        ],
+        "missing_tokens": []
+      },
+      "exact_sha_guard_execution": "DX11 census identity contract R131/R214: PASS"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84"
+      ],
+      "validation_bearing_result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R214 changes a source-contract test only; no user runtime payload or package identity changes."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5971080914,
+      "validation_comment_id": 5971127095,
+      "authoritative_metadata_correction_comment_id": 5971142005,
+      "exact_next_action": "Release CONVERSION-DX11-00302 as automation PASS under authoritative CONVERSION-DXVK-00301 / E003 rollover metadata, ATTEMPT=1/3. Keep NativeDrawPathActive disabled and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37136741723,
+    "head_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+    "validate_job_id": 111242698824,
+    "readiness_smoke_job_id": 111243656265,
+    "artifact_id": 11279325012,
+    "artifact_digest": "sha256:c36624e1a04fa21abb568f017107704b6ec1c0276e9c3feaf482ef7e060b5b37"
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5971080914,
+  "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00301",
+    "event_id": "CONVERSION-DXVK-00301-E003",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH",
+    "rollover_is_retry": false,
+    "superseded_bookkeeping_commit": "e46c6fe5902240db400e5868634cd80b0868c4c1",
+    "superseded_issue_comment_id": 5971124760
+  },
+  "validation_comment_id": 5971127095,
+  "evidence": [
+    "At base deb42c3919ae3673dedac20c39b9330b510a75cf, tools/test_dx11_census_log_contract_r131.py required literal 'runtime census', while runtime_census.cpp did not contain that literal.",
+    "Exact-SHA standalone guard execution from 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84 passed: DX11 census identity contract R131/R214: PASS.",
+    "Backend Conversion Gate run 37136741723 completed SUCCESS on exact SHA 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84."
+  ],
+  "issue14_comment_ids": [
+    5971080914,
+    5971124760,
+    5971127095,
+    5971142005
+  ],
+  "authoritative_metadata_correction_comment_id": 5971142005
+}

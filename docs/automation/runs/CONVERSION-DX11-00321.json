@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00321",
+  "production_id": "CONVERSION-DX11-00321",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00321-E002",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R224_VERTEX_SHADER_COMPILE_CENSUS_ANALYZER_PARITY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "14edd3667077b324783f8ef41d19c3788e581c6d",
+  "result_sha": "7164bcf9662a72eac894b049da0d45cf2b84d4ff",
+  "validation_bearing_result_sha": "7164bcf9662a72eac894b049da0d45cf2b84d4ff",
+  "result_marker": "[AUTO:CONVERSION-DX11-00321]",
+  "selected_work_item": "DX11_R224_VERTEX_SHADER_COMPILE_CENSUS_ANALYZER_PARITY",
+  "summary": "R224 closes the analyzer parity gap introduced by R223. Runtime census already logs per-signature fixed-function vertex shader D3DCompile evidence, but analyze_dx11_census.py previously discarded that telemetry while retaining only the R85 pixel compile probe. The analyzer now preserves R223 vertex compile evidence beside the pixel compile evidence. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00321.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub HEAD 14edd3667077b324783f8ef41d19c3788e581c6d. Verified prior R223 exact-SHA Backend Conversion Gate run 37153420737 concluded success. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md/Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and Issue #14. N100 remote-tracking ref was stale because remote.origin.fetch tracked only korean-localization-clean; git ls-remote and GitHub API agreed on the authoritative DX11 head before the isolated worktree was created.",
+      "resume_evidence": "CHAT_ROLLOVER=3 recovered GitHub SSOT at material HEAD 7164bcf9662a72eac894b049da0d45cf2b84d4ff; rollover was caused by queue result grace-period expiry with no assistant response, not by task failure, so ATTEMPT remains 1/3. Existing C0-C4 material work was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R223 emits 'VR DX11 R223 ffp vertex shader compile#...' telemetry and ExactSamples requires cached VS+PS compile success, but analyze_dx11_census.py only parsed the R85 pixel compile log. Offline evidence therefore lost the vertex half of the exactness decision.",
+      "review_lenses": {
+        "architecture": "Extend only the existing census analyzer data path; do not alter runtime draw routing or shader translation.",
+        "ownership_lifetime": "No COM object, resource, Reset, Present, transport or OpenXR lifetime changes.",
+        "stereo_correctness": "No WVP, per-eye, HUD, sky or recenter behavior changes.",
+        "performance": "Offline analyzer-only parsing; runtime hot path is unchanged.",
+        "adversarial": "A regression fixture proves the R223 line is currently dropped, and source-graph tokens fail closed if parser/store/output/fixture wiring drifts."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added FFP_VERTEX_SHADER_COMPILE_RE, per-signature fixed_function_vertex_shader_compiles storage/output, R223-only log discovery support, regression assertions for vs_4_0 compile evidence, and an R224 source-graph parity guard."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R224_VERTEX_SHADER_COMPILE_CENSUS_ANALYZER_PARITY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Local static/TDD validation from the pre-publication worktree passed. Exact-SHA Backend Conversion Gate run 37154286008 completed success for 7164bcf9662a72eac894b049da0d45cf2b84d4ff; validate job 111294338510 passed source graph, dormant activation, census analyzer, Win32 build/binary checks and artifact publication, and DX11 readiness smoke job 111295254875 passed all semantic/object/transport/surface/fan/pipeline probes. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "7164bcf9662a72eac894b049da0d45cf2b84d4ff",
+      "validation_bearing_result_sha": "7164bcf9662a72eac894b049da0d45cf2b84d4ff",
+      "result_marker": "[AUTO:CONVERSION-DX11-00321]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer/test/verifier parity only; no runtime candidate or package identity changes."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37154286008,
+      "validation_job_id": 111294338510,
+      "readiness_smoke_job_id": 111295254875,
+      "artifact_id": 11284879253,
+      "artifact_digest": "sha256:9b046fb0cce2d2f48f7041b6b01d5d3111915351d1e3999211eb436165dffdf9",
+      "exact_next_action": "Preserve R223 vertex-compile telemetry and R224 analyzer parity, keep NativeDrawPath dormant, and select the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "NONE_DIRECT_RUNTIME_PATH_MATCH",
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping. No D3D9/DX11 runtime source, startup, HUD, world-stereo, transport or OpenXR path is changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00321",
+    "event_id": "CONVERSION-DX11-00321-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+  },
+  "exact_next_action": "Preserve R223 vertex-compile telemetry and R224 analyzer parity, keep NativeDrawPath dormant, and select the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37154286008,
+      "run_number": 1878,
+      "result_sha": "7164bcf9662a72eac894b049da0d45cf2b84d4ff",
+      "conclusion": "success",
+      "validate_job_id": 111294338510,
+      "readiness_smoke_job_id": 111295254875,
+      "artifact_id": 11284879253,
+      "artifact_digest": "sha256:9b046fb0cce2d2f48f7041b6b01d5d3111915351d1e3999211eb436165dffdf9"
+    }
+  }
+}

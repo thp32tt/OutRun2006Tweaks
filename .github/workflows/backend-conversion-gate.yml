@@ -1,0 +1,739 @@
+name: Backend Conversion Gate
+
+on:
+  push:
+    branches:
+      - vr-dx11-native-r71
+      - vr-dxvk-r71-disasm
+  workflow_dispatch:
+
+concurrency:
+  group: backend-conversion-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Verify queue automation contract
+        shell: pwsh
+        run: python tools/verify_queue_controller_contract.py
+
+      - name: Verify DX11 integration-first auto-development acceptance
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          python tools/test_dx11_autodev_policy.py
+          python tools/dx11_autodev_policy.py --check-latest
+
+      - name: Verify HMD-proven baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
+      - name: Verify one-click structure contract
+        shell: pwsh
+        run: ./tools/Test-VROneClickContract.ps1
+
+      - name: Test DX11 XR source-resolution A/B policy
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_xr_source_resolution_policy.py
+
+      - name: Verify backend disassembly contract
+        shell: pwsh
+        run: python tools/verify_vr_backend_disasm_contract.py
+
+      - name: Test VR session auto-analysis regressions
+        shell: pwsh
+        run: ./tools/Test-Analyze-OutRunVRSession.ps1
+
+      - name: Verify DX11 native transport lifetime contract
+        shell: pwsh
+        run: python tools/verify_dx11_native_transport_contract.py
+
+      - name: Verify DX11 dual-source blend contract
+        shell: pwsh
+        run: python tools/verify_dx11_dual_source_contract.py
+
+      - name: Test DX11 static surface contract analyzer
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_static_surface_contract.py
+
+      - name: Verify DX11 static surface contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/dx11_native_static_surface_contract_check.py src/vr/d3d11/resource_translation.cpp src/vr/d3d11/surface_mirror.cpp
+
+      - name: Verify DX11 source hygiene
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $matches = git grep -n -F -- '[executed on device:' -- src/vr/d3d11 tools/verify_dx11_source_graph.py tools/verify_dx11_activation_boundary.py tools/dx11_constant_buffer_probe.cpp
+          if ($LASTEXITCODE -eq 0) {
+            $matches | Write-Host
+            throw "DX11 source contains a remote execution transcript marker"
+          }
+          if ($LASTEXITCODE -ne 1) {
+            throw "git grep failed while checking DX11 source hygiene (exit $LASTEXITCODE)"
+          }
+          exit 0
+
+      - name: Verify exclusive DX11 pair staging R180
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_surface_pair_readback_r180.py
+
+      - name: Verify DX11 triangle-fan actual GPU DrawIndexed R181
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_triangle_fan_gpu_draw_r181.py
+
+      - name: Verify DX11 resource format role isolation R179
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_resource_role_format_r179.py
+
+      - name: Verify DX11 transactional native resize R177
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_target_resize.py
+
+      - name: Verify DX11 source graph
+        shell: pwsh
+        run: python tools/verify_dx11_source_graph.py
+
+      - name: Verify DX11 dormant activation boundary
+        shell: pwsh
+        run: python tools/verify_dx11_activation_boundary.py
+
+      - name: Test DX11 census analyzer
+        shell: pwsh
+        run: python tools/test_analyze_dx11_census.py
+
+      - name: Configure Win32
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-auto -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-auto/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32
+        run: cmake --build build-auto --config Release --target outrun2006tweaks
+
+      - name: Verify binary exists
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-auto -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          if ($dll.Length -lt 1000000) { throw "dinput8.dll unexpectedly small" }
+          Write-Host "AUTOMATION_VALIDATION candidate built from $env:GITHUB_SHA"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-autovalidated-${{ github.ref_name }}-${{ github.sha }}
+          path: |
+            build-auto/bin/dinput8.dll
+          if-no-files-found: error
+
+  dx11-smoke:
+    name: DX11 readiness smoke probes
+    if: github.ref_name == 'vr-dx11-native-r71'
+    needs: validate
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Configure Win32
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-auto -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-auto/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build DX11 fixed-function shader semantic smoke
+        run: cmake --build build-auto --config Release --target dx11_fixed_function_shader_semantics
+
+      - name: Run DX11 fixed-function shader semantic smoke
+        shell: pwsh
+        run: |
+          $smoke = Get-ChildItem build-auto -Recurse -Filter dx11_fixed_function_shader_semantics.exe | Select-Object -First 1
+          if (-not $smoke) { throw "DX11 fixed-function shader semantic smoke executable missing" }
+          & $smoke.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 fixed-function shader semantic smoke failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 input-layout semantic smoke
+        run: cmake --build build-auto --config Release --target dx11_input_layout_semantics
+
+      - name: Run DX11 input-layout semantic smoke
+        shell: pwsh
+        run: |
+          $smoke = Get-ChildItem build-auto -Recurse -Filter dx11_input_layout_semantics.exe | Select-Object -First 1
+          if (-not $smoke) { throw "DX11 input-layout semantic smoke executable missing" }
+          & $smoke.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 input-layout semantic smoke failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 input-signature semantic smoke
+        run: cmake --build build-auto --config Release --target dx11_input_signature_semantics
+
+      - name: Run DX11 input-signature semantic smoke
+        shell: pwsh
+        run: |
+          $smoke = Get-ChildItem build-auto -Recurse -Filter dx11_input_signature_semantics.exe | Select-Object -First 1
+          if (-not $smoke) { throw "DX11 input-signature semantic smoke executable missing" }
+          & $smoke.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 input-signature semantic smoke failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 input-layout object probe
+        run: cmake --build build-auto --config Release --target dx11_input_layout_object_probe
+
+      - name: Run DX11 input-layout object probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_input_layout_object_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 input-layout object probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 input-layout object probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 shader object probe
+        run: cmake --build build-auto --config Release --target dx11_shader_object_probe
+
+      - name: Run DX11 shader object probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_shader_object_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 shader object probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 shader object probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 shader linkage probe
+        run: cmake --build build-auto --config Release --target dx11_shader_linkage_probe
+
+      - name: Run DX11 shader linkage probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_shader_linkage_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 shader linkage probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 shader linkage probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 native target resize R177 WARP probe
+        run: cmake --build build-auto --config Release --target dx11_native_target_resize_probe
+
+      - name: Run DX11 native target resize R177 WARP probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_native_target_resize_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 native target resize R177 probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 native target resize R177 WARP probe failed with exit code $LASTEXITCODE" }
+
+      # R179 runs the native resource-format/mirror WARP proof before
+      # the independently owned R175 varying probe can block later steps.
+      - name: Build DX11 surface mirror probe
+        run: cmake --build build-auto --config Release --target dx11_surface_mirror_probe
+
+      - name: Run DX11 surface mirror probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_surface_mirror_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 surface mirror probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
+
+
+      # R182 native guarded dispatch contract is verified once per changed source.
+      - name: Verify R182 guarded native DrawIndexed
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_dormant_fan_draw_r182.py
+
+      # R181 independently verifies real WARP DrawIndexed before inherited R175.
+      - name: Build DX11 triangle-fan generated index-buffer probe
+        run: cmake --build build-auto --config Release --target dx11_triangle_fan_index_buffer_probe
+
+      - name: Run DX11 triangle-fan generated index-buffer probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_triangle_fan_index_buffer_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 triangle-fan generated index-buffer probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 triangle-fan generated index-buffer probe failed with exit code $LASTEXITCODE" }
+
+      # R183: source delta once + real WARP VB/IB-owned indexed GPU pixels.
+      - name: Verify DX11 native linear VB/IB R183 source contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_buffer_owner_r183.py
+
+      # R184: source-accurate, conservative DrawIndexed VB/IB bounds fence.
+      - name: Verify DX11 native VB/IB R184 indexed bounds contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_buffer_range_r184.py
+
+      # R199: independent non-indexed native Draw exact RTV/viewport/scissor owner.
+      - name: Verify R199 native linear target and viewport fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_target_r199.py
+
+      # R197: reject retained GS/HS/DS for the independent non-indexed Draw path.
+      - name: Verify R197 native linear shader stage fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_stage_r197.py
+
+      # R185: new native Draw entrypoint is dormant but genuinely GPU-exercised.
+      - name: Verify DX11 native Draw R185 source contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_linear_draw_r185.py
+
+      # R209: same-device alien PS/RTV cannot satisfy exact non-indexed
+      # pipeline provenance; R183 WARP confirms actual changed GPU pixels.
+      - name: Verify R209 native linear exact pipeline identity
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_pipeline_identity_r209.py
+
+      # R210: dormant non-indexed depth DSV/state exact identity and GPU pixels.
+      - name: Verify R210 native linear depth OM identity
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_depth_om_r210.py
+
+      # R211: depth-aware non-indexed eye must reject unexpected MRT outputs.
+      - name: Verify R211 linear single-eye OM target ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_linear_single_eye_mrt_r211.py
+
+      # R195: exact immutable IB sub-slice bounds, no duplicate WARP target.
+      - name: Verify R195 native indexed slice ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_index_slice_r195.py
+
+      # R214: strict opaque non-indexed OM blend/mask identity plus real WARP.
+      - name: Verify R214 linear exact opaque OM ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_opaque_om_r214.py
+
+      # R215: full-eye viewport, exact raster and opaque OM composition.
+      - name: Verify R215 sealed opaque eye scope
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_sealed_opaque_eye_r215.py
+
+      # R216: typed D32_FLOAT eye precision/read-only seal.
+      - name: Verify R216 float depth eye ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_float_depth_eye_r216.py
+
+      # R221: non-indexed OM UAV eye isolation before WARP GPU draw.
+      - name: Verify R221 linear OM UAV isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_uav_eye_r221.py
+
+      # R230: non-indexed owned-eye GPU predicate exclusion.
+      - name: Verify R230 non-indexed predication guard
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_predication_r230.py
+
+      # R232: exclude all SO buffer targets from dormant non-indexed eye.
+      - name: Verify R232 non-indexed stream-output isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_linear_stream_output_r232.py
+
+      - name: Build DX11 linear VB/IB mirror R183 WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
+
+      - name: Run DX11 linear VB/IB mirror R183 WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_linear_buffer_mirror_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "R183 WARP VB/IB probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R183 WARP probe failed with code $LASTEXITCODE" }
+
+      # R196: disallow retained GS/HS/DS that mutate a native FVF triangle.
+      - name: Verify R196 native indexed shader stage fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_shader_stage_r196.py
+
+      # R186: independent indexed-native device/pipeline/IA readiness and real WARP pixels.
+      - name: Verify R186 native indexed Draw ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_draw_r186.py
+
+      # R207: exact same-device IA layout/VS/PS/RTV provenance and WARP alien-PS pixels.
+      - name: Verify R207 native indexed exact pipeline identity
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_pipeline_identity_r207.py
+
+      # R212 indexed MRT secondary-eye prevention + actual WARP leak evidence.
+      - name: Verify R212 indexed OM eye ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_single_eye_mrt_r212.py
+
+      # R218 one-shot indexed full-eye depth, raster and WARP proof.
+      - name: Verify R218 sealed indexed depth eye
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_indexed_sealed_eye_r218.py
+      - name: Verify DX11 R226 indexed D32 depth-only ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_indexed_depth_dedicated_r226.py
+
+
+      # R219: no hidden OM UAV/second-eye writes during indexed DrawIndexed.
+      - name: Verify R219 indexed OM UAV isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_uav_eye_r219.py
+
+      # R229: no live conditional GPU query during owned DrawIndexed.
+      - name: Verify R229 indexed GPU predication fence
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_predication_r229.py
+
+
+      # R231: a hidden stream-output binding cannot be another eye write.
+      - name: Verify R231 indexed stream-output isolation
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_stream_output_r231.py
+
+      - name: Build R186 owned indexed Draw WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186
+
+      - name: Run R186 owned indexed Draw WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_draw_probe_r186.exe | Select-Object -First 1
+          if (-not $probe) { throw "R186 indexed Draw WARP probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R186 indexed Draw WARP probe failed: $LASTEXITCODE" }
+
+
+      # R238: immutable transient D3D9 indexed-UP data to native WARP GPU output.
+      - name: Verify R238 indexed UP native source integration
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_up_r238.py
+
+      - name: Build R238 indexed UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_indexed_up_probe_r238
+
+      - name: Run R238 indexed UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_probe_r238.exe | Select-Object -First 1
+          if (-not $probe) { throw "R238 WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R238 indexed UP GPU pixel probe failed: $LASTEXITCODE" }
+
+
+      # R239: independent indexed-UP triangle-strip GPU output through R238 IA.
+      - name: Verify R239 strip adapter and GPU proof contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_indexed_up_strip_r239.py
+
+      - name: Build R239 strip indexed-UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_indexed_up_strip_probe_r239
+
+      - name: Run R239 strip indexed-UP WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_strip_probe_r239.exe | Select-Object -First 1
+          if (-not $probe) { throw "R239 WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R239 strip indexed UP GPU probe failed: $LASTEXITCODE" }
+
+      # R187 isolated owned indexed GPU path: exact RTV and full viewport.
+      - name: Verify R187 native indexed viewport ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_viewport_draw_r187.py
+
+      - name: Build R187 indexed viewport WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_viewport_draw_probe_r187
+
+      - name: Run R187 indexed viewport WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_viewport_draw_probe_r187.exe | Select-Object -First 1
+          if (-not $probe) { throw "R187 indexed viewport WARP probe missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R187 indexed viewport WARP probe failed: $LASTEXITCODE" }
+
+      # R203: non-indexed Draw live PS SRV/sampler object ownership and red/blue/red pixels.
+      - name: Verify R203 native linear PS texture ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_textured_linear_r203.py
+
+      - name: Build R203 textured linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_textured_linear_probe_r203
+
+      - name: Run R203 textured linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_linear_probe_r203.exe | Select-Object -First 1
+          if (-not $probe) { throw "R203 textured linear WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R203 textured linear WARP probe failed: $LASTEXITCODE" }
+
+      # R188: verify PS SRV/sampler object identity, texture descriptor and read/write hazard.
+      - name: Verify R188 native indexed PS texture binding
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_textured_indexed_r188.py
+
+      - name: Build R188 textured indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_textured_indexed_probe_r188
+
+      - name: Run R188 textured indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_indexed_probe_r188.exe | Select-Object -First 1
+          if (-not $probe) { throw "R188 textured indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R188 textured indexed WARP probe failed: $LASTEXITCODE" }
+
+      # R202: non-indexed live DSV/depth-state and real near/far GPU occlusion.
+      - name: Verify R202 native linear depth ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_depth_linear_r202.py
+
+      - name: Build R202 depth linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_depth_linear_probe_r202
+
+      - name: Run R202 depth linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_depth_linear_probe_r202.exe | Select-Object -First 1
+          if (-not $probe) { throw "R202 linear depth WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R202 linear depth WARP probe failed: $LASTEXITCODE" }
+
+      # R189: verify same-device exact DSV, depth state, and real GPU depth occlusion.
+      - name: Verify R189 native indexed depth ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_depth_indexed_r189.py
+
+      # R213 exact shader/layout + depth ownership; isolated WARP pixel path.
+      - name: Verify R213 indexed exact depth pipeline identity
+        shell: pwsh
+        run: python tools/test_dx11_indexed_depth_pipeline_identity_r213.py
+
+      - name: Build R189 depth indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_depth_indexed_probe_r189
+
+      - name: Run R189 depth indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_depth_indexed_probe_r189.exe | Select-Object -First 1
+          if (-not $probe) { throw "R189 indexed depth WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R189 indexed depth WARP probe failed: $LASTEXITCODE" }
+
+      # R190: live owned blend state + real alpha GPU DrawIndexed ahead of separate R175.
+      - name: Verify R190 native indexed OM blend ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_blend_indexed_r190.py
+
+      - name: Build R190 blend indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_blend_indexed_probe_r190
+
+      - name: Run R190 blend indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_indexed_probe_r190.exe | Select-Object -First 1
+          if (-not $probe) { throw "R190 indexed alpha blend WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R190 indexed alpha blend WARP probe failed: $LASTEXITCODE" }
+
+
+      # R200: independent non-indexed live alpha OM object with real WARP pixels.
+      - name: Verify R200 native linear OM alpha ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_blend_linear_r200.py
+
+      - name: Build R200 blend linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_blend_linear_probe_r200
+
+      - name: Run R200 blend linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_linear_probe_r200.exe | Select-Object -First 1
+          if (-not $probe) { throw "R200 linear blend WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R200 linear blend WARP probe failed: $LASTEXITCODE" }
+
+      # R191: real VS b0 ownership/revision and shifted indexed GPU pixel proof.
+      - name: Verify R191 VS constant indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_vs_constant_indexed_r191.py
+
+      - name: Build R191 VS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_vs_constant_indexed_probe_r191
+
+      - name: Run R191 VS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_vs_constant_indexed_probe_r191.exe | Select-Object -First 1
+          if (-not $probe) { throw "R191 VS indexed constant WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R191 VS indexed constant WARP probe failed: $LASTEXITCODE" }
+
+      # R192: immutable PS b0 source version, identity, and actual indexed GPU colors.
+      - name: Verify R192 PS constant indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_ps_constant_indexed_r192.py
+
+      - name: Build R192 PS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_ps_constant_indexed_probe_r192
+
+      - name: Run R192 PS constant indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_ps_constant_indexed_probe_r192.exe | Select-Object -First 1
+          if (-not $probe) { throw "R192 PS b0 indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R192 PS b0 indexed WARP probe failed: $LASTEXITCODE" }
+
+
+      # R193: owned live scissor, exact RTV and actual clipped indexed WARP pixels.
+      - name: Verify R193 scissor indexed ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_scissor_indexed_r193.py
+
+      - name: Build R193 scissor indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_scissor_indexed_probe_r193
+
+      - name: Run R193 scissor indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_scissor_indexed_probe_r193.exe | Select-Object -First 1
+          if (-not $probe) { throw "R193 clipped indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R193 clipped indexed WARP probe failed: $LASTEXITCODE" }
+
+      # R201: isolated non-indexed native Draw exact raster owner and WARP winding pixels.
+      - name: Verify R201 native linear raster cull ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_cull_linear_r201.py
+
+      - name: Build R201 cull linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_cull_linear_probe_r201
+
+      - name: Run R201 cull linear WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_linear_probe_r201.exe | Select-Object -First 1
+          if (-not $probe) { throw "R201 linear cull WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R201 linear cull WARP probe failed: $LASTEXITCODE" }
+
+      # R194: independent winding/cull polarity on an owned dormant indexed GPU path.
+      - name: Verify R194 native raster cull ownership
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_cull_indexed_r194.py
+
+      - name: Build R194 cull indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: cmake --build build-auto --config Release --target dx11_cull_indexed_probe_r194
+
+      - name: Run R194 cull indexed WARP probe
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_indexed_probe_r194.exe | Select-Object -First 1
+          if (-not $probe) { throw "R194 cull indexed WARP executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "R194 cull indexed WARP probe failed: $LASTEXITCODE" }
+
+      - name: Build DX11 constant buffer probe
+        run: cmake --build build-auto --config Release --target dx11_constant_buffer_probe
+
+      - name: Run DX11 constant buffer probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_constant_buffer_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 constant buffer probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 constant buffer probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 native transport probe
+        run: cmake --build build-auto --config Release --target dx11_native_transport_probe
+
+      - name: Run DX11 native transport probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_native_transport_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 native transport probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 native transport probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build DX11 fixed-function pipeline handoff probe
+        run: cmake --build build-auto --config Release --target dx11_fixed_function_pipeline_probe
+
+      - name: Run DX11 fixed-function pipeline handoff probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_fixed_function_pipeline_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 fixed-function pipeline handoff probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 fixed-function pipeline handoff probe failed with exit code $LASTEXITCODE" }

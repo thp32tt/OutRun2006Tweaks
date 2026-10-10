@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00423",
+  "production_id": "CONVERSION-DX11-00423",
+  "event_id": "CONVERSION-DX11-00423-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R285_PERSISTENT_NATIVE_DEVICE_PROGRAMMABLE_OWNERSHIP_TO_R275_HANDOFF",
+  "base_sha": "458a75649548279de3f90c9f737e592e0472b309",
+  "result_sha": "1506dec898f1c1c88086290cde04766bb1e5ed3c",
+  "material_result_sha": "1506dec898f1c1c88086290cde04766bb1e5ed3c",
+  "validation_bearing_sha": "1506dec898f1c1c88086290cde04766bb1e5ed3c",
+  "validation_bearing_result_sha": "1506dec898f1c1c88086290cde04766bb1e5ed3c",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37580012218,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112657280107,
+  "readiness_smoke_job_id": 112658691977,
+  "artifact_id": 11464860535,
+  "artifact_digest": "sha256:6a9d70c19b5c476712704da745a42a8810c37dfbd1e9461d9153f9d6ff7cbdff",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00423.json",
+  "implementation_commits": [
+    "1506dec898f1c1c88086290cde04766bb1e5ed3c"
+  ],
+  "issue14_comment_id": 6032221534,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "state_persisted": true,
+  "r285_persistent_backend_owner_present": true,
+  "r284_receipt_reuse_present": true,
+  "r242_receipt_fed_to_r275": true,
+  "native_backend_device_lifetime_owned": true,
+  "native_programmable_shader_object_bound": false,
+  "shader_translation_exact_enabled": false,
+  "native_draw_path_activation_allowed": false,
+  "draw_dispatch_authorized": false,
+  "evidence_scope": "R285_PERSISTENT_NATIVE_DEVICE_OWNERSHIP_AND_R275_HANDOFF_ONLY",
+  "summary": "R285 converts the one-shot R284 object materializer into a persistent NativeBackend-owned programmable shader ownership boundary. Exact R284/R242 receipts are retained and reused per programmable pair, the current R242 object receipt is fed directly into R275 semantic receipt composition, and NativeBackend initialization/shutdown ties the cache to its native D3D11 device generation. No shader/context binding, shaderTranslationExact promotion, NativeDrawPath activation or Draw/DrawIndexed dispatch is enabled.",
+  "evidence": [
+    "native_backend.hpp adds NativeProgrammableShaderBackendSemanticHandoffEvidence and NativeProgrammableShaderBackendOwnership with persistent per-cacheKey R284 receipt storage.",
+    "native_backend.cpp validates an existing R284 receipt before reuse, obtains the current R242 translation-object readiness from the same native device/cache/slot, and composes/validates the R275 translated-semantic receipt.",
+    "The R285 entrypoint accepts no ID3D11DeviceContext and explicitly keeps objectBindingAuthorized, nativeDrawPathActivationAllowed and drawDispatchAuthorized false.",
+    "NativeBackend::initialize initializes the R285 owner on device_.Get(); NativeBackend::shutdown invalidates R285 ownership before releasing the D3D11 device.",
+    "WARP hosted regression proves the first exact R284->R242->R275 handoff, idempotent reuse for a repeated pair without shader recreation, unbound immediate-context VS/PS state, stale R274 mapping rejection, and device-generation invalidation.",
+    "tools/verify_dx11_source_graph.py guards the R285 owner, R275 feed, NativeBackend lifetime integration and no-binding/no-draw boundary.",
+    "Backend Conversion Gate 37580012218 completed SUCCESS for exact SHA 1506dec898f1c1c88086290cde04766bb1e5ed3c; validate 112657280107 and DX11 readiness smoke 112658691977 both succeeded.",
+    "Artifact 11464860535 digest sha256:6a9d70c19b5c476712704da745a42a8810c37dfbd1e9461d9153f9d6ff7cbdff.",
+    "Issue #14 production ledger comment 6032221534 records the R285 change and next action.",
+    "No Quest 3/VDXR or in-game runtime test was performed."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "persistent_native_device_owner": true,
+    "r284_receipt_reuse": true,
+    "r242_receipt_fed_to_r275": true,
+    "native_programmable_object_created": true,
+    "native_programmable_object_bound": false,
+    "shader_translation_exact_enabled": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00422 material Gate SUCCESS, reconciled its missing durable state in bookkeeping SHA 458a75649548279de3f90c9f737e592e0472b309, then reread branch HEAD, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, VR_AUTODEV_STATE/VR_RUN_STATE, lane state and 00422 result."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed R284 one-shot semantics and found repeated live observations would fail closed once objects already existed. Selected a persistent native-device owner that validates/reuses the exact R284 receipt and composes R275 from the current R242 receipt."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R285 persistent owner/evidence/validator, NativeBackend device-lifetime ownership, exact receipt reuse and R275 composition, plus hosted reuse/stale/device-generation/no-binding regressions and source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37580012218 SUCCESS; validate 112657280107 and readiness smoke 112658691977 SUCCESS, including R285 constant-buffer WARP probe. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 1506dec898f1c1c88086290cde04766bb1e5ed3c contains exact marker [AUTO:CONVERSION-DX11-00423] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R285 is a dormant native-device ownership/semantic handoff slice; no runtime package or HMD deployment is warranted."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run record and lane state preserve exact material SHA, Gate/jobs/artifact, RUNTIME_VALIDATION=UNTESTED and the bounded R286 next action."
+    }
+  },
+  "exact_next_action": "Implement bounded R286 production observation plumbing from the exact R279/R280/R283/R274/R276 source-evidence chain into NativeBackend::programmable_shader_ownership().materialize_semantic_handoff_for_observation, with no pipeline binding, shaderTranslationExact promotion, NativeDrawPath activation, Draw or DrawIndexed.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "1506dec898f1c1c88086290cde04766bb1e5ed3c",
+    "backend_conversion_gate": {
+      "run_id": 37580012218,
+      "conclusion": "success",
+      "validate_job_id": 112657280107,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112658691977,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11464860535,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-1506dec898f1c1c88086290cde04766bb1e5ed3c",
+      "artifact_digest": "sha256:6a9d70c19b5c476712704da745a42a8810c37dfbd1e9461d9153f9d6ff7cbdff"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "record_type": "USER_HMD_RUNTIME_VALIDATION",
+  "recorded_kst": "2026-09-30T23:01:01+09:00",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "tested_source_sha": "46fa5383bbf1144e58446028a452f74065fa44c8",
+  "tested_backend": "dx11",
+  "tested_profile": "CORRECTNESS",
+  "runtime_validation": "FAILED_ISSUE_CONFIRMED",
+  "user_observation": [
+    "Menu still shows the brown rectangle.",
+    "Gameplay looks the same as the DX9Ex path."
+  ],
+  "log_evidence": {
+    "provider": "NATIVE_D3D9EX",
+    "development_stage": "R72-passive-census-R73-resource-exactness-native-draw-dormant",
+    "native_draw_path_activation_allowed": false,
+    "census_status": "UNSUPPORTED_BEHAVIOR_OBSERVED",
+    "census_samples": 144863,
+    "census_exact_samples": 0,
+    "behavior_unsupported": 2307,
+    "input_layout_unsupported": 8471,
+    "programmable_shader_pending": 143943,
+    "texture_stage_pending": 153828,
+    "direct_frames": 4662,
+    "direct_fallbacks": 3,
+    "fence_timeouts": 0,
+    "approx_average_xr_hz": 81.7045,
+    "menu_pipeline_evidence": "Repeated actualFinal=fallback-cached-image; multiple 450-frame windows have actualSubmits={fallback-cached-image:450}."
+  },
+  "analyzer_false_negative": "AUTO_ANALYSIS_SUMMARY reported NO_AUTOMATIC_RED_FLAG despite the user-visible menu failure. Transport/cadence health must not be treated as visual parity.",
+  "carry_forward": {
+    "latest_checked_automation_task": "CONVERSION-DX11-00134",
+    "latest_checked_result_sha": "47008654f22b060bcf296db9a5ff0ab401fc0bb9",
+    "newer_task_runtime_change": false,
+    "blocker_remains_active": true
+  },
+  "required_next_development": [
+    "Treat menu cached-image fallback as an unresolved runtime blocker.",
+    "Do not describe the path as native DX11 rendering while NativeDrawPathActive/ActivationAllowed is false.",
+    "Add automatic detection for sustained fallback-cached-image during a live menu session.",
+    "Only clear this runtime failure after a runtime-path change is re-tested on Quest 3/VDXR."
+  ],
+  "github_issue": 81
+}

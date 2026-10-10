@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00490",
+  "production_id": "CONVERSION-DX11-00490",
+  "event_id": "CONVERSION-DX11-00490-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00490",
+  "lease_epoch": 1,
+  "work_key": "DX11:R188:NATIVE_INDEXED_PS_TEXTURE_SAMPLER_IDENTITY_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp:R188",
+    "tools/dx11_textured_indexed_probe_r188.cpp:R188",
+    "tools/test_dx11_textured_indexed_r188.py:R188",
+    "cmake.toml:R188",
+    ".github/workflows/backend-conversion-gate.yml:R188"
+  ],
+  "base_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "result_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+  "material_result_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+  "validation_bearing_result_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R188 native indexed PS SRV/sampler same-device exact binding and RTV nonalias, real compiled WARP textured DrawIndexed GPU pixels PASS; exact material SHA full Gate FAIL only unchanged 00477-owned R175 TEXCOORD6 varying mismatch; HMD and gameplay native draw UNTESTED.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: 00490 unclaimed; initial 2f35de1e; reused 00489 latest R187 identity head 576048f0; preserved 00489 Gate 37966364768 until terminal; rebased and CAS material on 576048f0.",
+    "C1_REVIEW": "PASS five lenses: stable TASK/work_key ownership, owned VB/IB IA generation, R187 exact RTV/viewport, live PS SRV/sampler and RTV alias, real WARP GPU pixels; 00477 owns R175; no DXVK/DX9Ex mutation.",
+    "C2_IMPLEMENT": "PASS: R188 native_indexed_texture_binding.hpp C++ same-device SRV/sampler binding and RT alias fence, isolated WARP textured DrawIndexed + negative binding cases + red center/black corner readback, Python 3 negative source mutants, cmkr target, CI before inherited R175. No in-game activation.",
+    "C3_VALIDATE": "R188 PASS source contract and negative mutations, Win32 compile, isolated GPU textured DrawIndexed exact pixel proof. Exact material Gate 37967667135 validate 113945994386 SUCCESS; smoke 113948141041 FAIL at inherited R175 constant buffer varying only: BGRA [128,0,16,255] expected [224,128,32,255]. Whole Gate FAIL, do not assert automatic PASS.",
+    "C4_COMMIT": "PASS material SHA c5c62bf673e3a00aef7b6618153e2ca2b1301b81 [AUTO:CONVERSION-DX11-00490] source/probe/tests/manifest/workflow/record, no CI-skip. Exact SHA push Gate 37967667135 is terminal. This C6 record is bookkeeping [skip ci] and never replaces validation-bearing SHA; intervening 00489 C6 bookkeeping a0ec254b ancestor verified.",
+    "C5_PACKAGE": "NOT_REQUIRED, native game Draw activation not enabled; Quest 3/VDXR/game visual promotion remains RUNTIME_VALIDATION=UNTESTED.",
+    "C6_STATE": "SEALED: R188 source and real WARP GPU proof PASS, mandatory whole-Gate FAIL from separately owned R175; parked BLOCKED_UPSTREAM_R175_FULL_GATE. Keep task/work_key stable; do not replay or double-score."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00490.json"
+  ],
+  "blockers": [
+    "R175_GENERIC_VARYING_MISMATCH owned by CONVERSION-DX11-00477, tools/dx11_constant_buffer_probe.cpp unchanged. Observed BGRA 128,0,16,255 expected 224,128,32,255.",
+    "Quest3/VDXR real game native DX11 rendering and HMD visual runtime UNTESTED."
+  ],
+  "next_action": "Do not repeat R188 or treat scoped PASS as backend activation; owner 00477 repairs R175 independently. Continue distinct native DX11 work_key on future task; do not migrate to DXVK.",
+  "score_change": 0,
+  "validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37967667135,
+    "gate_event": "push",
+    "gate_head_sha": "c5c62bf673e3a00aef7b6618153e2ca2b1301b81",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113945994386,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113948141041,
+    "readiness_smoke_conclusion": "failure",
+    "r188_static_contract": "PASS",
+    "r188_negative_mutants": 3,
+    "r188_win32_warp_probe_build": "PASS",
+    "r188_actual_textured_drawindexed_pixel_readback": "PASS",
+    "r188_steps": [
+      "Verify R188 native indexed PS texture binding",
+      "Build R188 textured indexed WARP probe",
+      "Run R188 textured indexed WARP probe"
+    ],
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "artifact_id": 11634472817,
+    "artifact_digest": "sha256:6b292c2efedcd5906be6aa17be838efbf97f256ebb3c8cde9a9de365237b2866"
+  },
+  "static_precommit_checks": {
+    "ps_srv_sampler_identity": true,
+    "ps_slot_bounds": true,
+    "rtv_resource_alias_rejection": true,
+    "negative_source_mutants": 3,
+    "cmkr_and_ci_wiring": true,
+    "r187_expected_rtv_forwarding": true,
+    "source_activated_draw": false
+  },
+  "scoped_automation_validation": "PASS_R188_NATIVE_PS_TEXTURE_STATIC_WIN32_WARP_DRAWINDEXED",
+  "score_reason": "R188 independent native source and WARP proof PASS; required exact-SHA whole Gate FAIL due unchanged R175 owned by 00477. No full completion score, AI2 remains 1283."
+}

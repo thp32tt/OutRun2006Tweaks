@@ -1,0 +1,54 @@
+OUTRUN VR ONE-RUN VISUAL / RUNTIME GATE
+=========================================
+
+Goal: cover the DX11/DXVK merge-critical graphics set in one normal session.
+Do not restart between items unless the game crashes.
+
+1. STARTUP
+   - logo -> menu completes; no persistent white/black frame.
+   - headset tracking/recenter responds.
+
+2. MENU / OPTION
+   - open an option screen containing < > arrows and YES/NO.
+   - arrows and text use the intended single/head-lock behavior.
+   - no left/right duplicated menu overlay.
+
+3. CAR SELECT
+   - enter the car selection screen.
+   - vehicle model is coherent in both eyes; no split/corrupted 3D geometry.
+
+4. PRE-RACE GRID
+   - before launch, inspect vehicle/ground shadows.
+   - shadow is coherent; no left/right split introduced at scene start.
+
+5. GAMEPLAY WORLD
+   - road, scenery and vehicles have stable stereo depth.
+   - no eye mismatch, missing geometry or obvious culling pop caused by head motion.
+
+6. HUD
+   - rank/position, time, gear/rev and normal race HUD are readable and not doubled.
+   - HUD scale/placement remains stable while moving the head.
+
+7. WORLD RANK MARKERS
+   - inspect 1st/2nd/3rd/... markers above/near rival vehicles.
+   - markers remain attached to the correct vehicles and move as world billboards,
+     not as head-locked HUD.
+
+8. PROJECTED EFFECTS / LENS FLARE
+   - inspect a visible flare/projected-screen effect.
+   - it must not appear as an incorrect separated left/right pair.
+
+9. GOAL / RESULTS
+   - finish a race.
+   - GOAL, name/time/result text is single, readable and uses the intended space.
+   - transition back toward menu without rendering corruption.
+
+10. RECENTER / LIFECYCLE
+    - use F12 recenter once in gameplay and once in a menu if practical.
+    - no Reset/recenter corruption, stale eye, black frame or persistent misalignment.
+
+11. EXIT NORMALLY
+    - exit the game and allow the launcher to finish.
+    - upload only the newest OutRun2_VR_ANALYZE_*.zip.
+    - if a visual item failed, report only the failed item number(s) plus a short symptom;
+      all backend/census/provider identity is already inside the ZIP.

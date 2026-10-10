@@ -1,0 +1,222 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00386",
+  "production_id": "CONVERSION-DX11-00386",
+  "event_id": "CONVERSION-DX11-00386-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "rollover_is_retry": false,
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R255_PROGRAMMABLE_INDEXED_FINAL_PRE_DRAW_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "base_sha": "51f6c464cfa5afb06a111590e3ade52dcd87adeb",
+  "result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+  "material_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+  "source_implementation_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+  "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+  "result_marker": "[AUTO:CONVERSION-DX11-00386]",
+  "selected_work_item": "DX11_R255_PROGRAMMABLE_INDEXED_FINAL_PRE_DRAW_RECEIPT",
+  "summary": "R255 recomputes the current R252 indexed direct-dispatch tuple, R253 managed source-index value proof, and R254 fresh live IA index binding, then joins them into one final dormant indexed pre-Draw receipt. Stale R252, R253, or R254 receipts fail closed. No DrawIndexed call or NativeDrawPath activation was added.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533"
+  ],
+  "validation_candidate_commit": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 51f6c464cfa5afb06a111590e3ade52dcd87adeb; read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/reviews/VR_BACKEND_100_REVIEW_SET_05.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and Issue #14. No CONVERSION-DX11-00386 run record existed. The prior exact next action selected a final dormant indexed pre-Draw receipt joining R252/R253/R254. Current explicit rollover CONVERSION-DX11-00386-E002 / CHAT_ROLLOVER=2 supersedes the earlier automatic-queue CONVERSION-DX9EX-00385-E002 bookkeeping only; it is not a retry and ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R254 proves a fresh live IA index binding after R253, but the indexed programmable path still lacked one final receipt that simultaneously seals the current R252 dispatch tuple, R253 source-value proof, and R254 live-IA proof. R255 closes only that lineage gap and remains non-activating.",
+      "review_lenses": {
+        "architecture": "Extend only NativeProgrammableShaderPairCache dormant readiness; vr-d3d9ex-focus, selector, OpenXR transport and production draw routing remain untouched.",
+        "ownership_lifetime": "Recompute R252 and R253 against the current managed buffers and reobserve R254 live IA state on the current context/device before issuing R255.",
+        "stereo_correctness": "No WVP, projection, HUD, eye surface, pose, recenter or OpenXR behavior is changed; HMD behavior remains untested.",
+        "performance": "Dormant readiness/probe path only; no production Draw/DrawIndexed hot-path activation or additional runtime instrumentation.",
+        "adversarial": "Positive receipt plus explicit stale R252, stale R253 and stale R254 receipt tests fail closed. Set-05 F21/F23 activation constraints remain preserved."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material 6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533 adds NativeProgrammableShaderIndexedPreDrawReadiness, indexed_pre_draw_readiness(), validate_indexed_pre_draw_snapshot(), R252->R253 and R253->R254 lineage checks, independent 0x255 snapshot domain, constant-buffer regressions and source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R255_PROGRAMMABLE_INDEXED_FINAL_PRE_DRAW_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "validation_run_id": 37233244860,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111527173039,
+      "readiness_smoke_job_id": 111528181745,
+      "artifact_id": 11314178432,
+      "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+      "local_static_validation": "PASS_EXACT_SHA_DIFF_CHECK_SOURCE_GRAPH_DORMANT_ACTIVATION",
+      "evidence": "Exact SHA 6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533 passed Backend Conversion Gate 37233244860 attempt 1. validate job 111527173039 and DX11 readiness smoke job 111528181745 both succeeded; the latter passed Build/Run DX11 constant buffer probe containing R255 positive composition and stale R252/R253/R254 rejection. N100 auxiliary exact-SHA validation passed git diff --check, source graph (10 TUs), and dormant activation boundary. No Quest3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "material_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "source_implementation_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "result_marker": "[AUTO:CONVERSION-DX11-00386]",
+      "implementation_commits": [
+        "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R255 is dormant programmable indexed pre-Draw readiness/probe hardening only; it does not change runtime selector behavior, activate Draw/DrawIndexed/NativeDrawPath, or require an HMD distribution package."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_implementation_comment_id": 5984206283,
+      "issue14_validation_comment_id": 5984283676,
+      "exact_next_action": "Preserve validated R239-R255 programmable readiness. Under a new TASK_ID, review a bounded dormant programmable draw-candidate union over the validated non-indexed R251 and indexed R255 receipts before any Draw/DrawIndexed or NativeDrawPath activation.",
+      "rollover_metadata_reconciled": true,
+      "authoritative_event_id": "CONVERSION-DX11-00386-E002",
+      "authoritative_event_type": "rollover",
+      "authoritative_attempt": "1/3"
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "R255 changes only dormant DX11 readiness/probe/static-guard code. No protected DX9Ex baseline paths, OpenXR transport, selector, production Draw* routing or NativeDrawPath activation changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00386",
+    "production_id": "CONVERSION-DX11-00386",
+    "event_id": "CONVERSION-DX11-00386-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_ROLLOVER",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+    "source_implementation_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+    "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+    "validation_run_id": 37233244860,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111527173039,
+    "readiness_smoke_job_id": 111528181745,
+    "artifact_id": 11314178432,
+    "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+    "implementation_comment_id": 5984206283,
+    "validation_comment_id": 5984283676,
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37233244860,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "validate_job_id": 111527173039,
+      "readiness_smoke_job_id": 111528181745,
+      "artifact_id": 11314178432,
+      "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+      "artifact_size_bytes": 2366689
+    },
+    "n100_auxiliary_static": {
+      "exact_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "conclusion": "success",
+      "checks": [
+        "git diff --check base material",
+        "python3 -m py_compile tools/verify_dx11_source_graph.py",
+        "python3 tools/verify_dx11_source_graph.py"
+      ]
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5984206283,
+    "validation_comment_id": 5984283676
+  },
+  "exact_next_action": "Preserve validated R239-R255 programmable readiness. Under a new TASK_ID, review a bounded dormant programmable draw-candidate union over the validated non-indexed R251 and indexed R255 receipts before any Draw/DrawIndexed or NativeDrawPath activation.",
+  "validation_run_id": 37233244860,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111527173039,
+  "readiness_smoke_job_id": 111528181745,
+  "artifact_id": 11314178432,
+  "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00386",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00386",
+      "production_id": "CONVERSION-DX11-00386",
+      "event_id": "CONVERSION-DX11-00386-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "rollover_is_retry": false,
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
+      "runtime_validation": "UNTESTED",
+      "native_draw_path_activation_changed": false,
+      "material_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "source_implementation_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+      "validation_run_id": 37233244860,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111527173039,
+      "readiness_smoke_job_id": 111528181745,
+      "artifact_id": 11314178432,
+      "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+      "implementation_comment_id": 5984206283,
+      "validation_comment_id": 5984283676,
+      "chat_rollover": 2,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00386",
+        "production_id": "CONVERSION-DX9EX-00385",
+        "event_id": "CONVERSION-DX9EX-00385-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "rollover_is_retry": false,
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "material_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+        "source_implementation_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+        "validation_bearing_result_sha": "6c20bd422b8ff00c031b1a1ff5cb60ec6c1a8533",
+        "validation_run_id": 37233244860,
+        "validation_run_attempt": 1,
+        "validation_job_id": 111527173039,
+        "readiness_smoke_job_id": 111528181745,
+        "artifact_id": 11314178432,
+        "artifact_digest": "sha256:0dd950a07aa5f1f732281f5305621614a88ba2d4acde1de6b7ea0f7895c21b29",
+        "implementation_comment_id": 5984206283,
+        "validation_comment_id": 5984283676
+      }
+    ],
+    "reason": "The current explicit user rollover CONVERSION-DX11-00386-E002 / CHAT_ROLLOVER=2 supersedes the earlier automatic-queue CONVERSION-DX9EX-00385-E002 bookkeeping only. This rollover is not a retry, so ATTEMPT remains 1/3. R255 material and exact-SHA validation evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

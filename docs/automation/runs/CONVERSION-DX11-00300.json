@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00300",
+  "production_id": "CONVERSION-DXVK-00299",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00299-E003",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "f19b10bfd28957e04d7f137d01e8b86405b69227",
+  "source_implementation_sha": "0504e094bca1aee71451702d58b5aefb5932ee59",
+  "result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+  "validation_bearing_result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+  "result_marker": "[AUTO:CONVERSION-DX11-00300]",
+  "selected_work_item": "DX11_R213_OUTPUT_STATE_EXACTNESS_GATE",
+  "summary": "R213 makes DX11 census ExactSamples fail closed when dynamic output-state observation is incomplete, matching the dormant native output-state binder readiness boundary. Two follow-up verifier fixes aligned source-graph and dormant-activation textual guards with the new gate. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "implementation_commits": [
+    "0504e094bca1aee71451702d58b5aefb5932ee59",
+    "4c63002e7953c7060cc9ee3dc2a5240750a0595f",
+    "3670d3ed6b072c4203e1e40b7de590d7235b95ad"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub branch state from f19b10bfd28957e04d7f137d01e8b86405b69227 and read AGENTS.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md and docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md. No durable CONVERSION-DX11-00300 run record existed at recovery."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The dormant native output-state binder rejects incomplete viewport/scissor/blend-factor/sample-mask snapshots, but census ExactSamples did not require outputStateObservationComplete. This could overcount incomplete dynamic-output observations as exact diagnostic evidence.",
+      "review_lenses": {
+        "architecture": "Census exactness-only change; no selector, transport, packaging or vr-d3d9ex-focus modification.",
+        "ownership_lifetime": "No COM/resource lifetime, reset, synchronization or generation ownership changed.",
+        "stereo_correctness": "Prevents incomplete dynamic output-state evidence from being treated as exact; no native stereo draw activation.",
+        "performance": "One existing boolean joins the exact-sample predicate; no allocations, copies, waits or render-state object creation.",
+        "adversarial": "Native output binding was already fail-closed, so census evidence had to be at least as strict as the dormant consumer readiness boundary."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "0504e094bca1aee71451702d58b5aefb5932ee59 adds signature.outputStateObservationComplete to ExactSamples and an R213 source-graph contract. 4c63002e7953c7060cc9ee3dc2a5240750a0595f fixes the stale R80 source-graph verifier expression. 3670d3ed6b072c4203e1e40b7de590d7235b95ad fixes the dormant-activation verifier expression."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "evidence": "Required Backend Conversion Gate exact run 37134564287 on validation-bearing SHA 3670d3ed6b072c4203e1e40b7de590d7235b95ad passed validate job 111236341808 and DX11 readiness smoke probes job 111237313421, including source graph, dormant activation boundary, census analyzer, Win32 configure/build/binary and readiness probes. Prior run 37134404467 failed at the stale R80 source-graph textual guard and is superseded by the corrected exact-SHA pass.",
+      "local_read_only_checks": [
+        "python3 tools/verify_dx11_source_graph.py: PASS",
+        "python3 tools/verify_dx11_activation_boundary.py: PASS",
+        "python3 tools/test_analyze_dx11_census.py: PASS"
+      ],
+      "unrelated_preexisting_check": "tools/test_dx11_census_log_contract_r131.py expects a literal 'runtime census' string absent both before R213 at f19b10bfd28957e04d7f137d01e8b86405b69227 and after R213; it is not part of Backend Conversion Gate and was not modified under this task.",
+      "prior_same_attempt_runs": [
+        {
+          "run_id": 37134404467,
+          "head_sha": "0504e094bca1aee71451702d58b5aefb5932ee59",
+          "status": "FAIL",
+          "failure_signature": "Verify DX11 source graph: stale R80 exact-sample verifier token",
+          "correction_commit": "4c63002e7953c7060cc9ee3dc2a5240750a0595f"
+        },
+        {
+          "run_id": 37134478991,
+          "head_sha": "4c63002e7953c7060cc9ee3dc2a5240750a0595f",
+          "status": "FAIL",
+          "failure_signature": "Dormant activation verifier retained the stale R80 contiguous predicate token",
+          "correction_commit": "3670d3ed6b072c4203e1e40b7de590d7235b95ad"
+        }
+      ]
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "0504e094bca1aee71451702d58b5aefb5932ee59",
+        "4c63002e7953c7060cc9ee3dc2a5240750a0595f",
+        "3670d3ed6b072c4203e1e40b7de590d7235b95ad"
+      ],
+      "validation_bearing_result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R213 changes dormant census/readiness evidence and verifier contracts only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5970725189,
+      "exact_next_action": "Release CONVERSION-DX11-00300 as automation PASS under authoritative CONVERSION-DXVK-00299 / E003 rollover metadata, ATTEMPT=1/3. Keep NativeDrawPathActive disabled and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD.",
+      "validation_comment_id": 5970821437,
+      "authoritative_metadata_correction_comment_id": 5970840152
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37134564287,
+    "head_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+    "validate_job_id": 111236341808,
+    "readiness_smoke_job_id": 111237313421,
+    "artifact_id": 11278551482,
+    "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf"
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5970725189,
+  "issue14_comment_ids": [
+    5970725189,
+    5970820470,
+    5970821437,
+    5970840152
+  ],
+  "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00299",
+    "event_id": "CONVERSION-DXVK-00299-E003",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH",
+    "rollover_is_retry": false,
+    "superseded_bookkeeping_commits": [
+      "13fd8f6afc611cca92dd5d915dbbfae8eb3b55ee",
+      "33a4f403531c1808607d67cc61c59963675fd7e7"
+    ],
+    "superseded_issue_comment_id": 5970820470
+  },
+  "validation_comment_id": 5970821437,
+  "authoritative_metadata_correction_comment_id": 5970840152
+}

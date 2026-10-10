@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00409",
+  "production_id": "CONVERSION-DX11-00409",
+  "event_id": "CONVERSION-DX11-00409-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R271_PROGRAMMABLE_PAIR_SOURCE_SEMANTIC_RECEIPT",
+  "base_sha": "3510c1f4055ce7d09e7ab3c86194e1b98723f760",
+  "result_sha": "29525440f410b9c947c815fe45405f5b03331f20",
+  "source_implementation_sha": "bc585d040fdf4e565362b5509b9711b719a080f2",
+  "material_result_sha": "29525440f410b9c947c815fe45405f5b03331f20",
+  "validation_bearing_result_sha": "29525440f410b9c947c815fe45405f5b03331f20",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R271 composes a fail-closed pair-level programmable source-semantic receipt from the exact R239 pair identity, source-attested R266 VS/PS register semantics and exact R268 stage linkage. Production census seals the receipt into signature identity and emits diagnostic provenance while shaderTranslationExact and native draw authorization remain off.",
+  "evidence": [
+    "pipeline_translation.hpp defines ProgrammableShaderPairSourceSemanticEvidence with exact pair/source/register/linkage provenance.",
+    "pipeline_translation.cpp derives R271 only when R239 identity, VS/PS R266 source hashes/versions and R268 linkage all identify the same shader pair.",
+    "runtime_census.cpp derives, hashes and logs R271 pair evidence for programmable observations while preserving sig.shaderTranslationExact = false.",
+    "dx11_constant_buffer_probe verifies the exact R239/R266/R268 receipt and rejects detached pixel register semantics from another source stream.",
+    "verify_dx11_source_graph.py seals the R271 contract and explicitly guards the fail-closed shaderTranslationExact boundary.",
+    "Backend Conversion Gate 37434965808 succeeded on exact SHA 29525440f410b9c947c815fe45405f5b03331f20; validate job 112174836398 and DX11 readiness smoke job 112176757133 both succeeded.",
+    "Artifact 11398856236 digest sha256:f128af5dd640ff6a37b1dca7bd9edcaf63d4bf12320b35935bdcd2c85887a51a."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered current GitHub HEAD 3510c1f4055ce7d09e7ab3c86194e1b98723f760 after completing 00408. Re-read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, 00408 run record and inherited VR_AUTODEV_STATE.json under branch-local precedence."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "00408/R270 closed single-stage source provenance. The next smallest runnable DX11 activation-evidence gap was a pair-level receipt proving both source-attested R266 stage semantics and R268 linkage belong to the same R239 pair."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R271 pair evidence type/derivation, production census sealing/logging, positive/stale-source probe coverage and source-graph contract without widening programmable translation readiness."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37434965808 completed SUCCESS. validate 112174836398 passed static contracts, dormant activation, census, Win32 configure/build/binary verification. DX11 readiness smoke 112176757133 passed all probes including the R271 constant-buffer regressions. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material lineage bfa62795fc02eaed17f3386acee92d93491cb543 -> bc585d040fdf4e565362b5509b9711b719a080f2 -> d1232e1808ffb02988e5f251f83b30925d244617 -> 89537d0b7f789624c9a75a6fc146ef51c94ef578 -> 29525440f410b9c947c815fe45405f5b03331f20; every material commit contains [AUTO:CONVERSION-DX11-00409]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R271 is source/census diagnostic evidence only and does not authorize a runtime candidate or translated shader payload."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run record and conversion-lane state preserve exact validation-bearing SHA, Gate receipts, UNTESTED runtime status and next independent mapping-plan action."
+    }
+  },
+  "exact_next_action": "Under a later independent DX11 task, derive an explicit fail-closed programmable constant-register/sampler mapping plan from the exact R271 pair source-semantic receipt and its R266 operand provenance, with deterministic mapping hashes suitable for replacing R263's fixture-only constantRegisterMappingExact/samplerMappingExact booleans. Do not create/bind D3D11 shaders or enable shaderTranslationExact, NativeDrawPath, Draw or DrawIndexed.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "bfa62795fc02eaed17f3386acee92d93491cb543",
+    "bc585d040fdf4e565362b5509b9711b719a080f2",
+    "d1232e1808ffb02988e5f251f83b30925d244617",
+    "89537d0b7f789624c9a75a6fc146ef51c94ef578",
+    "29525440f410b9c947c815fe45405f5b03331f20"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "29525440f410b9c947c815fe45405f5b03331f20",
+    "backend_conversion_gate": {
+      "run_id": 37434965808,
+      "conclusion": "success",
+      "validate_job_id": 112174836398,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112176757133,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11398856236,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-29525440f410b9c947c815fe45405f5b03331f20",
+      "artifact_digest": "sha256:f128af5dd640ff6a37b1dca7bd9edcaf63d4bf12320b35935bdcd2c85887a51a"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00066",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T00:40:16+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "6e297f73ce93d80152ad4757bba34fe87fc5b1d3",
+  "result_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a",
+  "validation_bearing_result_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R105 managed Texture2D per-texture lifetime registry with pre-Unlock staging and post-Unlock HRESULT-gated commit.",
+  "summary": "R105 maps exact single-mip D3DPOOL_MANAGED Texture2D identities observed by the existing R30 census hooks to CPU shadows. LockRect bytes are copied to owned staging before the real UnlockRect, raw pBits lifetime ends before that COM call, staged bytes commit only after a successful real UnlockRect, failed Unlock invalidates shadow readiness without advancing version, zero-ref Release forgets registry ownership, and successful Reset advances generation while preserving valid CPU shadow content.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/runtime_census.hpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "managed_mirror_upload_from_production": false,
+    "srv_binding_from_production": false,
+    "native_game_draw_routing": false,
+    "census_gate": "OUTRUN_VR_DX11_CENSUS=1"
+  },
+  "risk_review": {
+    "intersected_regression_keys": [
+      "VR-R51-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "reason": "The changed R30 renderer paths are protected runtime-risk paths. CI proves structure/build/probe behavior only; Quest3/VDXR runtime parity remains untested."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36591104696,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T15:39:15Z",
+      "validated_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; fixed-function/input-layout/input-signature/object/linkage probes PASS; R105 constant-buffer/WARP probe build+run PASS; binary verification PASS."
+    },
+    "build": {
+      "run_id": 36591115234,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T15:39:24Z",
+      "validated_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36591115256,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T15:39:54Z",
+      "validated_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36591115289,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T15:39:11Z",
+      "validated_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a",
+      "evidence": "build-hud-inspector and static-exe-analysis PASS."
+    },
+    "pc_fast": {
+      "run_id": 36591104627,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T15:33:30Z",
+      "validated_sha": "6d3c16b2e8dd3644ec015d6637b4b3b9d8e5e62a"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5893430396,
+    "validation_comment_id": 5893550209,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "Result commit message contains exact controller marker [AUTO:CONVERSION-DX11-00066] and no CI-skip directive.",
+    "R105 source verifier enforces stage_managed_texture_unlock_rect before the real R30TextureUnlockRectHook call and finish_managed_texture_unlock_rect after the real HRESULT.",
+    "Hosted WARP probe proves pre-Unlock owned staging, success-only commit, failed-Unlock invalidation, recovery, Reset generation preservation, Release cleanup and registry clear.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R105 is automation-validated but runtime-untested. Per-texture MANAGED CPU-shadow lifetime is now captured safely; native mirror upload/binding and native game draw routing remain disabled.",
+  "next_action": "Continue Set 05 F18 with one bounded R106 readiness step that exposes per-bound-texture managed-shadow readiness to the DX11 census/activation gate without binding SRVs or routing draws. Keep native activation and visual parity HMD-gated."
+}

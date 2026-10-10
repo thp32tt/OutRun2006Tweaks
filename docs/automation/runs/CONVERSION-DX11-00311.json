@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00311",
+  "production_id": "CONVERSION-DX11-00311",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00311-E003",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_RESOURCE_BEHAVIOR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "9c4b56402bdcf90aadc3eae1ad4ca0c4bb3b2873",
+  "result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
+  "validation_bearing_result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
+  "result_marker": "[AUTO:CONVERSION-DX11-00311]",
+  "selected_work_item": "DX11_R219_RESOURCE_BEHAVIOR_EXACT_SAMPLES_SCOPE_GUARD",
+  "summary": "R219 makes the F18 resource descriptor/mutation/lifetime readiness boundary explicit in each sampled DX11 signature, hashes that derived state, and requires resourceBehaviorExact directly at the final ExactSamples predicate. Existing fail-closed mutation telemetry, managed-shadow, stream-frequency and surface-MSAA blockers remain unchanged; NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_census_log_contract_r131.py",
+    "docs/automation/runs/CONVERSION-DX11-00311.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 9c4b56402bdcf90aadc3eae1ad4ca0c4bb3b2873, VR_BACKEND_100_REVIEW_INDEX, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, branch-local CONVERSION_LANE_STATE, Set-05/07/09/10 findings, VR_AUTODEV_STATE, VR_REGRESSION_KNOWLEDGE and VR_PROBLEM_HISTORY. Prior R218 task is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F18 remains an activation blocker. Current resourcesExact is fail-closed for descriptor, mutation telemetry, managed-shadow, stream-frequency and surface-MSAA behavior, but that readiness is only an aggregate local. The final ExactSamples predicate does not directly name the F18 behavior gate, and sampled identity does not preserve its derived result as an explicit invariant.",
+      "review_lenses": {
+        "architecture": "Make resource behavior a named dormant activation-readiness gate without enabling any native draw route.",
+        "ownership_lifetime": "Preserve existing mutationTelemetryRequired and managedShadowRequired blockers; no resource ownership or Reset lifetime is promoted.",
+        "stereo_correctness": "No WVP, eye routing, presentation, HUD or shared-frame behavior changes.",
+        "performance": "Four boolean hash inputs and boolean assignments on already-sampled census draws only; no GPU work or allocation.",
+        "adversarial": "A later refactor of aggregate resourcesExact cannot silently bypass F18 mutation/lifetime readiness because the final predicate and signature identity now require the explicit derived gate."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "5e2df83a6c271b7ec2934807c145a984ee6bdb63 added R219 per-signature F18 resource-behavior fields, sampled hash identity, explicit final ExactSamples gate and verifier bindings. ae7d2d2aed033f3f0b191559d5a55c42b62eb953 repaired only the pre-R219 R175 verifier literal so it checks the preserved !streamSourceFrequencyUnsupported term inside resourceBehaviorExact; runtime semantics were not widened."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_RESOURCE_BEHAVIOR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Initial exact-SHA Backend Conversion Gate 37145172272 failed at source-graph verification because an R175 static oracle retained the pre-R219 aggregate literal. The repaired exact-SHA Backend Conversion Gate 37145322599 passed on ae7d2d2aed033f3f0b191559d5a55c42b62eb953. Validate job 111267944089 passed queue/baseline/backend/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111268949781 passed all fixed-function, input-layout/signature, shader, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
+        "ae7d2d2aed033f3f0b191559d5a55c42b62eb953"
+      ],
+      "validation_bearing_result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
+      "issue14_material_comment_id": 5972290556,
+      "issue14_repair_comment_id": 5972312790,
+      "issue14_validation_comment_id": 5972403229
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R219 changes dormant census/static activation-readiness evidence only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5972290556,
+      "issue14_repair_comment_id": 5972312790,
+      "issue14_validation_comment_id": 5972403229,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Quest 3/VDXR runtime parity remains a separate activation and visual-correctness gate."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** is a broad historical risk path, but R219 only changes sampled diagnostic accounting and static verification. Startup/device creation/reset/present, stereo transport/shared resources, host fallback, profiles and configuration are unchanged."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00311",
+    "event_id": "CONVERSION-DX11-00311-E003",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "source": "CURRENT_USER_QUEUE_RETRY"
+  },
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "source_implementation_sha": "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
+  "implementation_commits": [
+    "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
+    "ae7d2d2aed033f3f0b191559d5a55c42b62eb953"
+  ],
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37145322599,
+    "head_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
+    "validate_job_id": 111267944089,
+    "readiness_smoke_job_id": 111268949781,
+    "artifact_id": 11282013519,
+    "artifact_digest": "sha256:14e54c09bdf79ed33a288c41e0664fe3ee2aa2c5a30eee2d717b1be10f6f46f9"
+  },
+  "superseded_failed_gate": {
+    "result_sha": "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
+    "run_id": 37145172272,
+    "validate_job_id": 111267501883,
+    "failed_step": "Verify DX11 source graph",
+    "reason": "R175 verifier retained the pre-R219 literal resourcesExact gate; repaired without widening runtime/source semantics."
+  },
+  "issue14_comment_ids": [
+    5972290556,
+    5972312790,
+    5972396116,
+    5972403229
+  ],
+  "dispatch_metadata_correction": {
+    "authoritative_production_id": "CONVERSION-DX11-00311",
+    "authoritative_event_id": "CONVERSION-DX11-00311-E003",
+    "authoritative_event_type": "retry",
+    "authoritative_attempt": "3/3",
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00310",
+      "event_id": "CONVERSION-DXVK-00310-E002",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "evidence_comment_id": 5972403229,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

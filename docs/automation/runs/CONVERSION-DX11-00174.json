@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00174",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "0d5373c196a0b3c541b3f853c68ac510bcc3f098",
+  "result_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+  "validation_bearing_result_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R174_182194_CALL_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00172 completed the bounded 0x8BD20 control-flow proof and explicitly left the separate 0x182194 callee untouched. The already-proven aligned rel32 CALL at 0x2839D resolves to 0x182194, making bounded exact-byte provenance capture the smallest highest-priority independent F13 unit that does not require HMD/runtime evidence. DXVK-00173 independently validated the same public-EXE capture design; DX11 must pass separate exact-result Actions.",
+  "summary": "Completed a fail-closed DX11 exact-EXE provenance capture for the separate 0x182194 callee reached by the proven aligned 0x2839D rel32 CALL. Exact-SHA static analysis requires the predecessor proof, target link, raw inbound call membership, .text residency and a full 96-byte window. Function-entry identity, higher-level callee semantics and ScreenHud/world/render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00173",
+    "source_result_sha": "b3db9c2a94311d2e9ff02cb0ea437cbf2ed4cf13",
+    "source_proof_status": "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded provenance proof design. DX11 relies on its own proven 0x2839D call edge and independent exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00174.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result 003e099127352c744e0b85d4271e30986a5c4a44 contains exact marker [AUTO:CONVERSION-DX11-00174] and no CI-skip directive.",
+    "Existing EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN proof resolves aligned CALL 0x0002839D to 0x00182194 and confirms the raw call candidate.",
+    "HUD Inspector static job 110111536272 PASS emitted gf_target_c_helper_1_third_callee=0x00182194 status=EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED routine_predecessor=EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN routine_call=0x0002839D routine_link=True section=.text start_guess=0x00182194 probe_len=96 inbound_raw=343 outbound_raw=0 function_entry=UNRESOLVED semantic_effect=UNRESOLVED_CALLEE_BYTES_ONLY ownership_effect=NONE.",
+    "Captured exact 96-byte prefix: 55 8b ec 83 ec 20 83 e4 f0 d9 c0 d9 54 24 18 df 7c 24 10 df 6c 24 10 8b 54 24 18 8b 44 24 10 85 c0 74 3c de e9 85 d2 79 1e d9 1c 24 8b 0c 24 81 f1 00 00 00 80 81 c1 ff ff ff 7f 83 d0 00 8b 54 24 14 83 d2 00 eb 2c d9 1c 24 8b 0c 24 81 c1 ff ff ff 7f 83 d8 00 8b 54 24 14 83 da 00 eb 14 8b.",
+    "DXVK-00173 result b3db9c2a94311d2e9ff02cb0ea437cbf2ed4cf13 independently captured the same public-EXE target; DX11 validation remained independent.",
+    "Backend Conversion Gate 36781171555, Build 36781178837, OutRun EXE HUD Inspector CI 36781178652 and OpenXR VR architecture 36781178602 all passed on the result SHA; OpenXR jobs passed 6/6.",
+    "VR PC Fast Test Build 36781171519 was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Decode the exact 0x182194 96-byte prefix only to complete instruction boundaries/control flow, stopping at the first incomplete instruction, or gather structural pre-target evidence for function-entry identity. Keep higher-level callee semantics and all ScreenHud/world/render ownership unresolved; runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T06:49:44+09:00",
+  "runtime_claim": "NONE",
+  "proof_contract": {
+    "call_rva": "0x0002839D",
+    "target_rva": "0x00182194",
+    "target_section": ".text",
+    "probe_len": 96,
+    "raw_inbound_rel32_candidate_count": 343,
+    "raw_outbound_rel32_candidate_count": 0,
+    "status": "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED",
+    "predecessor_status": "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN",
+    "routine_call_link": true,
+    "function_start_guess_rva": "0x00182194_HINT_ONLY_NOT_PROMOTED",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "UNRESOLVED_CALLEE_BYTES_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The task establishes exact call/callee byte provenance only. No ScreenHud/world/render ownership is inferred; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The collector fails closed unless the prior exact 0x2839D call proof remains PASS, the raw inbound rel32 census includes 0x2839D, target 0x182194 remains in .text and the full 96-byte window is readable."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer path, DX9Ex baseline, HUD/world semantic ownership or open runtime problem state changed. Issue #13 therefore needs no new event."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36781171555,
+      "job_id": 110111512340,
+      "conclusion": "success",
+      "validated_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "artifact_id": 11128251856,
+      "artifact_digest": "sha256:4843463e702ca2adea04dbb7624a64143efc9c869e6a576217d72ae652d55f44"
+    },
+    "build": {
+      "run_id": 36781178837,
+      "conclusion": "success",
+      "validated_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "artifact_id": 11128231796,
+      "artifact_digest": "sha256:19f8c1761b09140cea019db0a7a8c9831a95ff417f3b6be0d11bec04925de178",
+      "source_snapshot_artifact_id": 11127986979,
+      "source_snapshot_artifact_digest": "sha256:e86f788bfb998424cbaf12fef120dffab98ca63cfb1d68185bb66bad69a8d89c"
+    },
+    "hud_inspector": {
+      "run_id": 36781178652,
+      "conclusion": "success",
+      "validated_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "static_analysis_job_id": 110111536272,
+      "analysis_artifact_id": 11127921244,
+      "analysis_artifact_digest": "sha256:9de341481eb81d11853d43e03fc7d158b0b5587974455b83d06b1f7ed7c90e8a",
+      "game_artifact_id": 11128221619,
+      "game_artifact_digest": "sha256:5edcd6b386d5d0ec4b7df9b94e9e892d315e94442f2e170f37fb2fc67a9267c2",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_third_callee=0x00182194 status=EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED routine_predecessor=EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN routine_call=0x0002839D routine_link=True section=.text start_guess=0x00182194 probe_len=96 inbound_raw=343 outbound_raw=0 function_entry=UNRESOLVED semantic_effect=UNRESOLVED_CALLEE_BYTES_ONLY ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36781178602,
+      "conclusion": "success",
+      "validated_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11128480276,
+      "host_artifact_digest": "sha256:fc37657978525b16e0501ade3329a2be0a4ffd7f714a0187e77a478fd7b3e4e0"
+    },
+    "pc_fast": {
+      "run_id": 36781171519,
+      "conclusion": "skipped",
+      "validated_sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "003e099127352c744e0b85d4271e30986a5c4a44",
+      "message": "dx11: capture 0x182194 callee provenance [AUTO:CONVERSION-DX11-00174]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5920241565,
+    "validation_comment_id": 5920338319,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_8BD20_BOUNDED_CONTROL_FLOW_PROVEN",
+    "after": "PARTIAL_PLUS_182194_EXACT_PROVENANCE_CAPTURED",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182194 call edge and 96-byte .text window are captured, but function-entry identity is not promoted from the analyzer hint, the captured bytes are not yet instruction-boundary decoded, higher-level callee semantics remain unresolved, and render/HUD ownership remains NONE.",
+  "resume_cursor": "Set04/F13 now has independent DX11 exact provenance for 0x182194 from aligned CALL 0x2839D plus a 96-byte .text capture. The next runnable unit may decode complete instructions/control flow from this exact window, stopping at the first incomplete instruction, or gather structural evidence before 0x182194 for function-entry identity. Do not infer runtime/render ownership from provenance alone."
+}

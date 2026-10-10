@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00419",
+  "production_id": "CONVERSION-DX11-00419",
+  "event_id": "CONVERSION-DX11-00419-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R281_TRANSLATED_ARTIFACT_RECEIPT",
+  "base_sha": "c970e30af609f8a247c2e2c187eac85f11ab0b7a",
+  "result_sha": "6087135de7215d1e31302efa382285c5b0c832ad",
+  "material_result_sha": "6087135de7215d1e31302efa382285c5b0c832ad",
+  "validation_bearing_sha": "6087135de7215d1e31302efa382285c5b0c832ad",
+  "validation_bearing_result_sha": "6087135de7215d1e31302efa382285c5b0c832ad",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37566748391,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112616099486,
+  "readiness_smoke_job_id": 112617403200,
+  "artifact_id": 11458838394,
+  "artifact_digest": "sha256:2e58fe282885dbafa920feba28bf9eb548d3052cb3ad44153848cef4b91b94ed",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00419.json",
+  "implementation_commits": [
+    "6087135de7215d1e31302efa382285c5b0c832ad"
+  ],
+  "issue14_comment_id": 6030375154,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "summary": "R281 adds a diagnostic-only translated programmable-shader artifact receipt identity. It binds the exact R280 source-to-object handoff and R276 semantic plan to distinct target vertex/pixel bytecode receipt identities while explicitly keeping target bytecode unmaterialized and shader object creation unauthorized.",
+  "evidence": [
+    "native_backend.hpp/.cpp define NativeProgrammableShaderTranslatedArtifactReceiptEvidence plus deterministic target vertex/pixel artifact identity and snapshot validation.",
+    "runtime_census.cpp derives, hashes and logs signature-attributable R281 receipt evidence while keeping sig.shaderTranslationExact=false.",
+    "analyze_dx11_census.py correlates R281 evidence and requires an exact unmaterialized, unauthorized translated artifact receipt before reducing the remaining boundary to R242 translated-object ownership.",
+    "tools/test_analyze_dx11_census.py, tools/dx11_constant_buffer_probe.cpp and tools/verify_dx11_source_graph.py cover R281 positive and stale-R280 rejection paths.",
+    "Exact-SHA Backend Conversion Gate 37566748391 completed success for 6087135de7215d1e31302efa382285c5b0c832ad; validate 112616099486 and DX11 readiness smoke 112617403200 both succeeded.",
+    "Artifact 11458838394 digest sha256:2e58fe282885dbafa920feba28bf9eb548d3052cb3ad44153848cef4b91b94ed.",
+    "Issue #14 production change ledger event 6030375154 records the material change."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "target_bytecode_materialized": false,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "object_creation_authorized": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch from 00418 C6 state and current GitHub HEAD c970e30af609f8a247c2e2c187eac85f11ab0b7a before the material implementation; read AGENTS.md and lane state."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Confirmed R280 sealed exact source/semantic/ownership handoff but future R242 creation still lacked exact translated target artifact/bytecode receipt identity."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R281 translated artifact receipt type/composer/validator, production census identity/logging, analyzer correlation and deterministic regressions without compiling/creating D3D11 programmable shaders."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Backend Conversion Gate 37566748391 exact SHA success; validate 112616099486 and DX11 readiness smoke 112617403200 succeeded; artifact 11458838394 produced. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 6087135de7215d1e31302efa382285c5b0c832ad contains [AUTO:CONVERSION-DX11-00419] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R281 is diagnostic-only and intentionally materializes no target bytecode or D3D11 shader objects; no runtime-testable programmable draw path was activated."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "This durable run/lane checkpoint preserves exact result SHA, Gate/jobs/artifact, Issue #14 ledger entry, UNTESTED runtime status and next independent action."
+    }
+  },
+  "exact_next_action": "Define and validate the exact target-bytecode materialization/compile contract required by R281 artifact identities, including deterministic target profile/entrypoint/compile-option provenance, without yet invoking D3DCompile/CreateVertexShader/CreatePixelShader or enabling NativeDrawPath/Draw/DrawIndexed.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "6087135de7215d1e31302efa382285c5b0c832ad",
+    "backend_conversion_gate": {
+      "run_id": 37566748391,
+      "conclusion": "success",
+      "validate_job_id": 112616099486,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112617403200,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11458838394,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-6087135de7215d1e31302efa382285c5b0c832ad",
+      "artifact_digest": "sha256:2e58fe282885dbafa920feba28bf9eb548d3052cb3ad44153848cef4b91b94ed"
+    }
+  }
+}
