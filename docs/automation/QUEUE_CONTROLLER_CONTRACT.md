@@ -1,5 +1,25 @@
 # Queue Controller Automation Contract
 
+## DX9Ex feature-scoped dispatch and terminal gates — 2026-10-10 21:40 KST (ACTIVE)
+
+**Authority:** The user requires fixing/debugging a whole functional capability per task, not finishing a production job after one trivial edit. This active contract supersedes the historical "one material structure seam per task", "keep changes narrowly scoped", and one-commit-per-feature interpretations below **only where they could terminate an incomplete feature**. Keep risk-bounded diffs and single-writer ownership; do not split feature-level success into micro-task completions.
+
+**Controller selection, before dispatch**
+- Fetch latest authenticated GitHub `vr-d3d9ex-focus` HEAD; read `AGENTS.md`, `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`, `docs/VR_WORK_QUEUE.json`, `docs/automation/runs/<TASK_ID>.json`, active work-key claims/lease and exact-SHA Actions. Read a new task only when no conflicting feature owner is live, and only if prior stable feature is terminal or genuinely blocked.
+- Stable `FEATURE_ID`/`work_key` is the *functional deliverable*, not the modified file, individual source guard, hook wrapper, test failure, commit or single R-series boundary. A single feature may require multiple reviewable source commits, verifier edits, compile/debug passes and CI attempts; keep one original TASK_ID across these subtasks, retries and 30-minute chat rollovers.
+- The currently outstanding R84 structural task is a SINGLE functional acceptance unit: all remaining R33→R32→R31→R30→R29 independent compile/link owners, explicit headers/interfaces, retired `.cpp` textual includes and HEADER_FILE_ONLY declarations, cmake.toml / generated CMakeLists.txt synchronization, full Win32 game/host/chain link, focused regression protection and exact-SHA DX9Ex Active + Domain Isolation success. Do not reopen already APPLIED_EQUIVALENT donor runtime logic or create a new TASK_ID for each extraction.
+- At dispatch publish the finite `acceptance_items` (ID, expected behavior, implementation evidence, full-build evidence and validator(s)), `feature_id`, `work_key`, `task_id`, `base_sha`, owned paths, `validation_bearing_result_sha`, `active_claim`/lease and `resume_cursor`. Retain all across ticks; a working repair step stays within the same feature.
+
+**Execution**
+- C0 recover -> diagnose full feature and regression history -> C2 implement interdependent changes -> targeted negative RED/GREEN tests -> *complete* Win32 compile/link -> inspect failures and repair -> rebuild until appropriate integration gates PASS -> exact-SHA Active/Domain checks -> persist C6. Never stop merely after an isolated C++/Python fix or `FEATURE_READY`.
+- Intermediate labels `FEATURE_READY`, `IMPLEMENTED`, `NEEDS_VALIDATION`, `WAITING_CI`, `PENDING_CONTROLLER_EXACT_SHA`, an intermediate commit, static-only PASS, or a chat rollover are checkpoint-only. A failed exact-SHA CI, missing job, skipped full-chain job or wrong SHA **must not produce terminal DONE**.
+- With all deterministic `acceptance_items` green and same `validation_bearing_result_sha` DX9Ex Active / Domain Isolation and required full Win32 gates successful, mark `DONE_BUILD_VERIFIED`. Actual Quest3/VDXR acceptance separately remains `RUNTIME_VALIDATION=UNTESTED` unless matched hardware evidence exists. Do not infer hardware FPS or visuals from CI.
+- If any required gate fails, use error logs to fix the SAME feature/TASK_ID; no trivial new FEATURE_ID on retry. If genuinely impossible after bounded repair and capability checks, record `BLOCKED` with exact failing gate/SHA/root cause/next step. A blocked feature is not completed and is not scoreable. Maintain existing cross-lane lease/fencing and idempotent score rules.
+- **Known broken example:** `CONVERSION-DX9EX-00590` `dbf6678e543b636858a4cbb1bc8ae847af82597e` was labelled `FEATURE_READY` but DX9Ex Active run `38051682030` failed `R31 StateBlock Apply generation producer` and full-chain compile/host/game/package jobs were skipped. Under this contract it is NONTERMINAL and the authorized owner must resume the same feature for repair, rebuild and validation.
+
+**Runtime deployment boundary:** This GitHub policy is the source document fetched by the external Docker controller. User will deploy/reload independently; a committed document is not evidence the active process has adopted the terminal conditions. Controller implementation MUST incorporate these gates and pass tests for multi-commit same-feature continuation, CI fail→same-ID repair, chat-rollover continuity, same-work-key lease exclusion, and no DONE without full-chain PASS.
+
+
 ## Effective multi-lane dispatch authority — 2026-10-10
 
 - A DX11 Native first-priority ACTIVE on `vr-dx11-native-r71`, C DX9Ex ACTIVE concurrently on `vr-d3d9ex-focus` (50% engineering-effort target), B DXVK FROZEN until explicit user reopening. DX12 reference-only.
@@ -16,7 +36,7 @@ The active production automation runs outside ChatGPT in the user's Docker queue
 - Do not rely on historical ChatGPT automation IDs, old clock schedules, a local clone, or an R84 cycle counter to select work.
 - HISTORICAL DX9Ex-only order was: recover earlier task -> Gate0 00505 -> R84 seams -> queue. Current C worker uses P0-P3 and must not rerun completed Gate0/inventory.
 - `vr-refactor-r84-2000c-20261001` is read-only donor/reference. Never write new work there and never wholesale merge it into focus.
-- One material structure seam per task. No filler/no-op cycles merely to increase a campaign count.
+- Historical only: one structure seam per **nonterminal checkpoint/commit**, not one completed task. Feature-level acceptance above overrides micro-task termination. No filler/no-op cycles.
 - Keep the existing `[AUTO:<TASK_ID>]` marker and durable run-record requirements.
 - A task is not complete while its required exact-SHA gate is red, missing, or belongs to a different SHA.
 - Runtime-visible success remains UNTESTED until exact Quest 3/VDXR evidence exists.
