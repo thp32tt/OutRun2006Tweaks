@@ -1,0 +1,426 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C373-C2-Q212-B362-FIRST-INDEPENDENT",
+  "role": "C2",
+  "shard": "EVEN",
+  "queue_index": 212,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "candidate_source": "B362 new unapproved persisted DDS",
+  "candidate_sha256": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+  "previous_independently_rejected_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "B361_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+  "execution_backend": "GITHUB_SOURCE_OF_TRUTH_N100_MCP_FALLBACK_DUE_TO_LOCAL_NETWORK_DOWNLOAD_FAILURE",
+  "firstlook_pixels_before_producer_verdict": false,
+  "firstlook_reason": "B362 producer QA read before fetching SHA and reconstructing views; no blind first-look qualification claimed.",
+  "visual_calibration": "NOT_QUALIFIED",
+  "novelty": "First independent persisted byte B362 C2 inspection versus exact B358/B361/official/source and actual native 100/white75/black50/RAW plus full-atlas r43 diff, first independent determination of 1px-stroke counter reopening versus still unqualified source-family thickness.",
+  "status": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_WEIGHT_AND_SEMANTIC_HOLD",
+  "source_style_failure": "B362 still cannot be approved as final original PROFESSIONAL equivalent, despite proven improvement over B361; no repeating Noto+stroke+tracking next.",
+  "r43_bbox_source": [
+    240,
+    341,
+    637,
+    386
+  ],
+  "r43_bbox_candidate": [
+    270,
+    343,
+    607,
+    384
+  ],
+  "numeric_scope": {
+    "official": {
+      "changed_rgba": 22434,
+      "changed_alpha": 12909,
+      "outside_r43_rgba": 14102,
+      "outside_r43_alpha": 5832,
+      "inside_r43_rgba": 8332
+    },
+    "B358": {
+      "changed_rgba": 16328,
+      "changed_alpha": 12873,
+      "outside_r43_rgba": 8896,
+      "outside_r43_alpha": 5441,
+      "inside_r43_rgba": 7432
+    },
+    "B361": {
+      "changed_rgba": 3559,
+      "changed_alpha": 3559,
+      "outside_r43_rgba": 0,
+      "outside_r43_alpha": 0,
+      "inside_r43_rgba": 3559
+    }
+  },
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_INDEPENDENT_MACHINE.json",
+    "sha256": "0f7fa8a5c772c3b4847f9285e2ad90fb693fc3a6837b52e59490e04a41af1e51"
+  },
+  "regions": [
+    {
+      "id": "r43_professional",
+      "korean": "프로페셔널 모드",
+      "views": {
+        "native": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+          "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+          "bytes": 19442
+        },
+        "practical_75": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png",
+          "sha256": "5728f9964b0b2da3a708f4adeb409b1bd33022832b89a17630af500dae485b6a",
+          "bytes": 30994
+        },
+        "practical_50": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+          "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+          "bytes": 22852
+        },
+        "raw": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_RAW_SAVED_NATIVE.png",
+          "sha256": "2f66d77655f21391a0381c1696e2b16bdbe590ffeeb8f0531ecc437135cad8f1",
+          "bytes": 17695
+        },
+        "pixel_delta": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png",
+          "sha256": "2d13ca5a5cdde27c2d89f126d992772be9d37a496ba34ad43c14e5328b5fa0e7",
+          "bytes": 1992
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_CALIBRATION",
+          "observation": "Actual readable SOURCE appears upright heavy condensed; B362 appears upright. No marked homologous stroke upper-minus-lower x displacement and blind controls in this invocation; not certified equal.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+            "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+            "bytes": 19442
+          }
+        },
+        "clean_plate": {
+          "result": "HOLD_C158_INDEPENDENT_BYTE_REVIEW",
+          "observation": "C158 CLEAN is referenced from producer/B358 and prior C2, but C158 PNG was not downloaded and revalidated in this C373 invocation. Original->B362 scoped mask / old ghost cleanup is not plate-only approval.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+            "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+            "bytes": 19442
+          }
+        },
+        "style": {
+          "result": "FAIL_SOURCE_FAMILY_WEIGHT_CONDENSATION",
+          "observation": "Direct native and practical black 50 comparison: original PROFESSIONAL is heavy cohesive condensed orange block, B362 Hangul appears noticeably thinner/weaker and spacing of per-syllable Noto+tracking differs; 337px versus original 397px. B361 visibly excessive counters closed, B362 opens them but fails original source family qualification.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+            "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+            "bytes": 22852
+          }
+        },
+        "readability": {
+          "result": "SCOPED_IMPROVED_BUT_HIERARCHY_FAIL",
+          "observation": "Actual 50% pixels show B362 Korean syllables legible after B361 counter-collapse, but density/width hierarchy still below original heavy PROFESSIONAL; no actual-game scene testing.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+            "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+            "bytes": 22852
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CLIPPED_STROKES",
+          "observation": "In B362 100% and 50% no externally cut Korean glyphs, 2px vertical margin; B361 2px stroke merges Hangul counters at practical size, B362 1px update visibly restores them, distinct SHA.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png",
+            "sha256": "5728f9964b0b2da3a708f4adeb409b1bd33022832b89a17630af500dae485b6a",
+            "bytes": 30994
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PASS_NEW_CHANGES_B361",
+          "observation": "Independent RGBA full-atlas B361->B362 changed 3559, outside r43 source bbox0 and alpha outside0; r44 B362 exact equal official. Official->B362 outside ORIGINAL r43 bbox RGBA14102 alpha5832 are inherited old-text cleanup and must not be falsely summarized as zero. This is not complete proof of entire game scene.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png",
+            "sha256": "2d13ca5a5cdde27c2d89f126d992772be9d37a496ba34ad43c14e5328b5fa0e7",
+            "bytes": 1992
+          }
+        },
+        "placement": {
+          "result": "PASS_SCOPED_GEOMETRIC_BOUNDARY",
+          "observation": "B362 decoded alpha>32 bbox [270,343,607,384] inside original [240,341,637,386], margins [30,30,2,2]; source max width397, B362 width337. Positive 2px margins but source-relative visual hierarchy unsatisfactory.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+            "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+            "bytes": 19442
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS_RAW_FLIPY",
+          "observation": "Exact saved source/official/B358/B361/B362 DDS all native 2048x2048 RGBA32 mip1 headers identical, RAW stored mirror-Y and decoded readable FLIP-Y independently viewed.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_RAW_SAVED_NATIVE.png",
+            "sha256": "2f66d77655f21391a0381c1696e2b16bdbe590ffeeb8f0531ecc437135cad8f1",
+            "bytes": 17695
+          }
+        }
+      }
+    },
+    {
+      "id": "r44_outrun",
+      "korean": "아웃런",
+      "views": {
+        "native": {
+          "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+          "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+          "bytes": 10586
+        }
+      },
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_NOT_REWORKED",
+          "observation": "B362 r44 same byte pixels as official. No new slant evidence or review of existing source family.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "clean_plate": {
+          "result": "HOLD_NOT_REVIEWED",
+          "observation": "No independent r44 CLEAN in invocation.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "style": {
+          "result": "HOLD_UNCHANGED_PROBLEM",
+          "observation": "Source OUTRUN, unchanged official/ B362 Korean 아웃런 existing. Prior recorded source style/semantic concern remains unresolved, no new C approval.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "readability": {
+          "result": "HOLD_IN_GAME",
+          "observation": "R44 text visible in 100% crop but no consumer context/current game assessment.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "glyph_integrity": {
+          "result": "HOLD_EXISTING",
+          "observation": "No new r44 glyph changes; prior checks not repeated as new outcome.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "protected_art": {
+          "result": "PASS_IDENTITY_ONLY",
+          "observation": "R44 B362 pixel-equal existing official, not improved; local scope no new damage.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "placement": {
+          "result": "HOLD_UNCHANGED",
+          "observation": "No new semantic or placement resolution for r44.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        },
+        "orientation": {
+          "result": "PASS_IDENTITY_ONLY",
+          "observation": "Same persisted DDS RAW/Y mapping as source, r44 unchanged official.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+            "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+            "bytes": 10586
+          }
+        }
+      }
+    }
+  ],
+  "stages": {
+    "C": {
+      "review_id": "C373",
+      "result": "REWORK_REQUIRED",
+      "pixel_before_producer_verdict": false,
+      "calibration": "NOT_QUALIFIED",
+      "findings": {
+        "r43_professional": {
+          "slant": {
+            "result": "HOLD_CALIBRATION",
+            "observation": "Actual readable SOURCE appears upright heavy condensed; B362 appears upright. No marked homologous stroke upper-minus-lower x displacement and blind controls in this invocation; not certified equal.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+              "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+              "bytes": 19442
+            }
+          },
+          "clean_plate": {
+            "result": "HOLD_C158_INDEPENDENT_BYTE_REVIEW",
+            "observation": "C158 CLEAN is referenced from producer/B358 and prior C2, but C158 PNG was not downloaded and revalidated in this C373 invocation. Original->B362 scoped mask / old ghost cleanup is not plate-only approval.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+              "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+              "bytes": 19442
+            }
+          },
+          "style": {
+            "result": "FAIL_SOURCE_FAMILY_WEIGHT_CONDENSATION",
+            "observation": "Direct native and practical black 50 comparison: original PROFESSIONAL is heavy cohesive condensed orange block, B362 Hangul appears noticeably thinner/weaker and spacing of per-syllable Noto+tracking differs; 337px versus original 397px. B361 visibly excessive counters closed, B362 opens them but fails original source family qualification.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+              "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+              "bytes": 22852
+            }
+          },
+          "readability": {
+            "result": "SCOPED_IMPROVED_BUT_HIERARCHY_FAIL",
+            "observation": "Actual 50% pixels show B362 Korean syllables legible after B361 counter-collapse, but density/width hierarchy still below original heavy PROFESSIONAL; no actual-game scene testing.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+              "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+              "bytes": 22852
+            }
+          },
+          "glyph_integrity": {
+            "result": "SCOPED_NO_CLIPPED_STROKES",
+            "observation": "In B362 100% and 50% no externally cut Korean glyphs, 2px vertical margin; B361 2px stroke merges Hangul counters at practical size, B362 1px update visibly restores them, distinct SHA.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png",
+              "sha256": "5728f9964b0b2da3a708f4adeb409b1bd33022832b89a17630af500dae485b6a",
+              "bytes": 30994
+            }
+          },
+          "protected_art": {
+            "result": "SCOPED_PASS_NEW_CHANGES_B361",
+            "observation": "Independent RGBA full-atlas B361->B362 changed 3559, outside r43 source bbox0 and alpha outside0; r44 B362 exact equal official. Official->B362 outside ORIGINAL r43 bbox RGBA14102 alpha5832 are inherited old-text cleanup and must not be falsely summarized as zero. This is not complete proof of entire game scene.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png",
+              "sha256": "2d13ca5a5cdde27c2d89f126d992772be9d37a496ba34ad43c14e5328b5fa0e7",
+              "bytes": 1992
+            }
+          },
+          "placement": {
+            "result": "PASS_SCOPED_GEOMETRIC_BOUNDARY",
+            "observation": "B362 decoded alpha>32 bbox [270,343,607,384] inside original [240,341,637,386], margins [30,30,2,2]; source max width397, B362 width337. Positive 2px margins but source-relative visual hierarchy unsatisfactory.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+              "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+              "bytes": 19442
+            }
+          },
+          "orientation": {
+            "result": "SCOPED_PASS_RAW_FLIPY",
+            "observation": "Exact saved source/official/B358/B361/B362 DDS all native 2048x2048 RGBA32 mip1 headers identical, RAW stored mirror-Y and decoded readable FLIP-Y independently viewed.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_RAW_SAVED_NATIVE.png",
+              "sha256": "2f66d77655f21391a0381c1696e2b16bdbe590ffeeb8f0531ecc437135cad8f1",
+              "bytes": 17695
+            }
+          }
+        },
+        "r44_outrun": {
+          "slant": {
+            "result": "HOLD_NOT_REWORKED",
+            "observation": "B362 r44 same byte pixels as official. No new slant evidence or review of existing source family.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "clean_plate": {
+            "result": "HOLD_NOT_REVIEWED",
+            "observation": "No independent r44 CLEAN in invocation.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "style": {
+            "result": "HOLD_UNCHANGED_PROBLEM",
+            "observation": "Source OUTRUN, unchanged official/ B362 Korean 아웃런 existing. Prior recorded source style/semantic concern remains unresolved, no new C approval.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "readability": {
+            "result": "HOLD_IN_GAME",
+            "observation": "R44 text visible in 100% crop but no consumer context/current game assessment.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "glyph_integrity": {
+            "result": "HOLD_EXISTING",
+            "observation": "No new r44 glyph changes; prior checks not repeated as new outcome.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "protected_art": {
+            "result": "PASS_IDENTITY_ONLY",
+            "observation": "R44 B362 pixel-equal existing official, not improved; local scope no new damage.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "placement": {
+            "result": "HOLD_UNCHANGED",
+            "observation": "No new semantic or placement resolution for r44.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          },
+          "orientation": {
+            "result": "PASS_IDENTITY_ONLY",
+            "observation": "Same persisted DDS RAW/Y mapping as source, r44 unchanged official.",
+            "evidence": {
+              "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+              "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+              "bytes": 10586
+            }
+          }
+        }
+      }
+    },
+    "C3": {
+      "result": "NOT_RUN",
+      "reason": "C2 failed source-family; existing official/IGR029 still REWORK"
+    }
+  },
+  "separate_C3_required": true,
+  "user_actual_game": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "IGR029": "OPEN_USER_INGAME_FAIL",
+  "official_remains": "c338_c2_rework_required_r43_r44_original_anchor_shift",
+  "approval": false,
+  "dds_promoted": 0,
+  "new_DDS_by_C2": 0,
+  "candidate_sha_repeated": false,
+  "required_next": [
+    "Do not repeat Noto+stroke/tracking recipe; switch to manual/PSD source-derived heavier condensed contour if producer chooses another attempt",
+    "Independently verify canonical C158 CLEAN actual bytes and full 12 region inventory and original source hierarchy",
+    "Resolve r43/r44 semantic

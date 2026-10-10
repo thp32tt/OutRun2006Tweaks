@@ -1,0 +1,122 @@
+{
+  "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+  "b358": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+  "b361": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+  "b362": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+  "native_size": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32 mip1 RAW-mirror_y readable-flip_y",
+  "comparisons": {
+    "official": {
+      "changed_rgba": 22434,
+      "changed_alpha": 12909,
+      "outside_r43_rgba": 14102,
+      "outside_r43_alpha": 5832,
+      "inside_r43_rgba": 8332
+    },
+    "B358": {
+      "changed_rgba": 16328,
+      "changed_alpha": 12873,
+      "outside_r43_rgba": 8896,
+      "outside_r43_alpha": 5441,
+      "inside_r43_rgba": 7432
+    },
+    "B361": {
+      "changed_rgba": 3559,
+      "changed_alpha": 3559,
+      "outside_r43_rgba": 0,
+      "outside_r43_alpha": 0,
+      "inside_r43_rgba": 3559
+    }
+  },
+  "bbox_32": {
+    "source": [
+      240,
+      341,
+      637,
+      386
+    ],
+    "B358": [
+      243,
+      342,
+      527,
+      384
+    ],
+    "B361": [
+      276,
+      343,
+      601,
+      384
+    ],
+    "B362": [
+      270,
+      343,
+      607,
+      384
+    ]
+  },
+  "r43_alpha_positive": {
+    "source.dds": 9871,
+    "official.dds": 1608,
+    "b358.dds": 4926,
+    "b361.dds": 6772,
+    "b362.dds": 6124
+  },
+  "r44_alpha_identity": {
+    "B362_equals_official": true
+  },
+  "source_bbox_margin": [
+    30,
+    30,
+    2,
+    2
+  ],
+  "png_files": [
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png",
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+    "C373_Q212_R43_RAW_SAVED_NATIVE.png",
+    "C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+    "C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png"
+  ],
+  "scope": "New C2 independent saved B362 SHA, includes prior B358/B361 saved bytes and official. C158 CLEAN not independently decoded in this run, cannot issue CLEAN PASS. No C3/game.",
+  "evidence": {
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG128_100.png",
+      "sha256": "0fa1098721cea074f3ca3bc515687c86017eee80b7204ab4e634623d831dd423",
+      "bytes": 19442
+    },
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG255_75.png",
+      "sha256": "5728f9964b0b2da3a708f4adeb409b1bd33022832b89a17630af500dae485b6a",
+      "bytes": 30994
+    },
+    "C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_SOURCE_OFFICIAL_B358_B361_B362_BG0_50.png",
+      "sha256": "cdb2a5190ddd49654e77e175c2599d812b5a22a9159551938e91e3fbe52bd79e",
+      "bytes": 22852
+    },
+    "C373_Q212_R43_RAW_SAVED_NATIVE.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_RAW_SAVED_NATIVE.png",
+      "sha256": "2f66d77655f21391a0381c1696e2b16bdbe590ffeeb8f0531ecc437135cad8f1",
+      "bytes": 17695
+    },
+    "C373_Q212_R44_SOURCE_OFFICIAL_B362.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R44_SOURCE_OFFICIAL_B362.png",
+      "sha256": "e1daf48466afd5e6a5fce6512ae47607a365b4288e309b15b1fadb34609eafaf",
+      "bytes": 10586
+    },
+    "C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png": {
+      "path": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_R43_B358_B361_TO_B362_CHANGE_MASK.png",
+      "sha256": "2d13ca5a5cdde27c2d89f126d992772be9d37a496ba34ad43c14e5328b5fa0e7",
+      "bytes": 1992
+    }
+  },
+  "causal_scope_note": "IMPORTANT: official->B362 14102 RGBA/5832 alpha changed outside original SOURCE r43 GLYPH bbox, because it removes inherited official stale Korean; B361->B362 outside r43=0. Do not call official->B362 change outside zero, and do not equate producer's larger working ROI to narrow source glyph ROI.",
+  "source_footprint_note": "B362 337/397=84.89%, improving B358 284/397=71.54%, but optical thickness and meaning need independent qualified review.",
+  "triage": "MATERIAL_REWORK (fresh queue)",
+  "result": "PIXEL_CONTAINMENT_SCOPED_NOT_VISUAL_APPROVAL"
+}

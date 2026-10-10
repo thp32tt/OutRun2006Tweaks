@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T03:50:57+09:00",
+  "updated_at_kst": "2026-10-11T03:58:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11913,5 +11913,27 @@
     "status": "HOLD_STRICT_RECHECK",
     "runtime": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C1-Q055-EXACT-SOURCE-CLEAN-EVIDENCE/C1_Q055_SOURCE_CLEAN_CONTROLLER_HOLD.json"
+  },
+  "c373_c2_q212_b362_independent_20261011": {
+    "role": "C2",
+    "index": 212,
+    "candidate_sha256": "0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33",
+    "distinct_prior_review": true,
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "result": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY",
+    "candidate_width": 337,
+    "source_width": 397,
+    "changed_B361_to_B362": 3559,
+    "outside_B361_to_B362_r43": 0,
+    "official_to_B362_outside_original_r43_source_bbox_rgba": 14102,
+    "r44_official_unchanged": true,
+    "clean_independent_current": "HOLD",
+    "C3": "NOT_RUN",
+    "new_C_PASS": 0,
+    "new_DDS_by_C2": 0,
+    "game": "UNTESTED",
+    "IGR029": "OPEN",
+    "qa": "localization/graphics/role_C/20261011-C373-C2-Q212-B362-INDEPENDENT-SAVED-STYLE/C373_Q212_C2_B362_INDEPENDENT_REWORK.json",
+    "review_id": "C373-C2-Q212-B362-FIRST-INDEPENDENT"
   }
 }
