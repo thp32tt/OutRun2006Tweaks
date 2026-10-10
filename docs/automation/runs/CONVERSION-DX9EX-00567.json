@@ -16,7 +16,7 @@
   "material_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
   "validation_bearing_result_sha": "54cc213f19da1f5d010bb80e288d1be8a73f9f49",
   "commit_marker": "[AUTO:CONVERSION-DX9EX-00567]",
-  "status": "WAIT_EXACT_SHA_CI",
+  "status": "WAIT_FULL_CHAIN_AND_GAME_ANALYZER_CI",
   "controller_terminal": false,
   "retry_allowed": false,
   "runtime_validation": "UNTESTED",
@@ -33,23 +33,39 @@
   ],
   "summary": "Reject negative-width/height XR per-eye FOV instead of mirroring stereo; publish candidate projection only after MatrixFinite validation. Add Release-active checks for zero, inverted axes, NaN, Infinity base, asymmetric valid FOV.",
   "source_review": "Confirmed independent from 00566 R32 diagnostic and smoke paths; no files overlap 00566; no previous 00567 result. Preserved FFB v0.2, immutable DX9Ex baseline and isolated DX11/DXVK/localization.",
-  "static_validation": "GITHUB_DIFF_REVIEWED_WITH_NEGATIVE_CASES; Actions exact-SHA pending",
+  "static_validation": "PASS_EXACT_SHA_DX9EX_POLICY_HOST_CORE_MATH_WIN32_GAME_DOMAIN_GUARD_HOST_MSVC_ANALYSIS; R33_FULL_CHAIN_AND_WIN32_MSVC_ANALYSIS_PENDING",
   "ci_runs": {
     "dx9ex_active": 38022025928,
     "domain_isolation": 38022025870,
     "full_source_impact": 38022025968
   },
   "package": {
-    "status": "WAIT_CI_NO_HMD_APPROVAL"
+    "status": "PUBLISHED_EXACT_SHA_CI_PENDING_REMAINING_GATES",
+    "artifact_id": 11658119002,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-54cc213f19da1f5d010bb80e288d1be8a73f9f49",
+    "digest": "sha256:54172d11d86168d6bc860606e7bfeebc573b3944aeac974fe653c072dc099b17",
+    "hmd_approved": false
   },
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD/checkpoint 00567 E002 and no result record",
     "C1_REVIEW": "PASS unique inverted-FOV and partial-publication defect; independent 00566 file ownership",
     "C2_IMPLEMENT": "PASS two-file source change and Release-active smoke negative cases",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
+    "C3_VALIDATE": "PARTIAL_PASS exact SHA: host/core_math, active game, policy, domain, host analyze SUCCESS; R33 full-chain and game analyzer pending",
     "C4_COMMIT": "PASS material 54cc213f19da with exact marker, remote ref verified",
-    "C5_PACKAGE": "PENDING CI artifacts",
+    "C5_PACKAGE": "PASS exact-SHA CI artifact 11658119002 published; NOT HMD approved",
     "C6_RESULT": "INTERIM await CI; do not mark COMPLETE"
   },
-  "next_action": "Check exact-SHA CI results, build and test logs, then update this record terminal only on success. Apply AI 2 +1 once only if work meets rubric; same TASK_ID rollover/retry never duplicates."
+  "next_action": "Poll the existing exact-SHA DX9Ex Active #38022025928 full-chain and Full Source #38022025968 game-analyze jobs; do not start duplicate source work or a duplicate workflow. On success finalize C6 and score once; keep HMD UNTESTED.",
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "host": "SUCCESS",
+    "host_core_math_smoke": "SUCCESS",
+    "game": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "full_chain_compile": "IN_PROGRESS",
+    "fullsource_game_analyze": "IN_PROGRESS"
+  }
 }
