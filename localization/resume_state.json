@@ -7023,7 +7023,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11T04:57:00+09:00",
+  "updated_at_kst": "2026-10-11T05:32:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15630,5 +15630,25 @@
     "changed_outside_source_pixels": 0,
     "visual_defect": "DOTTED_HOLLOW_SOURCE_FAMILY_WEIGHT",
     "qa_path": "localization/graphics/role_C/20261011-C375-C2-Q092-B363-SAVED-INDEPENDENT/C375_Q092_B363_INDEPENDENT_VISUAL_REWORK.json"
+  },
+  "c376_c2_q060_psd_alpha_clean_source": {
+    "review_id": "C376-C2-Q060-PSD-NEW-P1-SOURCE-MASK-RGB-20261011-0532",
+    "role": "C2",
+    "shard": "EVEN",
+    "queue_index": 60,
+    "scope": "PSD source PLATE_ONLY stage",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "candidate_sha256": "bab8dc25bc900d6806adf0462adb2046321353b78e29bdc82885ec9feef33255",
+    "result": "SCOPED_P1_SOURCE_ALPHA_REMOVAL_PASS",
+    "library_approval": "HOLD_TRANSPARENT_RGB_SOURCE_EQUIVALENCE",
+    "transparent_RGB_differing_pixels": 89343,
+    "original_removed_pixels": 89391,
+    "unremoved_source_mask_pixels": 0,
+    "queue_official": "c342_c2_rework_required_native_best_time_orange_overlap",
+    "candidate_C2": "C374_REWORK_UNCHANGED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "IGR044": "OPEN",
+    "evidence": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_ALPHA_CLEAN_PLATE_REVIEW.json"
   }
 }

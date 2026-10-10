@@ -1,0 +1,72 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C376-C2-Q060-PSD-NEW-P1-SOURCE-MASK-RGB-20261011-0532",
+  "index": 60,
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "trial_sha256": "bab8dc25bc900d6806adf0462adb2046321353b78e29bdc82885ec9feef33255",
+  "shared_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "mask_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "psd_plate_png_sha256": "a07ce4cc896148ce8c80463fe03de56f3db0bf8d77fb673c48ab0395fd7ec347",
+  "metrics": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "psd_roi_readable_xyxy": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "source_removal_mask_bbox_readable": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "source_removal_exact_pixels": 89391,
+    "mask_outside_psd_roi": 0,
+    "mask_inside_psd_roi": 89391,
+    "source_alpha_pos_pixels_inside_mask": 89391,
+    "library_clean_alpha_pos_pixels_inside_mask": 0,
+    "psd_plate_alpha_nonzero_in_full_roi": 0,
+    "original_alpha_nonzero_inside_roi_outside_mask": 0,
+    "source_to_shared_clean_rgba_delta_outside_mask": 0,
+    "protected_outside_source_mask_clean_change": 0,
+    "roi_pixels": 113766,
+    "roi_non_mask_pixels": 24375,
+    "original_alpha_in_roi_non_mask_pixels": 0,
+    "psd_plate_vs_shared_clean_rgb_difference_transparent_pixels": 89343,
+    "psd_plate_rgb_range": [
+      0,
+      57
+    ],
+    "same_rgba_as_shared_clean": false,
+    "same_visible_alpha_composited_black_gray_white": true
+  },
+  "opaque_protected_art_changes": 0,
+  "scope": "P1 removal only; no current final/approval PASS",
+  "png_sha256": [
+    {
+      "path": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_SOURCE_CLEAN_OFFICIAL_PSD_P1_NATIVE.png",
+      "sha256": "08161f0bd100f737e803638b66bd703a8173698eb27f220ed9dbbdf8fe035b49"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_REMOVAL_MASK_BORDER_X2.png",
+      "sha256": "788d1a54d1c043287e327b91e81cafe76258a305ff18e38b34965e987082c7c9"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_SHARED_PSDPLATE_FINAL_GRAY100.png",
+      "sha256": "442a95a31c84021b1afd43fdd632b8d35ce52c47db3989ef56a497ea7c3d747d"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_SHARED_PSDPLATE_FINAL_BLACK50.png",
+      "sha256": "ae3e35b396a7863533bbbc2732cae356a135e64098e35ae5d51b4972dc43f4fc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_SHARED_PSDPLATE_FINAL_WHITE75.png",
+      "sha256": "227293ee8cae8527545f2630c1be449da9e1d2e38253390064bd2262e6c43779"
+    }
+  ]
+}
