@@ -236,22 +236,35 @@ require(
     "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockTracker::Reliable()",
 )
-# R84 keeps projection provenance in R29 while R30 consumes only the
-# public lower-owner ABI. Require both sides so a missing forwarding edge fails.
-require(
+# R84 moved the original R28 projection query into the independent R29 TU.
+# Require the full R30 -> typed owner ABI -> original renderer chain, rather
+# than accepting a text marker in the retired textual-include R30 body.
+r30_projection = require(
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "R30SupportGetVerifiedProjection",
     "R29OwnerGetR28VerifiedProjection(",
 )
-require(
+r29_projection = require(
     "src/vr/d3d9/stereo_renderer_r29.cpp",
     "bool R29OwnerGetR28VerifiedProjection(",
     "OutRunVRRenderer::GetR28VerifiedProjection(",
 )
 require(
     "src/vr/core/r29_owner_api.hpp",
-    "R29OwnerGetR28VerifiedProjection(",
+    "bool R29OwnerGetR28VerifiedProjection(",
 )
+r30_start = r30_projection.index("bool R30SupportGetVerifiedProjection(")
+r30_end = r30_projection.index("bool R30SupportCurrentShaderEpoch(", r30_start)
+r30_body = r30_projection[r30_start:r30_end]
+r29_start = r29_projection.index("bool R29OwnerGetR28VerifiedProjection(")
+r29_end = r29_projection.index("void R29OwnerInvalidateRendererStateAfterExternalRestore(", r29_start)
+r29_body = r29_projection[r29_start:r29_end]
+if "return R29OwnerGetR28VerifiedProjection(" not in r30_body:
+    raise SystemExit("R84 R30 projection must delegate to typed R29 owner")
+if "OutRunVRRenderer::GetR28VerifiedProjection" in r30_projection:
+    raise SystemExit("R84 R30 must not reference lower renderer projection directly")
+if "return OutRunVRRenderer::GetR28VerifiedProjection(" not in r29_body:
+    raise SystemExit("R84 R29 projection owner lost the original R28 query")
 require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "R33 fast left-eye c64 rollback",
