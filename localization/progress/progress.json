@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 14:51 KST",
+  "updated_at_kst": "2026-10-10 15:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -119,25 +119,17 @@
         "RUNTIME_VALIDATION": "UNTESTED"
       },
       "latest_c2_trial_review": {
-        "index": 212,
-        "result": "SCOPED_PLACEMENT_IMPROVED_TRIAL_HOLD_OFFICIAL_REWORK_UNCHANGED",
-        "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
-        "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
-        "official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
-        "trial_sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
-        "full12_outside_rgba": 0,
-        "changed_old_to_trial_two_rows": 37978,
-        "other10_unchanged": true,
-        "original_vs_trial_alpha32_left_px": {
-          "r43": 1,
-          "r44": 2
-        },
-        "high_opaque_height_discrepancy_px": {
-          "r43": 10,
-          "r44": 7
-        },
+        "index": 60,
+        "result": "NEW_B349_UNPROMOTED_TRIAL_REWORK_REQUIRED",
+        "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "unpromoted_trial_sha256": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159",
+        "reason_codes": [
+          "SOURCE_HIERARCHY_UNDERFILL",
+          "SOURCE_FAMILY_RACING_ITALIC_MISMATCH",
+          "GOLD_FACE_DEPTH_INSUFFICIENT"
+        ],
+        "report": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_C2_B349_INDEPENDENT_VISUAL_REWORK.json",
         "new_promoted_dds": 0,
-        "report": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_C2_TRIAL_HOLD.json",
         "runtime_validation": "UNTESTED"
       },
       "latest_a_source_optical_q103": {

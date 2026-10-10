@@ -1,0 +1,130 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "review_id": "C362-Q060-B349-NEW-SHA-INDEPENDENT-VISUAL-REJECT",
+  "run_key": "OUTRUN-KOR-C362-C2-Q060-B349-DISTINCT-SHA-VISUAL-20261010-1450",
+  "reviewed_at_kst": "2026-10-10 15:00 KST",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "reviewed_unpromoted_trial_sha256": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159",
+  "current_official_candidate_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "canonical_source_sha256_prior_reference": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_provenance_limit": "Exact original DDS not separately loaded. SHA-verified B349 visual SOURCE is used as canonical source face reference and original source effect bbox was inherited from source-authenticated B348; not falsely called independent source-byte proof.",
+  "result": "REWORK_REQUIRED_FOR_UNPROMOTED_TRIAL",
+  "new_independent_C2_review_of_distinct_candidate": true,
+  "same_sha_prior_C2_review": false,
+  "previous_official_C342_REWORK_UNCHANGED": true,
+  "source_run_B349_producer_was_REJECT": true,
+  "C2_new_outcome": "Independent C2 rejection of distinct persisted material trial, not a new producer DDS or repeated completion of official old SHA.",
+  "machine_report": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_B349_INDEPENDENT_NATIVE_MEASURE.json",
+  "eight_checks": {
+    "BEST_TIME_TITLE": {
+      "slant": {
+        "result": "FAIL_SOURCE_RELATIVE_VISUAL",
+        "observation": "Source BEST TIME uses pronounced racing italic readable rightward lean and width; saved '최고 기록:' glyph body looks substantially more upright and generic. No identical-glyph anchor quantification falsely claimed."
+      },
+      "clean_plate": {
+        "result": "SCOPED_PASS",
+        "observation": "B348 source-derived CLEAN was SHA independently authenticated; alpha in source BEST TIME original effect rect zero; no English ghost in new composite."
+      },
+      "style": {
+        "result": "FAIL",
+        "observation": "New trial Korean appears pale flat orange/beige and lacks English source vivid orange-to-yellow bevel and navy deep extrusion. Current native final differs perceptually even while constructed transparent-only."
+      },
+      "readability": {
+        "result": "FAIL_SOURCE_RELATIVE_HIERARCHY",
+        "observation": "Readable standalone, but original BEST TIME source effect 849x134 while final only 512x114, about 60.31% width with visibly lost prominence in same atlas/50%."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_NO_BROKEN_HANGUL",
+        "observation": "All shown Hangul glyphs intact in persisted native and 50% gray/black/white comparisons; readability alone does not cure source family failure."
+      },
+      "protected_art": {
+        "result": "SCOPED_PASS",
+        "observation": "Independently decoded entire saved official and new trial 4096x2048 RGBA, changed count 87512 within declared ROI, zero changed RGBA/alpha outside including neighboring OUTRUN MILES/HOLLY. This is official→trial only, not a proof SOURCE unmodified everywhere."
+      },
+      "placement": {
+        "result": "PASS_CONTAINMENT_ONLY",
+        "observation": "Actual saved final bbox [2358, 353, 2870, 467] fully within authenticated-source edit bbox, positive margins [179, 158, 13, 7], no observed collision; however relative origin/size hierarchy fails."
+      },
+      "orientation": {
+        "result": "SCOPED_RAW_FLIPY_PASS",
+        "observation": "Same original first 128 DDS header and single mip; newly generated and visually inspected readable/RAW source-first comparisons using exact saved trial bytes."
+      }
+    }
+  },
+  "source_sibling_regions": {
+    "OUTRUN_MILES_AND_HOLLY": {
+      "result": "SCOPED_PROTECTED_PASS",
+      "source_art_retyped": false,
+      "observation": "Actual official→trial full-atlas RGBA/alpha outside exactly declared q060 ROI unchanged, both source siblings preserved as in official; does not claim game consumer."
+    }
+  },
+  "firstlook": "Directly inspected B349 100%, 50% and RAW existing SHA-bound lossless panels BEFORE producer-machine report; newly independently decoded saved B349 DDS to generate six additional panels and remeasure native pixels.",
+  "blind_calibration": "NOT_QUALIFIED — previously existing q060 producer panels are not a blind answer-key-free calibrated family control.",
+  "reason_codes": [
+    "SOURCE_HIERARCHY_UNDERFILL",
+    "SOURCE_FAMILY_RACING_ITALIC_MISMATCH",
+    "GOLD_FACE_DEPTH_INSUFFICIENT"
+  ],
+  "views_new": [
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_100_128.png",
+      "sha256": "64e9e2d7391ba71f2b0ca20a1b7dd16fd6b78e1d0b1dbb7448c6fb5c5a5cd78e",
+      "image_size": [
+        3122,
+        195
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_75_128.png",
+      "sha256": "276e588e86892e85a51330d0e648109fc196c1897735ec069fa72ea5deab177e",
+      "image_size": [
+        2348,
+        158
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_128.png",
+      "sha256": "9cfda3d54af0d609cad9f8528a33114ed8fc760734095dc1b0a0c04f2cc5aed2",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_0.png",
+      "sha256": "70aff16049a5271fffd7d6e678a5ad49a247986adede6b3551b668bab4adeaa5",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_255.png",
+      "sha256": "24c3f7b96b05ebcae2ab7dc358d6fa3ea11705cdeb45ba9ab392341b4377cd35",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_RAW_100_128.png",
+      "sha256": "23999a092947bdd9719c13139fe278c7d8278b2cb339ed5d09ae44422d594918",
+      "image_size": [
+        3122,
+        195
+      ]
+    }
+  ],
+  "C3": "BLOCKED_C2_FAIL",
+  "APPROVAL": "BLOCKED",
+  "IGR-044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_promoted_DDS": 0,
+  "source_branch_official_bytes_modified": false,
+  "execution_backend": "GITHUB_SSOT+N100_MCP_FALLBACK_FOR_LARGE_LOCAL_ONLY_DDS_DECODE",
+  "corrective_direction": "Manual/source-derived racing italic gold native contour/effect, measured readable slant anchors and full source optical width; preserve B348 source-first CLEAN; exact pixel guard after new producer DDS; new independent C2/C3 and user actual game retest."
+}

@@ -1,0 +1,113 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "review_id": "C362",
+  "role": "C2",
+  "queue_index": 60,
+  "source_visual_reference": {
+    "source_sha256_claimed_by_B348_B349": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "actual_original_DDS_independently_reopened_this_run": false,
+    "reference_path": "localization/graphics/role_B/20261010-B349-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B349_SOURCE_CLEAN_OFFICIAL_NEW_GRAY_100_FLIPY.png",
+    "reference_sha256_reverified": "874cf3a8e76cb52096d9fccc62ce04e1bd3aeaf43e253319c5dd1eab9e3cf7af",
+    "source_effect_bbox_prior_authenticated_B348": [
+      2179,
+      340,
+      3028,
+      474
+    ]
+  },
+  "official_candidate_sha256_independently_verified": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "new_trial_candidate_sha256_independently_verified": "0e2f055ccfc66c53e29d3d3ba41222b0595293dbb92e8d2de4abee23e0fce159",
+  "B348_source_first_clean_sha256_independently_verified": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "actual_persisted_trial_native_dimensions": [
+    4096,
+    2048
+  ],
+  "DDS_HEADER_FIRST128_EQUAL_OFFICIAL": true,
+  "readable_transform": "PIL native DDS RAW inversion transformed by ImageOps.flip; RAW evidence provided separately; mip1",
+  "native_source_effect_bbox_prior": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "native_trial_alpha_bbox_FRESH": [
+    2358,
+    353,
+    2870,
+    467
+  ],
+  "width_source_vs_trial": [
+    849,
+    512
+  ],
+  "width_ratio": 0.60306,
+  "height_source_vs_trial": [
+    134,
+    114
+  ],
+  "positive_internal_bbox_margins": [
+    179,
+    158,
+    13,
+    7
+  ],
+  "official_to_trial_full_atlas_changed": {
+    "inside_rgba": 87512,
+    "outside_rgba": 0,
+    "inside_alpha": 57829,
+    "outside_alpha": 0
+  },
+  "clean_source_first_atlas_alpha_in_source_effect_bbox": 0,
+  "machine_scoped_status": "PASS_FOR_EDIT_ROI_ISOLATION_AND_TEXT_SOURCE_BBOX_CONTAINMENT_ONLY",
+  "cannot_approve": "Actual native visual source-family/hierarchy/gold depth fail independently reviewed. Raw source not independently downloaded, homologue glyph-slant anchors not blind-calibrated, shared in-game consumer untested.",
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_100_128.png",
+      "sha256": "64e9e2d7391ba71f2b0ca20a1b7dd16fd6b78e1d0b1dbb7448c6fb5c5a5cd78e",
+      "image_size": [
+        3122,
+        195
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_75_128.png",
+      "sha256": "276e588e86892e85a51330d0e648109fc196c1897735ec069fa72ea5deab177e",
+      "image_size": [
+        2348,
+        158
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_128.png",
+      "sha256": "9cfda3d54af0d609cad9f8528a33114ed8fc760734095dc1b0a0c04f2cc5aed2",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_0.png",
+      "sha256": "70aff16049a5271fffd7d6e678a5ad49a247986adede6b3551b668bab4adeaa5",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_READABLE_50_255.png",
+      "sha256": "24c3f7b96b05ebcae2ab7dc358d6fa3ea11705cdeb45ba9ab392341b4377cd35",
+      "image_size": [
+        1577,
+        121
+      ]
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C362-C2-Q060-B349-PERSISTED-INDEPENDENT-REJECT/C362_Q060_OFFICIAL_PLATE_B349_RAW_100_128.png",
+      "sha256": "23999a092947bdd9719c13139fe278c7d8278b2cb339ed5d09ae44422d594918",
+      "image_size": [
+        3122,
+        195
+      ]
+    }
+  ]
+}
