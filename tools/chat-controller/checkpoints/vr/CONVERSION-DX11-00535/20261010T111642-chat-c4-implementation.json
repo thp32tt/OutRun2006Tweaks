@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chat_real_activity_c4",
+  "captured_at_utc": "2026-10-10T11:16:42.809Z",
+  "task_id": "CONVERSION-DX11-00535",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00535",
+  "work_key": "DX11:R238:D3D9_INDEXED_UP_IMMUTABLE_CPU_TO_NATIVE_WARP_PIXEL",
+  "material_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "validation_bearing_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "checkpoint": "C4_MATERIAL_COMMITTED_C3_CI_ACTIVE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "exact_sha_ci": {
+    "fast": {
+      "id": 38047742734,
+      "conclusion": "success"
+    },
+    "backend": {
+      "id": 38047742767,
+      "status": "in_progress"
+    },
+    "build": {
+      "id": 38047745898,
+      "status": "in_progress"
+    }
+  },
+  "next_action": "Inspect R238 targeted GPU build/run and complete exact-sha Backend Conversion Gate; preserve material SHA when updating run record",
+  "do_not_duplicate": true
+}
