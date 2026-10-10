@@ -20,10 +20,17 @@
 **Runtime deployment boundary:** This GitHub policy is the source document fetched by the external Docker controller. User will deploy/reload independently; a committed document is not evidence the active process has adopted the terminal conditions. Controller implementation MUST incorporate these gates and pass tests for multi-commit same-feature continuation, CI fail→same-ID repair, chat-rollover continuity, same-work-key lease exclusion, and no DONE without full-chain PASS.
 
 
+## GitHub queue alignment — 2026-10-11 (ACTIVE)
+
+- `DX9EX-P0-VISUAL-COMPOSITION-20261007` is READY for bounded independent source corrections, **not** automatically HMD-accepted. Its former `USER_PRIORITIZED_R84_PRODUCTION_CONVERGENCE` global blocker is retired; independent edits still require a non-overlapping `FEATURE_ID/work_key/active_claim` and must not displace the live `CONVERSION-DX9EX-00591` R84 writer.
+- Continue `CONVERSION-DX9EX-00591` through the complete R84 acceptance gate, even when current `FEATURE_READY` is observed. The target's DX9Ex Active and Domain Isolation success must refer to the same final `validation_bearing_result_sha`; skipped full-chain jobs or red verifiers are nonterminal. Changing GitHub policy is **not** a validation-bearing R84 source result and must not substitute its SHA.
+- The machine-readable `executionAuthority.dx9exPriority[0]` is `P0_UNRESOLVED_OPTICS_HUD`; FFB v0.2 source and input remain frozen. Quest3/VDXR gates only actual visual/runtime acceptance and DX9Ex live IPC v3 migration, never independent DX11 or non-overlapping C source work. Do not silently auto-unfreeze DXVK.
+- Docker downloads GitHub policy but must apply its latest fetched revision each dispatch; a GitHub policy commit alone never proves live-controller deployment. User owns any container redeployment/reload.
+
 ## Effective multi-lane dispatch authority — 2026-10-10
 
 - A DX11 Native first-priority ACTIVE on `vr-dx11-native-r71`, C DX9Ex ACTIVE concurrently on `vr-d3d9ex-focus` (50% engineering-effort target), B DXVK FROZEN until explicit user reopening. DX12 reference-only.
-- C follows `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`: P0 released FFB v0.2 integration -> P1 R84/refactor -> P2 OpenXR recommended per-eye extent/VD High -> P3 measured native 120FPS Quest3/RTX4070, with frozen baseline `fcd18ddd89f6dd40a8246fcf8591f086811149f1` untouched.
+- C follows `docs/DX9EX_AUTODEV_PRIORITY_20261010.md`: P0 unresolved user-confirmed optics/HUD correctness (non-overlapping owner/paths) alongside the finite P1 R84 feature, then P2 OpenXR recommended per-eye extent/VD High and P3 measured native performance. Already integrated FFB v0.2 and working gamepad/input are FROZEN absent demonstrated integration regression. Never use the older FFB-first queue label as executable priority. Keep frozen baseline `fcd18ddd89f6dd40a8246fcf8591f086811149f1` untouched.
 - HMD/wheel hardware-only acceptance gates do not block other independent C source work, and DX9Ex Architecture v3 live-IPC HMD gate never blocks independent DX11 A. DXVK B must NOT automatically thaw after any DX9Ex gate.
 - The 2026-10-07 DX9Ex-only Gate0/R84 selection order below is **historical/non-executable**; Gate0 and inventory were already completed. Keep original architecture/defect evidence, distinct work_keys, exact-SHA validation, GitHub C6 records and no needless CI cancellation.
 - Actual external Docker controller deployment, A/C parallel processes and leases require direct runtime confirmation; writing GitHub policy does not prove jobs are running.
