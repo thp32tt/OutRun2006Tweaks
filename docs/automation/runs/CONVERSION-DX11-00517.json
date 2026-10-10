@@ -2,11 +2,11 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00517",
   "production_id": "CONVERSION-DX11-00517",
-  "event_id": "CONVERSION-DX11-00517-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX11-00517-E004",
+  "event_type": "retry",
   "chat_rollover": 2,
-  "attempt": "1/3",
-  "retry_count": 0,
+  "attempt": "2/3",
+  "retry_count": 1,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "dispatched_base_sha": "b13bfe4e07e88090fd61b05f69a99b63ad4cb41b",
@@ -25,10 +25,10 @@
     "R175 CONVERSION-DX11-00477",
     "R219 CONVERSION-DX11-00516"
   ],
-  "checkpoint": "C3_VALIDATE",
-  "status": "PENDING_EXACT_SHA_GATE",
+  "checkpoint": "C6_STATE",
+  "status": "BLOCKED_DEPENDENCY_R175",
   "terminal": false,
-  "automation_validation": "IN_PROGRESS",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "selected_work_item": "R220 reject additional OM MRT and retained DSV in dormant R193 indexed scissor readiness with WARP negative controls",
   "summary": "Atomic material commit seals MRT1..7, rejects unowned depth, balances COM OMGet references; scoped R193 WARP probes include two negative binding states and restored positive clipped GPU draw.",
@@ -41,10 +41,10 @@
     "C0_RECOVER": "PASS: HEAD, checkpoint 20261010T1345, AGENTS, 00516 C6, no 00517 previous run record; rollover ATTEMPT unchanged",
     "C1_REVIEW": "PASS: independent R193 extra MRT/DSV gap; R175 and R219 lease fenced",
     "C2_IMPLEMENT": "PASS: actual C++ OM all-slot and DSV fail-closed; extended WARP negative tests and static mutations",
-    "C3_VALIDATE": "IN_PROGRESS: exact material SHA Gate 38025344528; no success claim",
+    "C3_VALIDATE": "FAIL exact material SHA d9f87c4d189dc2eb9b7e5018e510adec90bd52a5 Backend Conversion Gate 38025344528: validate 114134901264 SUCCESS incl Win32 build; readiness smoke 114135829493 FAILED at step 84 inherited R175 constant buffer TEXCOORD6 BGRA, while scoped R193/R220 indexed scissor static and WARP probe steps 74/75 PASS. Not an R220 fault; no bypass.",
     "C4_COMMIT": "PASS: material d9f87c4d189dc2eb9b7e5018e510adec90bd52a5; exact [AUTO:CONVERSION-DX11-00517] marker",
     "C5_PACKAGE": "NOT_REQUIRED: dormant D3D11 diagnostic; no native gameplay draw or HMD candidate activated",
-    "C6_STATE": "INTERIM durable record pending CI; update to terminal result on observed job evidence"
+    "C6_STATE": "BLOCKED_DEPENDENCY: exact-SHA gate failure persisted with canonical material identity, 00477 R175 ownership exclusion, no duplicate Gate or source commit, no HMD inference. NOT PASS / NOT READY_FOR_PROMOTION."
   },
   "evidence": {
     "material_commit": "d9f87c4d189dc2eb9b7e5018e510adec90bd52a5",
@@ -54,15 +54,40 @@
     "initial_source_guard": "PASS in-memory source/probe/static structural check; NOT a Windows WARP execution",
     "prior_inherited_r175_gate_id": 38024618918,
     "hmd_test_performed": false,
-    "native_gameplay_activation": false
+    "native_gameplay_activation": false,
+    "gate_status": "failure",
+    "gate_head_sha": "d9f87c4d189dc2eb9b7e5018e510adec90bd52a5",
+    "gate_validate_conclusion": "success",
+    "gate_readiness_job_id": 114135829493,
+    "gate_readiness_conclusion": "failure",
+    "r193_r220_scoped_static_steps": "74 PASS",
+    "r193_r220_scoped_warp_steps": "75 PASS",
+    "constant_buffer_smoke_step": "84 FAIL: R175_GENERIC_VARYING_MISMATCH",
+    "r175_bgra_observed": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_bgra_expected": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "ownership": "R175 constant-buffer probe is owned by CONVERSION-DX11-00477, continuation status RUNNING; excluded from 00517; do not modify."
   },
   "blockers": [
-    "R175 known independent BGRA WARP mismatch at previous exact-SHA Gate #38024618918; pending current independent R220 outcome",
-    "Quest3/VDXR runtime UNTESTED"
+    "Exact-SHA full required Gate 38025344528 FAILED in inherited R175 constant-buffer WARP; all R220-specific steps passed. No automated full PASS.",
+    "R175 source/probe ownership lies with independent CONVERSION-DX11-00477. Fixing its failure in 00517 would conflict with owner/work_key.",
+    "Quest3/VDXR runtime test not performed; RUNTIME_VALIDATION=UNTESTED."
   ],
-  "next_action": "Read Gate #38025344528 validate+readiness smoke job steps; verify R193 static/WARP scoped PASS or FAIL and separate inherited R175; update this record to C6 terminal result and verify GitHub HEAD; do not duplicate implementation on rollover.",
-  "score_previous_confirmed": 1074,
+  "next_action": "Hold R220 final PASS until independent R175 owner CONVERSION-DX11-00477 releases/fixes inherited BGRA probe; then reconcile current branch HEAD, publish a proper material validation-bearing result that incorporates the fix, and require its own exact-SHA complete Backend Conversion Gate PASS. No rerun of unchanged failing SHA, no new TASK_ID for same R220 work_key.",
+  "score_previous_confirmed": 1075,
   "score_change": 0,
-  "score_new_confirmed": 1074,
-  "timestamp_kst": "2026-10-10T13:50:00+09:00"
+  "score_new_confirmed": 1075,
+  "timestamp_kst": "2026-10-10T14:00:00+09:00",
+  "result_sha": "d9f87c4d189dc2eb9b7e5018e510adec90bd52a5",
+  "resume_cursor": "BLOCKED_DEPENDENCY_R175_WAIT_OWNER_RELEASE",
+  "last_real_activity_evidence": "Inspected failed run 38025344528 exact material SHA; Win32 validate PASS and R193 WARP PASS, inherited constant buffer R175 BGRA failure reproduced at step 84."
 }
