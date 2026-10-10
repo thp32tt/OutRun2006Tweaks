@@ -54,7 +54,12 @@ namespace outrun::vr::dx11 {
     if (!desc.Width || !desc.Height || desc.MipLevels != 1 ||
         desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
         desc.SampleDesc.Quality != 0 || desc.Format != textureFormat ||
-        !(desc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
+        // R228: an untracked DEFAULT/dynamic texture or a writable RTV/UAV
+        // alias has no immutable D3D9 source-revision receipt. Keep native
+        // indexed texture readiness opt-in until an update/lifetime owner exists.
+        desc.Usage != D3D11_USAGE_IMMUTABLE ||
+        desc.CPUAccessFlags != 0 || desc.MiscFlags != 0 ||
+        desc.BindFlags != D3D11_BIND_SHADER_RESOURCE)
         return false;
 
     // R223: R187 seals the indexed color RTV and optional DSV, but R188

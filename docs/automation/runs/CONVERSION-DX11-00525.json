@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00525",
+  "production_id": "CONVERSION-DX11-00525",
+  "event_id": "CONVERSION-DX11-00525-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "8765a243bb0dfdb481c6be14ee144cd7ef9d8471",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00525",
+  "lease_epoch": 1,
+  "work_key": "DX11:R228:INDEXED_TEXTURE_IMMUTABLE_TYPED_SOURCE_RECEIPT",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py"
+  ],
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_COMMIT",
+  "terminal": false,
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R228 require immutable typed indexed SRV source with exclusive shader-resource binding, no CPU/misc aliases; WARP DEFAULT and RTV|SRV negative cases and immutable restore; inherited R175 is independently owned.",
+  "static_validation": "PASS: focused local 10 source removal mutants, source/fixture assertions; Windows build/WARP pending exact-SHA Actions",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_texture_binding.hpp",
+    "tools/dx11_textured_indexed_probe_r188.cpp",
+    "tools/test_dx11_textured_indexed_r188.py",
+    "docs/automation/runs/CONVERSION-DX11-00525.json"
+  ],
+  "pipeline": {
+    "C0": "PASS remote 8765a243, checkpoint WAIT_CHAT, previous 00524 terminal",
+    "C1": "PASS distinct R228 native indexed texture source revision owner; R175 independent",
+    "C2": "PASS substantive R228 C++ guard and WARP negative+restore tests",
+    "C3": "PENDING exact-SHA Backend Conversion Gate",
+    "C4": "MATERIAL_COMMIT_PENDING_CAS",
+    "C5": "NOT_REQUIRED native gameplay activation dormant, HMD unavailable",
+    "C6": "PENDING Gate result"
+  },
+  "known_blocker": "R175 TEXCOORD6 varying WARP mismatch in independently owned tools/dx11_constant_buffer_probe.cpp (CONVERSION-DX11-00477); never bypass.",
+  "resume_cursor": "WAIT_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "score_change": 0
+}

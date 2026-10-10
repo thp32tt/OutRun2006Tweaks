@@ -108,6 +108,39 @@ int main() {
             DXGI_FORMAT_R8G8B8A8_UNORM,rtv.Get(),slot,expected,expectedState,fmt);
     };
     require(ready(srv.Get(),sampler.Get()), "baseline bound texture ownership");
+    // R228: an immutable source is revision-sealed; a DEFAULT source can be
+    // modified in place without changing the caller's SRV identity.
+    D3D11_TEXTURE2D_DESC mutableDesc{};
+    source->GetDesc(&mutableDesc);
+    mutableDesc.Usage=D3D11_USAGE_DEFAULT;
+    ComPtr<ID3D11Texture2D> mutableSource;
+    ComPtr<ID3D11ShaderResourceView> mutableSrv;
+    require(SUCCEEDED(dev->CreateTexture2D(
+        &mutableDesc,&redData,mutableSource.GetAddressOf())),
+        "R228 create writable-revision DEFAULT indexed source");
+    require(SUCCEEDED(dev->CreateShaderResourceView(
+        mutableSource.Get(),nullptr,mutableSrv.Get())),
+        "R228 create DEFAULT indexed SRV");
+    ID3D11ShaderResourceView* rawMutable=mutableSrv.Get();
+    ctx->PSSetShaderResources(0,1,&rawMutable);
+    require(!ready(mutableSrv.Get(),sampler.Get()),
+        "R228 reject mutable DEFAULT indexed source");
+    mutableDesc.BindFlags=D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET;
+    ComPtr<ID3D11Texture2D> aliasedSource;
+    ComPtr<ID3D11ShaderResourceView> aliasedSrv;
+    require(SUCCEEDED(dev->CreateTexture2D(
+        &mutableDesc,&redData,aliasedSource.GetAddressOf())),
+        "R228 create writable RTV-SRV indexed alias");
+    require(SUCCEEDED(dev->CreateShaderResourceView(
+        aliasedSource.Get(),nullptr,aliasedSrv.Get())),
+        "R228 create RTV-SRV indexed source view");
+    ID3D11ShaderResourceView* rawAliased=aliasedSrv.Get();
+    ctx->PSSetShaderResources(0,1,&rawAliased);
+    require(!ready(aliasedSrv.Get(),sampler.Get()),
+        "R228 reject alias-capable indexed source");
+    ctx->PSSetShaderResources(0,1,&rawSrv);
+    require(ready(srv.Get(),sampler.Get()),
+        "R228 restore immutable indexed source");
     // R223: a pixel UAV can write a side-eye buffer without occupying RTV1.
     // Keep it on the same WARP device; the failure must be OM ownership,
     // not a foreign-device or missing-texture shortcut.
