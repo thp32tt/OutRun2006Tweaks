@@ -1,0 +1,527 @@
+{
+  "schema_version": 1,
+  "run": "C349-C2",
+  "asset_index": 212,
+  "hashes": {
+    "source": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "official": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "trial": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "clean": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
+  },
+  "native": [
+    2048,
+    2048
+  ],
+  "dds_format": "RGBA32",
+  "mips": 1,
+  "source_revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_path": "Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "source_native_raw_to_readable": "FLIP_Y",
+  "clean_orientation": "ALREADY_READABLE_VERIFIED_BY_OUTSIDE_UNION_ZERO",
+  "full12_outside": {
+    "source_clean": {
+      "rgba_outside": 0,
+      "rgba_inside": 447850,
+      "alpha_outside": 0,
+      "alpha_inside": 447850
+    },
+    "source_official": {
+      "rgba_outside": 0,
+      "rgba_inside": 730405,
+      "alpha_outside": 0,
+      "alpha_inside": 469259
+    },
+    "source_trial": {
+      "rgba_outside": 0,
+      "rgba_inside": 722255,
+      "alpha_outside": 0,
+      "alpha_inside": 465197
+    },
+    "clean_trial": {
+      "rgba_outside": 0,
+      "rgba_inside": 587672,
+      "alpha_outside": 0,
+      "alpha_inside": 255789
+    }
+  },
+  "old_trial_outside_two_rois": {
+    "rgba_outside": 0,
+    "rgba_inside": 37978,
+    "alpha_outside": 0,
+    "alpha_inside": 19852
+  },
+  "rows": [
+    {
+      "id": 14,
+      "source": "HEART ATTACK",
+      "korean": "하트 어택",
+      "region": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "source_alpha32_bbox": [
+        21,
+        1316,
+        1311,
+        1464
+      ],
+      "official_alpha32_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "trial_alpha32_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 5,
+      "source_trial_margin": [
+        5,
+        2,
+        851,
+        2
+      ]
+    },
+    {
+      "id": 15,
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "region": [
+        14,
+        1148,
+        1760,
+        1296
+      ],
+      "source_alpha32_bbox": [
+        14,
+        1148,
+        1035,
+        1296
+      ],
+      "official_alpha32_bbox": [
+        19,
+        1153,
+        730,
+        1292
+      ],
+      "trial_alpha32_bbox": [
+        19,
+        1153,
+        730,
+        1292
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 5,
+      "source_trial_margin": [
+        5,
+        5,
+        1030,
+        4
+      ]
+    },
+    {
+      "id": 16,
+      "source": "COAST 2 COAST",
+      "korean": "코스트 2 코스트",
+      "region": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "source_alpha32_bbox": [
+        7,
+        976,
+        1428,
+        1124
+      ],
+      "official_alpha32_bbox": [
+        91,
+        969,
+        1344,
+        1120
+      ],
+      "trial_alpha32_bbox": [
+        91,
+        969,
+        1344,
+        1120
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 84,
+      "source_trial_margin": [
+        91,
+        5,
+        416,
+        4
+      ]
+    },
+    {
+      "id": 17,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "region": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "source_alpha32_bbox": [
+        603,
+        1512,
+        1321,
+        1660
+      ],
+      "official_alpha32_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "trial_alpha32_bbox": [
+        607,
+        1516,
+        979,
+        1656
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 4,
+      "source_trial_margin": [
+        4,
+        4,
+        342,
+        4
+      ]
+    },
+    {
+      "id": 25,
+      "source": "SELECT STAR SIGN",
+      "korean": "별자리 선택",
+      "region": [
+        0,
+        788,
+        726,
+        860
+      ],
+      "source_alpha32_bbox": [
+        0,
+        788,
+        726,
+        854
+      ],
+      "official_alpha32_bbox": [
+        5,
+        793,
+        305,
+        855
+      ],
+      "trial_alpha32_bbox": [
+        5,
+        793,
+        305,
+        855
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 5,
+      "source_trial_margin": [
+        5,
+        5,
+        421,
+        5
+      ]
+    },
+    {
+      "id": 26,
+      "source": "SELECT PHOTO",
+      "korean": "사진 선택",
+      "region": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "source_alpha32_bbox": [
+        0,
+        692,
+        566,
+        758
+      ],
+      "official_alpha32_bbox": [
+        6,
+        697,
+        223,
+        752
+      ],
+      "trial_alpha32_bbox": [
+        6,
+        697,
+        223,
+        752
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 6,
+      "source_trial_margin": [
+        6,
+        5,
+        343,
+        6
+      ]
+    },
+    {
+      "id": 27,
+      "source": "SELECT NATIONALITY",
+      "korean": "국적 선택",
+      "region": [
+        1,
+        604,
+        845,
+        670
+      ],
+      "source_alpha32_bbox": [
+        1,
+        604,
+        844,
+        670
+      ],
+      "official_alpha32_bbox": [
+        6,
+        609,
+        222,
+        664
+      ],
+      "trial_alpha32_bbox": [
+        6,
+        609,
+        222,
+        664
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 5,
+      "source_trial_margin": [
+        5,
+        5,
+        623,
+        6
+      ]
+    },
+    {
+      "id": 28,
+      "source": "ENTER NAME",
+      "korean": "이름 입력",
+      "region": [
+        0,
+        496,
+        1081,
+        572
+      ],
+      "source_alpha32_bbox": [
+        6,
+        510,
+        506,
+        572
+      ],
+      "official_alpha32_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "trial_alpha32_bbox": [
+        4,
+        500,
+        270,
+        568
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": -2,
+      "source_trial_margin": [
+        4,
+        4,
+        811,
+        4
+      ]
+    },
+    {
+      "id": 30,
+      "source": "DONE",
+      "korean": "완료",
+      "region": [
+        1080,
+        423,
+        1274,
+        496
+      ],
+      "source_alpha32_bbox": [
+        1088,
+        423,
+        1274,
+        478
+      ],
+      "official_alpha32_bbox": [
+        1085,
+        429,
+        1203,
+        491
+      ],
+      "trial_alpha32_bbox": [
+        1085,
+        429,
+        1203,
+        491
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": -3,
+      "source_trial_margin": [
+        5,
+        6,
+        71,
+        5
+      ]
+    },
+    {
+      "id": 43,
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "region": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "source_alpha32_bbox": [
+        240,
+        341,
+        637,
+        386
+      ],
+      "official_alpha32_bbox": [
+        5,
+        345,
+        321,
+        400
+      ],
+      "trial_alpha32_bbox": [
+        241,
+        345,
+        557,
+        400
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 28778,
+      "source_trial_alpha32_anchor_dx": 1,
+      "source_trial_margin": [
+        241,
+        4,
+        81,
+        4
+      ]
+    },
+    {
+      "id": 44,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "region": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "source_alpha32_bbox": [
+        1626,
+        524,
+        1837,
+        569
+      ],
+      "official_alpha32_bbox": [
+        1689,
+        529,
+        1832,
+        581
+      ],
+      "trial_alpha32_bbox": [
+        1628,
+        529,
+        1771,
+        581
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 9200,
+      "source_trial_alpha32_anchor_dx": 2,
+      "source_trial_margin": [
+        2,
+        5,
+        66,
+        6
+      ]
+    },
+    {
+      "id": 53,
+      "source": "DONE",
+      "korean": "완료",
+      "region": [
+        4,
+        78,
+        138,
+        122
+      ],
+      "source_alpha32_bbox": [
+        4,
+        78,
+        138,
+        121
+      ],
+      "official_alpha32_bbox": [
+        9,
+        83,
+        71,
+        117
+      ],
+      "trial_alpha32_bbox": [
+        9,
+        83,
+        71,
+        117
+      ],
+      "clean_alpha_nonzero_count": 0,
+      "old_new_modified_rgba": 0,
+      "source_trial_alpha32_anchor_dx": 5,
+      "source_trial_margin": [
+        5,
+        5,
+        67,
+        5
+      ]
+    }
+  ],
+  "evidence_files": [
+    "C349_Q212_R43_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_GRAY_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_BLACK_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_BLACK_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_WHITE_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_WHITE_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R43_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_GRAY_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_BLACK_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_BLACK_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_WHITE_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_WHITE_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+    "C349_Q212_R44_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png"
+  ]
+}

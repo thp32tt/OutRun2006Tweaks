@@ -1,0 +1,211 @@
+{
+  "schema_version": 2,
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C349-C2-Q212-B341-SHA-EXACT",
+  "run_key": "OUTRUN-KOR-C349-C2-Q212-B341-SOURCE-CLEAN-PERSISTED-20261010-0850",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 212,
+  "selected_head": "6a9301565e1b0e574b903d2a89be85708401cd7f",
+  "selected_queue_blob": "8c790f14224d5018c5b27c1888a96b79e10bafc4",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "src": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+    "sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "independently_verified": true
+  },
+  "clean": {
+    "path": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png",
+    "sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "orientation": "native readable, source DDS mirrored Y",
+    "independently_verified": true
+  },
+  "official": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+    "sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "unchanged": true
+  },
+  "unapproved_trial": {
+    "path": "localization/graphics/role_B/20261010-B341-Q212-PLACEMENT-REWORK/B341_UNAPPROVED_Q212_TWO_ANCHOR_TRIAL.dds",
+    "sha256": "fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7",
+    "promoted": false
+  },
+  "native": {
+    "dimension": [
+      2048,
+      2048
+    ],
+    "codec": "RGBA32_NATIVE",
+    "mips": 1,
+    "header_exact_source_trial": true,
+    "manual_rgba_header_matches_pillow_decode": true,
+    "readable_transform": "flip_y"
+  },
+  "triage": "MATERIAL_REWORK",
+  "full_source_region_inventory": 12,
+  "machine": {
+    "changed_outside_inventory12_rgba": 0,
+    "changed_outside_inventory12_alpha": 0,
+    "source_clean_outside_rgba": 0,
+    "clean_trial_outside_rgba": 0,
+    "clean_source_alpha_zero_12": 12,
+    "official_trial_changed_rgba_r43": 28778,
+    "official_trial_changed_rgba_r44": 9200,
+    "official_trial_total_changed_rgba": 37978,
+    "official_trial_changed_outside_r43_r44": 0,
+    "other10_decoded_exact": true,
+    "r43_alpha32_start_source": 240,
+    "r43_alpha32_start_official": 5,
+    "r43_alpha32_start_trial": 241,
+    "r44_alpha32_start_source": 1626,
+    "r44_alpha32_start_official": 1689,
+    "r44_alpha32_start_trial": 1628,
+    "alpha32_source_core_height": 45,
+    "alpha32_trial_height_r43": 55,
+    "alpha32_trial_height_r44": 52,
+    "alpha0_source_effect_envelope_height_r43": 63,
+    "alpha0_source_effect_envelope_height_r44": 63,
+    "source_effect_bbox_ceiling_final": "NOT_FAILED_ON_ALPHA0_ENVELOPE_BUT_OPTICAL_CORE_SCALE_UNCERTAIN"
+  },
+  "visual": "Independent pixels directly inspected four-way native source CLEAN official B341 trial on BG gray black white, native100 & practical50 & RAW. Trial placement aligns, letters clearly readable, small source-core height concerns remain. Main atlas remaining ten exact old-current but not newly qualified full source-family aesthetics.",
+  "regions": {
+    "r43": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Matched readable glyph top-minus-bottom reference stroke anchors not measured; no invented sign PASS."
+      },
+      "clean_plate": {
+        "result": "SCOPED_PASS",
+        "observation": "SHA-verified canonical source vs C158 CLEAN; r43 alpha nonzero=0 and outside 12 source-bbox union unchanged."
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Source orange uppercase condensed native-professional face smaller vertical body than high-opacity Korean trial, 45px vs 55px; silhouette family not calibrated."
+      },
+      "readability": {
+        "result": "SCOPED_PASS",
+        "observation": "Direct gray/black native 100% and gray practical50 trial 프로페셔널 legible."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_PASS",
+        "observation": "No visually obvious broken/missing Hangul glyph strokes on current decoded r43 trial native/50."
+      },
+      "protected_art": {
+        "result": "HOLD",
+        "observation": "Outside exact inventory12 union saved differences zero; inside-region consumer-protected sibling semantic masks not independently certified."
+      },
+      "placement": {
+        "result": "SCOPED_PASS",
+        "observation": "Original glyph alpha32 first x240, B341 Korean x241; official was x5, now source-matched +1px."
+      },
+      "orientation": {
+        "result": "SCOPED_PASS",
+        "observation": "RAW Y mirror and FLIPY readable native independently composed from saved DDS correct."
+      }
+    },
+    "r44": {
+      "slant": {
+        "result": "HOLD",
+        "observation": "Source/Hangul matched stem anchors absent."
+      },
+      "clean_plate": {
+        "result": "SCOPED_PASS",
+        "observation": "SHA-verified source and exact C158 CLEAN; r44 CLEAN alpha=0 and outside entire source union unchanged."
+      },
+      "style": {
+        "result": "HOLD",
+        "observation": "Source red OUTRUN high opacity face height45 vs trial52; exact family hierarchy unqualified and fade envelope ambiguous."
+      },
+      "readability": {
+        "result": "SCOPED_PASS",
+        "observation": "Direct native/50 gray and black B341 trial 아웃런 recognizable."
+      },
+      "glyph_integrity": {
+        "result": "SCOPED_PASS",
+        "observation": "No evident missing Hangul contour in inspected native and practical50 saved trial."
+      },
+      "protected_art": {
+        "result": "HOLD",
+        "observation": "Outside12 union change zero; r44 exact protected semantic masks/consumer overlay not requalified."
+      },
+      "placement": {
+        "result": "SCOPED_PASS",
+        "observation": "Source glyph first x1626, trial x1628 (+2px); official was x1689 (+63px)."
+      },
+      "orientation": {
+        "result": "SCOPED_PASS",
+        "observation": "Saved DDS RAW/FLIP-Y comparable correct mirror Y for r44."
+      }
+    }
+  },
+  "blind_calibration": "NOT_QUALIFIED_PREVIOUS_PRODUCER_READ",
+  "pixels_before_producer_verdict": false,
+  "C2_decision": "B341_TRIAL_SCOPED_PLACEMENT_PASS_HOLD_STRICT_RECHECK",
+  "official_queue_status": "c338_c2_rework_required_r43_r44_original_anchor_shift",
+  "C3": "BLOCKED_NOT_RUN",
+  "APPROVAL": "NO_CURRENT_POLICY_PASS",
+  "user_game": "IGR029_OPEN_NO_NEW_SCREENSHOT",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_promoted_dds": 0,
+  "evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R43_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "c747cbbe1cf0e2099a920850a7b5f6853222d366a7494c64ecea89a9375d7952"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R43_GRAY_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "ccb779348c4b767f5ea3f190982e34a67c6b4d4278732f8c4bbf1d927b80568a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R43_BLACK_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "1f5eafee6c2af69d8472270e0bf9310ba39bd265f044469355145b8c51031546"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R43_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "9ba48c9a0fc69889e298241cd76e8e051429a850a1a2b6a6be5e475a5b2c00bd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R43_ALPHA32_SOURCE_TRIAL_OVERLAY.png",
+      "sha256": "9f5f7603a180c76e9f9d3cc0debc84ebde80e91e13418e61187dcf4b4a853a80"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R44_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "10b7cbedba30de1f127d806959eea6d7c50187057d752cc0d6e1ca97fcb900bd"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R44_GRAY_50_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "acab41a778772d7b760b056ba1c334c44115c816bf21c4419ba5f68492d366ed"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R44_BLACK_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "d4fbf3815cfd134f4504628508993f8109d8e0237eac9bc08e9f6bfc838b569e"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R44_RAW_GRAY_100_SOURCE_CLEAN_OFFICIAL_TRIAL.png",
+      "sha256": "396a50ac1dbaaf123ad3fb6b4b5a6995bb5954fdbcada15e6cf95e91b8257fb8"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_R44_ALPHA32_SOURCE_TRIAL_OVERLAY.png",
+      "sha256": "87f39d5991fec63ef0a3934f8b5f44fe9f8a6a5f189c35a2a0af41195a562610"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_NATIVE_PIXEL_MACHINE.json",
+      "sha256": "da91e69531c9592e4655ea5e4511c6758e328c37755ffd8f40fbd84862ab6dfc"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_HIGH_ALPHA_PROFILE.json",
+      "sha256": "6ae5587bf9af67cad14059513d9a6e5fca018f31f41a999b37620c160d73ebeb"
+    }
+  ],
+  "backend": "GitHub SSOT + N100 MCP exact DDS pixel decode fallback; local HTTPS unavailable",
+  "excluded": [
+    "C1_ODD",
+    "UNINDEXED_SPECIAL",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "SEPARATE_CONTROLLER_TASK_QUEUE"
+  ]
+}

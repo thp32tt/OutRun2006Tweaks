@@ -1,0 +1,412 @@
+{
+  "source_trial_header_equal": true,
+  "source_official_header_equal": true,
+  "decoded_pillow_equals_manual_rgba": true,
+  "raw_flipy_roundtrip": true,
+  "regions": {
+    "43": {
+      "native_region": [
+        0,
+        341,
+        638,
+        404
+      ],
+      "thresholds": {
+        "0": {
+          "SOURCE": {
+            "bbox": [
+              0,
+              341,
+              638,
+              404
+            ],
+            "count": 13766,
+            "height": 63
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              345,
+              321,
+              400
+            ],
+            "count": 7490,
+            "height": 55
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              345,
+              557,
+              400
+            ],
+            "count": 7490,
+            "height": 55
+          }
+        },
+        "8": {
+          "SOURCE": {
+            "bbox": [
+              0,
+              341,
+              637,
+              403
+            ],
+            "count": 10079,
+            "height": 62
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              345,
+              321,
+              400
+            ],
+            "count": 7443,
+            "height": 55
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              345,
+              557,
+              400
+            ],
+            "count": 7443,
+            "height": 55
+          }
+        },
+        "32": {
+          "SOURCE": {
+            "bbox": [
+              240,
+              341,
+              637,
+              386
+            ],
+            "count": 9871,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              345,
+              321,
+              400
+            ],
+            "count": 7246,
+            "height": 55
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              345,
+              557,
+              400
+            ],
+            "count": 7246,
+            "height": 55
+          }
+        },
+        "64": {
+          "SOURCE": {
+            "bbox": [
+              240,
+              341,
+              637,
+              386
+            ],
+            "count": 9635,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              345,
+              321,
+              399
+            ],
+            "count": 6967,
+            "height": 54
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              345,
+              557,
+              399
+            ],
+            "count": 6967,
+            "height": 54
+          }
+        },
+        "128": {
+          "SOURCE": {
+            "bbox": [
+              240,
+              341,
+              637,
+              386
+            ],
+            "count": 9031,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              346,
+              320,
+              399
+            ],
+            "count": 6676,
+            "height": 53
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              346,
+              556,
+              399
+            ],
+            "count": 6676,
+            "height": 53
+          }
+        },
+        "200": {
+          "SOURCE": {
+            "bbox": [
+              241,
+              342,
+              636,
+              386
+            ],
+            "count": 8394,
+            "height": 44
+          },
+          "OFFICIAL": {
+            "bbox": [
+              5,
+              346,
+              320,
+              399
+            ],
+            "count": 6257,
+            "height": 53
+          },
+          "TRIAL": {
+            "bbox": [
+              241,
+              346,
+              556,
+              399
+            ],
+            "count": 6257,
+            "height": 53
+          }
+        }
+      }
+    },
+    "44": {
+      "native_region": [
+        1626,
+        524,
+        1837,
+        587
+      ],
+      "thresholds": {
+        "0": {
+          "SOURCE": {
+            "bbox": [
+              1626,
+              524,
+              1837,
+              587
+            ],
+            "count": 5822,
+            "height": 63
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1688,
+              529,
+              1832,
+              582
+            ],
+            "count": 3948,
+            "height": 53
+          },
+          "TRIAL": {
+            "bbox": [
+              1627,
+              529,
+              1771,
+              582
+            ],
+            "count": 3948,
+            "height": 53
+          }
+        },
+        "8": {
+          "SOURCE": {
+            "bbox": [
+              1626,
+              524,
+              1837,
+              569
+            ],
+            "count": 5553,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1688,
+              529,
+              1832,
+              582
+            ],
+            "count": 3907,
+            "height": 53
+          },
+          "TRIAL": {
+            "bbox": [
+              1627,
+              529,
+              1771,
+              582
+            ],
+            "count": 3907,
+            "height": 53
+          }
+        },
+        "32": {
+          "SOURCE": {
+            "bbox": [
+              1626,
+              524,
+              1837,
+              569
+            ],
+            "count": 5417,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1689,
+              529,
+              1832,
+              581
+            ],
+            "count": 3791,
+            "height": 52
+          },
+          "TRIAL": {
+            "bbox": [
+              1628,
+              529,
+              1771,
+              581
+            ],
+            "count": 3791,
+            "height": 52
+          }
+        },
+        "64": {
+          "SOURCE": {
+            "bbox": [
+              1627,
+              524,
+              1836,
+              569
+            ],
+            "count": 5283,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1689,
+              529,
+              1832,
+              581
+            ],
+            "count": 3736,
+            "height": 52
+          },
+          "TRIAL": {
+            "bbox": [
+              1628,
+              529,
+              1771,
+              581
+            ],
+            "count": 3736,
+            "height": 52
+          }
+        },
+        "128": {
+          "SOURCE": {
+            "bbox": [
+              1627,
+              524,
+              1836,
+              569
+            ],
+            "count": 4839,
+            "height": 45
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1689,
+              530,
+              1832,
+              581
+            ],
+            "count": 3555,
+            "height": 51
+          },
+          "TRIAL": {
+            "bbox": [
+              1628,
+              530,
+              1771,
+              581
+            ],
+            "count": 3555,
+            "height": 51
+          }
+        },
+        "200": {
+          "SOURCE": {
+            "bbox": [
+              1627,
+              525,
+              1836,
+              569
+            ],
+            "count": 4639,
+            "height": 44
+          },
+          "OFFICIAL": {
+            "bbox": [
+              1689,
+              530,
+              1831,
+              581
+            ],
+            "count": 3298,
+            "height": 51
+          },
+          "TRIAL": {
+            "bbox": [
+              1628,
+              530,
+              1770,
+              581
+            ],
+            "count": 3298,
+            "height": 51
+          }
+        }
+      }
+    }
+  }
+}
