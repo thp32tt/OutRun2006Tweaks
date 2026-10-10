@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "A",
+  "run": "A228",
+  "run_key": "OUTRUN-KOR-A228-Q059-C1-BC3-FACE-INDEX-SCOPED-20261010-2100",
+  "reviewed_at_kst": "2026-10-10 21:09 KST",
+  "queue_index": 59,
+  "priority": "P1_PJR019",
+  "baseline_source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "original_official_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+  "new_trial_sha256": "8150213897f4dc7b74e2d6273d703be3a9d6ac780627f8747059d25ec1ef9f2e",
+  "evidence_base": "localization/graphics/role_A/20261010-A228-Q059-BC3-INDEX-INTERIOR-REPAIR-TRIAL/",
+  "github_cpu_worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38050751825",
+  "execution_backend": "GitHub-hosted CPU because native local sandbox GitHub DNS could not retrieve source/DDS",
+  "stage": "BC3_PALETTE_INDEX_TRIAL_SOURCE_BOUNDED_NO_OFFICIAL_PROMOTION",
+  "scoped_pixel_results": {
+    "race_rivals_opaque_gold_holes_changed": 151,
+    "drift_score_opaque_gold_holes_changed": 182,
+    "slipstream_score_opaque_gold_holes_changed": 201,
+    "total_changed_pixels": 534,
+    "total_changed_file_bytes": 514,
+    "unchanged_alpha_exact": true,
+    "unchanged_header_and_size": true,
+    "unchanged_outside_3_source_text_regions": true,
+    "persisted_trial_dds_redecoded": true,
+    "mechanical_scope": "PASS_SCOPED_NOT_PRODUCT_VISUAL_PASS"
+  },
+  "controller_firsthand_view": {
+    "source_official_trial_native": {
+      "race_rivals": "A228_race_rivals_GRAY_100.png",
+      "drift_score": "A228_drift_score_GRAY_100.png"
+    },
+    "practical_50": {
+      "slipstream_score": "A228_slipstream_score_GRAY_50.png"
+    },
+    "source_to_trial": "Yellow face has visibly fewer isolated dark pin-dots in three Korean small-text cells; source English face remains smoother and source-relative proportion/effect fidelity is not demonstrated.",
+    "defects_remaining": [
+      "BC3_GLYPH_FACE_EDGE_STIPPLE_OR_DARK_OUTLINE_INTRUSION",
+      "SOURCE_FAMILY_EFFECT_STROKE_AND_GLYPH_PROPORTION_NOT_APPROVED"
+    ],
+    "plate_only_source_clean": "Historical A184R verified source/clean retained, but not independently re-proved in this run.",
+    "persisted_raw_vs_flipy": "Decoded readable FLIP-Y from exact persisted trial and format/header verification; separate first-hand native RAW crop and all-region BGW 100/75/50 review not completed.",
+    "visual_decision": "REWORK_REQUIRED_TRIAL_PARTIAL_IMPROVEMENT_NO_PROMOTION"
+  },
+  "source_width_hierarchy": {
+    "race_rivals": "382/550 prior; not re-set by 534 pixel repair",
+    "drift_score": "444/490 prior",
+    "slipstream_score": "491/691 prior"
+  },
+  "first_failed_stage": "COMPRESSED_GLYPH_FACE_OPTICAL_FIDELITY",
+  "next_material_method": "Native source-family glyph fill and BC3 block-aware source-aligned recompression with full source-CLEAN-lettering-final proof; do not repeat index-only repair and call it PASS.",
+  "current_official_changed": false,
+  "trial_dds_count": 1,
+  "promoted_dds_count": 0,
+  "independent_C1": "NOT_RUN_ON_TRIAL",
+  "C3": "NOT_RUN",
+  "evidence_approval": "NOT_APPROVED",
+  "user_jpg": "PJR019_OPEN",
+  "user_ingame": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
