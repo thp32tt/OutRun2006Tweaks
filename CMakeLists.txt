@@ -590,6 +590,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/core/transport.hpp"
 	"src/vr/d3d11/native_backend.cpp"
 	"src/vr/d3d11/native_backend.hpp"
+	"src/vr/d3d11/live_game_frame_bridge.cpp"
+	"src/vr/d3d11/live_game_frame_bridge.hpp"
 	"src/vr/d3d11/native_shared_eye_ring.cpp"
 	"src/vr/d3d11/native_shared_eye_ring.hpp"
 	"src/vr/d3d11/pipeline_translation.cpp"
