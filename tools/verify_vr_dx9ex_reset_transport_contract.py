@@ -848,24 +848,39 @@ forbid(
     "candidate.published = false;",
 )
 
-issue_marker = "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);"
-issue_pos = resolve_direct_r32.find(issue_marker)
-pending_publish_pos = resolve_direct_r32.find(
-    "R30SupportMarkDirectTransportSlotPending(selected, frameId);", issue_pos
+# R30 issues the exact producer EVENT under the same internal-pass scope as
+# both eye copies. R32 only inspects the returned HRESULT and fails closed
+# before publishing pending frame metadata.
+issue_r30 = body(r30, "R30SupportCopyDirectTransportEyesAndIssueFence(")
+require_order(
+    issue_r30,
+    "R30 producer EVENT issued only after guarded successful eye copies",
+    "InternalPassScope guard;",
+    "const HRESULT leftCopy = device->StretchRect(",
+    "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
+    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    "return {slot.fence->Issue(D3DISSUE_END), false};",
 )
-if min(issue_pos, pending_publish_pos) < 0:
-    fail("R32 producer EVENT issue scope missing")
-issue_r32 = resolve_direct_r32[issue_pos:pending_publish_pos]
+copy_pos = resolve_direct_r32.find(
+    "R30SupportCopyDirectTransportEyesAndIssueFence(")
+pending_publish_pos = resolve_direct_r32.find(
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);", copy_pos)
+if min(copy_pos, pending_publish_pos) < 0:
+    fail("R32 lower-owned DirectGPU copy/fence publication scope missing")
+issue_r32 = resolve_direct_r32[copy_pos:pending_publish_pos]
 require_order(
     issue_r32,
     "R32 producer EVENT issue failure fail-closed",
-    issue_marker,
-    "if (FAILED(issueHr))",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    "if (FAILED(copy.hr))",
     "R32DirectCopyPathRejected = true;",
-    "R32DirectCopyRejectHr = issueHr;",
+    "R32DirectCopyRejectHr = copy.hr;",
+    "if (copy.copyFailed)",
     "if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;",
     "return false;",
 )
+forbid(issue_r32, "R32 regained physical producer EVENT ownership",
+       "slot.fence->Issue(", "InternalPassScope guard;")
 
 forbid(
     resolve_direct_r32,
