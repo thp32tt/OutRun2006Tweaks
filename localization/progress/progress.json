@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 09:45 KST",
+  "updated_at_kst": "2026-10-10 10:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -10249,5 +10249,39 @@
       "IGR-040"
     ],
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a220_q121_the24_source_residue": {
+    "run": "A220",
+    "run_key": "OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "prior_A219_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "new_unpromoted_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+    "additional_source_ghost_pixels_removed": 24,
+    "prior_goal_residue_pixels_preserved": 33,
+    "cumulative_source_residue_pixels_removed_in_trial": 57,
+    "changed_bytes_vs_prior_trial": 95,
+    "unrelated_atlas_pixels_changed": 0,
+    "official_candidate_changed": false,
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "scope": "EXACT_ENGLISH_THE_FRAGMENT_RANK24",
+    "producer_machine_qa": "SCOPED_PASS",
+    "producer_visual": "SCOPED_PASS_NATIVE_GRAY_BG_BLACK_GRAY_WHITE_100_75_50_RAW",
+    "whole_atlas": "HOLD_SOURCE_PROTECTED_ART_SEMANTIC_29_REGION_C1_C3",
+    "C1": "PENDING_NEW_TRIAL",
+    "C3": "NOT_RUN",
+    "user_IGR": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 38011800333,
+    "qa_report": "localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json",
+    "updated_at_kst": "2026-10-10 10:12 KST"
   }
 }

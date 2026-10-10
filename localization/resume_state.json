@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A220 2026-10-10 10:12 KST q121 P0 NEW distinct 24 source-matching English 'the' stray visible pixels repaired into unpromoted saved 4096x4096 DDS trial SHA256 6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06 from A219 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb; preserves previously repaired 33 'goal.' pixels; total 57. Native SHA-pinned SOURCE/CLEAN/OFFICIAL/TRIAL, BGW100/75/50 and RAW scoped visual + exact changed bytes95 (pixels24) PASS. Official 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844 unchanged REWORK_REQUIRED, whole atlas/C1/C3/APPROVAL/game IGR030/031/040 untested. Evidence localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json RUN_KEY=OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
     "B346 2026-10-10 09:45 KST B EVEN q176 made real 2048x2048 trial DDS SHA eea9f4b6228d4261845712634c404abe171f39bcc54c60f318bdbf13a8d5ee45 from exact English source with native Bold stroke1 after B345 trial SHA 34edd2aa rejected for narrow counters. GitHub CPU #38009996777 SUCCESS; source/CLEAN/FINAL outside original 4 bboxes RGBA0 and RAW/FLIP-Y practical direct scoped visual improved. Official 494d42c0... stays C343 REWORK, no promoted DDS, C2/C3/game pending, runtime UNTESTED. Complete final manifest+pixel guard, fresh C2/C3 before publication. QA role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_CONTROLLER_PRODUCER_SCOPED_QA.json RUN_KEY=OUTRUN-KOR-B346-Q176-SOURCE-CALIBRATED-COUNTERS-20261010",
     "A219 2026-10-10 09:20 KST A q121 P0 exact English source residue 33px fixed in unpromoted saved DDS trial SHA 9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb. Source/CLEAN/current white 255 x33; saved DDS 132 bytes only, outside 0, RAW/FLIPY native/75/50 producer scoped visual PASS. OFFICIAL current A202 SHA 38d5c2c3 unchanged; q121 REWORK_REQUIRED, IGR030/031/040 OPEN, no C1/C3/new game acceptance; RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261010-A219-Q121-GOAL-SOURCE-RESIDUE-33/A219_CONTROLLER_SELF_QA.json",
     "C349 C2 2026-10-10 09:10 KST EVEN q212 distinct B341 unpromoted trial SHA fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7 vs unchanged official SHA e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea. Independently fetched SHA verified canonical English source f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61, full authored C158 CLEAN c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67, official and trial native 2048x2048 RGBA32 mip1; true RGBA channel/order and RAW=flipY stored confirmed. Full 12 source inventory bboxes SOURCE/CLEAN, SOURCE/TRIAL, CLEAN/TRIAL all RGBA+alpha outside0; all12 CLEAN original alpha0. Official→trial changes only r43/r44 within their source ROIs 37978 RGBA, other10 unchanged exact. r43 ORIGINAL PROFESSIONAL visible alpha>32 x240, official Korean x5, B341 trial x241 (dx+1); r44 OUTRUN x1626, official Korean x1689, B341 trial x1628 (dx+2). Native+practical50 visual shows layout improves without obvious ghost/box/glyph break; persists RAW orientation. But alpha>32 English glyph height r43=45 vs trial55, r44=45 vs trial52 (source alpha>0 effect envelope=63, so this is an optical high-opacity hierarchy HOLD, NOT proven literal source-effect-bbox pixel escape); qualified blind calibration/complete source-family slant/effect review and producer P1/P2/P3 manifest missing, trial not promoter nor full C2 PASS. C2 scoped placement PASS / overall HOLD_STRICT_RECHECK on trial only; official remains C338 REWORK_REQUIRED, C3/APPROVAL/IGR029 user game BLOCKED UNTESTED. New 10 lossless evidence PNG 2 machine JSON C2 report localization/graphics/role_C/20261010-C349-C2-Q212-B341-INDEPENDENT-SOURCE-ANCHOR/C349_Q212_C2_TRIAL_HOLD.json, DDS officially promoted0. OUTRUN-KOR-C349-C2-Q212-B341-SOURCE-CLEAN-PERSISTED-20261010-0850.",
@@ -6873,7 +6874,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 09:45 KST",
+  "updated_at_kst": "2026-10-10 10:12 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -14447,5 +14448,39 @@
       "IGR-040"
     ],
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a220_q121_the24_source_residue": {
+    "run": "A220",
+    "run_key": "OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
+    "role": "A",
+    "queue_index": 121,
+    "priority": "P0",
+    "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "prior_A219_trial_sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "new_unpromoted_trial_sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+    "additional_source_ghost_pixels_removed": 24,
+    "prior_goal_residue_pixels_preserved": 33,
+    "cumulative_source_residue_pixels_removed_in_trial": 57,
+    "changed_bytes_vs_prior_trial": 95,
+    "unrelated_atlas_pixels_changed": 0,
+    "official_candidate_changed": false,
+    "new_trial_dds": 1,
+    "new_promoted_dds": 0,
+    "scope": "EXACT_ENGLISH_THE_FRAGMENT_RANK24",
+    "producer_machine_qa": "SCOPED_PASS",
+    "producer_visual": "SCOPED_PASS_NATIVE_GRAY_BG_BLACK_GRAY_WHITE_100_75_50_RAW",
+    "whole_atlas": "HOLD_SOURCE_PROTECTED_ART_SEMANTIC_29_REGION_C1_C3",
+    "C1": "PENDING_NEW_TRIAL",
+    "C3": "NOT_RUN",
+    "user_IGR": [
+      "IGR-030",
+      "IGR-031",
+      "IGR-040"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "worker_run": 38011800333,
+    "qa_report": "localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_CONTROLLER_SELF_QA.json",
+    "updated_at_kst": "2026-10-10 10:12 KST"
   }
 }

@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "run": "A220",
+  "run_key": "OUTRUN-KOR-A220-Q121-THE-SOURCE-ORPHAN-20261010-1000",
+  "role": "A",
+  "owner_lane": "A",
+  "queue_index": 121,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "original_size": "4096x4096"
+  },
+  "official": {
+    "sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "changed": false
+  },
+  "prior_trial": {
+    "sha256": "9f5039dae7ee94cc33c118d5bd9e47c5720f165aa3c3c61a7c8dad992d0f62fb",
+    "removed_english_goal_pixels": 33
+  },
+  "new_trial": {
+    "path": "localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_Q121_THE_RESIDUE_PLUS_GOAL33_UNPROMOTED.dds",
+    "sha256": "6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06",
+    "source_english": "the",
+    "A215_source_component": 24,
+    "readable_crop": [
+      3056,
+      651,
+      3205,
+      743
+    ],
+    "original_text_bbox": [
+      3068,
+      663,
+      3193,
+      731
+    ],
+    "new_exact_source_pixels_removed": 24,
+    "changed_bytes_vs_prior_trial": 95,
+    "other_atlas_pixels_unchanged": true,
+    "header_unchanged": true,
+    "old_goal33_removal_preserved": true
+  },
+  "machine": {
+    "github_actions_run": 38011800333,
+    "result": "SUCCESS",
+    "path": "localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_MACHINE_TRIAL_QA.json",
+    "source_clean_official_exact_match": true,
+    "persisted_dds_redecode": true,
+    "source_pixel_match_before_removal": true,
+    "source_pixel_alpha_zero_after": true,
+    "changed_outside_selected_source_pixels": 0,
+    "ambiguous_alpha_inside_inner_text_bbox": 0
+  },
+  "controller_visual": {
+    "inspected": [
+      "A220_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY100.png",
+      "A220_TRIAL_GRAY_50.png",
+      "A220_TRIAL_RAW_NATIVE.png"
+    ],
+    "worker_saved_other_views": [
+      "A220_TRIAL_BLACK_100.png",
+      "A220_TRIAL_BLACK_75.png",
+      "A220_TRIAL_BLACK_50.png",
+      "A220_TRIAL_WHITE_100.png",
+      "A220_TRIAL_WHITE_75.png",
+      "A220_TRIAL_WHITE_50.png",
+      "A220_TRIAL_GRAY_100.png",
+      "A220_TRIAL_GRAY_75.png"
+    ],
+    "source_old": "White original English 'the' and tiny surviving white source fragments in OLD CLEAN/OFFICIAL",
+    "trial_new": "New saved DDS alpha-composited gray50 shows original-white fragments absent without new visible box or glyph overlap in selected cell",
+    "raw": "Native RAW output contains alpha-transparent hidden RGB; uncomposited black shapes must not be misclassified as visible artifacts",
+    "decision": "SCOPED_PLATE_RESIDUE_REMOVAL_PASS_ONLY"
+  },
+  "full_atlas": "HOLD_29_SEMANTIC_CELLS_PROTECTED_ART_FONT_PROFILE",
+  "qa_status": "REWORK_REQUIRED_OFFICIAL_UNCHANGED",
+  "C1": "FRESH_C1_NEEDED_NEW_SHA",
+  "C3": "NOT_RUN",
+  "independent_approval": false,
+  "pre_ingame": "BLOCKED",
+  "user_igr": [
+    "IGR-030",
+    "IGR-031",
+    "IGR-040"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "backend": "GitHub Actions CPU worker; controller GitHub connector; N100 unused",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
