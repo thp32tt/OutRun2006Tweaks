@@ -1,14 +1,14 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "task_id": "CONVERSION-DX11-00514",
   "production_id": "CONVERSION-DX11-00514",
   "event_id": "CONVERSION-DX11-00514-E001",
   "attempt": 1,
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "c16e7694af0d98d71055d4684b9e4ecbc4cd5dd1",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "result_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "validation_bearing_result_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:R217:INDEXED_OPAQUE_DEPTH_EYE_GPU",
@@ -16,21 +16,21 @@
     "src/vr/d3d11/native_indexed_draw_submit.hpp:R217",
     "tools/dx11_indexed_draw_probe_r186.cpp:R217"
   ],
-  "status": "WAITING_FOR_EXACT_SHA_CI",
-  "summary": "R217 strict live D3D11 indexed DrawIndexed opaque single-eye depth ownership and actual WARP positive/negative/restore GPU pixels; no gameplay activation.",
+  "status": "BLOCKED_INDEPENDENT_R175_GATE",
+  "summary": "R217 indexed D3D11 opaque single-eye depth ownership implemented and real WARP indexed GPU pixels pass; R212 test scoped and R217 11 negative mutants pass. Total exact-SHA Gate fails only at independently owned R175 TEXCOORD6 shader varying test.",
   "pipeline": {
-    "C0_RECOVER": "PASS branch HEAD and remote checkpoints/00513 C6 read",
-    "C1_REVIEW": "PASS R175 existing 00477 foreign claim; selected disjoint indexed depth-eye R217",
-    "C2_IMPLEMENT": "PASS production C++ indexed exact DSV/DS/blend/sample-mask/device guard and WARP real indexed depth negative/restoration proof",
-    "C3_VALIDATE": "Local 1x related static assertions PASS; exact-SHA Backend Conversion Gate pending",
-    "C4_COMMIT": "material [AUTO:CONVERSION-DX11-00514] commit prepared",
-    "C5_PACKAGE": "NOT_REQUIRED: dormant preflight only, no Quest3/VDXR gameplay promotion",
-    "C6_STATE": "PENDING exact-SHA gate and followup durable result"
+    "C0_RECOVER": "PASS branch HEAD, 00513 previous material and 00514 checkpoint",
+    "C1_REVIEW": "PASS R175 00477 foreign owner excluded; independent R217 indexed-depth work selected",
+    "C2_IMPLEMENT": "PASS native indexed R217 DSV/DS/blend/mask ownership, actual WARP GPU depth positive/negative/restore; R212 static scope repaired and eleven R217 guard mutants added",
+    "C3_VALIDATE": "R217 SCOPED PASS; required exact-SHA Gate FAIL at independent R175 varying",
+    "C4_COMMIT": "PASS source commit 7ad0be9b; repair material 39bb93b5 (both AUTO:00514)",
+    "C5_PACKAGE": "NOT_REQUIRED no gameplay native activation or HMD promotion",
+    "C6_STATE": "BLOCKED independently owned R175; exact CI recorded; runtime UNTESTED"
   },
   "changed_files": [
     "src/vr/d3d11/native_indexed_draw_submit.hpp",
     "tools/dx11_indexed_draw_probe_r186.cpp",
-    "docs/automation/runs/CONVERSION-DX11-00514.json"
+    "tools/test_dx11_indexed_single_eye_mrt_r212.py"
   ],
   "evidence": {
     "previous_00513_material": "3647e5d82dc7103d32570f64818aec0eecef455b",
@@ -42,5 +42,47 @@
     "old_header_blob": "e505c5154955a40207939e4da9872c547856e131",
     "old_probe_blob": "5f9d7d232f54b1788047f488631b0985b49fbe44"
   },
-  "next_action": "Read exact-SHA Backend Conversion Gate. If unrelated R175 red remains, preserve R217 scoped evidence and mark overall FAIL, without claiming Quest3 runtime."
+  "next_action": "Reconcile separate R175 owner/lease under its task, do not rerun 00514. Keep R217 exact source material 39bb93b5 and RUNTIME_VALIDATION=UNTESTED.",
+  "checkpoint": "C6_STATE",
+  "material_result_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "initial_material_sha": "7ad0be9b22a5bc59b1dcd99ff1d3293f14719bf0",
+  "validation_run_id": 38021861636,
+  "validation_job_id": 114124379543,
+  "readiness_smoke_job_id": 114125264803,
+  "initial_gate_id": 38021355703,
+  "validation": {
+    "canonical_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+    "gate_id": 38021861636,
+    "gate_conclusion": "failure",
+    "validate": "success",
+    "r212_r217_static": "success",
+    "r186_real_warp": "success",
+    "smoke": "failure",
+    "failed_step": "Run DX11 constant buffer probe",
+    "classification": "R175_GENERIC_VARYING_MISMATCH",
+    "actual_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "initial_gate_failed_step": "Verify R212 indexed OM eye ownership",
+    "initial_gate_38021355703_result": "failure; repaired R212 scope in 39bb93b5"
+  },
+  "blockers": [
+    "R175 TEXCOORD6 varying is independently owned by CONVERSION-DX11-00477; do not modify foreign source without owner fencing",
+    "Quest3/VDXR not tested, no runtime promotion"
+  ],
+  "issue14_comments": [
+    6093414061,
+    6093463154
+  ],
+  "score_change": 0,
+  "completed_at_kst": "2026-10-10 12:58 KST"
 }
