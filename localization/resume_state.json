@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C380 C2 EVEN q230 new RAW 7 pixel QA: CORRECT SOURCE FAMILY COURSES/BGMUSIC type and scale after independent source CLEAN gate. Official source/candidate SHA unchanged, status REWORK_REQUIRED. localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_C2_INDEPENDENT_STYLE_REWORK.json C3/game UNTESTED.",
     "C1 2026-10-11 07:20 KST ODD q121 NEW distinct A235R 4096x4096 native RGBA32/MIP1 saved trial SHA 1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98 independently SHA verified vs exact English source f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e and official preserved 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844. Source/new FLIP-Y decoded persisted PNG mismatch0; official->trial 9275 RGBA, 5824 alpha changed, all within original Gas Pedal [3490,391,3722,440], outside RGBA/alpha0 and other29 cells preserved. SOURCE->CLEAN removed 6334 original-alpha pixels to alpha0; CLEAN->A235R 6352 Korean visible alpha; full saved effect bbox local [7,2,225,48] against source [0,0,232,49] with L/T/R/B margins 7/2/7/1, 420 visible alpha pixels outside producer asserted glyph bbox [11,5,221,44]. Newly measured source near-white opaque face3504 vs A235R1426 (40.7%), blue-dark rim proxy1518 vs2462; 12 independent native lossless gray/black/white100/75/50/RAW SOURCE-CLEAN-OFFICIAL-A235R views reveal Korean excessively thin white face with heavy navy outline compared with English smooth white italic source. 8-check C1 scoped machine PASS for containment/no residue/readability/RAW, SOURCE-FAMILY OPTICAL FAIL; new A235R = REWORK_REQUIRED_UNPROMOTED, official unchanged, no C/C3/approval/user-game PASS, IGR030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED. Earlier C1 A234R e87c570f was distinct and NOT re-scored. QA localization/graphics/role_C/20261011-C1-Q121-A235R-INDEPENDENT-WHITE-FACE-REWORK/C1_Q121_A235R_INDEPENDENT_C1_QA.json; RUN_KEY=OUTRUN-KOR-C1-Q121-A235R-NEW-SHA-NATIVE-WHITE-FACE-20261011-0710.",
     "A235R odd q121 source-profile Regular vector native rank20 Gas Pedal→가속 페달. Actual new saved trial SHA 1c13618efccaf572ed6214aff2e8bde410049b51679e9192689e22d48e40ca98 (prior A235 under-height SHA 571bf039 rejected first-look, official 38d5c2c3 preserved). SOURCE f7847db9 exact; source face 3901 white/1729 navy dark pixels, English G optical lean dx4.94, not homologous calibrated anchor. Trial native 4096² RGBA32 RAW/FLIPY, 210x39 Korean within 232x49 source ROI, alpha6352 vs source6334; source ROI outside changes0, other29 atlas cells exact, persisted decode exact. Native gray100/white75/black50/RAW visible and complete. Smooth English italic face vs geometric Korean/rim shows style risk: SCOPED_MATERIAL_IMPROVEMENT_HOLD, NOT producer PASS, no official candidate, C1/C3 not run, IGR030/031/040 OPEN, game UNTESTED. QA localization/graphics/role_A/20261011-A235R-Q121-SOURCE-CONTOUR-NATIVE-HEIGHT-REFIT/A235R_CONTROLLER_OPTICAL_QA.json. RUN_KEY=OUTRUN-KOR-A235-Q121-REGULAR-SOURCE-CONTOUR-VECTOR-20261011-0700.",
     "C379 C2 2026-10-11 07:01:02 KST FIRST independent q176 new B365 SHA 13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7; canonical SOURCE 8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708 / OFFICIAL 494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407 exact 2048^2 saved DDS reauth, native/RAW/FLIPY/50/75 optical FAIL source broad solid red 980px vs narrow 706px (72%) thin Hangul. OFFICIAL->B365 RGBA80387 inside original bbox [8,49,988,204], outside0 alpha-outside0, three sibling labels unchanged, candidate bbox [14,54,720,199] margins [6,268,5,5]. New trial independent REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_UNDERWEIGHT, CLEAN/BLIND CALIBRATION HOLD, current official C343 REWORK unchanged, C3/APPROVAL/user real-game UNTESTED. REPORT=localization/graphics/role_C/20261011-C379-C2-Q176-B365-INDEPENDENT-NATIVE/C379_Q176_C2_INDEPENDENT_B365_REWORK.json RUN_KEY=OUTRUN-KOR-C379-C2-Q176-B365-NEW-NATIVE-SOURCE-STYLE-20261011-0657.",
@@ -7032,7 +7033,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 07:01:02 KST",
+  "updated_at_kst": "2026-10-11 07:33 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15755,5 +15756,29 @@
       "IGR-031",
       "IGR-040"
     ]
+  },
+  "c380_c2_q230_raw_seven_style_20261011": {
+    "review_id": "C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-FIRSTLOOK-20261011",
+    "role": "C2",
+    "shard": "EVEN",
+    "index": 230,
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "official_dds_changed": false,
+    "prior_state": "c341_c2_hold_exact_current_source_clean_final_scoped_full_atlas_blind_pending",
+    "new_state": "c380_c2_rework_required_source_family_hierarchy",
+    "changed_rgba_within_13": 164105,
+    "changed_outside_13": 0,
+    "alpha_changed_outside_13": 0,
+    "new_raw_regions": 7,
+    "source_family_failure": [
+      "left03_courses:31.4%-width",
+      "right01_bg_music:38%-width"
+    ],
+    "C2": "REWORK_REQUIRED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_approved_dds": 0,
+    "evidence": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_C2_INDEPENDENT_STYLE_REWORK.json"
   }
 }

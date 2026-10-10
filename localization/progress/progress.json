@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T07:20:00+09:00",
+  "updated_at_kst": "2026-10-11 07:33 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12284,5 +12284,29 @@
     "new_official_DDS": 0,
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c380_c2_q230_raw_seven_style_20261011": {
+    "review_id": "C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-FIRSTLOOK-20261011",
+    "role": "C2",
+    "shard": "EVEN",
+    "index": 230,
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+    "official_dds_changed": false,
+    "prior_state": "c341_c2_hold_exact_current_source_clean_final_scoped_full_atlas_blind_pending",
+    "new_state": "c380_c2_rework_required_source_family_hierarchy",
+    "changed_rgba_within_13": 164105,
+    "changed_outside_13": 0,
+    "alpha_changed_outside_13": 0,
+    "new_raw_regions": 7,
+    "source_family_failure": [
+      "left03_courses:31.4%-width",
+      "right01_bg_music:38%-width"
+    ],
+    "C2": "REWORK_REQUIRED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_approved_dds": 0,
+    "evidence": "localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_C2_INDEPENDENT_STYLE_REWORK.json"
   }
 }
