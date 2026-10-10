@@ -16,7 +16,7 @@
 #include "stereo_renderer_r26.cpp"
 #include "../core/r29_owner_api.hpp"
 #include "../state/state_block_tracker.hpp"
-#include "vr/game/render_semantics.hpp"\n
+#include "vr/game/render_semantics.hpp"
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
@@ -704,6 +704,32 @@ namespace OutRunVRStereo
         view.rightDepthSynchronized = RightDepthSynchronized;
         view.rightStencilSynchronized = RightStencilSynchronized;
         return view;
+    }
+
+    bool R29OwnerRecommendedEyeExtent(std::uint32_t eye,
+        std::uint32_t& width, std::uint32_t& height) noexcept
+    {
+        width = 0;
+        height = 0;
+        if (eye >= 2 || !SharedState ||
+            SharedState->magic != OutRunVR::SharedMagic ||
+            SharedState->protocolVersion != OutRunVR::SharedProtocolVersion)
+            return false;
+        width = SharedState->recommendedWidth[eye];
+        height = SharedState->recommendedHeight[eye];
+        return width != 0 && height != 0;
+    }
+
+    bool R29OwnerTryGetDirectTransportIdentity(
+        R29OwnerTransportIdentity& out) noexcept
+    {
+        out = {};
+        if (!SharedState || !DirectInteropVerified)
+            return false;
+        out.hostPid = SharedState->hostPid;
+        out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;
+        out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;
+        return true;
     }
 
     bool R29OwnerStereoWanted() noexcept
