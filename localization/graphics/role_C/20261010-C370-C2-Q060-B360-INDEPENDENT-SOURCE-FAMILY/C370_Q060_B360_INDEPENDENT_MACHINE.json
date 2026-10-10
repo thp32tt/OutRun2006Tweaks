@@ -1,0 +1,201 @@
+{
+  "role": "C2",
+  "queue_index": 60,
+  "policy_version": "visual-evidence-v1-20261008",
+  "backend": "N100_MCP_FALLBACK_GITHUB_RAW_INPUT_LOCAL_DNS_UNAVAILABLE",
+  "sources_sha256": {
+    "source.dds": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean.png": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official.dds": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "prevB359.dds": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+    "trial.dds": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d"
+  },
+  "native_dimensions": [
+    4096,
+    2048
+  ],
+  "persisted_DDS_header_identity": {
+    "source.dds": true,
+    "official.dds": true,
+    "prevB359.dds": true,
+    "trial.dds": true
+  },
+  "dds_mip_count": 1,
+  "source_bbox_readable": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "edit_bbox_readable": [
+    2090,
+    337,
+    3120,
+    485
+  ],
+  "trial_alpha32_bbox_readable": [
+    2222,
+    342,
+    3023,
+    472
+  ],
+  "source_to_trial_bbox_margins_readable": [
+    43,
+    5,
+    2,
+    2
+  ],
+  "pairwise": {
+    "SOURCE_TO_CLEAN_original_effect_box": {
+      "rgba_changed": 89391,
+      "alpha_changed": 89391,
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "inside_rgba": 89391
+    },
+    "OFFICIAL_TO_B360_worker_ROI": {
+      "rgba_changed": 93196,
+      "alpha_changed": 60247,
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "inside_rgba": 93196
+    },
+    "B359_TO_B360_worker_ROI": {
+      "rgba_changed": 39026,
+      "alpha_changed": 5784,
+      "outside_rgba": 0,
+      "outside_alpha": 0,
+      "inside_rgba": 39026
+    },
+    "SOURCE_TO_B360_worker_ROI": {
+      "rgba_changed": 1596957,
+      "alpha_changed": 1148217,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928,
+      "inside_rgba": 91808
+    },
+    "CLEAN_TO_B360_worker_ROI": {
+      "rgba_changed": 1552293,
+      "alpha_changed": 1137072,
+      "outside_rgba": 1505149,
+      "outside_alpha": 1089928,
+      "inside_rgba": 47144
+    }
+  },
+  "material_color_proxy": {
+    "source": {
+      "opaque_ge200": 80606,
+      "saturated_orange": 18781,
+      "cream_light": 2338,
+      "gold_yellow": 28587,
+      "navy_dark": 32653,
+      "bright_highlight": 550
+    },
+    "B359": {
+      "opaque_ge200": 44060,
+      "saturated_orange": 5879,
+      "cream_light": 148,
+      "gold_yellow": 20724,
+      "navy_dark": 17114,
+      "bright_highlight": 1
+    },
+    "B360": {
+      "opaque_ge200": 44060,
+      "saturated_orange": 11870,
+      "cream_light": 1486,
+      "gold_yellow": 17971,
+      "navy_dark": 12802,
+      "bright_highlight": 1455
+    }
+  },
+  "png_names": [
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_100.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_50.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_75.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_50.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_100.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_75.png",
+    "B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+    "B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+    "B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+    "B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png"
+  ],
+  "material_note": "Color counts are proxy not visual PASS; visible typography controls conclusion.",
+  "record_type": "Independent exact persisted-DDS pixel report; C2 visual verdict separate.",
+  "SOURCE_TO_CLEAN_observed": "Verified actual full source/clean diff; independent count not from producer.",
+  "user_IGR044": "OPEN_USER_INGAME_FAIL",
+  "runtime_validation": "UNTESTED",
+  "evidence_files": [
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_100.png",
+      "sha256": "12b7d58732e13f650229583f7d65f71c88b29075c2bce5d6fe913815f233c6b6",
+      "bytes": 189388
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+      "sha256": "30e2d3f1dfd846928b0aa1b2df5a75df6c95639b55d1ca3d7d4338b3870f172d",
+      "bytes": 183091
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_50.png",
+      "sha256": "64eaf091aa7ddfda59f49b2cb795e09d64ae8ed476485f109e5610b25ec58f34",
+      "bytes": 109005
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+      "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+      "bytes": 206617
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_75.png",
+      "sha256": "7e002a8619123df8fde8c80e69234bb47fb3d042d413e8d155e1cce39461ca44",
+      "bytes": 210097
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_50.png",
+      "sha256": "1088302dded4f990781cc2c3fd5692bb8e99524386a44e723298c9e740dccbfb",
+      "bytes": 126542
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_100.png",
+      "sha256": "baa12ad5a8a64c668f0e40750058c1a9ad0ddb891c2ef7c1951df223069c1df1",
+      "bytes": 216977
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_75.png",
+      "sha256": "30f5da935f018a5154130c1c0716925afde2703383143a7ce8689ff7888a7357",
+      "bytes": 221389
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+      "sha256": "23ef221b88e9e9683024edf4a921831b236d21d614e8d4ed694ed8a962b4669b",
+      "bytes": 130926
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+      "sha256": "f33b822254b1bc59116053d378b6db552dae073360d9b7cd7a9e247c96206982",
+      "bytes": 225939
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+      "sha256": "2594a1ac3403eb5a5d4318f08e72a20eb073981a186e939aa09f835257a54946",
+      "bytes": 103902
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png",
+      "sha256": "8ee75669d037679759a7a2076eac58ce16e773d8e9706fc072bfe34dccaf8dba",
+      "bytes": 8351
+    }
+  ],
+  "rework_triage": {
+    "index": 60,
+    "next_action": "METHOD_CHANGE_REQUIRED",
+    "repeated_root_causes": [
+      "SOURCE_RESIDUE_UNDER_KOREAN"
+    ],
+    "basis": "Current pinned queue+REWORK_ESCALATIONS.json via rework_triage.py --index 60; read-only."
+  },
+  "machine_observation": "Exact SOURCE->B348 CLEAN within canonical English effect bbox=89391 RGBA/alpha modified, outside=0; OFFICIAL->B360 worker ROI change93196 RGBA/60247 alpha, outside0; B359->B360 change39026 RGBA/5784 alpha, outside0. SOURCE/CLEAN vs localized across whole atlas has other legacy edits outside ROI; do not interpret those as this trial damage. Positive alpha32 bbox margins43/5/2/2. No machine PASS override of optical source-family failure."
+}

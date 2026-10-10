@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10T22:41:00+09:00",
+  "updated_at_kst": "2026-10-10 23:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11711,5 +11711,22 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_B/20261010-B360-Q060-SOURCE-PALETTE-LAYER-VECTOR/B360_CONTROLLER_PRODUCER_VISUAL_REJECT.json",
     "excluded_domains": []
+  },
+  "c370_c2_q060_b360_independent": {
+    "role": "C2",
+    "queue_index": 60,
+    "candidate_sha256": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d",
+    "prior_reviewed_B359": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+    "official_changed": false,
+    "result": "REWORK_REQUIRED_UNPROMOTED",
+    "new_dds": 0,
+    "new_c_pass": 0,
+    "C3": "NOT_RUN",
+    "user_game": "UNTESTED",
+    "igr044": "OPEN_USER_INGAME_FAIL",
+    "outside_worker_roi_rgba": 0,
+    "png_count": 12,
+    "qa_path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/C370_Q060_B360_C2_INDEPENDENT_VISUAL_REWORK.json",
+    "run_key": "OUTRUN-KOR-C370-C2-Q060-B360-SOURCE-LAYER-INDEPENDENT-20261010-2250"
   }
 }

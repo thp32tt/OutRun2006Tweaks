@@ -1,0 +1,325 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "role": "C2",
+  "shard": "EVEN",
+  "review_id": "C370-Q060-B360-INDEPENDENT-PIXELS",
+  "run_key": "OUTRUN-KOR-C370-C2-Q060-B360-SOURCE-LAYER-INDEPENDENT-20261010-2250",
+  "reviewed_at_kst": "2026-10-10 23:00 KST",
+  "queue_index": 60,
+  "asset_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "candidate_role": "B360_NEW_UNAPPROVED_TRIAL_NOT_OFFICIAL",
+  "candidate_sha256": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_current_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "last_C2_reviewed_B359_sha256": "6551bdf12b3bed1ce11829d1934934900f92a6aa3ad8d3743b0f97107fa86366",
+  "distinct_sha_compared": true,
+  "new_candidate_approval": false,
+  "result": "REWORK_REQUIRED_UNPROMOTED",
+  "cause": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH_HORIZONTAL_STRIPE_CHROME_AND_RACING_ITALIC",
+  "execution_backend": "N100_MCP_FALLBACK_ONLY_BECAUSE_GPT_LOCAL_GITHUB_HOST_DNS_UNAVAILABLE",
+  "firstlook_pixels_before_producer_verdict": false,
+  "firstlook_disclosure": "B360 producer metadata read to locate SHA/source before independently computing & viewing exact saved DDS; not blind-qualified, no C approval.",
+  "blind_calibration": "NOT_QUALIFIED",
+  "plate_only_result": "SCOPED_PASS",
+  "composite_only_result": "SOURCE_FAMILY_FAIL",
+  "source_style_result": "FAIL",
+  "rework_triage": "METHOD_CHANGE_REQUIRED",
+  "machine_report": {
+    "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/C370_Q060_B360_INDEPENDENT_MACHINE.json",
+    "sha256": "a637e6ac7cb2e922504ca2cb8bee3e06b17af62e39755f722b52dc94a089c86f",
+    "bytes": 8067
+  },
+  "regions": [
+    {
+      "id": "BEST_TIME",
+      "source_bbox_readable": [
+        2179,
+        340,
+        3028,
+        474
+      ],
+      "candidate_alpha32_bbox_readable": [
+        2222,
+        342,
+        3023,
+        472
+      ],
+      "source_margins": [
+        43,
+        5,
+        2,
+        2
+      ],
+      "text": "최고 기록:",
+      "views": {
+        "native": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+          "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+          "bytes": 206617
+        },
+        "practical_75": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+          "sha256": "30e2d3f1dfd846928b0aa1b2df5a75df6c95639b55d1ca3d7d4338b3870f172d",
+          "bytes": 183091
+        },
+        "practical_50": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+          "sha256": "23ef221b88e9e9683024edf4a921831b236d21d614e8d4ed694ed8a962b4669b",
+          "bytes": 130926
+        },
+        "raw": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+          "sha256": "f33b822254b1bc59116053d378b6db552dae073360d9b7cd7a9e247c96206982",
+          "bytes": 225939
+        },
+        "plate_only": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+          "sha256": "2594a1ac3403eb5a5d4318f08e72a20eb073981a186e939aa09f835257a54946",
+          "bytes": 103902
+        },
+        "new_vs_prior_change": {
+          "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png",
+          "sha256": "8ee75669d037679759a7a2076eac58ce16e773d8e9706fc072bfe34dccaf8dba",
+          "bytes": 8351
+        }
+      },
+      "eight_observations": {
+        "slant": {
+          "result": "HOLD_STRICT_RECHECK",
+          "observation": "Source English BEST TIME racing italic tilts right in readable orientation. Candidate broadly right-leaning but independent matched multiglyph top-minus-bottom English/Hangul stem anchors and perspective equivalence not qualified, so no slant PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Independent source→B348 CLEAN persisted 4096x2048 readable: exactly 89391 RGBA and alpha modifications inside original BEST TIME 849x134 effect ROI, zero outside. Target now transparent without English shadows/plate boxes in examined ROI; whole-atlas source-protection not asserted for unrelated prior localization.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+            "sha256": "2594a1ac3403eb5a5d4318f08e72a20eb073981a186e939aa09f835257a54946",
+            "bytes": 103902
+          }
+        },
+        "style": {
+          "result": "FAIL",
+          "failure_code": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+          "observation": "Observed directly on exact decoded native/75/50 BGW and RAW: English BEST TIME has smoothly connected orange-to-gold beveled racing-italic brush face with multi-layer navy sidewall, while B360 Hangul has hard flat horizontal orange mid-stroke stripes, weaker rounded bevel/counter anatomy, dissimilar condensed headline depth. This is NOT source-faithful, irrespective of positive bbox and zero outside pixels.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_HIERARCHY",
+          "observation": "Individual Hangul 최고 기록 can be read on practical 50% gray/white; nevertheless horizontal striping/flat depth visibly reduce consistency and immediate native headline hierarchy vs English; no actual game-composed assessment.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+            "sha256": "23ef221b88e9e9683024edf4a921831b236d21d614e8d4ed694ed8a962b4669b",
+            "bytes": 130926
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CLIPPING_CONFIRMED",
+          "observation": "Visible Hangul strokes in displayed persisted DDS native/75/50 have no obvious severed exterior fringe at inspected scale; actual effect anatomy visually incorrect and no independent full-stroke calibrated PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+            "sha256": "30e2d3f1dfd846928b0aa1b2df5a75df6c95639b55d1ca3d7d4338b3870f172d",
+            "bytes": 183091
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Source->CLEAN outside BEST TIME source bbox0 RGBA/alpha; B359->B360 39026 RGBA/5784 alpha inside worker ROI, outside both0; OFFICIAL->B360 93196 RGBA/60247 alpha changes all inside ROI. Neighbor HUD/source siblings unchanged by trial; other historic source->candidate changes outside this ROI not treated as current edit.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png",
+            "sha256": "8ee75669d037679759a7a2076eac58ce16e773d8e9706fc072bfe34dccaf8dba",
+            "bytes": 8351
+          }
+        },
+        "placement": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "Native readable alpha>32 B360 bbox [2222,342,3023,472] inside canonical English source effect [2179,340,3028,474], margins [43,5,2,2] px. Source intended headline type and screen compose still fail/unverified; a source bbox containment check cannot grant C approval.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Source/official/B359/B360 saved RGBA32 DDS 4096x2048 native headers equal, authored mip count1; independent RAW stored vertical mirror and flipped readable crop inspected side-by-side.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+            "sha256": "f33b822254b1bc59116053d378b6db552dae073360d9b7cd7a9e247c96206982",
+            "bytes": 225939
+          }
+        }
+      }
+    }
+  ],
+  "complete_image_evidence": [
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_100.png",
+      "sha256": "12b7d58732e13f650229583f7d65f71c88b29075c2bce5d6fe913815f233c6b6",
+      "bytes": 189388
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+      "sha256": "30e2d3f1dfd846928b0aa1b2df5a75df6c95639b55d1ca3d7d4338b3870f172d",
+      "bytes": 183091
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_50.png",
+      "sha256": "64eaf091aa7ddfda59f49b2cb795e09d64ae8ed476485f109e5610b25ec58f34",
+      "bytes": 109005
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+      "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+      "bytes": 206617
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_75.png",
+      "sha256": "7e002a8619123df8fde8c80e69234bb47fb3d042d413e8d155e1cce39461ca44",
+      "bytes": 210097
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_50.png",
+      "sha256": "1088302dded4f990781cc2c3fd5692bb8e99524386a44e723298c9e740dccbfb",
+      "bytes": 126542
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_100.png",
+      "sha256": "baa12ad5a8a64c668f0e40750058c1a9ad0ddb891c2ef7c1951df223069c1df1",
+      "bytes": 216977
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_75.png",
+      "sha256": "30f5da935f018a5154130c1c0716925afde2703383143a7ce8689ff7888a7357",
+      "bytes": 221389
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+      "sha256": "23ef221b88e9e9683024edf4a921831b236d21d614e8d4ed694ed8a962b4669b",
+      "bytes": 130926
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+      "sha256": "f33b822254b1bc59116053d378b6db552dae073360d9b7cd7a9e247c96206982",
+      "bytes": 225939
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+      "sha256": "2594a1ac3403eb5a5d4318f08e72a20eb073981a186e939aa09f835257a54946",
+      "bytes": 103902
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png",
+      "sha256": "8ee75669d037679759a7a2076eac58ce16e773d8e9706fc072bfe34dccaf8dba",
+      "bytes": 8351
+    }
+  ],
+  "stages": {
+    "C": {
+      "result": "REWORK_REQUIRED",
+      "review_id": "C370",
+      "calibration": "NOT_QUALIFIED",
+      "pixels_before_producer_verdict": false,
+      "eight_checks": {
+        "slant": {
+          "result": "HOLD_STRICT_RECHECK",
+          "observation": "Source English BEST TIME racing italic tilts right in readable orientation. Candidate broadly right-leaning but independent matched multiglyph top-minus-bottom English/Hangul stem anchors and perspective equivalence not qualified, so no slant PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "clean_plate": {
+          "result": "SCOPED_PASS",
+          "observation": "Independent source→B348 CLEAN persisted 4096x2048 readable: exactly 89391 RGBA and alpha modifications inside original BEST TIME 849x134 effect ROI, zero outside. Target now transparent without English shadows/plate boxes in examined ROI; whole-atlas source-protection not asserted for unrelated prior localization.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_SOURCE_PLATE_TRIAL_NATIVE.png",
+            "sha256": "2594a1ac3403eb5a5d4318f08e72a20eb073981a186e939aa09f835257a54946",
+            "bytes": 103902
+          }
+        },
+        "style": {
+          "result": "FAIL",
+          "failure_code": "SOURCE_FAMILY_FACE_FILL_DEPTH_MISMATCH",
+          "observation": "Observed directly on exact decoded native/75/50 BGW and RAW: English BEST TIME has smoothly connected orange-to-gold beveled racing-italic brush face with multi-layer navy sidewall, while B360 Hangul has hard flat horizontal orange mid-stroke stripes, weaker rounded bevel/counter anatomy, dissimilar condensed headline depth. This is NOT source-faithful, irrespective of positive bbox and zero outside pixels.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "readability": {
+          "result": "FAIL_SOURCE_HIERARCHY",
+          "observation": "Individual Hangul 최고 기록 can be read on practical 50% gray/white; nevertheless horizontal striping/flat depth visibly reduce consistency and immediate native headline hierarchy vs English; no actual game-composed assessment.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG255_READABLE_50.png",
+            "sha256": "23ef221b88e9e9683024edf4a921831b236d21d614e8d4ed694ed8a962b4669b",
+            "bytes": 130926
+          }
+        },
+        "glyph_integrity": {
+          "result": "SCOPED_NO_CLIPPING_CONFIRMED",
+          "observation": "Visible Hangul strokes in displayed persisted DDS native/75/50 have no obvious severed exterior fringe at inspected scale; actual effect anatomy visually incorrect and no independent full-stroke calibrated PASS.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG0_READABLE_75.png",
+            "sha256": "30e2d3f1dfd846928b0aa1b2df5a75df6c95639b55d1ca3d7d4338b3870f172d",
+            "bytes": 183091
+          }
+        },
+        "protected_art": {
+          "result": "SCOPED_PIXEL_PASS",
+          "observation": "Source->CLEAN outside BEST TIME source bbox0 RGBA/alpha; B359->B360 39026 RGBA/5784 alpha inside worker ROI, outside both0; OFFICIAL->B360 93196 RGBA/60247 alpha changes all inside ROI. Neighbor HUD/source siblings unchanged by trial; other historic source->candidate changes outside this ROI not treated as current edit.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_B359_TO_B360_SOURCE_BBOX_CHANGED_MASK.png",
+            "sha256": "8ee75669d037679759a7a2076eac58ce16e773d8e9706fc072bfe34dccaf8dba",
+            "bytes": 8351
+          }
+        },
+        "placement": {
+          "result": "SCOPED_BBOX_PASS",
+          "observation": "Native readable alpha>32 B360 bbox [2222,342,3023,472] inside canonical English source effect [2179,340,3028,474], margins [43,5,2,2] px. Source intended headline type and screen compose still fail/unverified; a source bbox containment check cannot grant C approval.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_SOURCE_CLEAN_OFFICIAL_B359_B360_BG128_READABLE_100.png",
+            "sha256": "ce22c8487cf565f8a485e7002ffa46ab1d01b2066acf2d19185af20ad57762a1",
+            "bytes": 206617
+          }
+        },
+        "orientation": {
+          "result": "SCOPED_PASS",
+          "observation": "Source/official/B359/B360 saved RGBA32 DDS 4096x2048 native headers equal, authored mip count1; independent RAW stored vertical mirror and flipped readable crop inspected side-by-side.",
+          "evidence": {
+            "path": "localization/graphics/role_C/20261010-C370-C2-Q060-B360-INDEPENDENT-SOURCE-FAMILY/B360_INDEPENDENT_RAW_NATIVE_BG128.png",
+            "sha256": "f33b822254b1bc59116053d378b6db552dae073360d9b7cd7a9e247c96206982",
+            "bytes": 225939
+          }
+        }
+      }
+    },
+    "C3": {
+      "result": "NOT_RUN",
+      "reason": "C failed source family; no valid new candidate C PASS, cannot audit C3"
+    }
+  },
+  "IGR044": "OPEN_USER_INGAME_FAIL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "approved_export": false,
+  "newly_produced_dds": 0,
+  "published_candidate_dds_changes": 0,
+  "user_accepted": false,
+  "required_action": [
+    "Do not promote flat B360 four-layer trial. B347/B359 prior approach similarly failed; source-glyph shape-derived manual/vector bevel-sidewall, natural brush face and graded highlights needed, not arbitrary horizontal palette bars.",
+    "After materially rebuilt SHA, independent blind source/CLEAN/FINAL C2 region checks with marked paired-stem anchors and current policy C3, exact current evidence APPROVALS, and NEW user in-game screenshot matching packaged hash.",
+    "Keep official q060 C342 REWORK, IGR044 OPEN; no same SHA re-completion."
+  ]
+}
