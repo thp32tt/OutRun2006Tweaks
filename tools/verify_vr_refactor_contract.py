@@ -425,7 +425,8 @@ for label, changed_r30, changed_r32 in (
         "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);",
         "return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,0);", 1), r32),
     ("indexed UP index format changed", r30.replace(
-        "d,t,m,n,p,idx,f,v,st);", "d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
+        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,f,v,st);",
+        "return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(\n            d,t,m,n,p,idx,D3DFMT_INDEX16,v,st);", 1), r32),
     ("Present region dropped", r30.replace(
         "return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);",
         "return PresentHook.stdcall<HRESULT>(d,s,dst,w,nullptr);", 1), r32),
@@ -1631,9 +1632,55 @@ for marker, source, owner in (
 ):
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
-for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31SupportInstallStatus()"):
-    if marker not in r32:
-        errors.append(f"R32 split facade missing prerequisite owner query: {marker}")
+# R84 source split relocated R13/R22 install-state reads behind R30's
+# lower-owned aggregation. R32 must depend only on that aggregation and R31.
+def r30_lower_prerequisite_aggregation_ok(api, lower, upper):
+    match = re.search(
+        r"R30SupportLowerPrerequisiteStatus\(\) noexcept\s*\{(.*?)\n    \}",
+        lower, re.DOTALL)
+    if not match:
+        return False
+    body = match.group(1)
+    return all((
+        "R30SupportLowerPrerequisiteStatus() noexcept;" in api,
+        "const auto r22 = R22InstallStatus();" in body,
+        "const auto r13 = R13InstallStatus();" in body,
+        "if (r22 == State::Failed || r13 == R13InstallStatusValue::Failed)" in body,
+        "return State::Failed;" in body,
+        "if (r22 == State::Ready && r13 == R13InstallStatusValue::Ready)" in body,
+        "return State::Ready;" in body,
+        "return State::Pending;" in body,
+        "const auto r31 = R31SupportInstallStatus();" in upper,
+        "const auto lower = R30SupportLowerPrerequisiteStatus();" in upper,
+        "if (r31 == State::Failed || lower == State::Failed) return State::Failed;" in upper,
+        "if (r31 == State::Ready && lower == State::Ready) return State::Ready;" in upper,
+    ))
+
+if not r30_lower_prerequisite_aggregation_ok(r30_support_api, r30, r32):
+    errors.append("R30/R32 lower prerequisite owner aggregation lost fail-closed semantics")
+
+for label, changed_r30, changed_r32 in (
+    ("R13 failed prerequisite ignored", r30.replace(
+        "r22 == State::Failed || r13 == R13InstallStatusValue::Failed",
+        "r22 == State::Failed", 1), r32),
+    ("R22 failed prerequisite ignored", r30.replace(
+        "r22 == State::Failed || r13 == R13InstallStatusValue::Failed",
+        "r13 == R13InstallStatusValue::Failed", 1), r32),
+    ("R13 ready state forced", r30.replace(
+        "r22 == State::Ready && r13 == R13InstallStatusValue::Ready",
+        "r22 == State::Ready", 1), r32),
+    ("R31 failed prerequisite ignored", r30, r32.replace(
+        "r31 == State::Failed || lower == State::Failed",
+        "lower == State::Failed", 1)),
+    ("R32 lower owner bypass", r30, r32.replace(
+        "const auto lower = R30SupportLowerPrerequisiteStatus();",
+        "const auto lower = State::Ready;", 1)),
+):
+    if changed_r30 == r30 and changed_r32 == r32:
+        errors.append("R84 prerequisite negative mutation not applied: " + label)
+    elif r30_lower_prerequisite_aggregation_ok(
+            r30_support_api, changed_r30, changed_r32):
+        errors.append("R84 prerequisite negative mutation survived: " + label)
 if "R32ReviewPrerequisiteStatus()" not in r33:
     errors.append("R33 missing R32 split facade prerequisite query")
 
