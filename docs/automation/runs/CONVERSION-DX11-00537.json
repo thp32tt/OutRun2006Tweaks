@@ -2,7 +2,7 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E008",
+  "event_id": "CONVERSION-DX11-00537-E009",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
@@ -361,5 +361,77 @@
     "new_feature_material": false,
     "duplicate_acceptance_implementation": false,
     "score_change": 0
+  },
+  "rollover_9": {
+    "event_id": "CONVERSION-DX11-00537-E009",
+    "event_type": "rollover",
+    "chat_rollover": 9,
+    "attempt": "1/3",
+    "reviewed_at_kst": "2026-10-11T04:46:11+09:00",
+    "checkpoint_verified": {
+      "path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0440-pre-rollover-0008.json",
+      "branch": "chat-controller-downloads",
+      "verified": true,
+      "checkpoint_game_head": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+      "controller_stale_blocker": "ACCEPTANCE_ITEM_PENDING:DX11-LIVE-CALLSITE"
+    },
+    "recovery_status": "FEATURE_READY_PENDING_CONTROLLER_PROMOTION",
+    "feature_head_verified": "a0e1a72b69284c40cf778c607873eea321ff23e5",
+    "target_head_verified": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+    "validation_bearing_material_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
+    "material_to_feature_diff": "3 commits; only docs/automation/runs/CONVERSION-DX11-00537.json modified; game code/workflows/tests unchanged",
+    "acceptance_source_build": {
+      "DX11-LIVE-CALLSITE": "PASS_WIN32_BUILD__GAME_RUNTIME_UNTESTED",
+      "DX11-NATIVE-DRAW": "PASS_WIN32_BUILD__GAME_RUNTIME_UNTESTED",
+      "DX11-VISIBLE-FRAME": "PASS_WIN32_BUILD__GAME_PIXEL_AND_HMD_UNTESTED",
+      "DX11-SAFE-RETURN": "PASS_SOURCE_NEGATIVE_REGRESSION__GAME_INPUT_UNTESTED",
+      "DX11-TEST-BUNDLE": "PASS_REAL_X86_X64_ZIP__GAME_RUNTIME_UNTESTED"
+    },
+    "exact_feature_head_ci": {
+      "Build": {
+        "run_id": 38079077042,
+        "head_sha": "a0e1a72b69284c40cf778c607873eea321ff23e5",
+        "conclusion": "SUCCESS",
+        "feature_acceptance_steps": "LIVE-CALLSITE/NATIVE-DRAW/VISIBLE-FRAME/SAFE-RETURN all SUCCESS; Win32 Release build SUCCESS"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38079077052,
+        "head_sha": "a0e1a72b69284c40cf778c607873eea321ff23e5",
+        "conclusion": "SUCCESS",
+        "feature_acceptance_steps": "DX11-TEST-BUNDLE SUCCESS; 5 game x86 variants plus host x64 SUCCESS"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38079077105,
+        "head_sha": "a0e1a72b69284c40cf778c607873eea321ff23e5",
+        "conclusion": "SUCCESS"
+      }
+    },
+    "latest_test_bundle": {
+      "artifact_id": 11679776354,
+      "name": "feature-dx11-first-game-frame-a0e1a72b69284c40cf778c607873eea321ff23e5",
+      "size_bytes": 2790297,
+      "artifact_digest_sha256": "87e9ea4bf902b75d5f6c4a4c2aec76c9e79be1b7449d025e4dab9d17ff6f51a1",
+      "run_id": 38079077052
+    },
+    "pr": {
+      "number": 114,
+      "state": "OPEN",
+      "draft": true,
+      "mergeable": true,
+      "head_sha": "a0e1a72b69284c40cf778c607873eea321ff23e5",
+      "base_sha": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba"
+    },
+    "r175_owner": "CONVERSION-DX11-00477; independent R175 parity files untouched and ownership preserved",
+    "incomplete_acceptance_at_source_build": [],
+    "incomplete_evidence": [
+      "Controller-only TARGET promotion after owner/lease check",
+      "TARGET exact-SHA Backend Conversion Gate validate and DX11 readiness smoke",
+      "Real OR2006C2C.EXE native game GPU pixels/desktop inset/input checks",
+      "Quest3/VDXR user HMD proof"
+    ],
+    "next_action": "Controller only: recheck PR #114 ownership and target lease, promote FEATURE_READY, then target exact-SHA Backend Conversion Gate. User: run artifact 11679776354 DX9Ex control and DX11 opt-in pair, collect game_tri_draws/native_draws/desktop_insets/failed plus input and HMD observations. Do not create a new WARP Rxxx work item.",
+    "runtime_validation": "UNTESTED",
+    "score_change": 0,
+    "implementation_or_package_changes_in_rollover": false
   }
 }
