@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 12:19 KST",
+  "updated_at_kst": "2026-10-10 12:43 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_p1_source_first_plate_q060": {"run":"B348","index":60,"priority":"P0","stage":"SCOPED_P1_SOURCE_FIRST_CLEAN_VISUAL_PASS_NOT_PRODUCER_PASS","canonical_source_sha256":"6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc","original_english_pixels_removed_to_clean":89391,"outside_mask_changed_rgba":0,"official_candidate_sha256":"d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01","official_state":"C342_C2_REWORK_REQUIRED_UNCHANGED","new_DDS":0,"P2":"BLOCKED_PENDING_SOURCE_FAMILY_FONT_SLANT","P3":"NOT_RUN_NO_NEW_DDS","C2":"NOT_REVALIDATED","C3":"BLOCKED","user_IGR044":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED","qa_report":"localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_CONTROLLER_P1_VISUAL_QA.json"},
       "status": "static_qa_active",
       "transcription_percent": 100,
       "draft_artwork_percent": 100,

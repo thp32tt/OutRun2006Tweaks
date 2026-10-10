@@ -1,3 +1,9 @@
+## 2026-10-10 12:43 KST — B348 B-even q060 P0 source-first BEST TIME CLEAN plate calibration
+
+- New source-derived unlettered transparent CLEAN plate and English source removal mask: two exact original alpha-connected BEST TIME components (43,974 + 45,417 = **89,391** original visible source pixels), 0 changed RGBA outside mask. Source SHA `6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc`; native 4096×2048 mirror-Y, 1 mip.
+- GitHub CPU [workflow #38021178170](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38021178170) SUCCESS produced exact source mask, CLEAN readable/RAW PNG and 9 native/practical comparison panels. Controller directly reviewed neutral GRAY 100, BLACK 50, WHITE 75 and RAW; source OUTRUN MILES / HOLLY WOLF neighboring alpha islands preserved. [B348 producer P1 evidence](localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_CONTROLLER_P1_VISUAL_QA.json).
+- **SCOPED P1 PLATE_ONLY PASS**, not P2 font/slant, not P3 new localized DDS, not whole-atlas or C approval. 0 new or promoted DDS; current official q060 DDS `d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01` unchanged **C342 C2 REWORK_REQUIRED**. Source-derived Korean glyph, full pixel guard, C2/C3 and user IGR044 game retest are pending. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK changes.
+
 ## 2026-10-10 10:39 KST — B347 even q212 source-core45 two-cell trial (producer visual REJECT)
 
 - Canonical source SHA `f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61`, verified C158 CLEAN PNG SHA `c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67`, official q212 SHA `e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea` unchanged, prior independently C349-held B341 trial SHA `fa0acb5629318d772eb6e7cb989e5d6840c63b3e699f51073ac201f1210b43e7` unchanged.
