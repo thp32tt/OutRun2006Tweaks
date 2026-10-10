@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX9EX-00588",
+  "lane": "DX9EX",
+  "owner": "AI2_CHATGPT2",
+  "work_key": "DX9EX:R31:RESET_TELEMETRY_EPOCH",
+  "status": "WIP_NOT_FINAL",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "5418a1677e56f253d91ec69dd2da2591bdceb188",
+  "temporary_branch": "wip/CONVERSION-DX9EX-00588-r31-reset-perf",
+  "wip_sha": "7af5724d5c08aa9e53da4077ac032bbd660cc2d9",
+  "wip_blob_sha": {
+    "src/vr/d3d9/stereo_renderer_r31.cpp": "5d694e3a01cf239779e60c6a7d8e670ca20bb51c",
+    "tools/verify_vr_r31_eye_tail_cache.py": "d3ce3fa9b7586adf31004c8d26d9a3f8379d25ce"
+  },
+  "source_changes": [
+    "R31 Reset/ResetEx clears R31Window 5s performance epoch together with eye cache and R31Frame",
+    "R31 scoped reset mutations guard cache/window invalidation"
+  ],
+  "local_preflight": "PASS three scoped negative mutants (JavaScript source test); full Python verifier and Windows builds not run",
+  "dependency": "00587 concurrent latest focus branch dad4caf970d3007ad4908f064c01c247cd085de3 undergoing exact-SHA DX9Ex Active Validation; do not cancel it",
+  "next_action": "Before target integration recheck GitHub current HEAD and active 00587 CI. When no conflicting job, graft the two WIP blobs onto latest focus base tree as one final [AUTO:CONVERSION-DX9EX-00588] material commit; use CAS, then exact-SHA Active/Domain/Full Source and C6 separate bookkeeping",
+  "runtime_validation": "UNTESTED"
+}
