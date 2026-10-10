@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "material_gate_result",
+  "captured_at_utc": "2026-10-10T11:26:05.098Z",
+  "task_id": "CONVERSION-DX11-00535",
+  "branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00535",
+  "work_key": "DX11:R238:D3D9_INDEXED_UP_IMMUTABLE_CPU_TO_NATIVE_WARP_PIXEL",
+  "material_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "validation_bearing_result_sha": "fef3dd7f16e2fe9ac1eea53e19606552416665f8",
+  "checkpoint": "C3_SCOPED_PASS_FULL_GATE_FAIL",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "github_actions": {
+    "backend_gate": {
+      "run_id": 38047742767,
+      "status": "completed",
+      "conclusion": "failure",
+      "inherited_r175_varying": "expected [224,128,32,255], actual [128,0,16,255]"
+    },
+    "dx11_r238": {
+      "source": "success",
+      "warp_compile": "success",
+      "warp_gpu": "success"
+    },
+    "win32_build": "success",
+    "fast_checks": "success",
+    "openxr": "success",
+    "hud_inspector": "in_progress"
+  },
+  "next_action": "Wait for inherited HUD Inspector CI before writing bookkeeping run C6 with [skip ci], preserve material SHA; DO NOT claim full PASS or change score",
+  "do_not_duplicate": true
+}
