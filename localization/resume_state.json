@@ -6884,7 +6884,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 14:19 KST",
+  "updated_at_kst": "2026-10-10 14:51 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15068,6 +15068,47 @@
     "c3": "BLOCKED",
     "evidence_approved_export": "BLOCKED",
     "pjr_019": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c1_20261010_q103_a224_exact_native_hold": {
+    "run_key": "OUTRUN-KOR-C1-Q103-A224-EXACT-PERSISTED-SOURCE-CLEAN-20261010-1451",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 103,
+    "candidate_kind": "UNPROMOTED_A224_SHA_DISTINCT",
+    "candidate_sha256": "2ad5e25e03bc1c9598548ef64ec397be91eae86f0b4f8d4cc161438c9e354c31",
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "official_sha256_unchanged": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "clean_sha256": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942",
+    "decision": "HOLD_STRICT_RECHECK",
+    "independent_native_machine": {
+      "source_clean_changed": 7439,
+      "clean_trial_changed": 5435,
+      "official_trial_changed": 11089,
+      "all_three_outside_source_bbox": 0,
+      "all_alpha_changes": 0,
+      "exact_original_glyph_bbox": [
+        1432,
+        1980,
+        1786,
+        2025
+      ],
+      "exact_trial_glyph_bbox": [
+        1451,
+        1981,
+        1766,
+        2024
+      ],
+      "native_raw_equal": true
+    },
+    "reason": "Source-family calibrated paired first-glyph/stem slope comparison, blind normal/opposite-slant/clipped/residue/excessive-weight calibration, source-conditioned protected masks and complete approved image evidence missing; do not declare C PASS despite improved 315x43 over previous A223.",
+    "report": "localization/graphics/role_C/20261010-C1-Q103-A224-EXACT-NATIVE-REVIEW/C1_Q103_A224_INDEPENDENT_PERSISTED_QA.json",
+    "new_dds": 0,
+    "promoted_dds": 0,
+    "C1_PASS": false,
+    "C3": "BLOCKED",
+    "evidence_approved_export": false,
+    "user_ingame": "UNTESTED",
     "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
