@@ -1,116 +1,156 @@
 #!/usr/bin/env python3
-"""A221: targeted source-matching CLEAN residue inspection and trial only, q121 P0.
-Do not promote or claim whole-atlas pass. Keep old A219/A220 edits exact.
+"""A222 q103 source-family lighter italic stroke rework, scoped NON-PROMOTED DDS.
+New method: native Regular Korean glyph contours, not shrinking A197 Bold pixels.
 """
+import hashlib, io, json, os, subprocess, urllib.request
 from pathlib import Path
-import hashlib, io, json, os, struct, subprocess, urllib.request
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
+from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
 assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
-root=Path.cwd(); name="20261010-A221-Q121-ADDITIONAL-SOURCE-REMAINDER"
-out=root/"localization/graphics/role_A"/name;out.mkdir(parents=True,exist_ok=True)
-sha=lambda x:hashlib.sha256(x).hexdigest()
-official=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-old=root/"localization/graphics/role_A/20261010-A220-Q121-THE-SOURCE-RESIDUE/A220_Q121_THE_RESIDUE_PLUS_GOAL33_UNPROMOTED.dds"
-proof=root/"localization/graphics/role_A/20261010-A215-Q121-P0-SOURCE-COMPONENT-LOSSLESS"
-official_sha="38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844"
-old_sha="6db7c40864f44dcb1a07568ae1717b7ecf4720b253f963fe5fbb38e90b1ede06"
-o=official.read_bytes(); previous=old.read_bytes()
-assert sha(o)==official_sha and sha(previous)==old_sha
-assert o[:128]==previous[:128] and len(o)==len(previous)==128+4096*4096*4
-triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","121"],capture_output=True,text=True,check=True).stdout
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-with urllib.request.urlopen(url,timeout=150) as response:en=response.read()
-source_sha="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-assert sha(en)==source_sha
-source=Image.open(io.BytesIO(en)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-before=Image.open(io.BytesIO(o)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-start=Image.open(io.BytesIO(previous)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-rows=json.loads((proof/"A215_COMPONENT_QA.json").read_text(encoding="utf-8"))["regions"]
-# Direct first-look source-contact list. 19/24 already repaired, do not repeat.
-# 26 English 'Do' has a dark-blue retained fragment at the native bottom.
-# 21 English 'race?' has an isolated right-edge question-mark remnant.
-targets=[(26,"Do"),(21,"race?")]
-samples=[]
-for rank,text_en in targets:
-    row=next(r for r in rows if r["rank"]==rank)
-    rect=tuple(row["expanded_crop_readable"]);inner=tuple(row["bbox_readable"])
-    def pp(tag):return Image.open(proof/f"A215_component_{rank:02d}_{tag}_NATIVE_RGBA.png").convert("RGBA")
-    S,C,F=[pp(tag) for tag in ("SOURCE","CLEAN","FINAL")]
-    assert S.size==(rect[2]-rect[0],rect[3]-rect[1])
-    assert S.tobytes()==source.crop(rect).tobytes()
-    assert F.tobytes()==before.crop(rect).tobytes() and C.tobytes()==F.tobytes()
-    assert start.crop(rect).tobytes()==F.tobytes(),"A220 changed this region; no blind overwrite"
-    so,cl=np.asarray(S),np.asarray(C)
-    y,x=np.indices(cl.shape[:2]); xx=x+rect[0];yy=y+rect[1]
-    inside=(xx>=inner[0])&(xx<inner[2])&(yy>=inner[1])&(yy<inner[3])
-    exact=(cl[:,:,3]>0)&inside&np.all(cl==so,axis=2)
-    cy,cx=np.nonzero(exact)
-    # Report all exact source fragments; do not redefine a mask to create PASS.
-    samples.append(dict(rank=rank,english=text_en,rect=rect,inner=inner,S=S,C=C,F=F,
-                        x=cx,y=cy,count=int(len(cx)),
-                        other_alpha=int(np.count_nonzero((cl[:,:,3]>0)&inside&(~np.all(cl==so,axis=2))))))
-assert any(x["count"] for x in samples),"No new source-exact residual found; fail closed."
-# Fail-closed if the source-matching candidate count is implausibly high.
-qualified=[x for x in samples if 0<x["count"]<=400]
-assert qualified,"Exact source remnants exceed narrow triage boundary"
-# Only one asset region is edited this run; prefer first observed English 'Do'.
-target=qualified[0]; rank=target["rank"]; xx=target["x"];yy=target["y"]; rect=target["rect"]
-patched=bytearray(previous);spots=[]
-for lx,ly in zip(xx.tolist(),yy.tolist()):
-    x,y=rect[0]+lx,rect[1]+ly
-    off=128+((4095-y)*4096+x)*4
-    assert patched[off:off+4]!=bytes(4)
-    patched[off:off+4]=bytes(4)
-    spots.append((x,y,off))
-patched=bytes(patched)
-assert sha(patched)!=old_sha and patched[:128]==o[:128]
-diff=np.flatnonzero(np.frombuffer(previous,dtype=np.uint8)!=np.frombuffer(patched,dtype=np.uint8))
-allowed={off+k for _,_,off in spots for k in range(4)}
-assert set(map(int,diff))<=allowed and 0<len(diff)<=4*len(spots)
-assert set(int(i) for i in np.flatnonzero(np.frombuffer(o,dtype=np.uint8)!=np.frombuffer(previous,dtype=np.uint8))).isdisjoint(allowed)
-dds=out/"A221_Q121_SOURCE_TEXT_REMNANT_UNPROMOTED.dds";dds.write_bytes(patched)
-decoded=Image.open(dds).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-new=np.asarray(decoded.crop(rect),dtype=np.uint8)
-oldregion=np.asarray(target["F"],dtype=np.uint8)
-assert np.all(new[yy,xx]==0)
-assert int(np.count_nonzero(np.any(new!=oldregion,axis=2)))==len(xx)
-def bg(im,rgba=(100,100,100,255)):
-    return Image.alpha_composite(Image.new("RGBA",im.size,rgba),im.convert("RGBA")).convert("RGB")
-contact=Image.new("RGB",(target["S"].width*4,target["S"].height+32),(100,100,100))
-drawer=ImageDraw.Draw(contact)
-for k,(label,img) in enumerate(zip(["EN SOURCE","OLD CLEAN","OFFICIAL","TRIAL"],[target["S"],target["C"],target["F"],decoded.crop(rect)])):
-    contact.paste(bg(img),(k*target["S"].width,32))
-    drawer.text((k*target["S"].width+4,7),label,fill=(255,255,255))
-contact.save(out/"A221_SOURCE_CLEAN_OFFICIAL_TRIAL_GRAY100.png")
-mask=np.zeros(oldregion.shape[:2],dtype=np.uint8);mask[yy,xx]=255
-Image.fromarray(mask,"L").resize((mask.shape[1]*4,mask.shape[0]*4),Image.Resampling.NEAREST).save(out/"A221_EXACT_SOURCE_MASK_4X.png")
-for title,rgb in [("BLACK",(0,0,0,255)),("GRAY",(100,100,100,255)),("WHITE",(255,255,255,255))]:
+repo=Path.cwd()
+run="20261010-A222-Q103-LIGHT-CONDENSED-SOURCE-ITALIC"
+out=repo/"localization/graphics/role_A"/run
+out.mkdir(parents=True,exist_ok=True)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+official=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
+prior=official.read_bytes()
+prior_sha="9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed"
+source_sha="76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544"
+assert sha(prior)==prior_sha and prior[:4]==b"DDS " and len(prior)==128+2048*2048*4
+W=H=2048
+triage=subprocess.run(["python","tools/localization/rework_triage.py","--index","103"],check=True,text=True,capture_output=True).stdout
+assert "MATERIAL_REWORK" in triage or "METHOD_CHANGE_REQUIRED" in triage,triage
+url=("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"
+"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/"
+"Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds")
+with urllib.request.urlopen(url,timeout=150) as r: english_bytes=r.read()
+assert sha(english_bytes)==source_sha
+source=Image.open(io.BytesIO(english_bytes)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+before=Image.open(io.BytesIO(prior)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+clean_path=repo/"localization/graphics/role_A/20261009-A197-Q103-NORMAL-BALANCE-ITALIC-NATIVE/A197_CLEAN_PLATE.png"
+clean=Image.open(clean_path).convert("RGBA")
+assert source.size==before.size==clean.size==(W,H)
+source_bbox=(1411,1968,1801,2040)
+# Verify before/CLEAN source style; never alter protected plate or source artwork.
+assert before.crop((1411,1968,1801,2040)).tobytes()!=clean.crop(source_bbox).tobytes()
+sarr=np.asarray(source.crop(source_bbox),dtype=np.uint8)
+carr=np.asarray(clean.crop(source_bbox),dtype=np.uint8)
+barr=np.asarray(before.crop(source_bbox),dtype=np.uint8)
+# CLEAN must be truly alpha transparent in the original source-letter region.
+assert np.count_nonzero(carr[:,:,3])==0,("nontransparent CLEAN: don't overlay glyphs",int(np.count_nonzero(carr[:,:,3])))
+# All final pixels outside source glyph bbox remain byte-exact as prior.
+font_path=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
+assert font_path.is_file(),"Required Noto CJK Regular font unavailable; no fallback"
+font_bytes=font_path.read_bytes()
+font_sha=sha(font_bytes)
+charset="일반 밸런스"
+collection=TTCollection(str(font_path),lazy=True)
+coverage=collection.fonts[1].getBestCmap()
+assert all(ord(c) in coverage for c in charset if c!=" "),"Font glyph coverage missing"
+# Source-fitted native lettering, NOT a scaled A197 Bold render.
+font=ImageFont.truetype(str(font_path),65,index=1)
+# Native spacing, source italic lean (positive top-minus-bottom x).
+tracking=4
+parts=[]
+for ch in charset:
+    if ch==" ":
+        parts.append((ch,round(font.getlength(" "))+tracking))
+    else:parts.append((ch,round(font.getlength(ch))+tracking))
+canvas_w=sum(p[1] for p in parts)+24
+canvas_h=91
+layer=Image.new("L",(canvas_w,canvas_h),0)
+d=ImageDraw.Draw(layer);cursor=5
+for ch,adv in parts:
+    if ch!=" ":d.text((cursor,3),ch,font=font,fill=255,stroke_width=0)
+    cursor+=adv
+# Preserve true Regular strokes; skew right at top over actual native glyph height.
+bb=layer.getbbox()
+assert bb
+glyph=layer.crop(bb)
+gW,gH=glyph.size
+shear=0.265
+pad=int(gH*shear)+3
+# Pixel forward correspondence: output.top.x > output.bottom.x.
+slanted=glyph.transform((gW+pad,gH),Image.Transform.AFFINE,
+                     (1,shear,-shear*(gH-1)+2,0,1,0),resample=Image.Resampling.BICUBIC)
+sb=slanted.getbbox();assert sb, "Empty glyph"
+slanted=slanted.crop(sb)
+w,h=slanted.size
+# Source's 390x72 ceiling; keep positive 1px+ margin and avoid shrink artifacts.
+assert 0<w<=388 and 0<h<=70,(w,h)
+x=source_bbox[0]+max(2,(390-w)//2)
+y=source_bbox[1]+max(2,(72-h)//2)
+assert x>1411 and y>1968 and x+w<1801 and y+h<2040,(x,y,w,h)
+# Original olive source fill, no arbitrary bevel or opaque pasted rectangle.
+rgb=(143,137,84)
+glyph_layer=Image.new("RGBA",(390,72),(0,0,0,0))
+color=Image.new("RGBA",slanted.size,rgb+(0,))
+color.putalpha(slanted)
+glyph_layer.alpha_composite(color,(x-1411,y-1968))
+# Existing CLEAN verified alpha0 in this region; composite-only lettering.
+edited=np.array(carr,copy=True)
+gl=np.asarray(glyph_layer,dtype=np.uint8)
+edited[:,:,:]=gl
+# Restrict changed pixels to source exact bbox; original already CLEAN from A108.
+newdata=bytearray(prior)
+for row in range(72):
+    readable_y=1968+row
+    raw_y=H-1-readable_y
+    off=128+(raw_y*W+1411)*4
+    newdata[off:off+390*4]=edited[row].tobytes()
+newdata=bytes(newdata)
+assert newdata[:128]==prior[:128] and sha(newdata)!=prior_sha
+dds=out/"A222_Q103_LIGHT_RIGHT_ITALIC_UNPROMOTED.dds"
+dds.write_bytes(newdata)
+persisted=Image.open(dds).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+actual=np.asarray(persisted.crop(source_bbox),dtype=np.uint8)
+assert np.array_equal(actual,edited),"Persisted decoded bytes mismatch"
+changed=np.flatnonzero(np.frombuffer(prior,dtype=np.uint8)!=np.frombuffer(newdata,dtype=np.uint8))
+assert len(changed)>0
+beyond=int(np.count_nonzero(np.any(np.asarray(persisted,dtype=np.uint8)!=np.asarray(before,dtype=np.uint8),axis=2)))
+# Region-only edited image: require all mutations inside bbox, no alpha outside.
+assert beyond==int(np.count_nonzero(np.any(actual!=barr,axis=2)))
+assert np.count_nonzero(edited[:,:,3])>0 and np.count_nonzero(gl[:,:,3])>0
+nz=np.nonzero(edited[:,:,3]>0)
+local_bbox=[int(min(nz[1])),int(min(nz[0])),int(max(nz[1]))+1,int(max(nz[0]))+1]
+global_bbox=[1411+local_bbox[0],1968+local_bbox[1],1411+local_bbox[2],1968+local_bbox[3]]
+margins=[global_bbox[0]-1411,1801-global_bbox[2],global_bbox[1]-1968,2040-global_bbox[3]]
+assert min(margins)>=1,(margins,global_bbox)
+assert not np.any((edited[:,:,3]>0)&(carr[:,:,3]>0))
+# Single-family native source/CLEAN/old/new evidence without hiding other atlas.
+rect=(1376,1943,1830,2048)
+def graybg(im,bg):
+    return Image.alpha_composite(Image.new("RGBA",im.size,bg),im.convert("RGBA")).convert("RGB")
+for label,img in (("SOURCE",source),("CLEAN",clean),("OLD",before),("TRIAL",persisted)):
+    img.crop(rect).save(out/f"A222_{label}_NATIVE_RGBA.png")
+for bgname,bg in (("BLACK",(0,0,0,255)),("GRAY",(110,110,110,255)),("WHITE",(255,255,255,255))):
+    ims=[graybg(im.crop(rect),bg) for im in (source,clean,before,persisted)]
     for pct in (100,75,50):
-        im=bg(decoded.crop(rect),rgb)
-        if pct!=100:im=im.resize((round(im.width*pct/100),round(im.height*pct/100)),Image.Resampling.LANCZOS)
-        im.save(out/f"A221_TRIAL_{title}_{pct}.png")
-Image.open(dds).convert("RGBA").crop((rect[0],4096-rect[3],rect[2],4096-rect[1])).save(out/"A221_TRIAL_RAW_NATIVE.png")
-# Show the other suspected fragment separately: it is not silently patched.
-for item in samples:
-    if item["rank"]==rank:continue
-    im=bg(item["C"])
-    im.save(out/f"A221_UNMODIFIED_RANK{item['rank']:02d}_CLEAN_GRAY.png")
-report={
-"run":"A221","run_key":"OUTRUN-KOR-A221-Q121-FRESH-ENGLISH-REMAINDER-20261010-1100",
-"role":"A","queue_index":121,"priority":"P0","source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
-"source_sha256":source_sha,"official_sha256":official_sha,"previous_A220_trial_sha256":old_sha,
-"new_unpromoted_trial_sha256":sha(patched),"target_rank":rank,"english_source_label":target["english"],
-"source_english_bbox_readable":list(target["inner"]),"expanded_rect_readable":list(rect),
-"source_exact_pixel_count_removed":len(spots),"changed_bytes_vs_A220":len(diff),"other_atlas_pixels_changed":0,
-"A219_goal33_and_A220_the24_preserved":True,"native_dds":[4096,4096,"RGBA32","mip1"],
-"candidates_scanned":[{"rank":x["rank"],"label":x["english"],"exact_source_pixels":x["count"],"other_alpha_ambiguous":x["other_alpha"]} for x in samples],
-"machine":"SCOPED_SOURCE_EXACT_REMOVAL_PASS",
-"visual_status":"PENDING_CONTROLLER_BG_NATIVE_SCALE_REVIEW",
-"whole_atlas":"HOLD_SEMANTIC_29_CELLS_PROTECTED_MASK_AND_NEW_C1",
-"new_trial_dds":1,"promoted_dds":0,
-"C1":"PENDING","C3":"NOT_RUN","user_IGR":["IGR-030","IGR-031","IGR-040"],"RUNTIME_VALIDATION":"UNTESTED",
-"backend":"GitHub Actions CPU worker, local GitHub raw network inaccessible; N100 unused"}
-(out/"A221_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"trial_sha":sha(patched),"rank":rank,"new_source_pixels_removed":len(spots),"changed_bytes":len(diff),"other_region":report["candidates_scanned"]},ensure_ascii=False))
+        w2,h2=(round(rect[2]-rect[0])*pct//100,round(rect[3]-rect[1])*pct//100)
+        rows=[v if pct==100 else v.resize((w2,h2),Image.Resampling.LANCZOS) for v in ims]
+        sheet=Image.new("RGB",(w2*4,h2+27),bg[:3]);paint=ImageDraw.Draw(sheet)
+        for i,(name,img) in enumerate(zip(("EN SOURCE","CLEAN","A197 REJECT","A222 TRIAL"),rows)):
+            sheet.paste(img,(w2*i,27));paint.text((i*w2+5,5),name,fill=(255,255,255) if bgname!="WHITE" else (0,0,0))
+        sheet.save(out/f"A222_COMPARE_{bgname}_{pct}.png")
+raw=Image.open(dds).convert("RGBA")
+raw.crop((rect[0],H-rect[3],rect[2],H-rect[1])).save(out/"A222_TRIAL_RAW_NATIVE_RGBA.png")
+Image.fromarray(gl[:,:,3],mode="L").save(out/"A222_LETTERING_NATIVE_ALPHA.png")
+report={"schema_version":2,"run":"A222","run_key":"OUTRUN-KOR-A222-Q103-C1-WEIGHT-FAMILY-METHOD-CHANGE-20261010-1200","role":"A","queue_index":103,
+"triage":triage[:2600],"independent_C1_rework":"OUTRUN-KOR-C1-Q103-A197-FAMILY-WEIGHT-REJECT-20261010-1110",
+"source_sha256":source_sha,"source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+"source_bbox":list(source_bbox),"source_family":{"en":"Normal Balance","ko":"일반 밸런스","english_font":"medium-light condensed right-italic","en_source_color":list(rgb)},
+"old_sha256":prior_sha,"new_trial_sha256":sha(newdata),"trial_dds_path":str(dds.relative_to(repo)),
+"font_file":str(font_path),"font_sha256":font_sha,"font_face_index":1,"font_coverage":True,
+"method_change":"A197 Bold 68px block => licensed native Noto Sans CJK Regular 65px no stroke, actual glyph counters preserved; 0.265 top-right slant without width-image resizing; 4px tracked native glyphs; RGB sampled original.",
+"output_bbox":global_bbox,"output_margins":margins,"letters_layer_only":True,"clean_plate_alpha0_in_source_bbox":True,
+"full_other_atlas_preservation":True,"changed_rgba_pixels_vs_A197":beyond,"changed_bytes":int(len(changed)),
+"outside_source_bbox_changed_rgba":0,"outside_source_bbox_changed_alpha":0,
+"source_glyph_size_limit":True,"raw_y_mirror":True,"source_clean_final_images":"SOURCE/CLEAN/OLD/TRIAL native, black/gray/white100/75/50, RAW, lettering transparent",
+"native":[2048,2048],"DDS":"RGBA32 mip1","firstlook":"PENDING_CONTROLLER_VISUAL",
+"producer_scope":"SINGLE_NORMAL_BALANCE_LABEL_TRIAL_UNPROMOTED","hd_candidates_changed":False,
+"new_trial_dds":1,"new_promoted_dds":0,"C1":"FRESH_INDEPENDENT_REQUIRED","C3":"NOT_RUN","user_ingame":"UNTESTED","RUNTIME_VALIDATION":"UNTESTED",
+"exclusions":["VR","FFB","DX11","DXVK"]}
+(out/"A222_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print(json.dumps({"sha":sha(newdata),"width_height":[w,h],"bbox":global_bbox,"margins":margins,"changed_pixels":beyond},ensure_ascii=False))
