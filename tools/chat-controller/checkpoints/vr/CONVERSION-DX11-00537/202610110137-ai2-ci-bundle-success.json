@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "kind": "feature_artifact_validation_checkpoint",
+  "task_id": "CONVERSION-DX11-00537",
+  "production_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "captured_at_kst": "2026-10-11T01:37:30.702+09:00",
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "feature_head_sha": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+  "feature_stage": "C3_VALIDATE_ARTIFACT_BUILT_RUNTIME_PENDING",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_unchanged": "8fb3d8607f9b5295bc022af8e26ed5dfb99fc1ba",
+  "pr": {
+    "number": 114,
+    "draft": true,
+    "feature_ready": false
+  },
+  "material_commits": [
+    {
+      "sha": "2023e751c784b2463788bbe637f5a7f55c4229fb",
+      "note": "Real R30 x2 D3D9 indexed descriptor read bug fix, real native diagnostic progress log, static negative mutant test"
+    },
+    {
+      "sha": "d847ae73530f529699601f32fdc6a064c22cd022",
+      "note": "Actual Win32 game and x64 OpenXR host opt-in binary tester packaging, PE/SHA manifest, selectors, logging"
+    },
+    {
+      "sha": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+      "note": "CI repair filename->digest parser; same native C++ source"
+    }
+  ],
+  "validation": {
+    "Build 38067788260": "SUCCESS exact feature SHA f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+    "OpenXR VR architecture 38067788205": "SUCCESS exact feature SHA",
+    "host-x64": "SUCCESS",
+    "game-x86-r26-hud-safe": "SUCCESS",
+    "DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle": "SUCCESS; Python synthetic negatives/PE/SHA tamper checks and real x86+x64 binaries",
+    "Backend Conversion Gate": "NOT_RUN on feature PR, target controller-owned",
+    "real in-game visible DX11 Draw": "UNTESTED",
+    "Quest3 VDXR runtime": "UNTESTED"
+  },
+  "artifact": {
+    "id": 11676470530,
+    "name": "feature-dx11-first-game-frame-f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb",
+    "actions_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38067788205",
+    "zip_sha256": "78ccba17e7ef4001cdf69da3a856f93240437909461881e19a1f8d988ca3387d",
+    "game_sha256": "7989b30fdb9302fd9963ab4d023c43d13bb4e58950b04fe2c655fef34c33eb44",
+    "host_sha256": "56d75c417ef00aa42cc0d43265052a4c51b2d92afa73d299a29dd8e811ee881a",
+    "build_source_merge_sha": "9fc9c64df5714cc246aaf49f758214b1978dc5b8",
+    "feature_sha": "f8a5a44e3bbdec38102bec9a8994154bf0d8ffbb"
+  },
+  "acceptance_results": [
+    {
+      "id": "DX11-LIVE-CALLSITE",
+      "status": "SOURCE_STATIC_AND_COMPILE_PASS_RUNTIME_PENDING"
+    },
+    {
+      "id": "DX11-NATIVE-DRAW",
+      "status": "COMPILED_NOT_LIVE_GAME_PROVEN"
+    },
+    {
+      "id": "DX11-VISIBLE-FRAME",
+      "status": "COMPILED_NOT_GAME_PIXEL_PROVEN"
+    },
+    {
+      "id": "DX11-SAFE-RETURN",
+      "status": "STATIC_NEGATIVES_PASS_INPUT_RUNTIME_PENDING"
+    },
+    {
+      "id": "DX11-TEST-BUNDLE",
+      "status": "CI_PASS_ARTIFACT_READY"
+    }
+  ],
+  "current_status": "TEST_BUNDLE_READY_FEATURE_INCOMPLETE",
+  "feature_ready": false,
+  "runtime_validation": "UNTESTED",
+  "next_action": "Run user's OutRun 2006 legal copy with supplied bundle twice: RUN_DX9EX_CONTROL.cmd then RUN_DX11_FIRST_GAME_FRAME.cmd. Inspect log zip counters game_tri_draws/native_draws/desktop_insets/failed; compare actual game-visible desktop inset and DX9Ex input/crash. Only when real game live visible frame is proven, finish acceptance and submit FEATURE_READY for controller-owned target promotion. Do not declare full native gameplay or HMD parity from probe alone. Do not repeat previous CI/score.",
+  "score": {
+    "AI": "AI2 ChatGPT2",
+    "previous": 955,
+    "delta": 1,
+    "current": 956,
+    "scoreboard_commit": "eb00098713c5e70c7f49b7744e80ef5988627a1d",
+    "run_key": "CONVERSION-DX11-00537",
+    "retry_or_rollover_additional_score": 0
+  }
+}
