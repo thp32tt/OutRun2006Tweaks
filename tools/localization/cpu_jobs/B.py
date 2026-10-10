@@ -64,6 +64,7 @@ font=ImageFont.truetype(str(fontp),ppem,index=font_index)
 # English source's racing title role, not a whole-word width post-transform.
 target_hangul_w=143
 tracking=20
+letter_spacing=tracking
 space_advance=37
 local=Image.new("L",(W,H),0)
 d=ImageDraw.Draw(local)
@@ -89,6 +90,7 @@ for ch in word:
  im=im.resize((target_w,im.height),Image.Resampling.LANCZOS)
  native_glyphs.append((ch,im,target_w))
 glyph_width=sum(t[2] for t in native_glyphs)+tracking*(len(native_glyphs)-1)
+advance=glyph_width-tracking*(len(native_glyphs)-1)
 assert 680<=glyph_width<=830,("SOURCE_FAMILY_OPTICAL_WIDTH_GATE",glyph_width)
 left=int(round((label_bbox[0]+label_bbox[2]-glyph_width)/2))-x0
 top=int(round((label_bbox[1]+label_bbox[3]-body_h)/2))-y0
@@ -128,7 +130,7 @@ color_bottom=np.median(sub[lower],axis=0).astype(np.uint8).tolist()
 # Optical source effect: navy outline plus brown soft extrusion.
 source_navy=[12,19,69]
 source_brown=[69,27,33]
-# B350 materially different from B350's flat two-color interpolant:
+# B350 materially different from B349's flat two-color interpolant:
 # Native contour-conditioned bevel, warm inner rim and orange -> gold ->
 # cream highlight -> orange ink gradient, with a thick navy extruded edge.
 from scipy.ndimage import distance_transform_edt,maximum_filter,minimum_filter
@@ -144,7 +146,7 @@ inside=face>=100
 dist=distance_transform_edt(inside)
 ly,lx=np.indices((H,W))
 # Reference optical palette: hot-orange upper, golden lower band and
-# narrow warm-white reflective bevel, unlike B350 uniform tan face.
+# narrow warm-white reflective bevel, unlike B349 uniform tan face.
 ym=np.clip((ly-(label_bbox[1]-y0+9))/max(1,label_bbox[3]-label_bbox[1]-18),0,1)
 stops=[(0.0,(245,96,4)),(0.19,(255,140,2)),(0.48,(255,181,13)),(0.71,(255,225,82)),(0.80,(255,244,143)),(1.0,(244,149,4))]
 rgb=np.zeros((H,W,3),np.float32)
@@ -219,7 +221,7 @@ Image.fromarray((diff.astype(np.uint8)*255),"L").save(OUT/"B350_PREVIOUS_TO_TRIA
 # Readable top-minus-bottom optical evidence is a distinct manual inspection,
 # not a computed homologous-source slant PASS.
 report={"schema_version":2,"role":"B","run":"B350","queue_index":60,
-"run_key":"OUTRUN-KOR-B350-Q060-P0-SOURCE-FIRST-NATIVE-LETTERING-20261010-1430",
+"run_key":"OUTRUN-KOR-B350-Q060-P0-CONTOUR-OPTICAL-PILOT-20261010-1535",
 "method":"B348 canonical English-derived CLEAN reused; B350 distinct native per-syllable vector contour construction, measured source optical width, contour-conditioned hot-orange/gold depth/highlight, strong readable racing italic and navy extruded outline",
 "triage":tri["next_action"],"priority":"P0","source_sha256":SH["source"],"prior_official_sha256":SH["official"],
 "authored_clean_sha256":SH["clean"],"authored_mask_sha256":SH["mask"],"trial_persisted_sha256":hs(newdds),
