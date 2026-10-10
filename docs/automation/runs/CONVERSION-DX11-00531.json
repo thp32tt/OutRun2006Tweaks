@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00531",
+  "production_id": "CONVERSION-DX11-00531",
+  "event_id": "CONVERSION-DX11-00531-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "b6b6d1bf5a6d89f2b15390bd6d07bc42226c38c8",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00531",
+  "lease_epoch": 1,
+  "work_key": "DX11:R234:LINEAR_CPU_TEXTURE_TO_WARP_PIXEL",
+  "conflict_keys": [
+    "DX11:R234:LINEAR_CPU_TEXTURE_MIRROR",
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py",
+    "src/vr/d3d11/native_linear_source_texture_r234.hpp"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 A8B8G8R8 CPU LockRect-derived source snapshot plus byte pitch/version",
+      "owned immutable D3D11 Texture2D/SRV and live PS slot bind",
+      "native linear VB/IA/PS exact source owner and OM isolation",
+      "WARP Draw red/blue/red pixel verification and source/UAV/stale negative recovery"
+    ],
+    "batch_components": [
+      "native_linear_source_texture_r234.hpp producer resource lifetime + PS binding",
+      "native_linear_texture_binding.hpp consumer texture/UAV eye isolation",
+      "dx11_textured_linear_probe_r203.cpp WARP GPU positive/negative integration",
+      "test_dx11_textured_linear_r203.py mutation regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "R234 CPU A8B8G8R8 RGBA source converted to immutable D3D11 texture and bound PS draws red/blue/red WARP pixels",
+      "negative_regression": "Wrong D3D9 version, mutable/default and RTV alias SRV, OM UAV side-eye, expired source and VB rejected",
+      "component_integration": "D3D9 source bytes/revision -> native Texture2D+SRV -> native PS binding -> real WARP Draw GPU-pixel readback"
+    },
+    "conflict_keys": [
+      "DX11:R234:LINEAR_CPU_TEXTURE_MIRROR",
+      "src/vr/d3d11/native_linear_texture_binding.hpp",
+      "tools/dx11_textured_linear_probe_r203.cpp",
+      "tools/test_dx11_textured_linear_r203.py",
+      "src/vr/d3d11/native_linear_source_texture_r234.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "WAITING_FOR_CI",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "summary": "R234 actual D3D9 RGBA CPU source snapshot ownership -> immutable D3D11 texture/SRV, PS bind -> WARP Draw red/blue/red. Reject stale version/byte length/writable aliases/OM UAV and retire, no gameplay activation.",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py",
+    "src/vr/d3d11/native_linear_source_texture_r234.hpp",
+    "docs/automation/runs/CONVERSION-DX11-00531.json"
+  ],
+  "pipeline": {
+    "C0": "PASS current GitHub HEAD + controller 00531 checkpoint; inherited 00530 owner verified",
+    "C1": "PASS policy-driven mono_native_draw source-pixel vertical slice independent from R175/R233",
+    "C2": "PASS batched immutable D3D11 source owner + PS UAV preflight + real WARP proof + mutant regression",
+    "C3": "STATIC preflight PASS; targeted and full exact-SHA GitHub Actions pending",
+    "C4": "MATERIAL_COMMIT pending exact SHA",
+    "C5": "NOT_REQUIRED no native game Draw activation",
+    "C6": "WAITING_CI"
+  },
+  "evidence": {
+    "source_preflight": "JS negative guard/mutation evidence and WARP source assertions; exact CI actual execution authoritative",
+    "policy": "new DX11 AUTODEV policy strategy fields present, CI will invoke Python policy --check-latest"
+  },
+  "blockers": [
+    "Preexisting unrelated R175 WARP varying mismatch assigned 00477; no unsafe bypass",
+    "RUNTIME HMD/Quest3 not performed"
+  ],
+  "score_change": 0,
+  "next_action": "Poll exact-SHA Backend Conversion Gate, inspect R203/R234 WARP positive/negative and failure step; do not mark PASS on inherited R175 failure."
+}

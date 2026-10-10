@@ -1,4 +1,5 @@
 #pragma once
+// R234: immutable source revision and OM UAV eye isolation.
 // R203: dormant native non-indexed Draw PS SRV/sampler identity and read/write hazard fence.
 // The caller owns expected SRV/sampler lifetime. This helper never dispatches Draw.
 #include "native_linear_target_viewport.hpp"
@@ -54,7 +55,10 @@ namespace outrun::vr::dx11 {
     if (!desc.Width || !desc.Height || desc.MipLevels != 1 ||
         desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
         desc.SampleDesc.Quality != 0 || desc.Format != textureFormat ||
-        !(desc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
+        // No revision owner for an in-place writable D3D11 texture.
+        desc.Usage != D3D11_USAGE_IMMUTABLE ||
+        desc.CPUAccessFlags != 0 || desc.MiscFlags != 0 ||
+        desc.BindFlags != D3D11_BIND_SHADER_RESOURCE)
         return false;
 
     // An eye's native non-indexed Draw owns exactly one OM output.
@@ -73,6 +77,22 @@ namespace outrun::vr::dx11 {
     for (auto* boundView : liveOutputs)
         if (boundView) boundView->Release(); // OMGetRenderTargets added a COM reference.
     if (!singleEyeTarget) return false;
+
+    // R234: OMGetRenderTargets hides UAV writes into a second eye.
+    ID3D11RenderTargetView* liveUavQueryTarget = nullptr;
+    ID3D11UnorderedAccessView* liveUavs[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+    context->OMGetRenderTargetsAndUnorderedAccessViews(
+        1u, &liveUavQueryTarget, nullptr, 0u,
+        D3D11_PS_CS_UAV_REGISTER_COUNT, liveUavs);
+    bool noPixelSideEffects = liveUavQueryTarget == expectedTarget;
+    if (liveUavQueryTarget) liveUavQueryTarget->Release();
+    for (auto* uav : liveUavs) {
+        if (uav) {
+            noPixelSideEffects = false;
+            uav->Release();
+        }
+    }
+    if (!noPixelSideEffects) return false;
     // A shader read of the active output is undefined even for one RTV.
     Microsoft::WRL::ComPtr<ID3D11Resource> output;
     expectedTarget->GetResource(output.GetAddressOf());
