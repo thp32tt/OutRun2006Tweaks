@@ -19,7 +19,7 @@ q=json.loads(subprocess.run(["python","tools/localization/rework_triage.py","--i
 assert q["index"]==101 and q["next_action"]=="MATERIAL_REWORK",q
 review=json.loads((repo/"localization/graphics/role_C/20261010-C1-Q101-SOURCE-ITALIC-REWORK/C1_Q101_INDEPENDENT_VISUAL_REJECT.json").read_text())
 assert review["decision"]=="REWORK_REQUIRED" and review["firsthand_review"]["reason_code"]=="SOURCE_FAMILY_RIGHT_ITALIC_MISMATCH"
-new_c1=json.loads((repo/"localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A226_INDEPENDENT_PERSISTED_REWORK.json").read_text())
+new_c1=json.loads((repo/"localization/graphics/role_C/20261010-C1-Q101-A225-CLEAN-PLATE-LEFTOVER/C1_Q101_A225_INDEPENDENT_PERSISTED_REWORK.json").read_text())
 assert new_c1["independent_C1_result"]=="REWORK_REQUIRED"
 assert new_c1["first_hand_contact_residue"]["clean_visible_non_gray_pixels"]==45
 assert new_c1["trial_candidate_sha256"]=="5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86"
@@ -87,7 +87,7 @@ for n,m in enumerate(source_rows):
 assert en_boxes[0][3]<=en_boxes[1][1]+10,en_boxes
 # English slant: a source-family right-italic, upper glyph strokes lean
 # to the right relative to lower stems in readable orientation.
-# A225 reconstitutes genuine Hangul outlines with a prescribed explicit
+# A226 reconstitutes genuine Hangul outlines with a prescribed explicit
 # native-source slant profile; do not shear pixels from old Korean DDS.
 source_italic_dx_over_height=0.32
 def make_layer(line,ppem):
@@ -170,7 +170,7 @@ def composite(im,rgb=(110,110,110,255)):
     return Image.alpha_composite(Image.new("RGBA",im.size,rgb),im).convert("RGB")
 images=[source.crop(crop),clean.crop(crop),before.crop(crop),saved.crop(crop)]
 for name,im in zip(("SOURCE","CLEAN","OLD","FINAL"),images):
-    im.save(out/f"A225_{name}_READABLE_NATIVE_RGBA.png")
+    im.save(out/f"A226_{name}_READABLE_NATIVE_RGBA.png")
 for bgname,bg in [("GRAY",(110,110,110,255)),("BLACK",(0,0,0,255)),("WHITE",(255,255,255,255))]:
     for pct in (100,75,50):
         cells=[composite(im,bg) for im in images]
@@ -180,12 +180,12 @@ for bgname,bg in [("GRAY",(110,110,110,255)),("BLACK",(0,0,0,255)),("WHITE",(255
         w,h=cells[0].size
         sheet=Image.new("RGB",(w*4,h+28),bg[:3])
         draw=ImageDraw.Draw(sheet)
-        for j,(name,im) in enumerate(zip(("SOURCE","CLEAN","A38","A225"),cells)):
+        for j,(name,im) in enumerate(zip(("SOURCE","CLEAN","A38","A226"),cells)):
             sheet.paste(im,(j*w,28))
             draw.text((j*w+5,5),name,fill=(0,0,0) if bgname=="WHITE" else (255,255,255))
-        sheet.save(out/f"A225_COMPARE_{bgname}_{pct}.png")
-saved.transpose(Image.Transpose.FLIP_TOP_BOTTOM).crop((2850,4096-210,4096,4096)).save(out/"A225_FINAL_RAW_NATIVE_RGBA.png")
-Image.fromarray(np.asarray(final_region)[:,:,3],mode="L").save(out/"A225_TRANSPARENT_LETTER_ALPHA.png")
+        sheet.save(out/f"A226_COMPARE_{bgname}_{pct}.png")
+saved.transpose(Image.Transpose.FLIP_TOP_BOTTOM).crop((2850,4096-210,4096,4096)).save(out/"A226_FINAL_RAW_NATIVE_RGBA.png")
+Image.fromarray(np.asarray(final_region)[:,:,3],mode="L").save(out/"A226_TRANSPARENT_LETTER_ALPHA.png")
 report={
   "run":"A226","role":"A","queue_index":101,
   "run_key":"OUTRUN-KOR-A226-Q101-C1-45PIXEL-REMNANT-CANONICAL-20261010-1800",
@@ -214,6 +214,6 @@ report={
   "visual_review":"PENDING_CONTROLLER_FIRSTHAND","independent_C1":"PENDING",
   "C3":"NOT_RUN","USER_INGAME":"NOT_TESTED","RUNTIME_VALIDATION":"UNTESTED",
   "exclusions":["VR","FFB","DX11","DXVK"]}
-(out/"A225_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"A226_MACHINE_TRIAL_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"trial_sha":sha(updated),"ppem":chosen,"source_line_boxes":en_boxes,
                   "new_glyph_boxes":glyph_bounds,"changed":changed},ensure_ascii=False))
