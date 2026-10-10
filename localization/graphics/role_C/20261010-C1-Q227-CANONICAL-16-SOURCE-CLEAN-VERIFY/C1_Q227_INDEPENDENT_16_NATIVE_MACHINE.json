@@ -1,0 +1,946 @@
+{
+  "source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "clean_sha256": "a6c8b4a921654e144e9580057c391fedc8cfc84e24e16a50a4697b971b76f984",
+  "final_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "atlas_format": "2048x2048 DDS RGBA32 mip1 Y flip readable",
+  "regions": 16,
+  "source_clean": {
+    "rgba": 531382,
+    "alpha": 531382,
+    "visible": 531382,
+    "outside_allowed_rgba": 0,
+    "outside_allowed_alpha": 0
+  },
+  "clean_final": {
+    "rgba": 269362,
+    "alpha": 269362,
+    "visible": 269362,
+    "outside_allowed_rgba": 0,
+    "outside_allowed_alpha": 0
+  },
+  "source_final": {
+    "rgba": 540060,
+    "alpha": 540060,
+    "visible": 540060,
+    "outside_allowed_rgba": 0,
+    "outside_allowed_alpha": 0
+  },
+  "all_protected_outside_original_16_bboxes_exact_unchanged": true,
+  "per_region": [
+    {
+      "id": "intermediate",
+      "source": "INTERMEDIATE",
+      "korean": "중급",
+      "source_bbox": [
+        7,
+        421,
+        676,
+        493
+      ],
+      "candidate_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "positive_margins": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "source_alpha": 27476,
+      "clean_alpha": 0,
+      "candidate_alpha": 4891,
+      "s_to_c_changed_rgba": 27476,
+      "c_to_f_changed_rgba": 4891,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 669,
+      "korean_width_px": 134,
+      "relative_width": 0.2003
+    },
+    {
+      "id": "outrun",
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "source_bbox": [
+        5,
+        512,
+        362,
+        586
+      ],
+      "candidate_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "positive_margins": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "source_alpha": 14573,
+      "clean_alpha": 0,
+      "candidate_alpha": 6249,
+      "s_to_c_changed_rgba": 14573,
+      "c_to_f_changed_rgba": 6249,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 357,
+      "korean_width_px": 196,
+      "relative_width": 0.549
+    },
+    {
+      "id": "professional",
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "source_bbox": [
+        3,
+        611,
+        675,
+        686
+      ],
+      "candidate_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "positive_margins": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "source_alpha": 26827,
+      "clean_alpha": 0,
+      "candidate_alpha": 6007,
+      "s_to_c_changed_rgba": 26827,
+      "c_to_f_changed_rgba": 6007,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 672,
+      "korean_width_px": 165,
+      "relative_width": 0.2455
+    },
+    {
+      "id": "alpine",
+      "source": "ALPINE",
+      "korean": "알파인",
+      "source_bbox": [
+        2,
+        701,
+        346,
+        777
+      ],
+      "candidate_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "positive_margins": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "source_alpha": 14475,
+      "clean_alpha": 0,
+      "candidate_alpha": 6907,
+      "s_to_c_changed_rgba": 14475,
+      "c_to_f_changed_rgba": 6907,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 344,
+      "korean_width_px": 201,
+      "relative_width": 0.5843
+    },
+    {
+      "id": "ancient_ruins",
+      "source": "ANCIENT RUINS",
+      "korean": "에인션트 루인스",
+      "source_bbox": [
+        2,
+        795,
+        707,
+        875
+      ],
+      "candidate_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "positive_margins": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "source_alpha": 30946,
+      "clean_alpha": 0,
+      "candidate_alpha": 16625,
+      "s_to_c_changed_rgba": 30946,
+      "c_to_f_changed_rgba": 16625,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 705,
+      "korean_width_px": 541,
+      "relative_width": 0.7674
+    },
+    {
+      "id": "cape_way",
+      "source": "CAPE WAY",
+      "korean": "케이프 웨이",
+      "source_bbox": [
+        8,
+        891,
+        473,
+        971
+      ],
+      "candidate_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "positive_margins": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "source_alpha": 18972,
+      "clean_alpha": 0,
+      "candidate_alpha": 12284,
+      "s_to_c_changed_rgba": 18972,
+      "c_to_f_changed_rgba": 12284,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 465,
+      "korean_width_px": 376,
+      "relative_width": 0.8086
+    },
+    {
+      "id": "castle_wall",
+      "source": "CASTLE WALL",
+      "korean": "캐슬 월",
+      "source_bbox": [
+        8,
+        987,
+        634,
+        1067
+      ],
+      "candidate_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "positive_margins": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "source_alpha": 24295,
+      "clean_alpha": 0,
+      "candidate_alpha": 8615,
+      "s_to_c_changed_rgba": 24295,
+      "c_to_f_changed_rgba": 8615,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 626,
+      "korean_width_px": 233,
+      "relative_width": 0.3722
+    },
+    {
+      "id": "cloudy_highland",
+      "source": "CLOUDY HIGHLAND",
+      "korean": "클라우디 하이랜드",
+      "source_bbox": [
+        1,
+        1083,
+        835,
+        1163
+      ],
+      "candidate_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "positive_margins": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "source_alpha": 36242,
+      "clean_alpha": 0,
+      "candidate_alpha": 18685,
+      "s_to_c_changed_rgba": 36242,
+      "c_to_f_changed_rgba": 18685,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 834,
+      "korean_width_px": 601,
+      "relative_width": 0.7206
+    },
+    {
+      "id": "coniferous_forest",
+      "source": "CONIFEROUS FOREST",
+      "korean": "코니퍼러스 포레스트",
+      "source_bbox": [
+        1,
+        1179,
+        933,
+        1259
+      ],
+      "candidate_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "positive_margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "source_alpha": 42175,
+      "clean_alpha": 0,
+      "candidate_alpha": 19176,
+      "s_to_c_changed_rgba": 42175,
+      "c_to_f_changed_rgba": 19176,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 932,
+      "korean_width_px": 675,
+      "relative_width": 0.7242
+    },
+    {
+      "id": "deep_lake",
+      "source": "DEEP LAKE",
+      "korean": "딥 레이크",
+      "source_bbox": [
+        1,
+        1277,
+        491,
+        1353
+      ],
+      "candidate_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "positive_margins": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "source_alpha": 21201,
+      "clean_alpha": 0,
+      "candidate_alpha": 8604,
+      "s_to_c_changed_rgba": 21201,
+      "c_to_f_changed_rgba": 8604,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 490,
+      "korean_width_px": 287,
+      "relative_width": 0.5857
+    },
+    {
+      "id": "desert",
+      "source": "DESERT",
+      "korean": "데저트",
+      "source_bbox": [
+        1,
+        1371,
+        348,
+        1451
+      ],
+      "candidate_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "positive_margins": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "source_alpha": 16313,
+      "clean_alpha": 0,
+      "candidate_alpha": 7130,
+      "s_to_c_changed_rgba": 16313,
+      "c_to_f_changed_rgba": 7130,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 347,
+      "korean_width_px": 213,
+      "relative_width": 0.6138
+    },
+    {
+      "id": "bay_area",
+      "source": "BAY AREA",
+      "korean": "베이 에어리어",
+      "source_bbox": [
+        3,
+        1469,
+        436,
+        1545
+      ],
+      "candidate_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "positive_margins": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "source_alpha": 18856,
+      "clean_alpha": 0,
+      "candidate_alpha": 13514,
+      "s_to_c_changed_rgba": 18856,
+      "c_to_f_changed_rgba": 13514,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 433,
+      "korean_width_px": 425,
+      "relative_width": 0.9815
+    },
+    {
+      "id": "flagman1",
+      "source": "FLAGMAN 1",
+      "korean": "플래그맨 1",
+      "source_bbox": [
+        8,
+        1565,
+        963,
+        1716
+      ],
+      "candidate_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "positive_margins": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "source_alpha": 72996,
+      "clean_alpha": 0,
+      "candidate_alpha": 42213,
+      "s_to_c_changed_rgba": 72996,
+      "c_to_f_changed_rgba": 42213,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 955,
+      "korean_width_px": 695,
+      "relative_width": 0.7277
+    },
+    {
+      "id": "flagman2",
+      "source": "FLAGMAN 2",
+      "korean": "플래그맨 2",
+      "source_bbox": [
+        8,
+        1722,
+        994,
+        1880
+      ],
+      "candidate_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "positive_margins": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "source_alpha": 76607,
+      "clean_alpha": 0,
+      "candidate_alpha": 46968,
+      "s_to_c_changed_rgba": 76607,
+      "c_to_f_changed_rgba": 46968,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 986,
+      "korean_width_px": 728,
+      "relative_width": 0.7383
+    },
+    {
+      "id": "flagman3",
+      "source": "FLAGMAN 3",
+      "korean": "플래그맨 3",
+      "source_bbox": [
+        8,
+        1889,
+        993,
+        2047
+      ],
+      "candidate_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "positive_margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "source_alpha": 76096,
+      "clean_alpha": 0,
+      "candidate_alpha": 47131,
+      "s_to_c_changed_rgba": 76096,
+      "c_to_f_changed_rgba": 47131,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 985,
+      "korean_width_px": 728,
+      "relative_width": 0.7391
+    },
+    {
+      "id": "novice",
+      "source": "NOVICE",
+      "korean": "초급",
+      "source_bbox": [
+        1041,
+        1640,
+        1374,
+        1714
+      ],
+      "candidate_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "positive_margins": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "source_alpha": 13332,
+      "clean_alpha": 0,
+      "candidate_alpha": 4363,
+      "s_to_c_changed_rgba": 13332,
+      "c_to_f_changed_rgba": 4363,
+      "candidate_bbox_source_contained": true,
+      "candidate_bbox_margins_recomputed": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "measured_candidate_alpha_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "persisted_bbox_exactly_matches_claim": true,
+      "measured_positive_margins": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "minimum_margin_px": 1,
+      "source_width_px": 333,
+      "korean_width_px": 134,
+      "relative_width": 0.4024
+    }
+  ],
+  "evidence": {
+    "C1_Q227_SET1_GRAY_100.png": "8ace5f95cc6e9b6deb5d8e369faea45026afb8eff98e6cc89228e0c007af0f19",
+    "C1_Q227_SET1_GRAY_50.png": "288f83ff8fa6d6dddd66b75b8aa4d3b7719f54f08c36de6686d79f285694d04a",
+    "C1_Q227_SET1_BLACK_100.png": "6b7a6cea67bee0cea31b28aefcfe1a95833debc0293d1a8ccf37b0a2fe6926e6",
+    "C1_Q227_SET1_WHITE_100.png": "2fa894d1112fbf7b475201981681836a833525aa0f5610e494588b553953980f",
+    "C1_Q227_SET2_GRAY_100.png": "b43da60ffc8619f2ee5ae20692c83d7082c9f6fe6b75a823ff13fffebada9d6a",
+    "C1_Q227_SET2_GRAY_50.png": "0ca4bf8056478b11dde78e54a2a547dc1134e297476a3acb7143e1102b5f9f80",
+    "C1_Q227_SET2_BLACK_100.png": "371e33f8d1fed117576fb62ec2a35cfba6d8d6624226062f1a1d745bf006f9c6",
+    "C1_Q227_SET2_WHITE_100.png": "4b233e9a90d1388f4e218e475607fe925d5b000cce1c9defb5ece8fe9a1a4a64",
+    "C1_Q227_SET3_GRAY_100.png": "9bf4d13316858c1d1895c5f9ac16b3f4d855c945b4d153c23f1eb81628eed965",
+    "C1_Q227_SET3_GRAY_50.png": "a118326d7742c6b4f2f4b8cff7672c408fae57370d88eaf157ff6625d09908ef",
+    "C1_Q227_SET3_BLACK_100.png": "db9ff81f0820542947f8959db0b023cc1a03156f0a9022b35429f269c2454b62",
+    "C1_Q227_SET3_WHITE_100.png": "975b562abfdf2ced209cba01eebee46c51e8cbcec972e984a763816bcd673ea7",
+    "C1_Q227_SET4_GRAY_100.png": "921d0fbe49929c7fae340ad1084d25b7051e589983267a70263dc06c7b87ceb6",
+    "C1_Q227_SET4_GRAY_50.png": "5195ffd63e99a190b3a50daf950a4c7596c3d927455cf4ea5683d0c8d53c1c43",
+    "C1_Q227_SET4_BLACK_100.png": "e33ac0eb1daf18b69728f921139488634441ad5815e9fa035549ee2456003677",
+    "C1_Q227_SET4_WHITE_100.png": "96e5defffbaa00634058302fe014603d1265e9d8992b67ad1cdf8b592f049973",
+    "C1_Q227_FINAL_RAW_TOP260.png": "3c024356e51747834d448a005375cd728ba1f1b1a6c4db7b784a404dde9d2c4d"
+  },
+  "stored_candidate_bbox_exact_matches": 16,
+  "strict_margin_positive_all": true,
+  "minimum_margin_px": 1,
+  "native_views_readable_flipy_proven": "All uploaded SOURCE/CLEAN/FINAL PNG are decoded persisted DDS full-native Y-mirrored read and SHA-pinned authored PNG with native dimension 2048x2048",
+  "runtime_validation": "UNTESTED",
+  "run_key": "OUTRUN-KOR-C1-Q227-16-INDEPENDENT-CANONICAL-SOURCE-CLEAN-20261010-2340",
+  "role": "C1",
+  "queue_index": 227,
+  "candidate_review_unchanged_since_C339": true,
+  "scope": "New independent canonical English DDS and A96R CLEAN original-identity proof plus all16 complete SOURCE/CLEAN/persisted DDS decoded spatial/alpha QA",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+  "clean_path": "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_CLEAN_PLATE.png",
+  "source_and_clean_independent_exact_SHA256_verified": true,
+  "published_views": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_GRAY_100.png",
+      "sha256": "8ace5f95cc6e9b6deb5d8e369faea45026afb8eff98e6cc89228e0c007af0f19"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_GRAY_50.png",
+      "sha256": "288f83ff8fa6d6dddd66b75b8aa4d3b7719f54f08c36de6686d79f285694d04a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET2_GRAY_100.png",
+      "sha256": "b43da60ffc8619f2ee5ae20692c83d7082c9f6fe6b75a823ff13fffebada9d6a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET2_GRAY_50.png",
+      "sha256": "0ca4bf8056478b11dde78e54a2a547dc1134e297476a3acb7143e1102b5f9f80"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET3_GRAY_100.png",
+      "sha256": "9bf4d13316858c1d1895c5f9ac16b3f4d855c945b4d153c23f1eb81628eed965"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET3_GRAY_50.png",
+      "sha256": "a118326d7742c6b4f2f4b8cff7672c408fae57370d88eaf157ff6625d09908ef"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_GRAY_100.png",
+      "sha256": "921d0fbe49929c7fae340ad1084d25b7051e589983267a70263dc06c7b87ceb6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_GRAY_50.png",
+      "sha256": "5195ffd63e99a190b3a50daf950a4c7596c3d927455cf4ea5683d0c8d53c1c43"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_BLACK_100.png",
+      "sha256": "6b7a6cea67bee0cea31b28aefcfe1a95833debc0293d1a8ccf37b0a2fe6926e6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_WHITE_100.png",
+      "sha256": "96e5defffbaa00634058302fe014603d1265e9d8992b67ad1cdf8b592f049973"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_FINAL_RAW_TOP260.png",
+      "sha256": "3c024356e51747834d448a005375cd728ba1f1b1a6c4db7b784a404dde9d2c4d"
+    }
+  ],
+  "decision": "HOLD_STRICT_RECHECK",
+  "C3": "NOT_RUN",
+  "APPROVAL": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

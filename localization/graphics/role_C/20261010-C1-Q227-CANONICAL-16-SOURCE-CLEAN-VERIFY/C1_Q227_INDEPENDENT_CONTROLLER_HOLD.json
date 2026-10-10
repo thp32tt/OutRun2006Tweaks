@@ -1,0 +1,718 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "schema_version": 2,
+  "run_key": "OUTRUN-KOR-C1-Q227-16-INDEPENDENT-CANONICAL-SOURCE-CLEAN-20261010-2340",
+  "review_id": "C1-Q227-INDEPENDENT-CANONICAL-ALL16-20261010",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD_ONLY",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "index": 227,
+  "candidate_scope": "CURRENT_OFFICIAL_SAME_SHA_AS_C339_NEW_SOURCE_CLEAN_PROOF_NOT_NEW_C_PASS",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+  "canonical_source_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+  "authenticated_clean_png_sha256": "a6c8b4a921654e144e9580057c391fedc8cfc84e24e16a50a4697b971b76f984",
+  "candidate_persisted_sha256": "83120095e3ff960939c0b413dd85d1633314f23dcde0192f0cf68a7a47776595",
+  "source_and_clean_first_authenticated_in_C1": true,
+  "duplicate_candidate_completion": false,
+  "first_hand": "Native and practical50 English source/CLEAN/Korean current four grouped 4-region sets directly viewed on gray background; representative black and white native too. Original gray titles are wide dense condensed. Korean titles are flat source-family gray/red, legible, with no definite new visible source fragments or clipped strokes. Several two-syllable translations shrink horizontal hierarchy markedly; evaluate in blind calibration/composed game rather than treating transliteration-length variance alone as a numeric FAIL.",
+  "calibration": "NOT_BLIND_CALIBRATED; producer identity/previous notes read, not eligible to pretend same person is a separate reviewer or mark calibrated PASS",
+  "source_clean_stage": {
+    "source_alpha_removed": 531382,
+    "clean_visible_alpha_in_16_regions": 0,
+    "source_clean_changed_outside_16_exact_boxes_rgba": 0,
+    "source_clean_changed_outside_alpha": 0,
+    "result": "SCOPED_MACHINE_PASS"
+  },
+  "clean_final_stage": {
+    "new_visible_pixels": 269362,
+    "clean_final_changed_outside_16_exact_boxes_rgba": 0,
+    "clean_final_changed_outside_alpha": 0,
+    "result": "SCOPED_MACHINE_PASS"
+  },
+  "source_final_stage": {
+    "changed_rgba": 540060,
+    "changed_outside_all_original_boxes_rgba": 0,
+    "changed_outside_alpha": 0,
+    "result": "SCOPED_MACHINE_PASS"
+  },
+  "bbox_review": {
+    "regions_total": 16,
+    "exact_measured_rgba_alpha_bboxes_match_producer": 16,
+    "minimum_margin_px": 1,
+    "high_risk_1px": true
+  },
+  "visual_eight": {
+    "plate": {
+      "result": "SCOPED_PASS",
+      "observation": "Exact English source DDS independently authenticated and producer A96R CLEAN original hash authenticated; clean alpha0 in 16/16, no visible English/rectangular plate on BGW review"
+    },
+    "slant": {
+      "result": "HOLD_STRICT_RECHECK",
+      "observation": "Original and Korean labels appear upright in gray/red families; qualified blind homologous stroke-anchor slant measurements for all16 not completed"
+    },
+    "size": {
+      "result": "HOLD_STRICT_RECHECK",
+      "observation": "Measured glyphs within 16 source bboxes min1px. Intermediate 20.0% source width, professional 24.6%, castle wall 37.2%, novice 40.2%; natural Hangul character-length difference not by itself error, but consumer visual hierarchy requires controlled comparison"
+    },
+    "weight": {
+      "result": "HOLD_STRICT_RECHECK",
+      "observation": "Broad gray and bright flat red style appears source-like in images, no proven material mismatch, but exact source-face stroke topology and blind control not independently qualified"
+    },
+    "glyph": {
+      "result": "SCOPED_PASS",
+      "observation": "No visually broken Korean glyph or clipping at inspected native and gray50; all16 independently measured persisted DDS bbox positive margins"
+    },
+    "protected": {
+      "result": "SCOPED_MACHINE_PASS",
+      "observation": "SOURCE-CLEAN, CLEAN-FINAL and SOURCE-FINAL actual decoded RGBA/alpha changed zero pixels outside source16 box union, but within-region protected semantic masks not separately reconstructed"
+    },
+    "orientation": {
+      "result": "SCOPED_PASS",
+      "observation": "Native 2048x2048 RGBA32 mip1 DDS decoded RAW mirror Y and readable FLIPY. Grouped full-native/50 proof and actual RAW top260 pinned"
+    },
+    "readability": {
+      "result": "HOLD_STRICT_RECHECK",
+      "observation": "Gray text legible under 100/50 opaque composite, but selected source-wide labels look much smaller and game pixel consumer/layout has not been tested"
+    }
+  },
+  "per_region": [
+    {
+      "index": 227,
+      "id": "intermediate",
+      "source": "INTERMEDIATE",
+      "korean": "중급",
+      "source_bbox": [
+        7,
+        421,
+        676,
+        493
+      ],
+      "persisted_candidate_bbox": [
+        9,
+        422,
+        143,
+        491
+      ],
+      "margin": [
+        2,
+        533,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 4891,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "outrun",
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "source_bbox": [
+        5,
+        512,
+        362,
+        586
+      ],
+      "persisted_candidate_bbox": [
+        7,
+        513,
+        203,
+        584
+      ],
+      "margin": [
+        2,
+        159,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 6249,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "professional",
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "source_bbox": [
+        3,
+        611,
+        675,
+        686
+      ],
+      "persisted_candidate_bbox": [
+        5,
+        612,
+        170,
+        684
+      ],
+      "margin": [
+        2,
+        505,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 6007,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "alpine",
+      "source": "ALPINE",
+      "korean": "알파인",
+      "source_bbox": [
+        2,
+        701,
+        346,
+        777
+      ],
+      "persisted_candidate_bbox": [
+        4,
+        702,
+        205,
+        775
+      ],
+      "margin": [
+        2,
+        141,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 6907,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "ancient_ruins",
+      "source": "ANCIENT RUINS",
+      "korean": "에인션트 루인스",
+      "source_bbox": [
+        2,
+        795,
+        707,
+        875
+      ],
+      "persisted_candidate_bbox": [
+        4,
+        796,
+        545,
+        873
+      ],
+      "margin": [
+        2,
+        162,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 16625,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "cape_way",
+      "source": "CAPE WAY",
+      "korean": "케이프 웨이",
+      "source_bbox": [
+        8,
+        891,
+        473,
+        971
+      ],
+      "persisted_candidate_bbox": [
+        10,
+        892,
+        386,
+        969
+      ],
+      "margin": [
+        2,
+        87,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 12284,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "castle_wall",
+      "source": "CASTLE WALL",
+      "korean": "캐슬 월",
+      "source_bbox": [
+        8,
+        987,
+        634,
+        1067
+      ],
+      "persisted_candidate_bbox": [
+        10,
+        988,
+        243,
+        1065
+      ],
+      "margin": [
+        2,
+        391,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 8615,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "cloudy_highland",
+      "source": "CLOUDY HIGHLAND",
+      "korean": "클라우디 하이랜드",
+      "source_bbox": [
+        1,
+        1083,
+        835,
+        1163
+      ],
+      "persisted_candidate_bbox": [
+        3,
+        1084,
+        604,
+        1161
+      ],
+      "margin": [
+        2,
+        231,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 18685,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "coniferous_forest",
+      "source": "CONIFEROUS FOREST",
+      "korean": "코니퍼러스 포레스트",
+      "source_bbox": [
+        1,
+        1179,
+        933,
+        1259
+      ],
+      "persisted_candidate_bbox": [
+        3,
+        1180,
+        678,
+        1257
+      ],
+      "margin": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 19176,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "deep_lake",
+      "source": "DEEP LAKE",
+      "korean": "딥 레이크",
+      "source_bbox": [
+        1,
+        1277,
+        491,
+        1353
+      ],
+      "persisted_candidate_bbox": [
+        3,
+        1278,
+        290,
+        1351
+      ],
+      "margin": [
+        2,
+        201,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 8604,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "desert",
+      "source": "DESERT",
+      "korean": "데저트",
+      "source_bbox": [
+        1,
+        1371,
+        348,
+        1451
+      ],
+      "persisted_candidate_bbox": [
+        3,
+        1372,
+        216,
+        1449
+      ],
+      "margin": [
+        2,
+        132,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 7130,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "bay_area",
+      "source": "BAY AREA",
+      "korean": "베이 에어리어",
+      "source_bbox": [
+        3,
+        1469,
+        436,
+        1545
+      ],
+      "persisted_candidate_bbox": [
+        5,
+        1470,
+        430,
+        1543
+      ],
+      "margin": [
+        2,
+        6,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 13514,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "flagman1",
+      "source": "FLAGMAN 1",
+      "korean": "플래그맨 1",
+      "source_bbox": [
+        8,
+        1565,
+        963,
+        1716
+      ],
+      "persisted_candidate_bbox": [
+        10,
+        1566,
+        705,
+        1714
+      ],
+      "margin": [
+        2,
+        258,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 42213,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "flagman2",
+      "source": "FLAGMAN 2",
+      "korean": "플래그맨 2",
+      "source_bbox": [
+        8,
+        1722,
+        994,
+        1880
+      ],
+      "persisted_candidate_bbox": [
+        10,
+        1723,
+        738,
+        1878
+      ],
+      "margin": [
+        2,
+        256,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 46968,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "flagman3",
+      "source": "FLAGMAN 3",
+      "korean": "플래그맨 3",
+      "source_bbox": [
+        8,
+        1889,
+        993,
+        2047
+      ],
+      "persisted_candidate_bbox": [
+        10,
+        1890,
+        738,
+        2045
+      ],
+      "margin": [
+        2,
+        255,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 47131,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    },
+    {
+      "index": 227,
+      "id": "novice",
+      "source": "NOVICE",
+      "korean": "초급",
+      "source_bbox": [
+        1041,
+        1640,
+        1374,
+        1714
+      ],
+      "persisted_candidate_bbox": [
+        1043,
+        1641,
+        1177,
+        1712
+      ],
+      "margin": [
+        2,
+        197,
+        1,
+        2
+      ],
+      "clean_alpha": 0,
+      "persisted_final_alpha": 4363,
+      "checks": {
+        "plate": "SCOPED_PASS",
+        "slant": "HOLD",
+        "size": "SCOPED_MACHINE_PASS",
+        "weight": "HOLD",
+        "glyph": "SCOPED_PASS",
+        "protected": "SCOPED_OUTSIDE_UNION_PASS_WITHIN_HOLD",
+        "orientation": "SCOPED_PASS",
+        "readability": "HOLD_INGAME"
+      }
+    }
+  ],
+  "images": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_GRAY_100.png",
+      "sha256": "8ace5f95cc6e9b6deb5d8e369faea45026afb8eff98e6cc89228e0c007af0f19"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_GRAY_50.png",
+      "sha256": "288f83ff8fa6d6dddd66b75b8aa4d3b7719f54f08c36de6686d79f285694d04a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET2_GRAY_100.png",
+      "sha256": "b43da60ffc8619f2ee5ae20692c83d7082c9f6fe6b75a823ff13fffebada9d6a"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET2_GRAY_50.png",
+      "sha256": "0ca4bf8056478b11dde78e54a2a547dc1134e297476a3acb7143e1102b5f9f80"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET3_GRAY_100.png",
+      "sha256": "9bf4d13316858c1d1895c5f9ac16b3f4d855c945b4d153c23f1eb81628eed965"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET3_GRAY_50.png",
+      "sha256": "a118326d7742c6b4f2f4b8cff7672c408fae57370d88eaf157ff6625d09908ef"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_GRAY_100.png",
+      "sha256": "921d0fbe49929c7fae340ad1084d25b7051e589983267a70263dc06c7b87ceb6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_GRAY_50.png",
+      "sha256": "5195ffd63e99a190b3a50daf950a4c7596c3d927455cf4ea5683d0c8d53c1c43"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET1_BLACK_100.png",
+      "sha256": "6b7a6cea67bee0cea31b28aefcfe1a95833debc0293d1a8ccf37b0a2fe6926e6"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_SET4_WHITE_100.png",
+      "sha256": "96e5defffbaa00634058302fe014603d1265e9d8992b67ad1cdf8b592f049973"
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_FINAL_RAW_TOP260.png",
+      "sha256": "3c024356e51747834d448a005375cd728ba1f1b1a6c4db7b784a404dde9d2c4d"
+    }
+  ],
+  "machine_report": "localization/graphics/role_C/20261010-C1-Q227-CANONICAL-16-SOURCE-CLEAN-VERIFY/C1_Q227_INDEPENDENT_16_NATIVE_MACHINE.json",
+  "decision": "HOLD_STRICT_RECHECK",
+  "official_status": "HOLD_STRICT_RECHECK_UNCHANGED",
+  "C1_STATIC_PASS": false,
+  "C3": "NOT_RUN_NEEDS_SEPARATE",
+  "APPROVAL": "BLOCKED",
+  "USER_INGAME_ISSUES": [
+    "IGR-034",
+    "IGR-035",
+    "IGR-036"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_DDS": 0,
+  "new_promoted_DDS": 0,
+  "next_action": "Qualified independent blind normal/defect calibration and source-like title density/slant across all16; separate source-region protected masks/1px tight risk, C3 separate review and newer actual in-game screenshots for IGR034/035/036. No repeat same-SHA completion or game pass."
+}
