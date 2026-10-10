@@ -20,6 +20,9 @@ constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 constexpr UINT kMaxVertices = 1536;
 constexpr UINT kMaxIndices = 1536;
+// Rotate among eligible game Draws so an off-screen first Draw cannot starve
+// later visible candidates. Exactly one native submission is allowed per Present.
+constexpr UINT kProbeSlots = 64;
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
 struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; };
@@ -45,6 +48,9 @@ struct State {
     bool logged = false;
     UINT observed = 0;
     std::uint64_t presents = 0;
+    std::uint64_t eligible = 0;
+    UINT eligibleThisFrame = 0;
+    UINT probeSlot = 0;
     UINT issued = 0;
     UINT visible = 0;
     UINT failed = 0;
@@ -226,9 +232,14 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
-        if (s.attempted) return;
         D3DVIEWPORT9 vp{};
         if (!supported_game_state(game, vp)) return;
+        // Count every admitted state, including calls after this frame's one
+        // native draw. Use that bounded population to rotate the next frame's
+        // probe rather than sampling its same first triangle indefinitely.
+        const UINT candidateOrdinal = s.eligibleThisFrame++;
+        ++s.eligible;
+        if (s.attempted || candidateOrdinal != s.probeSlot) return;
         if (indexCount && (!indices || indexCount != primitives * 3 ||
                            vertexCount > kMaxVertices))
             return;
@@ -326,6 +337,9 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         }
         s.pending = false;
         s.attempted = false;
+        const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);
+        s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;
+        s.eligibleThisFrame = 0;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
@@ -333,13 +347,19 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         if (s.presents == 300 ||
             (s.presents % 1800u == 0u && s.visible == 0u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={}; unsupported draws stay DX9Ex; HMD UNTESTED",
-                s.observed, s.issued, s.visible, s.failed, s.presents);
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} next_probe_slot={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                s.observed, s.issued, s.visible, s.failed, s.presents,
+                s.eligible, s.probeSlot);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.
-        state().pending = false;
-        state().attempted = false;
+        // The diagnostic is best-effort even when logging/readback fails;
+        // leave all original D3D9 Present and input behavior untouched.
+        State& s = state();
+        s.pending = false;
+        s.attempted = false;
+        s.eligibleThisFrame = 0;
+        s.probeSlot = 0;
     }
 }
 
@@ -349,6 +369,8 @@ void before_game_reset() noexcept {
     std::lock_guard<std::mutex> lock(s.mutex);
     s.pending = false;
     s.attempted = false;
+    s.eligibleThisFrame = 0;
+    s.probeSlot = 0;
     s.staging.Reset(); s.raster.Reset(); s.layout.Reset();
     s.ps.Reset(); s.vs.Reset();
     s.backend.shutdown();
