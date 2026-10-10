@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T08:13:00+09:00",
+  "updated_at_kst": "2026-10-11T08:19:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12347,5 +12347,27 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_B354_C2_INDEPENDENT_REWORK.json"
+  },
+  "c1_20261011_q161_a236_independent_P1": {
+    "run_key": "OUTRUN-KOR-C1-Q161-A236-INDEPENDENT-SOURCE-CLEAN-P1-20261011-0810",
+    "queue_index": 161,
+    "source_removed_alpha_pixels": 23886,
+    "clean_mask_pixels": 43827,
+    "source_to_clean_rgba_changed": 29650,
+    "outside_mask_changed": 0,
+    "source_flipy_mismatch": 0,
+    "reviewed_regions": [
+      11,
+      16,
+      24
+    ],
+    "remaining_not_approved": 35,
+    "decision": "PLATE_PASS_SCOPED_OFFICIAL_REWORK",
+    "qa": "localization/graphics/role_C/20261011-C1-Q161-A236-INDEPENDENT-P1-CLEAN/C1_Q161_A236_INDEPENDENT_PLATE_QA.json",
+    "plate_library_review": "localization/graphics/plate_library/reviews/caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8.json",
+    "C3": "NOT_RUN",
+    "official_updated": false,
+    "new_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }

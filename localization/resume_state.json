@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 2026-10-11 08:19 KST ODD q161 NEW A236 P1 SOURCE/CLEAN immutable PLATE first independent SHA-verified review; canonical ORIGINAL BC3/DXT5 DDS a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d SHA-authenticated 2048² mip1 actual decoded RAW/FLIPY exact readable SOURCE PNG 0 mismatches; CLEAN object 60f5b09266bad5f517c06cdd23b02576ec493b5149fc03dea59ee8d1843f1720 / binary mask dee1f143543cf510968aaf8b1e20d9844327b8b6f9ec4456758544e2410d6320 authenticated. Mask 43827 pixels exactly three English SOURCE regions R11 AQUARIUS/R16 SOUTH KOREA/R24 ITALY; SOURCE->CLEAN RGBA29650/alpha23886 changed only mask, outside 0/0; all23886 source-visible alpha removed and CLEAN residual0; other35 cells exact; source region removed glyph visible gray100 white75 black50 and native RAW in 12 new SHA-bound lossless PNG. Independent PLATE_PASS_SCOPED_3_OF_38, manifest caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8 q161, localization/graphics/plate_library/reviews/caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8.json. Existing OFFICIAL 8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65 remains C344 REWORK_REQUIRED, old A218 trial 8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e C349 HOLD is NOT re-reviewed or re-scored, Korean DDS produced/approved0; remaining35 and source-family typography unresolved, C3/APPROVAL/USER_GAME NOT_RUN RUNTIME_VALIDATION=UNTESTED. Independent QA localization/graphics/role_C/20261011-C1-Q161-A236-INDEPENDENT-P1-CLEAN/C1_Q161_A236_INDEPENDENT_PLATE_QA.json; RUN_KEY=OUTRUN-KOR-C1-Q161-A236-INDEPENDENT-SOURCE-CLEAN-P1-20261011-0810.",
     "A236 q161 NEW exact SHA source-authenticated P1 CLEAN plate for source text cells AQUARIUS/물병자리(11), SOUTH KOREA/대한민국(16), ITALY/이탈리아(24). Canonical SOURCE a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d verified; SHA of NEW 2048x2048 lossless CLEAN=60f5b09266bad5f517c06cdd23b02576ec493b5149fc03dea59ee8d1843f1720, 29650 RGBA source->clean changes, 43827 removal-area pixels, 0 outside mask, alpha-residue0, 35 other atlas cells unchanged. Immutable plate library manifest caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8, audit PASS3; actual 100/75/50 source/CLEAN/native and RAW inspected. Prior A218 trial SHA8000601a and official SHA8ded8565 unchanged; newly approved Korean DDS0, overall C344 REWORK remains, independent C1 plate review NOT_RUN, C3 NOT_RUN, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261011-A236-Q161-THREE-SOURCE-AUTHENTICATED-CLEAN/A236_CONTROLLER_PLATE_OPTICAL_QA.json RUN_KEY=OUTRUN-KOR-A236-Q161-CANONICAL-THREE-CELL-CLEAN-PLATE-20261011-0800.",
     "C381 C2 EVEN q154 distinct B354 trial visually rejected thin gray native font vs source. Never promote B354/B355; manually reconstruct condensed heavy gray source family. Official C356 REWORK persists; C3/game UNTESTED. localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_B354_C2_INDEPENDENT_REWORK.json",
     "C380 C2 EVEN q230 new RAW 7 pixel QA: CORRECT SOURCE FAMILY COURSES/BGMUSIC type and scale after independent source CLEAN gate. Official source/candidate SHA unchanged, status REWORK_REQUIRED. localization/graphics/role_C/20261011-C380-C2-Q230-RAW-SEVEN-SOURCE-FAMILY-REWORK/C380_Q230_C2_INDEPENDENT_STYLE_REWORK.json C3/game UNTESTED.",
@@ -15800,5 +15801,19 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C381-C2-Q154-B354-INDEPENDENT-SAVED/C381_Q154_B354_C2_INDEPENDENT_REWORK.json"
+  },
+  "c1_20261011_q161_a236_independent_P1": {
+    "run_key": "OUTRUN-KOR-C1-Q161-A236-INDEPENDENT-SOURCE-CLEAN-P1-20261011-0810",
+    "queue_index": 161,
+    "shard": "ODD",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "manifest_sha256": "caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8",
+    "plate": "PLATE_PASS_3_OF_38_ONLY",
+    "official": "REWORK_REQUIRED_UNCHANGED",
+    "new_DDS": 0,
+    "qa": "localization/graphics/role_C/20261011-C1-Q161-A236-INDEPENDENT-P1-CLEAN/C1_Q161_A236_INDEPENDENT_PLATE_QA.json",
+    "review": "localization/graphics/plate_library/reviews/caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8.json",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
