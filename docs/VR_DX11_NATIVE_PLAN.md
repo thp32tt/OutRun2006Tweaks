@@ -4,6 +4,26 @@ Baseline: `vr-r70-structure-squash` at `b6c208bbc9a411b9c035be26f9e1e9c014028738
 
 Development branch: `vr-dx11-native-r71`
 
+## 2026-10-10 20:39 KST — user-mandated gameplay-first correction (DX11 00537+)
+
+This section supersedes earlier R71-R239 dormant WARP vertical-slice priorities. The next deliverable is a **real OutRun 2006 game-generated frame drawn with native D3D11**, not another isolated test triangle. WARP smoke fixtures and readiness guards support but do not complete this milestone.
+
+**Priority 0 — R175 root-cause unblock.** Correct the actual shader/VS-PS TEXCOORD6 varying mismatch and failing exact-SHA Windows gate, never mask the failing test. The existing CONVERSION-DX11-00477 claim is authoritative until explicit remote release or fenced ownership handoff. If the lease is still held, do not duplicate it; progress independently owned live game-draw integration and keep R175 visible as blocked.
+
+**Priority 1 — FIRST_GAME_DRAW_FRAME.** Route one game-authored intercepted D3D9 Draw/DrawIndexed, with real live resources/VB/IB/shader/RT and generation/lifetime, to native D3D11 Draw and a bounded, visible in-game diagnostic frame. Include actual callsite evidence, fail-closed opt-in, DX9Ex fallback on unsupported paths, and a safe off switch. NativeDrawPathActive remains false by default; no production enablement without parity proof.
+
+**Priority 2 — menu to actual driving.** Expand coverage from menu through vehicle selection and in-race draws; confirm texture/shader parity, input, lifecycle/Reset, then Quest 3/OpenXR stereo/HUD/markers and frame-time. Distinguish code-complete, observed output and playable user test.
+
+**No stand-alone new R240/R241/... WARP-only milestones.** A new readiness guard, pixel fixture or one tiny conversion is eligible only as a necessary component of the real game-frame path or proven R175 root cause. Use a stable feature ID across rollover/retries, preserve source checkpoints and run one final exact-SHA full gate when the whole feature is ready.
+
+Acceptance milestones:
+- FRAME_PATH_CODE_COMPLETE: live game Draw hook through D3D11 native Draw and frame delivery code linked; changed-source checks pass, not proven playable.
+- FRAME_OBSERVED: a captured real in-game native DX11 diagnostic frame, safe fallback confirmed.
+- PLAYABLE_BETA_CANDIDATE: menu, vehicle selection, sustained race, controls and Quest 3/OpenXR stereo validated on hardware.
+
+Machine-readable policy: docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json and tools/dx11_autodev_policy.py.
+
+
 ## Goal
 
 Keep the game as a D3D9 caller, but translate the D3D9 behavior actually used by
