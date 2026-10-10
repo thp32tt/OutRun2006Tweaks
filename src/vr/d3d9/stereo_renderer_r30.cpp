@@ -2158,12 +2158,12 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.right.data(), stride);
             };
@@ -2251,13 +2251,13 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices,
                     primitiveCount, indexData, indexFormat,
                     scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices,
                     primitiveCount, indexData, indexFormat,
                     scratch.right.data(), stride);
@@ -2338,12 +2338,12 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount,
                     scratch.right.data(), stride);
             };
@@ -2593,12 +2593,12 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, vertexCount, primitiveCount,
                     rebased, ibDesc.Format, scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, vertexCount, primitiveCount,
                     rebased, ibDesc.Format, scratch.right.data(), stride);
             };
@@ -2634,7 +2634,7 @@ namespace OutRunVRStereo
                 return false;
 
             if (FAILED(device->GetVertexShaderConstantF(
-                    OutRunWvpRegister, original, OutRunWvpRegisterCount)))
+                    R30SupportWvpFirstRegister, original, R30SupportWvpRegisterCount)))
                 return false;
 
             if (!R30BuildEyeAffine(stereo, eyeScale, eyeOffset))
@@ -2840,7 +2840,7 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 R30ScopedInternalPass guard;
-                leftWvpOk = SetWvpOneRegisterAtATime(
+                leftWvpOk = R29OwnerSetWvpOneRegisterAtATime(
                     device, eyeConstants[0]);
             }
             if (!leftWvpOk)
@@ -2848,12 +2848,12 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     R30ScopedInternalPass guard;
-                    restored = SetWvpOneRegisterAtATime(device, original);
+                    restored = R29OwnerSetWvpOneRegisterAtATime(device, original);
                 }
                 if (!restored)
                 {
                     R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
-                        "R30/HUD-left-WVP-rollback");
+                        "R30/HUD-left-WVP-rollback", E_FAIL);
                     R29OwnerArmMonoSafety();
                     return E_FAIL;
                 }
@@ -2866,7 +2866,7 @@ namespace OutRunVRStereo
                 R30ScopedInternalPass guard;
                 if (FAILED(device->SetScissorRect(&eyeScissor[0])))
                 {
-                    SetWvpOneRegisterAtATime(device, original);
+                    R29OwnerSetWvpOneRegisterAtATime(device, original);
                     ++R30ScreenSpaceFallbacks;
                     return E_NOTIMPL;
                 }
@@ -2880,7 +2880,7 @@ namespace OutRunVRStereo
                 if (FAILED(device->SetScissorRect(&savedScissor)))
                 {
                     R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
-                        "R30/HUD-left-scissor");
+                        "R30/HUD-left-scissor", E_FAIL);
                     R29OwnerArmMonoSafety();
                 }
             }
@@ -2889,7 +2889,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     R30ScopedInternalPass guard;
-                    restored = SetWvpOneRegisterAtATime(device, original);
+                    restored = R29OwnerSetWvpOneRegisterAtATime(device, original);
                 }
                 R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
@@ -2919,7 +2919,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr) && transformScissor)
                     rightHr = device->SetScissorRect(&eyeScissor[1]);
                 if (SUCCEEDED(rightHr) &&
-                    !SetWvpOneRegisterAtATime(device, eyeConstants[1]))
+                    !R29OwnerSetWvpOneRegisterAtATime(device, eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -2998,7 +2998,7 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitive(
                     device, type, startVertex, primitiveCount);
             };
             auto r29 = [&]() {
@@ -3021,7 +3021,7 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                return R29OwnerCallRawDrawIndexedPrimitive(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
@@ -3044,7 +3044,7 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                return R29OwnerCallRawDrawPrimitiveUP(
                     device, type, primitiveCount, data, stride);
             };
             auto r29 = [&]() {
@@ -3068,7 +3068,7 @@ namespace OutRunVRStereo
                 return xyzrhw;
 
             auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(device, type,
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
             };
@@ -3116,8 +3116,8 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
-                    R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
+                if (IDirect3DDevice9* gameDevice = R29OwnerGameDevice())
+                    R30InstallBufferCreationHooks(gameDevice);
 
                 const auto r29 = R29OwnerInstallStatus();
                 if (r29 == State::Failed)
@@ -3135,22 +3135,22 @@ namespace OutRunVRStereo
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R30PresentR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDest),
+                        R29OwnerPresentTarget(),
                         PresentDestR30, disabled);
                     R30ResetR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDest),
+                        R29OwnerResetTarget(),
                         ResetDestR30, disabled);
                     R30DrawPrimitiveR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR29),
+                        R29OwnerDrawPrimitiveTarget(),
                         DrawPrimitiveDestR30, disabled);
                     R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR29),
+                        R29OwnerDrawIndexedPrimitiveTarget(),
                         DrawIndexedPrimitiveDestR30, disabled);
                     R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR29),
+                        R29OwnerDrawPrimitiveUPTarget(),
                         DrawPrimitiveUPDestR30, disabled);
                     R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR29),
+                        R29OwnerDrawIndexedPrimitiveUPTarget(),
                         DrawIndexedPrimitiveUPDestR30, disabled);
 
                     if (!R30EnableHooks())
@@ -3365,24 +3365,14 @@ namespace OutRunVRStereo
         R30SupportVoidCallback active, void* activeContext,
         R30SupportHResultCallback draw, void* drawContext) noexcept
     {
-        if (!draw) return E_INVALIDARG;
-        R22RasterReplayGuard replay(device, site);
-        if (!replay.StateValid()) return draw(drawContext);
-        if (active) active(activeContext);
-        return draw(drawContext);
+        return R29OwnerRunRasterReplayGuardCallback(
+            device, site, active, activeContext, draw, drawContext);
     }
 
     OutRunVR::RuntimeEligibility::InstallState
     R30SupportLowerPrerequisiteStatus() noexcept
     {
-        using State = OutRunVR::RuntimeEligibility::InstallState;
-        const auto r22 = R22InstallStatus();
-        const auto r13 = R13InstallStatus();
-        if (r22 == State::Failed || r13 == R13InstallStatusValue::Failed)
-            return State::Failed;
-        if (r22 == State::Ready && r13 == R13InstallStatusValue::Ready)
-            return State::Ready;
-        return State::Pending;
+        return R29OwnerLowerPrerequisiteStatus();
     }
 
     void* R30SupportDrawPrimitiveTarget() noexcept
@@ -3409,12 +3399,12 @@ namespace OutRunVRStereo
 
     bool R30SupportIsGameDevice(IDirect3DDevice9* device) noexcept
     {
-        return IsGameDevice(device);
+        return R29OwnerIsGameDevice(device);
     }
 
     bool R30SupportInternalStereoPassActive() noexcept
     {
-        return InternalStereoPass;
+        return R29OwnerInternalStereoPassActive();
     }
 
     bool R30SupportExchangeInternalStereoPass(bool active) noexcept
@@ -3434,17 +3424,17 @@ namespace OutRunVRStereo
 
     bool R30SupportStereoBaselineSeeded() noexcept
     {
-        return R9StereoBaselineSeeded();
+        return R29OwnerStereoBaselineSeeded();
     }
 
     std::uint64_t R30SupportMainDepthGeneration() noexcept
     {
-        return R9MainDepthGenerationValue();
+        return R29OwnerMainDepthGeneration();
     }
 
     bool R30SupportMainDepthHasStencil() noexcept
     {
-        return R9TrackedMainDepthHasStencil();
+        return R29OwnerMainDepthHasStencil();
     }
 
     bool R30SupportLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept
@@ -3465,21 +3455,21 @@ namespace OutRunVRStereo
     HRESULT R30SupportCallRawDrawPrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     {
-        return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);
+        return R29OwnerCallRawDrawPrimitive(d,t,s,p);
     }
 
     HRESULT R30SupportCallRawDrawIndexedPrimitive(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, INT b,
         UINT m, UINT n, UINT s, UINT p) noexcept
     {
-        return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);
+        return R29OwnerCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);
     }
 
     HRESULT R30SupportCallRawDrawPrimitiveUP(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
         const void* data, UINT st) noexcept
     {
-        return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);
+        return R29OwnerCallRawDrawPrimitiveUP(d,t,p,data,st);
     }
 
     HRESULT R30SupportCallRawDrawIndexedPrimitiveUP(
@@ -3487,7 +3477,7 @@ namespace OutRunVRStereo
         UINT m, UINT n, UINT p, const void* idx,
         D3DFORMAT f, const void* v, UINT st) noexcept
     {
-        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+        return R29OwnerCallRawDrawIndexedPrimitiveUP(
             d,t,m,n,p,idx,f,v,st);
     }
 
@@ -3495,7 +3485,7 @@ namespace OutRunVRStereo
         IDirect3DDevice9* d, const RECT* s, const RECT* dst,
         HWND w, const RGNDATA* r) noexcept
     {
-        return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);
+        return R29OwnerCallRawPresent(d,s,dst,w,r);
     }
 
     void R30SupportNoteStereoDrawWithoutMonoBackup() noexcept
@@ -3513,17 +3503,17 @@ namespace OutRunVRStereo
     void R30SupportInvalidateRightDepthStencilSync(
         bool invalidateDepth, bool invalidateStencil) noexcept
     {
-        R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);
+        R29OwnerInvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);
     }
 
     bool R30SupportRightDepthInSync() noexcept
     {
-        return R9IsRightDepthInSync();
+        return R29OwnerRightDepthInSync();
     }
 
     bool R30SupportRightStencilInSync() noexcept
     {
-        return R9IsRightStencilInSync();
+        return R29OwnerRightStencilInSync();
     }
 
     bool R30SupportTargetIsBackBuffer() noexcept
@@ -3533,24 +3523,23 @@ namespace OutRunVRStereo
 
     bool R30SupportAnyAuxRenderTargetActive() noexcept
     {
-        return AnyAuxRenderTargetActive();
+        return R29OwnerAnyAuxRenderTargetActive();
     }
 
     bool R30SupportTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept
     {
-        return TryGetTrackedViewport(viewport);
+        return R29OwnerTryGetTrackedViewport(viewport);
     }
 
     bool R30SupportTryGetEffectTelemetrySnapshot(
         R30SupportEffectTelemetrySnapshot& out) noexcept
     {
-        R29EffectTelemetrySnapshot lower{};
-        if (!TryGetEffectTelemetrySnapshot(lower))
+        R29OwnerEffectTelemetrySnapshot lower{};
+        if (!R29OwnerTryGetEffectTelemetrySnapshot(lower))
         {
             out = {};
             return false;
         }
-
         out.alphaBlend = lower.alphaBlend;
         out.alphaTest = lower.alphaTest;
         out.zWrite = lower.zWrite;
@@ -3575,100 +3564,71 @@ namespace OutRunVRStereo
 
     bool R30SupportOverlayReadyForTransport() noexcept
     {
-        return R13OverlayReadyForTransport();
+        return R29OwnerOverlayReadyForTransport();
     }
 
     void R30SupportNoteSafeAckBackpressure() noexcept
     {
-        R13NoteSafeAckBackpressure();
+        R29OwnerNoteSafeAckBackpressure();
     }
 
     void R30SupportNoteDirectTransportRingBackpressure() noexcept
     {
-        ++DirectTransportRingBackpressure;
+        R29OwnerNoteDirectTransportRingBackpressure();
     }
 
     std::uint64_t R30SupportDirectTransportRingBackpressureCount() noexcept
     {
-        return static_cast<std::uint64_t>(DirectTransportRingBackpressure);
+        return R29OwnerDirectTransportRingBackpressureCount();
     }
 
     void R30SupportSetActiveDirectTransportSlot(std::uint32_t slot) noexcept
     {
-        ActiveDirectTransportSlot = slot;
+        R29OwnerSetActiveDirectTransportSlot(slot);
     }
 
     void R30SupportMarkDirectTransportSlotPending(
         std::uint32_t slot, std::uint32_t frameId) noexcept
     {
-        auto& target = DirectTransportSlots[slot];
-        target.producerPending = true;
-        target.pendingFrameId = frameId;
-        target.frameId = frameId;
-        target.published = false;
+        R29OwnerMarkDirectTransportSlotPending(slot, frameId);
     }
 
     R30SupportDirectTransportSlotPublication
     R30SupportGetDirectTransportSlotPublication(
         std::uint32_t slot) noexcept
     {
-        if (slot >= OutRunVR::RenderFrameRingSize)
-            return {};
-        const auto& candidate = DirectTransportSlots[slot];
-        return {candidate.published, candidate.frameId};
+        const auto pub = R29OwnerGetDirectTransportSlotPublication(slot);
+        return {pub.published, pub.frameId};
     }
 
     HRESULT R30SupportPollDirectTransportSlotProducer(
         std::uint32_t slot) noexcept
     {
-        auto& target = DirectTransportSlots[slot];
-        if (!target.producerPending)
-            return S_OK;
-
-        const HRESULT ready = target.fence
-            ? target.fence->GetData(nullptr, 0, 0) : E_FAIL;
-        if (ready == S_OK)
-        {
-            target.producerPending = false;
-            target.pendingFrameId = 0;
-            if (!target.published)
-                target.frameId = 0;
-        }
-        return ready;
+        return R29OwnerPollDirectTransportSlotProducer(slot);
     }
 
     void R30SupportRetireDirectTransportSlotPublication(
         std::uint32_t slot) noexcept
     {
-        auto& target = DirectTransportSlots[slot];
-        target.frameId = 0;
-        target.published = false;
+        R29OwnerRetireDirectTransportSlotPublication(slot);
     }
 
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {
-        R13GpuCompletionSnapshot lower{};
-        if (!R13TryGetGpuCompletionSnapshot(lower))
-        {
-            out = {};
-            return false;
-        }
-
-        for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize; ++i)
-            out.completedFrameId[i] = lower.completedFrameId[i];
-        return true;
+        out = {};
+        return R29OwnerTryGetGpuCompletionSnapshot(out.completedFrameId);
     }
 
     bool R30SupportDirectTransportResourcesReady() noexcept
     {
-        return DirectTransportResourcesReady;
+        return R29OwnerDirectTransportResourcesReady();
     }
 
     bool R30SupportEnsureDirectTransportResources(
         IDirect3DDevice9* device) noexcept
     {
-        return EnsureDirectTransportResources(device);
+        return R29OwnerEnsureDirectTransportResources(device);
     }
 
     bool R30SupportTryGetDirectTransportSourceSurfaces(
@@ -3684,25 +3644,10 @@ namespace OutRunVRStereo
         IDirect3DDevice9* device, std::uint32_t index,
         const R30SupportDirectTransportSourceSurfaces& source) noexcept
     {
-        if (!device || !source.left || !source.right ||
-            index >= OutRunVR::RenderFrameRingSize)
-            return {D3DERR_INVALIDCALL, true};
-
-        auto& slot = DirectTransportSlots[index];
-        if (!slot.leftSurface || !slot.rightSurface || !slot.fence)
-            return {D3DERR_INVALIDCALL, true};
-
         R30ScopedInternalPass guard;
-        const HRESULT leftCopy = device->StretchRect(
-            source.left, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE);
-        const HRESULT rightCopy = SUCCEEDED(leftCopy)
-            ? device->StretchRect(
-                source.right, nullptr, slot.rightSurface, nullptr, D3DTEXF_NONE)
-            : leftCopy;
-        if (FAILED(leftCopy) || FAILED(rightCopy))
-            return {FAILED(leftCopy) ? leftCopy : rightCopy, true};
-
-        return {slot.fence->Issue(D3DISSUE_END), false};
+        const auto result = R29OwnerCopyDirectTransportEyesAndIssueFence(
+            device, index, source.left, source.right);
+        return {result.hr, result.copyFailed};
     }
 
     IDirect3DSurface9* R30SupportBorrowedTrackedRenderTarget() noexcept
@@ -3798,7 +3743,7 @@ namespace OutRunVRStereo
 
     IDirect3DDevice9* R30SupportInstalledDevice() noexcept
     {
-        return StereoInstalledDevice.load(std::memory_order_acquire);
+        return R29OwnerInstalledDevice();
     }
 
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
@@ -3808,13 +3753,12 @@ namespace OutRunVRStereo
 
     void R30SupportReleaseDirectAckState() noexcept
     {
-        R13ReleaseAckState();
+        R29OwnerReleaseDirectAckState();
     }
 
     void R30SupportReleaseDirectTransportInterop() noexcept
     {
-        ReleaseDirectTransportSlots();
-        ReleaseDirectInteropProbe();
+        R29OwnerReleaseDirectTransportInterop();
     }
 
     bool R30SupportTryGetDirectTransportIdentity(
@@ -3833,17 +3777,17 @@ namespace OutRunVRStereo
 
     void R30SupportInvalidateEffectStateCache() noexcept
     {
-        InvalidateEffectStateCache();
+        R29OwnerInvalidateEffectStateCache();
     }
 
     void R30SupportInvalidateTrackedRasterShadow() noexcept
     {
-        InvalidateTrackedRasterShadow();
+        R29OwnerInvalidateTrackedRasterShadow();
     }
 
     void R30SupportInvalidateLiveStateSample() noexcept
     {
-        InvalidateLiveStateSample();
+        R29OwnerInvalidateLiveStateSample();
     }
 
     std::uintptr_t R30SupportCurrentVertexShaderIdentity() noexcept
@@ -3913,10 +3857,7 @@ namespace OutRunVRStereo
         IDirect3DDevice9* device, const float verified[16],
         float live[16]) noexcept
     {
-        return device && verified && live &&
-            SUCCEEDED(device->GetVertexShaderConstantF(
-                OutRunWvpRegister, live, OutRunWvpRegisterCount)) &&
-            FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon);
+        return R29OwnerValidateVerifiedWvp(device, verified, live);
     }
 
     bool R30SupportGetVerifiedProjection(
@@ -3953,27 +3894,27 @@ namespace OutRunVRStereo
     bool R30SupportPrimeTrackedRasterShadow(
         IDirect3DDevice9* device) noexcept
     {
-        return PrimeTrackedRasterShadow(device);
+        return R29OwnerPrimeTrackedRasterShadow(device);
     }
 
     void R30SupportSetStereoRecoverySafetyThroughEpoch(
         std::uint64_t throughEpoch) noexcept
     {
-        SetStereoRecoverySafetyThroughEpoch(throughEpoch);
+        R29OwnerSetStereoRecoverySafetyThroughEpoch(throughEpoch);
     }
     bool R30SupportFrameIdAtOrAfter(
         std::uint32_t candidate, std::uint32_t reference) noexcept
     {
-        return FrameIdAtOrAfter(candidate, reference);
+        return R29OwnerFrameIdAtOrAfter(candidate, reference);
     }
     void R30SupportFailClosedResetBaselineState() noexcept
     {
-        FailClosedResetBaselineState();
+        R29OwnerFailClosedResetBaselineState();
     }
     void R30SupportArmStereoRecoverySafety(
         std::uint64_t extraPresents) noexcept
     {
-        ArmStereoRecoverySafety(extraPresents);
+        R29OwnerArmStereoRecoverySafety(extraPresents);
     }
     void R30SupportNoteRestoreFailure(const char* what) noexcept
     {

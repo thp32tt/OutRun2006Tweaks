@@ -133,10 +133,7 @@ delegations = {
     "R30SupportMatrixFinite(": ("R29OwnerMatrixFinite(matrix)",),
     "R30SupportGetInverseProjection(": ("R29OwnerGetInverseProjection(projection, inverse)",),
     "R30SupportValidateVerifiedWvp(": (
-        "GetVertexShaderConstantF(",
-        "OutRunWvpRegister",
-        "OutRunWvpRegisterCount",
-        "FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon)",
+        "R29OwnerValidateVerifiedWvp(device, verified, live)",
     ),
     "R30SupportGetVerifiedProjection(": ("OutRunVRRenderer::GetR28VerifiedProjection(",),
     "R30SupportResynchronizeShaderEpoch(": (
@@ -205,6 +202,73 @@ for must in ("R29OwnerRecordXyzrhwWorldStereoDuplicate(",
     if must not in r30:
         errors.append(f"R30 lost R29 owner consumer: {must}")
 
+# Physical lower guard and prerequisite checks remain in R29.
+for required in ("R22RasterReplayGuard replay(device, site);",
+                 "R22InstallStatus();", "R13InstallStatus();"):
+    if required not in r29:
+        errors.append(f"R29 lower raster guard lost: {required}")
+for leaked in ("R22RasterReplayGuard replay", "R22InstallStatus()",
+               "R13InstallStatus()"):
+    if leaked in r30:
+        errors.append(f"R30 private R22 owner leak: {leaked}")
+
+# Direct transport and verified-WVP storage remain only in physical R29.
+for symbol in ("R29OwnerPollDirectTransportSlotProducer",
+               "R29OwnerCopyDirectTransportEyesAndIssueFence",
+               "R29OwnerTryGetGpuCompletionSnapshot",
+               "R29OwnerTryGetEffectTelemetrySnapshot",
+               "R29OwnerValidateVerifiedWvp"):
+    if symbol not in owner_header or symbol not in r29 or symbol not in r30:
+        errors.append(f"R84 R29 physical service missing: {symbol}")
+for leak in ("DirectTransportSlots[", "R13GpuCompletionSnapshot lower",
+             "R29EffectTelemetrySnapshot lower", "FloatArrayNear("):
+    if leak in r30:
+        errors.append(f"R30 lower storage ownership leak: {leak}")
+
+# R84 source split must keep original lower hook addresses and c64..c67
+# register uploads, never create duplicate R30 physical owners.
+for owner in ("R29OwnerPresentTarget", "R29OwnerResetTarget",
+              "R29OwnerDrawPrimitiveTarget",
+              "R29OwnerDrawIndexedPrimitiveTarget",
+              "R29OwnerDrawPrimitiveUPTarget",
+              "R29OwnerDrawIndexedPrimitiveUPTarget",
+              "R29OwnerSetWvpOneRegisterAtATime", "R29OwnerGameDevice"):
+    if owner not in owner_header or owner not in r29 or owner not in r30:
+        errors.append(f"R84 lower install/WVP owner incomplete: {owner}")
+for forbidden in ("reinterpret_cast<void*>(&PresentDest)",
+                  "reinterpret_cast<void*>(&ResetDest)",
+                  "reinterpret_cast<void*>(&DrawPrimitiveDestR29)",
+                  "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR29)",
+                  "reinterpret_cast<void*>(&DrawPrimitiveUPDestR29)",
+                  "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR29)",
+                  "Game::D3DDevice_ptr", "OutRunWvpRegisterCount"):
+    if forbidden in r30:
+        errors.append(f"R84 R30 private install/WVP leak: {forbidden}")
+
+# Exact lower hook identity survives R30/R29 independent compilation.
+raw_hooks = {
+    "DrawPrimitive": "DrawPrimitiveHook.stdcall<HRESULT>(",
+    "DrawIndexedPrimitive": "DrawIndexedPrimitiveHook.stdcall<HRESULT>(",
+    "DrawPrimitiveUP": "DrawPrimitiveUPHook.stdcall<HRESULT>(",
+    "DrawIndexedPrimitiveUP": "DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(",
+    "Present": "PresentHook.stdcall<HRESULT>(",
+}
+for name, token in raw_hooks.items():
+    marker = f"R29OwnerCallRaw{name}("
+    if marker.rstrip("(") not in owner_header:
+        errors.append(f"R29 raw hook ABI missing: {name}")
+    try:
+        body = function_body(r29, marker)
+    except ValueError as exc:
+        errors.append(str(exc))
+        continue
+    if token not in body:
+        errors.append(f"R29 raw hook physical dispatch changed: {name}")
+    if token in r30:
+        errors.append(f"R30 still owns physical raw hook dispatch: {name}")
+    if marker not in r30:
+        errors.append(f"R30 lost original lower raw hook delegation: {name}")
+
 # Integrated R33/R32/R31/R30 build now owns explicit R30 support and
 # R31 upper owners in distinct translation units. Refuse the once-dangerous
 # R31/R30 split when the prerequisite R32/R31 support boundary is absent.
@@ -246,14 +310,9 @@ extracted = {
     "R30SupportCallLowerDrawPrimitiveUP": ("R30CallLowerDrawPrimitiveUP(",),
     "R30SupportCallLowerDrawIndexedPrimitiveUP": ("R30CallLowerDrawIndexedPrimitiveUP(",),
     "R30SupportRunRasterReplayGuardCallback": (
-        "if (!draw) return E_INVALIDARG;",
-        "R22RasterReplayGuard replay(device, site);",
-        "if (!replay.StateValid()) return draw(drawContext);",
-        "if (active) active(activeContext);",
-        "return draw(drawContext);"),
+        "R29OwnerRunRasterReplayGuardCallback("),
     "R30SupportLowerPrerequisiteStatus": (
-        "R22InstallStatus()", "R13InstallStatus()",
-        "State::Failed", "State::Ready", "State::Pending"),
+        "R29OwnerLowerPrerequisiteStatus("),
     "R30SupportDrawPrimitiveTarget": ("&DrawPrimitiveDestR30",),
     "R30SupportDrawIndexedPrimitiveTarget": ("&DrawIndexedPrimitiveDestR30",),
     "R30SupportDrawPrimitiveUPTarget": ("&DrawPrimitiveUPDestR30",),

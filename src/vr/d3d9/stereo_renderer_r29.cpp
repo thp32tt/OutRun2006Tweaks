@@ -973,4 +973,308 @@ namespace OutRunVRStereo
     {
         return GetInverseProjection(matrix, inverse);
     }
+
+    HRESULT R29OwnerCallRawDrawPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
+    {
+        return DrawPrimitiveHook.stdcall<HRESULT>(d, t, s, p);
+    }
+    HRESULT R29OwnerCallRawDrawIndexedPrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, INT b,
+        UINT m, UINT n, UINT s, UINT p) noexcept
+    {
+        return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);
+    }
+    HRESULT R29OwnerCallRawDrawPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT st) noexcept
+    {
+        return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);
+    }
+    HRESULT R29OwnerCallRawDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT m,
+        UINT n, UINT p, const void* idx, D3DFORMAT f,
+        const void* v, UINT st) noexcept
+    {
+        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+            d,t,m,n,p,idx,f,v,st);
+    }
+    HRESULT R29OwnerCallRawPresent(
+        IDirect3DDevice9* d, const RECT* s, const RECT* dst,
+        HWND w, const RGNDATA* r) noexcept
+    {
+        return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);
+    }
+
+    IDirect3DDevice9* R29OwnerGameDevice() noexcept
+    {
+        return Game::D3DDevice_ptr ? *Game::D3DDevice_ptr : nullptr;
+    }
+    void* R29OwnerPresentTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&PresentDest);
+    }
+    void* R29OwnerResetTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&ResetDest);
+    }
+    void* R29OwnerDrawPrimitiveTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawPrimitiveDestR29);
+    }
+    void* R29OwnerDrawIndexedPrimitiveTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR29);
+    }
+    void* R29OwnerDrawPrimitiveUPTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawPrimitiveUPDestR29);
+    }
+    void* R29OwnerDrawIndexedPrimitiveUPTarget() noexcept
+    {
+        return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR29);
+    }
+    bool R29OwnerSetWvpOneRegisterAtATime(
+        IDirect3DDevice9* device, const float* constants) noexcept
+    {
+        return SetWvpOneRegisterAtATime(device, constants);
+    }
+
+    // Re-export lower services without relocating physical state/hook ownership.
+    bool R29OwnerIsGameDevice(IDirect3DDevice9* device) noexcept
+    {
+        return IsGameDevice(device);
+    }
+    bool R29OwnerInternalStereoPassActive() noexcept
+    {
+        return InternalStereoPass;
+    }
+    bool R29OwnerStereoBaselineSeeded() noexcept
+    {
+        return R9StereoBaselineSeeded();
+    }
+    std::uint64_t R29OwnerMainDepthGeneration() noexcept
+    {
+        return R9MainDepthGenerationValue();
+    }
+    bool R29OwnerMainDepthHasStencil() noexcept
+    {
+        return R9TrackedMainDepthHasStencil();
+    }
+    void R29OwnerInvalidateRightDepthStencilSync(bool invalidateDepth, bool invalidateStencil) noexcept
+    {
+        R9InvalidateRightDepthStencilSync(invalidateDepth, invalidateStencil);
+    }
+    bool R29OwnerRightDepthInSync() noexcept
+    {
+        return R9IsRightDepthInSync();
+    }
+    bool R29OwnerRightStencilInSync() noexcept
+    {
+        return R9IsRightStencilInSync();
+    }
+    bool R29OwnerAnyAuxRenderTargetActive() noexcept
+    {
+        return AnyAuxRenderTargetActive();
+    }
+    bool R29OwnerTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept
+    {
+        return TryGetTrackedViewport(viewport);
+    }
+    bool R29OwnerOverlayReadyForTransport() noexcept
+    {
+        return R13OverlayReadyForTransport();
+    }
+    void R29OwnerNoteSafeAckBackpressure() noexcept
+    {
+        R13NoteSafeAckBackpressure();
+    }
+    bool R29OwnerDirectTransportResourcesReady() noexcept
+    {
+        return DirectTransportResourcesReady;
+    }
+    bool R29OwnerEnsureDirectTransportResources(IDirect3DDevice9* device) noexcept
+    {
+        return EnsureDirectTransportResources(device);
+    }
+    void R29OwnerReleaseDirectAckState() noexcept
+    {
+        R13ReleaseAckState();
+    }
+    void R29OwnerReleaseDirectTransportInterop() noexcept
+    {
+        ReleaseDirectTransportSlots();
+        ReleaseDirectInteropProbe();
+    }
+    void R29OwnerInvalidateEffectStateCache() noexcept
+    {
+        InvalidateEffectStateCache();
+    }
+    void R29OwnerInvalidateTrackedRasterShadow() noexcept
+    {
+        InvalidateTrackedRasterShadow();
+    }
+    void R29OwnerInvalidateLiveStateSample() noexcept
+    {
+        InvalidateLiveStateSample();
+    }
+    bool R29OwnerPrimeTrackedRasterShadow(IDirect3DDevice9* device) noexcept
+    {
+        return PrimeTrackedRasterShadow(device);
+    }
+    void R29OwnerSetStereoRecoverySafetyThroughEpoch(std::uint64_t throughEpoch) noexcept
+    {
+        SetStereoRecoverySafetyThroughEpoch(throughEpoch);
+    }
+    bool R29OwnerFrameIdAtOrAfter(std::uint32_t candidate, std::uint32_t reference) noexcept
+    {
+        return FrameIdAtOrAfter(candidate, reference);
+    }
+    void R29OwnerFailClosedResetBaselineState() noexcept
+    {
+        FailClosedResetBaselineState();
+    }
+    void R29OwnerArmStereoRecoverySafety(std::uint64_t extraPresents) noexcept
+    {
+        ArmStereoRecoverySafety(extraPresents);
+    }
+    IDirect3DDevice9* R29OwnerInstalledDevice() noexcept
+    {
+        return StereoInstalledDevice.load(std::memory_order_acquire);
+    }
+
+    HRESULT R29OwnerRunRasterReplayGuardCallback(
+        IDirect3DDevice9* device, const char* site,
+        R29OwnerVoidCallback active, void* activeContext,
+        R29OwnerHResultCallback draw, void* drawContext) noexcept
+    {
+        if (!draw) return E_INVALIDARG;
+        R22RasterReplayGuard replay(device, site);
+        if (!replay.StateValid()) return draw(drawContext);
+        if (active) active(activeContext);
+        return draw(drawContext);
+    }
+    OutRunVR::RuntimeEligibility::InstallState
+    R29OwnerLowerPrerequisiteStatus() noexcept
+    {
+        using State = OutRunVR::RuntimeEligibility::InstallState;
+        const auto r22 = R22InstallStatus();
+        const auto r13 = R13InstallStatus();
+        if (r22 == State::Failed || r13 == R13InstallStatusValue::Failed)
+            return State::Failed;
+        if (r22 == State::Ready && r13 == R13InstallStatusValue::Ready)
+            return State::Ready;
+        return State::Pending;
+    }
+
+    void R29OwnerNoteDirectTransportRingBackpressure() noexcept
+    {
+        ++DirectTransportRingBackpressure;
+    }
+    std::uint64_t R29OwnerDirectTransportRingBackpressureCount() noexcept
+    {
+        return static_cast<std::uint64_t>(DirectTransportRingBackpressure);
+    }
+    void R29OwnerSetActiveDirectTransportSlot(std::uint32_t slot) noexcept
+    {
+        ActiveDirectTransportSlot = slot;
+    }
+    void R29OwnerMarkDirectTransportSlotPending(
+        std::uint32_t slot, std::uint32_t frameId) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        target.producerPending = true;
+        target.pendingFrameId = frameId;
+        target.frameId = frameId;
+        target.published = false;
+    }
+    R29OwnerDirectTransportPublication
+    R29OwnerGetDirectTransportSlotPublication(
+        std::uint32_t slot) noexcept
+    {
+        if (slot >= OutRunVR::RenderFrameRingSize)
+            return {};
+        const auto& candidate = DirectTransportSlots[slot];
+        return {candidate.published, candidate.frameId};
+    }
+    HRESULT R29OwnerPollDirectTransportSlotProducer(
+        std::uint32_t slot) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        if (!target.producerPending)
+            return S_OK;
+        const HRESULT ready = target.fence
+            ? target.fence->GetData(nullptr, 0, 0) : E_FAIL;
+        if (ready == S_OK)
+        {
+            target.producerPending = false;
+            target.pendingFrameId = 0;
+            if (!target.published)
+                target.frameId = 0;
+        }
+        return ready;
+    }
+    void R29OwnerRetireDirectTransportSlotPublication(
+        std::uint32_t slot) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        target.frameId = 0;
+        target.published = false;
+    }
+    bool R29OwnerTryGetGpuCompletionSnapshot(
+        std::uint32_t completed[OutRunVR::RenderFrameRingSize]) noexcept
+    {
+        if (!completed)
+            return false;
+        R13GpuCompletionSnapshot lower{};
+        if (!R13TryGetGpuCompletionSnapshot(lower))
+            return false;
+        for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize; ++i)
+            completed[i] = lower.completedFrameId[i];
+        return true;
+    }
+    R29OwnerDirectTransportCopyResult
+    R29OwnerCopyDirectTransportEyesAndIssueFence(
+        IDirect3DDevice9* device, std::uint32_t index,
+        IDirect3DSurface9* left, IDirect3DSurface9* right) noexcept
+    {
+        if (!device || !left || !right ||
+            index >= OutRunVR::RenderFrameRingSize)
+            return {D3DERR_INVALIDCALL, true};
+        auto& slot = DirectTransportSlots[index];
+        if (!slot.leftSurface || !slot.rightSurface || !slot.fence)
+            return {D3DERR_INVALIDCALL, true};
+        const HRESULT leftCopy = device->StretchRect(
+            left, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE);
+        const HRESULT rightCopy = SUCCEEDED(leftCopy)
+            ? device->StretchRect(
+                right, nullptr, slot.rightSurface, nullptr, D3DTEXF_NONE)
+            : leftCopy;
+        if (FAILED(leftCopy) || FAILED(rightCopy))
+            return {FAILED(leftCopy) ? leftCopy : rightCopy, true};
+        return {slot.fence->Issue(D3DISSUE_END), false};
+    }
+    bool R29OwnerTryGetEffectTelemetrySnapshot(
+        R29OwnerEffectTelemetrySnapshot& out) noexcept
+    {
+        R29EffectTelemetrySnapshot lower{};
+        if (!TryGetEffectTelemetrySnapshot(lower))
+        {
+            out = {};
+            return false;
+        }
+        out.alphaBlend = lower.alphaBlend;
+        out.alphaTest = lower.alphaTest;
+        out.zWrite = lower.zWrite;
+        return true;
+    }
+    bool R29OwnerValidateVerifiedWvp(
+        IDirect3DDevice9* device,
+        const float* verified, float* live) noexcept
+    {
+        return device && verified && live &&
+            SUCCEEDED(device->GetVertexShaderConstantF(
+                OutRunWvpRegister, live, OutRunWvpRegisterCount)) &&
+            FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon);
+    }
 }
