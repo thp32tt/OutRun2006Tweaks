@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00562",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "material_result_sha": "650c4ab30797f5220b5544a05968c4ae7df5afed",
+  "work_key": "DX9EX:FFB:legacy-selected-XInput-ID-and-wheel-stop-routing",
+  "source_paths": [
+    "src/hooks_forcefeedback.cpp",
+    "tools/verify_vr_ffb_controller_routing.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "original_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "immutable_release_files_changed": false
+  },
+  "exact_sha_ci": {
+    "active": 38013753457,
+    "domain": 38013753413,
+    "full_source": 38013753442,
+    "default_build": 38013812840
+  },
+  "current_evidence": "Policy and OpenXR host PASS, Domain Isolation PASS; Win32 game/full-chain running at checkpoint. Default Build separately FAIL at source snapshot verifier because src/wheel_ffb_ps2.hpp absent in .github/workflows/build.yml snapshot. Do not claim exact-SHA full gate pass yet.",
+  "next_action": "Wait for original 650c4ab Active/fullsource exact-SHA completion without push cancellation. Then fix source snapshot dependency omission as separate material work if necessary; validate new exact-SHA, record docs/automation/runs result and ledger Issue 14. Do not restart this TASK_ID if completed.",
+  "runtime_validation": "UNTESTED",
+  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+  "checkpoint_kst": "2026-10-10 10:39 KST"
+}
