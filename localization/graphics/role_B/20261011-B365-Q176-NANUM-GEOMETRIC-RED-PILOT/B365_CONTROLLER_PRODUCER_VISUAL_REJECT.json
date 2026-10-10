@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "shard": "EVEN",
+  "run": "B365",
+  "run_key": "OUTRUN-KOR-B365-Q176-NANUM-ALT-FAMILY-20261011-0644",
+  "timestamp_kst": "2026-10-11T06:44:00+09:00",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "scope": "FLAGMAN4_ONLY",
+  "reason_for_selection": "C371 distinct B346 candidate source-family stroke underweight; one representative alternative font pilot; avoid q236 C377 missing independent family qualification, q060/212/228 manual method blockers",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "clean_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+  "official_candidate_sha256_unchanged": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "unapproved_saved_dds_sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+  "material_method_change": "Native NanumGothicBold family contours (ppem153, no synthetic strokes or dilation) replace Noto CJK Bold 1-3px strokes; exact source sampled flat dark red RGB; source-first authored B346 CLEAN reused at precise SHA.",
+  "font": {
+    "name": "NanumGothicBold.ttf",
+    "sha256": "454eb3f503f377782a99eb84fc4bb7dde22a0f075d41b47427737f2985053bc9",
+    "package": "Ubuntu fonts-nanum 20200506-1",
+    "glyph_coverage": "ALL_VERIFIED"
+  },
+  "worker": {
+    "run_id": 38088552871,
+    "conclusion": "success",
+    "prior_preflight_failures": [
+      {
+        "run_id": 38088155934,
+        "reason": "initial wrong prior B201 clean SHA, no output"
+      },
+      {
+        "run_id": 38088332563,
+        "reason": "RGBA original header erroneously packed as BGRA, persisted mismatch; no output"
+      }
+    ],
+    "execution": "GITHUB_HOSTED_UBUNTU_CPU_WORKER"
+  },
+  "machine": {
+    "source_bbox": [
+      8,
+      49,
+      988,
+      204
+    ],
+    "final_bbox": [
+      14,
+      54,
+      720,
+      199
+    ],
+    "margins_px": [
+      6,
+      268,
+      5,
+      5
+    ],
+    "height_native": 145,
+    "width_native": 706,
+    "format": "DDS_RGBA32",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "orientation": "RAW_MIRROR_Y",
+    "changed_rgba_pixels": 80387,
+    "changed_outside_source_bbox": 0,
+    "other_three_glyph_regions": "EXACT_UNCHANGED",
+    "persisted_dds_decode_mismatch": 0,
+    "header_channel_masks": [
+      "000000ff",
+      "0000ff00",
+      "00ff0000",
+      "ff000000"
+    ]
+  },
+  "firsthand_visual": {
+    "readable_gray_native": "Directly inspected saved 4-column SOURCE/CLEAN/OFFICIAL/B365. Korean visible and glyphs not apparently clipped, source English plate entirely cleared. New typeface lacks dense solid source uppercase red stroke mass: weaker narrower geometric Hangul, especially thin vertical/horizontal stems relative to FLAGMAN 4 and previous official.",
+    "readable_white_50": "Directly inspected practical 50% WHITE: new Hangul still readable but source heavy headline hierarchy weaker and source-type face not matched; visually rejected.",
+    "raw_gray_native": "Inspected saved RAW vertically mirrored original and candidate, both share vertical transform and no obvious new foreign box."
+  },
+  "ordered_eight_checks": [
+    {
+      "name": "source_removal",
+      "result": "PASS_SCOPED_SOURCE_CLEAN_ALPHA0",
+      "observation": "Pinned B346 clean sha, source-first comparison native gray; no source text residue visible in FLAGMAN4"
+    },
+    {
+      "name": "readable_slant",
+      "result": "HOLD_STEM_ANCHOR_BLIND_CALIBRATION",
+      "observation": "Both source and trial appear upright but no comparable homologous stem anchors calibrated"
+    },
+    {
+      "name": "source_relative_size",
+      "result": "PASS_NUMERIC_BUT_VISUAL_HIERARCHY_FAIL",
+      "observation": "706x145 within 980x155, but significantly narrower and visually weaker than source"
+    },
+    {
+      "name": "font_weight_outline_shadow",
+      "result": "FAIL_SOURCE_FAMILY_STROKE_UNDERWEIGHT",
+      "observation": "Visual dark red source solid thick capital strokes versus new thin geometric Hangul, insufficient source fidelity"
+    },
+    {
+      "name": "glyph_integrity",
+      "result": "NO_CONFIRMED_BROKEN_SYLLABLE_SCOPED",
+      "observation": "Korean '플래그맨 4' complete at saved native and 50%; not a comprehensive C pass"
+    },
+    {
+      "name": "protected_art",
+      "result": "PASS_EXACT",
+      "observation": "80,387 changed native RGBA entirely within source FLAGMAN4, other three labels and atlas unchanged"
+    },
+    {
+      "name": "raw_flipy",
+      "result": "PASS_SCOPED",
+      "observation": "RAW native and readable FLIP-Y checked, original DDS RGBA mask honored after preflight correction"
+    },
+    {
+      "name": "practical_readability",
+      "result": "FAIL_SOURCE_RELATIVE_STYLE",
+      "observation": "Readability alone does not override source-relative optical underweight and weaker hierarchy at 50%"
+    }
+  ],
+  "ten_stage": [
+    {
+      "stage": 1,
+      "result": "PASS",
+      "proof": "Canonical SHA-pinned English DDS and 2048² RGBA32 raw header preserved"
+    },
+    {
+      "stage": 2,
+      "result": "PASS_SCOPED",
+      "proof": "Four original graphic labels; flagman4 alone edited, other three protected"
+    },
+    {
+      "stage": 3,
+      "result": "PASS_REUSE",
+      "proof": "B346 authored CLEAN exact SHA 29e77ca...; no English under new Korean"
+    },
+    {
+      "stage": 4,
+      "result": "PASS_SCOPED",
+      "proof": "First-hand SOURCE/CLEAN native transparent region, no observed residue"
+    },
+    {
+      "stage": 5,
+      "result": "FAIL_SOURCE_FAMILY_PROFILE",
+      "proof": "Source thick red block face unmatched by new Nanum source family"
+    },
+    {
+      "stage": 6,
+      "result": "PASS_NATIVE_GEOMETRIC",
+      "proof": "Real target-size ppem153 vectors, no raster upscale, glyph coverage verified"
+    },
+    {
+      "stage": 7,
+      "result": "PASS_SCOPED",
+      "proof": "New transparent lettering only, no pasted rectangle"
+    },
+    {
+      "stage": 8,
+      "result": "PASS_SCOPED",
+      "proof": "Changed outside source ROI zero, 3 siblings exact"
+    },
+    {
+      "stage": 9,
+      "result": "PASS_MECHANICAL_FAIL_OPTICAL",
+      "proof": "Persisted exact decoder roundtrip0, RAW/FLIPY/BGW 100/75/50 proofs saved"
+    },
+    {
+      "stage": 10,
+      "result": "HOLD_NO_HANDOFF",
+      "proof": "Independent C2/C3 and actual user game not run; visual FAIL blocks promotion"
+    }
+  ],
+  "qa_status": "PRODUCER_VISUAL_REWORK_REQUIRED_UNPROMOTED_THIN_SOURCE_FAMILY",
+  "official_promoted_dds": 0,
+  "new_saved_unapproved_dds": 1,
+  "C2": "NOT_RUN_B365",
+  "C3": "BLOCKED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence": [
+    {
+      "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_MACHINE.json",
+      "kind": "exact_saved_machine"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_SOURCE_CLEAN_OFFICIAL_NANUM_FLIPY_BG128_100.png",
+      "sha256": "bb5e495cd0a0b3aa964688648d2d5a898ca8e28f70b5c65487dab365cbae190b",
+      "kind": "source_clean_current_trial_native"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_SOURCE_CLEAN_OFFICIAL_NANUM_FLIPY_BG255_50.png",
+      "sha256": "0c813ae3b77ac7c28361eae03bb870389b597b0c63341e910dfe3c0c2f8c777a",
+      "kind": "source_clean_current_trial_50"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_SOURCE_CLEAN_OFFICIAL_NANUM_RAW_BG128_100.png",
+      "sha256": "89a3718eff79f32604c9983538fae25c5241acadf1eae92defee55e86210620d",
+      "kind": "source_clean_current_trial_raw"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT/B365_Q176_FLAGMAN_NANUM_UNAPPROVED.dds",
+      "sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+      "kind": "binary_unpromoted"
+    }
+  ],
+  "consumer_chain": {
+    "verified": "canonical source -> q176 flagman4 mapping -> native renderer -> persisted trial SHA",
+    "first_unverified": "unapproved trial -> preview/build manifest -> game asset load/selection -> screen composition -> user game validation"
+  },
+  "next": "Do not rerun Noto synthetic strokes or this Nanum font without new source-conditioned manual/vector thick-body topology method; preserve official C343 REWORK. C2 independent approval only on future material source-faithful DDS. Do not migrate failed trial into hd_candidates.",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "cleanup": "GitHub worker scratch disposed; temporary N100 PNG references used only for controller visual review and must be deleted"
+}
