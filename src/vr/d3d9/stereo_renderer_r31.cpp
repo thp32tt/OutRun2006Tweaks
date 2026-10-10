@@ -158,6 +158,14 @@ namespace OutRunVRStereo
         {
             if (R31Frame.epoch == 0 || R31Frame.draws == 0)
                 return;
+            // A disabled diagnostic window must not contaminate the next
+            // enabled five-second measurement with historical frames.
+            // Per-frame routing counters remain available to R32/R33.
+            if (!R30SupportTelemetryEnabled())
+            {
+                R31Window = {};
+                return;
+            }
             ++R31Window.presents;
             R31Window.draws += R31Frame.draws;
             R31Window.main += R31Frame.main;
