@@ -100,10 +100,26 @@ require(
     "ring.reserved0 != 0",
     "frame.reserved[RenderFrameRunGenerationIndex] == ring.reserved0",
 )
-require(
+shadow_v2 = require(
     "src/vr/ipc/shadow_legacy_v2.hpp",
-    "RenderFrameRunIdentityMatches(ring, out)",
+    "inline bool LatestFrame(",
+    "RenderFrameRunIdentityMatches(ring, candidate)",
+    "if (&producerSlot == &out)",
+    "out = {};",
+    "out = candidate;",
 )
+# Check that LatestFrame rejects producer aliasing, clears stale output, and
+# validates the candidate's game-run identity before publishing to the caller.
+latest_start = shadow_v2.index("inline bool LatestFrame(")
+latest_end = shadow_v2.index("inline std::uint32_t HostFlagsFromV2", latest_start)
+latest_body = shadow_v2[latest_start:latest_end]
+alias_guard = latest_body.index("if (&producerSlot == &out)")
+clear_output = latest_body.index("out = {};")
+validate_run = latest_body.index("RenderFrameRunIdentityMatches(ring, candidate)")
+publish = latest_body.index("out = candidate;")
+if not (alias_guard < clear_output < validate_run < publish):
+    raise SystemExit("Legacy LatestFrame must validate run identity before atomic publication")
+
 require(
     "src/vr/d3d9/stereo_renderer_r7.inc",
     "ClaimRenderFrameRingForCurrentRun",
