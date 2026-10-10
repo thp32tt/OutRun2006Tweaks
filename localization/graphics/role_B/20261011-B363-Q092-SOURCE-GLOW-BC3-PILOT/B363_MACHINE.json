@@ -1,0 +1,66 @@
+{
+  "role": "B",
+  "run": "B363",
+  "queue_index": 92,
+  "run_key": "OUTRUN-KOR-B363-Q092-SOURCE-DIFFUSE-GLOW-FIRST-20261011-0432",
+  "triage": "MATERIAL_REWORK",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "official_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "source_clean_reused": "B221_SOURCE_CONDITIONED_ALPHA_ZERO_P1",
+  "clean_sha256": "1a06b6ce304337b9487f4c130ea5e68c8fa6cd24dc460a2b03acef56a0187a35",
+  "plate_library_inspect": "NOT_REGISTERED_REUSE_B221_EXISTING_CLEAN_WITH_SOURCE_PIXEL_QA",
+  "source_removal_mask_sha256": "de83ebb2ebd54e23e66b323d397f44fc02887774601f3fc47512816d857e83f3",
+  "material_method": "Separate SOURCE RGB white halo sample and native sigma3.5 continuous Gaussian transparent alpha BEFORE existing Korean lettering composite. Unlike B221 hard dotted white outline; BC3 recalibrates affected 4x4 only. Font/semantic Korean pixels preserved, no repeated glyph rerender.",
+  "new_unapproved_trial_sha256": "f113c3aafff77ef3ace10246975dbf199188077a3b08541dddae8a612ba028c3",
+  "dds_format": "BC3_DXT5",
+  "native": [
+    2048,
+    256
+  ],
+  "mips": 1,
+  "native_orientation": "RAW_MIRROR_Y",
+  "source_bbox": [
+    387,
+    13,
+    1318,
+    132
+  ],
+  "changed_bc3_blocks": 2274,
+  "changed_rgba_pixels": 31867,
+  "changed_rgba_outside_source_bbox": 0,
+  "protected_second_row_exact": true,
+  "unchanged_blocks_outside_source": true,
+  "original_source_translucent_1_179": 16391,
+  "old_korean_translucent_1_179": 4480,
+  "new_trial_translucent_1_179": 24156,
+  "source_white_glow_median_rgb": [
+    255,
+    255,
+    255
+  ],
+  "mechanical_result": "PASS_SCOPED",
+  "producer_visual": "PENDING_ACTUAL_NATIVE_AND_50_PERCENT_INSPECTION",
+  "independent_C2": "NOT_RUN",
+  "C3": "BLOCKED",
+  "official_promoted_dds": 0,
+  "new_trial_dds": 1,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "evidence_previews": [
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG0_100.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG0_75.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG0_50.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG128_100.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG128_75.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG128_50.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG255_100.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG255_75.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_FLIPY_BG255_50.png",
+    "B363_SOURCE_CLEAN_OFFICIAL_GLOW_RAW_BG128_100.png"
+  ],
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
