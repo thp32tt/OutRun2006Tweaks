@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A225",
+  "run_key": "OUTRUN-KOR-A225-Q101-C1-ITALIC-SOURCE-CONTOUR-20261010-1500",
+  "index": 101,
+  "date_kst": "2026-10-10 16:00 KST",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "action": "MATERIAL_REWORK_OF_CONFIRMED_C1_SOURCE_FAMILY_RIGHT_ITALIC_MISMATCH",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "source_ref": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "old_official_candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+  "trial_path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_Q101_WARNING_NATIVE_ITALIC_UNPROMOTED.dds",
+  "official_candidate_updated": false,
+  "worker": {
+    "run_id": 38029810272,
+    "conclusion": "SUCCESS",
+    "generated_new_dds": 1
+  },
+  "mechanical": {
+    "persisted_decoded_exact": true,
+    "texture_format": "4096x4096 RGBA32 mip1 RAW mirror_y",
+    "source_effect_bbox": [
+      3006,
+      25,
+      3932,
+      168
+    ],
+    "source_line_bboxes": [
+      [
+        3006,
+        25,
+        3729,
+        92
+      ],
+      [
+        3062,
+        92,
+        3931,
+        168
+      ]
+    ],
+    "trial_line_bboxes": [
+      [
+        3013,
+        30,
+        3721,
+        87
+      ],
+      [
+        3161,
+        101,
+        3832,
+        158
+      ]
+    ],
+    "pixel_changes_inside_warning": 114661,
+    "pixel_changes_outside_warning": 0,
+    "protected_neighbors_unchanged_vs_old": true,
+    "source_vs_official_other_regions_qa": "NOT_INDEPENDENTLY_AUTHENTICATED",
+    "face_original_sample_rgb": [
+      247,
+      186,
+      24
+    ],
+    "stroke_original_sample_rgb": [
+      0,
+      10,
+      57
+    ]
+  },
+  "firsthand_visual": {
+    "files": [
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_GRAY_100.png",
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_BLACK_50.png",
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_FINAL_RAW_NATIVE_RGBA.png"
+    ],
+    "observed": "Source English very strong right italic with navy outer stroke/yellow face; A38 Korean upright; persisted A225 Korean strongly right leaning and more readable on GRAY100 and BLACK50. Icon and numeric sprites unchanged by full-atlas byte difference. Two-line native text no visible overlap/clipping at 50%.",
+    "source_clean": "CLEAN removes inside exact warning bbox, but sliver immediately next to warning icon in source/CLEAN contact could be original protected icon or English-edge residue; do not assert absence without original-protected mask classification",
+    "source_font": "Noto Sans CJK Bold 51ppem right-sheared 0.32 with source-derived sampled color, visibly stronger slant than prior",
+    "raw": "Saved RAW upside-down/flip-y consistent in directly reviewed crop",
+    "trailing_caveat": "New Korean sentence reorders authorized translation; semantic approximate but NOT approved wording"
+  },
+  "ordered_checks": {
+    "source_and_canonical": "PASS exact sha and source revision",
+    "source_clean_plate": "HOLD_INCOMPLETE_SOURCE_TO_CLEAN_PROTECTED_MASK_AND_NEAR_ICON_BOUNDARY_UNCLASSIFIED",
+    "renderer_font_glyph": "PASS true native face glyph coverage; no low-res reupscale",
+    "slant_anchors": "HOLD source paired glyph top-minus-bottom not measured; 0.32 is prescribed, not empirically validated",
+    "font_style": "HOLD independently C1 source-family visual similarity pending",
+    "glyph_bound": "PASS each row fit exact source bounds with positive margins",
+    "overlap_protection": "PASS zero candidate delta outside edited source effect; original-vs-final protected art not fully authenticated",
+    "raw_mips_native_practical": "PASS saved native/RAW and 100/75/50 background views produced; source through all authored mips one mip",
+    "english_remnant": "HOLD unknown small navy sliver by icon; not deleted to avoid protected art intrusion",
+    "text_semantics": "HOLD wording differs from legacy approved string"
+  },
+  "producer_verdict": "HOLD_STRICT_RECHECK_SCOPED_VISUAL_IMPROVEMENT_NOT_APPROVED",
+  "reason_codes": [
+    "SOURCE_FAMILY_SLANT_ANCHOR_UNMEASURED",
+    "SOURCE_CLEAN_ICON_BOUNDARY_UNCLASSIFIED",
+    "TRANSLATION_CANONICAL_WORDING_DRIFT",
+    "FULL_SOURCE_PROTECTION_PENDING"
+  ],
+  "new_trial_dds": 1,
+  "new_promoted_dds": 0,
+  "independent_C1": "NOT_RUN_ON_NEW_SHA",
+  "C3": "NOT_RUN",
+  "approval": false,
+  "user_game": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "C1 source-derived glyph anchor/family review and verify icon-left sliver against canonical original; restore approved translation wording before any eventual final promotion; complete full source protection/P1 and pixel manifest; preserve current official until new C1/C3 acceptance",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

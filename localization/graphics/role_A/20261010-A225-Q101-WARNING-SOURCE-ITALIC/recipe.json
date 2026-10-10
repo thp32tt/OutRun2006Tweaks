@@ -1,0 +1,105 @@
+{
+  "schema": "source-family-recipe-v1",
+  "run": "A225",
+  "status": "TRIAL_ONLY_PENDING_CALIBRATION",
+  "canonical_source": {
+    "revision": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "source_path": "Release/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds"
+  },
+  "target_queue_index": 101,
+  "translated_lines": [
+    "모든 플레이어가 동시에 참가해야",
+    "이 모드를 플레이할 수 있습니다."
+  ],
+  "canonical_legacy_lines": [
+    "이 모드를 플레이하려면 모든 플레이어가",
+    "동시에 참가해야 합니다."
+  ],
+  "consistency": "NOT_YET_APPROVED; preserve original meaning but verify canonical wording",
+  "font": {
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "face_index": 1,
+    "family": "Noto Sans CJK KR Bold",
+    "ppem": 51,
+    "glyph_coverage": true
+  },
+  "source_color": {
+    "face": [
+      247,
+      186,
+      24
+    ],
+    "outline": [
+      0,
+      10,
+      57
+    ]
+  },
+  "source_line_bounds": [
+    [
+      3006,
+      25,
+      3729,
+      92
+    ],
+    [
+      3062,
+      92,
+      3931,
+      168
+    ]
+  ],
+  "trial_line_bounds": [
+    [
+      3013,
+      30,
+      3721,
+      87
+    ],
+    [
+      3161,
+      101,
+      3832,
+      158
+    ]
+  ],
+  "italic": {
+    "method": "new native KR glyph outlines + Pillow affine inverse transform",
+    "ratio": 0.32,
+    "source_paired_anchors_measured": false,
+    "warning": "source-relative right-slant direction visually improved; quantitative source-anchor calibration pending"
+  },
+  "plate": {
+    "source_name": "warning",
+    "bbox": [
+      3006,
+      25,
+      3932,
+      168
+    ],
+    "alpha0_after_clean_inside_bbox": true,
+    "source_protected_near_icon": "UNCLASSIFIED",
+    "other_source_vs_current_regions": "UNTESTED"
+  },
+  "candidate": {
+    "path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_Q101_WARNING_NATIVE_ITALIC_UNPROMOTED.dds",
+    "sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+    "official_unchanged_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb"
+  },
+  "visual_proofs": [
+    "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_GRAY_100.png",
+    "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_BLACK_50.png",
+    "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_FINAL_RAW_NATIVE_RGBA.png"
+  ],
+  "gate": {
+    "P1": "HOLD near-icon source boundary",
+    "P2": "HOLD source slant anchors/approved translation",
+    "P3": "SCOPED machine PASS and visual improvement",
+    "C1": "PENDING",
+    "C3": "BLOCKED",
+    "USER": "UNTESTED"
+  },
+  "no_promotion": true
+}

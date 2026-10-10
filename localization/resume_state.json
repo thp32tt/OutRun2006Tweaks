@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A225 q101 2026-10-10 16:00 KST worker #38029810272 SUCCESS new physically persisted 4096x4096 RGBA32 trial SHA 5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86, source/clean/old/final and RAW directly viewed, scoped improved italic 100/50, outside changed0; producer HOLD on unmeasured source slant/approved Korean line ordering/near-icon clean boundary, official SHA 939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb unchanged and C1/C3/game untested. localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_CONTROLLER_VISUAL_QA.json RUN_KEY=OUTRUN-KOR-A225-Q101-C1-ITALIC-SOURCE-CONTOUR-20261010-1500",
     "C2 2026-10-10 16:01:58 KST even q060 P0 B350 NEW distinct persisted native SHA 4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5 independently SOURCE/OFFICIAL/TRIAL hash-verified, saved decode 100/75/50 + RAW exact; 99951 official-to-trial RGBA inside ROI, outside RGBA/alpha0; source bright cream-gold/navy vs trial red-brown flat bevel visual REWORK_REQUIRED. Official d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01 C342 REWORK remains; IGR044 OPEN, C3/APPROVAL/USER_GAME UNTESTED. QA localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_INDEPENDENT_VISUAL_REWORK.json OUTRUN-KOR-C2-Q060-B350-NATIVE-GOLD-FAMILY-FAIL-20261010-1550",
     "B350 2026-10-10 15:44 KST even q060 P0 distinct new persisted 4096x2048 source-conditioned contour title trial SHA256 4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5; GitHub CPU #38031651627 SUCCESS; canonical English 6a33c730 and verified B348 clean reused; saved native glyph effect794/849 source vs old B349 512/849; 99951 changed pixels entirely in scoped ROI, 0 protected sibling outside new effect, 0 saved decode mismatch. Direct persisted native gray100/black50/RAW optical FACE/DEPTH FAIL, orange-red/brown instead of vivid English cream-gold/navy and source homologous lean unqualified; producer trial REJECT, official candidate d81d0d14 and C342 REWORK unchanged; IGR044 OPEN, C2/C3/APPROVAL/USER_GAME UNTESTED. QA localization/graphics/role_B/20261010-B350-Q060-SOURCE-CLEAN-KOREAN-GOLD-LETTERING/B350_CONTROLLER_PRODUCER_VISUAL_REJECT.json OUTRUN-KOR-B350-Q060-P0-CONTOUR-OPTICAL-TRIAL-20261010-1535",
     "C364 C2 2026-10-10 15:32 KST q092 NEW strict native glow visual fail: original soft luminous broad white halo vs Korean jagged stippled thin hard outline, both rows, SOURCE/CURRENT hash d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774/c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a, outside ROI RGBA0/alpha0, old C260 C3 pass reopened as REWORK_REQUIRED same bytes, no new DDS/APPROVAL/user game. localization/graphics/role_C/20261010-C364-C2-Q092-C3-STRICT-GLOW-DEFECT/C364_Q092_C2_C3_STRICT_VISUAL_REWORK.json RUN_KEY=OUTRUN-KOR-C364-C2-Q092-STRICT-GLOW-STIPPLE-FAIL-20261010-1520",
@@ -15176,5 +15177,23 @@
     "trial_sha256": "4899fbd07d77fb7996ec0066601ae14512b772937e643d2a68aa214f38a647b5",
     "report": "localization/graphics/role_C/20261010-C2-Q060-B350-NEW-SHA-VISUAL-FAIL-1550/C2_Q060_B350_INDEPENDENT_VISUAL_REWORK.json",
     "external_runtime": "UNTESTED"
+  },
+  "a225_q101_source_italic_trial": {
+    "run_key": "OUTRUN-KOR-A225-Q101-C1-ITALIC-SOURCE-CONTOUR-20261010-1500",
+    "run": "A225",
+    "index": 101,
+    "new_trial_sha256": "5b6bcfd83c39aebbe46f2cbdb8d95cfa584a4955ec9a84d9039480a77a709a86",
+    "old_official_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "worker_id": 38029810272,
+    "generated_dds": 1,
+    "promoted_dds": 0,
+    "qa_path": "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_CONTROLLER_VISUAL_QA.json",
+    "status": "HOLD_STRICT_RECHECK_SCOPED_VISUAL_IMPROVEMENT_NOT_APPROVED",
+    "firsthand_visual_proof": [
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_GRAY_100.png",
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_COMPARE_BLACK_50.png",
+      "localization/graphics/role_A/20261010-A225-Q101-WARNING-SOURCE-ITALIC/A225_FINAL_RAW_NATIVE_RGBA.png"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
