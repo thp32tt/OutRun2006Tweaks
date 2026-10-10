@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "task_id": "CONVERSION-DX11-00529",
+  "event_id": "CONVERSION-DX11-00529-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "captured_at_kst": "2026-10-10T18:16:11+09:00",
+  "checkpoint": "C3_VALIDATE",
+  "status": "WAITING_CI",
+  "terminal": false,
+  "target_branch": "vr-dx11-native-r71",
+  "source_result_candidate_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+  "work_key": "DX11:R232:LINEAR_STREAM_OUTPUT_SIDE_EFFECT_FENCE",
+  "gate": {
+    "id": 38040255183,
+    "head_sha": "057b45a0e2e70af79f2f2cdd8b6a9d7843b7782f",
+    "status": "in_progress",
+    "overall_conclusion": null,
+    "win32_validate": "SUCCESS",
+    "step_r230_guard": "SUCCESS",
+    "step_r232_so_isolation": "SUCCESS",
+    "step_r183_warp_probe": "SUCCESS",
+    "readiness_smoke": "IN_PROGRESS"
+  },
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "next_action": "Wait for exact-SHA 38040255183 full Gate conclusion. If success, C6 bookkeeping while preserving validation-bearing SHA. If failure, inspect failed step and respect independent R175 owner. No source duplicate."
+}
