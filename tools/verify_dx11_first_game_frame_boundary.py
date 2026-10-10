@@ -79,8 +79,12 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
     require(len(dispatch) == len(scoped) == 2,
             "native Draw escapes the explicitly admitted diagnostic submit")
-    require("s.attempted = true;" in code and "if (s.attempted) return;" in code,
-            "must bound diagnostic GPU work to one call per game frame")
+    require("s.attempted = true;" in code and
+            "if (s.attempted || candidateOrdinal != s.probeSlot) return;" in code and
+            "const UINT candidateOrdinal = s.eligibleThisFrame++;" in code and
+            "const UINT window = std::min(s.eligibleThisFrame, kProbeSlots);" in code and
+            "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;" in code,
+            "must bound native GPU work to one sampled live Draw per game frame")
     require("return R30PresentR29Hook.stdcall<HRESULT>(" in caller,
             "game Present must retain the D3D9 path")
 
