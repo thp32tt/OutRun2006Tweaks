@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00534",
+  "production_id": "CONVERSION-DX11-00534",
+  "event_id": "CONVERSION-DX11-00534-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "e0a1cdd326542fe3cb28392ee95bc481cb88084a",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00534",
+  "lease_epoch": 1,
+  "work_key": "DX11:R237:D3D9_DRAWPRIMITIVEUP_TRANSIENT_SOURCE_TO_MONO_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_d3d9_up_triangle_batch.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R237",
+    "tools/test_dx11_native_linear_draw_r185.py:R237",
+    "DX11:R237:UP_MONO"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 DrawPrimitiveUP caller-attested CPU span, vertex stride and triangle list",
+      "R237 bounded immutable D3D11 vertex buffer capture and exact generation/IA binding",
+      "R236 single-eye pipeline/shader/RTV and no-silent-output contract",
+      "real WARP Draw(3,0) and center/corner RGBA pixel readback after CPU-source mutation"
+    ],
+    "batch_components": [
+      "native_d3d9_up_triangle_batch.hpp ownership adapter",
+      "dx11_linear_buffer_mirror_probe.cpp GPU copy/readback and negative cases",
+      "test_dx11_native_linear_draw_r185.py R237 regression mutations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP red center/black corner from copied source after original D3D9 UP pointer memory mutated",
+      "negative_regression": "9 source guard mutants and null/length/stride/topology/overflow/stale/PS/foreign-eye/release negatives",
+      "component_integration": "transient UP CPU bytes -> owned D3D11 IA VB -> R236 exact native mono shader/RTV -> WARP GPU pixel"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_d3d9_up_triangle_batch.hpp",
+      "tools/dx11_linear_buffer_mirror_probe.cpp:R237",
+      "tools/test_dx11_native_linear_draw_r185.py:R237",
+      "DX11:R237:UP_MONO"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "C4_MATERIAL_COMMITTED_C3_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_d3d9_up_triangle_batch.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "docs/automation/runs/CONVERSION-DX11-00534.json"
+  ],
+  "blockers": [
+    "R175 full gate programmable varying pixel mismatch remains owned by CONVERSION-DX11-00477; do not alter ownership",
+    "Quest 3/VDXR gameplay native path not user-tested"
+  ],
+  "pipeline": {
+    "C0": "PASS: GitHub checkpoint 20261010T1950, HEAD e0a1cdd3, previous 00533 R236 frozen; 00534 no prior material",
+    "C1": "PASS: R175 00477 blocked independent owner; mono DrawPrimitiveUP path R237 independent from R235/R236 source ownership",
+    "C2": "Prepared coherent CPU UP->immutable IA->R236 WARP GPU pixel batch",
+    "C3": "PENDING exact-SHA GitHub full backend Gate and targeted WARP static",
+    "C4": "Publishing source/test batch as atomic material Git commit",
+    "C5": "NOT_REQUIRED, dormant probe only",
+    "C6": "PENDING GitHub CI results"
+  },
+  "resume_cursor": "AWAIT_EXACT_SHA_CI",
+  "score_change": 0,
+  "next_action": "Check exact material SHA Gate (R183 static and WARP; R237 red readback). Inherited R175 failure remains independent. Publish C6 without promoting full Gate or score unless all mandatory gates pass.",
+  "last_real_activity_at": "2026-10-10T19:53:00+09:00",
+  "last_activity_evidence": "GitHub checkpoint recovered, previous 00533 scoped WARP pass and inherited 00477 R175 failure reviewed"
+}

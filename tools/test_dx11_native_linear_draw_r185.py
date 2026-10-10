@@ -79,3 +79,46 @@ for token in (
     assert token in probe, "missing R236 WARP integration proof: " + token
 assert "->Draw(" not in r236 and "->DrawIndexed(" not in r236, "gameplay native Draw forbidden"
 print("R236 nonindexed D3D9 source to native mono Draw WARP + 11 mutants: PASS")
+
+
+# R237 transient DrawPrimitiveUP source ownership -> R236 pipeline -> WARP GPU
+# evidence. No production header is allowed to issue a Draw call.
+up = (root/"src/vr/d3d11/native_d3d9_up_triangle_batch.hpp").read_text(encoding="utf-8")
+r237_guards = (
+    "reset(); // A failed re-capture",
+    "primitiveType != D3DPT_TRIANGLELIST",
+    "primitiveCount > (std::numeric_limits<UINT>::max)() / 3u",
+    "vertexStride > (std::numeric_limits<UINT>::max)() / vertexCount",
+    "sourceByteLength < neededBytes",
+    "vertex_.initialize(device, ResourceRole::Vertex",
+    "generation != generation_ || snapshotVersion != snapshot_version_",
+    "!vertex_.bind(context, generation, snapshotVersion)",
+    "verified_d3d9_nonindexed_triangles_ready(",
+)
+def r237_contract(source):
+    return all(x in source for x in r237_guards)
+assert r237_contract(up), "R237 UP source immutable VB/mono pipeline integration incomplete"
+for guard in r237_guards:
+    assert not r237_contract(up.replace(guard,"",1)), "R237 guard mutant survived: " + guard
+assert "->Draw(" not in up and "->DrawIndexed(" not in up, "R237 live Draw forbidden"
+for label in (
+    "R237 reject null D3D9 UP source",
+    "R237 reject undersized D3D9 UP source span",
+    "R237 reject unexpanded source topology",
+    "R237 reject empty D3D9 UP draw",
+    "R237 reject zero source stride",
+    "R237 reject primitive-count overflow",
+    "R237 reject byte-width overflow",
+    "R237 copy D3D9 UP user vertices into native D3D11 VB",
+    "R237 reject stale D3D9 UP generation",
+    "R237 reject stale D3D9 UP snapshot",
+    "R237 reject absent programmable native pixel shader",
+    "R237 reject foreign second-eye RTV",
+    "ctx->Draw(3u,0u);",
+    "R237 captured DrawPrimitiveUP -> native WARP red pixel",
+    "R237 retired UP batch cannot authorize stale Draw",
+):
+    assert label in probe, "R237 WARP proof missing: " + label
+assert "for (auto& point : r237Vertices) point={3.f,3.f};" in probe, (
+    "R237 UP source mutation isolation not tested")
+print("R237 DrawPrimitiveUP source->native VB->WARP mono pixel + 9 mutants: PASS")

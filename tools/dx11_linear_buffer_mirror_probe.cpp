@@ -2,6 +2,7 @@
 // No game draw hook, backend activation or Quest 3 runtime claim.
 #include "vr/d3d11/native_linear_buffer_mirror.hpp"
 #include "vr/d3d11/native_linear_target_viewport.hpp"
+#include "vr/d3d11/native_d3d9_up_triangle_batch.hpp"
 #include "vr/d3d11/native_linear_uav_eye_guard.hpp"
 #include <cstdint>
 #include <cstdlib>
@@ -960,6 +961,84 @@ int main() {
     r236VB.shutdown();
     require(!r236Ready(D3DPT_TRIANGLELIST,3u,1u,r236Version),
             "R236 reject released source VB ownership");
+
+
+    // R237: a transient D3D9 DrawPrimitiveUP pointer is copied to a
+    // generation-owned immutable native VB before its CPU storage is changed.
+    // The exact mono R236 shader/RTV chain then reaches real WARP pixels.
+    outrun::vr::dx11::NativeD3D9UPTriangleBatch upBad;
+    Vertex r237Vertices[]={{-.9f,-.9f},{0.f,.9f},{.9f,-.9f}};
+    constexpr std::uint64_t r237Version = 237;
+    require(!upBad.capture(dev.Get(),nullptr,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,1u,sizeof(Vertex),generation,r237Version),
+            "R237 reject null D3D9 UP source");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices)-1u,
+            D3DPT_TRIANGLELIST,1u,sizeof(Vertex),generation,r237Version),
+            "R237 reject undersized D3D9 UP source span");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLESTRIP,1u,sizeof(Vertex),generation,r237Version),
+            "R237 reject unexpanded source topology");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,0u,sizeof(Vertex),generation,r237Version),
+            "R237 reject empty D3D9 UP draw");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,1u,0u,generation,r237Version),
+            "R237 reject zero source stride");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,0xffffffffu,sizeof(Vertex),generation,r237Version),
+            "R237 reject primitive-count overflow");
+    require(!upBad.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,1u,0xffffffffu,generation,r237Version),
+            "R237 reject byte-width overflow");
+
+    outrun::vr::dx11::NativeD3D9UPTriangleBatch up;
+    require(up.capture(dev.Get(),r237Vertices,sizeof(r237Vertices),
+            D3DPT_TRIANGLELIST,1u,sizeof(Vertex),generation,r237Version),
+            "R237 copy D3D9 UP user vertices into native D3D11 VB");
+    // The source is caller-owned: an actual GPU draw must consume the
+    // captured copy, not these overwritten CPU bytes.
+    for (auto& point : r237Vertices) point={3.f,3.f};
+    const auto r237Ready = [&](std::uint64_t deviceGen,
+                               std::uint64_t sourceVer) {
+        return up.bind_and_verify(ctx.Get(),deviceGen,sourceVer,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get());
+    };
+    require(!r237Ready(generation+1u,r237Version),
+            "R237 reject stale D3D9 UP generation");
+    require(!r237Ready(generation,r237Version+1u),
+            "R237 reject stale D3D9 UP snapshot");
+    require(r237Ready(generation,r237Version),
+            "R237 owned UP source native IA/pipeline integration");
+    ctx->PSSetShader(nullptr,nullptr,0);
+    require(!r237Ready(generation,r237Version),
+            "R237 reject absent programmable native pixel shader");
+    ctx->PSSetShader(ps.Get(),nullptr,0);
+    ID3D11RenderTargetView* r237TwoEyes[]={rtv.Get(),secondEyeView.Get()};
+    ctx->OMSetRenderTargets(2,r237TwoEyes,nullptr);
+    require(!r237Ready(generation,r237Version),
+            "R237 reject foreign second-eye RTV");
+    ctx->OMSetRenderTargets(1,&rawRTV,nullptr);
+    require(r237Ready(generation,r237Version),
+            "R237 restore exclusive mono WARP pixel pipeline");
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3u,0u);
+    ctx->CopyResource(staging.Get(),color.Get());
+    D3D11_MAPPED_SUBRESOURCE r237Mapped{};
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,
+            &r237Mapped)) && r237Mapped.pData,
+            "R237 actual WARP UP source GPU readback");
+    const auto* r237Pixels=static_cast<const unsigned char*>(r237Mapped.pData);
+    const auto* r237Center=r237Pixels+16*r237Mapped.RowPitch+16*4;
+    const auto* r237Corner=r237Pixels+1*r237Mapped.RowPitch+1*4;
+    const bool r237Red=r237Center[0]==255 && r237Center[1]==0 &&
+        r237Center[2]==0 && r237Center[3]==255 &&
+        r237Corner[0]==0 && r237Corner[1]==0 && r237Corner[2]==0;
+    ctx->Unmap(staging.Get(),0);
+    require(r237Red,"R237 captured DrawPrimitiveUP -> native WARP red pixel");
+    up.reset();
+    require(!r237Ready(generation,r237Version),
+            "R237 retired UP batch cannot authorize stale Draw");
 
     ib.shutdown();
     require(!ib.binding_exact(ctx.Get(),generation,version),
