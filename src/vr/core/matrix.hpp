@@ -53,6 +53,10 @@ namespace OutRunVR::Core
 
     inline bool Invert(const Matrix4& in, Matrix4& out) noexcept
     {
+        // P1: do not compute from nonfinite input or expose rejected inverses.
+        if (!MatrixFinite(in))
+            return false;
+
         float a[4][8]{};
         for (int r = 0; r < 4; ++r)
         {
@@ -94,10 +98,16 @@ namespace OutRunVR::Core
             }
         }
 
+        // Elimination can overflow even when the original elements are finite.
+        // Stage the inverse, validate it, then publish once on success.
+        Matrix4 candidate{};
         for (int r = 0; r < 4; ++r)
             for (int c = 0; c < 4; ++c)
-                out[r][c] = a[r][c + 4];
-        return MatrixFinite(out);
+                candidate[r][c] = a[r][c + 4];
+        if (!MatrixFinite(candidate))
+            return false;
+        out = candidate;
+        return true;
     }
 
     inline Matrix4 RigidTransform(const Quaternion& qIn, const Vector3& position,

@@ -115,5 +115,32 @@ int main()
         RumbleAmplitudeToWord((std::numeric_limits<float>::max)()) != 65535)
         return 18;
 
+    // P1: rejected inverses must not corrupt the previously valid eye matrix.
+    // Check the actual Release/NDEBUG behavior, not an assert-only contract.
+    Matrix4 retained = IdentityMatrix();
+    retained[3][0] = 1234.0f;
+    Matrix4 badInverseInput = IdentityMatrix();
+    badInverseInput[0][1] = (std::numeric_limits<float>::quiet_NaN)();
+    if (Invert(badInverseInput, retained) ||
+        !MatrixFinite(retained) || !Near(retained[3][0], 1234.0f))
+        return 19;
+
+    badInverseInput[0][1] = (std::numeric_limits<float>::infinity)();
+    if (Invert(badInverseInput, retained) ||
+        !MatrixFinite(retained) || !Near(retained[3][0], 1234.0f))
+        return 20;
+
+    badInverseInput = IdentityMatrix();
+    badInverseInput[2][2] = 0.0f;
+    if (Invert(badInverseInput, retained) ||
+        !MatrixFinite(retained) || !Near(retained[3][0], 1234.0f))
+        return 21;
+
+    // In-place inversion remains supported on the valid path.
+    Matrix4 inPlace = IdentityMatrix();
+    inPlace[3][0] = 3.0f;
+    if (!Invert(inPlace, inPlace) || !Near(inPlace[3][0], -3.0f))
+        return 22;
+
     return 0;
 }
