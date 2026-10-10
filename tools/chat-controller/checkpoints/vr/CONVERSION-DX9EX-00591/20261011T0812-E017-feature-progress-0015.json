@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_feature_progress",
+  "checkpoint_mode": "GITHUB_VERIFIED",
+  "captured_at_kst": "2026-10-11T08:12:41+09:00",
+  "task_id": "CONVERSION-DX9EX-00591",
+  "production_id": "CONVERSION-DX9EX-00591",
+  "event_id": "CONVERSION-DX9EX-00591-E017",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "chat_rollover": 15,
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
+  "feature_head_sha": "98bc7ad9140661ffd64b526d9a927871b589917d",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_head_at_last_check": "0887504dfe9e5689d4bf6ee849dbae9af7693f59",
+  "material_commit_message": "test(dx9ex): fail closed on R84 physical owner edges and check Windows policy parity [AUTO:CONVERSION-DX9EX-00591]",
+  "changed_files": [
+    "tools/verify_vr_refactor_contract.py",
+    ".github/workflows/vr-r84-feature-00591.yml"
+  ],
+  "known_success_feature_ci": {
+    "run_id": 38093120753,
+    "sha": "8bc35ef3842277774405eff12f8508d5b087f60d",
+    "conclusion": "success"
+  },
+  "previous_inflight_feature_ci": 38093344063,
+  "exact_feature_ci": {
+    "run_id": 38094167169,
+    "sha": "98bc7ad9140661ffd64b526d9a927871b589917d",
+    "status": "pending",
+    "conclusion": null
+  },
+  "earlier_target_active_ci": {
+    "run_id": 38092286273,
+    "sha": "0887504dfe9e5689d4bf6ee849dbae9af7693f59",
+    "conclusion": "failure",
+    "failed_job": "policy",
+    "reason": "pre-R84 refactor mutation suite false failures"
+  },
+  "incomplete_acceptance_for_new_sha": [
+    "R84-OWNERS",
+    "R84-ABI",
+    "R84-BUILD-GRAPH",
+    "R84-REGRESSION",
+    "R84-TEST-BUNDLE"
+  ],
+  "feature_stage": "FEATURE_READY_PENDING_NEW_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Check exact-SHA run 38094167169 all five acceptance jobs. On failure inspect job logs and amend FEATURE_BRANCH only; on success report FEATURE_READY with SHA and defer TARGET_BRANCH promotion to controller, then require DX9Ex Active Validation and Domain Isolation Guard at identical target SHA.",
+  "score": {
+    "ai": 2,
+    "prior_confirmed": 957,
+    "delta": 0,
+    "current": 957,
+    "reason": "TASK_ID already scored, rollover/CI repair no second increment"
+  }
+}
