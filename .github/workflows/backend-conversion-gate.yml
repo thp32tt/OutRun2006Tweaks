@@ -379,6 +379,12 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_indexed_single_eye_mrt_r212.py
 
+      # R218 one-shot indexed full-eye depth, raster and WARP proof.
+      - name: Verify R218 sealed indexed depth eye
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_indexed_sealed_eye_r218.py
+
       - name: Build R186 owned indexed Draw WARP probe
         if: github.ref_name == 'vr-dx11-native-r71'
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186

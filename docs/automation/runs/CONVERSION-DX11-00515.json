@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00515",
+  "production_id": "CONVERSION-DX11-00515",
+  "event_id": "CONVERSION-DX11-00515-E001",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "75947d8a85a781f5725cc0f13bb958fae69bccaf",
+  "original_dispatch_base_sha": "39bb93b54f8f2ab15a76bbd47ffc4d8e70b43da1",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00515",
+  "work_key": "DX11:R218:INDEXED_FULL_EYE_DEPTH_RESOURCE_RASTER",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R218",
+    "tools/dx11_indexed_draw_probe_r186.cpp:R218",
+    "tools/test_dx11_indexed_sealed_eye_r218.py",
+    ".github/workflows/backend-conversion-gate.yml:R218"
+  ],
+  "status": "WAITING_FOR_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "R218 opt-in exact indexed full-eye D32 resource/mip/raster ownership, GPU/WARP negative and restored pixel assertions; native game DrawIndexed remains dormant",
+  "pipeline": {
+    "C0_RECOVER": "PASS remote head, checkpoint, AGENTS, index, contract",
+    "C1_REVIEW": "PASS independent R218 WARP indexed composed-owner gap",
+    "C2_IMPLEMENT": "PASS C++ plus WARP negative and restoration, one-shot mutation checker",
+    "C3_VALIDATE": "Source-scoped static guard PASS once; exact-SHA Gate pending",
+    "C4_COMMIT": "One final material batch commit pending",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING exact-SHA CI"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_sealed_eye_r218.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00515.json"
+  ],
+  "evidence": {
+    "previous_00514_C6_sha": "75947d8a85a781f5725cc0f13bb958fae69bccaf",
+    "local_static_check": "PASS",
+    "known_inherited_r175_gate": "FAIL under independently owned work_key",
+    "hmd": "UNTESTED"
+  },
+  "next_action": "Verify exact SHA Backend Conversion Gate and R218 probe evidence; never equate scoped PASS with total Gate PASS."
+}

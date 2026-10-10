@@ -83,4 +83,68 @@ namespace outrun::vr::dx11 {
     }
     return true;
 }
+
+// R218: composed indexed full-eye D32 readiness: R187 seals full RTV/viewport,
+// R217 seals indexed IA/shader/depth/opaque OM; neither seals dedicated DSV
+// subresource nor exact raster ownership. No production DrawIndexed dispatch.
+[[nodiscard]] inline bool verified_indexed_sealed_opaque_eye_draw_ready(
+    const NativeLinearBufferMirror& vb, const NativeLinearBufferMirror& ib,
+    ID3D11DeviceContext* context, UINT firstIndex, UINT indexCount,
+    INT baseVertex, std::uint64_t generation, std::uint64_t vbVersion,
+    std::uint64_t ibVersion, UINT width, UINT height, DXGI_FORMAT format,
+    ID3D11InputLayout* expectedLayout,
+    ID3D11VertexShader* expectedVs, ID3D11PixelShader* expectedPs,
+    ID3D11RenderTargetView* expectedRtv,
+    ID3D11DepthStencilView* expectedDsv,
+    ID3D11DepthStencilState* expectedDepthState,
+    ID3D11RasterizerState* expectedRaster) noexcept {
+    if (!context || !expectedDsv || !expectedRaster ||
+        !verified_indexed_full_target_draw_ready(
+            vb, ib, context, firstIndex, indexCount, baseVertex,
+            generation, vbVersion, ibVersion, width, height, format,
+            expectedRtv, expectedDsv) ||
+        !verified_indexed_opaque_depth_single_eye_ready(
+            vb, ib, context, firstIndex, indexCount, baseVertex,
+            generation, vbVersion, ibVersion,
+            expectedLayout, expectedVs, expectedPs, expectedRtv,
+            expectedDsv, expectedDepthState))
+        return false;
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthView{};
+    expectedDsv->GetDesc(&depthView);
+    if (depthView.ViewDimension != D3D11_DSV_DIMENSION_TEXTURE2D ||
+        depthView.Texture2D.MipSlice != 0 ||
+        depthView.Format != DXGI_FORMAT_D32_FLOAT ||
+        depthView.Flags != 0) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> depthResource;
+    expectedDsv->GetResource(depthResource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTexture;
+    if (!depthResource || FAILED(depthResource.As(&depthTexture)) ||
+        !depthTexture) return false;
+    D3D11_TEXTURE2D_DESC depthDesc{};
+    depthTexture->GetDesc(&depthDesc);
+    if (depthDesc.Width != width || depthDesc.Height != height ||
+        depthDesc.MipLevels != 1 || depthDesc.ArraySize != 1 ||
+        depthDesc.SampleDesc.Count != 1 ||
+        depthDesc.SampleDesc.Quality != 0 ||
+        depthDesc.Format != DXGI_FORMAT_D32_FLOAT ||
+        depthDesc.Usage != D3D11_USAGE_DEFAULT ||
+        depthDesc.CPUAccessFlags != 0 ||
+        !(depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> liveRaster;
+    context->RSGetState(liveRaster.GetAddressOf());
+    if (liveRaster.Get() != expectedRaster) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> liveDevice, rasterDevice;
+    context->GetDevice(liveDevice.GetAddressOf());
+    expectedRaster->GetDevice(rasterDevice.GetAddressOf());
+    if (!liveDevice || liveDevice.Get() != rasterDevice.Get()) return false;
+    D3D11_RASTERIZER_DESC rasterDesc{};
+    expectedRaster->GetDesc(&rasterDesc);
+    return rasterDesc.FillMode == D3D11_FILL_SOLID &&
+        rasterDesc.CullMode == D3D11_CULL_NONE &&
+        !rasterDesc.ScissorEnable && rasterDesc.DepthClipEnable &&
+        rasterDesc.DepthBias == 0 && rasterDesc.DepthBiasClamp == 0.f &&
+        rasterDesc.SlopeScaledDepthBias == 0.f &&
+        !rasterDesc.MultisampleEnable && !rasterDesc.AntialiasedLineEnable;
+}
 } // namespace outrun::vr::dx11

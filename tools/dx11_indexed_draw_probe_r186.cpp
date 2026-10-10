@@ -1,6 +1,6 @@
 // R186: isolated WARP GPU DrawIndexed proves production-owned VB/IB +
 // pipeline readiness and actual framebuffer pixels. No gameplay activation.
-#include "vr/d3d11/native_indexed_draw_submit.hpp"
+#include "vr/d3d11/native_indexed_target_viewport.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <d3dcompiler.h>
@@ -280,6 +280,66 @@ int main() {
     context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.0f,0u);
     context->DrawIndexed(3u,0u,0);
     require(r217ReadCenter(true),"R217 restored WARP indexed green pixel");
+
+    // R218: old R217 permits a half viewport, alien raster, or a mip-one
+    // DSV whose 32x32 view aliases a larger resource.
+    const auto r217With = [&](ID3D11DepthStencilView* dsv) {
+        return outrun::vr::dx11::verified_indexed_opaque_depth_single_eye_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),dsv,r217State.Get());
+    };
+    const auto r218Ready = [&](ID3D11DepthStencilView* dsv) {
+        return outrun::vr::dx11::verified_indexed_sealed_opaque_eye_draw_ready(
+            vb,ib,context.Get(),0u,3u,0,generation,vbVersion,ibVersion,
+            32u,32u,DXGI_FORMAT_R8G8B8A8_UNORM,
+            layout.Get(),vs.Get(),ps.Get(),rtv.Get(),dsv,r217State.Get(),
+            rs.Get());
+    };
+    require(r218Ready(r217Dsv.Get()),"R218 initial exact indexed eye");
+    D3D11_VIEWPORT r218Cropped=vp;
+    r218Cropped.Width=16.f;
+    context->RSSetViewports(1,&r218Cropped);
+    require(r217Ready(),"R218 old guard accepts half viewport");
+    require(!r218Ready(r217Dsv.Get()),"R218 reject cropped viewport");
+    context->RSSetViewports(1,&vp);
+    require(r218Ready(r217Dsv.Get()),"R218 viewport restored");
+    D3D11_RASTERIZER_DESC r218AlienRasterDesc=raster;
+    r218AlienRasterDesc.CullMode=D3D11_CULL_BACK;
+    ComPtr<ID3D11RasterizerState> r218AlienRaster;
+    require(SUCCEEDED(device->CreateRasterizerState(&r218AlienRasterDesc,
+        r218AlienRaster.GetAddressOf())),"R218 create foreign raster");
+    context->RSSetState(r218AlienRaster.Get());
+    require(r217Ready(),"R218 old guard accepts foreign raster");
+    require(!r218Ready(r217Dsv.Get()),"R218 reject alien raster");
+    context->RSSetState(rs.Get());
+    require(r218Ready(r217Dsv.Get()),"R218 raster restored");
+
+    D3D11_TEXTURE2D_DESC r218MipDesc=r217DepthDesc;
+    r218MipDesc.Width=64u;
+    r218MipDesc.Height=64u;
+    r218MipDesc.MipLevels=2u;
+    ComPtr<ID3D11Texture2D> r218MipTexture;
+    ComPtr<ID3D11DepthStencilView> r218MipDsv;
+    D3D11_DEPTH_STENCIL_VIEW_DESC r218MipView{};
+    r218MipView.Format=DXGI_FORMAT_D32_FLOAT;
+    r218MipView.ViewDimension=D3D11_DSV_DIMENSION_TEXTURE2D;
+    r218MipView.Texture2D.MipSlice=1u;
+    require(SUCCEEDED(device->CreateTexture2D(&r218MipDesc,nullptr,
+        r218MipTexture.GetAddressOf())),"R218 create mip-aliased depth");
+    require(SUCCEEDED(device->CreateDepthStencilView(r218MipTexture.Get(),
+        &r218MipView,r218MipDsv.GetAddressOf())),"R218 create nonbase DSV");
+    context->OMSetRenderTargets(1,&rawTarget,r218MipDsv.Get());
+    require(r217With(r218MipDsv.Get()),
+        "R218 old guard accepts exact live mip-one DSV");
+    require(!r218Ready(r218MipDsv.Get()),"R218 reject mip-aliased DSV");
+    context->OMSetRenderTargets(1,&rawTarget,r217Dsv.Get());
+    require(r218Ready(r217Dsv.Get()),"R218 dedicated depth restored");
+    context->ClearRenderTargetView(rtv.Get(),r217Clear);
+    context->ClearDepthStencilView(r217Dsv.Get(),D3D11_CLEAR_DEPTH,1.f,0u);
+    require(r218Ready(r217Dsv.Get()),"R218 ready before restored WARP DrawIndexed");
+    context->DrawIndexed(3u,0u,0);
+    require(r217ReadCenter(true),"R218 restored WARP green indexed pixel");
+
     context->OMSetRenderTargets(1,&rawTarget,nullptr);
     context->OMSetDepthStencilState(nullptr,0u);
 
