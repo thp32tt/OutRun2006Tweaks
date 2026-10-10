@@ -134,6 +134,28 @@ int main() {
             layout.Get(),vs.Get(),expectedPs);
     };
     require(exactReady(ps.Get()), "R213 baseline exact indexed pipeline");
+    // An otherwise exact indexed eye cannot render opaque proof pixels with
+    // foreign OM blending or masked-out writes. R189 lacks this OM ownership.
+    D3D11_BLEND_DESC blendDesc{};
+    auto& rtBlend=blendDesc.RenderTarget[0];
+    rtBlend.BlendEnable=TRUE;
+    rtBlend.SrcBlend=D3D11_BLEND_ZERO;
+    rtBlend.DestBlend=D3D11_BLEND_ONE;
+    rtBlend.BlendOp=D3D11_BLEND_OP_ADD;
+    rtBlend.SrcBlendAlpha=D3D11_BLEND_ZERO;
+    rtBlend.DestBlendAlpha=D3D11_BLEND_ONE;
+    rtBlend.BlendOpAlpha=D3D11_BLEND_OP_ADD;
+    rtBlend.RenderTargetWriteMask=D3D11_COLOR_WRITE_ENABLE_ALL;
+    ComPtr<ID3D11BlendState> foreignBlend;
+    require(SUCCEEDED(dev->CreateBlendState(&blendDesc,
+        foreignBlend.GetAddressOf())), "R213 foreign blend create");
+    ctx->OMSetBlendState(foreignBlend.Get(),nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(ready(), "R213 legacy depth guard ignores foreign blend");
+    require(!exactReady(ps.Get()), "R213 rejects foreign OM blend");
+    ctx->OMSetBlendState(nullptr,nullptr,0);
+    require(!exactReady(ps.Get()), "R213 rejects zero sample mask");
+    ctx->OMSetBlendState(nullptr,nullptr,D3D11_DEFAULT_SAMPLE_MASK);
+    require(exactReady(ps.Get()), "R213 restores opaque blend sample mask");
     ctx->PSSetShader(redPs.Get(),nullptr,0);
     require(ready(), "R213 R189 accepts a foreign same-device PS");
     require(!exactReady(ps.Get()), "R213 rejects same-device PS drift");

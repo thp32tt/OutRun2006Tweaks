@@ -94,6 +94,13 @@ namespace outrun::vr::dx11 {
     ID3D11PixelShader* expectedPs) noexcept {
     if (!context || !expectedLayout || !expectedVs || !expectedPs ||
         !expectedRtv || !expectedDsv || !expectedDepthState) return false;
+    // R213 retry: an exact shader/depth match is not enough if an inherited
+    // blend state or zero sample mask can suppress/change the actual pixels.
+    // This strict opaque readiness path intentionally rejects custom blending.
+    Microsoft::WRL::ComPtr<ID3D11BlendState> boundBlend;
+    UINT sampleMask = 0;
+    context->OMGetBlendState(boundBlend.GetAddressOf(), nullptr, &sampleMask);
+    if (boundBlend || sampleMask != D3D11_DEFAULT_SAMPLE_MASK) return false;
     return verified_indexed_depth_draw_ready(
         vb, ib, context, startIndex, indexCount, baseVertex, generation,
         vbVersion, ibVersion, targetWidth, targetHeight, targetFormat,
