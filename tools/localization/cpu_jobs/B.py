@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""B361 P1 q212 r43: source-sized Korean heavyweight character-outline pilot.
+"""B362 P1 q212 r43: source-sized Korean lighter outline counter-preserving FINAL pilot.
 Do not repeat B358 untouched Noto Bold whole-word weak 284/395 typography:
-draw individually positioned glyph outlines with native 2px native stroke,
-original orange face, source-limited 10px native tracking, and clean-before-ink.
+draw individually positioned glyph outlines with native 1px stroke,
+original orange face, source-limited 10px native tracking, and clean-before-ink.\nB361 first saved native 2px counter-collapse visual FAIL is immutable and\nexcluded from official promotion; this is the final same-family correction.
 Only r43 changed; r44 and other 10 atlas cells remain exact official bytes.
 This is a scoped unapproved trial, never independent C/C3/game PASS.
 """
@@ -14,7 +14,7 @@ from fontTools.ttLib import TTCollection
 assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
 ROOT=Path("localization/graphics")
 ASSET=ROOT/"hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
-OUT=ROOT/"role_B/20261011-B361-Q212-R43-SOURCE-OUTLINE-PILOT";OUT.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/"role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS";OUT.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
 SOURCE_SHA="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 OFFICIAL_SHA="e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea"
@@ -84,7 +84,7 @@ for reg in regions:
  # One source-sized manual letter-layout method, not whole-word width stretch.
  # First determine a legitimate source-limited native point size; stroke
  # outlines at the final 2048 native atlas scale without bitmap resizing.
- stroke_px=2
+ stroke_px=1
  tracking_px=10
  trial_geom=[]
  for font_size in range(43,37,-1):
@@ -106,7 +106,7 @@ for reg in regions:
    d.text((round(pen),baseline),ch,font=font,fill=255,
           stroke_width=stroke_px,stroke_fill=255)
   pen += float(d.textlength(ch,font=font))+tracking_px
- assert natural_w>reg["source_opaque_width"]*.82,("SOURCE_HIERARCHY_UNDERFILL",natural_w)
+ assert natural_w>reg["source_opaque_width"]*.84,("SOURCE_HIERARCHY_UNDERFILL",natural_w)
  a=np.array(img)
  ys,xs=np.nonzero(a>16);assert len(xs)>150
  nb=[l+int(xs.min()),t+int(ys.min()),l+int(xs.max()+1),t+int(ys.max()+1)]
@@ -148,7 +148,7 @@ dds=raw[:128]+np.flipud(result)[:,:,order].copy().tobytes()
 assert len(dds)==len(raw) and sha(dds)!=OFFICIAL_SHA
 D=decode(dds)
 assert np.array_equal(D,result),("DDS_ROUNDTRIP_FAIL")
-(OUT/"B361_Q212_R43_SOURCE_OUTLINE_UNAPPROVED.dds").write_bytes(dds)
+(OUT/"B362_Q212_R43_SOURCE_OUTLINE_UNAPPROVED.dds").write_bytes(dds)
 def compose(a,roi,bg,rawview=False):
  l,t,r,b=roi
  if rawview:a=np.flipud(a);t,b=2048-b,2048-t
@@ -166,20 +166,21 @@ for r in regions:
     sheet=Image.new("RGB",(width,max(im.height for im in ims)),bg)
     off=0
     for im in ims:sheet.paste(im,(off,0));off+=im.width+8
-    fn=f"B361_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
+    fn=f"B362_{r['id']}_SOURCE_CLEAN_OFFICIAL_TRIAL_{orient}_{bg_name}_{pct}.png"
     sheet.save(OUT/fn,optimize=True);evidence.append(fn)
  l,t,x,b=r["atlas_roi"]
- Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B361_{r['id']}_PLATE_ONLY.png")
- Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B361_{r['id']}_LETTERING_ONLY.png")
-qa={"schema_version":2,"role":"B","run":"B361","queue_index":212,
- "run_key":"OUTRUN-KOR-B361-Q212-R43-NATIVE-STROKED-OUTLINE-20261011-0330",
+ Image.fromarray(C[t:b,l:x],"RGBA").save(OUT/f"B362_{r['id']}_PLATE_ONLY.png")
+ Image.fromarray(D[t:b,l:x],"RGBA").save(OUT/f"B362_{r['id']}_LETTERING_ONLY.png")
+qa={"schema_version":2,"role":"B","run":"B362","queue_index":212,
+ "run_key":"OUTRUN-KOR-B362-Q212-R43-OPEN-COUNTERS-SECOND-20261011-0340",
  "priority":"P1_IGR029_SHARED_MODE_ATLAS","triage":tri["next_action"],
- "method":"P2 material change after B358 C2 underweight/width FAIL: each Korean syllable hand-positioned from native TrueType contours, 2px native opaque stroke, explicit 10px character tracking and source English orange extracted palette on previously independently C2-cleared zero-alpha r43 scope. Only r43 revised; other 11 atlas cells from official exactly unchanged. No whole-word scaling, no old Korean resampling or invented pass.",
+ "method":"B362 second/final source-bounded individual-syllable native glyph layout: preserve orange SOURCE core and spacing, decrease B361 stroke 2px to 1px while increasing native glyph point size within 45px source bound to reopen Korean counters. Exact source-zero-alpha CLEAN used, r44 and other 10 atlas cells protected. Previously B361 visual counter-collapse rejected; no arbitrary bitmap scaling. Independent C2/C3/USER game untested.",
  "canonical_source_sha256":SOURCE_SHA,"full_C158_clean_reference_sha256":C158_CLEAN_SHA,
  "source_clean_stage":"P1_REUSE_B358_EXACT_SOURCE-TRANSPARENT_SCOPED_R43_PERSISTED_BASE",
  "current_official_sha256":OFFICIAL_SHA,"new_unapproved_trial_sha256":sha(dds),
- "C2_B358_defect":"R43_PROFESSIONAL_NATIVE_UNDERWEIGHT_UNDERFILL_284_OF_395",
- "fix_stage":"P2_SOURCE_BOUNDED_NATIVE_STROKED_SYLLABLE_VECTOR_OUTLINES",
+ "B361_rejected_trial_sha256":"c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+ "B361_root_cause":"HEAVY_2PX_STROKE_CAUSED_KOREAN_COUNTER_COLLAPSE_AT_PRACTICAL_50PCT",
+ "fix_stage":"P2_NATIVELY_REOPEN_GLYPH_COUNTERS_WITH_1PX_OUTLINE",
  "new_saved_trial_DDS":1,"official_promoted_DDS":0,
  "native_size":[2048,2048],"dds_format":"RGBA32","mips":1,"raw_orientation":"MIRROR_Y",
  "font_file":str(fontpath),"font_sha256":font_sha,"font_index":fontindex,
@@ -191,6 +192,6 @@ qa={"schema_version":2,"role":"B","run":"B361","queue_index":212,
  "evidence_previews":evidence,"producer_visual":"HOLD_CONTROLLER_ACTUAL_SOURCE_FAMILY_AND_50PCT_REVIEW",
  "independent_C2":"NOT_RUN","C3":"BLOCKED",
  "IGR029":"OPEN_USER_INGAME_FAIL","RUNTIME_VALIDATION":"UNTESTED"}
-(OUT/"B361_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
-(OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 11 current atlas cells exact","method":"materially changed native per-glyph manually spaced outlines+2px stroke on source-proven zero-alpha CLEAN r43; no bitmap stretch, no B358 whole-word weak typography","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B361","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
+(OUT/"B362_MACHINE.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"recipe.json").write_text(json.dumps({"source":{"uri":url,"sha256":SOURCE_SHA,"revision":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"},"full_clean_reference":C158_CLEAN_SHA,"old_official":OFFICIAL_SHA,"font":{"path":str(fontpath),"sha256":font_sha,"index":fontindex},"regions":rec,"protected":"other 11 current atlas cells exact","method":"second/final native per-glyph positioned outlines+1px stroke after B361 2px counter visual FAIL, source-proven zero-alpha r43; no lowres resampling/whole-word scaling","C2_and_runtime_required":True},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":"B362","sha256":sha(dds),"regions":rec,"changed":int(change.sum()),"outside":0},ensure_ascii=False),flush=True)
