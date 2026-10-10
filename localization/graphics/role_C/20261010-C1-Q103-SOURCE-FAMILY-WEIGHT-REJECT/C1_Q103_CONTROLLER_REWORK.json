@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run_key": "OUTRUN-KOR-C1-Q103-A197-FAMILY-WEIGHT-REJECT-20261010-1110",
+  "role": "C",
+  "lane": "C1",
+  "shard": "ODD",
+  "queue_index": 103,
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "decision": "REWORK_REQUIRED",
+  "failure_code": "SOURCE_FAMILY_STROKE_OVERWEIGHT",
+  "new_dds": 0,
+  "candidate_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+  "candidate_verification": "2026-10-10 exact branch raw DDS downloaded and SHA-256 verified independently through N100 github_download; 16777344 bytes",
+  "canonical_source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "pinned_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+  },
+  "previous_review": "C312 HOLD_STRICT_RECHECK; suspected (not confirmed) family weight mismatch; now independently inspected rendered exact source/current native and 50% images and confirmed material visual failure",
+  "source_bbox_effect_readable": [
+    1411,
+    1968,
+    1801,
+    2040
+  ],
+  "candidate_bbox_readable": [
+    1431,
+    1972,
+    1780,
+    2036
+  ],
+  "source_effect_size": [
+    390,
+    72
+  ],
+  "candidate_size": [
+    349,
+    64
+  ],
+  "margins": [
+    20,
+    21,
+    4,
+    4
+  ],
+  "prior_machine_evidence": {
+    "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_INDEPENDENT_MACHINE_AND_EVIDENCE.json",
+    "source_to_clean_changed_outside": 0,
+    "clean_to_final_changed_outside": 0,
+    "source_to_final_changed_outside": 0,
+    "alpha_outside": 0,
+    "counts_provenance": "C312 machine report, not recomputed or certified as whole-atlas PASS this run"
+  },
+  "visual_firsthand": {
+    "english_source_style": "Original Normal Balance is comparatively slender, condensed olive-gray right-italic lettering with open counters and narrower strokes inside the beveled yellow selection plate.",
+    "korean_current_style": "Current 일반 밸런스 fills much of the plate with visibly heavy broad block-like Hangul strokes and denser counters; its weight and font-family impression are materially stronger/more angular than the original at native and practical 50%.",
+    "reason": "Confirmed source-family font weight/shape mismatch in direct exact-image comparison. Producer or old C312 numerical containment PASS/HOLD cannot override visual mismatch.",
+    "right_italic": "Overall legibility/lean direction appears rightward in matched readable orientation; exact per-glyph anchors not established, not a slant PASS.",
+    "clean_plate": "Clean plate appears flat in cited native sample without evident English shadows, but calibrated plate-only/whole-atlas validation is not certified.",
+    "protected_art": "Yellow plate border remains visually intact in cited native/RAW images; no 1-pixel full-atlas protected mask revalidation in this run.",
+    "glyph_integrity": "No obvious fractured syllable in inspected native or 50% crops; this does not rescue style failure.",
+    "orientation": "Readable source/final and persisted RAW vertically mirrored as expected in existing source-bound native lossless crops.",
+    "runtime": "UNTESTED"
+  },
+  "evidence_images": {
+    "native_source": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SOURCE_ONLY_NATIVE.png",
+      "sha256": "7f2a76f1308b7b9d243354b4e4c7164eacffb3a8b0399cb39dae550f684c0c9f"
+    },
+    "native_clean": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CLEAN_ONLY_NATIVE.png",
+      "sha256": "6b72408572c9a37e831a741661a01b025d04c19535604269ae9e59f9ed0fab23"
+    },
+    "native_current": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CURRENT_ONLY_NATIVE.png",
+      "sha256": "0e8ae317f6a0f96a590668109378c5aeaea2f59c6689e648daf55b421fcb7dea"
+    },
+    "gray100": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_GRAY_100.png",
+      "sha256": "0545d2bc2729b26b73cf60a5a8fda44c670ad6a59235b25bec3ff7582ee5422f"
+    },
+    "gray50": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_SC_PAST_FINAL_GRAY_50.png",
+      "sha256": "e2068de6be403bfb2d6e8e2209a08e6021e6b4c64a3c71dadc08aa265a30e77c"
+    },
+    "raw": {
+      "path": "localization/graphics/role_C/20261009-C312-C1-Q103-A197-INDEPENDENT-NATIVE/C312_Q103_CURRENT_RAW_LOSSLESS.png",
+      "sha256": "98ee04b2feb3187030a36f308bdb735ccca623baa87551ed203a0d08ea42f337"
+    }
+  },
+  "calibration": {
+    "blind_known_defect_calibration": "NOT_PERFORMED; reviewer had already seen C312 notes; no false blind claim",
+    "full_family_reference": "REQUIRED_AFTER_REWORK",
+    "per_glyph_slant_anchors": "PENDING"
+  },
+  "required_rework": "Reconstruct native-resolution glyphs with source-derived lighter/condensed right-italic contours and open counters, while retaining yellow plate/bevel, exact English source, CLEAN continuity, source bbox ceiling, RAW mirror-y, positive pixel margins. Full independent source/CLEAN/FINAL and C1/C3 after new SHA; do not simply shrink the bold current face to satisfy bbox.",
+  "C_PASS": false,
+  "C3_STRICT_PASS": false,
+  "approval": false,
+  "user_ingame_fail_closed": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "C2 even queue indexes",
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK",
+    "separate controller TASK_ID/queue engine"
+  ],
+  "backend": "GitHub connector source/evidence + independently SHA-verified GitHub RAW persisted DDS via N100 fallback; direct ChatGPT visual review; no game execution"
+}
