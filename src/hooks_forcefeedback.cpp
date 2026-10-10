@@ -4,6 +4,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/input/rumble_amplitude.hpp"
 
 #include "Xinput.h"
 
@@ -80,8 +81,8 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     }
 
     XINPUT_VIBRATION vib{ 0 };
-    vib.wLeftMotorSpeed = uint16_t(std::clamp(int(leftMotor * 65535.f), 0, 0xFFFF));
-    vib.wRightMotorSpeed = uint16_t(std::clamp(int(rightMotor * 65535.f), 0, 0xFFFF));
+    vib.wLeftMotorSpeed = OutRunVR::Input::RumbleAmplitudeToWord(leftMotor);
+    vib.wRightMotorSpeed = OutRunVR::Input::RumbleAmplitudeToWord(rightMotor);
 
     void InputManager_SetVibration(WORD, WORD);
     InputManager_SetVibration(vib.wLeftMotorSpeed, vib.wRightMotorSpeed);

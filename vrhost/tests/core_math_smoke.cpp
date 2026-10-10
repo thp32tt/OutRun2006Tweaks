@@ -1,4 +1,5 @@
 #include "vr/core/matrix.hpp"
+#include "vr/input/rumble_amplitude.hpp"
 
 #include <cmath>
 #include <limits>
@@ -94,6 +95,25 @@ int main()
         Near(projection[2][0], 0.0f) ||
         Near(projection[2][1], 0.0f))
         return 16;
+
+    // FFB v0.2 VR integration: corrupt/overscaled legacy rumble must never
+    // perform an undefined float-to-int conversion or poison motor output.
+    using OutRunVR::Input::RumbleAmplitudeToWord;
+    if (RumbleAmplitudeToWord(0.0f) != 0 ||
+        RumbleAmplitudeToWord(-0.5f) != 0 ||
+        RumbleAmplitudeToWord(0.5f) != 32767 ||
+        RumbleAmplitudeToWord(1.0f) != 65535 ||
+        RumbleAmplitudeToWord(1.5f) != 65535)
+        return 17;
+
+    const float nan = (std::numeric_limits<float>::quiet_NaN)();
+    const float posInf = (std::numeric_limits<float>::infinity)();
+    const float negInf = -posInf;
+    if (RumbleAmplitudeToWord(nan) != 0 ||
+        RumbleAmplitudeToWord(posInf) != 0 ||
+        RumbleAmplitudeToWord(negInf) != 0 ||
+        RumbleAmplitudeToWord((std::numeric_limits<float>::max)()) != 65535)
+        return 18;
 
     return 0;
 }
