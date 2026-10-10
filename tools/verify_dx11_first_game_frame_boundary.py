@@ -11,6 +11,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src/vr/d3d11/live_game_frame_bridge.cpp"
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+ACTIVE_R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 HEADER = ROOT / "src/vr/d3d11/live_game_frame_bridge.hpp"
 NATIVE = ROOT / "src/vr/d3d11/native_backend.hpp"
 
@@ -84,12 +85,22 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "game Present must retain the D3D9 path")
 
 def main() -> None:
-    require(DX11.is_file() and R30.is_file() and HEADER.is_file(),
-            "diagnostic source files absent")
-    validate(DX11.read_text(encoding="utf-8"),
-             R30.read_text(encoding="utf-8"),
-             HEADER.read_text(encoding="utf-8"),
-             NATIVE.read_text(encoding="utf-8"))
+    require(DX11.is_file() and R30.is_file() and ACTIVE_R30.is_file()
+            and HEADER.is_file(), "diagnostic source files absent")
+    code = DX11.read_text(encoding="utf-8")
+    header = HEADER.read_text(encoding="utf-8")
+    native = NATIVE.read_text(encoding="utf-8")
+    # Both compile variants must preserve the same source/return ownership.
+    validate(code, R30.read_text(encoding="utf-8"), header, native)
+    active = ACTIVE_R30.read_text(encoding="utf-8")
+    validate(code, active, header, native)
+    require("if (IsGameDevice(device) && !InternalStereoPass)" in active,
+            "default R26+HUD game callsite must exclude synthetic eye replay")
+    require("OUTRUN_VR_R26_HUD_COMPARE" in
+            (ROOT / "CMakeLists.txt").read_text(encoding="utf-8") and
+            "stereo_renderer_r30_r26_safe.cpp" in
+            (ROOT / "CMakeLists.txt").read_text(encoding="utf-8"),
+            "default game DLL must compile the audited R26+HUD owner")
     print("DX11 controlled live game draw diagnostic admission: PASS (static only)")
 
 if __name__ == "__main__":
