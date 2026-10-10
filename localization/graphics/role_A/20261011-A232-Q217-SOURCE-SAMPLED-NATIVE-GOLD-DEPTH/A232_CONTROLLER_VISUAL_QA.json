@@ -1,0 +1,38 @@
+{
+  "run": "A232",
+  "run_key": "OUTRUN-KOR-A232-Q217-SOURCE-SAMPLED-GOLD-DEPTH-NEW-FAMILY-20261011-0505",
+  "role": "A",
+  "index": 217,
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "previous_trial_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "new_trial_sha256": "3a9739b923625526e53ba32634459a85d12d208e6a9625ae4b01891d94ed0a53",
+  "new_scoped_changed_pixels": 1629,
+  "source_protected_changes": 0,
+  "alpha_changes": 0,
+  "persisted_decode": "EXACT_PASS",
+  "firsthand_files": [
+    "A232_start_GRAY_100.png",
+    "A232_goal_GRAY_100.png",
+    "A232_start_BLACK_50.png",
+    "A232_goal_WHITE_75.png",
+    "A232_start_RAW.png"
+  ],
+  "observations": {
+    "source_plate": "Reuses exact A231 English-source reconstructed red badge CLEAN; outside both original text bboxes exact source",
+    "font_glyph": "New Noto CJK glyphs look busy jagged/striped, intersections visually crowded at native 100 and at practical 50; style not accepted",
+    "source_family": "Original is broad solid-cream-gold face with warm red/orange 3D rim; new look lacks comparable coherent extrusion/typography",
+    "orientation": "Initial inverse x-shear transform yields visually unsuitable relative right-lean/centering: not calibrated",
+    "protected_art": "425 red border pixels remain source-exact"
+  },
+  "verdict": "PRODUCER_REWORK_REQUIRED_UNPROMOTED",
+  "reason_codes": [
+    "GLYPH_STROKE_VISUAL_OVERDRAW",
+    "SOURCE_3D_MATERIAL_MISMATCH",
+    "READABLE_SHEAR_INVERSE_GEOMETRY_NEEDS_REPAIR"
+  ],
+  "official_DDS_changed": false,
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "One bounded corrected render attempt (A233) with inverse shear fixed and original English warm bevel palette/shorter extrusion; fail closed if not visually improved; no flat-font repeated iteration."
+}
