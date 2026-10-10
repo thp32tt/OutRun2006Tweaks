@@ -1,0 +1,33 @@
+{
+  "run": "A234",
+  "run_key": "OUTRUN-KOR-A234-Q121-RANK20-SOURCE-DERIVED-PLATE-NATIVE-ITALIC-20261011-0600",
+  "review": "A234 first persisted saved DDS producer optical rejection",
+  "index": 121,
+  "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "rejected_trial_sha256": "dd1cb811cf449f108913906cd2ef47d2c46fabe1bd1cafb0f5c611fe2ca7de29",
+  "source_bbox_readable": [
+    3490,
+    391,
+    3722,
+    440
+  ],
+  "source_plate": "Source-derived modal RGB with transparent background, independently visualized; source residue visibly removed in CLEAN",
+  "visual_evidence": [
+    "A234_COMPARE_GRAY_100.png",
+    "A234_COMPARE_BLACK_50.png",
+    "A234_PERSISTED_FINAL_NATIVE_RGBA.png",
+    "A234_PERSISTED_FINAL_RAW.png",
+    "A234_GLYPH_ONLY_TRANSPARENT_RGBA.png"
+  ],
+  "actual_observation": "Persisted saved DDS preview RAW shows RGB lettering over transparent sprite, while gray 100% and black 50% alpha-composite panels show empty destination. New glyph RGB was populated but alpha remained zero from background. Actual game would not display this glyph. This hard failure takes precedence over saved-roundtrip and outside-change numeric success.",
+  "failure_code": "TRANSPARENT_LETTERING_ALPHA_ZERO",
+  "producer_result": "REWORK_REQUIRED_UNPROMOTED",
+  "first_failed_stage": "P2_TRANSPARENT_GLYPH_ALPHA_COMPOSITING",
+  "scope": "q121 rank20 Gas Pedal only; 29 other atlas source regions unchanged",
+  "official_candidate_unchanged": true,
+  "independent_C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "correction": "A234R compute changes real sprite alpha with straight-alpha SRC_OVER per transparent face, outline and shadow, source-footprint optical width refit before one final raster. Trial should be separately viewed before approval.",
+  "new_score_event": false
+}
