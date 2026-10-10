@@ -9,7 +9,7 @@ guards = (
     "verified_indexed_uav_isolated_eye_ready(",
     "!context || !expectedRtv || !expectedDsv",
     "!verified_indexed_sealed_opaque_eye_draw_ready(",
-    "ID3D11_PS_CS_UAV_REGISTER_COUNT",
+    "ID3D11UnorderedAccessView* liveUavs[D3D11_PS_CS_UAV_REGISTER_COUNT]{};",
     "OMGetRenderTargetsAndUnorderedAccessViews(",
     "liveRtv[0] == expectedRtv && liveDsv == expectedDsv",
     "if (liveRtv[0]) liveRtv[0]->Release()",
